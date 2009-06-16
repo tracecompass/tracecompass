@@ -4,7 +4,7 @@ Bundle-Name: TMF
 Bundle-SymbolicName: org.eclipse.linuxtools.tmf
 Bundle-Version: 1.0.0
 Bundle-Activator: org.eclipse.linuxtools.tmf.Activator
-Bundle-Vendor: Ericsson
+Bundle-Vendor: Eclipse
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.junit4
