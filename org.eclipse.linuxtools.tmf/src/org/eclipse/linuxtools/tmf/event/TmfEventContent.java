@@ -7,11 +7,10 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Francois Chouinard - Initial API and implementation
+ *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.event;
-
 
 /**
  * <b><u>TmfEventContent</u></b>
@@ -20,150 +19,74 @@ package org.eclipse.linuxtools.tmf.event;
  */
 public class TmfEventContent {
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
     // Attributes
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
-	protected TmfEvent fParentEvent;
-	protected Object   fRawContent;
-	protected Object[] fFields;
+	private final TmfEventFormat fFormat;
+	private final String fContent;
+	private final int fNbFields;
+	private       TmfEventField[] fFields = null;
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
     // Constructors
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
 	/**
-	 * @param parent the parent event (owner)
-	 * @param content the raw content
+	 * @param content
+	 * @param format
 	 */
-	public TmfEventContent(TmfEvent parent, Object content) {
-		fParentEvent = parent;
-		fRawContent  = content;
+	public TmfEventContent(Object content, TmfEventFormat format) {
+		fFormat = format;
+		fContent = content.toString();
+		fNbFields = fFormat.getLabels().length;
+	}
+
+    // ========================================================================
+    // Accessors
+    // ========================================================================
+
+	/**
+	 * @return
+	 */
+	public String getContent() {
+		return fContent;
+	}
+
+	/**
+	 * @return
+	 */
+	public TmfEventFormat getFormat() {
+		return fFormat;
 	}
 
     /**
-     * @param other the original event content
+     * @return
      */
-    public TmfEventContent(TmfEventContent other) {
-    	if (other == null)
-    		throw new IllegalArgumentException();
-    	fParentEvent = other.fParentEvent;
-		fRawContent  = other.fRawContent;
-		fFields      = other.fFields;
+    public int getNbFields() {
+        return fNbFields;
     }
 
-    @SuppressWarnings("unused")
-	private TmfEventContent() {
-		throw new AssertionError();
-    }
-
-    // ------------------------------------------------------------------------
-    // Accessors
-    // ------------------------------------------------------------------------
-
 	/**
-	 * @return the parent (containing) event
+	 * @return
 	 */
-	public TmfEvent getEvent() {
-		return fParentEvent;
-	}
-
-	/**
-	 * @return the event type
-	 */
-	public TmfEventType getType() {
-		return fParentEvent.getType();
-	}
-
-	/**
-	 * @return the raw content
-	 */
-	public Object getContent() {
-		return fRawContent;
-	}
-
-	/**
-	 * Returns the list of fields in the same order as TmfEventType.getLabels()
-	 * 
-	 * @return the ordered set of fields (optional fields might be null)
-	 */
-	public Object[] getFields() {
-		if (fFields == null) {
-			parseContent();
-		}
+	public TmfEventField[] getFields() {
+	    if (fFields == null) {
+	        fFields = fFormat.parse(fContent);
+	    }
 		return fFields;
 	}
 
 	/**
-	 * @param id the field id
-	 * @return the corresponding field
-	 * @throws TmfNoSuchFieldException
+	 * @param id
+	 * @return
 	 */
-	public Object getField(String id) throws TmfNoSuchFieldException {
-		if (fFields == null) {
-			parseContent();
-		}
-		return fFields[getType().getFieldIndex(id)];
+	public TmfEventField getField(int id) {
+        assert id >= 0 && id < fNbFields;
+        if (fFields == null) {
+            fFields = fFormat.parse(fContent);
+        }
+		return fFields[id];
 	}
-
-	/**
-	 * @param n the field index as per TmfEventType.getLabels()
-	 * @return the corresponding field (null if non-existing)
-	 */
-	public Object getField(int n) {
-		if (fFields == null) {
-			parseContent();
-		}
-		if (n >= 0 && n < fFields.length)
-			return fFields[n];
-
-		return null;
-	}
-
-    // ------------------------------------------------------------------------
-    // Operators
-    // ------------------------------------------------------------------------
-
-	/**
-	 * Parse the content into fields. By default, a single field (the raw
-	 * content) is returned. 
-	 * Should be overridden.
-	 */
-	protected void parseContent() {
-		fFields = new Object[1];
-		fFields[0] = fRawContent;
-	}
-	
-    // ------------------------------------------------------------------------
-    // Object
-    // ------------------------------------------------------------------------
-
-	@Override
-    public int hashCode() {
-		int result = 17;
-		result = 37 * result + ((fParentEvent != null) ? fParentEvent.hashCode() : 0);
-		result = 37 * result + ((fRawContent  != null) ? fRawContent.hashCode()  : 0);
-        return result;
-    }
-
-	@Override
-    public boolean equals(Object other) {
-		if (!(other instanceof TmfEventContent))
-			return false;
-		TmfEventContent o = (TmfEventContent) other;
-        return fRawContent.equals(o.fRawContent);
-    }
-
-    @Override
-	public String toString() {
-    	Object[] fields = getFields();
-    	StringBuilder result = new StringBuilder("[TmfEventContent(");
-    	for (int i = 0; i < fields.length; i++) {
-    		if (i > 0) result.append(",");
-    		result.append(fields[i]);
-    	}
-    	result.append(")]");
-    	return result.toString();
-    }
 
 }

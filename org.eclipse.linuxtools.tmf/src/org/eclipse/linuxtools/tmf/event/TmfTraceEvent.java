@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Francois Chouinard - Initial API and implementation
+ *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.event;
@@ -21,74 +21,43 @@ package org.eclipse.linuxtools.tmf.event;
  * <p>
  * TODO: Concept is still a bit vague and should be aligned with the CDT
  * source lookup service.
- * TODO: Consider composition instead of extension
  */
 public class TmfTraceEvent extends TmfEvent {
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
     // Attributes
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
     private final String fSourcePath;
     private final String fFileName;
-    private final int    fLineNumber;
+    private final int fLineNumber;
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
     // Constructors
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
 	/**
-	 * @param originalTS
-	 * @param effectiveTS
-	 * @param source
-	 * @param type
-	 * @param content
-	 * @param reference
-	 * @param path
-	 * @param file
-	 * @param line
-	 */
-	public TmfTraceEvent(TmfTimestamp originalTS, TmfTimestamp effectiveTS, TmfEventSource source,
-			TmfEventType type, TmfEventReference reference,	String path, String file, int line)
-	{
-		super(originalTS, effectiveTS, source, type, reference);
-		fSourcePath = path;
-		fFileName   = file;
-		fLineNumber = line;
-	}
-
-	/**
+	 * The constructor.
+	 * 
 	 * @param timestamp
 	 * @param source
 	 * @param type
 	 * @param content
 	 * @param reference
-	 * @param path
-	 * @param file
-	 * @param line
 	 */
 	public TmfTraceEvent(TmfTimestamp timestamp, TmfEventSource source, TmfEventType type,
-			TmfEventReference reference, String path, String file, int line)
+			TmfEventContent content, TmfEventReference reference,
+			String path, String file, int line)
 	{
-		super(timestamp, source, type, reference);
+		super(timestamp, source, type,content, reference);
 		fSourcePath = path;
-		fFileName   = file;
+		fFileName = file;
 		fLineNumber = line;
 	}
 
-	/**
-	 * @param other
-	 */
-	public TmfTraceEvent(TmfTraceEvent other) {
-		super(other);
-		fSourcePath = other.fSourcePath;
-		fFileName   = other.fFileName;
-		fLineNumber = other.fLineNumber;
-	}
-
-    // ------------------------------------------------------------------------
+    // ========================================================================
     // Accessors
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
     /**
      * @return
@@ -109,39 +78,6 @@ public class TmfTraceEvent extends TmfEvent {
      */
     public int getLineNumber() {
         return fLineNumber;
-    }
-
-    // ------------------------------------------------------------------------
-    // Object
-    // ------------------------------------------------------------------------
-
-    @Override
-    public int hashCode() {
-		int result = super.hashCode();
-		result = 37 * result + ((fSourcePath != null) ? fSourcePath.hashCode() : 0);
-		result = 37 * result + ((fFileName   != null) ? fFileName.hashCode()   : 0);
-		result = 37 * result + fLineNumber;
-        return result;
-    }
-
-    @Override
-	public boolean equals(Object other) {
-    	if (other instanceof TmfEvent) {
-    		return super.equals(other); 
-    	}
-    	if (!(other instanceof TmfTraceEvent)) {
-    		return false; 
-    	}
-		TmfTraceEvent o = (TmfTraceEvent) other;
-        return super.equals((TmfEvent) o) && fSourcePath.equals(o.fSourcePath) &&
-        		fFileName.equals(o.fFileName) && fLineNumber == o.fLineNumber;
-
-    }
-
-    // TODO: Proper format
-    @Override
-    public String toString() {
-		return "[TmfTraceEvent(" + fSourcePath + "," + fFileName + "," + fLineNumber + ")]";
     }
 
 }

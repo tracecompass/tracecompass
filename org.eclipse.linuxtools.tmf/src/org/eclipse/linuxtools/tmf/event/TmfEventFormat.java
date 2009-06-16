@@ -13,48 +13,59 @@
 package org.eclipse.linuxtools.tmf.event;
 
 /**
- * <b><u>TmfEventField</u></b>
+ * <b><u>TmfEventFormat</u></b>
  * <p>
- * A basic event field.
+ * The basic event content format.
  */
-public class TmfEventField {
+public class TmfEventFormat implements ITmfContentParser {
 
     // ========================================================================
     // Attributes
     // ========================================================================
 
-    private final Object fValue;
+	private final String[] fLabels;
 
     // ========================================================================
     // Constructors
     // ========================================================================
 
+	/**
+	 * 
+	 */
+	public TmfEventFormat() {
+	    this(new String[] { "Content" });
+	}
+
     /**
-     * @param value
+     * @param labels
      */
-    public TmfEventField(Object value) {
-        fValue = value;
+    public TmfEventFormat(String[] labels) {
+        fLabels = labels;
     }
 
     // ========================================================================
     // Accessors
     // ========================================================================
 
-    /**
-     * @return
-     */
-    public Object getValue() {
-        return fValue;
-    }
+	/**
+	 * @return
+	 */
+	public String[] getLabels() {
+		return fLabels;
+	}
 
     // ========================================================================
     // Operators
     // ========================================================================
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    public String toString() {
-        return fValue.toString();
+	/**
+	 * The default content parser: returns a single field containing the whole
+	 * content.
+	 * 
+	 * @param content
+	 * @return
+	 */
+	public TmfEventField[] parse(Object content) {
+        return new TmfEventField[] { new TmfEventField(content.toString()) };
     }
 }

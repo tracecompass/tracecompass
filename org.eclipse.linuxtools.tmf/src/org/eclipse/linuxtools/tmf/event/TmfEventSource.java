@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Francois Chouinard - Initial API and implementation
+ *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.event;
@@ -19,21 +19,21 @@ package org.eclipse.linuxtools.tmf.event;
  */
 public class TmfEventSource {
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
     // Attributes
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
-	protected Object fSourceId;
+	private final Object fSourceId;
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
     // Constructors
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
     /**
-     * The default constructor
+     * 
      */
     public TmfEventSource() {
-    	fSourceId = null;
+        this(null);
     }
 
 	/**
@@ -43,20 +43,9 @@ public class TmfEventSource {
 		fSourceId = sourceId;
 	}
 
-	/**
-	 * Copy constructor
-	 * @param other
-	 */
-	public TmfEventSource(TmfEventSource other) {
-    	if (other == null)
-    		throw new IllegalArgumentException();
-    	TmfEventSource o = (TmfEventSource) other;
-    	fSourceId = o.fSourceId;
-	}
-
-    // ------------------------------------------------------------------------
+    // ========================================================================
     // Accessors
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
 	/**
 	 * @return
@@ -64,27 +53,4 @@ public class TmfEventSource {
 	public Object getSourceId() {
 		return fSourceId;
 	}
-
-    // ------------------------------------------------------------------------
-    // Object
-    // ------------------------------------------------------------------------
-
-	@Override
-    public int hashCode() {
-        return (fSourceId != null) ? fSourceId.hashCode() : 0;
-    }
-
-	@Override
-    public boolean equals(Object other) {
-		if (!(other instanceof TmfEventSource))
-			return false;
-		TmfEventSource o = (TmfEventSource) other;
-        return fSourceId.equals(o.fSourceId);
-    }
-
-	@Override
-    public String toString() {
-        return "[TmfEventSource(" + ((fSourceId != null) ? fSourceId.toString() : "null") + ")]";
-    }
-
 }

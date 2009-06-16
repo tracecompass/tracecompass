@@ -10,30 +10,35 @@
  *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.event;
+package org.eclipse.linuxtools.tmf.eventlog;
+
+import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 /**
- * <b><u>TmfEventField</u></b>
+ * <b><u>TmfStreamBookmark</u></b>
  * <p>
- * A basic event field.
+ * This class maps an event timestamp with a trace location.
  */
-public class TmfEventField {
+public class TmfStreamBookmark implements Comparable<TmfStreamBookmark> {
 
     // ========================================================================
     // Attributes
     // ========================================================================
-
-    private final Object fValue;
+    
+    private final TmfTimestamp fTimestamp;
+    private final Object fLocation;
 
     // ========================================================================
     // Constructors
     // ========================================================================
 
     /**
-     * @param value
+     * @param ts
+     * @param location
      */
-    public TmfEventField(Object value) {
-        fValue = value;
+    public TmfStreamBookmark(TmfTimestamp ts, Object location) {
+        fTimestamp = ts;
+        fLocation = location;
     }
 
     // ========================================================================
@@ -41,20 +46,26 @@ public class TmfEventField {
     // ========================================================================
 
     /**
-     * @return
+     * @return the bookmarked event timestamp
      */
-    public Object getValue() {
-        return fValue;
+    public TmfTimestamp getTimestamp() {
+        return fTimestamp;
+    }
+
+    /**
+     * @return the bookmarked event stream location
+     */
+    public Object getLocation() {
+        return fLocation;
     }
 
     // ========================================================================
     // Operators
     // ========================================================================
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    public String toString() {
-        return fValue.toString();
+    @Override
+    public int compareTo(TmfStreamBookmark other) {
+        return fTimestamp.compareTo(other.fTimestamp, false);
     }
+
 }

@@ -10,51 +10,68 @@
  *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.event;
+package org.eclipse.linuxtools.tmf.eventlog;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
- * <b><u>TmfEventField</u></b>
+ * <b><u>TmfEventStreamStub</u></b>
  * <p>
- * A basic event field.
+ * TODO: Implement me. Please.
  */
-public class TmfEventField {
+public class TmfEventStreamStub extends TmfEventStream {
 
     // ========================================================================
     // Attributes
     // ========================================================================
 
-    private final Object fValue;
-
     // ========================================================================
     // Constructors
     // ========================================================================
 
-    /**
-     * @param value
+   /**
+     * @param filename
+     * @throws FileNotFoundException 
      */
-    public TmfEventField(Object value) {
-        fValue = value;
+    public TmfEventStreamStub(String filename, ITmfEventParser parser) throws FileNotFoundException {
+        super(filename, parser);
+    }
+
+    /**
+     * @param filename
+     * @throws FileNotFoundException 
+     */
+    public TmfEventStreamStub(String filename, ITmfEventParser parser, int cacheSize) throws FileNotFoundException {
+        super(filename, parser, cacheSize);
     }
 
     // ========================================================================
     // Accessors
     // ========================================================================
 
-    /**
-     * @return
-     */
-    public Object getValue() {
-        return fValue;
-    }
-
     // ========================================================================
     // Operators
     // ========================================================================
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    public String toString() {
-        return fValue.toString();
+    @Override
+    public void seekLocation(Object location) throws IOException {
+        seek((Long) location);
     }
+
+    @Override
+    public Object getCurrentLocation() {
+        try {
+            return new Long(getFilePointer());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // ========================================================================
+    // Helper functions
+    // ========================================================================
+
 }

@@ -10,51 +10,33 @@
  *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.event;
+package org.eclipse.linuxtools.tmf.eventlog;
 
 /**
- * <b><u>TmfEventField</u></b>
+ * <b><u>TmfEventLogSet</u></b>
  * <p>
- * A basic event field.
+ * TODO: Implement me. Please.
  */
-public class TmfEventField {
+public class TmfEventLogSet {
 
     // ========================================================================
     // Attributes
     // ========================================================================
 
-    private final Object fValue;
-
     // ========================================================================
     // Constructors
     // ========================================================================
-
-    /**
-     * @param value
-     */
-    public TmfEventField(Object value) {
-        fValue = value;
-    }
 
     // ========================================================================
     // Accessors
     // ========================================================================
 
-    /**
-     * @return
-     */
-    public Object getValue() {
-        return fValue;
-    }
-
     // ========================================================================
     // Operators
     // ========================================================================
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    public String toString() {
-        return fValue.toString();
-    }
+    // ========================================================================
+    // Helper functions
+    // ========================================================================
+
 }

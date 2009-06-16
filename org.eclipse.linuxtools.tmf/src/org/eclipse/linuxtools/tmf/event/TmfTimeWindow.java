@@ -13,48 +13,47 @@
 package org.eclipse.linuxtools.tmf.event;
 
 /**
- * <b><u>TmfEventField</u></b>
+ * <b><u>TmfTimeWindow</u></b>
  * <p>
- * A basic event field.
+ * A utility class to define time ranges.
  */
-public class TmfEventField {
+public class TmfTimeWindow {
 
     // ========================================================================
     // Attributes
     // ========================================================================
 
-    private final Object fValue;
+	private final TmfTimestamp fStartTime;
+	private final TmfTimestamp fEndTime;
 
     // ========================================================================
     // Constructors
     // ========================================================================
 
-    /**
-     * @param value
-     */
-    public TmfEventField(Object value) {
-        fValue = value;
-    }
+	/**
+	 * @param startTime
+	 * @param endTime
+	 */
+	public TmfTimeWindow(TmfTimestamp startTime, TmfTimestamp endTime) {
+		fStartTime = startTime;
+		fEndTime   = endTime;
+	}
 
     // ========================================================================
     // Accessors
     // ========================================================================
 
-    /**
-     * @return
-     */
-    public Object getValue() {
-        return fValue;
-    }
+	/**
+	 * @return The time range start time
+	 */
+	public TmfTimestamp getStartTime() {
+		return fStartTime;
+	}
 
-    // ========================================================================
-    // Operators
-    // ========================================================================
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    public String toString() {
-        return fValue.toString();
-    }
+	/**
+	 * @return The time range end time
+	 */
+	public TmfTimestamp getEndTime() {
+		return fEndTime;
+	}
 }
