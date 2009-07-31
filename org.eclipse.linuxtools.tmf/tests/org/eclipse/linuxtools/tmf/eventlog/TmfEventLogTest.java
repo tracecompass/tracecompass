@@ -48,7 +48,7 @@ public class TmfEventLogTest {
 
 	@Test
 	public void testBasicTmfEventLog() {
-		TmfEventLog eventLog = new TmfEventLog("MyEventLog", fStream);
+		TmfTrace eventLog = new TmfTrace("MyEventLog", fStream);
 
 		assertEquals("GetId", "MyEventLog", eventLog.getId());
         assertEquals("GetEpoch", TmfTimestamp.BigBang, eventLog.getEpoch());
@@ -62,7 +62,7 @@ public class TmfEventLogTest {
 	@Test
 	public void testTmfEventLogWithEpoch() {
 		TmfTimestamp epoch = new TmfTimestamp(100, (byte) 0, 0);
-		TmfEventLog eventLog = new TmfEventLog("MyEventLog", fStream, epoch);
+		TmfTrace eventLog = new TmfTrace("MyEventLog", fStream, epoch);
 
 		assertEquals("GetId", "MyEventLog", eventLog.getId());
         assertEquals("GetEpoch", epoch, eventLog.getEpoch());
@@ -80,7 +80,7 @@ public class TmfEventLogTest {
     @Test
     public void testProcessRequestForNbEvents() throws Exception {
 
-        TmfEventLog eventLog = new TmfEventLog("MyEventLog", fStream);
+        TmfTrace eventLog = new TmfTrace("MyEventLog", fStream);
 
         final int NB_EVENTS  = 10 * 1000;
         final int BLOCK_SIZE = 100;
@@ -111,7 +111,7 @@ public class TmfEventLogTest {
     @Test
     public void testProcessRequestForAllEvents() throws Exception {
 
-        TmfEventLog eventLog = new TmfEventLog("MyEventLog", fStream);
+        TmfTrace eventLog = new TmfTrace("MyEventLog", fStream);
 
         final int NB_EVENTS  = -1;
         final int BLOCK_SIZE =  1;
@@ -143,7 +143,7 @@ public class TmfEventLogTest {
     // @Test
     public void testProcessRequestWithOffset() throws Exception {
 
-        TmfEventLog eventLog = new TmfEventLog("MyEventLog", fStream);
+        TmfTrace eventLog = new TmfTrace("MyEventLog", fStream);
 
         final int NB_EVENTS  = -1;
         final int BLOCK_SIZE =  1;
@@ -176,7 +176,7 @@ public class TmfEventLogTest {
     // l@Test
     public void testProcessRequestWithNegativeOffset() throws Exception {
 
-        TmfEventLog eventLog = new TmfEventLog("MyEventLog", fStream);
+        TmfTrace eventLog = new TmfTrace("MyEventLog", fStream);
 
         final int NB_EVENTS  = -1;
         final int BLOCK_SIZE =  1;
@@ -213,7 +213,7 @@ public class TmfEventLogTest {
     @Test
     public void testCancel() throws Exception {
 
-        TmfEventLog eventLog = new TmfEventLog("MyEventLog", fStream);
+        TmfTrace eventLog = new TmfTrace("MyEventLog", fStream);
 
         final int NB_EVENTS  = 10 * 1000;
         final int BLOCK_SIZE = 100;

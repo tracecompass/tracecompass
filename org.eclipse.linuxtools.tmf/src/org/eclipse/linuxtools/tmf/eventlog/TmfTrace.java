@@ -35,7 +35,7 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
  * TODO: Handle concurrent and possibly overlapping requests in a way that
  * optimizes the stream access and event parsing.
  */
-public class TmfEventLog implements ITmfRequestHandler {
+public class TmfTrace implements ITmfRequestHandler {
 
     // ========================================================================
     // Attributes
@@ -49,14 +49,14 @@ public class TmfEventLog implements ITmfRequestHandler {
     // Constructors
     // ========================================================================
 
-    public TmfEventLog(String id, TmfEventStream stream) {
+    public TmfTrace(String id, TmfEventStream stream) {
         assert stream != null;
         fId = id;
         fStream = stream;
         fEpoch = TmfTimestamp.BigBang;
     }
 
-    public TmfEventLog(String id, TmfEventStream stream, TmfTimestamp epoch) {
+    public TmfTrace(String id, TmfEventStream stream, TmfTimestamp epoch) {
         assert stream != null;
         fId = id;
         fStream = stream;
