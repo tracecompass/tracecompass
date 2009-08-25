@@ -63,7 +63,6 @@ public class TmfStreamBookmark implements Comparable<TmfStreamBookmark> {
     // Operators
     // ========================================================================
 
-    @Override
     public int compareTo(TmfStreamBookmark other) {
         return fTimestamp.compareTo(other.fTimestamp, false);
     }

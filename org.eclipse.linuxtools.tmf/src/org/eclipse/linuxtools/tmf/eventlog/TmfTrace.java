@@ -94,7 +94,6 @@ public class TmfTrace implements ITmfRequestHandler {
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.eventlog.ITmfRequestExecutor#execute(org.eclipse.linuxtools.tmf.eventlog.TmfEventRequest, boolean)
      */
-    @Override
     public void process(final TmfEventRequest request, boolean waitForCompletion) {
         serviceEventRequest(request);
         if (waitForCompletion) {
