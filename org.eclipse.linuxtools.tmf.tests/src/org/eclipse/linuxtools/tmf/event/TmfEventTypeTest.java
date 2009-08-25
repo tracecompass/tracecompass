@@ -19,7 +19,7 @@ import org.junit.Test;
 /**
  * <b><u>TmfEventTypeTest</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * JUnit test suite for the TmfEventType class.
  */
 public class TmfEventTypeTest {
 

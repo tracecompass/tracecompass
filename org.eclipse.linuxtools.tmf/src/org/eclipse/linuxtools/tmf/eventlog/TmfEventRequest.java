@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.tmf.eventlog;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.event.TmfTimeWindow;
+import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 
 /**
  * <b><u>TmfEventRequest</u></b>
@@ -68,7 +68,7 @@ public class TmfEventRequest {
     // Attributes
     // ========================================================================
 
-    private final TmfTimeWindow fRange;     // The requested events timestamp range
+    private final TmfTimeRange fRange;     // The requested events timestamp range
     private final long fOffset;             // The synchronization offset to apply
     private final int  fNbRequestedEvents;  // The number of events to read (-1 == the whole range)
     private final int  fBlockSize;          // The maximum number of events per chunk
@@ -86,7 +86,7 @@ public class TmfEventRequest {
      * @param offset
      * @param nbEvents
      */
-    public TmfEventRequest(TmfTimeWindow range, long offset, int nbEvents) {
+    public TmfEventRequest(TmfTimeRange range, long offset, int nbEvents) {
         this(range, offset, nbEvents, DEFAULT_BLOCK_SIZE);
     }
 
@@ -96,7 +96,7 @@ public class TmfEventRequest {
      * @param nbEvents
      * @param maxBlockSize Size of the largest blocks expected
      */
-    public TmfEventRequest(TmfTimeWindow range, long offset, int nbEvents, int maxBlockSize) {
+    public TmfEventRequest(TmfTimeRange range, long offset, int nbEvents, int maxBlockSize) {
         fRange = range;
         fOffset = offset;
         fNbRequestedEvents = nbEvents;
@@ -110,7 +110,7 @@ public class TmfEventRequest {
     /**
      * @return the requested time range
      */
-    public TmfTimeWindow getRange() {
+    public TmfTimeRange getRange() {
         return fRange;
     }
 

@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.event.TmfTimeWindow;
+import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 /**
@@ -55,7 +55,7 @@ public abstract class TmfEventStream extends RandomAccessFile implements ITmfStr
     private int fNbEvents = 0;
 
     // The time span of the event stream 
-    private TmfTimeWindow fTimeRange = new TmfTimeWindow(TmfTimestamp.BigBang, TmfTimestamp.BigBang);
+    private TmfTimeRange fTimeRange = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigBang);
     
     // ========================================================================
     // Constructors
@@ -105,7 +105,7 @@ public abstract class TmfEventStream extends RandomAccessFile implements ITmfStr
     /**
      * @return
      */
-    public TmfTimeWindow getTimeRange() {
+    public TmfTimeRange getTimeRange() {
         return fTimeRange;
     }
 
@@ -184,7 +184,7 @@ public abstract class TmfEventStream extends RandomAccessFile implements ITmfStr
                     location = getCurrentLocation();
                     event = getNextEvent();
                 }
-                fTimeRange = new TmfTimeWindow(startTime, lastTime);
+                fTimeRange = new TmfTimeRange(startTime, lastTime);
             }
             seek(0);
         } catch (IOException e) {

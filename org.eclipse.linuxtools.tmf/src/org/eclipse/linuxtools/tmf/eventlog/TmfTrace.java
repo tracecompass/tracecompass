@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.event.TmfTimeWindow;
+import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 /**
@@ -79,7 +79,7 @@ public class TmfTrace implements ITmfRequestHandler {
     	return fEpoch;
     }
 
-    public TmfTimeWindow getTimeRange() {
+    public TmfTimeRange getTimeRange() {
     	return fStream.getTimeRange();
     }
 

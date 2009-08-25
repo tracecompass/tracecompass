@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.event.TmfTimeWindow;
+import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -42,7 +42,7 @@ public class TmfEventRequestTest {
 
     @Test
     public void testConstructorForRange() throws Exception {
-        TmfTimeWindow range = new TmfTimeWindow(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         TmfEventRequest request = new TmfEventRequest(range, 0, -1, 1);
 
         assertEquals("StartTime", TmfTimestamp.BigBang,   request.getRange().getStartTime());
@@ -53,7 +53,7 @@ public class TmfEventRequestTest {
 
     @Test
     public void testConstructorForNbEvents() throws Exception {
-        TmfTimeWindow range = new TmfTimeWindow(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         TmfEventRequest request = new TmfEventRequest(range, 0, 10, 1);
 
         assertEquals("StartTime", TmfTimestamp.BigBang,   request.getRange().getStartTime());
@@ -64,7 +64,7 @@ public class TmfEventRequestTest {
 
     @Test
     public void testConstructorWithOffset() throws Exception {
-        TmfTimeWindow range = new TmfTimeWindow(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         TmfEventRequest request = new TmfEventRequest(range, 5, 10, 1);
 
         assertEquals("StartTime", TmfTimestamp.BigBang,   request.getRange().getStartTime());
@@ -75,7 +75,7 @@ public class TmfEventRequestTest {
 
     @Test
     public void testConstructorWithNegativeOffset() throws Exception {
-        TmfTimeWindow range = new TmfTimeWindow(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         TmfEventRequest request = new TmfEventRequest(range, -5, 10, 1);
 
         assertEquals("StartTime", TmfTimestamp.BigBang,   request.getRange().getStartTime());
@@ -95,7 +95,7 @@ public class TmfEventRequestTest {
         final int BLOCK_SIZE = 100;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
 
-        TmfTimeWindow range = new TmfTimeWindow(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest request = new TmfEventRequest(range, 0, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void newEvents(Vector<TmfEvent> events) {
@@ -125,7 +125,7 @@ public class TmfEventRequestTest {
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
         int nbExpectedEvents = TmfRequestHandlerStub.MAX_GENERATED_EVENTS;
 
-        TmfTimeWindow range = new TmfTimeWindow(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest request = new TmfEventRequest(range, 0, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void newEvents(Vector<TmfEvent> events) {
@@ -156,7 +156,7 @@ public class TmfEventRequestTest {
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
         int nbExpectedEvents = TmfRequestHandlerStub.MAX_GENERATED_EVENTS;
 
-        TmfTimeWindow range = new TmfTimeWindow(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest request = new TmfEventRequest(range, OFFSET, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void newEvents(Vector<TmfEvent> events) {
@@ -187,7 +187,7 @@ public class TmfEventRequestTest {
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
         int nbExpectedEvents = TmfRequestHandlerStub.MAX_GENERATED_EVENTS;
 
-        TmfTimeWindow range = new TmfTimeWindow(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest request = new TmfEventRequest(range, OFFSET, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void newEvents(Vector<TmfEvent> events) {
@@ -220,7 +220,7 @@ public class TmfEventRequestTest {
         final int BLOCK_SIZE = 100;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
 
-        TmfTimeWindow range = new TmfTimeWindow(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest request = new TmfEventRequest(range, 0, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void newEvents(Vector<TmfEvent> events) {

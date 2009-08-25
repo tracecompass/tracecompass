@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
+ *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.event;
@@ -15,9 +15,7 @@ package org.eclipse.linuxtools.tmf.event;
 /**
  * <b><u>TmfEvent</u></b>
  * <p>
- * The basic event structure in the TMF.
- * <p>
- * In its canonical form, an event has:
+ * The basic event structure in the TMF. In its canonical form, an event has:
  * <ul>
  * <li> a normalized timestamp
  * <li> a source (reporter)
@@ -34,7 +32,8 @@ public class TmfEvent {
     // Attributes
     // ========================================================================
 
-	private final TmfTimestamp fTimestamp;
+	private final TmfTimestamp fEffectiveTimestamp;
+	private final TmfTimestamp fOriginalTimestamp;
 	private final TmfEventSource fSource;
 	private final TmfEventType fType;
 	private final TmfEventContent fContent;
@@ -51,10 +50,28 @@ public class TmfEvent {
 	 * @param content
 	 * @param reference
 	 */
-	public TmfEvent(TmfTimestamp timestamp, TmfEventSource source, TmfEventType type,
-			TmfEventContent content, TmfEventReference reference)
+	public TmfEvent(TmfTimestamp originalTS, TmfTimestamp effectiveTS, TmfEventSource source,
+			TmfEventType type, TmfEventContent content, TmfEventReference reference)
 	{
-		fTimestamp = timestamp;
+		fOriginalTimestamp = originalTS;
+		fEffectiveTimestamp = effectiveTS;
+		fSource = source;
+		fType = type;
+		fContent = content;
+		fReference = reference;
+	}
+
+	/**
+	 * @param timestamp
+	 * @param source
+	 * @param type
+	 * @param content
+	 * @param reference
+	 */
+	public TmfEvent(TmfTimestamp timestamp, TmfEventSource source,
+			TmfEventType type, TmfEventContent content, TmfEventReference reference)
+	{
+		fOriginalTimestamp = fEffectiveTimestamp = timestamp;
 		fSource = source;
 		fType = type;
 		fContent = content;
@@ -69,7 +86,14 @@ public class TmfEvent {
 	 * @return
 	 */
 	public TmfTimestamp getTimestamp() {
-		return fTimestamp;
+		return fEffectiveTimestamp;
+	}
+
+	/**
+	 * @return
+	 */
+	public TmfTimestamp getOriginalTimestamp() {
+		return fOriginalTimestamp;
 	}
 
 	/**
@@ -99,4 +123,5 @@ public class TmfEvent {
 	public TmfEventReference getReference() {
 		return fReference;
 	}
+
 }

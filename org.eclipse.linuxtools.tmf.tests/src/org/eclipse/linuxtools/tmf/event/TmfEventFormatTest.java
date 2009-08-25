@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
+ *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.event;
@@ -19,7 +19,7 @@ import org.junit.Test;
 /**
  * <b><u>TmfEventFormatTest</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * JUnit test suite for the TmfEventFormat class.
  */
 public class TmfEventFormatTest {
 

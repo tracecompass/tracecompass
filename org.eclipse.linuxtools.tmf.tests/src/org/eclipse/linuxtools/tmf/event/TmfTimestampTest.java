@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
+ *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.event;
@@ -19,7 +19,7 @@ import org.junit.Test;
 /**
  * <b><u>TmfTimestampTest</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * JUnit test suite for the TmfTimestamp class.
  */
 public class TmfTimestampTest {
 
@@ -37,6 +37,14 @@ public class TmfTimestampTest {
 
     @Test
     public void testSimpleConstructor() throws Exception {
+        TmfTimestamp ts = new TmfTimestamp(12345);
+        assertEquals("getValue", 12345, ts.getValue());
+        assertEquals("getscale",     0, ts.getScale());
+        assertEquals("getPrecision", 0, ts.getPrecision());
+    }
+
+    @Test
+    public void testSimpleConstructor2() throws Exception {
         TmfTimestamp ts = new TmfTimestamp(12345, (byte) -1);
         assertEquals("getValue", 12345, ts.getValue());
         assertEquals("getscale",    -1, ts.getScale());

@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
+ *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.event;
@@ -19,7 +19,7 @@ import org.junit.Test;
 /**
  * <b><u>TmfEventContentTest</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * JUnit test suite for the TmfEventContent class.
  */
 public class TmfEventContentTest {
 
@@ -29,8 +29,7 @@ public class TmfEventContentTest {
 
 	@Test
 	public void testTmfEventContent() {
-		TmfEventContent content = new TmfEventContent("Some content",
-				new TmfEventFormat());
+		TmfEventContent content = new TmfEventContent("Some content", new TmfEventFormat());
 		assertEquals("getFormat", 1, content.getFormat().getLabels().length);
 		assertEquals("getLabels", "Content", content.getFormat().getLabels()[0]);
 		assertEquals("getContent", "Some content", content.getContent());
@@ -42,8 +41,7 @@ public class TmfEventContentTest {
 
 	@Test
 	public void testBasicGetField() {
-		TmfEventContent content = new TmfEventContent("Some content",
-				new TmfEventFormat());
+		TmfEventContent content = new TmfEventContent("Some content", new TmfEventFormat());
 		assertEquals("getField", 1, content.getFields().length);
 		assertEquals("getField", "Some content", content.getField(0).toString());
 	}
@@ -56,8 +54,7 @@ public class TmfEventContentTest {
 		assertEquals("getField", "-10", content.getField(1).toString());
 		assertEquals("getField", "true", content.getField(2).toString());
 		assertEquals("getField", "some string", content.getField(3).toString());
-		assertEquals("getField", "[TmfTimestamp:1,2,3]", content.getField(4)
-				.toString());
+		assertEquals("getField", "[TmfTimestamp:1,2,3]", content.getField(4).toString());
 	}
 
 }

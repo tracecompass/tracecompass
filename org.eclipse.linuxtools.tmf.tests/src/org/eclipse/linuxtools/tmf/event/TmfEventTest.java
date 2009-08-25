@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
+ *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.event;
@@ -19,7 +19,7 @@ import org.junit.Test;
 /**
  * <b><u>TmfEventTest</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * JUNit test suite for the TmfEvent class.
  */
 public class TmfEventTest {
 
@@ -40,29 +40,80 @@ public class TmfEventTest {
         TmfEvent event = new TmfEvent(timestamp, source, type, content, reference);
 
         // Check the event timestamp
-        TmfTimestamp evTS = event.getTimestamp();
-        assertEquals("getValue", 12345, evTS.getValue());
-        assertEquals("getscale",     2, evTS.getScale());
-        assertEquals("getPrecision", 5, evTS.getPrecision());
+        TmfTimestamp ts = event.getTimestamp();
+        assertEquals("getValue", 12345, ts.getValue());
+        assertEquals("getscale",     2, ts.getScale());
+        assertEquals("getPrecision", 5, ts.getPrecision());
+
+        // Check the original event timestamp
+        ts = event.getOriginalTimestamp();
+        assertEquals("getValue", 12345, ts.getValue());
+        assertEquals("getscale",     2, ts.getScale());
+        assertEquals("getPrecision", 5, ts.getPrecision());
 
         // Check the event source
-        TmfEventSource evSrc = event.getSource();
-        assertEquals("getValue", "Source", evSrc.getSourceId());
+        TmfEventSource src = event.getSource();
+        assertEquals("getValue", "Source", src.getSourceId());
 
         // Check the event type
-        TmfEventType evType = event.getType();
-        assertEquals("getValue", "Type", evType.getTypeId());
-        assertEquals("getFormat", "field1", evType.getFormat().getLabels()[0]);
-        assertEquals("getFormat", "field2", evType.getFormat().getLabels()[1]);
+        TmfEventType tp = event.getType();
+        assertEquals("getValue", "Type", tp.getTypeId());
+        assertEquals("getFormat", "field1", tp.getFormat().getLabels()[0]);
+        assertEquals("getFormat", "field2", tp.getFormat().getLabels()[1]);
 
         // Check the event content
-        TmfEventContent evContent = event.getContent();
-        assertEquals("getField", 1, evContent.getFields().length);
-        assertEquals("getField", "Some content", evContent.getField(0).toString());
+        TmfEventContent cnt = event.getContent();
+        assertEquals("getField", 1, cnt.getFields().length);
+        assertEquals("getField", "Some content", cnt.getField(0).toString());
 
         // Check the event reference
-        TmfEventReference evRef = event.getReference();
-        assertEquals("getValue", "Reference", evRef.getValue());
+        TmfEventReference ref = event.getReference();
+        assertEquals("getValue", "Reference", ref.getValue());
+    }
+
+    @Test
+    public void testTmfEvent2() {
+        TmfTimestamp      original  = new TmfTimestamp(12345, (byte) 2, 5);
+        TmfTimestamp      effective = new TmfTimestamp(12350, (byte) 2, 5);
+        TmfEventSource    source    = new TmfEventSource("Source");
+        TmfEventFormat    format    = new TmfEventFormat(new String[] { "field1", "field2" });
+        TmfEventType      type      = new TmfEventType("Type", format);
+        TmfEventContent   content   = new TmfEventContent("Some content", format);
+        TmfEventReference reference = new TmfEventReference("Reference");
+
+        // Create the event
+        TmfEvent event = new TmfEvent(original, effective, source, type, content, reference);
+
+        // Check the event timestamp
+        TmfTimestamp ts = event.getTimestamp();
+        assertEquals("getValue", 12350, ts.getValue());
+        assertEquals("getscale",     2, ts.getScale());
+        assertEquals("getPrecision", 5, ts.getPrecision());
+
+        // Check the original event timestamp
+        ts = event.getOriginalTimestamp();
+        assertEquals("getValue", 12345, ts.getValue());
+        assertEquals("getscale",     2, ts.getScale());
+        assertEquals("getPrecision", 5, ts.getPrecision());
+
+        // Check the event source
+        TmfEventSource src = event.getSource();
+        assertEquals("getValue", "Source", src.getSourceId());
+
+        // Check the event type
+        TmfEventType tp = event.getType();
+        assertEquals("getValue", "Type", tp.getTypeId());
+        assertEquals("getFormat", "field1", tp.getFormat().getLabels()[0]);
+        assertEquals("getFormat", "field2", tp.getFormat().getLabels()[1]);
+
+        // Check the event content
+        TmfEventContent cnt = event.getContent();
+        assertEquals("getField", 1, cnt.getFields().length);
+        assertEquals("getField", "Some content", cnt.getField(0).toString());
+
+        // Check the event reference
+        TmfEventReference ref = event.getReference();
+        assertEquals("getValue", "Reference", ref.getValue());
     }
 
 }

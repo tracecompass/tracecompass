@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.event.TmfTimeWindow;
+import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -54,7 +54,7 @@ public class TmfEventLogTest {
         assertEquals("GetEpoch", TmfTimestamp.BigBang, eventLog.getEpoch());
         assertEquals("GetNbEvents", fTotalNbEvents, eventLog.getNbEvents());
 
-        TmfTimeWindow timeRange = eventLog.getTimeRange();
+        TmfTimeRange timeRange = eventLog.getTimeRange();
         assertEquals("GetTimeRange", 0, timeRange.getStartTime().getValue());
         assertEquals("GetTimeRange", fTotalNbEvents - 1, timeRange.getEndTime().getValue());
 	}
@@ -68,7 +68,7 @@ public class TmfEventLogTest {
         assertEquals("GetEpoch", epoch, eventLog.getEpoch());
         assertEquals("GetNbEvents", fTotalNbEvents, eventLog.getNbEvents());
 
-        TmfTimeWindow timeRange = eventLog.getTimeRange();
+        TmfTimeRange timeRange = eventLog.getTimeRange();
         assertEquals("GetTimeRange", 0, timeRange.getStartTime().getValue());
         assertEquals("GetTimeRange", fTotalNbEvents - 1, timeRange.getEndTime().getValue());
 	}
@@ -86,7 +86,7 @@ public class TmfEventLogTest {
         final int BLOCK_SIZE = 100;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
 
-        TmfTimeWindow range = new TmfTimeWindow(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest request = new TmfEventRequest(range, 0, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void newEvents(Vector<TmfEvent> events) {
@@ -118,7 +118,7 @@ public class TmfEventLogTest {
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
         int nbExpectedEvents = eventLog.getNbEvents();
 
-        TmfTimeWindow range = new TmfTimeWindow(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest request = new TmfEventRequest(range, 0, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void newEvents(Vector<TmfEvent> events) {
@@ -151,7 +151,7 @@ public class TmfEventLogTest {
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
         int nbExpectedEvents = TmfRequestHandlerStub.MAX_GENERATED_EVENTS;
 
-        TmfTimeWindow range = new TmfTimeWindow(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest request = new TmfEventRequest(range, OFFSET, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void newEvents(Vector<TmfEvent> events) {
@@ -184,7 +184,7 @@ public class TmfEventLogTest {
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
         int nbExpectedEvents = TmfRequestHandlerStub.MAX_GENERATED_EVENTS;
 
-        TmfTimeWindow range = new TmfTimeWindow(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest request = new TmfEventRequest(range, OFFSET, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void newEvents(Vector<TmfEvent> events) {
@@ -219,7 +219,7 @@ public class TmfEventLogTest {
         final int BLOCK_SIZE = 100;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
 
-        TmfTimeWindow range = new TmfTimeWindow(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest request = new TmfEventRequest(range, 0, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void newEvents(Vector<TmfEvent> events) {

@@ -13,79 +13,53 @@
 package org.eclipse.linuxtools.tmf.event;
 
 /**
- * <b><u>TmfTimeRange</u></b>
+ * <b><u>TmfTimeWindow</u></b>
  * <p>
  * A utility class to define time ranges.
  */
 public class TmfTimeRange {
 
-	// ------------------------------------------------------------------------
-    // Constants
-	// ------------------------------------------------------------------------
-
-	public static final TmfTimeRange Eternity = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-	
-	// ------------------------------------------------------------------------
+    // ========================================================================
     // Attributes
-	// ------------------------------------------------------------------------
+    // ========================================================================
 
 	private final TmfTimestamp fStartTime;
 	private final TmfTimestamp fEndTime;
 
-	// ------------------------------------------------------------------------
+    // ========================================================================
     // Constructors
-	// ------------------------------------------------------------------------
-
-	@SuppressWarnings("unused")
-	private TmfTimeRange() {
-		throw new AssertionError();
-	}
+    // ========================================================================
 
 	/**
 	 * @param startTime
 	 * @param endTime
 	 */
 	public TmfTimeRange(TmfTimestamp startTime, TmfTimestamp endTime) {
-		if (startTime == null || endTime == null) {
-    		throw new IllegalArgumentException();
-		}
-		fStartTime =  new TmfTimestamp(startTime);
-		fEndTime   =  new TmfTimestamp(endTime);
-	}
-	
-	/**
-	 * Copy constructor
-	 * @param other
-	 */
-	public TmfTimeRange(TmfTimeRange other) {
-    	if (other == null) {
-    		throw new IllegalArgumentException();
-    	}
-		fStartTime = new TmfTimestamp(other.fStartTime);
-		fEndTime   = new TmfTimestamp(other.fEndTime);
+		fStartTime = startTime;
+		fEndTime   = endTime;
 	}
 
-	// ------------------------------------------------------------------------
+    // ========================================================================
     // Accessors
-	// ------------------------------------------------------------------------
+    // ========================================================================
 
 	/**
 	 * @return The time range start time
 	 */
 	public TmfTimestamp getStartTime() {
-		return new TmfTimestamp(fStartTime);
+		return fStartTime;
 	}
 
 	/**
 	 * @return The time range end time
 	 */
 	public TmfTimestamp getEndTime() {
-		return new TmfTimestamp(fEndTime);
+		return fEndTime;
 	}
 
-	// ------------------------------------------------------------------------
+    // ========================================================================
     // Predicates
-	// ------------------------------------------------------------------------
+    // ========================================================================
 
 	/**
 	 * Check if the timestamp is within the time range
@@ -94,44 +68,8 @@ public class TmfTimeRange {
 	 * @return
 	 */
 	public boolean contains(TmfTimestamp ts) {
-		return (fStartTime.compareTo(ts, true) <= 0) && (fEndTime.compareTo(ts, true) >= 0);
-	}
-
-	/**
-	 * Check if the time range is within the time range
-	 * 
-	 * @param range
-	 * @return
-	 */
-	public boolean contains(TmfTimeRange range) {
-		TmfTimestamp startTime = range.getStartTime();
-		TmfTimestamp endTime   = range.getEndTime();
-		return (fStartTime.compareTo(startTime, true) <= 0) && (fEndTime.compareTo(endTime, true) >= 0);
-	}
-
-	// ------------------------------------------------------------------------
-    // Object
-	// ------------------------------------------------------------------------
-
-	@Override
-    public int hashCode() {
-		int result = 17;
-		result = 37 * result + fStartTime.hashCode();
-		result = 37 * result + fEndTime.hashCode();
-        return result;
-    }
-
-	@Override
-    public boolean equals(Object other) {
-    	if (!(other instanceof TmfTimeRange))
-    		return false;
-   		TmfTimeRange range = (TmfTimeRange) other;
-   		return range.fStartTime.equals(fStartTime) && range.fEndTime.equals(fEndTime);
-    }
-
-	@Override
-	public String toString() {
-		return "[TmfTimeRange(" + fStartTime + ":" + fEndTime + ")]";
+		boolean result = (fStartTime.compareTo(ts, true) <= 0) && (fEndTime.compareTo(ts, true) >= 0);
+		return result;
 	}
 
 }

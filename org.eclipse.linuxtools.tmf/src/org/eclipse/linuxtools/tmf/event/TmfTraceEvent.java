@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
+ *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.event;
@@ -35,6 +35,25 @@ public class TmfTraceEvent extends TmfEvent {
     // ========================================================================
     // Constructors
     // ========================================================================
+
+	/**
+	 * The constructor.
+	 * 
+	 * @param timestamp
+	 * @param source
+	 * @param type
+	 * @param content
+	 * @param reference
+	 */
+	public TmfTraceEvent(TmfTimestamp originalTS, TmfTimestamp effectiveTS, TmfEventSource source,
+			TmfEventType type, TmfEventContent content, TmfEventReference reference,
+			String path, String file, int line)
+	{
+		super(originalTS, effectiveTS, source, type,content, reference);
+		fSourcePath = path;
+		fFileName = file;
+		fLineNumber = line;
+	}
 
 	/**
 	 * The constructor.

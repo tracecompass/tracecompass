@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,70 +12,66 @@
 
 package org.eclipse.linuxtools.tmf;
 
-import org.eclipse.core.runtime.Plugin;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * <b><u>TmfCorePlugin</u></b>
  * <p>
- * The activator class controls the plug-in life cycle. No more than one such
- * plug-in can exist at any time.
+ * The activator class controls the plug-in life cycle
  */
-public class TmfCorePlugin extends Plugin {
+public class TmfCorePlugin extends AbstractUIPlugin {
 
-	// ------------------------------------------------------------------------
+    // ========================================================================
     // Attributes
-	// ------------------------------------------------------------------------
+    // ========================================================================
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.eclipse.linuxtools.tmf";
 
 	// The shared instance
-	private static TmfCorePlugin fPlugin;
+	private static TmfCorePlugin plugin;
 	
-	// ------------------------------------------------------------------------
+    // ========================================================================
     // Constructors
-	// ------------------------------------------------------------------------
+    // ========================================================================
 
 	/**
 	 * The constructor
 	 */
 	public TmfCorePlugin() {
-		setDefault(this);
 	}
 
-	// ------------------------------------------------------------------------
+    // ========================================================================
     // Accessors
-	// ------------------------------------------------------------------------
+    // ========================================================================
 
     /**
      * @return the shared instance
      */
     public static TmfCorePlugin getDefault() {
-        return fPlugin;
+        return plugin;
     }
 
-	/**
-	 * @param plugin the shared instance
+    // ========================================================================
+    // Operators
+    // ========================================================================
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
-	private static void setDefault(TmfCorePlugin plugin) {
-		fPlugin = plugin;
-	}
-
-	// ------------------------------------------------------------------------
-    // Operations
-	// ------------------------------------------------------------------------
-
-	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		setDefault(this);
-		Tracer.init();
+		plugin = this;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 */
 	public void stop(BundleContext context) throws Exception {
-		setDefault(null);
+		plugin = null;
 		super.stop(context);
 	}
 
