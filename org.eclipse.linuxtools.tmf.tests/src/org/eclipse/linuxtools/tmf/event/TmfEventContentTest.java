@@ -50,8 +50,7 @@ public class TmfEventContentTest {
 
 	@Test
 	public void testExtendedGetField() {
-		TmfEventContent content = new TmfEventContent("",
-				new TmfEventFormatStub());
+		TmfEventContent content = new TmfEventContent("", new TmfEventFormatStub());
 		assertEquals("getField", 5, content.getFields().length);
 		assertEquals("getField", "1", content.getField(0).toString());
 		assertEquals("getField", "-10", content.getField(1).toString());
