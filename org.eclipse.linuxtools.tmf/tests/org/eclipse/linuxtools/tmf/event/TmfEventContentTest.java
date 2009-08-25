@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.event;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -23,38 +23,42 @@ import org.junit.Test;
  */
 public class TmfEventContentTest {
 
-    // ========================================================================
-    // Constructors
-    // ========================================================================
+	// ========================================================================
+	// Constructors
+	// ========================================================================
 
-    @Test
-    public void testTmfEventContent() {
-        TmfEventContent content = new TmfEventContent("Some content", new TmfEventFormat());
-        assertEquals("getFormat", 1, content.getFormat().getLabels().length);
-        assertEquals("getLabels", "Content", content.getFormat().getLabels()[0]);
-        assertEquals("getContent", "Some content", content.getContent());
-    }
+	@Test
+	public void testTmfEventContent() {
+		TmfEventContent content = new TmfEventContent("Some content",
+				new TmfEventFormat());
+		assertEquals("getFormat", 1, content.getFormat().getLabels().length);
+		assertEquals("getLabels", "Content", content.getFormat().getLabels()[0]);
+		assertEquals("getContent", "Some content", content.getContent());
+	}
 
-    // ========================================================================
-    // getField
-    // ========================================================================
+	// ========================================================================
+	// getField
+	// ========================================================================
 
-    @Test
-    public void testBasicGetField() {
-        TmfEventContent content = new TmfEventContent("Some content", new TmfEventFormat());
-        assertEquals("getField", 1, content.getFields().length);
-        assertEquals("getField", "Some content", content.getField(0).toString());
-    }
+	@Test
+	public void testBasicGetField() {
+		TmfEventContent content = new TmfEventContent("Some content",
+				new TmfEventFormat());
+		assertEquals("getField", 1, content.getFields().length);
+		assertEquals("getField", "Some content", content.getField(0).toString());
+	}
 
-    @Test
-    public void testExtendedGetField() {
-        TmfEventContent content = new TmfEventContent("", new TmfEventFormatStub());
-        assertEquals("getField", 5, content.getFields().length);
-        assertEquals("getField", "1",                    content.getField(0).toString());
-        assertEquals("getField", "-10",                  content.getField(1).toString());
-        assertEquals("getField", "true",                 content.getField(2).toString());
-        assertEquals("getField", "some string",          content.getField(3).toString());
-        assertEquals("getField", "[TmfTimestamp:1,2,3]", content.getField(4).toString());
-    }
+	@Test
+	public void testExtendedGetField() {
+		TmfEventContent content = new TmfEventContent("",
+				new TmfEventFormatStub());
+		assertEquals("getField", 5, content.getFields().length);
+		assertEquals("getField", "1", content.getField(0).toString());
+		assertEquals("getField", "-10", content.getField(1).toString());
+		assertEquals("getField", "true", content.getField(2).toString());
+		assertEquals("getField", "some string", content.getField(3).toString());
+		assertEquals("getField", "[TmfTimestamp:1,2,3]", content.getField(4)
+				.toString());
+	}
 
 }
