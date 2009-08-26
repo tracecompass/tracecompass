@@ -7,25 +7,26 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
+ *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.eventlog;
+package org.eclipse.linuxtools.tmf.request;
 
 /**
  * <b><u>ITmfRequestHandler</u></b>
  * <p>
  * TODO: Implement me. Please.
+ * @param <V>
  */
-public interface ITmfRequestHandler {
+public interface ITmfRequestHandler<T> {
 
     /**
      * Process the request. The client thread can be suspended until the 
      * request is completed (e.g. for a specific range of events) or it
      * can choose to process the events asynchronously (e.g. for streaming).
      * 
-     * @param waitForCompletion Suspend the client thread until the request completes or is canceled 
+     * @param waitForCompletion Suspend the client thread until the request completes or is cancelled 
      */
-    public void process(TmfEventRequest request, boolean waitForCompletion);
+    public void processRequest(TmfDataRequest<T> request, boolean waitForCompletion);
 
 }

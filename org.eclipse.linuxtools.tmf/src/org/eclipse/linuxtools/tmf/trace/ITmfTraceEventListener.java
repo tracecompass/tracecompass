@@ -7,25 +7,17 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
+ *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.eventlog;
-
-import java.io.IOException;
-
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
+package org.eclipse.linuxtools.tmf.trace;
 
 /**
- * <b><u>ITmfEventParser</u></b>
+ * <b><u>ITmfEventListener</u></b>
  * <p>
  * TODO: Implement me. Please.
  */
-public interface ITmfEventParser {
+public interface ITmfTraceEventListener {
 
-    /**
-     * @return
-     * @throws IOException 
-     */
-    public TmfEvent getNextEvent(TmfEventStream stream) throws IOException;
+	public void handleEvent(ITmfTraceEvent event);
 }

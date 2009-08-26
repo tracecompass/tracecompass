@@ -7,36 +7,64 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
+ *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.eventlog;
+package org.eclipse.linuxtools.tmf.stream;
+
+import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 /**
- * <b><u>TmfEventLogSet</u></b>
+ * <b><u>TmfStreamCheckpoint</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * This class maps an event timestamp with a trace location.
  */
-public class TmfEventLogSet {
+public class TmfStreamCheckpoint implements Comparable<TmfStreamCheckpoint> {
 
     // ========================================================================
     // Attributes
     // ========================================================================
+    
+    private final TmfTimestamp fTimestamp;
+    private final Object fLocation;
 
     // ========================================================================
     // Constructors
     // ========================================================================
 
+    /**
+     * @param ts
+     * @param location
+     */
+    public TmfStreamCheckpoint(TmfTimestamp ts, Object location) {
+        fTimestamp = ts;
+        fLocation = location;
+    }
+
     // ========================================================================
     // Accessors
     // ========================================================================
+
+    /**
+     * @return the checkpoint event timestamp
+     */
+    public TmfTimestamp getTimestamp() {
+        return fTimestamp;
+    }
+
+    /**
+     * @return the checkpoint event stream location
+     */
+    public Object getLocation() {
+        return fLocation;
+    }
 
     // ========================================================================
     // Operators
     // ========================================================================
 
-    // ========================================================================
-    // Helper functions
-    // ========================================================================
+    public int compareTo(TmfStreamCheckpoint other) {
+        return fTimestamp.compareTo(other.fTimestamp, false);
+    }
 
 }

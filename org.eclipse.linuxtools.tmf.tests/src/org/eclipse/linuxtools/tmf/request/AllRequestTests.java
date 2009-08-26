@@ -7,21 +7,20 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
+ *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.eventlog;
+package org.eclipse.linuxtools.tmf.request;
 
+import org.eclipse.linuxtools.tmf.request.TmfDataRequestTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    TmfEventRequestTest.class,
-    TmfEventStreamTest.class,
-    TmfEventLogTest.class
+    TmfDataRequestTest.class,
 })
 
-public class AllEventLogTests {
+public class AllRequestTests {
 
 }

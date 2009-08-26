@@ -7,21 +7,20 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
+ *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
+package org.eclipse.linuxtools.tmf.stream;
 
-package org.eclipse.linuxtools.tmf.eventlog;
+import org.eclipse.linuxtools.tmf.stream.TmfEventStreamTest;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
-import java.io.IOException;
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+    TmfEventStreamTest.class
+})
 
-/**
- * <b><u>ITmfStreamLocator</u></b>
- * <p>
- * TODO: Implement me. Please.
- */
-public interface ITmfStreamLocator {
+public class AllStreamTests {
 
-    public void seekLocation(Object location) throws IOException;
-    public Object getCurrentLocation();
 }
