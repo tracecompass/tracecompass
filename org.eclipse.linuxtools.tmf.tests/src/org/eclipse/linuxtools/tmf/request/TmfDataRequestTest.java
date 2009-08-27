@@ -102,7 +102,7 @@ public class TmfDataRequestTest {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 0, NB_EVENTS, BLOCK_SIZE) {
             @Override
-            public void handlePartialResult() {
+            public void handleData() {
             	TmfEvent[] events = getData();
                 for (TmfEvent e : events) {
                     requestedEvents.add(e);
@@ -133,7 +133,7 @@ public class TmfDataRequestTest {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 0, NB_EVENTS, BLOCK_SIZE) {
             @Override
-            public void handlePartialResult() {
+            public void handleData() {
             	TmfEvent[] events = getData();
                 for (TmfEvent e : events) {
                     requestedEvents.add(e);
@@ -165,7 +165,7 @@ public class TmfDataRequestTest {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, OFFSET, NB_EVENTS, BLOCK_SIZE) {
             @Override
-            public void handlePartialResult() {
+            public void handleData() {
             	TmfEvent[] events = getData();
                 for (TmfEvent e : events) {
                     requestedEvents.add(e);
@@ -197,7 +197,7 @@ public class TmfDataRequestTest {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, OFFSET, NB_EVENTS, BLOCK_SIZE) {
             @Override
-            public void handlePartialResult() {
+            public void handleData() {
             	TmfEvent[] events = getData();
                 for (TmfEvent e : events) {
                     requestedEvents.add(e);
@@ -231,7 +231,7 @@ public class TmfDataRequestTest {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 0, NB_EVENTS, BLOCK_SIZE) {
             @Override
-            public void handlePartialResult() {
+            public void handleData() {
             	TmfEvent[] events = getData();
                 for (TmfEvent e : events) {
                     requestedEvents.add(e);

@@ -38,11 +38,22 @@ import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
  * Typical usage:
  *<pre><code><i>TmfTimeWindow range = new TmfTimewindow(...);
  *TmfDataRequest&lt;DataType[]&gt; request = new TmfDataRequest&lt;DataType[]&gt;(range, 0, NB_EVENTS, BLOCK_SIZE) {
- *    &#64;Override
- *    public void handlePartialResult() {
+ *    public void handleData() {
  *         DataType[] data = request.getData();
  *         for (DataType e : data) {
  *             // do something
+ *         }
+ *    }
+ *    public void handleSuccess() {
+ *         // do something
+ *         }
+ *    }
+ *    public void handleFailure() {
+ *         // do something
+ *         }
+ *    }
+ *    public void handleCancel() {
+ *         // do something
  *         }
  *    }
  *};
@@ -53,6 +64,8 @@ import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
  * The main issue is the slicing of the result in blocks and continuous
  * streams. This would require using a thread executor and to carefully
  * look at setData() and getData().
+ * 
+ * TODO: Implement request failures (codes, etc...)
  */
 public class TmfDataRequest<V> {
 
@@ -70,7 +83,7 @@ public class TmfDataRequest<V> {
     // Attributes
     // ========================================================================
 
-    private final TmfTimeRange fRange;     // The requested events timestamp range
+    private final TmfTimeRange fRange;      // The requested events timestamp range
     private final int  fIndex;              // The event index to get
     private final long fOffset;             // The synchronization offset to apply
     private final int  fNbRequestedItems;   // The number of items to read (-1 == the whole range)
@@ -78,6 +91,7 @@ public class TmfDataRequest<V> {
 
     private Object lock = new Object();
     private boolean fRequestCompleted = false;
+    private boolean fRequestFailed    = false;
     private boolean fRequestCanceled  = false;
 
     private V[] fData;	// Data object
@@ -177,6 +191,13 @@ public class TmfDataRequest<V> {
     /**
      * @return indicates if the request is canceled
      */
+    public boolean isFailed() {
+        return fRequestFailed;
+    }
+
+    /**
+     * @return indicates if the request is canceled
+     */
     public boolean isCancelled() {
         return fRequestCanceled;
     }
@@ -202,7 +223,8 @@ public class TmfDataRequest<V> {
     }
     
     /**
-     * handlePartialResult()
+     * Handle a block of incoming data. This method is called every time
+     * a block of data becomes available.
      * 
      * - Data items are received in the order they appear in the stream.
      * - Called by the request processor, in its execution thread, every time a
@@ -215,10 +237,36 @@ public class TmfDataRequest<V> {
      *
      * @param events - an array of events
      */
-    public void handlePartialResult() {
+    public void handleData() {
     }
 
+    /**
+     * Handle the completion of the request. It is called when there is no more
+     * data available either because:
+     * - the request completed normally
+     * - the request failed
+     * - the request was canceled
+     * 
+     * As a convenience, handleXXXX methods are provided. They are meant to be
+     * overridden by the application if it needs to handle these conditions. 
+     */
     public void handleCompleted() {
+    	if (fRequestFailed) { 
+    		handleFailure();
+    	}
+    	else if (fRequestCanceled) {
+    		handleCancel();
+    	}
+    	handleSuccess();
+    }
+
+    public void handleSuccess() {
+    }
+
+    public void handleFailure() {
+    }
+
+    public void handleCancel() {
     }
 
     /**
@@ -239,7 +287,7 @@ public class TmfDataRequest<V> {
     }
 
     /**
-     * Complete the request. Called by the request processor upon completion.
+     * Called by the request processor upon completion.
      */
     public void done() {
         synchronized(lock) {
@@ -250,13 +298,22 @@ public class TmfDataRequest<V> {
     }
 
     /**
-     * Cancel the request.
+     * Called by the request processor upon failure.
+     */
+    public void fail() {
+        synchronized(lock) {
+            fRequestFailed = true;
+            done();
+        }
+    }
+
+    /**
+     * Called by the request processor upon cancellation.
      */
     public void cancel() {
         synchronized(lock) {
             fRequestCanceled = true;
-            fRequestCompleted = true;
-            lock.notify();
+            done();
         }
     }
 

@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Map;
 
-import org.eclipse.linuxtools.tmf.stream.AbstractTmfEventStream;
+import org.eclipse.linuxtools.tmf.stream.TmfEventStream;
 import org.eclipse.linuxtools.tmf.stream.ITmfEventParser;
 
 /**
@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.tmf.stream.ITmfEventParser;
  * <p>
  * TODO: Implement me. Please.
  */
-public class TmfEventStreamStub extends AbstractTmfEventStream {
+public class TmfEventStreamStub extends TmfEventStream {
 
     // ========================================================================
     // Attributes

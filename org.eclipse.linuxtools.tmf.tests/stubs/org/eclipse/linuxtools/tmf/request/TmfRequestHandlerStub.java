@@ -76,7 +76,7 @@ public class TmfRequestHandlerStub implements ITmfRequestHandler<TmfEvent> {
                     	TmfEvent[] result = new TmfEvent[events.size()];
                     	events.toArray(result);
                     	request.setData(result);
-                        request.handlePartialResult();
+                        request.handleData();
                         events.removeAllElements();
                     }
                     event = fStream.getNextEvent(context);
@@ -85,7 +85,7 @@ public class TmfRequestHandlerStub implements ITmfRequestHandler<TmfEvent> {
             	events.toArray(result);
 
             	request.setData(result);
-                request.handlePartialResult();
+                request.handleData();
                 request.done();
             }
         };

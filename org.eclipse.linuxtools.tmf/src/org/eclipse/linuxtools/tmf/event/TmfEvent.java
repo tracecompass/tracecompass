@@ -26,7 +26,7 @@ package org.eclipse.linuxtools.tmf.event;
  * used as e.g. a location marker in the event stream to distinguish between
  * otherwise identical events.
  */
-public class TmfEvent {
+public class TmfEvent extends TmfData {
 
     // ========================================================================
     // Attributes

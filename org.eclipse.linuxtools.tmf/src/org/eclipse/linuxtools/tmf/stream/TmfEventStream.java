@@ -29,11 +29,11 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
 
 /**
- * <b><u>AbstractTmfEventStream</u></b>
+ * <b><u>TmfEventStream</u></b>
  * <p>
  * TODO: Implement me. Please.
  */
-public abstract class AbstractTmfEventStream implements ITmfEventStream {
+public abstract class TmfEventStream implements ITmfEventStream {
 
     // ========================================================================
     // Constants
@@ -77,7 +77,7 @@ public abstract class AbstractTmfEventStream implements ITmfEventStream {
      * @param cacheSize
      * @throws FileNotFoundException
      */
-    protected AbstractTmfEventStream(String filename, ITmfEventParser parser, int cacheSize) throws FileNotFoundException {
+    protected TmfEventStream(String filename, ITmfEventParser parser, int cacheSize) throws FileNotFoundException {
     	fName = filename;
         fParser = parser;
         fCacheSize = cacheSize;
@@ -88,7 +88,7 @@ public abstract class AbstractTmfEventStream implements ITmfEventStream {
      * @param parser
      * @throws FileNotFoundException
      */
-    protected AbstractTmfEventStream(String filename, ITmfEventParser parser) throws FileNotFoundException {
+    protected TmfEventStream(String filename, ITmfEventParser parser) throws FileNotFoundException {
     	this(filename, parser, DEFAULT_CACHE_SIZE);
     }
 
@@ -303,59 +303,6 @@ public abstract class AbstractTmfEventStream implements ITmfEventStream {
 
 			return Status.OK_STATUS;
 		}
-    }
-
-    public void indexStream(final String filename) {
-
-//        ProgressMonitorDialog dialog = new ProgressMonitorDialog(null);
-//        try {
-//            dialog.run(true, true, new IRunnableWithProgress() {
-//                @Override
-//                public void run(IProgressMonitor monitor)
-//                        throws InvocationTargetException, InterruptedException {
-//                    monitor.beginTask("Indexing " + filename,
-//                            IProgressMonitor.UNKNOWN);
-//
-//                    try {
-//                        seekLocation(null);
-//                        TmfTimestamp startTime = new TmfTimestamp();
-//                        TmfTimestamp lastTime = new TmfTimestamp();
-//                        Object location = getCurrentLocation();
-//
-//                        TmfEvent event = getNextEvent();
-//                        if (event != null) {
-//                            startTime = event.getTimestamp();
-//                            while (event != null) {
-//                                lastTime = event.getTimestamp();
-//                                if ((fNbEvents++ % fCacheSize) == 0) {
-//                                    if (monitor.isCanceled()) {
-//                                        throw new CancellationException();
-//                                    }
-//                                    TmfStreamCheckpoint bookmark = new TmfStreamCheckpoint(
-//                                            lastTime, location);
-//                                    fCheckpoints.add(bookmark);
-//                                    monitor.worked(1);
-//                                }
-//                                location = getCurrentLocation();
-//                                event = getNextEvent();
-//                            }
-//                            fTimeRange = new TmfTimeRange(startTime, lastTime);
-//                        }
-//                        seekLocation(null);
-//                    } catch (IOException e) {
-//                    } finally {
-//                        monitor.done();
-//                    }
-//                }
-//
-//            });
-//        } catch (InvocationTargetException e1) {
-//            // TODO Auto-generated catch block
-//            e1.printStackTrace();
-//        } catch (InterruptedException e1) {
-//            // TODO Auto-generated catch block
-//            e1.printStackTrace();
-//        }
     }
 
 }

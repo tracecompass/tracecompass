@@ -26,9 +26,9 @@ import org.eclipse.linuxtools.tmf.stream.TmfStreamUpdateEvent;
 import org.eclipse.linuxtools.tmf.stream.ITmfEventStream.StreamContext;
 
 /**
- * <b><u>TmfEventLog</u></b>
+ * <b><u>TmfTrace</u></b>
  * <p>
- * TmfEventLog represents a time-ordered set of events tied to a single event
+ * TmfTrace represents a time-ordered set of events tied to a single event
  * stream. It keeps track of the global information about the event log:
  * <ul>
  * <li> the epoch, a reference timestamp for the whole log (t0)
@@ -165,7 +165,7 @@ public class TmfTrace implements ITmfRequestHandler<TmfEvent> {
                     	TmfEvent[] result = new TmfEvent[events.size()];
                     	events.toArray(result);
                     	request.setData(result);
-                        request.handlePartialResult();
+                        request.handleData();
                         events.removeAllElements();
                     }
                     // To avoid an unnecessary read passed the last event requested 
@@ -176,7 +176,7 @@ public class TmfTrace implements ITmfRequestHandler<TmfEvent> {
             	events.toArray(result);
             	request.setData(result);
 
-            	request.handlePartialResult();
+            	request.handleData();
                 request.done();
             }
         };
@@ -211,7 +211,7 @@ public class TmfTrace implements ITmfRequestHandler<TmfEvent> {
                     	TmfEvent[] result = new TmfEvent[events.size()];
                     	events.toArray(result);
                     	request.setData(result);
-                        request.handlePartialResult();
+                        request.handleData();
                         events.removeAllElements();
                     }
                     // To avoid an unnecessary read passed the last event requested 
@@ -222,7 +222,7 @@ public class TmfTrace implements ITmfRequestHandler<TmfEvent> {
             	events.toArray(result);
 
             	request.setData(result);
-                request.handlePartialResult();
+                request.handleData();
                 request.done();
             }
         };
