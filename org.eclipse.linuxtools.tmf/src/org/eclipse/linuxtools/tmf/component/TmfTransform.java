@@ -10,14 +10,18 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.trace;
+package org.eclipse.linuxtools.tmf.component;
 
 /**
- * <b><u>ITmfEventListener</u></b>
+ * <b><u>TmfTransform</u></b>
  * <p>
  * TODO: Implement me. Please.
  */
-public interface ITmfTraceEventListener {
+public abstract class TmfTransform implements ITmfComponent {
 
-	public void handleEvent(ITmfTraceEvent event);
+	/**
+	 * 
+	 */
+	public void transformData() {
+	}
 }

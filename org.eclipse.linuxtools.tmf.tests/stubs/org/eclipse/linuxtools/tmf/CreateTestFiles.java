@@ -38,6 +38,7 @@ public class CreateTestFiles {
     // Constants
     // ========================================================================
 
+	private static final String DIRECTORY = "testfiles";
 	private static final String FILE_NAMES[] = { "Test-10", "Test-1K", "Test-10K", "Test-100K", "Test-1M",  "Test-10M" };
     private static final int    FILE_SIZES[] = {       10 ,     1000 ,     10000 ,     100000 ,  1000000 ,   10000000  };
 
@@ -54,7 +55,7 @@ public class CreateTestFiles {
     public static void main(String[] args) {
         
         try {
-            System.out.println("Creating test files in directory: " + new File(".").getCanonicalPath() + File.separator + "testfiles");
+            System.out.println("Creating test files in directory: " + new File(".").getCanonicalPath() + File.separator + DIRECTORY);
         } catch (IOException e) {
             e.printStackTrace();
         }

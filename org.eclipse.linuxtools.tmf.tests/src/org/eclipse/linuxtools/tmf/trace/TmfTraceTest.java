@@ -35,9 +35,10 @@ import org.junit.Test;
  */
 public class TmfTraceTest {
 
-    private static final String TEST_STREAM = "M-Test-100K";
+    private static final String DIRECTORY   = "testfiles";
+    private static final String TEST_STREAM = "M-Test-10K";
     private static String testfile;
-    private static int fTotalNbEvents = 100000;
+    private static int fTotalNbEvents = 10000;
     private static int fDefaultBlockSize = 1000;
 
     private static ITmfEventParser fParser;
@@ -48,12 +49,12 @@ public class TmfTraceTest {
 
     @BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-    	String directory = new File(".").getCanonicalPath() + File.separator + "testfiles";
+    	String directory = new File(".").getCanonicalPath() + File.separator + DIRECTORY;
     	testfile = directory + File.separator + TEST_STREAM;
 
 		fParser = new TmfEventParserStub();
 		fStream = new TmfEventStreamStub(testfile, fParser);
-        fTrace  = new TmfTrace("MyEventLog", fStream);
+        fTrace  = new TmfTrace("MyTrace", fStream);
         fStream.indexStream(true);
 	}
 
@@ -63,13 +64,11 @@ public class TmfTraceTest {
 
 	@Test
 	public void testBasicTmfEventLog() {
-		TmfTrace eventLog = new TmfTrace("MyEventLog", fStream);
+		assertEquals("GetId", "MyTrace", fTrace.getId());
+        assertEquals("GetEpoch", TmfTimestamp.BigBang, fTrace.getEpoch());
+        assertEquals("GetNbEvents", fTotalNbEvents, fTrace.getNbEvents());
 
-		assertEquals("GetId", "MyEventLog", eventLog.getId());
-        assertEquals("GetEpoch", TmfTimestamp.BigBang, eventLog.getEpoch());
-        assertEquals("GetNbEvents", fTotalNbEvents, eventLog.getNbEvents());
-
-        TmfTimeRange timeRange = eventLog.getTimeRange();
+        TmfTimeRange timeRange = fTrace.getTimeRange();
         assertEquals("GetTimeRange-start", 1, timeRange.getStartTime().getValue());
         assertEquals("GetTimeRange-end", fTotalNbEvents, timeRange.getEndTime().getValue());
 	}
@@ -89,15 +88,15 @@ public class TmfTraceTest {
 //        assertEquals("GetTimeRange-end", fTotalNbEvents, timeRange.getEndTime().getValue());
 //	}
 
-    // ========================================================================
-    // Accessors
-    // ========================================================================
-
-    @Test
-    public void testGetNbEvents() throws Exception {
-    	TmfTrace eventLog = new TmfTrace("MyEventLog", fStream);
-        assertEquals("nbEvents", fTotalNbEvents, eventLog.getNbEvents());
-    }
+//    // ========================================================================
+//    // Accessors
+//    // ========================================================================
+//
+//    @Test
+//    public void testGetNbEvents() throws Exception {
+//    	TmfTrace eventLog = new TmfTrace("MyEventLog", fStream);
+//        assertEquals("nbEvents", fTotalNbEvents, eventLog.getNbEvents());
+//    }
 
     // ========================================================================
     // Operators
@@ -110,6 +109,7 @@ public class TmfTraceTest {
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        fStream.indexStream(true);
         final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 0, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void handleData() {

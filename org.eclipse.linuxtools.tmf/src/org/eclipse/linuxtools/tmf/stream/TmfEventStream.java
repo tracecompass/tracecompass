@@ -15,8 +15,6 @@ package org.eclipse.linuxtools.tmf.stream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -26,7 +24,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.trace.TmfTrace;
+import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 
 /**
  * <b><u>TmfEventStream</u></b>
@@ -63,9 +61,6 @@ public abstract class TmfEventStream implements ITmfEventStream {
 
     // The time span of the event stream
     private TmfTimeRange fTimeRange = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigBang);
-
-    // The listeners
-    private Set<TmfTrace> fListeners = new HashSet<TmfTrace>();
 
     // ========================================================================
     // Constructors
@@ -211,18 +206,8 @@ public abstract class TmfEventStream implements ITmfEventStream {
         return null;
     }
 
-	public synchronized void addListener(TmfTrace listener) {
-		fListeners.add(listener);
-	}
-
-	public synchronized void removeListener(TmfTrace listener) {
-		fListeners.remove(listener);
-	}
-
 	private synchronized void notifyListeners() {
-		for (TmfTrace listener : fListeners) {
-			listener.handleEvent(new TmfStreamUpdateEvent(this));
-		}
+		TmfSignalManager.dispatchSignal(new TmfStreamUpdateSignal(this, this));
 	}
    
     /* (non-Javadoc)

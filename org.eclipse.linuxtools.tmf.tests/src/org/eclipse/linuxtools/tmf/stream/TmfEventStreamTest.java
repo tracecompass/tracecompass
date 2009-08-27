@@ -31,6 +31,7 @@ import org.junit.Test;
  */
 public class TmfEventStreamTest {
 
+    private static final String DIRECTORY   = "testfiles";
     private static final String TEST_STREAM = "M-Test-100K";
     private static String testfile;
     private static final int NB_EVENTS = 100000;
@@ -43,7 +44,7 @@ public class TmfEventStreamTest {
      */
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-    	String directory = new File(".").getCanonicalPath() + File.separator + "testfiles";
+    	String directory = new File(".").getCanonicalPath() + File.separator + DIRECTORY;
     	testfile = directory + File.separator + TEST_STREAM;
 
         TmfEventParserStub parser = new TmfEventParserStub();

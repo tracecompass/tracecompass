@@ -12,8 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.trace;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
@@ -21,8 +19,8 @@ import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.ITmfRequestHandler;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.stream.ITmfEventStream;
-import org.eclipse.linuxtools.tmf.stream.TmfStreamUpdateEvent;
 import org.eclipse.linuxtools.tmf.stream.ITmfEventStream.StreamContext;
 
 /**
@@ -51,11 +49,8 @@ public class TmfTrace implements ITmfRequestHandler<TmfEvent> {
     private final ITmfEventStream fStream;
     private final TmfTimestamp fEpoch;
     
-    // The listeners
-    private Set<ITmfTraceEventListener> fListeners = new HashSet<ITmfTraceEventListener>();
-
     // ========================================================================
-    // Constructors/Destructors
+    // Constructors
     // ========================================================================
 
     public TmfTrace(String id, ITmfEventStream stream) {
@@ -67,11 +62,11 @@ public class TmfTrace implements ITmfRequestHandler<TmfEvent> {
         fId = id;
         fStream = stream;
         fEpoch = epoch;
-        fStream.addListener(this);
+        TmfSignalManager.addListener(this);
     }
 
     public void dispose() {
-    	fStream.removeListener(this);
+        TmfSignalManager.removeListener(this);
     }
 
     // ========================================================================
@@ -116,19 +111,12 @@ public class TmfTrace implements ITmfRequestHandler<TmfEvent> {
         }
     }
 
-	public void addListener(ITmfTraceEventListener listener) {
-		fListeners.add(listener);
-	}
-
-	public void removeListener(ITmfTraceEventListener listener) {
-		fListeners.remove(listener);
-	}
-
-	public void handleEvent(TmfStreamUpdateEvent event) {
-    	for (ITmfTraceEventListener listener : fListeners) {
-    		listener.handleEvent(new TmfTraceUpdateEvent(this));
-    	}
-    }
+//    @TmfSignalHandler
+//	public void handleSignal(TmfStreamUpdateSignal event) {
+//		for (ITmfTraceEventListener listener : fListeners) {
+//			listener.handleEvent(new TmfTraceUpdateEvent(this));
+//		}
+//	}
 
     // ========================================================================
     // Helper functions

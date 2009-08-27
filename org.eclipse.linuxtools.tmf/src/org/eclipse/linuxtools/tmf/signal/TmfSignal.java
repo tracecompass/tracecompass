@@ -22,27 +22,11 @@ public abstract class TmfSignal {
 	// The signal originator
 	private final Object fSource;
 
-	private int fReference;
-
 	public TmfSignal(Object source) {
-		this(source, 0);
-	}
-
-	public TmfSignal(Object source, int reference) {
 		fSource = source;
-		fReference = reference;
 	}
 
 	public Object getSource() {
 		return fSource;
 	}
-
-	public void setReference(int reference) {
-		fReference = reference;
-	}
-
-	public int getReference() {
-		return fReference;
-	}
-
 }

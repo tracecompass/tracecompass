@@ -17,7 +17,6 @@ import java.util.Map;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.trace.TmfTrace;
 
 /**
  * <b><u>ITmfEventStream</u></b>
@@ -75,6 +74,4 @@ public interface ITmfEventStream {
     public Object getCurrentLocation();
     public StreamContext seekLocation(Object location);
 
-	public void addListener(TmfTrace tmfEventLog);
-	public void removeListener(TmfTrace tmfEventLog);
 }

@@ -12,7 +12,9 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Import-Package: org.junit.runner
 Export-Package: org.eclipse.linuxtools.tmf,
+ org.eclipse.linuxtools.tmf.component,
  org.eclipse.linuxtools.tmf.event,
  org.eclipse.linuxtools.tmf.request,
+ org.eclipse.linuxtools.tmf.signal,
  org.eclipse.linuxtools.tmf.stream,
  org.eclipse.linuxtools.tmf.trace
