@@ -15,15 +15,15 @@ package org.eclipse.linuxtools.tmf.stream;
 import org.eclipse.linuxtools.tmf.signal.TmfSignal;
 
 /**
- * <b><u>TmfStreamUpdateEvent</u></b>
+ * <b><u>TmfStreamUpdatedEvent</u></b>
  * <p>
  * TODO: Implement me. Please.
  */
-public class TmfStreamUpdateSignal extends TmfSignal {
+public class TmfStreamUpdatedSignal extends TmfSignal {
 
 	private final ITmfEventStream fEventStream;
 	
-	public TmfStreamUpdateSignal(Object source, ITmfEventStream stream) {
+	public TmfStreamUpdatedSignal(Object source, ITmfEventStream stream) {
 		super(source);
 		fEventStream = stream;
 	}

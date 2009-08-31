@@ -25,36 +25,43 @@ import java.util.Map;
  * TODO: Implement me. Please.
  * <p>
  * TODO: Error/exception handling
- * <p>
- * Note: This code is a shameless simplification of Pawel Piech's excellent
- * event handling work in DSF.
  */
 public class TmfSignalManager {
 
 	/**
 	 * The set of event listeners and their corresponding handler methods.
-	 * 
-	 * Note: The use of WeakHashMap is far from ideal but, if a listener goes
-	 * out of scope without removing itself from this list, GC will eventually
-	 * call the finalize() method 
 	 */
 	static private Map<Object, Method[]> fListeners = new HashMap<Object, Method[]>();
 
+	// TODO: read from the preferences
+	private static boolean fTraceIsActive = true;
+	private static TmfSignalTrace fSignalTracer;
 
-	static public void addListener(Object listener) {
-		Method[] methods = getSignalHandlerMethods(listener);
-		if (methods.length > 0)
-			synchronized(fListeners) {
-				fListeners.put(listener, methods);
-			}
-	}
+	private static TmfSignalManager fInstance;
 
-	static public void removeListener(Object listener) {
-		synchronized(fListeners) {
-			fListeners.remove(listener);
+	static {
+		if (fTraceIsActive) {
+			fSignalTracer = new TmfSignalTrace();
+			addListener(fSignalTracer);
 		}
 	}
 
+	public static synchronized void addListener(Object listener) {
+		Method[] methods = getSignalHandlerMethods(listener);
+		if (methods.length > 0)
+			fListeners.put(listener, methods);
+	}
+
+	public static synchronized void removeListener(Object listener) {
+		fListeners.remove(listener);
+	}
+
+	public static TmfSignalManager getInstance() {
+		if (fInstance == null) {
+			fInstance = new TmfSignalManager();
+		}
+		return fInstance;
+	}
 	/**
 	 * Invokes the handling methods that expect this signal.
 	 * 
@@ -65,13 +72,47 @@ public class TmfSignalManager {
 	 * 
 	 * @param signal
 	 */
-	static public void dispatchSignal(Object signal) {
+	private class Dispatch implements Runnable {
+
+		private final Method method;
+		private final Object entry;
+		private final Object signal;
+
+		public Dispatch(Method m, Object e, Object s) {
+			method = m;
+			entry = e;
+			signal = s;
+		}
+
+		public void run() {
+			try {
+				method.invoke(entry, new Object[] { signal });
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void dispatch(Method method, Object key, Object signal) {
+		Dispatch disp = new Dispatch(method, key, signal);
+		new Thread(disp).start();
+	}
+
+	static public synchronized void dispatchSignal(Object signal) {
 
 		// Build the list of listener methods that are registered for this signal
 		Class<?> signalClass = signal.getClass();
 		Map<Object, List<Method>> listeners = new HashMap<Object, List<Method>>();
-		List<Method> matchingMethods = new ArrayList<Method>();
+		listeners.clear();
 		for (Map.Entry<Object, Method[]> entry : fListeners.entrySet()) {
+			List<Method> matchingMethods = new ArrayList<Method>();
 			for (Method method : entry.getValue()) {
 				if (method.getParameterTypes()[0].isAssignableFrom(signalClass)) {
 					matchingMethods.add(method);
@@ -85,18 +126,19 @@ public class TmfSignalManager {
 		// Call the signal handlers
 		for (Map.Entry<Object, List<Method>> entry : listeners.entrySet()) {
 			for (Method method : entry.getValue()) {
-				try {
-					method.invoke(entry.getKey(), new Object[] { signal });
-				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				getInstance().dispatch(method, entry.getKey(), signal);
+//				try {
+//					method.invoke(entry.getKey(), new Object[] { signal });
+//				} catch (IllegalArgumentException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (IllegalAccessException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (InvocationTargetException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 			}
 		}
 	}

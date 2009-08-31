@@ -10,26 +10,25 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.signal;
+package org.eclipse.linuxtools.tmf.trace;
 
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.signal.TmfSignal;
 
 /**
- * <b><u>TmfTimeSynchSignal</u></b>
+ * <b><u>TmfTraceUpdatedEvent</u></b>
  * <p>
  * TODO: Implement me. Please.
  */
-public class TmfTimeSynchSignal extends TmfSignal {
+public class TmfTraceUpdatedSignal extends TmfSignal {
 
-	private final TmfTimestamp fCurrentTime;
-
-	public TmfTimeSynchSignal(Object source, TmfTimestamp ts) {
+	private final TmfTrace fTrace;
+	
+	public TmfTraceUpdatedSignal(Object source, TmfTrace trace) {
 		super(source);
-		fCurrentTime = ts;
+		fTrace = trace;
 	}
 
-	public TmfTimestamp getCurrentTime() {
-		return fCurrentTime;
+	public TmfTrace getTrace() {
+		return fTrace;
 	}
-
 }

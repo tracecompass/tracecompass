@@ -19,8 +19,10 @@ import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.ITmfRequestHandler;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.stream.ITmfEventStream;
+import org.eclipse.linuxtools.tmf.stream.TmfStreamUpdatedSignal;
 import org.eclipse.linuxtools.tmf.stream.ITmfEventStream.StreamContext;
 
 /**
@@ -93,6 +95,10 @@ public class TmfTrace implements ITmfRequestHandler<TmfEvent> {
     	return fStream.getNbEvents();
     }
 
+    public int getIndex(TmfTimestamp ts) {
+    	return fStream.getIndex(ts);
+    }
+
     // ========================================================================
     // Operators
     // ========================================================================
@@ -111,12 +117,14 @@ public class TmfTrace implements ITmfRequestHandler<TmfEvent> {
         }
     }
 
-//    @TmfSignalHandler
-//	public void handleSignal(TmfStreamUpdateSignal event) {
-//		for (ITmfTraceEventListener listener : fListeners) {
-//			listener.handleEvent(new TmfTraceUpdateEvent(this));
-//		}
-//	}
+    // ========================================================================
+    // Signal handlers
+    // ========================================================================
+
+    @TmfSignalHandler
+    public void streamUpdated(TmfStreamUpdatedSignal signal) {
+		TmfSignalManager.dispatchSignal(new TmfTraceUpdatedSignal(this, this));
+    }
 
     // ========================================================================
     // Helper functions
@@ -129,7 +137,7 @@ public class TmfTrace implements ITmfRequestHandler<TmfEvent> {
     private void serviceEventRequestByTimestamp(final TmfDataRequest<TmfEvent> request) {
         Thread thread = new Thread() {
             @Override
-            public void run() {
+			public void run() {
                 TmfTimestamp startTime = request.getRange().getStartTime();
                 TmfTimestamp endTime   = request.getRange().getEndTime();
                 int blockSize = request.getBlockize();
@@ -178,7 +186,7 @@ public class TmfTrace implements ITmfRequestHandler<TmfEvent> {
     private void serviceEventRequestByIndex(final TmfDataRequest<TmfEvent> request) {
         Thread thread = new Thread() {
             @Override
-            public void run() {
+			public void run() {
                 int blockSize = request.getBlockize();
 
                 int nbRequestedEvents = request.getNbRequestedItems();

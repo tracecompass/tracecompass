@@ -27,8 +27,18 @@ public interface ITmfEventStream {
 
 	public class StreamContext {
 		Object location;
-		public StreamContext(Object loc) {
+		int index;
+
+		public StreamContext(Object loc, int ind) {
 			location = loc;
+			index = ind;
+		}
+
+		public StreamContext(StreamContext other) {
+			if (other != null) {
+				location = other.location;
+				index    = other.index;
+			}
 		}
 	}
     
@@ -74,4 +84,11 @@ public interface ITmfEventStream {
     public Object getCurrentLocation();
     public StreamContext seekLocation(Object location);
 
+    /**
+     * Returns the index of the event at that timestamp
+     * 
+     * @param timestamp
+     * @return
+     */
+	public int getIndex(TmfTimestamp timestamp); 
 }

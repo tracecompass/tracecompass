@@ -78,7 +78,7 @@ public class TmfEventStreamStub extends TmfEventStream {
     	StreamContext context = null;
         try {
 			fStream.seek((location != null) ? (Long) location : 0);
-			context = new StreamContext(getCurrentLocation());
+			context = new StreamContext(getCurrentLocation(), 0);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

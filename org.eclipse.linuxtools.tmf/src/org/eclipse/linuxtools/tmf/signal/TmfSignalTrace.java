@@ -10,25 +10,17 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.trace;
-
-import org.eclipse.linuxtools.tmf.signal.TmfSignal;
+package org.eclipse.linuxtools.tmf.signal;
 
 /**
- * <b><u>TmfTraceUpdateEvent</u></b>
+ * <b><u>TmfSignalTrace</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * TODO: Activate the tracing from a preference
  */
-public class TmfTraceUpdateSignal extends TmfSignal {
+public class TmfSignalTrace {
 
-	private final TmfTrace fTrace;
-	
-	public TmfTraceUpdateSignal(Object source, TmfTrace trace) {
-		super(source);
-		fTrace = trace;
-	}
-
-	public TmfTrace getTrace() {
-		return fTrace;
+	@TmfSignalHandler
+	public void traceSignal(TmfSignal signal) {
+		System.out.println(signal.getSource().toString() + ": " + signal.getClass().toString());
 	}
 }

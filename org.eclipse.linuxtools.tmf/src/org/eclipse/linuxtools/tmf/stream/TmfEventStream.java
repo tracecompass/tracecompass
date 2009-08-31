@@ -105,18 +105,26 @@ public abstract class TmfEventStream implements ITmfEventStream {
         return fName;
     }
 
-    /**
-     * @return
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.stream.ITmfEventStream#getNbEvents()
      */
-    public synchronized int getNbEvents() {
+    public int getNbEvents() {
         return fNbEvents;
     }
 
-    /**
-     * @return
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.stream.ITmfEventStream#getTimeRange()
      */
-    public synchronized TmfTimeRange getTimeRange() {
+    public TmfTimeRange getTimeRange() {
         return fTimeRange;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.stream.ITmfEventStream#getIndex(org.eclipse.linuxtools.tmf.event.TmfTimestamp)
+     */
+    public int getIndex(TmfTimestamp timestamp) {
+    	StreamContext context = seekEvent(timestamp);
+    	return context.index;
     }
 
     // ========================================================================
@@ -141,12 +149,13 @@ public abstract class TmfEventStream implements ITmfEventStream {
         synchronized(this) {
         	nextEventContext = seekLocation(location);
         }
-        StreamContext currentEventContext = new StreamContext(nextEventContext.location);
+        StreamContext currentEventContext = new StreamContext(nextEventContext.location, index * fCacheSize);
 
         // And get the event
         TmfEvent event = getNextEvent(nextEventContext);
         while (event != null && event.getTimestamp().compareTo(timestamp, false) < 0) {
         	currentEventContext.location = nextEventContext.location;
+        	currentEventContext.index++;
         	event = getNextEvent(nextEventContext);
         }
 
@@ -162,7 +171,7 @@ public abstract class TmfEventStream implements ITmfEventStream {
         synchronized(this) {
         	nextEventContext = seekLocation(location);
         }
-        StreamContext currentEventContext = new StreamContext(nextEventContext.location);
+        StreamContext currentEventContext = new StreamContext(nextEventContext);
 
         // And locate the event (if it exists)
         int current = index * fCacheSize;
@@ -207,7 +216,7 @@ public abstract class TmfEventStream implements ITmfEventStream {
     }
 
 	private synchronized void notifyListeners() {
-		TmfSignalManager.dispatchSignal(new TmfStreamUpdateSignal(this, this));
+		TmfSignalManager.dispatchSignal(new TmfStreamUpdatedSignal(this, this));
 	}
    
     /* (non-Javadoc)
@@ -249,7 +258,7 @@ public abstract class TmfEventStream implements ITmfEventStream {
                 synchronized(this) {
                 	nextEventContext = seekLocation(null);
                 }
-                StreamContext currentEventContext = new StreamContext(nextEventContext.location);
+                StreamContext currentEventContext = new StreamContext(nextEventContext);
                 TmfEvent event = getNextEvent(nextEventContext);
                 if (event != null) {
                 	startTime = event.getTimestamp();
