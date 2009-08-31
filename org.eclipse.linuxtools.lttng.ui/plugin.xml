@@ -3,22 +3,22 @@
 <plugin>
    <extension
          id="org,eclipse.linuxtools.lttng.ui.perspective"
-         name="%extension.name"
+         name="LTTng Perspective"
          point="org.eclipse.ui.perspectives">
       <perspective
             class="org.eclipse.linuxtools.lttng.ui.views.PerspectiveFactory"
             icon="icons/garland32.png"
             id="org.eclipse.linuxtools.lttng.ui.perspective"
-            name="%perspective.name">
+            name="LTTng">
       </perspective>
    </extension>
    <extension
          id="org.eclipse.linuxtools.lttng.ui.views"
-         name="%extension.name.0"
+         name="LTTng Views"
          point="org.eclipse.ui.views">
       <category
             id="org.eclipse.linuxtools.lttng.ui.views.category"
-            name="%category.name">
+            name="LTTng">
       </category>
       <view
             allowMultiple="false"
@@ -26,7 +26,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.project.ProjectView"
             icon="icons/project_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.project"
-            name="%view.name"
+            name="Project"
             restorable="true">
       </view>
       <view
@@ -35,7 +35,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.control.ControlView"
             icon="icons/control_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.control"
-            name="%view.name.0"
+            name="Control"
             restorable="true">
       </view>
       <view
@@ -44,7 +44,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.events.EventsView"
             icon="icons/events_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.events"
-            name="%view.name.1"
+            name="Events"
             restorable="true">
       </view>
       <view
@@ -53,7 +53,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.timeframe.TimeFrameView"
             icon="icons/time_frame_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.timeframe"
-            name="%view.name.2"
+            name="Time Frame"
             restorable="true">
       </view>
       <view
@@ -62,7 +62,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.controlflow.ControlFlowView"
             icon="icons/control_flow_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.controlflow"
-            name="%view.name.3"
+            name="Control Flow"
             restorable="true">
       </view>
       <view
@@ -71,7 +71,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.resources.ResourcesView"
             icon="icons/resources_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.resources"
-            name="%view.name.4"
+            name="Resources"
             restorable="true">
       </view>
       <view
@@ -80,7 +80,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.statistics.StatisticsView"
             icon="icons/statistics_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.statistics"
-            name="%view.name.5"
+            name="Statistics"
             restorable="true">
       </view>
       <view
@@ -89,145 +89,49 @@
             class="org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramView"
             icon="icons/histogram.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.histogram"
-            name="%view.name.6"
+            name="Histogram"
             restorable="true">
       </view>
    </extension>
    <extension
          id="org.eclipse.linuxtools.lttng.wizards.new"
-         name="%extension.name.1"
+         name="LTTng New Wizards"
          point="org.eclipse.ui.newWizards">
       <category
             id="org.eclipse.linuxtools.lttng.ui.wizards.new"
-            name="%category.name.0">
+            name="LTTng">
       </category>
       <wizard
             category="org.eclipse.linuxtools.lttng.ui.wizards.new"
-            class="org.eclipse.linuxtools.lttng.ui.views.project.dialogs.NewProjectWizard"
-            descriptionImage="icons/garland16.png"
+            class="org.eclipse.linuxtools.lttng.ui.views.project.NewProjectWizard"
             finalPerspective="org.eclipse.linuxtools.lttng.ui.perspective"
-            icon="icons/garland16.png"
+            icon="icons/garland32.png"
             id="org.eclipse.linuxtools.lttng.ui.views.ui.wizards.newProject"
-            name="%wizard.name"
+            name="LTTng Project"
             project="true">
          <description>
-            %wizard.description
+            Create a new LTTng project
          </description>
       </wizard>
    </extension>
    <extension
-         id="org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature"
-         name="%extension.name.2"
-         point="org.eclipse.core.resources.natures">
-      <runtime>
-         <run
-               class="org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature">
-         </run>
-      </runtime>
-   </extension>
-   <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            description="%actionSet.description"
-            id="org.eclipse.linuxtools.lttng.ui.view.project.actionSet"
-            label="%actionSet.label"
-            visible="false">
-         <menu
-               id="org.eclipse.linuxtools.lttng.ui.view.project.menu"
-               label="%menu.label"
-               path="additions">
-            <groupMarker
-                  name="content">
-            </groupMarker>
-            <groupMarker
-                  name="additions">
-            </groupMarker>
-         </menu>
-         <action
-               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.NewProjectActionDelegate"
-               icon="icons/garland16.png"
-               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.newProjectAction"
-               label="%action.label"
-               menubarPath="org.eclipse.linuxtools.lttng.ui.view.project.menu/content"
-               style="push"
-               toolbarPath="Normal/additions"
-               tooltip="%action.tooltip">
-         </action>
-      </actionSet>
-   </extension>
-   <extension
-         point="org.eclipse.ui.popupMenus">
-      <objectContribution
-            adaptable="true"
-            id="org.eclipse.linuxtools.lttng.ui.view.project.projectMenu"
-            objectClass="org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProject">
-         <action
-               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.DeleteProjectActionDelegate"
-               enablesFor="1"
-               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.deleteProjectAction"
-               label="%action.label.0"
-               menubarPath="additions">
-         </action>
-         <action
-               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.NewProjectActionDelegate"
-               enablesFor="?"
-               icon="icons/garland16.png"
-               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.newProjectAction"
-               label="%action.label.1"
-               menubarPath="additions"
-               tooltip="%action.tooltip.0">
-         </action>
-      </objectContribution>
-      <objectContribution
-            adaptable="true"
-            id="org.eclipse.linuxtools.lttng.ui.view.project.traceMenu"
-            objectClass="org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngTraceFolder">
-         <action
-               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.ImportTraceActionDelegate"
-               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.importTraceAction"
-               label="%action.label.2"
-               menubarPath="additions">
-         </action>
-      </objectContribution>
-      <objectContribution
-            adaptable="true"
-            id="org.eclipse.linuxtools.lttng.ui.view.project.traceEntryMenu"
-            objectClass="org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngTraceEntry">
-         <action
-               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.DeleteTraceActionDelegate"
-               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.deleteTraceAction"
-               label="%action.label.3"
-               menubarPath="additions">
-         </action>
-      </objectContribution>
-      <objectContribution
-            adaptable="true"
-            id="org.eclipse.linuxtools.lttng.ui.view.project.experimentMenu"
-            objectClass="org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentFolder">
-         <action
-               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.NewExperimentActionDelegate"
-               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.newExperimentAction"
-               label="%action.label.4"
-               menubarPath="additions">
-         </action>
-      </objectContribution>
-      <objectContribution
-            adaptable="true"
-            id="org.eclipse.linuxtools.lttng.ui.view.project.experimentEntryMenu"
-            objectClass="org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentEntry">
-         <action
-               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.DeleteExperimentActionDelegate"
-               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.deleteExperimentAction"
-               label="%action.label.5"
-               menubarPath="additions">
-         </action>
-         <action
-               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.AddTraceActionDelegate"
-               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.addTraceExperimentAction"
-               label="%action.label.6"
-               menubarPath="additions">
-         </action>
-      </objectContribution>
+         id="org.eclipse.linuxtools.lttng.wizards.import"
+         name="LTTng Import Wizards"
+         point="org.eclipse.ui.importWizards">
+      <category
+            id="org.eclipse.linuxtools.lttng.ui.wizards.import"
+            name="LTTng">
+      </category>
+      <wizard
+            category="org.eclipse.linuxtools.lttng.ui.wizards.import"
+            class="org.eclipse.linuxtools.lttng.ui.views.project.ImportTraceWizard"
+            icon="icons/garland32.png"
+            id="org.eclipse.linuxtools.lttng.ui.wizards.importTrace"
+            name="LTTng Trace">
+         <description>
+            Import an existing LTTng trace file
+         </description>
+      </wizard>
    </extension>
 
 </plugin>

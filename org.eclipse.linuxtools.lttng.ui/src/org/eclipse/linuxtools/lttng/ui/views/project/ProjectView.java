@@ -12,31 +12,33 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.project;
 
-import java.io.FileNotFoundException;
-
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.internal.resources.File;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
-import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentEntry;
-import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngTraceEntry;
-import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
-import org.eclipse.linuxtools.tmf.trace.TmfExperimentSelectedSignal;
-import org.eclipse.linuxtools.tmf.ui.views.TmfView;
+import org.eclipse.linuxtools.lttng.stubs.LTTngEventParserStub;
+import org.eclipse.linuxtools.lttng.stubs.LTTngEventStreamStub;
+import org.eclipse.linuxtools.lttng.ui.views.Labels;
+import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
+import org.eclipse.linuxtools.tmf.stream.ITmfEventParser;
+import org.eclipse.linuxtools.tmf.stream.ITmfEventStream;
+import org.eclipse.linuxtools.tmf.trace.TmfTrace;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceSelectedSignal;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.part.ViewPart;
 
 /**
  * <b><u>ProjectView</u></b>
@@ -44,19 +46,19 @@ import org.eclipse.swt.widgets.Tree;
  * The ProjectView keeps track of the LTTng projects in the workspace.
  *
  * TODO: Implement me. Please.
- * TODO: Put all actions in a context menu
- * TODO: Identify LTTng traces vs. experiments and hook doubleClick properly
+ * TODO: Display only LTTng projects (nature)
+ * TODO: Add context menu
+ * TODO: Identify LTTng traces and hook doubleClick properly
  * TODO: Handle multiple traces
  */
-public class ProjectView extends TmfView {
+@SuppressWarnings("restriction")
+public class ProjectView extends ViewPart {
 
-    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.project";
+    public static final String ID = Labels.ProjectView_ID;
 
     private final IWorkspace fWorkspace;
     private final IResourceChangeListener fResourceChangeListener;
     private TreeViewer fViewer;
-    private TmfExperiment fExperiment = null;
-//    private Object fSelection = null;
 
     // To perform updates on the UI thread
     private Runnable fViewRefresher = new Runnable() {
@@ -74,10 +76,7 @@ public class ProjectView extends TmfView {
 	 * This view needs to react to workspace resource changes
 	 */
 	public ProjectView() {
-
-//		TmfTraceContext.init();
-
-		fWorkspace = ResourcesPlugin.getWorkspace();
+        fWorkspace = ResourcesPlugin.getWorkspace();
         fResourceChangeListener = new IResourceChangeListener() {
             public void resourceChanged(IResourceChangeEvent event) {
                 if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
@@ -103,72 +102,74 @@ public class ProjectView extends TmfView {
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
-
-		fViewer = new TreeViewer(parent, SWT.SINGLE);
-        fViewer.setLabelProvider(new LTTngProjectLabelProvider());
-        fViewer.setContentProvider(new LTTngProjectContentProvider());
-        fViewer.setInput(ResourcesPlugin.getWorkspace().getRoot());
+        IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        fViewer = new TreeViewer(parent, SWT.SINGLE);
+        fViewer.setContentProvider(new ProjectContentProvider());
+        fViewer.setLabelProvider(new ProjectLabelProvider());
+        fViewer.setInput(root);
 
         hookMouse();
-        hookDragAndDrop();
         createContextMenu();
 	}
 
     /**
-     * 
+     * TODO: Hook to LTTng trace instead of File (when available)
      */
     private void hookMouse() {
         fViewer.getTree().addMouseListener(new MouseAdapter() {
-        	@Override
+			@Override
 			public void mouseDoubleClick(MouseEvent event) {
                 TreeSelection selection = (TreeSelection) fViewer.getSelection();
                 Object element = selection.getFirstElement();
-                if (element instanceof LTTngExperimentEntry) {
-                	LTTngExperimentEntry experiment = (LTTngExperimentEntry) element;
-                	selectExperiment(experiment);                
+//                if (element instanceof Folder) {
+//                	openTraceFile((Folder) element);                
+//                }
+                if (element instanceof File) {
+                    openTraceFile((File) element);                
                 }
             }
         });
     }
 
-    private void hookDragAndDrop() {
-    	new TraceDragSource(fViewer);
-    	new TraceDropTarget(fViewer);
-    }
-
     /**
-     * @param experiment
+     * @param trace
      * 
-     * TODO: Tie the proper parser to the trace 
+     * TODO: Handle LTTng Trace files (when available)
+     * TODO: Handle multiple traces simultaneously
      */
-    // FIXME: Troubleshooting hack - start
-	private boolean waitForCompletion = true;
-    // FIXME: Troubleshooting hack - end
-
-	private void selectExperiment(LTTngExperimentEntry experiment) {
-    	String expId = experiment.getName();
-        if (fExperiment != null)
-        	fExperiment.dispose();
+    private void openTraceFile(File file) {
+        String fname = Platform.getLocation() + file.getFullPath().toOSString();
         try {
-        	LTTngTraceEntry[] traceEntries = experiment.getTraces();
-        	int nbTraces = traceEntries.length;
-        	ITmfTrace[] traces = new ITmfTrace[nbTraces];
-        	for (int i = 0; i < nbTraces; i++) {
-        		IResource res = traceEntries[i].getResource();
-        		String location = res.getLocation().toOSString();
-        		ITmfTrace trace = new LTTngTrace(location, waitForCompletion);
-                traces[i] = trace;
-        	}
-            fExperiment = new TmfExperiment(expId, traces, waitForCompletion);
-            broadcastSignal(new TmfExperimentSelectedSignal(this, fExperiment));
-        } catch (FileNotFoundException e) {
-        	// TODO: Why not tell the user? He would appreciate...
-//            e.printStackTrace();
-            return;
+            ITmfEventParser parser = new LTTngEventParserStub();
+            ITmfEventStream stream = new LTTngEventStreamStub(fname, parser);
+            TmfTrace trace = new TmfTrace(file.getName(), stream);
+            TmfSignalManager.dispatchSignal(new TmfTraceSelectedSignal(this, trace));
+            stream.indexStream(false);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+//    /**
+//     * @param trace
+//     * 
+//     * TODO: Handle LTTng Trace files (when available)
+//     * TODO: Handle multiple traces simultaneously
+//     */
+//    private void openTraceFile(Folder trace) {
+//        String fname = Platform.getLocation() + trace.getFullPath().toOSString();
+//        try {
+//            ITmfEventStream stream = new LttngEventStream(fname);
+//            TmfTrace eventLog = new TmfTrace(trace.getName(), stream);
+//            broadcastEvent(new TmfTraceSelectedEvent(eventLog));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+//    public void handleEvent(ITmfEventLogEvent event) {
+////    	System.out.println("ProjectView.handleEvent()");
+//    }
 
     /**
      * 
@@ -199,14 +200,7 @@ public class ProjectView extends TmfView {
 	@Override
 	public void setFocus() {
 		// TODO Auto-generated method stub
-	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "[ProjectView]";
 	}
 
 }

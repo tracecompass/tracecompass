@@ -12,11 +12,6 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 public class LTTngTimestampStub extends TmfTimestamp {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 216576768443708259L;
-
-	/**
      * @param value
      * @param scale
      * @param precision

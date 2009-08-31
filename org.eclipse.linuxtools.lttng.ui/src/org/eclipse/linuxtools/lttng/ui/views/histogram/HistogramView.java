@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
+import org.eclipse.linuxtools.lttng.ui.views.Labels;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
@@ -22,7 +23,7 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class HistogramView extends ViewPart {
 
-    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.histogram";
+    public static final String ID = Labels.HistogramView_ID;
 
 	/**
 	 * 

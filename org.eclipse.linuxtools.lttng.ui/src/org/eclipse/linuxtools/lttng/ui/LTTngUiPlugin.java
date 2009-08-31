@@ -27,7 +27,6 @@ public class LTTngUiPlugin extends AbstractUIPlugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		TraceDebug.init();
 		plugin = this;
 	}
 
