@@ -10,7 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.viewer;
+package org.eclipse.linuxtools.tmf.ui.views;
 
 import org.eclipse.linuxtools.tmf.component.ITmfComponent;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;

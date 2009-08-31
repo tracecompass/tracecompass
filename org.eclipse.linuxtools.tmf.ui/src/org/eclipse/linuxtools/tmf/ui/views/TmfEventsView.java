@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,16 +14,16 @@ package org.eclipse.linuxtools.tmf.ui.views;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
-import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
-import org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal;
-import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
+import org.eclipse.linuxtools.tmf.stream.TmfStreamUpdatedSignal;
+import org.eclipse.linuxtools.tmf.trace.TmfTrace;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceSelectedSignal;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -40,16 +40,15 @@ import org.eclipse.swt.widgets.TableItem;
  * TODO: Handle column selection, sort, ... generically (nothing less...)
  * TODO: Implement hide/display columns
  */
-public class TmfEventsView extends TmfView {
+public class TmfEventsView extends TmfViewer {
 
-    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.events";
+    public static final String ID = "org.eclipse.linuxtools.tmf.ui.viewer.events";
 
-    private TmfExperiment<TmfEvent> fExperiment;
-    private String fTitlePrefix;
+    private TmfTrace fTrace;
 
-	// ------------------------------------------------------------------------
+    // ========================================================================
     // Table data
-	// ------------------------------------------------------------------------
+    // ========================================================================
 
     private Table fTable;
 
@@ -60,7 +59,7 @@ public class TmfEventsView extends TmfView {
     private final String REFERENCE_COLUMN = "File";
     private final String CONTENT_COLUMN   = "Content";
     private final String[] columnProperties =  new String[] {
-    	TIMESTAMP_COLUMN,
+        TIMESTAMP_COLUMN,
         SOURCE_COLUMN,
         TYPE_COLUMN,
         REFERENCE_COLUMN,
@@ -88,35 +87,18 @@ public class TmfEventsView extends TmfView {
         new ColumnData(columnProperties[4], 100, SWT.LEFT)
     };
 
-	// ------------------------------------------------------------------------
-    // Event cache
-	// ------------------------------------------------------------------------
-
-	private static final int DEFAULT_CACHE_SIZE = 1000;
-    private final int fCacheSize;
-    private TmfEvent[] cache = new TmfEvent[1];
-    private int cacheStartIndex = 0;
-    private int cacheEndIndex = 0;
-    
-	// ------------------------------------------------------------------------
+    // ========================================================================
     // Constructor
-	// ------------------------------------------------------------------------
-
-    public TmfEventsView(int cacheSize) {
-    	super("TmfEventsView");
-    	fCacheSize = cacheSize;
-    }
+    // ========================================================================
 
     public TmfEventsView() {
-    	this(DEFAULT_CACHE_SIZE);
+    	super();
     }
 
-	// ------------------------------------------------------------------------
-    // ViewPart
-	// ------------------------------------------------------------------------
-
-    @SuppressWarnings("unchecked")
-	@Override
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+     */
+    @Override
 	public void createPartControl(Composite parent) {
     	
     	// Create a virtual table
@@ -126,6 +108,7 @@ public class TmfEventsView extends TmfView {
 
         // Set the table layout
         GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
+        layoutData.horizontalSpan= columnData.length;
         fTable.setLayoutData(layoutData);
 
         // Some cosmetic enhancements
@@ -133,69 +116,52 @@ public class TmfEventsView extends TmfView {
         fTable.setLinesVisible(true);
 
         // Set the columns
-        createColumnHeaders(fTable);
+        setColumnHeaders(fTable);
 
         // Handle the table item requests 
-        fTable.addSelectionListener(new SelectionAdapter() {
+        fTable.addSelectionListener(new SelectionListener() {
 
-        	@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+			}
+
 			public void widgetSelected(SelectionEvent e) {
-				TmfTimestamp ts = (TmfTimestamp) fTable.getSelection()[0].getData();
-				broadcast(new TmfTimeSynchSignal(fTable, ts));
+				// Get the timestamp string
+				String time = fTable.getSelection()[0].getText();
+
+				// Compose a timestamp
+				int pos = time.indexOf('.');
+				String integer = time.substring(0, pos);
+				String fraction = time.substring(pos + 1);
+
+				byte exponent = (byte) -fraction.length();
+				String value = integer + fraction;
+				TmfTimestamp ts = new TmfTimestamp(new Long(value), exponent);
+
+				// Generate the synchronization event
+				TmfSignalManager.dispatchSignal(new TmfTimeSynchSignal(fTable, ts));
 			}
         });
 
         // Handle the table item requests 
         fTable.addListener(SWT.SetData, new Listener() {
-
 			public void handleEvent(Event event) {
-
-        		TableItem item = (TableItem) event.item;
-				final int index = fTable.indexOf(item);
-
-				// Note: this works because handleEvent() is called once for each row, in sequence  
-				if ((index >= cacheStartIndex ) && (index < cacheEndIndex)) {
-					int i = index - cacheStartIndex;
-					item.setText(extractItemFields(cache[i]));
-					item.setData(new TmfTimestamp(cache[i].getTimestamp()));
-					return;
-				}
-
-				TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(TmfEvent.class, index, fCacheSize) {
+				TableItem item = (TableItem) event.item;
+				int index = fTable.indexOf(item);
+				final TmfEvent[] evt = new TmfEvent[1];
+				TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(index, 0, 1) {
 					@Override
 					public void handleData() {
-						TmfEvent[] tmpEvent = getData();
-						if ((tmpEvent != null) && (tmpEvent.length > 0)) {
-							cache = tmpEvent;
-							cacheStartIndex = index;
-							cacheEndIndex = index + tmpEvent.length;
-//							System.out.println("TmfTableView: entry#" + index);
-						}
+						TmfEvent[] result = getData();
+						evt[0] = (result.length > 0) ? result[0] : null;
 					}
 				};
-				fExperiment.sendRequest(request);
-		        try {
-					request.waitForCompletion();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				
-				if (cache[0] != null && cacheStartIndex == index) {
-					item.setText(extractItemFields(cache[0]));
-					item.setData(new TmfTimestamp(cache[0].getTimestamp()));
-				}
-				
+				fTrace.processRequest(request, true);
+				item.setText(extractItemFields(evt[0]));
 			}
         });
 
         fTable.setItemCount(0);
-    	fTitlePrefix = getTitle();
-
-    	// If an experiment is already selected, update the table
-    	fExperiment = (TmfExperiment<TmfEvent>) TmfExperiment.getCurrentExperiment();
-    	if (fExperiment != null) {
-    		experimentSelected(new TmfExperimentSelectedSignal<TmfEvent>(fTable, fExperiment));
-    	}
     }
 
 	/**
@@ -203,7 +169,7 @@ public class TmfEventsView extends TmfView {
 	 * 
 	 * FIXME: Add support for column selection
 	 */
-	protected void createColumnHeaders(Table table) {
+	protected void setColumnHeaders(Table table) {
         for (int i = 0; i < columnData.length; i++) {
             TableColumn column = new TableColumn(table, columnData[i].alignment, i);
             column.setText(columnData[i].header);
@@ -224,8 +190,8 @@ public class TmfEventsView extends TmfView {
 				new Long(event.getTimestamp().getValue()).toString(),		
 				event.getSource().getSourceId().toString(),
 				event.getType().getTypeId().toString(),
-				event.getReference().getReference().toString(),
-				event.getContent().toString()
+				event.getReference().getValue().toString(),
+				event.getContent().getContent()
             };
 		}
 		return fields;
@@ -238,88 +204,49 @@ public class TmfEventsView extends TmfView {
 	public void setFocus() {
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-	public String toString() {
-    	return "[TmfEventsView]";
-    }
-
-	// ------------------------------------------------------------------------
+    // ========================================================================
     // Signal handlers
-	// ------------------------------------------------------------------------
+    // ========================================================================
     
-	@SuppressWarnings("unchecked")
 	@TmfSignalHandler
-    public void experimentSelected(TmfExperimentSelectedSignal<TmfEvent> signal) {
+    public void traceSelected(TmfTraceSelectedSignal signal) {
 		// Update the trace reference
-    	fExperiment = (TmfExperiment<TmfEvent>) signal.getExperiment();
-    	setPartName(fTitlePrefix + " - " + fExperiment.getName());
+		if (fTrace != null)
+			fTrace.dispose();
+    	fTrace = signal.getTrace();
 
         // Perform the updates on the UI thread
         fTable.getDisplay().asyncExec(new Runnable() {
         	public void run() {
-       			fTable.setSelection(0);
             	fTable.clearAll();
-				cacheStartIndex = cacheEndIndex = 0;	// Clear the cache
-            	fTable.setItemCount((int) fExperiment.getNbEvents());        
+            	fTable.setItemCount(fTrace.getNbEvents());        
         	}
         });
     }
 
 	@TmfSignalHandler
-    public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
+    public void traceUpdated(TmfStreamUpdatedSignal signal) {
         // Perform the refresh on the UI thread
     	fTable.getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				if (!fTable.isDisposed() && fExperiment != null) {
-					int nbEvents = (int) fExperiment.getNbEvents();
-			    	fTable.setItemCount((nbEvents > 100) ? nbEvents : 100);        
+				if (!fTable.isDisposed()) {
+			    	fTable.setItemCount(fTrace.getNbEvents());        
 				}
 			}
         });
     }
 
-	private boolean fRefreshPending = false;
-	@TmfSignalHandler
-    public synchronized void rangeSynched(TmfRangeSynchSignal signal) {
-		if (!fRefreshPending) {
-			// Perform the refresh on the UI thread
-			fRefreshPending = true;
-			fTable.getDisplay().asyncExec(new Runnable() {
-				public void run() {
-					fRefreshPending = false;
-					if (!fTable.isDisposed() && fExperiment != null) {
-						fTable.setItemCount((int) fExperiment.getNbEvents());
-//						if (Tracer.INTERNALS) Tracer.trace("TmfEventsView: itemCount=" + fTable.getItemCount());
-					}
-				}
-			});
-		}
+    @TmfSignalHandler
+    public void currentTimeUpdated(TmfTimeSynchSignal signal) {
+    	if (signal.getSource() != fTable) {
+    		final int index = fTrace.getIndex(signal.getCurrentTime());
+            // Perform the updates on the UI thread
+            fTable.getDisplay().asyncExec(new Runnable() {
+            	public void run() {
+            		fTable.setSelection(index);
+            	}
+            });
+    	}
     }
-
-//    @TmfSignalHandler
-//    public void currentTimeUpdated(TmfTimeSynchSignal signal) {
-//    	if (signal.getSource() != fTable && fExperiment != null) {
-//    		final int index = (int) fExperiment.getRank(signal.getCurrentTime());
-//            // Perform the updates on the UI thread
-//            fTable.getDisplay().asyncExec(new Runnable() {
-//            	public void run() {
-//            		fTable.setSelection(index);
-//            		// The timestamp might not correspond to an actual event
-//            		// and the selection will point to the next experiment event.
-//            		// But we would like to display both the event before and
-//            		// after the selected timestamp.
-//            		// This works fine by default except when the selected event
-//            		// is the top displayed event. The following ensures that we
-//            		// always see both events.
-//            		if ((index > 0) && (index == fTable.getTopIndex())) {
-//            			fTable.setTopIndex(index - 1);
-//            		}
-//            	}
-//            });
-//    	}
-//    }
 
 }
