@@ -195,6 +195,7 @@ public class TimeFrameView extends TmfViewer implements SelectionListener {
         fSlider.setLayoutData(gridData);
 
         fSlider.addSelectionListener(this);
+
     }
 
     /**
@@ -228,19 +229,55 @@ public class TimeFrameView extends TmfViewer implements SelectionListener {
     /* (non-Javadoc)
      * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
      */
-    public void widgetSelected(SelectionEvent e) {
+    public void widgetSelected(SelectionEvent event) {
 
-        // Get the relative position
-        int ratio = fSlider.getSelection();
+    	switch (event.detail) {
+    		case SWT.ARROW_DOWN:
+		        fSlider.setSelection(fSlider.getSelection() + SLIDER_RANGE / 100);
+    	    	updateCurentTime();
+    			break;
+    			
+    		case SWT.ARROW_UP:
+		        fSlider.setSelection(fSlider.getSelection() - SLIDER_RANGE / 100);
+    	    	updateCurentTime();
+    			break;
+    			
+//    		case SWT.DRAG:
+//    	    	updateCurentTime();
+//    			break;
+//    			
+//    		case SWT.END:
+//		        fSlider.setSelection(SLIDER_RANGE);
+//    			break;
+//    			
+//    		case SWT.HOME:
+//		        fSlider.setSelection(0);
+//    			break;
+    			
+    		case SWT.PAGE_DOWN:
+		        fSlider.setSelection(fSlider.getSelection() + SLIDER_RANGE / 10);
+    	    	updateCurentTime();
+    			break;
+    			
+    		case SWT.PAGE_UP:
+		        fSlider.setSelection(fSlider.getSelection() - SLIDER_RANGE / 10);
+    			break;
 
+    		// The slider was released - set the current time
+    		case SWT.NONE:
+    	    	updateCurentTime();
+    			break;
+    	}
+    }
+
+	private void updateCurentTime() {
+		int ratio = fSlider.getSelection();
         TmfTimestamp span = fCurrentGroup.getSpan();
         long value = span.getValue() * ratio / SLIDER_RANGE;
-
         TmfTimestamp start = fCurrentGroup.getStartTime();
         TmfTimestamp current = new TmfTimestamp(start.getValue() + value, start.getScale(), 0);
-
         fCurrentGroup.setValue(current);
-    }
+	}
 
     // ========================================================================
     // TMF Signal Handling
