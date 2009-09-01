@@ -34,10 +34,10 @@ public class TmfSignalManager {
 	static private Map<Object, Method[]> fListeners = new HashMap<Object, Method[]>();
 
 	// TODO: read from the preferences
-	private static boolean fTraceIsActive = true;
+	private static boolean fTraceIsActive = false;
 	private static TmfSignalTrace fSignalTracer;
 
-	private static TmfSignalManager fInstance;
+//	private static TmfSignalManager fInstance;
 
 	static {
 		if (fTraceIsActive) {
@@ -56,12 +56,13 @@ public class TmfSignalManager {
 		fListeners.remove(listener);
 	}
 
-	public static TmfSignalManager getInstance() {
-		if (fInstance == null) {
-			fInstance = new TmfSignalManager();
-		}
-		return fInstance;
-	}
+//	public static TmfSignalManager getInstance() {
+//		if (fInstance == null) {
+//			fInstance = new TmfSignalManager();
+//		}
+//		return fInstance;
+//	}
+
 	/**
 	 * Invokes the handling methods that expect this signal.
 	 * 
@@ -72,38 +73,38 @@ public class TmfSignalManager {
 	 * 
 	 * @param signal
 	 */
-	private class Dispatch implements Runnable {
-
-		private final Method method;
-		private final Object entry;
-		private final Object signal;
-
-		public Dispatch(Method m, Object e, Object s) {
-			method = m;
-			entry = e;
-			signal = s;
-		}
-
-		public void run() {
-			try {
-				method.invoke(entry, new Object[] { signal });
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	private void dispatch(Method method, Object key, Object signal) {
-		Dispatch disp = new Dispatch(method, key, signal);
-		new Thread(disp).start();
-	}
+//	private class Dispatch implements Runnable {
+//
+//		private final Method method;
+//		private final Object entry;
+//		private final Object signal;
+//
+//		public Dispatch(Method m, Object e, Object s) {
+//			method = m;
+//			entry = e;
+//			signal = s;
+//		}
+//
+//		public void run() {
+//			try {
+//				method.invoke(entry, new Object[] { signal });
+//			} catch (IllegalArgumentException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (IllegalAccessException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (InvocationTargetException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//	}
+//	
+//	private void dispatch(Method method, Object key, Object signal) {
+//		Dispatch disp = new Dispatch(method, key, signal);
+//		new Thread(disp).start();
+//	}
 
 	static public synchronized void dispatchSignal(Object signal) {
 
@@ -126,19 +127,19 @@ public class TmfSignalManager {
 		// Call the signal handlers
 		for (Map.Entry<Object, List<Method>> entry : listeners.entrySet()) {
 			for (Method method : entry.getValue()) {
-				getInstance().dispatch(method, entry.getKey(), signal);
-//				try {
-//					method.invoke(entry.getKey(), new Object[] { signal });
-//				} catch (IllegalArgumentException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				} catch (IllegalAccessException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				} catch (InvocationTargetException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
+//				getInstance().dispatch(method, entry.getKey(), signal);
+				try {
+					method.invoke(entry.getKey(), new Object[] { signal });
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InvocationTargetException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 	}

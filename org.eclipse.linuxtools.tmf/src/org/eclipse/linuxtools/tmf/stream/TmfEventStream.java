@@ -215,7 +215,7 @@ public abstract class TmfEventStream implements ITmfEventStream {
         return null;
     }
 
-	private synchronized void notifyListeners() {
+	private void notifyListeners() {
 		TmfSignalManager.dispatchSignal(new TmfStreamUpdatedSignal(this, this));
 	}
    
