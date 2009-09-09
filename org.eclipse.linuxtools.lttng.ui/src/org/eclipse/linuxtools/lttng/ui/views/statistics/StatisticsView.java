@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.statistics;
 
-import org.eclipse.linuxtools.lttng.ui.views.Labels;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
@@ -23,7 +22,7 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class StatisticsView extends ViewPart {
 
-    public static final String ID = Labels.StatisticsView_ID;
+    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.statistics";
 
     /**
 	 * 

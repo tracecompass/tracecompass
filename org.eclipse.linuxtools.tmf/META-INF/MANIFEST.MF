@@ -16,5 +16,4 @@ Export-Package: org.eclipse.linuxtools.tmf,
  org.eclipse.linuxtools.tmf.event,
  org.eclipse.linuxtools.tmf.request,
  org.eclipse.linuxtools.tmf.signal,
- org.eclipse.linuxtools.tmf.stream,
  org.eclipse.linuxtools.tmf.trace

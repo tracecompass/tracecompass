@@ -12,69 +12,102 @@
 
 package org.eclipse.linuxtools.tmf.trace;
 
-import org.eclipse.linuxtools.tmf.component.ITmfComponent;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 /**
- * <b><u>ITmfTrace</u></b>
+ * <b><u>ITmfEventStream</u></b>
  * <p>
+ * TODO: Implement me. Please.
  */
-public interface ITmfTrace extends ITmfComponent {
-	
-	public ITmfTrace createTraceCopy();
-	
+public interface ITmfTrace {
+
 	/**
-	 * @return the trace path 
+	 * <b><u>StreamContext</u></b>
+	 * <p>
+	 * Stream context keeper to avoid conflicting, concurrent accesses to the
+	 * underlying stream. 
 	 */
-	public String getPath();
+	public class StreamContext {
+		public Object location;
+		public int    index;
+
+		public StreamContext(Object loc, int ind) {
+			location = loc;
+			index = ind;
+		}
+
+		public StreamContext(StreamContext other) {
+			if (other != null) {
+				location = other.location;
+				index = other.index;
+			}
+		}
+	}
     
 	/**
-	 * @return the trace name 
+	 * @return 
 	 */
 	public String getName();
-
-	/**
-	 * @return the number of events in the trace
-	 */
-	public long getNbEvents();
     
 	/**
-	 * Trace time range accessors
+	 * @return the number of events in the stream
 	 */
-	public TmfTimeRange getTimeRange();
-    public TmfTimestamp getStartTime();
-    public TmfTimestamp getEndTime();
-
+	public int getNbEvents();
+    
 	/**
-     * Positions the trace at the first event with the specified
-     * timestamp or index (i.e. the nth event in the trace).
+	 * @return the stream time range
+	 */
+    public TmfTimeRange getTimeRange();
+
+//	/**
+//	 * @return The stream time range
+//	 */
+//    public Map<String, Object> getAttributes();
+
+    /**
+     * Positions the stream at the first event with timestamp.
      * 
-     * Returns a context which can later be used to read the event.
-     * 
-     * @param data.timestamp
-     * @param data.index
+     * @param timestamp
      * @return a context object for subsequent reads
      */
-    public TmfContext seekLocation(ITmfLocation<?> location);
-    public TmfContext seekEvent(TmfTimestamp timestamp);
-    public TmfContext seekEvent(long rank);
+    public StreamContext seekEvent(TmfTimestamp timestamp);
+    public StreamContext seekEvent(int index);
 
     /**
-     * Return the event pointed by the supplied context (or null if
-     * no event left) and updates the context to the next event.
+     * Reads and the next event on the stream and updates the context.
+     * If there is no event left, return null.
      * 
      * @return the next event in the stream
      */
-    public TmfEvent getNextEvent(TmfContext context);
+    public TmfEvent peekEvent(StreamContext context);
+    public TmfEvent getEvent(StreamContext context, TmfTimestamp timestamp);
+    public TmfEvent getEvent(StreamContext context, int index);
+    public TmfEvent getNextEvent(StreamContext context);
 
     /**
-     * Return the event pointed by the supplied context (or null if
-     * no event left) and *does not* update the context.
-     * 
-     * @return the next event in the stream
+     * Parse the stream and creates the checkpoint structure.
+     * Normally invoked once at the creation of the event stream.
      */
-    public TmfEvent parseEvent(TmfContext context);
+    public void indexStream(boolean waitForCompletion);
 
+    public Object getCurrentLocation();
+    public StreamContext seekLocation(Object location);
+
+    /**
+     * Returns the index of the event at that timestamp
+     * 
+     * @param timestamp
+     * @return
+     */
+	public int getIndex(TmfTimestamp timestamp); 
+
+	/**
+	 * Returns the timestamp of the event at position [index]
+	 * 
+	 * @param index the event index
+	 * @return the corresponding timestamp
+	 */
+    public TmfTimestamp getTimestamp(int index);
 }

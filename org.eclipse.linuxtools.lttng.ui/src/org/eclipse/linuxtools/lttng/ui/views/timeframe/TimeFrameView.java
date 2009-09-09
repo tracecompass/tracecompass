@@ -12,22 +12,21 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.timeframe;
 
-import org.eclipse.linuxtools.lttng.ui.views.Labels;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
-import org.eclipse.linuxtools.tmf.trace.TmfTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceSelectedSignal;
+import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
+import org.eclipse.linuxtools.tmf.trace.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.ui.views.TmfViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Slider;
 
 /**
@@ -54,9 +53,9 @@ import org.eclipse.swt.widgets.Slider;
  * FIXME: The slider is very jumpy due to the large number of async updates
  * FIXME: Revisit the control flow between View, Spinners and Slider
  */
-public class TimeFrameView extends TmfViewer implements SelectionListener {
+public class TimeFrameView extends TmfViewer {
 
-    public static final String ID = Labels.TimeFrameView_ID;
+    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.timeframe";
 
     // ========================================================================
     // TimeFrameView
@@ -72,6 +71,12 @@ public class TimeFrameView extends TmfViewer implements SelectionListener {
     private TmfTimeRange fTraceSpan      = new TmfTimeRange(fTraceStartTime, fTraceEndTime);
     private byte fScale = 0;
 
+    // Labels
+    private static final String START_TIME_LABEL   = "Start Time";
+    private static final String END_TIME_LABEL     = "End Time";
+    private static final String TIME_RANGE_LABEL   = "Interval";
+    private static final String CURRENT_TIME_LABEL = "Current Time";
+
     private static final int SLIDER_RANGE = 10000;
 
     private SpinnerGroup fStartGroup;
@@ -82,8 +87,8 @@ public class TimeFrameView extends TmfViewer implements SelectionListener {
     // The slider
     private Slider fSlider;
 
-    // The event log
-    TmfTrace fEventLog = null;
+    // The current experiment
+    TmfExperiment fExperiment = null;
 
     /**
      * Constructor
@@ -102,10 +107,10 @@ public class TimeFrameView extends TmfViewer implements SelectionListener {
         GridLayout layout = new GridLayout(4, true);
         parent.setLayout(layout);
 
-        fStartGroup   = new SpinnerGroup(this, parent, Labels.TimeFrameView_StartTime,   fTraceTimeRange, fTraceStartTime);
-        fEndGroup     = new SpinnerGroup(this, parent, Labels.TimeFrameView_EndTime,     fTraceTimeRange, fTraceEndTime);
-        fRangeGroup   = new SpinnerGroup(this, parent, Labels.TimeFrameView_TimeRange,   fTraceTimeRange, fTraceEndTime);
-        fCurrentGroup = new SpinnerGroup(this, parent, Labels.TimeFrameView_CurrentTime, fTraceTimeRange, fTraceStartTime);
+        fStartGroup   = new SpinnerGroup(this, parent, START_TIME_LABEL,   fTraceTimeRange, fTraceStartTime);
+        fEndGroup     = new SpinnerGroup(this, parent, END_TIME_LABEL,     fTraceTimeRange, fTraceEndTime);
+        fRangeGroup   = new SpinnerGroup(this, parent, TIME_RANGE_LABEL,   fTraceTimeRange, fTraceEndTime);
+        fCurrentGroup = new SpinnerGroup(this, parent, CURRENT_TIME_LABEL, fTraceTimeRange, fTraceStartTime);
 
         // Create the slider
         createSlider(parent);
@@ -187,14 +192,27 @@ public class TimeFrameView extends TmfViewer implements SelectionListener {
      */
     private void createSlider(Composite parent) {
         fSlider = new Slider(parent, SWT.SMOOTH | SWT.FILL);
+        fSlider.setMinimum(0);
         fSlider.setMaximum(SLIDER_RANGE + fSlider.getThumb());
+        fSlider.setIncrement(SLIDER_RANGE / 100);
+        fSlider.setPageIncrement(SLIDER_RANGE / 10);
+        fSlider.setSelection(0);
 
         GridData gridData = new GridData(SWT.LEFT, SWT.TOP, true, false);
         gridData.horizontalAlignment = SWT.FILL;
         gridData.horizontalSpan = 4;
         fSlider.setLayoutData(gridData);
 
-        fSlider.addSelectionListener(this);
+        fSlider.addListener(SWT.Selection, new Listener() {
+        	public void handleEvent(Event event) {
+				int ratio = fSlider.getSelection();
+				TmfTimestamp span = fCurrentGroup.getSpan();
+				long value = span.getValue() * ratio / SLIDER_RANGE;
+				TmfTimestamp start = fCurrentGroup.getStartTime();
+				TmfTimestamp current = new TmfTimestamp(start.getValue() + value, start.getScale(), 0);
+				fCurrentGroup.setValue(current);
+			}
+        });
 
     }
 
@@ -219,66 +237,6 @@ public class TimeFrameView extends TmfViewer implements SelectionListener {
         });
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
-     */
-    public void widgetDefaultSelected(SelectionEvent e) {
-        // TODO Auto-generated method stub
-    }
-
-    /* (non-Javadoc)
-     * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-     */
-    public void widgetSelected(SelectionEvent event) {
-
-    	switch (event.detail) {
-    		case SWT.ARROW_DOWN:
-		        fSlider.setSelection(fSlider.getSelection() + SLIDER_RANGE / 100);
-    	    	updateCurentTime();
-    			break;
-    			
-    		case SWT.ARROW_UP:
-		        fSlider.setSelection(fSlider.getSelection() - SLIDER_RANGE / 100);
-    	    	updateCurentTime();
-    			break;
-    			
-//    		case SWT.DRAG:
-//    	    	updateCurentTime();
-//    			break;
-//    			
-//    		case SWT.END:
-//		        fSlider.setSelection(SLIDER_RANGE);
-//    			break;
-//    			
-//    		case SWT.HOME:
-//		        fSlider.setSelection(0);
-//    			break;
-    			
-    		case SWT.PAGE_DOWN:
-		        fSlider.setSelection(fSlider.getSelection() + SLIDER_RANGE / 10);
-    	    	updateCurentTime();
-    			break;
-    			
-    		case SWT.PAGE_UP:
-		        fSlider.setSelection(fSlider.getSelection() - SLIDER_RANGE / 10);
-    			break;
-
-    		// The slider was released - set the current time
-    		case SWT.NONE:
-    	    	updateCurentTime();
-    			break;
-    	}
-    }
-
-	private void updateCurentTime() {
-		int ratio = fSlider.getSelection();
-        TmfTimestamp span = fCurrentGroup.getSpan();
-        long value = span.getValue() * ratio / SLIDER_RANGE;
-        TmfTimestamp start = fCurrentGroup.getStartTime();
-        TmfTimestamp current = new TmfTimestamp(start.getValue() + value, start.getScale(), 0);
-        fCurrentGroup.setValue(current);
-	}
-
     // ========================================================================
     // TMF Signal Handling
     // ========================================================================
@@ -287,15 +245,15 @@ public class TimeFrameView extends TmfViewer implements SelectionListener {
      * @param signal
      */
     @TmfSignalHandler
-    public void traceSelected(TmfTraceSelectedSignal signal) {
+    public void experimentSelected(TmfExperimentSelectedSignal signal) {
 
         // Update the trace reference
-    	if (fEventLog != null)
-    		fEventLog.dispose();
-        fEventLog = signal.getTrace();
+    	if (fExperiment != null)
+    		fExperiment.dispose();
+        fExperiment = signal.getExperiment();
 
         // Update the time frame
-        fTraceTimeRange = fEventLog.getTimeRange();
+        fTraceTimeRange = fExperiment.getTimeRange();
         fTraceStartTime = fTraceTimeRange.getStartTime();
         fTraceEndTime   = fTraceTimeRange.getEndTime();
         fScale          = fTraceStartTime.getScale();
@@ -326,7 +284,7 @@ public class TimeFrameView extends TmfViewer implements SelectionListener {
 
         // Update the widgets
         fStartGroup.setContent(fTraceTimeRange, fStartGroup.getCurrentTime());
-        fEndGroup.setContent(fTraceTimeRange, fTraceEndTime); // fEndGroup.getCurrentTime());
+        fEndGroup.setContent(fTraceTimeRange, fTraceEndTime);
         fCurrentGroup.setContent(fTraceTimeRange, fCurrentGroup.getCurrentTime());
 
         TmfTimestamp delta = new TmfTimestamp(fTraceStartTime.getAdjustment(fTraceEndTime), fScale, 0);

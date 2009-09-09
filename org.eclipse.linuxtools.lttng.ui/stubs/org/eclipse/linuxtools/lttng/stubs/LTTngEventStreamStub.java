@@ -17,15 +17,15 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Map;
 
-import org.eclipse.linuxtools.tmf.stream.ITmfEventParser;
-import org.eclipse.linuxtools.tmf.stream.TmfEventStream;
+import org.eclipse.linuxtools.tmf.trace.ITmfEventParser;
+import org.eclipse.linuxtools.tmf.trace.TmfTrace;
 
 /**
  * <b><u>TmfEventStreamStub</u></b>
  * <p>
  * TODO: Implement me. Please.
  */
-public class LTTngEventStreamStub extends TmfEventStream {
+public class LTTngEventStreamStub extends TmfTrace {
 
     // ========================================================================
     // Attributes

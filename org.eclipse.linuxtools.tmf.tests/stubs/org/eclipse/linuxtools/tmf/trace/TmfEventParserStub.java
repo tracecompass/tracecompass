@@ -24,8 +24,6 @@ import org.eclipse.linuxtools.tmf.event.TmfEventReference;
 import org.eclipse.linuxtools.tmf.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.stream.ITmfEventParser;
-import org.eclipse.linuxtools.tmf.stream.ITmfEventStream;
 
 /**
  * <b><u>TmfEventParserStub</u></b>
@@ -65,7 +63,7 @@ public class TmfEventParserStub implements ITmfEventParser {
      * @see org.eclipse.linuxtools.tmf.eventlog.ITmfEventParser#parseNextEvent()
      */
     static final String typePrefix = "Type-";
-    public TmfEvent getNextEvent(ITmfEventStream eventStream) throws IOException {
+    public TmfEvent getNextEvent(ITmfTrace eventStream) throws IOException {
 
         if (! (eventStream instanceof TmfEventStreamStub)) {
             return null;

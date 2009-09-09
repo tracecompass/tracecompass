@@ -18,10 +18,10 @@ import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.stream.ITmfEventParser;
-import org.eclipse.linuxtools.tmf.stream.ITmfEventStream.StreamContext;
+import org.eclipse.linuxtools.tmf.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.trace.TmfEventParserStub;
 import org.eclipse.linuxtools.tmf.trace.TmfEventStreamStub;
+import org.eclipse.linuxtools.tmf.trace.ITmfTrace.StreamContext;
 
 /**
  * <b><u>TmfRequestHandlerStub</u></b>

@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.events;
 
-import org.eclipse.linuxtools.lttng.ui.views.Labels;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.ui.views.TmfEventsView;
 import org.eclipse.swt.SWT;
@@ -26,7 +25,7 @@ import org.eclipse.swt.widgets.TableColumn;
  */
 public class EventsView extends TmfEventsView {
 
-    public static final String ID = Labels.EventsView_ID;
+    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.events";
 
     // ========================================================================
     // Table data

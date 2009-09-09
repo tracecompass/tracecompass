@@ -20,6 +20,12 @@ package org.eclipse.linuxtools.tmf.event;
 public class TmfTimeRange {
 
     // ========================================================================
+    // Constants
+    // ========================================================================
+
+	public static TmfTimeRange Eternity = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+	
+    // ========================================================================
     // Attributes
     // ========================================================================
 

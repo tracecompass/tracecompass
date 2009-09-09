@@ -10,7 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.stream;
+package org.eclipse.linuxtools.tmf.trace;
 
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 

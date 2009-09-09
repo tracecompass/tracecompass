@@ -210,7 +210,7 @@ public class TmfTimestamp {
      */
     public int compareTo(final TmfTimestamp other, boolean withinPrecision) {
 
-        // If values have the same time scale, perform the comparison
+    	// If values have the same time scale, perform the comparison
         if (fScale == other.fScale) {
             if (withinPrecision) {
                 if ((fValue + fPrecision) < (other.fValue - other.fPrecision))
@@ -226,7 +226,7 @@ public class TmfTimestamp {
         // If values have different time scales, adjust to the finest one and
         // then compare. If the scaling difference is too large, revert to
         // some heuristics. Hopefully, nobody will try to compare galactic and
-        // atomic clock events...
+        // quantic clock events...
         byte newScale = (fScale < other.fScale) ? fScale : other.fScale;
         try {
             TmfTimestamp ts1 = this.synchronize(0, newScale);

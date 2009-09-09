@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.timeframe;
 
-import org.eclipse.linuxtools.lttng.ui.views.Labels;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.swt.SWT;
@@ -42,6 +41,10 @@ public class SpinnerGroup {
     // The nanosecond scale (10^9)
     private static final int NANOSECOND_SCALE = 1000 * 1000 * 1000;
     private static final byte SCALE = -9;
+
+    // Labels
+    private static final String SECONDS_LABEL = "sec";
+    private static final String NANOSEC_LABEL = "ns";
 
     // Widgets
     private Group group;
@@ -101,7 +104,7 @@ public class SpinnerGroup {
         seconds.setBounds(5, 25, 110, 25);
 
         Label label = new Label(group, SWT.LEFT);
-        label.setText(Labels.TimeFrameView_Seconds);
+        label.setText(SECONDS_LABEL);
         label.setBounds(120, 28, 25, 22);
 
         nanosec = new Spinner(group, SWT.BORDER);
@@ -124,7 +127,7 @@ public class SpinnerGroup {
         nanosec.setBounds(150, 25, 110, 25);
 
         label = new Label(group, SWT.LEFT);
-        label.setText(Labels.TimeFrameView_Nanosec);
+        label.setText(NANOSEC_LABEL);
         label.setBounds(265, 28, 25, 22);
 
         setContent(range, current);
@@ -164,21 +167,33 @@ public class SpinnerGroup {
     }
 
     public void setStartTime(TmfTimestamp ts) {
-        startTime = ts.synchronize(0, SCALE);
-        startSeconds = (int) (startTime.getValue() / NANOSECOND_SCALE);
-        startNanosec = (int) (startTime.getValue() % NANOSECOND_SCALE);
+    	try {
+    		startTime = ts.synchronize(0, SCALE);
+    		startSeconds = (int) (startTime.getValue() / NANOSECOND_SCALE);
+    		startNanosec = (int) (startTime.getValue() % NANOSECOND_SCALE);
+    	}
+    	catch (ArithmeticException e) {
+    	}
     }
 
     public void setEndTime(TmfTimestamp ts) {
-        endTime = ts.synchronize(0, SCALE);
-        endSeconds = (int) (endTime.getValue() / NANOSECOND_SCALE);
-        endNanosec = (int) (endTime.getValue() % NANOSECOND_SCALE);
+    	try {
+    		endTime = ts.synchronize(0, SCALE);
+    		endSeconds = (int) (endTime.getValue() / NANOSECOND_SCALE);
+    		endNanosec = (int) (endTime.getValue() % NANOSECOND_SCALE);
+    	}
+    	catch (ArithmeticException e) {
+    	}
     }
 
     public void setCurrentTime(TmfTimestamp ts) {
-        currentTime = ts.synchronize(0, SCALE);
-        currentSeconds = (int) (currentTime.getValue() / NANOSECOND_SCALE);
-        currentNanosec = (int) (currentTime.getValue() % NANOSECOND_SCALE);
+    	try {
+    		currentTime = ts.synchronize(0, SCALE);
+    		currentSeconds = (int) (currentTime.getValue() / NANOSECOND_SCALE);
+    		currentNanosec = (int) (currentTime.getValue() % NANOSECOND_SCALE);
+    	}
+    	catch (ArithmeticException e) {
+    	}
     }
 
     // ====================================================================

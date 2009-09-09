@@ -18,9 +18,9 @@ import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
-import org.eclipse.linuxtools.tmf.stream.TmfStreamUpdatedSignal;
-import org.eclipse.linuxtools.tmf.trace.TmfTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceSelectedSignal;
+import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
+import org.eclipse.linuxtools.tmf.trace.TmfExperimentSelectedSignal;
+import org.eclipse.linuxtools.tmf.trace.TmfStreamUpdatedSignal;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -44,7 +44,8 @@ public class TmfEventsView extends TmfViewer {
 
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.viewer.events";
 
-    private TmfTrace fTrace;
+    private TmfExperiment fExperiment;
+    private String fTitlePrefix;
 
     // ========================================================================
     // Table data
@@ -156,12 +157,13 @@ public class TmfEventsView extends TmfViewer {
 						evt[0] = (result.length > 0) ? result[0] : null;
 					}
 				};
-				fTrace.processRequest(request, true);
+				fExperiment.processRequest(request, true);
 				item.setText(extractItemFields(evt[0]));
 			}
         });
 
         fTable.setItemCount(0);
+    	fTitlePrefix = getTitle();
     }
 
 	/**
@@ -209,17 +211,18 @@ public class TmfEventsView extends TmfViewer {
     // ========================================================================
     
 	@TmfSignalHandler
-    public void traceSelected(TmfTraceSelectedSignal signal) {
+    public void experimentSelected(TmfExperimentSelectedSignal signal) {
 		// Update the trace reference
-		if (fTrace != null)
-			fTrace.dispose();
-    	fTrace = signal.getTrace();
+		if (fExperiment != null)
+			fExperiment.dispose();
+    	fExperiment = signal.getExperiment();
+    	setPartName(fTitlePrefix + " - " + fExperiment.getExperimentId());
 
         // Perform the updates on the UI thread
         fTable.getDisplay().asyncExec(new Runnable() {
         	public void run() {
             	fTable.clearAll();
-            	fTable.setItemCount(fTrace.getNbEvents());        
+            	fTable.setItemCount(fExperiment.getNbEvents());        
         	}
         });
     }
@@ -230,7 +233,7 @@ public class TmfEventsView extends TmfViewer {
     	fTable.getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				if (!fTable.isDisposed()) {
-			    	fTable.setItemCount(fTrace.getNbEvents());        
+			    	fTable.setItemCount(fExperiment.getNbEvents());        
 				}
 			}
         });
@@ -239,7 +242,7 @@ public class TmfEventsView extends TmfViewer {
     @TmfSignalHandler
     public void currentTimeUpdated(TmfTimeSynchSignal signal) {
     	if (signal.getSource() != fTable) {
-    		final int index = fTrace.getIndex(signal.getCurrentTime());
+    		final int index = fExperiment.getIndex(signal.getCurrentTime());
             // Perform the updates on the UI thread
             fTable.getDisplay().asyncExec(new Runnable() {
             	public void run() {

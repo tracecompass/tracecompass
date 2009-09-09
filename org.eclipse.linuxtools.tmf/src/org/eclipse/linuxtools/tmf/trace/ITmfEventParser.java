@@ -12,23 +12,20 @@
 
 package org.eclipse.linuxtools.tmf.trace;
 
-import org.eclipse.linuxtools.tmf.signal.TmfSignal;
+import java.io.IOException;
+
+import org.eclipse.linuxtools.tmf.event.TmfEvent;
 
 /**
- * <b><u>TmfTraceSelectedEvent</u></b>
+ * <b><u>ITmfEventParser</u></b>
  * <p>
  * TODO: Implement me. Please.
  */
-public class TmfTraceSelectedSignal extends TmfSignal {
+public interface ITmfEventParser {
 
-	private final TmfTrace fTrace;
-	
-	public TmfTraceSelectedSignal(Object source, TmfTrace trace) {
-		super(source);
-		fTrace = trace;
-	}
-
-	public TmfTrace getTrace() {
-		return fTrace;
-	}
+    /**
+     * @return
+     * @throws IOException 
+     */
+    public TmfEvent getNextEvent(ITmfTrace stream) throws IOException;
 }

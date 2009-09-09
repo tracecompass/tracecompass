@@ -12,6 +12,14 @@
 
 package org.eclipse.linuxtools.lttng.ui.views;
 
+import org.eclipse.linuxtools.lttng.ui.views.control.ControlView;
+import org.eclipse.linuxtools.lttng.ui.views.controlflow.ControlFlowView;
+import org.eclipse.linuxtools.lttng.ui.views.events.EventsView;
+import org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramView;
+import org.eclipse.linuxtools.lttng.ui.views.project.ProjectView;
+import org.eclipse.linuxtools.lttng.ui.views.resources.ResourcesView;
+import org.eclipse.linuxtools.lttng.ui.views.statistics.StatisticsView;
+import org.eclipse.linuxtools.lttng.ui.views.timeframe.TimeFrameView;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
@@ -24,14 +32,14 @@ import org.eclipse.ui.IPerspectiveFactory;
 public class PerspectiveFactory implements IPerspectiveFactory {
 
     // LTTng views
-    private static final String PROJECT_VIEW_ID      = Labels.ProjectView_ID;
-    private static final String CONTROL_VIEW_ID      = Labels.ControlView_ID;
-    private static final String EVENTS_VIEW_ID       = Labels.EventsView_ID;
-    private static final String TIME_FRAME_VIEW_ID   = Labels.TimeFrameView_ID;
-    private static final String CONTROL_FLOW_VIEW_ID = Labels.ControlFlowView_ID;
-    private static final String RESOURCES_VIEW_ID    = Labels.ResourcesView_ID;
-    private static final String STATISTICS_VIEW_ID   = Labels.StatisticsView_ID;
-    private static final String HISTOGRAM_VIEW_ID    = Labels.HistogramView_ID;
+    private static final String PROJECT_VIEW_ID      = ProjectView.ID;
+    private static final String CONTROL_VIEW_ID      = ControlView.ID;
+    private static final String EVENTS_VIEW_ID       = EventsView.ID;
+    private static final String TIME_FRAME_VIEW_ID   = TimeFrameView.ID;
+    private static final String CONTROL_FLOW_VIEW_ID = ControlFlowView.ID;
+    private static final String RESOURCES_VIEW_ID    = ResourcesView.ID;
+    private static final String STATISTICS_VIEW_ID   = StatisticsView.ID;
+    private static final String HISTOGRAM_VIEW_ID    = HistogramView.ID;
 
     // Standard Eclipse views
     private static final String PROPERTIES_VIEW_ID   = IPageLayout.ID_PROP_SHEET;

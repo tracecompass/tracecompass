@@ -34,6 +34,7 @@ public abstract class TmfViewer extends ViewPart implements ITmfComponent {
 	/**
 	 * Destructor
 	 */
+	@Override
 	public void dispose() {
 		TmfSignalManager.removeListener(this);
 	}
@@ -41,6 +42,7 @@ public abstract class TmfViewer extends ViewPart implements ITmfComponent {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		// TODO Auto-generated method stub
 	}
@@ -48,6 +50,7 @@ public abstract class TmfViewer extends ViewPart implements ITmfComponent {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
+	@Override
 	public void setFocus() {
 		// TODO Auto-generated method stub
 	}

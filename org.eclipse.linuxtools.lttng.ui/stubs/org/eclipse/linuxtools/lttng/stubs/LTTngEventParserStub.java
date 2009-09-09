@@ -23,8 +23,8 @@ import org.eclipse.linuxtools.tmf.event.TmfEventFormat;
 import org.eclipse.linuxtools.tmf.event.TmfEventReference;
 import org.eclipse.linuxtools.tmf.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.event.TmfEventType;
-import org.eclipse.linuxtools.tmf.stream.ITmfEventParser;
-import org.eclipse.linuxtools.tmf.stream.ITmfEventStream;
+import org.eclipse.linuxtools.tmf.trace.ITmfEventParser;
+import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 
 /**
  * <b><u>TmfEventParserStub</u></b>
@@ -68,19 +68,22 @@ public class LTTngEventParserStub implements ITmfEventParser {
      * @see org.eclipse.linuxtools.tmf.eventlog.ITmfEventParser#parseNextEvent()
      */
     static final String typePrefix = "Type-";
-    public TmfEvent getNextEvent(ITmfEventStream eventStream) throws IOException {
+    public TmfEvent getNextEvent(ITmfTrace eventStream) throws IOException {
 
         if (! (eventStream instanceof LTTngEventStreamStub)) {
             return null;
         }
 
         RandomAccessFile stream = ((LTTngEventStreamStub) eventStream).getStream();
+        String name = eventStream.getName();
+        name = name.substring(name.lastIndexOf('/') + 1);
 
         try {
             long ts        = stream.readLong();
             String source  = stream.readUTF();
             String type    = stream.readUTF();
-            int reference  = stream.readInt();
+            @SuppressWarnings("unused")
+			int reference  = stream.readInt();
             int typeIndex  = Integer.parseInt(type.substring(typePrefix.length()));
             String[] fields = new String[typeIndex];
             for (int i = 0; i < typeIndex; i++) {
@@ -97,7 +100,7 @@ public class LTTngEventParserStub implements ITmfEventParser {
                     new TmfEventSource(source),
                     new TmfEventType(type, fFormats[typeIndex]),
                     new TmfEventContent(content, fFormats[typeIndex]),
-                    new TmfEventReference(reference));
+                    new TmfEventReference(name));
             return event;
         } catch (EOFException e) {
         }

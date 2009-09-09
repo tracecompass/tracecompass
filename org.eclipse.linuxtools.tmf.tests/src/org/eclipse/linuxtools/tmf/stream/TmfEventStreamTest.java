@@ -18,9 +18,9 @@ import java.io.File;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.stream.ITmfEventStream.StreamContext;
 import org.eclipse.linuxtools.tmf.trace.TmfEventParserStub;
 import org.eclipse.linuxtools.tmf.trace.TmfEventStreamStub;
+import org.eclipse.linuxtools.tmf.trace.ITmfTrace.StreamContext;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

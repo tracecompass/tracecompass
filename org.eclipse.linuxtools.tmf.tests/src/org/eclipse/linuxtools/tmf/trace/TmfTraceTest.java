@@ -23,8 +23,6 @@ import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
-import org.eclipse.linuxtools.tmf.stream.ITmfEventParser;
-import org.eclipse.linuxtools.tmf.stream.ITmfEventStream;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -37,13 +35,14 @@ public class TmfTraceTest {
 
     private static final String DIRECTORY   = "testfiles";
     private static final String TEST_STREAM = "M-Test-10K";
+    private static final String EXPERIMENT  = "MyExperiment";
     private static String testfile;
     private static int fTotalNbEvents = 10000;
     private static int fDefaultBlockSize = 1000;
 
     private static ITmfEventParser fParser;
-    private static ITmfEventStream fStream;
-    private static TmfTrace        fTrace;
+    private static ITmfTrace fStream;
+    private static TmfExperiment   fExperiment;
 
 //    private static byte SCALE = (byte) -3;
 
@@ -54,7 +53,7 @@ public class TmfTraceTest {
 
 		fParser = new TmfEventParserStub();
 		fStream = new TmfEventStreamStub(testfile, fParser);
-        fTrace  = new TmfTrace("MyTrace", fStream);
+        fExperiment = new TmfExperiment(EXPERIMENT, new ITmfTrace[] { fStream });
         fStream.indexStream(true);
 	}
 
@@ -64,11 +63,11 @@ public class TmfTraceTest {
 
 	@Test
 	public void testBasicTmfEventLog() {
-		assertEquals("GetId", "MyTrace", fTrace.getId());
-        assertEquals("GetEpoch", TmfTimestamp.BigBang, fTrace.getEpoch());
-        assertEquals("GetNbEvents", fTotalNbEvents, fTrace.getNbEvents());
+		assertEquals("GetId", EXPERIMENT, fExperiment.getExperimentId());
+        assertEquals("GetEpoch", TmfTimestamp.BigBang, fExperiment.getEpoch());
+        assertEquals("GetNbEvents", fTotalNbEvents, fExperiment.getNbEvents());
 
-        TmfTimeRange timeRange = fTrace.getTimeRange();
+        TmfTimeRange timeRange = fExperiment.getTimeRange();
         assertEquals("GetTimeRange-start", 1, timeRange.getStartTime().getValue());
         assertEquals("GetTimeRange-end", fTotalNbEvents, timeRange.getEndTime().getValue());
 	}
@@ -119,7 +118,7 @@ public class TmfTraceTest {
                 }
             }
         };
-        fTrace.processRequest(request, true);
+        fExperiment.processRequest(request, true);
 
         assertEquals("nbEvents", NB_EVENTS, requestedEvents.size());
         assertTrue("isCompleted",  request.isCompleted());
@@ -137,7 +136,7 @@ public class TmfTraceTest {
         final int NB_EVENTS  = -1;
         final int BLOCK_SIZE =  1;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
-        int nbExpectedEvents = fTrace.getNbEvents();
+        int nbExpectedEvents = fExperiment.getNbEvents();
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 0, NB_EVENTS, BLOCK_SIZE) {
@@ -149,7 +148,7 @@ public class TmfTraceTest {
                 }
             }
         };
-        fTrace.processRequest(request, true);
+        fExperiment.processRequest(request, true);
 
         assertEquals("nbEvents", nbExpectedEvents, requestedEvents.size());
         assertTrue("isCompleted",  request.isCompleted());
@@ -247,7 +246,7 @@ public class TmfTraceTest {
                 cancel();
             }
         };
-        fTrace.processRequest(request, true);
+        fExperiment.processRequest(request, true);
 
         assertEquals("nbEvents",  BLOCK_SIZE, requestedEvents.size());
         assertTrue("isCompleted", request.isCompleted());

@@ -12,7 +12,8 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.project;
 
-import org.eclipse.core.internal.resources.File;
+import org.eclipse.core.internal.resources.Folder;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IWorkspace;
@@ -26,12 +27,11 @@ import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.linuxtools.lttng.stubs.LTTngEventParserStub;
 import org.eclipse.linuxtools.lttng.stubs.LTTngEventStreamStub;
-import org.eclipse.linuxtools.lttng.ui.views.Labels;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
-import org.eclipse.linuxtools.tmf.stream.ITmfEventParser;
-import org.eclipse.linuxtools.tmf.stream.ITmfEventStream;
-import org.eclipse.linuxtools.tmf.trace.TmfTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceSelectedSignal;
+import org.eclipse.linuxtools.tmf.trace.ITmfEventParser;
+import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
+import org.eclipse.linuxtools.tmf.trace.TmfExperimentSelectedSignal;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -54,7 +54,7 @@ import org.eclipse.ui.part.ViewPart;
 @SuppressWarnings("restriction")
 public class ProjectView extends ViewPart {
 
-    public static final String ID = Labels.ProjectView_ID;
+    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.project";
 
     private final IWorkspace fWorkspace;
     private final IResourceChangeListener fResourceChangeListener;
@@ -113,7 +113,7 @@ public class ProjectView extends ViewPart {
 	}
 
     /**
-     * TODO: Hook to LTTng trace instead of File (when available)
+     * 
      */
     private void hookMouse() {
         fViewer.getTree().addMouseListener(new MouseAdapter() {
@@ -121,11 +121,8 @@ public class ProjectView extends ViewPart {
 			public void mouseDoubleClick(MouseEvent event) {
                 TreeSelection selection = (TreeSelection) fViewer.getSelection();
                 Object element = selection.getFirstElement();
-//                if (element instanceof Folder) {
-//                	openTraceFile((Folder) element);                
-//                }
-                if (element instanceof File) {
-                    openTraceFile((File) element);                
+                if (element instanceof Folder) {
+                	selectExperiment((Folder) element);                
                 }
             }
         });
@@ -134,42 +131,24 @@ public class ProjectView extends ViewPart {
     /**
      * @param trace
      * 
-     * TODO: Handle LTTng Trace files (when available)
-     * TODO: Handle multiple traces simultaneously
+     * TODO: Tie the proper parser to the trace 
      */
-    private void openTraceFile(File file) {
-        String fname = Platform.getLocation() + file.getFullPath().toOSString();
+    private void selectExperiment(Folder folder) {
+        String expId = folder.getName();
+        TmfExperiment experiment = new TmfExperiment(expId, new ITmfTrace[] { });
         try {
             ITmfEventParser parser = new LTTngEventParserStub();
-            ITmfEventStream stream = new LTTngEventStreamStub(fname, parser);
-            TmfTrace trace = new TmfTrace(file.getName(), stream);
-            TmfSignalManager.dispatchSignal(new TmfTraceSelectedSignal(this, trace));
-            stream.indexStream(false);
+        	for (IResource res : folder.members()) {
+                String traceId = Platform.getLocation() + res.getFullPath().toOSString();
+                ITmfTrace trace = new LTTngEventStreamStub(traceId, parser);
+                trace.indexStream(false);
+                experiment.addTrace(trace);
+        	}
         } catch (Exception e) {
             e.printStackTrace();
         }
+        TmfSignalManager.dispatchSignal(new TmfExperimentSelectedSignal(this, experiment));
     }
-
-//    /**
-//     * @param trace
-//     * 
-//     * TODO: Handle LTTng Trace files (when available)
-//     * TODO: Handle multiple traces simultaneously
-//     */
-//    private void openTraceFile(Folder trace) {
-//        String fname = Platform.getLocation() + trace.getFullPath().toOSString();
-//        try {
-//            ITmfEventStream stream = new LttngEventStream(fname);
-//            TmfTrace eventLog = new TmfTrace(trace.getName(), stream);
-//            broadcastEvent(new TmfTraceSelectedEvent(eventLog));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-//    public void handleEvent(ITmfEventLogEvent event) {
-////    	System.out.println("ProjectView.handleEvent()");
-//    }
 
     /**
      * 

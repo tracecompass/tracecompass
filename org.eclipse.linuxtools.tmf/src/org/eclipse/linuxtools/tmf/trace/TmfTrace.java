@@ -12,217 +12,307 @@
 
 package org.eclipse.linuxtools.tmf.trace;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.Vector;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.request.ITmfRequestHandler;
-import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
-import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
-import org.eclipse.linuxtools.tmf.stream.ITmfEventStream;
-import org.eclipse.linuxtools.tmf.stream.TmfStreamUpdatedSignal;
-import org.eclipse.linuxtools.tmf.stream.ITmfEventStream.StreamContext;
 
 /**
- * <b><u>TmfTrace</u></b>
+ * <b><u>TmfEventStream</u></b>
  * <p>
- * TmfTrace represents a time-ordered set of events tied to a single event
- * stream. It keeps track of the global information about the event log:
- * <ul>
- * <li> the epoch, a reference timestamp for the whole log (t0)
- * <li> the span of the log i.e. the timestamps range
- * <li> the total number of events
- * </ul>
- * As an ITmfRequestHandler, it provides an implementation of process()
- * which handles event requests.
- * <p>
- * TODO: Handle concurrent and possibly overlapping requests in a way that
- * optimizes the stream access and event parsing.
+ * TODO: Implement me. Please.
  */
-public class TmfTrace implements ITmfRequestHandler<TmfEvent> {
+public abstract class TmfTrace implements ITmfTrace {
+
+    // ========================================================================
+    // Constants
+    // ========================================================================
+
+    // The default number of events to cache
+    public static final int DEFAULT_CACHE_SIZE = 1000;
 
     // ========================================================================
     // Attributes
     // ========================================================================
 
-	private final String fId;
-    private final ITmfEventStream fStream;
-    private final TmfTimestamp fEpoch;
-    
+    // The stream name
+    private final String fName;
+
+    // The stream parser
+    private final ITmfEventParser fParser;
+
+    // The cache size
+    private final int fCacheSize;
+
+    // The set of event stream checkpoints (for random access)
+    private Vector<TmfStreamCheckpoint> fCheckpoints = new Vector<TmfStreamCheckpoint>();
+
+    // The number of events collected
+    private int fNbEvents = 0;
+
+    // The time span of the event stream
+    private TmfTimeRange fTimeRange = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigBang);
+
     // ========================================================================
     // Constructors
     // ========================================================================
 
-    public TmfTrace(String id, ITmfEventStream stream) {
-        this(id, stream, TmfTimestamp.BigBang);
+    /**
+     * @param filename
+     * @param parser
+     * @param cacheSize
+     * @throws FileNotFoundException
+     */
+    protected TmfTrace(String filename, ITmfEventParser parser, int cacheSize) throws FileNotFoundException {
+    	fName = filename;
+        fParser = parser;
+        fCacheSize = cacheSize;
     }
 
-    public TmfTrace(String id, ITmfEventStream stream, TmfTimestamp epoch) {
-        assert stream != null;
-        fId = id;
-        fStream = stream;
-        fEpoch = epoch;
-        TmfSignalManager.addListener(this);
-    }
-
-    public void dispose() {
-        TmfSignalManager.removeListener(this);
+    /**
+     * @param filename
+     * @param parser
+     * @throws FileNotFoundException
+     */
+    protected TmfTrace(String filename, ITmfEventParser parser) throws FileNotFoundException {
+    	this(filename, parser, DEFAULT_CACHE_SIZE);
     }
 
     // ========================================================================
     // Accessors
     // ========================================================================
 
-    public String getId() {
-    	return fId;
+    /**
+     * @return
+     */
+    public int getCacheSize() {
+        return fCacheSize;
     }
 
-    public ITmfEventStream getStream() {
-    	return fStream;
+    /**
+     * @return
+     */
+    public String getName() {
+        return fName;
     }
 
-    public TmfTimestamp getEpoch() {
-    	return fEpoch;
-    }
-
-    public TmfTimeRange getTimeRange() {
-    	return fStream.getTimeRange();
-    }
-
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.stream.ITmfEventStream#getNbEvents()
+     */
     public int getNbEvents() {
-    	return fStream.getNbEvents();
+        return fNbEvents;
     }
 
-    public int getIndex(TmfTimestamp ts) {
-    	return fStream.getIndex(ts);
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.stream.ITmfEventStream#getTimeRange()
+     */
+    public TmfTimeRange getTimeRange() {
+        return fTimeRange;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.stream.ITmfEventStream#getIndex(org.eclipse.linuxtools.tmf.event.TmfTimestamp)
+     */
+    public int getIndex(TmfTimestamp timestamp) {
+    	StreamContext context = seekEvent(timestamp);
+    	return context.index;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.stream.ITmfEventStream#getTimestamp(int)
+     */
+    public TmfTimestamp getTimestamp(int index) {
+    	StreamContext context = seekEvent(index);
+    	TmfEvent event = peekEvent(context);
+    	return event.getTimestamp();
     }
 
     // ========================================================================
     // Operators
     // ========================================================================
 
+    public StreamContext seekEvent(TmfTimestamp timestamp) {
+
+        // First, find the right checkpoint
+    	int index = Collections.binarySearch(fCheckpoints, new TmfStreamCheckpoint(timestamp, 0));
+
+        // In the very likely event that the checkpoint was not found, bsearch
+        // returns its negated would-be location (not an offset...). From that
+        // index, we can then position the stream and get the event.
+        if (index < 0) {
+            index = Math.max(0, -(index + 2));
+        }
+
+        // Position the stream at the checkpoint
+        Object location = (index < fCheckpoints.size()) ? fCheckpoints.elementAt(index).getLocation() : null;
+        StreamContext nextEventContext;
+        synchronized(this) {
+        	nextEventContext = seekLocation(location);
+        }
+        StreamContext currentEventContext = new StreamContext(nextEventContext.location, index * fCacheSize);
+
+        // And get the event
+        TmfEvent event = getNextEvent(nextEventContext);
+        while (event != null && event.getTimestamp().compareTo(timestamp, false) < 0) {
+        	currentEventContext.location = nextEventContext.location;
+        	currentEventContext.index++;
+        	event = getNextEvent(nextEventContext);
+        }
+
+        return currentEventContext;
+    }
+
+    public StreamContext seekEvent(int position) {
+
+        // Position the stream at the previous checkpoint
+        int index = position / fCacheSize;
+        Object location = (index < fCheckpoints.size()) ? fCheckpoints.elementAt(index).getLocation() : null;
+        StreamContext nextEventContext;
+        synchronized(this) {
+        	nextEventContext = seekLocation(location);
+        }
+        StreamContext currentEventContext = new StreamContext(nextEventContext);
+
+        // And locate the event (if it exists)
+        int current = index * fCacheSize;
+        TmfEvent event = getNextEvent(nextEventContext);
+        while (event != null && current < position) {
+        	currentEventContext.location = nextEventContext.location;
+        	event = getNextEvent(nextEventContext);
+            current++;
+        }
+
+        return currentEventContext;
+    }
+
+    public TmfEvent peekEvent(StreamContext context) {
+    	StreamContext ctx = new StreamContext(context);
+        return getNextEvent(ctx);
+    }
+
+    public TmfEvent getEvent(StreamContext context, TmfTimestamp timestamp) {
+
+    	// Position the stream and update the context object
+    	StreamContext ctx = seekEvent(timestamp);
+    	context.location = ctx.location; 
+
+        return getNextEvent(context);
+    }
+
+    public TmfEvent getEvent(StreamContext context, int position) {
+
+    	// Position the stream and update the context object
+    	StreamContext ctx = seekEvent(position);
+    	context.location = ctx.location; 
+
+        return getNextEvent(context);
+    }
+
+    public synchronized TmfEvent getNextEvent(StreamContext context) {
+        try {
+        	seekLocation(context.location);
+        	TmfEvent event = fParser.getNextEvent(this);
+        	context.location = getCurrentLocation();
+        	return event;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+	private void notifyListeners(TmfTimeRange range) {
+		TmfSignalManager.dispatchSignal(new TmfStreamUpdatedSignal(this, this, range));
+	}
+   
     /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.eventlog.ITmfRequestHandler#processRequest(org.eclipse.linuxtools.tmf.eventlog.TmfDataRequest, boolean)
+     * @see org.eclipse.linuxtools.tmf.eventlog.ITmfEventStream#indexStream()
      */
-    public void processRequest(TmfDataRequest<TmfEvent> request, boolean waitForCompletion) {
-    	if (request.getRange() != null) {
-    		serviceEventRequestByTimestamp(request);
-    	} else {
-    		serviceEventRequestByIndex(request);
-    	}
+    public void indexStream(boolean waitForCompletion) {
+    	IndexingJob job = new IndexingJob(fName);
+    	job.schedule();
         if (waitForCompletion) {
-            request.waitForCompletion();
+            try {
+				job.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
     }
 
-    // ========================================================================
-    // Signal handlers
-    // ========================================================================
+    private class IndexingJob extends Job {
 
-    @TmfSignalHandler
-    public void streamUpdated(TmfStreamUpdatedSignal signal) {
-		TmfSignalManager.dispatchSignal(new TmfTraceUpdatedSignal(this, this));
-    }
+		public IndexingJob(String name) {
+			super(name);
+		}
 
-    // ========================================================================
-    // Helper functions
-    // ========================================================================
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
+		 */
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
 
-    /* (non-Javadoc)
-     * 
-     * @param request
-     */
-    private void serviceEventRequestByTimestamp(final TmfDataRequest<TmfEvent> request) {
-        Thread thread = new Thread() {
-            @Override
-			public void run() {
-                TmfTimestamp startTime = request.getRange().getStartTime();
-                TmfTimestamp endTime   = request.getRange().getEndTime();
-                int blockSize = request.getBlockize();
+            int nbEvents = 0;
+            TmfTimestamp startTime = new TmfTimestamp();
+            TmfTimestamp lastTime  = new TmfTimestamp();
+            TmfTimestamp rangeStartTime = new TmfTimestamp();
 
-                int nbRequestedEvents = request.getNbRequestedItems();
-                if (nbRequestedEvents == -1) {
-                    nbRequestedEvents = Integer.MAX_VALUE;
+            monitor.beginTask("Indexing " + fName, IProgressMonitor.UNKNOWN);
+
+            try {
+                StreamContext nextEventContext;
+                synchronized(this) {
+                	nextEventContext = seekLocation(null);
+                }
+                StreamContext currentEventContext = new StreamContext(nextEventContext);
+                TmfEvent event = getNextEvent(nextEventContext);
+                if (event != null) {
+                	startTime = event.getTimestamp();
+                	lastTime  = event.getTimestamp();
                 }
 
-                Vector<TmfEvent> events = new Vector<TmfEvent>();
-                int nbEvents = 0;
-
-                StreamContext context = new StreamContext(null);
-                TmfEvent event = fStream.getEvent(context, startTime);
-
-                while (!request.isCancelled() && nbEvents < nbRequestedEvents && event != null &&
-                        event.getTimestamp().compareTo(endTime, false) <= 0 )
-                {
-                    events.add(event);
-                    if (++nbEvents % blockSize == 0) {
-                    	TmfEvent[] result = new TmfEvent[events.size()];
-                    	events.toArray(result);
-                    	request.setData(result);
-                        request.handleData();
-                        events.removeAllElements();
+                rangeStartTime = startTime;
+                while (event != null) {
+                    lastTime = event.getTimestamp();
+                    if ((nbEvents++ % fCacheSize) == 0) {
+                        TmfStreamCheckpoint bookmark = new TmfStreamCheckpoint(lastTime, currentEventContext.location);
+                        synchronized(this) {
+                        	fCheckpoints.add(bookmark);
+                        	fNbEvents = nbEvents;
+                            fTimeRange = new TmfTimeRange(startTime, lastTime);
+                        }
+                        notifyListeners(new TmfTimeRange(rangeStartTime, lastTime));
+                        monitor.worked(1);
+                        // Check monitor *after* fCheckpoints has been updated
+                        if (monitor.isCanceled()) {
+                        	return Status.CANCEL_STATUS;
+                        }
                     }
-                    // To avoid an unnecessary read passed the last event requested 
-                    if (nbEvents < nbRequestedEvents)
-                        event = fStream.getNextEvent(context);
-                }
-            	TmfEvent[] result = new TmfEvent[events.size()];
-            	events.toArray(result);
-            	request.setData(result);
 
-            	request.handleData();
-                request.done();
+                	currentEventContext.location = nextEventContext.location;
+					event = getNextEvent(nextEventContext);
+                }
             }
-        };
-        thread.start();
-    }
-
-    /* (non-Javadoc)
-     * 
-     * @param request
-     */
-    private void serviceEventRequestByIndex(final TmfDataRequest<TmfEvent> request) {
-        Thread thread = new Thread() {
-            @Override
-			public void run() {
-                int blockSize = request.getBlockize();
-
-                int nbRequestedEvents = request.getNbRequestedItems();
-                if (nbRequestedEvents == -1) {
-                    nbRequestedEvents = Integer.MAX_VALUE;
+            finally {
+                synchronized(this) {
+                	fNbEvents = nbEvents;
+                	fTimeRange = new TmfTimeRange(startTime, lastTime);
                 }
-
-                Vector<TmfEvent> events = new Vector<TmfEvent>();
-                int nbEvents = 0;
-
-                StreamContext context = new StreamContext(null);
-                TmfEvent event = fStream.getEvent(context, request.getIndex());
-
-                while (!request.isCancelled() && nbEvents < nbRequestedEvents && event != null)
-                {
-                    events.add(event);
-                    if (++nbEvents % blockSize == 0) {
-                    	TmfEvent[] result = new TmfEvent[events.size()];
-                    	events.toArray(result);
-                    	request.setData(result);
-                        request.handleData();
-                        events.removeAllElements();
-                    }
-                    // To avoid an unnecessary read passed the last event requested 
-                    if (nbEvents < nbRequestedEvents)
-                        event = fStream.getNextEvent(context);
-                }
-            	TmfEvent[] result = new TmfEvent[events.size()];
-            	events.toArray(result);
-
-            	request.setData(result);
-                request.handleData();
-                request.done();
+                notifyListeners(new TmfTimeRange(rangeStartTime, lastTime));
+                monitor.done();
             }
-        };
-        thread.start();
+
+			return Status.OK_STATUS;
+		}
     }
 
 }

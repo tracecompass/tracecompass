@@ -10,25 +10,25 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.stream;
+package org.eclipse.linuxtools.tmf.trace;
 
 import org.eclipse.linuxtools.tmf.signal.TmfSignal;
 
 /**
- * <b><u>TmfStreamUpdatedEvent</u></b>
+ * <b><u>TmfExperimentSelectedSignal</u></b>
  * <p>
  * TODO: Implement me. Please.
  */
-public class TmfStreamUpdatedSignal extends TmfSignal {
+public class TmfExperimentSelectedSignal extends TmfSignal {
 
-	private final ITmfEventStream fEventStream;
+	private final TmfExperiment fExperiment;
 	
-	public TmfStreamUpdatedSignal(Object source, ITmfEventStream stream) {
+	public TmfExperimentSelectedSignal(Object source, TmfExperiment experiment) {
 		super(source);
-		fEventStream = stream;
+		fExperiment = experiment;
 	}
 
-	public ITmfEventStream getEventStream() {
-		return fEventStream;
+	public TmfExperiment getExperiment() {
+		return fExperiment;
 	}
 }

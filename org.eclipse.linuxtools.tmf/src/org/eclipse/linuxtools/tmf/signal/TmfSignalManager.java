@@ -132,13 +132,10 @@ public class TmfSignalManager {
 					method.invoke(entry.getKey(), new Object[] { signal });
 				} catch (IllegalArgumentException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
 				} catch (IllegalAccessException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
 				} catch (InvocationTargetException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
 			}
 		}
