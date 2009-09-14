@@ -47,10 +47,15 @@ public interface ITmfTrace {
 	}
     
 	/**
+	 * @return the trace path 
+	 */
+	public String getPath();
+    
+	/**
 	 * @return the trace name 
 	 */
 	public String getName();
-    
+
 	/**
 	 * @return the number of events in the trace
 	 */

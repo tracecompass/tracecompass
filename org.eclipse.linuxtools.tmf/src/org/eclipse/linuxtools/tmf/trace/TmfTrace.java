@@ -12,7 +12,9 @@
 
 package org.eclipse.linuxtools.tmf.trace;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Vector;
 
@@ -20,6 +22,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
@@ -46,7 +50,10 @@ public abstract class TmfTrace implements ITmfTrace {
     // Attributes
     // ========================================================================
 
-    // The stream name
+    // The trace path
+    private final String fPath;
+
+    // The trace name
     private final String fName;
 
     // The checkpoints page size
@@ -74,8 +81,10 @@ public abstract class TmfTrace implements ITmfTrace {
      * @param index
      * @throws FileNotFoundException
      */
-    protected TmfTrace(String name, int pageSize, boolean index) throws FileNotFoundException {
-    	fName = name;
+    protected TmfTrace(String path, int pageSize, boolean index) throws FileNotFoundException {
+    	int sep = path.lastIndexOf(File.separator);
+    	fName = (sep >= 0) ? path.substring(sep + 1) : path;
+    	fPath = path;
         fPageSize = pageSize;
         fIndex = index;
     }
@@ -111,10 +120,10 @@ public abstract class TmfTrace implements ITmfTrace {
     // ========================================================================
 
     /**
-     * @return the size of the cache
+     * @return the trace path
      */
-    public int getPageSize() {
-        return fPageSize;
+    public String getPath() {
+        return fPath;
     }
 
     /**
@@ -129,6 +138,13 @@ public abstract class TmfTrace implements ITmfTrace {
      */
     public int getNbEvents() {
         return fNbEvents;
+    }
+
+    /**
+     * @return the size of the cache
+     */
+    public int getPageSize() {
+        return fPageSize;
     }
 
     /* (non-Javadoc)
@@ -291,15 +307,23 @@ public abstract class TmfTrace implements ITmfTrace {
     // ========================================================================
 
     public void indexStream() {
-    	IndexingJob job = new IndexingJob(fName);
+    	final IndexingJob job = new IndexingJob(fName);
     	job.schedule();
     	if (fIndex) {
-    		try {
-				job.join();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+            ProgressMonitorDialog dialog = new ProgressMonitorDialog(null);
+            try {
+                dialog.run(true, true, new IRunnableWithProgress() {
+                    public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                        monitor.beginTask("Indexing " + getName(), IProgressMonitor.UNKNOWN);
+        				job.join();
+                        monitor.done();
+                    }
+                });
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
     	}
     }
 
