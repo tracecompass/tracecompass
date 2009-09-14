@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.trace.TmfExperimentSelectedSignal;
-import org.eclipse.linuxtools.tmf.trace.TmfStreamUpdatedSignal;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceUpdatedSignal;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -228,7 +228,7 @@ public class TmfEventsView extends TmfViewer {
     }
 
 	@TmfSignalHandler
-    public void traceUpdated(TmfStreamUpdatedSignal signal) {
+    public void traceUpdated(TmfTraceUpdatedSignal signal) {
         // Perform the refresh on the UI thread
     	fTable.getDisplay().asyncExec(new Runnable() {
 			public void run() {

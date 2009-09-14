@@ -15,74 +15,36 @@ package org.eclipse.linuxtools.lttng.event;
 import org.eclipse.linuxtools.tmf.event.*;
 
 /**
- * <b><u>LttngEventReference</u></b><p>
- * 
+ * <b><u>LttngEventReference</u></b>
+ * <p>
  * Lttng specific implementation of the TmfEventReference
+ * <p>
+ * The Lttng implementation is the same as the basic Tmf Implementation but allow construction with a String
  */
 public class LttngEventReference extends TmfEventReference {
     
-    private String tracename = ""; 
+    
+    private String tracepath = ""; 
     
     /**
-     * Constructor with parameters.<p>
+     * Constructor with parameters
      * 
-     * @param newTraceName      Trace name 
+     * @param referencePath  A string that will be our reference
      */
-    public LttngEventReference(String newTraceName) {
-        super("");
-        tracename = newTraceName;
-    }
-    
-    /**
-     * Constructor with parameters with optional tracefile path.<p>
-     * 
-     * @param newTracefilePath  Complete tracefile path
-     * @param newTraceName      Trace name 
-     */
-    public LttngEventReference(String newTracefilePath, String newTraceName) {
+    public LttngEventReference(String newTracefilePath, String newTracePath) {
         super(newTracefilePath);
         
-        // Save the name of the trace 
-        tracename = newTraceName;
-    }
-    
-    /**
-     * Copy Constructor.<p>
-     * 
-     * @param oldReference  LttngEventReference to copy from.
-     */
-    public LttngEventReference(LttngEventReference oldReference) {
-        this( oldReference.getValue().toString(), oldReference.getTracepath() );
+        // Save the path of the trace 
+        tracepath = newTracePath;
     }
     
     
     public String getTracepath() {
-        return tracename;
+        return tracepath;
     }
-    
-    public void setTracepath(String tracename) {
-        this.tracename = tracename;
-    }
-    
-    public String getValue() {
-        return (String)fReference;
-    }
-    
-    public void setValue(String newReference) {
-        fReference = newReference;
-    }
-    
-    /**
-     * toString() method.<p>
-     * 
-     * We return only tracename, as it will be used directly in the eventsView.
-     *  Returning only tracename gives a better output.
-     * 
-     * @return tracename as String
-     */
-    @Override
-	public String toString() {
-    	return tracename;
+
+    public void setTracepath(String tracepath) {
+        this.tracepath = tracepath;
     }
     
 }

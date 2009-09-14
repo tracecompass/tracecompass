@@ -89,4 +89,11 @@ public class TmfEventContent {
 		return fFields[id];
 	}
 
+	/**
+	 * @return
+	 */
+	public void setFields(TmfEventField[] fields) {
+        fFields = fields;
+	}
+
 }

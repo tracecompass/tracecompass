@@ -18,10 +18,8 @@ import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.trace.ITmfEventParser;
-import org.eclipse.linuxtools.tmf.trace.TmfEventParserStub;
-import org.eclipse.linuxtools.tmf.trace.TmfEventStreamStub;
-import org.eclipse.linuxtools.tmf.trace.ITmfTrace.StreamContext;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
+import org.eclipse.linuxtools.tmf.trace.ITmfTrace.TmfTraceContext;
 
 /**
  * <b><u>TmfRequestHandlerStub</u></b>
@@ -36,15 +34,12 @@ public class TmfRequestHandlerStub implements ITmfRequestHandler<TmfEvent> {
     // A constant to limit the number of events for the tests
     public static final int MAX_GENERATED_EVENTS = 1000;
 
-    private ITmfEventParser fParser;
-    private TmfEventStreamStub fStream;
+    private TmfTraceStub fTrace;
 
     public TmfRequestHandlerStub() throws IOException {
     	String directory = new File(".").getCanonicalPath() + File.separator + "testfiles";
     	String filename  = directory + File.separator + TEST_STREAM;
-
-    	fParser = new TmfEventParserStub();
-        fStream = new TmfEventStreamStub(filename, fParser);
+        fTrace = new TmfTraceStub(filename);
     }
 
     /* (non-Javadoc)
@@ -66,8 +61,8 @@ public class TmfRequestHandlerStub implements ITmfRequestHandler<TmfEvent> {
 
                 Vector<TmfEvent> events = new Vector<TmfEvent>();
                 int nbEvents = 0;
-            	StreamContext context = new StreamContext(null);
-                TmfEvent event = fStream.getEvent(context, startTime);
+            	TmfTraceContext context = new TmfTraceContext(null);
+                TmfEvent event = fTrace.getEvent(context, startTime);
                 while (!request.isCancelled() && nbEvents < nbRequestedEvents &&
                        event != null && event.getTimestamp().compareTo(endTime, false) <= 0 )
                 {
@@ -79,7 +74,7 @@ public class TmfRequestHandlerStub implements ITmfRequestHandler<TmfEvent> {
                         request.handleData();
                         events.removeAllElements();
                     }
-                    event = fStream.getNextEvent(context);
+                    event = fTrace.getNextEvent(context);
                 }
             	TmfEvent[] result = new TmfEvent[events.size()];
             	events.toArray(result);

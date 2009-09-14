@@ -15,73 +15,56 @@ package org.eclipse.linuxtools.lttng.event;
 import org.eclipse.linuxtools.tmf.event.*;
 
 /**
- * <b><u>LttngEventType</u></b><p>
- * 
- * Lttng specific implementation of the TmfEventType.<p>
- * 
+ * <b><u>LttngEventType</u></b>
+ * <p>
+ * Lttng specific implementation of the TmfEventType
+ * <p>
  * This implementation add some attributes to the basic Tmf object.
  */
 public class LttngEventType extends TmfEventType {
-    
-    private String tracefileName    = null;
-    private Long   cpuId            = null;
-    private String markerName       = null;
-    
-    /**
-     * Default Constructor.<p>
-     * 
-     */
-    public LttngEventType() {
-        super();
-    }
+    private String  channelName = "";
+    private long    cpuId = 0;
+    private String  markerName = "";
     
     /**
-     * Constructor with parameters.<p>
+     * Constructor with parameters
      * 
-     * @param thisTracefileName		Tracefile (channel) name in Ltt
-     * @param thisMarkerName 		Marker name in LTT
-     * @param thisMarkerfieldsName  MarkerFields related to this marker	
+     * @param thisChannelName   Channel name. It is the Tracefile name in LTT.
+     * @param thisCpuId         CPU id number from LTT
+     * @param thisMarkerName    JniMarker name. It is the marker_info name in LTT.
+     * @param thisFormat        The format relative to the event
+     * @see org.eclipse.linuxtools.lttng.event.LttngEventFormat
      */
-    public LttngEventType(String thisTracefileName, Long thisCpuId, String thisMarkerName, String[] thisMarkerfieldsName) {
-        super( thisTracefileName + "/" + thisCpuId + "/" + thisMarkerName, thisMarkerfieldsName);
+    public LttngEventType(String thisChannelName, long thisCpuId, String thisMarkerName, LttngEventFormat thisFormat) {
+        super( thisChannelName + "/" + thisCpuId + "/" + thisMarkerName, thisFormat);
         
-        tracefileName   = thisTracefileName;
-        cpuId           = thisCpuId;
-        markerName      = thisMarkerName;
+        channelName = thisChannelName;
+        cpuId       = thisCpuId;
+        markerName  = thisMarkerName;
     }
 
-    /**
-     * Copy constructor.<p>
-     * 
-     * @param oldType   Type we want to copy from
-     */
-    public LttngEventType(LttngEventType oldType) {
-        this(oldType.tracefileName, oldType.cpuId, oldType.markerName, oldType.getLabels());
+    
+    public String getChannelName() {
+        return channelName;
     }
     
     
-    public String getTracefileName() {
-        return tracefileName;
-    }
-    
-    public Long getCpuId() {
+    public long getCpuId() {
         return cpuId;
     }
+    
     
     public String getMarkerName() {
         return markerName;
     }
     
+    
     /**
      * toString() method.
      * 
-     * @return TypeId (channel/marker) of the object
+     * @return String  TypeId of the object
      */
-    @Override
-	public String toString() {
-        // *** TODO ***
-        // This is used as-it in the events view, so we won't change its format.
-        //  ...but maybe we should?
-        return tracefileName + "/" + cpuId.toString() + "/" + markerName;
+    public String toString() {
+        return getTypeId();
     }
 }

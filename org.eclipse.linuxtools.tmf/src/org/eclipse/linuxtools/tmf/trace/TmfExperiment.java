@@ -21,7 +21,7 @@ import org.eclipse.linuxtools.tmf.request.ITmfRequestHandler;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
-import org.eclipse.linuxtools.tmf.trace.ITmfTrace.StreamContext;
+import org.eclipse.linuxtools.tmf.trace.ITmfTrace.TmfTraceContext;
 
 /**
  * <b><u>TmfExperiment</u></b>
@@ -29,7 +29,7 @@ import org.eclipse.linuxtools.tmf.trace.ITmfTrace.StreamContext;
  * TmfExperiment presents a time-ordered, unified view of a set of 
  * TmfTraces that are part of a tracing experiment. 
  * <p>
- * TODO: Implement me. Please.
+ * TODO: Complete multi-trace experiment
  */
 public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
 
@@ -37,7 +37,7 @@ public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
     // Attributes
     // ========================================================================
 
-	private final int CACHE_SIZE = 1000;
+//	private final int CACHE_SIZE = 10000;
 
     private String fExperimentId;
     private Vector<ITmfTrace> fTraces;
@@ -51,16 +51,13 @@ public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
 
     public TmfExperiment(String id, ITmfTrace[] traces) {
         this(id, traces, TmfTimestamp.BigBang);
-        for (ITmfTrace trace : traces) {
-        	addTrace(trace);
-        }
     }
 
     public TmfExperiment(String id, ITmfTrace[] traces, TmfTimestamp epoch) {
     	fExperimentId = id;
     	fTraces = new Vector<ITmfTrace>();
     	for (ITmfTrace trace : traces) {
-    		fTraces.add(trace);
+    		addTrace(trace);
     	}
     	fEpoch = epoch;
         TmfSignalManager.addListener(this);
@@ -99,6 +96,11 @@ public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
     // TODO: Go over all the traces
     public int getIndex(TmfTimestamp ts) {
     	return fTraces.firstElement().getIndex(ts);
+    }
+
+    // TODO: Go over all the traces
+    public TmfTimestamp getTimestamp(int index) {
+    	return fTraces.firstElement().getTimestamp(index);
     }
 
 //	public TmfTimestamp getTimestamp(int index) {
@@ -193,7 +195,7 @@ public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
 		Thread thread = new Thread() {
 
 			private ITmfTrace[] traces = new ITmfTrace[0];
-			private StreamContext[] contexts;
+			private TmfTraceContext[] contexts;
 			private TmfEvent[] peekEvents;
 
 			@Override
@@ -214,7 +216,7 @@ public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
 
 				// Initialize the traces array and position the streams
 				traces = fTraces.toArray(traces);
-				contexts = new StreamContext[traces.length];
+				contexts = new TmfTraceContext[traces.length];
 				peekEvents = new TmfEvent[traces.length];
 				for (int i = 0; i < contexts.length; i++) {
 					contexts[i] = traces[i].seekEvent(startTime);
@@ -260,7 +262,7 @@ public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
 		Thread thread = new Thread() {
 
 			private ITmfTrace[] traces = new ITmfTrace[0];
-			private StreamContext[] contexts;
+			private TmfTraceContext[] contexts;
 			private TmfEvent[] peekEvents;
 
 			@Override
@@ -279,7 +281,7 @@ public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
 
 				// Initialize the traces array and position the streams
 				traces = fTraces.toArray(traces);
-				contexts = new StreamContext[traces.length];
+				contexts = new TmfTraceContext[traces.length];
 				peekEvents = new TmfEvent[traces.length];
 				for (int i = 0; i < contexts.length; i++) {
 					contexts[i] = traces[i].seekEvent(request.getIndex());
@@ -315,7 +317,7 @@ public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
 
     // Returns the next event in chronological order
 	// TODO: Consider the time adjustment
-	private TmfEvent getNextEvent(ITmfTrace[] traces, StreamContext[] contexts, TmfEvent[] peekEvents) {
+	private TmfEvent getNextEvent(ITmfTrace[] traces, TmfTraceContext[] contexts, TmfEvent[] peekEvents) {
 		int index = 0;
 		TmfEvent evt = peekEvents[0];
 		TmfTimestamp ts0 = evt != null ? evt.getTimestamp() : TmfTimestamp.BigCrunch;
@@ -333,53 +335,52 @@ public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
 		return event;
 	}
 
-	// TODO: Redesign me
-	private Vector<StreamContext[]> fIndices = new Vector<StreamContext[]>();
-	public void indexExperiment() {
-		ITmfTrace[] traces = new ITmfTrace[0];
-		StreamContext[] contexts;
-		TmfEvent[] peekEvents;
-
-		traces = fTraces.toArray(traces);
-		contexts = new StreamContext[traces.length];
-		peekEvents = new TmfEvent[traces.length];
-		for (int i = 0; i < contexts.length; i++) {
-			contexts[i] = traces[i].seekEvent(TmfTimestamp.BigBang);
-			peekEvents[i] = traces[i].peekEvent(contexts[i]);
-		}
-
-		// Initialize the indices
-		StreamContext[] ctx = new StreamContext[contexts.length];
-		for (int i = 0; i < ctx.length; i++) {
-			ctx[i] = new StreamContext(contexts[i]);
-		}
-		fIndices.add(ctx);
-
-		// Get the ordered events and populate the indices
-		int nbEvents = 0;
-		while (getNextEvent(traces, contexts, peekEvents) != null)
-		{
-			if (++nbEvents % CACHE_SIZE == 0) {
-				ctx = new StreamContext[contexts.length];
-				for (int i = 0; i < ctx.length; i++) {
-					ctx[i] = new StreamContext(contexts[i]);
-				}
-				fIndices.add(ctx);
-			}
-		}
-	}
+//	private Vector<TraceContext[]> fIndices = new Vector<TraceContext[]>();
+//	public void indexExperiment() {
+//		ITmfTrace[] traces = new ITmfTrace[0];
+//		TraceContext[] contexts;
+//		TmfEvent[] peekEvents;
+//
+//		traces = fTraces.toArray(traces);
+//		contexts = new TraceContext[traces.length];
+//		peekEvents = new TmfEvent[traces.length];
+//		for (int i = 0; i < contexts.length; i++) {
+//			contexts[i] = traces[i].seekEvent(TmfTimestamp.BigBang);
+//			peekEvents[i] = traces[i].peekEvent(contexts[i]);
+//		}
+//
+//		// Initialize the indices
+//		TraceContext[] ctx = new TraceContext[contexts.length];
+//		for (int i = 0; i < ctx.length; i++) {
+//			ctx[i] = new TraceContext(contexts[i]);
+//		}
+//		fIndices.add(ctx);
+//
+//		// Get the ordered events and populate the indices
+//		int nbEvents = 0;
+//		while (getNextEvent(traces, contexts, peekEvents) != null)
+//		{
+//			if (++nbEvents % CACHE_SIZE == 0) {
+//				ctx = new TraceContext[contexts.length];
+//				for (int i = 0; i < ctx.length; i++) {
+//					ctx[i] = new TraceContext(contexts[i]);
+//				}
+//				fIndices.add(ctx);
+//			}
+//		}
+//	}
 
     // ========================================================================
     // Signal handlers
     // ========================================================================
 
     @TmfSignalHandler
-    public void streamUpdated(TmfStreamUpdatedSignal signal) {
+    public void traceUpdated(TmfTraceUpdatedSignal signal) {
     	synchronized(this) {
     		updateNbEvents();
     		updateTimeRange();
     	}
-		TmfSignalManager.dispatchSignal(new TmfTraceUpdatedSignal(this, this));
+		TmfSignalManager.dispatchSignal(new TmfExperimentUpdatedSignal(this, this, signal.getTrace()));
     }
 
 }

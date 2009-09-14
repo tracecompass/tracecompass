@@ -65,11 +65,11 @@ public class TmfEventParserStub implements ITmfEventParser {
     static final String typePrefix = "Type-";
     public TmfEvent getNextEvent(ITmfTrace eventStream) throws IOException {
 
-        if (! (eventStream instanceof TmfEventStreamStub)) {
+        if (! (eventStream instanceof TmfTraceStub)) {
             return null;
         }
 
-        RandomAccessFile stream = ((TmfEventStreamStub) eventStream).getStream();
+        RandomAccessFile stream = ((TmfTraceStub) eventStream).getStream();
 
         try {
             long ts        = stream.readLong();

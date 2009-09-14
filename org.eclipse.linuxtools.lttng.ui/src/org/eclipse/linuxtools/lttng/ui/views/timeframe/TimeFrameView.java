@@ -19,7 +19,7 @@ import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.trace.TmfExperimentSelectedSignal;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceUpdatedSignal;
+import org.eclipse.linuxtools.tmf.trace.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.ui.views.TmfViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -274,7 +274,7 @@ public class TimeFrameView extends TmfViewer {
      * @param signal
      */
     @TmfSignalHandler
-    public void traceUpdated(TmfTraceUpdatedSignal signal) {
+    public void traceUpdated(TmfExperimentUpdatedSignal signal) {
 
         // Update the time frame
        	fTraceTimeRange = signal.getTrace().getTimeRange();

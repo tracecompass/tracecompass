@@ -12,233 +12,119 @@
 
 package org.eclipse.linuxtools.lttng.event;
 
-import java.util.HashMap;
-
 import org.eclipse.linuxtools.tmf.event.TmfEventContent;
 
 /**
- * <b><u>LttngEventContent</u></b><p>
- * 
- * Lttng specific implementation of the TmfEventContent.<p>
+ * <b><u>LttngEventContent</u></b>
+ * <p>
+ * Lttng specific implementation of the TmfEventContent
+ * <p>
+ * Lttng LttngEventContent is very similar from TMF basic one. <br>
  */
 public class LttngEventContent extends TmfEventContent {
     
-    // Hash map that contain the (parsed) fields. This is the actual payload of the event.
-    HashMap<String, LttngEventField> fFieldsMap = new HashMap<String, LttngEventField>();
-    
     /**
-     * Default constructor.<p>
+     * Constructor with parameters<br>
+     * <br>
+     * Content will be null as no parsed content is given.
      * 
+     * @param thisFormat    The LttngEventFormat relative to the JniEvent
+     */
+    public LttngEventContent(LttngEventFormat thisFormat) {
+        super(null, thisFormat);
+    }
+
+    /**
+     * Constructor with parameters<br>
+     * 
+     * @param thisFormat        The LttngEventFormat relative to this JniEvent
+     * @param thisParsedContent The string content of the JniEvent, already parsed
      * 
      */
-    public LttngEventContent() {
-        super(null, null);
-    }
-    
-    /**
-     * Constructor with parameters.<p>
-     * 
-     * @param thisParent    Parent event for this content.
-     * 
-     * @see org.eclipse.linuxtools.lttng.event.LttngEvent
-     */
-    public LttngEventContent(LttngEvent thisParent) {
-        super(thisParent, null);
-    }
-    
-    /**
-     * Constructor with parameters, with optional content.<p>
-     * 
-     * @param thisParent    Parent event for this content.
-     * @param thisContent   Already parsed content.
-     * 
-     * @see org.eclipse.linuxtools.lttng.event.LttngEvent
-     */
-    public LttngEventContent(LttngEvent thisParent, HashMap<String, LttngEventField> thisContent) {
-        super(thisParent, null);
-        
-        fFieldsMap = thisContent;
-    }
-    
-    /**
-     * Copy Constructor.<p>
-     * 
-     * @param oldContent  Content to copy from
-     */
-    public LttngEventContent(LttngEventContent oldContent) {
-        this((LttngEvent)oldContent.getEvent(), oldContent.getRawContent() );
+    public LttngEventContent(LttngEventFormat thisFormat, String thisParsedContent, LttngEventField[] thisFields) {
+        super(thisParsedContent, thisFormat);
+        setFields(thisFields);
     }
     
     
-    @Override
-	public LttngEvent getEvent() {
-        return (LttngEvent)fParentEvent;
-    }
-    
-    public void setEvent(LttngEvent newParent) {
-        fParentEvent = newParent;
-    }
-    
-    
-    // *** VERIFY ***
-    // These are not very useful, are they?
-    @Override
-	public LttngEventType getType() {
-        return (LttngEventType)fParentEvent.getType();
-//        return (LttngEventType)fEventType;
-    }
-    public void setType(LttngEventType newType) {
-        ((LttngEvent)fParentEvent).setType(newType);
-//        fEventType = newType;
-    }
-    
-    
-    // ***TODO***
-    // Find a better way to ensure content is sane!!
-    public void emptyContent() {
-        fFieldsMap.clear();
-    }
-    
-    // ***VERIFY***
-    // A bit weird to return the _currently_parsed fields (unlike all like getFields() )
-    // Should we keep this?
-    /**
-     * Return currently parsed fields in an object array format.<p>
-     * 
-     * @return  Currently parsed fields.
-     */
-    @Override
-    public Object[] getContent() {
-        Object[] returnedContent = fFieldsMap.values().toArray( new Object[fFieldsMap.size()] );
-        
-        return returnedContent;
-    }
-    
-    /**
-     * Return currently parsed fields in the internal hashmap format.<p>
-     * 
-     * @return  Currently parsed fields.
-     */
-    public HashMap<String, LttngEventField> getRawContent() {
-        return fFieldsMap;
-    }
-    
-//    @SuppressWarnings("unchecked")
-//    @Override
-//    public LttngEventField[] getFields() {
-//        LttngEventField tmpField = null;
-//        
-//        // *** TODO ***
-//        // SLOW! SLOW! SLOW! We should prevent the user to use this!!
-//        HashMap<String, Object> parsedContent = parseContent();
-//        
-//        String contentKey = null;
-//        Iterator<String> contentItr = parsedContent.keySet().iterator();
-//        while ( contentItr.hasNext() ) {
-//            contentKey = contentItr.next();
-//            
-//            tmpField = new LttngEventField(this, contentKey, parsedContent.get(contentKey));
-//            ((HashMap<String, LttngEventField>)fFields).put(contentKey, tmpField);
-//        }
-//        
-//        return fFields.values().toArray(new LttngEventField[fFields.size()]);
-//    }
-    
-    /**
-     * Parse all fields and return them as an array of LttngFields.<p>
-     * 
-     * Note : This function is heavy and should only be called if all fields are really needed.
-     * 
-     * @return  All fields.
-     * 
-     * @see @see org.eclipse.linuxtools.lttng.event.LttngEventField
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.event.TmfEventContent#getFields()
      */
     @Override
     public LttngEventField[] getFields() {
-        LttngEventField tmpField = null;
+    	
+    	// Request the field variable from the inherited class
+        LttngEventField[] fields = (LttngEventField[])super.getFields();
         
-        LttngEventType tmpType = (LttngEventType)fParentEvent.getType();
-        
-        for ( int pos=0; pos<tmpType.getNbFields(); pos++ ) {
-            String name = tmpType.getLabel(pos);
-            Object newValue = ((LttngEvent)getEvent()).convertEventTmfToJni().parseFieldByName(name);
-            
-            tmpField = new LttngEventField(this, name, newValue );
-            fFieldsMap.put(name, tmpField);
+        // Field may be null if the content hasn't been parse yet
+        // If that's the case, call the parsing function
+        if (fields == null) {
+            fields = ((LttngEventFormat) this.getFormat()).parse(this.getContent());
+            setFields(fields);
         }
-        return fFieldsMap.values().toArray(new LttngEventField[fFieldsMap.size()]);
+        return fields;
     }
-    
-    /**
-     * Parse a single field from its given position.<p>
-     * 
-     * @return  The parsed field or null.
-     * 
-     * @see @see org.eclipse.linuxtools.lttng.event.LttngEventField
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.event.TmfEventContent#getField(int)
      */
     @Override
-    public LttngEventField getField(int position) {
+    public LttngEventField getField(int id) {
+        assert id >= 0 && id < this.getNbFields();
+        
         LttngEventField returnedField = null;
-        String label = fParentEvent.getType().getLabel(position);
+        LttngEventField[] allFields = this.getFields();
         
-        if ( label != null ) {
-            returnedField = this.getField(label);
+        if ( allFields != null ) {
+        	returnedField = allFields[id];
         }
         
         return returnedField;
     }
     
     /**
-     * Parse a single field from its given name.<p>
-     * 
-     * @return  The parsed field or null.
-     * 
-     * @see @see org.eclipse.linuxtools.lttng.event.LttngEventField
+     * @param thisEvent
+     * @return
      */
-    @Override
-    public LttngEventField getField(String name) {
-        // *** VERIFY ***
-        // Should we check if the field exists in LttngType before parsing? 
-        // It could avoid calling parse for non-existent fields but would waste some cpu cycle on check?
-        LttngEventField returnedField = fFieldsMap.get(name);
+    public LttngEventField[] getFields(LttngEvent thisEvent) {
+    	
+    	// Request the field variable from the inherited class
+        LttngEventField[] fields = (LttngEventField[])super.getFields();
         
-        if ( returnedField == null ) {
-            // *** VERIFY ***
-            // Should we really make sure we didn't get null before creating/inserting a field?
-        	Object newValue = ((LttngEvent)getEvent()).convertEventTmfToJni().parseFieldByName(name);
-            
-            if ( newValue!= null ) {
-                returnedField = new LttngEventField(this, name, newValue);
-                fFieldsMap.put(name, returnedField );
-            }
+        // Field may be null if the content hasn't been parse yet
+        // If that's the case, call the parsing function
+        if (fields == null) {
+            fields = ((LttngEventFormat)this.getFormat()).parse(thisEvent);
+            setFields(fields);
+        }
+        return fields;
+    }
+    
+    /**
+     * @param id
+     * @param thisEvent
+     * @return
+     */
+    public LttngEventField getField(int id, LttngEvent thisEvent) {
+        assert id >= 0 && id < this.getNbFields();
+        
+        LttngEventField returnedField = null;
+        LttngEventField[] allFields = this.getFields(thisEvent);
+        
+        if ( allFields != null ) {
+        	returnedField = allFields[id];
         }
         
         return returnedField;
     }
     
-    // *** VERIFY ***
-    // *** Is this even useful?
-    @Override
-    protected void parseContent() {
-        fFields = getFields();
-    }
-    
+
     /**
-     * toString() method to print the content
+     * basic toString() method.
      * 
-     * Note : this function parse all fields and so is very heavy to use.
+     * @return Attributes of the object concatenated in String
      */
-    @Override
     public String toString() {
-        String returnedString = "";
-        
-        LttngEventField[] allFields = getFields();
-        
-        for ( int pos=0; pos < allFields.length; pos++) {
-            returnedString +=  allFields[pos].toString() + " ";
-        }
-        
-        return returnedString;
-        
+        return getContent().toString();
     }
 }

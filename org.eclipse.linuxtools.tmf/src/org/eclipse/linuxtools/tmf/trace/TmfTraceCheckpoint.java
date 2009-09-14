@@ -15,11 +15,11 @@ package org.eclipse.linuxtools.tmf.trace;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 /**
- * <b><u>TmfStreamCheckpoint</u></b>
+ * <b><u>TmfTraceCheckpoint</u></b>
  * <p>
  * This class maps an event timestamp with a trace location.
  */
-public class TmfStreamCheckpoint implements Comparable<TmfStreamCheckpoint> {
+public class TmfTraceCheckpoint implements Comparable<TmfTraceCheckpoint> {
 
     // ========================================================================
     // Attributes
@@ -36,7 +36,7 @@ public class TmfStreamCheckpoint implements Comparable<TmfStreamCheckpoint> {
      * @param ts
      * @param location
      */
-    public TmfStreamCheckpoint(TmfTimestamp ts, Object location) {
+    public TmfTraceCheckpoint(TmfTimestamp ts, Object location) {
         fTimestamp = ts;
         fLocation = location;
     }
@@ -63,7 +63,7 @@ public class TmfStreamCheckpoint implements Comparable<TmfStreamCheckpoint> {
     // Operators
     // ========================================================================
 
-    public int compareTo(TmfStreamCheckpoint other) {
+    public int compareTo(TmfTraceCheckpoint other) {
         return fTimestamp.compareTo(other.fTimestamp, false);
     }
 

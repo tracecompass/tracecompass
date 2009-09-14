@@ -12,52 +12,48 @@
 
 package org.eclipse.linuxtools.lttng.event;
 
-import org.eclipse.linuxtools.tmf.event.TmfEventContent;
-import org.eclipse.linuxtools.tmf.event.TmfEventField;
+import org.eclipse.linuxtools.tmf.event.*;
 
 /**
- * <b><u>LttngEventField</u></b><p>
- * 
- * Lttng specific implementation of the TmfEventField.<p>
- * 
- * LttngEventField add a "name" attribute to the Tmf implementation This
- * mean the fields will have a name and a value.
+ * <b><u>LttngEventField</u></b>
+ * <p>
+ * Lttng specific implementation of the TmfEventField
+ * <p>
+ * Lttng LttngEventField add a "Name" attribute to the Tmf implementation
+ * This mean the fields will have a name and a value.
  */
-public class LttngEventField extends TmfEventField {
-	
-    /**
-     * Constructor with parameters.<p>
-     * 
-     * @param parent   Parent content for this field
-     * @param id       Name (label) of this field
-     */
-    public LttngEventField(TmfEventContent parent, String id) {
-        super(parent, id, null);
-    }
-    
-	/**
-	 * Constructor with parameters with optional value.<p>
-	 * 
-	 * @param parent   Parent content for this field
-	 * @param id       Name (label) of this field
-	 * @param value    Parsed value (payload) of this field
-	 */
-	public LttngEventField(TmfEventContent parent, String id, Object value) {
-		super(parent, id, value);
-	}
-	
-	/**
-	 * Copy constructor.<p>
-	 * 
-	 * @param oldField     the field to copy from
-	 */
-	public LttngEventField(LttngEventField oldField) {
-		this(oldField.getParent(), oldField.getId(), oldField.getValue());
-	}
-	
-	@Override
-	public String toString() {
-	    return getId().toString() + ":" + getValue().toString();
-	}
-	
+public class LttngEventField extends TmfEventField 
+{
+        private String fieldName = "";
+        
+        /**
+         * Constructor with parameters<br>
+         * 
+         * @param newContent    The parsedContent we want to populate the field with. 
+         * 
+         * @see org.eclipse.linuxtools.lttng.jni.ParsedContent   
+         */
+        public LttngEventField(String name, Object newContent) {
+                super( newContent );
+        
+                fieldName = name;
+        }
+        
+        /**
+         * getter for the name attribute.
+         */
+        public String getName() {
+                return fieldName;
+        }
+        
+        /**
+         * overrided toString() method.<br>
+         * <br>
+         * Print both field name and value.
+         */
+        @Override
+        public String toString() {
+                return fieldName + " : " + getValue().toString();
+        }
 }
+

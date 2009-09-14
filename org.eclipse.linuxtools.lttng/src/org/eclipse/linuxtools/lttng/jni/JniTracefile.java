@@ -1,4 +1,3 @@
-package org.eclipse.linuxtools.lttng.jni;
 /*******************************************************************************
  * Copyright (c) 2009 Ericsson
  * 
@@ -11,18 +10,19 @@ package org.eclipse.linuxtools.lttng.jni;
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
+package org.eclipse.linuxtools.lttng.jni;
 
 import java.util.HashMap;
 
 /**
  * <b><u>JniTracefile</u></b>
  * <p>
- * A tracefile own an event of a certain type.<br>
- * Provides access to the LttTracefile C structure in java.
+ * A tracefile own an event of a certain type
+ * It provides access to the LttTracefile C structure in java.
  * <p>
  * Most important fields in the JniTracefile are :
  * <ul>
- * <li> a JniTracefile path (a tracefile <b>file</b> within a JniTrace directory)
+ * <li> a JniTracefile path (a tracefile <b>file</b> with a JniTrace directory)
  * <li> a name (basically the name without the directory part)
  * <li> a reference to a single event object
  * <li> a HashMap of marker associated with this tracefile
@@ -31,7 +31,7 @@ import java.util.HashMap;
 public final class JniTracefile extends Jni_C_Common {
         
     // Internal C pointer of the JniTracefile used in LTT
-    private Jni_C_Pointer thisTracefilePtr = new Jni_C_Pointer();
+    private C_Pointer thisTracefilePtr = new C_Pointer();
     
     // Reference to the parent trace
     private JniTrace parentTrace = null;
@@ -46,11 +46,8 @@ public final class JniTracefile extends Jni_C_Common {
     private long    tid = 0;
     private long    pgid = 0;
     private long    creation = 0;
-    
-    // Internal C pointer for trace and marker
-    private Jni_C_Pointer tracePtr = null;
-    private Jni_C_Pointer markerDataPtr = null;
-    
+    private long    tracePtr = 0;
+    private long    markerDataPtr = 0;
     private int     CFileDescriptor = 0;
     private long    fileSize = 0;
     private long    blocksNumber = 0;
@@ -65,14 +62,11 @@ public final class JniTracefile extends Jni_C_Common {
     private long    eventsLost = 0;
     private long    subBufferCorrupt = 0;
     private JniEvent   currentEvent = null;
-    
-    // Internal C pointer for trace and marker
-    private Jni_C_Pointer bufferPtr = null;
-    
+    private long    bufferPtr = NULL;
     private long    bufferSize = 0;
 
     // This map will hold markers_info owned by this tracefile
-    private HashMap<Integer, JniMarker> tracefileMarkersMap = null;        
+    private HashMap<Integer, JniMarker> tracefileMarkersMap;        
 
     // Native access functions
     private native boolean  ltt_getIsCpuOnline(long tracefilePtr);
@@ -102,16 +96,16 @@ public final class JniTracefile extends Jni_C_Common {
     private native long     ltt_getBufferSize(long tracefilePtr);
 
     // Method to fill a map with marker object
-    private native void ltt_feedAllMarkers(long tracefilePtr);
-    
+    private native void ltt_getAllMarkers(long tracefilePtr);
+
     // Debug native function, ask LTT to print tracefile structure
     private native void ltt_printTracefile(long tracefilePtr);
-    
+
     static {
         System.loadLibrary("lttvtraceread");
     }
         
-    /*
+    /**
      * Default constructor is forbidden
      */
     @SuppressWarnings("unused")
@@ -119,14 +113,16 @@ public final class JniTracefile extends Jni_C_Common {
     };
 
     /**
-     * Copy constructor.<p>
+     * Copy constructor.
      * 
-     * @param oldTracefile      Reference to the JniTracefile you want to copy. 
+     * @param oldTracefile
+     *            A reference to the JniTracefile you want to copy. 
      */
     public JniTracefile(JniTracefile oldTracefile) {
         thisTracefilePtr    = oldTracefile.thisTracefilePtr;
         parentTrace         = oldTracefile.parentTrace;
         tracefileMarkersMap = oldTracefile.tracefileMarkersMap;
+
         isCpuOnline         = oldTracefile.isCpuOnline;
         tracefilePath       = oldTracefile.tracefilePath;
         tracefileName       = oldTracefile.tracefileName;
@@ -155,16 +151,13 @@ public final class JniTracefile extends Jni_C_Common {
     }
 
     /**
-     * Constructor, using C pointer.<p>
+     * Copy constructor, using pointer.
      * 
-     * @param newPtr  The pointer of an already opened LttTracefile C Structure
+     * @param newPtr  The pointer to an already opened LttTracefile C Structure
      * 
      * @exception JniException
-     * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTrace
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
      */
-    public JniTracefile(Jni_C_Pointer newPtr, JniTrace newParentTrace) throws JniException {
+    public JniTracefile(C_Pointer newPtr, JniTrace newParentTrace) throws JniException {
         thisTracefilePtr = newPtr;
         parentTrace = newParentTrace;
         tracefileMarkersMap = new HashMap<Integer, JniMarker>();
@@ -179,28 +172,21 @@ public final class JniTracefile extends Jni_C_Common {
     }        
 
     /**
-     * Read the next event of this tracefile.<p>
+     * Move the current event to the next one.
      * 
-     * Note : If the read succeed, the event will be populated.<p>
-     *      
-     * @return LTT read status, as defined in Jni_C_Common
-     * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.Jni_C_Common
+     * @return The read status, as defined in Jni_C_Common
+     * @see org.eclipse.linuxtools.lttng.jni.Jni_C_Common
      */
     public int readNextEvent() {
         return currentEvent.readNextEvent();
     }        
 
     /**
-     * Seek to the given time.<p>
+     * Move the current event to the time given.<br>
      * 
-     * Note : If the seek succeed, the event will be populated.
-     * 
-     * @param seekTime      The timestamp where to seek.
-     * 
-     * @return LTT read status, as defined in Jni_C_Common
-     * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.Jni_C_Common
+     * @param seekTime JniTime where to seek to
+     * @return The read status, as defined in Jni_C_Common
+     * @see org.eclipse.linuxtools.lttng.jni.Jni_C_Common
      */
     public int seekToTime(JniTime seekTime) {
         return currentEvent.seekToTime(seekTime);
@@ -209,7 +195,7 @@ public final class JniTracefile extends Jni_C_Common {
     /* 
      * This function populates the tracefile data with data from LTT
      * 
-     * @throws JniException
+     * @throws JafException
      */
     private void populateTracefileInformation() throws JniException {
         if (thisTracefilePtr.getPointer() == NULL) {
@@ -224,8 +210,8 @@ public final class JniTracefile extends Jni_C_Common {
         tid = ltt_getTid( thisTracefilePtr.getPointer() );
         pgid = ltt_getPgid( thisTracefilePtr.getPointer() );
         creation = ltt_getCreation( thisTracefilePtr.getPointer() );
-        tracePtr = new Jni_C_Pointer(ltt_getTracePtr( thisTracefilePtr.getPointer()) );
-        markerDataPtr = new Jni_C_Pointer(ltt_getMarkerDataPtr( thisTracefilePtr.getPointer()) );
+        tracePtr = ltt_getTracePtr( thisTracefilePtr.getPointer() );
+        markerDataPtr = ltt_getMarkerDataPtr( thisTracefilePtr.getPointer() );
         CFileDescriptor = ltt_getCFileDescriptor( thisTracefilePtr.getPointer() );
         fileSize = ltt_getFileSize( thisTracefilePtr.getPointer() );
         blocksNumber = ltt_getBlockNumber( thisTracefilePtr.getPointer() );
@@ -239,13 +225,13 @@ public final class JniTracefile extends Jni_C_Common {
         currentTimestampCounterMaskNextBit = ltt_getCurrentTimestampCounterMaskNextBit( thisTracefilePtr.getPointer() );
         eventsLost = ltt_getEventsLost( thisTracefilePtr.getPointer() );
         subBufferCorrupt = ltt_getSubBufferCorrupt( thisTracefilePtr.getPointer() );
-        bufferPtr = new Jni_C_Pointer(ltt_getBufferPtr( thisTracefilePtr.getPointer()) );
+        bufferPtr = ltt_getBufferPtr( thisTracefilePtr.getPointer() );
         bufferSize = ltt_getBufferSize( thisTracefilePtr.getPointer() );
 
         // To fill the map is a bit different
-        ltt_feedAllMarkers( thisTracefilePtr.getPointer() );
+        ltt_getAllMarkers( thisTracefilePtr.getPointer() );
 
-        Jni_C_Pointer tmpEventPointer = new Jni_C_Pointer(ltt_getEventPtr(thisTracefilePtr.getPointer()));
+        C_Pointer tmpEventPointer = new C_Pointer(ltt_getEventPtr(thisTracefilePtr.getPointer()));
         currentEvent = new JniEvent(tmpEventPointer , tracefileMarkersMap, this);
     }        
     
@@ -264,19 +250,19 @@ public final class JniTracefile extends Jni_C_Common {
         // Create a new tracefile object and insert it in the map
         // the tracefile fill itself with LTT data while being constructed
         try {
-            JniMarker newMarker = new JniMarker( new Jni_C_Pointer(markerInfoPtr) );
+            JniMarker newMarker = new JniMarker( new C_Pointer(markerInfoPtr) );
 
             tracefileMarkersMap.put(markerId, newMarker);
         } catch (Exception e) {
             printlnC("Failed to add marker to tracefileMarkersMap!(addMarkersFromC)\n\tException raised : " + e.toString());
         }
-    }
-    
+    }        
+
     // Access to class variable. Most of them doesn't have setter
     public boolean getIsCpuOnline() {
         return isCpuOnline;
     }
-    
+
     public String getTracefilePath() {
         return tracefilePath;
     }
@@ -301,11 +287,11 @@ public final class JniTracefile extends Jni_C_Common {
         return creation;
     }
 
-    public Jni_C_Pointer getTracePtr() {
+    public long getTracePtr() {
         return tracePtr;
     }
 
-    public Jni_C_Pointer getMarkerDataPtr() {
+    public long getMarkerDataPtr() {
         return markerDataPtr;
     }
 
@@ -365,7 +351,7 @@ public final class JniTracefile extends Jni_C_Common {
         return currentEvent;
     }
 
-    public Jni_C_Pointer getBufferPtr() {
+    public long getBufferPtr() {
         return bufferPtr;
     }
 
@@ -378,58 +364,34 @@ public final class JniTracefile extends Jni_C_Common {
     }
 
     /**
-     * Parent trace of this tracefile.<p>
+     * Getter to the parent trace for this tracefile.
      *
-     * @return The parent trace
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTrace
+     * @return  the parent trace
+     * @see org.eclipse.linuxtools.lttng.jni.JniTrace
      */
     public JniTrace getParentTrace() {
         return parentTrace;
     }
     
     /**
-     * Pointer to the LttTracefile C structure<p>
+     * Pointer to the LttTracefile C structure<br>
+     * <br>
+     * The pointer should only be used INTERNALY, do not use these unless you
+     * know what you are doing.
      * 
-     * The pointer should only be used <u>INTERNALY</u>, do not use unless you
-     * know what you are doing.<p>
-     * 
-     * @return The actual (long converted) pointer or NULL.
-     * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
+     * @return The actual (long converted) pointer or NULL
      */
-    public Jni_C_Pointer getTracefilePtr() {
+    public C_Pointer getTracefilePtr() {
         return thisTracefilePtr;
     }
-    
-    /**
-     * Print information for this tracefile. 
-     * <u>Intended to debug</u><p>
-     * 
-     * This function will call Ltt to print, so information printed will be the
-     * one from the C structure, not the one populated in java.<p>
-     * 
-     * This function will not throw but will complain loudly if pointer is NULL.
-     */
-    public void printTracefileInformation() {
 
-        // If null pointer, print a warning!
-        if (thisTracefilePtr.getPointer() == NULL) {
-            printlnC("Pointer is NULL, cannot print. (printTracefileInformation)");
-        } 
-        else {
-            ltt_printTracefile( thisTracefilePtr.getPointer() );
-        }
-    }
-    
     /**
-     * toString() method. 
-     * <u>Intended to debug</u><p>
+     * toString() method. <u>Intended to debug</u><br>
      * 
-     * @return Attributes of the object concatenated in String
+     * @return String Attributes of the object concatenated in String
      */
-	@Override
-	public String toString() {
+    public String toString() {
         String returnData = "";
                 
         returnData += "isCpuOnline                        : " + isCpuOnline + "\n";
@@ -439,8 +401,8 @@ public final class JniTracefile extends Jni_C_Common {
         returnData += "tid                                : " + tid + "\n";
         returnData += "pgid                               : " + pgid + "\n";
         returnData += "creation                           : " + creation + "\n";
-        returnData += "tracePtr                           : " + tracePtr + "\n";
-        returnData += "markerDataPtr                      : " + markerDataPtr + "\n";
+        returnData += "tracePtr                           : 0x" + java.lang.Long.toHexString(tracePtr) + "\n";
+        returnData += "markerDataPtr                      : 0x" + java.lang.Long.toHexString(markerDataPtr) + "\n";
         returnData += "CFileDescriptor                    : " + CFileDescriptor + "\n";
         returnData += "fileSize                           : " + fileSize + "\n";
         returnData += "blocksNumber                       : " + blocksNumber + "\n";
@@ -455,11 +417,29 @@ public final class JniTracefile extends Jni_C_Common {
         returnData += "eventsLost                         : " + eventsLost + "\n";
         returnData += "subBufferCorrupt                   : " + subBufferCorrupt + "\n";
         returnData += "currentEvent                       : " + currentEvent.getReferenceToString() + "\n"; // Hack to avoid ending up with event.toString()
-        returnData += "bufferPtr                          : " + bufferPtr + "\n";
+        returnData += "bufferPtr                          : 0x" + java.lang.Long.toHexString(bufferPtr) + "\n";
         returnData += "bufferSize                         : " + bufferSize + "\n";
         returnData += "tracefileMarkersMap                : " + tracefileMarkersMap.keySet() + "\n"; // Hack to avoid ending up with tracefileMarkersMap.toString()
 
         return returnData;
+    }
+
+    /**
+     * Print information for this tracefile. <u>Intended to debug</u><br>
+     * 
+     * This function will call Ltt to print, so information printed will be the
+     * one from the C structure<br>
+     * <br>
+     * This function will not throw but will complain loudly if pointer is NULL
+     */
+    public void printTracefileInformation() {
+
+        // If null pointer, print a warning!
+        if (thisTracefilePtr.getPointer() == NULL) {
+            printlnC("Pointer is NULL, cannot print. (printTracefileInformation)");
+        } else {
+            ltt_printTracefile( thisTracefilePtr.getPointer() );
+        }
     }
 }
 

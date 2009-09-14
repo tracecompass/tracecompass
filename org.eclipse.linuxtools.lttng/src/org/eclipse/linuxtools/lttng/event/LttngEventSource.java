@@ -15,51 +15,19 @@ package org.eclipse.linuxtools.lttng.event;
 import org.eclipse.linuxtools.tmf.event.*;
 
 /**
- * <b><u>LttngEventSource</u></b><p>
- * 
+ * <b><u>LttngEventSource</u></b>
+ * <p>
  * Lttng specific implementation of the TmfEventSource
+ * <p>
+ * The Lttng implementation is the same as the basic Tmf Implementation but allow construction with a String as paramter
  */
 public class LttngEventSource extends TmfEventSource {
-    
     /**
-     * Default Constructor.<p>
+     * Constructor with parameters
      * 
-     */
-    public LttngEventSource() {
-        super();
-    }
-    
-    /**
-     * Copy Constructor.<p>
-     * 
-     * @param newSource  Source of the event as string.
+     * @param newSource    Name as string of the source.
      */
     public LttngEventSource(String newSource) {
         super(newSource);
-    }
-    
-    
-    /**
-     * Copy Constructor.<p>
-     * 
-     * @param oldSource  LttngEventSource to copy from.
-     */
-    public LttngEventSource(LttngEventSource oldSource) {
-        this( (String)oldSource.getSourceId() );
-    }
-    
-    
-    @Override
-	public String getSourceId() {
-        return (String)fSourceId;
-    }
-    
-    public void setSourceId(String newSource) {
-        fSourceId = newSource;
-    }
-    
-    @Override
-	public String toString() {
-        return fSourceId.toString();
     }
 }

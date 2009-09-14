@@ -12,23 +12,30 @@
 
 package org.eclipse.linuxtools.tmf.trace;
 
+import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.signal.TmfSignal;
 
 /**
- * <b><u>TmfTraceUpdatedEvent</u></b>
+ * <b><u>TmfTraceUpdatedSignal</u></b>
  * <p>
  * TODO: Implement me. Please.
  */
 public class TmfTraceUpdatedSignal extends TmfSignal {
 
-	private final TmfExperiment fExperiment;
+	private final ITmfTrace fTrace;
+	private final TmfTimeRange fTimeRange;
 	
-	public TmfTraceUpdatedSignal(Object source, TmfExperiment experiment) {
+	public TmfTraceUpdatedSignal(Object source, ITmfTrace trace, TmfTimeRange range) {
 		super(source);
-		fExperiment = experiment;
+		fTrace = trace;
+		fTimeRange = range;
 	}
 
-	public TmfExperiment getTrace() {
-		return fExperiment;
+	public ITmfTrace getTrace() {
+		return fTrace;
+	}
+
+	public TmfTimeRange getRange() {
+		return fTimeRange;
 	}
 }

@@ -70,11 +70,11 @@ public class LTTngEventParserStub implements ITmfEventParser {
     static final String typePrefix = "Type-";
     public TmfEvent getNextEvent(ITmfTrace eventStream) throws IOException {
 
-        if (! (eventStream instanceof LTTngEventStreamStub)) {
+        if (! (eventStream instanceof LTTngTraceStub)) {
             return null;
         }
 
-        RandomAccessFile stream = ((LTTngEventStreamStub) eventStream).getStream();
+        RandomAccessFile stream = ((LTTngTraceStub) eventStream).getStream();
         String name = eventStream.getName();
         name = name.substring(name.lastIndexOf('/') + 1);
 

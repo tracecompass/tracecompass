@@ -1,4 +1,3 @@
-package org.eclipse.linuxtools.lttng.jni;
 /*******************************************************************************
  * Copyright (c) 2009 Ericsson
  * 
@@ -11,11 +10,12 @@ package org.eclipse.linuxtools.lttng.jni;
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
+package org.eclipse.linuxtools.lttng.jni;
 
 /**
  * <b><u>JniException</u></b>
  * <p>
- * Super class for JNI exception.
+ * Super exception class for JNI
  */
 public class JniException extends Exception {
     private static final long serialVersionUID = -6620784221853154537L;

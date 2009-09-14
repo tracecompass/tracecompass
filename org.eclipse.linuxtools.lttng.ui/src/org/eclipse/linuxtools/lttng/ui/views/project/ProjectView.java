@@ -25,10 +25,8 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.linuxtools.lttng.stubs.LTTngEventParserStub;
-import org.eclipse.linuxtools.lttng.stubs.LTTngEventStreamStub;
+import org.eclipse.linuxtools.lttng.trace.LttngEventStream;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
-import org.eclipse.linuxtools.tmf.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.trace.TmfExperimentSelectedSignal;
@@ -137,11 +135,9 @@ public class ProjectView extends ViewPart {
         String expId = folder.getName();
         TmfExperiment experiment = new TmfExperiment(expId, new ITmfTrace[] { });
         try {
-            ITmfEventParser parser = new LTTngEventParserStub();
         	for (IResource res : folder.members()) {
                 String traceId = Platform.getLocation() + res.getFullPath().toOSString();
-                ITmfTrace trace = new LTTngEventStreamStub(traceId, parser);
-                trace.indexStream(false);
+                ITmfTrace trace = new LttngEventStream(traceId);
                 experiment.addTrace(trace);
         	}
         } catch (Exception e) {

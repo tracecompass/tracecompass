@@ -17,7 +17,8 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    TmfTraceTest.class
+	TmfTraceTest.class,
+    TmfExperimentTest.class
 })
 
 public class AllTraceTests {

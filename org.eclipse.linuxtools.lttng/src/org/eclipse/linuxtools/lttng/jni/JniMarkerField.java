@@ -1,4 +1,3 @@
-package org.eclipse.linuxtools.lttng.jni;
 /*******************************************************************************
  * Copyright (c) 2009 Ericsson
  * 
@@ -11,13 +10,13 @@ package org.eclipse.linuxtools.lttng.jni;
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
+package org.eclipse.linuxtools.lttng.jni;
 
 /**
- * <b><u>JniMarkerField</u></b> <p>
- * A JniMarkerField is one of the field of the unparsed content (payload) of an event. <p>
- * 
- * Provides access to the marker_field C structure (from LTT) in java.<p>
- * 
+ * <b><u>JniMarkerField</u></b>
+ * <p>
+ * A JniMarkerField is one of the field of the unparsed content (payload) of an event
+ * <p>
  * Most important attributes in the JniMarkerField are :
  * <ul>
  * <li> the name (field) of in String
@@ -27,11 +26,11 @@ package org.eclipse.linuxtools.lttng.jni;
 public final class JniMarkerField extends Jni_C_Common
 {
     // Internal C pointer of the JniEvent used in LTT
-    private Jni_C_Pointer thisMarkerFieldPtr = new Jni_C_Pointer();
+    private C_Pointer thisMarkerFieldPtr = new C_Pointer();
 
     private String field = "";
     private String format = "";
-    
+
     // Native access method
     private native String ltt_getField(long markerFieldPtr);
     @SuppressWarnings("unused")
@@ -55,7 +54,7 @@ public final class JniMarkerField extends Jni_C_Common
         System.loadLibrary("lttvtraceread");
     }
 
-    /*
+    /**
      * Default constructor is forbidden
      */
     @SuppressWarnings("unused")
@@ -63,9 +62,10 @@ public final class JniMarkerField extends Jni_C_Common
     }
 
     /**
-     * Copy constructor.<p>
+     * Copy constructor.
      * 
-     * @param oldMarkerField Reference to the JniMarkerField you want to copy. 
+     * @param oldMarkerField
+     *            A reference to the JniMarkerField you want to copy. 
      */
     public JniMarkerField(JniMarkerField oldMarkerField) {
         thisMarkerFieldPtr = oldMarkerField.getMarkerFieldPtr();
@@ -74,13 +74,13 @@ public final class JniMarkerField extends Jni_C_Common
     }
 
     /**
-     * Constructor, using pointer.<p>
+     * Copy constructor, using pointer.
      * 
      * @param newMarkerFieldPtr  Pointer to a C marker_field structure
      * 
      * @exception JniException
      */
-    public JniMarkerField(Jni_C_Pointer newMarkerFieldPtr) throws JniException {
+    public JniMarkerField(C_Pointer newMarkerFieldPtr) throws JniException {
         thisMarkerFieldPtr = newMarkerFieldPtr;
 
         // Populate the marker field
@@ -110,25 +110,34 @@ public final class JniMarkerField extends Jni_C_Common
     }
 
     /**
-     * Pointer to the marker_field C structure.<p>
-     * 
-     * The pointer should only be used <u>INTERNALY</u>, do not use these unless you
-     * know what you are doing.<p>
+     * Pointer to the marker_field C structure<br>
+     * <br>
+     * The pointer should only be used INTERNALY, do not use these unless you
+     * know what you are doing.
      * 
      * @return The actual (long converted) pointer or NULL
-     * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
      */
-    public Jni_C_Pointer getMarkerFieldPtr() {
+    public C_Pointer getMarkerFieldPtr() {
         return thisMarkerFieldPtr;
     }
-    
+
+    /**
+     * toString() method. <u>Intended to debug</u><br>
+     * 
+     * @return String Attributes of the object concatenated in String
+     */
+    public String toString() {
+        String returnData = "";
+        returnData += "field                   : " + field + "\n";
+        returnData += "format                  : " + format + "\n";
+        return returnData;
+    }
+
     /**
      * Print information for this event. <u>Intended to debug</u><br>
      * 
-     * This function will call Ltt to print, so information printed will be the one from 
-     * the C structure, not the one populated in java.<p>
-     * 
+     * This function will call Ltt to print, so information printed will be the one from the C structure<br>
+     * <br>
      * This function will not throw but will complain loudly if pointer is NULL
      */
     public void printMarkerFieldInformation() {
@@ -139,20 +148,5 @@ public final class JniMarkerField extends Jni_C_Common
         } else {
             ltt_printMarkerField(thisMarkerFieldPtr.getPointer());
         }
-    }
-    
-    /**
-     * toString() method. 
-     * <u>Intended to debug</u><br>
-     * 
-     * @return Attributes of the object concatenated in String
-     */
-    @Override
-    public String toString() {
-        String returnData = "";
-        returnData += "field                   : " + field + "\n";
-        returnData += "format                  : " + format + "\n";
-        
-        return returnData;
     }
 }

@@ -49,7 +49,7 @@ public class TmfTimestamp {
     // ========================================================================
 
     // The beginning and end of time
-    public static final TmfTimestamp BigBang = new TmfTimestamp(0, (byte) 0, 0);
+    public static final TmfTimestamp BigBang   = new TmfTimestamp(Long.MIN_VALUE, Byte.MAX_VALUE, 0);
     public static final TmfTimestamp BigCrunch = new TmfTimestamp(Long.MAX_VALUE, Byte.MAX_VALUE, 0);
 
     // ========================================================================

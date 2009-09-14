@@ -75,17 +75,17 @@ public class TmfTimestampTest {
     @Test
     public void testCopyConstructorBigBang() throws Exception {
         TmfTimestamp ts = new TmfTimestamp(TmfTimestamp.BigBang);
-        assertEquals("getValue",     0, ts.getValue());
-        assertEquals("getscale",     0, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
+        assertEquals("getValue",     TmfTimestamp.BigBang.getValue(), ts.getValue());
+        assertEquals("getscale",     TmfTimestamp.BigBang.getScale(), ts.getScale());
+        assertEquals("getPrecision", TmfTimestamp.BigBang.getPrecision(), ts.getPrecision());
     }
 
     @Test
     public void testCopyConstructorBigCrunch() throws Exception {
         TmfTimestamp ts = new TmfTimestamp(TmfTimestamp.BigCrunch);
-        assertEquals("getValue", Long.MAX_VALUE, ts.getValue());
-        assertEquals("getscale", Byte.MAX_VALUE, ts.getScale());
-        assertEquals("getPrecision",          0, ts.getPrecision());
+        assertEquals("getValue",     TmfTimestamp.BigCrunch.getValue(), ts.getValue());
+        assertEquals("getscale",     TmfTimestamp.BigCrunch.getScale(), ts.getScale());
+        assertEquals("getPrecision", TmfTimestamp.BigCrunch.getPrecision(), ts.getPrecision());
     }
 
     // ========================================================================
@@ -177,18 +177,6 @@ public class TmfTimestampTest {
         assertEquals("getPrecision", 120, ts.getPrecision());
     }
 
-    @Test
-    public void testSynchronizeWithArithmeticException() throws Exception {
-        TmfTimestamp bigBang   = new TmfTimestamp(TmfTimestamp.BigBang);
-        TmfTimestamp bigCrunch = new TmfTimestamp(TmfTimestamp.BigCrunch);
-
-        try {
-            bigCrunch.synchronize(bigBang.getValue(), bigBang.getScale());
-            fail("Exception not thrown");
-        } catch (ArithmeticException e) {          
-        }
-    }
-
     // ========================================================================
     // getAdjustment
     // ========================================================================
@@ -212,15 +200,6 @@ public class TmfTimestampTest {
 
         delta = ts0.getAdjustment(ts);
         assertEquals("delta", 0, delta);
-    }
-
-    @Test
-    public void testGetAdjustmentDifferentScaleWithException() throws Exception {
-        try {
-            TmfTimestamp.BigBang.getAdjustment(TmfTimestamp.BigCrunch);
-            fail("ArithmeticException not thrown");
-        } catch (ArithmeticException e) {
-        }
     }
 
     // ========================================================================
@@ -324,10 +303,10 @@ public class TmfTimestampTest {
         TmfTimestamp ts3 = new TmfTimestamp( 1, Byte.MAX_VALUE);
         TmfTimestamp ts4 = new TmfTimestamp( 1, Byte.MIN_VALUE);
 
-        assertTrue(ts1.compareTo(TmfTimestamp.BigBang,   false) < 0);
+        assertTrue(ts1.compareTo(TmfTimestamp.BigBang,   false) > 0);
         assertTrue(ts1.compareTo(TmfTimestamp.BigCrunch, false) < 0);
 
-        assertTrue(ts2.compareTo(TmfTimestamp.BigBang,   false) < 0);
+        assertTrue(ts2.compareTo(TmfTimestamp.BigBang,   false) > 0);
         assertTrue(ts2.compareTo(TmfTimestamp.BigCrunch, false) < 0);
 
         assertTrue(ts3.compareTo(TmfTimestamp.BigBang,   false) > 0);
