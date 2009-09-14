@@ -54,7 +54,7 @@ public class TmfTraceStub extends TmfTrace {
      * @throws FileNotFoundException
      */
     public TmfTraceStub(String filename, int cacheSize) throws FileNotFoundException {
-        super(filename, cacheSize);
+        super(filename, cacheSize, true);
         fTrace = new RandomAccessFile(filename, "r");
         fParser = new TmfEventParserStub();
         indexStream();
@@ -105,7 +105,7 @@ public class TmfTraceStub extends TmfTrace {
 	 */
 	public TmfEvent parseNextEvent() {
 		try {
-			TmfEvent event = fParser.getNextEvent(this);
+			TmfEvent event = fParser.parseNextEvent(this);
 			return event;
 		}
 		catch (IOException e) {

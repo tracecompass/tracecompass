@@ -45,13 +45,7 @@ public class TmfTraceTest {
     public static void setUpBeforeClass() throws Exception {
     	String directory = new File(".").getCanonicalPath() + File.separator + DIRECTORY;
     	testfile = directory + File.separator + TEST_STREAM;
-
         fTrace = new TmfTraceStub(testfile, 500);
-
-        // Wait for the stream indexing to complete
-        while (fTrace.getNbEvents() < NB_EVENTS) {
-        	Thread.sleep(1000);
-        }
     }
 
     // ========================================================================
@@ -61,10 +55,6 @@ public class TmfTraceTest {
     @Test
     public void testDefaultConstructor() throws Exception {
         TmfTraceStub stream = new TmfTraceStub(testfile);
-        // Wait for the stream indexing to complete
-        while (stream.getNbEvents() < NB_EVENTS) {
-        	Thread.sleep(1000);
-        }
 
         assertEquals("getCacheSize", TmfTraceStub.DEFAULT_PAGE_SIZE, stream.getPageSize());
         assertEquals("getTraceSize", NB_EVENTS, stream.getNbEvents());
@@ -75,10 +65,6 @@ public class TmfTraceTest {
     @Test
     public void testNormalConstructor() throws Exception {
         TmfTraceStub stream = new TmfTraceStub(testfile, 500);
-        // Wait for the stream indexing to complete
-        while (stream.getNbEvents() < NB_EVENTS) {
-        	Thread.sleep(1000);
-        }
 
         assertEquals("getCacheSize",    500, stream.getPageSize());
         assertEquals("getTraceSize", NB_EVENTS, stream.getNbEvents());

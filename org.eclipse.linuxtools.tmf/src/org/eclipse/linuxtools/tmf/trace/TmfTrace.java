@@ -52,6 +52,9 @@ public abstract class TmfTrace implements ITmfTrace {
     // The checkpoints page size
     private final int fPageSize;
 
+    // The checkpoints page size
+    private final boolean fIndex;
+
     // The set of event stream checkpoints (for random access)
     protected Vector<TmfTraceCheckpoint> fCheckpoints = new Vector<TmfTraceCheckpoint>();
 
@@ -67,12 +70,32 @@ public abstract class TmfTrace implements ITmfTrace {
 
     /**
      * @param name
+     * @param pageSize
+     * @param index
+     * @throws FileNotFoundException
+     */
+    protected TmfTrace(String name, int pageSize, boolean index) throws FileNotFoundException {
+    	fName = name;
+        fPageSize = pageSize;
+        fIndex = index;
+    }
+
+    /**
+     * @param name
      * @param cacheSize
      * @throws FileNotFoundException
      */
-    protected TmfTrace(String name, int cacheSize) throws FileNotFoundException {
-    	fName = name;
-        fPageSize = cacheSize;
+    protected TmfTrace(String name, boolean index) throws FileNotFoundException {
+    	this(name, DEFAULT_PAGE_SIZE, index);
+    }
+
+    /**
+     * @param name
+     * @param cacheSize
+     * @throws FileNotFoundException
+     */
+    protected TmfTrace(String name, int pageSize) throws FileNotFoundException {
+    	this(name, pageSize, false);
     }
 
     /**
@@ -80,7 +103,7 @@ public abstract class TmfTrace implements ITmfTrace {
      * @throws FileNotFoundException
      */
     protected TmfTrace(String name) throws FileNotFoundException {
-    	this(name, DEFAULT_PAGE_SIZE);
+    	this(name, DEFAULT_PAGE_SIZE, false);
     }
 
     // ========================================================================
@@ -270,6 +293,14 @@ public abstract class TmfTrace implements ITmfTrace {
     public void indexStream() {
     	IndexingJob job = new IndexingJob(fName);
     	job.schedule();
+    	if (fIndex) {
+    		try {
+				job.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
     }
 
     private class IndexingJob extends Job {

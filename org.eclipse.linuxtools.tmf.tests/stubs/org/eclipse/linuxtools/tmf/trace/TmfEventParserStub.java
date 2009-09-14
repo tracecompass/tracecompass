@@ -63,7 +63,7 @@ public class TmfEventParserStub implements ITmfEventParser {
      * @see org.eclipse.linuxtools.tmf.eventlog.ITmfEventParser#parseNextEvent()
      */
     static final String typePrefix = "Type-";
-    public TmfEvent getNextEvent(ITmfTrace eventStream) throws IOException {
+    public TmfEvent parseNextEvent(ITmfTrace eventStream) throws IOException {
 
         if (! (eventStream instanceof TmfTraceStub)) {
             return null;

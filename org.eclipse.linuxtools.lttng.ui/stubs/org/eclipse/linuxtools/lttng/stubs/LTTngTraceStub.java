@@ -109,7 +109,7 @@ public class LTTngTraceStub extends TmfTrace {
 	 */
 	public TmfEvent parseNextEvent() {
 		try {
-			TmfEvent event = fParser.getNextEvent(this);
+			TmfEvent event = fParser.parseNextEvent(this);
 			return event;
 		}
 		catch (IOException e) {

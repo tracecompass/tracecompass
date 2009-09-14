@@ -53,9 +53,6 @@ public class TmfExperimentTest {
 
 		fStream = new TmfTraceStub(testfile);
         fExperiment = new TmfExperiment(EXPERIMENT, new ITmfTrace[] { fStream });
-        while (fStream.getNbEvents() < NB_EVENTS) {
-        	Thread.sleep(1000);
-        }
 	}
 
     // ========================================================================
