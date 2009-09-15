@@ -260,7 +260,9 @@ public abstract class TmfTrace implements ITmfTrace {
      */
     public TmfEvent peekEvent(TmfTraceContext context) {
     	TmfTraceContext ctx = new TmfTraceContext(context);
-        return getNextEvent(ctx);
+        TmfEvent event = getNextEvent(ctx);
+        seekLocation(context.location);
+        return event;
     }
 
     /* (non-Javadoc)
