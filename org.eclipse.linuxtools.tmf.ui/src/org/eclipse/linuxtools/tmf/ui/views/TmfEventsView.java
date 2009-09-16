@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.TableItem;
  * TODO: Handle column selection, sort, ... generically (nothing less...)
  * TODO: Implement hide/display columns
  */
-public class TmfEventsView extends TmfViewer {
+public class TmfEventsView extends TmfView {
 
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.viewer.events";
 

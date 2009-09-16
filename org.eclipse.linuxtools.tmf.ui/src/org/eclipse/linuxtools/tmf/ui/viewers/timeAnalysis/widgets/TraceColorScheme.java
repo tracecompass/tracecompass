@@ -130,9 +130,7 @@ public class TraceColorScheme {
 	static public final int GR_FOREGROUND_SEL_NOFOCUS = 76;
 
 	static public final int LIGHT_LINE = 77;
-    static public final int BACKGROUND_NAME = 78;
-    static public final int BACKGROUND_NAME_SEL = 79;
-    static public final int BACKGROUND_NAME_SEL_NOFOCUS = 80;
+	static public final int BACKGROUND_NAME = 78;
 
 	// Interraction's colors
 	static public final int TI_START_THREAD = BLACK;
@@ -207,7 +205,8 @@ public class TraceColorScheme {
 			//
 			new RGB(100, 100, 100), // UNKNOWN
 			new RGB(174, 200, 124), // RUNNING
-			new Mix(new SysCol(SWT.COLOR_BLUE), new SysCol(SWT.COLOR_GRAY), 1, 3), // SLEEPING
+			new Mix(new SysCol(SWT.COLOR_BLUE), new SysCol(SWT.COLOR_GRAY), 1,
+					3), // SLEEPING
 			new RGB(210, 150, 60), // WAITING
 			new RGB(242, 225, 168), // BLOCKED
 			new Mix(new SysCol(SWT.COLOR_RED), new SysCol(SWT.COLOR_GRAY), 1, 3), // DEADLOCK
@@ -244,8 +243,8 @@ public class TraceColorScheme {
 
 			new SysCol(SWT.COLOR_LIST_BACKGROUND), // BACKGROUND
 			new SysCol(SWT.COLOR_LIST_FOREGROUND), // FOREGROUND
-			new RGB(232, 242, 254), // BACKGROUND_SEL
-			new SysCol(SWT.COLOR_LIST_FOREGROUND), // FOREGROUND_SEL
+			new SysCol(SWT.COLOR_LIST_SELECTION), // BACKGROUND_SEL
+			new SysCol(SWT.COLOR_LIST_SELECTION_TEXT), // FOREGROUND_SEL
 			new SysCol(SWT.COLOR_WIDGET_BACKGROUND), // BACKGROUND_SEL_NOFOCUS
 			new SysCol(SWT.COLOR_WIDGET_FOREGROUND), // FOREGROUND_SEL_NOFOCUS
 			new SysCol(SWT.COLOR_WIDGET_BACKGROUND), // TOOL_BACKGROUND
@@ -300,10 +299,8 @@ public class TraceColorScheme {
 
 			new Mix(new SysCol(SWT.COLOR_GRAY), new SysCol(
 					SWT.COLOR_LIST_BACKGROUND), 1, 3), // LIGHT_LINE
-
-			new Mix(new SysCol(SWT.COLOR_GRAY), new SysCol(SWT.COLOR_LIST_BACKGROUND), 1, 6),   // BACKGROUND_NAME
-		    new Mix(new SysCol(SWT.COLOR_GRAY), new RGB(232, 242, 254), 1, 6),                  // BACKGROUND_NAME_SEL
-		    new Mix(new SysCol(SWT.COLOR_GRAY), new SysCol(SWT.COLOR_WIDGET_BACKGROUND), 1, 6), // BACKGROUND_NAME_SEL_NOFOCUS
+			new Mix(new SysCol(SWT.COLOR_GRAY), new SysCol(
+					SWT.COLOR_LIST_BACKGROUND), 1, 6), // BACKGROUND_NAME
 	};
 
 	private Color _colors[];
@@ -333,19 +330,13 @@ public class TraceColorScheme {
 	}
 
 	public Color getBkColor(boolean selected, boolean focused, boolean name) {
-	    if (name) {
-	        if (selected && focused)
-	            return getColor(BACKGROUND_NAME_SEL);
-	        if (selected)
-	            return getColor(BACKGROUND_NAME_SEL_NOFOCUS);
-	        return getColor(BACKGROUND_NAME);
-	    } else {
-	        if (selected && focused)
-	            return getColor(BACKGROUND_SEL);
-	        if (selected)
-	            return getColor(BACKGROUND_SEL_NOFOCUS);
-	        return getColor(BACKGROUND);
-	    }
+		if (selected && focused)
+			return getColor(BACKGROUND_SEL);
+		if (selected)
+			return getColor(BACKGROUND_SEL_NOFOCUS);
+		if (name)
+			return getColor(BACKGROUND_NAME);
+		return getColor(BACKGROUND);
 	}
 
 	public Color getFgColor(boolean selected, boolean focused) {

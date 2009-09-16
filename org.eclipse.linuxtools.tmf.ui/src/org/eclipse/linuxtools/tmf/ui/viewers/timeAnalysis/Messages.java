@@ -1,5 +1,5 @@
 /********************************************************************** 
- * Copyright (c) 2005, 2008, 2009, 2010  IBM Corporation, Intel Corporation, Ericsson
+ * Copyright (c) 2005, 2008, 2009  IBM Corporation, Intel Corporation, Ericsson
  * 
  * All rights reserved.   This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0 
@@ -26,7 +26,6 @@ public class Messages {
 	public static String _TRACE_CLASS_NAME;
 	public static String _TRACE_GROUP_NAME;
 	public static String _TRACE_START_TIME;
-	public static String _TRACE_EVENT_TIME;
 	public static String _TRACE_DATE;
 	public static String _TRACE_STOP_TIME;
 	public static String _TRACE_STATE;
@@ -35,7 +34,7 @@ public class Messages {
 	public static String _TRACE_FILTER_DESC;
 	// misc
 	public static String _Timescale;
-    public static String _DURATION;
+	public static String _DURATION;
 	public static String _UNDEFINED_GROUP;
 	public static String _TRACE_GROUP_LABEL;
 	public static String _EDIT_PROFILING_OPTIONS;

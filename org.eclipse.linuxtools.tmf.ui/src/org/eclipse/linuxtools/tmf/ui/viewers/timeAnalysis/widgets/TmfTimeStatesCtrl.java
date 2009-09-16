@@ -16,6 +16,7 @@
 package org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -54,14 +55,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
 
-/**
- * @author alvaro
- * 
- */
 public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		KeyListener, MouseMoveListener, MouseListener, MouseWheelListener,
 		ControlListener, SelectionListener, MouseTrackListener,
@@ -70,16 +65,14 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 	public static final boolean DEFAULT_DRAW_THREAD_JOIN = true;
 	public static final boolean DEFAULT_DRAW_THREAD_WAIT = true;
 	public static final boolean DEFAULT_DRAW_THREAD_RELEASE = true;
-	public static int H_SCROLLBAR_MAX = Integer.MAX_VALUE - 1;
 
 	private final double zoomCoeff = 1.5;
 
 	private ITimeDataProvider _timeProvider;
 	private boolean _isInFocus = false;
 	private boolean _isDragCursor3 = false;
-	private boolean _isWaitCursor = true;
 	private boolean _mouseHover = false;
-	private int _itemHeightDefault = 19;
+	private int _itemHeightDefault = 18;
 	private int _itemHeight = _itemHeightDefault;
 	private int _topItem = 0;
 	private int _dragState = 0;
@@ -87,6 +80,8 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 	private int _dragX0 = 0;
 	private int _dragX = 0;
 	private int _idealNameWidth = 0;
+	// TODO: 050409
+	private double _timeStep = 0.001;
 	// private double _timeStep = 10000000;
 	private long _time0bak;
 	private long _time1bak;
@@ -97,7 +92,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 	private Rectangle _rect0 = new Rectangle(0, 0, 0, 0);
 	private Rectangle _rect1 = new Rectangle(0, 0, 0, 0);
 	private Cursor _dragCursor3;
-	private Cursor _WaitCursor;
 	private boolean drawTracesInteraction = false;
 	private boolean drawTraceJoins = DEFAULT_DRAW_THREAD_JOIN;
 	private boolean drawTraceWaits = DEFAULT_DRAW_THREAD_WAIT;
@@ -107,8 +101,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 	private boolean _visibleVerticalScroll = true;
 	private int _borderWidth = 0;
 	private int _headerHeight = 0;
-
-	private Listener mouseScrollFilterListener;
 
 	public TmfTimeStatesCtrl(Composite parent, TraceColorScheme colors,
 			TmfTimeAnalysisProvider rutilImp) {
@@ -137,23 +129,13 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		if (scrollHor != null) {
 			scrollHor.addSelectionListener(this);
 		}
-		mouseScrollFilterListener = new Listener() {
-			// This filter is used to prevent scrolling of the view when the
-			// mouse wheel is used to zoom
-			public void handleEvent(Event event) {
-				event.doit = false;
-			}
-		};
 
 		_dragCursor3 = new Cursor(super.getDisplay(), SWT.CURSOR_SIZEWE);
-		_WaitCursor = new Cursor(super.getDisplay(), SWT.CURSOR_WAIT);
 	}
 
-	@Override
 	public void dispose() {
 		super.dispose();
 		_dragCursor3.dispose();
-		_WaitCursor.dispose();
 	}
 
 	public void setTimeProvider(ITimeDataProvider timeProvider) {
@@ -227,8 +209,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 			getHorizontalBar().setValues(0, 1, 1, 1, 1, 1);
 			return;
 		}
-
-		// Vertical scroll bar
 		int page = countPerPage();
 		if (_topItem + page > _data._items.length)
 			_topItem = _data._items.length - page;
@@ -236,31 +216,34 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 			_topItem = 0;
 		getVerticalBar().setValues(_topItem, 0, _data._items.length, page, 1,
 				page);
-
-		// HORIZONTAL BAR
-		// Visible window
 		long time0 = _timeProvider.getTime0();
 		long time1 = _timeProvider.getTime1();
-		// Time boundaries
 		long timeMin = _timeProvider.getMinTime();
 		long timeMax = _timeProvider.getMaxTime();
+
+		// int timePage = (int) ((time1 - time0) / _timeStep);
+		// int timePos = (int) (time0 / _timeStep);
+		// int minimum = (int) (timeMin / _timeStep);
+		// int maximum = (int) (timeMax / _timeStep);
 
 		long delta = timeMax - timeMin;
 
 		int timePos = 0;
-		int thumb = H_SCROLLBAR_MAX;
-
+		int timePage = 0;
+		// Trace.debug("time0 - time1 = " + (time0 - timeMin));
 		if (delta != 0) {
-			// Thumb size (page size)
-			thumb = Math.max(1, (int) (H_SCROLLBAR_MAX * ((double) (time1 - time0) / delta)));
-			// At the beginning of visible window
-			timePos = (int) (H_SCROLLBAR_MAX * ((double) (time0 - timeMin) / delta));
+			timePage = (int) (((double) (time1 - time0) / _timeStep) / delta);
+			timePos = (int) (((double) (time0 - timeMin) / _timeStep) / delta);
 		}
 
-		// position, minimum, maximum, thumb size, increment (half page)t, page
-		// increment size (full page)
-		getHorizontalBar().setValues(timePos, 0, H_SCROLLBAR_MAX, thumb,
-				Math.max(1, thumb / 2), Math.max(2, thumb));
+		int minimum = 0;
+		int maximum = 1000;
+		// Trace.debug("time0:" + time0 + " time1:" + time1 + " timeStep:"
+		// + _timeStep + " delta:" + delta);
+		// Trace.debug("selection:" + timePos + " min:" + minimum + " maximum:"
+		// + maximum + " Page:" + timePage);
+		getHorizontalBar().setValues(timePos, minimum, maximum, timePage, 1,
+				timePage);
 	}
 
 	boolean ensureVisibleItem(int idx, boolean redraw) {
@@ -384,12 +367,12 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		if (null == _timeProvider)
 			return;
 		ITmfTimeAnalysisEntry trace = getSelectedTrace();
-		if (trace == _timeProvider || trace == null)
+		if (trace == _timeProvider)
 			return;
 		long selectedTime = _timeProvider.getSelectedTime();
 		long endTime = _timeProvider.getEndTime();
 		ITimeEvent nextEvent;
-		if (-1 == n && selectedTime > endTime)
+		if (-1 == n && selectedTime >= endTime)
 			nextEvent = Utils.findEvent(trace, selectedTime, 0);
 		else
 			nextEvent = Utils.findEvent(trace, selectedTime, n);
@@ -420,38 +403,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		selectTrace(-1);
 	}
 
-	/**
-	 * Zooming based on mouse cursor location with mouse scrolling
-	 * 
-	 * @param zoomIn
-	 */
-	public void zoom(boolean zoomIn) {
-		int globalX = getDisplay().getCursorLocation().x;
-		Point p = toControl(globalX, 0);
-		int nameSpace = _timeProvider.getNameSpace();
-		int timeSpace = _timeProvider.getTimeSpace();
-		int xPos = Math.max(nameSpace, Math.min(nameSpace + timeSpace, p.x));
-		long time0 = _timeProvider.getTime0();
-		long time1 = _timeProvider.getTime1();
-		long interval = time1 - time0;
-		if (interval == 0) {
-			interval = 1;
-		} // to allow getting out of single point interval
-		long newInterval;
-		if (zoomIn) {
-			newInterval = Math.max(Math.round((double) interval * 0.8), _timeProvider.getMinTimeInterval());
-		} else {
-			newInterval = Math.round((double) interval * 1.25);
-		}
-		long center = time0 + Math.round(((double) (xPos - nameSpace) / timeSpace * interval));
-		long newTime0 = center - Math.round((double) newInterval * (center - time0) / interval);
-		long newTime1 = newTime0 + newInterval;
-		_timeProvider.setStartFinishTime(newTime0, newTime1);
-	}
-
-	/**
-	 * zoom in using single click
-	 */
 	public void zoomIn() {
 		long _time0 = _timeProvider.getTime0();
 		long _time1 = _timeProvider.getTime1();
@@ -471,7 +422,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		// + time1 + " inaccuracy:" + inaccuracy);
 
 		if (inaccuracy > 0 && inaccuracy < 100) {
-			_timeProvider.setStartFinishTimeNotify(_timeProvider.getMinTime(),
+			_timeProvider.setStartFinishTime(_timeProvider.getMinTime(),
 					_timeProvider.getMaxTime());
 			return;
 		}
@@ -482,12 +433,9 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 			time1 = time0 + m;
 		}
 
-		_timeProvider.setStartFinishTimeNotify(time0, time1);
+		_timeProvider.setStartFinishTime(time0, time1);
 	}
 
-	/**
-	 * zoom out using single click
-	 */
 	public void zoomOut() {
 		long _time0 = _timeProvider.getTime0();
 		long _time1 = _timeProvider.getTime1();
@@ -502,12 +450,12 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 				.getMinTime())
 				- (time1 - time0);
 		if (inaccuracy > 0 && inaccuracy < 100) {
-			_timeProvider.setStartFinishTimeNotify(_timeProvider.getMinTime(),
+			_timeProvider.setStartFinishTime(_timeProvider.getMinTime(),
 					_timeProvider.getMaxTime());
 			return;
 		}
 
-		_timeProvider.setStartFinishTimeNotify(time0, time1);
+		_timeProvider.setStartFinishTime(time0, time1);
 	}
 
 	public void groupTraces(boolean on) {
@@ -627,13 +575,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		int nameWidth = _timeProvider.getNameSpace();
 		x -= nameWidth;
 		if (x >= 0 && size.x >= nameWidth) {
-		    if (time1 - time0 > size.x - nameWidth - RIGHT_MARGIN) {
-		        // get the last possible time represented by the pixel position
-		        // by taking the time of the next pixel position minus 1 nanosecond
-		        hitTime = time0 + (long) ((time1 - time0) * ((double) (x + 1) / (size.x - nameWidth - RIGHT_MARGIN))) - 1;
-		    } else {
-                hitTime = time0 + (long) ((time1 - time0) * ((double) (x) / (size.x - nameWidth - RIGHT_MARGIN)));
-		    }
+			hitTime = time0 + ((time1 - time0) * x) / (size.x - nameWidth);
 		}
 		return hitTime;
 	}
@@ -682,12 +624,8 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 
 	Point getCtrlSize() {
 		Point size = getSize();
-		if (getVerticalBar().isVisible()) {
-			size.x -= getVerticalBar().getSize().x;
-		}
-		if (getHorizontalBar().isVisible()) {
-			size.y -= getHorizontalBar().getSize().y;
-		}
+		size.x -= getVerticalBar().getSize().x;
+		size.y -= getHorizontalBar().getSize().y;
 		return size;
 	}
 
@@ -784,10 +722,9 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 			return;
 
 		int xr = bound.x + nameWidth;
-		double pixelsPerNanoSec = (bound.width - xr <= RIGHT_MARGIN) ? 0
-				: (double) (bound.width - xr - RIGHT_MARGIN) / (time1 - time0);
+		double K = (double) (bound.width - xr) / (time1 - time0);
 
-		int x0 = xr + (int) ((e.getTime() - time0) * pixelsPerNanoSec);
+		int x0 = xr + (int) ((e.getTime() - time0) * K);
 		if (x0 < xr)
 			return;
 
@@ -905,16 +842,17 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		// }
 	}
 
-	@Override
 	void paint(Rectangle bound, PaintEvent e) {
-		GC gc = e.gc;
-		gc.setBackground(_colors.getColor(TraceColorScheme.BACKGROUND));
-		drawBackground(gc, bound.x, bound.y, bound.width, bound.height);
+		// If no user preference defined for item height
+		if (_itemHeight == _itemHeightDefault) {
+			_itemHeight = getFontHeight() + 6;
+		}
 
 		if (bound.width < 2 || bound.height < 2 || null == _timeProvider)
 			return;
 
 		_idealNameWidth = 0;
+		GC gc = e.gc;
 		int nameWidth = _timeProvider.getNameSpace();
 		long time0 = _timeProvider.getTime0();
 		long time1 = _timeProvider.getTime1();
@@ -924,7 +862,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		Object[] items = _data._items;
 		for (int i = _topItem; i < items.length; i++) {
 			Item item = (Item) items[i];
-			
 			getNameRect(_rect0, bound, i, nameWidth);
 			if (_rect0.y >= bound.y + bound.height)
 				break;
@@ -944,6 +881,15 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		if (drawTracesInteraction)
 			drawTraceInteractions(bound, e.gc);
 
+		// fill free canvas area
+		_rect0.x = bound.x;
+		_rect0.y += _rect0.height;
+		_rect0.width = bound.width;
+		_rect0.height = bound.y + bound.height - _rect0.y;
+		if (_rect0.y < bound.y + bound.height) {
+			gc.setBackground(_colors.getColor(TraceColorScheme.BACKGROUND));
+			gc.fillRectangle(_rect0);
+		}
 		// draw drag line, no line if name space is 0.
 		if (3 == _dragState) {
 			gc.setForeground(_colors.getColor(TraceColorScheme.BLACK));
@@ -1065,8 +1011,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 
 		Utils.init(_rect1, rect);
 		boolean selected = item._selected;
-		double pixelsPerNanoSec = (rect.width <= RIGHT_MARGIN) ? 0
-				: (double) (rect.width - RIGHT_MARGIN) / (time1 - time0);
+		double K = (double) rect.width / (time1 - time0);
 		boolean group = item instanceof GroupItem;
 
 		if (group) {
@@ -1085,8 +1030,8 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 				ITimeEvent nextEvent = null;
 				long currEventTime = currEvent.getTime();
 				long nextEventTime = currEventTime;
-				x0 = rect.x + (int) ((currEventTime - time0) * pixelsPerNanoSec);
-				int xEnd = rect.x + (int) ((time1 - time0) * pixelsPerNanoSec);
+				x0 = rect.x + (int) ((currEventTime - time0) * K);
+				int xEnd = rect.x + (int) ((time1 - time0) * K);
 				int x1 = -1;
 				int idx = 1;
 
@@ -1110,7 +1055,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 						nextEvent = null;
 						nextEventTime = endTime;
 					}
-					x1 = rect.x + (int) ((nextEventTime - time0) * pixelsPerNanoSec);
+					x1 = rect.x + (int) ((nextEventTime - time0) * K);
 					if (x1 >= rect.x) {
 						_rect1.x = x0 >= rect.x ? x0 : rect.x;
 						_rect1.width = (x1 <= xEnd ? x1 : xEnd) - _rect1.x;
@@ -1166,7 +1111,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		}
 
 		// draw selected time
-		int x = rect.x + (int) ((selectedTime - time0) * pixelsPerNanoSec);
+		int x = rect.x + (int) ((selectedTime - time0) * K);
 		if (x >= rect.x && x < rect.x + rect.width) {
 			gc.setForeground(_colors.getColor(TraceColorScheme.SELECTED_TIME));
 			if (group)
@@ -1205,8 +1150,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		Utils.init(_rect1, rect);
 		boolean selected = item._selected;
 		// K pixels per second
-		double pixelsPerNanoSec = (rect.width <= RIGHT_MARGIN) ? 0
-				: (double) (rect.width - RIGHT_MARGIN) / (time1 - time0);
+		double K = (double) rect.width / (time1 - time0);
 		// Trace.debug("Value of K: " + K + " width:" + rect.width + " time0: "
 		// + time0 + " time1:" + time1 + " endTime: " + endTime);
 
@@ -1233,10 +1177,10 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 				long currEventTime = currEvent.getTime();
 				long nextEventTime = currEventTime;
 				// x0 - Points to the beginning of the event being drawn
-				double step = (double) ((currEventTime - time0) * pixelsPerNanoSec);
+				double step = (double) ((currEventTime - time0) * K);
 				x0 = rect.x + step;
 				// xEnd - Points to the end of the events rectangle
-				double xEnd = rect.x + (double) ((time1 - time0) * pixelsPerNanoSec);
+				double xEnd = rect.x + (double) ((time1 - time0) * K);
 				double x1 = -1;
 				int idx = 1;
 				double xNext = 0;
@@ -1284,7 +1228,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 						// with space until next event
 						_rect1.x += _rect1.width;
 						x0 = x1;
-						xNext = rect.x + (double) ((nextEventTime - time0) * pixelsPerNanoSec);
+						xNext = rect.x + (double) ((nextEventTime - time0) * K);
 					}
 					// Fill space till next event
 					fillSpace(rect, gc, selected, x0, xNext, xEnd);
@@ -1293,7 +1237,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 					currEvent = nextEvent;
 					currEventTime = nextEventTime;
 					// Move x0 to the beginning of next event
-					x0 = rect.x + (double) ((nextEventTime - time0) * pixelsPerNanoSec);
+					x0 = rect.x + (double) ((nextEventTime - time0) * K);
 					// Trace.debug("rect.x: " + rect.x + " + " +
 					// "(nextEvenTime: "
 					// + nextEventTime + "- time0: " + time0 + ") * K: "
@@ -1339,7 +1283,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		}
 
 		// draw selected time
-		int x = rect.x + (int) ((selectedTime - time0) * pixelsPerNanoSec);
+		int x = rect.x + (int) ((selectedTime - time0) * K);
 		if (x >= rect.x && x < rect.x + rect.width) {
 			gc.setForeground(_colors.getColor(TraceColorScheme.SELECTED_TIME));
 			if (group)
@@ -1380,8 +1324,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		Utils.init(_rect1, rect);
 		boolean selected = item._selected;
 		// K pixels per second
-		double pixelsPerNanoSec = (rect.width <= RIGHT_MARGIN) ? 0
-				: (double) (rect.width - RIGHT_MARGIN) / (time1 - time0);
+		double K = (double) rect.width / (time1 - time0);
 		// Trace.debug("Value of K: " + K + " width:" + rect.width + " time0: "
 		// + time0 + " time1:" + time1 + " endTime: " + endTime);
 
@@ -1390,6 +1333,9 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		if (group) {
 			// gc.setBackground(_colors.getBkColorGroup(selected, _isInFocus));
 			// gc.fillRectangle(rect);
+			// if (Trace.isDEBUG()) {
+			// Trace.debug("\n\t\t\tGroup: " + ((GroupItem) item)._name);
+			// }
 		} else if (item instanceof TraceItem) {
 			ITmfTimeAnalysisEntry trace = ((TraceItem) item)._trace;
 
@@ -1397,19 +1343,12 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 			List<TimeEvent> list = trace.getTraceEvents();
 			// Iterator it = list.iterator();
 			int count = list.size();
-			// ITimeEvent lastEvent = null;
+			ITimeEvent lastEvent = null;
 			// if (Trace.isDEBUG()) {
 			// Trace.debug("\n\t\t\tTrace: " + trace.getName()
 			// + utilImpl.getTraceClassName(trace));
 			// }
 			// Trace.debug("count is: " + count);
-			// Drawing rectangle is smaller than reserved space
-			_rect1.y += 3;
-			_rect1.height -= 6;
-
-			// Clean up to empty line to draw on top
-			int xEnd = rect.x + rect.width;
-			fillSpace(rect, gc, selected, _rect1.x, xEnd, xEnd);
 			if (count > 0) {
 				ITimeEvent currEvent = list.get(0);
 				ITimeEvent nextEvent = null;
@@ -1418,15 +1357,22 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 				// initial value
 				long nextEventTime = currEventTime;
 				// x0 - Points to the beginning of the event being drawn
-				double step = (double) ((currEventTime - time0) * pixelsPerNanoSec);
+				double step = (double) ((currEventTime - time0) * K);
 				x0 = rect.x + step;
 				// xEnd - Points to the end of the events rectangle
+				double xEnd = rect.x + (double) ((time1 - time0) * K);
 				double x1 = -1;
 				int idx = 1;
 				double xNext = 0;
 
+				// Drawing rectangle is smaller than reserved space
+				_rect1.y += 3;
+				_rect1.height -= 6;
+
+				// Clean up to empty line to draw on top
+				fillSpace(rect, gc, selected, _rect1.x, xEnd, xEnd);
 				// draw event states
-				while (/* x0 <= xEnd &&*/ null != currEvent) {
+				while (x0 <= xEnd && null != currEvent) {
 					boolean stopped = false;// currEvent instanceof
 					// refresh current event duration as the loop moves
 					currEventDuration = currEvent.getDuration();
@@ -1447,15 +1393,14 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 					}
 
 					// Calculate position to next event
-					xNext = rect.x + (double) ((nextEventTime - time0) * pixelsPerNanoSec);
+					xNext = rect.x + (double) ((nextEventTime - time0) * K);
 
 					// Calculate end position of current event
 					if (currEventDuration < 0) {
-						x1 = rect.x + (double) ((nextEventTime - time0) * pixelsPerNanoSec);
-					} else if (currEventDuration == 0) {
-						x1 = x0;
+						x1 = rect.x + (double) ((nextEventTime - time0) * K);
 					} else {
-						x1 = x0 + (double) ((currEventDuration) * pixelsPerNanoSec);
+						x1 = currEventDuration == 0 ? (x0 + 2)
+								: (x0 + (double) ((currEventDuration) * K));
 					}
 
 					// If event end position x1 further away than start position
@@ -1464,17 +1409,12 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 					// Trace.debug("Next Event Pos: " + xNext
 					// + " End Of Current at: " + x1 + " Event Duration: "
 					// + currEventDuration);
-					if (currEventDuration != 0) {
-						x1 = x1 > xNext ? xNext : x1;
-					}
+					x1 = x1 > xNext ? xNext : x1;
 					// if event end boundary is within time range
 					if (x1 >= rect.x && x0 <= xEnd) {
-						if (currEventDuration != 0) {
-							x0 = (double) (x0 >= rect.x ? x0 : rect.x);
-							_rect1.width = (int) ((x1 <= xEnd ? x1 : xEnd) - x0);
-						} else {
-                            _rect1.width = 2; // make punctual events 2 pixels wide
-						}
+						// Fill with space until x0
+						x0 = (double) (x0 >= rect.x ? x0 : rect.x);
+						_rect1.width = (int) ((x1 <= xEnd ? x1 : xEnd) - x0);
 						_rect1.x = (int) x0;
 						boolean timeSelected = currEventTime <= selectedTime
 								&& selectedTime < nextEventTime;
@@ -1491,18 +1431,38 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 					}
 
 					// Fill space till next event
-					// fillSpace(rect, gc, selected, x0, xNext, xEnd);
+					fillSpace(rect, gc, selected, x0, xNext, xEnd);
 
-					// lastEvent = currEvent;
+					lastEvent = currEvent;
 					currEvent = nextEvent;
 					currEventTime = nextEventTime;
 					// Move x0 to the beginning of next event
-					x0 = rect.x + (double) ((nextEventTime - time0) * pixelsPerNanoSec);
+					x0 = rect.x + (double) ((nextEventTime - time0) * K);
 					// Trace.debug("rect.x: " + rect.x + " + " +
 					// "(nextEvenTime: "
 					// + nextEventTime + "- time0: " + time0 + ") * K: "
 					// + K + " = " + x0);
 				}
+			}
+
+			// fill space after last event
+			int xEnd = rect.x + rect.width;
+			if (x0 < xEnd) {
+				// Trace.debug("Space after last event, x0: " + x0 + ", xEnd: "
+				// + xEnd);
+				_rect1.x = (int) (x0 >= rect.x ? x0 : rect.x);
+				_rect1.width = xEnd - _rect1.x;
+				gc.setBackground(_colors
+						.getBkColor(selected, _isInFocus, false));
+				gc.fillRectangle(_rect1);
+				// draw middle line
+				gc.setForeground(_colors.getColor(utilImpl
+						.getEventColorVal(lastEvent)));
+				int midy = _rect1.y + _rect1.height / 2;
+				int lw = gc.getLineWidth();
+				gc.setLineWidth(2);
+				gc.drawLine(_rect1.x, midy, _rect1.x + _rect1.width, midy);
+				gc.setLineWidth(lw);
 			}
 
 			// draw focus area
@@ -1523,7 +1483,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		}
 
 		// draw selected time
-		int x = rect.x + (int) ((double) (selectedTime - time0) * pixelsPerNanoSec);
+		int x = rect.x + (int) ((selectedTime - time0) * K);
 		if (x >= rect.x && x < rect.x + rect.width) {
 			gc.setForeground(_colors.getColor(TraceColorScheme.SELECTED_TIME));
 			if (group)
@@ -1624,7 +1584,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 	public void focusGained(FocusEvent e) {
 		_isInFocus = true;
 		redraw();
-		getDisplay().addFilter(SWT.MouseWheel, mouseScrollFilterListener);
 	}
 
 	public void focusLost(FocusEvent e) {
@@ -1634,7 +1593,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 			_dragState = 0;
 		}
 		redraw();
-		getDisplay().removeFilter(SWT.MouseWheel, mouseScrollFilterListener);
 	}
 
 	public boolean isInFocus() {
@@ -1650,9 +1608,9 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 			int x = e.x - nameWidth;
 			if (x > 0 && size.x > nameWidth && _dragX != x) {
 				_dragX = x;
-				double pixelsPerNanoSec = (size.x - nameWidth <= RIGHT_MARGIN) ? 0
-						: (double) (size.x - nameWidth - RIGHT_MARGIN) / (_time1bak - _time0bak);
-				long timeDelta = (long) ((pixelsPerNanoSec == 0) ? 0 : ((_dragX - _dragX0) / pixelsPerNanoSec));
+				double K = (double) (size.x - nameWidth)
+						/ (_time1bak - _time0bak);
+				long timeDelta = (long) ((_dragX - _dragX0) / K);
 				long time1 = _time1bak - timeDelta;
 				long maxTime = _timeProvider.getMaxTime();
 				if (time1 > maxTime)
@@ -1672,10 +1630,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 			if (_mouseHover != mouseHover)
 				redraw();
 			_mouseHover = mouseHover;
-			// Make sure any time changes are notified to the application e.g.
-			// getting back from the horizontal scroll bar or zoomed using the
-			// mouse wheel
-			_timeProvider.notifyStartFinishTime();
 		}
 		updateCursor(e.x, e.y);
 	}
@@ -1700,50 +1654,16 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		}
 	}
 
-	/**
-	 * <p>
-	 * If the x, y position is over the vertical split line (name to time
-	 * ranges), then change the cursor to a drag cursor to indicate the user the
-	 * possibility of resizing
-	 * </p>
-	 * 
-	 * @param x
-	 * @param y
-	 */
 	void updateCursor(int x, int y) {
-		// if Wait cursor not active, check for the need to change to a drag
-		// cursor
-		if (_isWaitCursor == false) {
-			int idx = hitSplitTest(x, y);
-			// No dragcursor is name space is fixed to zero
-			if (idx > 0 && !_isDragCursor3 && _timeProvider.getNameSpace() > 0) {
-				setCursor(_dragCursor3);
-				_isDragCursor3 = true;
-			} else if (idx <= 0 && _isDragCursor3) {
-				setCursor(null);
-				_isDragCursor3 = false;
-			}
-		}
-	}
-
-	/**
-	 * Provide the possibilty to control the wait cursor externally e.g. data
-	 * requests in progress
-	 * 
-	 * @param waitInd
-	 */
-	public void waitCursor(boolean waitInd) {
-		// Update cursor as indicated
-		if (waitInd) {
-			setCursor(_WaitCursor);
-			_isWaitCursor = true;
-		} else {
+		int idx = hitSplitTest(x, y);
+		// No dragcursor is name space is fixed to zero
+		if (idx > 0 && !_isDragCursor3 && _timeProvider.getNameSpace() > 0) {
+			setCursor(_dragCursor3);
+			_isDragCursor3 = true;
+		} else if (idx <= 0 && _isDragCursor3) {
 			setCursor(null);
-			_isWaitCursor = false;
+			_isDragCursor3 = false;
 		}
-
-		// Get ready for next mouse move
-		_isDragCursor3 = false;
 	}
 
 	public void mouseDown(MouseEvent e) {
@@ -1784,8 +1704,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 				}
 				selectItem(idx, false);
 				fireSelectionChanged();
-			} else {
-				selectItem(idx, false); // clear selection
 			}
 		}
 	}
@@ -1793,10 +1711,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 	public void mouseUp(MouseEvent e) {
 		if (0 != _dragState) {
 			setCapture(false);
-			if (1 == _dragState) {
-			    // Notify time provider to check the need for listener notification
-			    _timeProvider.notifyStartFinishTime();
-			} else if (2 == _dragState) {
+			if (2 == _dragState) {
 				if (hitTest(e.x, e.y) == _hitIdx)
 					toggle(_hitIdx);
 			} else if (3 == _dragState) {
@@ -1823,7 +1738,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 				_topItem = 0;
 			redraw();
 		} else if (e.widget == getHorizontalBar() && null != _timeProvider) {
-			int start = getHorizontalBar().getSelection();
+			int startTime = getHorizontalBar().getSelection();
 			long time0 = _timeProvider.getTime0();
 			long time1 = _timeProvider.getTime1();
 			long timeMin = _timeProvider.getMinTime();
@@ -1832,17 +1747,11 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 
 			long range = time1 - time0;
 			// _timeRangeFixed = true;
-			time0 = timeMin + (long) (delta * ((double) start / H_SCROLLBAR_MAX));
+			time0 = timeMin + (long) ((double) (startTime * _timeStep) * delta);
 			time1 = time0 + range;
-
-			// TODO: Follow-up with Bug 310310
-			// In Linux SWT.DRAG is the only value received
-			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=310310
-			if (e.detail == SWT.DRAG) {
-				_timeProvider.setStartFinishTime(time0, time1);
-			} else {
-				_timeProvider.setStartFinishTimeNotify(time0, time1);
-			}
+			// Trace.debug("\nstartTime:" + startTime + " time0:" + time0
+			// + " time1:" + time1 + " Delta:" + delta);
+			_timeProvider.setStartFinishTime(time0, time1);
 		}
 	}
 
@@ -1860,12 +1769,10 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 	}
 
 	public void mouseScrolled(MouseEvent e) {
-		if (!_isInFocus)
-			return;
 		if (e.count > 0) {
-			zoom(true);
+			zoomIn();
 		} else if (e.count < 0) {
-			zoom(false);
+			zoomOut();
 		}
 	}
 
@@ -1881,7 +1788,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		this._visibleVerticalScroll = visibleVerticalScroll;
 	}
 
-	@Override
 	public int getBorderWidth() {
 		return _borderWidth;
 	}
@@ -1951,7 +1857,6 @@ class Item {
 		_name = name;
 	}
 
-	@Override
 	public String toString() {
 		return _name;
 	}
@@ -2120,35 +2025,33 @@ class ItemData {
 		// Find the Trace item within the current list
 		TraceItem item = findTraceItem(parent);
 
-// This method is not used (yet) so this code can be commented out for now
-// FIXME: Arrays.copyOf is a Java6 feature
-//		if (item == null) {
-//			// If the parent item is not found, make room for it in the current
-//			// array
-//			int length = 1;
-//			Object[] traces;
-//			if (_traces != null) {
-//				length = _traces.length + 1;
-//				traces = Arrays.copyOf(_traces, length);
-//			} else {
-//				traces = new Object[length];
-//			}
-//
-//			// Add the new parent element to the end of the array.
-//			traces[length - 1] = parent;
-//
-//			// update the filter array to accomodate a postion to the new
-//			// element
-//			traceFilter = new boolean[traces.length];
-//			java.util.Arrays.fill(traceFilter, true);
-//
-//			// rebuild internal data
-//			_traces = traces;
-//			refreshData();
-//
-//			// item must be there
-//			item = findTraceItem(parent);
-//		}
+		if (item == null) {
+			// If the parent item is not found, make room for it in the current
+			// array
+			int length = 1;
+			Object[] traces;
+			if (_traces != null) {
+				length = _traces.length + 1;
+				traces = Arrays.copyOf(_traces, length);
+			} else {
+				traces = new Object[length];
+			}
+
+			// Add the new parent element to the end of the array.
+			traces[length - 1] = parent;
+
+			// update the filter array to accomodate a postion to the new
+			// element
+			traceFilter = new boolean[traces.length];
+			java.util.Arrays.fill(traceFilter, true);
+
+			// rebuild internal data
+			_traces = traces;
+			refreshData();
+
+			// item must be there
+			item = findTraceItem(parent);
+		}
 
 		ITmfTimeAnalysisEntry localTraceItem = item._trace;
 		// Local trace found

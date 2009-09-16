@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.Composite;
 public abstract class TraceCtrl extends Canvas implements PaintListener {
 
 	static public final int MARGIN = 4;
-    static public final int RIGHT_MARGIN = 2; // 2 pixels less to make sure end time is visible
 	static public final int SMALL_ICON_SIZE = 16;
 
 	protected TraceColorScheme _colors;
@@ -42,7 +41,6 @@ public abstract class TraceCtrl extends Canvas implements PaintListener {
 		addPaintListener(this);
 	}
 
-	@Override
 	public void dispose() {
 		super.dispose();
 	}

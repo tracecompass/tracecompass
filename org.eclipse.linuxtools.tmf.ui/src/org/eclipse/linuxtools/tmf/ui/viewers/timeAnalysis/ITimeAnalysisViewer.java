@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,9 +15,9 @@
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.linuxtools.tmf.ui.viewers.ITmfViewer;
+import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.TimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.TimeEvent;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Control;
 
@@ -46,11 +46,8 @@ public interface ITimeAnalysisViewer extends ITmfViewer {
 	 *            displayed
 	 * @param end
 	 *            Specifies a fixed end time to the information to be displayed
-	 * @param updateTimeBounds
-	 *            If True - Time Range boundaries update is required
 	 */
-	public abstract void display(ITmfTimeAnalysisEntry[] traceArr, long start,
-			long end, boolean updateTimeBounds);
+	public abstract void display(ITmfTimeAnalysisEntry[] traceArr, long start, long end);
 
 	/**
 	 * The start and End time are taken from the limits used by the children
@@ -63,7 +60,7 @@ public interface ITimeAnalysisViewer extends ITmfViewer {
 	public void addWidgetSelectionListner(ITmfTimeSelectionListener listener);
 
 	public void addWidgetTimeScaleSelectionListner(
-			ITmfTimeScaleSelectionListener listener);
+			ITmfTimeTimeScaleSelectionListener listener);
 
 	public void filterTraces();
 
@@ -78,7 +75,7 @@ public interface ITimeAnalysisViewer extends ITmfViewer {
 	public void removeWidgetSelectionListner(ITmfTimeSelectionListener listener);
 
 	public void removeWidgetTimeScaleSelectionListner(
-			ITmfTimeScaleSelectionListener listener);
+			ITmfTimeTimeScaleSelectionListener listener);
 
 	public void resetStartFinishTime();
 
@@ -148,20 +145,4 @@ public interface ITimeAnalysisViewer extends ITmfViewer {
 	public Control getControl();
 
 	public ISelectionProvider getSelectionProvider();
-
-	/**
-	 * <p>
-	 * Provide the possibility to control the wait cursor externally
-	 * </p>
-	 * <p>
-	 * e.g. data requests in progress
-	 * </p>
-	 * 
-	 * @param waitInd
-	 *            - true change to wait cursor
-	 */
-	public void waitCursor(boolean waitInd);
-
-    public void setFocus();
-
 }

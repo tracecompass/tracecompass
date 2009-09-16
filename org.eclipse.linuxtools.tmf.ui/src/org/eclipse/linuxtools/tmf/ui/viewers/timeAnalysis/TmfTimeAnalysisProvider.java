@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,6 +15,8 @@ package org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.TimeEvent;
@@ -23,6 +25,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 public abstract class TmfTimeAnalysisProvider {
     
@@ -52,31 +55,31 @@ public abstract class TmfTimeAnalysisProvider {
 		}
 	}
 
-	// static private String _externalPath[] = {
-	// "icons/full/obj16/thread_obj.gif", // running thread
-	// "icons/full/obj16/threads_obj.gif", // suspended
-	// "icons/full/obj16/threadt_obj.gif", // stopped
-	// "icons/full/obj16/stckframe_running_obj.gif", // running stack frame
-	// "icons/full/obj16/stckframe_obj.gif", // stack frame
-	// };
-	//
-	// static private String _externalPlugin[] = { "org.eclipse.debug.ui",
-	// "org.eclipse.debug.ui", "org.eclipse.debug.ui",
-	// "org.eclipse.debug.ui", "org.eclipse.debug.ui", };
-	//
-	// static private Image getImage(int idx) {
-	// if (idx < 0 || idx >= IMG_NUM)
-	// SWT.error(SWT.ERROR_INVALID_ARGUMENT);
-	// String key = "trace.img." + idx;
-	// Image img = TmfUiPlugin.getDefault().getImageRegistry().get(key);
-	// if (null == img) {
-	// ImageDescriptor desc = AbstractUIPlugin.imageDescriptorFromPlugin(
-	// _externalPlugin[idx], _externalPath[idx]);
-	// TmfUiPlugin.getDefault().getImageRegistry().put(key, desc);
-	// img = TmfUiPlugin.getDefault().getImageRegistry().get(key);
-	// }
-	// return img;
-	// }
+	static private String _externalPath[] = {
+			"icons/full/obj16/thread_obj.gif", // running thread
+			"icons/full/obj16/threads_obj.gif", // suspended
+			"icons/full/obj16/threadt_obj.gif", // stopped
+			"icons/full/obj16/stckframe_running_obj.gif", // running stack frame
+			"icons/full/obj16/stckframe_obj.gif", // stack frame
+	};
+
+	static private String _externalPlugin[] = { "org.eclipse.debug.ui",
+			"org.eclipse.debug.ui", "org.eclipse.debug.ui",
+			"org.eclipse.debug.ui", "org.eclipse.debug.ui", };
+
+	static private Image getImage(int idx) {
+		if (idx < 0 || idx >= IMG_NUM)
+			SWT.error(SWT.ERROR_INVALID_ARGUMENT);
+		String key = "trace.img." + idx;
+		Image img = TmfUiPlugin.getDefault().getImageRegistry().get(key);
+		if (null == img) {
+			ImageDescriptor desc = AbstractUIPlugin.imageDescriptorFromPlugin(
+					_externalPlugin[idx], _externalPath[idx]);
+			TmfUiPlugin.getDefault().getImageRegistry().put(key, desc);
+			img = TmfUiPlugin.getDefault().getImageRegistry().get(key);
+		}
+		return img;
+	}
 
 	public void drawState(TraceColorScheme colors, ITimeEvent event,
 			Rectangle rect, GC gc, boolean selected, boolean rectBound,
@@ -305,7 +308,6 @@ public abstract class TmfTimeAnalysisProvider {
 	 * @return
 	 */
 	public Image getItemImage(Object obj) {
-	    /*
 		if (obj instanceof ITmfTimeAnalysisEntry) {
 			List<TimeEvent> list = ((ITmfTimeAnalysisEntry) obj).getTraceEvents();
 			if (null != list && list.size() > 0)
@@ -318,7 +320,6 @@ public abstract class TmfTimeAnalysisProvider {
 		if (obj instanceof TimeEvent) {
 			return getImage(IMG_THREAD_RUNNING);
 		}
-		*/
 		return null;
 	}
 
