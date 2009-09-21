@@ -126,7 +126,8 @@ public final class JniMarkerField extends Jni_C_Common
      * 
      * @return String Attributes of the object concatenated in String
      */
-    public String toString() {
+    @Override
+	public String toString() {
         String returnData = "";
         returnData += "field                   : " + field + "\n";
         returnData += "format                  : " + format + "\n";

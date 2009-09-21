@@ -391,7 +391,8 @@ public final class JniTracefile extends Jni_C_Common {
      * 
      * @return String Attributes of the object concatenated in String
      */
-    public String toString() {
+	@Override
+	public String toString() {
         String returnData = "";
                 
         returnData += "isCpuOnline                        : " + isCpuOnline + "\n";

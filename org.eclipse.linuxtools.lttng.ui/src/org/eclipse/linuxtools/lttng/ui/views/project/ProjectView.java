@@ -25,7 +25,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.linuxtools.lttng.trace.LttngEventStream;
+import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
@@ -57,6 +57,7 @@ public class ProjectView extends ViewPart {
     private final IWorkspace fWorkspace;
     private final IResourceChangeListener fResourceChangeListener;
     private TreeViewer fViewer;
+    private TmfExperiment fExperiment;
 
     // To perform updates on the UI thread
     private Runnable fViewRefresher = new Runnable() {
@@ -133,17 +134,19 @@ public class ProjectView extends ViewPart {
      */
     private void selectExperiment(Folder folder) {
         String expId = folder.getName();
-        TmfExperiment experiment = new TmfExperiment(expId, new ITmfTrace[] { });
+        if (fExperiment != null)
+        	fExperiment.dispose();
+        fExperiment = new TmfExperiment(expId, new ITmfTrace[] { });
         try {
         	for (IResource res : folder.members()) {
                 String traceId = Platform.getLocation() + res.getFullPath().toOSString();
-                ITmfTrace trace = new LttngEventStream(traceId);
-                experiment.addTrace(trace);
+                ITmfTrace trace = new LTTngTrace(traceId);
+                fExperiment.addTrace(trace);
         	}
         } catch (Exception e) {
             e.printStackTrace();
         }
-        TmfSignalManager.dispatchSignal(new TmfExperimentSelectedSignal(this, experiment));
+        TmfSignalManager.dispatchSignal(new TmfExperimentSelectedSignal(this, fExperiment));
     }
 
     /**

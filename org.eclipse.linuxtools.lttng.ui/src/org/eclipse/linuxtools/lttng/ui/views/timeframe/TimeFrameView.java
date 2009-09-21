@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.trace.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.trace.TmfExperimentUpdatedSignal;
-import org.eclipse.linuxtools.tmf.ui.views.TmfViewer;
+import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -53,7 +53,7 @@ import org.eclipse.swt.widgets.Slider;
  * FIXME: The slider is very jumpy due to the large number of async updates
  * FIXME: Revisit the control flow between View, Spinners and Slider
  */
-public class TimeFrameView extends TmfViewer {
+public class TimeFrameView extends TmfView {
 
     public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.timeframe";
 
@@ -100,7 +100,7 @@ public class TimeFrameView extends TmfViewer {
     /* (non-Javadoc)
      * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
      */
-    @Override
+	@Override
 	public void createPartControl(Composite parent) {
 
         // Set the view layout
@@ -119,7 +119,7 @@ public class TimeFrameView extends TmfViewer {
     /* (non-Javadoc)
      * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
      */
-    @Override
+	@Override
 	public void setFocus() {
         // TODO Auto-generated method stub
     }
@@ -248,8 +248,6 @@ public class TimeFrameView extends TmfViewer {
     public void experimentSelected(TmfExperimentSelectedSignal signal) {
 
         // Update the trace reference
-    	if (fExperiment != null)
-    		fExperiment.dispose();
         fExperiment = signal.getExperiment();
 
         // Update the time frame
@@ -274,7 +272,7 @@ public class TimeFrameView extends TmfViewer {
      * @param signal
      */
     @TmfSignalHandler
-    public void traceUpdated(TmfExperimentUpdatedSignal signal) {
+    public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
 
         // Update the time frame
        	fTraceTimeRange = signal.getTrace().getTimeRange();

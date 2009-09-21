@@ -121,7 +121,8 @@ class C_Pointer extends Jni_C_Common {
      * 
      * @return String Attributes of the object concatenated in String
      */
-    public String toString() {
+    @Override
+	public String toString() {
         String returnData = "0x";
 
         if (isLong == true) {

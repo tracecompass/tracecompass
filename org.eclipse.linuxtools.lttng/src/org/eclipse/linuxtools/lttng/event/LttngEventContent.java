@@ -124,7 +124,8 @@ public class LttngEventContent extends TmfEventContent {
      * 
      * @return Attributes of the object concatenated in String
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return getContent().toString();
     }
 }

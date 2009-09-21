@@ -33,7 +33,7 @@ public class LTTngTraceStub extends TmfTrace {
     // ========================================================================
 
     // The actual stream
-    private final RandomAccessFile fStream;
+    private final RandomAccessFile fTrace;
 
     // The associated event parser
     private final ITmfEventParser fParser;
@@ -58,8 +58,8 @@ public class LTTngTraceStub extends TmfTrace {
      * @throws FileNotFoundException
      */
     public LTTngTraceStub(String filename, int cacheSize) throws FileNotFoundException {
-        super(filename, cacheSize);
-        fStream = new RandomAccessFile(filename, "r");
+        super(filename, cacheSize, true);
+        fTrace = new RandomAccessFile(filename, "r");
     	fParser = new LTTngEventParserStub();
     	indexStream();
     }
@@ -69,7 +69,7 @@ public class LTTngTraceStub extends TmfTrace {
     // ========================================================================
 
     public RandomAccessFile getStream() {
-        return fStream;
+        return fTrace;
     }
 
     // ========================================================================
@@ -79,14 +79,16 @@ public class LTTngTraceStub extends TmfTrace {
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.eventlog.ITmfStreamLocator#seekLocation(java.lang.Object)
      */
-    public TmfTraceContext seekLocation(Object location) {
+	public TmfTraceContext seekLocation(Object location) {
         TmfTraceContext context = null;
-        try {
-            fStream.seek((location != null) ? (Long) location : 0);
-            context = new TmfTraceContext(getCurrentLocation(), 0);
+       	try {
+       		synchronized(fTrace) {
+        		fTrace.seek((location != null) ? (Long) location : 0);
+        		context = new TmfTraceContext(getCurrentLocation(), null, 0);
+       		}
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        	// TODO Auto-generated catch block
+        	e.printStackTrace();
         }
         return context;
     }
@@ -94,28 +96,30 @@ public class LTTngTraceStub extends TmfTrace {
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.eventlog.ITmfStreamLocator#getCurrentLocation()
      */
-    public Object getCurrentLocation() {
-        try {
-            return new Long(fStream.getFilePointer());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    @Override
+	public Object getCurrentLocation() {
+       	try {
+       		return new Long(fTrace.getFilePointer());
+       	} catch (IOException e) {
+       		// TODO Auto-generated catch block
+       		e.printStackTrace();
+       	}
         return null;
     }
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#parseEvent()
 	 */
-	public TmfEvent parseNextEvent() {
-		try {
-			TmfEvent event = fParser.parseNextEvent(this);
-			return event;
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
+	@Override
+	public TmfEvent parseEvent() {
+       	try {
+       		TmfEvent event = fParser.parseNextEvent(this);
+       		return event;
+       	}
+       	catch (IOException e) {
+       		e.printStackTrace();
+       	}
+       	return null;
 	}
 
     // ========================================================================

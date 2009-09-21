@@ -48,7 +48,8 @@ public class LttngTimestamp extends TmfTimestamp {
      * 
      * @return String  Attributes of this object.
      */
-    public String toString() {
+    @Override
+	public String toString() {
 //        String returnData = "";
 //
 //        returnData += "[lttng_Timestamp: " + getValue() / Jni_C_Common.NANO;

@@ -64,7 +64,8 @@ public class LttngEventType extends TmfEventType {
      * 
      * @return String  TypeId of the object
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return getTypeId();
     }
 }
