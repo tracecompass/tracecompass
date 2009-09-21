@@ -113,6 +113,7 @@ public class TimeScaleCtrl extends TraceCtrl implements MouseListener,
 		return timeDraw;
 	}
 
+	@Override
 	void paint(Rectangle rect, PaintEvent e) {
 
 		if (_isInUpdate || null == _timeProvider)
@@ -336,11 +337,13 @@ abstract class TimeDraw {
 class TimeDrawSec extends TimeDraw {
 	static String _hint = "sec";
 
+	@Override
 	public void draw(GC gc, long time, Rectangle rect) {
 		time /= 1000000000;
 		Utils.drawText(gc, time + "", rect, true);
 	}
 
+	@Override
 	public String hint() {
 		return _hint;
 	}
@@ -349,6 +352,7 @@ class TimeDrawSec extends TimeDraw {
 class TimeDrawMillisec extends TimeDraw {
 	static String _hint = "s:ms";
 
+	@Override
 	public void draw(GC gc, long time, Rectangle rect) {
 		time /= 1000000;
 		long ms = time % 1000;
@@ -356,6 +360,7 @@ class TimeDrawMillisec extends TimeDraw {
 		Utils.drawText(gc, time + pad(ms), rect, true);
 	}
 
+	@Override
 	public String hint() {
 		return _hint;
 	}
@@ -364,6 +369,7 @@ class TimeDrawMillisec extends TimeDraw {
 class TimeDrawMicrosec extends TimeDraw {
 	static String _hint = "s:ms:mcs";
 
+	@Override
 	public void draw(GC gc, long time, Rectangle rect) {
 		time /= 1000;
 		long mcs = time % 1000;
@@ -373,6 +379,7 @@ class TimeDrawMicrosec extends TimeDraw {
 		Utils.drawText(gc, time + pad(ms) + pad(mcs), rect, true);
 	}
 
+	@Override
 	public String hint() {
 		return _hint;
 	}
@@ -381,6 +388,7 @@ class TimeDrawMicrosec extends TimeDraw {
 class TimeDrawNanosec extends TimeDraw {
 	static String _hint = "s:ms:mcs:ns";
 
+	@Override
 	public void draw(GC gc, long time, Rectangle rect) {
 		long ns = time % 1000;
 		time /= 1000;
@@ -391,6 +399,7 @@ class TimeDrawNanosec extends TimeDraw {
 		Utils.drawText(gc, time + pad(ms) + pad(mcs) + pad(ns), rect, true);
 	}
 
+	@Override
 	public String hint() {
 		return _hint;
 	}
@@ -399,11 +408,13 @@ class TimeDrawNanosec extends TimeDraw {
 class TimeDrawAbsSec extends TimeDraw {
 	static String _hint = "HH:mm:ss";
 
+	@Override
 	public void draw(GC gc, long time, Rectangle rect) {
 		String stime = stimeformat.format(new Date((long) (time * 1E-6)));
 		Utils.drawText(gc, stime, rect, true);
 	}
 
+	@Override
 	public String hint() {
 		return _hint;
 	}
@@ -412,6 +423,7 @@ class TimeDrawAbsSec extends TimeDraw {
 class TimeDrawAbsMillisec extends TimeDraw {
 	static String _hint = "HH:ss:ms";
 
+	@Override
 	public void draw(GC gc, long time, Rectangle rect) {
 		String stime = stimeformat.format(new Date((long) (time * 1E-6)));
 		String ns = Utils.formatNs(time, Resolution.MILLISEC);
@@ -419,6 +431,7 @@ class TimeDrawAbsMillisec extends TimeDraw {
 		Utils.drawText(gc, stime + " " + ns, rect, true);
 	}
 
+	@Override
 	public String hint() {
 		return _hint;
 	}
@@ -427,12 +440,14 @@ class TimeDrawAbsMillisec extends TimeDraw {
 class TimeDrawAbsMicroSec extends TimeDraw {
 	static String _hint = "HH:ss:ms:mcs";
 
+	@Override
 	public void draw(GC gc, long time, Rectangle rect) {
 		String stime = stimeformat.format(new Date((long) (time * 1E-6)));
 		String micr = Utils.formatNs(time, Resolution.MICROSEC);
 		Utils.drawText(gc, stime + " " + micr, rect, true);
 	}
 
+	@Override
 	public String hint() {
 		return _hint;
 	}
@@ -441,12 +456,14 @@ class TimeDrawAbsMicroSec extends TimeDraw {
 class TimeDrawAbsNanoSec extends TimeDraw {
 	static String _hint = "HH:ss:ms:mcs:ns";
 
+	@Override
 	public void draw(GC gc, long time, Rectangle rect) {
 		String stime = stimeformat.format(new Date((long) (time * 1E-6)));
 		String ns = Utils.formatNs(time, Resolution.NANOSEC);
 		Utils.drawText(gc, stime + " " + ns, rect, true);
 	}
 
+	@Override
 	public String hint() {
 		return _hint;
 	}

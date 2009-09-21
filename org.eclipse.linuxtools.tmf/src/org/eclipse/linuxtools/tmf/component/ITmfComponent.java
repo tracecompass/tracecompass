@@ -19,5 +19,4 @@ package org.eclipse.linuxtools.tmf.component;
  * TODO: Implement me. Please.
  */
 public interface ITmfComponent {
-
 }

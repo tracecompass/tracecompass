@@ -15,7 +15,6 @@ package org.eclipse.linuxtools.tmf.trace;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.Map;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 
@@ -75,11 +74,13 @@ public class TmfTraceStub extends TmfTrace {
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.eventlog.ITmfStreamLocator#seekLocation(java.lang.Object)
      */
-    public TmfTraceContext seekLocation(Object location) {
+	public TmfTraceContext seekLocation(Object location) {
     	TmfTraceContext context = null;
         try {
-			fTrace.seek((location != null) ? (Long) location : 0);
-			context = new TmfTraceContext(getCurrentLocation(), 0);
+        	synchronized(fTrace) {
+        		fTrace.seek((location != null) ? (Long) location : 0);
+        		context = new TmfTraceContext(getCurrentLocation(), null, 0);
+        	}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -90,7 +91,8 @@ public class TmfTraceStub extends TmfTrace {
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.eventlog.ITmfStreamLocator#getCurrentLocation()
      */
-    public Object getCurrentLocation() {
+    @Override
+	public Object getCurrentLocation() {
         try {
             return new Long(fTrace.getFilePointer());
         } catch (IOException e) {
@@ -103,7 +105,8 @@ public class TmfTraceStub extends TmfTrace {
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.tmf.trace.TmfTrace#parseEvent()
 	 */
-	public TmfEvent parseNextEvent() {
+	@Override
+	public TmfEvent parseEvent() {
 		try {
 			TmfEvent event = fParser.parseNextEvent(this);
 			return event;
@@ -117,13 +120,5 @@ public class TmfTraceStub extends TmfTrace {
     // ========================================================================
     // Helper functions
     // ========================================================================
-
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.eventlog.ITmfEventStream#getAttributes()
-     */
-    public Map<String, Object> getAttributes() {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
 }

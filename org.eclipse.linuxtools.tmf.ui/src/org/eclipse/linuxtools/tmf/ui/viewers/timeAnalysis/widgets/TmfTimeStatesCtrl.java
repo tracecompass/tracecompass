@@ -133,6 +133,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		_dragCursor3 = new Cursor(super.getDisplay(), SWT.CURSOR_SIZEWE);
 	}
 
+	@Override
 	public void dispose() {
 		super.dispose();
 		_dragCursor3.dispose();
@@ -842,6 +843,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		// }
 	}
 
+	@Override
 	void paint(Rectangle bound, PaintEvent e) {
 		// If no user preference defined for item height
 		if (_itemHeight == _itemHeightDefault) {
@@ -1788,6 +1790,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		this._visibleVerticalScroll = visibleVerticalScroll;
 	}
 
+	@Override
 	public int getBorderWidth() {
 		return _borderWidth;
 	}
@@ -1857,6 +1860,7 @@ class Item {
 		_name = name;
 	}
 
+	@Override
 	public String toString() {
 		return _name;
 	}

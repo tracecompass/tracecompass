@@ -81,6 +81,7 @@ public class TmfTimeTipHandler {
 
 	public void activateHoverHelp(final Control control) {
 		control.addMouseListener(new MouseAdapter() {
+			@Override
 			public void mouseDown(MouseEvent e) {
 				if (_tipShell.isVisible())
 					_tipShell.setVisible(false);
@@ -88,6 +89,7 @@ public class TmfTimeTipHandler {
 		});
 
 		control.addMouseTrackListener(new MouseTrackAdapter() {
+			@Override
 			public void mouseExit(MouseEvent e) {
 				if (_tipShell.isVisible())
 					_tipShell.setVisible(false);
@@ -171,6 +173,7 @@ public class TmfTimeTipHandler {
 				}
 			}
 
+			@Override
 			public void mouseHover(MouseEvent event) {
 				Point pt = new Point(event.x, event.y);
 				Widget widget = event.widget;

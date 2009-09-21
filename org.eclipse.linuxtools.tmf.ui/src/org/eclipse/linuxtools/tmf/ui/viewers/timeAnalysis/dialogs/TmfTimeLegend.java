@@ -72,6 +72,7 @@ public class TmfTimeLegend extends TitleAreaDialog {
 		this.ifUtil = rifUtil;
 	}
 
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite dlgArea = (Composite) super.createDialogArea(parent);
 		Composite composite = new Composite(dlgArea, SWT.NONE);
@@ -170,11 +171,13 @@ public class TmfTimeLegend extends TitleAreaDialog {
 	// name.setLayoutData(gd);
 	// }
 
+	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(Messages._WINDOW_TITLE);
 	}
 
+	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
 				true);

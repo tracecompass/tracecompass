@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.trace.TmfExperimentSelectedSignal;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceUpdatedSignal;
+import org.eclipse.linuxtools.tmf.trace.TmfExperimentUpdatedSignal;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -213,8 +213,6 @@ public class TmfEventsView extends TmfView {
 	@TmfSignalHandler
     public void experimentSelected(TmfExperimentSelectedSignal signal) {
 		// Update the trace reference
-		if (fExperiment != null)
-			fExperiment.dispose();
     	fExperiment = signal.getExperiment();
     	setPartName(fTitlePrefix + " - " + fExperiment.getExperimentId());
 
@@ -228,11 +226,11 @@ public class TmfEventsView extends TmfView {
     }
 
 	@TmfSignalHandler
-    public void traceUpdated(TmfTraceUpdatedSignal signal) {
+    public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
         // Perform the refresh on the UI thread
     	fTable.getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				if (!fTable.isDisposed()) {
+				if (!fTable.isDisposed() && fExperiment != null) {
 			    	fTable.setItemCount(fExperiment.getNbEvents());        
 				}
 			}
@@ -241,8 +239,8 @@ public class TmfEventsView extends TmfView {
 
     @TmfSignalHandler
     public void currentTimeUpdated(TmfTimeSynchSignal signal) {
-    	if (signal.getSource() != fTable) {
-    		final int index = fExperiment.getIndex(signal.getCurrentTime());
+    	if (signal.getSource() != fTable && fExperiment != null) {
+    		final int index = (int) fExperiment.getIndex(signal.getCurrentTime());
             // Perform the updates on the UI thread
             fTable.getDisplay().asyncExec(new Runnable() {
             	public void run() {

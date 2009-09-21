@@ -71,11 +71,15 @@ public class TmfEvent extends TmfData {
 	public TmfEvent(TmfTimestamp timestamp, TmfEventSource source,
 			TmfEventType type, TmfEventContent content, TmfEventReference reference)
 	{
-		fOriginalTimestamp = fEffectiveTimestamp = timestamp;
-		fSource = source;
-		fType = type;
-		fContent = content;
-		fReference = reference;
+		this(timestamp, timestamp, source, type, content, reference);
+	}
+
+	/**
+	 */
+	public TmfEvent(TmfEvent other)
+	{
+		this(other.fOriginalTimestamp, other.fEffectiveTimestamp, other.fSource,
+			 other.fType, other.fContent, other.fReference);
 	}
 
     // ========================================================================
@@ -124,4 +128,9 @@ public class TmfEvent extends TmfData {
 		return fReference;
 	}
 
+	// TODO: Design a proper format...
+	@Override
+	public String toString() {
+		return fEffectiveTimestamp.toString();
+	}
 }

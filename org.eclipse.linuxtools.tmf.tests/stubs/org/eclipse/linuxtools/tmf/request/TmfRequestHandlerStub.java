@@ -61,8 +61,8 @@ public class TmfRequestHandlerStub implements ITmfRequestHandler<TmfEvent> {
 
                 Vector<TmfEvent> events = new Vector<TmfEvent>();
                 int nbEvents = 0;
-            	TmfTraceContext context = new TmfTraceContext(null);
-                TmfEvent event = fTrace.getEvent(context, startTime);
+            	TmfTraceContext context = fTrace.seekEvent(startTime);
+                TmfEvent event = fTrace.getNextEvent(context);
                 while (!request.isCancelled() && nbEvents < nbRequestedEvents &&
                        event != null && event.getTimestamp().compareTo(endTime, false) <= 0 )
                 {

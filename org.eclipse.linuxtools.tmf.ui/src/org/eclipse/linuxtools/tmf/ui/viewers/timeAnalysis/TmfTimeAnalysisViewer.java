@@ -172,6 +172,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		_stateCtrl.addSelectionListener(this);
 		_stateCtrl.setLayoutData(GridUtil.createFill());
 		_dataViewer.addControlListener(new ControlAdapter() {
+			@Override
 			public void controlResized(ControlEvent event) {
 				resizeControls();
 			}
@@ -633,7 +634,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	public void notifyStartFinishTimeSelectionListeners(long _time0, long _time1) {
 		if (widgetTimeScaleSelectionListners.size() > 0) {
 			// Notify Time Scale Selection Listeners
-			TmfTimeTimeScaleSelectionEvent event = new TmfTimeTimeScaleSelectionEvent(
+			TmfTimeScaleSelectionEvent event = new TmfTimeScaleSelectionEvent(
 					this, _time0, _time1, getTimeSpace(), getSelectedTime());
 
 			for (Iterator<ITmfTimeTimeScaleSelectionListener> iter = widgetTimeScaleSelectionListners

@@ -41,6 +41,7 @@ public abstract class TraceCtrl extends Canvas implements PaintListener {
 		addPaintListener(this);
 	}
 
+	@Override
 	public void dispose() {
 		super.dispose();
 	}

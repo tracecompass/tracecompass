@@ -12,8 +12,15 @@
 
 package org.eclipse.linuxtools.tmf.trace;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Vector;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
@@ -30,6 +37,7 @@ import org.eclipse.linuxtools.tmf.trace.ITmfTrace.TmfTraceContext;
  * TmfTraces that are part of a tracing experiment. 
  * <p>
  * TODO: Complete multi-trace experiment
+ * TODO: Add support for live streaming (notifications, incremental indexing, ...)
  */
 public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
 
@@ -37,7 +45,7 @@ public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
     // Attributes
     // ========================================================================
 
-//	private final int CACHE_SIZE = 10000;
+	private final int DEFAULT_PAGE_SIZE = 1000;
 
     private String fExperimentId;
     private Vector<ITmfTrace> fTraces;
@@ -45,22 +53,34 @@ public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
     private TmfTimeRange fTimeRange;
 	private TmfTimestamp fEpoch;
 
+    // Indicate if the stream should be pre-indexed
+    private final boolean fWaitForIndexCompletion;
+
     // ========================================================================
     // Constructors/Destructor
     // ========================================================================
 
     public TmfExperiment(String id, ITmfTrace[] traces) {
-        this(id, traces, TmfTimestamp.BigBang);
+        this(id, traces, TmfTimestamp.BigBang, false);
     }
 
-    public TmfExperiment(String id, ITmfTrace[] traces, TmfTimestamp epoch) {
+    public TmfExperiment(String id, ITmfTrace[] traces, boolean waitForIndexCompletion) {
+        this(id, traces, TmfTimestamp.BigBang, waitForIndexCompletion);
+    }
+
+    public TmfExperiment(String id, ITmfTrace[] traces, TmfTimestamp epoch, boolean waitForIndexCompletion) {
     	fExperimentId = id;
     	fTraces = new Vector<ITmfTrace>();
     	for (ITmfTrace trace : traces) {
-    		addTrace(trace);
+    		fTraces.add(trace);
     	}
     	fEpoch = epoch;
         TmfSignalManager.addListener(this);
+        fWaitForIndexCompletion = waitForIndexCompletion;
+
+        updateNbEvents();
+		updateTimeRange();
+		indexExperiment();
     }
 
     public void dispose() {
@@ -94,42 +114,18 @@ public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
     }
 
     // TODO: Go over all the traces
-    public int getIndex(TmfTimestamp ts) {
-    	return fTraces.firstElement().getIndex(ts);
+    public long getIndex(TmfTimestamp ts) {
+    	ITmfTrace trace = fTraces.firstElement();
+    	TmfTraceContext context = trace.seekEvent(ts);
+    	return context.index;
     }
 
     // TODO: Go over all the traces
     public TmfTimestamp getTimestamp(int index) {
-    	return fTraces.firstElement().getTimestamp(index);
+    	ITmfTrace trace = fTraces.firstElement();
+    	TmfTraceContext context = trace.seekEvent(index);
+    	return context.timestamp;
     }
-
-//	public TmfTimestamp getTimestamp(int index) {
-//		if (fIndices.size() == 0) {
-//			indexExperiment();
-//		}
-//
-//		int offset = index / CACHE_SIZE;
-//
-//		ITmfEventStream[] traces = new ITmfEventStream[0];
-//		StreamContext[] contexts;
-//		TmfEvent[] peekEvents;
-//
-//		traces = fTraces.toArray(traces);
-//		contexts = new StreamContext[traces.length];
-//		peekEvents = new TmfEvent[traces.length];
-//
-//		for (int i = 0; i < traces.length; i++) {
-//			contexts[i] = new StreamContext(fIndices.get(offset)[i]);
-//			peekEvents[i] = traces[i].peekEvent(contexts[i]);
-//		}
-//
-//		TmfEvent event = getNextEvent(traces, contexts, peekEvents);
-//		for (int i = offset * CACHE_SIZE; i < index; i++) {
-//			event = getNextEvent(traces, contexts, peekEvents);
-//		}
-//		
-//		return event != null ? event.getTimestamp() : null;
-//	}
 
     // ========================================================================
     // Operators
@@ -141,6 +137,7 @@ public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
 			updateNbEvents();
 			updateTimeRange();
 		}
+		indexExperiment();
     }
 
     private void updateNbEvents() {
@@ -175,23 +172,37 @@ public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
      * @see org.eclipse.linuxtools.tmf.eventlog.ITmfRequestHandler#processRequest(org.eclipse.linuxtools.tmf.eventlog.TmfDataRequest, boolean)
      */
 	public void processRequest(TmfDataRequest<TmfEvent> request, boolean waitForCompletion) {
-    	if (request.getRange() != null) {
-    		processEventRequestByTimestamp(request);
-    	} else {
-    		processEventRequestByIndex(request);
-    	}
-		if (waitForCompletion) {
+
+		// Process the request
+		processEventRequest(request);
+		
+		// Wait for completion if needed
+    	if (waitForCompletion) {
 			request.waitForCompletion();
 		}
 	}
 
 	/**
-	 * Process a time range request - this has to be seriously re-worked...
+	 * Process a data request
 	 * 
 	 * @param request
 	 */
-	private void processEventRequestByTimestamp(final TmfDataRequest<TmfEvent> request) {
+	private void processEventRequest(final TmfDataRequest<TmfEvent> request) {
 
+		// General request parameters
+		final TmfTimestamp endTime;
+		final long index;
+
+		// Initialize depending on request type
+		if (request.getRange() != null) {
+			index = getIndex(request.getRange().getStartTime());
+			endTime = request.getRange().getEndTime();
+    	} else {
+    		index = request.getIndex();
+    		endTime = TmfTimestamp.BigCrunch;
+    	}
+
+		// Process the request
 		Thread thread = new Thread() {
 
 			private ITmfTrace[] traces = new ITmfTrace[0];
@@ -200,11 +211,8 @@ public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
 
 			@Override
 			public void run() {
-				// Extract the request information
-				TmfTimestamp startTime = request.getRange().getStartTime();
-				TmfTimestamp endTime = request.getRange().getEndTime();
+				// Extract the general request information
 				int blockSize = request.getBlockize();
-
 				int nbRequestedEvents = request.getNbRequestedItems();
 				if (nbRequestedEvents == -1) {
 					nbRequestedEvents = Integer.MAX_VALUE;
@@ -218,10 +226,7 @@ public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
 				traces = fTraces.toArray(traces);
 				contexts = new TmfTraceContext[traces.length];
 				peekEvents = new TmfEvent[traces.length];
-				for (int i = 0; i < contexts.length; i++) {
-					contexts[i] = traces[i].seekEvent(startTime);
-					peekEvents[i] = traces[i].peekEvent(contexts[i]);
-				}
+				positionTraces(index, traces, contexts, peekEvents);
 
 				// Get the ordered events
 				TmfEvent event = getNextEvent(traces, contexts, peekEvents);
@@ -252,135 +257,202 @@ public class TmfExperiment implements ITmfRequestHandler<TmfEvent> {
 	}
 
 	/**
-	 * Process an index range request - this has to be seriously re-worked...
-	 * Does not work for multiple traces - yet
+	 * Given an experiment event index, position the set of traces at the
+	 * corresponding location.
 	 * 
-	 * @param request
+	 * @param index
+	 * @param traces
+	 * @param contexts
+	 * @param peekEvents
 	 */
-	private void processEventRequestByIndex(final TmfDataRequest<TmfEvent> request) {
+	private void positionTraces(long index, ITmfTrace[] traces, TmfTraceContext[] contexts, TmfEvent[] peekEvents) {
 
-		Thread thread = new Thread() {
+		// Initialize the contexts at the page boundary
+		TmfTraceContext[] ctx = new TmfTraceContext[contexts.length];
+		for (int i = 0; i < contexts.length; i++) {
+			contexts[i] = new TmfTraceContext(traces[i].seekLocation(null));
+		}
 
-			private ITmfTrace[] traces = new ITmfTrace[0];
-			private TmfTraceContext[] contexts;
-			private TmfEvent[] peekEvents;
-
-			@Override
-			public void run() {
-				// Extract the request information
-				int blockSize = request.getBlockize();
-
-				int nbRequestedEvents = request.getNbRequestedItems();
-				if (nbRequestedEvents == -1) {
-					nbRequestedEvents = Integer.MAX_VALUE;
-				}
-
-				// Create the result buffer
-				Vector<TmfEvent> events = new Vector<TmfEvent>();
-				int nbEvents = 0;
-
-				// Initialize the traces array and position the streams
-				traces = fTraces.toArray(traces);
-				contexts = new TmfTraceContext[traces.length];
-				peekEvents = new TmfEvent[traces.length];
-				for (int i = 0; i < contexts.length; i++) {
-					contexts[i] = traces[i].seekEvent(request.getIndex());
-					peekEvents[i] = traces[i].peekEvent(contexts[i]);
-				}
-
-				// Get the ordered events
-				TmfEvent event = getNextEvent(traces, contexts, peekEvents);
-				while (!request.isCancelled() && nbEvents < nbRequestedEvents && event != null) {
-					events.add(event);
-					if (++nbEvents % blockSize == 0) {
-						TmfEvent[] result = new TmfEvent[events.size()];
-						events.toArray(result);
-						request.setData(result);
-						request.handleData();
-						events.removeAllElements();
-					}
-					// To avoid an unnecessary read passed the last event
-					// requested
-					if (nbEvents < nbRequestedEvents)
-						event = getNextEvent(traces, contexts, peekEvents);
-				}
-				TmfEvent[] result = new TmfEvent[events.size()];
-				events.toArray(result);
-
-				request.setData(result);
-				request.handleData();
-				request.done();
+		int entry = (int) index / DEFAULT_PAGE_SIZE;
+		if (entry < fIndices.size()) {
+			ctx = fIndices.elementAt((int) index / DEFAULT_PAGE_SIZE);
+			for (int i = 0; i < contexts.length; i++) {
+				contexts[i] = new TmfTraceContext(ctx[i]);
 			}
-		};
-		thread.start();
+		}
+
+		// Set the current position (a page boundary)
+		int current = ((int) index / DEFAULT_PAGE_SIZE) * DEFAULT_PAGE_SIZE;
+
+		for (int i = 0; i < contexts.length; i++) {
+			peekEvents[i] = traces[i].getNextEvent(contexts[i]);
+		}
+
+		// Position the traces
+		while (current++ < index) {
+			getNextEvent(traces, contexts, peekEvents);
+		}
 	}
 
-    // Returns the next event in chronological order
+	// Returns the next event in chronological order
 	// TODO: Consider the time adjustment
 	private TmfEvent getNextEvent(ITmfTrace[] traces, TmfTraceContext[] contexts, TmfEvent[] peekEvents) {
 		int index = 0;
-		TmfEvent evt = peekEvents[0];
-		TmfTimestamp ts0 = evt != null ? evt.getTimestamp() : TmfTimestamp.BigCrunch;
+		TmfEvent current = peekEvents[0];
+		TmfTimestamp currentTS = (current != null) ? current.getTimestamp() : TmfTimestamp.BigCrunch;
 		for (int i = 1; i < traces.length; i++) {
 			if (peekEvents[i] != null) {
-				TmfTimestamp ts1 = peekEvents[i].getTimestamp();
-				if (ts1.compareTo(ts0, true) < 0) {
+				TmfTimestamp newTS = peekEvents[i].getTimestamp();
+				if (newTS.compareTo(currentTS, true) < 0) {
 					index = i;
-					ts0 = ts1;
+					currentTS = newTS;
+					current = peekEvents[i];
 				}
 			}
 		}
-		TmfEvent event = traces[index].getNextEvent(contexts[index]);
-		peekEvents[index] = traces[index].peekEvent(contexts[index]);
+		TmfEvent event = (current != null) ? new TmfEvent(current) : null;
+		peekEvents[index] = traces[index].getNextEvent(contexts[index]);
 		return event;
 	}
 
-//	private Vector<TraceContext[]> fIndices = new Vector<TraceContext[]>();
-//	public void indexExperiment() {
-//		ITmfTrace[] traces = new ITmfTrace[0];
-//		TraceContext[] contexts;
-//		TmfEvent[] peekEvents;
-//
-//		traces = fTraces.toArray(traces);
-//		contexts = new TraceContext[traces.length];
-//		peekEvents = new TmfEvent[traces.length];
-//		for (int i = 0; i < contexts.length; i++) {
-//			contexts[i] = traces[i].seekEvent(TmfTimestamp.BigBang);
-//			peekEvents[i] = traces[i].peekEvent(contexts[i]);
-//		}
-//
-//		// Initialize the indices
-//		TraceContext[] ctx = new TraceContext[contexts.length];
-//		for (int i = 0; i < ctx.length; i++) {
-//			ctx[i] = new TraceContext(contexts[i]);
-//		}
-//		fIndices.add(ctx);
-//
-//		// Get the ordered events and populate the indices
-//		int nbEvents = 0;
-//		while (getNextEvent(traces, contexts, peekEvents) != null)
-//		{
-//			if (++nbEvents % CACHE_SIZE == 0) {
-//				ctx = new TraceContext[contexts.length];
-//				for (int i = 0; i < ctx.length; i++) {
-//					ctx[i] = new TraceContext(contexts[i]);
-//				}
-//				fIndices.add(ctx);
-//			}
-//		}
-//	}
+    // ========================================================================
+    // Indexing
+    // ========================================================================
+
+	/**
+	 * Index the experiment 
+	 */
+	private Vector<TmfTraceContext[]> fIndices = new Vector<TmfTraceContext[]>();
+	private Boolean fIndexing = false;
+	private IndexingJob job;
+
+	public void indexExperiment() {
+
+		synchronized(fIndexing) {
+			if (fIndexing) {
+				// An indexing job is already running but a new request came
+				// in (probably due to a change in the trace set). The index
+				// being currently built is therefore already invalid.
+				// TODO: Cancel the and restart the job
+				return;
+			}
+			fIndexing = true;
+		}
+
+		job = new IndexingJob(fExperimentId);
+		job.schedule();
+		if (fWaitForIndexCompletion) {
+	        ProgressMonitorDialog dialog = new ProgressMonitorDialog(null);
+	        try {
+	            dialog.run(true, true, new IRunnableWithProgress() {
+	                public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+	                    monitor.beginTask("Indexing " + fExperimentId, IProgressMonitor.UNKNOWN);
+	    				job.join();
+	                    monitor.done();
+	                }
+	            });
+	        } catch (InvocationTargetException e) {
+	            e.printStackTrace();
+	        } catch (InterruptedException e) {
+	            e.printStackTrace();
+	        }
+		}
+	}
+
+	private class IndexingJob extends Job {
+
+		public IndexingJob(String name) {
+			super(name);
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
+		 */
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+
+			// Minimal check
+			if (fTraces.size() == 0) {
+	            fIndexing = false;
+				return Status.OK_STATUS;
+			}
+
+			monitor.beginTask("Indexing " + fExperimentId, IProgressMonitor.UNKNOWN);
+
+    		ITmfTrace[] traces = new ITmfTrace[0];
+    		TmfTraceContext[] contexts;
+    		TmfEvent[] events;
+
+    		// Initialize the traces and contexts arrays
+    		traces = fTraces.toArray(traces);
+    		contexts = new TmfTraceContext[traces.length];
+    		events = new TmfEvent[traces.length];
+    		TmfTraceContext[] savedContexts = new TmfTraceContext[contexts.length];
+    		for (int i = 0; i < contexts.length; i++) {
+    			// Context of the first event of the trace
+    			contexts[i] = traces[i].seekLocation(null);
+    			savedContexts[i] = new TmfTraceContext(contexts[i]);
+    			// Set the peeked event
+    			events[i] = traces[i].getNextEvent(new TmfTraceContext(contexts[i]));
+    		}
+    
+    		// Initialize the index array
+    		fIndices.clear();
+			
+    		// Get the ordered events and populate the indices
+    		int nbEvents = 0;
+    		while ((getNextEvent(traces, contexts, events)) != null)
+    		{
+    			if (nbEvents++ % DEFAULT_PAGE_SIZE == 0) {
+    	    		for (int i = 0; i < contexts.length; i++) {
+    	    			savedContexts[i].timestamp = events[i].getTimestamp();
+    	    		}
+    				fIndices.add(savedContexts);
+    			}
+    			// Prepare the saved contexts for the upcoming save (next iteration)
+    			if ((nbEvents + 1) % DEFAULT_PAGE_SIZE == 0) {
+    				savedContexts = new TmfTraceContext[contexts.length];
+    				for (int i = 0; i < contexts.length; i++) {
+    					savedContexts[i] = new TmfTraceContext(contexts[i]);
+    				}
+    			}
+
+    			monitor.worked(1);
+                // Check monitor *after* fCheckpoints has been updated
+                if (monitor.isCanceled()) {
+                    monitor.done();
+                	return Status.CANCEL_STATUS;
+                }
+    		}
+
+            monitor.done();
+
+            fIndexing = false;
+            return Status.OK_STATUS;
+		}
+    }
 
     // ========================================================================
     // Signal handlers
     // ========================================================================
 
     @TmfSignalHandler
+    public void experimentSelected(TmfExperimentSelectedSignal signal) {
+    	indexExperiment();
+    }
+
+    @TmfSignalHandler
+    public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
+    	indexExperiment();
+    }
+
+    @TmfSignalHandler
     public void traceUpdated(TmfTraceUpdatedSignal signal) {
+    	// TODO: Update index
     	synchronized(this) {
     		updateNbEvents();
     		updateTimeRange();
     	}
 		TmfSignalManager.dispatchSignal(new TmfExperimentUpdatedSignal(this, this, signal.getTrace()));
     }
-
 }

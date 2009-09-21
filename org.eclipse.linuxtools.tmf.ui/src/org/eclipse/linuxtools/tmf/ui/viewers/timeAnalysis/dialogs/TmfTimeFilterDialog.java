@@ -71,6 +71,7 @@ public class TmfTimeFilterDialog extends TitleAreaDialog {
 		return true;
 	}
 
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite) super.createDialogArea(parent);
 
@@ -129,6 +130,7 @@ public class TmfTimeFilterDialog extends TitleAreaDialog {
 		}
 	}
 
+	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(Messages._EDIT_PROFILING_OPTIONS);
@@ -173,6 +175,7 @@ public class TmfTimeFilterDialog extends TitleAreaDialog {
 
 	class ViewLabelProvider extends LabelProvider implements
 			ITableLabelProvider {
+		@Override
 		public Image getImage(Object obj) {
 			return null;
 		}
@@ -195,6 +198,7 @@ public class TmfTimeFilterDialog extends TitleAreaDialog {
 	}
 
 	class TraceComparator extends ViewerComparator {
+		@Override
 		public int compare(Viewer viewer, Object e1, Object e2) {
 			// TODO: AA: Provide comparator externally
 			int id1 = ((ITmfTimeAnalysisEntry) e1).getId();
