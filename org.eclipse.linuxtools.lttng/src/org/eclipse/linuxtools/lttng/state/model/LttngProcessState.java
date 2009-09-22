@@ -18,6 +18,7 @@ import org.eclipse.linuxtools.lttng.state.StateStrings;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ExecutionMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ExecutionSubMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessStatus;
+import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 /**
  * <b>LttngProcessState</b>
@@ -33,12 +34,12 @@ public class LttngProcessState implements Cloneable {
 	private Long pid = null;
 	private Long tgid = null;
 	private String name = null;
-	private Long creation_time = null;
+	private TmfTimestamp creation_time = null;
 	private String brand = null;
 	private StateStrings.ProcessType type = null;
 	private Long current_function = null;
 	private Long ppid = null;
-	private Long insertion_time = null;
+	private TmfTimestamp insertion_time = null;
 	private String pid_time = null;
 	private Long free_events = null;
 	private LttngExecutionState state = null; // top of stack
@@ -47,29 +48,26 @@ public class LttngProcessState implements Cloneable {
 	
 	private String userTrace = null; /* Associated file trace  */
 	private Long target_pid = null; /* target PID of the current event. */
-	private String trace_id = null;
-	
+
 	// ========================================================================
 	// Constructor
 	// =======================================================================
-	public LttngProcessState(Long startTime, String traceId) {
+	public LttngProcessState(TmfTimestamp startTime) {
 		this.cpu = 0L;
 		this.pid = 0L;
 		this.tgid = 0L;
 		this.name = StateStrings.ProcessStatus.LTTV_STATE_UNNAMED.getInName();
 		this.insertion_time = startTime;
-		this.trace_id = "";
 		init();
 	}
 
 	public LttngProcessState(Long cpu, Long pid, Long tgid,
-			String name, Long startTime, String traceId) {
+			String name, TmfTimestamp startTime) {
 		this.cpu = cpu;
 		this.pid = pid;
 		this.tgid = tgid;
 		this.name = name;
 		this.insertion_time = startTime;
-		this.trace_id = traceId;
 		init();
 	}
 
@@ -81,10 +79,12 @@ public class LttngProcessState implements Cloneable {
 		this.type = StateStrings.ProcessType.LTTV_STATE_USER_THREAD;
 		this.current_function = 0L;
 		this.ppid = 0L;
-		this.creation_time = 0L;
+		// creation time defined when parent pid is known
+		// calling the setCreation_time method adjust the pid_time string
+		setCreation_time(new TmfTimestamp());
 		this.free_events = 0L;
 
-		// Initialise stack
+		// Initialize stack
 		LttngExecutionState es = new LttngExecutionState();
 		es.setExec_mode(ExecutionMode.LTTV_STATE_USER_MODE);
 		es.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE.getInName());
@@ -94,12 +94,9 @@ public class LttngProcessState implements Cloneable {
 		es.setProc_status(ProcessStatus.LTTV_STATE_RUN);
 		this.execution_stack.push(es);
 
-		//This second entry is needed when processes are created via a Fork event.
 		es = new LttngExecutionState();
 		es.setExec_mode(ExecutionMode.LTTV_STATE_SYSCALL);
-		es
-				.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE
-						.getInName());
+		es.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE.getInName());
 		es.setEntry_Time(this.insertion_time);
 		es.setChange_Time(this.insertion_time);
 		es.setCum_cpu_time(0L);
@@ -110,7 +107,6 @@ public class LttngProcessState implements Cloneable {
 		this.state = es;
 	}
 	
-	@Override
 	@SuppressWarnings("unchecked")
     public LttngProcessState clone() {
 	    LttngProcessState newState = null;
@@ -134,9 +130,16 @@ public class LttngProcessState implements Cloneable {
             newState.free_events = this.free_events;
             newState.userTrace = this.userTrace;
             newState.target_pid = this.target_pid;
-            newState.trace_id = this.trace_id;
-            newState.creation_time = this.creation_time;
-            newState.insertion_time = this.insertion_time;
+            
+			// No clonable implemented in TMF, we will use copy constructor
+            // NOTE : we GOT to check for null to avoid crashing on null pointer here!
+            if ( this.creation_time != null ) {
+                newState.creation_time = new TmfTimestamp(this.creation_time);
+            }
+            
+            if ( this.creation_time != null ) {
+                newState.insertion_time = new TmfTimestamp(this.insertion_time);
+            }
             
             // Call clone on our own object is safe as Long it implements Clonable
             newState.state = (LttngExecutionState)this.state.clone();
@@ -231,7 +234,7 @@ public class LttngProcessState implements Cloneable {
 	 * @param ppid
 	 *            the ppid to set
 	 */
-	public void setPpid(Long ppid, Long creationTime) {
+	public void setPpid(Long ppid, TmfTimestamp creationTime) {
 		if (ppid != null) {
 			this.ppid = ppid;
 		}
@@ -244,7 +247,7 @@ public class LttngProcessState implements Cloneable {
 	/**
 	 * @return the creation_time
 	 */
-	public Long getCreation_time() {
+	public TmfTimestamp getCreation_time() {
 		return creation_time;
 	}
 
@@ -252,7 +255,7 @@ public class LttngProcessState implements Cloneable {
 	 * @param creationTime
 	 *            the creation_time to set
 	 */
-	public void setCreation_time(Long creationTime) {
+	public void setCreation_time(TmfTimestamp creationTime) {
 		if ( (creationTime != null) && (pid != null) ) {
 			creation_time = creationTime;
 			StringBuilder sb = new StringBuilder(this.pid.toString() + "-"
@@ -264,7 +267,7 @@ public class LttngProcessState implements Cloneable {
 	/**
 	 * @return the insertion_time
 	 */
-	public Long getInsertion_time() {
+	public TmfTimestamp getInsertion_time() {
 		return insertion_time;
 	}
 
@@ -272,7 +275,7 @@ public class LttngProcessState implements Cloneable {
 	 * @param insertionTime
 	 *            the insertion_time to set
 	 */
-	public void setInsertion_time(Long insertionTime) {
+	public void setInsertion_time(TmfTimestamp insertionTime) {
 		insertion_time = insertionTime;
 	}
 
@@ -357,15 +360,7 @@ public class LttngProcessState implements Cloneable {
 	public void setTarget_pid(Long targetPid) {
 		target_pid = targetPid;
 	}
-	
-	public String getTrace_id() {
-		return trace_id;
-	}
 
-	public void setTrace_id(String traceId) {
-		trace_id = traceId;
-	}
-	
 	/**
 	 * @return the free_events
 	 */
@@ -464,19 +459,15 @@ public class LttngProcessState implements Cloneable {
     
     public void pushToExecutionStack(LttngExecutionState newState) {
         execution_stack.push(newState);
-		setState(newState);
     }
     
     public LttngExecutionState popFromExecutionStack() {
        if (execution_stack.size() <= 1) {
-    	   TraceDebug.debug("Removing last item from execution stack is not allowed! (popFromExecutionStack)");
+            TraceDebug.debug("Removing last item from execution stack is not allowed! (popFromExecutionStack)");
             return null;
         }
         else {
-			LttngExecutionState popedState = execution_stack.pop();
-			// adjust current state to the new top
-			setState(peekFromExecutionStack());
-			return popedState;
+           return execution_stack.pop();
        }
     }
     
@@ -487,4 +478,72 @@ public class LttngProcessState implements Cloneable {
     public LttngExecutionState getFirstElementFromExecutionStack() {
         return execution_stack.firstElement();
     }
+	
+	/* 
+     *  MAIN : For testing only!
+     */
+     public static void main(String[] args) {
+         
+         // !!! TESTING CLONE HERE !!!
+         
+         // *** New object with some args set to "123"
+         LttngProcessState joie = new LttngProcessState(new TmfTimestamp(123L, (byte) -9));
+         
+         // Stack not empty by default??
+         System.out.println("Emptying stack... Trashing empty instance of : " + joie.popFromExecutionStack() );
+         
+         joie.setCpu(123L);
+         joie.setName("123");
+         
+         LttngExecutionState testEx1 = new LttngExecutionState();
+         testEx1.setCum_cpu_time(123L);
+         testEx1.setChange_Time(new TmfTimestamp(123L, (byte) -9));
+         testEx1.setEntry_Time(new TmfTimestamp(123L, (byte) -9));
+         
+         // Print testEx1 reference
+         System.out.println("testEx1 reference : " + testEx1);
+         
+         joie.pushToExecutionStack(testEx1);
+         joie.pushToUserStack(123L);
+         
+         
+         
+         // *** New object cloned from the first one
+         LttngProcessState joie2 = (LttngProcessState)joie.clone();
+         
+         
+         // *** Modification of the FIRST object : Everything to "456"
+         joie.setCpu(456L);
+         joie.setName("456");
+         testEx1.setCum_cpu_time(456L);
+         testEx1.setChange_Time(new TmfTimestamp(456L, (byte) -9));
+         testEx1.setEntry_Time(new TmfTimestamp(456L, (byte) -9));
+         
+         // Push new object on stack of the FIRST object
+         LttngExecutionState testEx2 = new LttngExecutionState();
+         testEx2.setCum_cpu_time(456L);
+         joie.pushToExecutionStack(testEx2);
+         joie.pushToUserStack(456L);
+         
+         
+         // *** TEST : Everything should be "123L" stil
+         System.out.println("123 == " + joie2.getCpu() );
+         System.out.println("123 == " + joie2.getName() );
+         
+         LttngExecutionState newtestEx1 = joie2.popFromExecutionStack();
+         // Print newtestEx1 reference
+         System.out.println("testEx1 reference : " + newtestEx1);
+         
+         System.out.println("123 == " + newtestEx1.getCum_cpu_time() );
+         System.out.println("123 == " + joie2.popFromUserStack() );
+         
+         // *** LAST TEST : The joie2 stack should be empty, only joie1 stack contains more than 1 object  
+         try {
+             System.out.println("123 == " + joie2.popFromExecutionStack().getCum_cpu_time() );
+         }
+         catch ( Exception e) {
+             System.out.println("All fine");
+         }
+     }
+     
 }

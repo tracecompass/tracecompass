@@ -17,12 +17,14 @@ import java.util.Vector;
 
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
+import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.lttng.state.evProcessor.AbsEventProcessorFactory;
 import org.eclipse.linuxtools.lttng.state.evProcessor.EventProcessorProxy;
 import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
 import org.eclipse.linuxtools.lttng.state.model.ILttngStateInputRef;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
 
 /**
@@ -55,18 +57,20 @@ public class StateStacksHandler {
 	 * @param log
 	 * 
 	 */
-	void init(TmfTrace log) throws LttngStateException {
-		if (log == null) {
-			throw new LttngStateException("No TmfTrace object available!");
+	void init(JniTrace trace, TmfTrace log) throws LttngStateException {
+		if (trace == null || log == null) {
+			StringBuilder sb = new StringBuilder(
+					"No JniTrace object available, trace must be set via method setTrace(JniTrace trace)");
+			throw new LttngStateException(sb.toString());
 		}
 
 		// this.trace = trace;
-		ILttngStateInputRef ref = new LttngStateInputRef(log);
+		ILttngStateInputRef ref = new LttngStateInputRef(trace, log);
 		this.traceStateModel.init(ref);
 	}
 
 
-	protected void processEvent(TmfEvent tmfEvent) /* throws LttngStateException */{
+	void processEvent(TmfEvent tmfEvent) /* throws LttngStateException */{
 		if (tmfEvent == null) {
 			return;
 		}
@@ -77,9 +81,9 @@ public class StateStacksHandler {
 		}
 
 		LttngEvent trcEvent = (LttngEvent) tmfEvent;
-//		LttngEventField[] fields = ((LttngEventContent)trcEvent.getContent()).getFields();
+		TmfEventField[] fields = trcEvent.getContent().getFields();
 
-		if (trcEvent != null) {
+		if (fields != null) {
 			String inEventName = trcEvent.getMarkerName();
 			// String inChannel = trcEvent.getChannelName();
 			// TraceDebug.debug("Event: " + inEventName);

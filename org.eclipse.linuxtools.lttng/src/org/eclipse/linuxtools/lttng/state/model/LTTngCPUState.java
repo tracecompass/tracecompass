@@ -40,7 +40,6 @@ public class LTTngCPUState implements Cloneable {
 		trap_stack.push(-1L);
 	}
 
-	@Override
 	@SuppressWarnings("unchecked")
 	public LTTngCPUState clone() {
 		LTTngCPUState newState = null;

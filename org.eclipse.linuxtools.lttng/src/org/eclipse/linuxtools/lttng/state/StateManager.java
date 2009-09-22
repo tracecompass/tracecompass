@@ -15,18 +15,23 @@ package org.eclipse.linuxtools.lttng.state;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Observable;
 import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
+import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.lttng.state.evProcessor.AbsEventProcessorFactory;
 import org.eclipse.linuxtools.lttng.state.evProcessor.EventProcessorProxy;
 import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
+import org.eclipse.linuxtools.lttng.state.experiment.StateManagerFactory;
 import org.eclipse.linuxtools.lttng.state.model.ILttngStateInputRef;
+import org.eclipse.linuxtools.lttng.state.model.LttngProcessState;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.state.model.StateModelFactory;
+import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
@@ -42,7 +47,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfTraceCheckpoint;
  */
 public class StateManager extends Observable {
 
-	private static final long LTTNG_STATE_SAVE_INTERVAL = 5000000L;
+	private static final long LTTNG_STATE_SAVE_INTERVAL = 50000L;
 
 	// These are used in the building of the data request.
 	private static final long DEFAULT_OFFSET = 0L;
@@ -52,8 +57,9 @@ public class StateManager extends Observable {
 	// Data
 	// =======================================================================
 	private TmfExperiment fExperiment = null;
-	private TmfTrace fEventLog = null;
+	private LTTngTrace fEventLog = null;
 	private StateStacksHandler stateIn = null;
+	private JniTrace trace = null;
 	private Long eventCount = 0L;
 
 	private HashMap<Long, LttngTraceState> stateCheckpointsList = new HashMap<Long, LttngTraceState>();
@@ -106,61 +112,57 @@ public class StateManager extends Observable {
 	// ========================================================================
 	// Methods
 	// =======================================================================
-	/**
-	 * A new Experiment or trace selected
-	 * @param experiment
-	 * @param clearPreviousData
-	 */
-	public void setTraceSelection(TmfExperiment experiment,
-			boolean clearPreviousData) {
+	public void setTraceSelection(TmfExperiment experiment) {
 		// New log in use, read all events and build state transition stack
 		if (experiment != null) {
-			if (fExperiment != null && fExperiment != experiment) {
-				this.fExperiment.dispose();
-			}
+			if (fExperiment != null && experiment.equals(fExperiment)) {
+				// No update needed
+			} else {
 
-			this.fExperiment = experiment;
+				// this.fExperiment.dispose();
+				this.fExperiment = experiment;
 
-			// if (fEventLog != null) {
-			// this.fEventLog.dispose();
-			// }
-			
-			this.fEventLog = (TmfTrace)experiment.getTraces()[0];
-			try {
-				stateIn.init(fEventLog);
-			} catch (LttngStateException e) {
-				e.printStackTrace();
-			}
-
-			// Restart count and collections
-			eventCount = 0L;
-			stateCheckpointsList.clear();
-			timestampCheckpointsList.clear();
-
-			// Obtain a dataRequest to pass to the processRequest function
-			TmfTimeRange allTraceWindow = fEventLog.getTimeRange();
-			StateDataRequest request = getDataRequestStateSave(allTraceWindow,
-					null);
-			request.setclearDataInd(clearPreviousData);
-
-			// Wait for completion
-			request.startRequestInd(fExperiment, true, true);
-
-			if (TraceDebug.isDEBUG()) {
-				StringBuilder sb = new StringBuilder(
-						"Total number of processes in the State provider: "
-								+ stateIn.getTraceStateModel().getProcesses().length);
-
-				TmfTimeRange logTimes = fEventLog.getTimeRange();
-				sb.append("\n\tLog file times "
-						+ new LttngTimestamp(logTimes.getStartTime()));
-				sb.append(" - " + new LttngTimestamp(logTimes.getEndTime()));
-
-				sb.append("\n\tCheckPoints available at: ");
-				for (TmfTraceCheckpoint cpoint : timestampCheckpointsList) {
-					sb.append("\n\t" + cpoint.getTimestamp());
+				// this.fEventLog.dispose();
+				this.fEventLog = (LTTngTrace) experiment.getTraces()[0];
+				trace = fEventLog.getCurrentJniTrace();
+				try {
+					stateIn.init(trace, fEventLog);
+				} catch (LttngStateException e) {
+					e.printStackTrace();
 				}
-				TraceDebug.debug(sb.toString());
+
+				// Restart count and collections
+				eventCount = 0L;
+				stateCheckpointsList.clear();
+				timestampCheckpointsList.clear();
+
+				// Obtain a dataRequest to pass to the processRequest function
+				TmfTimeRange allTraceWindow = fEventLog.getTimeRange();
+				StateDataRequest request = getDataRequestStateSave(
+						allTraceWindow, null);
+				request.startRequestInd(fExperiment, true);
+
+				if (TraceDebug.isDEBUG()) {
+					List<LttngProcessState> processes = stateIn
+							.getTraceStateModel().getProcesses();
+					StringBuilder sb = new StringBuilder(
+							"Total number of processes in the State provider: "
+									+ processes.size());
+
+					TmfTimeRange logTimes = fEventLog.getTimeRange();
+					sb.append("\n\tLog file times "
+							+ new LttngTimestamp(logTimes.getStartTime()));
+					sb
+							.append(" - "
+									+ new LttngTimestamp(logTimes.getEndTime()));
+
+					sb.append("\n\tCheckPoints available at: ");
+					for (TmfTraceCheckpoint cpoint : timestampCheckpointsList) {
+						sb.append("\n\t" + cpoint.getTimestamp());
+					}
+					TraceDebug.debug(sb.toString());
+				}
+
 			}
 		}
 
@@ -176,8 +178,7 @@ public class StateManager extends Observable {
 	 * @param obs
 	 * @param transactionID
 	 */
-	public StateDataRequest executeDataRequest(TmfTimeRange trange,
-			String transactionID,
+	public void executeDataRequest(TmfTimeRange trange, String transactionID,
 			IStateDataRequestListener listener) {
 		TmfTimestamp restoredStartTime = restoreCheckPointByTimestamp(trange
 				.getStartTime());
@@ -189,22 +190,17 @@ public class StateManager extends Observable {
 
 		// Process request to that point
 		StateDataRequest request = getDataRequestByTimeRange(trange, listener);
-		// don't wait for completion i.e. allow cancellations
-		// TODO: Broadcast set to true to make all views participate as a work
-		// around until TMF supports data coalescing and event filtering within
-		// the request
-		request.startRequestInd(fExperiment, true, false);
+		request.startRequestInd(fExperiment, false);
 
 		if (TraceDebug.isDEBUG()) {
-			TraceDebug
-					.debug(" Time Window requested, (start adjusted to checkpoint): "
-							+ trange.getStartTime()
-					+ "-" + trange.getEndTime()
+			List<LttngProcessState> processes = stateIn.getTraceStateModel()
+					.getProcesses();
+			TraceDebug.debug(" Time Window requested: "
+					+ trange.getStartTime().getValue() + "-"
+					+ trange.getEndTime().getValue()
 					+ " Total number of processes in the State provider: "
-					+ stateIn.getTraceStateModel().getProcesses().length + " Completed");
+					+ processes.size());
 		}
-
-		return request;
 	}
 
 	/**
@@ -310,13 +306,13 @@ public class StateManager extends Observable {
 				|| (eventTime.getValue() > logRange.getEndTime().getValue())) {
 			return null;
 		}
-		
+
 		// The GUI can have time limits lower than this log, since GUI can
 		// handle multiple logs
 		if ((eventTime.getValue() < logRange.getStartTime().getValue())) {
 			eventTime = logRange.getStartTime();
 		}
-		
+
 		// Sort the checkpoints, required before the binary search
 		Collections.sort(timestampCheckpointsList);
 		// Initiate the compare with a checkpoint containing the target time
@@ -332,7 +328,8 @@ public class StateManager extends Observable {
 		if (index == 0) {
 			// No checkpoint restore is needed, start with a brand new
 			// TraceState
-			ILttngStateInputRef inputDataRef = new LttngStateInputRef(fEventLog);
+			ILttngStateInputRef inputDataRef = new LttngStateInputRef(trace,
+					fEventLog);
 			traceState = StateModelFactory.getStateEntryInstance(inputDataRef);
 		} else {
 			// Useful CheckPoint found
@@ -426,9 +423,11 @@ public class StateManager extends Observable {
 
 		final TmfEvent[] evt = new TmfEvent[1];
 
-		// ***TODO***
-		// The override of handlePartialResult is similar to the one in
+		// ***FIXME***
+		// The override of handlePartialResult is exactly the same as the one in
 		// getDataRequestByPosition()
+		// However, there is no way to override it in only one place to avoid
+		// code duplication!
 		// ***
 
 		// Create the new request and override the handlePartialResult function
@@ -443,21 +442,12 @@ public class StateManager extends Observable {
 				// Dispatch information for Event processing
 				stateIn.processEvent(evt[0]);
 
-				// increment internal and external number of events
-				setNumOfEvents(getNumOfEvents() + 1);
 				eventCount++;
 			}
 
-			@Override
 			public void handleCompleted() {
-				if (isCancelled() || isFailed()) {
-					// No notification to end request handlers
-				} else {
-					// notify the associated end request handlers
-					requestCompleted();
-				}
-
-				// notify listeners
+				requestCompleted();
+				// notify the associated listener
 				notifyCompletion();
 			}
 		};
@@ -470,9 +460,11 @@ public class StateManager extends Observable {
 
 		final TmfEvent[] evt = new TmfEvent[1];
 
-		// ***TODO***
-		// The override of handlePartialResult is similar to the one in
+		// ***FIXME***
+		// The override of handlePartialResult is exactly the same as the one in
 		// getDataRequestByPosition()
+		// However, there is no way to override it in only one place to avoid
+		// code duplication!
 		// ***
 
 		// Create the new request and override the handlePartialResult function
@@ -483,14 +475,14 @@ public class StateManager extends Observable {
 			@Override
 			public void handleData() {
 				TmfEvent[] result = getData();
-				
+
 				evt[0] = (result.length > 0) ? result[0] : null;
 				// Dispatch information for Event processing
 				stateIn.processEvent(evt[0]);
 
 				// Call the function that will save a checkpoint if needed at
 				// that point
-				// Note : We call this function before incrementing eventCount
+				// Note : We call this function before eventCount incrementation
 				// to avoid skipping the "0th" event
 				if (evt[0] != null) {
 					saveCheckPointIfNeeded(getNumOfEvents(), evt[0]
@@ -502,16 +494,10 @@ public class StateManager extends Observable {
 				eventCount++;
 			}
 
-			@Override
 			public void handleCompleted() {
-				if (isCancelled() || isFailed()) {
-					// No notification to end request handlers
-				} else {
-					// notify the associated end request handlers
-					requestCompleted();
-				}
+				requestCompleted();
 
-				// notify listeners
+				// Notify listeners of the completion of this request.
 				notifyCompletion();
 				TraceDebug.debug("number of events processed on file opening"
 						+ getNumOfEvents());
@@ -590,4 +576,64 @@ public class StateManager extends Observable {
 			}
 		}
 	}
+
+	// *** MAIN : For testing only ***
+	public static void main(String[] args) {
+
+		// Timestamp for the "197500th" events
+		long timefor197500 = 953098902827L;
+
+		// A new StateManager
+		StateManager stateManagerTest = StateManagerFactory.getManager("test");
+
+		LTTngTrace[] testStream = new LTTngTrace[1];
+		try {
+			// The stream is needed by the eventLog, which is needed by the
+			// StateManager
+			// testStream[0] = new LttngEventStream("/home/william/trace1",
+			// true);
+			testStream[0] = new LTTngTrace(
+					"/home/william/runtime-EclipseApplication/TEST_JOIE/Traces/trace3",
+					true);
+			// testStream[0] = new LttngEventStream("/home/alvaro/ltt/trace1",
+			// true);
+
+			TmfExperiment newExpt = new TmfExperiment("trace1", testStream);
+
+			// This will create all the checkpoint
+			stateManagerTest.setTraceSelection(newExpt);
+			System.out.println("JOIE JOIE FIN DE LA CREATION DES CHECKPOINTS");
+
+			// *** Restore some checkpoint to test
+
+			// Test the restoration from position
+			// stateManagerTest.restoreCheckPointByPosition(197500);
+
+			if (testStream[0].getCurrentEvent().getTimestamp().getValue() == timefor197500) {
+				System.out.println("Successfully restored by Position!");
+			} else {
+				System.out.println("FAILED : "
+						+ testStream[0].getCurrentEvent().getTimestamp()
+								.getValue() + " != " + timefor197500);
+			}
+
+			// Test the restoration from Timestamp
+			TmfTimestamp newTimestamp = new TmfTimestamp(timefor197500,
+					(byte) -9);
+			stateManagerTest.restoreCheckPointByTimestamp(newTimestamp);
+			// test the timestamp
+			if (testStream[0].getCurrentEvent().getTimestamp().getValue() == timefor197500) {
+				System.out.println("Successfully restored by Timestamp!");
+			} else {
+				System.out.println("FAILED : "
+						+ testStream[0].getCurrentEvent().getTimestamp()
+								.getValue() + " != " + timefor197500);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
 }

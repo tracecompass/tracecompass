@@ -11,11 +11,12 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.state.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
-import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.state.LttngStateException;
 import org.eclipse.linuxtools.lttng.state.StateStrings;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ExecutionMode;
@@ -23,6 +24,7 @@ import org.eclipse.linuxtools.lttng.state.StateStrings.ExecutionSubMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.IRQMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessStatus;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 /**
  * <b><u>LttngTraceState</u></b>
@@ -40,10 +42,13 @@ public class LttngTraceState implements Cloneable {
     
 	private Long save_interval = null;
 
-	private Long max_time_state_recomputed_in_seek = null;
+	private TmfTimestamp max_time_state_recomputed_in_seek = null;
 	private boolean has_precomputed_states = false;
 
-	private HashMap<ProcessStateKey, LttngProcessState> processes = new HashMap<ProcessStateKey, LttngProcessState>();
+	// TODO: check if this can be used as a map, but consider that the key
+	// shall be composed by Pid, TimeStamp, and CPU, this combination may not
+	// always be available and the cpu value may change over time.
+	private List<LttngProcessState> processes = new ArrayList<LttngProcessState>();
 
 	// by cpu
 	private Map<Long, LttngProcessState> running_process = new HashMap<Long, LttngProcessState>();
@@ -103,7 +108,6 @@ public class LttngTraceState implements Cloneable {
 	// =======================================================================
 	// Methods
 	// =======================================================================
-	@Override
 	public LttngTraceState clone() {
 		LttngTraceState newState = null;
 
@@ -120,7 +124,14 @@ public class LttngTraceState implements Cloneable {
 			// Basic value only need to be assigned while cloning
 			newState.has_precomputed_states = this.has_precomputed_states;
 			newState.nb_events = this.nb_events;
-			newState.max_time_state_recomputed_in_seek = this.max_time_state_recomputed_in_seek;
+
+			// No clonable implemented in TMF, we will use copy constructor
+			// NOTE : we GOT to check for null to avoid crashing on null pointer
+			// here!
+			if (this.max_time_state_recomputed_in_seek != null) {
+				newState.max_time_state_recomputed_in_seek = new TmfTimestamp(
+						this.max_time_state_recomputed_in_seek);
+			}
 
 			// Clone should work correctly for all stack object that contain
 			// basic java object (String, Long, etc...)
@@ -138,62 +149,58 @@ public class LttngTraceState implements Cloneable {
 			// *** TODO ***
 			// In the future, implement something better here... serialization
 			// perhaps? Or copy the array chunk of memory in C?
-			
-			Iterator<Long> iteratorL = null;
-			Iterator<ProcessStateKey> iteratorP = null;
-			Long mapKey = null;
-			ProcessStateKey processKey = null;
-			
-			newState.processes = new HashMap<ProcessStateKey, LttngProcessState>();
-			iteratorP = this.processes.keySet().iterator();
-			while (iteratorP.hasNext()) {
-				processKey = iteratorP.next();
-				newState.processes.put(processKey, this.processes.get(processKey).clone());
+			newState.processes = new ArrayList<LttngProcessState>();
+			for (int pos = 0; pos < this.processes.size(); pos++) {
+				newState.processes.add(this.processes.get(pos).clone());
 			}
 
+			Iterator<Long> iterator = null;
+			Long mapKey = null;
+
 			newState.running_process = new HashMap<Long, LttngProcessState>();
-			iteratorL = this.running_process.keySet().iterator();
-			while (iteratorL.hasNext()) {
-				mapKey = iteratorL.next();
-				newState.running_process.put(mapKey, this.running_process.get(mapKey).clone());
+			iterator = this.running_process.keySet().iterator();
+			while (iterator.hasNext()) {
+				mapKey = iterator.next();
+				newState.running_process.put(mapKey, this.running_process.get(
+						mapKey).clone());
 			}
 
 			newState.cpu_states = new HashMap<Long, LTTngCPUState>();
-			iteratorL = this.cpu_states.keySet().iterator();
-			while (iteratorL.hasNext()) {
-				mapKey = iteratorL.next();
+			iterator = this.cpu_states.keySet().iterator();
+			while (iterator.hasNext()) {
+				mapKey = iterator.next();
 				newState.cpu_states.put(mapKey, this.cpu_states.get(mapKey)
 						.clone());
 			}
 
 			newState.irq_states = new HashMap<Long, LttngIRQState>();
-			iteratorL = this.irq_states.keySet().iterator();
-			while (iteratorL.hasNext()) {
-				mapKey = iteratorL.next();
+			iterator = this.irq_states.keySet().iterator();
+			while (iterator.hasNext()) {
+				mapKey = iterator.next();
 				newState.irq_states.put(mapKey, this.irq_states.get(mapKey)
 						.clone());
 			}
 
 			newState.soft_irq_states = new HashMap<Long, LttngSoftIRQState>();
-			iteratorL = this.soft_irq_states.keySet().iterator();
-			while (iteratorL.hasNext()) {
-				mapKey = iteratorL.next();
+			iterator = this.soft_irq_states.keySet().iterator();
+			while (iterator.hasNext()) {
+				mapKey = iterator.next();
 				newState.soft_irq_states.put(mapKey, this.soft_irq_states.get(
 						mapKey).clone());
 			}
 
 			newState.trap_states = new HashMap<Long, LttngTrapState>();
-			iteratorL = this.trap_states.keySet().iterator();
-			while (iteratorL.hasNext()) {
-				mapKey = iteratorL.next();
+			iterator = this.trap_states.keySet().iterator();
+			while (iterator.hasNext()) {
+				mapKey = iterator.next();
 				newState.trap_states.put(mapKey, this.trap_states.get(mapKey)
 						.clone());
 			}
 
 			newState.bdev_states = new HashMap<Long, LttngBdevState>();
-			iteratorL = this.bdev_states.keySet().iterator();
-			while (iteratorL.hasNext()) {
-				mapKey = iteratorL.next();
+			iterator = this.bdev_states.keySet().iterator();
+			while (iterator.hasNext()) {
+				mapKey = iterator.next();
 				newState.bdev_states.put(mapKey, this.bdev_states.get(mapKey)
 						.clone());
 			}
@@ -220,7 +227,7 @@ public class LttngTraceState implements Cloneable {
 		traceId = inputDataRef.getTraceId();
 
 		// max time
-		max_time_state_recomputed_in_seek = 0L;
+		setMax_time_state_recomputed_in_seek(new TmfTimestamp());
 
 		// reset cpu_states
 		cpu_states.clear();
@@ -252,7 +259,13 @@ public class LttngTraceState implements Cloneable {
 
 		// bdev states
 		bdev_states.clear();
-		
+
+		// JniTrace State
+		init_state(numCpus);
+
+	}
+
+	public void init_state(int numCpus) {
 		processes.clear();
 
 		nb_events = 0;
@@ -260,7 +273,8 @@ public class LttngTraceState implements Cloneable {
 
 		/* Put the per cpu running_process to beginning state : process 0. */
 		for (Long i = 0L; i < numCpus; i++) {
-			LttngProcessState process = new LttngProcessState(timeWin.getStartTime().getValue(), traceId );
+			LttngProcessState process = new LttngProcessState(timeWin
+					.getStartTime());
 
 			/*
 			 * We are not sure is it's a kernel thread or normal thread, put the
@@ -285,7 +299,7 @@ public class LttngTraceState implements Cloneable {
 			LTTngCPUState cpuState = cpu_states.get(i);
 			cpuState.reset();
 			// Add the new process to the list
-			processes.put(new ProcessStateKey(process), process);
+			processes.add(process);
 		}
 
 		// reset irq_states
@@ -338,12 +352,12 @@ public class LttngTraceState implements Cloneable {
 		return inputDataRef;
 	}
 
-	public Long getMax_time_state_recomputed_in_seek() {
+	public TmfTimestamp getMax_time_state_recomputed_in_seek() {
 		return max_time_state_recomputed_in_seek;
 	}
 
 	public void setMax_time_state_recomputed_in_seek(
-			Long maxTimeStateRecomputedInSeek) {
+			TmfTimestamp maxTimeStateRecomputedInSeek) {
 		max_time_state_recomputed_in_seek = maxTimeStateRecomputedInSeek;
 	}
 
@@ -353,6 +367,11 @@ public class LttngTraceState implements Cloneable {
 
 	public void setHas_precomputed_states(boolean hasPrecomputedStates) {
 		has_precomputed_states = hasPrecomputedStates;
+	}
+	
+	
+	public List<LttngProcessState> getProcesses() {
+		return processes;
 	}
 
 	public Map<Long, LttngProcessState> getRunning_process() {
@@ -405,161 +424,5 @@ public class LttngTraceState implements Cloneable {
 	public String getTraceId() {
 		return traceId;
 	}
-	
-	/**
-	 *  Return an array of Processes
-	 * 
-	 * @return LttngProcessState
-	 */
-	public LttngProcessState[] getProcesses() {
-		return processes.values().toArray(new LttngProcessState[processes.size()]);
-	}
-	
-	/**
-	 * Clear all process state items e.g. when a new experiment is selected
-	 */
-	public void clearProcessState() {
-		processes.clear();
-	}
-	
-	/**
-	 * Interface to add process state.
-	 * 
-	 * @param newProcessState
-	 */
-	public void addProcessState(LttngProcessState newProcessState) {
-		if (newProcessState != null) {
-			processes.put( new ProcessStateKey(newProcessState), newProcessState);
-		}
-	}
-	
-	/**
-	 * Interface to remove process state.
-	 * 
-	 * @param oldProcessState
-	 */
-	public void removeProcessState(LttngProcessState oldProcessState) {
-		if (oldProcessState != null) {
-			processes.remove(new ProcessStateKey(oldProcessState));
-		}
-	}
-	
-	/**
-     * Search by keys (pid, cpuId and traceId)<p>
-     * 
-     * A match is returned if the three arguments received match an entry
-     *  Otherwise null is returned
-     *  
-     * @param searchedPid       The processId (Pid) we are looking for
-     * @param searchedCpuId     The cpu Id we are looking for
-     * @param searchedTraceID   The traceId (trace name?) we are looking for
-     * 
-     * @return LttngProcessState
-     */
-    public LttngProcessState findProcessState(Long searchedPid, Long searchedCpuId, String searchedTraceID) {
-        // Get the TimeRangeEventProcess associated to a key we create here
-    	LttngProcessState foundProcess = processes.get( new ProcessStateKey(searchedPid, searchedCpuId, searchedTraceID) );
-        
-        return foundProcess;
-    }
-	
-	
-}
 
-class ProcessStateKey {
-    private LttngProcessState valueRef = null;
-    
-    private Long    pid = null;
-    private Long    cpuId = null;
-    private String  traceId = null;
-    
-    @SuppressWarnings("unused")
-    private ProcessStateKey() { }
-    
-    public ProcessStateKey(LttngProcessState newRef) {
-        valueRef = newRef;
-    }
-    
-    public ProcessStateKey(Long newPid, Long newCpuId, String newTraceId) {
-        pid = newPid;
-        cpuId = newCpuId;
-        traceId = newTraceId;
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-        boolean isSame = false;
-        
-        if ( obj instanceof ProcessStateKey ) {
-        	ProcessStateKey procKey = (ProcessStateKey) obj;
-        	
-        	if ( valueRef != null ) {
-	            if ( (procKey.getPid().equals(valueRef.getPid()) ) &&
-	                 (procKey.getTraceId().equals(valueRef.getTrace_id()) ) &&
-	                 ( (procKey.getCpuId().longValue() == 0L ) || (procKey.getCpuId().equals(valueRef.getCpu()))  )  )
-	            {
-	                isSame = true;
-	            }
-        	}
-        	else {
-        		if ( (procKey.getPid().equals(this.pid) ) &&
-   	                 (procKey.getTraceId().equals(this.traceId) ) &&
-   	                 ( (procKey.getCpuId().longValue() == 0L ) || (procKey.getCpuId().equals(this.cpuId))  )  )
-   	            {
-   	                isSame = true;
-   	            }
-        	}
-        }
-        else {
-			TraceDebug
-					.debug("ERROR : The received Key is not of the type ProcessStateKey! but "
-							+ obj.getClass().toString());
-        }
-        
-        return isSame;
-    }
-    
-    // *** WARNING : Everything in there work because the check "valueRef != null" is the same for ALL getter
-    // Do NOT change this check without checking.
-    public Long getPid() {
-    	if ( valueRef != null ) {
-            return valueRef.getPid();
-        }
-        else {
-            return pid;
-        }
-    }
-
-    public Long getCpuId() {
-        if ( valueRef != null ) {
-            return valueRef.getCpu();
-        }
-        else {
-            return cpuId;
-        }
-    }
-    
-    public String getTraceId() {
-        if ( valueRef != null ) {
-            return valueRef.getTrace_id();
-        }
-        else {
-            return traceId;
-        }
-    }
-    
-    @Override
-    public int hashCode() {
-    	return this.toString().hashCode();
-    }
-    
-    
-    @Override
-    public String toString() {
-        if ( valueRef != null ) {
-            return (valueRef.getPid().toString() + ":" + valueRef.getCpu().toString() + ":" + valueRef.getTrace_id().toString() );
-        } 
-        
-        return (pid.toString() + ":" + cpuId.toString() + ":" + traceId.toString());
-    }
 }

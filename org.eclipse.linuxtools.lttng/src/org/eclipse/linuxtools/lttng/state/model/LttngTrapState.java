@@ -32,8 +32,7 @@ public class LttngTrapState implements Cloneable {
 		this.running = running;
 	}
 	
-    @Override
-	public LttngTrapState clone() {
+    public LttngTrapState clone() {
 	    LttngTrapState newState = null;
         
         try {

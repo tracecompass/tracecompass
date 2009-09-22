@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.state.evProcessor.state;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.linuxtools.lttng.TraceDebug;
@@ -499,14 +500,14 @@ class StateUpdateHandlers {
 				Long irq = getAFieldLong(trcEvent, traceSt,
 						Fields.LTT_FIELD_IRQ_ID);
 
-				if (action == null) {
+				if (action != null) {
 					TraceDebug.debug("Field Action not found in event "
 							+ eventType.getInName() + " time: "
 							+ trcEvent.getTimestamp());
 					return true;
 				}
 
-				if (irq == null) {
+				if (irq != null) {
 					TraceDebug.debug("Field irq_id not found in event "
 							+ eventType.getInName() + " time: "
 							+ trcEvent.getTimestamp());
@@ -902,16 +903,16 @@ class StateUpdateHandlers {
 							process.getState().setProc_status(
 									ProcessStatus.LTTV_STATE_WAIT);
 							process.getState().setChange_Time(
-									trcEvent.getTimestamp().getValue());
+									trcEvent.getTimestamp());
 							process.getState().setEntry_Time(
-									trcEvent.getTimestamp().getValue());
+									trcEvent.getTimestamp());
 						}
 					} else {
 						if (process.getState().getProc_status() == ProcessStatus.LTTV_STATE_EXIT) {
 							process.getState().setProc_status(
 									ProcessStatus.LTTV_STATE_ZOMBIE);
 							process.getState().setChange_Time(
-									trcEvent.getTimestamp().getValue());
+									trcEvent.getTimestamp());
 						} else {
 							if ((state_out != null)
 									&& (state_out.longValue() == 0L)) {
@@ -923,7 +924,7 @@ class StateUpdateHandlers {
 							}
 
 							process.getState().setChange_Time(
-									trcEvent.getTimestamp().getValue());
+									trcEvent.getTimestamp());
 						}
 
 						if ((state_out != null)
@@ -937,7 +938,7 @@ class StateUpdateHandlers {
 								process.getState().setProc_status(
 										ProcessStatus.LTTV_STATE_DEAD);
 								process.getState().setChange_Time(
-										trcEvent.getTimestamp().getValue());
+										trcEvent.getTimestamp());
 							}
 						}
 					}
@@ -948,7 +949,7 @@ class StateUpdateHandlers {
 				traceSt.getRunning_process().put(cpu, process);
 
 				process.getState().setProc_status(ProcessStatus.LTTV_STATE_RUN);
-				process.getState().setChange_Time(eventTime.getValue());
+				process.getState().setChange_Time(eventTime);
 				process.setCpu(cpu);
 				// process->state->s = LTTV_STATE_RUN;
 				// if(process->usertrace)
@@ -1073,7 +1074,6 @@ class StateUpdateHandlers {
 				if (child_process == null) {
 					child_process = create_process(traceSt, cpu, child_pid,
 							child_tgid, timeStamp);
-					child_process.setPpid(process.getPid(), timeStamp.getValue());
 				} else {
 					/*
 					 * The process has already been created : due to time
@@ -1165,6 +1165,9 @@ class StateUpdateHandlers {
 					exState.setExec_mode(ExecutionMode.LTTV_STATE_SYSCALL);
 					process.clearExecutionStack();
 					process.pushToExecutionStack(exState);
+
+					// update the process state to the only one in the stack
+					process.setState(exState);
 				}
 
 				process.setType(ProcessType.LTTV_STATE_KERNEL_THREAD);
@@ -1416,13 +1419,13 @@ class StateUpdateHandlers {
 				 * mode, wait
 				 */
 				/* else, if stack[0] is unknown, set to user mode, running */
-				LttngProcessState[] processes = traceSt.getProcesses();
+				List<LttngProcessState> processes = traceSt.getProcesses();
 				TmfTimestamp time = trcEvent.getTimestamp();
-				
-				for (int pos = 0; pos < processes.length; pos++) {
-					fix_process(processes[pos], time);
+
+				for (LttngProcessState process : processes) {
+					fix_process(process, time);
 				}
-				
+
 				return false;
 
 			}
@@ -1452,8 +1455,8 @@ class StateUpdateHandlers {
 						es
 								.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE
 										.getInName());
-						es.setEntry_Time(timestamp.getValue());
-						es.setChange_Time(timestamp.getValue());
+						es.setEntry_Time(timestamp);
+						es.setChange_Time(timestamp);
 						es.setCum_cpu_time(0L);
 						if (es.getProc_status() == ProcessStatus.LTTV_STATE_UNNAMED) {
 							es.setProc_status(ProcessStatus.LTTV_STATE_WAIT);
@@ -1466,8 +1469,8 @@ class StateUpdateHandlers {
 						es
 								.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE
 										.getInName());
-						es.setEntry_Time(timestamp.getValue());
-						es.setChange_Time(timestamp.getValue());
+						es.setEntry_Time(timestamp);
+						es.setChange_Time(timestamp);
 						es.setCum_cpu_time(0L);
 						if (es.getProc_status() == ProcessStatus.LTTV_STATE_UNNAMED) {
 							es.setProc_status(ProcessStatus.LTTV_STATE_RUN);
@@ -1494,10 +1497,10 @@ class StateUpdateHandlers {
 							es
 									.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE
 											.getInName());
-							es.setEntry_Time(timestamp.getValue());
-							es.setChange_Time(timestamp.getValue());
+							es.setEntry_Time(timestamp);
+							es.setChange_Time(timestamp);
 							es.setCum_cpu_time(0L);
-							es.setProc_status(ProcessStatus.LTTV_STATE_WAIT);
+							es.setProc_status(ProcessStatus.LTTV_STATE_UNNAMED);
 
 							// Push the new state to the stack
 							process.pushToExecutionStack(es);
@@ -1534,14 +1537,13 @@ class StateUpdateHandlers {
 				Long tgid;
 				String command;
 				Long cpu = trcEvent.getCpuId();
-				
 				LttngProcessState process = traceSt.getRunning_process().get(
 						cpu);
 				LttngProcessState parent_process;
 				String type;
 				// String mode, submode, status;
 				LttngExecutionState es;
-				
+
 				/* PID */
 				pid = getAFieldLong(trcEvent, traceSt, Fields.LTT_FIELD_PID);
 
@@ -1555,10 +1557,10 @@ class StateUpdateHandlers {
 
 				Long typeVal = getAFieldLong(trcEvent, traceSt,
 						Fields.LTT_FIELD_TYPE);
-
-				type = ProcessType.LTTV_STATE_KERNEL_THREAD.getInName();
 				if ((typeVal != null) && (typeVal.longValue() == 0L)) {
 					type = ProcessType.LTTV_STATE_USER_THREAD.getInName();
+				} else {
+					type = ProcessType.LTTV_STATE_KERNEL_THREAD.getInName();
 				}
 
 				// /* mode */
@@ -1604,11 +1606,10 @@ class StateUpdateHandlers {
 					if (process == null) {
 						parent_process = lttv_state_find_process(traceSt,
 								ANY_CPU, parent_pid);
-						TmfTimestamp eventTime = trcEvent.getTimestamp();
 						process = create_process(traceSt, cpu, pid, tgid,
-								command, eventTime);
+								command, trcEvent.getTimestamp());
 						if (parent_process != null) {
-							process.setPpid(parent_process.getPid(), eventTime.getValue());
+							process.setPpid(parent_process.getPid());
 						}
 
 						/* Keep the stack bottom : a running user mode */
@@ -1628,14 +1629,69 @@ class StateUpdateHandlers {
 							 * cause expected interrupt when being syscall.
 							 * (only before end of statedump event)
 							 */
-							// process type is USER_THREAD by default.
 							process
 									.setType(ProcessType.LTTV_STATE_KERNEL_THREAD);
 
+							// #if 0
+							// es->t = LTTV_STATE_SYSCALL;
+							// es->s = status;
+							// es->n = submode;
+							// #endif //0
+						} else {
+							/*
+							 * User space process : bottom : user mode either
+							 * currently running or scheduled out. can be
+							 * scheduled out because interrupted in (user mode
+							 * or in syscall) or because of an explicit call to
+							 * the scheduler in syscall. Note that the scheduler
+							 * call comes after the irq_exit, so never in
+							 * interrupt context.
+							 */
+							// temp workaround : set size to 1 : only have user
+							// mode
+							// bottom of stack.
+							// will cause g_info message of expected syscall
+							// mode when
+							// in fact being
+							// in user mode. Can also cause expected trap when
+							// in fact
+							// being user
+							// mode in the event of a page fault reenabling
+							// interrupts
+							// in the handler.
+							// Expected syscall and trap can also happen after
+							// the end
+							// of statedump
+							// This will cause a
+							// "popping last state on stack, ignoring it."
+
+							// process->execution_stack =
+							// g_array_set_size(process->execution_stack, 1);
+							// es = process->state =
+							// &g_array_index(process->execution_stack,
+							// LttvExecutionState, 0);
+							// a new process must have only one state in the
+							// stack and
+							// be the same as the current state
+							// es = process.getState();
+							// es.setExec_mode(ExecutionMode.LTTV_STATE_MODE_UNKNOWN);
+							// es.setProc_status(ProcessStatus.LTTV_STATE_UNNAMED);
+							// es
+							// .setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_UNKNOWN
+							// .getInName());
+
+							// #if 0
+							// es->t = LTTV_STATE_USER_MODE;
+							// es->s = status;
+							// es->n = submode;
+							// #endif //0
 						}
-						
-						//Only one entry needed in the execution stack
-						process.popFromExecutionStack();
+						// TODO: clean up comments above: Moved repeated code
+						// from both
+						// if / else blocks above,
+						// comments left temporarily for easier visualization
+						// and
+						// comparision with c code
 						es = process.getState();
 						es.setExec_mode(ExecutionMode.LTTV_STATE_MODE_UNKNOWN);
 						es.setProc_status(ProcessStatus.LTTV_STATE_UNNAMED);

@@ -15,7 +15,6 @@ import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
@@ -36,7 +35,7 @@ public class StateDataRequest extends TmfDataRequest<TmfEvent> {
 	private StateManager manager = null;
 	private long numOfEvents = 0;
 	private boolean broadcast = false;
-	private boolean clearDataInd = false;
+
 	// ========================================================================
 	// Constructors
 	// =======================================================================
@@ -50,9 +49,8 @@ public class StateDataRequest extends TmfDataRequest<TmfEvent> {
 	public StateDataRequest(TmfTimeRange range, long offset, int nbEvents,
 			int maxBlockSize, IStateDataRequestListener listener,
 			StateManager manager) {
-		
-		super(range, nbEvents, maxBlockSize);
-		//super(0, nbEvents, maxBlockSize);
+
+		super(range, offset, nbEvents, maxBlockSize);
 		this.manager = manager;
 		if (listener != null && !listeners.contains(listener)) {
 			listeners.add(listener);
@@ -88,8 +86,7 @@ public class StateDataRequest extends TmfDataRequest<TmfEvent> {
 	 * @param broadcast
 	 *            true: All views, false: only to registered listeners
 	 */
-	public void startRequestInd(TmfExperiment experiment, boolean broadcast,
-			boolean waitForCompletion) {
+	public void startRequestInd(TmfExperiment experiment, boolean broadcast) {
 		if (broadcast) {
 			// Notify all state views.
 			this.broadcast = broadcast;
@@ -102,7 +99,7 @@ public class StateDataRequest extends TmfDataRequest<TmfEvent> {
 		}
 
 		// trigger the start to process this request
-		experiment.processRequest(this, waitForCompletion);
+		experiment.processRequest(this, true);
 	}
 
 	/**
@@ -166,45 +163,5 @@ public class StateDataRequest extends TmfDataRequest<TmfEvent> {
 	 */
 	public long getNumOfEvents() {
 		return numOfEvents;
-	}
-
-	/**
-	 * @param clearAllData
-	 *            indicates the need to clear all previous data e.g. a new
-	 *            experiment selection
-	 */
-	public void setclearDataInd(boolean clearAllData) {
-		this.clearDataInd = clearAllData;
-	}
-
-	/**
-	 * Returns indication - clearing of all existing data model is required e.g
-	 * from the selection of a new experiment
-	 * 
-	 * @return
-	 */
-	public boolean isclearDataInd() {
-		return clearDataInd;
-	}
-
-	/**
-	 * Compare the time range with a Data Request.
-	 * 
-	 * @param trange
-	 * @return
-	 */
-	public boolean equalTime(StateDataRequest otherRequest) {
-		TmfTimeRange trange = otherRequest.getRange();
-		TmfTimeRange myTimeRange = getRange();
-		TmfTimestamp myStartTime = myTimeRange.getStartTime();
-		TmfTimestamp myEndTime = myTimeRange.getEndTime();
-		
-		if (myStartTime.equals(trange.getStartTime())) {
-			if (myEndTime.equals(trange.getEndTime())) {
-				return true;
-			}
-		}
-		
-		return false;
 	}
 }

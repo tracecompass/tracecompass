@@ -116,24 +116,6 @@ public class TraceDebug {
 		return null;
 	}
 
-	public static boolean setDEBUG(boolean newValue) {
-		boolean oldValue = DEBUG;
-		DEBUG = newValue;
-		return oldValue;
-	}
-
-	public static boolean setINFO(boolean newValue) {
-		boolean oldValue = INFO;
-		INFO = newValue;
-		return oldValue;
-	}
-
-	public static boolean setWARN(boolean newValue) {
-		boolean oldValue = WARN;
-		WARN = newValue;
-		return oldValue;
-	}
-
 	public static boolean isDEBUG() {
 		return DEBUG;
 	}

@@ -69,7 +69,6 @@ public class LttngBdevState implements Cloneable {
     }
 	
     
-	@Override
 	@SuppressWarnings("unchecked")
     public LttngBdevState clone() {
 	    LttngBdevState newState = null;

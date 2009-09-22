@@ -11,11 +11,13 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.state.evProcessor.state;
 
+import java.util.List;
 
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
+import org.eclipse.linuxtools.lttng.event.LttngEventField;
 import org.eclipse.linuxtools.lttng.state.StateStrings;
-import org.eclipse.linuxtools.lttng.state.StateStrings.ExecutionMode;
+import org.eclipse.linuxtools.lttng.state.StateStrings.Fields;
 import org.eclipse.linuxtools.lttng.state.StateStrings.IRQMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessStatus;
 import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
@@ -25,10 +27,10 @@ import org.eclipse.linuxtools.lttng.state.model.LttngExecutionState;
 import org.eclipse.linuxtools.lttng.state.model.LttngIRQState;
 import org.eclipse.linuxtools.lttng.state.model.LttngProcessState;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
+import org.eclipse.linuxtools.tmf.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
-public abstract class AbsStateUpdate extends AbsStateProcessing implements
-		IEventProcessing {
+public abstract class AbsStateUpdate implements IEventProcessing {
 
 	// ========================================================================
 	// Data
@@ -45,10 +47,11 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 		LttngExecutionState exe_state = new LttngExecutionState();
 		exe_state.setExec_mode(execMode);
 		exe_state.setExec_submode(submode);
-		exe_state.setEntry_Time(eventTime.getValue());
-		exe_state.setChange_Time(eventTime.getValue());
+		exe_state.setEntry_Time(eventTime);
+		exe_state.setChange_Time(eventTime);
 		exe_state.setCum_cpu_time(0L);
 		exe_state.setProc_status(process.getState().getProc_status());
+		process.setState(exe_state);
 		process.pushToExecutionStack(exe_state);
 	}
 
@@ -66,9 +69,9 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 			return;
 		}
 
-		//The process state is updated within the pop method
 		process.popFromExecutionStack();
-		process.getState().setChange_Time(eventTime.getValue());
+		process.setState(process.peekFromExecutionStack());
+		process.getState().setChange_Time(eventTime);
 	}
 
 	protected void irq_push_mode(LttngIRQState irqst, IRQMode state) {
@@ -155,6 +158,185 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 	// ========================================================================
 	// General methods
 	// =======================================================================
+	/**
+	 * protected method used when only one Field is expected with Type "Long" if
+	 * the number of fields is greater, the first field is returned and a
+	 * tracing message is sent Null is returned if the value could not be
+	 * extracted.
+	 * 
+	 * @param trcEvent
+	 * @param traceSt
+	 * @param expectedNumFields
+	 * @return
+	 */
+	protected Long getDField(LttngEvent trcEvent, LttngTraceState traceSt,
+			Fields expectedField) {
+		Long fieldVal = null;
+		TmfEventField[] fields = trcEvent.getContent().getFields();
+		String[] fieldLabels = trcEvent.getContent().getFormat().getLabels();
+
+		// Only one field expected
+		if (fields.length != 1 || fieldLabels.length != 1) {
+			StringBuilder sb = new StringBuilder(
+					"Unexpected number of fields received: " + fields.length
+							+ " for Event: " + trcEvent.getMarkerName() + "\n\t\tFields: ");
+
+			for (TmfEventField field : fields) {
+				sb.append(((LttngEventField)field).getName() + " ");				
+			}
+
+			TraceDebug.debug(sb.toString());
+			if (fields.length == 0) {
+				return null;
+			}
+		}
+
+		LttngEventField field = (LttngEventField) fields[0];
+		String fieldname = field.getName();
+		String expectedFieldName = expectedField.getInName();
+		if (fieldname.equals(expectedFieldName)) {
+			Object fieldObj = field.getValue();
+			if (fieldObj instanceof Long) {
+				// Expected value found
+				fieldVal = (Long) field.getValue();
+			} else {
+				if (TraceDebug.isDEBUG()) {
+					TraceDebug
+							.debug("Unexpected field Type. Expected: Long, Received: "
+									+ fieldObj.getClass().getSimpleName());
+				}
+				return null;
+			}
+		} else {
+			TraceDebug.debug("Unexpected field received: " + fieldname
+					+ " Expected: " + expectedFieldName);
+			return null;
+		}
+
+		return fieldVal;
+	}
+
+	/**
+	 * protected method used when a Field is requested among several available
+	 * fields and the expected type is Long
+	 * 
+	 * @param trcEvent
+	 * @param traceSt
+	 * @param expectedNumFields
+	 * @return
+	 */
+	protected Long getAFieldLong(LttngEvent trcEvent, LttngTraceState traceSt,
+			Fields expectedField) {
+		Long fieldVal = null;
+		TmfEventField[] fields = trcEvent.getContent().getFields();
+
+		// At least one field expected
+		if (fields.length == 0) {
+			TraceDebug.debug("Unexpected number of fields received: "
+					+ fields.length);
+			return null;
+		}
+
+		LttngEventField field;
+		String fieldname;
+		String expectedFieldName = expectedField.getInName();
+		for (int i = 0; i < fields.length; i++) {
+			field = (LttngEventField) fields[i];
+			fieldname = field.getName();
+			if (fieldname.equals(expectedFieldName)) {
+				Object fieldObj = field.getValue();
+				if (fieldObj instanceof Long) {
+					// Expected value found
+					fieldVal = (Long) field.getValue();
+					// if (expectedField == Fields.LTT_FIELD_TYPE) {
+					// TraceDebug.debug("Field Type value is: " + fieldVal);
+					// }
+					break;
+				} else {
+					if (TraceDebug.isDEBUG()) {
+						TraceDebug
+								.debug("Unexpected field Type. Expected: Long, Received: "
+										+ fieldObj.getClass().getSimpleName());
+					}
+					return null;
+				}
+			}
+		}
+
+		if (fieldVal == null) {
+			if (TraceDebug.isDEBUG()) {
+				sendNoFieldFoundMsg(fields, expectedFieldName);
+			}
+		}
+		return fieldVal;
+	}
+
+	/**
+	 * protected method used when a Field is requested among several available
+	 * fields and the expected type is String
+	 * 
+	 * @param trcEvent
+	 * @param traceSt
+	 * @param expectedNumFields
+	 * @return
+	 */
+	protected String getAFieldString(LttngEvent trcEvent,
+			LttngTraceState traceSt, Fields expectedField) {
+		String fieldVal = null;
+		TmfEventField[] fields = trcEvent.getContent().getFields();
+
+		// Only one field expected
+		if (fields.length == 0) {
+			TraceDebug.debug("Unexpected number of fields received: "
+					+ fields.length);
+			return null;
+		}
+
+		LttngEventField field;
+		String fieldname;
+		String expectedFieldName = expectedField.getInName();
+		for (int i = 0; i < fields.length; i++) {
+			field = (LttngEventField) fields[i];
+			fieldname = field.getName();
+			if (fieldname.equals(expectedFieldName)) {
+				Object fieldObj = field.getValue();
+				if (fieldObj instanceof String) {
+					// Expected value found
+					fieldVal = (String) field.getValue();
+					break;
+				} else {
+					if (TraceDebug.isDEBUG()) {
+						TraceDebug
+								.debug("Unexpected field Type. Expected: String, Received: "
+										+ fieldObj.getClass().getSimpleName());
+					}
+					return null;
+				}
+			}
+		}
+
+		if (fieldVal == null) {
+			if (TraceDebug.isDEBUG()) {
+				sendNoFieldFoundMsg(fields, expectedFieldName);
+			}
+		}
+		return fieldVal;
+	}
+
+	protected void sendNoFieldFoundMsg(TmfEventField[] fields,
+			String expectedFieldName) {
+		LttngEventField field;
+		StringBuilder sb = new StringBuilder("Field not found, requested: "
+				+ expectedFieldName);
+		sb.append(" number of fields: " + fields.length + "Fields: ");
+		for (int i = 0; i < fields.length; i++) {
+			field = (LttngEventField) fields[i];
+			sb.append(field.getName() + " ");
+		}
+
+		TraceDebug.debug(sb.toString(), 5);
+	}
+
 	// Adaption from MKDEV macro
 	protected Long mkdev(Long major, Long minor) {
 		Long result = null;
@@ -167,7 +349,7 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 	/*
 	 * FIXME : this function should be called when we receive an event telling
 	 * that release_task has been called in the kernel. In happens generally
-	 * when the parent waits for its child termination, but may also happen in
+	 * when the parent waits for its child terminaison, but may also happen in
 	 * special cases in the child's exit : when the parent ignores its children
 	 * SIGCCHLD or has the flag SA_NOCLDWAIT. It can also happen when the child
 	 * is part of a killed thread group, but isn't the leader.
@@ -184,9 +366,62 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 
 		process.clearExecutionStack();
 		process.clearUserStack();
-		ts.removeProcessState(process);
+		ts.getProcesses().remove(process);
 
 		return true;
+	}
+
+	/**
+	 * Find the process matching the given pid and cpu
+	 * 
+	 * If cpu is 0, the cpu value is not matched and the selection is based on
+	 * pid value only
+	 * 
+	 * @param ts
+	 * @param cpu
+	 * @param pid
+	 * @return
+	 */
+	protected LttngProcessState lttv_state_find_process(LttngTraceState ts,
+			Long cpu, Long pid) {
+		// Define the return value
+		LttngProcessState process = null;
+
+		// Obtain the list of available processes
+		List<LttngProcessState> processList = ts.getProcesses();
+
+		// find the process matching pid and cpu,
+		// TODO: This may need to be improved since the pid may be re-used and
+		// the creation time may need to be considered.
+		// NOTE: A hash search shall be used
+		for (LttngProcessState dprocess : processList) {
+			if (dprocess.getPid().equals(pid)) {
+				if (dprocess.getCpu().equals(cpu) || cpu.longValue() == 0L) {
+					return dprocess;
+				}
+			}
+		}
+
+		return process;
+	}
+
+	/**
+	 * @param ts
+	 * @param cpu
+	 * @param pid
+	 * @param timestamp
+	 *            , Used when a new process is needed
+	 * @return
+	 */
+	protected LttngProcessState lttv_state_find_process_or_create(
+			LttngTraceState ts, Long cpu, Long pid, final TmfTimestamp timestamp) {
+
+		LttngProcessState process = lttv_state_find_process(ts, cpu, pid);
+		/* Put ltt_time_zero creation time for unexisting processes */
+		if (process == null) {
+			process = create_process(ts, cpu, pid, 0L, timestamp);
+		}
+		return process;
 	}
 
 	/**
@@ -217,33 +452,8 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 			Long cpu, Long pid, Long tgid, String name,
 			final TmfTimestamp timestamp) {
 		LttngProcessState process;
-		process = new LttngProcessState(cpu, pid, tgid, name, timestamp.getValue(), traceSt.getTraceId());
-		traceSt.addProcessState(process);
-		return process;
-	}
-
-	/**
-	 * @param ts
-	 * @param cpu
-	 * @param pid
-	 * @param timestamp
-	 *            , Used when a new process is needed
-	 * @return
-	 */
-	protected LttngProcessState lttv_state_find_process_or_create(
-			LttngTraceState ts, Long cpu, Long pid, final TmfTimestamp timestamp) {
-	
-		LttngProcessState process = lttv_state_find_process(ts, cpu, pid);
-		/* Put ltt_time_zero creation time for non existing processes */
-		if (process == null) {
-			process = create_process(ts, cpu, pid, 0L, timestamp);
-			// leave only one entry in the execution stack
-			process.popFromExecutionStack();
-			LttngExecutionState es = process.getState();
-			es.setExec_mode(ExecutionMode.LTTV_STATE_MODE_UNKNOWN);
-			es.setProc_status(ProcessStatus.LTTV_STATE_UNNAMED);
-		}
-	
+		process = new LttngProcessState(cpu, pid, tgid, name, timestamp);
+		traceSt.getProcesses().add(process);
 		return process;
 	}
 

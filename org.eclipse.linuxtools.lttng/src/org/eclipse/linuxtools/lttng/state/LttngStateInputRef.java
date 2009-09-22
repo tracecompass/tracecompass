@@ -11,9 +11,8 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.state;
 
+import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.lttng.state.model.ILttngStateInputRef;
-import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
-import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
 
@@ -24,26 +23,18 @@ import org.eclipse.linuxtools.tmf.trace.TmfTrace;
  * 
  */
 public class LttngStateInputRef implements ILttngStateInputRef {
-	
-	private int cpuNumber = -1;
-	
 	// ========================================================================
 	// Table data
 	// =======================================================================
+	JniTrace trace = null;
 	TmfTrace log = null;
 
 	// ========================================================================
 	// Constructor
 	// ========================================================================
-	LttngStateInputRef(TmfTrace log) {
+	LttngStateInputRef(JniTrace trace, TmfTrace log) {
+		this.trace = trace;
 		this.log = log;
-		
-		if ( log instanceof LTTngTrace) {
-			cpuNumber = ((LTTngTrace)log).getCpuNumber();
-		}
-		else if ( log instanceof LTTngTextTrace) {
-			cpuNumber = ((LTTngTextTrace)log).getCpuNumber();
-		}
 	}
 
 	// ========================================================================
@@ -57,7 +48,10 @@ public class LttngStateInputRef implements ILttngStateInputRef {
 	 */
 	// @Override
 	public int getNumberOfCpus() {
-		return cpuNumber;
+		if (trace != null) {
+			return trace.getCpuNumber();
+		}
+		return 0;
 	}
 
 	/*
