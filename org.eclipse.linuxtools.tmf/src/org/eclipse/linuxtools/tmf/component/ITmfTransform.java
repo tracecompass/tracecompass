@@ -13,11 +13,14 @@
 package org.eclipse.linuxtools.tmf.component;
 
 /**
- * <b><u>ITmfComponent</u></b>
+ * <b><u>ITmfTransform</u></b>
  * <p>
  * TODO: Implement me. Please.
  */
-public interface ITmfComponent {
+public interface ITmfTransform {
 
-	public void dispose();
+	/**
+	 * 
+	 */
+	public void transformData();
 }

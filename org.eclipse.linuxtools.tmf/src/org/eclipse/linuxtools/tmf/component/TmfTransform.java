@@ -17,11 +17,6 @@ package org.eclipse.linuxtools.tmf.component;
  * <p>
  * TODO: Implement me. Please.
  */
-public abstract class TmfTransform implements ITmfComponent {
+public abstract class TmfTransform extends TmfComponent implements ITmfTransform  {
 
-	/**
-	 * 
-	 */
-	public void transformData() {
-	}
 }
