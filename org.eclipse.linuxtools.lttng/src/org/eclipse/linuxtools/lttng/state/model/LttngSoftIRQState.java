@@ -33,7 +33,8 @@ public class LttngSoftIRQState implements Cloneable {
 		running = 0L;
 	}
 	
-    public LttngSoftIRQState clone() {
+    @Override
+	public LttngSoftIRQState clone() {
         LttngSoftIRQState newState = null;
         
         try {

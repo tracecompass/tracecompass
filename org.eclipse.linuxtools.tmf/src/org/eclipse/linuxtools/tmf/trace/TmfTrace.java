@@ -254,8 +254,7 @@ public abstract class TmfTrace implements ITmfTrace, ITmfRequestHandler<TmfEvent
 	 * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#getNextEvent(org.eclipse.linuxtools.tmf.trace.ITmfTrace.TraceContext)
 	 */
 	public synchronized TmfEvent getNextEvent(TmfTraceContext context) {
-		seekLocation(context.location);
-		TmfEvent event = parseEvent();
+		TmfEvent event = parseEvent(context);
 		if (event != null) {
 			context.location = getCurrentLocation();
 			context.timestamp = event.getTimestamp();
@@ -270,7 +269,7 @@ public abstract class TmfTrace implements ITmfTrace, ITmfRequestHandler<TmfEvent
      * @return
      */
 	public abstract Object getCurrentLocation();
-    public abstract TmfEvent parseEvent();
+    public abstract TmfEvent parseEvent(TmfTraceContext context);
 
 	/**
 	 * Hook for "special" processing by the extending class

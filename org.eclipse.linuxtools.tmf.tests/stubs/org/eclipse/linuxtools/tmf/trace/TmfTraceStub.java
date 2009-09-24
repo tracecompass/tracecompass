@@ -106,18 +106,20 @@ public class TmfTraceStub extends TmfTrace {
 	 * @see org.eclipse.linuxtools.tmf.trace.TmfTrace#parseEvent()
 	 */
 	@Override
-	public TmfEvent parseEvent() {
-		try {
-			TmfEvent event = fParser.parseNextEvent(this);
-			return event;
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
+	public synchronized TmfEvent parseEvent(TmfTraceContext context) {
+       	try {
+       		fTrace.seek((context.location != null) ? (Long) context.location : 0);
+      		TmfEvent event = fParser.parseNextEvent(this);
+      		context = new TmfTraceContext(getCurrentLocation(), null, 0);
+       		return event;
+       	}
+       	catch (IOException e) {
+       		e.printStackTrace();
+       	}
+       	return null;
 	}
 
-    // ========================================================================
+	// ========================================================================
     // Helper functions
     // ========================================================================
 

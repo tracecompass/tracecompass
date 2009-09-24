@@ -34,6 +34,7 @@ public class LttngIRQState implements Cloneable {
 		mode_stack.push(IRQMode.LTTV_IRQ_UNKNOWN);
 	}
 	
+	@Override
 	@SuppressWarnings("unchecked")
     public LttngIRQState clone() {
 	    LttngIRQState newState = null;

@@ -34,19 +34,25 @@ import org.eclipse.ui.PlatformUI;
 @SuppressWarnings("restriction")
 public class ProjectLabelProvider implements ILabelProvider {
 
-    private final Image fLTTngImage;
+	@SuppressWarnings("unused")
+	private final String fLTTngTraceIconFile = "icons/garland16.png";
+	private final String fLTTngExperimentIconFile = "icons/garland16.png";
+
+	@SuppressWarnings("unused")
+	private final Image fLTTngTraceIcon;
+	private final Image fLTTngExperimentIcon;
 
     public ProjectLabelProvider() {
-        String filename = "icons/logo16.png";
         LTTngUiPlugin plugin = LTTngUiPlugin.getDefault();
-        Image image = plugin.getImageRegistry().get(filename);
+        Image image = plugin.getImageRegistry().get(fLTTngExperimentIconFile);
         if (image == null) {
-            URL url = plugin.getBundle().getEntry(filename);
+            URL url = plugin.getBundle().getEntry(fLTTngExperimentIconFile);
             ImageDescriptor descriptor = ImageDescriptor.createFromURL(url);
             image = descriptor.createImage();
         }
         
-        fLTTngImage = image;
+        fLTTngExperimentIcon = image;
+        fLTTngTraceIcon = null;
     }
 
 	public Image getImage(Object element) {
@@ -57,7 +63,7 @@ public class ProjectLabelProvider implements ILabelProvider {
 			return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
 		}
 		if (element instanceof File) {
-			return fLTTngImage;
+			return fLTTngExperimentIcon;
 		}
 		return null;
 	}

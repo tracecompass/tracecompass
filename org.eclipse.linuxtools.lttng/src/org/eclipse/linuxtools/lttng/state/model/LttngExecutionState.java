@@ -31,7 +31,8 @@ public class LttngExecutionState implements Cloneable {
 	private StateStrings.ExecutionMode exec_mode = StateStrings.ExecutionMode.LTTV_STATE_MODE_UNKNOWN;
 	private String exec_submode = StateStrings.ExecutionSubMode.LTTV_STATE_SUBMODE_UNKNOWN.getInName();
 	
-    public LttngExecutionState clone() {
+    @Override
+	public LttngExecutionState clone() {
 	    LttngExecutionState newState = null;
         
         try {

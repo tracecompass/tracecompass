@@ -88,7 +88,8 @@ public class LTTngTrace extends TmfTrace {
 	 * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#parseNextEvent()
 	 */
 	@Override
-	public synchronized TmfEvent parseEvent() {
+	public synchronized TmfEvent parseEvent(TmfTraceContext context) {
+		seekLocation(context.location);
     	JniEvent jniEvent = currentJniTrace.readNextEvent();
     	currentLttngEvent = convertJniEventToTmf(jniEvent);
         return currentLttngEvent;
@@ -173,6 +174,7 @@ public class LTTngTrace extends TmfTrace {
      * 
      * @return LttngTimestamp The current LTT timestamp, in long. Unit is nanosecond.
      */
+	@Override
 	public Object getCurrentLocation() {
         LttngTimestamp returnedLocation = null;
         JniEvent tmpJniEvent = currentJniTrace.findNextEvent();
@@ -212,7 +214,8 @@ public class LTTngTrace extends TmfTrace {
         return new TmfTraceContext(ts, ts, 0);
 	}
 
-	   public String toString() {
+	   @Override
+	public String toString() {
 	    	String result="";
 
 	    	result += "Path :" + getPath() + " ";

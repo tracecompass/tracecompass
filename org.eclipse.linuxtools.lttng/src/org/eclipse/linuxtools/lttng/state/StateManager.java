@@ -445,6 +445,7 @@ public class StateManager extends Observable {
 				eventCount++;
 			}
 
+			@Override
 			public void handleCompleted() {
 				requestCompleted();
 				// notify the associated listener
@@ -494,6 +495,7 @@ public class StateManager extends Observable {
 				eventCount++;
 			}
 
+			@Override
 			public void handleCompleted() {
 				requestCompleted();
 

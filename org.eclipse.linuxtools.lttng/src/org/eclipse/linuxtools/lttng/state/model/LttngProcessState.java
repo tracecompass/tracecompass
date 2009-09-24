@@ -107,6 +107,7 @@ public class LttngProcessState implements Cloneable {
 		this.state = es;
 	}
 	
+	@Override
 	@SuppressWarnings("unchecked")
     public LttngProcessState clone() {
 	    LttngProcessState newState = null;

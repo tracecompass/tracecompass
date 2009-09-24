@@ -111,9 +111,11 @@ public class LTTngTraceStub extends TmfTrace {
 	 * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#parseEvent()
 	 */
 	@Override
-	public TmfEvent parseEvent() {
+	public synchronized TmfEvent parseEvent(TmfTraceContext context) {
        	try {
-       		TmfEvent event = fParser.parseNextEvent(this);
+       		fTrace.seek((context != null) ? (Long) context.location : 0);
+      		TmfEvent event = fParser.parseNextEvent(this);
+      		context = new TmfTraceContext(getCurrentLocation(), null, 0);
        		return event;
        	}
        	catch (IOException e) {

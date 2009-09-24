@@ -108,6 +108,7 @@ public class LttngTraceState implements Cloneable {
 	// =======================================================================
 	// Methods
 	// =======================================================================
+	@Override
 	public LttngTraceState clone() {
 		LttngTraceState newState = null;
 
