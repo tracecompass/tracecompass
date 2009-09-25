@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.lttng.jni;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * <b><u>JniParser</u></b>
@@ -110,28 +111,44 @@ public class JniParser extends Jni_C_Common
      * @see org.eclipse.linuxtools.lttng.jni.JniEvent
      */
     static public HashMap<String, Object> parseAllFields(JniEvent eventToParse) {
-        JniMarker markerData = eventToParse.requestEventMarker();
-        int nbMarkerField = markerData.getMarkerFieldsArrayList().size();
-        
-         // This hashmap will contain the parsed content.
-         // ParsedContent is defined at the end of this file
-         HashMap<String, Object> parsedDataArray = new HashMap<String, Object>(nbMarkerField);
-        
-         // *** HACK ***
-         // We cannot use "Object" directly as java does not support swapping on primitive value
-         //  We either need to create a new object type or to use a "non-primitive" type that have "Setter()" functions
-         // ***
-         ParsedObjectContent parsedData = new ParsedObjectContent();
-         
-        // Loop on markerfield, as we need to parse each field in the event data
-        for (int pos = 0; pos < nbMarkerField; pos++) {
-            // Call the C to parse the data
-            ltt_getParsedData(parsedData, eventToParse.getEventPtr().getPointer(), markerData.getMarkerFieldsArrayList().get(pos).getMarkerFieldPtr().getPointer() );
-            // Save the result into the HashMap
-            parsedDataArray.put(markerData.getMarkerFieldsArrayList().get(pos).getField(), parsedData.getData() );
-        }
-        
-         return parsedDataArray;
+		HashMap<String,JniMarkerField> markerFieldData = eventToParse.requestEventMarker().getMarkerFieldsHashMap();
+		
+		 // This hashmap will contain the parsed content.
+		 // ParsedContent is a local class defined at the end of this file
+		
+		 // *** HACK ***
+		 // We want (need?) the map that contain the parsed data to be in the same order as markerField map
+		 // The "instinctive way" would be to use : 
+		 //       HashMap<String, Object> parsedDataMap = new HashMap<String, Object>(nbMarkerField);
+		 //
+		 // However, we cannot ensure that the newly created hashmap will use the same order.
+		 // The hard way would be to override the default hash function for both hashmap
+		 // However, this is way easier to abuse the fact that both hashmap are of type <String, something...>
+		 // Therefore we can abuse the java-cast with clone() : 
+		 //       HashMap<String, Object> parsedDataMap = (HashMap<String, Object>)markerFieldData.clone();
+		 // Or even safer, use HashMap constructor to do so : 
+		 HashMap<String, Object> parsedDataMap = new HashMap<String, Object>(markerFieldData);
+		 
+		 // *** HACK ***
+		 // We cannot use "Object" directly as java does not support swapping on primitive value
+		 //  We either need to create a new object type or to use a "non-primitive" type that have "Setter()" functions
+		 // ***
+		 ParsedObjectContent parsedData = new ParsedObjectContent();
+		 
+		 String				newKey 	 = null; 
+		 JniMarkerField 	newValue = null;
+		 Iterator<String> 	iterator = markerFieldData.keySet().iterator();
+		 
+		 while ( iterator.hasNext() ) {
+			 newKey = iterator.next();
+			 newValue = markerFieldData.get(newKey);
+			 // Call the C to parse the data
+			 ltt_getParsedData(parsedData, eventToParse.getEventPtr().getPointer(), newValue.getMarkerFieldPtr().getPointer() );
+		 	 // Save the result into the HashMap
+			 parsedDataMap.put(newValue.getField(), parsedData.getData() );
+		 }
+		 
+		 return parsedDataMap;
     }
     
     /* 

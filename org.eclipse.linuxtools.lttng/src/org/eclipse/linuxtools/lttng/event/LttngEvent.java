@@ -1,8 +1,10 @@
 package org.eclipse.linuxtools.lttng.event;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
+import org.eclipse.linuxtools.lttng.LttngException;
 
 /**
  * <b><u>LttngEvent</u></b>
@@ -16,7 +18,7 @@ import org.eclipse.linuxtools.lttng.jni.JniEvent;
 @SuppressWarnings("unused")
 public class LttngEvent extends TmfEvent {
     // Reference to the JNI JniEvent. Should only used INTERNALLY
-    JniEvent jniEventReference = null;
+    private JniEvent jniEventReference = null;
     
     /**
      * Constructor with parameters <br>
@@ -37,11 +39,33 @@ public class LttngEvent extends TmfEvent {
      * @see org.eclipse.linuxtools.lttng.jni.JniEvent
      * 
      */
-    public LttngEvent(LttngTimestamp timestamp, LttngEventSource source, LttngEventType type, LttngEventContent content, LttngEventReference reference, JniEvent lttEvent) { 
+    public LttngEvent(LttngTimestamp timestamp, TmfEventSource source, LttngEventType type, LttngEventContent content, LttngEventReference reference, JniEvent lttEvent) throws LttngException { 
         super(timestamp, source, type, content, reference);
+        
+        if ( (timestamp == null) || (source == null) || (type == null) || (content == null) || (reference == null) || (lttEvent == null) ) {
+        	throw new LttngException("Event creation with null values is forbidden!");
+        }
         
         jniEventReference = lttEvent;
     }
+    
+    /**
+     * Copy constructor <br>
+     * <br>
+     * 
+     * @param oldEvent		Event we want to copy from
+     * 
+     */
+    public LttngEvent(LttngEvent oldEvent) throws LttngException { 
+        this(	(LttngTimestamp)oldEvent.getTimestamp(), 
+        		(TmfEventSource)oldEvent.getSource(), 
+        		(LttngEventType)oldEvent.getType(), 
+        		(LttngEventContent)oldEvent.getContent(), 
+        		(LttngEventReference)oldEvent.getReference(), 
+        		oldEvent.jniEventReference
+        	);
+    }
+    
     
     /**
      * Return the channel name of this event<br>
@@ -107,5 +131,17 @@ public class LttngEvent extends TmfEvent {
         }
 
         return tmpEvent;
+    }
+    
+    @Override
+	public String toString() {
+    	String returnedData="";
+    	
+    	returnedData += "Event timestamp:" + this.getTimestamp().getValue() + " ";
+    	returnedData += "Channel:" + getChannelName() + " ";
+    	returnedData += "CPU Id:" + getCpuId() + " ";
+    	returnedData += "Marker:" + getMarkerName() + " ";
+    	
+    	return returnedData;
     }
 }

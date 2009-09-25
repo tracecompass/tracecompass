@@ -43,6 +43,17 @@ public class LttngEventType extends TmfEventType {
         markerName  = thisMarkerName;
     }
 
+    /**
+     * Copy constructor
+     * 
+     * @param oldType   type we want to copy from
+     * 
+     * @see org.eclipse.linuxtools.lttng.event.LttngEventFormat
+     */
+    public LttngEventType(LttngEventType oldType) {
+        this(oldType.channelName, oldType.cpuId, oldType.markerName, (LttngEventFormat)oldType.getFormat());
+    }
+    
     
     public String getChannelName() {
         return channelName;

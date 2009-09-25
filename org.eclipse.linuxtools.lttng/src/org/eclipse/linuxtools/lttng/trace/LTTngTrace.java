@@ -12,24 +12,31 @@
 
 package org.eclipse.linuxtools.lttng.trace;
 
-import java.io.FileNotFoundException;
-
+import org.eclipse.linuxtools.lttng.LttngException;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.event.LttngEventContent;
 import org.eclipse.linuxtools.lttng.event.LttngEventField;
 import org.eclipse.linuxtools.lttng.event.LttngEventFormat;
 import org.eclipse.linuxtools.lttng.event.LttngEventReference;
-import org.eclipse.linuxtools.lttng.event.LttngEventSource;
 import org.eclipse.linuxtools.lttng.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
-import org.eclipse.linuxtools.lttng.jni.JniException;
 import org.eclipse.linuxtools.lttng.jni.JniTime;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
+
+
+class LTTngTraceException extends LttngException {
+	static final long serialVersionUID = -1636648737081868146L;
+
+	public LTTngTraceException(String errMsg) {
+        super(errMsg);
+    }
+}
 
 /**
  * <b><u>LTTngTrace</u></b>
@@ -74,27 +81,169 @@ public class LTTngTrace extends TmfTrace {
     public LTTngTrace(String path, boolean waitForCompletion) throws Exception {
         super(path, CHECKPOINT_PAGE_SIZE, waitForCompletion);
         try {
-            currentJniTrace = new JniTrace(path);
+    		currentJniTrace = new JniTrace(path);
         }
-        catch (JniException e) {
-            throw new FileNotFoundException();
+        catch (Exception e) {
+            throw new LTTngTraceException(e.getMessage());
         }
         TmfTimestamp startTime = new LttngTimestamp(currentJniTrace.getStartTimeFromTimestampCurrentCounter().getTime());
         setTimeRange(new TmfTimeRange(startTime, startTime));
         indexStream();
     }
     
-	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#parseNextEvent()
-	 */
-	@Override
+    /*
+     * Copy constructor is forbidden for LttngEvenmStream
+     * 
+     * Events are only valid for a very limited period of time and
+     *   JNI library does not support multiple access at once (yet?).
+     * For this reason, copy constructor should NEVER be used here.
+     */
+    private LTTngTrace(LTTngTrace oldStream) throws Exception { 
+    	super(null);
+    	throw new Exception("Copy constructor should never be use with a LTTngTrace!");
+    }
+    
+    /** 
+     * Parse the next event in the trace
+     * 
+     * @return TmfEvent	 The parsed event, or null if none available.
+     * 
+     * 
+     * @see org.eclipse.linuxtools.lttng.jni.JniTrace
+     */ 
+    @Override
 	public synchronized TmfEvent parseEvent(TmfTraceContext context) {
-		seekLocation(context.location);
-    	JniEvent jniEvent = currentJniTrace.readNextEvent();
-    	currentLttngEvent = convertJniEventToTmf(jniEvent);
-        return currentLttngEvent;
-	}
 
+    	seekLocation(context.location);
+        JniEvent jniEvent = currentJniTrace.readNextEvent();
+        currentLttngEvent = convertJniEventToTmf(jniEvent, true);
+        context = new TmfTraceContext((LttngTimestamp) getCurrentLocation(), currentLttngEvent.getTimestamp(), context.index++);
+        
+        return currentLttngEvent;
+    }
+    
+    /*
+     * Method to convert a JniEvent into a LttngEvent.<br>
+     * <br>
+     * Note : This method will call LttngEvent convertEventJniToTmf(JniEvent, boolean)
+     * with a default value for isParsingNeeded
+     * 
+     * @param   newEvent     The JniEvent to convert
+     * 
+     * @return  LttngEvent   The converted event
+     * 
+     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
+     */
+	public LttngEvent convertJniEventToTmf(JniEvent newEvent) {
+    	LttngEvent event = null;
+    	if (newEvent != null)
+    		event = convertJniEventToTmf(newEvent, IS_PARSING_NEEDED_DEFAULT);
+    	return event;
+    }
+    
+    /*
+     * Method tp convert a JniEvent into a LttngEvent
+     * 
+     * @param   jniEvent        The JniEvent to convert
+     * @param   isParsingNeeded A boolean value telling if the event should be parsed or not.
+     * 
+     * @return  LttngEvent   The converted event
+     * 
+     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
+     */
+    public LttngEvent convertJniEventToTmf(JniEvent jniEvent, boolean isParsingNeeded) {
+    	
+    	// *** FIXME ***
+    	// Format seems weird to me... we need to revisit Format/Fields/Content to find a better ways
+    	//
+    	// Generate fields
+    	String[] labels = new String[jniEvent.requestEventMarker().getMarkerFieldsHashMap().size()];
+    	labels = jniEvent.requestEventMarker().getMarkerFieldsHashMap().keySet().toArray( labels );
+    	
+    	// We need a format for content and fields
+        LttngEventFormat eventFormat = new LttngEventFormat(labels);
+        String content = "";
+        LttngEventField[] fields = null;
+
+        if (isParsingNeeded == true) {
+            fields = eventFormat.parse(jniEvent.parseAllFields());
+            for (int y = 0; y < fields.length; y++) {
+                content += fields[y].toString() + " ";
+            }
+        }
+        
+        LttngEvent event = null;
+        try {
+        	event = new LttngEvent(
+	        			new LttngTimestamp(jniEvent.getEventTime().getTime()),
+	        			new TmfEventSource(jniEvent.requestEventSource() ), 
+	        			new LttngEventType(jniEvent.getParentTracefile().getTracefileName(),
+	                                       jniEvent.getParentTracefile().getCpuNumber(),
+	                                       jniEvent.requestEventMarker().getName(),
+	                                       eventFormat),
+	                    new LttngEventContent(eventFormat, content, fields), 
+	                    new LttngEventReference(jniEvent.getParentTracefile().getTracefilePath(), this.getName()),
+	                    jniEvent);
+        }
+        catch (LttngException e) {
+        	System.out.println("ERROR : Event creation returned :" + e.getMessage() );
+        }
+        
+        return event;
+    }
+    
+    /**
+     * Seek (move) to a certain location in the trace.
+     * <p>
+     * WARNING : No event is read by this function, it just seek to a certain time.<br>
+     * Use "parseNextEvent()" or "readNextEvent()" to get the event we seeked to. 
+     * 
+     * @param location  a TmfTimestamp of a position in the trace
+     * 
+     * @return StreamContext pointing the position in the trace JUST AFTER the seek location 
+     */
+    public TmfTraceContext seekLocation(Object location) {
+        
+        // If location is null, interpret this as a request to get back to the beginning of the trace
+        // Change the location, the seek will happen below
+    	if (location == null) {
+    		location = getStartTime();
+    	}
+    	
+    	if (location instanceof TmfTimestamp) {
+    		long value = ((TmfTimestamp) location).getValue();
+    		if (value != currentJniTrace.getCurrentEventTimestamp().getTime()) {
+    			currentJniTrace.seekToTime(new JniTime(value));
+    		}
+    	}
+    	else {
+    	    System.out.println("ERROR : Location not instance of TmfTimestamp");
+    	}
+    	
+        return new TmfTraceContext((LttngTimestamp) getCurrentLocation(), currentLttngEvent.getTimestamp(), 0);
+    }
+    
+    /**
+     * Return location (timestamp) of our current position in the trace.
+     * 
+     * @return LttngTimestamp  The time JUST AFTER the current event or AFTER endTime if no more event is available.
+     */
+    @Override
+	public Object getCurrentLocation() {
+        
+        LttngTimestamp returnedLocation = null;
+        JniEvent tmpJniEvent = currentJniTrace.findNextEvent();
+        
+        if ( tmpJniEvent != null  ) {
+            returnedLocation = new LttngTimestamp(tmpJniEvent.getEventTime().getTime() + 1);
+        }
+        else {
+            returnedLocation = new LttngTimestamp( getEndTime().getValue() + 1 );
+        }
+        
+        return returnedLocation;
+    }
+    
     /**
      * Return a reference to the current LttngTrace we are reading from.
      * 
@@ -107,7 +256,7 @@ public class LTTngTrace extends TmfTrace {
     
     
     /**
-     * Return a reference to the current LttngEvent we are reading.
+     * Return a reference to the current LttngEvent we have in memory.
      * 
      * @return LttngEvent
      * @see org.eclipse.linuxtools.lttng.event.LttngEvent
@@ -117,121 +266,40 @@ public class LTTngTrace extends TmfTrace {
     }
     
     
-    /**
-     * Method to convert a JniEvent into a LttngEvent.<br>
-     * <br>
-     * Note : This method will call LttngEvent convertEventJniToTmf(JniEvent, boolean)
-     * with a default value for isParsingNeeded
-     * 
-     * @param   newEvent     The JniEvent to convert
-     * @return  LttngEvent   The converted event
-     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
-     */
-    private LttngEvent convertJniEventToTmf(JniEvent newEvent) {
-    	LttngEvent event = null;
-    	if (newEvent != null)
-    		event = convertJniEventToTmf(newEvent, IS_PARSING_NEEDED_DEFAULT);
-    	return event;
-    }
-    
-    /**
-     * Method tp convert a JniEvent into a LttngEvent
-     * 
-     * @param   jniEvent        The JniEvent to convert
-     * @param   isParsingNeeded A boolean value telling if the event should be parsed or not.
-     * @return  LttngEvent   The converted event
-     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
-     */
-    public LttngEvent convertJniEventToTmf(JniEvent jniEvent, boolean parsingIsNeeded) {
-        LttngEventFormat eventFormat = new LttngEventFormat();
-        String content = "";
-        LttngEventField[] fields = null;
-
-        if (parsingIsNeeded) {
-            fields = eventFormat.parse(jniEvent.parseAllFields());
-            for (int y = 0; y < fields.length; y++) {
-                content += fields[y].toString() + " ";
-            }
-        }
-        
-        LttngEvent event = new LttngEvent(
-        		new LttngTimestamp(jniEvent.getEventTime().getTime()),
-                new LttngEventSource(jniEvent.requestEventSource() ), 
-                new LttngEventType(jniEvent.getParentTracefile().getTracefileName(),
-                                   jniEvent.getParentTracefile().getCpuNumber(),
-                                   jniEvent.requestEventMarker().getName(),
-                                   eventFormat),
-                new LttngEventContent(eventFormat, content, fields), 
-                new LttngEventReference(jniEvent.getParentTracefile().getTracefilePath(), this.getName()),
-                jniEvent);
-        
-        return event;
-    }
-    
-    
-    /**
-     * Return location (timestamp) of our current position in the trace.
-     * 
-     * @return LttngTimestamp The current LTT timestamp, in long. Unit is nanosecond.
-     */
-	@Override
-	public Object getCurrentLocation() {
-        LttngTimestamp returnedLocation = null;
-        JniEvent tmpJniEvent = currentJniTrace.findNextEvent();
-        
-        if (tmpJniEvent != null) {
-            returnedLocation = new LttngTimestamp(tmpJniEvent.getEventTime().getTime());
-        }
-        
-        return returnedLocation;
-    }
-    
-    /**
-     * Seek (move) to a certain location in the trace.
-     * 
-     * @param location  a LttngTimestamp of a position in the trace
-     * @return StreamContext pointing to the current (after seek) position in the trace
-     */
-	public synchronized TmfTraceContext seekLocation(Object location) {
-        
-        // If location is null, interpret this as a request to get back to the beginning of the trace
-        // Change the location, the seek will happen below
-    	if (location == null) {
-    		location = getStartTime();
-    	}
-    	
-    	if (location instanceof LttngTimestamp) {
-    		long value = ((LttngTimestamp) location).getValue();
-    		if (value != currentJniTrace.getCurrentEventTimestamp().getTime()) {
-    			currentJniTrace.seekToTime(new JniTime(value));
-    		}
-    	}
-    	else {
-    	    System.out.println("ERROR : Location not instance of TmfTimestamp");
-    	}
-
-    	LttngTimestamp ts = (LttngTimestamp) getCurrentLocation();
-        return new TmfTraceContext(ts, ts, 0);
-	}
-
-	   @Override
+    @Override
 	public String toString() {
-	    	String result="";
-
-	    	result += "Path :" + getPath() + " ";
-	    	result += "Trace:" + currentJniTrace + " ";
-	    	result += "Event:" + currentLttngEvent;
-	    	
-	    	return result;
-	    }
-	    
+    	String returnedData="";
+    	
+    	returnedData += "Path :" + getPath() + " ";
+    	returnedData += "Trace:" + currentJniTrace + " ";
+    	returnedData += "Event:" + currentLttngEvent;
+    	
+    	return returnedData;
+    }
+    
+    
 //    // !!! THIS MAIN IS FOR TESTING ONLY !!!
 //    public static void main(String[] args) {
 //
-//        LttngEventStream testStream = null;
+//        LTTngTrace testStream = null;
 //        try {
-//            testStream = new LttngEventStream("/home/william/trace1");
-//            Thread.sleep(5000);
+//        	
+//    		System.out.println("JAVA.LIBRARY.PATH : " + System.getProperty("java.library.path"));
+//    		
+//    		Map<String,String> testEnv = System.getenv();
+//    		
+//    		String new_key = null;
+//            String new_data = null;
+//            Iterator<String> iterator = testEnv.keySet().iterator();
+//            
+//            System.out.println("ENV : " );
+//            while (iterator.hasNext()) {
+//                new_key = iterator.next();
+//                new_data = testEnv.get(new_key);
+//                System.out.println("   " + new_key + ":" + new_data );
+//            }
+//        	
+//            testStream = new LTTngTrace("/home/william/trace1", true);
 //            
 //            System.out.println("NB Events : " + testStream.getNbEvents());
 //            System.out.println("Beginning test run parsing event");

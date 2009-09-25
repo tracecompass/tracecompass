@@ -331,11 +331,14 @@ public class JniTrace extends Jni_C_Common {
      */
     @SuppressWarnings("unused")
     private void addTracefileFromC(String tracefileName, long tracefilePtr) {
+        
+        JniTracefile newTracefile = null;
+            
         // Create a new tracefile object and insert it in the map
         //    the tracefile fill itself with LTT data while being constructed
         try {
-            JniTracefile newTracefile = new JniTracefile( new C_Pointer(tracefilePtr), this );
-            tracefilesMap.put(tracefileName, newTracefile);
+            newTracefile = new JniTracefile( new C_Pointer(tracefilePtr), this );
+            tracefilesMap.put(tracefileName + newTracefile.getCpuNumber(), newTracefile);
         }
         catch(JniTracefileWithoutEventException e) {
             printlnC("JniTracefile " + tracefileName + " has no event (addTracefileFromC). Ignoring.");
@@ -641,19 +644,23 @@ public class JniTrace extends Jni_C_Common {
          JniEvent tmpEvent = null;
          
          try {
-             testTrace = new JniTrace("/home/william/trace1");
+             //testTrace = new JniTrace("/home/william/trace1");
+             testTrace = new JniTrace("/home/william/trace5");
+             //testTrace = new JniTrace("/home/william/trace1_numcpu");
          }
          catch (JniException e) {
              System.out.println(e.getMessage() );
              return;
          }
          
-         
-         testTrace.printlnC( testTrace.toString() );
+//         testTrace.printAllTracefilesInformation();
+//         
+//         
+//         testTrace.printlnC( testTrace.toString() );
          
          long nbEvent = 0;
          
-         testTrace.printlnC("Beginning test run on 600k events");
+         testTrace.printlnC("Beginning test run on all events");
          tmpEvent = testTrace.readNextEvent();
          while (tmpEvent != null) {
              nbEvent++;

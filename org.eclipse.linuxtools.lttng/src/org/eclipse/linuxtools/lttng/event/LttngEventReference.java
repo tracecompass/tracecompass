@@ -23,7 +23,6 @@ import org.eclipse.linuxtools.tmf.event.*;
  */
 public class LttngEventReference extends TmfEventReference {
     
-    
     private String tracepath = ""; 
     
     /**
@@ -38,13 +37,28 @@ public class LttngEventReference extends TmfEventReference {
         tracepath = newTracePath;
     }
     
+    /**
+     * Copy Constructor
+     * 
+     * @param oldReference  Reference to copy
+     */
+    public LttngEventReference(LttngEventReference oldReference) {
+        this( oldReference.getValue().toString(), oldReference.getTracepath() );
+    }
+    
     
     public String getTracepath() {
         return tracepath;
     }
-
+    
     public void setTracepath(String tracepath) {
         this.tracepath = tracepath;
+    }
+    
+    
+    @Override
+	public String toString() {
+    	return tracepath + " " + this.getValue();
     }
     
 }

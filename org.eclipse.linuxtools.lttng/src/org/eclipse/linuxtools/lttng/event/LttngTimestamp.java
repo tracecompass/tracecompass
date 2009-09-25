@@ -24,17 +24,6 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 public class LttngTimestamp extends TmfTimestamp {
     
     /**
-     * Copy Constructor<br>
-     * <br>
-     * Note : this constructor require a TmfTimestamp instead of a LttngTimestamp to save us some casts
-     * 
-     * @param newEventTime    The TmfTimestamp object we want to copy
-     */
-    public LttngTimestamp(TmfTimestamp newEventTime) {
-        super(newEventTime);
-    }
-    
-    /**
      * Constructor with parameters
      * 
      * @param newEventTime    JniTime as long, unit expected to be nanoseconds.
@@ -44,37 +33,12 @@ public class LttngTimestamp extends TmfTimestamp {
     }
     
     /**
-     * toString() method.
+     * Copy Constructor<br>
      * 
-     * @return String  Attributes of this object.
+     * @param oldEventTime    The timestamp object we want to copy
      */
-    @Override
-	public String toString() {
-//        String returnData = "";
-//
-//        returnData += "[lttng_Timestamp: " + getValue() / Jni_C_Common.NANO;
-//        returnData += "." + getValue() % Jni_C_Common.NANO;
-//        returnData += " ]";
-//
-//        return returnData;
-
-        // If we are dealing with units of seconds (or higher),
-        // use the plain formatter
-        if (fScale >= 0) {
-            Double value = fValue * Math.pow(10, fScale);
-            return value.toString();
-        }
-
-        // Define a format string
-        String format = String.format("%%1d.%%0%dd", -fScale);
-
-        // And format the timestamp value
-        double scale = Math.pow(10, fScale);
-        long seconds = (long) (fValue * scale);
-        long fracts  = fValue - (long) ((double) seconds / scale); 
-        String result = String.format(format, seconds, fracts);
-
-        return result;
+    public LttngTimestamp(TmfTimestamp oldEventTime) {
+        this(oldEventTime.getValue());
     }
 
 	/**
@@ -149,4 +113,31 @@ public class LttngTimestamp extends TmfTimestamp {
 		return temp.toString();
 	}
 
+	
+    /**
+     * toString() method.
+     * 
+     * @return String  Attributes of this object.
+     */
+    @Override
+	public String toString() {
+
+        // If we are dealing with units of seconds (or higher),
+        // use the plain formatter
+        if (fScale >= 0) {
+            Double value = fValue * Math.pow(10, fScale);
+            return value.toString();
+        }
+
+        // Define a format string
+        String format = String.format("%%1d.%%0%dd", -fScale);
+
+        // And format the timestamp value
+        double scale = Math.pow(10, fScale);
+        long seconds = (long) (fValue * scale);
+        long fracts  = fValue - (long) ((double) seconds / scale); 
+        String result = String.format(format, seconds, fracts);
+
+        return result;
+    }
 }

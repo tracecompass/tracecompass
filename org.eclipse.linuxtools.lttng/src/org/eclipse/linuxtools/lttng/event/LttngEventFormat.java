@@ -29,20 +29,15 @@ public class LttngEventFormat extends TmfEventFormat {
     /**
      * Default constructor
      */
-    public LttngEventFormat() {
-        
+    public LttngEventFormat( String[] labels) {
+        super(labels);
     }
-
+    
     /**
-     * Getter for the label of the fields for this event.<br>
-     * 
-     * @return String[]     A string array that contain the labels name
+     * Copy constructor
      */
-    public String[] getLabels(LttngEvent thisEvent) {
-        String[] returnedLabels = null; 
-        returnedLabels = thisEvent.convertEventTmfToJni().requestEventMarker().getMarkerFieldsHashMap().keySet().toArray(returnedLabels);
-        
-        return returnedLabels;
+    public LttngEventFormat( LttngEventFormat oldFormat ) {
+        this(oldFormat.getLabels());
     }
     
     /**
@@ -110,26 +105,49 @@ public class LttngEventFormat extends TmfEventFormat {
         // - 3rd : Fill the array
         int fieldPosition = 0;
         
-        int lastFieldPos = 0;
+        int lastFieldnamePos = 0;
         int lastDoubleDottedPos = 0;
+        
         int lastSpacePos = 0;
         
-        for ( int pos = 0; pos < uselessContent.length(); pos++ ) {
+        boolean isSearchingFieldname = true;
+        
+        String  fieldName   = "";
+        String  fieldValue  = "";
+        
+        int pos = 0;
+        while ( (pos < uselessContent.length()) && (fieldPosition<nbFields) )
+        {
             if ( uselessContent.substring(pos, pos+1).equals(":") ) {
-                lastDoubleDottedPos = pos;
+              
+              if ( isSearchingFieldname==false ) {
+                  fieldValue = uselessContent.substring(lastDoubleDottedPos+1, lastSpacePos);
+                  tmpFields[fieldPosition] = new LttngEventField( fieldName, fieldValue );
+                  fieldPosition++;
+                  isSearchingFieldname = true;
+              }
+              
+              lastDoubleDottedPos = pos;
             }
             else if ( uselessContent.substring(pos, pos+1).equals(" ") ) {
-                lastSpacePos = pos;
                 
-                // ANOTHER highly unreliable assumption : 
-                //  Usually, most fields are in the form : "NAME : DATA"
-                //  We need to skip the space following the double dots
-                if ( pos > lastDoubleDottedPos+1 ) {
-                    tmpFields[fieldPosition] = new LttngEventField( uselessContent.substring(lastFieldPos, lastDoubleDottedPos), uselessContent.substring(lastDoubleDottedPos, lastSpacePos)  );
-                    
-                    lastFieldPos = pos;
+                if ( isSearchingFieldname==true ) {
+                    fieldName = uselessContent.substring(lastFieldnamePos, lastDoubleDottedPos);
+                    lastFieldnamePos = pos+1;
+                    isSearchingFieldname = false;
                 }
+                
+                lastSpacePos = pos;
             }
+            else if ( pos+2 >= uselessContent.length() ) {
+                fieldName = uselessContent.substring(lastSpacePos+1, lastDoubleDottedPos);
+                fieldValue = uselessContent.substring(lastDoubleDottedPos+1, pos+1);
+                
+                tmpFields[fieldPosition] = new LttngEventField( fieldName, fieldValue );
+                fieldPosition++;
+            }
+            
+            pos++;
         }
         
         return tmpFields;
