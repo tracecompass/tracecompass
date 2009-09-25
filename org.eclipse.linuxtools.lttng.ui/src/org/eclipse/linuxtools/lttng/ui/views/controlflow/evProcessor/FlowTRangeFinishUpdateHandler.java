@@ -13,6 +13,7 @@ package org.eclipse.linuxtools.lttng.ui.views.controlflow.evProcessor;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
+import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.state.StateStrings.Events;
 import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
 import org.eclipse.linuxtools.lttng.state.model.LttngProcessState;
@@ -21,6 +22,7 @@ import org.eclipse.linuxtools.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeComponent;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEvent;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventProcess;
+import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 /**
  * Creates specific finish state data request
@@ -38,10 +40,10 @@ public class FlowTRangeFinishUpdateHandler extends AbsFlowTRangeUpdate
 
 	public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 		// Draw a last known state to the end of the trace
-		long endReqTime = traceSt.getInputDataRef().getTraceTimeWindow()
-				.getEndTime().getValue();
+		TmfTimestamp endReqTime = traceSt.getInputDataRef()
+				.getTraceTimeWindow().getEndTime();
 		TraceDebug.debug("Number of localProcesses: "
-				+ procContainer.readProcesses().length);
+				+ procContainer.readProcesses().size());
 		// to identify the process relevant to the traceState
 		String traceId = traceSt.getTraceId();
 		int numLocalFound = 0;
@@ -72,14 +74,13 @@ public class FlowTRangeFinishUpdateHandler extends AbsFlowTRangeUpdate
 					if (prevEvent instanceof TimeRangeEvent) {
 						TimeRangeEvent prevTimeRange = (TimeRangeEvent) prevEvent;
 						// calculate the next good time to draw the event
-						// nextGoodTime = prevTimeRange.getStopTime() + 1;
-						nextGoodTime = localProcess.getNext_good_time();
+						nextGoodTime = prevTimeRange.getStopTime() + 1;
 						stateMode = prevTimeRange.getStateMode();
 
 						// Draw with the Local information since the current
 						// request did
 						// not contain events related to this process
-						makeDraw(traceSt, nextGoodTime,
+						makeDraw(traceSt, new LttngTimestamp(nextGoodTime),
 								endReqTime, localProcess, params, stateMode);
 					} else {
 						TraceDebug

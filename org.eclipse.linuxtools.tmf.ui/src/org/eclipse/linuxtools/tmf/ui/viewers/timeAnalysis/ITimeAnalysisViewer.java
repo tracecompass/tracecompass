@@ -60,7 +60,7 @@ public interface ITimeAnalysisViewer extends ITmfViewer {
 	public void addWidgetSelectionListner(ITmfTimeSelectionListener listener);
 
 	public void addWidgetTimeScaleSelectionListner(
-			ITmfTimeTimeScaleSelectionListener listener);
+			ITmfTimeScaleSelectionListener listener);
 
 	public void filterTraces();
 
@@ -75,7 +75,7 @@ public interface ITimeAnalysisViewer extends ITmfViewer {
 	public void removeWidgetSelectionListner(ITmfTimeSelectionListener listener);
 
 	public void removeWidgetTimeScaleSelectionListner(
-			ITmfTimeTimeScaleSelectionListener listener);
+			ITmfTimeScaleSelectionListener listener);
 
 	public void resetStartFinishTime();
 

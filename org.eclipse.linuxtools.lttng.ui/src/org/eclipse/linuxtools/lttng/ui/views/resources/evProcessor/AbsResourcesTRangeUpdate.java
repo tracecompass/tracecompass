@@ -11,10 +11,12 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.resources.evProcessor;
 
+import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
+import org.eclipse.linuxtools.lttng.state.model.LttngProcessState;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeComponent;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEvent;
@@ -43,16 +45,16 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 	// Methods
 	// =======================================================================
 	protected TimeRangeEventResource addLocalResource(long traceStartTime,
-			long traceEndTime, String traceId, ResourceTypes type, Long resId,
-			long insertionTime) {
+			long traceEndTime, String traceId, ResourceTypes type, Long resId) {
 
 		String resourceName = type.toString() + " " + resId.toString();
 		// Note : the "traceid" here is assigned to the "groupname" as we group
 		// by trace in the UI
 		TimeRangeEventResource localRessource = TimeRangeResourceFactory
-				.getInstance().createResource(resContainer.getUniqueId(),
-						traceStartTime, traceEndTime, resourceName, traceId,
-						"", type, resId, insertionTime);
+				.getInstance()
+				.createResource(
+				resContainer.getUniqueId(), traceStartTime, traceEndTime,
+				resourceName, traceId, "", type, resId);
 		resContainer.addResource(localRessource);
 		return localRessource;
 	}
@@ -87,6 +89,29 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 		}
 
 		return false;
+	}
+
+	public LttngProcessState lttv_state_find_process(
+			LttngTraceState traceState, Long cpu, Long pid) {
+		// Define the return value
+		LttngProcessState returnedProcess = null;
+
+		// Obtain the list of available processes
+		List<LttngProcessState> processList = traceState.getProcesses();
+
+		int pos = 0;
+		while ((pos < processList.size()) && (returnedProcess == null)) {
+			if (processList.get(pos).getPid().equals(pid)) {
+				if ((processList.get(pos).getCpu().equals(cpu))
+						|| (cpu.longValue() == 0L)) {
+					returnedProcess = processList.get(pos);
+				}
+			}
+
+			pos++;
+		}
+
+		return returnedProcess;
 	}
 
 	public TimeRangeEventResource resourcelist_obtain_bdev(
@@ -151,14 +176,14 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 					.getTraceTimeWindow();
 			localResource = addLocalResource(timeRange.getStartTime()
 					.getValue(), timeRange.getEndTime().getValue(), traceSt
-					.getTraceId(), ResourceTypes.CPU, cpu, trcEvent
-					.getTimestamp().getValue());
+					.getTraceId(), ResourceTypes.CPU, cpu);
 		}
 
 		// get the start time
 		long stime = localResource.getNext_good_time();
 		// Get the resource state mode
-		String cpuStateMode = localResource.getStateMode(traceSt);
+		String cpuStateMode = traceSt.getCpu_states().get(cpu)
+				.peekFromCpuStack().getInName();
 		// Call the makeDraw function
 		makeDraw(traceSt, stime, trcEvent.getTimestamp().getValue(),
 				localResource, params, cpuStateMode);
@@ -166,15 +191,11 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 		return false;
 	}
 
-	/**
-	 * @param traceSt
-	 * @param startTime
-	 * @param endTime
-	 * @param localResource
-	 * @param params
-	 * @param stateMode
-	 * @return
-	 */
+	// *** FIXME ***
+	// "stateMode" should NOT be a string, it is very confusing to use (can we
+	// use any string? what kind of string? can it be null??)
+	// It should be a "ProcessStatus" or "ExecutionMode". However this mean
+	// refactoring this part.
 	protected boolean makeDraw(LttngTraceState traceSt, long startTime,
 			long endTime, TimeRangeEventResource localResource,
 			ParamsUpdater params, String stateMode) {
@@ -248,6 +269,11 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 
 		Type eventType = getEventType(localResource);
 		if (eventType != null) {
+			// Create the time-range event
+			// *** VERIFY ***
+			// This should replace this C call, right?
+			// TimeWindow time_window =
+			// lttvwindow_get_time_window(control_flow_data->tab);
 			TimeRangeEvent time_window = new TimeRangeEvent(stime, etime,
 					localResource, eventType, stateMode);
 

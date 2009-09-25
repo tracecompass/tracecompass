@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.lttng.event;
 
 import org.eclipse.linuxtools.tmf.event.TmfEventContent;
+import org.eclipse.linuxtools.tmf.event.TmfEventField;
 
 /**
  * <b><u>LttngEventContent</u></b>
@@ -51,10 +52,10 @@ public class LttngEventContent extends TmfEventContent {
      * @see org.eclipse.linuxtools.tmf.event.TmfEventContent#getFields()
      */
     @Override
-    public LttngEventField[] getFields() {
+	public TmfEventField[] getFields() {
     	
     	// Request the field variable from the inherited class
-        LttngEventField[] fields = (LttngEventField[])super.getFields();
+		TmfEventField[] fields = super.getFields();
         
         // Field may be null if the content hasn't been parse yet
         // If that's the case, call the parsing function
@@ -73,10 +74,10 @@ public class LttngEventContent extends TmfEventContent {
         assert id >= 0 && id < this.getNbFields();
         
         LttngEventField returnedField = null;
-        LttngEventField[] allFields = this.getFields();
+		TmfEventField[] allFields = this.getFields();
         
         if ( allFields != null ) {
-        	returnedField = allFields[id];
+			returnedField = (LttngEventField) allFields[id];
         }
         
         return returnedField;
@@ -86,10 +87,10 @@ public class LttngEventContent extends TmfEventContent {
      * @param thisEvent
      * @return
      */
-    public LttngEventField[] getFields(LttngEvent thisEvent) {
+	public TmfEventField[] getFields(LttngEvent thisEvent) {
     	
     	// Request the field variable from the inherited class
-        LttngEventField[] fields = (LttngEventField[])super.getFields();
+		TmfEventField[] fields = super.getFields();
         
         // Field may be null if the content hasn't been parse yet
         // If that's the case, call the parsing function
@@ -109,10 +110,10 @@ public class LttngEventContent extends TmfEventContent {
         assert id >= 0 && id < this.getNbFields();
         
         LttngEventField returnedField = null;
-        LttngEventField[] allFields = this.getFields(thisEvent);
+		TmfEventField[] allFields = this.getFields(thisEvent);
         
         if ( allFields != null ) {
-        	returnedField = allFields[id];
+			returnedField = (LttngEventField) allFields[id];
         }
         
         return returnedField;

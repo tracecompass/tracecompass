@@ -48,15 +48,32 @@ public class TmfTimeScaleSelectionEvent extends EventObject {
 		this.selectedTime = selTime;
 	}
 	
+	/**
+	 * @return
+	 */
 	public long getTime0() {
 		return time0;
 	}
 	
+	/**
+	 * @return
+	 */
 	public long getTime1() {
 		return time1;
 	}
 
+	/**
+	 * @return
+	 */
 	public int getWidth() {
 		return width;
 	}
+
+	/**
+	 * @return
+	 */
+	public long getSelectedTime() {
+		return selectedTime;
+	}
+
 }

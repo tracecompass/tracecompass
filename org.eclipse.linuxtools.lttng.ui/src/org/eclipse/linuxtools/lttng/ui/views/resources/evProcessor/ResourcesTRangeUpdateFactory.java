@@ -30,26 +30,26 @@ import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
  * 
  */
 public class ResourcesTRangeUpdateFactory extends AbsEventProcessorFactory {
-	// ========================================================================
-	// Data
-	// =======================================================================
-	private final Map<String, IEventProcessing> eventNametoBeforeProcessor = new HashMap<String, IEventProcessing>();
-	private final Map<String, IEventProcessing> eventNametoAfterProcessor = new HashMap<String, IEventProcessing>();
+    // ========================================================================
+    // Data
+    // =======================================================================
+    private final Map<String, IEventProcessing> eventNametoBeforeProcessor = new HashMap<String, IEventProcessing>();
+    private final Map<String, IEventProcessing> eventNametoAfterProcessor = new HashMap<String, IEventProcessing>();
 	private ResourcesTRangeFinishUpdateHandler finishProcessor = null;
-	private static ResourcesTRangeUpdateFactory instance = null;
-	private ResourcesTRangeBeforeUpdateHandlers instantiateBeforeHandler = new ResourcesTRangeBeforeUpdateHandlers();
-	private ResourcesTRangeAfterUpdateHandlers instantiateAfterHandler = new ResourcesTRangeAfterUpdateHandlers();
-
+    private static ResourcesTRangeUpdateFactory instance = null;
+    private ResourcesTRangeBeforeUpdateHandlers instantiateBeforeHandler = new ResourcesTRangeBeforeUpdateHandlers();
+    private ResourcesTRangeAfterUpdateHandlers instantiateAfterHandler = new ResourcesTRangeAfterUpdateHandlers();
+    
+    
 	private ResourcesTRangeUpdateFactory() {
-		// Create one instance of each individual event handler and add the
-		// instance to the map
+        // Create one instance of each individual event handler and add the instance to the map
 
-		// *** BEFORE HOOKS ***
+        // *** BEFORE HOOKS ***
 		eventNametoBeforeProcessor.put(
 				StateStrings.Events.LTT_EVENT_SCHED_SCHEDULE.getInName(),
 				instantiateBeforeHandler.getBeforeSchedChangeHandler());
-
-		eventNametoBeforeProcessor.put(StateStrings.Events.LTT_EVENT_TRAP_ENTRY
+        
+        eventNametoBeforeProcessor.put(StateStrings.Events.LTT_EVENT_TRAP_ENTRY
 				.getInName(), instantiateBeforeHandler
 				.getBeforeExecutionModeTrap());
 		eventNametoBeforeProcessor.put(StateStrings.Events.LTT_EVENT_TRAP_EXIT
@@ -69,15 +69,15 @@ public class ResourcesTRangeUpdateFactory extends AbsEventProcessorFactory {
 				.put(StateStrings.Events.LTT_EVENT_PAGE_FAULT_NOSEM_EXIT
 						.getInName(), instantiateBeforeHandler
 						.getBeforeExecutionModeTrap());
-
-		eventNametoBeforeProcessor.put(StateStrings.Events.LTT_EVENT_IRQ_ENTRY
+        
+        eventNametoBeforeProcessor.put(StateStrings.Events.LTT_EVENT_IRQ_ENTRY
 				.getInName(), instantiateBeforeHandler
 				.getBeforeExecutionModeIrq());
 		eventNametoBeforeProcessor.put(StateStrings.Events.LTT_EVENT_IRQ_EXIT
 				.getInName(), instantiateBeforeHandler
 				.getBeforeExecutionModeIrq());
-
-		eventNametoBeforeProcessor.put(
+        
+        eventNametoBeforeProcessor.put(
 				StateStrings.Events.LTT_EVENT_SOFT_IRQ_RAISE.getInName(),
 				instantiateBeforeHandler.getBeforeExecutionModeSoftIrq());
 		eventNametoBeforeProcessor.put(
@@ -86,41 +86,44 @@ public class ResourcesTRangeUpdateFactory extends AbsEventProcessorFactory {
 		eventNametoBeforeProcessor.put(
 				StateStrings.Events.LTT_EVENT_SOFT_IRQ_EXIT.getInName(),
 				instantiateBeforeHandler.getBeforeExecutionModeSoftIrq());
-
-		eventNametoBeforeProcessor.put(
+        
+        eventNametoBeforeProcessor.put(
 				StateStrings.Events.LTT_EVENT_REQUEST_ISSUE.getInName(),
 				instantiateBeforeHandler.getBeforeBdevEvent());
 		eventNametoBeforeProcessor.put(
 				StateStrings.Events.LTT_EVENT_REQUEST_COMPLETE.getInName(),
 				instantiateBeforeHandler.getBeforeBdevEvent());
-
-		// *** AFTER HOOKS ***
-		eventNametoAfterProcessor.put(
+        
+        
+        
+        // *** AFTER HOOKS ***
+		eventNametoBeforeProcessor.put(
 				StateStrings.Events.LTT_EVENT_SCHED_SCHEDULE.getInName(),
 				instantiateAfterHandler.getAfterSchedChangeHandler());
 
 		finishProcessor = new ResourcesTRangeFinishUpdateHandler();
-	}
-
-	/**
+    }
+    
+    
+    /**
      * 
      */
 	public static AbsEventProcessorFactory getInstance() {
-		if (instance == null) {
+        if (instance == null) {
 			instance = new ResourcesTRangeUpdateFactory();
-		}
-		return instance;
-	}
+        }
+        return instance;
+    }
+    
+    @Override
+    public IEventProcessing getAfterProcessor(String eventType) {
+        return eventNametoAfterProcessor.get(eventType);
+    }
 
-	@Override
-	public IEventProcessing getAfterProcessor(String eventType) {
-		return eventNametoAfterProcessor.get(eventType);
-	}
-
-	@Override
-	public IEventProcessing getBeforeProcessor(String eventType) {
-		return eventNametoBeforeProcessor.get(eventType);
-	}
+    @Override
+    public IEventProcessing getBeforeProcessor(String eventType) {
+        return eventNametoBeforeProcessor.get(eventType);
+    }
 
 	@Override
 	public IEventProcessing getfinishProcessor() {

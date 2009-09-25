@@ -22,8 +22,8 @@ import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessStatus;
 import org.eclipse.linuxtools.lttng.state.StateStrings.SoftIRQMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.TrapMode;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
+import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 
 public class TimeRangeViewerProvider extends TmfTimeAnalysisProvider {
 	// ========================================================================
@@ -103,16 +103,11 @@ public class TimeRangeViewerProvider extends TmfTimeAnalysisProvider {
 	@Override
 	public Map<String, String> getEventHoverToolTipInfo(ITimeEvent revent) {
 		Map<String, String> toolTipEventMsgs = new HashMap<String, String>();
-		//if the selected resource is a Process, add the Process type to the tool tip
-		if (revent instanceof TimeRangeComponent) {
-			ITimeRangeComponent parent = ((TimeRangeComponent) revent)
-					.getEventParent();
-			if (parent != null && parent instanceof TimeRangeEventProcess) {
-				TimeRangeEventProcess localProcess = (TimeRangeEventProcess) parent;
-				toolTipEventMsgs.put("Process Type", localProcess
-						.getProcessType());
-			}
-		}
+		// No need for additional tooltip info
+		// if (revent instanceof TimeRangeEvent) {
+			// toolTipEventMsgs.put("Test Tip1", "Test Value tip1");
+			// toolTipEventMsgs.put("Test Tip2", "Test Value tip2");
+		// }
 
 		return toolTipEventMsgs;
 	}
@@ -202,7 +197,7 @@ public class TimeRangeViewerProvider extends TmfTimeAnalysisProvider {
 		procStateToColor.put(ProcessStatus.LTTV_STATE_DEAD.getInName(),
 				StateColor.BLACK);
 		procStateToColor.put(ProcessStatus.LTTV_STATE_WAIT_FORK.getInName(),
-				StateColor.DARK_GREEN);
+				StateColor.GREEN);
 		procStateToColor.put(ProcessStatus.LTTV_STATE_WAIT_CPU.getInName(),
 				StateColor.DARK_YELLOW);
 		procStateToColor.put(ProcessStatus.LTTV_STATE_EXIT.getInName(),

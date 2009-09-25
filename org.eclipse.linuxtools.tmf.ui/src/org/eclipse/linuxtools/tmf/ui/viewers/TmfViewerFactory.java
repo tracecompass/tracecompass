@@ -30,7 +30,7 @@ public class TmfViewerFactory {
 //        return null;
 //    }
     
-    public static ITimeAnalysisViewer createWidget(Composite parent,
+    public static ITimeAnalysisViewer createViewer(Composite parent,
             TmfTimeAnalysisProvider provider) {
         return new TmfTimeAnalysisViewer(parent, provider);
     }

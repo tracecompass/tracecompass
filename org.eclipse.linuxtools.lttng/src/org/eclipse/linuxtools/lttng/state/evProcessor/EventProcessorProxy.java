@@ -35,7 +35,7 @@ public class EventProcessorProxy {
 	// =======================================================================
 	public EventProcessorProxy() {
 		// Manual creation of State update factory
-		processingFactories.add(StateUpdateFactory.getInstance());
+		addEventProcessorFactory(StateUpdateFactory.getInstance());
 	}
 
 	// ========================================================================
@@ -72,7 +72,7 @@ public class EventProcessorProxy {
 		if (handlersFactory != null) {
 			//only add the listener if not already included
 			if (!processingFactories.contains(handlersFactory)) {
-				processingFactories.add(handlersFactory);				
+				processingFactories.add(handlersFactory);
 			}
 		} else {
 			TraceDebug

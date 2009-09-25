@@ -83,10 +83,19 @@ public class StateExperimentManager extends TmfComponent {
 		// loaded.
 		if (listener != null && fExperiment != null) {
 			TmfTimeRange trange = fExperiment.getTimeRange();
-			Collection<StateManager> mamangers = managersByID.values();
-			for (StateManager manager : mamangers) {
-				manager.executeDataRequest(trange, transactionID, listener);
-			}
+			String experimentId = fExperiment.getExperimentId();
+
+			// FIXME: there should be an id field available at the trace level
+			// to be fixed with the support of multiple files.
+			// We also need to iterate over the traces in the Experiment and
+			// execute a data Request on each of them
+			// This is also on hold till the request can be performed at a trace
+			// level.
+			// ITmfTrace[] fTraces = fExperiment.getTraces();
+			// for (int i=0; i < fTraces.length; i++) {
+			StateManager manager = StateManagerFactory.getManager(experimentId);
+			manager.executeDataRequest(trange, transactionID, listener);
+			// }
 		}
 	}
 	

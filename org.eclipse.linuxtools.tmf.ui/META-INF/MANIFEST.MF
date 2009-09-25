@@ -10,4 +10,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.linuxtools.tmf;bundle-version="0.0.1"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.linuxtools.tmf.ui.views
+Export-Package: org.eclipse.linuxtools.tmf.ui.viewers,
+ org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis,
+ org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model,
+ org.eclipse.linuxtools.tmf.ui.views

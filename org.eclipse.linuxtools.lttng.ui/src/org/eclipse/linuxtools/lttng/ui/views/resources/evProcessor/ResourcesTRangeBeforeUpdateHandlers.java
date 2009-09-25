@@ -12,6 +12,7 @@
 package org.eclipse.linuxtools.lttng.ui.views.resources.evProcessor;
 
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
+import org.eclipse.linuxtools.lttng.state.StateStrings;
 import org.eclipse.linuxtools.lttng.state.StateStrings.Channels;
 import org.eclipse.linuxtools.lttng.state.StateStrings.Events;
 import org.eclipse.linuxtools.lttng.state.StateStrings.Fields;
@@ -117,15 +118,15 @@ public class ResourcesTRangeBeforeUpdateHandlers {
 						localResource = addLocalResource(timeRange
 								.getStartTime().getValue(), timeRange
 								.getEndTime().getValue(), traceSt.getTraceId(),
-								ResourceTypes.IRQ, irqId, trcEvent
-										.getTimestamp().getValue());
+								ResourceTypes.IRQ, irqId);
 					}
 
 					// get the start time
 					long stime = localResource.getNext_good_time();
 
 					// Get the resource state mode
-					String irqStateMode = localResource.getStateMode(traceSt);
+					String irqStateMode = traceSt.getIrq_states().get(irqId)
+							.peekFromIrqStack().getInName();
 
 					// Call the makeDraw function
 					makeDraw(traceSt, stime,
@@ -209,16 +210,28 @@ public class ResourcesTRangeBeforeUpdateHandlers {
 						localResource = addLocalResource(timeRange
 								.getStartTime().getValue(), timeRange
 								.getEndTime().getValue(), traceSt.getTraceId(),
-								ResourceTypes.SOFT_IRQ, softIrqId, trcEvent
-										.getTimestamp().getValue());
+								ResourceTypes.SOFT_IRQ, softIrqId);
 					}
 
 					// get the start time
 					long stime = localResource.getNext_good_time();
-
 					// Get the resource state mode
-					String softIrqStateMode = localResource
-							.getStateMode(traceSt);
+					long running = traceSt.getSoft_irq_states().get(softIrqId)
+							.getRunning().longValue();
+					long pending = traceSt.getSoft_irq_states().get(softIrqId)
+							.getPending().longValue();
+
+					String softIrqStateMode;
+					if (running > 0) {
+						softIrqStateMode = StateStrings.SoftIRQMode.LTTV_SOFT_IRQ_BUSY
+								.getInName();
+					} else if (pending > 0) {
+						softIrqStateMode = StateStrings.SoftIRQMode.LTTV_SOFT_IRQ_PENDING
+								.getInName();
+					} else {
+						softIrqStateMode = StateStrings.SoftIRQMode.LTTV_SOFT_IRQ_IDLE
+								.getInName();
+					}
 
 					// Call the makeDraw function
 					makeDraw(traceSt, stime,
@@ -317,12 +330,20 @@ public class ResourcesTRangeBeforeUpdateHandlers {
 						localResource = addLocalResource(timeRange
 								.getStartTime().getValue(), timeRange
 								.getEndTime().getValue(), traceSt.getTraceId(),
-								ResourceTypes.TRAP, trapId, trcEvent
-										.getTimestamp().getValue());
+								ResourceTypes.TRAP, trapId);
 					}
 
 					// Determine the trap state.
-					String trapStateMode = localResource.getStateMode(traceSt);
+					long trapState = traceSt.getTrap_states().get(trapId)
+							.getRunning().longValue();
+					String trapStateMode;
+					if (trapState == 0) {
+						trapStateMode = StateStrings.TrapMode.LTTV_TRAP_IDLE
+								.getInName();
+					} else {
+						trapStateMode = StateStrings.TrapMode.LTTV_TRAP_BUSY
+								.getInName();
+					}
 
 					long stime = localResource.getNext_good_time();
 					makeDraw(traceSt, stime,
@@ -388,14 +409,14 @@ public class ResourcesTRangeBeforeUpdateHandlers {
 							.getTraceTimeWindow();
 					localResource = addLocalResource(timeRange.getStartTime()
 							.getValue(), timeRange.getEndTime().getValue(),
-							traceSt.getTraceId(), ResourceTypes.BDEV, bdevId,
-							trcEvent.getTimestamp().getValue());
+							traceSt.getTraceId(), ResourceTypes.BDEV, bdevId);
 				}
 
 				// get the start time
 				long stime = localResource.getNext_good_time();
 				// Get the resource state mode
-				String bdevStateMode = localResource.getStateMode(traceSt);
+				String bdevStateMode = traceSt.getBdev_states().get(bdevId)
+						.peekFromBdevStack().getInName();
 				// Call the makeDraw function
 				makeDraw(traceSt, stime, trcEvent.getTimestamp().getValue(),
 						localResource, params, bdevStateMode);

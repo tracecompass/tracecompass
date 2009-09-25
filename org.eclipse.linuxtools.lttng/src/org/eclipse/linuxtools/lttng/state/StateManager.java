@@ -115,54 +115,52 @@ public class StateManager extends Observable {
 	public void setTraceSelection(TmfExperiment experiment) {
 		// New log in use, read all events and build state transition stack
 		if (experiment != null) {
-			if (fExperiment != null && experiment.equals(fExperiment)) {
-				// No update needed
-			} else {
+			if (fExperiment != null && fExperiment != experiment) {
+				this.fExperiment.dispose();
+			}
 
-				// this.fExperiment.dispose();
-				this.fExperiment = experiment;
+			this.fExperiment = experiment;
 
-				// this.fEventLog.dispose();
-				this.fEventLog = (LTTngTrace) experiment.getTraces()[0];
-				trace = fEventLog.getCurrentJniTrace();
-				try {
-					stateIn.init(trace, fEventLog);
-				} catch (LttngStateException e) {
-					e.printStackTrace();
+			// if (fEventLog != null) {
+			// this.fEventLog.dispose();
+			// }
+
+			this.fEventLog = (LTTngTrace) experiment.getTraces()[0];
+			trace = fEventLog.getCurrentJniTrace();
+			try {
+				stateIn.init(trace, fEventLog);
+			} catch (LttngStateException e) {
+				e.printStackTrace();
+			}
+
+			// Restart count and collections
+			eventCount = 0L;
+			stateCheckpointsList.clear();
+			timestampCheckpointsList.clear();
+
+			// Obtain a dataRequest to pass to the processRequest function
+			TmfTimeRange allTraceWindow = fEventLog.getTimeRange();
+			StateDataRequest request = getDataRequestStateSave(allTraceWindow,
+					null);
+			request.startRequestInd(fExperiment, true);
+
+			if (TraceDebug.isDEBUG()) {
+				List<LttngProcessState> processes = stateIn
+						.getTraceStateModel().getProcesses();
+				StringBuilder sb = new StringBuilder(
+						"Total number of processes in the State provider: "
+								+ processes.size());
+
+				TmfTimeRange logTimes = fEventLog.getTimeRange();
+				sb.append("\n\tLog file times "
+						+ new LttngTimestamp(logTimes.getStartTime()));
+				sb.append(" - " + new LttngTimestamp(logTimes.getEndTime()));
+
+				sb.append("\n\tCheckPoints available at: ");
+				for (TmfTraceCheckpoint cpoint : timestampCheckpointsList) {
+					sb.append("\n\t" + cpoint.getTimestamp());
 				}
-
-				// Restart count and collections
-				eventCount = 0L;
-				stateCheckpointsList.clear();
-				timestampCheckpointsList.clear();
-
-				// Obtain a dataRequest to pass to the processRequest function
-				TmfTimeRange allTraceWindow = fEventLog.getTimeRange();
-				StateDataRequest request = getDataRequestStateSave(
-						allTraceWindow, null);
-				request.startRequestInd(fExperiment, true);
-
-				if (TraceDebug.isDEBUG()) {
-					List<LttngProcessState> processes = stateIn
-							.getTraceStateModel().getProcesses();
-					StringBuilder sb = new StringBuilder(
-							"Total number of processes in the State provider: "
-									+ processes.size());
-
-					TmfTimeRange logTimes = fEventLog.getTimeRange();
-					sb.append("\n\tLog file times "
-							+ new LttngTimestamp(logTimes.getStartTime()));
-					sb
-							.append(" - "
-									+ new LttngTimestamp(logTimes.getEndTime()));
-
-					sb.append("\n\tCheckPoints available at: ");
-					for (TmfTraceCheckpoint cpoint : timestampCheckpointsList) {
-						sb.append("\n\t" + cpoint.getTimestamp());
-					}
-					TraceDebug.debug(sb.toString());
-				}
-
+				TraceDebug.debug(sb.toString());
 			}
 		}
 
@@ -483,7 +481,7 @@ public class StateManager extends Observable {
 
 				// Call the function that will save a checkpoint if needed at
 				// that point
-				// Note : We call this function before eventCount incrementation
+				// Note : We call this function before incrementing eventCount
 				// to avoid skipping the "0th" event
 				if (evt[0] != null) {
 					saveCheckPointIfNeeded(getNumOfEvents(), evt[0]
@@ -597,8 +595,6 @@ public class StateManager extends Observable {
 			testStream[0] = new LTTngTrace(
 					"/home/william/runtime-EclipseApplication/TEST_JOIE/Traces/trace3",
 					true);
-			// testStream[0] = new LttngEventStream("/home/alvaro/ltt/trace1",
-			// true);
 
 			TmfExperiment newExpt = new TmfExperiment("trace1", testStream);
 

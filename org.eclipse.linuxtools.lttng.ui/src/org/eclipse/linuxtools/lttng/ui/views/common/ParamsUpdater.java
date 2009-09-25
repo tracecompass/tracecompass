@@ -14,7 +14,6 @@ package org.eclipse.linuxtools.lttng.ui.views.common;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeScaleSelectionEvent;
 
 /**
@@ -89,17 +88,6 @@ public class ParamsUpdater {
 	}
 
 	/**
-	 * Update time range but keep width as is
-	 * 
-	 * @param time0
-	 * @param time1
-	 * @return
-	 */
-	public boolean update(long time0, long time1) {
-		return update(time0, time1, width);
-	}
-
-	/**
 	 * Only positive attributes are expected
 	 * 
 	 * @param time0
@@ -127,24 +115,16 @@ public class ParamsUpdater {
 			width = dwidth;
 
 			pixelsPerNs = (double) width / (double) (endTime - startTime);
-
-			TmfTimestamp fTimeStart = new LttngTimestamp(startTime);
-			TmfTimestamp fTimeEnd = new LttngTimestamp(endTime);
-			trange = new TmfTimeRange(fTimeStart, fTimeEnd);
-
-			// make sure the selected time is within the new range or else set
-			// mark it as invalid
-			if (selectedTime != null) {
-				setSelectedTime(selectedTime);
-			}
+			trange = new TmfTimeRange(new LttngTimestamp(startTime),
+					new LttngTimestamp(endTime));
 
 			// update succeeded
 			updated = true;
 
 			TraceDebug.debug("Configuration updated to: StartTime: " /* */
-					+ fTimeStart /* */
-					+ "-" /* */
-					+ fTimeEnd /* */
+					+ startTime /* */
+					+ " endTime: " /* */
+					+ endTime /* */
 					+ " width: " /* */
 					+ width + " k: " + pixelsPerNs); /* */
 		} else {

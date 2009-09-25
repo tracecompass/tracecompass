@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.controlflow.evProcessor;
 
+import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessStatus;
@@ -24,6 +25,7 @@ import org.eclipse.linuxtools.lttng.ui.views.common.AbsTRangeUpdate;
 import org.eclipse.linuxtools.lttng.ui.views.common.ParamsUpdater;
 import org.eclipse.linuxtools.lttng.ui.views.controlflow.model.FlowModelFactory;
 import org.eclipse.linuxtools.lttng.ui.views.controlflow.model.FlowProcessContainer;
+import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEventProcessing {
 
@@ -40,15 +42,11 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 	// Methods
 	// =======================================================================
 	protected TimeRangeEventProcess addLocalProcess(LttngProcessState stateProcess, long traceStartTime, long traceEndTime, String traceId) {
-		// TimeRangeEventProcess localProcess = new TimeRangeEventProcess(id, name, startTime, stopTime, groupName, className)
-		TimeRangeEventProcess localProcess = new TimeRangeEventProcess(
-				procContainer.getUniqueId(), stateProcess.getName(),
-				traceStartTime, traceEndTime, "", stateProcess.getType()
-						.getInName(), stateProcess.getCpu(), stateProcess
-						.getInsertion_time());
-		
-		
-		localProcess.setCreationTime(stateProcess.getCreation_time());
+		// TimeRangeEventProcess localProcess = new TimeRangeEventProcess(id, name, startTime, stopTime, groupName, className);
+		TimeRangeEventProcess localProcess = new TimeRangeEventProcess(procContainer.bookProcId(), stateProcess.getName(),traceStartTime, 
+		                                                               traceEndTime, "", stateProcess.getType().getInName(), stateProcess.getCpu()
+		                                                              );
+		localProcess.setCreationTime(stateProcess.getCreation_time().getValue());
 		localProcess.setPid(stateProcess.getPid());
 		localProcess.setTgid(stateProcess.getTgid());
 		localProcess.setPpid(stateProcess.getPpid());
@@ -56,7 +54,7 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 		localProcess.setBrand(stateProcess.getBrand());
 		localProcess.setTraceID(traceId);
 		localProcess.setProcessType(stateProcess.getType().getInName());
-		procContainer.addProcess(localProcess);
+		procContainer.addProcesse(localProcess);
 		return localProcess;
 	}
 	
@@ -91,6 +89,39 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 
 		return false;
 	}
+	
+	/**
+	 * Find the process matching the given pid and cpu
+	 * 
+	 * If cpu is 0, the cpu value is not matched and the selection is based on
+	 * pid value only
+	 * 
+	 * @param ts
+	 * @param cpu
+	 * @param pid
+	 * @return
+	 */
+	protected LttngProcessState lttv_state_find_process(LttngTraceState ts,
+			Long cpu, Long pid) {
+		// Define the return value
+		LttngProcessState process = null;
+
+		// Obtain the list of available processes
+		List<LttngProcessState> processList = ts.getProcesses();
+
+		// find the process matching pid and cpu,
+		// TODO: This may need to be improved since the pid may be re-used and
+		// the creation time may need to be considered
+		for (LttngProcessState dprocess : processList) {
+			if (dprocess.getPid().equals(pid)) {
+				if (dprocess.getCpu().equals(cpu) || cpu.longValue() == 0L) {
+					return dprocess;
+				}
+			}
+		}
+
+		return process;
+	}
 
 	/**
 	 * @param traceSt
@@ -101,13 +132,13 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 	 * @param stateMode
 	 * @return
 	 */
-	protected boolean makeDraw(LttngTraceState traceSt, long startTime,
-			long endTime, TimeRangeEventProcess localProcess,
+	protected boolean makeDraw(LttngTraceState traceSt, TmfTimestamp startTime,
+			TmfTimestamp endTime, TimeRangeEventProcess localProcess,
 			ParamsUpdater params, String stateMode) {
 
 		// Determine start and end times to establish duration
-		Long stime = startTime;
-		Long etime = endTime;
+		Long stime = startTime.getValue();
+		Long etime = endTime.getValue();
 
 		if (etime < stime) {
 			// Validate the sequential order of events
@@ -187,7 +218,6 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 		// I'm not sure about it
 		time_window.setVisible(visible);
 		localProcess.getTraceEvents().add(time_window);
-		localProcess.setNext_good_time(etime);
 
 		// *** VERIFY ***
 		// Missing checks like this one?
@@ -206,12 +236,11 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 	 * @param params
 	 * @return
 	 */
-	protected boolean makeDraw(LttngTraceState traceSt, long evTime,
+	protected boolean makeDraw(LttngTraceState traceSt, TmfTimestamp evTime,
 			LttngProcessState process, TimeRangeEventProcess localProcess,
 			ParamsUpdater params) {
 
-		// TmfTimestamp stime = process.getState().getChange_LttTime();
-		long stime = localProcess.getNext_good_time();
+		TmfTimestamp stime = process.getState().getChange_LttTime();
 
 		String stateMode;
 		ProcessStatus procStatus = process.getState().getProc_status();

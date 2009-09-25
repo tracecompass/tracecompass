@@ -67,6 +67,7 @@ public class LTTngCorePlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		TraceDebug.init();
 	}
 
 	/*

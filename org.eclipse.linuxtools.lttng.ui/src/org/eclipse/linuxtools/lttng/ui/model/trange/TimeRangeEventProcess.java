@@ -40,30 +40,15 @@ public class TimeRangeEventProcess extends TimeRangeComposite implements
 	 * @param className
 	 */
 	public TimeRangeEventProcess(int id, String name, long startTime,
-			long stopTime, String groupName, String className, Long cpu,
-			long insertionTime) {
+			long stopTime, String groupName, String className, Long cpu) {
 
-		super(id, startTime, stopTime, name, CompositeType.PROCESS,
-				insertionTime);
+		super(id, startTime, stopTime, name, CompositeType.PROCESS);
 		this.cpu = cpu;
 	}
 
 	// ========================================================================
 	// Methods
 	// =======================================================================
-	
-	
-	/**
-     * Interface to add children to this process
-     * 
-     * @param newEvent
-     */
-    public void addChildren(TimeRangeEvent newEvent) {
-        if ((newEvent != null)) {
-            this.ChildEventLeafs.add(newEvent);
-        }
-    }
-	
 	/**
 	 * @return
 	 */

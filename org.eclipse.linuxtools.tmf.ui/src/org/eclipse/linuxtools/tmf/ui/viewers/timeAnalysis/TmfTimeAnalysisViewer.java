@@ -68,7 +68,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 
 	private boolean _acceptSetSelAPICalls = false;
 	Vector<ITmfTimeSelectionListener> widgetSelectionListners = new Vector<ITmfTimeSelectionListener>();
-	Vector<ITmfTimeTimeScaleSelectionListener> widgetTimeScaleSelectionListners = new Vector<ITmfTimeTimeScaleSelectionListener>();
+	Vector<ITmfTimeScaleSelectionListener> widgetTimeScaleSelectionListners = new Vector<ITmfTimeScaleSelectionListener>();
 	Vector<ITmfTimeFilterSelectionListener> widgetFilterSelectionListeners = new Vector<ITmfTimeFilterSelectionListener>();
 
 	// Calender Time format, using Epoch reference or Relative time
@@ -544,12 +544,12 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	}
 
 	public void addWidgetTimeScaleSelectionListner(
-			ITmfTimeTimeScaleSelectionListener listener) {
+			ITmfTimeScaleSelectionListener listener) {
 		widgetTimeScaleSelectionListners.add(listener);
 	}
 
 	public void removeWidgetTimeScaleSelectionListner(
-			ITmfTimeTimeScaleSelectionListener listener) {
+			ITmfTimeScaleSelectionListener listener) {
 		widgetTimeScaleSelectionListners.removeElement(listener);
 	}
 
@@ -637,9 +637,9 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 			TmfTimeScaleSelectionEvent event = new TmfTimeScaleSelectionEvent(
 					this, _time0, _time1, getTimeSpace(), getSelectedTime());
 
-			for (Iterator<ITmfTimeTimeScaleSelectionListener> iter = widgetTimeScaleSelectionListners
+			for (Iterator<ITmfTimeScaleSelectionListener> iter = widgetTimeScaleSelectionListners
 					.iterator(); iter.hasNext();) {
-				ITmfTimeTimeScaleSelectionListener listener = (ITmfTimeTimeScaleSelectionListener) iter
+				ITmfTimeScaleSelectionListener listener = (ITmfTimeScaleSelectionListener) iter
 						.next();
 				listener.tsfTmProcessTimeScaleEvent(event);
 			}

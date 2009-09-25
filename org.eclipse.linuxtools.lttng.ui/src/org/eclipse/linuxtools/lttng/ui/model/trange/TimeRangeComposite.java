@@ -51,30 +51,23 @@ ITmfTimeAnalysisEntry {
 	protected String groupName = "";
 	protected String className = "";
 	protected CompositeType contType = CompositeType.UNKNOWN;
-	protected Long next_good_time = -1L;
-	/*Time of first event which trigger the creation of this local resource */
-	protected Long insertionTime = -1L; 
 
 	// ========================================================================
 	// Constructors
 	// =======================================================================
-	public TimeRangeComposite(Integer id, Long stime, Long etime, String name,
-			CompositeType type, long insertionTime) {
+	public TimeRangeComposite(Integer id, Long stime, Long etime, String name, CompositeType type) {
 		super(stime, etime, null);
 		this.id = id;
 		this.name = name;
 		contType = type;
-		this.insertionTime = insertionTime;
-		// Adjust the first good drawing position to the event time creating this resource
-		next_good_time = insertionTime;
 	}
 
-	public TimeRangeComposite(Integer id, Long stime, Long etime, String name,
-			String groupName, String className, CompositeType type,
-			long insertionTime) {
-		this(id, stime, etime, name, type, insertionTime);
-		this.groupName = groupName;
-		this.className = className;
+	public TimeRangeComposite(Integer id, Long stime, Long etime, String name, String groupName, String className, CompositeType type) {
+		this(id, stime, etime, name, type);
+
+        this.groupName = groupName;
+        this.className = className;
+
     }
 	
 	// ========================================================================
@@ -165,41 +158,4 @@ ITmfTimeAnalysisEntry {
 		return ChildEventComposites;
 	}
 
-	/**
-	 * Represents the time where the next time range can start the drawing i.e.
-	 * right after previous time range.
-	 * 
-	 * @return
-	 */
-	public long getNext_good_time() {
-		return next_good_time;
-	}
-
-	/**
-	 * Represents the time where the next time range can start the drawing i.e.
-	 * right after previous time range.
-	 * 
-	 * @param nextGoodTime
-	 */
-	public void setNext_good_time(long nextGoodTime) {
-		next_good_time = nextGoodTime;
-	}
-
-	/**
-	 * Reset this resource to the construction state
-	 */
-	public void reset() {
-		getChildEventComposites().clear();
-		getTraceEvents().clear();
-		next_good_time = insertionTime;
-	}
-
-	/**
-	 * Event Time reflecting the creation of this local resource e.g. at Reception of Fork, etc.
-	 * 
-	 * @return
-	 */
-	public long getInsertionTime() {
-		return insertionTime;
-	}
 }
