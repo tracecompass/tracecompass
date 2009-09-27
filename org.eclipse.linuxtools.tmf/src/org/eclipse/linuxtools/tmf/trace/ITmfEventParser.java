@@ -27,5 +27,5 @@ public interface ITmfEventParser {
      * @return
      * @throws IOException 
      */
-    public TmfEvent parseNextEvent(ITmfTrace stream) throws IOException;
+    public TmfEvent parseNextEvent(ITmfTrace stream, TmfTraceContext context) throws IOException;
 }

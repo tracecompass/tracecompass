@@ -18,8 +18,8 @@ import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
-import org.eclipse.linuxtools.tmf.trace.ITmfTrace.TmfTraceContext;
 
 /**
  * <b><u>TmfRequestHandlerStub</u></b>

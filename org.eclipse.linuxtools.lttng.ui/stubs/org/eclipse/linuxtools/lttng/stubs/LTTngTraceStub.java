@@ -15,16 +15,16 @@ package org.eclipse.linuxtools.lttng.stubs;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.Map;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /**
  * <b><u>LTTngTraceStub</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * Dummy test trace. Use in conjunction with LTTngEventParserStub.
  */
 public class LTTngTraceStub extends TmfTrace {
 
@@ -48,7 +48,7 @@ public class LTTngTraceStub extends TmfTrace {
      * @throws FileNotFoundException
      */
     public LTTngTraceStub(String filename) throws FileNotFoundException {
-        this(filename, DEFAULT_PAGE_SIZE);
+        this(filename, DEFAULT_CACHE_SIZE);
     }
 
     /**
@@ -58,7 +58,7 @@ public class LTTngTraceStub extends TmfTrace {
      * @throws FileNotFoundException
      */
     public LTTngTraceStub(String filename, int cacheSize) throws FileNotFoundException {
-        super(filename, cacheSize, true);
+        super(filename, cacheSize, false);
         fTrace = new RandomAccessFile(filename, "r");
     	fParser = new LTTngEventParserStub();
     	indexStream();
@@ -111,11 +111,13 @@ public class LTTngTraceStub extends TmfTrace {
 	 * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#parseEvent()
 	 */
 	@Override
-	public synchronized TmfEvent parseEvent(TmfTraceContext context) {
+	public TmfEvent parseEvent(TmfTraceContext context) {
        	try {
-       		fTrace.seek((context != null) ? (Long) context.location : 0);
-      		TmfEvent event = fParser.parseNextEvent(this);
-      		context = new TmfTraceContext(getCurrentLocation(), null, 0);
+   			// paserNextEvent updates the context
+   			TmfEvent event = fParser.parseNextEvent(this, context);
+   			if (event != null) {
+   				context.setTimestamp(event.getTimestamp());
+   			}
        		return event;
        	}
        	catch (IOException e) {
@@ -124,16 +126,24 @@ public class LTTngTraceStub extends TmfTrace {
        	return null;
 	}
 
-    // ========================================================================
-    // Helper functions
-    // ========================================================================
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "[LTTngTraceStub]";
+	}
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.eventlog.ITmfEventStream#getAttributes()
-     */
-    public Map<String, Object> getAttributes() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+//    // ========================================================================
+//    // Helper functions
+//    // ========================================================================
+//
+//    /* (non-Javadoc)
+//     * @see org.eclipse.linuxtools.tmf.eventlog.ITmfEventStream#getAttributes()
+//     */
+//    public Map<String, Object> getAttributes() {
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
 
 }

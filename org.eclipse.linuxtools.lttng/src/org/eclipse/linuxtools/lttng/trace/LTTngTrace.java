@@ -28,6 +28,7 @@ import org.eclipse.linuxtools.tmf.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 
 class LTTngTraceException extends LttngException {
@@ -114,10 +115,11 @@ public class LTTngTrace extends TmfTrace {
     @Override
 	public synchronized TmfEvent parseEvent(TmfTraceContext context) {
 
-    	seekLocation(context.location);
+    	seekLocation(context.getLocation());
         JniEvent jniEvent = currentJniTrace.readNextEvent();
         currentLttngEvent = convertJniEventToTmf(jniEvent, true);
-        context = new TmfTraceContext((LttngTimestamp) getCurrentLocation(), currentLttngEvent.getTimestamp(), context.index++);
+        context = new TmfTraceContext((LttngTimestamp) getCurrentLocation(),
+        		currentLttngEvent.getTimestamp(), context.getIndex() + 1);
         
         return currentLttngEvent;
     }

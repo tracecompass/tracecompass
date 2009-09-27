@@ -16,7 +16,6 @@ import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
-import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.trace.TmfExperimentSelectedSignal;
@@ -127,20 +126,8 @@ public class TmfEventsView extends TmfView {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
-				// Get the timestamp string
-				String time = fTable.getSelection()[0].getText();
-
-				// Compose a timestamp
-				int pos = time.indexOf('.');
-				String integer = time.substring(0, pos);
-				String fraction = time.substring(pos + 1);
-
-				byte exponent = (byte) -fraction.length();
-				String value = integer + fraction;
-				TmfTimestamp ts = new TmfTimestamp(new Long(value), exponent);
-
-				// Generate the synchronization event
-				TmfSignalManager.dispatchSignal(new TmfTimeSynchSignal(fTable, ts));
+				TmfTimestamp ts = extractTimestamp(fTable.getSelection()[0].getText());
+				broadcastSignal(new TmfTimeSynchSignal(this, ts));
 			}
         });
 
@@ -164,6 +151,28 @@ public class TmfEventsView extends TmfView {
 
         fTable.setItemCount(0);
     	fTitlePrefix = getTitle();
+
+    	// If an experiment is already selected, update the table
+    	fExperiment = TmfExperiment.getCurrentExperiment();
+    	if (fExperiment != null) {
+    		experimentSelected(new TmfExperimentSelectedSignal(fTable, fExperiment));
+    	}
+    }
+
+    private TmfTimestamp extractTimestamp(String entry) {
+    	TmfTimestamp ts = null;
+
+    	int pos = entry.indexOf('.');
+    	if (pos > 0) {
+    		String integer = entry.substring(0, pos);
+    		String fraction = entry.substring(pos + 1);
+
+    		byte exponent = (byte) -fraction.length();
+    		String value = integer + fraction;
+    		ts = new TmfTimestamp(new Long(value), exponent);
+    	}
+
+    	return ts;
     }
 
 	/**
@@ -206,6 +215,14 @@ public class TmfEventsView extends TmfView {
 	public void setFocus() {
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+	public String toString() {
+    	return "[TmfEventsView]";
+    }
+
     // ========================================================================
     // Signal handlers
     // ========================================================================
@@ -219,6 +236,8 @@ public class TmfEventsView extends TmfView {
         // Perform the updates on the UI thread
         fTable.getDisplay().asyncExec(new Runnable() {
         	public void run() {
+        		// TODO: Potentially long operation. Add some feedback for the user
+        		fTable.setSelection(0);
             	fTable.clearAll();
             	fTable.setItemCount(fExperiment.getNbEvents());        
         	}
@@ -244,7 +263,10 @@ public class TmfEventsView extends TmfView {
             // Perform the updates on the UI thread
             fTable.getDisplay().asyncExec(new Runnable() {
             	public void run() {
-            		fTable.setSelection(index);
+            		int pos = (index > fTable.getTopIndex()) ? fTable.getTopIndex() : index; 
+            		fTable.setSelection(pos);
+    				TmfTimestamp ts = extractTimestamp(fTable.getSelection()[0].getText());
+    				broadcastSignal(new TmfTimeSynchSignal(fTable, ts));
             	}
             });
     	}

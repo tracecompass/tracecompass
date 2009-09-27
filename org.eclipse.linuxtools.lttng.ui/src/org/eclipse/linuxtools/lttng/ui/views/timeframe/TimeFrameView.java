@@ -15,7 +15,6 @@ package org.eclipse.linuxtools.lttng.ui.views.timeframe;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
-import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.trace.TmfExperimentSelectedSignal;
@@ -62,10 +61,10 @@ public class TimeFrameView extends TmfView {
     // ========================================================================
 
     // The event log timestamp characteristics
-    private TmfTimestamp  fTraceStartTime = new TmfTimestamp();
-    private TmfTimestamp  fTraceEndTime   = new TmfTimestamp();
+    private TmfTimestamp fTraceStartTime = new TmfTimestamp();
+    private TmfTimestamp fTraceEndTime   = new TmfTimestamp();
 
-    private TmfTimestamp  fCurrentTime   = new TmfTimestamp();
+    private TmfTimestamp fCurrentTime   = new TmfTimestamp();
     
     private TmfTimeRange fTraceTimeRange = new TmfTimeRange(fTraceStartTime, fTraceEndTime);
     private TmfTimeRange fTraceSpan      = new TmfTimeRange(fTraceStartTime, fTraceEndTime);
@@ -179,7 +178,7 @@ public class TimeFrameView extends TmfView {
         // Notify other views
         if (!fCurrentTime.equals(currentTime)) {
             fCurrentTime = currentTime;
-            TmfSignalManager.dispatchSignal(new TmfTimeSynchSignal(this, currentTime));
+            broadcastSignal(new TmfTimeSynchSignal(this, currentTime));
         }
     }
 
@@ -218,24 +217,35 @@ public class TimeFrameView extends TmfView {
 
     /**
      * @param range
-     * @param current
+     * @param timestamp
      */
-    private void updateSlider(TmfTimeRange range, TmfTimestamp current) {
+    private void updateSlider(TmfTimeRange range, TmfTimestamp timestamp) {
 
         // Determine the new relative position
         long total    = range.getStartTime().getAdjustment(range.getEndTime());
-        long relative = range.getStartTime().getAdjustment(current);
+        long relative = range.getStartTime().getAdjustment(timestamp);
 
         // Set the slider value
         final long position = (total > 0) ? (relative * SLIDER_RANGE / total) : 0;
 
         // Update the slider on the UI thread
-        fSlider.getDisplay().asyncExec(new Runnable() {
-			public void run() {
-		        fSlider.setSelection((int) position);
-			}
-        });
+        long current = fSlider.getSelection();
+        if (position != current) {
+        	fSlider.getDisplay().asyncExec(new Runnable() {
+        		public void run() {
+        			fSlider.setSelection((int) position);
+        		}
+        	});
+        }
     }
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "[TimeFrameView]";
+	}
 
     // ========================================================================
     // TMF Signal Handling
@@ -296,7 +306,7 @@ public class TimeFrameView extends TmfView {
     @TmfSignalHandler
     public void currentTimeUpdated(TmfTimeSynchSignal signal) {
     	if (signal.getSource() != this) {
-            fCurrentTime = signal.getCurrentTime();
+            fCurrentTime = signal.getCurrentTime().synchronize(0, fStartGroup.getCurrentTime().getScale());
             if (fStartGroup.getCurrentTime().compareTo(fCurrentTime, false) > 0) {
             	fStartGroup.setContent(new TmfTimeRange(fCurrentTime, fEndGroup.getCurrentTime()), fCurrentTime);
             }

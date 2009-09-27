@@ -25,6 +25,7 @@ import org.eclipse.linuxtools.tmf.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /**
  * <b><u>TmfEventParserStub</u></b>
@@ -68,41 +69,57 @@ public class LTTngEventParserStub implements ITmfEventParser {
      * @see org.eclipse.linuxtools.tmf.eventlog.ITmfEventParser#parseNextEvent()
      */
     static final String typePrefix = "Type-";
-    public TmfEvent parseNextEvent(ITmfTrace eventStream) throws IOException {
+    public TmfEvent parseNextEvent(ITmfTrace eventStream, TmfTraceContext context) throws IOException {
 
         if (! (eventStream instanceof LTTngTraceStub)) {
             return null;
         }
 
-        RandomAccessFile stream = ((LTTngTraceStub) eventStream).getStream();
-        String name = eventStream.getName();
-        name = name.substring(name.lastIndexOf('/') + 1);
+       	// Highly inefficient...
+       	RandomAccessFile stream = ((LTTngTraceStub) eventStream).getStream();
+       	String name = eventStream.getName();
+       	name = name.substring(name.lastIndexOf('/') + 1);
 
-        try {
-            long ts        = stream.readLong();
-            String source  = stream.readUTF();
-            String type    = stream.readUTF();
-            @SuppressWarnings("unused")
-			int reference  = stream.readInt();
-            int typeIndex  = Integer.parseInt(type.substring(typePrefix.length()));
-            String[] fields = new String[typeIndex];
-            for (int i = 0; i < typeIndex; i++) {
-                fields[i] = stream.readUTF();
-            }
-            String content = "[";
-            for (int i = 0; i < typeIndex; i++) {
-                content += fields[i] + ", ";
-            }
-            content += "]";
-            
-            TmfEvent event = new TmfEvent(
-                    new LTTngTimestampStub(ts),
-                    new TmfEventSource(source),
-                    new TmfEventType(type, fFormats[typeIndex]),
-                    new TmfEventContent(content, fFormats[typeIndex]),
-                    new TmfEventReference(name));
-            return event;
-        } catch (EOFException e) {
+        synchronized(stream) {
+        	long location = 0;
+        	if (context != null)
+        		location = (Long) (context.getLocation());
+        	stream.seek(location);
+
+        	try {
+        		long ts        = stream.readLong();
+        		String source  = stream.readUTF();
+        		String type    = stream.readUTF();
+        		@SuppressWarnings("unused")
+        		int reference  = stream.readInt();
+        		int typeIndex  = Integer.parseInt(type.substring(typePrefix.length()));
+        		String[] fields = new String[typeIndex];
+        		for (int i = 0; i < typeIndex; i++) {
+        			fields[i] = stream.readUTF();
+        		}
+
+        		// Update the context
+        		context.setLocation(stream.getFilePointer());
+        		context.incrIndex();
+
+        		String content = "[";
+        		if (typeIndex > 0) {
+        			content += fields[0];
+        		}
+        		for (int i = 1; i < typeIndex; i++) {
+        			content += ", " + fields[i];
+        		}
+        		content += "]";
+
+        		TmfEvent event = new TmfEvent(
+        				new LTTngTimestampStub(ts),
+        				new TmfEventSource(source),
+        				new TmfEventType(type, fFormats[typeIndex]),
+        				new TmfEventContent(content, fFormats[typeIndex]),
+        				new TmfEventReference(name));
+        		return event;
+        	} catch (EOFException e) {
+        	}
         }
         return null;
     }

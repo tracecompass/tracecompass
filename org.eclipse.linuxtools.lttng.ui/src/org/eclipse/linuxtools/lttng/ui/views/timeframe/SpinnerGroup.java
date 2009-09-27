@@ -39,8 +39,8 @@ import org.eclipse.swt.widgets.Spinner;
 public class SpinnerGroup {
 
     // The nanosecond scale (10^9)
-    private static final int NANOSECOND_SCALE = 1000 * 1000 * 1000;
-    private static final byte SCALE = -9;
+    private static final int  NS_PER_SECOND = 1000 * 1000 * 1000;
+    private static final byte NS_SCALING_FACTOR = -9;
 
     // Labels
     private static final String SECONDS_LABEL = "sec";
@@ -114,10 +114,10 @@ public class SpinnerGroup {
                 // Correct for nanosec underflow
                 if (currentNanosec < 0) {
                     currentSeconds--;
-                    currentNanosec = NANOSECOND_SCALE - 1;
+                    currentNanosec = NS_PER_SECOND - 1;
                 }
                 // Correct for nanosec overflow
-                if (currentNanosec >= NANOSECOND_SCALE) {
+                if (currentNanosec >= NS_PER_SECOND) {
                     currentSeconds++;
                     currentNanosec = 0;
                 }
@@ -134,8 +134,8 @@ public class SpinnerGroup {
     }
 
     private void refreshCurrentTime() {
-        long newCurrentTime = (long) currentSeconds * NANOSECOND_SCALE + currentNanosec;
-        TmfTimestamp ts = new TmfTimestamp(newCurrentTime, SCALE, 0);
+        long newCurrentTime = ((long) currentSeconds) * NS_PER_SECOND + currentNanosec;
+        TmfTimestamp ts = new TmfTimestamp(newCurrentTime, NS_SCALING_FACTOR, 0);
         currentTime = ts;
         fOwner.synchTimeFrameWidgets(this);
     }
@@ -157,7 +157,7 @@ public class SpinnerGroup {
     }
 
     public TmfTimestamp getSpan() {
-        TmfTimestamp span = new TmfTimestamp(startTime.getAdjustment(endTime), SCALE, 0);
+        TmfTimestamp span = new TmfTimestamp(startTime.getAdjustment(endTime), NS_SCALING_FACTOR, 0);
         return span;
     }
 
@@ -168,9 +168,9 @@ public class SpinnerGroup {
 
     public void setStartTime(TmfTimestamp ts) {
     	try {
-    		startTime = ts.synchronize(0, SCALE);
-    		startSeconds = (int) (startTime.getValue() / NANOSECOND_SCALE);
-    		startNanosec = (int) (startTime.getValue() % NANOSECOND_SCALE);
+    		startTime = ts.synchronize(0, NS_SCALING_FACTOR);
+    		startSeconds = (int) (startTime.getValue() / NS_PER_SECOND);
+    		startNanosec = (int) (startTime.getValue() % NS_PER_SECOND);
     	}
     	catch (ArithmeticException e) {
     	}
@@ -178,9 +178,9 @@ public class SpinnerGroup {
 
     public void setEndTime(TmfTimestamp ts) {
     	try {
-    		endTime = ts.synchronize(0, SCALE);
-    		endSeconds = (int) (endTime.getValue() / NANOSECOND_SCALE);
-    		endNanosec = (int) (endTime.getValue() % NANOSECOND_SCALE);
+    		endTime = ts.synchronize(0, NS_SCALING_FACTOR);
+    		endSeconds = (int) (endTime.getValue() / NS_PER_SECOND);
+    		endNanosec = (int) (endTime.getValue() % NS_PER_SECOND);
     	}
     	catch (ArithmeticException e) {
     	}
@@ -188,9 +188,9 @@ public class SpinnerGroup {
 
     public void setCurrentTime(TmfTimestamp ts) {
     	try {
-    		currentTime = ts.synchronize(0, SCALE);
-    		currentSeconds = (int) (currentTime.getValue() / NANOSECOND_SCALE);
-    		currentNanosec = (int) (currentTime.getValue() % NANOSECOND_SCALE);
+    		currentTime = ts.synchronize(0, NS_SCALING_FACTOR);
+    		currentSeconds = (int) (currentTime.getValue() / NS_PER_SECOND);
+    		currentNanosec = (int) (currentTime.getValue() % NS_PER_SECOND);
     	}
     	catch (ArithmeticException e) {
     	}
@@ -293,7 +293,7 @@ public class SpinnerGroup {
 		            // If we are on the end second, ensure that [currentNS <= endNS]
 		            // If the currentSeconds < endSeconds, set endns to MAX so we can
 		            // "overflow"
-		            int endns = NANOSECOND_SCALE;
+		            int endns = NS_PER_SECOND;
 		            if (currentSeconds >= endSeconds) {
 		                currentSeconds = endSeconds;
 		                endns = endNanosec;

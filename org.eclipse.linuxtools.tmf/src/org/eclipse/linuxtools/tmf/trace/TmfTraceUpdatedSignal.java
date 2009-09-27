@@ -38,4 +38,13 @@ public class TmfTraceUpdatedSignal extends TmfSignal {
 	public TmfTimeRange getRange() {
 		return fTimeRange;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "[TmfTraceUpdatedSignal (" + fTrace.toString() + ", " + fTimeRange.toString() + ")]";
+	}
+
 }

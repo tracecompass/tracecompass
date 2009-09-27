@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.tmf.ui.views;
 
 import org.eclipse.linuxtools.tmf.component.ITmfComponent;
+import org.eclipse.linuxtools.tmf.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
@@ -37,6 +38,13 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
 	@Override
 	public void dispose() {
 		TmfSignalManager.removeListener(this);
+	}
+
+	/**
+	 * broadcastSignal
+	 */
+	public void broadcastSignal(TmfSignal signal) {
+		TmfSignalManager.dispatchSignal(signal);
 	}
 
 	/* (non-Javadoc)

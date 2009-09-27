@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.component;
 
+import org.eclipse.linuxtools.tmf.signal.TmfSignal;
+
 /**
  * <b><u>ITmfComponent</u></b>
  * <p>
@@ -20,4 +22,6 @@ package org.eclipse.linuxtools.tmf.component;
 public interface ITmfComponent {
 
 	public void dispose();
+
+	public void broadcastSignal(TmfSignal signal);
 }

@@ -31,4 +31,9 @@ public class TmfExperimentSelectedSignal extends TmfSignal {
 	public TmfExperiment getExperiment() {
 		return fExperiment;
 	}
+
+	@Override
+	public String toString() {
+		return "[TmfExperimentSelectedSignal (" + fExperiment.getExperimentId() + ")]";
+	}
 }

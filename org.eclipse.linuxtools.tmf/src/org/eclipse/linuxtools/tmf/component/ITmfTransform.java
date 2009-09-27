@@ -17,7 +17,7 @@ package org.eclipse.linuxtools.tmf.component;
  * <p>
  * TODO: Implement me. Please.
  */
-public interface ITmfTransform {
+public interface ITmfTransform extends ITmfComponent {
 
 	/**
 	 * 

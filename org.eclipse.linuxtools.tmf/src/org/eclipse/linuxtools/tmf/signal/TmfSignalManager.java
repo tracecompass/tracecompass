@@ -22,24 +22,25 @@ import java.util.Map;
 /**
  * <b><u>TmfSignalHandler</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * This class manages the set of signal listeners and the signals they are
+ * interested in. When a signal is broadcasted, the appropriate listeners
+ * signal handlers are invoked.
  * <p>
- * TODO: Error/exception handling
  */
 public class TmfSignalManager {
 
-	/**
-	 * The set of event listeners and their corresponding handler methods.
-	 */
+	// The set of event listeners and their corresponding handler methods.
+	// Note: listeners could be restricted to ITmfComponents but there is no
+	// harm in letting anyone use this
 	static private Map<Object, Method[]> fListeners = new HashMap<Object, Method[]>();
 
-	// TODO: read from the preferences
+	// If requested, add universal signal tracer
+	// TODO: to be revisited... 
 	private static boolean fTraceIsActive = false;
-	private static TmfSignalTrace fSignalTracer;
-
+	private static TmfSignalTracer fSignalTracer;
 	static {
 		if (fTraceIsActive) {
-			fSignalTracer = new TmfSignalTrace();
+			fSignalTracer = TmfSignalTracer.getInstance();
 			addListener(fSignalTracer);
 		}
 	}
@@ -55,7 +56,25 @@ public class TmfSignalManager {
 	}
 
 	/**
-	 * Invokes the handling methods that expect this signal.
+	 * Returns the list of signal handlers in the listener. Signal handler name
+	 * is irrelevant; only the annotation (@TmfSignalHandler) is important.
+	 * 
+	 * @param listener
+	 * @return
+	 */
+	static private Method[] getSignalHandlerMethods(Object listener) {
+		List<Method> handlers = new ArrayList<Method>();
+		Method[] methods = listener.getClass().getMethods();
+		for (Method method : methods) {
+			if (method.isAnnotationPresent(TmfSignalHandler.class)) {
+				handlers.add(method);
+			}
+		}
+		return handlers.toArray(new Method[handlers.size()]);
+	}
+
+	/**
+	 * Invokes the handling methods that listens to signals of a given type.
 	 * 
 	 * The list of handlers is built on-the-fly to allow for the dynamic
 	 * creation/deletion of signal handlers. Since the number of signal
@@ -64,7 +83,7 @@ public class TmfSignalManager {
 	 * 
 	 * @param signal
 	 */
-	static public synchronized void dispatchSignal(Object signal) {
+	static public synchronized void dispatchSignal(TmfSignal signal) {
 
 		// Build the list of listener methods that are registered for this signal
 		Class<?> signalClass = signal.getClass();
@@ -96,24 +115,6 @@ public class TmfSignalManager {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Returns the list of signal handlers in the listener. Signal handler name
-	 * is irrelevant; only the annotation (@TmfSignalHandler) is important.
-	 * 
-	 * @param listener
-	 * @return
-	 */
-	static private Method[] getSignalHandlerMethods(Object listener) {
-		List<Method> handlers = new ArrayList<Method>();
-		Method[] methods = listener.getClass().getMethods();
-		for (Method method : methods) {
-			if (method.isAnnotationPresent(TmfSignalHandler.class)) {
-				handlers.add(method);
-			}
-		}
-		return handlers.toArray(new Method[handlers.size()]);
 	}
 
 }

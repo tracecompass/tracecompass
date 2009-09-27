@@ -78,4 +78,12 @@ public class TmfTimeRange {
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "[TmfTimeRange (" + fStartTime.toString() + ":" + fEndTime.toString() + ")]";
+	}
+
 }

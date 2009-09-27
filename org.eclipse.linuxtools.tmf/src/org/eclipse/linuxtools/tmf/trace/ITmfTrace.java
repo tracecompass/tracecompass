@@ -19,33 +19,9 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 /**
  * <b><u>ITmfTrace</u></b>
  * <p>
- * TODO: Implement me. Please.
  */
 public interface ITmfTrace {
 
-	/**
-	 * <b><u>TmfTraceContext</u></b>
-	 * <p>
-	 * Stream context keeper. It ties an event index to a stream location
-	 * which can later be restored. Used to prevent conflicting, concurrent
-	 * accesses to the trace. 
-	 */
-	public class TmfTraceContext {
-		public Object       location;
-		public TmfTimestamp timestamp;
-		public long         index;
-
-		public TmfTraceContext(Object loc, TmfTimestamp ts, long ind) {
-			location = loc;
-			timestamp = (ts != null) ? ts : TmfTimestamp.BigBang;
-			index = ind;
-		}
-
-		public TmfTraceContext(TmfTraceContext other) {
-			this(other.location, other.timestamp, other.index);
-		}
-	}
-    
 	/**
 	 * @return the trace path 
 	 */
@@ -74,8 +50,8 @@ public interface ITmfTrace {
      * 
      * Returns a context which can later be used to read the event.
      * 
-     * @param timestamp
-     * @param index
+     * @param data.timestamp
+     * @param data.index
      * @return a context object for subsequent reads
      */
     public TmfTraceContext seekLocation(Object location);
@@ -83,14 +59,8 @@ public interface ITmfTrace {
     public TmfTraceContext seekEvent(long index);
 
     /**
-     * These functions return the event pointed by the supplied context
-     * (or null if no event left).
-     * 
-     * - <code>getEvent()</code> consumes and returns the event at the
-     * specified timestamp/index. Updates the stream context.
-     * 
-     * - <code>getNextEvent()</code> consumes and returns the next event in
-     * the trace. Updates the stream context.
+     * Return the event pointed by the supplied context (or null if
+     * no event left) and updates the context to the next event.
      * 
      * @return the next event in the stream
      */

@@ -23,8 +23,6 @@ import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
-import org.eclipse.linuxtools.tmf.trace.ITmfTrace.TmfTraceContext;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -50,7 +48,7 @@ public class TmfTraceTest {
     public static void setUpBeforeClass() throws Exception {
     	String directory = new File(".").getCanonicalPath() + File.separator + DIRECTORY;
     	testfile = directory + File.separator + TEST_STREAM;
-        fTrace = new TmfTraceStub(testfile, 500);
+        fTrace = new TmfTraceStub(testfile, 500, true);
     }
 
     // ========================================================================
@@ -59,9 +57,9 @@ public class TmfTraceTest {
 
     @Test
     public void testDefaultConstructor() throws Exception {
-        TmfTraceStub trace = new TmfTraceStub(testfile);
+        TmfTraceStub trace = new TmfTraceStub(testfile, true);
 
-        assertEquals("getCacheSize", TmfTraceStub.DEFAULT_PAGE_SIZE, trace.getPageSize());
+        assertEquals("getCacheSize", TmfTraceStub.DEFAULT_CACHE_SIZE, trace.getCacheSize());
         assertEquals("getTraceSize", NB_EVENTS, trace.getNbEvents());
         assertEquals("getRange-start", 1, trace.getTimeRange().getStartTime().getValue());
         assertEquals("getRange-end", NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
@@ -69,7 +67,7 @@ public class TmfTraceTest {
 
     @Test
     public void testNormalConstructor() throws Exception {
-        assertEquals("getCacheSize",    500,    fTrace.getPageSize());
+        assertEquals("getCacheSize",    500,    fTrace.getCacheSize());
         assertEquals("getTraceSize", NB_EVENTS, fTrace.getNbEvents());
         assertEquals("getRange-start",    1,    fTrace.getTimeRange().getStartTime().getValue());
         assertEquals("getRange-end", NB_EVENTS, fTrace.getTimeRange().getEndTime().getValue());

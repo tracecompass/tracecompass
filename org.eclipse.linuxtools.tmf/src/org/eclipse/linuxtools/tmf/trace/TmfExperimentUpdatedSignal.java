@@ -37,4 +37,13 @@ public class TmfExperimentUpdatedSignal extends TmfSignal {
 	public ITmfTrace getTrace() {
 		return fTrace;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "[TmfExperimentUpdatedSignal (" + fExperiment.toString() + ", " + fTrace.toString() + ")]";
+	}
+
 }

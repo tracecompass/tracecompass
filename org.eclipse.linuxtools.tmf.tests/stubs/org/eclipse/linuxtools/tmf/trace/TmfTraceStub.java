@@ -21,7 +21,7 @@ import org.eclipse.linuxtools.tmf.event.TmfEvent;
 /**
  * <b><u>TmfTraceStub</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * Dummy test trace. Use in conjunction with TmfEventParserStub.
  */
 public class TmfTraceStub extends TmfTrace {
 
@@ -44,7 +44,15 @@ public class TmfTraceStub extends TmfTrace {
      * @throws FileNotFoundException
      */
     public TmfTraceStub(String filename) throws FileNotFoundException {
-        this(filename, DEFAULT_PAGE_SIZE);
+        this(filename, DEFAULT_CACHE_SIZE, false);
+    }
+
+    /**
+     * @param filename
+     * @throws FileNotFoundException
+     */
+    public TmfTraceStub(String filename, boolean waitForCompletion) throws FileNotFoundException {
+        this(filename, DEFAULT_CACHE_SIZE, waitForCompletion);
     }
 
     /**
@@ -53,7 +61,16 @@ public class TmfTraceStub extends TmfTrace {
      * @throws FileNotFoundException
      */
     public TmfTraceStub(String filename, int cacheSize) throws FileNotFoundException {
-        super(filename, cacheSize, true);
+        this(filename, cacheSize, false);
+    }
+
+    /**
+     * @param filename
+     * @param cacheSize
+     * @throws FileNotFoundException
+     */
+    public TmfTraceStub(String filename, int cacheSize, boolean waitForCompletion) throws FileNotFoundException {
+        super(filename, cacheSize, waitForCompletion);
         fTrace = new RandomAccessFile(filename, "r");
         fParser = new TmfEventParserStub();
         indexStream();
@@ -106,11 +123,13 @@ public class TmfTraceStub extends TmfTrace {
 	 * @see org.eclipse.linuxtools.tmf.trace.TmfTrace#parseEvent()
 	 */
 	@Override
-	public synchronized TmfEvent parseEvent(TmfTraceContext context) {
+	public TmfEvent parseEvent(TmfTraceContext context) {
        	try {
-       		fTrace.seek((context.location != null) ? (Long) context.location : 0);
-      		TmfEvent event = fParser.parseNextEvent(this);
-      		context = new TmfTraceContext(getCurrentLocation(), null, 0);
+   			// paserNextEvent updates the context
+   			TmfEvent event = fParser.parseNextEvent(this, context);
+   			if (event != null) {
+   				context.setTimestamp(event.getTimestamp());
+   			}
        		return event;
        	}
        	catch (IOException e) {
