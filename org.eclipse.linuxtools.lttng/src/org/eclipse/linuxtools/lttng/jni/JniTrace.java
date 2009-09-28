@@ -645,7 +645,7 @@ public class JniTrace extends Jni_C_Common {
          
          try {
              //testTrace = new JniTrace("/home/william/trace1");
-             testTrace = new JniTrace("/home/william/trace5");
+             testTrace = new JniTrace("/home/francois/workspace/LTTng/org.eclipse.linuxtools.lttng.tests/traceset/trace_617984ev_withlost");
              //testTrace = new JniTrace("/home/william/trace1_numcpu");
          }
          catch (JniException e) {
