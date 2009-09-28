@@ -211,7 +211,7 @@ public class LTTngTrace extends TmfTrace {
      * 
      * @return StreamContext pointing the position in the trace JUST AFTER the seek location 
      */
-    public synchronized TmfTraceContext seekLocation(Object location) {
+    public TmfTraceContext seekLocation(Object location) {
         
     	LttngTimestamp timestamp = null;
 

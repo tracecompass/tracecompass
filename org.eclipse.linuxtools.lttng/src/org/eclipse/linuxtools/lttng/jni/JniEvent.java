@@ -133,14 +133,25 @@ public final class JniEvent extends Jni_C_Common {
                 || (newParentTracefile == null)) {
             throw new JniEventException("Null or empty value passed to constructor, object is invalid! (JniEvent)");
         }
-
+        
         thisEventPtr = newEventPtr;
         tracefilePtr = newParentTracefile.getTracefilePtr();
         markersMap = newMarkersMap;
         parentTracefile = newParentTracefile;
 
         eventTime = new JniTime();
-
+        
+        // *** FIXME ***
+        // *** HACK  ***
+        // Lttv C library (liblttvtraceread) fail with "assertation error" while calling ltt_seek_next_event() on "metadata" type of events
+        //	 We do not really care about "metadata" stuff as these are special events type for marker self-definition in the trace
+        // 	 However, this force us to add a (very bad) special case here temporary. 
+        // 
+        // Note that this only happen on multi-CPU trace, on single CPU trace, the call to ltt_seek_next_event() works correctly
+        if ( parentTracefile.getTracefileName().equals("metadata") ) {
+        	throw new JniNoSuchEventException("FIXME : Metadata tracefile badly handled in liblttvtraceread.");
+        }
+        
         // Try to move to the first event
         // If the event is Out of Range (ERANGE) at the first range, this event
         // type will never been usable
