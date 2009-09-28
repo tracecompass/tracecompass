@@ -113,15 +113,22 @@ public class LTTngTrace extends TmfTrace {
      * @see org.eclipse.linuxtools.lttng.jni.JniTrace
      */ 
     @Override
-	public synchronized TmfEvent parseEvent(TmfTraceContext context) {
+	public TmfEvent parseEvent(TmfTraceContext context) {
 
-    	seekLocation(context.getLocation());
-        JniEvent jniEvent = currentJniTrace.readNextEvent();
-        currentLttngEvent = convertJniEventToTmf(jniEvent, true);
-        context = new TmfTraceContext((LttngTimestamp) getCurrentLocation(),
-        		currentLttngEvent.getTimestamp(), context.getIndex() + 1);
-        
-        return currentLttngEvent;
+		JniEvent jniEvent;
+		LttngTimestamp timestamp = null;
+		
+    	synchronized (currentJniTrace) {
+    		seekLocation(context.getLocation());
+    		jniEvent = currentJniTrace.readNextEvent();
+    		currentLttngEvent = (jniEvent != null) ? convertJniEventToTmf(jniEvent, true) : null;
+    		timestamp = (LttngTimestamp) getCurrentLocation();
+    	}
+   		context.setLocation(timestamp);
+   		context.setTimestamp(timestamp);
+   		context.incrIndex();
+
+   		return currentLttngEvent;
     }
     
     /*
@@ -204,25 +211,30 @@ public class LTTngTrace extends TmfTrace {
      * 
      * @return StreamContext pointing the position in the trace JUST AFTER the seek location 
      */
-    public TmfTraceContext seekLocation(Object location) {
+    public synchronized TmfTraceContext seekLocation(Object location) {
         
-        // If location is null, interpret this as a request to get back to the beginning of the trace
+    	LttngTimestamp timestamp = null;
+
+    	// If location is null, interpret this as a request to get back to the beginning of the trace
         // Change the location, the seek will happen below
     	if (location == null) {
     		location = getStartTime();
     	}
-    	
+
     	if (location instanceof TmfTimestamp) {
     		long value = ((TmfTimestamp) location).getValue();
     		if (value != currentJniTrace.getCurrentEventTimestamp().getTime()) {
-    			currentJniTrace.seekToTime(new JniTime(value));
+    			synchronized (currentJniTrace) {
+    				currentJniTrace.seekToTime(new JniTime(value));
+    				timestamp = (LttngTimestamp) getCurrentLocation();
+    			}
     		}
     	}
     	else {
     	    System.out.println("ERROR : Location not instance of TmfTimestamp");
     	}
     	
-        return new TmfTraceContext((LttngTimestamp) getCurrentLocation(), currentLttngEvent.getTimestamp(), 0);
+        return new TmfTraceContext(timestamp, timestamp, 0);
     }
     
     /**
@@ -237,7 +249,7 @@ public class LTTngTrace extends TmfTrace {
         JniEvent tmpJniEvent = currentJniTrace.findNextEvent();
         
         if ( tmpJniEvent != null  ) {
-            returnedLocation = new LttngTimestamp(tmpJniEvent.getEventTime().getTime() + 1);
+            returnedLocation = new LttngTimestamp(tmpJniEvent.getEventTime().getTime());
         }
         else {
             returnedLocation = new LttngTimestamp( getEndTime().getValue() + 1 );

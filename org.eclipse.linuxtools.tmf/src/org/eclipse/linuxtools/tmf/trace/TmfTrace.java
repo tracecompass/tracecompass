@@ -442,7 +442,9 @@ public abstract class TmfTrace extends TmfComponent implements ITmfTrace, ITmfRe
                 while ((event = getNextEvent(nextEventContext)) != null) {
                     lastTime = event.getTimestamp();
                     if ((++nbEvents % fCacheSize) == 0) {
-                       	fCheckpoints.add(new TmfTraceCheckpoint(lastTime, currentEventContext.getLocation()));
+//                       	fCheckpoints.add(new TmfTraceCheckpoint(lastTime, currentEventContext.getLocation()));
+                    	// TODO: LTTng specific (to be generalized)
+                       	fCheckpoints.add(new TmfTraceCheckpoint(lastTime, nextEventContext.getLocation()));
                        	fNbEvents = nbEvents - 1;
                         fTimeRange = new TmfTimeRange(startTime, lastTime);
                         notifyListeners(new TmfTimeRange(rangeStartTime, lastTime));

@@ -321,7 +321,7 @@ public class TmfExperiment extends TmfComponent implements ITmfRequestHandler<Tm
 	 * @param contexts
 	 * @param nextEvents
 	 */
-	private void positionTraces(long index, ITmfTrace[] traces, TmfTraceContext[] contexts, TmfEvent[] nextEvents) {
+	private synchronized void positionTraces(long index, ITmfTrace[] traces, TmfTraceContext[] contexts, TmfEvent[] nextEvents) {
 
 		// Compute the index page and corresponding index
 		int page = (int) index / fIndexPageSize;
@@ -526,34 +526,53 @@ public class TmfExperiment extends TmfComponent implements ITmfRequestHandler<Tm
     			// So, once the event is read, we can retrofit the timestamp of the context 
     			savedContexts[i].setTimestamp((events[i] != null) ? events[i].getTimestamp() : null);
     		}
+			indices.add(savedContexts);
 
     		// Get the ordered events and populate the indices
     		int nbEvents = 0;
     		while ((getNextEvent(traces, contexts, events)) != null)
     		{
-    			if (nbEvents % fIndexPageSize == 0) {
+//    			if (nbEvents % fIndexPageSize == 0) {
+//	    			// Udpate the contexts timestamp
+//    				// Special case: if the total number of events is a multiple of the
+//    				// DEFAULT_PAGE_SIZE then all the pending events are null. In that
+//    				// case, we don't store an additional entry in the index array.
+//    				int nullTimestamps = 0;
+//    	    		for (int i = 0; i < nbTraces; i++) {
+//    	    			savedContexts[i].setTimestamp((events[i] != null) ? events[i].getTimestamp() : null);
+//    	    			if (events[i] == null)
+//    	    				nullTimestamps++;
+//    	    		}
+//    	    		if (nullTimestamps < nbTraces) {
+//    	    			indices.add(savedContexts);
+//    	    		}
+//    			}
+//
+//                // Prepare the saved contexts for the upcoming save (next iteration)
+//    			// The timestamp will then be set
+//    			if (++nbEvents % fIndexPageSize == 0) {
+//    				savedContexts = new TmfTraceContext[nbTraces];
+//    				for (int i = 0; i < nbTraces; i++) {
+//    					savedContexts[i] = new TmfTraceContext(contexts[i].getLocation(), null, nbEvents);
+//    				}
+//    			}
+
+    			// TODO: LTTng specific (to be generalized)
+    			if (++nbEvents % fIndexPageSize == 0) {
 	    			// Udpate the contexts timestamp
     				// Special case: if the total number of events is a multiple of the
     				// DEFAULT_PAGE_SIZE then all the pending events are null. In that
     				// case, we don't store an additional entry in the index array.
     				int nullTimestamps = 0;
+    				savedContexts = new TmfTraceContext[nbTraces];
     	    		for (int i = 0; i < nbTraces; i++) {
-    	    			savedContexts[i].setTimestamp((events[i] != null) ? events[i].getTimestamp() : null);
+    	    			savedContexts[i] = new TmfTraceContext(contexts[i].getLocation(), (TmfTimestamp) contexts[i].getLocation(), nbEvents);
     	    			if (events[i] == null)
     	    				nullTimestamps++;
     	    		}
     	    		if (nullTimestamps < nbTraces) {
     	    			indices.add(savedContexts);
     	    		}
-    			}
-
-                // Prepare the saved contexts for the upcoming save (next iteration)
-    			// The timestamp will then be set
-    			if (++nbEvents % fIndexPageSize == 0) {
-    				savedContexts = new TmfTraceContext[nbTraces];
-    				for (int i = 0; i < nbTraces; i++) {
-    					savedContexts[i] = new TmfTraceContext(contexts[i].getLocation(), null, nbEvents);
-    				}
     			}
 
     			monitor.worked(1);
