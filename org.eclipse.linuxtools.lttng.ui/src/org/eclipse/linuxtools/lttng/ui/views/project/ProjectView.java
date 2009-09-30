@@ -144,13 +144,15 @@ public class ProjectView extends TmfView {
     	String expId = folder.getName();
         if (fExperiment != null)
         	fExperiment.dispose();
-        fExperiment = new TmfExperiment(expId, new ITmfTrace[] { }, waitForCompletion);
         try {
-        	for (IResource res : folder.members()) {
+        	ITmfTrace[] traces = new ITmfTrace[folder.members().length];
+        	for (int i = 0; i < folder.members().length; i++) {
+        		IResource res = folder.members()[i];
                 String traceId = Platform.getLocation() + res.getFullPath().toOSString();
                 ITmfTrace trace = new LTTngTrace(traceId, waitForCompletion);
-                fExperiment.addTrace(trace);
+                traces[i] = trace;
         	}
+            fExperiment = new TmfExperiment(expId, traces, waitForCompletion);
             broadcastSignal(new TmfExperimentSelectedSignal(this, fExperiment));
         } catch (FileNotFoundException e) {
         	// TODO: Why not tell the user? He would appreciate...
