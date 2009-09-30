@@ -419,35 +419,36 @@ public abstract class TmfTrace extends TmfComponent implements ITmfTrace, ITmfRe
             int nbEvents = 0;
             TmfTimestamp startTime = new TmfTimestamp();
             TmfTimestamp lastTime  = new TmfTimestamp();
-            TmfTimestamp rangeStartTime = new TmfTimestamp();
 
             monitor.beginTask("Indexing " + fName, IProgressMonitor.UNKNOWN);
 
-			try {
-                TmfTraceContext nextEventContext = null;
-               	nextEventContext = seekLocation(null);
-                TmfTraceContext currentEventContext = new TmfTraceContext(nextEventContext);
-
-                TmfEvent event = getNextEvent(nextEventContext);
-                if (event == null) {
+            try {
+            	// Position the trace at the beginning
+                TmfTraceContext context = seekLocation(null);
+                if (context.getTimestamp() == null) {
                 	return Status.OK_STATUS;
                 }
+                // FIXME: LTTng hack - start
+//               	fCheckpoints.add(new TmfTraceCheckpoint(context.getTimestamp(), context.getLocation()));	// TMF
+                // FIXME: LTTng hack - end
 
-               	startTime = event.getTimestamp();
-               	lastTime  = event.getTimestamp();
-               	fCheckpoints.add(new TmfTraceCheckpoint(lastTime, currentEventContext.getLocation()));
-                currentEventContext.setLocation(nextEventContext.getLocation());
-
-                rangeStartTime = startTime;
-                while ((event = getNextEvent(nextEventContext)) != null) {
-                    lastTime = event.getTimestamp();
-                    if ((++nbEvents % fCacheSize) == 0) {
-//                       	fCheckpoints.add(new TmfTraceCheckpoint(lastTime, currentEventContext.getLocation()));
-                    	// TODO: LTTng specific (to be generalized)
-                       	fCheckpoints.add(new TmfTraceCheckpoint(lastTime, nextEventContext.getLocation()));
-                       	fNbEvents = nbEvents - 1;
-                        fTimeRange = new TmfTimeRange(startTime, lastTime);
-                        notifyListeners(new TmfTimeRange(rangeStartTime, lastTime));
+               	TmfEvent event;
+               	startTime = context.getTimestamp();
+               	lastTime  = context.getTimestamp();
+                while ((event = getNextEvent(context)) != null) {
+                	TmfTimestamp timestamp = context.getTimestamp();
+            		if (timestamp != null) {
+            			lastTime = timestamp;
+            		}
+                    // FIXME: LTTng hack - start
+//                    if (((++nbEvents % fCacheSize) == 0) && (timestamp != null)) {	// TMF
+                    if (((nbEvents++ % fCacheSize) == 0) && (timestamp != null)) {	// LTTng
+                        // FIXME: LTTng hack - end
+                   		fCheckpoints.add(new TmfTraceCheckpoint(timestamp, context.getLocation()));
+                   		fNbEvents = nbEvents - 1;
+                   		lastTime = context.getTimestamp();
+                   		fTimeRange = new TmfTimeRange(startTime, lastTime);
+                   		notifyListeners(new TmfTimeRange(startTime, lastTime));
 
                         monitor.worked(1);
 
@@ -460,19 +461,22 @@ public abstract class TmfTrace extends TmfComponent implements ITmfTrace, ITmfRe
 
                     // Do whatever
                     processEvent(event);
-                    currentEventContext.setLocation(nextEventContext.getLocation());
                 }
             }
             finally {
                 synchronized(this) {
-                	fNbEvents = ++nbEvents;
+                	fNbEvents = nbEvents;
                 	fTimeRange = new TmfTimeRange(startTime, lastTime);
             		fIndexing = false;
                 }
-                notifyListeners(new TmfTimeRange(rangeStartTime, lastTime));
+                notifyListeners(new TmfTimeRange(startTime, lastTime));
                 monitor.done();
+
             }
 
+//            createOffsetsFile();
+//            dumpCheckpoints();
+            
             return Status.OK_STATUS;
 		}
     }
@@ -481,4 +485,70 @@ public abstract class TmfTrace extends TmfComponent implements ITmfTrace, ITmfRe
     	broadcastSignal(new TmfTraceUpdatedSignal(this, this, range));
 	}
    
+//	/**
+//	 * Dump the trace checkpoints
+//	 */
+//	private void dumpCheckpoints() {
+//		System.out.println("-----");
+//		System.out.println("Checkpoints of " + fName);
+//		for (int i = 0; i < fCheckpoints.size(); i++) {
+//			TmfTraceCheckpoint checkpoint = fCheckpoints.get(i);
+//			TmfTraceContext context = new TmfTraceContext(checkpoint.getLocation());
+//			TmfEvent event = getNextEvent(context);
+//			System.out.println("  Entry: " + i + " timestamp: " + checkpoint.getTimestamp() + ", event: " + event.getTimestamp());
+//			assert((checkpoint.getTimestamp().compareTo(event.getTimestamp(), false) == 0));
+//		}
+//		System.out.println();
+//	}
+
+//	private void createOffsetsFile() {
+//
+//	    try {
+//	    	ObjectOutputStream  out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("LTTngOffsets.dat")));
+//
+//	    	TmfTraceContext context = null;
+//           	context = seekLocation(null);
+//			out.writeObject(context.getLocation());
+//
+//			int nbEvents = 0;
+//            while (getNextEvent(context) != null) {
+//    			out.writeObject(context.getLocation());
+//    			nbEvents++;
+//            }
+//            out.close();
+//            System.out.println("TmfTrace wrote " + nbEvents + " events");
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
+
+//	private void createOffsetsFile() {
+//
+//		try {
+//			DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("LTTngOffsets.dat")));
+//
+//			TmfTraceContext context = null;
+//			context = seekLocation(null);
+//
+//			TmfEvent event;
+//			int nbEvents = 0;
+//			while ((event = getNextEvent(context)) != null) {
+//				out.writeUTF(event.getTimestamp().toString());
+//				nbEvents++;
+//			}
+//			out.close();
+//			System.out.println("TmfTrace wrote " + nbEvents + " events");
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
+
 }

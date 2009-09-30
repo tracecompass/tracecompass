@@ -80,28 +80,28 @@ public class LTTngEventParserStub implements ITmfEventParser {
        	String name = eventStream.getName();
        	name = name.substring(name.lastIndexOf('/') + 1);
 
-        synchronized(stream) {
+		synchronized(stream) {
         	long location = 0;
         	if (context != null)
         		location = (Long) (context.getLocation());
         	stream.seek(location);
 
-        	try {
-        		long ts        = stream.readLong();
-        		String source  = stream.readUTF();
-        		String type    = stream.readUTF();
-        		@SuppressWarnings("unused")
-        		int reference  = stream.readInt();
+    		try {
+    			// Read the individual fields
+        		long ts       = stream.readLong();
+        		String source = stream.readUTF();
+        		String type   = stream.readUTF();
+    			@SuppressWarnings("unused")
+    			int reference = stream.readInt();
+
+        		// Read the event parts
         		int typeIndex  = Integer.parseInt(type.substring(typePrefix.length()));
         		String[] fields = new String[typeIndex];
         		for (int i = 0; i < typeIndex; i++) {
         			fields[i] = stream.readUTF();
         		}
 
-        		// Update the context
-        		context.setLocation(stream.getFilePointer());
-        		context.incrIndex();
-
+        		// Format the content from the individual fields
         		String content = "[";
         		if (typeIndex > 0) {
         			content += fields[0];
@@ -111,14 +111,28 @@ public class LTTngEventParserStub implements ITmfEventParser {
         		}
         		content += "]";
 
-        		TmfEvent event = new TmfEvent(
-        				new LTTngTimestampStub(ts),
-        				new TmfEventSource(source),
-        				new TmfEventType(type, fFormats[typeIndex]),
-        				new TmfEventContent(content, fFormats[typeIndex]),
-        				new TmfEventReference(name));
-        		return event;
-        	} catch (EOFException e) {
+        		// Update the context
+        		context.setLocation(stream.getFilePointer());
+        		context.incrIndex();
+       			try {
+       				long ts2 = stream.readLong();
+           			context.setTimestamp(new LTTngTimestampStub(ts2));
+        		} catch (EOFException e) {
+        			context.setTimestamp(null);
+            	}
+
+       	    	// Create the event
+       			TmfEvent event = new TmfEvent(
+       					new LTTngTimestampStub(ts),
+       					new TmfEventSource(source),
+       					new TmfEventType(type, fFormats[typeIndex]),
+       					new TmfEventContent(content, fFormats[typeIndex]),
+       					new TmfEventReference(name));
+
+       			return event;
+
+    		} catch (EOFException e) {
+    			context.setTimestamp(null);
         	}
         }
         return null;

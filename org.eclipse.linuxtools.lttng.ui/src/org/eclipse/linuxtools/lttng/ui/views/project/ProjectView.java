@@ -76,8 +76,10 @@ public class ProjectView extends TmfView {
 	 * This view needs to react to workspace resource changes
 	 */
 	public ProjectView() {
+
 //		TmfTraceContext.init();
-        fWorkspace = ResourcesPlugin.getWorkspace();
+
+		fWorkspace = ResourcesPlugin.getWorkspace();
         fResourceChangeListener = new IResourceChangeListener() {
             public void resourceChanged(IResourceChangeEvent event) {
                 if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
@@ -134,20 +136,24 @@ public class ProjectView extends TmfView {
      * 
      * TODO: Tie the proper parser to the trace 
      */
-    private void selectExperiment(Folder folder) {
-        String expId = folder.getName();
+    // FIXME: Troubleshooting hack - start
+	private boolean waitForCompletion = true;
+    // FIXME: Troubleshooting hack - end
+
+	private void selectExperiment(Folder folder) {
+    	String expId = folder.getName();
         if (fExperiment != null)
         	fExperiment.dispose();
-        fExperiment = new TmfExperiment(expId, new ITmfTrace[] { });
+        fExperiment = new TmfExperiment(expId, new ITmfTrace[] { }, waitForCompletion);
         try {
         	for (IResource res : folder.members()) {
                 String traceId = Platform.getLocation() + res.getFullPath().toOSString();
-                ITmfTrace trace = new LTTngTrace(traceId);
+                ITmfTrace trace = new LTTngTrace(traceId, waitForCompletion);
                 fExperiment.addTrace(trace);
         	}
             broadcastSignal(new TmfExperimentSelectedSignal(this, fExperiment));
         } catch (FileNotFoundException e) {
-        	// TODO: Why not tell the user?
+        	// TODO: Why not tell the user? He would appreciate...
 //            e.printStackTrace();
             return;
         } catch (Exception e) {

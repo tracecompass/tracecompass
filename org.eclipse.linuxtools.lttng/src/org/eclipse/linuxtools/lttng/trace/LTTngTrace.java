@@ -66,7 +66,7 @@ public class LTTngTrace extends TmfTrace {
      * @see org.eclipse.linuxtools.lttng.jni.JniTrace
      */
     public LTTngTrace(String path) throws Exception {
-        this(path, true);
+        this(path, false);
     }
     
     /**
@@ -233,8 +233,11 @@ public class LTTngTrace extends TmfTrace {
     	else {
     	    System.out.println("ERROR : Location not instance of TmfTimestamp");
     	}
-    	
-        return new TmfTraceContext(timestamp, timestamp, 0);
+
+    	// FIXME: LTTng hack - start
+//        return new TmfTraceContext(timestamp, timestamp, 0);	// Original
+        return new TmfTraceContext(timestamp, timestamp, -1);	// Hacked
+    	// FIXME: LTTng hack - end
     }
     
     /**

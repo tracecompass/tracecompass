@@ -85,6 +85,9 @@ public class LTTngTraceStub extends TmfTrace {
        		synchronized(fTrace) {
         		fTrace.seek((location != null) ? (Long) location : 0);
         		context = new TmfTraceContext(getCurrentLocation(), null, 0);
+        		TmfTraceContext context2 = new TmfTraceContext(getCurrentLocation(), null, 0);
+        		TmfEvent event = parseEvent(context2);
+        		context.setTimestamp(event.getTimestamp());
        		}
         } catch (IOException e) {
         	// TODO Auto-generated catch block
@@ -115,9 +118,9 @@ public class LTTngTraceStub extends TmfTrace {
        	try {
    			// paserNextEvent updates the context
    			TmfEvent event = fParser.parseNextEvent(this, context);
-   			if (event != null) {
-   				context.setTimestamp(event.getTimestamp());
-   			}
+//   			if (event != null) {
+//   				context.setTimestamp(event.getTimestamp());
+//   			}
        		return event;
        	}
        	catch (IOException e) {

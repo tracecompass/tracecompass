@@ -272,7 +272,6 @@ public class TmfExperiment extends TmfComponent implements ITmfRequestHandler<Tm
 				// Key variables
 				ITmfTrace[] traces = new ITmfTrace[0];	// The set of traces
 				TmfTraceContext[] contexts;				// The set of trace contexts
-				TmfEvent[] nextEvents;					// The next event of each trace
 
 				// Extract the general request information
 				int blockSize = request.getBlockize();
@@ -289,11 +288,10 @@ public class TmfExperiment extends TmfComponent implements ITmfRequestHandler<Tm
 				// at the first requested event
 				traces = fTraces.toArray(traces);
 				contexts = new TmfTraceContext[traces.length];
-				nextEvents = new TmfEvent[traces.length];
-				positionTraces(index, traces, contexts, nextEvents);
+				positionTraces(index, traces, contexts);
 
 				// Get the ordered events
-				TmfEvent event = getNextEvent(traces, contexts, nextEvents);
+				TmfEvent event = getNextEvent(traces, contexts);
 				while (!request.isCancelled() && nbEvents < nbRequestedEvents && event != null
 						&& event.getTimestamp().compareTo(endTime, false) < 0)
 				{
@@ -303,7 +301,7 @@ public class TmfExperiment extends TmfComponent implements ITmfRequestHandler<Tm
 					}
 					// Avoid an unnecessary read passed the last event requested
 					if (nbEvents < nbRequestedEvents)
-						event = getNextEvent(traces, contexts, nextEvents);
+						event = getNextEvent(traces, contexts);
 				}
 				pushData(request, events);
 				request.done();
@@ -321,7 +319,7 @@ public class TmfExperiment extends TmfComponent implements ITmfRequestHandler<Tm
 	 * @param contexts
 	 * @param nextEvents
 	 */
-	private synchronized void positionTraces(long index, ITmfTrace[] traces, TmfTraceContext[] contexts, TmfEvent[] nextEvents) {
+	private synchronized void positionTraces(long index, ITmfTrace[] traces, TmfTraceContext[] contexts) {
 
 		// Compute the index page and corresponding index
 		int page = (int) index / fIndexPageSize;
@@ -354,14 +352,9 @@ public class TmfExperiment extends TmfComponent implements ITmfRequestHandler<Tm
 			}
 		}
 
-		// Set the next events
-		for (int i = 0; i < contexts.length; i++) {
-			nextEvents[i] = traces[i].getNextEvent(contexts[i]);
-		}
-
 		// Position the traces at the requested index
 		while (current++ < index) {
-			getNextEvent(traces, contexts, nextEvents);
+			getNextEvent(traces, contexts);
 		}
 	}
 
@@ -374,22 +367,23 @@ public class TmfExperiment extends TmfComponent implements ITmfRequestHandler<Tm
 	 * @param nextEvents
 	 * @return
 	 */
-	private TmfEvent getNextEvent(ITmfTrace[] traces, TmfTraceContext[] contexts, TmfEvent[] nextEvents) {
+	private TmfEvent getNextEvent(ITmfTrace[] traces, TmfTraceContext[] contexts) {
 		// TODO: Consider the time adjustment
 		int trace = 0;
-		TmfEvent event = nextEvents[0];
-		TmfTimestamp timestamp = (event != null) ? event.getTimestamp() : TmfTimestamp.BigCrunch;
+		TmfTimestamp timestamp = contexts[trace].getTimestamp();
+		if (timestamp == null) {
+			timestamp = TmfTimestamp.BigCrunch;
+		}
 		for (int i = 1; i < traces.length; i++) {
-			if (nextEvents[i] != null) {
-				TmfTimestamp otherTS = nextEvents[i].getTimestamp();
+			if (contexts[i].getTimestamp() != null) {
+				TmfTimestamp otherTS = contexts[i].getTimestamp();
 				if (otherTS.compareTo(timestamp, true) < 0) {
 					trace = i;
 					timestamp = otherTS;
-					event = nextEvents[i];
 				}
 			}
 		}
-		nextEvents[trace] = traces[trace].getNextEvent(contexts[trace]);
+		TmfEvent event = traces[trace].getNextEvent(contexts[trace]);
 		return event;
 	}
 
@@ -507,70 +501,48 @@ public class TmfExperiment extends TmfComponent implements ITmfRequestHandler<Tm
 
     		ITmfTrace[] traces = new ITmfTrace[0];
     		TmfTraceContext[] contexts;
-    		TmfEvent[] events;
     		int nbTraces = fTraces.size();
 
     		// Initialize the traces and contexts arrays
     		traces = fTraces.toArray(traces);
     		contexts = new TmfTraceContext[nbTraces];
-    		events = new TmfEvent[nbTraces];
     		TmfTraceContext[] savedContexts = new TmfTraceContext[nbTraces];
+			int nullEvents = 0;
     		for (int i = 0; i < nbTraces; i++) {
     			// Context of the first event of the trace
     			contexts[i] = traces[i].seekLocation(null);
-    			savedContexts[i] = new TmfTraceContext(contexts[i].getLocation(), null, 0);
-    			// Set the peeked event
-    			events[i] = traces[i].getNextEvent(new TmfTraceContext(contexts[i]));
-    			// We don't know the event timestamp before we parse it, at which time
-    			// the trace points to the beginning of the *next* event...
-    			// So, once the event is read, we can retrofit the timestamp of the context 
-    			savedContexts[i].setTimestamp((events[i] != null) ? events[i].getTimestamp() : null);
+    			savedContexts[i] = new TmfTraceContext(contexts[i].getLocation(), contexts[i].getTimestamp(), 0);
+    			if (contexts[i].getTimestamp() == null)
+    				nullEvents++;
     		}
-			indices.add(savedContexts);
-
+    		// Check if there is anything to index
+    		if (nullEvents >= nbTraces) {
+	            fIndexing = false;
+				return Status.OK_STATUS;
+    		}
+    		// FIXME: LTTng hack - start
+//			indices.add(savedContexts);	// TMF
+    		// FIXME: LTTng hack - end
+    		
     		// Get the ordered events and populate the indices
-    		int nbEvents = 0;
-    		while ((getNextEvent(traces, contexts, events)) != null)
+    		// FIXME: LTTng hack - start
+//    		int nbEvents = 0; // TMF
+    		int nbEvents = -1; // LTTng
+    		// FIXME: LTTng hack - end
+    		while ((getNextEvent(traces, contexts)) != null)
     		{
-//    			if (nbEvents % fIndexPageSize == 0) {
-//	    			// Udpate the contexts timestamp
-//    				// Special case: if the total number of events is a multiple of the
-//    				// DEFAULT_PAGE_SIZE then all the pending events are null. In that
-//    				// case, we don't store an additional entry in the index array.
-//    				int nullTimestamps = 0;
-//    	    		for (int i = 0; i < nbTraces; i++) {
-//    	    			savedContexts[i].setTimestamp((events[i] != null) ? events[i].getTimestamp() : null);
-//    	    			if (events[i] == null)
-//    	    				nullTimestamps++;
-//    	    		}
-//    	    		if (nullTimestamps < nbTraces) {
-//    	    			indices.add(savedContexts);
-//    	    		}
-//    			}
-//
-//                // Prepare the saved contexts for the upcoming save (next iteration)
-//    			// The timestamp will then be set
-//    			if (++nbEvents % fIndexPageSize == 0) {
-//    				savedContexts = new TmfTraceContext[nbTraces];
-//    				for (int i = 0; i < nbTraces; i++) {
-//    					savedContexts[i] = new TmfTraceContext(contexts[i].getLocation(), null, nbEvents);
-//    				}
-//    			}
-
-    			// TODO: LTTng specific (to be generalized)
     			if (++nbEvents % fIndexPageSize == 0) {
-	    			// Udpate the contexts timestamp
     				// Special case: if the total number of events is a multiple of the
     				// DEFAULT_PAGE_SIZE then all the pending events are null. In that
     				// case, we don't store an additional entry in the index array.
-    				int nullTimestamps = 0;
+    				nullEvents = 0;
     				savedContexts = new TmfTraceContext[nbTraces];
     	    		for (int i = 0; i < nbTraces; i++) {
-    	    			savedContexts[i] = new TmfTraceContext(contexts[i].getLocation(), (TmfTimestamp) contexts[i].getLocation(), nbEvents);
-    	    			if (events[i] == null)
-    	    				nullTimestamps++;
+    	    			savedContexts[i] = new TmfTraceContext(contexts[i]);
+    	    			if (contexts[i].getTimestamp() ==  null)
+    	    				nullEvents++;
     	    		}
-    	    		if (nullTimestamps < nbTraces) {
+    	    		if (nullEvents < nbTraces) {
     	    			indices.add(savedContexts);
     	    		}
     			}
@@ -596,17 +568,25 @@ public class TmfExperiment extends TmfComponent implements ITmfRequestHandler<Tm
 //	 * Dump the experiment index
 //	 */
 //	private void dumpIndex() {
-//        for (int i = 0; i < fExperimentIndex.size(); i++) {
+//		System.out.println("-----");
+//		System.out.println("Index of " + fExperimentId);
+//		for (int i = 0; i < fExperimentIndex.size(); i++) {
 //        	System.out.println("Entry:" + i);
-//        	TmfTraceContext[] ctxts = fExperimentIndex.get(i);
-//        	for (int j = 0; j < ctxts.length; j++) {
-//            	TmfTraceContext context = new TmfTraceContext(ctxts[j]);
+//        	TmfTraceContext[] contexts = fExperimentIndex.get(i);
+//        	int nbEvents = 0;
+//        	for (int j = 0; j < contexts.length; j++) {
+//        		ITmfTrace trace = fTraces.get(j);
+//            	TmfTraceContext context = trace.seekLocation(contexts[j].getLocation());
 //            	TmfEvent event = fTraces.get(j).getNextEvent(new TmfTraceContext(context));
-//            	System.out.println(
-//            			"    index: " +  context.index
-//            			+ ", timestamp " + context.timestamp
-//            			+ ", event: " + event.getTimestamp());
+//            	nbEvents += contexts[j].getIndex();
+//            	System.out.println("  ["  + trace.getName() + "]" 
+//            			+  " index: "     + contexts[j].getIndex()
+//            			+ ", timestamp: " + contexts[j].getTimestamp()
+//            			+ ", event: "     + event.getTimestamp());
+//            	assert (contexts[j].getTimestamp().compareTo(event.getTimestamp(), false) == 0);
 //        	}
+//        	assert ((i+1) * fIndexPageSize == nbEvents);
+//	
 //        }
 //	}
 

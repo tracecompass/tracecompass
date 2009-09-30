@@ -24,6 +24,11 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 public class LttngTimestamp extends TmfTimestamp {
     
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7016853105162491273L;
+
+	/**
      * Constructor with parameters
      * 
      * @param newEventTime    JniTime as long, unit expected to be nanoseconds.

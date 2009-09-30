@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.event;
 
+import java.io.Serializable;
+
 /**
  * <b><u>TmfTimestamp</u></b>
  * <p>
@@ -34,9 +36,14 @@ package org.eclipse.linuxtools.tmf.event;
  * occurred before t0 of the reference clock.
  * 
  */
-public class TmfTimestamp {
+public class TmfTimestamp implements Serializable {
 
-    // ========================================================================
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3196421507276821609L;
+
+	// ========================================================================
     // Attributes
     // ========================================================================
 

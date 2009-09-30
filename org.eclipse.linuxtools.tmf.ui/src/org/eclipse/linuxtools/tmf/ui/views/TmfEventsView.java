@@ -135,17 +135,23 @@ public class TmfEventsView extends TmfView {
         fTable.addListener(SWT.SetData, new Listener() {
 			public void handleEvent(Event event) {
 				TableItem item = (TableItem) event.item;
-				int index = fTable.indexOf(item);
-				final TmfEvent[] evt = new TmfEvent[1];
-				TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(index, 0, 1) {
+				final int index = fTable.indexOf(item);
+				// Note: this works because handleEvent() is called once for each row, in sequence  
+				if ((index >= cacheStartIndex ) && (index < cacheEndIndex)) {
+					item.setText(extractItemFields(cache[index - cacheStartIndex]));
+					return;
+				}
+				TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(index, 0, CACHE_SIZE) {
 					@Override
 					public void handleData() {
-						TmfEvent[] result = getData();
-						evt[0] = (result.length > 0) ? result[0] : null;
+						// No need to synchronize because the request is synchronous
+						cache = getData();
+						cacheStartIndex = index;
+						cacheEndIndex = index + cache.length; 
 					}
 				};
 				fExperiment.processRequest(request, true);
-				item.setText(extractItemFields(evt[0]));
+				item.setText(extractItemFields(cache[0]));
 			}
         });
 
@@ -159,6 +165,13 @@ public class TmfEventsView extends TmfView {
     	}
     }
 
+    // Events cache - temporary stuff
+    private final int CACHE_SIZE = 100;
+    private TmfEvent[] cache;
+    private int cacheStartIndex = 0;
+    private int cacheEndIndex = 0;
+
+    
     private TmfTimestamp extractTimestamp(String entry) {
     	TmfTimestamp ts = null;
 
@@ -256,20 +269,20 @@ public class TmfEventsView extends TmfView {
         });
     }
 
-    @TmfSignalHandler
-    public void currentTimeUpdated(TmfTimeSynchSignal signal) {
-    	if (signal.getSource() != fTable && fExperiment != null) {
-    		final int index = (int) fExperiment.getIndex(signal.getCurrentTime());
-            // Perform the updates on the UI thread
-            fTable.getDisplay().asyncExec(new Runnable() {
-            	public void run() {
-            		int pos = (index > fTable.getTopIndex()) ? fTable.getTopIndex() : index; 
-            		fTable.setSelection(pos);
-    				TmfTimestamp ts = extractTimestamp(fTable.getSelection()[0].getText());
-    				broadcastSignal(new TmfTimeSynchSignal(fTable, ts));
-            	}
-            });
-    	}
-    }
+//    @TmfSignalHandler
+//    public void currentTimeUpdated(TmfTimeSynchSignal signal) {
+//    	if (signal.getSource() != fTable && fExperiment != null) {
+//    		final int index = (int) fExperiment.getIndex(signal.getCurrentTime());
+//            // Perform the updates on the UI thread
+//            fTable.getDisplay().asyncExec(new Runnable() {
+//            	public void run() {
+//            		int pos = (index > fTable.getTopIndex()) ? fTable.getTopIndex() : index; 
+//            		fTable.setSelection(pos);
+//    				TmfTimestamp ts = extractTimestamp(fTable.getSelection()[0].getText());
+////    				broadcastSignal(new TmfTimeSynchSignal(fTable, ts));
+//            	}
+//            });
+//    	}
+//    }
 
 }

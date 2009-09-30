@@ -31,8 +31,12 @@ public class TmfTraceContext {
 	
 	public TmfTraceContext(Object loc, TmfTimestamp ts, long ind) {
 		location = loc;
-		timestamp = (ts != null) ? ts : TmfTimestamp.BigBang;
+		timestamp = ts;
 		index = ind;
+	}
+
+	public TmfTraceContext(Object loc) {
+		this(loc, null, 0);
 	}
 
 	public TmfTraceContext(TmfTraceContext other) {
@@ -69,39 +73,39 @@ public class TmfTraceContext {
 		index++;
 	}
 
-// TODO: Generalize this code so an implementor can troubleshoot concurrency issues 
-	
 //	// ========================================================================
 //	// Toubleshooting code
 //	// ========================================================================
 //
 //	static private DataInputStream in;
-//	static private int size = 100001;
-//	static private long offsets[] = new long[size];
+//	static private int size = 100000;
+//	static private String locations[] = new String[size];
 //	static public void init() {
-//		System.out.println("TmfTraceContext: Loading valid offsets...");
+//		System.out.println("TmfTraceContext: Loading valid locations...");
 //		try {
-//			in = new DataInputStream(new BufferedInputStream(new FileInputStream("Offsets.dat")));
-//			for (int i = 0; i < size; i++)
-//				offsets[i] = in.readLong();
+//			in = new DataInputStream(new BufferedInputStream(new FileInputStream("LTTngOffsets.dat")));
+//			int i = 0;
+//			while (i < size) {
+//				locations[i] = in.readUTF();
+//				i++;
+//			}
+//			in.close();
 //		} catch (FileNotFoundException e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
 //		}
 //		System.out.println("TmfTraceContext: Done.");
 //	}
-//
+
 //	private boolean bsearch(long key) {
 //		int first = 0;
 //		int last = size;
 //		while (first < last) {
 //			int mid = (first + last) / 2;
-//			if (key < offsets[mid]) {
+//			if (key < locations[mid]) {
 //				last = mid;
-//			} else if (key > offsets[mid]) {
+//			} else if (key > locations[mid]) {
 //				first = mid + 1;
 //			} else {
 //				return true;
