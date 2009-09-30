@@ -30,7 +30,6 @@ public abstract class TimeRangeEventResource extends TimeRangeComposite
 
 	private ResourceTypes type = ResourceTypes.UNKNOWN;
 	private Long resourceId = null;
-	private long next_good_time = 0;
 
 	// ========================================================================
 	// Constructor
@@ -57,7 +56,6 @@ public abstract class TimeRangeEventResource extends TimeRangeComposite
 
 		type = newType;
 		resourceId = newResourceId;
-		next_good_time = newStartTime;
 	}
 
 	// ========================================================================
@@ -173,34 +171,5 @@ public abstract class TimeRangeEventResource extends TimeRangeComposite
 		return returnedValue;
 	}
 
-	/**
-	 * Represents the time where the next time range can start the drawing i.e.
-	 * right after previous time range.
-	 * 
-	 * @return
-	 */
-	public long getNext_good_time() {
-		return next_good_time;
-	}
-
-	/**
-	 * Represents the time where the next time range can start the drawing i.e.
-	 * right after previous time range.
-	 * 
-	 * @param nextGoodTime
-	 */
-	public void setNext_good_time(long nextGoodTime) {
-		next_good_time = nextGoodTime;
-	}
-
-	/**
-	 * Reset this resource to the construction state except for
-	 */
-	public void reset() {
-		getChildEventComposites().clear();
-		getTraceEvents().clear();
-		next_good_time = startTime;
-	}
-	
 	public abstract String getStateMode(LttngTraceState traceState);
 }

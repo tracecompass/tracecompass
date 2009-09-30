@@ -142,7 +142,9 @@ public class StateManager extends Observable {
 			TmfTimeRange allTraceWindow = fEventLog.getTimeRange();
 			StateDataRequest request = getDataRequestStateSave(allTraceWindow,
 					null);
-			request.startRequestInd(fExperiment, true);
+
+			// Wait for completion
+			request.startRequestInd(fExperiment, true, true);
 
 			if (TraceDebug.isDEBUG()) {
 				List<LttngProcessState> processes = stateIn
@@ -188,7 +190,8 @@ public class StateManager extends Observable {
 
 		// Process request to that point
 		StateDataRequest request = getDataRequestByTimeRange(trange, listener);
-		request.startRequestInd(fExperiment, false);
+		// don't wait for completion i.e. allow cancellations
+		request.startRequestInd(fExperiment, false, true);
 
 		if (TraceDebug.isDEBUG()) {
 			List<LttngProcessState> processes = stateIn.getTraceStateModel()
@@ -421,11 +424,9 @@ public class StateManager extends Observable {
 
 		final TmfEvent[] evt = new TmfEvent[1];
 
-		// ***FIXME***
-		// The override of handlePartialResult is exactly the same as the one in
+		// ***TODO***
+		// The override of handlePartialResult is similar to the one in
 		// getDataRequestByPosition()
-		// However, there is no way to override it in only one place to avoid
-		// code duplication!
 		// ***
 
 		// Create the new request and override the handlePartialResult function
@@ -440,13 +441,21 @@ public class StateManager extends Observable {
 				// Dispatch information for Event processing
 				stateIn.processEvent(evt[0]);
 
+				// increment internal and external number of events
+				setNumOfEvents(getNumOfEvents() + 1);
 				eventCount++;
 			}
 
 			@Override
 			public void handleCompleted() {
-				requestCompleted();
-				// notify the associated listener
+				if (isCancelled() || isFailed()) {
+					// No notification to end request handlers
+				} else {
+					// notify the associated end request handlers
+					requestCompleted();
+				}
+
+				// notify listeners
 				notifyCompletion();
 			}
 		};
@@ -459,11 +468,9 @@ public class StateManager extends Observable {
 
 		final TmfEvent[] evt = new TmfEvent[1];
 
-		// ***FIXME***
-		// The override of handlePartialResult is exactly the same as the one in
+		// ***TODO***
+		// The override of handlePartialResult is similar to the one in
 		// getDataRequestByPosition()
-		// However, there is no way to override it in only one place to avoid
-		// code duplication!
 		// ***
 
 		// Create the new request and override the handlePartialResult function
@@ -495,9 +502,14 @@ public class StateManager extends Observable {
 
 			@Override
 			public void handleCompleted() {
-				requestCompleted();
+				if (isCancelled() || isFailed()) {
+					// No notification to end request handlers
+				} else {
+					// notify the associated end request handlers
+					requestCompleted();
+				}
 
-				// Notify listeners of the completion of this request.
+				// notify listeners
 				notifyCompletion();
 				TraceDebug.debug("number of events processed on file opening"
 						+ getNumOfEvents());

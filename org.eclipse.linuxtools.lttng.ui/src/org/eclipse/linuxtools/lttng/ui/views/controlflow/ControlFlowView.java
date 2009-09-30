@@ -34,9 +34,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
-import org.eclipse.linuxtools.lttng.state.IStateDataRequestListener;
-import org.eclipse.linuxtools.lttng.state.RequestCompletedSignal;
-import org.eclipse.linuxtools.lttng.state.RequestStartedSignal;
 import org.eclipse.linuxtools.lttng.state.StateDataRequest;
 import org.eclipse.linuxtools.lttng.state.StateManager;
 import org.eclipse.linuxtools.lttng.state.evProcessor.EventProcessorProxy;
@@ -45,10 +42,10 @@ import org.eclipse.linuxtools.lttng.state.experiment.StateManagerFactory;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventProcess;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeViewerProvider;
+import org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView;
 import org.eclipse.linuxtools.lttng.ui.views.common.ParamsUpdater;
 import org.eclipse.linuxtools.lttng.ui.views.controlflow.evProcessor.FlowTRangeUpdateFactory;
 import org.eclipse.linuxtools.lttng.ui.views.controlflow.model.FlowModelFactory;
-import org.eclipse.linuxtools.lttng.ui.views.resources.model.ResourceModelFactory;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
@@ -62,7 +59,6 @@ import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeFilterSelection
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeScaleSelectionEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeSelectionEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
-import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -92,12 +88,16 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  * <p>
  * TODO: Implement me. Please.
  */
-public class ControlFlowView extends TmfView implements
+/**
+ * @author alvaro
+ * 
+ */
+public class ControlFlowView extends AbsTimeUpdateView implements
 		ITmfTimeSelectionListener, ITmfTimeScaleSelectionListener,
-		ITmfTimeFilterSelectionListener, IStateDataRequestListener {
+		ITmfTimeFilterSelectionListener {
 
     public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.controlflow";
-
+    
 	// ========================================================================
 	// Table data
 	// ========================================================================
@@ -125,8 +125,6 @@ public class ControlFlowView extends TmfView implements
 	// ========================================================================
 	// Data
 	// ========================================================================
-	private Vector<StateDataRequest> pendingDataRequests = new Vector<StateDataRequest>();
-
 	private TableViewer tableViewer;
 	// private int totalNumItems = 0;
 	// Actions
@@ -302,6 +300,7 @@ public class ControlFlowView extends TmfView implements
 	 * The constructor.
 	 */
 	public ControlFlowView() {
+		super(ID);
 	}
 
 	/**
@@ -518,7 +517,7 @@ public class ControlFlowView extends TmfView implements
 		tsfviewer.addWidgetSelectionListner(this);
 		tsfviewer.addWidgetTimeScaleSelectionListner(this);
 
-		// Traces shall not be grouped to allow synchronization
+		// Traces shall not be grouped to allow synchronisation
 		tsfviewer.groupTraces(false);
 		tsfviewer.setItemHeight(itemHeight);
 		tsfviewer.setBorderWidth(borderWidth);
@@ -529,7 +528,7 @@ public class ControlFlowView extends TmfView implements
 		tsfviewer.setAcceptSelectionAPIcalls(true);
 
 		// Viewer to notify selection to this class
-		// This class will synchronize selections with table.
+		// This class will synchronise selections with table.
 		tsfviewer.addWidgetSelectionListner(this);
 		tsfviewer.addFilterSelectionListner(this);
 		tsfviewer.addWidgetTimeScaleSelectionListner(this);
@@ -702,8 +701,8 @@ public class ControlFlowView extends TmfView implements
 
 		// action6
 		prevEvent = new Action() {
-			@Override
-public void run() {
+		@Override
+		public void run() {
 				if (tsfviewer != null) {
 					tsfviewer.selectPrevEvent();
 				}
@@ -886,7 +885,7 @@ public void run() {
 			tableViewer.setSelection(sel);
 		}
 
-		ParamsUpdater paramUpdater = ResourceModelFactory.getParamsUpdater();
+		ParamsUpdater paramUpdater = FlowModelFactory.getParamsUpdater();
 		Long savedSelTime = paramUpdater.getSelectedTime();
 
 		long selTimens = event.getSelectedTime();
@@ -908,7 +907,8 @@ public void run() {
 		}
 	}
 
-	public void tsfTmProcessTimeScaleEvent(TmfTimeScaleSelectionEvent event) {
+	public synchronized void tsfTmProcessTimeScaleEvent(
+			TmfTimeScaleSelectionEvent event) {
 		// source needed to keep track of source values
 		Object source = event.getSource();
 
@@ -921,8 +921,8 @@ public void run() {
 				// Read the updated time window
 				TmfTimeRange trange = paramUpdater.getTrange();
 				if (trange != null) {
-					StateManagerFactory.getExperimentManager()
-							.readExperimentTimeWindow(trange, "flowView", this);
+					// Request new data for specified time range
+					dataRequest(trange);
 				}
 			}
 		}
@@ -970,9 +970,10 @@ public void run() {
 		final Table table = tableViewer.getTable();
 		Display display = table.getDisplay();
 
-		// Perform the updates on the UI thread
+		// Perform the updates on the UI thread)
 		display.asyncExec(new Runnable() {
 			public void run() {
+
 				tableViewer.setInput(items); // This shall be the minimal
 				// initial
 				tableFilter = new ViewProcessFilter(tableViewer);
@@ -1042,127 +1043,6 @@ public void run() {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.linuxtools.lttng.state.IStateDataRequestListener#
-	 * processingCompleted(org.eclipse.linuxtools.lttng.state.StateDataRequest)
-	 */
-	@TmfSignalHandler
-	public void processingCompleted(RequestCompletedSignal signal) {
-		StateDataRequest request = signal.getRequest();
-
-		if (request == null) {
-			return;
-		} else {
-			// Remove from the pending requests record
-			pendingDataRequests.remove(request);
-		}
-
-		// No data refresh actions for cancelled requests.
-		if (request.isCancelled() || request.isFailed()) {
-			if (TraceDebug.isDEBUG()) {
-				TmfTimeRange range = request.getRange();
-				TraceDebug.debug("Request cancelled: "
-						+ range.getStartTime().toString() + " - "
-						+ range.getEndTime().toString());
-			}
-
-			return;
-		}
-
-		long experimentStartTime = -1;
-		long experimentEndTime = -1;
-		StateManager smanager = request.getStateManager();
-		TmfTimeRange experimentTimeRange = smanager.getExperimentTimeWindow();
-		if (experimentTimeRange != null) {
-			experimentStartTime = experimentTimeRange.getStartTime().getValue();
-			experimentEndTime = experimentTimeRange.getEndTime().getValue();
-		}
-
-		// Obtain the current process list
-		Vector<TimeRangeEventProcess> processList = FlowModelFactory
-				.getProcContainer().readProcesses();
-		// convert it to an Array as expected by the widget
-		TimeRangeEventProcess[] processArr = processList
-				.toArray(new TimeRangeEventProcess[processList.size()]);
-		// Sort the array by pid
-		Arrays.sort(processArr);
-
-		// Update the view part
-		flowModelUpdates(processArr, experimentStartTime, experimentEndTime);
-
-		// reselect to original time
-		ParamsUpdater paramUpdater = ResourceModelFactory.getParamsUpdater();
-		final Long selTime = paramUpdater.getSelectedTime();
-		if (selTime != null) {
-			Display display = tsfviewer.getControl().getDisplay();
-			display.asyncExec(new Runnable() {
-				public void run() {
-					tsfviewer.setSelectedTime(selTime, false, this);
-				}
-			});
-		}
-
-		if (TraceDebug.isDEBUG()) {
-			int eventCount = 0;
-			Long count = smanager.getEventCount();
-			for (TimeRangeEventProcess process : processList) {
-				eventCount += process.getTraceEvents().size();
-			}
-
-			int discarded = FlowModelFactory.getParamsUpdater()
-					.getEventsDiscarded();
-			int discardedOutofOrder = ResourceModelFactory.getParamsUpdater()
-					.getEventsDiscardedWrongOrder();
-			TraceDebug
-					.debug("Events handled: "
-							+ count
-							+ " Events loaded in Control Flow view: "
-							+ eventCount
-							+ " Number of events discarded: "
-							+ discarded
-							+ "\n\tNumber of events discarded with start time earlier than next good time: "
-							+ discardedOutofOrder);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.linuxtools.lttng.state.IStateDataRequestListener#
-	 * processingStarted(org.eclipse.linuxtools.lttng.state.StateDataRequest)
-	 */
-	@TmfSignalHandler
-	public void processingStarted(RequestStartedSignal signal) {
-		StateDataRequest request = signal.getRequest();
-		cancelPendingRequests();
-		if (request != null) {
-			// make sure there are no duplicates
-			if (!pendingDataRequests.contains(request)) {
-				pendingDataRequests.add(request);
-			}
-			pendingDataRequests.add(request);
-			StateManager smanager = request.getStateManager();
-			// Clear the children on the Processes related to this manager.
-			// Leave the GUI in charge of the updated data.
-			String traceId = smanager.getEventLog().getName();
-			FlowModelFactory.getProcContainer().clearChildren(traceId);
-			// Start over
-			FlowModelFactory.getParamsUpdater().setEventsDiscarded(0);
-		}
-	}
-
-	/**
-	 * Orders cancellation of any pending data requests
-	 */
-	private void cancelPendingRequests() {
-		for (StateDataRequest request : pendingDataRequests) {
-			request.cancel();
-		}
-		pendingDataRequests.clear();
-	}
-
 	/**
 	 * @param scrollFrame
 	 * @param wrapper
@@ -1228,4 +1108,102 @@ public void run() {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.linuxtools.lttng.ui.views.common.LttngTimeUpdateView#waitCursor
+	 * (boolean)
+	 */
+	protected synchronized void waitCursor(final boolean waitInd) {
+		if (tsfviewer != null) {
+			Display display = tsfviewer.getControl().getDisplay();
+
+			// Perform the updates on the UI thread
+			display.asyncExec(new Runnable() {
+				public void run() {
+					tsfviewer.waitCursor(waitInd);
+				}
+			});
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.linuxtools.lttng.ui.views.common.LttngTimeUpdateView#
+	 * ModelUpdatePrep(java.lang.String)
+	 */
+	public void ModelUpdatePrep(String traceId) {
+		FlowModelFactory.getProcContainer().clearChildren(traceId);
+		// Start over
+		FlowModelFactory.getParamsUpdater().setEventsDiscarded(0);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.linuxtools.lttng.ui.views.common.LttngTimeUpdateView#
+	 * ModelUpdateComplete(org.eclipse.linuxtools.lttng.state.StateDataRequest)
+	 */
+	public void ModelUpdateComplete(StateDataRequest request) {
+		long experimentStartTime = -1;
+		long experimentEndTime = -1;
+		StateManager smanager = request.getStateManager();
+		TmfTimeRange experimentTimeRange = smanager.getExperimentTimeWindow();
+		if (experimentTimeRange != null) {
+			experimentStartTime = experimentTimeRange.getStartTime().getValue();
+			experimentEndTime = experimentTimeRange.getEndTime().getValue();
+		}
+		// Obtain the current process list
+		Vector<TimeRangeEventProcess> processList = FlowModelFactory
+				.getProcContainer().readProcesses();
+		// convert it to an Array as expected by the widget
+		TimeRangeEventProcess[] processArr = processList
+				.toArray(new TimeRangeEventProcess[processList.size()]);
+		// Sort the array by pid
+		Arrays.sort(processArr);
+
+		// Update the view part
+		flowModelUpdates(processArr, experimentStartTime, experimentEndTime);
+
+		// reselect to original time
+		ParamsUpdater paramUpdater = FlowModelFactory.getParamsUpdater();
+		final Long selTime = paramUpdater.getSelectedTime();
+		if (selTime != null) {
+			Display display = tsfviewer.getControl().getDisplay();
+			display.asyncExec(new Runnable() {
+				public void run() {
+					tsfviewer.setSelectedTime(selTime, false, this);
+				}
+			});
+		}
+
+		if (TraceDebug.isDEBUG()) {
+			int eventCount = 0;
+			Long count = smanager.getEventCount();
+			for (TimeRangeEventProcess process : processList) {
+				eventCount += process.getTraceEvents().size();
+			}
+
+			int discarded = FlowModelFactory.getParamsUpdater()
+					.getEventsDiscarded();
+			int discardedOutofOrder = FlowModelFactory.getParamsUpdater()
+					.getEventsDiscardedWrongOrder();
+			TmfTimeRange range = request.getRange();
+			StringBuilder sb = new StringBuilder(
+					"Events handled: "
+							+ count
+							+ " Events loaded in Control Flow view: "
+							+ eventCount
+							+ " Number of events discarded: "
+							+ discarded
+							+ "\n\tNumber of events discarded with start time earlier than next good time: "
+							+ discardedOutofOrder);
+
+			sb.append("\n\t\tRequested Time Range: " + range.getStartTime()
+					+ " - " + range.getEndTime());
+			TraceDebug.debug(sb.toString());
+		}
+	}
 }

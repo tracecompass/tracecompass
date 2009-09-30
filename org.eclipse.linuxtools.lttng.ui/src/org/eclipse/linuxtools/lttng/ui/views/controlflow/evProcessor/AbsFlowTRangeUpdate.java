@@ -25,7 +25,6 @@ import org.eclipse.linuxtools.lttng.ui.views.common.AbsTRangeUpdate;
 import org.eclipse.linuxtools.lttng.ui.views.common.ParamsUpdater;
 import org.eclipse.linuxtools.lttng.ui.views.controlflow.model.FlowModelFactory;
 import org.eclipse.linuxtools.lttng.ui.views.controlflow.model.FlowProcessContainer;
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEventProcessing {
 
@@ -132,13 +131,13 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 	 * @param stateMode
 	 * @return
 	 */
-	protected boolean makeDraw(LttngTraceState traceSt, TmfTimestamp startTime,
-			TmfTimestamp endTime, TimeRangeEventProcess localProcess,
+	protected boolean makeDraw(LttngTraceState traceSt, long startTime,
+			long endTime, TimeRangeEventProcess localProcess,
 			ParamsUpdater params, String stateMode) {
 
 		// Determine start and end times to establish duration
-		Long stime = startTime.getValue();
-		Long etime = endTime.getValue();
+		Long stime = startTime;
+		Long etime = endTime;
 
 		if (etime < stime) {
 			// Validate the sequential order of events
@@ -218,6 +217,7 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 		// I'm not sure about it
 		time_window.setVisible(visible);
 		localProcess.getTraceEvents().add(time_window);
+		localProcess.setNext_good_time(etime);
 
 		// *** VERIFY ***
 		// Missing checks like this one?
@@ -236,11 +236,12 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 	 * @param params
 	 * @return
 	 */
-	protected boolean makeDraw(LttngTraceState traceSt, TmfTimestamp evTime,
+	protected boolean makeDraw(LttngTraceState traceSt, long evTime,
 			LttngProcessState process, TimeRangeEventProcess localProcess,
 			ParamsUpdater params) {
 
-		TmfTimestamp stime = process.getState().getChange_LttTime();
+		// TmfTimestamp stime = process.getState().getChange_LttTime();
+		long stime = localProcess.getNext_good_time();
 
 		String stateMode;
 		ProcessStatus procStatus = process.getState().getProc_status();

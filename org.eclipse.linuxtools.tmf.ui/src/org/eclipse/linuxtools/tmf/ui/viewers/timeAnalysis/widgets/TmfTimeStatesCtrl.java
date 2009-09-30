@@ -57,6 +57,10 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ScrollBar;
 
+/**
+ * @author alvaro
+ * 
+ */
 public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		KeyListener, MouseMoveListener, MouseListener, MouseWheelListener,
 		ControlListener, SelectionListener, MouseTrackListener,
@@ -71,6 +75,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 	private ITimeDataProvider _timeProvider;
 	private boolean _isInFocus = false;
 	private boolean _isDragCursor3 = false;
+	private boolean _isWaitCursor = true;
 	private boolean _mouseHover = false;
 	private int _itemHeightDefault = 18;
 	private int _itemHeight = _itemHeightDefault;
@@ -92,6 +97,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 	private Rectangle _rect0 = new Rectangle(0, 0, 0, 0);
 	private Rectangle _rect1 = new Rectangle(0, 0, 0, 0);
 	private Cursor _dragCursor3;
+	private Cursor _WaitCursor;
 	private boolean drawTracesInteraction = false;
 	private boolean drawTraceJoins = DEFAULT_DRAW_THREAD_JOIN;
 	private boolean drawTraceWaits = DEFAULT_DRAW_THREAD_WAIT;
@@ -131,12 +137,14 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		}
 
 		_dragCursor3 = new Cursor(super.getDisplay(), SWT.CURSOR_SIZEWE);
+		_WaitCursor = new Cursor(super.getDisplay(), SWT.CURSOR_WAIT);
 	}
 
 	@Override
 	public void dispose() {
 		super.dispose();
 		_dragCursor3.dispose();
+		_WaitCursor.dispose();
 	}
 
 	public void setTimeProvider(ITimeDataProvider timeProvider) {
@@ -1656,16 +1664,50 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		}
 	}
 
+	/**
+	 * <p>
+	 * If the x, y position is over the vertical split line (name to time
+	 * ranges), then change the cursor to a drag cursor to indicate the user the
+	 * possibility of resizing
+	 * </p>
+	 * 
+	 * @param x
+	 * @param y
+	 */
 	void updateCursor(int x, int y) {
-		int idx = hitSplitTest(x, y);
-		// No dragcursor is name space is fixed to zero
-		if (idx > 0 && !_isDragCursor3 && _timeProvider.getNameSpace() > 0) {
-			setCursor(_dragCursor3);
-			_isDragCursor3 = true;
-		} else if (idx <= 0 && _isDragCursor3) {
-			setCursor(null);
-			_isDragCursor3 = false;
+		// if Wait cursor not active, check for the need to change to a drag
+		// cursor
+		if (_isWaitCursor == false) {
+			int idx = hitSplitTest(x, y);
+			// No dragcursor is name space is fixed to zero
+			if (idx > 0 && !_isDragCursor3 && _timeProvider.getNameSpace() > 0) {
+				setCursor(_dragCursor3);
+				_isDragCursor3 = true;
+			} else if (idx <= 0 && _isDragCursor3) {
+				setCursor(null);
+				_isDragCursor3 = false;
+			}
 		}
+	}
+
+	/**
+	 * Provide the possibilty to control the wait cursor externally e.g. data
+	 * requests in progress
+	 * 
+	 * @param waitInd
+	 */
+	public void waitCursor(boolean waitInd) {
+		// Update cursor as indicated
+		if (waitInd) {
+			setCursor(_WaitCursor);
+			_isWaitCursor = true;
+		} else {
+			setCursor(null);
+			_isWaitCursor = false;
+		}
+
+		// Get ready for next mouse move
+		_isDragCursor3 = false;
 	}
 
 	public void mouseDown(MouseEvent e) {

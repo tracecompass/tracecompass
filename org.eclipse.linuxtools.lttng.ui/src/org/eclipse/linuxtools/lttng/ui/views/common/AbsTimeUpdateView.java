@@ -18,6 +18,7 @@ import org.eclipse.linuxtools.lttng.state.StateDataRequest;
 import org.eclipse.linuxtools.lttng.state.StateManager;
 import org.eclipse.linuxtools.lttng.state.experiment.StateManagerFactory;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
+import org.eclipse.linuxtools.lttng.ui.views.common.DataRequestState.RequestState;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
@@ -42,7 +43,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	// ========================================================================
 	// Data
 	// ========================================================================
-	private DataRequestQueue reqState = UiCommonFactory.getQueue();
+	private DataRequestState reqState = new DataRequestState();
 	private String viewID = "";
 
 	// ========================================================================
@@ -65,34 +66,28 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	public synchronized void processingStarted(RequestStartedSignal signal) {
 		StateDataRequest request = signal.getRequest();
 		if (request != null) {
-			// update queue with the id of the current request.
-			reqState.requestStarted(request);
-			// if there was no new request then this one is still on
-			// prepare for the reception of new data
+			// Check if a newer request is in the queue
+			TmfTimeRange newerReq = reqState.peekQueued();
+			if (newerReq == null) {
+				reqState.setState(DataRequestState.RequestState.BUSY);
+				reqState.setCurrentRequest(request);
 
-			waitCursor(true);
+				waitCursor(true);
 
-			StateManager smanager = request.getStateManager();
-			// Clear the children on the Processes related to this
-			// manager.
-			// Leave the GUI in charge of the updated data.
-			String traceId = smanager.getEventLog().getName();
+				StateManager smanager = request.getStateManager();
+				// Clear the children on the Processes related to this
+				// manager.
+				// Leave the GUI in charge of the updated data.
+				String traceId = smanager.getEventLog().getName();
+				ModelUpdatePrep(traceId);
+			} else {
+				// clean up any possible pending request
+				request.cancel();
 
-			// indicate if the data model needs to be cleared e.g. a new
-			// experiment is being selected
-			boolean clearData = request.isclearDataInd();
-			// no new time range for zoom orders
-			TmfTimeRange trange = null;
-			if (clearData) {
-				// Time Range will be used to filter out events which are
-				// not visible in one pixel
-				trange = StateManagerFactory.getExperimentManager()
-						.getExperimentTimeRange();
+				// Start the new request.
+				StateManagerFactory.getExperimentManager()
+						.readExperimentTimeWindow(newerReq, viewID, this);
 			}
-
-			// Indicate if current data needs to be cleared and if so
-			// specify the new experiment time range that applies
-			ModelUpdatePrep(traceId, clearData, trange);
 		}
 	}
 
@@ -103,20 +98,23 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	 * processingCompleted(org.eclipse.linuxtools.lttng.state.StateDataRequest)
 	 */
 	@TmfSignalHandler
-	public synchronized void processingCompleted(RequestCompletedSignal signal) {
+	public void processingCompleted(RequestCompletedSignal signal) {
 		StateDataRequest request = signal.getRequest();
 
 		if (request == null) {
 			return;
 		} else {
-			reqState.requestCompleted(request);
+			synchronized (this) {
+				reqState.setCurrentRequest(null);
+			}
 
 		}
 
-		// Update wait cursor
-		requestStateUpdate();
 		// No data refresh actions for cancelled requests.
 		if (request.isCancelled() || request.isFailed()) {
+
+			requestStateUpdate();
+
 			if (TraceDebug.isDEBUG()) {
 				TmfTimeRange trange = request.getRange();
 				if (request.isCancelled()) {
@@ -133,6 +131,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 			return;
 		} else {
 			ModelUpdateComplete(request);
+			requestStateUpdate();
 		}
 	}
 
@@ -144,20 +143,42 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	 * @param trange
 	 */
 	public synchronized void dataRequest(TmfTimeRange trange) {
-		boolean sent = reqState.processDataRequest(trange, viewID, this);
+		if (trange != null) {
+			// cancelPendingRequests();
+			StateDataRequest currentRequest = reqState.getCurrentRequest();
+			// If a request is ongoing queue the new request
+			if (reqState.getState().equals(RequestState.BUSY)) {
+				reqState.setQueued(trange);
+				currentRequest = reqState.getCurrentRequest();
+				if (currentRequest != null) {
+					currentRequest.cancel();
+				}
+			} else {
+				// Set the state to busy
+				reqState.setState(DataRequestState.RequestState.BUSY);
+				waitCursor(true);
+				// no request is ongoing, proceed with request
+				StateManagerFactory.getExperimentManager()
+						.readExperimentTimeWindow(trange, viewID, this);
 
-		if (sent) {
-			waitCursor(true);
+			}
 		}
 	}
 
 	/**
-	 * Disable the wait cursor if the state is back to idle
+	 * Check for pending request an either send a new request or change the
+	 * state to idle
 	 */
 	private synchronized void requestStateUpdate() {
-		// disable the wait cursor if the state is back to idle
-		if (reqState.isIdle()) {
-			// no more in the queue
+		// Check if a new time range update is waiting to be processed
+		TmfTimeRange queuedRequest = reqState.popQueued();
+		if (queuedRequest != null) {
+			// Trigger the pending request
+			StateManagerFactory.getExperimentManager()
+					.readExperimentTimeWindow(queuedRequest, viewID, this);
+		} else {
+			// All requests cancelled and no more pending requests
+			reqState.setState(RequestState.IDLE);
 			waitCursor(false);
 		}
 	}
@@ -175,13 +196,8 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	 * given traceId
 	 * 
 	 * @param traceId
-	 * @param clearAllData
-	 *            - reset all data e.g when a new experiment is selected
-	 * @param timeRange
-	 *            - new total time range e.g. Experiment level
 	 */
-	public abstract void ModelUpdatePrep(String traceId, boolean clearAllData,
-			TmfTimeRange timeRange);
+	public abstract void ModelUpdatePrep(String traceId);
 
 	/**
 	 * Actions taken by the view to refresh its widget(s) with the updated data

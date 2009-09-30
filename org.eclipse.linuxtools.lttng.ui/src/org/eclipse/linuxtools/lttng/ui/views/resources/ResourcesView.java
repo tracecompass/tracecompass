@@ -11,7 +11,6 @@
 package org.eclipse.linuxtools.lttng.ui.views.resources;
 
 import java.util.Arrays;
-import java.util.Vector;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -20,18 +19,15 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
-import org.eclipse.linuxtools.lttng.state.IStateDataRequestListener;
-import org.eclipse.linuxtools.lttng.state.RequestCompletedSignal;
-import org.eclipse.linuxtools.lttng.state.RequestStartedSignal;
 import org.eclipse.linuxtools.lttng.state.StateDataRequest;
 import org.eclipse.linuxtools.lttng.state.StateManager;
 import org.eclipse.linuxtools.lttng.state.evProcessor.EventProcessorProxy;
 import org.eclipse.linuxtools.lttng.state.experiment.StateExperimentManager;
 import org.eclipse.linuxtools.lttng.state.experiment.StateManagerFactory;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
-import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeComponent;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeViewerProvider;
+import org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView;
 import org.eclipse.linuxtools.lttng.ui.views.common.ParamsUpdater;
 import org.eclipse.linuxtools.lttng.ui.views.resources.evProcessor.ResourcesTRangeUpdateFactory;
 import org.eclipse.linuxtools.lttng.ui.views.resources.model.ResourceModelFactory;
@@ -46,7 +42,6 @@ import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITmfTimeSelectionListe
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeScaleSelectionEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeSelectionEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
-import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -61,15 +56,13 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  * @author alvaro
  * 
  */
-public class ResourcesView extends TmfView implements
-		ITmfTimeSelectionListener, ITmfTimeScaleSelectionListener,
-		IStateDataRequestListener {
+public class ResourcesView extends AbsTimeUpdateView implements
+		ITmfTimeSelectionListener, ITmfTimeScaleSelectionListener {
 
 	// ========================================================================
 	// Data
 	// ========================================================================
 	public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.resources";
-	private Vector<StateDataRequest> pendingDataRequests = new Vector<StateDataRequest>();
 
 	// private int totalNumItems = 0;
 	// Actions
@@ -93,14 +86,19 @@ public class ResourcesView extends TmfView implements
 	// private TraceModelImplFactory fact;
 
 	// ========================================================================
-	// Methods
+	// Constructor
 	// ========================================================================
 
 	/**
 	 * The constructor.
 	 */
 	public ResourcesView() {
+		super(ID);
 	}
+
+	// ========================================================================
+	// Methods
+	// ========================================================================
 
 	/**
 	 * This is a callback that will allow us to create the viewer and initialize
@@ -117,12 +115,12 @@ public class ResourcesView extends TmfView implements
 		tsfviewer.addWidgetSelectionListner(this);
 		tsfviewer.addWidgetTimeScaleSelectionListner(this);
 
-		// Traces shall not be grouped to allow synchronization
+		// Traces shall not be grouped to allow synchronisation
 		tsfviewer.groupTraces(true);
 		tsfviewer.setAcceptSelectionAPIcalls(true);
 
 		// Viewer to notify selection to this class
-		// This class will synchronize selections with table.
+		// This class will synchronise selections with table.
 		tsfviewer.addWidgetSelectionListner(this);
 		tsfviewer.addWidgetTimeScaleSelectionListner(this);
 
@@ -141,7 +139,7 @@ public class ResourcesView extends TmfView implements
 		// FlowParamsUpdater listener = FlowModelFactory.getParamsUpdater();
 		// tsfviewer.addWidgetTimeScaleSelectionListner(listener);
 
-		// TODO: refactor regitration / notificatio process
+		// TODO: re-factor registration / notification process
 		// Register this view to receive updates when the model is updated with
 		// fresh info
 		// ModelListenFactory.getRegister().addFlowModelUpdatesListener(this);
@@ -465,6 +463,14 @@ public class ResourcesView extends TmfView implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.
+	 * ITmfTimeScaleSelectionListener
+	 * #tsfTmProcessTimeScaleEvent(org.eclipse.linuxtools
+	 * .tmf.ui.viewers.timeAnalysis.TmfTimeScaleSelectionEvent)
+	 */
 	public void tsfTmProcessTimeScaleEvent(TmfTimeScaleSelectionEvent event) {
 		// source needed to keep track of source values
 		Object source = event.getSource();
@@ -478,11 +484,8 @@ public class ResourcesView extends TmfView implements
 			if (newParams) {
 				// Read the updated time window
 				TmfTimeRange trange = paramUpdater.getTrange();
-				if (trange != null) {
-					StateManagerFactory.getExperimentManager()
-							.readExperimentTimeWindow(trange, "resourceView",
-									this);
-				}
+				// Either send a new request or queue for next opportunity
+				dataRequest(trange);
 			}
 		}
 	}
@@ -513,12 +516,6 @@ public class ResourcesView extends TmfView implements
 		return strVal.substring(strVal.length() - 9);
 	}
 
-	// // @Override
-	// public void resourceModelUpdates(ModelUpdatesEvent event) {
-	// ITmfTimeAnalysisEntry[] items = event.getItems();
-	// resourceModelUpdates(items, event.getStartTime(), event.getEndTime());
-	// }
-
 	public void resourceModelUpdates(final ITmfTimeAnalysisEntry[] items,
 			final long startTime, final long endTime) {
 		tsfviewer.getControl().getDisplay().asyncExec(new Runnable() {
@@ -543,71 +540,80 @@ public class ResourcesView extends TmfView implements
 		tsfviewer = null;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Trigger time synchronisation to other views this method shall be called
+	 * when a check has been performed to note that an actual change of time has
+	 * been performed vs a pure re-selection of the same time
 	 * 
-	 * @seeorg.eclipse.linuxtools.lttng.state.IStateDataRequestListener#
-	 * processingStarted(org.eclipse.linuxtools.lttng.state.StateDataRequest)
+	 * @param time
 	 */
-	@TmfSignalHandler
-	public void processingStarted(RequestStartedSignal startSignal) {
-		StateDataRequest request = startSignal.getRequest();
-		cancelPendingRequests();
-		if (request != null) {
-			// make sure there are no duplicates
-			if (!pendingDataRequests.contains(request)) {
-				pendingDataRequests.add(request);
-			}
-
-			StateManager smanager = request.getStateManager();
-			// Clear the children on the Processes related to this manager.
-			// Leave the GUI in charge of the updated data.
-			String traceId = smanager.getEventLog().getName();
-			ResourceModelFactory.getResourceContainer().clearChildren(traceId);
-			// Start over
-			ResourceModelFactory.getParamsUpdater().setEventsDiscarded(0);
+	private void synchTimeNotification(long time) {
+		// if synchronisation selected
+		if (synch.isChecked()) {
+			// Notify other views
+			TmfSignalManager.dispatchSignal(new TmfTimeSynchSignal(this,
+					new LttngTimestamp(time)));
 		}
 	}
 
 	/**
-	 * Orders cancellation of any pending data requests
+	 * Registers as listener of time selection from other tmf views
+	 * 
+	 * @param signal
 	 */
-	private void cancelPendingRequests() {
-		for (StateDataRequest request : pendingDataRequests) {
-			request.cancel();
+	@TmfSignalHandler
+	public void synchToTime(TmfTimeSynchSignal signal) {
+		if (synch.isChecked()) {
+			Object source = signal.getSource();
+			if (signal != null && source != null && source != this) {
+				// Internal value is expected in nano seconds.
+				long selectedTime = signal.getCurrentTime().getValue();
+				if (tsfviewer != null) {
+					tsfviewer.setSelectedTime(selectedTime, true, source);
+				}
+			}
 		}
-		pendingDataRequests.clear();
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @seeorg.eclipse.linuxtools.lttng.state.IStateDataRequestListener#
-	 * processingCompleted(org.eclipse.linuxtools.lttng.state.StateDataRequest)
+	 * @see
+	 * org.eclipse.linuxtools.lttng.ui.views.common.LttngTimeUpdateView#waitCursor
+	 * (boolean)
 	 */
-	@TmfSignalHandler
-	public void processingCompleted(
-			RequestCompletedSignal completedSignal) {
-		StateDataRequest request = completedSignal.getRequest();
+	protected void waitCursor(final boolean waitInd) {
+		if (tsfviewer != null) {
+			Display display = tsfviewer.getControl().getDisplay();
 
-		if (request == null) {
-			return;
-		} else {
-			// Remove from the pending requests record
-			pendingDataRequests.remove(request);
+			// Perform the updates on the UI thread
+			display.asyncExec(new Runnable() {
+				public void run() {
+					tsfviewer.waitCursor(waitInd);
+				}
+			});
 		}
+	}
 
-		// No data refresh actions for cancelled requests.
-		if (request.isCancelled() || request.isFailed()) {
-			if (TraceDebug.isDEBUG()) {
-				TmfTimeRange range = request.getRange();
-				TraceDebug.debug("Request cancelled: "
-						+ range.getStartTime().toString() + " - "
-						+ range.getEndTime().toString());
-			}
-			return;
-		}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.linuxtools.lttng.ui.views.common.LttngTimeUpdateView#
+	 * ModelUpdatePrep(java.lang.String)
+	 */
+	public void ModelUpdatePrep(String traceId) {
+		ResourceModelFactory.getResourceContainer().clearChildren(traceId);
+		// Start over
+		ResourceModelFactory.getParamsUpdater().setEventsDiscarded(0);
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.linuxtools.lttng.ui.views.common.LttngTimeUpdateView#
+	 * ModelUpdateComplete(org.eclipse.linuxtools.lttng.state.StateDataRequest)
+	 */
+	public void ModelUpdateComplete(StateDataRequest request) {
 		StateManager smanager = request.getStateManager();
 		long experimentStartTime = -1;
 		long experimentEndTime = -1;
@@ -662,45 +668,5 @@ public class ResourcesView extends TmfView implements
 							+ discardedOutofOrder);
 		}
 
-	}
-
-	public void newTimeRange(TimeRangeComponent trange) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/**
-	 * Trigger time synchronisation to other views this method shall be called
-	 * when a check has been performed to note that an actual change of time has
-	 * been performed vs a pure re-selection of the same time
-	 * 
-	 * @param time
-	 */
-	private void synchTimeNotification(long time) {
-		// if synchronisation selected
-		if (synch.isChecked()) {
-			// Notify other views
-			TmfSignalManager.dispatchSignal(new TmfTimeSynchSignal(this,
-					new LttngTimestamp(time)));
-		}
-	}
-
-	/**
-	 * Registers as listener of time selection from other tmf views
-	 * 
-	 * @param signal
-	 */
-	@TmfSignalHandler
-	public void synchToTime(TmfTimeSynchSignal signal) {
-		if (synch.isChecked()) {
-			Object source = signal.getSource();
-			if (signal != null && source != null && source != this) {
-				// Internal value is expected in nano seconds.
-				long selectedTime = signal.getCurrentTime().getValue();
-				if (tsfviewer != null) {
-					tsfviewer.setSelectedTime(selectedTime, true, source);
-				}
-			}
-		}
 	}
 }

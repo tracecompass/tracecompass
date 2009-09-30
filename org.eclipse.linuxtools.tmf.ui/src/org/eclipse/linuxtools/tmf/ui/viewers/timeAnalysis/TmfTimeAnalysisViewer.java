@@ -25,13 +25,13 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.dialogs.TmfTimeFilterDialog;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.dialogs.TmfTimeLegend;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.TimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
+import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.TimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.ITimeDataProvider;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.TimeScaleCtrl;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.TmfTimeTipHandler;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.TmfTimeStatesCtrl;
+import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.TmfTimeTipHandler;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.TraceColorScheme;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.Utils;
 import org.eclipse.swt.SWT;
@@ -744,5 +744,16 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	 */
 	public ISelectionProvider getSelectionProvider() {
 		return _stateCtrl;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITimeAnalysisViewer
+	 * #waitCursor(boolean)
+	 */
+	public void waitCursor(boolean waitInd) {
+		_stateCtrl.waitCursor(waitInd);
 	}
 }

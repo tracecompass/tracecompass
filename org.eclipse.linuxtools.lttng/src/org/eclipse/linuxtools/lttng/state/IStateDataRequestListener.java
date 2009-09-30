@@ -24,7 +24,15 @@ public interface IStateDataRequestListener {
 	// Methods
 	// ========================================================================
 	
+	/**
+	 * 
+	 * @param request
+	 * @return
+	 */
 	public void processingStarted(RequestStartedSignal request);
 
+	/**
+	 * @param signal
+	 */
 	public void processingCompleted(RequestCompletedSignal signal);
 }

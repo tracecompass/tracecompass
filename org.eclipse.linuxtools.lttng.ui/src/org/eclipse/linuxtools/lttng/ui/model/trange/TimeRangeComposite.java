@@ -51,6 +51,7 @@ ITmfTimeAnalysisEntry {
 	protected String groupName = "";
 	protected String className = "";
 	protected CompositeType contType = CompositeType.UNKNOWN;
+	protected long next_good_time = -1;
 
 	// ========================================================================
 	// Constructors
@@ -60,6 +61,7 @@ ITmfTimeAnalysisEntry {
 		this.id = id;
 		this.name = name;
 		contType = type;
+		next_good_time = stime;
 	}
 
 	public TimeRangeComposite(Integer id, Long stime, Long etime, String name, String groupName, String className, CompositeType type) {
@@ -158,4 +160,32 @@ ITmfTimeAnalysisEntry {
 		return ChildEventComposites;
 	}
 
+	/**
+	 * Represents the time where the next time range can start the drawing i.e.
+	 * right after previous time range.
+	 * 
+	 * @return
+	 */
+	public long getNext_good_time() {
+		return next_good_time;
+	}
+
+	/**
+	 * Represents the time where the next time range can start the drawing i.e.
+	 * right after previous time range.
+	 * 
+	 * @param nextGoodTime
+	 */
+	public void setNext_good_time(long nextGoodTime) {
+		next_good_time = nextGoodTime;
+	}
+
+	/**
+	 * Reset this resource to the construction state except for
+	 */
+	public void reset() {
+		getChildEventComposites().clear();
+		getTraceEvents().clear();
+		next_good_time = startTime;
+	}
 }

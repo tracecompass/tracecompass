@@ -1074,6 +1074,7 @@ class StateUpdateHandlers {
 				if (child_process == null) {
 					child_process = create_process(traceSt, cpu, child_pid,
 							child_tgid, timeStamp);
+					child_process.setPpid(process.getPid(), timeStamp);
 				} else {
 					/*
 					 * The process has already been created : due to time
@@ -1606,10 +1607,11 @@ class StateUpdateHandlers {
 					if (process == null) {
 						parent_process = lttv_state_find_process(traceSt,
 								ANY_CPU, parent_pid);
+						TmfTimestamp eventTime = trcEvent.getTimestamp();
 						process = create_process(traceSt, cpu, pid, tgid,
-								command, trcEvent.getTimestamp());
+								command, eventTime);
 						if (parent_process != null) {
-							process.setPpid(parent_process.getPid());
+							process.setPpid(parent_process.getPid(), eventTime);
 						}
 
 						/* Keep the stack bottom : a running user mode */

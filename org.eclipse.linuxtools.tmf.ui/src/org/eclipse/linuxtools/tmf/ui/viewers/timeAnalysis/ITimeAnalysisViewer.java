@@ -15,9 +15,9 @@
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.linuxtools.tmf.ui.viewers.ITmfViewer;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.TimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
+import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.TimeEvent;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Control;
 
@@ -145,4 +145,18 @@ public interface ITimeAnalysisViewer extends ITmfViewer {
 	public Control getControl();
 
 	public ISelectionProvider getSelectionProvider();
+
+	/**
+	 * <p>
+	 * Provide the possibility to control the wait cursor externally
+	 * </p>
+	 * <p>
+	 * e.g. data requests in progress
+	 * </p>
+	 * 
+	 * @param waitInd
+	 *            - true change to wait cursor
+	 */
+	public void waitCursor(boolean waitInd);
+
 }

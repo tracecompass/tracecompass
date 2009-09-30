@@ -86,7 +86,8 @@ public class StateDataRequest extends TmfDataRequest<TmfEvent> {
 	 * @param broadcast
 	 *            true: All views, false: only to registered listeners
 	 */
-	public void startRequestInd(TmfExperiment experiment, boolean broadcast) {
+	public void startRequestInd(TmfExperiment experiment, boolean broadcast,
+			boolean waitForCompletion) {
 		if (broadcast) {
 			// Notify all state views.
 			this.broadcast = broadcast;
@@ -99,7 +100,7 @@ public class StateDataRequest extends TmfDataRequest<TmfEvent> {
 		}
 
 		// trigger the start to process this request
-		experiment.processRequest(this, true);
+		experiment.processRequest(this, waitForCompletion);
 	}
 
 	/**

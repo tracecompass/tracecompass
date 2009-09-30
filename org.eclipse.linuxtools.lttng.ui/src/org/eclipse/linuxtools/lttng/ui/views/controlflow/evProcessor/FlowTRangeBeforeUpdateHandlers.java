@@ -75,8 +75,8 @@ class FlowTRangeBeforeUpdateHandlers {
 					}
 
 					// Do the actual drawing
-					makeDraw(traceSt, trcEvent.getTimestamp(), stateProcess,
-							localProcess, params);
+					makeDraw(traceSt, trcEvent.getTimestamp().getValue(),
+							stateProcess, localProcess, params);
 				} else {
 					TraceDebug
 							.debug("Running process is null! (getStateModesHandler)");
@@ -160,7 +160,8 @@ class FlowTRangeBeforeUpdateHandlers {
 						}
 
 						// Do the actual drawing
-						makeDraw(traceSt, trcEvent.getTimestamp(), process,
+						makeDraw(traceSt, trcEvent.getTimestamp().getValue(),
+								process,
 								localProcess, params);
 					} else {
 						// Process may be null if the process started BEFORE the
@@ -199,7 +200,8 @@ class FlowTRangeBeforeUpdateHandlers {
 						}
 
 						// Do the actual drawing
-						makeDraw(traceSt, trcEvent.getTimestamp(), process,
+						makeDraw(traceSt, trcEvent.getTimestamp().getValue(),
+								process,
 								localProcess, params);
 
 					} else {
@@ -278,8 +280,8 @@ class FlowTRangeBeforeUpdateHandlers {
 									.getEndTime().getValue(), traceSt
 									.getTraceId());
 							// Call the function that does the actual drawing
-							makeDraw(traceSt, trcEvent.getTimestamp(), process,
-									localProcess, params);
+							makeDraw(traceSt, trcEvent.getTimestamp()
+									.getValue(), process, localProcess, params);
 						} else {
 							TraceDebug
 									.debug("Pid is null or Pid == PPID!  (getProcessExitHandler)");
@@ -287,7 +289,7 @@ class FlowTRangeBeforeUpdateHandlers {
 					}
 				} else {
 					TraceDebug
-							.debug("Running proces is null! (getProcessExitHandler)");
+							.debug("Running process is null! (getProcessExitHandler)");
 				}
 
 				return false;
@@ -342,7 +344,8 @@ class FlowTRangeBeforeUpdateHandlers {
 						}
 
 						// Perform the drawing
-						makeDraw(traceSt, trcEvent.getTimestamp(), process,
+						makeDraw(traceSt, trcEvent.getTimestamp().getValue(),
+								process,
 								localProcess, params);
 					}
 				} else {
@@ -405,8 +408,8 @@ class FlowTRangeBeforeUpdateHandlers {
 						if (localProcess != null) {
 							// Call the function that will does the actual
 							// drawing
-							makeDraw(traceSt, trcEvent.getTimestamp(), process,
-									localProcess, params);
+							makeDraw(traceSt, trcEvent.getTimestamp()
+									.getValue(), process, localProcess, params);
 						} else {
 							TraceDebug
 									.debug("localProcess is null! (getStateDumpEndHandler)");

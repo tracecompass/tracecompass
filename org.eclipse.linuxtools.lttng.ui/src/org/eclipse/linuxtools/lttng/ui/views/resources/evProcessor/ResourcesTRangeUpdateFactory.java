@@ -97,7 +97,7 @@ public class ResourcesTRangeUpdateFactory extends AbsEventProcessorFactory {
         
         
         // *** AFTER HOOKS ***
-		eventNametoBeforeProcessor.put(
+		eventNametoAfterProcessor.put(
 				StateStrings.Events.LTT_EVENT_SCHED_SCHEDULE.getInName(),
 				instantiateAfterHandler.getAfterSchedChangeHandler());
 

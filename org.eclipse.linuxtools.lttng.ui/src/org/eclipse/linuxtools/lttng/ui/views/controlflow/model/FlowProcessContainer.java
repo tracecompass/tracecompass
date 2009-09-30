@@ -74,8 +74,7 @@ public class FlowProcessContainer {
 		for (TimeRangeEventProcess process : processes) {
 			procTraceId = process.getTraceID();
 			if (procTraceId.equals(traceId)) {
-				process.getTraceEvents().clear();
-				process.getChildEventComposites().clear();
+				process.reset();
 			}
 		}
 	}

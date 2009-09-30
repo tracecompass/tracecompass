@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.state.experiment;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,9 +70,14 @@ public class StateExperimentManager extends TmfComponent {
 	 */
 	public void readExperimentTimeWindow(TmfTimeRange trange,
 			String transactionID, IStateDataRequestListener listener) {
-		Collection<StateManager> mamangers = managersByID.values();
-		for (StateManager manager : mamangers) {
-			manager.executeDataRequest(trange, transactionID, listener);
+		if (fExperiment != null) {
+			String id = fExperiment.getExperimentId();
+			StateManager manager = managersByID.get(id);
+			if (manager != null) {
+				// TODO: A loop to request data for each trace needs to be used
+				// here when multiple traces are supported.
+				manager.executeDataRequest(trange, transactionID, listener);
+			}
 		}
 	}
 
