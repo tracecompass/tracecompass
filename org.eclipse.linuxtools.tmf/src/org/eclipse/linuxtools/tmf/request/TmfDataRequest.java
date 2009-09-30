@@ -88,6 +88,7 @@ public class TmfDataRequest<V> {
     private final long fOffset;             // The synchronization offset to apply
     private final int  fNbRequestedItems;   // The number of items to read (-1 == the whole range)
     private final int  fBlockSize;          // The maximum number of events per chunk
+    private       int  fNbEvents;           // The number of events read so far
 
     private Object lock = new Object();
     private boolean fRequestCompleted = false;
@@ -140,6 +141,7 @@ public class TmfDataRequest<V> {
         fOffset = offset;
         fNbRequestedItems = nbEvents;
         fBlockSize = maxBlockSize;
+        fNbEvents = 0;
     }
 
     // ========================================================================
@@ -182,6 +184,13 @@ public class TmfDataRequest<V> {
     }
 
     /**
+     * @return the number of events read so far
+     */
+    public int getNbEvents() {
+        return fNbEvents;
+    }
+
+    /**
      * @return indicates if the request is completed
      */
     public boolean isCompleted() {
@@ -207,11 +216,12 @@ public class TmfDataRequest<V> {
     // ========================================================================
 
     /** 
-     * Sets the data object to specified value.  To be called by the 
+     * Sets the data object to specified value. To be called by the 
      * asynchronous method implementor.
      * @param data Data value to set.
      */
     public synchronized void setData(V[] data) {
+    	fNbEvents += data.length;
     	fData = data;
     }
     
