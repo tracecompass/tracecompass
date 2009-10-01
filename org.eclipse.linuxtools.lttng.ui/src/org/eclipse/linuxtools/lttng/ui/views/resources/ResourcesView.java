@@ -582,6 +582,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	 * org.eclipse.linuxtools.lttng.ui.views.common.LttngTimeUpdateView#waitCursor
 	 * (boolean)
 	 */
+	@Override
 	protected void waitCursor(final boolean waitInd) {
 		if (tsfviewer != null) {
 			Display display = tsfviewer.getControl().getDisplay();
@@ -601,6 +602,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	 * @seeorg.eclipse.linuxtools.lttng.ui.views.common.LttngTimeUpdateView#
 	 * ModelUpdatePrep(java.lang.String)
 	 */
+	@Override
 	public void ModelUpdatePrep(String traceId) {
 		ResourceModelFactory.getResourceContainer().clearChildren(traceId);
 		// Start over
@@ -613,6 +615,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	 * @seeorg.eclipse.linuxtools.lttng.ui.views.common.LttngTimeUpdateView#
 	 * ModelUpdateComplete(org.eclipse.linuxtools.lttng.state.StateDataRequest)
 	 */
+	@Override
 	public void ModelUpdateComplete(StateDataRequest request) {
 		StateManager smanager = request.getStateManager();
 		long experimentStartTime = -1;

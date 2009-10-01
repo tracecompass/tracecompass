@@ -1115,6 +1115,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	 * org.eclipse.linuxtools.lttng.ui.views.common.LttngTimeUpdateView#waitCursor
 	 * (boolean)
 	 */
+	@Override
 	protected synchronized void waitCursor(final boolean waitInd) {
 		if (tsfviewer != null) {
 			Display display = tsfviewer.getControl().getDisplay();
@@ -1134,6 +1135,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	 * @seeorg.eclipse.linuxtools.lttng.ui.views.common.LttngTimeUpdateView#
 	 * ModelUpdatePrep(java.lang.String)
 	 */
+	@Override
 	public void ModelUpdatePrep(String traceId) {
 		FlowModelFactory.getProcContainer().clearChildren(traceId);
 		// Start over
@@ -1146,6 +1148,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	 * @seeorg.eclipse.linuxtools.lttng.ui.views.common.LttngTimeUpdateView#
 	 * ModelUpdateComplete(org.eclipse.linuxtools.lttng.state.StateDataRequest)
 	 */
+	@Override
 	public void ModelUpdateComplete(StateDataRequest request) {
 		long experimentStartTime = -1;
 		long experimentEndTime = -1;
