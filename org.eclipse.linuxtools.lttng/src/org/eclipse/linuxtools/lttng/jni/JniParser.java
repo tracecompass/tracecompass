@@ -16,9 +16,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * <b><u>JniParser</u></b>
- * <p>
- * JniParser class.
+ * <b><u>JniParser</u></b><p>
+ * 
+ * JniParser is used to parse an event payload into something usable.<p>
+ * 
  * All methods are static, the parser shouldn't be instantiated.
  */
 public class JniParser extends Jni_C_Common
@@ -29,17 +30,17 @@ public class JniParser extends Jni_C_Common
         System.loadLibrary("lttvtraceread");
     }
 
-    /**
+    /*
      * Default constructor is forbidden
      */
     private JniParser() {
     }
     
     
-    
     /**
-     * Method to parse a single field identified by its id<br>
-     * All parsing will be done on C side as we need Ltt function
+     * Method to parse a single field identified by its id.<p>
+     * 
+     * All parsing will be done on C side as we need LTT functions.
      * 
      * @param   eventToParse    The jni event we want to parse. 
      * @param   fieldPosition   The position (or id) of the field we want to parse
@@ -57,7 +58,8 @@ public class JniParser extends Jni_C_Common
         
         // *** HACK ***
         // We cannot use "Object" directly as java does not support swapping primitive value
-        //  We either need to create a new object type or to use a "non-primitive" type that have "Setter()" functions
+        //    We either need to create a new object type or to use a "non-primitive" type that have "Setter()" functions
+        //    Another (ugly) hack would be to pass an array to modify the reference's reference.
         // ***
         ParsedObjectContent parsedData = new ParsedObjectContent();
         
@@ -69,11 +71,12 @@ public class JniParser extends Jni_C_Common
     
     
     /**
-     * Method to parse a single field identified by its name<br>
-     * All parsing will be done on C side as we need Ltt function
+     * Method to parse a single field identified by its name.<p>
+     * 
+     * All parsing will be done on C side as we need LTT functions.
      * 
      * @param   eventToParse    The jni event we want to parse. 
-     * @param   fieldPosition   The position (or id) of the field we want to parse
+     * @param   fieldName       The name of the field we want to parse.
      * 
      * @return                  An Object that contain the JniEvent payload parsed by the C, or null, if if was impossible to parse (i.e., wrong position)
      * 
@@ -90,7 +93,8 @@ public class JniParser extends Jni_C_Common
         
         // *** HACK ***
         // We cannot use "Object" directly as java does not support swapping on primitive value
-        //  We either need to create a new object type or to use a "non-primitive" type that have "Setter()" functions
+        //      We either need to create a new object type or to use a "non-primitive" type that have "Setter()" functions
+        //      Another (ugly) hack would be to pass an array to modify the reference's reference.
         // ***
         ParsedObjectContent parsedData = new ParsedObjectContent();
         
@@ -102,8 +106,9 @@ public class JniParser extends Jni_C_Common
     
     
     /**
-     * Method to parse all field at once<br>
-     * All parsing will be done on C side as we need Ltt function
+     * Method to parse all fields at once.<p>
+     * 
+     * All parsing will be done on C side as we need LTT functions.
      * 
      * @param   eventToParse    The jni event we want to parse.  
      * @return                  An HashMap of Object that contain the is the JniEvent's payload parsed by the C
@@ -111,45 +116,46 @@ public class JniParser extends Jni_C_Common
      * @see org.eclipse.linuxtools.lttng.jni.JniEvent
      */
     static public HashMap<String, Object> parseAllFields(JniEvent eventToParse) {
-		HashMap<String,JniMarkerField> markerFieldData = eventToParse.requestEventMarker().getMarkerFieldsHashMap();
+        HashMap<String,JniMarkerField> markerFieldData = eventToParse.requestEventMarker().getMarkerFieldsHashMap();
 		
-		 // This hashmap will contain the parsed content.
-		 // ParsedContent is a local class defined at the end of this file
+		// This hashmap will contain the parsed content.
+		// ParsedContent is a local class defined at the end of this file
 		
-		 // *** HACK ***
-		 // We want (need?) the map that contain the parsed data to be in the same order as markerField map
-		 // The "instinctive way" would be to use : 
-		 //       HashMap<String, Object> parsedDataMap = new HashMap<String, Object>(nbMarkerField);
-		 //
-		 // However, we cannot ensure that the newly created hashmap will use the same order.
-		 // The hard way would be to override the default hash function for both hashmap
-		 // However, this is way easier to abuse the fact that both hashmap are of type <String, something...>
-		 // Therefore we can abuse the java-cast with clone() : 
-		 //       HashMap<String, Object> parsedDataMap = (HashMap<String, Object>)markerFieldData.clone();
-		 // Or even safer, use HashMap constructor to do so : 
-		 HashMap<String, Object> parsedDataMap = new HashMap<String, Object>(markerFieldData);
+		// *** HACK ***
+		// We want (need?) the map that contain the parsed data to be in the same order as markerField map
+		// The "instinctive way" would be to use : 
+		//       HashMap<String, Object> parsedDataMap = new HashMap<String, Object>(nbMarkerField);
+		//
+		// However, we cannot ensure that the newly created hashmap will use the same order.
+		// The hard way would be to override the default hash function for both hashmap
+		// However, this is way easier to abuse the fact that both hashmap are of type <String, something...>
+		// Therefore we can abuse the java-cast with clone() : 
+		//       HashMap<String, Object> parsedDataMap = (HashMap<String, Object>)markerFieldData.clone();
+		// Or even safer, use HashMap constructor to do so : 
+        HashMap<String, Object> parsedDataMap = new HashMap<String, Object>(markerFieldData);
 		 
-		 // *** HACK ***
-		 // We cannot use "Object" directly as java does not support swapping on primitive value
-		 //  We either need to create a new object type or to use a "non-primitive" type that have "Setter()" functions
-		 // ***
-		 ParsedObjectContent parsedData = new ParsedObjectContent();
+		// *** HACK ***
+		// We cannot use "Object" directly as java does not support swapping on primitive value
+		//  We either need to create a new object type or to use a "non-primitive" type that have "Setter()" functions
+		// ***
+        ParsedObjectContent parsedData = new ParsedObjectContent();
 		 
-		 String				newKey 	 = null; 
-		 JniMarkerField 	newValue = null;
-		 Iterator<String> 	iterator = markerFieldData.keySet().iterator();
-		 
-		 while ( iterator.hasNext() ) {
-			 newKey = iterator.next();
-			 newValue = markerFieldData.get(newKey);
-			 // Call the C to parse the data
-			 ltt_getParsedData(parsedData, eventToParse.getEventPtr().getPointer(), newValue.getMarkerFieldPtr().getPointer() );
-		 	 // Save the result into the HashMap
-			 parsedDataMap.put(newValue.getField(), parsedData.getData() );
-		 }
-		 
-		 return parsedDataMap;
+        String              newKey 	 = null; 
+        JniMarkerField      newValue = null;
+        Iterator<String>    iterator = markerFieldData.keySet().iterator();
+ 
+        while ( iterator.hasNext() ) {
+            newKey = iterator.next();
+            newValue = markerFieldData.get(newKey);
+            // Call the C to parse the data
+            ltt_getParsedData(parsedData, eventToParse.getEventPtr().getPointer(), newValue.getMarkerFieldPtr().getPointer() );
+            // Save the result into the HashMap
+            parsedDataMap.put(newValue.getField(), parsedData.getData() );
+        }
+ 
+        return parsedDataMap;
     }
+    
     
     /* 
      * Add a parsed String value to the Array<br>
@@ -182,7 +188,7 @@ public class JniParser extends Jni_C_Common
      */
     @SuppressWarnings("unused")
     static private void addLongPointerToParsingFromC(Object contentHolder, String fieldName, long pointerToAdd) {
-        ((ParsedObjectContent)contentHolder).setData( new C_Pointer((long) pointerToAdd));
+        ((ParsedObjectContent)contentHolder).setData( new Jni_C_Pointer((long) pointerToAdd));
     }
 
     /* 
@@ -199,7 +205,7 @@ public class JniParser extends Jni_C_Common
      */
     @SuppressWarnings("unused")
     static private void addIntPointerToParsingFromC(Object contentHolder, String fieldName, long pointerToAdd) {
-        ((ParsedObjectContent)contentHolder).setData( new C_Pointer((int) pointerToAdd));
+        ((ParsedObjectContent)contentHolder).setData( new Jni_C_Pointer((int) pointerToAdd));
     }
 
     /* 
@@ -291,10 +297,10 @@ public class JniParser extends Jni_C_Common
 }
 
 /**
- * <b><u>ParsedObjectContent</u></b>
- * <p>
+ * <b><u>ParsedObjectContent</u></b><p>
+ * 
  * ParsedObjectContent class.
- * This class will only be used locally in this object to parse event data more efficiently in the C
+ * Only be used locally in this object to parse event data more efficiently in the C.
  */
 class ParsedObjectContent {
     private Object parsedData = null;

@@ -15,73 +15,70 @@ package org.eclipse.linuxtools.lttng.event;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 /**
- * <b><u>LttngTimestamp</u></b>
- * <p>
- * Lttng specific implementation of the TmfTimestamp
- * <p>
- * The Lttng implementation is the same as the basic Tmf Implementation but allow construction with a TmfTimestamp and a long
+ * <b><u>LttngTimestamp</u></b><p>
+ * 
+ * Lttng specific implementation of the TmfTimestamp.<p>
+ * 
+ * The Lttng implementation is the same as the basic Tmf Implementation but allow construction with a TmfTimestamp or a long.
  */
 public class LttngTimestamp extends TmfTimestamp {
     
-    /**
-	 * 
-	 */
+    // Required by Serializable
 	private static final long serialVersionUID = -7016853105162491273L;
 
 	/**
-     * Constructor with parameters
+     * Constructor with parameters.<p>
      * 
-     * @param newEventTime    JniTime as long, unit expected to be nanoseconds.
+     * @param newEventTime    JniTime as long, unit expected to be nanoseconds
      */
     public LttngTimestamp(long newEventTime) {
         super(newEventTime, (byte) -9);
     }
     
     /**
-     * Copy Constructor<br>
+     * Copy Constructor.<p>
      * 
-     * @param oldEventTime    The timestamp object we want to copy
+     * @param oldEventTime    The timestamp object we want to copy from
      */
     public LttngTimestamp(TmfTimestamp oldEventTime) {
         this(oldEventTime.getValue());
     }
 
 	/**
-	 * This method does not use scale and assumes contents to be in nano seconds
+	 * Get the second part in timestamp.<p>
 	 * 
-	 * @return String Attributes of this object.
+	 * Note : We do not use scale and assumes contents to be in nano seconds.
+	 * 
+	 * @return Seconds in the object, in string.
 	 */
 	public String getSeconds() {
 		return formatSecs(fValue);
 	}
 
 	/**
-	 * This method does not use scale and assumes contents to be in nano seconds
+     * Get the nanosecond part in timestamp.<p>
+     * 
+     * Note : We do not use scale and assumes contents to be in nanoseconds.
 	 * 
-	 * @return String Attributes of this object.
+	 * @return Seconds in the object, in string.
 	 */
 	public String getNanoSeconds() {
 		return formatNs(fValue);
 	}
 
-	/**
-	 * @param time
-	 * @return
+	/*
+	 * Use the exponent to format the second in the correct format.
 	 */
 	private String formatSecs(long time) {
 		long sec = (long) (time * 1E-9);
 		return String.valueOf(sec);
 	}
 
-	/**
+	/*
 	 * Obtains the remainder fraction on unit Seconds of the entered value in
-	 * nanoseconds. e.g. input: 1241207054171080214 ns The number of fraction
-	 * seconds can be obtained by removing the last 9 digits: 1241207054 the
-	 * fractional portion of seconds, expressed in ns is: 171080214
-	 * 
-	 * @param time
-	 * @param res
-	 * @return
+	 * nanoseconds. e.g. input: 1241207054171080214 ns.
+	 * The number of fraction seconds can be obtained by removing the last 9 digits: 
+	 * In 1241207054, the fractional portion of seconds, expressed in ns is: 171080214
 	 */
 	private String formatNs(long time) {
 		boolean neg = time < 0;
@@ -91,8 +88,7 @@ public class LttngTimestamp extends TmfTimestamp {
 		// The following approach could be used although performance
 		// decreases in half.
 		// String strVal = String.format("%09d", time);
-		// String tmp = strVal.substring(strVal.length() - 9);
-
+		// String tmp = strVal.substring(strVal.length() - 9)
 		StringBuffer temp = new StringBuffer();
 		long ns = time;
 		ns %= 1000000000;
@@ -122,7 +118,7 @@ public class LttngTimestamp extends TmfTimestamp {
     /**
      * toString() method.
      * 
-     * @return String  Attributes of this object.
+     * @return Attributes of this object.
      */
     @Override
 	public String toString() {

@@ -6,11 +6,11 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    TraceTest.class,
-    TracefileTest.class,
-    EventTest.class,
-    MarkerTest.class,
-    MarkerFieldTest.class
+    JniTraceTest.class,
+    JniTracefileTest.class,
+    JniEventTest.class,
+    JniMarkerTest.class,
+    JniMarkerFieldTest.class
 })
 
 public class AllJniTests {

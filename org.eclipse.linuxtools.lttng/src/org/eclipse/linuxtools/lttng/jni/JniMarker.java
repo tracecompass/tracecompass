@@ -16,11 +16,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * <b><u>JniMarker</u></b>
- * <p>
+ * <b><u>JniMarker</u></b><p>
+ * 
  * A JniMarker contain information how to interpret the unparsed content (payload) of an event.<br>
  * Each JniMarker contains several MarkerFields for each fields in the event's payload.
- * <p>
+ * 
+ * Provides access to the marker_info C structure (from LTT) in java. 
+ * 
  * Most important fields in the JniMarker are :
  * <ul>
  * <li> the name of the marker in String
@@ -31,7 +33,7 @@ import java.util.HashMap;
 public final class JniMarker extends Jni_C_Common
 {
     // Internal C pointer of the JniEvent used in LTT
-    private C_Pointer thisMarkerPtr = new C_Pointer();
+    private Jni_C_Pointer thisMarkerPtr = new Jni_C_Pointer();
 
     private String name = "";
     private String formatOverview = "";
@@ -70,7 +72,7 @@ public final class JniMarker extends Jni_C_Common
         System.loadLibrary("lttvtraceread");
     }
 
-    /**
+    /*
      * Default constructor is forbidden
      */
     @SuppressWarnings("unused")
@@ -78,10 +80,9 @@ public final class JniMarker extends Jni_C_Common
     }
     
     /**
-     * Copy constructor.
+     * Copy constructor.<p>
      * 
-     * @param oldMarker
-     *            A reference to the JniMarker you want to copy. 
+     * @param oldMarker Reference to the JniMarker you want to copy. 
      */
     public JniMarker(JniMarker oldMarker) {
         thisMarkerPtr = oldMarker.thisMarkerPtr;
@@ -93,13 +94,13 @@ public final class JniMarker extends Jni_C_Common
     }
 
     /**
-     * Copy constructor, using pointer.
+     * Constructor, using pointer.<p>
      * 
      * @param newMarkerPtr  Pointer to a C marker_info structure
      * 
      * @exception JniException
      */
-    public JniMarker(C_Pointer newMarkerPtr) throws JniException {
+    public JniMarker(Jni_C_Pointer newMarkerPtr) throws JniException {
         thisMarkerPtr = newMarkerPtr;
         markerFieldsArrayList = new ArrayList<JniMarkerField>();
         markerFieldsHashMap = new HashMap<String, JniMarkerField>();
@@ -139,7 +140,7 @@ public final class JniMarker extends Jni_C_Common
         // Create a new Jaf_markerField object and insert it in the map
         // the maker field fill itself with LTT data while being constructed
         try {
-            JniMarkerField newMarkerField = new JniMarkerField( new C_Pointer(markerFieldPtr) );
+            JniMarkerField newMarkerField = new JniMarkerField( new Jni_C_Pointer(markerFieldPtr) );
             markerFieldsArrayList.add(newMarkerField);
             markerFieldsHashMap.put(markerFieldName, newMarkerField);
             
@@ -164,55 +165,29 @@ public final class JniMarker extends Jni_C_Common
     public ArrayList<JniMarkerField> getMarkerFieldsArrayList() {
         return markerFieldsArrayList;
     }
-
-
-    /**
-     * Pointer to the marker_info C structure<br>
-     * <br>
-     * The pointer should only be used INTERNALY, do not use these unless you
-     * know what you are doing.
-     * 
-     * @return The actual (long converted) pointer or NULL
-     */
-    public C_Pointer getMarkerPtr() {
-        return thisMarkerPtr;
-    }
-
-    /**
-     * toString() method. <u>Intended to debug</u><br>
-     * 
-     * @return String Attributes of the object concatenated in String
-     */
-    @Override
-	public String toString() {
-        String returnData = "";
-
-        returnData += "name                    : " + name + "\n";
-        returnData += "formatOverview          : " + formatOverview + "\n";
-        returnData += "markerFieldArrayList    : " + markerFieldsArrayList.toArray() + "\n";
-
-        return returnData;
-    }
-
     
     /**
-     * Print information for ALL marker fields for this marker. <u>Intended to debug</u><br>
+     * Pointer to the marker_info C structure.<p>
      * 
-     * This function will call Ltt to print, so information printed will be the one from the C structure
+     * The pointer should only be used <u>INTERNALY</u>, do not use unless you
+     * know what you are doing.<p>
+     * 
+     * @return The actual (long converted) pointer or NULL
+     * 
+     * @see org.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
      */
-    public void printAllMarkerFieldsInformation() {
-        Object[] allMarkersField = markerFieldsArrayList.toArray();
-
-        for (int pos = 0; pos < allMarkersField.length; pos++) {
-            printlnC(allMarkersField[pos].toString());
-        }
+    public Jni_C_Pointer getMarkerPtr() {
+        return thisMarkerPtr;
     }
-
+    
+    
     /**
-     * Print information for this JniMarker. <u>Intended to debug</u><br>
+     * Print information for this JniMarker. 
+     * <u>Intended to debug</u><br>
      * 
-     * This function will call Ltt to print, so information printed will be the one from the C structure<br>
-     * <br>
+     * This function will call Ltt to print, so information printed will be the one from 
+     * the C structure, not the one populated in java.<p>
+     * 
      * This function will not throw but will complain loudly if pointer is NULL
      */
     public void printMarkerInformation() {
@@ -224,4 +199,37 @@ public final class JniMarker extends Jni_C_Common
             ltt_printMarker(thisMarkerPtr.getPointer());
         }
     }
+    
+    /**
+     * Print information for ALL marker fields for this marker. 
+     * <u>Intended to debug</u><br>
+     * 
+     * This function will call Ltt to print, so information printed will be the one from 
+     * the C structure, not the one populated in java.
+     */
+    public void printAllMarkerFieldsInformation() {
+        Object[] allMarkersField = markerFieldsArrayList.toArray();
+
+        for (int pos = 0; pos < allMarkersField.length; pos++) {
+            printlnC(allMarkersField[pos].toString());
+        }
+    }
+    
+    /**
+     * toString() method. 
+     * <u>Intended to debug</u><br>
+     * 
+     * @return Attributes of the object concatenated in String
+     */
+    @Override
+	public String toString() {
+        String returnData = "";
+
+        returnData += "name                    : " + name + "\n";
+        returnData += "formatOverview          : " + formatOverview + "\n";
+        returnData += "markerFieldArrayList    : " + markerFieldsArrayList.toArray() + "\n";
+
+        return returnData;
+    }
+    
 }

@@ -1,6 +1,5 @@
 package org.eclipse.linuxtools.lttng.jni;
 
-
 /**
  * <b><u>Jni_C_Pointer</u></b>
  * <p>

@@ -52,7 +52,7 @@ import org.junit.Test;
  */
 
 
-public class TraceTest
+public class JniTraceTest
 {
         private final static String tracepath1="traceset/trace_617984ev_withlost";
         private final static String tracepath2="traceset/trace_211064ev_nolost";
@@ -61,10 +61,10 @@ public class TraceTest
         private final static String correctTracefileName="kernel0";
         private final static String wrongTracefileName="somethingThatDoesNotExists";
         
-        private final static int   numberOfTracefilesInTrace = 17;
+        private final static int   numberOfTracefilesInTrace = 18;
         
-        private final static long   firstEventTimestamp = 952090116049L;
-        private final static String secondEventName = "kernel";
+        private final static long   firstEventTimestamp = 952088954601L;
+        private final static String secondEventName = "metadata";
         
         private final static long   timestampToSeekTest1 = 953852206193L;
         private final static String eventNameAfterSeekTest1 = "kernel";
@@ -98,8 +98,6 @@ public class TraceTest
                 
                 // Test constructor with argument on a wrong tracepath
                 try {
-                		System.out.println("TEST1");
-                		
                         testTrace1 = new JniTrace(wrongTracePath);
                         fail("Construction with wrong tracepath should fail!");
                 }
@@ -108,8 +106,6 @@ public class TraceTest
                 
                 // Test constructor with argument on a correct tracepath
                 try {
-                		System.out.println("TEST2");
-                		
                         testTrace1 = new JniTrace(tracepath1);
                 }
                 catch( JniException e) {
@@ -118,9 +114,7 @@ public class TraceTest
                 
                 // Test copy constructor that take a pointer with a good pointer
                 try {
-                		System.out.println("TEST3");
-                		
-                        testTrace1 = new JniTrace( new C_Pointer(0) );
+                        testTrace1 = new JniTrace( new Jni_C_Pointer(0) );
                         fail("Construction with wrong pointer should fail!");
                 }
                 catch( JniException e) { 
@@ -128,8 +122,6 @@ public class TraceTest
                 
                 // Test copy constructor that take a pointer with a good pointer
                 try {
-                		System.out.println("TEST4");
-                		
                         testTrace1 = new JniTrace(tracepath1); // This trace should be valid
                         testTrace2 = new JniTrace( testTrace1.getTracePtr() );
                 }

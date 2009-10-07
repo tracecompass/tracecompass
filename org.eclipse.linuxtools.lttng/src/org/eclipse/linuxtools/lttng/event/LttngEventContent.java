@@ -16,18 +16,16 @@ import org.eclipse.linuxtools.tmf.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.event.TmfEventField;
 
 /**
- * <b><u>LttngEventContent</u></b>
- * <p>
- * Lttng specific implementation of the TmfEventContent
- * <p>
- * Lttng LttngEventContent is very similar from TMF basic one. <br>
+ * <b><u>LttngEventContent</u></b><p>
+ * 
+ * Lttng specific implementation of the TmfEventContent.<p>
  */
 public class LttngEventContent extends TmfEventContent {
     
     /**
-     * Constructor with parameters<br>
-     * <br>
-     * Content will be null as no parsed content is given.
+     * Constructor with parameters.<p>
+     * 
+     * Content will be empty as no parsed content is given.
      * 
      * @param thisFormat    The LttngEventFormat relative to the JniEvent
      */
@@ -36,11 +34,10 @@ public class LttngEventContent extends TmfEventContent {
     }
 
     /**
-     * Constructor with parameters<br>
+     * Constructor with parameters.<p>
      * 
      * @param thisFormat        The LttngEventFormat relative to this JniEvent
      * @param thisParsedContent The string content of the JniEvent, already parsed
-     * 
      */
     public LttngEventContent(LttngEventFormat thisFormat, String thisParsedContent, TmfEventField[] thisFields)  {
         super(thisParsedContent, thisFormat);
@@ -49,18 +46,23 @@ public class LttngEventContent extends TmfEventContent {
     }
     
     /**
-     * Copy Constructor<br>
+     * Copy Constructor.<p>
      * 
-     * @param oldContent        Content to copy from
-     * 
+     * @param oldContent  Content to copy from
      */
     public LttngEventContent(LttngEventContent oldContent) {
         this( (LttngEventFormat)oldContent.getFormat(), oldContent.getContent(), oldContent.getFields() );
     }
     
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.event.TmfEventContent#getFields()
+    /**
+     * <b>*DEPRECATED*</b><br>Get all fields of the content.<p>
+     * 
+     * <b><u>DO NOT USE!</b></u> <br>
+     * This function will disapears soon! Use getFields(LttngEvent) instead.<p>
+     * 
+     * If the content was not parsed, format.parse() will get called.<p>
+     * 
+     * @return An array of TmfEventFields
      */
     @Override
     public TmfEventField[] getFields() {
@@ -77,26 +79,42 @@ public class LttngEventContent extends TmfEventContent {
         return fields;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.event.TmfEventContent#getField(int)
+    /**
+     * <b>*DEPRECATED*</b><br>Get a single field of the content, from its id (position).<p>
+     * 
+     * <b><u>DO NOT USE!</b></u> <br>
+     * This function will disapears soon! Use getFields(LttngEvent) instead.<p>
+     * 
+     * If the content was not parsed, format.parse() will get called.<p>
+     * 
+     * @param id    The id of the field we want to obtain.
+     * 
+     * @return A single LttngEventField
      */
     @Override
     public LttngEventField getField(int id) {
-        assert id >= 0 && id < this.getNbFields();
-        
         LttngEventField returnedField = null;
-        TmfEventField[] allFields = this.getFields();
         
-        if ( allFields != null ) {
-        	returnedField = (LttngEventField)allFields[id];
+        if ( (id >= 0) && (id < this.getNbFields()) )
+        {
+            // Call getFields() of this object. Will parse if fields were'nt parse before.
+            TmfEventField[] allFields = this.getFields();
+            
+            if ( allFields != null ) {
+            	returnedField = (LttngEventField)allFields[id];
+            }
         }
-        
         return returnedField;
     }
     
     /**
-     * @param thisEvent
-     * @return
+     * Get all fields of the content.<p>
+     * 
+     * If the content was not parsed, format.parse(LttngEvent) will get called.<p>
+     * 
+     * @param thisEvent     The event to get the fields from
+     * 
+     * @return An array of TmfEventFields
      */
     public TmfEventField[] getFields(LttngEvent thisEvent) {
     	
@@ -113,26 +131,32 @@ public class LttngEventContent extends TmfEventContent {
     }
     
     /**
-     * @param id
-     * @param thisEvent
-     * @return
+     * Get a single field of the content, from its id (position).<p>
+     * 
+     * If the content was not parsed, format.parse(LttngEvent) will get called.<p>
+     * 
+     * @param thisEvent     The event to get the fields from
+     * @param id    The id of the field we want to obtain.
+     * 
+     * @return A single LttngEventField
      */
     public LttngEventField getField(int id, LttngEvent thisEvent) {
-        assert id >= 0 && id < this.getNbFields();
-        
         LttngEventField returnedField = null;
-        TmfEventField[] allFields = this.getFields(thisEvent);
         
-        if ( allFields != null ) {
-        	returnedField = (LttngEventField)allFields[id];
+        if ( (id >= 0) && (id < this.getNbFields()) ) {
+            // Call getFields() of this object. Will parse if fields were'nt parse before.
+            TmfEventField[] allFields = this.getFields(thisEvent);
+            
+            if ( allFields != null ) {
+            	returnedField = (LttngEventField)allFields[id];
+            }
         }
-        
         return returnedField;
     }
     
 
     /**
-     * basic toString() method.
+     * toString() method.
      * 
      * @return Attributes of the object concatenated in String
      */

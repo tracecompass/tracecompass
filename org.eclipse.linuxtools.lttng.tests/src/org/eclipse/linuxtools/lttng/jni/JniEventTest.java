@@ -33,7 +33,7 @@ package org.eclipse.linuxtools.lttng.jni;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
-public class EventTest
+public class JniEventTest
 {
         private final static String tracepath="traceset/trace_617984ev_withlost";
         private final static String eventName="kernel0";
@@ -99,7 +99,7 @@ public class EventTest
                 // Test the constructor with parameters using wrong arguments
                 // Test constructor on a wrong event pointer
                 try {
-                        testEvent1 = new JniEvent( new C_Pointer(0), testTracefile.getTracefileMarkersMap(), testTracefile );
+                        testEvent1 = new JniEvent( new Jni_C_Pointer(0), testTracefile.getTracefileMarkersMap(), testTracefile );
                         fail("Construction with wrong event pointer should fail!");
                 }
                 catch( JniException e) { 

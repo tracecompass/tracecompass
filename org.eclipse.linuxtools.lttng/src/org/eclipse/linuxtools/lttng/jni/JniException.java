@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.lttng.jni;
 /**
  * <b><u>JniException</u></b>
  * <p>
- * Super exception class for JNI
+ * Super class for JNI exception.
  */
 public class JniException extends Exception {
     private static final long serialVersionUID = -6620784221853154537L;

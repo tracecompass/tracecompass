@@ -15,15 +15,19 @@ package org.eclipse.linuxtools.lttng.jni;
 /**
  * <b><u>JniTime</u></b>
  * <p>
- * JniTime object linked to the LttTime C structure
+ * Used to store (event, trace, tracefile, ...) timestamp.
+ * 
+ * Mimic the behavior of the LttTime C structure.
  */
-public final class JniTime extends Jni_C_Common
+public final class JniTime extends Jni_C_Common implements Comparable<JniTime>
 {
     private long time = 0;
 
     /**
-     * Default constructor.
-     *          
+     * Default constructor.<p>
+     * 
+     * Note : Time will be set to 0.
+     * 
      */
     JniTime() {
         time = 0;
@@ -32,16 +36,16 @@ public final class JniTime extends Jni_C_Common
     /**
      * Copy constructor.
      * 
-     * @param oldTime A reference to the JniTime you want to copy.           
+     * @param oldTime   Reference to the JniTime you want to copy.           
      */
     JniTime(JniTime oldTime) {
         time = oldTime.getTime();
     }
 
     /**
-     * Constructor with parameters
-     * <br>
-     * "Ltt style" constructor with Seconds et Nanoseconds
+     * Constructor with parameters.<p>
+     * 
+     * "LTT style" constructor with Seconds et Nanoseconds
      * 
      * @param newSec      Seconds of the JniTime
      * @param newNanoSec  Nanoseconds of the JniTime
@@ -51,76 +55,82 @@ public final class JniTime extends Jni_C_Common
     }
 
     /**
-     * Constructor with parameters
-     * <br>
-     * Usual "nanosecond only" constructor
+     * Constructor with parameters.<p>
      * 
-     * @param newNanoSecTime  JniTime in nanoseconds
+     * Usual "nanosecond only" constructor.
+     * 
+     * @param newNanoSecTime  Time in nanoseconds
      */
     public JniTime(long newNanoSecTime) {
         time = newNanoSecTime;
     }
 
     /**
-     * Getter for the second of the time
-     * <br>
-     * This only return seconds part, i.e. multiple of 1 000 000, of the stored time
+     * Second of the time.<p>
      * 
-     * @return long Second of the time
+     * Returns seconds, i.e. multiple of 1 000 000, of the stored nanoseconds time.
+     * 
+     * @return Second of this time.
      */
     public long getSeconds() {
         return (time / NANO);
     }
 
     /**
-     * Getter for the nanosecond of the time
-     * <br>
-     * This only nanosecondspart , i.e. modulo of 1 000 000, of the stored time
+     * Getter for the nanosecond of the time.<p>
      * 
-     * @return long Nanoseconds of the time
+     * Returns nanoseconds part, i.e. modulo of 1 000 000, of the stored nanoseconds time.
+     * 
+     * @return Nanoseconds of this time
      */
     public long getNanoSeconds() {
         return time % NANO;
     }
 
     /**
-     * Getter for the full time, in nanoseconds
+     * Full time, in nanoseconds.<p>
      * 
-     * @return The complete time in nanoseconds
+     * @return Complete time in nanoseconds
      */
     public long getTime() {
         return time;
     }
      
     /**
-     * Comparaison operator <=
+     * Comparaison operator smaller or equal than "<=" .<p>
      * 
      * @param comparedTime  The time we want to compare with this one
-     * @return boolean true if the compared time is smaller or equal, false otherwise
+     * 
+     * @return true if compared time is smaller or equal, false otherwise
      */
-    public boolean isGivenTimeSmallerOrEqual(JniTime comparedTime) {
+    public boolean isSmallerOrEqual(JniTime comparedTime) {
 
         // NOTE : We check <= instead of just <
-        // This mean the RIGHT OPERAND (comparedTime) always prevails
-        if (comparedTime.getTime() < this.getTime()) {
+        // This mean the LEFT OPERAND (comparedTime) always prevails
+        if (this.getTime() <= comparedTime.getTime() ) {
             return true;
-        } else {
+        } 
+        else {
             return false;
         }
     }
     
     /**
-     * Integer Comparaison operator
+     * compareTo operator.<p>
      * 
-     * @param comparedTime  The time we want to compare with this one
-     * @return int Integer of value -1, 0 or 1, as the pased argument is bigger, equal or smaller than this time
+     * @param right  The time we want to compare with this one
+     * 
+     * @return int of value -1, 0 or 1, as the pased argument is bigger, equal or smaller than this time
      */
-    public int compare(JniTime comparedTime) {
-        if ( comparedTime.getTime() < this.getTime() ) {
-                return 1;
+    public int compareTo(JniTime right) {
+        
+        JniTime left = this;
+        
+        if ( left.getTime() < right.getTime() ) {
+            return -1;
         }
-        else if ( comparedTime.getTime() > this.getTime() ) {
-                return -1;
+        else if ( left.getTime() > right.getTime() ) {
+            return 1;
         }
         else {
             return 0;
@@ -140,9 +150,10 @@ public final class JniTime extends Jni_C_Common
     }
     
     /**
-     * toString() method. <u>Intended to debug</u><br>
-     * <br>
-     * NOTE : we output the time in the same format as LTT (seconds and nanosecond separatly)
+     * toString() method.
+     * <u>Intended to debug</u><p>
+     * 
+     * NOTE : We output the time in the same format as LTT (seconds and nanosecond separatly)
      * 
      * @return String Attributes of the object concatenated in String
      */

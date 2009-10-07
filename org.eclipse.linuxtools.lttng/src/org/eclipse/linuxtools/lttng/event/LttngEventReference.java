@@ -15,32 +15,31 @@ package org.eclipse.linuxtools.lttng.event;
 import org.eclipse.linuxtools.tmf.event.*;
 
 /**
- * <b><u>LttngEventReference</u></b>
- * <p>
+ * <b><u>LttngEventReference</u></b><p>
+ * 
  * Lttng specific implementation of the TmfEventReference
- * <p>
- * The Lttng implementation is the same as the basic Tmf Implementation but allow construction with a String
  */
 public class LttngEventReference extends TmfEventReference {
     
-    private String tracepath = ""; 
+    private String tracename = ""; 
     
     /**
-     * Constructor with parameters
+     * Constructor with parameters.<p>
      * 
-     * @param referencePath  A string that will be our reference
+     * @param newTracefilePath  Complete tracefile path
+     * @param newTraceName      The Trace name 
      */
-    public LttngEventReference(String newTracefilePath, String newTracePath) {
+    public LttngEventReference(String newTracefilePath, String newTraceName) {
         super(newTracefilePath);
         
-        // Save the path of the trace 
-        tracepath = newTracePath;
+        // Save the name of the trace 
+        tracename = newTraceName;
     }
     
     /**
-     * Copy Constructor
+     * Copy Constructor.<p>
      * 
-     * @param oldReference  Reference to copy
+     * @param oldReference  LttngEventReference to copy from.
      */
     public LttngEventReference(LttngEventReference oldReference) {
         this( oldReference.getValue().toString(), oldReference.getTracepath() );
@@ -48,17 +47,23 @@ public class LttngEventReference extends TmfEventReference {
     
     
     public String getTracepath() {
-        return tracepath;
+        return tracename;
     }
     
-    public void setTracepath(String tracepath) {
-        this.tracepath = tracepath;
+    public void setTracepath(String tracename) {
+        this.tracename = tracename;
     }
     
-    
+    /**
+     * toString() method.<p>
+     * 
+     * We return only tracename, as it will be used directly in the eventsView and it gives a better output.
+     * 
+     * @return tracename as String
+     */
     @Override
 	public String toString() {
-    	return tracepath + " " + this.getValue();
+    	return tracename;
     }
     
 }

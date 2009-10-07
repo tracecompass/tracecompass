@@ -15,10 +15,10 @@ package org.eclipse.linuxtools.lttng.event;
 import org.eclipse.linuxtools.tmf.event.*;
 
 /**
- * <b><u>LttngEventType</u></b>
- * <p>
- * Lttng specific implementation of the TmfEventType
- * <p>
+ * <b><u>LttngEventType</u></b><p>
+ * 
+ * Lttng specific implementation of the TmfEventType.<p>
+ * 
  * This implementation add some attributes to the basic Tmf object.
  */
 public class LttngEventType extends TmfEventType {
@@ -27,12 +27,13 @@ public class LttngEventType extends TmfEventType {
     private String  markerName = "";
     
     /**
-     * Constructor with parameters
+     * Constructor with parameters.<p>
      * 
-     * @param thisChannelName   Channel name. It is the Tracefile name in LTT.
+     * @param thisChannelName   Channel name. It is the Tracefile name in LTT
      * @param thisCpuId         CPU id number from LTT
-     * @param thisMarkerName    JniMarker name. It is the marker_info name in LTT.
+     * @param thisMarkerName    JniMarker name. It is the marker_info name in LTT
      * @param thisFormat        The format relative to the event
+     * 
      * @see org.eclipse.linuxtools.lttng.event.LttngEventFormat
      */
     public LttngEventType(String thisChannelName, long thisCpuId, String thisMarkerName, LttngEventFormat thisFormat) {
@@ -44,9 +45,9 @@ public class LttngEventType extends TmfEventType {
     }
 
     /**
-     * Copy constructor
+     * Copy constructor.<p>
      * 
-     * @param oldType   type we want to copy from
+     * @param oldType   Type we want to copy from
      * 
      * @see org.eclipse.linuxtools.lttng.event.LttngEventFormat
      */
@@ -73,7 +74,7 @@ public class LttngEventType extends TmfEventType {
     /**
      * toString() method.
      * 
-     * @return String  TypeId of the object
+     * @return TypeId (channel/cpu/marker) of the object
      */
     @Override
 	public String toString() {

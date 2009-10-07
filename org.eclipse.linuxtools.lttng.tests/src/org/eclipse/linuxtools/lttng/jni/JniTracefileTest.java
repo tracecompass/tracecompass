@@ -47,7 +47,7 @@ import org.junit.Test;
         public void printTracefileInformation()
 */
 
-public class TracefileTest
+public class JniTracefileTest
 {
         private final static String tracepath1="traceset/trace_617984ev_withlost";
         private final static String tracefileName1="kernel0";
@@ -94,7 +94,7 @@ public class TracefileTest
                 
                 // Test constructor with pointer on a wrong pointer
                 try {
-                        testTracefile1 = new JniTracefile( new C_Pointer(0), testTrace );
+                        testTracefile1 = new JniTracefile( new Jni_C_Pointer(0), testTrace );
                         fail("Construction with wrong pointer should fail!");
                 }
                 catch( JniException e) { 

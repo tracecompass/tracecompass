@@ -19,7 +19,7 @@ import org.junit.Test;
         public void printMarkerInformation()
 */
 
-public class MarkerTest
+public class JniMarkerTest
 {
         private final static String tracepath="traceset/trace_617984ev_withlost";
         private final static String eventName="kernel0";
@@ -61,7 +61,7 @@ public class MarkerTest
                 
                 // Test constructor with pointer on a wrong pointer
                 try {
-                        testMarker1 = new JniMarker( new C_Pointer(0) );
+                        testMarker1 = new JniMarker( new Jni_C_Pointer(0) );
                         fail("Construction with wrong pointer should fail!");
                 }
                 catch( JniException e) { 

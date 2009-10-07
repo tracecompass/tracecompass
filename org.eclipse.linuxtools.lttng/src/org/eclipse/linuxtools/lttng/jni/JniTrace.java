@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.lttng.jni;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.PriorityQueue;
@@ -32,7 +31,7 @@ import java.util.PriorityQueue;
 public class JniTrace extends Jni_C_Common {
         
     // Internal C pointer of the JniTrace used in LTT
-    private C_Pointer thisTracePtr = new C_Pointer();
+    private Jni_C_Pointer thisTracePtr = new Jni_C_Pointer();
 
     // Data we should populate from LTT
     // Note that all type have been scaled up as there is no "unsigned" in java
@@ -60,15 +59,7 @@ public class JniTrace extends Jni_C_Common {
     private PriorityQueue<JniEvent> eventsHeap = null;
     
     // This variable will hold the content of the "last" event we read
-    private JniTime currentEventTimestamp = new JniTime();
-    
-    // Comparator we will need for the heap construction
-    private Comparator<JniEvent> eventComparator = new Comparator<JniEvent>() {
-    	public int compare(JniEvent left, JniEvent right ){
-    		return ( left.getEventTime().compare( right.getEventTime() ) );
-    	}
-    };
-    
+    private JniEvent currentEvent = null;  
     
     // Open/close native functions
     private native long ltt_openTrace(String pathname);
@@ -103,19 +94,34 @@ public class JniTrace extends Jni_C_Common {
     static {
         System.loadLibrary("lttvtraceread");
     }
-        
-    /**
+    
+    /*
      * Default constructor is forbidden
      */
     @SuppressWarnings("unused")
     private JniTrace() {
     }
-
+    
+    /**
+     * Constructor that takes a tracepath parameter.<p>
+     * 
+     * This constructor also opens the trace.
+     * 
+     * @param newpath The <b>directory</b> of the trace to be opened
+     * 
+     * @exception JniException
+     */
+    public JniTrace(String newpath) throws JniException {
+        tracepath = newpath;
+        thisTracePtr = new Jni_C_Pointer();
+        
+        openTrace(newpath);
+    }
+    
     /**
      * Copy constructor.
      * 
-     * @param oldTrace
-     *            A reference to the JniTrace you want to copy.           
+     * @param oldTrace  A reference to the JniTrace to copy.           
      */
     public JniTrace(JniTrace oldTrace) {
         thisTracePtr  = oldTrace.thisTracePtr;
@@ -138,18 +144,20 @@ public class JniTrace extends Jni_C_Common {
         tracefilesMap = new HashMap<String, JniTracefile>(oldTrace.tracefilesMap.size());
         tracefilesMap = oldTrace.tracefilesMap;
         
-        eventsHeap = new PriorityQueue<JniEvent>( oldTrace.eventsHeap.size(), eventComparator );
+        eventsHeap = new PriorityQueue<JniEvent>( oldTrace.eventsHeap.size());
         eventsHeap = oldTrace.eventsHeap;
     }        
         
     /**
-     * Copy constructor, using pointer.
+     * Constructor, using C pointer.<p>
      * 
-     * @param newPtr The pointer to an already opened LttTrace C structure
+     * @param newPtr The pointer to an already opened LttTrace C structure.
      *            
      * @exception JniException
+     * 
+     * @see org.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
      */
-    public JniTrace(C_Pointer newPtr) throws JniException {
+    public JniTrace(Jni_C_Pointer newPtr) throws JniException {
         thisTracePtr = newPtr;
         
         // Populate our trace
@@ -157,31 +165,14 @@ public class JniTrace extends Jni_C_Common {
     }
         
     /**
-     * Constructor that takes a tracepath parameter
-     * <br>
-     * This constructor also opens the trace
+     * Open an existing trace.<p>
      * 
-     * @param newpath The <b>directory</b> of the trace to be opened
-     * 
-     * @exception JniException
-     */
-    public JniTrace(String newpath) throws JniException {
-        tracepath = newpath;
-        thisTracePtr = new C_Pointer();
-        
-        openTrace(newpath);
-    }
-        
-    /**
-     * Open an existing trace<br>
-     * <br>
      * The tracepath is a directory and needs to exist, otherwise
-     * a JafOpenTraceFailedException is raised.
+     * a JafOpenTraceFailedException is throwed.
      * 
-     * @param newPath
-     *            The <b>directory</b> of the trace to be opened
-     * @exception JafOpenTraceFailedException
-     *                Thrown if the open failed
+     * @param newPath The <b>directory</b> of the trace to be opened
+     * 
+     * @exception JniOpenTraceFailedException Thrown if the open failed
      */
     public void openTrace(String newPath) throws JniException {
         // If open is called while a trace is already opened, we will try to close it first
@@ -195,12 +186,11 @@ public class JniTrace extends Jni_C_Common {
     }
         
     /**
-     * Open an existing trace<br>
-     * <br>
+     * Open an existing trace.<p>
+     * 
      * The tracepath should have been set already,
      * 
-     * @exception JafOpenTraceFailedException
-     *                Thrown if the open failed
+     * @exception JniOpenTraceFailedException  Thrown if the open failed
      */
     public void openTrace() throws JniException {
         
@@ -219,23 +209,23 @@ public class JniTrace extends Jni_C_Common {
         if (newPtr == NULL) {
             throw new JniOpenTraceFailedException("Error while opening trace. Is the tracepath correct? (openTrace)");
         }
-
+        
         // This is OUR pointer
-        thisTracePtr = new C_Pointer(newPtr);
+        thisTracePtr = new Jni_C_Pointer(newPtr);
 
         // Populate the trace with LTT information
         populateTraceInformation();
     }
         
     /**
-     * Close a trace
+     * Close a trace.<p>
      * 
      * If the trace is already closed, will silently do nothing.
      */
     public void closeTrace() {
         if (thisTracePtr.getPointer() != NULL) {
             ltt_closeTrace(thisTracePtr.getPointer());
-            thisTracePtr = new C_Pointer(NULL);
+            thisTracePtr = new Jni_C_Pointer(NULL);
 
             // Clear the tracefile map
             tracefilesMap.clear();
@@ -254,7 +244,7 @@ public class JniTrace extends Jni_C_Common {
     /* 
      * This function populates the trace data with data from LTT
      * 
-     * @throws JafException
+     * @throws JniException
      */
     private void populateTraceInformation() throws JniException {
         if (thisTracePtr.getPointer() == NULL) {
@@ -290,7 +280,7 @@ public class JniTrace extends Jni_C_Common {
         ltt_getAllTracefiles( thisTracePtr.getPointer() );
         
         if (eventsHeap == null) {
-            eventsHeap = new PriorityQueue<JniEvent>(tracefilesMap.size(), eventComparator);
+            eventsHeap = new PriorityQueue<JniEvent>(tracefilesMap.size());
         }
         
         // Populate the heap with events
@@ -302,7 +292,7 @@ public class JniTrace extends Jni_C_Common {
      * It should be called after each seek or when the object is constructed
      */
     private void populateEventHeap() {
-        currentEventTimestamp = new JniTime();
+        currentEvent = null;
         eventsHeap.clear();
         
         Object new_key = null;
@@ -337,7 +327,7 @@ public class JniTrace extends Jni_C_Common {
         // Create a new tracefile object and insert it in the map
         //    the tracefile fill itself with LTT data while being constructed
         try {
-            newTracefile = new JniTracefile( new C_Pointer(tracefilePtr), this );
+            newTracefile = new JniTracefile( new Jni_C_Pointer(tracefilePtr), this );
             tracefilesMap.put(tracefileName + newTracefile.getCpuNumber(), newTracefile);
         }
         catch(JniTracefileWithoutEventException e) {
@@ -350,12 +340,10 @@ public class JniTrace extends Jni_C_Common {
         
         
     /**
-     * Return the next event, determined by timestamp, among the trace files.
-     * The event content is populated.
-     *  
-     * Returns  null in case of error or if we reach end of trace.
+     * Return the next event in the events stack, determined by timestamp, in the trace (all the tracefiles).<p>
      * 
-     * @return The next event in the trace or null
+     * @return The next event in the trace or null if no event is available.
+     * 
      * @see org.eclipse.linuxtools.lttng.jni.JniEvent
      */
     public JniEvent readNextEvent() {
@@ -368,7 +356,8 @@ public class JniTrace extends Jni_C_Common {
         }
         
         // Otherwise, we need to make sure the timestamp of the event we got is not the same as the last "NextEvent" we requested 
-        if (tmpEvent.getEventTime().getTime() == currentEventTimestamp.getTime() ) {
+        // NOTE : JniEvent.compareTo() compare by timestamp AND type, as 2 events of different type could have the same timestamp.
+        if ( tmpEvent.compareTo(currentEvent) == 0 ) {
             // Remove the event on top as it is the same currentEventTimestamp
             eventsHeap.poll();
             
@@ -383,26 +372,24 @@ public class JniTrace extends Jni_C_Common {
             // Pick the top event again
             tmpEvent = eventsHeap.peek();
             
-            // Save the timestamp if the event is not null (null mean we reached the last event in the trace)
-            if (tmpEvent != null) {
-                currentEventTimestamp = tmpEvent.getEventTime();
-            }
+            // Save the event we just read as the "current event"
+            currentEvent = tmpEvent;
         }
-        // If the event on top has differetn timestamp than the currentTimestamp, just save this timestamp as current
+        // If the event on top has different timestamp than the currentTimestamp, just save this timestamp as current
         else {
-            currentEventTimestamp = tmpEvent.getEventTime();
+            currentEvent = tmpEvent;
         }
-            
+        
         return tmpEvent;
     }
     
     /**
-     * Return the next event, determined by timestamp, among the trace files.
-     * The event content is NOT populated (requires a call to readNextEvent()).
-     *  
-     * Returns null in case of error or EOF.
+     * Return the top event in the events stack, determined by timestamp, in the trace (all the tracefiles).<p>
      * 
-     * @return The next event, or null if none is available
+     * Note : If the events were read before, the top event and the event currently loaded (currentEvent) are most likely the same.
+     * 
+     * @return The top event in the stack or null if no event is available.
+     * 
      * @see org.eclipse.linuxtools.lttng.jni.JniEvent
      */
     public JniEvent findNextEvent() {
@@ -410,14 +397,16 @@ public class JniTrace extends Jni_C_Common {
     }
     
     /**
-     * Seek to a certain time and read the next event from that time.<br>
-     * <br>
-     * If no more events are available or an error happen, null will be returned
+     * Seek to a certain timestamp and read the next event.
+     * <p>
+     * If no more events are available or an error happen, null will be returned.
      * 
-     * @param seekTime  The time where we want to seek to
-     * @return JniEvent    The next event after the seek time or null
+     * @param seekTime      The time where we want to seek to.
+     * 
+     * @return The event just after the seeked time or null if none available.
      * 
      * @see org.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.lttng.jni.JniTime
      */
      public JniEvent seekAndRead(JniTime seekTime) { 
           JniEvent returnedEvent = null;
@@ -430,13 +419,16 @@ public class JniTrace extends Jni_C_Common {
      }
     
      /**
-      * Seek to a certain time but <b>do not</b> read the next event.<br>
-      * <br>
-      * This only position the trace, it will not return anything.
+      * Seek to a certain time but <b>do not</b> read the next event.<p>
+      * 
+      * This only position the trace, it will not return anything.<p>
       * 
       * @param seekTime     The time where we want to seek to
+      * 
+      * @see org.eclipse.linuxtools.lttng.jni.JniTime
       */
       public void seekToTime(JniTime seekTime) {
+          
            Object tracefile_name = null;
            Iterator<String> iterator = tracefilesMap.keySet().iterator();
            
@@ -450,10 +442,12 @@ public class JniTrace extends Jni_C_Common {
       }
      
     /**
-     * Get a certain tracefile from its given name<br>
+     * Get a certain tracefile from its given name.<p>
      * 
-     * @param tracefileName The name of the tracefile
-     * @return JniTracefile The tracefile found or null if none
+     * @param tracefileName     The name of the tracefile.
+     * 
+     * @return The tracefile found or null if none.
+     * 
      * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
      */
     public JniTracefile requestTracefileByName(String tracefileName) {
@@ -461,10 +455,12 @@ public class JniTrace extends Jni_C_Common {
     }        
         
     /**
-     * Get a certain event associated to a trace file from the trace file name<br>
+     * Get a certain event associated to a tracefile from the tracefile name.<p>
      * 
-     * @param tracefileName The name of the trace file
-     * @return The JniEvent found or null if none
+     * @param tracefileName     The name of the trace file.
+     * 
+     * @return Event of the tracefile or null if none found.
+     * 
      * @see org.eclipse.linuxtools.lttng.jni.JniEvent
      */
     public JniEvent requestEventByName(String tracefileName) {
@@ -543,55 +539,67 @@ public class JniTrace extends Jni_C_Common {
     }        
     
     /**
-     * Getter for the last read event timestamp<br>
+     * The timestamp of the last read event.<p>
      * 
-     * @return The time of the last event read
+     * Note : If no event is available, Long.MAX_VALUE is returned.
+     * 
+     * @return Time of the last event read
+     * 
+     * @see org.eclipse.linuxtools.lttng.jni.JniTime
      */
     public JniTime getCurrentEventTimestamp() {
-        return currentEventTimestamp;
+        JniTime returnedTime = null;
+        
+        // If no event were read or we reach the last event in the trace, 
+        //      currentEvent will be null
+        if (  currentEvent != null ) {
+            returnedTime = currentEvent.getEventTime();
+        }
+        else {
+            returnedTime = new JniTime(Long.MAX_VALUE);
+        }
+        return returnedTime;
     }
     
     /**
-     * Pointer to the LttTrace C structure<br>
-     * <br>
-     * The pointer should only be used INTERNALY, do not use these unless you
+     * Pointer to the LttTrace C structure.<p>
+     * 
+     * The pointer should only be used <u>INTERNALY</u>, do not use unless you
      * know what you are doing.
      * 
-     * @return The actual (long converted) pointer or NULL
+     * @return The actual (long converted) pointer or NULL.
+     * 
+     * @see org.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
      */
-    public C_Pointer getTracePtr() {
+    public Jni_C_Pointer getTracePtr() {
         return thisTracePtr;
     }        
         
     /**
      * Print information for all the tracefiles associated with this trace.
-     * <u>Intended to debug</u><br>
+     * <u>Intended to debug</u><p>
      * 
      * This function will call Ltt to print, so information printed will be the
-     * one from the C structure
+     * one from the C structure, not the one populated in java.
      * 
      * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
      */
     public void printAllTracefilesInformation() {
-
-        Object new_key = null;
-        JniTracefile tracefile;
+        JniTracefile tracefile = null;
 
         Iterator<String> iterator = tracefilesMap.keySet().iterator();
         while (iterator.hasNext()) {
-            new_key = iterator.next();
-
-            tracefile = tracefilesMap.get(new_key);
-
+            tracefile = tracefilesMap.get(iterator.next());
             tracefile.printTracefileInformation();
         }
     }        
         
     /**
-     * Print information for this trace. <u>Intended to debug</u><br>
+     * Print information for this trace. 
+     * <u>Intended to debug</u><p>
      * 
      * This function will call Ltt to print, so information printed will be the
-     * one from the C structure<br>
+     * one from the C structure, not the one populated in java.<p>
      * <br>
      * This function will not throw but will complain loudly if pointer is NULL
      */
@@ -600,15 +608,17 @@ public class JniTrace extends Jni_C_Common {
         // If null pointer, print a warning!
         if (thisTracePtr.getPointer() == NULL) {
             printlnC("Pointer is NULL, cannot print. (printTraceInformation)");
-        } else {
+        } 
+        else {
             ltt_printTrace( thisTracePtr.getPointer() );
         }
     }
         
     /**
-     * toString() method. <u>Intended to debug</u><br>
+     * toString() method. 
+     * <u>Intended to debug</u><br>
      * 
-     * @return String Attributes of the object concatenated in String
+     * @return Attributes of the object concatenated in String
      */
     @Override
 	public String toString() {
@@ -635,115 +645,4 @@ public class JniTrace extends Jni_C_Common {
 
         return returnData;
     }
-     
-     /* 
-     *  MAIN : For testing only!
-     */
-     public static void main(String[] args) {
-         JniTrace testTrace = null;
-         JniEvent tmpEvent = null;
-         
-         try {
-             //testTrace = new JniTrace("/home/william/trace1");
-             testTrace = new JniTrace("/home/francois/workspace/LTTng/org.eclipse.linuxtools.lttng.tests/traceset/trace_617984ev_withlost");
-             //testTrace = new JniTrace("/home/william/trace1_numcpu");
-         }
-         catch (JniException e) {
-             System.out.println(e.getMessage() );
-             return;
-         }
-         
-//         testTrace.printAllTracefilesInformation();
-//         
-//         
-//         testTrace.printlnC( testTrace.toString() );
-         
-         long nbEvent = 0;
-         
-         testTrace.printlnC("Beginning test run on all events");
-         tmpEvent = testTrace.readNextEvent();
-         while (tmpEvent != null) {
-             nbEvent++;
-             tmpEvent = testTrace.readNextEvent();
-             
-             if ( tmpEvent != null ) {
-                 tmpEvent.parseAllFields();
-             }
-         }
-         testTrace.printlnC("We read " + nbEvent + " total events (JAF)\n");
-         
-         
-         /*
-         
-         tmpEvent = testTrace.readNextEvent();
-         
-         JniTime test_time = new JniTime(960386633737L);
-         tmpEvent = testTrace.seekAndRead(test_time);
-         
-         testTrace.printlnC(tmpEvent.getParentTracefile().getTracefileName().toString() );
-         testTrace.printlnC(tmpEvent.toString() );
-         
-         
-         test_time = new JniTime(960386638531L);
-         tmpEvent = testTrace.seekAndRead(test_time);
-         
-         testTrace.printlnC(tmpEvent.getParentTracefile().getTracefileName().toString() );
-         testTrace.printlnC(tmpEvent.toString() );
-         
-         
-         tmpEvent = testTrace.readNextEvent();
-         if ( tmpEvent == null ) {
-             testTrace.printlnC("NULL NULL NULL1");
-         }
-         else {
-             testTrace.printlnC(tmpEvent.getParentTracefile().getTracefileName().toString() );
-             testTrace.printlnC(tmpEvent.toString() );
-         }
-         
-         tmpEvent = testTrace.readNextEvent();
-         if ( tmpEvent == null ) {
-             testTrace.printlnC("NULL NULL NULL2");
-         }
-         else {
-             testTrace.printlnC(tmpEvent.getParentTracefile().getTracefileName().toString() );
-             testTrace.printlnC(tmpEvent.toString() );
-         }
-         */
-         
-         
-         
-         
-         
-         
-         /*
-         testTrace.printlnC("Beginning test run seek time");        
-         JniTime test_time = new JniTime(953, 977711854);
-         testTrace.seekToTime(test_time);
-         tmpEvent = testTrace.findNextEvent();
-         testTrace.printlnC(tmpEvent.toString() );
-         */
-         
-         /*
-         testTrace.printlnC("Beginning test run parsing event"); 
-         Object[] parsedName = null;
-         HashMap<String,Object> parsedData = null;
-         for ( int x = 0; x<30; x++) {
-             tmpEvent = testTrace.readNextEvent();
-                 
-             testTrace.printlnC(tmpEvent.getParentTracefile().getTracefileName().toString() );
-             testTrace.printC(tmpEvent.toString() );
-                 
-             testTrace.printlnC("Format                  : " + tmpEvent.requestEventMarker().getFormatOverview().toString() );
-             parsedData = tmpEvent.parse();
-             parsedName = parsedData.keySet().toArray();
-             
-             testTrace.printC("                          ");
-             for ( int pos=0; pos<parsedName.length; pos++) {
-                 testTrace.printC( parsedName[pos].toString() + " " + parsedData.get(parsedName[pos]).toString() + " ");
-             }
-             testTrace.printlnC("\n");
-         }*/
-         
-     }
-     
 }

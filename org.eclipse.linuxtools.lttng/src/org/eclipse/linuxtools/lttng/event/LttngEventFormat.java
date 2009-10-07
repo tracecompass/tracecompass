@@ -18,40 +18,46 @@ import java.util.Iterator;
 import org.eclipse.linuxtools.tmf.event.TmfEventFormat;
 
 /**
- * <b><u>LttngEventFormat</u></b>
- * <p>
- * Lttng specific implementation of the TmfEventFormat
- * <p>
- * The Lttng implementation of format override parse but require a LttngEvent for most functions so it can call Jni
+ * <b><u>LttngEventFormat</u></b><p>
+ * 
+ * Lttng specific implementation of the TmfEventFormat.<p>
  */
 public class LttngEventFormat extends TmfEventFormat {
 
     /**
-     * Default constructor
+     * Constructor with parameters.<p>
+     * 
+     * @param labels    The fields labels of the content. 
      */
     public LttngEventFormat( String[] labels) {
         super(labels);
     }
     
     /**
-     * Copy constructor
+     * Copy constructor.<p>
+     * 
+     * @param oldFormat     The format to copy from
      */
     public LttngEventFormat( LttngEventFormat oldFormat ) {
         this(oldFormat.getLabels());
     }
     
     /**
-     * Parse the LttngEvent linked to this LttngEventFormat.<br>
+     * Parse the given LttngEvent.<p>
      * 
-     * @return LttngEventField[]     An array of LttngEventField that contain the parsed data
+     * @param thisEvent   The LttngEvent to parse
+     * 
+     * @return            An array of LttngEventField that contain the parsed data
      */
     public LttngEventField[] parse(LttngEvent thisEvent) {
+        // Obtain the parsed content from the JNI
         HashMap<String, Object> parsedMap = thisEvent.convertEventTmfToJni().parseAllFields();
         LttngEventField[] returnedField = new LttngEventField[parsedMap.size()];
         
         String fieldName = null;
         int position = 0;
         Iterator<String> iterator = parsedMap.keySet().iterator();
+        // Loop to create the LttngEventField from the parsedContent
         while (iterator.hasNext()) {
             fieldName = iterator.next();
             returnedField[position] = new LttngEventField( fieldName, parsedMap.get(fieldName) );
@@ -62,10 +68,16 @@ public class LttngEventFormat extends TmfEventFormat {
     }
     
     
-    
-    /* *** FIXME
-     * TEMPORARY IMPLEMENTATION
-     * THIS WILL DISAPEAR ( ?? )
+    /**
+     * <b>*FIXME*</b><br>Parse from a HashMap of content.<p>
+     * 
+     * This function will hopefully disapears soon!<br>
+     * We need to parse WHILE CREATING LttngEvent, so we cannot always use parse(LttngEvent).<br>
+     * This function is ugly but should be 100% safe to use.<p>
+     * 
+     * @param  parsedEvents     HashMap of parsed content, as returned by JniParser.parseAllFields()
+     * 
+     * @return An array of TmfEventFields
      */
     public LttngEventField[] parse(HashMap<String, Object> parsedEvents) {
         LttngEventField[] returnedField = new LttngEventField[parsedEvents.size()];
@@ -73,21 +85,34 @@ public class LttngEventFormat extends TmfEventFormat {
         String fieldName = null;
         int position = 0;
         Iterator<String> iterator = parsedEvents.keySet().iterator();
+        // Loop to create the LttngEventField from the parsedContent in the map
         while (iterator.hasNext()) {
             fieldName = iterator.next();
             returnedField[position] = new LttngEventField( fieldName, parsedEvents.get(fieldName) );
             position++;
         }
-        
         return returnedField;
     }
     
-    /* *** FIXME ***
-     * Evil "do at least something" parse function
-     * THIS IS JUST FOR COMPATIBILITY! DO NOT USE!
-     * Content/Format/Fields interelation need to be revisited ASAP
-     */ 
+    /**
+     * <b>*DEPRECATED*</b><br>Parse from the content string.<p>
+     * 
+     * <b><u>DO NOT USE!</b></u> <br>
+     * This function will disapears soon! Use parse(LttngEvent) instead.<br>
+     * It is evil to parse content string directly as we <u>do not control the content</u>.<br>
+     * So this would theorically works but it could break at any moment if kernel developpers changes their usual format.<p>
+     * 
+     * This is provided because we need to implement this function since we inherit TmfFormat
+     * 
+     * @param  uselessContent    Content to parse as String
+     * 
+     * @return An array of TmfEventFields
+     */
     public LttngEventField[] parse(String uselessContent) {
+        
+        // This function is _under commented_ because you should not use it
+        //  (this imply you shouldn't read it as well).
+        
         // *** Begining of the evil "parse String" function
         // 
         // - 1st : Find the number of ":" in the String. This will be the number of fields in the String. 
@@ -103,13 +128,18 @@ public class LttngEventFormat extends TmfEventFormat {
         LttngEventField[] tmpFields = new LttngEventField[nbFields];
         
         // - 3rd : Fill the array
+        //      Content is the NAME:VALUE format with space separators
+        //
+        //      We search for 3 possible case : 
+        //          - Field name
+        //          - Value (AKA payload or parsed content)
+        //          - "Out of range" (EOF found)
+        //
+        //
         int fieldPosition = 0;
-        
         int lastFieldnamePos = 0;
         int lastDoubleDottedPos = 0;
-        
         int lastSpacePos = 0;
-        
         boolean isSearchingFieldname = true;
         
         String  fieldName   = "";
@@ -118,6 +148,7 @@ public class LttngEventFormat extends TmfEventFormat {
         int pos = 0;
         while ( (pos < uselessContent.length()) && (fieldPosition<nbFields) )
         {
+            // : symbol mean we found the end of "NAME" 
             if ( uselessContent.substring(pos, pos+1).equals(":") ) {
               
               if ( isSearchingFieldname==false ) {
@@ -129,6 +160,7 @@ public class LttngEventFormat extends TmfEventFormat {
               
               lastDoubleDottedPos = pos;
             }
+            // space mean we found the end of VALUE
             else if ( uselessContent.substring(pos, pos+1).equals(" ") ) {
                 
                 if ( isSearchingFieldname==true ) {
@@ -139,6 +171,7 @@ public class LttngEventFormat extends TmfEventFormat {
                 
                 lastSpacePos = pos;
             }
+            // pos+2 > length mean EOF
             else if ( pos+2 >= uselessContent.length() ) {
                 fieldName = uselessContent.substring(lastSpacePos+1, lastDoubleDottedPos);
                 fieldValue = uselessContent.substring(lastDoubleDottedPos+1, pos+1);
@@ -152,5 +185,5 @@ public class LttngEventFormat extends TmfEventFormat {
         
         return tmpFields;
     }
-
+    
 }
