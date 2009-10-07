@@ -48,7 +48,18 @@ public class TmfTraceContext {
 		return location;
 	}
 
+// The FW expects the trace events to be ordered in time.
+// If this is not the case, this invalidates the Trace index (at least)
+// TODO: Throw an exception
+//	private TmfTimestamp previous = TmfTimestamp.BigBang;
 	public void setLocation(Object loc) {
+//		if (loc instanceof TmfTimestamp) {
+//			TmfTimestamp ts = (TmfTimestamp) loc;
+//			if (ts.compareTo(previous, false) < 0) {
+//				System.out.println("Going back in time from " + previous + " to " + ts);
+//			}
+//			previous = ts;
+//		}
 //		validateLocation(loc);
 		location = loc;
 	}

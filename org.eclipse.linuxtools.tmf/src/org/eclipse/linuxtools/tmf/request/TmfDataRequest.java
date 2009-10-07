@@ -267,7 +267,9 @@ public class TmfDataRequest<V> {
     	else if (fRequestCanceled) {
     		handleCancel();
     	}
-    	handleSuccess();
+    	else {
+    		handleSuccess();
+    	}
     }
 
     public void handleSuccess() {

@@ -303,8 +303,11 @@ public class TmfExperiment extends TmfComponent implements ITmfRequestHandler<Tm
 					if (nbEvents < nbRequestedEvents)
 						event = getNextEvent(traces, contexts);
 				}
-				pushData(request, events);
-				request.done();
+
+				if (!request.isCancelled() && !request.isFailed()) {
+					pushData(request, events);
+					request.done();
+				}
 			}
 		};
 		thread.start();
