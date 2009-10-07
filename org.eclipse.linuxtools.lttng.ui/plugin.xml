@@ -103,9 +103,10 @@
       </category>
       <wizard
             category="org.eclipse.linuxtools.lttng.ui.wizards.new"
-            class="org.eclipse.linuxtools.lttng.ui.views.project.NewProjectWizard"
+            class="org.eclipse.linuxtools.lttng.ui.views.project.dialogs.NewProjectWizard"
+            descriptionImage="icons/garland16.png"
             finalPerspective="org.eclipse.linuxtools.lttng.ui.perspective"
-            icon="icons/garland32.png"
+            icon="icons/garland16.png"
             id="org.eclipse.linuxtools.lttng.ui.views.ui.wizards.newProject"
             name="LTTng Project"
             project="true">
@@ -115,23 +116,118 @@
       </wizard>
    </extension>
    <extension
-         id="org.eclipse.linuxtools.lttng.wizards.import"
-         name="LTTng Import Wizards"
-         point="org.eclipse.ui.importWizards">
-      <category
-            id="org.eclipse.linuxtools.lttng.ui.wizards.import"
-            name="LTTng">
-      </category>
-      <wizard
-            category="org.eclipse.linuxtools.lttng.ui.wizards.import"
-            class="org.eclipse.linuxtools.lttng.ui.views.project.ImportTraceWizard"
-            icon="icons/garland32.png"
-            id="org.eclipse.linuxtools.lttng.ui.wizards.importTrace"
-            name="LTTng Trace">
-         <description>
-            Import an existing LTTng trace file
-         </description>
-      </wizard>
+         id="org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature"
+         name="LTTng Project Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature">
+         </run>
+      </runtime>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            description="LTTng project management options"
+            id="org.eclipse.linuxtools.lttng.ui.view.project.actionSet"
+            label="LTTng Project ActionSet"
+            visible="false">
+         <menu
+               id="org.eclipse.linuxtools.lttng.ui.view.project.menu"
+               label="&amp;LTTng"
+               path="additions">
+            <groupMarker
+                  name="content">
+            </groupMarker>
+            <groupMarker
+                  name="additions">
+            </groupMarker>
+         </menu>
+         <action
+               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.NewProjectActionDelegate"
+               icon="icons/garland16.png"
+               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.newProjectAction"
+               label="New LTTng Project"
+               menubarPath="org.eclipse.linuxtools.lttng.ui.view.project.menu/content"
+               style="push"
+               toolbarPath="Normal/additions"
+               tooltip="Create a new LTTng project">
+         </action>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="org.eclipse.linuxtools.lttng.ui.view.project.projectMenu"
+            objectClass="org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProject">
+         <action
+               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.DeleteProjectActionDelegate"
+               enablesFor="1"
+               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.deleteProjectAction"
+               label="Delete LTTng Project"
+               menubarPath="additions">
+         </action>
+         <action
+               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.NewProjectActionDelegate"
+               enablesFor="?"
+               icon="icons/garland16.png"
+               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.newProjectAction"
+               label="New LTTng Project"
+               menubarPath="additions"
+               tooltip="Create a new LTTng project">
+         </action>
+      </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="org.eclipse.linuxtools.lttng.ui.view.project.traceMenu"
+            objectClass="org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngTraceFolder">
+         <action
+               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.ImportTraceActionDelegate"
+               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.importTraceAction"
+               label="Import a Trace"
+               menubarPath="additions">
+         </action>
+      </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="org.eclipse.linuxtools.lttng.ui.view.project.traceEntryMenu"
+            objectClass="org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngTraceEntry">
+         <action
+               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.DeleteTraceActionDelegate"
+               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.deleteTraceAction"
+               label="Delete Trace"
+               menubarPath="additions">
+         </action>
+      </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="org.eclipse.linuxtools.lttng.ui.view.project.experimentMenu"
+            objectClass="org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentFolder">
+         <action
+               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.NewExperimentActionDelegate"
+               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.newExperimentAction"
+               label="New Experiment"
+               menubarPath="additions">
+         </action>
+      </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="org.eclipse.linuxtools.lttng.ui.view.project.experimentEntryMenu"
+            objectClass="org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentEntry">
+         <action
+               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.DeleteExperimentActionDelegate"
+               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.deleteExperimentAction"
+               label="Delete Experiment"
+               menubarPath="additions">
+         </action>
+         <action
+               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.AddTraceActionDelegate"
+               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.addTraceExperimentAction"
+               label="Add Traces"
+               menubarPath="additions">
+         </action>
+      </objectContribution>
    </extension>
 
 </plugin>

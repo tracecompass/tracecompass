@@ -14,20 +14,19 @@ package org.eclipse.linuxtools.lttng.ui.views.project;
 
 import java.io.FileNotFoundException;
 
-import org.eclipse.core.internal.resources.Folder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
+import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentEntry;
+import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngTraceEntry;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.trace.TmfExperimentSelectedSignal;
@@ -45,12 +44,10 @@ import org.eclipse.swt.widgets.Tree;
  * The ProjectView keeps track of the LTTng projects in the workspace.
  *
  * TODO: Implement me. Please.
- * TODO: Display only LTTng projects (nature)
- * TODO: Add context menu
+ * TODO: Put all actions in a context menu
  * TODO: Identify LTTng traces and hook doubleClick properly
  * TODO: Handle multiple traces
  */
-@SuppressWarnings("restriction")
 public class ProjectView extends TmfView {
 
     public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.project";
@@ -58,7 +55,8 @@ public class ProjectView extends TmfView {
     private final IWorkspace fWorkspace;
     private final IResourceChangeListener fResourceChangeListener;
     private TreeViewer fViewer;
-    private TmfExperiment fExperiment;
+    private TmfExperiment fExperiment = null;
+//    private Object fSelection = null;
 
     // To perform updates on the UI thread
     private Runnable fViewRefresher = new Runnable() {
@@ -105,13 +103,14 @@ public class ProjectView extends TmfView {
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
-        IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        fViewer = new TreeViewer(parent, SWT.SINGLE);
-        fViewer.setContentProvider(new ProjectContentProvider());
-        fViewer.setLabelProvider(new ProjectLabelProvider());
-        fViewer.setInput(root);
+
+		fViewer = new TreeViewer(parent, SWT.SINGLE);
+        fViewer.setLabelProvider(new LTTngProjectLabelProvider());
+        fViewer.setContentProvider(new LTTngProjectContentProvider());
+        fViewer.setInput(ResourcesPlugin.getWorkspace().getRoot());
 
         hookMouse();
+        hookDragAndDrop();
         createContextMenu();
 	}
 
@@ -120,19 +119,25 @@ public class ProjectView extends TmfView {
      */
     private void hookMouse() {
         fViewer.getTree().addMouseListener(new MouseAdapter() {
-			@Override
+        	@Override
 			public void mouseDoubleClick(MouseEvent event) {
                 TreeSelection selection = (TreeSelection) fViewer.getSelection();
                 Object element = selection.getFirstElement();
-                if (element instanceof Folder) {
-                	selectExperiment((Folder) element);                
+                if (element instanceof LTTngExperimentEntry) {
+                	LTTngExperimentEntry experiment = (LTTngExperimentEntry) element;
+                	selectExperiment(experiment);                
                 }
             }
         });
     }
 
+    private void hookDragAndDrop() {
+    	new TraceDragSource(fViewer);
+    	new TraceDropTarget(fViewer);
+    }
+
     /**
-     * @param trace
+     * @param experiment
      * 
      * TODO: Tie the proper parser to the trace 
      */
@@ -140,16 +145,18 @@ public class ProjectView extends TmfView {
 	private boolean waitForCompletion = true;
     // FIXME: Troubleshooting hack - end
 
-	private void selectExperiment(Folder folder) {
-    	String expId = folder.getName();
+	private void selectExperiment(LTTngExperimentEntry experiment) {
+    	String expId = experiment.getName();
         if (fExperiment != null)
         	fExperiment.dispose();
         try {
-        	ITmfTrace[] traces = new ITmfTrace[folder.members().length];
-        	for (int i = 0; i < folder.members().length; i++) {
-        		IResource res = folder.members()[i];
-                String traceId = Platform.getLocation() + res.getFullPath().toOSString();
-                ITmfTrace trace = new LTTngTrace(traceId, waitForCompletion);
+        	LTTngTraceEntry[] traceEntries = experiment.getTraces();
+        	int nbTraces = traceEntries.length;
+        	ITmfTrace[] traces = new ITmfTrace[nbTraces];
+        	for (int i = 0; i < nbTraces; i++) {
+        		IResource res = traceEntries[i].getResource();
+        		String location = res.getLocation().toOSString();
+        		ITmfTrace trace = new LTTngTrace(location, waitForCompletion);
                 traces[i] = trace;
         	}
             fExperiment = new TmfExperiment(expId, traces, waitForCompletion);
@@ -192,7 +199,6 @@ public class ProjectView extends TmfView {
 	@Override
 	public void setFocus() {
 		// TODO Auto-generated method stub
-
 	}
 
 	/* (non-Javadoc)

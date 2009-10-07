@@ -35,7 +35,6 @@ public class DeleteTraceActionDelegate implements IWorkbenchWindowActionDelegate
 	@SuppressWarnings("unused")
 	private IWorkbenchWindow fWindow;
 	private IStructuredSelection fSelection;
-	@SuppressWarnings("unused")
 	private LTTngTraceEntry fEntry;
 
 	/**
