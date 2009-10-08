@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Tree;
  *
  * TODO: Implement me. Please.
  * TODO: Put all actions in a context menu
- * TODO: Identify LTTng traces and hook doubleClick properly
+ * TODO: Identify LTTng traces vs. experiments and hook doubleClick properly
  * TODO: Handle multiple traces
  */
 public class ProjectView extends TmfView {

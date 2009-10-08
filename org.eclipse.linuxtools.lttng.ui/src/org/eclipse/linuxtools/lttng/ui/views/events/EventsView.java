@@ -15,6 +15,8 @@ package org.eclipse.linuxtools.lttng.ui.views.events;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.ui.views.TmfEventsView;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
@@ -73,17 +75,29 @@ public class EventsView extends TmfEventsView {
     public EventsView() {
     }
 
-    /**
-     * @param table
-     */
-    @Override
+	/**
+	 * @param table
+	 * 
+	 * FIXME: Add support for column selection
+	 */
+	@Override
 	protected void setColumnHeaders(Table table) {
         for (int i = 0; i < columnData.length; i++) {
-            TableColumn column = new TableColumn(table, columnData[i].alignment, i);
+            final TableColumn column = new TableColumn(table, columnData[i].alignment, i);
             column.setText(columnData[i].header);
             column.setWidth(columnData[i].width);
+            // TODO: Investigate why the column resizing doesn't work by default
+            // Anything to do with SWT_VIRTUAL?
+            column.addSelectionListener(new SelectionListener() {
+				public void widgetDefaultSelected(SelectionEvent e) {
+					// TODO Auto-generated method stub
+				}
+				public void widgetSelected(SelectionEvent e) {
+					column.pack();
+				}
+            });
         }
-    }
+	}
 
     /**
      * @param event
