@@ -500,14 +500,14 @@ class StateUpdateHandlers {
 				Long irq = getAFieldLong(trcEvent, traceSt,
 						Fields.LTT_FIELD_IRQ_ID);
 
-				if (action != null) {
+				if (action == null) {
 					TraceDebug.debug("Field Action not found in event "
 							+ eventType.getInName() + " time: "
 							+ trcEvent.getTimestamp());
 					return true;
 				}
 
-				if (irq != null) {
+				if (irq == null) {
 					TraceDebug.debug("Field irq_id not found in event "
 							+ eventType.getInName() + " time: "
 							+ trcEvent.getTimestamp());
@@ -1166,9 +1166,6 @@ class StateUpdateHandlers {
 					exState.setExec_mode(ExecutionMode.LTTV_STATE_SYSCALL);
 					process.clearExecutionStack();
 					process.pushToExecutionStack(exState);
-
-					// update the process state to the only one in the stack
-					process.setState(exState);
 				}
 
 				process.setType(ProcessType.LTTV_STATE_KERNEL_THREAD);
@@ -1501,7 +1498,7 @@ class StateUpdateHandlers {
 							es.setEntry_Time(timestamp);
 							es.setChange_Time(timestamp);
 							es.setCum_cpu_time(0L);
-							es.setProc_status(ProcessStatus.LTTV_STATE_UNNAMED);
+							es.setProc_status(ProcessStatus.LTTV_STATE_WAIT);
 
 							// Push the new state to the stack
 							process.pushToExecutionStack(es);
@@ -1558,10 +1555,10 @@ class StateUpdateHandlers {
 
 				Long typeVal = getAFieldLong(trcEvent, traceSt,
 						Fields.LTT_FIELD_TYPE);
+
+				type = ProcessType.LTTV_STATE_KERNEL_THREAD.getInName();
 				if ((typeVal != null) && (typeVal.longValue() == 0L)) {
 					type = ProcessType.LTTV_STATE_USER_THREAD.getInName();
-				} else {
-					type = ProcessType.LTTV_STATE_KERNEL_THREAD.getInName();
 				}
 
 				// /* mode */
@@ -1631,69 +1628,14 @@ class StateUpdateHandlers {
 							 * cause expected interrupt when being syscall.
 							 * (only before end of statedump event)
 							 */
+							// process type is USER_THREAD by default.
 							process
 									.setType(ProcessType.LTTV_STATE_KERNEL_THREAD);
 
-							// #if 0
-							// es->t = LTTV_STATE_SYSCALL;
-							// es->s = status;
-							// es->n = submode;
-							// #endif //0
-						} else {
-							/*
-							 * User space process : bottom : user mode either
-							 * currently running or scheduled out. can be
-							 * scheduled out because interrupted in (user mode
-							 * or in syscall) or because of an explicit call to
-							 * the scheduler in syscall. Note that the scheduler
-							 * call comes after the irq_exit, so never in
-							 * interrupt context.
-							 */
-							// temp workaround : set size to 1 : only have user
-							// mode
-							// bottom of stack.
-							// will cause g_info message of expected syscall
-							// mode when
-							// in fact being
-							// in user mode. Can also cause expected trap when
-							// in fact
-							// being user
-							// mode in the event of a page fault reenabling
-							// interrupts
-							// in the handler.
-							// Expected syscall and trap can also happen after
-							// the end
-							// of statedump
-							// This will cause a
-							// "popping last state on stack, ignoring it."
-
-							// process->execution_stack =
-							// g_array_set_size(process->execution_stack, 1);
-							// es = process->state =
-							// &g_array_index(process->execution_stack,
-							// LttvExecutionState, 0);
-							// a new process must have only one state in the
-							// stack and
-							// be the same as the current state
-							// es = process.getState();
-							// es.setExec_mode(ExecutionMode.LTTV_STATE_MODE_UNKNOWN);
-							// es.setProc_status(ProcessStatus.LTTV_STATE_UNNAMED);
-							// es
-							// .setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_UNKNOWN
-							// .getInName());
-
-							// #if 0
-							// es->t = LTTV_STATE_USER_MODE;
-							// es->s = status;
-							// es->n = submode;
-							// #endif //0
 						}
-						// TODO: clean up comments above: Moved repeated code
-						// from both
-						// if / else blocks above,
-						// comments left temporarily for easier visualization
-						// and
-						// comparision with c code
+						
+						//Only one entry needed in the execution stack
+						process.popFromExecutionStack();
 						es = process.getState();
 						es.setExec_mode(ExecutionMode.LTTV_STATE_MODE_UNKNOWN);
 						es.setProc_status(ProcessStatus.LTTV_STATE_UNNAMED);

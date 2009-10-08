@@ -40,9 +40,11 @@ public class TimeRangeEventProcess extends TimeRangeComposite implements
 	 * @param className
 	 */
 	public TimeRangeEventProcess(int id, String name, long startTime,
-			long stopTime, String groupName, String className, Long cpu) {
+			long stopTime, String groupName, String className, Long cpu,
+			long insertionTime) {
 
-		super(id, startTime, stopTime, name, CompositeType.PROCESS);
+		super(id, startTime, stopTime, name, CompositeType.PROCESS,
+				insertionTime);
 		this.cpu = cpu;
 	}
 

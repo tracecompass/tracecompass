@@ -72,7 +72,8 @@ public class DataRequestState {
 			if (this.queued != null) {
 				StringBuilder sb = new StringBuilder(
 						"Queued request replaced from: "
-								+ queued.getStartTime() + "-"
+
+						+ queued.getStartTime() + "-"
 								+ queued.getEndTime() + "\n\t\t to: "
 								+ nqueued.getStartTime() + "-"
 								+ nqueued.getEndTime());

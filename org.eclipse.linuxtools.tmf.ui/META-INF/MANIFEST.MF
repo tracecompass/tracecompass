@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: TMF UI
 Bundle-SymbolicName: org.eclipse.linuxtools.tmf.ui
-Bundle-Version: 0.0.1
+Bundle-Version: 0.1.0.qualifier
 Bundle-Activator: org.eclipse.linuxtools.tmf.ui.TmfUiPlugin
 Bundle-Vendor: Eclipse
 Require-Bundle: org.eclipse.ui,

@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.controlflow.evProcessor;
 
-import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessStatus;
@@ -41,10 +40,12 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 	// Methods
 	// =======================================================================
 	protected TimeRangeEventProcess addLocalProcess(LttngProcessState stateProcess, long traceStartTime, long traceEndTime, String traceId) {
-		// TimeRangeEventProcess localProcess = new TimeRangeEventProcess(id, name, startTime, stopTime, groupName, className);
-		TimeRangeEventProcess localProcess = new TimeRangeEventProcess(procContainer.bookProcId(), stateProcess.getName(),traceStartTime, 
-		                                                               traceEndTime, "", stateProcess.getType().getInName(), stateProcess.getCpu()
-		                                                              );
+		// TimeRangeEventProcess localProcess = new TimeRangeEventProcess(id, name, startTime, stopTime, groupName, className)
+		TimeRangeEventProcess localProcess = new TimeRangeEventProcess(
+				procContainer.bookProcId(), stateProcess.getName(),
+				traceStartTime, traceEndTime, "", stateProcess.getType()
+						.getInName(), stateProcess.getCpu(), stateProcess
+						.getInsertion_time().getValue());
 		localProcess.setCreationTime(stateProcess.getCreation_time().getValue());
 		localProcess.setPid(stateProcess.getPid());
 		localProcess.setTgid(stateProcess.getTgid());
@@ -87,39 +88,6 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 		}
 
 		return false;
-	}
-	
-	/**
-	 * Find the process matching the given pid and cpu
-	 * 
-	 * If cpu is 0, the cpu value is not matched and the selection is based on
-	 * pid value only
-	 * 
-	 * @param ts
-	 * @param cpu
-	 * @param pid
-	 * @return
-	 */
-	protected LttngProcessState lttv_state_find_process(LttngTraceState ts,
-			Long cpu, Long pid) {
-		// Define the return value
-		LttngProcessState process = null;
-
-		// Obtain the list of available processes
-		List<LttngProcessState> processList = ts.getProcesses();
-
-		// find the process matching pid and cpu,
-		// TODO: This may need to be improved since the pid may be re-used and
-		// the creation time may need to be considered
-		for (LttngProcessState dprocess : processList) {
-			if (dprocess.getPid().equals(pid)) {
-				if (dprocess.getCpu().equals(cpu) || cpu.longValue() == 0L) {
-					return dprocess;
-				}
-			}
-		}
-
-		return process;
 	}
 
 	/**

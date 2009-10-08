@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.controlflow.evProcessor;
 
+import java.util.List;
+
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.state.StateStrings.Events;
 import org.eclipse.linuxtools.lttng.state.StateStrings.Fields;
@@ -79,7 +81,7 @@ class FlowTRangeBeforeUpdateHandlers {
 							stateProcess, localProcess, params);
 				} else {
 					TraceDebug
-							.debug("Running process is null! (getStateModesHandler)");
+							.debug("Running state process is null! (getStateModesHandler)");
 				}
 
 				return false;
@@ -137,8 +139,10 @@ class FlowTRangeBeforeUpdateHandlers {
 					}
 
 					if (process != null) {
-						// ***VERIFY***
-						// Is this call really replace these two C lines ??
+						// TODO: Implement something similar to current hash in
+						// order to keep track of the current process and speed
+						// up finding the local resource.
+
 						// HashedProcessData *hashed_process_data = NULL;
 						// hashed_process_data =
 						// processlist_get_process_data(process_list,pid_out,process->cpu,&birth,trace_num);
@@ -169,12 +173,11 @@ class FlowTRangeBeforeUpdateHandlers {
 						// TraceDebug.debug("Process is null for pid_out! (getBeforeSchedChangeHandler)");
 					}
 
+					// PID_IN section
 					process = lttv_state_find_process(traceSt, trcEvent
 							.getCpuId(), pid_in);
 
 					if (process != null) {
-						// ***VERIFY***
-						// Is this call really replace these two C lines ??
 						// HashedProcessData *hashed_process_data = NULL;
 						// hashed_process_data =
 						// processlist_get_process_data(process_list, pid_in,
@@ -247,15 +250,10 @@ class FlowTRangeBeforeUpdateHandlers {
 						trcEvent.getCpuId());
 
 				if (process != null) {
-					// *** FIXME ***
-					// This C call does not seem to be possible, as we have no
-					// "current_process" in LttngTraceState
-					// hashed_process_data =
-					// process_list->current_hash_data[trace_num][cpu];
+					// TODO: Implement a similar method to track the current
+					// local process in order to speed up finding the local
+					// resource
 
-					// ***VERIFY***
-					// Is this call really replace these two C lines ??
-					// HashedProcessData *hashed_process_data = NULL;
 					// hashed_process_data =
 					// processlist_get_process_data(process_list, pid,
 					// process->cpu, &birth,trace_num);
@@ -271,22 +269,17 @@ class FlowTRangeBeforeUpdateHandlers {
 					// trace_num, process->name, process->brand,&pl_height,
 					// &process_info, &hashed_process_data);
 					if (localProcess == null) {
-						if ((process.getPid() == 0)
-								|| (process.getPid() != process.getPpid())) {
-							TmfTimeRange timeRange = traceSt.getInputDataRef()
-									.getTraceTimeWindow();
-							localProcess = addLocalProcess(process, timeRange
-									.getStartTime().getValue(), timeRange
-									.getEndTime().getValue(), traceSt
-									.getTraceId());
-							// Call the function that does the actual drawing
-							makeDraw(traceSt, trcEvent.getTimestamp()
-									.getValue(), process, localProcess, params);
-						} else {
-							TraceDebug
-									.debug("Pid is null or Pid == PPID!  (getProcessExitHandler)");
-						}
+						TmfTimeRange timeRange = traceSt.getInputDataRef()
+								.getTraceTimeWindow();
+						localProcess = addLocalProcess(process, timeRange
+								.getStartTime().getValue(), timeRange
+								.getEndTime().getValue(), traceSt.getTraceId());
 					}
+
+					// Call the function that does the actual drawing
+					makeDraw(traceSt, trcEvent.getTimestamp().getValue(),
+							process, localProcess, params);
+
 				} else {
 					TraceDebug
 							.debug("Running process is null! (getProcessExitHandler)");
@@ -391,37 +384,38 @@ class FlowTRangeBeforeUpdateHandlers {
 				//
 				// And the draw is always the same then...
 
-				LttngProcessState process = null;
-				for (int proc_id = 0; proc_id < traceSt.getProcesses().size(); proc_id++) {
-					process = lttv_state_find_process(traceSt, traceSt
-							.getProcesses().get(proc_id).getCpu(), traceSt
-							.getProcesses().get(proc_id).getPid());
+				// The c-library loops through the local processes, search for
+				// the local processes in the state provider and then draws
+				// If it's present is the local processes why shuldn't they be
+				// present in the state provider?
+				// This seems more direct. and makes sure all processes are
+				// reflected in the control flow view.
+				List<LttngProcessState> processes = traceSt.getProcesses();
+				for (LttngProcessState process : processes) {
+					// Replace the C call :
+					// hashed_process_data =
+					// processlist_get_process_data(process_list,pid,process->cpu,&birth,trace_num);
+					TimeRangeEventProcess localProcess = procContainer
+							.findProcess(process.getPid(), process
+									.getCreation_time().getValue(), traceSt
+									.getTraceId());
 
-					if (process != null) {
-						// Replace the C call :
-						// hashed_process_data =
-						// processlist_get_process_data(process_list,pid,process->cpu,&birth,trace_num);
-						TimeRangeEventProcess localProcess = procContainer
-								.findProcess(process.getPid(), process
-										.getCreation_time().getValue(), traceSt
-										.getTraceId());
-						if (localProcess != null) {
-							// Call the function that will does the actual
-							// drawing
-							makeDraw(traceSt, trcEvent.getTimestamp()
-									.getValue(), process, localProcess, params);
-						} else {
-							TraceDebug
-									.debug("localProcess is null! (getStateDumpEndHandler)");
-						}
-					} else {
-						TraceDebug
-								.debug("Process is null! (getStateDumpEndHandler)");
+					// Add process to process list if not present
+					if (localProcess == null) {
+						TmfTimeRange timeRange = traceSt.getInputDataRef()
+								.getTraceTimeWindow();
+						localProcess = addLocalProcess(process, timeRange
+								.getStartTime().getValue(), timeRange
+								.getEndTime().getValue(), traceSt.getTraceId());
 					}
+
+					// Call the function that will does the actual
+					// drawing
+					makeDraw(traceSt, trcEvent.getTimestamp().getValue(),
+							process, localProcess, params);
 				}
 
 				return false;
-
 			}
 
 			// @Override

@@ -52,24 +52,29 @@ ITmfTimeAnalysisEntry {
 	protected String className = "";
 	protected CompositeType contType = CompositeType.UNKNOWN;
 	protected long next_good_time = -1;
+	/*Time of first event which trigger the creation of this local resource */
+	protected long insertionTime = -1; 
 
 	// ========================================================================
 	// Constructors
 	// =======================================================================
-	public TimeRangeComposite(Integer id, Long stime, Long etime, String name, CompositeType type) {
+	public TimeRangeComposite(Integer id, Long stime, Long etime, String name,
+			CompositeType type, long insertionTime) {
 		super(stime, etime, null);
 		this.id = id;
 		this.name = name;
 		contType = type;
-		next_good_time = stime;
+		this.insertionTime = insertionTime;
+		// Adjust the first good drawing position to the event time creating this resource
+		next_good_time = insertionTime;
 	}
 
-	public TimeRangeComposite(Integer id, Long stime, Long etime, String name, String groupName, String className, CompositeType type) {
-		this(id, stime, etime, name, type);
-
-        this.groupName = groupName;
-        this.className = className;
-
+	public TimeRangeComposite(Integer id, Long stime, Long etime, String name,
+			String groupName, String className, CompositeType type,
+			long insertionTime) {
+		this(id, stime, etime, name, type, insertionTime);
+		this.groupName = groupName;
+		this.className = className;
     }
 	
 	// ========================================================================
@@ -186,6 +191,15 @@ ITmfTimeAnalysisEntry {
 	public void reset() {
 		getChildEventComposites().clear();
 		getTraceEvents().clear();
-		next_good_time = startTime;
+		next_good_time = insertionTime;
+	}
+
+	/**
+	 * Event Time reflecting the creation of this local resource e.g. at Reception of Fork, etc.
+	 * 
+	 * @return
+	 */
+	public long getInsertionTime() {
+		return insertionTime;
 	}
 }

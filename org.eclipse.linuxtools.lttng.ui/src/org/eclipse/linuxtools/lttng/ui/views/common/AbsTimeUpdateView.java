@@ -20,6 +20,7 @@ import org.eclipse.linuxtools.lttng.state.experiment.StateManagerFactory;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.lttng.ui.views.common.DataRequestState.RequestState;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 
@@ -98,15 +99,13 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	 * processingCompleted(org.eclipse.linuxtools.lttng.state.StateDataRequest)
 	 */
 	@TmfSignalHandler
-	public void processingCompleted(RequestCompletedSignal signal) {
+	public synchronized void processingCompleted(RequestCompletedSignal signal) {
 		StateDataRequest request = signal.getRequest();
 
 		if (request == null) {
 			return;
 		} else {
-			synchronized (this) {
-				reqState.setCurrentRequest(null);
-			}
+			reqState.setCurrentRequest(null);
 
 		}
 
@@ -152,11 +151,19 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 				currentRequest = reqState.getCurrentRequest();
 				if (currentRequest != null) {
 					currentRequest.cancel();
+				} else {
+					TraceDebug
+							.debug("Exception : State busy but current request is null");
 				}
 			} else {
 				// Set the state to busy
 				reqState.setState(DataRequestState.RequestState.BUSY);
 				waitCursor(true);
+				if (TraceDebug.isDEBUG()) {
+					TraceDebug
+							.debug("Requesting data: " + trange.getStartTime()
+									+ "-" + trange.getEndTime());
+				}
 				// no request is ongoing, proceed with request
 				StateManagerFactory.getExperimentManager()
 						.readExperimentTimeWindow(trange, viewID, this);
@@ -174,10 +181,18 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 		TmfTimeRange queuedRequest = reqState.popQueued();
 		if (queuedRequest != null) {
 			// Trigger the pending request
+			if (TraceDebug.isDEBUG()) {
+				TmfTimestamp start = queuedRequest.getStartTime();
+				TmfTimestamp end = queuedRequest.getEndTime();
+				TraceDebug.debug("New request about to start: " + start + "-"
+						+ end);
+			}
+
 			StateManagerFactory.getExperimentManager()
 					.readExperimentTimeWindow(queuedRequest, viewID, this);
 		} else {
 			// All requests cancelled and no more pending requests
+			TraceDebug.debug("No requests pending in the queue");
 			reqState.setState(RequestState.IDLE);
 			waitCursor(false);
 		}

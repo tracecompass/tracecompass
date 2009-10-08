@@ -1205,7 +1205,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 							+ discardedOutofOrder);
 
 			sb.append("\n\t\tRequested Time Range: " + range.getStartTime()
-					+ " - " + range.getEndTime());
+					+ "-" + range.getEndTime());
 			TraceDebug.debug(sb.toString());
 		}
 	}

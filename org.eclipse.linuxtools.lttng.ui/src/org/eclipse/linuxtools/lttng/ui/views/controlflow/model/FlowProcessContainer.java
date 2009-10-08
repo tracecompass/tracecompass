@@ -110,6 +110,9 @@ public class FlowProcessContainer {
 			String traceID) {
 		TimeRangeEventProcess rprocess = null;
 
+		// TODO: This needs a more efficient way to find, e.g. use class with
+		// hash code base on the keys trace, pid and creation time the class
+		// should also override the equals to valid the search via the hashcode
 		for (TimeRangeEventProcess process : processes) {
 			if (process.getPid().equals(pid)) {
 				if (process.getCreationTime().equals(creationtime)) {

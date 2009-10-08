@@ -191,16 +191,17 @@ public class StateManager extends Observable {
 		// Process request to that point
 		StateDataRequest request = getDataRequestByTimeRange(trange, listener);
 		// don't wait for completion i.e. allow cancellations
-		request.startRequestInd(fExperiment, false, true);
+		request.startRequestInd(fExperiment, false, false);
 
 		if (TraceDebug.isDEBUG()) {
 			List<LttngProcessState> processes = stateIn.getTraceStateModel()
 					.getProcesses();
-			TraceDebug.debug(" Time Window requested: "
-					+ trange.getStartTime().getValue() + "-"
-					+ trange.getEndTime().getValue()
+			TraceDebug
+					.debug(" Time Window requested, (start adjusted to checkpoint): "
+							+ trange.getStartTime()
+					+ "-" + trange.getEndTime()
 					+ " Total number of processes in the State provider: "
-					+ processes.size());
+					+ processes.size() + " Completed");
 		}
 	}
 

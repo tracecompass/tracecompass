@@ -51,37 +51,37 @@ public class TimeRangeResourceFactory {
 	// ========================================================================
 	// Public methods
 	// =======================================================================
-	public TimeRangeEventResource createResource(int newId,
-			long newStartTime,
+	public TimeRangeEventResource createResource(int newId, long newStartTime,
 			long newStopTime, String newName, String newGroupName,
-			String newClassName, ResourceTypes type, Long newResourceId) {
+			String newClassName, ResourceTypes type, Long newResourceId,
+			long insertionTime) {
 
 		TimeRangeEventResource resource = null;
 		switch (type) {
 		case CPU:
 			resource = createCpuResource(newId, newStartTime, newStopTime,
-					newName,
-					newGroupName, newClassName, type, newResourceId);
+					newName, newGroupName, newClassName, type, newResourceId,
+					insertionTime);
 			break;
 		case IRQ:
 			resource = createIrqResource(newId, newStartTime, newStopTime,
-					newName,
-					newGroupName, newClassName, type, newResourceId);
+					newName, newGroupName, newClassName, type, newResourceId,
+					insertionTime);
 			break;
 		case SOFT_IRQ:
 			resource = createSoftIrqResource(newId, newStartTime, newStopTime,
-					newName,
-					newGroupName, newClassName, type, newResourceId);
+					newName, newGroupName, newClassName, type, newResourceId,
+					insertionTime);
 			break;
 		case TRAP:
 			resource = createTrapResource(newId, newStartTime, newStopTime,
-					newName,
-					newGroupName, newClassName, type, newResourceId);
+					newName, newGroupName, newClassName, type, newResourceId,
+					insertionTime);
 			break;
 		case BDEV:
 			resource = createBdevResource(newId, newStartTime, newStopTime,
-					newName,
-					newGroupName, newClassName, type, newResourceId);
+					newName, newGroupName, newClassName, type, newResourceId,
+					insertionTime);
 			break;
 		default:
 			break;
@@ -96,11 +96,11 @@ public class TimeRangeResourceFactory {
 	private TimeRangeEventResource createIrqResource(int newId,
 			long newStartTime, long newStopTime, String newName,
 			String newGroupName, String newClassName, ResourceTypes newType,
-			Long newResourceId) {
+			Long newResourceId, long insertionTime) {
 
 		TimeRangeEventResource resource = new TimeRangeEventResource(newId,
-				newStartTime, newStopTime,
-				newName, newGroupName, newClassName, newType, newResourceId) {
+				newStartTime, newStopTime, newName, newGroupName, newClassName,
+				newType, newResourceId, insertionTime) {
 
 			@Override
 			public String getStateMode(LttngTraceState traceSt) {
@@ -121,11 +121,11 @@ public class TimeRangeResourceFactory {
 	private TimeRangeEventResource createTrapResource(int newId,
 			long newStartTime, long newStopTime, String newName,
 			String newGroupName, String newClassName, ResourceTypes newType,
-			Long newResourceId) {
+			Long newResourceId, long insertionTime) {
 
 		TimeRangeEventResource resource = new TimeRangeEventResource(newId,
 				newStartTime, newStopTime, newName, newGroupName, newClassName,
-				newType, newResourceId) {
+				newType, newResourceId, insertionTime) {
 
 			@Override
 			public String getStateMode(LttngTraceState traceSt) {
@@ -151,11 +151,11 @@ public class TimeRangeResourceFactory {
 	private TimeRangeEventResource createSoftIrqResource(int newId,
 			long newStartTime, long newStopTime, String newName,
 			String newGroupName, String newClassName, ResourceTypes newType,
-			Long newResourceId) {
+			Long newResourceId, long insertionTime) {
 
 		TimeRangeEventResource resource = new TimeRangeEventResource(newId,
 				newStartTime, newStopTime, newName, newGroupName, newClassName,
-				newType, newResourceId) {
+				newType, newResourceId, insertionTime) {
 
 			@Override
 			public String getStateMode(LttngTraceState traceSt) {
@@ -190,11 +190,11 @@ public class TimeRangeResourceFactory {
 	private TimeRangeEventResource createBdevResource(int newId,
 			long newStartTime, long newStopTime, String newName,
 			String newGroupName, String newClassName, ResourceTypes newType,
-			Long newResourceId) {
+			Long newResourceId, long insertionTime) {
 
 		TimeRangeEventResource resource = new TimeRangeEventResource(newId,
 				newStartTime, newStopTime, newName, newGroupName, newClassName,
-				newType, newResourceId) {
+				newType, newResourceId, insertionTime) {
 
 			@Override
 			public String getStateMode(LttngTraceState traceSt) {
@@ -213,11 +213,11 @@ public class TimeRangeResourceFactory {
 	private TimeRangeEventResource createCpuResource(int newId,
 			long newStartTime, long newStopTime, String newName,
 			String newGroupName, String newClassName, ResourceTypes newType,
-			Long newResourceId) {
+			Long newResourceId, long insertionTime) {
 
 		TimeRangeEventResource resource = new TimeRangeEventResource(newId,
 				newStartTime, newStopTime, newName, newGroupName, newClassName,
-				newType, newResourceId) {
+				newType, newResourceId, insertionTime) {
 
 			@Override
 			public String getStateMode(LttngTraceState traceSt) {

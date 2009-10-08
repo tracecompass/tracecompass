@@ -35,6 +35,7 @@ public class DeleteExperimentActionDelegate implements IWorkbenchWindowActionDel
 	@SuppressWarnings("unused")
 	private IWorkbenchWindow fWindow;
 	private IStructuredSelection fSelection;
+	@SuppressWarnings("unused")
 	private LTTngExperimentEntry fEntry;
 
 	/**

@@ -22,6 +22,7 @@ import org.eclipse.swt.dnd.DropTargetAdapter;
  */
 public class TraceDropTarget extends DropTargetAdapter {
 
+	@SuppressWarnings("unused")
 	private final TreeViewer fViewer;
 
 	/**

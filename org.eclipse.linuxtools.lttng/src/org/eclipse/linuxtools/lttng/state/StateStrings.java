@@ -515,7 +515,7 @@ public class StateStrings {
 	}
 
 	public enum ProcessStatus {
-		LTTV_STATE_UNNAMED(""), LTTV_STATE_WAIT_FORK("WAIT_FORK"), /* */
+		LTTV_STATE_UNNAMED("UNNAMED"), LTTV_STATE_WAIT_FORK("WAIT_FORK"), /* */
 		LTTV_STATE_WAIT_CPU("WAIT_CPU"), /* */
 		LTTV_STATE_EXIT("EXIT"), /* */
 		LTTV_STATE_ZOMBIE("ZOMBIE"), /* */
@@ -644,7 +644,7 @@ public class StateStrings {
 	}
 
 	/**
-	 * @return the maping from int to softirq name
+	 * @return the mapping from int to softirq name
 	 */
 	public String[] getSoftIrqNames() {
 		return soft_irq_names;

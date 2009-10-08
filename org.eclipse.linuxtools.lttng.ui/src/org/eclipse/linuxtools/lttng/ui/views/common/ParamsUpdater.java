@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.lttng.ui.views.common;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeScaleSelectionEvent;
 
 /**
@@ -115,16 +116,18 @@ public class ParamsUpdater {
 			width = dwidth;
 
 			pixelsPerNs = (double) width / (double) (endTime - startTime);
-			trange = new TmfTimeRange(new LttngTimestamp(startTime),
-					new LttngTimestamp(endTime));
+
+			TmfTimestamp fTimeStart = new LttngTimestamp(startTime);
+			TmfTimestamp fTimeEnd = new LttngTimestamp(endTime);
+			trange = new TmfTimeRange(fTimeStart, fTimeEnd);
 
 			// update succeeded
 			updated = true;
 
 			TraceDebug.debug("Configuration updated to: StartTime: " /* */
-					+ startTime /* */
-					+ " endTime: " /* */
-					+ endTime /* */
+					+ fTimeStart /* */
+					+ "-" /* */
+					+ fTimeEnd /* */
 					+ " width: " /* */
 					+ width + " k: " + pixelsPerNs); /* */
 		} else {

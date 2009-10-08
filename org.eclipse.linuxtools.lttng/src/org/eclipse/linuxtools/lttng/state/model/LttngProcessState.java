@@ -84,26 +84,27 @@ public class LttngProcessState implements Cloneable {
 		setCreation_time(new TmfTimestamp());
 		this.free_events = 0L;
 
-		// Initialize stack
+		// Initialise stack
 		LttngExecutionState es = new LttngExecutionState();
-		es.setExec_mode(ExecutionMode.LTTV_STATE_MODE_UNKNOWN);
+		es.setExec_mode(ExecutionMode.LTTV_STATE_USER_MODE);
 		es.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE.getInName());
 		es.setEntry_Time(this.insertion_time);
 		es.setChange_Time(this.insertion_time);
 		es.setCum_cpu_time(0L);
 		es.setProc_status(ProcessStatus.LTTV_STATE_RUN);
 		this.execution_stack.push(es);
-		
-		//TODO: This initialisation is present in C, however an entry in waiting fork may
-		//display incorrect states, there is a need for deeper compare of the initialisation phase
-		// es = new LttngExecutionState();
-		// es.setExec_mode(ExecutionMode.LTTV_STATE_SYSCALL);
-		// es.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE.getInName());
-		// es.setEntry_Time(this.insertion_time);
-		// es.setChange_Time(this.insertion_time);
-		// es.setCum_cpu_time(0L);
-		// es.setProc_status(ProcessStatus.LTTV_STATE_WAIT_FORK);
-		// this.execution_stack.push(es);
+
+		//This second entry is needed when processes are created via a Fork event.
+		es = new LttngExecutionState();
+		es.setExec_mode(ExecutionMode.LTTV_STATE_SYSCALL);
+		es
+				.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE
+						.getInName());
+		es.setEntry_Time(this.insertion_time);
+		es.setChange_Time(this.insertion_time);
+		es.setCum_cpu_time(0L);
+		es.setProc_status(ProcessStatus.LTTV_STATE_WAIT_FORK);
+		this.execution_stack.push(es);
 		
 		// point state to the top of the stack
 		this.state = es;
@@ -462,6 +463,7 @@ public class LttngProcessState implements Cloneable {
     
     public void pushToExecutionStack(LttngExecutionState newState) {
         execution_stack.push(newState);
+		setState(newState);
     }
     
     public LttngExecutionState popFromExecutionStack() {
@@ -470,7 +472,10 @@ public class LttngProcessState implements Cloneable {
             return null;
         }
         else {
-           return execution_stack.pop();
+			LttngExecutionState popedState = execution_stack.pop();
+			// adjust current state to the new top
+			setState(peekFromExecutionStack());
+			return popedState;
        }
     }
     

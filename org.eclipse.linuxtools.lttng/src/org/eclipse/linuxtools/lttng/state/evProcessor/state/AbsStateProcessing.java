@@ -3,6 +3,8 @@
  */
 package org.eclipse.linuxtools.lttng.state.evProcessor.state;
 
+import java.util.List;
+
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.event.LttngEventContent;
@@ -30,29 +32,9 @@ public abstract class AbsStateProcessing {
 	 * @param expectedNumFields
 	 * @return
 	 */
-	protected Long getAFieldLong(LttngEvent trcEvent, LttngTraceState traceSt, Fields expectedField) {
-		Long fieldVal = 0L;
-		
-        String fieldname = expectedField.getInName();
-		LttngEventField field = ((LttngEventContent) trcEvent.getContent()).getField(fieldname);
-		
-		if ( field == null ) {
-			TraceDebug.debug("***************** CONTENT : " + ((LttngEventContent) trcEvent.getContent()).toString());
-		}
-		else {
-            Object fieldObj = field.getValue();
-            if ( (fieldObj instanceof Long) || (fieldObj instanceof Integer) ) {
-                // Expected numeric value found
-                fieldVal = (Long) field.getValue();
-            } 
-            else {
-                if (TraceDebug.isDEBUG()) {
-                    TraceDebug.debug("Unexpected field Type. Expected: Long, Received: "+ fieldObj.getClass().getSimpleName());
-                }
-            }
-		}
-		
-		/*
+	protected Long getAFieldLong(LttngEvent trcEvent, LttngTraceState traceSt,
+			Fields expectedField) {
+		Long fieldVal = null;
 		// TmfEventField[] fields = trcEvent.getContent().getFields();
 		TmfEventField[] fields = ((LttngEventContent) trcEvent.getContent())
 				.getFields(trcEvent);
@@ -89,13 +71,12 @@ public abstract class AbsStateProcessing {
 				}
 			}
 		}
-		*/
 	
-//		if (fieldVal == null) {
-//			if (TraceDebug.isDEBUG()) {
-//				sendNoFieldFoundMsg(((LttngEventContent) trcEvent.getContent()).getFields(), fieldname);
-//			}
-//		}
+		if (fieldVal == null) {
+			if (TraceDebug.isDEBUG()) {
+				sendNoFieldFoundMsg(fields, expectedFieldName);
+			}
+		}
 		return fieldVal;
 	}
 
@@ -110,28 +91,7 @@ public abstract class AbsStateProcessing {
 	 */
 	protected String getAFieldString(LttngEvent trcEvent,
 			LttngTraceState traceSt, Fields expectedField) {
-		String fieldVal = "";
-		
-		String fieldname = expectedField.getInName();
-        LttngEventField field = ((LttngEventContent) trcEvent.getContent()).getField(fieldname);
-        
-		if ( field == null ) {
-			TraceDebug.debug("***************** CONTENT : " + ((LttngEventContent) trcEvent.getContent()).toString());
-		}
-		else {
-	        Object fieldObj = field.getValue();
-	        if (fieldObj instanceof String) {
-	            // Expected numeric value found
-	            fieldVal = (String) field.getValue();
-	        } 
-	        else {
-	            if (TraceDebug.isDEBUG()) {
-	                TraceDebug.debug("Unexpected field Type. Expected: String, Received: "+ fieldObj.getClass().getSimpleName());
-	            }
-	        }
-		}
-		
-		/*
+		String fieldVal = null;
 		// TmfEventField[] fields = trcEvent.getContent().getFields();
 		TmfEventField[] fields = ((LttngEventContent) trcEvent.getContent())
 				.getFields(trcEvent);
@@ -165,13 +125,12 @@ public abstract class AbsStateProcessing {
 				}
 			}
 		}
-	    */
-	    
-//        if (fieldVal == null) {
-//            if (TraceDebug.isDEBUG()) {
-//                sendNoFieldFoundMsg(((LttngEventContent) trcEvent.getContent()).getFields(), fieldname);
-//            }
-//        }
+	
+		if (fieldVal == null) {
+			if (TraceDebug.isDEBUG()) {
+				sendNoFieldFoundMsg(fields, expectedFieldName);
+			}
+		}
 		return fieldVal;
 	}
 
@@ -187,9 +146,29 @@ public abstract class AbsStateProcessing {
 	 * @return
 	 */
 	protected LttngProcessState lttv_state_find_process(
-							LttngTraceState traceState, Long cpu, Long pid) {
+			LttngTraceState traceState, Long cpu, Long pid) {
+		// Define the return value
+		LttngProcessState returnedProcess = null;
 
-		return traceState.findProcessState(pid, cpu, traceState.getTraceId());
+		// Obtain the list of available processes
+		List<LttngProcessState> processList = traceState.getProcesses();
+
+		// FIXME: This needs be more efficient e.g. introduce a class with a
+		// overriden hash and equals to consider the key values pid, cpu and
+		// traceid and iterate over a collection of this new type.
+		int pos = 0;
+		while ((pos < processList.size()) && (returnedProcess == null)) {
+			if (processList.get(pos).getPid().equals(pid)) {
+				if ((processList.get(pos).getCpu().equals(cpu))
+						|| (cpu.longValue() == 0L)) {
+					returnedProcess = processList.get(pos);
+				}
+			}
+
+			pos++;
+		}
+
+		return returnedProcess;
 	}
 
 	protected void sendNoFieldFoundMsg(TmfEventField[] fields,
@@ -200,7 +179,7 @@ public abstract class AbsStateProcessing {
 		sb.append(" number of fields: " + fields.length + "Fields: ");
 		for (int i = 0; i < fields.length; i++) {
 			field = (LttngEventField) fields[i];
-			sb.append(field.getId() + " ");
+			sb.append(field.getName() + " ");
 		}
 	
 		TraceDebug.debug(sb.toString(), 5);

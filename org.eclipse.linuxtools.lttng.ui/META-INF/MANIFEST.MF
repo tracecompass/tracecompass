@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: LTTng UI
 Bundle-SymbolicName: org.eclipse.linuxtools.lttng.ui;singleton:=true
-Bundle-Version: 0.0.1
+Bundle-Version: 0.1.0.qualifier
 Bundle-Activator: org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin
 Bundle-Vendor: Eclipse
 Require-Bundle: org.eclipse.ui,

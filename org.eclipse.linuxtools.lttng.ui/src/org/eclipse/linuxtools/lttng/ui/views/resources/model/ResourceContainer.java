@@ -210,12 +210,10 @@ public class ResourceContainer {
          newMap.clear();
 		TimeRangeResourceFactory rfactory = TimeRangeResourceFactory
 				.getInstance();
-		TimeRangeEventResource tmpRes1 = rfactory
-				.createResource(0, 0, 0, "name1", "trace1", "classname1",
-						ResourceTypes.CPU, 0L);
-		TimeRangeEventResource tmpRes2 = rfactory
-				.createResource(0, 0, 0, "name2", "trace1", "classname2",
-						ResourceTypes.CPU, 0L);
+		TimeRangeEventResource tmpRes1 = rfactory.createResource(0, 0, 0,
+				"name1", "trace1", "classname1", ResourceTypes.CPU, 0L, 0l);
+		TimeRangeEventResource tmpRes2 = rfactory.createResource(0, 0, 0,
+				"name2", "trace1", "classname2", ResourceTypes.CPU, 0L, 0l);
          
          ResourceKey test3 = new ResourceKey(tmpRes1);
          ResourceKey test4 = new ResourceKey(tmpRes2);

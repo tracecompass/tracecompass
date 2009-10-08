@@ -55,10 +55,6 @@ class FlowTRangeAfterUpdateHandlers {
 				//Long pid_out = getAFieldLong(trcEvent, traceSt, Fields.LTT_FIELD_PREV_PID);
 				Long pid_in = getAFieldLong(trcEvent, traceSt, Fields.LTT_FIELD_NEXT_PID);
 				
-				// *** VERIFY ***
-				// LTTV modify tracefile context with pid_in... should we do something with that?
-				// tfc->target_pid = pid_in;
-				
 				if ( !(pid_in.equals(process_in.getPid())) ) {
 				    TraceDebug.debug("pid_in != PID!  (getSchedChangeHandler)");
                 }
@@ -72,16 +68,19 @@ class FlowTRangeAfterUpdateHandlers {
 	                    localProcess = addLocalProcess(process_in, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
 					}
 					else {
-					    TraceDebug.debug("pid_in is 0 or pid_in != PPID!  (getSchedChangeHandler)");
+						TraceDebug
+								.debug("pid_in is not 0 or pid_in == PPID!  (getSchedChangeHandler)");
 					}
 				}
-				
-				// *** VERIFY ***
-				// We doesn't seem to be doing anything about this C call... should we?
-				//process_list->current_hash_data[trace_num][process_in->cpu] = hashed_process_data_in;
-				
-				// *** VERIFY ***
-				// There doesn't seem to be any drawing done by the below C code ??
+
+				// There is no drawing done by the C code below, only refreshing
+				// the references to the current hash data to make it ready for
+				// next event
+
+				// This current implementation does not support the use of
+				// current hashed data
+				// although an equivalent would be good in order to improve the
+				// time to find the currently running process per cpu.
 				/*
 				if(ltt_time_compare(hashed_process_data_in->next_good_time, evtime) <= 0)
 				{
@@ -144,62 +143,22 @@ class FlowTRangeAfterUpdateHandlers {
 			        
 			        if ( localProcess == null ) {
 			            if ( (child_pid == 0) || (child_pid != process_child.getPpid()) ) {            
-			                // *** VERIFY ***
-			                // What am I supposed to do with that?
-			                //   Drawing_t *drawing = control_flow_data->drawing;
-			                //   ProcessInfo *process_info;
-			                //   gtk_widget_set_size_request(drawing->drawing_area, -1, pl_height);
-			                //   gtk_widget_queue_draw(drawing->drawing_area);
 			                TmfTimeRange timeRange = traceSt.getInputDataRef().getTraceTimeWindow();
                             localProcess = addLocalProcess(process_child, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
 			            }
 			            else {
 			                TraceDebug.debug("localProcess is null with child_pid not 0 or child_pid equals PPID (getProcessForkHandler)");
 			            }
-			        }
-			        else {
-			            // If we found the process, the Ppid and the Tgid might be missing, let's add them
-			            localProcess.setPpid(process_child.getPpid());
-			            localProcess.setTgid(process_child.getTgid());
-			            
+					} else {
+						// If we found the process, the Ppid and the Tgid might
+						// be missing, let's add them
+						localProcess.setPpid(process_child.getPpid());
+						localProcess.setTgid(process_child.getTgid());
 			        }
 			    }
 			    else {
 			        TraceDebug.debug("process_child is null! (getProcessForkHandler)");
 			    }
-                
-			    // *** VERIFY ***
-			    // We don't need any of those, do we?
-			    //
-			    //if(likely(ltt_time_compare(hashed_process_data_child->next_good_time,evtime) <= 0))
-	            //  {
-	            //    TimeWindow time_window = lttvwindow_get_time_window(control_flow_data->tab);
-			    //
-	            //    #ifdef EXTRA_CHECK
-	            //    if(ltt_time_compare(evtime, time_window.start_time) == -1 || ltt_time_compare(evtime, time_window.end_time) == 1)
-	            //       return FALSE;
-	            //    #endif //EXTRA_CHECK
-	            //    
-	            //    Drawing_t *drawing = control_flow_data->drawing;
-	            //    guint width = drawing->width;
-	            //    guint new_x;
-	            //    convert_time_to_pixels(time_window,evtime,width,&new_x);
-			    //
-	            //    if(likely(hashed_process_data_child->x.over != new_x)) {
-	            //      hashed_process_data_child->x.over = new_x;
-	            //      hashed_process_data_child->x.over_used = FALSE;
-	            //      hashed_process_data_child->x.over_marked = FALSE;
-	            //    }
-	            //    if(likely(hashed_process_data_child->x.middle != new_x)) {
-	            //      hashed_process_data_child->x.middle = new_x;
-	            //      hashed_process_data_child->x.middle_used = FALSE;
-	            //      hashed_process_data_child->x.middle_marked = FALSE;
-	            //    }
-	            //    if(likely(hashed_process_data_child->x.under != new_x)) {
-	            //      hashed_process_data_child->x.under = new_x;
-	            //      hashed_process_data_child->x.under_used = FALSE;
-	            //      hashed_process_data_child->x.under_marked = FALSE;
-	            //    }
 	              
 				return false;
 			}
@@ -234,6 +193,7 @@ class FlowTRangeAfterUpdateHandlers {
 			        
 					// *** TODO: ***
 					// We shall look into a way to find the current process
+					// faster, see the c library
 					// (current_hash) in order to speed up the find. see c-code
 			        //   if(likely(process_list->current_hash_data[trace_num][cpu] != NULL) ){
 		            //        hashed_process_data = process_list->current_hash_data[trace_num][cpu];
@@ -248,50 +208,11 @@ class FlowTRangeAfterUpdateHandlers {
 			            else {
 			                TraceDebug.debug("process pid is not 0 or pid equals ppid! (getProcessExitHandler)");
 			            }
-			        }
-			        else {
-			            // *** FIXME ***
-                        // I feel like we are missing something here... what are we suppose to do with that?
-                        //   process_list->current_hash_data[trace_num][process->cpu] = hashed_process_data;
-			        }
-                        
+					}
 			    }
 			    else {
 			        TraceDebug.debug("process is null! (getProcessExitHandler)");
 			    }			    
-			    
-			    // *** VERIFY ***
-                // We don't need any of those, do we?
-                //
-                //if(likely(ltt_time_compare(hashed_process_data_child->next_good_time,evtime) <= 0))
-                //  {
-                //    TimeWindow time_window = lttvwindow_get_time_window(control_flow_data->tab);
-                //
-                //    #ifdef EXTRA_CHECK
-                //    if(ltt_time_compare(evtime, time_window.start_time) == -1 || ltt_time_compare(evtime, time_window.end_time) == 1)
-                //       return FALSE;
-                //    #endif //EXTRA_CHECK
-                //    
-                //    Drawing_t *drawing = control_flow_data->drawing;
-                //    guint width = drawing->width;
-                //    guint new_x;
-                //    convert_time_to_pixels(time_window,evtime,width,&new_x);
-                //
-                //    if(likely(hashed_process_data_child->x.over != new_x)) {
-                //      hashed_process_data_child->x.over = new_x;
-                //      hashed_process_data_child->x.over_used = FALSE;
-                //      hashed_process_data_child->x.over_marked = FALSE;
-                //    }
-                //    if(likely(hashed_process_data_child->x.middle != new_x)) {
-                //      hashed_process_data_child->x.middle = new_x;
-                //      hashed_process_data_child->x.middle_used = FALSE;
-                //      hashed_process_data_child->x.middle_marked = FALSE;
-                //    }
-                //    if(likely(hashed_process_data_child->x.under != new_x)) {
-                //      hashed_process_data_child->x.under = new_x;
-                //      hashed_process_data_child->x.under_used = FALSE;
-                //      hashed_process_data_child->x.under_marked = FALSE;
-                //    }
 			    
 				return false;
 			}
@@ -325,22 +246,10 @@ class FlowTRangeAfterUpdateHandlers {
 
                 if ( process != null ) {
                     
-                    // *** VERIFY ***
-                    // This make no sense in our java implementation and should be ignored, right?
-                    //
-                    //   if(likely(process_list->current_hash_data[trace_num][cpu] != NULL) ){
-                    //        hashed_process_data = process_list->current_hash_data[trace_num][cpu];
-                    //   }
                     TimeRangeEventProcess localProcess = procContainer.findProcess(process.getPid(), process.getCreation_time().getValue(), traceSt.getTraceId());
                     
                     if ( localProcess == null ) {
                         if ( (process.getPid() == 0) || (process.getPid() != process.getPpid()) ) {
-                            // *** VERIFY ***
-                            // What am I supposed to do with that?
-                            //   Drawing_t *drawing = control_flow_data->drawing;
-                            //   ProcessInfo *process_info;
-                            //   gtk_widget_set_size_request(drawing->drawing_area, -1, pl_height);
-                            //   gtk_widget_queue_draw(drawing->drawing_area);
                             TmfTimeRange timeRange = traceSt.getInputDataRef().getTraceTimeWindow();
                             localProcess = addLocalProcess(process, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
                         }
@@ -351,10 +260,6 @@ class FlowTRangeAfterUpdateHandlers {
                     else {
                         // If we found the process, the name might be missing. Let's add it here.
                         localProcess.setName(process.getName());
-                        
-                        // *** FIXME ***
-                        // I feel like we are missing something here... what are we suppose to do with that?
-                        //   process_list->current_hash_data[trace_num][process->cpu] = hashed_process_data;
                     }
                 }
                 else {
@@ -392,9 +297,8 @@ class FlowTRangeAfterUpdateHandlers {
 
                 if ( process != null ) {
                     
-                    // *** VERIFY ***
-                    // This make no sense in our java implementation and should be ignored, right?
-                    //
+					// Similar to above comments, implement a faster way to find
+					// the local process
                     //   if(likely(process_list->current_hash_data[trace_num][cpu] != NULL) ){
                     //        hashed_process_data = process_list->current_hash_data[trace_num][cpu];
                     //   }
@@ -402,12 +306,6 @@ class FlowTRangeAfterUpdateHandlers {
                     
                     if ( localProcess == null ) {
                         if ( (process.getPid() == 0) || (process.getPid() != process.getPpid()) ) {                         
-                            // *** VERIFY ***
-                            // What am I supposed to do with that?
-                            //   Drawing_t *drawing = control_flow_data->drawing;
-                            //   ProcessInfo *process_info;
-                            //   gtk_widget_set_size_request(drawing->drawing_area, -1, pl_height);
-                            //   gtk_widget_queue_draw(drawing->drawing_area);
                             TmfTimeRange timeRange = traceSt.getInputDataRef().getTraceTimeWindow();
                             localProcess = addLocalProcess(process, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
                         }
@@ -416,12 +314,9 @@ class FlowTRangeAfterUpdateHandlers {
                         }
                     }
                     else {
-                        // If we foubd the process, the brand might be missing on it, add it.
+						// If we found the process, the brand might be missing
+						// on it, add it.
                         localProcess.setBrand(process.getBrand());
-                        
-                        // *** FIXME ***
-                        // I feel like we are missing something here... what are we suppose to do with that?
-                        //   process_list->current_hash_data[trace_num][process->cpu] = hashed_process_data;
                     }
                 }
                 else {
@@ -440,17 +335,21 @@ class FlowTRangeAfterUpdateHandlers {
 		return handler;
 	}
 
-
 	/**
 	 * <p>
 	 * LTT_EVENT_PROCESS_STATE
 	 * </p>
 	 * Replace C function "after_event_enum_process_hook" in eventhooks.c
 	 * <p>
-	 * * <p>
-     * Fields: LTT_FIELD_NEXT_PID
-     * </p>
-     * 
+	 * <p>
+	 * Creates the processlist entry for the child process. Put the last
+	 * position in x at the current time value.
+	 * </p>
+	 * 
+	 * <p>
+	 * Fields: LTT_FIELD_PID
+	 * </p>
+	 * 
 	 * @return
 	 */
 	final IEventProcessing getEnumProcessStateHandler() {
@@ -464,9 +363,8 @@ class FlowTRangeAfterUpdateHandlers {
 				int first_cpu;
 				int nb_cpus;
 			    
-			    // *** VERIFY ***
-			    // We want the pid_in... we assume the pid_in is the next pid, as we get on the CPU, right?
-			    Long pid_in = getAFieldLong(trcEvent, traceSt, Fields.LTT_FIELD_NEXT_PID);
+				Long pid_in = getAFieldLong(trcEvent, traceSt,
+						Fields.LTT_FIELD_PID);
 			    
                 // Lttv assume that pid_in will NEVER be null or incoherent
                 // What if ... ?    (let's add some debug)
@@ -488,11 +386,6 @@ class FlowTRangeAfterUpdateHandlers {
     	                    
     			            if (localProcess == null) {
         			            if ( (process_in.getPid() == 0) || (process_in.getPid() != process_in.getPpid()) ) {
-                                    // *** VERIFY ***
-                                    // What am I supposed to do with that?
-            		                //    Drawing_t *drawing = control_flow_data->drawing;
-            		                //    gtk_widget_set_size_request(drawing->drawing_area,-1,pl_height);
-            		                //    gtk_widget_queue_draw(drawing->drawing_area);
                                     TmfTimeRange timeRange = traceSt.getInputDataRef().getTraceTimeWindow();
                                     localProcess = addLocalProcess(process_in, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
                                 }

@@ -49,10 +49,11 @@ public abstract class TimeRangeEventResource extends TimeRangeComposite
 	 */
 	public TimeRangeEventResource(int newId, long newStartTime,
 			long newStopTime, String newName, String newGroupName,
-			String newClassName, ResourceTypes newType, Long newResourceId) {
+			String newClassName, ResourceTypes newType, Long newResourceId,
+			long insertionTime) {
 
 		super(newId, newStartTime, newStopTime, newName, newGroupName,
-				newClassName, CompositeType.RESOURCE);
+				newClassName, CompositeType.RESOURCE, insertionTime);
 
 		type = newType;
 		resourceId = newResourceId;

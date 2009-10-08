@@ -12,7 +12,6 @@
 package org.eclipse.linuxtools.lttng.ui.views.resources.evProcessor;
 
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.state.StateStrings;
 import org.eclipse.linuxtools.lttng.state.StateStrings.Channels;
 import org.eclipse.linuxtools.lttng.state.StateStrings.Events;
 import org.eclipse.linuxtools.lttng.state.StateStrings.Fields;
@@ -118,15 +117,15 @@ public class ResourcesTRangeBeforeUpdateHandlers {
 						localResource = addLocalResource(timeRange
 								.getStartTime().getValue(), timeRange
 								.getEndTime().getValue(), traceSt.getTraceId(),
-								ResourceTypes.IRQ, irqId);
+								ResourceTypes.IRQ, irqId, trcEvent
+										.getTimestamp().getValue());
 					}
 
 					// get the start time
 					long stime = localResource.getNext_good_time();
 
 					// Get the resource state mode
-					String irqStateMode = traceSt.getIrq_states().get(irqId)
-							.peekFromIrqStack().getInName();
+					String irqStateMode = localResource.getStateMode(traceSt);
 
 					// Call the makeDraw function
 					makeDraw(traceSt, stime,
@@ -210,28 +209,16 @@ public class ResourcesTRangeBeforeUpdateHandlers {
 						localResource = addLocalResource(timeRange
 								.getStartTime().getValue(), timeRange
 								.getEndTime().getValue(), traceSt.getTraceId(),
-								ResourceTypes.SOFT_IRQ, softIrqId);
+								ResourceTypes.SOFT_IRQ, softIrqId, trcEvent
+										.getTimestamp().getValue());
 					}
 
 					// get the start time
 					long stime = localResource.getNext_good_time();
-					// Get the resource state mode
-					long running = traceSt.getSoft_irq_states().get(softIrqId)
-							.getRunning().longValue();
-					long pending = traceSt.getSoft_irq_states().get(softIrqId)
-							.getPending().longValue();
 
-					String softIrqStateMode;
-					if (running > 0) {
-						softIrqStateMode = StateStrings.SoftIRQMode.LTTV_SOFT_IRQ_BUSY
-								.getInName();
-					} else if (pending > 0) {
-						softIrqStateMode = StateStrings.SoftIRQMode.LTTV_SOFT_IRQ_PENDING
-								.getInName();
-					} else {
-						softIrqStateMode = StateStrings.SoftIRQMode.LTTV_SOFT_IRQ_IDLE
-								.getInName();
-					}
+					// Get the resource state mode
+					String softIrqStateMode = localResource
+							.getStateMode(traceSt);
 
 					// Call the makeDraw function
 					makeDraw(traceSt, stime,
@@ -330,20 +317,12 @@ public class ResourcesTRangeBeforeUpdateHandlers {
 						localResource = addLocalResource(timeRange
 								.getStartTime().getValue(), timeRange
 								.getEndTime().getValue(), traceSt.getTraceId(),
-								ResourceTypes.TRAP, trapId);
+								ResourceTypes.TRAP, trapId, trcEvent
+										.getTimestamp().getValue());
 					}
 
 					// Determine the trap state.
-					long trapState = traceSt.getTrap_states().get(trapId)
-							.getRunning().longValue();
-					String trapStateMode;
-					if (trapState == 0) {
-						trapStateMode = StateStrings.TrapMode.LTTV_TRAP_IDLE
-								.getInName();
-					} else {
-						trapStateMode = StateStrings.TrapMode.LTTV_TRAP_BUSY
-								.getInName();
-					}
+					String trapStateMode = localResource.getStateMode(traceSt);
 
 					long stime = localResource.getNext_good_time();
 					makeDraw(traceSt, stime,
@@ -409,14 +388,14 @@ public class ResourcesTRangeBeforeUpdateHandlers {
 							.getTraceTimeWindow();
 					localResource = addLocalResource(timeRange.getStartTime()
 							.getValue(), timeRange.getEndTime().getValue(),
-							traceSt.getTraceId(), ResourceTypes.BDEV, bdevId);
+							traceSt.getTraceId(), ResourceTypes.BDEV, bdevId,
+							trcEvent.getTimestamp().getValue());
 				}
 
 				// get the start time
 				long stime = localResource.getNext_good_time();
 				// Get the resource state mode
-				String bdevStateMode = traceSt.getBdev_states().get(bdevId)
-						.peekFromBdevStack().getInName();
+				String bdevStateMode = localResource.getStateMode(traceSt);
 				// Call the makeDraw function
 				makeDraw(traceSt, stime, trcEvent.getTimestamp().getValue(),
 						localResource, params, bdevStateMode);
