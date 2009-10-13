@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.eclipse.linuxtools.lttng.feature"
-      label="Linux Tracing Toolkit"
-      version="0.1.0.qualifier"
+      label="Linux Tracing Toolkit (LTTng)"
+      version="0.1.0.200910131142"
+      provider-name="Ericsson"
       os="linux">
 
-   <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+   <description>
+      %description
    </description>
 
-   <copyright url="http://www.example.com/copyright">
-      [Enter Copyright Description here.]
+   <copyright>
+      %copyright
    </copyright>
 
-   <license url="http://www.example.com/license">
-      [Enter License Description here.]
+   <license url="%licenseURL">
+      %license
    </license>
 
    <requires>
@@ -23,16 +24,24 @@
 
    <plugin
          id="org.eclipse.linuxtools.lttng"
+         os="linux"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.1.0.200910131142"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.linuxtools.lttng.ui"
+         os="linux"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.1.0.200910131142"
          unpack="false"/>
+
+   <plugin
+         id="org.eclipse.linuxtools.lttng.help"
+         download-size="0"
+         install-size="0"
+         version="0.1.0.200910131142"/>
 
 </feature>
