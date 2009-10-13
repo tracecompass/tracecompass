@@ -66,7 +66,7 @@ public class TestStateManager {
 			//Get the Test StateManager
 			StateManager manager = StateManagerFactoryTestSupport.getManager(newExp.getExperimentId());
 			//Start execution.
-			manager.setTraceSelection(newExp);
+			manager.setTraceSelection(newExp, false);
 			
 			//Print events not handled.
 			Set<String> notHandledEvents = manager.getEventsNotHandled();
