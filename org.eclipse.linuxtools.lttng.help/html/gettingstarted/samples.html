@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-1">
+	<TITLE>Main Topic</TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.1  (Linux)">
+	<META NAME="CREATED" CONTENT="0;0">
+	<META NAME="CHANGED" CONTENT="20091008;17334500">
+</HEAD>
+<BODY LANG="en-CA" DIR="LTR">
+<H1>Samples</H1>
+<P>The following LTTng traces are provided as reference examples. 
+</P>
+<P>Each trace as its own feature and complexity. The size given
+refers to the size of the trace once "untarred", the actual tar size
+should be around 10 times smaller. 
+</P>
+<UL>
+	<LI><P STYLE="margin-bottom: 0cm"><A HREF="http://dev.eclipse.org/viewsvn/index.cgi/lttng/trunk/org.eclipse.linuxtools.lttng.tests/traceset/trace-1021events-nolost-1cpu.tar.gz?root=Technology_LINUXTOOLS&view=co">trace-1021events-nolost-1cpu
+	(2.1MB)</A> 
+	</P>
+	<P STYLE="margin-bottom: 0cm">Very small trace made from a single
+	marker. Recorded under a VirtualBox system with 1 processor.</P>
+	<P STYLE="margin-bottom: 0cm"></P>
+	<LI><P STYLE="margin-bottom: 0cm"><A HREF="http://dev.eclipse.org/viewsvn/index.cgi/lttng/trunk/org.eclipse.linuxtools.lttng.tests/traceset/trace-399747events-nolost-1cpu.tar.gz?root=Technology_LINUXTOOLS&view=co">trace-399747events-nolost-1cpu
+	(28MB)</A> 
+	</P>
+	<P STYLE="margin-bottom: 0cm">Trace of several markers, that has no
+	lost event. Recorded under VirtualBox with 1 processor.</P>
+	<P STYLE="margin-bottom: 0cm"></P>
+	<LI><P STYLE="margin-bottom: 0cm"><A HREF="http://dev.eclipse.org/viewsvn/index.cgi/lttng/trunk/org.eclipse.linuxtools.lttng.tests/traceset/trace-618339events-1293lost-1cpu.tar.gz?root=Technology_LINUXTOOLS&view=co">trace-618339events-1293lost-1cpu
+	(11MB)</A></P>
+	<P STYLE="margin-bottom: 0cm">Trace of several markers, with some
+	lost events. Recorded under VirtualBox with 1 processor.</P>
+	<P STYLE="margin-bottom: 0cm"></P>
+	<LI><P STYLE="margin-bottom: 0cm"><A HREF="http://dev.eclipse.org/viewsvn/index.cgi/lttng/trunk/org.eclipse.linuxtools.lttng.tests/traceset/trace-698650events_3029lost-8CPU.tar.gz?root=Technology_LINUXTOOLS&view=co">trace-698650events_3029lost-8CPU
+	(41MB)</A> <FONT COLOR="#ff0000"><B>(Multi-cpu is currently
+	experimental)</B></FONT></P>
+	<P STYLE="margin-bottom: 0cm">Trace of several markers, with some
+	lost events. Recorded on a native system with 8 processors.</P>
+</UL>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm">The smaller is the trace, the faster it
+will load in Eclipse. All traces should load correctly, but only the
+first one and the third one were extensively tested. 
+</P>
+<P STYLE="margin-bottom: 0cm">Note that recording of a new trace
+directly in Eclipse is currently work under progress. If you would
+like to record your own trace, you need to install LTTng kernel
+patches and LTTv application. 
+</P>
+<P STYLE="margin-bottom: 0cm">You can get more information about that
+at <A HREF="http://www.lttng.org/">http://www.lttng.org</A>. 
+</P>
+</BODY>
+</HTML>

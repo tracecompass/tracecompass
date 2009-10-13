@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>Control Flow View</title>
+</head>
+
+<body>
+<h1>Control Flow View</h1>
+<p>It shows a process table of the traced system as well as the state transitions over time</p>
+<p>The dotted vertical lines in the state area represent "more information" i.e. There is at least one state that could not be represented in one pixel with the current scale</p>
+
+<p>The tool bar options from right to left are:</p>
+<dl>
+<dt>Home</dt>
+<dd>Reset the time scale to Default</dd>
+<p></p>
+<dt>Next Event</dt>
+<dd>Moves to the next event over the highlighted process</dd>
+<p></p>
+<dt>Previous Event</dt>
+<dd>Moves to the previous event overt the highlighted process</dd>
+<p></p>
+<dt>Next Process</dt>
+<dd>Moves from the currently highlighted process to the next down in the list</dd>
+<p></p>
+<dt>Previous Process</dt>
+<dd>Moves from the currently highlighted process to the next up in the list</dd>
+<p></p>
+<dt>Zoom In</dt>
+<dd>Maintains the same width while reducing the visible time range in order to see a bigger representation of the states</dd>
+<p></p>
+<dt>Zoom Out</dt>
+<dd>Maintains the same width while increasing the visible time range in order to see a smaller representation of the states</dd>
+<p></p>
+<dt>Synchronize</dt>
+<dd><ul><li>Notify time selections to synchronized views</li><li>Listens and apply time selections from other synchronized views</li></ul></dd>
+
+</dl> 
+<p>Note: Due to the large size of the LTTng traces, this view does not keep all state information in memory</p>
+<br> <img alt="Control Flow View" src="../images/controlFlowView2.png"  width="1059" height="343">
+
+<p>Additional mouse controls</p>
+<dl>
+<dt>Mouse Scroll wheel</dt>
+<dd>
+<ul>
+<li>Forward  - One Zoom In order per step</li>
+<li>Backward - One Zoom Out order per step</li>
+</ul>
+</dd>
+<dt>Mouse drag</dt>
+<dd>
+<ul>
+<li>States Area     - Moves the time window in the direction of the drag keeping current scale</li>
+<li>Time Scale Area - Changes the time scale to the time range from the start to the end of the drag action</li>
+</ul>
+</dd>
+<dt>Mouse Hovering</dt>
+<dd>Hovering the mouse selection over a state will trigger a tooltip display with additional information, 
+including the start and end times as well as the name of the state associated to the color</dd>
+
+</dl>
+<br> <img alt="Control Flow View hover tool tip" src="../images/controlFlowViewTooltip.png">
+</body>
+</html>

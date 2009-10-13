@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.linuxtools.tmf.feature"
+      label="Tracing and Monitoring Framework (TMF)"
+      version="0.1.0.qualifier"
+      provider-name="Ericsson">
+
+   <description url="http://www.example.com/description">
+      Tracing and Monitoring Framework
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      Copyright (c) 2009 Ericsson
+
+All rights reserved. This program and the accompanying materials
+are  made available under the terms of the Eclipse Public License
+v1.0 which accompanies this distribution, and is available at
+http://www.eclipse.org/legal/epl-v10.html
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <plugin
+         id="org.eclipse.linuxtools.tmf"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.linuxtools.tmf.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
