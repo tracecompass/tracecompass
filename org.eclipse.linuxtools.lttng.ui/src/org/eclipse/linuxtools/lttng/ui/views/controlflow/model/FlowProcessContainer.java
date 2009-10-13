@@ -80,6 +80,13 @@ public class FlowProcessContainer {
 	}
 
 	/**
+	 * Clear all process items
+	 */
+	public void clearProcesses() {
+		processes.clear();
+	}
+
+	/**
 	 * remove the processes related to a specific trace e.g. during trace
 	 * removal
 	 * 

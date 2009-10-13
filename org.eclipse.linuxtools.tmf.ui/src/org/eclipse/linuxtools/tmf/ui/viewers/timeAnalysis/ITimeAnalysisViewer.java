@@ -46,8 +46,11 @@ public interface ITimeAnalysisViewer extends ITmfViewer {
 	 *            displayed
 	 * @param end
 	 *            Specifies a fixed end time to the information to be displayed
+	 * @param updateTimeBounds
+	 *            If True - Time Range boundaries update is required
 	 */
-	public abstract void display(ITmfTimeAnalysisEntry[] traceArr, long start, long end);
+	public abstract void display(ITmfTimeAnalysisEntry[] traceArr, long start,
+			long end, boolean updateTimeBounds);
 
 	/**
 	 * The start and End time are taken from the limits used by the children

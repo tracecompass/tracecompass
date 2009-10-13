@@ -80,7 +80,22 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 				// manager.
 				// Leave the GUI in charge of the updated data.
 				String traceId = smanager.getEventLog().getName();
-				ModelUpdatePrep(traceId);
+
+				// indicate if the data model needs to be cleared e.g. a new
+				// experiment is being selected
+				boolean clearData = request.isclearDataInd();
+				// no new time range for zoom orders
+				TmfTimeRange trange = null;
+				if (clearData) {
+					// Time Range will be used to filter out events which are
+					// not visible in one pixel
+					trange = StateManagerFactory.getExperimentManager()
+							.getExperimentTimeRange();
+				}
+				
+				//Indicate if current data needs to be cleared and if so 
+				//specify the new experiment time range that applies
+				ModelUpdatePrep(traceId, clearData, trange);
 			} else {
 				// clean up any possible pending request
 				request.cancel();
@@ -211,8 +226,13 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	 * given traceId
 	 * 
 	 * @param traceId
+	 * @param clearAllData
+	 *            - reset all data e.g when a new experiment is selected
+	 * @param timeRange
+	 *            - new total time range e.g. Experiment level
 	 */
-	public abstract void ModelUpdatePrep(String traceId);
+	public abstract void ModelUpdatePrep(String traceId, boolean clearAllData,
+			TmfTimeRange timeRange);
 
 	/**
 	 * Actions taken by the view to refresh its widget(s) with the updated data

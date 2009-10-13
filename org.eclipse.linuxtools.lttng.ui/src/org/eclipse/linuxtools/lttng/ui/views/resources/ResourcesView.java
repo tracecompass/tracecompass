@@ -516,12 +516,18 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		return strVal.substring(strVal.length() - 9);
 	}
 
+	/**
+	 * @param items
+	 * @param startTime
+	 * @param endTime
+	 * @param timeUpdate - Time bounds updated needed e.g. if a new Experiment or trace is selected
+	 */
 	public void resourceModelUpdates(final ITmfTimeAnalysisEntry[] items,
-			final long startTime, final long endTime) {
+			final long startTime, final long endTime, final boolean timeUpdate) {
 		tsfviewer.getControl().getDisplay().asyncExec(new Runnable() {
 
 			public void run() {
-				tsfviewer.display(items, startTime, endTime);
+				tsfviewer.display(items, startTime, endTime, timeUpdate);
 				tsfviewer.resizeControls();
 			}
 		});
@@ -599,14 +605,27 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @seeorg.eclipse.linuxtools.lttng.ui.views.common.LttngTimeUpdateView#
-	 * ModelUpdatePrep(java.lang.String)
+	 * @seeorg.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
+	 * ModelUpdatePrep(java.lang.String, boolean)
 	 */
 	@Override
-	public void ModelUpdatePrep(String traceId) {
-		ResourceModelFactory.getResourceContainer().clearChildren(traceId);
+	public void ModelUpdatePrep(String traceId, boolean clearAllData,
+			TmfTimeRange trange) {
+		if (clearAllData) {
+			ResourceModelFactory.getResourceContainer().clearResources();
+		} else {
+			ResourceModelFactory.getResourceContainer().clearChildren(traceId);
+		}
+
+		ParamsUpdater updater = ResourceModelFactory.getParamsUpdater();
 		// Start over
-		ResourceModelFactory.getParamsUpdater().setEventsDiscarded(0);
+		updater.setEventsDiscarded(0);
+
+		// Update new visible time range if available
+		if (trange != null) {
+			updater.update(trange.getStartTime().getValue(), trange
+					.getEndTime().getValue());
+		}
 	}
 
 	/*
@@ -635,7 +654,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 
 		// Update the view part
 		resourceModelUpdates(resourceArr, experimentStartTime,
-				experimentEndTime);
+				experimentEndTime, request.isclearDataInd());
 
 		// reselect to original time
 		ParamsUpdater paramUpdater = ResourceModelFactory.getParamsUpdater();

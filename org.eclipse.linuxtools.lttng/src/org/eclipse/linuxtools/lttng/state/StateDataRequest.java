@@ -35,7 +35,7 @@ public class StateDataRequest extends TmfDataRequest<TmfEvent> {
 	private StateManager manager = null;
 	private long numOfEvents = 0;
 	private boolean broadcast = false;
-
+	private boolean clearDataInd = false;
 	// ========================================================================
 	// Constructors
 	// =======================================================================
@@ -164,5 +164,24 @@ public class StateDataRequest extends TmfDataRequest<TmfEvent> {
 	 */
 	public long getNumOfEvents() {
 		return numOfEvents;
+	}
+
+	/**
+	 * @param clearAllData
+	 *            indicates the need to clear all previous data e.g. a new
+	 *            experiment selection
+	 */
+	public void setclearDataInd(boolean clearAllData) {
+		this.clearDataInd = clearAllData;
+	}
+
+	/**
+	 * Returns indication - clearing of all existing data model is required e.g
+	 * from the selection of a new experiment
+	 * 
+	 * @return
+	 */
+	public boolean isclearDataInd() {
+		return clearDataInd;
 	}
 }

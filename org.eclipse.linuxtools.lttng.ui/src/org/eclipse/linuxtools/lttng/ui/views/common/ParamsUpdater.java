@@ -89,6 +89,17 @@ public class ParamsUpdater {
 	}
 
 	/**
+	 * Update time range but keep width as is
+	 * 
+	 * @param time0
+	 * @param time1
+	 * @return
+	 */
+	public boolean update(long time0, long time1) {
+		return update(time0, time1, width);
+	}
+
+	/**
 	 * Only positive attributes are expected
 	 * 
 	 * @param time0
@@ -120,6 +131,12 @@ public class ParamsUpdater {
 			TmfTimestamp fTimeStart = new LttngTimestamp(startTime);
 			TmfTimestamp fTimeEnd = new LttngTimestamp(endTime);
 			trange = new TmfTimeRange(fTimeStart, fTimeEnd);
+
+			// make sure the selected time is within the new range or else set
+			// mark it as invalid
+			if (selectedTime != null) {
+				setSelectedTime(selectedTime);
+			}
 
 			// update succeeded
 			updated = true;

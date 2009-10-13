@@ -964,9 +964,15 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		table.setLinesVisible(true);
 	}
 
-	// @Override
+	/**
+	 * @param items
+	 * @param startTime
+	 * @param endTime
+	 * @param updateTimeBounds - Update needed e.g. a new Experiment or trace selected
+	 */
 	public void flowModelUpdates(final ITmfTimeAnalysisEntry[] items,
-			final long startTime, final long endTime) {
+			final long startTime, final long endTime,
+			final boolean updateTimeBounds) {
 		final Table table = tableViewer.getTable();
 		Display display = table.getDisplay();
 
@@ -983,7 +989,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 				table.update();
 				tableViewer.refresh();
 
-				tsfviewer.display(items, startTime, endTime);
+				tsfviewer.display(items, startTime, endTime, updateTimeBounds);
 				tsfviewer.resizeControls();
 
 				// Adjust the size of the vertical scroll bar to fit the
@@ -1132,14 +1138,36 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @seeorg.eclipse.linuxtools.lttng.ui.views.common.LttngTimeUpdateView#
-	 * ModelUpdatePrep(java.lang.String)
+	 * @seeorg.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
+	 * ModelUpdatePrep(java.lang.String, boolean)
 	 */
 	@Override
-	public void ModelUpdatePrep(String traceId) {
-		FlowModelFactory.getProcContainer().clearChildren(traceId);
+	public void ModelUpdatePrep(String traceId, boolean clearAllData,
+			TmfTimeRange trange) {
+		if (clearAllData) {
+			FlowModelFactory.getProcContainer().clearProcesses();
+			// Obtain the current process list
+			Vector<TimeRangeEventProcess> processList = FlowModelFactory
+					.getProcContainer().readProcesses();
+			// convert it to an Array as expected by the widget
+			TimeRangeEventProcess[] processArr = processList
+					.toArray(new TimeRangeEventProcess[processList.size()]);
+
+			// initialise to an empty model
+			flowModelUpdates(processArr, -1, -1, false);
+		} else {
+			FlowModelFactory.getProcContainer().clearChildren(traceId);
+		}
+
+		ParamsUpdater updater = FlowModelFactory.getParamsUpdater();
 		// Start over
-		FlowModelFactory.getParamsUpdater().setEventsDiscarded(0);
+		updater.setEventsDiscarded(0);
+
+		// Update new visible time range if available
+		if (trange != null) {
+			updater.update(trange.getStartTime().getValue(), trange
+					.getEndTime().getValue());
+		}
 	}
 
 	/*
@@ -1168,9 +1196,10 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		Arrays.sort(processArr);
 
 		// Update the view part
-		flowModelUpdates(processArr, experimentStartTime, experimentEndTime);
+		flowModelUpdates(processArr, experimentStartTime, experimentEndTime,
+				request.isclearDataInd());
 
-		// reselect to original time
+		// get back to user selected time if still within range
 		ParamsUpdater paramUpdater = FlowModelFactory.getParamsUpdater();
 		final Long selTime = paramUpdater.getSelectedTime();
 		if (selTime != null) {
@@ -1206,6 +1235,8 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 			sb.append("\n\t\tRequested Time Range: " + range.getStartTime()
 					+ "-" + range.getEndTime());
+			sb.append("\n\t\tExperiment Time Range: " + experimentStartTime
+					+ "-" + experimentEndTime);
 			TraceDebug.debug(sb.toString());
 		}
 	}

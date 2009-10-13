@@ -89,8 +89,9 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
         modelUpdate(traceArr);
     }
 
-    public void display(ITmfTimeAnalysisEntry[] traceArr, long start, long end) {
-        modelUpdate(traceArr, start, end);
+	public void display(ITmfTimeAnalysisEntry[] traceArr, long start, long end,
+			boolean updateTimeBounds) {
+		modelUpdate(traceArr, start, end, updateTimeBounds);
     }
 
     public void controlMoved(ControlEvent e) {
@@ -111,12 +112,19 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	}
 
 	// called from the display order in the API
-	public void modelUpdate(ITmfTimeAnalysisEntry[] traces, long start, long end) {
+	public void modelUpdate(ITmfTimeAnalysisEntry[] traces, long start,
+			long end, boolean updateTimeBounds) {
 		if (null != _stateCtrl) {
 			loadOptions();
 			updateInternalData(traces, start, end);
-			_stateCtrl.redraw();
-			_timeScaleCtrl.redraw();
+			if (updateTimeBounds) {
+				_timeRangeFixed = true;
+				// set window to match limits
+				setStartFinishTimeExt(_time0_, _time1_);
+			} else {
+				_stateCtrl.redraw();
+				_timeScaleCtrl.redraw();
+			}
 		}
 	}
 
@@ -243,7 +251,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	}
 
 	void setTimeBounds() {
-		_time0_ = _beginTime - (long) ((_endTime - _beginTime) * 0.05);
+		_time0_ = _beginTime - (long) ((_endTime - _beginTime) * 0.02);
 		if (_time0_ < 0)
 			_time0_ = 0;
 		// _time1_ = _time0_ + (_endTime - _time0_) * 1.05;
@@ -275,7 +283,8 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		if (null == traces)
 			traces = new ITmfTimeAnalysisEntry[0];
 		if (end < 1 || start < 1) {
-			// End or start time are unspecified
+			// End or start time are unspecified and need to be determined from
+			// individual processes
 			setTimeRange(traces);
 		} else {
 			_endTime = end;

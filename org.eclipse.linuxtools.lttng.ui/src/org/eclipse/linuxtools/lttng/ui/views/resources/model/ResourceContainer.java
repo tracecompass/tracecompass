@@ -85,7 +85,14 @@ public class ResourceContainer {
             }
         }
 	}
-	
+
+	/**
+	 * Clear all resources items e.g. when a new experiment is selected
+	 */
+	public void clearResources() {
+		resources.clear();
+	}
+
 	/**
 	 * remove the resources related to a specific trace e.g. during trace
 	 * removal

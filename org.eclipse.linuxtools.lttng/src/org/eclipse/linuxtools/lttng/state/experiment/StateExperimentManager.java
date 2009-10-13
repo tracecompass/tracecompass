@@ -124,19 +124,23 @@ public class StateExperimentManager extends TmfComponent {
 	}
 
 	/**
-	 * A new trace log is opened, notification received from the framework
-	 * Notify the new log selection to the state handling manager
+	 * A new Experiment selected, notification received from the framework
+	 * Notify the new log selection to the state handling managers
 	 * 
 	 * @param experiment
 	 */
 	private void traceSelected(TmfExperiment experiment) {
-		// TODO: Re-factor when the experiment provides the list of traces per
+		// TODO: Re-factor when multiple traces are supported
 		// traceId, as well as when the request can be specified at the trace
 		// level
 		// For the moment it does work for only one trace per experiment.
 		String experimentId = experiment.getExperimentId();
 		StateManager manager = StateManagerFactory.getManager(experimentId);
-		manager.setTraceSelection(experiment);
+		// TODO: clearAllData shall not be applied to all manager calls below
+		// since that would clean all data loaded within previous iterations in
+		// the future loop. i.e. It can be applied to first manager in the loop.
+		boolean clearAllData = true;
+		manager.setTraceSelection(experiment, clearAllData);
 	}
 
 	/**

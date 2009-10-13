@@ -112,7 +112,13 @@ public class StateManager extends Observable {
 	// ========================================================================
 	// Methods
 	// =======================================================================
-	public void setTraceSelection(TmfExperiment experiment) {
+	/**
+	 * A new Experiment or trace selected
+	 * @param experiment
+	 * @param clearPreviousData
+	 */
+	public void setTraceSelection(TmfExperiment experiment,
+			boolean clearPreviousData) {
 		// New log in use, read all events and build state transition stack
 		if (experiment != null) {
 			if (fExperiment != null && fExperiment != experiment) {
@@ -142,6 +148,7 @@ public class StateManager extends Observable {
 			TmfTimeRange allTraceWindow = fEventLog.getTimeRange();
 			StateDataRequest request = getDataRequestStateSave(allTraceWindow,
 					null);
+			request.setclearDataInd(clearPreviousData);
 
 			// Wait for completion
 			request.startRequestInd(fExperiment, true, true);
@@ -612,7 +619,7 @@ public class StateManager extends Observable {
 			TmfExperiment newExpt = new TmfExperiment("trace1", testStream);
 
 			// This will create all the checkpoint
-			stateManagerTest.setTraceSelection(newExpt);
+			stateManagerTest.setTraceSelection(newExpt, false);
 			System.out.println("JOIE JOIE FIN DE LA CREATION DES CHECKPOINTS");
 
 			// *** Restore some checkpoint to test
