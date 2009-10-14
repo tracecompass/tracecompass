@@ -2,8 +2,8 @@
 <feature
       id="org.eclipse.linuxtools.tmf.feature"
       label="Tracing and Monitoring Framework (TMF)"
-      version="0.1.0.200910131141"
-      provider-name="Ericsson">
+      version="0.1.0.qualifier"
+      provider-name="Eclipse">
 
    <description>
       %description
@@ -21,14 +21,14 @@
          id="org.eclipse.linuxtools.tmf"
          download-size="0"
          install-size="0"
-         version="0.1.0.200910131141"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.linuxtools.tmf.ui"
          download-size="0"
          install-size="0"
-         version="0.1.0.200910131141"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>

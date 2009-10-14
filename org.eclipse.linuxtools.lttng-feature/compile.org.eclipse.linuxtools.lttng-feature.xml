@@ -3,5 +3,6 @@
 	<target name="main">
 		<ant antfile="build.xml" dir="../org.eclipse.linuxtools.lttng" target="build.jars"/>
 		<ant antfile="build.xml" dir="../org.eclipse.linuxtools.lttng.ui" target="build.jars"/>
+		<ant antfile="build.xml" dir="../org.eclipse.linuxtools.lttng.help" target="build.jars"/>
 	</target>
 </project>

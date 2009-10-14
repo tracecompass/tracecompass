@@ -2,8 +2,8 @@
 <feature
       id="org.eclipse.linuxtools.lttng.feature"
       label="Linux Tracing Toolkit (LTTng)"
-      version="0.1.0.200910131142"
-      provider-name="Ericsson"
+      version="0.1.0.qualifier"
+      provider-name="Eclipse"
       os="linux">
 
    <description>
@@ -19,7 +19,7 @@
    </license>
 
    <requires>
-      <import feature="org.eclipse.linuxtools.tmf.feature" version="0.1.0.qualifier"/>
+      <import feature="org.eclipse.linuxtools.tmf.feature" version="0.1.0.qualifier" match="compatible"/>
    </requires>
 
    <plugin
@@ -27,7 +27,7 @@
          os="linux"
          download-size="0"
          install-size="0"
-         version="0.1.0.200910131142"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
@@ -35,13 +35,13 @@
          os="linux"
          download-size="0"
          install-size="0"
-         version="0.1.0.200910131142"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.linuxtools.lttng.help"
          download-size="0"
          install-size="0"
-         version="0.1.0.200910131142"/>
+         version="0.0.0"/>
 
 </feature>
