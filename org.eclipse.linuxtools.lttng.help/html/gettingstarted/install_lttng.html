@@ -1,0 +1,478 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-1">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.1  (Linux)">
+	<META NAME="CREATED" CONTENT="20091006;11250700">
+	<META NAME="CHANGED" CONTENT="20091006;16533800">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 2cm }
+		P { margin-bottom: 0.21cm }
+		P.western { font-family: "Nimbus Roman No9 L", serif }
+		P.cjk { font-size: 10pt }
+		H1 { margin-bottom: 0.21cm }
+		H1.western { font-family: "Nimbus Sans L", sans-serif; font-size: 16pt }
+		H1.cjk { font-family: "Bitstream Vera Sans"; font-size: 16pt }
+		H1.ctl { font-family: "Bitstream Vera Sans"; font-size: 16pt }
+		H3 { margin-bottom: 0.21cm }
+		H3.western { font-family: "Nimbus Roman No9 L", serif }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+
+</HEAD>
+<BODY LANG="en-CA" DIR="LTR">
+<P CLASS="western" STYLE="margin-bottom: 0cm"><BR>
+</P>
+<H1 CLASS="western">Installing LTTv library for Eclipse LTTng plugin</H1>
+<P CLASS="western"><BR><BR>
+</P>
+<P CLASS="western">This document will describe how to install and
+configure LTTv C-code library to work with eclipse LTTng plugin. 
+</P>
+<P CLASS="western" STYLE="margin-bottom: 0cm"><BR>
+</P>
+<H3 CLASS="western">For the impatient
+s</H3>
+<UL>
+	<LI><P CLASS="western">Download latest LTTv application, from 
+	<A HREF="http://www.lttng.org/">http://www.lttng.org</A></P>
+
+	<LI><P CLASS="western">Compile it with the JNI support activated :</P>
+	<P STYLE="margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>./configure
+	--with-jni-interface &amp;&amp; make &amp;&amp; make install</I></FONT></FONT></P>
+	<LI><P CLASS="western" STYLE="margin-bottom: 0cm">
+Start Eclipse
+	application making sure the library is in LD_LIBRARY_PATH.</P>
+</UL>
+<P CLASS="western" STYLE="margin-bottom: 0cm"><BR>
+</P>
+
+<P CLASS="western" STYLE="margin-left: -0.03cm; text-indent: 1.27cm; margin-bottom: 0cm">
+It didn't work? Please read &ldquo;Installation steps&rdquo; section.
+</P>
+<P CLASS="western" STYLE="margin-bottom: 0cm"><BR>
+</P>
+<H3 CLASS="western">Why a C library ?
+</H3>
+<P CLASS="western">LTTng and LTTv are mostly made in C (and some part
+in more evil stuff) so their functionnality are not directly
+available in Java. Also, for the sake of performance, it was better
+for the project to use the native, multi-platform C library for most
+of the low-level functions than to try to re-implement the same in
+Java. Finally, the C library is  under constant development and it
+would have been a bad idea to branch this one just yet.</P>
+<P CLASS="western">So right now, the usual path for an event through
+LTTng would be the following :</P>
+<P CLASS="western" STYLE="margin-left: 0.5cm"><I>Linux Kernel  -&gt; 
+LTTv C Library  -&gt; JNI (C side)  -&gt; JNI (Java Side)  -&gt;
+
+Eclipse LTTng Plugin</I></P>
+<P CLASS="western">(Note that the kernel is only called to record at
+trace). 
+</P>
+<P CLASS="western">For all these reasons, the LTTv C library and  a
+JNI (Java Native Interface) is needed for java to process LTTng
+trace. The JNI itself, however, is already included in LTTV and it
+should be easy to build and to install (using this very installation
+guide). 
+</P>
+<P CLASS="western" STYLE="margin-bottom: 0cm">
+</P>
+<P CLASS="western" STYLE="margin-bottom: 0cm"><BR>
+</P>
+<H3 CLASS="western">Installation steps
+</H3>
+<P CLASS="western">First on all, we need to download and compile the
+source of the LTTv application, with the JNI support enabled. To do
+so, there is 4 steps to follow. 
+</P>
+<P CLASS="western"><BR><BR>
+</P>
+<OL>
+
+	<LI><P CLASS="western" STYLE="text-decoration: none"><I><B>Downloading
+	LTTv</B></I></P>
+</OL>
+<P CLASS="western" STYLE="margin-left: 1.22cm">There is actually
+three stage of LTTv available for download.</P>
+<P CLASS="western" STYLE="margin-left: 1.22cm">- <B>Stable release</B></P>
+<P CLASS="western" STYLE="margin-left: 1.22cm">This is the main LTTv
+tree. Actually missing the JNI fonctionnality but this might be added
+soon. Until this is done, you should stick with development version. 
+</P>
+<P CLASS="western" STYLE="margin-left: 1.22cm">If you want to try it
+anyways, you can get it from <A HREF="http://www.lttng.org/?q=node/3"><I>http://www.lttng.org/?q=node/3</I></A></P>
+<P CLASS="western" STYLE="margin-left: 1.22cm">Then, select &ldquo;<I>Download
+the latest lttv-[version].tar.gz</I>&rdquo; in the menu and pick the
+most recent (usually on top) release.</P>
+
+<P CLASS="western" STYLE="margin-left: 1.22cm"><BR><BR>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.22cm">- <B>Development build
+(git)  </B><FONT COLOR="#ff950e"><B>(PLEASE USE THIS)</B></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.22cm">This is the release
+candidate of the LTTv application. It contains features that are
+under heavy development or too experimental to make it to the main
+tree. It also includes the newer JNI interface that you need to use
+for eclipse.</P>
+<P CLASS="western" STYLE="margin-left: 1.22cm">This is definitely
+what you should use, get it from :<BR>
+<A HREF="http://lttng.org/cgi-bin/gitweb.cgi?p=lttv.git;a=summary"><I>http://lttng.org/cgi-bin/gitweb.cgi?p=lttv.git;a=summary</I></A></P>
+<P CLASS="western" STYLE="margin-left: 1.22cm">Then, find the line
+marked as &ldquo;<I>master</I>&rdquo; and click &ldquo;<I>snapshot</I>&rdquo;
+
+to download it. 
+</P>
+<P CLASS="western" STYLE="margin-left: 1.22cm"><BR><BR>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.22cm">- <B>Beta JNI build
+(git)</B></P>
+<P CLASS="western" STYLE="margin-left: 1.22cm">This is the very beta
+tree of LTTv that include the newest JNI changes. It is under
+constant development, so you should probably avoid using this branch
+unless you were told to. 
+</P>
+<P CLASS="western" STYLE="margin-left: 1.22cm">If you were instructed
+to use the latest JNI git, the adress is : 
+</P>
+<P CLASS="western" STYLE="margin-left: 1.22cm"><A HREF="http://git.dorsal.polymtl.ca/?p=liblttngtrace.git;a=summary"><I>http://git.dorsal.polymtl.ca/?p=liblttngtrace.git;a=summary</I></A></P>
+<P CLASS="western" STYLE="margin-left: 1.22cm"><SPAN STYLE="font-style: normal">Then,
+find the line marked as &ldquo;</SPAN><I>master</I><SPAN STYLE="font-style: normal">&rdquo;
+and click &ldquo;</SPAN><I>snapshot</I><SPAN STYLE="font-style: normal">&rdquo;
+
+to download it.</SPAN></P>
+<P CLASS="western">	</P>
+<P CLASS="western"><BR><BR>
+</P>
+<OL START=2>
+	<LI><P CLASS="western"><I><B>Decompressing the archive</B></I></P>
+</OL>
+<P CLASS="western" STYLE="margin-left: 1.27cm">You now need to move
+the archive file where you want it and to uncompress it. We also need
+to &ldquo;enter&rdquo; the uncompressed directory.</P>
+<P CLASS="western" STYLE="margin-left: 1.27cm">The way to do it in
+command line would be something like : 
+
+</P>
+<P STYLE="margin-left: 1.27cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>mv
+archive_name.tar.gz /where/you/want</I></FONT></FONT></P>
+<P STYLE="margin-left: 1.27cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>tar
+-xvzf  archive_name.tar.gz</I></FONT></FONT></P>
+<P STYLE="margin-left: 1.27cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>cd
+archive_directory</I></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.27cm"><BR><BR>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.27cm">As example, this is
+what I would do for myself :</P>
+<P STYLE="margin-left: 1.27cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>mv
+lttv-bcaf565bbfb26d0ac7e4647528230feb61443a01.tar.gz /home/william</I></FONT></FONT></P>
+<P STYLE="margin-left: 1.27cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>tar
+-xvzf lttv-bcaf565bbfb26d0ac7e4647528230feb61443a01.tar.gz</I></FONT></FONT></P>
+<P STYLE="margin-left: 1.27cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>cd
+lttv</I></FONT></FONT></P>
+
+<P CLASS="western">	</P>
+<P CLASS="western"><BR><BR>
+</P>
+<OL START=3>
+	<LI><P CLASS="western"><I><B>Configuration</B></I></P>
+</OL>
+<P CLASS="western" STYLE="margin-left: 1.27cm"><B><SPAN STYLE="font-style: normal">At
+First</SPAN></B></P>
+<P CLASS="western" STYLE="margin-left: 1.24cm; margin-bottom: 0cm">If
+you are using the &ldquo;Development build&rdquo; (second choice of
+the download section), before doing anything, you need to do the
+following : 
+</P>
+<P STYLE="margin-left: 1.24cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>./autogen.sh</I></FONT></FONT></P>
+
+<P CLASS="western" STYLE="margin-left: 1.24cm">You can safetly ignore
+any errors you get there, we will take care of them next. 
+</P>
+<P CLASS="western"><BR><BR>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.3cm"><B><SPAN STYLE="font-style: normal">Dependencies</SPAN></B></P>
+<P CLASS="western" STYLE="margin-left: 1.3cm">To build LTTv, the
+folowing dependencies need to be met. A (very) incomplete list is the
+following. Most distribution should have most of this stuff, except
+maybe gtk-dev, glib-dev and libopt that are probably missing on most
+systems.</P>
+<P CLASS="western" STYLE="margin-left: 1.3cm">Install the missing
+dependencies using your distribution package manager and then jump to
+the &ldquo;<I>configure script</I>&rdquo; step.</P>
+<P CLASS="western" STYLE="margin-left: 1.3cm"><FONT SIZE=2><B>libtool
+(and its dependencies like autotools, autoconf, automake and such...)</B></FONT></P>
+<P CLASS="western" STYLE="margin-left: 2.01cm"><FONT SIZE=2><I><SPAN STYLE="font-weight: normal">(Debian/Ubuntu
+: libtool)</SPAN></I></FONT></P>
+
+<P CLASS="western" STYLE="margin-left: 2.01cm"> <FONT SIZE=2><I><SPAN STYLE="font-weight: normal">(Fedora/Redhat
+: libtool-2)</SPAN></I></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.3cm"><FONT SIZE=2><B>gcc 3.2
+(or better)</B></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.98cm"><FONT SIZE=2><I><SPAN STYLE="font-weight: normal">(Debian/Ubuntu
+: gcc-3.2)</SPAN></I></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.98cm"><FONT SIZE=2><I><SPAN STYLE="font-weight: normal">(Fedora/Redhat
+: gcc-3.2)</SPAN></I></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.3cm"><FONT SIZE=2><B>gtk 2.4
+development libraries (or better)</B></FONT></P>
+<P CLASS="western" STYLE="margin-left: 2.04cm"> <FONT SIZE=2><I>(Debian/Ubuntu
+: libgtk2.0, libgtk2.0-dev)</I></FONT></P>
+<P CLASS="western" STYLE="margin-left: 2.04cm"> <FONT SIZE=2><I>(Fedora/Redhat
+: gtk2, gtk2-devel)</I></FONT></P>
+
+<P CLASS="western" STYLE="margin-left: 1.3cm"><FONT SIZE=2><B>glib
+2.4 development libraries (or better)</B></FONT></P>
+<P CLASS="western" STYLE="margin-left: 2.09cm">  <FONT SIZE=2><I>(Debian/Ubuntu
+: libglib2.0-0, libglib2.0-dev)</I></FONT></P>
+<P CLASS="western" STYLE="margin-left: 2.09cm">  <FONT SIZE=2><I>(Fedora/Redhat
+: glib2, glib2-devel)</I></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.3cm"><FONT SIZE=2><B>libpopt
+development libraries</B></FONT></P>
+<P CLASS="western" STYLE="margin-left: 2.17cm"><FONT SIZE=2><I>(Debian/Ubuntu
+: libpopt0, libpopt-dev)</I></FONT></P>
+<P CLASS="western" STYLE="margin-left: 2.17cm"><FONT SIZE=2><I>(Fedora/Redhat
+: popt)</I></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.3cm"><FONT SIZE=2><B>libpango
+development libraries</B></FONT></P>
+<P CLASS="western" STYLE="margin-left: 2.12cm"> <FONT SIZE=2><I>(Debian
+: libpango1.0, libpango1.0-dev)</I></FONT></P>
+
+<P CLASS="western" STYLE="margin-left: 2.12cm"> <FONT SIZE=2><I>(Fedora
+: pango, pango-devel)</I></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.3cm"><FONT SIZE=2><B>libc6
+development librairies </B></FONT>
+</P>
+<P CLASS="western" STYLE="margin-left: 2.09cm">  <FONT SIZE=2><I>(Debian
+: libc6, libc6-dev)</I></FONT></P>
+<P CLASS="western" STYLE="margin-left: 2.09cm">  <FONT SIZE=2><I>(Fedora
+: glibc, glibc)<BR></I></FONT><BR><BR>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.3cm"><B>Configure step</B></P>
+<P CLASS="western" STYLE="margin-left: 1.3cm">LTTv have several
+compile options that you can turn on/off. To see a full list, type
+the following : 
+</P>
+
+<P STYLE="margin-left: 1.3cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>./configure
+&ndash;help<BR></I></FONT></FONT><BR><BR>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.3cm">The following option is
+<U><B>essential</B></U> for Eclipse to work :</P>
+<P STYLE="margin-left: 1.3cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>--with-jni-interface
+   Build JNI interface between C and java. Need java include files.
+[default=no]<BR></I></FONT></FONT><BR><BR>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.3cm">The following options
+may be useful for you as well : 
+</P>
+<P STYLE="margin-left: 1.3cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>1)
+ --prefix=PREFIX         install architecture-independent files in
+PREFIX [/usr/local] </I></FONT></FONT>
+</P>
+
+<P STYLE="margin-left: 1.3cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>2)
+ --with-lttv      Build whole LTTV system, as opposed to only the
+trace reading library  [default=yes]</I></FONT></FONT></P>
+<P STYLE="margin-left: 1.3cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>3)
+ --with-java-jdk=DIR     Use java jdk from DIR. Ex : $JAVA_HOME.</I></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.3cm"><BR><BR>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.27cm">1) Change PREFIX to
+something in your home if you don't have root access on your system.</P>
+<P CLASS="western" STYLE="margin-left: 1.85cm">Use a flag like :
+--prefix=/home/your_name/a_directory</P>
+<P CLASS="western" STYLE="margin-left: 1.27cm">2) Unless you need
+LTTv Gtk gui, you better turn off turn off LTTv UI compilation. 
+</P>
+<P CLASS="western" STYLE="margin-left: 1.85cm">Use the flag :
+--without-lttv</P>
+<P CLASS="western" STYLE="margin-left: 1.27cm">3) On some (most?)
+system, configure will need you to indicate where it can find the
+java JDK to compile the JNI. 
+</P>
+<P CLASS="western" STYLE="margin-left: 1.85cm">Use a flag like :
+--with-java-jdk=/where/java-jdk/is</P>
+
+<P CLASS="western" STYLE="margin-left: 1.3cm"><BR><BR>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.3cm">As example, here is
+what I would use :</P>
+<P STYLE="margin-left: 1.3cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>./configure
+--prefix=/home/william/apps --without-lttv
+--with-java-jdk=/usr/local/jdk1.6.0_13 --with-jni-interface </I></FONT></FONT>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.3cm"><BR><BR>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.3cm">Fix any missing
+dependencies errors and move to the next step.</P>
+<P CLASS="western"><BR><BR>
+</P>
+<OL START=4>
+	<LI><P CLASS="western"><I><B>Build and install</B></I></P>
+
+</OL>
+<P CLASS="western" STYLE="margin-left: 1.32cm">Now that program is
+correctly configured, we can try to build it. Type the following
+command (this can take a while) :</P>
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>make</I></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.32cm"><BR><BR>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.32cm">When it is over, make
+sure there were no error during the compilation and issue the
+following command : 
+</P>
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>sudo
+make install</I></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.32cm">OR if you don't have
+root acess AND changed the --prefix=PREFIX flag during the
+configuration :</P>
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>make
+install </I></FONT></FONT>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.32cm"><BR><BR>
+
+</P>
+<P CLASS="western" STYLE="margin-left: 1.32cm">LTTv should now be
+installed on your system. 
+</P>
+<P CLASS="western"><BR><BR>
+</P>
+<OL START=5>
+	<LI><P CLASS="western"><I><B>Set library path</B></I></P>
+</OL>
+<P CLASS="western" STYLE="margin-left: 1.3cm; margin-bottom: 0cm">
+Now
+that LTTv is installed, we need to make sure Eclipse can find its
+library easily. The best way to do so is to ajust the
+LD_LIBRARY_PATH. 
+</P>
+<P CLASS="western" STYLE="margin-left: 1.3cm; margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.3cm; margin-bottom: 0cm">The
+following should work on most system if your shell is BASH or KSH <U>(in
+case of doubt try this one)</U> :</P>
+
+<P STYLE="margin-left: 1.3cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>export
+LD_LIBRARY_PATH=&rdquo;/usr/local/lib:$LD_LIBRARY_PATH&rdquo;</I></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.3cm">OR if you changed the
+--prefix=PREFIX flag during the configuration :</P>
+<P STYLE="margin-left: 1.3cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>export
+LD_LIBRARY_PATH=&rdquo;/where_you_set_prefix/lib:$LD_LIBRARY_PATH&rdquo;</I></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.3cm; margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.3cm; margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.3cm; margin-bottom: 0cm">If
+you are using a CSH or TCSH shell, this might be what you need : 
+</P>
+<P STYLE="margin-left: 1.3cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>setenv
+LD_LIBRARY_PATH  /usr/local/lib\:$LD_LIBRARY_PATH</I></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.3cm">OR if you changed the
+--prefix=PREFIX flag during the configuration :</P>
+
+<P STYLE="margin-left: 1.3cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>setenv
+LD_LIBRARY_PATH  /where_you_set_prefix/lib\:$LD_LIBRARY_PATH</I></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.3cm; margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.3cm; margin-bottom: 0cm">If
+you have root access on the system, if can be a good idea to run
+ldconfig as well :</P>
+<P STYLE="margin-left: 1.3cm; margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>sudo
+ldconfig</I></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-left: 1.3cm; margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.3cm; margin-bottom: 0cm"><I><U>Note
+these settings will disapears on logout</U>, you mght consider adding
+this to your autostart or setting it system wide! </I>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.3cm; margin-bottom: 0cm"><BR>
+</P>
+<P CLASS="western" STYLE="margin-left: 1.3cm; margin-bottom: 0cm">You
+should be ready to start Eclipse now.</P>
+
+<P CLASS="western" STYLE="margin-bottom: 0cm"><BR>
+</P>
+<H3 CLASS="western">FAQ</H3>
+<OL>
+	<LI><P CLASS="western"><I>When trying to start LTTng in Eclipse, I
+	end up with the following exception :<BR></I><FONT COLOR="#ff0000"><FONT FACE="Monospace"><FONT SIZE=2><I>Exception
+	in thread &quot;main&quot; java.lang.UnsatisfiedLinkError: no
+	lttvtraceread in java.library.path</I></FONT></FONT></FONT></P>
+	<P CLASS="western">This basically mean that Java can not find the C
+	library you just compile. To find any C library, java would normally
+	need to be passed a flag like &ldquo;-Djava.library.path=/somewhere/lib&rdquo;
+
+	but there seems to be a bug in Eclipse about it, as defined here :
+	<A HREF="https://bugs.eclipse.org/bugs/show_bug.cgi?id=290068">https://bugs.eclipse.org/bugs/show_bug.cgi?id=290068</A></P>
+	<P CLASS="western">Therefore, the workaround is to make sure to pass
+	a correct LD_LIBRARY_PATH to Eclipse (see section above about &ldquo;<I>Set
+	library path</I>&rdquo;). The best way to make sure the flag is
+	corerctly passed is to add it in front of the command that is called
+	to start Eclipse, on the command line or in the desktop shortcut
+	itself. 
+	</P>
+	<P CLASS="western">As example, here is the shortcut I use to call
+	Eclipse :</P>
+	<P STYLE="margin-bottom: 0.3cm"><FONT FACE="Arial, sans-serif"><FONT SIZE=2><I>export
+	LD_LIBRARY_PATH=&quot;/usr/local/lib&quot;;
+	/usr/local/eclipse/eclipse</I></FONT></FONT></P>
+
+</OL>
+<P STYLE="margin-bottom: 0.3cm"><BR><BR>
+</P>
+<OL START=2>
+	<LI><P CLASS="western">I did what you said in 1) but I'm still
+	getting the same error <I>:<BR></I><FONT COLOR="#ff0000"><FONT FACE="Monospace"><FONT SIZE=2><I>Exception
+	in thread &quot;main&quot; java.lang.UnsatisfiedLinkError: no
+	lttvtraceread in java.library.path</I></FONT></FONT></FONT></P>
+	<P CLASS="western">If your LD_LIBRARY_PATH is correct, then the only
+	reason why you might get this error is that you did not compile the
+	JNI interface inside LTTv. <BR>Go back to &ldquo;<I>Installation
+	steps</I>&rdquo; and make sure you used the development version of
+	LTTv and that you compiled it with the --<I>with-jni-interface</I><SPAN STYLE="font-style: normal">
+
+	flag</SPAN>.</P>
+</OL>
+<P CLASS="western"><BR><BR>
+</P>
+<OL START=3>
+	<LI><P CLASS="western">When I run LTTng in Eclipse, at some point, I
+	am getting an error like this :</P>
+	<P CLASS="western" STYLE="margin-bottom: 0cm"><FONT COLOR="#ff0000"><FONT FACE="Monospace"><FONT SIZE=2><I>Exception
+	in thread &quot;main&quot; java.lang.Error: Unresolved compilation
+	problem: </I></FONT></FONT></FONT>
+
+	</P>
+</OL>
+<P CLASS="western" ALIGN=LEFT STYLE="margin-left: 1.3cm; margin-bottom: 0cm">
+<FONT COLOR="#ff0000"><FONT FACE="Monospace"><FONT SIZE=2><I>The
+method ltt_someFunction() is undefined for the type JniXYZ</I></FONT></FONT></FONT><FONT COLOR="#ff0000"><FONT FACE="Monospace"><FONT SIZE=2><BR>	</FONT></FONT></FONT></P>
+<OL START=3>
+	<P CLASS="western">This may happen if the LTTv version you are using
+	is not recent enought. Make sure you are using the latest
+	development version, recompile the latest one if needed. If this
+	doesn't work, you might want to try the Beta JNI Build, as described
+	in &ldquo;<I>Download</I>&rdquo; section. If nothing work, please
+	submit a bug report. 
+	</P>
+	<P CLASS="western"></P>
+	<P CLASS="western"></P>
+
+</OL>
+<P CLASS="western"><BR><BR>
+</P>
+<P CLASS="western"><BR><BR>
+</P>
+<P CLASS="western"><BR><BR>
+</P>
+<P CLASS="western"><BR><BR>
+</P>
+<P CLASS="western" STYLE="margin-bottom: 0cm">
+</P>
+<P CLASS="western"><BR><BR>
+</P>
+</BODY>
+</HTML>
