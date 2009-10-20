@@ -1146,12 +1146,10 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 			TmfTimeRange trange) {
 		if (clearAllData) {
 			FlowModelFactory.getProcContainer().clearProcesses();
-			// Obtain the current process list
-			Vector<TimeRangeEventProcess> processList = FlowModelFactory
+			// Obtain the current process array
+			TimeRangeEventProcess[] processArr = FlowModelFactory
 					.getProcContainer().readProcesses();
-			// convert it to an Array as expected by the widget
-			TimeRangeEventProcess[] processArr = processList
-					.toArray(new TimeRangeEventProcess[processList.size()]);
+			
 
 			// initialise to an empty model
 			flowModelUpdates(processArr, -1, -1, false);
@@ -1186,12 +1184,9 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 			experimentStartTime = experimentTimeRange.getStartTime().getValue();
 			experimentEndTime = experimentTimeRange.getEndTime().getValue();
 		}
-		// Obtain the current process list
-		Vector<TimeRangeEventProcess> processList = FlowModelFactory
+		// Obtain the current process array
+		TimeRangeEventProcess[] processArr = FlowModelFactory
 				.getProcContainer().readProcesses();
-		// convert it to an Array as expected by the widget
-		TimeRangeEventProcess[] processArr = processList
-				.toArray(new TimeRangeEventProcess[processList.size()]);
 		// Sort the array by pid
 		Arrays.sort(processArr);
 
@@ -1214,8 +1209,8 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		if (TraceDebug.isDEBUG()) {
 			int eventCount = 0;
 			Long count = smanager.getEventCount();
-			for (TimeRangeEventProcess process : processList) {
-				eventCount += process.getTraceEvents().size();
+			for ( int pos = 0; pos<processArr.length; pos++ ) {
+				eventCount += processArr[pos].getTraceEvents().size();
 			}
 
 			int discarded = FlowModelFactory.getParamsUpdater()

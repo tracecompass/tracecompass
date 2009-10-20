@@ -186,7 +186,7 @@ ITmfTimeAnalysisEntry {
 	}
 
 	/**
-	 * Reset this resource to the construction state except for
+	 * Reset this resource to the construction state
 	 */
 	public void reset() {
 		getChildEventComposites().clear();

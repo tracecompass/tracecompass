@@ -42,7 +42,7 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 	protected TimeRangeEventProcess addLocalProcess(LttngProcessState stateProcess, long traceStartTime, long traceEndTime, String traceId) {
 		// TimeRangeEventProcess localProcess = new TimeRangeEventProcess(id, name, startTime, stopTime, groupName, className)
 		TimeRangeEventProcess localProcess = new TimeRangeEventProcess(
-				procContainer.bookProcId(), stateProcess.getName(),
+				procContainer.getUniqueId(), stateProcess.getName(),
 				traceStartTime, traceEndTime, "", stateProcess.getType()
 						.getInName(), stateProcess.getCpu(), stateProcess
 						.getInsertion_time().getValue());
@@ -54,7 +54,7 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 		localProcess.setBrand(stateProcess.getBrand());
 		localProcess.setTraceID(traceId);
 		localProcess.setProcessType(stateProcess.getType().getInName());
-		procContainer.addProcesse(localProcess);
+		procContainer.addProcess(localProcess);
 		return localProcess;
 	}
 	

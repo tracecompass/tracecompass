@@ -41,7 +41,7 @@ public class FlowTRangeFinishUpdateHandler extends AbsFlowTRangeUpdate
 		long endReqTime = traceSt.getInputDataRef().getTraceTimeWindow()
 				.getEndTime().getValue();
 		TraceDebug.debug("Number of localProcesses: "
-				+ procContainer.readProcesses().size());
+				+ procContainer.readProcesses().length);
 		// to identify the process relevant to the traceState
 		String traceId = traceSt.getTraceId();
 		int numLocalFound = 0;

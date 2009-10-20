@@ -51,6 +51,19 @@ public class TimeRangeEventProcess extends TimeRangeComposite implements
 	// ========================================================================
 	// Methods
 	// =======================================================================
+	
+	
+	/**
+     * Interface to add children to this process
+     * 
+     * @param newEvent
+     */
+    public void addChildren(TimeRangeEvent newEvent) {
+        if ((newEvent != null)) {
+            this.ChildEventLeafs.add(newEvent);
+        }
+    }
+	
 	/**
 	 * @return
 	 */

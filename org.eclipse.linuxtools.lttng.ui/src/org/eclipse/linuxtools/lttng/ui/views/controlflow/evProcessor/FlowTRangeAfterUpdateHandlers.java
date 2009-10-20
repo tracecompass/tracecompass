@@ -60,7 +60,7 @@ class FlowTRangeAfterUpdateHandlers {
                 }
 				
 				//hashed_process_data = processlist_get_process_data(process_list,pid_out,process->cpu,&birth,trace_num);
-				TimeRangeEventProcess localProcess = procContainer.findProcess(process_in.getPid(), process_in.getCreation_time().getValue(), traceSt.getTraceId() );
+				TimeRangeEventProcess localProcess = procContainer.findProcess(process_in.getPid(), process_in.getCpu(), traceSt.getTraceId(),process_in.getCreation_time().getValue() );
 				
 				if ( localProcess == null ) {
 					if ( (pid_in == 0) || (pid_in != process_in.getPpid()) ) {
@@ -139,7 +139,7 @@ class FlowTRangeAfterUpdateHandlers {
                 LttngProcessState process_child = lttv_state_find_process(traceSt, trcEvent.getCpuId(), child_pid );
 			    
 			    if ( process_child != null ) {
-			        TimeRangeEventProcess localProcess = procContainer.findProcess(process_child.getPid(), process_child.getCreation_time().getValue(), traceSt.getTraceId() );
+			        TimeRangeEventProcess localProcess = procContainer.findProcess(process_child.getPid(), process_child.getCpu(), traceSt.getTraceId(), process_child.getCreation_time().getValue() );
 			        
 			        if ( localProcess == null ) {
 			            if ( (child_pid == 0) || (child_pid != process_child.getPpid()) ) {            
@@ -198,7 +198,7 @@ class FlowTRangeAfterUpdateHandlers {
 			        //   if(likely(process_list->current_hash_data[trace_num][cpu] != NULL) ){
 		            //        hashed_process_data = process_list->current_hash_data[trace_num][cpu];
 		            //   }
-			        TimeRangeEventProcess localProcess = procContainer.findProcess(process.getPid(), process.getCreation_time().getValue(), traceSt.getTraceId());
+			        TimeRangeEventProcess localProcess = procContainer.findProcess(process.getPid(), process.getCpu(), traceSt.getTraceId(),  process.getCreation_time().getValue());
 			        
 			        if ( localProcess == null ) {
 			            if ( (process.getPid() == 0) || (process.getPid() != process.getPpid()) ) {			                
@@ -246,7 +246,7 @@ class FlowTRangeAfterUpdateHandlers {
 
                 if ( process != null ) {
                     
-                    TimeRangeEventProcess localProcess = procContainer.findProcess(process.getPid(), process.getCreation_time().getValue(), traceSt.getTraceId());
+                    TimeRangeEventProcess localProcess = procContainer.findProcess(process.getPid(),  process.getCpu(), traceSt.getTraceId(), process.getCreation_time().getValue());
                     
                     if ( localProcess == null ) {
                         if ( (process.getPid() == 0) || (process.getPid() != process.getPpid()) ) {
@@ -302,7 +302,7 @@ class FlowTRangeAfterUpdateHandlers {
                     //   if(likely(process_list->current_hash_data[trace_num][cpu] != NULL) ){
                     //        hashed_process_data = process_list->current_hash_data[trace_num][cpu];
                     //   }
-                    TimeRangeEventProcess localProcess = procContainer.findProcess(process.getPid(), process.getCreation_time().getValue(), traceSt.getTraceId());
+                    TimeRangeEventProcess localProcess = procContainer.findProcess(process.getPid(), process.getCpu(), traceSt.getTraceId(), process.getCreation_time().getValue());
                     
                     if ( localProcess == null ) {
                         if ( (process.getPid() == 0) || (process.getPid() != process.getPpid()) ) {                         
@@ -382,7 +382,7 @@ class FlowTRangeAfterUpdateHandlers {
     			        LttngProcessState process_in = lttv_state_find_process(traceSt, trcEvent.getCpuId(), pid_in );
     			        
     			        if ( process_in != null ) {
-    			            TimeRangeEventProcess localProcess = procContainer.findProcess(process_in.getPid(), process_in.getCreation_time().getValue(), traceSt.getTraceId());
+    			            TimeRangeEventProcess localProcess = procContainer.findProcess(process_in.getPid(), process_in.getCpu(), traceSt.getTraceId(), process_in.getCreation_time().getValue());
     	                    
     			            if (localProcess == null) {
         			            if ( (process_in.getPid() == 0) || (process_in.getPid() != process_in.getPpid()) ) {

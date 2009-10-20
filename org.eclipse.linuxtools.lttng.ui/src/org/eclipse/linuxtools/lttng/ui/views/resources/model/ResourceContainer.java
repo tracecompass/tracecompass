@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
+ *   Alvaro Sanchez-Leon - Initial API and implementation
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.resources.model;
 
@@ -25,10 +25,16 @@ import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource.Resou
  * 
  */
 public class ResourceContainer {
-    
+	// ========================================================================
+	// Data
+	// ========================================================================
 	private final HashMap<ResourceKey, TimeRangeEventResource> resources = new HashMap<ResourceKey, TimeRangeEventResource>();
 	private static Integer uniqueId = 0;
 	
+	
+	// ========================================================================
+	// Constructor
+	// ========================================================================
 	/**
 	 * Package level constructor
 	 */
@@ -45,7 +51,9 @@ public class ResourceContainer {
 		}
 	}
 	
-	
+	// ========================================================================
+	// Methods
+	// ========================================================================
 	/**
      * Request a unique ID
      * 
@@ -73,7 +81,6 @@ public class ResourceContainer {
 	 * @param traceId
 	 */
 	public void clearChildren(String traceId) {
-	    
 	    TimeRangeEventResource newRes = null;
         Iterator<ResourceKey> iterator = resources.keySet().iterator();
         
@@ -94,7 +101,7 @@ public class ResourceContainer {
 	}
 
 	/**
-	 * remove the resources related to a specific trace e.g. during trace
+	 * Remove the resources related to a specific trace e.g. during trace
 	 * removal
 	 * 
 	 * @param traceId
@@ -114,81 +121,23 @@ public class ResourceContainer {
 	
 	
 	/**
-     * Obtain a resource id from resource attributes<br>
-     * <br>
-     * Note : Slow as hell and defeat the purpose of the map. 
-     *        This function probably shouldn't be used, except for testing.
-     * 
-     */
-    public Long findUniqueIdOfresource(Long startTime, Long endTime, String name, String groupName, String className, ResourceTypes type, String traceId) {
-        
-        Long foundId = null;
-        
-        ResourceKey newKey = null;
-        TimeRangeEventResource newContent = null;
-        
-        Iterator<ResourceKey> iterator = resources.keySet().iterator();
-        while ( (iterator.hasNext()) && (foundId == null) ) {
-            newKey = iterator.next();
-            newContent = resources.get(newKey);
-            
-            if ( ( newContent.getStartTime() == startTime ) && ( newContent.getStopTime() == endTime ) && ( newContent.getName() == name ) &&
-                 ( newContent.getGroupName() == groupName ) && ( newContent.getClassName() == className ) && ( newContent.getType() == type ) &&
-                 ( newContent.getTraceId() == traceId ) ) 
-            {
-                foundId = newKey.getResourceId();
-            }
-        }
-        
-        return foundId;
-        
-    }
-	
-	/**
-	 * Search by keys (resourceId, traceId and type)<br>
-	 * <br>
+	 * Search by keys (resourceId, traceId and type)<p>
+	 * 
      * A match is returned if the three arguments received match an entry
      *  Otherwise null is returned
+     *  
+     * @param searchedId        The ressourceId we are looking for
+     * @param searchedType      The ressourceType we are looking for
+     * @param searchedTraceId   The traceId (trace name?) we are looking for
      * 
-     * @return
+     * @return TimeRangeEventResource
      */
     public TimeRangeEventResource findResource(Long searchedId, ResourceTypes searchedType, String searchedTraceId) {
-        
-        TimeRangeEventResource foundResource = null;
-        
 		// Get the EventResource associated to a key we create here
-        TimeRangeEventResource tmpRes = resources.get( new ResourceKey(searchedId, searchedTraceId, searchedType) );
-        
-        if ( tmpRes != null ) {
-            foundResource = tmpRes;
-        }
+        TimeRangeEventResource foundResource = resources.get( new ResourceKey(searchedId, searchedTraceId, searchedType) );
         
         return foundResource;
     }
-	
-	/**
-	 * Search by name<br>
-	 * <br>
-	 * A match is returned if the four arguments received match an entry in the
-	 *     Otherwise null is returned
-	 * 
-	 * @return
-	 */
-	public TimeRangeEventResource findResourceFilterByName(Long searchedId, ResourceTypes searchedType, String searchedTraceId, String searchedName) {
-	    
-	    TimeRangeEventResource foundResource = null;
-	    
-	    // Get the EventResource asociated to a key we create here
-	    TimeRangeEventResource tmpRes = resources.get( new ResourceKey(searchedId, searchedTraceId, searchedType) );
-	    
-	    if ( tmpRes != null ) {
-            if ( tmpRes.getName().equals(searchedName) ) {
-                foundResource = tmpRes;
-            }
-	    }
-	    
-		return foundResource;
-	}
 	
 	/* 
      *  MAIN : For testing only!
@@ -313,8 +262,9 @@ class ResourceKey {
     
     @Override
     public String toString() {
-        return (getResourceId().toString() + ":" + getTraceId().toString() + ":" + getType().toString());
-        
+        if ( valueRef != null ) {
+            return (valueRef.getResourceId().toString() + ":" + valueRef.getTraceId().toString() + ":" + valueRef.getType().toString());
+        }
+        return (resourceId + ":" + traceId + ":" + type);
     }
 }
-
