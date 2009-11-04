@@ -106,9 +106,9 @@ public class TmfExperiment extends TmfComponent implements ITmfRequestHandler<Tm
     	fIndexPageSize = indexPageSize;
         fWaitForIndexCompletion = waitForIndexCompletion;
 
-        updateNbEvents();
+		updateNbEvents();
 		updateTimeRange();
-		indexExperiment();
+//		indexExperiment();
     }
 
     /**
