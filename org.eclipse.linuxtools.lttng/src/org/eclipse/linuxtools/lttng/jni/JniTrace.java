@@ -338,7 +338,19 @@ public class JniTrace extends Jni_C_Common {
         }
     }
         
-        
+    /**
+     * Return the top event in the events stack, determined by timestamp, in the trace (all the tracefiles).<p>
+     * 
+     * Note : If the events were read before, the top event and the event currently loaded (currentEvent) are most likely the same.
+     * 
+     * @return The top event in the stack or null if no event is available.
+     * 
+     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
+     */
+    public JniEvent findNextEvent() {
+        return eventsHeap.peek();
+    }
+    
     /**
      * Return the next event in the events stack, determined by timestamp, in the trace (all the tracefiles).<p>
      * 
@@ -384,62 +396,145 @@ public class JniTrace extends Jni_C_Common {
     }
     
     /**
-     * Return the top event in the events stack, determined by timestamp, in the trace (all the tracefiles).<p>
+     * Read the next event on a certain tracefile.<p>
      * 
-     * Note : If the events were read before, the top event and the event currently loaded (currentEvent) are most likely the same.
+     * By calling this function make sure the "global" readNextEvent() stay synchronised.
+     * Calling  readNextEvent() after this function will consider this tracefile moved and is then consistent.
      * 
-     * @return The top event in the stack or null if no event is available.
+     * @param targetTracefile 	The tracefile object to read from
      * 
+     * @return The next event in the tracefile or null if no event is available.
+     * 
+     * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
      * @see org.eclipse.linuxtools.lttng.jni.JniEvent
      */
-    public JniEvent findNextEvent() {
-        return eventsHeap.peek();
+    public JniEvent readNextEvent(JniTracefile targetTracefile) {
+        JniEvent returnedEvent = null;
+    	
+        // There is 2 special cases where we should read the CURRENT event, not the next one
+        // 1- The currentEvent is null                      --> We never read or we just seeked
+        // 2- The currentEvent is of another type  --> We last read on a DIFFERENT tracefile
+        if ( (currentEvent == null) || 
+              (currentEvent.getParentTracefile().equals(targetTracefile) == false)
+            ) {
+            returnedEvent = targetTracefile.getCurrentEvent();
+            // Save the event we read
+            currentEvent = returnedEvent; 
+        }
+        else {
+        	// Remove from the event related to this tracefile from the event heap, if it exists.
+        	// WARNING : This only safe as long getCurrentEvent() never return "null" in any case.
+        	eventsHeap.remove(targetTracefile.getCurrentEvent() );
+        	
+        	// If status EOK, we can return the event, otherwise something wrong happen (out of range, read error, etc...)
+        	if ( targetTracefile.readNextEvent() == EOK) {
+        	    returnedEvent = targetTracefile.getCurrentEvent();
+        		// Add back to the heap the read event
+        		eventsHeap.add(returnedEvent);
+        	}
+        	// Save the event we read... 
+        	// Note : might be null if the read failed and it's ok
+        	currentEvent = targetTracefile.getCurrentEvent(); 
+        }
+        
+    	return returnedEvent;
     }
     
     /**
-     * Seek to a certain timestamp and read the next event.
-     * <p>
-     * If no more events are available or an error happen, null will be returned.
-     * 
-     * @param seekTime      The time where we want to seek to.
-     * 
-     * @return The event just after the seeked time or null if none available.
-     * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
-     * @see org.eclipse.linuxtools.lttng.jni.JniTime
-     */
-     public JniEvent seekAndRead(JniTime seekTime) { 
-          JniEvent returnedEvent = null;
-          seekToTime(seekTime);
-              
-          // The trace should be correctly positionned, let's get the event
-          returnedEvent = readNextEvent();
-               
-          return returnedEvent;
-     }
-    
-     /**
-      * Seek to a certain time but <b>do not</b> read the next event.<p>
-      * 
-      * This only position the trace, it will not return anything.<p>
-      * 
-      * @param seekTime     The time where we want to seek to
-      * 
-      * @see org.eclipse.linuxtools.lttng.jni.JniTime
-      */
-      public void seekToTime(JniTime seekTime) {
-          
-           Object tracefile_name = null;
-           Iterator<String> iterator = tracefilesMap.keySet().iterator();
-           
-           while (iterator.hasNext() ) {
-               // We seek to the given event for ALL tracefiles
-               tracefile_name = iterator.next();
-               tracefilesMap.get(tracefile_name).seekToTime(seekTime);
-           }
-           
-           populateEventHeap();
-      }
+    * Seek to a certain time but <b>do not</b> read the next event.<p>
+    * 
+    * This only position the trace, it will not return anything.<p>
+    * 
+    * @param seekTime     The time where we want to seek to
+    * 
+    * @see org.eclipse.linuxtools.lttng.jni.JniTime
+    */
+    public void seekToTime(JniTime seekTime) {
+        
+        // Invalidate the last read event
+        currentEvent = null;
+        
+        Object tracefile_name = null;
+    	Iterator<String> iterator = tracefilesMap.keySet().iterator();
+    	
+    	while (iterator.hasNext() ) {
+    	    // We seek to the given event for ALL tracefiles
+    	    tracefile_name = iterator.next();
+    		seekToTime(seekTime, tracefilesMap.get(tracefile_name));
+    	}
+    	
+    	populateEventHeap();
+    }
+	
+    /**
+    * Seek to a certain time on a certain tracefile but <b>do not</b> read the next event.<p>
+    * 
+    * This only position the trace, it will not return anything.<p>
+    * 
+    * @param targetTracefile 	The tracefile object to read from
+    * @param seekTime     		The time where we want to seek to
+    * 
+    * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
+    * @see org.eclipse.linuxtools.lttng.jni.JniTime
+    */
+    public void seekToTime(JniTime seekTime, JniTracefile targetTracefile) {
+        // Invalidate the current read event
+        currentEvent = null;
+        
+        // Remove from the event related to this tracefile from the event heap, if it exists.
+        // WARNING : This only safe as long getCurrentEvent() never return "null" in any case.
+        eventsHeap.remove(targetTracefile.getCurrentEvent() );
+        
+        // Perform the actual seek on the tracefile
+        // Add the event to the heap if it succeed
+        if ( targetTracefile.seekToTime(seekTime) == EOK) {
+        	// Add back to the heap the read event
+            eventsHeap.add(targetTracefile.getCurrentEvent());
+        }
+    }
+	
+    /**
+    * Seek to a certain timestamp and read the next event.
+    * <p>
+    * If no more events are available or an error happen, null will be returned.
+    * 
+    * @param seekTime      The time where we want to seek to.
+    * 
+    * @return The event just after the seeked time or null if none available.
+    * 
+    * @see org.eclipse.linuxtools.lttng.jni.JniEvent
+    * @see org.eclipse.linuxtools.lttng.jni.JniTime
+    */
+    public JniEvent seekAndRead(JniTime seekTime) { 
+         JniEvent returnedEvent = null;
+         seekToTime(seekTime);
+            
+         // The trace should be correctly positionned, let's get the event
+         returnedEvent = readNextEvent();
+             
+         return returnedEvent;
+    }
+	
+    /**
+    * Seek to a certain timestamp on a certain tracefile and read the next event.<p>
+    * 
+    * If no more events are available or an error happen, null will be returned.
+    * 
+    * Calling  readNextEvent() after this function will consider this tracefile moved and is then consistent.<br>
+    * 
+    * @param tracefileName   The tracefile object to read from
+    * @param seekTime           The time where we want to seek to
+    * 
+    * @return The event just after the seeked time or null if none available.
+    * 
+    * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
+    * @see org.eclipse.linuxtools.lttng.jni.JniTime
+    * @see org.eclipse.linuxtools.lttng.jni.JniEvent
+    */
+    public JniEvent seekAndRead(JniTime seekTime, JniTracefile targetTracefile) { 
+        seekToTime(seekTime, targetTracefile);
+        return readNextEvent(targetTracefile);
+    }
      
     /**
      * Get a certain tracefile from its given name.<p>

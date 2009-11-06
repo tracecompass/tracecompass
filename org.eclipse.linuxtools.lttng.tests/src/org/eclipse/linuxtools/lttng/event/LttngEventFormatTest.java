@@ -21,7 +21,7 @@ import org.junit.Test;
 public class LttngEventFormatTest {
 	private final static boolean skipIndexing=true;
 	private final static boolean waitForCompletion=true;
-    private final static String tracepath1="traceset/trace_617984ev_withlost";
+    private final static String tracepath1="traceset/trace-618339events-1293lost-1cpu";
     
     private final static long   timestampAfterMetadata 		 = 952090116049L;
     

@@ -21,7 +21,7 @@ import org.junit.Test;
 
 public class JniMarkerTest
 {
-        private final static String tracepath="traceset/trace_617984ev_withlost";
+        private final static String tracepath="traceset/trace-618339events-1293lost-1cpu";
         private final static String eventName="kernel0";
         
         private final static int    numberOfMarkersFieldInMarker = 3;

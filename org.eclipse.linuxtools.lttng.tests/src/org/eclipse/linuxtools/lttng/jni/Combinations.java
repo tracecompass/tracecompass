@@ -19,7 +19,7 @@ import org.junit.Test;
  */
 public class Combinations {
 
-    private final static String tracepath="traceset/trace_617984ev_withlost";
+    private final static String tracepath="traceset/trace-618339events-1293lost-1cpu";
 	private final static String eventName = "syscall_state";
 
 	private final static Integer expect_syscall_entry = 195596;

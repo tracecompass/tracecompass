@@ -26,7 +26,7 @@ import org.junit.Test;
 
 public class LTTngTraceTest {
 	
-    private final static String tracepath1="traceset/trace_617984ev_withlost";
+    private final static String tracepath1="traceset/trace-618339events-1293lost-1cpu";
     private final static String wrongTracePath="/somewhere/that/does/not/exist";
     
     private final static boolean waitForCompletion=true;

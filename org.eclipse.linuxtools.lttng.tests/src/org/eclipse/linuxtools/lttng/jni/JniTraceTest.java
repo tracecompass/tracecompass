@@ -54,8 +54,8 @@ import org.junit.Test;
 
 public class JniTraceTest
 {
-        private final static String tracepath1="traceset/trace_617984ev_withlost";
-        private final static String tracepath2="traceset/trace_211064ev_nolost";
+        private final static String tracepath1="traceset/trace-618339events-1293lost-1cpu";
+        private final static String tracepath2="traceset/trace-1021events-nolost-1cpu";
         private final static String wrongTracePath="/somewhere/that/does/not/exist";
         
         private final static String correctTracefileName="kernel0";
@@ -64,10 +64,19 @@ public class JniTraceTest
         private final static int   numberOfTracefilesInTrace = 18;
         
         private final static long   firstEventTimestamp = 952088954601L;
+        private final static String firstEventTracefilename = "metadata0";
+        
+        private final static long   secondEventTimestamp = 952088959952L;
         private final static String secondEventName = "metadata";
+        
+        private final static long  thirdEventTimestamp = 952088965599L;
+        
+        private final static long   eventTimestampAfterMetadata = 952090116049L;
+        private final static String eventTracefilenameAfterMetadata = "kernel0";
         
         private final static long   timestampToSeekTest1 = 953852206193L;
         private final static String eventNameAfterSeekTest1 = "kernel";
+        private final static String eventTracefilenameAfterSeekTest1 = "kernel0";
         private final static String nextEventNameAfterSeekTest1 = "fs";
         
         private final static long   timestampToSeekTest2 = 953852210706L;
@@ -332,5 +341,58 @@ public class JniTraceTest
                 testEvent = testTrace.readNextEvent();
                 assertNotSame("seekToTime(time) to seek back returned null",null,testEvent);
                 assertEquals("seekToTime(time) timestamp after seek back is incoherent",firstEventTimestamp,testEvent.getEventTime().getTime());
+        }
+        
+        @Test
+        public void testEventDisplacementByTracefile() {
+        
+                JniEvent testEvent = null; 
+                JniTrace testTrace = prepareTraceToTest();
+                
+                // Read first event for the metadata (which is also the first event in the trace)
+                testEvent = testTrace.readNextEvent(testTrace.requestTracefileByName(firstEventTracefilename) );
+                assertNotSame("readNextEvent() returned null",null,testEvent);
+                assertEquals("readNextEvent() timestamp is incoherent",firstEventTimestamp,testEvent.getEventTime().getTime() );
+                
+                // If we read the next event again for this tracefile, we should get the SECOND event
+                testEvent = testTrace.readNextEvent(testTrace.requestTracefileByName(firstEventTracefilename));
+                assertNotSame("readNextEvent() on second read returned null",null,testEvent);
+                assertEquals("readNextEvent() timestamp on second read  is incoherent",secondEventTimestamp,testEvent.getEventTime().getTime() );
+                
+                // Reading the "global" event should take care of the change
+                // So if we read the next event, we should get the THIRD event
+                testEvent = testTrace.readNextEvent();
+                assertNotSame("readNextEvent() to read global event returned null",null,testEvent);
+                assertEquals("readNextEvent() timestamp to read global event is incoherent",thirdEventTimestamp,testEvent.getEventTime().getTime());
+                
+                // Now read the next event for another type of tracefile
+                testEvent = testTrace.readNextEvent(testTrace.requestTracefileByName(eventTracefilenameAfterMetadata) );
+                assertNotSame("readNextEvent() returned null",null,testEvent);
+                assertEquals("readNextEvent() timestamp is incoherent",eventTimestampAfterMetadata,testEvent.getEventTime().getTime() );
+                
+                
+                // Seek back to the beginning
+                testTrace.seekToTime(new JniTime(firstEventTimestamp), testTrace.requestTracefileByName(firstEventTracefilename) );
+                // Read the first event
+                testEvent = testTrace.readNextEvent(testTrace.requestTracefileByName(firstEventTracefilename) );
+                assertNotSame("readNextEvent() after seekToTime returned null",null,testEvent);
+                assertEquals("readNextEvent() after seekToTime timestamp is incoherent",firstEventTimestamp,testEvent.getEventTime().getTime() );
+                
+                // Seek and Read the first event for the metadata (again the first event in the trace)
+                testEvent = testTrace.seekAndRead(new JniTime(firstEventTimestamp), testTrace.requestTracefileByName(firstEventTracefilename) );
+                assertNotSame("seekAndRead() returned null",null,testEvent);
+                assertEquals("seekAndRead() timestamp is incoherent",firstEventTimestamp,testEvent.getEventTime().getTime() );
+                
+                // Seek the whole trace to the infinity
+                testTrace.seekToTime(new JniTime(Long.MAX_VALUE));
+                // Seek and Read the next event in the trace
+                testEvent = testTrace.seekAndRead(new JniTime(timestampToSeekTest1), testTrace.requestTracefileByName(eventTracefilenameAfterSeekTest1) );
+                assertNotSame("seekAndRead() returned null",null,testEvent);
+                assertEquals("seekAndRead() timestamp is incoherent",timestampToSeekTest1,testEvent.getEventTime().getTime() );
+                // Read next event... only the same type should be here as other are exhausted
+                testEvent = testTrace.readNextEvent();
+                assertNotSame("readNextEvent() after seekToTime returned null",null,testEvent);
+                assertEquals("readNextEvent() name after seekToTime is incoherent",eventNameAfterSeekTest1,testEvent.getParentTracefile().getTracefileName());
+                
         }
 }
