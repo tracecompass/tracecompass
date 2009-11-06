@@ -11,8 +11,6 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.controlflow.evProcessor;
 
-import java.util.List;
-
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.state.StateStrings.Events;
 import org.eclipse.linuxtools.lttng.state.StateStrings.Fields;
@@ -387,8 +385,10 @@ class FlowTRangeBeforeUpdateHandlers {
 				// present in the state provider?
 				// This seems more direct. and makes sure all processes are
 				// reflected in the control flow view.
-				List<LttngProcessState> processes = traceSt.getProcesses();
-				for (LttngProcessState process : processes) {
+				LttngProcessState[] processes = traceSt.getProcesses();
+				for (int pos=0; pos < processes.length; pos++) {
+					LttngProcessState process = processes[pos];
+					
 					// Replace the C call :
 					// hashed_process_data =
 					// processlist_get_process_data(process_list,pid,process->cpu,&birth,trace_num);

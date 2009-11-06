@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.lttng.ui.views.controlflow.model;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventProcess;
 
 /**
@@ -173,13 +174,28 @@ class ProcessKey {
         
         if ( obj instanceof ProcessKey ) {
         	ProcessKey procKey = (ProcessKey) obj;
-            if ( (procKey.getPid().equals(this.getPid()) ) &&
-                 (procKey.getTraceId().equals(this.getTraceId()) ) &&
-                 (procKey.getCpuId().equals(this.getCpuId()) ) &&
-                 (procKey.getCreationtime().equals(this.getCreationtime()) )  )
-            {
-                isSame = true;
-            }
+        	
+        	if ( valueRef != null ) {
+	            if ( (procKey.getPid().equals(valueRef.getPid()) ) &&
+	                 (procKey.getTraceId().equals(valueRef.getTraceID()) ) &&
+	                 (procKey.getCpuId().equals(valueRef.getCpu()) ) &&
+	                 (procKey.getCreationtime().equals(valueRef.getCreationTime()) )  )
+	            {
+	                isSame = true;
+	            }
+        	}
+        	else {
+        		if ( (procKey.getPid().equals(this.pid ) ) &&
+   	                 (procKey.getTraceId().equals(this.traceId ) ) &&
+   	                 (procKey.getCpuId().equals(this.cpuId ) ) &&
+   	                 (procKey.getCreationtime().equals(this.creationtime ) )  )
+   	            {
+   	                isSame = true;
+   	            }
+        	}
+        }
+        else {
+        	TraceDebug.debug("ERROR : The given key is not of the type ProcessKey!" + obj.getClass().toString());
         }
         
         return isSame;

@@ -3,8 +3,6 @@
  */
 package org.eclipse.linuxtools.lttng.state.evProcessor.state;
 
-import java.util.List;
-
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.event.LttngEventContent;
@@ -146,29 +144,9 @@ public abstract class AbsStateProcessing {
 	 * @return
 	 */
 	protected LttngProcessState lttv_state_find_process(
-			LttngTraceState traceState, Long cpu, Long pid) {
-		// Define the return value
-		LttngProcessState returnedProcess = null;
+							LttngTraceState traceState, Long cpu, Long pid) {
 
-		// Obtain the list of available processes
-		List<LttngProcessState> processList = traceState.getProcesses();
-
-		// FIXME: This needs be more efficient e.g. introduce a class with a
-		// overriden hash and equals to consider the key values pid, cpu and
-		// traceid and iterate over a collection of this new type.
-		int pos = 0;
-		while ((pos < processList.size()) && (returnedProcess == null)) {
-			if (processList.get(pos).getPid().equals(pid)) {
-				if ((processList.get(pos).getCpu().equals(cpu))
-						|| (cpu.longValue() == 0L)) {
-					returnedProcess = processList.get(pos);
-				}
-			}
-
-			pos++;
-		}
-
-		return returnedProcess;
+		return traceState.findProcessState(pid, cpu, traceState.getTraceId());
 	}
 
 	protected void sendNoFieldFoundMsg(TmfEventField[] fields,

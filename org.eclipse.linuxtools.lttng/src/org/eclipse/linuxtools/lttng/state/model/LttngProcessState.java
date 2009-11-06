@@ -48,7 +48,8 @@ public class LttngProcessState implements Cloneable {
 	
 	private String userTrace = null; /* Associated file trace  */
 	private Long target_pid = null; /* target PID of the current event. */
-
+	private String trace_id = null;
+	
 	// ========================================================================
 	// Constructor
 	// =======================================================================
@@ -58,16 +59,18 @@ public class LttngProcessState implements Cloneable {
 		this.tgid = 0L;
 		this.name = StateStrings.ProcessStatus.LTTV_STATE_UNNAMED.getInName();
 		this.insertion_time = startTime;
+		this.trace_id = "";
 		init();
 	}
 
 	public LttngProcessState(Long cpu, Long pid, Long tgid,
-			String name, TmfTimestamp startTime) {
+			String name, TmfTimestamp startTime, String traceId) {
 		this.cpu = cpu;
 		this.pid = pid;
 		this.tgid = tgid;
 		this.name = name;
 		this.insertion_time = startTime;
+		this.trace_id = traceId;
 		init();
 	}
 
@@ -134,6 +137,7 @@ public class LttngProcessState implements Cloneable {
             newState.free_events = this.free_events;
             newState.userTrace = this.userTrace;
             newState.target_pid = this.target_pid;
+            newState.trace_id = this.trace_id;
             
 			// No clonable implemented in TMF, we will use copy constructor
             // NOTE : we GOT to check for null to avoid crashing on null pointer here!
@@ -364,7 +368,15 @@ public class LttngProcessState implements Cloneable {
 	public void setTarget_pid(Long targetPid) {
 		target_pid = targetPid;
 	}
+	
+	public String getTrace_id() {
+		return trace_id;
+	}
 
+	public void setTrace_id(String traceId) {
+		trace_id = traceId;
+	}
+	
 	/**
 	 * @return the free_events
 	 */
@@ -468,7 +480,7 @@ public class LttngProcessState implements Cloneable {
     
     public LttngExecutionState popFromExecutionStack() {
        if (execution_stack.size() <= 1) {
-            TraceDebug.debug("Removing last item from execution stack is not allowed! (popFromExecutionStack)");
+    	   TraceDebug.debug("Removing last item from execution stack is not allowed! (popFromExecutionStack)");
             return null;
         }
         else {
@@ -486,72 +498,4 @@ public class LttngProcessState implements Cloneable {
     public LttngExecutionState getFirstElementFromExecutionStack() {
         return execution_stack.firstElement();
     }
-	
-	/* 
-     *  MAIN : For testing only!
-     */
-     public static void main(String[] args) {
-         
-         // !!! TESTING CLONE HERE !!!
-         
-         // *** New object with some args set to "123"
-         LttngProcessState joie = new LttngProcessState(new TmfTimestamp(123L, (byte) -9));
-         
-         // Stack not empty by default??
-         System.out.println("Emptying stack... Trashing empty instance of : " + joie.popFromExecutionStack() );
-         
-         joie.setCpu(123L);
-         joie.setName("123");
-         
-         LttngExecutionState testEx1 = new LttngExecutionState();
-         testEx1.setCum_cpu_time(123L);
-         testEx1.setChange_Time(new TmfTimestamp(123L, (byte) -9));
-         testEx1.setEntry_Time(new TmfTimestamp(123L, (byte) -9));
-         
-         // Print testEx1 reference
-         System.out.println("testEx1 reference : " + testEx1);
-         
-         joie.pushToExecutionStack(testEx1);
-         joie.pushToUserStack(123L);
-         
-         
-         
-         // *** New object cloned from the first one
-         LttngProcessState joie2 = (LttngProcessState)joie.clone();
-         
-         
-         // *** Modification of the FIRST object : Everything to "456"
-         joie.setCpu(456L);
-         joie.setName("456");
-         testEx1.setCum_cpu_time(456L);
-         testEx1.setChange_Time(new TmfTimestamp(456L, (byte) -9));
-         testEx1.setEntry_Time(new TmfTimestamp(456L, (byte) -9));
-         
-         // Push new object on stack of the FIRST object
-         LttngExecutionState testEx2 = new LttngExecutionState();
-         testEx2.setCum_cpu_time(456L);
-         joie.pushToExecutionStack(testEx2);
-         joie.pushToUserStack(456L);
-         
-         
-         // *** TEST : Everything should be "123L" stil
-         System.out.println("123 == " + joie2.getCpu() );
-         System.out.println("123 == " + joie2.getName() );
-         
-         LttngExecutionState newtestEx1 = joie2.popFromExecutionStack();
-         // Print newtestEx1 reference
-         System.out.println("testEx1 reference : " + newtestEx1);
-         
-         System.out.println("123 == " + newtestEx1.getCum_cpu_time() );
-         System.out.println("123 == " + joie2.popFromUserStack() );
-         
-         // *** LAST TEST : The joie2 stack should be empty, only joie1 stack contains more than 1 object  
-         try {
-             System.out.println("123 == " + joie2.popFromExecutionStack().getCum_cpu_time() );
-         }
-         catch ( Exception e) {
-             System.out.println("All fine");
-         }
-     }
-     
 }

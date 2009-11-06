@@ -15,7 +15,6 @@ package org.eclipse.linuxtools.lttng.state;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Observable;
 import java.util.Set;
 import java.util.Vector;
@@ -26,9 +25,7 @@ import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.lttng.state.evProcessor.AbsEventProcessorFactory;
 import org.eclipse.linuxtools.lttng.state.evProcessor.EventProcessorProxy;
 import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
-import org.eclipse.linuxtools.lttng.state.experiment.StateManagerFactory;
 import org.eclipse.linuxtools.lttng.state.model.ILttngStateInputRef;
-import org.eclipse.linuxtools.lttng.state.model.LttngProcessState;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.state.model.StateModelFactory;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
@@ -154,11 +151,9 @@ public class StateManager extends Observable {
 			request.startRequestInd(fExperiment, true, true);
 
 			if (TraceDebug.isDEBUG()) {
-				List<LttngProcessState> processes = stateIn
-						.getTraceStateModel().getProcesses();
 				StringBuilder sb = new StringBuilder(
 						"Total number of processes in the State provider: "
-								+ processes.size());
+								+ stateIn.getTraceStateModel().getProcesses().length);
 
 				TmfTimeRange logTimes = fEventLog.getTimeRange();
 				sb.append("\n\tLog file times "
@@ -201,14 +196,12 @@ public class StateManager extends Observable {
 		request.startRequestInd(fExperiment, false, false);
 
 		if (TraceDebug.isDEBUG()) {
-			List<LttngProcessState> processes = stateIn.getTraceStateModel()
-					.getProcesses();
 			TraceDebug
 					.debug(" Time Window requested, (start adjusted to checkpoint): "
 							+ trange.getStartTime()
 					+ "-" + trange.getEndTime()
 					+ " Total number of processes in the State provider: "
-					+ processes.size() + " Completed");
+					+ stateIn.getTraceStateModel().getProcesses().length + " Completed");
 		}
 	}
 
@@ -596,62 +589,4 @@ public class StateManager extends Observable {
 			}
 		}
 	}
-
-	// *** MAIN : For testing only ***
-	public static void main(String[] args) {
-
-		// Timestamp for the "197500th" events
-		long timefor197500 = 953098902827L;
-
-		// A new StateManager
-		StateManager stateManagerTest = StateManagerFactory.getManager("test");
-
-		LTTngTrace[] testStream = new LTTngTrace[1];
-		try {
-			// The stream is needed by the eventLog, which is needed by the
-			// StateManager
-			// testStream[0] = new LttngEventStream("/home/william/trace1",
-			// true);
-			testStream[0] = new LTTngTrace(
-					"/home/william/runtime-EclipseApplication/TEST_JOIE/Traces/trace3",
-					true);
-
-			TmfExperiment newExpt = new TmfExperiment("trace1", testStream);
-
-			// This will create all the checkpoint
-			stateManagerTest.setTraceSelection(newExpt, false);
-			System.out.println("JOIE JOIE FIN DE LA CREATION DES CHECKPOINTS");
-
-			// *** Restore some checkpoint to test
-
-			// Test the restoration from position
-			// stateManagerTest.restoreCheckPointByPosition(197500);
-
-			if (testStream[0].getCurrentEvent().getTimestamp().getValue() == timefor197500) {
-				System.out.println("Successfully restored by Position!");
-			} else {
-				System.out.println("FAILED : "
-						+ testStream[0].getCurrentEvent().getTimestamp()
-								.getValue() + " != " + timefor197500);
-			}
-
-			// Test the restoration from Timestamp
-			TmfTimestamp newTimestamp = new TmfTimestamp(timefor197500,
-					(byte) -9);
-			stateManagerTest.restoreCheckPointByTimestamp(newTimestamp);
-			// test the timestamp
-			if (testStream[0].getCurrentEvent().getTimestamp().getValue() == timefor197500) {
-				System.out.println("Successfully restored by Timestamp!");
-			} else {
-				System.out.println("FAILED : "
-						+ testStream[0].getCurrentEvent().getTimestamp()
-								.getValue() + " != " + timefor197500);
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-
 }

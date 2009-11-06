@@ -14,8 +14,8 @@ package org.eclipse.linuxtools.lttng.ui.views.resources.model;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource;
-import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeResourceFactory;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource.ResourceTypes;
 
 /**
@@ -138,55 +138,7 @@ public class ResourceContainer {
         
         return foundResource;
     }
-	
-	/* 
-     *  MAIN : For testing only!
-     */
-     public static void main(String[] args) {
-         
-         System.out.println("**** TEST PART 1 WITH STANDALONE *** ");
-         HashMap<ResourceKey, String> newMap = new HashMap<ResourceKey, String>();
-         
-         ResourceKey test1 = new ResourceKey(0L,"trace1", ResourceTypes.CPU);
-         ResourceKey test2 = new ResourceKey(0L, "trace1", ResourceTypes.CPU);
-         newMap.put(test2, "BUG BUG BUG");
-         newMap.put(test1, "JOY JOY JOY");
-         
-         // Test1 and TestKey  return the same value!
-         ResourceKey testKey = new ResourceKey(0L, "trace1", ResourceTypes.CPU);
-         System.out.println( newMap.get(testKey) + " == " + newMap.get(test1) );
-         
-         // Test2 should return the same as Test1
-         System.out.println( "JOY JOY JOY == " + newMap.get(test2) );
-         
-         
-         
-         
-         System.out.println("**** TEST PART 2 WITH TimeRangeEventResource *** ");
-         newMap.clear();
-		TimeRangeResourceFactory rfactory = TimeRangeResourceFactory
-				.getInstance();
-		TimeRangeEventResource tmpRes1 = rfactory.createResource(0, 0, 0,
-				"name1", "trace1", "classname1", ResourceTypes.CPU, 0L, 0l);
-		TimeRangeEventResource tmpRes2 = rfactory.createResource(0, 0, 0,
-				"name2", "trace1", "classname2", ResourceTypes.CPU, 0L, 0l);
-         
-         ResourceKey test3 = new ResourceKey(tmpRes1);
-         ResourceKey test4 = new ResourceKey(tmpRes2);
-         
-         newMap.put(test3, "BUG BUG BUG");
-         newMap.put(test4, "JOY JOY JOY");
-         
-         // Test3 and Test4  return the same value!
-         System.out.println( newMap.get(test3) + " == " + newMap.get(test4) );
-         
-         
-         ResourceKey testKey2 = new ResourceKey(0L, "trace1", ResourceTypes.CPU);
-         // TestKey2 should return the same as Test3 AND Test4
-         System.out.println( newMap.get(test4) + " == " + newMap.get(test4) + " == " + newMap.get(testKey2) );
-     }
 }
-
 
 class ResourceKey {
     
@@ -214,12 +166,25 @@ class ResourceKey {
         boolean isSame = false;
         
         if ( obj instanceof ResourceKey ) {
-            if ( (  ((ResourceKey)obj).getResourceId().equals(this.getResourceId()) ) &&
-                 (  ((ResourceKey)obj).getTraceId().equals(this.getTraceId()) ) &&
-                 (  ((ResourceKey)obj).getType().equals(this.getType()) ) )
-            {
-                isSame = true;
-            }
+        	if ( valueRef != null )  {
+	            if ( (  ((ResourceKey)obj).getResourceId().equals(valueRef.getResourceId()) ) &&
+	                 (  ((ResourceKey)obj).getTraceId().equals(valueRef.getTraceId()) ) &&
+	                 (  ((ResourceKey)obj).getType().equals(valueRef.getType()) ) )
+	            {
+	                isSame = true;
+	            }
+        	}
+        	else {
+        		if ( (  ((ResourceKey)obj).getResourceId().equals(this.resourceId)) &&
+   	                 (  ((ResourceKey)obj).getTraceId().equals(this.traceId)) &&
+   	                 (  ((ResourceKey)obj).getType().equals(this.traceId)) )
+   	            {
+   	                isSame = true;
+   	            }
+        	}
+        }
+        else {
+        	TraceDebug.debug("ERROR : The given key is not of the type ProcessKey!" + obj.getClass().toString());
         }
         
         return isSame;

@@ -184,7 +184,7 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 
 		process.clearExecutionStack();
 		process.clearUserStack();
-		ts.getProcesses().remove(process);
+		ts.removeProcessState(process);
 
 		return true;
 	}
@@ -217,8 +217,8 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 			Long cpu, Long pid, Long tgid, String name,
 			final TmfTimestamp timestamp) {
 		LttngProcessState process;
-		process = new LttngProcessState(cpu, pid, tgid, name, timestamp);
-		traceSt.getProcesses().add(process);
+		process = new LttngProcessState(cpu, pid, tgid, name, timestamp, traceSt.getTraceId());
+		traceSt.addProcessState(process);
 		return process;
 	}
 

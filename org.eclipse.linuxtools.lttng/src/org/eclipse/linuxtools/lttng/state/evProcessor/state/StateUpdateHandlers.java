@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.state.evProcessor.state;
 
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.linuxtools.lttng.TraceDebug;
@@ -1417,13 +1416,13 @@ class StateUpdateHandlers {
 				 * mode, wait
 				 */
 				/* else, if stack[0] is unknown, set to user mode, running */
-				List<LttngProcessState> processes = traceSt.getProcesses();
+				LttngProcessState[] processes = traceSt.getProcesses();
 				TmfTimestamp time = trcEvent.getTimestamp();
-
-				for (LttngProcessState process : processes) {
-					fix_process(process, time);
+				
+				for (int pos = 0; pos < processes.length; pos++) {
+					fix_process(processes[pos], time);
 				}
-
+				
 				return false;
 
 			}
