@@ -1,8 +1,7 @@
 
 package org.eclipse.linuxtools.lttng.jni;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
+import junit.framework.TestCase;
 
 /*
  Functions tested here :
@@ -19,8 +18,10 @@ import org.junit.Test;
         public void printMarkerInformation()
 */
 
-public class JniMarkerTest
+public class JniMarkerTest extends TestCase
 {
+		private final static boolean printLttDebug = false;
+		
         private final static String tracepath="traceset/trace-618339events-1293lost-1cpu";
         private final static String eventName="kernel0";
         
@@ -34,7 +35,7 @@ public class JniMarkerTest
                 // This trace should be valid
                 // We will read the second event to have something interesting to test on
                 try {
-                        tmpEvent = new JniTrace(tracepath).requestEventByName(eventName);
+                        tmpEvent = new JniTrace(tracepath, printLttDebug).requestEventByName(eventName);
                         tmpEvent.readNextEvent();
                         
                         tmpMarker = tmpEvent.requestEventMarker();
@@ -44,8 +45,6 @@ public class JniMarkerTest
                 return tmpMarker;
         }
         
-        
-        @Test
         public void testEventConstructors() {
                 
                 JniEvent tmpEvent = null;
@@ -55,7 +54,7 @@ public class JniMarkerTest
                 
                 // This event should be valid and will be used in test
                 try {
-                        tmpEvent = new JniTrace(tracepath).requestEventByName(eventName);
+                        tmpEvent = new JniTrace(tracepath, printLttDebug).requestEventByName(eventName);
                 }
                 catch( JniException e) { }
                 
@@ -89,7 +88,6 @@ public class JniMarkerTest
                 
         }
         
-        @Test
         public void testGetSet() {
                 
                 JniMarker testMarker = prepareMarkerToTest();
@@ -105,7 +103,6 @@ public class JniMarkerTest
                 assertNotSame("getMarkerPtr is 0",0,testMarker.getMarkerPtr() );
         }
         
-        @Test
         public void testPrintAndToString() {
                 
                 JniMarker testMarker = prepareMarkerToTest();

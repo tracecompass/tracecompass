@@ -73,6 +73,7 @@ public class FlowProcessContainer {
      * @return TimeRangeEventProcess[]
      */
 	public TimeRangeEventProcess[] readProcesses() {
+		
 	    // This allow us to return an Array of the correct type of the exact correct dimension, without looping
 		return allProcesses.values().toArray(new TimeRangeEventProcess[allProcesses.size()]);
 	}
@@ -138,9 +139,9 @@ public class FlowProcessContainer {
      * @return TimeRangeEventProcess
      */
     public TimeRangeEventProcess findProcess(Long searchedPid, Long searchedCpuId, String searchedTraceID, Long searchedCreationtime) {
-        // Get the TimeRangeEventProcess associated to a key we create here
+    	// Get the TimeRangeEventProcess associated to a key we create here
         TimeRangeEventProcess foundProcess = allProcesses.get( new ProcessKey(searchedPid, searchedCpuId, searchedTraceID, searchedCreationtime) );
-        
+    	 
         return foundProcess;
     }
 }
@@ -251,6 +252,6 @@ class ProcessKey {
             return (valueRef.getPid().toString() + ":" + valueRef.getCpu().toString() + ":" + valueRef.getTraceID().toString() + ":" + valueRef.getCreationTime().toString());
         } 
         
-        return (pid + ":" + cpuId + ":" + traceId + ":" + creationtime);
+        return (pid.toString() + ":" + cpuId.toString() + ":" + traceId.toString() + ":" + creationtime.toString());
     }
 }

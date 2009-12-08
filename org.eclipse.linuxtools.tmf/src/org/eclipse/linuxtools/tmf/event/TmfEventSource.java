@@ -17,13 +17,13 @@ package org.eclipse.linuxtools.tmf.event;
  * <p>
  * The event source.
  */
-public class TmfEventSource {
+public class TmfEventSource implements Cloneable {
 
     // ========================================================================
     // Attributes
     // ========================================================================
 
-	private final Object fSourceId;
+	protected Object fSourceId;
 
     // ========================================================================
     // Constructors
@@ -43,6 +43,13 @@ public class TmfEventSource {
 		fSourceId = sourceId;
 	}
 
+	/**
+	 * @param other
+	 */
+	public TmfEventSource(TmfEventSource other) {
+		this((other != null) ? other.fSourceId : null);
+	}
+
     // ========================================================================
     // Accessors
     // ========================================================================
@@ -58,9 +65,14 @@ public class TmfEventSource {
     // Operators
     // ========================================================================
 
-    @Override
+	@Override
+	public TmfEventSource clone() {
+		return new TmfEventSource(this);
+	}
+
+	@Override
     public String toString() {
-        return fSourceId.toString();
+        return "[TmfEventSource(" + ((fSourceId != null) ? fSourceId.toString() : "null") + ")]";
     }
 
 }

@@ -19,7 +19,6 @@ import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfEventContent;
-import org.eclipse.linuxtools.tmf.event.TmfEventFormat;
 import org.eclipse.linuxtools.tmf.event.TmfEventReference;
 import org.eclipse.linuxtools.tmf.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.event.TmfEventType;
@@ -36,22 +35,22 @@ public class TmfEventParserStub implements ITmfEventParser {
     // Attributes
     // ========================================================================
 
-	private final int NB_FORMATS = 10;
-    private final TmfEventFormat[] fFormats;
+	private final int NB_TYPES = 10;
+    private final TmfEventType[] fTypes;
 
     // ========================================================================
     // Constructors
     // ========================================================================
 
     public TmfEventParserStub() {
-    	fFormats = new TmfEventFormat[NB_FORMATS];
-    	for (int i = 0; i < NB_FORMATS; i++) {
+    	fTypes = new TmfEventType[NB_TYPES];
+    	for (int i = 0; i < NB_TYPES; i++) {
     		Vector<String> format = new Vector<String>();
     		for (int j = 1; j <= i; j++) {
     			format.add(new String("Fmt-" + i + "-Fld-" + j));
     		}
     		String[] fields = new String[i];
-    		fFormats[i] = new TmfEventFormat(format.toArray(fields));
+    		fTypes[i] = new TmfEventType("Type-" + i, format.toArray(fields));
     	}
     }
 
@@ -59,9 +58,6 @@ public class TmfEventParserStub implements ITmfEventParser {
     // Operators
     // ========================================================================
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.eventlog.ITmfEventParser#parseNextEvent()
-     */
     static final String typePrefix = "Type-";
     public TmfEvent parseNextEvent(ITmfTrace eventStream, TmfTraceContext context) throws IOException {
 
@@ -108,10 +104,11 @@ public class TmfEventParserStub implements ITmfEventParser {
         		TmfEvent event = new TmfEvent(
         				new TmfTimestamp(ts, (byte) -3, 0),     // millisecs
         				new TmfEventSource(source),
-        				new TmfEventType(type, fFormats[typeIndex]),
-        				new TmfEventContent(content, fFormats[typeIndex]),
+        				fTypes[typeIndex],
         				new TmfEventReference(name));
-        		return event;
+				TmfEventContent cnt = new TmfEventContent(event, content);
+				event.setContent(cnt);
+				return event;
         	} catch (EOFException e) {
         	}
         }

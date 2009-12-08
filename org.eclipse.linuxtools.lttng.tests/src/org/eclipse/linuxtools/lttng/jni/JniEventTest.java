@@ -30,11 +30,12 @@
 
 package org.eclipse.linuxtools.lttng.jni;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
+import junit.framework.TestCase;
 
-public class JniEventTest
+public class JniEventTest extends TestCase
 {
+		private final static boolean printLttDebug = false;
+	
         private final static String tracepath="traceset/trace-618339events-1293lost-1cpu";
         private final static String eventName="kernel0";
         
@@ -74,7 +75,7 @@ public class JniEventTest
                 
                 // This trace should be valid
                 try {
-                        tmpEvent = new JniTrace(tracepath).requestEventByName(eventName);
+                        tmpEvent = new JniTrace(tracepath, printLttDebug).requestEventByName(eventName);
                 }
                 catch( JniException e) { }
                 
@@ -82,7 +83,6 @@ public class JniEventTest
         }
         
         
-        @Test
         public void testEventConstructors() {
                 JniTracefile testTracefile = null;
                 
@@ -91,7 +91,7 @@ public class JniEventTest
                 
                 // This trace should be valid and will be used in test
                 try {
-                        testTracefile = new JniTrace(tracepath).requestTracefileByName(eventName);
+                        testTracefile = new JniTrace(tracepath, printLttDebug).requestTracefileByName(eventName);
                 }
                 catch( JniException e) { }
                 
@@ -145,7 +145,6 @@ public class JniEventTest
                 
         }
         
-        @Test
         public void testPrintAndToString() {
                 
                 JniEvent testEvent = prepareEventToTest();
@@ -163,7 +162,6 @@ public class JniEventTest
                 
         }
         
-        @Test
         public void testEventDisplacement() {
                 
                 int readValue = -1;
@@ -222,7 +220,6 @@ public class JniEventTest
                 assertEquals("readNextEvent() event timestamp is incoherent (test #2)",timestampToSeekTest1,testEvent.getEventTime().getTime() );
         }
         
-        @Test
         public void testGetSet() {
                 
                 JniEvent testEvent = prepareEventToTest();
@@ -249,7 +246,6 @@ public class JniEventTest
                 assertNotNull("getParentTracefile returned null", testEvent.getParentTracefile() );
         }
         
-        @Test
         public void testRequestFunctions() {
                 
                 JniEvent testEvent = prepareEventToTest();
@@ -268,7 +264,6 @@ public class JniEventTest
                 
         }
         
-        @Test
         public void testParseAllFieldsFunctions() {
                 
                 JniEvent testEvent = prepareEventToTest();
@@ -310,7 +305,6 @@ public class JniEventTest
                 assertNotNull("parseAllFields returned null",testEvent.parseAllFields() );
         }
         
-        @Test
         public void testParseFieldByIdFunctions() {
                 JniEvent testEvent = prepareEventToTest();
                 

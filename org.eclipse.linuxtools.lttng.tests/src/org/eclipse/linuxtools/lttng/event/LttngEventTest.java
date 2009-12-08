@@ -1,15 +1,10 @@
 package org.eclipse.linuxtools.lttng.event;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
-import org.junit.Test;
+import junit.framework.TestCase;
 
 /*
  Functions tested here :
@@ -23,7 +18,7 @@ import org.junit.Test;
 
  */
 
-public class LttngEventTest {
+public class LttngEventTest extends TestCase {
 	private final static boolean skipIndexing=true;
 	private final static boolean waitForCompletion=true;
     private final static String tracepath1="traceset/trace-618339events-1293lost-1cpu";
@@ -52,7 +47,6 @@ public class LttngEventTest {
 		return tmpEvent;
 	}
 
-	@Test
 	public void testConstructors() {
 		
 		LTTngTrace testStream1 = null;
@@ -61,23 +55,23 @@ public class LttngEventTest {
 		LttngEvent 			testAnotherEvent = null;
         LttngTimestamp		testTime		= null;
         TmfEventSource 		testSource 		= null;
-        LttngEventFormat	testFormat		= null;
         LttngEventType   	testType   		= null;
         LttngEventContent	testContent		= null;
         LttngEventReference testReference 	= null;
         JniEvent			testJniEvent 	= null;
-		
+		String[]			testMarkerFields = null;
+        
         // This need to work if we want to perform tests
         try {
     			// In order to test LttngEvent, we need all these constructors/functions to work.
             	// Make sure to run their unit tests first!
+        		testMarkerFields = new String[1];
         		testStream1 = new LTTngTrace(tracepath1, waitForCompletion, skipIndexing);
                 testEvent 	= null;
                 testTime	= new LttngTimestamp(0L);
                 testSource 	= new TmfEventSource("test");
-                testFormat	= new LttngEventFormat(new String[1]);
-                testType   	= new LttngEventType("test", 0, "test", testFormat);
-                testContent	= new LttngEventContent(testFormat);
+                testType   	= new LttngEventType("test", 0L, "test", testMarkerFields);
+                testContent	= new LttngEventContent(testEvent);
                 testReference = new LttngEventReference("test", "test");
                 testJniEvent = testStream1.getCurrentJniTrace().findNextEvent();
         }
@@ -164,8 +158,6 @@ public class LttngEventTest {
 		
 	}
 	
-	
-    @Test
 	public void testGetter() {
     	LttngEvent testEvent = prepareToTest();
     	
@@ -177,10 +169,9 @@ public class LttngEventTest {
     	assertEquals("CpuId not what expected!",eventCpu,testEvent.getCpuId());
     	assertEquals("Marker not what expected!",eventMarker,testEvent.getMarkerName());
     	assertEquals("Content not what expected!",eventContent,testEvent.getContent().getContent());
-    	assertTrue("Reference not what expected!",((String)testEvent.getReference().getValue()).contains(eventReference) );
+    	assertTrue("Reference not what expected!",((String)testEvent.getReference().getReference()).contains(eventReference) );
     }
     
-    @Test
 	public void testConversion() {
     	JniEvent tmpJniEvent = null;
     	LttngEvent testEvent = null;
@@ -199,7 +190,6 @@ public class LttngEventTest {
     	
     }
     
-    @Test
 	public void testToString() {
     	LttngEvent tmpEvent = prepareToTest();
     	

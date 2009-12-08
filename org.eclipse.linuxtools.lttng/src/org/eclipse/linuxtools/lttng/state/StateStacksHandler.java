@@ -17,6 +17,8 @@ import java.util.Vector;
 
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
+import org.eclipse.linuxtools.lttng.event.LttngEventContent;
+import org.eclipse.linuxtools.lttng.event.LttngEventField;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.lttng.state.evProcessor.AbsEventProcessorFactory;
 import org.eclipse.linuxtools.lttng.state.evProcessor.EventProcessorProxy;
@@ -81,9 +83,9 @@ public class StateStacksHandler {
 		}
 
 		LttngEvent trcEvent = (LttngEvent) tmfEvent;
-		TmfEventField[] fields = trcEvent.getContent().getFields();
+//		LttngEventField[] fields = ((LttngEventContent)trcEvent.getContent()).getFields();
 
-		if (fields != null) {
+		if (trcEvent != null) {
 			String inEventName = trcEvent.getMarkerName();
 			// String inChannel = trcEvent.getChannelName();
 			// TraceDebug.debug("Event: " + inEventName);

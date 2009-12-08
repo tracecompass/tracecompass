@@ -17,23 +17,37 @@ package org.eclipse.linuxtools.tmf.event;
  * <p>
  * An application-defined event reference.
  */
-public class TmfEventReference {
+public class TmfEventReference implements Cloneable {
 
     // ========================================================================
     // Attributes
     // ========================================================================
 
-	private final Object fReference;
+	protected Object fReference;
 
     // ========================================================================
     // Constructors
     // ========================================================================
 
 	/**
+	 * 
+	 */
+	public TmfEventReference() {
+		this(null);
+	}
+
+	/**
 	 * @param reference
 	 */
 	public TmfEventReference(Object reference) {
 		fReference = reference;
+	}
+
+	/**
+	 * @param other
+	 */
+	public TmfEventReference(TmfEventReference other) {
+		this((other != null) ? other.fReference : null);
 	}
 
     // ========================================================================
@@ -43,7 +57,7 @@ public class TmfEventReference {
 	/**
 	 * @return
 	 */
-	public Object getValue() {
+	public Object getReference() {
 		return fReference;
 	}
 
@@ -52,8 +66,13 @@ public class TmfEventReference {
     // ========================================================================
 
     @Override
+    public TmfEventReference clone() {
+    	return new TmfEventReference(this);
+    }
+
+    @Override
     public String toString() {
-        return fReference.toString();
+        return "[TmfEventReference(" + ((fReference != null) ? fReference.toString() : "null") + ")]";
     }
 
 }

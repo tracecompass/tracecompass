@@ -51,9 +51,9 @@ ITmfTimeAnalysisEntry {
 	protected String groupName = "";
 	protected String className = "";
 	protected CompositeType contType = CompositeType.UNKNOWN;
-	protected long next_good_time = -1;
+	protected Long next_good_time = -1L;
 	/*Time of first event which trigger the creation of this local resource */
-	protected long insertionTime = -1; 
+	protected Long insertionTime = -1L; 
 
 	// ========================================================================
 	// Constructors

@@ -272,7 +272,7 @@ public abstract class AbsStateUpdate implements IEventProcessing {
 		String expectedFieldName = expectedField.getInName();
 		for (int i = 0; i < fields.length; i++) {
 			field = (LttngEventField) fields[i];
-			fieldname = field.getName();
+			fieldname = field.getId();
 			if (fieldname.equals(expectedFieldName)) {
 				Object fieldObj = field.getValue();
 				if (fieldObj instanceof Long) {
@@ -327,7 +327,7 @@ public abstract class AbsStateUpdate implements IEventProcessing {
 		String expectedFieldName = expectedField.getInName();
 		for (int i = 0; i < fields.length; i++) {
 			field = (LttngEventField) fields[i];
-			fieldname = field.getName();
+			fieldname = field.getId();
 			if (fieldname.equals(expectedFieldName)) {
 				Object fieldObj = field.getValue();
 				if (fieldObj instanceof String) {
@@ -361,7 +361,7 @@ public abstract class AbsStateUpdate implements IEventProcessing {
 		sb.append(" number of fields: " + fields.length + "Fields: ");
 		for (int i = 0; i < fields.length; i++) {
 			field = (LttngEventField) fields[i];
-			sb.append(field.getName() + " ");
+			sb.append(field.getId() + " ");
 		}
 
 		TraceDebug.debug(sb.toString(), 5);

@@ -18,7 +18,6 @@ import org.eclipse.linuxtools.lttng.state.StateStrings;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ExecutionMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ExecutionSubMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessStatus;
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 /**
  * <b>LttngProcessState</b>
@@ -34,12 +33,12 @@ public class LttngProcessState implements Cloneable {
 	private Long pid = null;
 	private Long tgid = null;
 	private String name = null;
-	private TmfTimestamp creation_time = null;
+	private Long creation_time = null;
 	private String brand = null;
 	private StateStrings.ProcessType type = null;
 	private Long current_function = null;
 	private Long ppid = null;
-	private TmfTimestamp insertion_time = null;
+	private Long insertion_time = null;
 	private String pid_time = null;
 	private Long free_events = null;
 	private LttngExecutionState state = null; // top of stack
@@ -53,7 +52,7 @@ public class LttngProcessState implements Cloneable {
 	// ========================================================================
 	// Constructor
 	// =======================================================================
-	public LttngProcessState(TmfTimestamp startTime) {
+	public LttngProcessState(Long startTime, String traceId) {
 		this.cpu = 0L;
 		this.pid = 0L;
 		this.tgid = 0L;
@@ -64,7 +63,7 @@ public class LttngProcessState implements Cloneable {
 	}
 
 	public LttngProcessState(Long cpu, Long pid, Long tgid,
-			String name, TmfTimestamp startTime, String traceId) {
+			String name, Long startTime, String traceId) {
 		this.cpu = cpu;
 		this.pid = pid;
 		this.tgid = tgid;
@@ -82,9 +81,7 @@ public class LttngProcessState implements Cloneable {
 		this.type = StateStrings.ProcessType.LTTV_STATE_USER_THREAD;
 		this.current_function = 0L;
 		this.ppid = 0L;
-		// creation time defined when parent pid is known
-		// calling the setCreation_time method adjust the pid_time string
-		setCreation_time(new TmfTimestamp());
+		this.creation_time = 0L;
 		this.free_events = 0L;
 
 		// Initialise stack
@@ -138,16 +135,8 @@ public class LttngProcessState implements Cloneable {
             newState.userTrace = this.userTrace;
             newState.target_pid = this.target_pid;
             newState.trace_id = this.trace_id;
-            
-			// No clonable implemented in TMF, we will use copy constructor
-            // NOTE : we GOT to check for null to avoid crashing on null pointer here!
-            if ( this.creation_time != null ) {
-                newState.creation_time = new TmfTimestamp(this.creation_time);
-            }
-            
-            if ( this.creation_time != null ) {
-                newState.insertion_time = new TmfTimestamp(this.insertion_time);
-            }
+            newState.creation_time = this.creation_time;
+            newState.insertion_time = this.insertion_time;
             
             // Call clone on our own object is safe as Long it implements Clonable
             newState.state = (LttngExecutionState)this.state.clone();
@@ -242,7 +231,7 @@ public class LttngProcessState implements Cloneable {
 	 * @param ppid
 	 *            the ppid to set
 	 */
-	public void setPpid(Long ppid, TmfTimestamp creationTime) {
+	public void setPpid(Long ppid, Long creationTime) {
 		if (ppid != null) {
 			this.ppid = ppid;
 		}
@@ -255,7 +244,7 @@ public class LttngProcessState implements Cloneable {
 	/**
 	 * @return the creation_time
 	 */
-	public TmfTimestamp getCreation_time() {
+	public Long getCreation_time() {
 		return creation_time;
 	}
 
@@ -263,7 +252,7 @@ public class LttngProcessState implements Cloneable {
 	 * @param creationTime
 	 *            the creation_time to set
 	 */
-	public void setCreation_time(TmfTimestamp creationTime) {
+	public void setCreation_time(Long creationTime) {
 		if ( (creationTime != null) && (pid != null) ) {
 			creation_time = creationTime;
 			StringBuilder sb = new StringBuilder(this.pid.toString() + "-"
@@ -275,7 +264,7 @@ public class LttngProcessState implements Cloneable {
 	/**
 	 * @return the insertion_time
 	 */
-	public TmfTimestamp getInsertion_time() {
+	public Long getInsertion_time() {
 		return insertion_time;
 	}
 
@@ -283,7 +272,7 @@ public class LttngProcessState implements Cloneable {
 	 * @param insertionTime
 	 *            the insertion_time to set
 	 */
-	public void setInsertion_time(TmfTimestamp insertionTime) {
+	public void setInsertion_time(Long insertionTime) {
 		insertion_time = insertionTime;
 	}
 

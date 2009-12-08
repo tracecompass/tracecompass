@@ -45,15 +45,15 @@ public class TmfEventContentStub extends TmfEventContent {
 		return content;
     }
 
-//    @Override
-//	public String toString() {
-//    	Object[] fields = getFields();
-//    	StringBuilder result = new StringBuilder("[TmfEventContent(");
-//    	for (int i = 0; i < fields.length; i++) {
-//    		if (i > 0) result.append(",");
-//    		result.append(fields[i]);
-//    	}
-//    	result.append(")]");
-//    	return result.toString();
-//    }
+    @Override
+	public String toString() {
+    	Object[] fields = getFields();
+    	String result = "[TmfEventContentStub(";
+    	for (int i = 0; i < fields.length; i++) {
+    		result += fields[i].toString() + ",";
+    	}
+    	result += ")]";
+
+    	return result;
+    }
 }

@@ -26,8 +26,18 @@ public class LttngEventReference extends TmfEventReference {
     /**
      * Constructor with parameters.<p>
      * 
+     * @param newTraceName      Trace name 
+     */
+    public LttngEventReference(String newTraceName) {
+        super("");
+        tracename = newTraceName;
+    }
+    
+    /**
+     * Constructor with parameters with optional tracefile path.<p>
+     * 
      * @param newTracefilePath  Complete tracefile path
-     * @param newTraceName      The Trace name 
+     * @param newTraceName      Trace name 
      */
     public LttngEventReference(String newTracefilePath, String newTraceName) {
         super(newTracefilePath);
@@ -54,10 +64,19 @@ public class LttngEventReference extends TmfEventReference {
         this.tracename = tracename;
     }
     
+    public String getValue() {
+        return (String)fReference;
+    }
+    
+    public void setValue(String newReference) {
+        fReference = newReference;
+    }
+    
     /**
      * toString() method.<p>
      * 
-     * We return only tracename, as it will be used directly in the eventsView and it gives a better output.
+     * We return only tracename, as it will be used directly in the eventsView.
+     *  Returning only tracename gives a better output.
      * 
      * @return tracename as String
      */

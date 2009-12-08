@@ -23,7 +23,7 @@ import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
  * continuous streaming.
  * <p>
  * The request is processed asynchronously by an ITmfRequestProcessor and,
- * as blocks of data become available, the callback handlePartialData() is
+ * as blocks of data become available, the callback handleData() is
  * invoked, synchronously, for each block. When returning from the callback,
  * the data instances go out of scope and become eligible for gc. It is
  * is thus the responsibility of the requester to either copy or keep a
@@ -83,10 +83,9 @@ public class TmfDataRequest<V> {
     // Attributes
     // ========================================================================
 
-    private final TmfTimeRange fRange;      // The requested events timestamp range
-    private final int  fIndex;              // The event index to get
-    private final long fOffset;             // The synchronization offset to apply
-    private final int  fNbRequestedItems;   // The number of items to read (-1 == the whole range)
+    private final int  fIndex;              // The index (order) of the requested event
+    private final TmfTimeRange fRange;      // The requested events time range
+    private final int  fNbRequestedEvents;  // The number of events to read (-1 == all in the range)
     private final int  fBlockSize;          // The maximum number of events per chunk
     private       int  fNbEvents;           // The number of events read so far
 
@@ -105,48 +104,61 @@ public class TmfDataRequest<V> {
      * @param index
      * @param nbEvents
      */
-    public TmfDataRequest(int index, long offset, int nbEvents) {
-        this(null, index, offset, nbEvents, DEFAULT_BLOCK_SIZE);
+    public TmfDataRequest(int index, int nbEvents) {
+        this(null, index, nbEvents, DEFAULT_BLOCK_SIZE);
+    }
+
+    public TmfDataRequest(int index, int nbEvents, int blockSize) {
+        this(null, index, nbEvents, blockSize);
+    }
+    
+    /**
+     * @param range
+     */
+    public TmfDataRequest(TmfTimeRange range) {
+        this(range, 0, ALL_EVENTS, DEFAULT_BLOCK_SIZE);
     }
 
     /**
      * @param range
-     * @param offset
      * @param nbEvents
      */
-    public TmfDataRequest(TmfTimeRange range, long offset, int nbEvents) {
-        this(range, 0, offset, nbEvents, DEFAULT_BLOCK_SIZE);
+    public TmfDataRequest(TmfTimeRange range, int nbEvents) {
+        this(range, 0, nbEvents, DEFAULT_BLOCK_SIZE);
     }
-
     /**
      * @param range
-     * @param offset
-     * @param nbItems
-     * @param maxBlockSize Size of the largest blocks expected
+     * @param nbEvents
+     * @param blockSize Size of the largest blocks expected
      */
-    public TmfDataRequest(TmfTimeRange range, long offset, int nbEvents, int maxBlockSize) {
-        this(range, 0, offset, nbEvents, maxBlockSize);
+    public TmfDataRequest(TmfTimeRange range, int nbEvents, int blockSize) {
+        this(range, 0, nbEvents, blockSize);
     }
 
     /**
      * @param range
      * @param index
-     * @param offset
-     * @param nbItems
-     * @param maxBlockSize Size of the largest blocks expected
+     * @param nbEvents
+     * @param blockSize Size of the largest blocks expected
      */
-    public TmfDataRequest(TmfTimeRange range, int index, long offset, int nbEvents, int maxBlockSize) {
-        fRange = range;
-        fIndex = index;
-        fOffset = offset;
-        fNbRequestedItems = nbEvents;
-        fBlockSize = maxBlockSize;
-        fNbEvents = 0;
+    private TmfDataRequest(TmfTimeRange range, int index, int nbEvents, int blockSize) {
+    	fIndex             = index;
+    	fRange             = range;
+    	fNbRequestedEvents = nbEvents;
+    	fBlockSize         = blockSize;
+    	fNbEvents          = 0;
     }
 
     // ========================================================================
     // Accessors
     // ========================================================================
+
+	/**
+	 * @return the index
+	 */
+	public int getIndex() {
+		return fIndex;
+	}
 
     /**
      * @return the requested time range
@@ -156,24 +168,10 @@ public class TmfDataRequest<V> {
     }
 
     /**
-     * @return the index
-     */
-    public int getIndex() {
-        return fIndex;
-    }
-
-    /**
-     * @return the offset
-     */
-    public long getOffset() {
-        return fOffset;
-    }
-
-    /**
      * @return the number of requested events (-1 = all)
      */
-    public int getNbRequestedItems() {
-        return fNbRequestedItems;
+    public int getNbRequestedEvents() {
+        return fNbRequestedEvents;
     }
 
     /**

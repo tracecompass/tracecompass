@@ -141,17 +141,36 @@ public class TmfEventsView extends TmfView {
 					item.setText(extractItemFields(cache[index - cacheStartIndex]));
 					return;
 				}
-				TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(index, 0, CACHE_SIZE) {
+				
+				// *** TODO ***
+				// This is broken!
+				// 
+				// This one fails to return any result : 
+				// 		TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(fExperiment.getTimeRange(), index, 1) {
+				// All these will return THE SAME RESULT!
+				//		TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(index, 1) {
+				// 		TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(index+10, 1) {
+				// 		TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(null, 1) {
+				// 		
+				// THIS IS ONLY A TEMPORARY FIX! 
+				
+				TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(index, 1) {
 					@Override
 					public void handleData() {
-						// No need to synchronize because the request is synchronous
-						cache = getData();
-						cacheStartIndex = index;
-						cacheEndIndex = index + cache.length; 
+						TmfEvent[] tmpEvent = getData();
+						if ( (tmpEvent != null) && (tmpEvent.length > 0) ) {
+							cache = tmpEvent;
+						}
+//						cacheStartIndex = index;
+//						cacheEndIndex = index + cache.length; 
 					}
 				};
 				fExperiment.processRequest(request, true);
-				item.setText(extractItemFields(cache[0]));
+				
+				if (cache[0] != null) {
+					item.setText(extractItemFields(cache[0]));
+				}
+				
 			}
         });
 
@@ -166,7 +185,7 @@ public class TmfEventsView extends TmfView {
     }
 
     // Events cache - temporary stuff
-    private final int CACHE_SIZE = 100;
+    private final int CACHE_SIZE = 1;
     private TmfEvent[] cache;
     private int cacheStartIndex = 0;
     private int cacheEndIndex = 0;
@@ -214,8 +233,8 @@ public class TmfEventsView extends TmfView {
 				new Long(event.getTimestamp().getValue()).toString(),		
 				event.getSource().getSourceId().toString(),
 				event.getType().getTypeId().toString(),
-				event.getReference().getValue().toString(),
-				event.getContent().getContent()
+				event.getReference().getReference().toString(),
+				event.getContent().toString()
             };
 		}
 		return fields;
@@ -249,7 +268,7 @@ public class TmfEventsView extends TmfView {
         // Perform the updates on the UI thread
         fTable.getDisplay().asyncExec(new Runnable() {
         	public void run() {
-        		// TODO: Potentially long operation. Add some feedback for the user
+//        		// TODO: Potentially long operation. Add some feedback for the user
         		fTable.setSelection(0);
             	fTable.clearAll();
             	fTable.setItemCount(fExperiment.getNbEvents());        

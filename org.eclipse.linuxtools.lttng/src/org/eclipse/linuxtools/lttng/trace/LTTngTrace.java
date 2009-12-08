@@ -12,19 +12,22 @@
 
 package org.eclipse.linuxtools.lttng.trace;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Vector;
+
 import org.eclipse.linuxtools.lttng.LttngException;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.event.LttngEventContent;
-import org.eclipse.linuxtools.lttng.event.LttngEventField;
-import org.eclipse.linuxtools.lttng.event.LttngEventFormat;
 import org.eclipse.linuxtools.lttng.event.LttngEventReference;
+import org.eclipse.linuxtools.lttng.event.LttngEventSource;
 import org.eclipse.linuxtools.lttng.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
+import org.eclipse.linuxtools.lttng.jni.JniMarker;
 import org.eclipse.linuxtools.lttng.jni.JniTime;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.event.TmfEventSource;
+import org.eclipse.linuxtools.lttng.jni.JniTracefile;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
@@ -46,15 +49,28 @@ class LTTngTraceException extends LttngException {
  * (seeking, reading and parsing) through the JNI component.
  */
 public class LTTngTrace extends TmfTrace {
-
-	private final static boolean IS_PARSING_NEEDED_DEFAULT = true;
-	private final static int     CHECKPOINT_PAGE_SIZE = 1000;
-	
-    // Reference to the current LttngEvent
-    private LttngEvent currentLttngEvent = null;
+    private final static boolean SHOW_LTT_DEBUG_DEFAULT = false;
+	private final static boolean IS_PARSING_NEEDED_DEFAULT = false;
+	private final static int     CHECKPOINT_PAGE_SIZE      = 1;
     
     // Reference to our JNI trace
     private JniTrace currentJniTrace = null;
+    
+    // *** HACK ***
+    // To save time, we will declare all component of the LttngEvent during the construction of the trace
+    //  Then, while reading the trace, we will just SET the values instead of declaring new object
+    LttngTimestamp                  eventTimestamp   = null;
+    LttngEventSource                eventSource      = null;
+    LttngEventType                  eventType        = null;
+    LttngEventContent               eventContent     = null;
+    LttngEventReference             eventReference   = null;
+    // The actual event
+    LttngEvent                      currentLttngEvent = null;             
+    
+    // Hashmap of the possible types of events (Tracefile/CPU/Marker in the JNI)
+    HashMap<String, LttngEventType> traceTypes       = null;
+    // This vector will be used to quickly find a marker name from a position 
+    Vector<String>                  traceTypeNames   = null;
     
     /**
      * Default Constructor.<p>
@@ -62,8 +78,6 @@ public class LTTngTrace extends TmfTrace {
      * @param path  Path to a <b>directory</b> that contain an LTTng trace.
      * 
      * @exception Exception (most likely LTTngTraceException or FileNotFoundException)
-     * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniTrace
      */
     public LTTngTrace(String path) throws Exception {
         // Call with "wait for completion" true and "skip indexing" false
@@ -77,11 +91,9 @@ public class LTTngTrace extends TmfTrace {
      * @param waitForCompletion     Should we wait for indexign to complete before moving on.
      * 
      * @exception Exception (most likely LTTngTraceException or FileNotFoundException)
-     * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniTrace
      */
     public LTTngTrace(String path, boolean waitForCompletion) throws Exception {
-     // Call with "skip indexing" false
+        // Call with "skip indexing" false
         this(path, waitForCompletion, false);
     }
     
@@ -94,18 +106,38 @@ public class LTTngTrace extends TmfTrace {
      * 
      * @exception Exception (most likely LTTngTraceException or FileNotFoundException)
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniTrace
      */
     public LTTngTrace(String path, boolean waitForCompletion, boolean bypassIndexing) throws Exception {
         super(path, CHECKPOINT_PAGE_SIZE, true);
         try {
-    		currentJniTrace = new JniTrace(path);
+    		currentJniTrace = new JniTrace(path, SHOW_LTT_DEBUG_DEFAULT);
         }
         catch (Exception e) {
             throw new LTTngTraceException(e.getMessage());
         }
-        TmfTimestamp startTime = new LttngTimestamp(currentJniTrace.getStartTimeFromTimestampCurrentCounter().getTime());
+        
+        // Set the start time of the trace
+        LttngTimestamp startTime = new LttngTimestamp(currentJniTrace.getStartTimeFromTimestampCurrentCounter().getTime());
         setTimeRange(new TmfTimeRange(startTime, startTime));
+        
+        // Export all the event types from the JNI side 
+        traceTypes      = new HashMap<String, LttngEventType>();
+        traceTypeNames  = new Vector<String>();
+        initialiseEventTypes(currentJniTrace);
+        
+        // *** VERIFY ***
+        // Verify that all those "default constructor" are safe to use
+        eventTimestamp        = new LttngTimestamp();
+        eventSource           = new LttngEventSource();
+        eventType             = new LttngEventType();
+        eventContent          = new LttngEventContent(currentLttngEvent);
+        eventReference        = new LttngEventReference(this.getName());
+        
+        // Create the skeleton event
+        currentLttngEvent = new LttngEvent(eventTimestamp, eventSource, eventType, eventContent, eventReference, null);
+        
+        // Set the currentEvent to the eventContent
+        eventContent.setEvent(currentLttngEvent);
         
         // Bypass indexing if asked
         if ( bypassIndexing == false ) {
@@ -125,19 +157,70 @@ public class LTTngTrace extends TmfTrace {
     	throw new Exception("Copy constructor should never be use with a LTTngTrace!");
     }
     
+    /*
+     * Fill out the HashMap with "Type" (Tracefile/Marker)
+     * 
+     * This should be called at construction once the trace is open
+     */
+    private void initialiseEventTypes(JniTrace trace) {
+        // Work variables
+        LttngEventType  tmpType             = null;
+        String[]        markerFieldsLabels  = null;
+        
+        String          newTracefileKey     = null;
+        Integer         newMarkerKey        = null;
+        
+        JniTracefile    newTracefile    = null;
+        JniMarker       newMarker       = null;
+        
+        // First, obtain an iterator on TRACEFILES of owned by the TRACE
+        Iterator<String>    tracefileItr = trace.getTracefilesMap().keySet().iterator();
+        while ( tracefileItr.hasNext() ) {
+            newTracefileKey = tracefileItr.next();
+            newTracefile    = trace.getTracefilesMap().get(newTracefileKey);
+            
+            // From the TRACEFILE read, obtain its MARKER
+            Iterator<Integer> markerItr = newTracefile.getTracefileMarkersMap().keySet().iterator();
+            while ( markerItr.hasNext() ) {
+                newMarkerKey = markerItr.next();
+                newMarker = newTracefile.getTracefileMarkersMap().get(newMarkerKey);
+                
+                // From the MARKER we can obtain the MARKERFIELDS keys (i.e. labels)
+                markerFieldsLabels = newMarker.getMarkerFieldsHashMap().keySet().toArray( new String[newMarker.getMarkerFieldsHashMap().size()] );
+                tmpType = new LttngEventType(newTracefile.getTracefileName(), newTracefile.getCpuNumber(), newMarker.getName(), markerFieldsLabels );
+                
+                // Add the type to the map/vector
+                addEventTypeToMap(tmpType);
+            }
+        }
+    }
+    
+    /*
+     * Add a new type to the HashMap
+     * 
+     * As the hashmap use a key format that is a bit dangerous to use, we should always add using this function.
+     */
+    private void addEventTypeToMap(LttngEventType newEventType) {
+        String newTypeKey = EventTypeKey.getEventTypeKey(newEventType);
+        
+        this.traceTypes.put(newTypeKey, newEventType);
+        this.traceTypeNames.add(newTypeKey);
+    }
+    
     /** 
-     * Parse the next event in the trace.<p>
+     * Return the next event in the trace.<p>
      * 
      * @param context   The actual context of the trace
      * 
-     * @return The parsed event, or null if none available
+     * @return The next event, or null if none available
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniTrace
+     * @see org.eclipse.linuxtools.lttng.event.LttngEvent
      */ 
     @Override
-	public TmfEvent parseEvent(TmfTraceContext context) {
+	public LttngEvent parseEvent(TmfTraceContext context) {
 		JniEvent jniEvent;
 		LttngTimestamp timestamp = null;
+		LttngEvent returnedEvent = null;
 		
     	synchronized (currentJniTrace) {
     	    // Seek to the context's location
@@ -145,7 +228,12 @@ public class LTTngTrace extends TmfTrace {
     		
     		// Read an event from the JNI and convert it into a LttngEvent
     		jniEvent = currentJniTrace.readNextEvent();
-    		currentLttngEvent = (jniEvent != null) ? convertJniEventToTmf(jniEvent, true) : null;
+    		
+    		//currentLttngEvent = (jniEvent != null) ? convertJniEventToTmf(jniEvent, true) : null;
+    		if ( jniEvent != null ) {
+    		    currentLttngEvent = convertJniEventToTmf(jniEvent);
+    		    returnedEvent = currentLttngEvent;
+    		}
     		
     		// Save timestamp
     		timestamp = (LttngTimestamp) getCurrentLocation();
@@ -153,8 +241,8 @@ public class LTTngTrace extends TmfTrace {
    		context.setLocation(timestamp);
    		context.setTimestamp(timestamp);
    		context.incrIndex();
-
-   		return currentLttngEvent;
+   		
+   		return returnedEvent;
     }
     
     /**
@@ -165,66 +253,58 @@ public class LTTngTrace extends TmfTrace {
      * 
      * @param   newEvent     The JniEvent to convert into LttngEvent
      * 
-     * @return  The converted event
+     * @return  The converted LttngEvent
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.org.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.lttng.event.LttngEvent
      */
 	public LttngEvent convertJniEventToTmf(JniEvent newEvent) {
-    	LttngEvent event = null;
-    	if (newEvent != null)
-    		event = convertJniEventToTmf(newEvent, IS_PARSING_NEEDED_DEFAULT);
-    	return event;
+	    currentLttngEvent = convertJniEventToTmf(newEvent, IS_PARSING_NEEDED_DEFAULT);
+	    
+	    return currentLttngEvent;
     }
     
     /**
-     * Method tp convert a JniEvent into a LttngEvent
+     * Method to convert a JniEvent into a LttngEvent
      * 
      * @param   jniEvent        The JniEvent to convert into LttngEvent
      * @param   isParsingNeeded A boolean value telling if the event should be parsed or not.
      * 
-     * @return  The converted event
+     * @return  The converted LttngEvent
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.org.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.lttng.event.LttngEvent
      */
     public LttngEvent convertJniEventToTmf(JniEvent jniEvent, boolean isParsingNeeded) {
-    	
-    	// *** FIXME ***
-    	// Format seems weird to me... we need to revisit Format/Fields/Content to find a better ways
-    	//
-    	// Generate fields
-    	String[] labels = new String[jniEvent.requestEventMarker().getMarkerFieldsHashMap().size()];
-    	labels = jniEvent.requestEventMarker().getMarkerFieldsHashMap().keySet().toArray( labels );
-    	
-    	// We need a format for content and fields
-        LttngEventFormat eventFormat = new LttngEventFormat(labels);
-        String content = "";
-        LttngEventField[] fields = null;
-
-        if (isParsingNeeded == true) {
-            fields = eventFormat.parse(jniEvent.parseAllFields());
-            for (int y = 0; y < fields.length; y++) {
-                content += fields[y].toString() + " ";
-            }
+        // *** HACK *** 
+        // To save time here, we only set value instead of allocating new object
+        // This give an HUGE performance improvement
+        // all allocation done in the LttngTrace constructor
+        
+        eventTimestamp.setValue(jniEvent.getEventTime().getTime());
+        eventSource.setSourceId(jniEvent.requestEventSource());
+        
+        eventType = traceTypes.get( EventTypeKey.getEventTypeKey(jniEvent) );
+        
+        eventReference.setValue(jniEvent.getParentTracefile().getTracefilePath());
+        eventReference.setTracepath(this.getName());
+        
+//        eventContent.setEvent(currentLttngEvent);
+//        eventContent.setType(eventType);
+        eventContent.emptyContent();
+        
+//        currentLttngEvent.setContent(eventContent);
+        currentLttngEvent.setType(eventType);
+        // Save the jni reference
+        currentLttngEvent.setJniEventReference(jniEvent);
+        
+        // Parse now if was asked
+        // Warning : THIS IS SLOW
+        if (isParsingNeeded == true ) {
+            eventContent.getFields();
         }
         
-        LttngEvent event = null;
-        try {
-        	event = new LttngEvent(
-	        			new LttngTimestamp(jniEvent.getEventTime().getTime()),
-	        			new TmfEventSource(jniEvent.requestEventSource() ), 
-	        			new LttngEventType(jniEvent.getParentTracefile().getTracefileName(),
-	                                       jniEvent.getParentTracefile().getCpuNumber(),
-	                                       jniEvent.requestEventMarker().getName(),
-	                                       eventFormat),
-	                    new LttngEventContent(eventFormat, content, fields), 
-	                    new LttngEventReference(jniEvent.getParentTracefile().getTracefilePath(), this.getName()),
-	                    jniEvent);
-        }
-        catch (LttngException e) {
-        	System.out.println("ERROR : Event creation returned :" + e.getMessage() );
-        }
-        
-        return event;
+        return currentLttngEvent;
     }
     
     /**
@@ -294,7 +374,7 @@ public class LTTngTrace extends TmfTrace {
      * 
      * @return Reference to the current LttngTrace 
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniTrace
+     * @see org.eclipse.linuxtools.org.eclipse.linuxtools.lttng.jni.JniTrace
      */
     public JniTrace getCurrentJniTrace() {
         return currentJniTrace;
@@ -322,6 +402,30 @@ public class LTTngTrace extends TmfTrace {
     	returnedData += "Event:" + currentLttngEvent;
     	
     	return returnedData;
+    }
+}
+
+/*
+ * EventTypeKey inner class
+ * 
+ * This class is used to make the process of generating the HashMap key more transparent and so less error prone to use
+ * 
+ */
+class EventTypeKey {
+    //*** WARNING ***
+    // These two getEventTypeKey() functions should ALWAYS construct the key the same ways! 
+    // Otherwise, every type search will fail!
+    
+    static public String getEventTypeKey(LttngEventType newEventType) {
+        String key = newEventType.getTracefileName() + "/" + newEventType.getCpuId().toString() + "/" + newEventType.getMarkerName();
+        
+        return key;
+    }
+    
+    static public String getEventTypeKey(JniEvent newEvent) {
+        String key = newEvent.getParentTracefile().getTracefileName() + "/" + newEvent.getParentTracefile().getCpuNumber() + "/" + newEvent.requestEventMarker().getName();
+        
+        return key;
     }
     
 }

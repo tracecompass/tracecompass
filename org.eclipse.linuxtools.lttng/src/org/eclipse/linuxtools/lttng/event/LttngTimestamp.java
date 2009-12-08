@@ -25,11 +25,19 @@ public class LttngTimestamp extends TmfTimestamp {
     
     // Required by Serializable
 	private static final long serialVersionUID = -7016853105162491273L;
-
+	
+    /**
+     * Default Constructor.<p>
+     * 
+     */
+	public LttngTimestamp() {
+	    super(Long.MIN_VALUE, (byte) -9);
+	}
+	
 	/**
      * Constructor with parameters.<p>
      * 
-     * @param newEventTime    JniTime as long, unit expected to be nanoseconds
+     * @param newEventTime    Time as long, unit expected to be nanoseconds
      */
     public LttngTimestamp(long newEventTime) {
         super(newEventTime, (byte) -9);
@@ -43,7 +51,16 @@ public class LttngTimestamp extends TmfTimestamp {
     public LttngTimestamp(TmfTimestamp oldEventTime) {
         this(oldEventTime.getValue());
     }
-
+    
+    @Override
+    public long getValue() {
+        return fValue;
+    }
+    
+    public void setValue(long newValue) {
+        fValue = newValue;
+    }
+    
 	/**
 	 * Get the second part in timestamp.<p>
 	 * 
@@ -65,7 +82,7 @@ public class LttngTimestamp extends TmfTimestamp {
 	public String getNanoSeconds() {
 		return formatNs(fValue);
 	}
-
+	
 	/*
 	 * Use the exponent to format the second in the correct format.
 	 */
@@ -118,7 +135,7 @@ public class LttngTimestamp extends TmfTimestamp {
     /**
      * toString() method.
      * 
-     * @return Attributes of this object.
+     * @return timestamp, as string
      */
     @Override
 	public String toString() {

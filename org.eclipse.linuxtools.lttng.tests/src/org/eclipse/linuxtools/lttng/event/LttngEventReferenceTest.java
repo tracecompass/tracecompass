@@ -1,13 +1,8 @@
 package org.eclipse.linuxtools.lttng.event;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
-import org.junit.Test;
+import junit.framework.TestCase;
 
 /*
  Functions tested here :
@@ -18,7 +13,7 @@ import org.junit.Test;
     public String toString() 
  */
 
-public class LttngEventReferenceTest {
+public class LttngEventReferenceTest extends TestCase {
 	private final static boolean skipIndexing=true;
 	private final static boolean waitForCompletion=true;
     private final static String tracepath1="traceset/trace-618339events-1293lost-1cpu";
@@ -53,8 +48,7 @@ public class LttngEventReferenceTest {
 
         return tmpEventRef;
     }
-
-    @Test
+    
     public void testConstructors() {
         LttngEventReference testRef = null;
         @SuppressWarnings("unused")
@@ -79,7 +73,6 @@ public class LttngEventReferenceTest {
     }
     
     
-    @Test
     public void testGetter() {
         LttngEventReference tmpRef = prepareToTest();
         
@@ -87,7 +80,6 @@ public class LttngEventReferenceTest {
         assertEquals("Content not what expected!",firstEventReference,tmpRef.getTracepath());
     }
     
-    @Test
     public void testToString() {
         LttngEventReference tmpRef = prepareToTest();
         

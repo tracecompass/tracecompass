@@ -1,3 +1,4 @@
+package org.eclipse.linuxtools.lttng.jni;
 /*******************************************************************************
  * Copyright (c) 2009 Ericsson
  * 
@@ -10,7 +11,6 @@
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.jni;
 
 /**
  * <b><u>JniMarkerField</u></b> <p>
@@ -117,7 +117,7 @@ public final class JniMarkerField extends Jni_C_Common
      * 
      * @return The actual (long converted) pointer or NULL
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
      */
     public Jni_C_Pointer getMarkerFieldPtr() {
         return thisMarkerFieldPtr;

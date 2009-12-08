@@ -3,8 +3,8 @@ package org.eclipse.linuxtools.lttng.event;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.lttng.LttngException;
+import org.eclipse.linuxtools.lttng.jni.JniEvent;
 
 /**
  * <b><u>LttngEvent</u></b><p>
@@ -17,9 +17,9 @@ import org.eclipse.linuxtools.lttng.LttngException;
 @SuppressWarnings("unused")
 public class LttngEvent extends TmfEvent {
     
-    // Reference to the JNI JniEvent. Should only used INTERNALLY
+    // Reference to the JNI JniEvent. Should only be used INTERNALLY
     private JniEvent jniEventReference = null;
-    
+
     /**
      * Constructor with parameters.<p>
      * 
@@ -35,16 +35,12 @@ public class LttngEvent extends TmfEvent {
      * @see org.eclipse.linuxtools.lttng.event.LttngEventType
      * @see org.eclipse.linuxtools.lttng.event.LttngEventContent
      * @see org.eclipse.linuxtools.lttng.event.LttngEventReference
-     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.org.eclipse.linuxtools.lttng.jni.JniEvent
      */
-    public LttngEvent(LttngTimestamp timestamp, TmfEventSource source, LttngEventType type, LttngEventContent content, LttngEventReference reference, JniEvent lttEvent) throws LttngException { 
-        super(timestamp, source, type, content, reference);
+    public LttngEvent(LttngTimestamp timestamp, TmfEventSource source, LttngEventType type, LttngEventContent content, LttngEventReference reference, JniEvent lttEvent) { 
+        super(timestamp, source, type, reference);
         
-        // Sanity checks
-        if ( (timestamp == null) || (source == null) || (type == null) || (content == null) || (reference == null) || (lttEvent == null) ) {
-        	throw new LttngException("Event creation with null values is forbidden!");
-        }
-        
+        fContent = content;
         jniEventReference = lttEvent;
     }
     
@@ -54,7 +50,7 @@ public class LttngEvent extends TmfEvent {
      * @param oldEvent		Event we want to copy from.
      * 
      */
-    public LttngEvent(LttngEvent oldEvent) throws LttngException { 
+    public LttngEvent(LttngEvent oldEvent) { 
         this(	(LttngTimestamp)oldEvent.getTimestamp(), 
         		(TmfEventSource)oldEvent.getSource(), 
         		(LttngEventType)oldEvent.getType(), 
@@ -68,47 +64,61 @@ public class LttngEvent extends TmfEvent {
     /**
      * Return the channel name of this event.<p>
      * 
-     * @return The name of the channel for this event
+     * @return Channel (tracefile) for this event
      */
     public String getChannelName() {
-        String returnedValue = "";
+        String returnedChannel = "";
         
-        // This should always be true
-        if ( this.getType() instanceof LttngEventType ) {
-            returnedValue = ( (LttngEventType)this.getType() ).getChannelName();
-        }
-        return returnedValue;
+        return ( (LttngEventType)this.getType() ).getTracefileName();
     }
     
     /**
      * Cpu id number of this event.<p>
      * 
-     * @return The cpu id
+     * @return Cpu id
      */
     public long getCpuId() {
-        long returnedValue =-1;
-        
-        // This should always be true
-        if ( this.getType() instanceof LttngEventType ) {
-            returnedValue = ( (LttngEventType)this.getType() ).getCpuId();
-        }
-        return returnedValue;
+        return ( (LttngEventType)this.getType() ).getCpuId();
     }
     
     /**
      * Marker name of this event.<p>
      * 
-     * @return The marker name
+     * @return Marker name
      */
     public String getMarkerName() {
         String returnedValue = "";
         
-        // This should always be true
-        if ( this.getType() instanceof LttngEventType ) {
-            returnedValue = ( (LttngEventType)this.getType() ).getMarkerName();
-        }
-        return returnedValue;
+        return ( (LttngEventType)this.getType() ).getMarkerName();
     }
+    
+    
+    public JniEvent getJniEventReference() {
+        return jniEventReference;
+    }
+    
+    public void setJniEventReference(JniEvent newJniEventReference) {
+        this.jniEventReference = newJniEventReference;
+    }
+    
+    @Override
+    public LttngEventContent getContent() {
+        return (LttngEventContent)fContent;
+    }
+    
+    public void setContent(LttngEventContent newContent) {
+        fContent = newContent;
+    }
+    
+    @Override
+    public LttngEventType getType() {
+        return (LttngEventType)fType;
+    }
+    
+    public void setType(LttngEventType newType) {
+        fType = newType;
+    }
+    
     
     /**
      * Convert this event into a Jni JniEvent.<p>
@@ -118,15 +128,21 @@ public class LttngEvent extends TmfEvent {
      * 
      * @return The converted JniEvent
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.org.eclipse.linuxtools.lttng.jni.JniEvent
      */
     public JniEvent convertEventTmfToJni() {
         JniEvent tmpEvent = null;
+        
+        // ***TODO***
+        // Should we remove the check to save some time??
         
         // We don't want to send away events that are outdated as their informations could be invalid
         //  If the timestamp between the event and the trace are not coherent we will not perform the conversion
         if ( jniEventReference.getParentTracefile().getParentTrace().getCurrentEventTimestamp().getTime() == getTimestamp().getValue() ) {
             tmpEvent = jniEventReference;
+        }
+        else {
+            System.out.println("WRONG TIMESTAMP : " + getTimestamp().getValue() + " vs " + jniEventReference.getParentTracefile().getParentTrace().getCurrentEventTimestamp().getTime());
         }
         return tmpEvent;
     }

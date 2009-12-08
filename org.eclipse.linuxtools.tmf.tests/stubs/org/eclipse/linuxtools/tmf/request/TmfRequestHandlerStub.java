@@ -54,7 +54,7 @@ public class TmfRequestHandlerStub implements ITmfRequestHandler<TmfEvent> {
                 TmfTimestamp endTime   = request.getRange().getEndTime();
                 int blockSize = request.getBlockize();
 
-                int nbRequestedEvents = request.getNbRequestedItems();
+                int nbRequestedEvents = request.getNbRequestedEvents();
                 if (nbRequestedEvents <= 0) {
                     nbRequestedEvents = MAX_GENERATED_EVENTS;
                 }

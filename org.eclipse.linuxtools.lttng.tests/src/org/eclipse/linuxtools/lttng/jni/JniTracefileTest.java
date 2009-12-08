@@ -1,8 +1,7 @@
 
 package org.eclipse.linuxtools.lttng.jni;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
+import junit.framework.TestCase;
 
 /*
  Functions tested here :
@@ -47,8 +46,10 @@ import org.junit.Test;
         public void printTracefileInformation()
 */
 
-public class JniTracefileTest
+public class JniTracefileTest extends TestCase
 {
+		private final static boolean printLttDebug = false;
+		
         private final static String tracepath1="traceset/trace-618339events-1293lost-1cpu";
         private final static String tracefileName1="kernel0";
         
@@ -70,7 +71,7 @@ public class JniTracefileTest
                 
                 // This trace should be valid
                 try {
-                        tmpTracefile = new JniTrace(tracepath1).requestTracefileByName(tracefileName1);
+                        tmpTracefile = new JniTrace(tracepath1, printLttDebug).requestTracefileByName(tracefileName1);
                         
                 }
                 catch( JniException e) { }
@@ -79,7 +80,6 @@ public class JniTracefileTest
         }
         
         
-        @Test
         public void testTracefileConstructors() {
                 JniTrace testTrace = null;
                 JniTracefile testTracefile1 = null;
@@ -87,7 +87,7 @@ public class JniTracefileTest
                 
                 // This trace should be valid and will be used in test
                 try {
-                        testTrace = new JniTrace(tracepath1);
+                        testTrace = new JniTrace(tracepath1, printLttDebug);
                 }
                 catch( JniException e) { }
                 
@@ -122,7 +122,6 @@ public class JniTracefileTest
                 
         }
         
-        @Test
         public void testGetSet() {
                 
                 JniTracefile testTracefile = prepareTracefileToTest();
@@ -166,7 +165,6 @@ public class JniTracefileTest
                 
         }
         
-        @Test
         public void testPrintAndToString() {
                 
                 JniTracefile testTracefile = prepareTracefileToTest();
@@ -184,7 +182,6 @@ public class JniTracefileTest
                 
         }
         
-        @Test
         public void testEventDisplacement() {
                 
                 int readValue = -1;

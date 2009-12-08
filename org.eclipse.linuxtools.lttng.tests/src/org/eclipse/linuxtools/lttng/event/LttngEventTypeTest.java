@@ -1,12 +1,8 @@
 package org.eclipse.linuxtools.lttng.event;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.fail;
-
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
-import org.junit.Test;
+import junit.framework.TestCase;
 
 /*
  Functions tested here :
@@ -18,7 +14,7 @@ import org.junit.Test;
     public String toString() 
  */
 
-public class LttngEventTypeTest {
+public class LttngEventTypeTest extends TestCase {
 	private final static boolean skipIndexing=true;
 	private final static boolean waitForCompletion=true;
     private final static String tracepath1="traceset/trace-618339events-1293lost-1cpu";
@@ -54,8 +50,7 @@ public class LttngEventTypeTest {
 
         return tmpEventType;
     }
-
-    @Test
+    
     public void testConstructors() {
         LttngEventType tmpEventType = null;
         @SuppressWarnings("unused")
@@ -63,7 +58,7 @@ public class LttngEventTypeTest {
         
         // Default construction with good argument
         try {
-            tmpEventType = new LttngEventType("test", 0L, "test",  new LttngEventFormat(new String[1]));
+            tmpEventType = new LttngEventType("test", 0L, "test",  new String[1]);
         }
         catch( Exception e) { 
             fail("Construction failed!");
@@ -71,7 +66,7 @@ public class LttngEventTypeTest {
         
         // Copy constructor
         try {
-            tmpEventType = new LttngEventType("test", 0L, "test", new LttngEventFormat(new String[1]));
+            tmpEventType = new LttngEventType("test", 0L, "test", new String[1]);
             tmpEventType2 = new LttngEventType(tmpEventType);
         }
         catch( Exception e) { 
@@ -80,18 +75,16 @@ public class LttngEventTypeTest {
     }
     
     
-    @Test
     public void testGetter() {
         LttngEventType tmpEventType = prepareToTest();
         
-        assertEquals("Channel name not what was expected!",firstEventChannel,(String)tmpEventType.getChannelName() );
-        assertEquals("Cpu Id not what was expected!",firstEventCpu,tmpEventType.getCpuId() );
-        assertEquals("Marker Name not what was expected!",firstEventMarker,(String)tmpEventType.getMarkerName() );
-        // Just test the non-nullity of format
-        assertNotSame("getFormat returned null",null, tmpEventType.getFormat() );
+        assertTrue("Channel name not what was expected!",firstEventChannel.equals((String)tmpEventType.getTracefileName()) );
+        assertTrue("Cpu Id not what was expected!",firstEventCpu == tmpEventType.getCpuId() );
+        assertTrue("Marker Name not what was expected!",firstEventMarker.equals((String)tmpEventType.getMarkerName()) );
+        // Just test the non-nullity of labels
+        assertNotSame("getFormat returned null",null, tmpEventType.getLabels() );
     }
     
-    @Test
     public void testToString() {
         LttngEventType tmpEventType = prepareToTest();
         

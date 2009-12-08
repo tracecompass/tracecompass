@@ -1,3 +1,4 @@
+package org.eclipse.linuxtools.lttng.jni;
 /*******************************************************************************
  * Copyright (c) 2009 Ericsson
  * 
@@ -10,7 +11,6 @@
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.jni;
 
 import java.util.HashMap;
 
@@ -161,8 +161,8 @@ public final class JniTracefile extends Jni_C_Common {
      * 
      * @exception JniException
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniTrace
-     * @see org.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTrace
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
      */
     public JniTracefile(Jni_C_Pointer newPtr, JniTrace newParentTrace) throws JniException {
         thisTracefilePtr = newPtr;
@@ -185,7 +185,7 @@ public final class JniTracefile extends Jni_C_Common {
      *      
      * @return LTT read status, as defined in Jni_C_Common
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.Jni_C_Common
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.Jni_C_Common
      */
     public int readNextEvent() {
         return currentEvent.readNextEvent();
@@ -200,7 +200,7 @@ public final class JniTracefile extends Jni_C_Common {
      * 
      * @return LTT read status, as defined in Jni_C_Common
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.Jni_C_Common
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.Jni_C_Common
      */
     public int seekToTime(JniTime seekTime) {
         return currentEvent.seekToTime(seekTime);
@@ -382,7 +382,7 @@ public final class JniTracefile extends Jni_C_Common {
      *
      * @return The parent trace
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniTrace
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTrace
      */
     public JniTrace getParentTrace() {
         return parentTrace;
@@ -396,7 +396,7 @@ public final class JniTracefile extends Jni_C_Common {
      * 
      * @return The actual (long converted) pointer or NULL.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
      */
     public Jni_C_Pointer getTracefilePtr() {
         return thisTracefilePtr;

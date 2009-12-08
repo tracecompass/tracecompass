@@ -30,48 +30,59 @@ public class TmfTraceEvent extends TmfEvent {
 
     private final String fSourcePath;
     private final String fFileName;
-    private final int fLineNumber;
+    private final int    fLineNumber;
 
     // ========================================================================
     // Constructors
     // ========================================================================
 
 	/**
-	 * The constructor.
-	 * 
-	 * @param timestamp
+	 * @param originalTS
+	 * @param effectiveTS
 	 * @param source
 	 * @param type
 	 * @param content
 	 * @param reference
+	 * @param path
+	 * @param file
+	 * @param line
 	 */
 	public TmfTraceEvent(TmfTimestamp originalTS, TmfTimestamp effectiveTS, TmfEventSource source,
-			TmfEventType type, TmfEventContent content, TmfEventReference reference,
-			String path, String file, int line)
+			TmfEventType type, TmfEventReference reference,	String path, String file, int line)
 	{
-		super(originalTS, effectiveTS, source, type,content, reference);
+		super(originalTS, effectiveTS, source, type, reference);
 		fSourcePath = path;
-		fFileName = file;
+		fFileName   = file;
 		fLineNumber = line;
 	}
 
 	/**
-	 * The constructor.
-	 * 
 	 * @param timestamp
 	 * @param source
 	 * @param type
 	 * @param content
 	 * @param reference
+	 * @param path
+	 * @param file
+	 * @param line
 	 */
 	public TmfTraceEvent(TmfTimestamp timestamp, TmfEventSource source, TmfEventType type,
-			TmfEventContent content, TmfEventReference reference,
-			String path, String file, int line)
+			TmfEventReference reference, String path, String file, int line)
 	{
-		super(timestamp, source, type,content, reference);
+		super(timestamp, source, type, reference);
 		fSourcePath = path;
-		fFileName = file;
+		fFileName   = file;
 		fLineNumber = line;
+	}
+
+	/**
+	 * @param other
+	 */
+	public TmfTraceEvent(TmfTraceEvent other) {
+		super(other);
+		fSourcePath = other.fSourcePath;
+		fFileName   = other.fFileName;
+		fLineNumber = other.fLineNumber;
 	}
 
     // ========================================================================
@@ -97,6 +108,22 @@ public class TmfTraceEvent extends TmfEvent {
      */
     public int getLineNumber() {
         return fLineNumber;
+    }
+
+    // ========================================================================
+    // Operators
+    // ========================================================================
+
+    // TODO: Deep copy
+    @Override
+    public TmfTraceEvent clone() {
+    	return new TmfTraceEvent(this);
+    }
+
+    // TODO: Proper format
+    @Override
+    public String toString() {
+    	return null;
     }
 
 }

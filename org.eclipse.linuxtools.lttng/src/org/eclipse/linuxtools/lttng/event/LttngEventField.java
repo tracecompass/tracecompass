@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.lttng.event;
 
+import org.eclipse.linuxtools.tmf.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.event.TmfEventField;
 
 /**
@@ -23,20 +24,26 @@ import org.eclipse.linuxtools.tmf.event.TmfEventField;
  * mean the fields will have a name and a value.
  */
 public class LttngEventField extends TmfEventField {
-	private String fieldName = "";
 	
+    /**
+     * Constructor with parameters.<p>
+     * 
+     * @param parent   Parent content for this field
+     * @param id       Name (label) of this field
+     */
+    public LttngEventField(TmfEventContent parent, String id) {
+        super(parent, id, null);
+    }
+    
 	/**
-	 * Constructor with parameters.<p>
+	 * Constructor with parameters with optional value.<p>
 	 * 
-	 * @param name       Name of the field
-	 * @param newContent ParsedContent we want to populate the field with.
-	 * 
-	 * @see org.eclipse.linuxtools.lttng.jni.JniParser
+	 * @param parent   Parent content for this field
+	 * @param id       Name (label) of this field
+	 * @param value    Parsed value (payload) of this field
 	 */
-	public LttngEventField(String name, Object newContent) {
-		super(newContent);
-		
-		fieldName = name;
+	public LttngEventField(TmfEventContent parent, String id, Object value) {
+		super(parent, id, value);
 	}
 	
 	/**
@@ -45,21 +52,12 @@ public class LttngEventField extends TmfEventField {
 	 * @param oldField     the field to copy from
 	 */
 	public LttngEventField(LttngEventField oldField) {
-		this(oldField.fieldName, oldField.getValue());
+		this(oldField.getParent(), oldField.getId(), oldField.getValue());
 	}
 	
-	
-	public String getName() {
-		return fieldName;
-	}
-
-	/**
-	 * toString() method.<p>
-	 * 
-	 * Print both field name and value (i.e. NAME:VALUE ).
-	 */
 	@Override
 	public String toString() {
-		return fieldName + ":" + getValue().toString();
+	    return getId().toString() + ":" + getValue().toString();
 	}
+	
 }

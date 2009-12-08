@@ -12,10 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.trace;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.util.Vector;
 
@@ -23,15 +19,15 @@ import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
-import org.junit.BeforeClass;
-import org.junit.Test;
+
+import junit.framework.TestCase;
 
 /**
- * <b><u>TmfEventStreamTest</u></b>
+ * <b><u>TmfTraceTest</u></b>
  * <p>
  * TODO: Implement me. Please.
  */
-public class TmfTraceTest {
+public class TmfTraceTest extends TestCase {
 
     private static final String DIRECTORY   = "testfiles";
     private static final String TEST_STREAM = "M-Test-10K";
@@ -41,43 +37,51 @@ public class TmfTraceTest {
 
     private static byte SCALE = (byte) -3;
 
-    /**
-     * @throws java.lang.Exception
-     */
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
+    // ========================================================================
+    // Housekeeping
+    // ========================================================================
+
+	public TmfTraceTest(String name) throws Exception {
+		super(name);
     	String directory = new File(".").getCanonicalPath() + File.separator + DIRECTORY;
     	testfile = directory + File.separator + TEST_STREAM;
         fTrace = new TmfTraceStub(testfile, 500, true);
-    }
+	}
+
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+	}
 
     // ========================================================================
-    // Constructor
+    // Constructors
     // ========================================================================
 
-    @Test
-    public void testDefaultConstructor() throws Exception {
+    public void testTmfTraceDefault() throws Exception {
         TmfTraceStub trace = new TmfTraceStub(testfile, true);
 
         assertEquals("getCacheSize", TmfTraceStub.DEFAULT_CACHE_SIZE, trace.getCacheSize());
-        assertEquals("getTraceSize", NB_EVENTS, trace.getNbEvents());
-        assertEquals("getRange-start", 1, trace.getTimeRange().getStartTime().getValue());
-        assertEquals("getRange-end", NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
+        assertEquals("getTraceSize",   0, trace.getNbEvents());
+        assertEquals("getRange-start", 0, trace.getTimeRange().getStartTime().getValue());
+        assertEquals("getRange-end",   0, trace.getTimeRange().getEndTime().getValue());
     }
 
-    @Test
-    public void testNormalConstructor() throws Exception {
-        assertEquals("getCacheSize",    500,    fTrace.getCacheSize());
-        assertEquals("getTraceSize", NB_EVENTS, fTrace.getNbEvents());
-        assertEquals("getRange-start",    1,    fTrace.getTimeRange().getStartTime().getValue());
-        assertEquals("getRange-end", NB_EVENTS, fTrace.getTimeRange().getEndTime().getValue());
+    public void testTmfTrace() throws Exception {
+        assertEquals("getCacheSize", 500, fTrace.getCacheSize());
+        assertEquals("getTraceSize",   0, fTrace.getNbEvents());
+        assertEquals("getRange-start", 0, fTrace.getTimeRange().getStartTime().getValue());
+        assertEquals("getRange-end",   0, fTrace.getTimeRange().getEndTime().getValue());
     }
 
     // ========================================================================
     // seek
     // ========================================================================
 
-    @Test
     public void testSeekOnCacheBoundary() throws Exception {
     	TmfTraceContext context = fTrace.seekLocation(null);
 
@@ -94,7 +98,6 @@ public class TmfTraceTest {
         assertEquals("Event timestamp", 4000, event.getTimestamp().getValue());
     }
 
-    @Test
     public void testSeekNotOnCacheBoundary() throws Exception {
     	TmfTraceContext context = fTrace.seekLocation(null);
 
@@ -111,7 +114,6 @@ public class TmfTraceTest {
         assertEquals("Event timestamp", 4499, event.getTimestamp().getValue());
     }
 
-    @Test
     public void testSeekForEventOutOfBounds() throws Exception {
     	TmfTraceContext context = fTrace.seekLocation(null);
 
@@ -130,7 +132,6 @@ public class TmfTraceTest {
     // getNextEvent
     // ========================================================================
 
-    @Test
     public void testGetNextEvent() throws Exception {
     	TmfTraceContext context = fTrace.seekLocation(null);
 
@@ -149,14 +150,13 @@ public class TmfTraceTest {
     // processRequest
     // ========================================================================
 
-    @Test
     public void testProcessRequestForNbEvents() throws Exception {
         final int BLOCK_SIZE = 100;
         final int NB_EVENTS  = 1000;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 0, NB_EVENTS, BLOCK_SIZE) {
+        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void handleData() {
             	TmfEvent[] events = getData();
@@ -178,15 +178,13 @@ public class TmfTraceTest {
         }
     }
     
-    @Test
     public void testProcessRequestForAllEvents() throws Exception {
-        final int NB_EVENTS  = -1;
         final int BLOCK_SIZE =  1;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
-        long nbExpectedEvents = fTrace.getNbEvents();
+        long nbExpectedEvents = NB_EVENTS;
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 0, NB_EVENTS, BLOCK_SIZE) {
+        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void handleData() {
             	TmfEvent[] events = getData();
@@ -197,13 +195,13 @@ public class TmfTraceTest {
         };
         fTrace.processRequest(request, true);
 
-        assertEquals("nbEvents", nbExpectedEvents, requestedEvents.size());
+        assertEquals("nbEvents", NB_EVENTS, requestedEvents.size());
         assertTrue("isCompleted",  request.isCompleted());
         assertFalse("isCancelled", request.isCancelled());
 
         // Ensure that we have distinct events.
         // Don't go overboard: we are not validating the stub! 
-        for (int i = 0; i < nbExpectedEvents; i++) {
+        for (int i = 0; i < NB_EVENTS; i++) {
             assertEquals("Distinct events", i+1, requestedEvents.get(i).getTimestamp().getValue());
         }
     }
@@ -212,12 +210,11 @@ public class TmfTraceTest {
     // cancel
     // ========================================================================
 
-    @Test
     public void testCancel() throws Exception {
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 0, NB_EVENTS, NB_EVENTS) {
+        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, NB_EVENTS, NB_EVENTS) {
             @Override
             public void handleData() {
             	TmfEvent[] events = getData();
@@ -234,5 +231,4 @@ public class TmfTraceTest {
         assertTrue("isCompleted", request.isCompleted());
         assertTrue("isCancelled", request.isCancelled());
     }
-
 }

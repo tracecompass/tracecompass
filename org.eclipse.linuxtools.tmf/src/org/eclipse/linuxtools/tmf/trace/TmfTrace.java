@@ -324,7 +324,7 @@ public abstract class TmfTrace extends TmfComponent implements ITmfTrace, ITmfRe
 			public void run() {
 				// Extract the general request information
 				int blockSize = request.getBlockize();
-				int nbRequestedEvents = request.getNbRequestedItems();
+				int nbRequestedEvents = request.getNbRequestedEvents();
 				if (nbRequestedEvents == -1) {
 					nbRequestedEvents = Integer.MAX_VALUE;
 				}

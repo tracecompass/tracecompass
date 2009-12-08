@@ -152,7 +152,7 @@ abstract class AbstractStatsEventHandler implements IEventProcessing {
 		if (process.getState().getProc_status().equals(ProcessStatus.LTTV_STATE_RUN) &&
 				!process.getState().getExec_mode().equals(ExecutionMode.LTTV_STATE_MODE_UNKNOWN)) {
 			node.getValue().cpuTime += event.getTimestamp().getValue()
-				- process.getState().getChange_LttTime().getValue();
+				- process.getState().getChange_LttTime();
 		}
 	}
 	
@@ -168,7 +168,7 @@ abstract class AbstractStatsEventHandler implements IEventProcessing {
 		
 		if (!process.getState().getExec_mode().equals(ExecutionMode.LTTV_STATE_MODE_UNKNOWN)) {
 			node.getValue().elapsedTime += event.getTimestamp().getValue()
-				- process.getState().getEntry_LttTime().getValue();
+				- process.getState().getEntry_LttTime();
 		}
 	}
 	
@@ -184,14 +184,14 @@ abstract class AbstractStatsEventHandler implements IEventProcessing {
 		
 		if (!process.getState().getExec_mode().equals(ExecutionMode.LTTV_STATE_MODE_UNKNOWN)) {
 			long cumulativeCpuTime = process.getState().getCum_cpu_time();
-			long delta = event.getTimestamp().getValue() - process.getState().getEntry_LttTime().getValue();
+			long delta = event.getTimestamp().getValue() - process.getState().getEntry_LttTime();
 			process.getState().setCum_cpu_time(cumulativeCpuTime + delta);
 			node.getValue().cumulativeCpuTime += process.getState().getCum_cpu_time();
 		}
 		else if (process.getState().getProc_status().equals(ProcessStatus.LTTV_STATE_RUN) &&
 				!process.getState().getExec_mode().equals(ExecutionMode.LTTV_STATE_MODE_UNKNOWN)) {
 			long cumulativeCpuTime = process.getState().getCum_cpu_time();
-			long delta = event.getTimestamp().getValue() - process.getState().getChange_LttTime().getValue();
+			long delta = event.getTimestamp().getValue() - process.getState().getChange_LttTime();
 			process.getState().setCum_cpu_time(cumulativeCpuTime + delta);
 			node.getValue().cumulativeCpuTime += process.getState().getCum_cpu_time();
 		}
@@ -209,7 +209,7 @@ abstract class AbstractStatsEventHandler implements IEventProcessing {
 		if (process.getState().getProc_status().equals(ProcessStatus.LTTV_STATE_RUN) &&
 				!process.getState().getExec_mode().equals(ExecutionMode.LTTV_STATE_MODE_UNKNOWN)) {
 			long cumulativeCpuTime = process.getState().getCum_cpu_time();
-			long delta = event.getTimestamp().getValue() - process.getState().getChange_LttTime().getValue();
+			long delta = event.getTimestamp().getValue() - process.getState().getChange_LttTime();
 			process.getState().setCum_cpu_time(cumulativeCpuTime + delta);
 		}
 	}

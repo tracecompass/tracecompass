@@ -177,7 +177,7 @@ class ResourceKey {
         	else {
         		if ( (  ((ResourceKey)obj).getResourceId().equals(this.resourceId)) &&
    	                 (  ((ResourceKey)obj).getTraceId().equals(this.traceId)) &&
-   	                 (  ((ResourceKey)obj).getType().equals(this.traceId)) )
+   	                 (  ((ResourceKey)obj).getType().equals(this.type)) )
    	            {
    	                isSame = true;
    	            }

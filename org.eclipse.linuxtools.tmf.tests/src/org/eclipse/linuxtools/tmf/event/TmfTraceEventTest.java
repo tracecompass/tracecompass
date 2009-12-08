@@ -12,63 +12,102 @@
 
 package org.eclipse.linuxtools.tmf.event;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
+import junit.framework.TestCase;
 
 /**
  * <b><u>TmfTraceEventTest</u></b>
  * <p>
- * JUnit test suite for the TmfTraceEvent class.
+ * TODO: Implement me. Please.
  */
-public class TmfTraceEventTest {
+public class TmfTraceEventTest extends TestCase {
 
-    // ========================================================================
-    // Constructor
-    // ========================================================================
+	private final String   fTypeId = "Some type";
+	private final String   fLabel0 = "label1";
+	private final String   fLabel1 = "label2";
+	private final String[] fLabels = new String[] { fLabel0, fLabel1 };
 
-    @Test
+	private final TmfTimestamp      fTimestamp1 = new TmfTimestamp(12345, (byte) 2, 5);
+	private final TmfTimestamp      fTimestamp2 = new TmfTimestamp(12350, (byte) 2, 5);
+	private final TmfEventSource    fSource     = new TmfEventSource("Source");
+	private final TmfEventType      fType       = new TmfEventType(fTypeId, fLabels);
+	private final TmfEventReference fReference  = new TmfEventReference("Some reference");
+
+	private final TmfTraceEvent fEvent1;
+	private final TmfTraceEvent fEvent2;
+
+	private final TmfEventContent fContent1;
+	private final TmfEventContent fContent2;
+
+	private final String fPath = "/some/path/";
+	private final String fFile = "filename";
+	private final int    fLine = 10;
+
+	// ========================================================================
+	// Housekeeping
+	// ========================================================================
+
+	public TmfTraceEventTest(String name) {
+		super(name);
+
+		fEvent1 = new TmfTraceEvent(fTimestamp1, fSource, fType, fReference, fPath, fFile, fLine);
+		fContent1 = new TmfEventContent(fEvent1, "Some content");
+		fEvent1.setContent(fContent1);
+
+		fEvent2 = new TmfTraceEvent(fTimestamp1, fTimestamp2, fSource, fType, fReference, fPath, fFile, fLine);
+		fContent2 = new TmfEventContent(fEvent2, "Some other content");
+		fEvent2.setContent(fContent2);
+	}
+
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+	}
+
+	// ========================================================================
+	// Constructors
+	// ========================================================================
+
     public void testTmfTraceEvent() throws Exception {
-        TmfTimestamp      timestamp = new TmfTimestamp(12345, (byte) 2, 5);
-        TmfEventSource    source    = new TmfEventSource("Source");
-        TmfEventFormat    format    = new TmfEventFormat(new String[] { "field1", "field2" });
-        TmfEventType      type      = new TmfEventType("Type", format);
-        TmfEventContent   content   = new TmfEventContent("Some content", format);
-        TmfEventReference reference = new TmfEventReference("Reference");
+		assertEquals("getTimestamp",         fTimestamp1, fEvent1.getTimestamp());
+		assertEquals("getOriginalTimestamp", fTimestamp1, fEvent1.getOriginalTimestamp());
+		assertEquals("getSource",            fSource,     fEvent1.getSource());
+		assertEquals("getType",              fType,       fEvent1.getType());
+		assertEquals("getContent",           fContent1,   fEvent1.getContent());
+		assertEquals("getReference",         fReference,  fEvent1.getReference());
+		assertEquals("getSourcePath",        fPath,       fEvent1.getSourcePath());
+		assertEquals("getFileName",          fFile,       fEvent1.getFileName());
+		assertEquals("getLineNumber",        fLine,       fEvent1.getLineNumber());
+    }
 
-        // Create the trace event
-        TmfTraceEvent event = 
-            new TmfTraceEvent(timestamp, source, type, content, reference, "path", "filename", 10);
+    public void testTmfTraceEvent2() throws Exception {
+		assertEquals("getTimestamp",         fTimestamp2, fEvent2.getTimestamp());
+		assertEquals("getOriginalTimestamp", fTimestamp1, fEvent2.getOriginalTimestamp());
+		assertEquals("getSource",            fSource,     fEvent2.getSource());
+		assertEquals("getType",              fType,       fEvent2.getType());
+		assertEquals("getContent",           fContent2,   fEvent2.getContent());
+		assertEquals("getReference",         fReference,  fEvent2.getReference());
+		assertEquals("getSourcePath",        fPath,       fEvent2.getSourcePath());
+		assertEquals("getFileName",          fFile,       fEvent2.getFileName());
+		assertEquals("getLineNumber",        fLine,       fEvent2.getLineNumber());
+    }
 
-        // Check the event timestamp
-        TmfTimestamp evTS = event.getTimestamp();
-        assertEquals("getValue", 12345, evTS.getValue());
-        assertEquals("getscale",     2, evTS.getScale());
-        assertEquals("getPrecision", 5, evTS.getPrecision());
-
-        // Check the event source
-        TmfEventSource evSrc = event.getSource();
-        assertEquals("getValue", "Source", evSrc.getSourceId());
-
-        // Check the event type
-        TmfEventType evType = event.getType();
-        assertEquals("getValue", "Type", evType.getTypeId());
-        assertEquals("getFormat", "field1", evType.getFormat().getLabels()[0]);
-        assertEquals("getFormat", "field2", evType.getFormat().getLabels()[1]);
-
-        // Check the event content
-        TmfEventContent evContent = event.getContent();
-        assertEquals("getField", 1, evContent.getFields().length);
-        assertEquals("getField", "Some content", evContent.getField(0).toString());
-
-        // Check the event reference
-        TmfEventReference evRef = event.getReference();
-        assertEquals("getValue", "Reference", evRef.getValue());
-
-        // Check the event file reference
-        assertEquals("getPath", "path", event.getSourcePath());
-        assertEquals("getFile", "filename", event.getFileName());
-        assertEquals("getLineNumber", 10, event.getLineNumber());
+    public void testTmfTraceEventCopy() throws Exception {
+    	TmfTraceEvent event = new TmfTraceEvent(fEvent2);
+		assertEquals("getTimestamp",         fTimestamp2, event.getTimestamp());
+		assertEquals("getOriginalTimestamp", fTimestamp1, event.getOriginalTimestamp());
+		assertEquals("getSource",            fSource,     event.getSource());
+		assertEquals("getType",              fType,       event.getType());
+		assertEquals("getContent",           fContent2,   event.getContent());
+		assertEquals("getReference",         fReference,  event.getReference());
+		assertEquals("getSourcePath",        fPath,       event.getSourcePath());
+		assertEquals("getFileName",          fFile,       event.getFileName());
+		assertEquals("getLineNumber",        fLine,       event.getLineNumber());
     }
 
 }
+

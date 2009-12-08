@@ -37,12 +37,30 @@ public class TmfTimeRange {
     // ========================================================================
 
 	/**
+	 * 
+	 */
+	@SuppressWarnings("unused")
+	private TmfTimeRange() {
+		fStartTime = null;
+		fEndTime   = null;
+	}
+
+	/**
 	 * @param startTime
 	 * @param endTime
 	 */
 	public TmfTimeRange(TmfTimestamp startTime, TmfTimestamp endTime) {
 		fStartTime = startTime;
 		fEndTime   = endTime;
+	}
+	
+	/**
+	 * @param other
+	 */
+	public TmfTimeRange(TmfTimeRange other) {
+		assert(other != null);
+		fStartTime = other.fStartTime;
+		fEndTime   = other.fEndTime;
 	}
 
     // ========================================================================
@@ -83,7 +101,7 @@ public class TmfTimeRange {
 	 */
 	@Override
 	public String toString() {
-		return "[TmfTimeRange (" + fStartTime.toString() + ":" + fEndTime.toString() + ")]";
+		return "[TmfTimeRange(" + fStartTime.toString() + ":" + fEndTime.toString() + ")]";
 	}
 
 }

@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Test
+Bundle-Name: TMF Unit Test Suite
 Bundle-SymbolicName: org.eclipse.linuxtools.tmf.tests
-Bundle-Version: 0.0.1
+Bundle-Version: 0.1.0.qualifier
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Vendor: Eclipse
-Require-Bundle: org.junit4;bundle-version="4.5.0",
+Require-Bundle: org.junit;bundle-version="3.8.2",
  org.eclipse.linuxtools.tmf;bundle-version="0.0.1"

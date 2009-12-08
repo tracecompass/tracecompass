@@ -1,14 +1,9 @@
 package org.eclipse.linuxtools.lttng.trace;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
-import org.junit.Test;
+import junit.framework.TestCase;
 
 /*
  Functions tested here :
@@ -24,7 +19,7 @@ import org.junit.Test;
 
  */
 
-public class LTTngTraceTest {
+public class LTTngTraceTest extends TestCase {
 	
     private final static String tracepath1="traceset/trace-618339events-1293lost-1cpu";
     private final static String wrongTracePath="/somewhere/that/does/not/exist";
@@ -58,8 +53,7 @@ public class LTTngTraceTest {
 
 		return tmpStream;
 	}
-
-	@Test
+	
 	public void testTraceConstructors() {
 		@SuppressWarnings("unused")
 		LTTngTrace testStream1 = null;
@@ -102,7 +96,6 @@ public class LTTngTraceTest {
         }
 	}
 	
-	@Test
 	public void testParseNextEvent() {
 		TmfEvent tmpEvent = null;
 		LTTngTrace testStream1 = prepareStreamToTest();
@@ -119,7 +112,6 @@ public class LTTngTraceTest {
 		assertEquals("tmpEvent has wrong timestamp after second parseEvent()",secondEventTimestamp,(long)tmpEvent.getTimestamp().getValue() );
 	}
 	
-	@Test
 	public void testSeekLocation() {
 		TmfEvent tmpEvent = null;
 		TmfTraceContext tmpContext = new TmfTraceContext(null, null, 0);
@@ -131,7 +123,7 @@ public class LTTngTraceTest {
 		assertEquals("tmpContext has wrong timestamp after first seekLocation()",contextValueAfterSeekTest1,(long)((TmfTimestamp)tmpContext.getLocation()).getValue() );
 		tmpEvent = testStream1.parseEvent(tmpContext);
 		assertNotSame("tmpEvent is null after first seekLocation()",null,tmpEvent );
-		assertTrue("tmpEvent has wrong reference after first seekLocation()", ((String)tmpEvent.getReference().getValue()).contains(seek1EventReference) );
+		assertTrue("tmpEvent has wrong reference after first seekLocation()", ((String)tmpEvent.getReference().getReference()).contains(seek1EventReference) );
 		
 		// Seek to the last timestamp
 		tmpContext = testStream1.seekLocation(new TmfTimestamp(timestampToSeekLast));
@@ -139,7 +131,7 @@ public class LTTngTraceTest {
 		assertEquals("tmpContext has wrong timestamp after seekLocation() to last",contextValueAfterSeekLast,(long)((TmfTimestamp)tmpContext.getLocation()).getValue() );
 		tmpEvent = testStream1.parseEvent(tmpContext);
 		assertNotSame("tmpEvent is null after seekLocation() to last ",null,tmpEvent );
-		assertTrue("tmpEvent has wrong reference after seekLocation() to last",((String)tmpEvent.getReference().getValue()).contains(seekLastEventReference) );
+		assertTrue("tmpEvent has wrong reference after seekLocation() to last",((String)tmpEvent.getReference().getReference()).contains(seekLastEventReference) );
 		
 		// Seek to the first timestamp (startTime)
 		tmpContext = testStream1.seekLocation(new TmfTimestamp(firstEventTimestamp));
@@ -147,11 +139,10 @@ public class LTTngTraceTest {
 		assertEquals("tmpContext has wrong timestamp after seekLocation() to start",contextValueAfterFirstEvent,(long)((TmfTimestamp)tmpContext.getLocation()).getValue() );
 		tmpEvent = testStream1.parseEvent(tmpContext);
 		assertNotSame("tmpEvent is null after seekLocation() to start ",null,tmpEvent );
-		assertTrue("tmpEvent has wrong reference after seekLocation() to start",((String)tmpEvent.getReference().getValue()).contains(firstEventReference) );
+		assertTrue("tmpEvent has wrong reference after seekLocation() to start",((String)tmpEvent.getReference().getReference()).contains(firstEventReference) );
 	}
 	
 	
-    @Test
 	public void testGetter() {
     	TmfEvent tmpEvent = null;
 		LTTngTrace testStream1 = prepareStreamToTest();
@@ -167,10 +158,9 @@ public class LTTngTraceTest {
 		
 		// Test current event
 		assertNotSame("tmpEvent is null after first event",null,tmpEvent );
-		assertTrue("tmpEvent has wrong reference after first event",((String)tmpEvent.getReference().getValue()).contains(firstEventReference) );
+		assertTrue("tmpEvent has wrong reference after first event",((String)tmpEvent.getReference().getReference()).contains(firstEventReference) );
     }
     
-    @Test
 	public void testToString() {
 		LTTngTrace testStream1 = prepareStreamToTest();
 		

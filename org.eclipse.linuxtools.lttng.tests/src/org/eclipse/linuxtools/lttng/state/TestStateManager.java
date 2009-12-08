@@ -18,36 +18,14 @@ import org.eclipse.linuxtools.lttng.ActivateDebugging;
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import junit.framework.TestCase;
 
 /**
  * @author alvaro
  * 
  */
-public class TestStateManager {
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	@Before
-	public void setUp() throws Exception {
-		ActivateDebugging.activate();
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
-
-	@Test
+public class TestStateManager extends TestCase {
+	
 	public void testSetTraceSelection() {
 		String logName = "traceset/trace1";
 		

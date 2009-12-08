@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.events;
 
+import org.eclipse.linuxtools.lttng.event.LttngEvent;
+import org.eclipse.linuxtools.lttng.event.LttngEventContent;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.ui.views.TmfEventsView;
 import org.eclipse.swt.SWT;
@@ -106,13 +108,15 @@ public class EventsView extends TmfEventsView {
     @Override
 	protected String[] extractItemFields(TmfEvent event) {
         String[] fields = new String[0];
+        
         if (event != null) {
             fields = new String[] {
                     event.getTimestamp().toString(),
                     event.getSource().toString(),
                     event.getType().toString(),
                     event.getReference().toString(),
-                    event.getContent().getContent() };
+                    ((LttngEventContent)event.getContent()).toString() 
+                };
         }
         return fields;
     }

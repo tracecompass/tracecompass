@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.event;
 
-import java.io.Serializable;
 
 /**
  * <b><u>TmfTimestamp</u></b>
@@ -27,29 +26,25 @@ import java.io.Serializable;
  * <li>a precision to indicate the error on the value (useful for comparing
  * timestamps in different scales). Default: 0.
  * </ul>
- * To allow synchronization of timestamps from different reference clocks, there
- * is a possibility to "adjust" the timestamp both by changing its scale (traces
- * of different scale) and by adding an offset to its value (clock drift between
- * traces).
+ * To allow synchronization of timestamps from different reference clocks,
+ * there is a possibility to "adjust" the timestamp both by changing its scale
+ * (traces of different scale) and by adding an offset to its value (clock
+ * drift between traces).
  * <p>
- * Note that the adjusted timestamp value could be negative e.g. for events that
- * occurred before t0 of the reference clock.
- * 
+ * Notice that the adjusted timestamp value could be negative e.g. for events
+ * that occurred before t0 wrt the reference clock.
+ * <p>
+ * Finally, notice that timestamps are immutable.
  */
-public class TmfTimestamp implements Serializable {
-
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -3196421507276821609L;
+public class TmfTimestamp implements Cloneable {
 
 	// ========================================================================
     // Attributes
     // ========================================================================
 
-    protected final long fValue; // The timestamp value
-    protected final byte fScale; // The time scale
-    protected final long fPrecision; // The value precision (tolerance)
+    protected long fValue; 		// The timestamp value
+    protected byte fScale; 		// The time scale
+    protected long fPrecision; 	// The value precision (tolerance)
 
     // ========================================================================
     // Constants
@@ -64,21 +59,21 @@ public class TmfTimestamp implements Serializable {
     // ========================================================================
 
     /**
-     * Default constructor.
+     * Default constructor
      */
     public TmfTimestamp() {
         this(0, (byte) 0, 0);
     }
 
     /**
-     * Simple constructor.
+     * Simple constructor with value only
      */
     public TmfTimestamp(long value) {
         this(value, (byte) 0, 0);
     }
 
     /**
-     * Simple constructor with default error value
+     * Simple constructor with value and scale
      * 
      * @param value
      * @param scale
@@ -88,7 +83,7 @@ public class TmfTimestamp implements Serializable {
     }
 
     /**
-     * Constructor with measurement error.
+     * Constructor with value, scale and precision
      * 
      * @param value
      * @param scale
@@ -101,12 +96,15 @@ public class TmfTimestamp implements Serializable {
     }
 
     /**
-     * Copy constructor.
+     * Copy constructor
      * 
      * @param other
      */
     public TmfTimestamp(TmfTimestamp other) {
-        this(other.fValue, other.fScale, other.fPrecision);
+    	assert(other != null);
+        fValue = other.fValue;
+        fScale = other.fScale;
+        fPrecision = other.fPrecision;
     }
 
     // ========================================================================
@@ -114,21 +112,21 @@ public class TmfTimestamp implements Serializable {
     // ========================================================================
 
     /**
-     * @return The timestamp value
+     * @return the timestamp value
      */
     public long getValue() {
         return fValue;
     }
 
     /**
-     * @return The timestamp scale
+     * @return the timestamp scale
      */
     public byte getScale() {
         return fScale;
     }
 
     /**
-     * @return The timestamp value precision
+     * @return the timestamp value precision
      */
     public long getPrecision() {
         return fPrecision;
@@ -196,7 +194,7 @@ public class TmfTimestamp implements Serializable {
      * 
      * @param reference
      *            - the reference timestamp to synchronize with
-     * @return The adjustment term in the reference time scale
+     * @return the adjustment term in the reference time scale
      * @throws TmfNumericalException
      */
     public long getAdjustment(TmfTimestamp reference) throws ArithmeticException {
@@ -211,8 +209,9 @@ public class TmfTimestamp implements Serializable {
      *            - the other timestamp
      * @param withinPrecision
      *            - indicates if precision is to be take into consideration
-     * @return <li>-1: this timestamp is lower <li>0: timestamps are equal
-     *         (within precision if requested) <li>1: this timestamp is higher
+     * @return -1: this timestamp is lower
+     *          0: timestamps are equal (within precision if requested)
+     *          1: this timestamp is higher
      * @throws TmfNumericalException
      */
     public int compareTo(final TmfTimestamp other, boolean withinPrecision) {
@@ -254,11 +253,11 @@ public class TmfTimestamp implements Serializable {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
+	@Override
+	public TmfTimestamp clone() {
+		return new TmfTimestamp(this);
+	}
+
     @Override
     public boolean equals(Object other) {
         if (other instanceof TmfTimestamp)
@@ -266,12 +265,9 @@ public class TmfTimestamp implements Serializable {
         return super.equals(other);
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-    	return "[TmfTimestamp:" + fValue + "," + fScale + "," + fPrecision + "]";
+    	return "[TmfTimestamp(" + fValue + "," + fScale + "," + fPrecision + ")]";
     }
 
 }

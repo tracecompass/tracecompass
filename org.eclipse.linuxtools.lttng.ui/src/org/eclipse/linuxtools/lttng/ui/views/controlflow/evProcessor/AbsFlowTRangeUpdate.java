@@ -12,6 +12,7 @@ package org.eclipse.linuxtools.lttng.ui.views.controlflow.evProcessor;
 
 import java.util.Vector;
 
+import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessStatus;
 import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
 import org.eclipse.linuxtools.lttng.state.model.LttngProcessState;
@@ -45,8 +46,10 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 				procContainer.getUniqueId(), stateProcess.getName(),
 				traceStartTime, traceEndTime, "", stateProcess.getType()
 						.getInName(), stateProcess.getCpu(), stateProcess
-						.getInsertion_time().getValue());
-		localProcess.setCreationTime(stateProcess.getCreation_time().getValue());
+						.getInsertion_time());
+		
+		
+		localProcess.setCreationTime(stateProcess.getCreation_time());
 		localProcess.setPid(stateProcess.getPid());
 		localProcess.setTgid(stateProcess.getTgid());
 		localProcess.setPpid(stateProcess.getPpid());

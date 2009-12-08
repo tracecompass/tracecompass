@@ -1,8 +1,7 @@
 
 package org.eclipse.linuxtools.lttng.jni;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
+import junit.framework.TestCase;
 
 /*
  Functions tested here :
@@ -16,8 +15,10 @@ import org.junit.Test;
         public void printMarkerFieldInformation()
 */
 
-public class JniMarkerFieldTest
+public class JniMarkerFieldTest extends TestCase
 {
+		private final static boolean printLttDebug = false;
+	
         private final static String tracepath="traceset/trace-618339events-1293lost-1cpu";
         private final static String eventName="kernel0";
         
@@ -29,7 +30,7 @@ public class JniMarkerFieldTest
                 // This trace should be valid
                 // We will read the first 2 event to have something interesting to test on
                 try {
-                        tmpEvent = new JniTrace(tracepath).requestEventByName(eventName);
+                        tmpEvent = new JniTrace(tracepath, printLttDebug).requestEventByName(eventName);
                         tmpEvent.readNextEvent();
                         tmpEvent.readNextEvent();
                         
@@ -41,8 +42,6 @@ public class JniMarkerFieldTest
                 return tmpMarkerField;
         }
         
-        
-        @Test
         public void testEventConstructors() {
                 
                 JniMarker tmpMarker = null;
@@ -52,7 +51,7 @@ public class JniMarkerFieldTest
                 
                 // This event should be valid and will be used in test
                 try {
-                        tmpMarker = new JniTrace(tracepath).requestEventByName(eventName).requestEventMarker();
+                        tmpMarker = new JniTrace(tracepath, printLttDebug).requestEventByName(eventName).requestEventMarker();
                 }
                 catch( JniException e) { }
                 
@@ -86,7 +85,6 @@ public class JniMarkerFieldTest
                 
         }
         
-        @Test
         public void testGetSet() {
                 
                 JniMarkerField testMarkerField = prepareMarkerFieldToTest();
@@ -97,7 +95,6 @@ public class JniMarkerFieldTest
                 assertNotSame("getMarkerFieldPtr is 0",0,testMarkerField.getMarkerFieldPtr() );
         }
         
-        @Test
         public void testPrintAndToString() {
                 
                 JniMarkerField testMarkerField = prepareMarkerFieldToTest();

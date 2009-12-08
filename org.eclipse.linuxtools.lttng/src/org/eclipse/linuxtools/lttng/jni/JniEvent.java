@@ -1,3 +1,4 @@
+package org.eclipse.linuxtools.lttng.jni;
 /*******************************************************************************
  * Copyright (c) 2009 Ericsson
  * 
@@ -10,7 +11,6 @@
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.jni;
 
 import java.util.HashMap;
 
@@ -47,10 +47,8 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
     // Note that all type have been scaled up as there is no "unsigned" in java
     // This might be a problem about "unsigned long" as there is no equivalent
     // in java
-    private Jni_C_Pointer tracefilePtr = new Jni_C_Pointer();;
-    private int eventMarkerId = 0;
+    private Jni_C_Pointer tracefilePtr = new Jni_C_Pointer();
     private JniTime eventTime = null;
-    private long eventDataSize = 0;
 
     // These methods need a tracefile pointer, instead of a event pointer
     private native int      ltt_readNextEvent(long tracefilePtr);
@@ -68,6 +66,8 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
     @SuppressWarnings("unused")
     private native long     ltt_getTimestamp(long eventPtr);
     private native int      ltt_getEventMarkerId(long eventPtr);
+    private native long     ltt_getNanosencondsTime(long eventPtr);
+    @SuppressWarnings("unused")
     private native void     ltt_feedEventTime(long eventPtr, JniTime eventTime);
     private native long     ltt_getEventDataSize(long eventPtr);
     @SuppressWarnings("unused")
@@ -107,9 +107,7 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
         eventState = oldEvent.eventState;
 
         tracefilePtr = oldEvent.tracefilePtr;
-        eventMarkerId = oldEvent.eventMarkerId;
         eventTime = oldEvent.eventTime;
-        eventDataSize = oldEvent.eventDataSize;
     }
     
     /**
@@ -124,9 +122,9 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
      *            
      * @exception JniException
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
-     * @see org.eclipse.linuxtools.lttng.jni.JniMarker
-     * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniMarker
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTracefile
      */
     public JniEvent(Jni_C_Pointer newEventPtr, HashMap<Integer, JniMarker> newMarkersMap, JniTracefile newParentTracefile) throws JniException {
 
@@ -147,10 +145,8 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
         
         // Try to move to the first event
         // If the event is Out of Range (ERANGE) at the first read, 
-        //  this event type will never been usable.
+        //  this event type will never be usable.
         // In that case, throw JniNoSuchEventException to warn the tracefile.
-        //
-        // Position ourself on the first event.
         eventState = positionToFirstEvent();
         if (eventState != EOK)  {
             throw new JniNoSuchEventException("Object not populated, unusable. There is probably no event of that type in the trace. (JniEvent)");
@@ -167,17 +163,16 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
      * 
      * @return LTT read status, as defined in Jni_C_Common.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.Jni_C_Common
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.Jni_C_Common
      */
      public int readNextEvent() {
         // Ask Ltt to read the next event for this particular tracefile
-        eventState = ltt_readNextEvent(tracefilePtr.getPointer() );
-
+        eventState = ltt_readNextEvent( tracefilePtr.getPointer() );
         // If the event state is sane populate it
         if (eventState == EOK) {
             populateEventInformation();
         }
-
+        
         return eventState;
     }
 
@@ -193,7 +188,7 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
      * 
      * @return LTT read status, as defined in Jni_C_Common
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.Jni_C_Common
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.Jni_C_Common
      */
     public int seekToTime(JniTime seekTime) {
         // Ask Ltt to read the next event for this particular tracefile
@@ -216,11 +211,11 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
      * 
      * @return LTT read status, as defined in Jni_C_Common
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.Jni_C_Common
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.Jni_C_Common
      */
     public int seekOrFallBack(JniTime seekTime) {
         // Save the old time
-        JniTime oldTime = eventTime;
+        JniTime oldTime = new JniTime(eventTime);
 
         // Call seek to move ahead
         // Save the state for the return (eventState will be modified if we seek back)
@@ -246,7 +241,7 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
      * 
      * @return LTT read status, as defined in Jni_C_Common
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.Jni_C_Common
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.Jni_C_Common
      */
     public int positionToFirstEvent() {
         eventState = ltt_positionToFirstEvent(tracefilePtr.getPointer());
@@ -259,10 +254,10 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
      * 
      * @return Reference to the marker for this tracefile's event or null if none.
      *  
-     * @see org.eclipse.linuxtools.lttng.jni.JniMarker
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniMarker
      */
     public JniMarker requestEventMarker() {
-        return markersMap.get(eventMarkerId);
+        return markersMap.get(getEventMarkerId());
     }
 
     /**
@@ -274,9 +269,9 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
      * @return  Bytes array of raw data (contain raw C bytes).
      */
     public byte[] requestEventContent() {
-        byte dataContent[] = new byte[(int) eventDataSize];
+        byte dataContent[] = new byte[(int) getEventDataSize()];
 
-        ltt_getDataContent(thisEventPtr.getPointer(), eventDataSize, dataContent);
+        ltt_getDataContent(thisEventPtr.getPointer(), getEventDataSize(), dataContent);
 
         return dataContent;
     }
@@ -288,7 +283,7 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
      * 
      * @return  Reference to the JniMarker object for this event or null if none. 
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniMarker
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniMarker
      */
     public String requestEventSource() {
         // *** TODO ***
@@ -307,6 +302,8 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
      * @param fieldId   Position of the field to parse.
      * 
      * @return Object that contain the parsed payload
+     * 
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniParser
      */
     public Object parseFieldById(int fieldId) {
         return JniParser.parseField(this, fieldId);
@@ -320,6 +317,8 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
      * @param fieldName   Position of the field to parse.
      * 
      * @return Object that contain the parsed payload
+     * 
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniParser
      */
     public Object parseFieldByName(String fieldName) {
         return JniParser.parseField(this, fieldName);
@@ -328,7 +327,9 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
     /**
      * Method to parse all the event payload.<p>
      * 
-     * @return HashMap<String, Object> which is the parsedContent objects and their name as key. 
+     * @return HashMap<String, Object> which is the parsedContent objects and their name as key.
+     * 
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniParser 
      */
     public HashMap<String, Object> parseAllFields() {
         return JniParser.parseAllFields(this);
@@ -337,40 +338,32 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
     /* 
      * This function populates the event data with data from LTT
      * 
+     * NOTE : To get better performance, we copy very few data into memory here
+     * 
      */
     private void populateEventInformation() {
-        if (thisEventPtr.getPointer() == NULL) {
-            printlnC("Pointer is NULL, trace closed? (populateEventInformation)");
-        }
-        else {
-            tracefilePtr = new Jni_C_Pointer( ltt_getTracefilePtr(thisEventPtr.getPointer()) );
-            eventMarkerId = ltt_getEventMarkerId(thisEventPtr.getPointer());
-            
-            // Creation of time is a bit different, we need to pass the object
-            // reference to C
-            ltt_feedEventTime(thisEventPtr.getPointer(), eventTime);
-            
-            eventDataSize = ltt_getEventDataSize(thisEventPtr.getPointer());
-        }
+    	// We need to save the time, as it is not a primitive (can't be dynamically called in getter)
+    	eventTime.setTime(ltt_getNanosencondsTime(thisEventPtr.getPointer() ));
     }
     
-    public int getEventMarkerId() {
-        return eventMarkerId;
-    }
-
     public JniTime getEventTime() {
         return eventTime;
     }
+    
+    // *** To get better performance, all getter belows call LTT directly ****
+    //     That way, we can avoid copying data into memory
+    public int getEventMarkerId() {
+        return ltt_getEventMarkerId(thisEventPtr.getPointer());
+    }
 
     public long getEventDataSize() {
-        return eventDataSize;
+        return ltt_getEventDataSize(thisEventPtr.getPointer());
     }
 
     public HashMap<Integer, JniMarker> getMarkersMap() {
         return markersMap;
     }
 
-    
     /**
      * Pointer to the parent LTTTracefile C structure.<br>
      * <br>
@@ -379,10 +372,10 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
      * 
      * @return The actual (long converted) pointer or NULL.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
      */
     public Jni_C_Pointer getTracefilePtr() {
-        return tracefilePtr;
+        return new Jni_C_Pointer( ltt_getTracefilePtr(thisEventPtr.getPointer()) );
     }
 
     /**
@@ -393,7 +386,7 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
      * 
      * @return The actual (long converted) pointer or NULL.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
      */
     public Jni_C_Pointer getEventPtr() {
         return thisEventPtr;
@@ -408,7 +401,7 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
      *
      * @return  The parent tracefile 
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTracefile
      */
     public JniTracefile getParentTracefile() {
         return parentTracefile;
@@ -422,19 +415,20 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
      * 
      * @return -1 if given event happens before, 0 if equal, 1 if passed event happens after.
      */
-    //@Override
     public int compareTo(JniEvent rightEvent ){
-        JniEvent leftEvent = this;
+    	
+    	// Note : this = left hand operand
+    	
         // By default, we consider the current event to be older.
         int eventComparaison = -1; 
         
         // Test against null before performing anything
         if ( rightEvent != null ) {
             // Compare the timestamp first
-            eventComparaison = leftEvent.getEventTime().compareTo( rightEvent.getEventTime() );
+            eventComparaison = this.getEventTime().compareTo( rightEvent.getEventTime() );
             
             // If timestamp is equal, compare the parent tracefile ("event type")
-            if ( (eventComparaison == 0) && ( !leftEvent.parentTracefile.equals(rightEvent.parentTracefile)) ) {
+            if ( (eventComparaison == 0) && ( !this.parentTracefile.equals(rightEvent.parentTracefile)) ) {
                 eventComparaison = 1;
             }
         }
@@ -472,11 +466,11 @@ public final class JniEvent extends Jni_C_Common implements Comparable<JniEvent>
         String returnData = "";
 
         returnData += "tracefilePtr            : " + tracefilePtr + "\n";
-        returnData += "eventMarkerId           : " + eventMarkerId + "\n";
+        returnData += "eventMarkerId           : " + getEventMarkerId() + "\n";
         returnData += "eventTime               : " + eventTime.getReferenceToString() + "\n";
         returnData += "   seconds              : " + eventTime.getSeconds() + "\n";
         returnData += "   nanoSeconds          : " + eventTime.getNanoSeconds() + "\n";
-        returnData += "eventDataSize           : " + eventDataSize + "\n";
+        returnData += "eventDataSize           : " + getEventDataSize() + "\n";
         returnData += "markersMap              : " + markersMap.keySet() + "\n"; // Hack to avoid ending up with markersMap.toString()
 
         return returnData;

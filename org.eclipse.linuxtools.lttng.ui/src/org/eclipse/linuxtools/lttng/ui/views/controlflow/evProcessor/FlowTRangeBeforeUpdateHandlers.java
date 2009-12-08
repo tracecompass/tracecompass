@@ -63,7 +63,7 @@ class FlowTRangeBeforeUpdateHandlers {
 					// may change
 					TimeRangeEventProcess localProcess = procContainer
 							.findProcess(stateProcess.getPid(), stateProcess.getCpu(), traceId, stateProcess
-                                    .getCreation_time().getValue());
+                                    .getCreation_time());
 
 					// Add process to process list if not present
 					if (localProcess == null) {
@@ -146,7 +146,7 @@ class FlowTRangeBeforeUpdateHandlers {
 						// processlist_get_process_data(process_list,pid_out,process->cpu,&birth,trace_num);
 						TimeRangeEventProcess localProcess = procContainer
 								.findProcess(process.getPid(), process.getCpu(), traceSt
-										.getTraceId(), process.getCreation_time().getValue());
+										.getTraceId(), process.getCreation_time());
 
 						// Add process to process list if not present
 						// Replace C Call :
@@ -181,7 +181,7 @@ class FlowTRangeBeforeUpdateHandlers {
 						// tfs->cpu, &birth, trace_num);
 						TimeRangeEventProcess localProcess = procContainer
 								.findProcess(process.getPid(), process.getCpu(), traceSt
-										.getTraceId(), process.getCreation_time().getValue());
+										.getTraceId(), process.getCreation_time());
 
 						// Add process to process list if not present
 						// Replace C Call :
@@ -255,7 +255,7 @@ class FlowTRangeBeforeUpdateHandlers {
 					// process->cpu, &birth,trace_num);
 					TimeRangeEventProcess localProcess = procContainer
 							.findProcess(process.getPid(), process.getCpu(), traceSt
-									.getTraceId(), process.getCreation_time().getValue());
+									.getTraceId(), process.getCreation_time());
 
 					// Add process to process list if not present
 					// Replace C Call :
@@ -324,7 +324,7 @@ class FlowTRangeBeforeUpdateHandlers {
 						TimeRangeEventProcess localProcess = procContainer
 								.findProcess(process.getPid(), process.getCpu(), traceSt
 										.getTraceId(), process
-                                        .getCreation_time().getValue());
+                                        .getCreation_time());
 
 						// This is as it was in the C ... ?
 						if (localProcess == null) {
@@ -395,7 +395,7 @@ class FlowTRangeBeforeUpdateHandlers {
 					TimeRangeEventProcess localProcess = procContainer
 							.findProcess(process.getPid(), process.getCpu(), traceSt
 									.getTraceId(), process
-                                    .getCreation_time().getValue());
+                                    .getCreation_time());
 
 					// Add process to process list if not present
 					if (localProcess == null) {

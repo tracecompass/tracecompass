@@ -12,31 +12,68 @@
 
 package org.eclipse.linuxtools.tmf.event;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <b><u>TmfEventType</u></b>
  * <p>
  * The event type.
  */
-public class TmfEventType {
+public class TmfEventType implements Cloneable {
 
+    // ========================================================================
+    // Constants
+    // ========================================================================
+
+	public static final String DEFAULT_TYPE_ID  = "TMF Default Type";
+	public static final String[] DEFAULT_LABELS = new String[] { "Content" };
+	
     // ========================================================================
     // Attributes
     // ========================================================================
 
-	private final String fTypeId;
-    private final TmfEventFormat fFormat;
+	private final String   fTypeId;
+	private final String[] fFieldLabels;
+	private final int      fNbFields;
+	private final Map<String, Integer> fFieldMap;
 
-    // ========================================================================
+	// ========================================================================
     // Constructors
     // ========================================================================
+
+	/**
+	 * 
+	 */
+	public TmfEventType() {
+		this(DEFAULT_TYPE_ID, DEFAULT_LABELS);
+	}
 
 	/**
 	 * @param type
 	 * @param format
 	 */
-	public TmfEventType(String typeID, TmfEventFormat format) {
-		fTypeId = typeID;
-		fFormat = format;
+	public TmfEventType(String typeId, String[] labels) {
+		assert(typeId != null);
+		assert(labels != null);
+		fTypeId      = typeId;
+		fFieldLabels = labels;
+		fNbFields    = fFieldLabels.length;
+		fFieldMap    = new HashMap<String, Integer>();
+		for (int i = 0; i < fNbFields; i++) {
+			fFieldMap.put(fFieldLabels[i], i);
+		}
+	}
+
+	/**
+	 * @param other
+	 */
+	public TmfEventType(TmfEventType other) {
+		assert(other != null);
+		fTypeId      = other.fTypeId;
+		fFieldLabels = other.fFieldLabels;
+		fNbFields    = other.fNbFields;
+		fFieldMap    = other.fFieldMap;
 	}
 
     // ========================================================================
@@ -50,20 +87,51 @@ public class TmfEventType {
 		return fTypeId;
 	}
 
-    /**
-     * @return
-     */
-    public TmfEventFormat getFormat() {
-        return fFormat;
-    }
+	/**
+	 * @return
+	 */
+	public int getNbFields() {
+		return fNbFields;
+	}
+
+	/**
+	 * @return
+	 */
+	public int getFieldIndex(String id) throws TmfNoSuchFieldException {
+		Integer index = fFieldMap.get(id);
+		if (index == null)
+			throw(new TmfNoSuchFieldException(id));
+		return index;
+	}
+
+	/**
+	 * @return
+	 */
+	public String[] getLabels() {
+		return fFieldLabels;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getLabel(int i) {
+		if (i >= 0 && i < fNbFields)
+			return fFieldLabels[i];
+		return null;
+	}
 
     // ========================================================================
     // Operators
     // ========================================================================
 
     @Override
+    public TmfEventType clone() {
+    	return new TmfEventType(this);
+    }
+
+    @Override
     public String toString() {
-        return fTypeId.toString();
+    	return "[TmfEventType:" + fTypeId + "]";
     }
 
 }

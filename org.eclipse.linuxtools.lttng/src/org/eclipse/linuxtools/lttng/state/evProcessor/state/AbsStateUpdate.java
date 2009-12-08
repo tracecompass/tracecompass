@@ -45,8 +45,8 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 		LttngExecutionState exe_state = new LttngExecutionState();
 		exe_state.setExec_mode(execMode);
 		exe_state.setExec_submode(submode);
-		exe_state.setEntry_Time(eventTime);
-		exe_state.setChange_Time(eventTime);
+		exe_state.setEntry_Time(eventTime.getValue());
+		exe_state.setChange_Time(eventTime.getValue());
 		exe_state.setCum_cpu_time(0L);
 		exe_state.setProc_status(process.getState().getProc_status());
 		process.pushToExecutionStack(exe_state);
@@ -68,7 +68,7 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 
 		//The process state is updated within the pop method
 		process.popFromExecutionStack();
-		process.getState().setChange_Time(eventTime);
+		process.getState().setChange_Time(eventTime.getValue());
 	}
 
 	protected void irq_push_mode(LttngIRQState irqst, IRQMode state) {
@@ -217,7 +217,7 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 			Long cpu, Long pid, Long tgid, String name,
 			final TmfTimestamp timestamp) {
 		LttngProcessState process;
-		process = new LttngProcessState(cpu, pid, tgid, name, timestamp, traceSt.getTraceId());
+		process = new LttngProcessState(cpu, pid, tgid, name, timestamp.getValue(), traceSt.getTraceId());
 		traceSt.addProcessState(process);
 		return process;
 	}

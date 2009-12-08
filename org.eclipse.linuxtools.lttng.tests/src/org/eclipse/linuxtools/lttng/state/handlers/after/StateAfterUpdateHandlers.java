@@ -72,7 +72,7 @@ class StateAfterUpdateHandlers {
 							+ ExecutionMode.LTTV_STATE_SYSCALL.getInName());
 				}
 
-				if (stackState.getEntry_LttTime() != trcEvent.getTimestamp()) {
+				if (stackState.getEntry_LttTime() != trcEvent.getTimestamp().getValue()) {
 					TraceDebug.debug("Unexpected Entry time: "
 							+ trcEvent.getTimestamp() + " Expected: "
 							+ stackState.getEntry_LttTime());

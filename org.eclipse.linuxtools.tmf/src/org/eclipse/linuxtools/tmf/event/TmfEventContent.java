@@ -12,68 +12,83 @@
 
 package org.eclipse.linuxtools.tmf.event;
 
+
 /**
  * <b><u>TmfEventContent</u></b>
  * <p>
  * The event content.
  */
-public class TmfEventContent {
+public class TmfEventContent implements Cloneable {
 
     // ========================================================================
     // Attributes
     // ========================================================================
 
-	private final TmfEventFormat fFormat;
-	private final String fContent;
-	private final int fNbFields;
-	private       TmfEventField[] fFields = null;
+	protected TmfEvent fParentEvent = null;
+	protected Object   fRawContent  = null;
+	protected Object[] fFields      = null;
 
     // ========================================================================
     // Constructors
     // ========================================================================
 
 	/**
+	 * @param parent
 	 * @param content
-	 * @param format
 	 */
-	public TmfEventContent(Object content, TmfEventFormat format) {
-		fFormat = format;
-		fContent = content.toString();
-		fNbFields = fFormat.getLabels().length;
+	public TmfEventContent(TmfEvent parent, Object content) {
+		fParentEvent = parent;
+		fRawContent  = content;
 	}
+
+    /**
+     * @param other
+     */
+    public TmfEventContent(TmfEventContent other) {
+    	assert(other != null);
+    	fParentEvent = other.fParentEvent;
+		fRawContent  = other.fRawContent;
+		fFields      = other.fFields;
+    }
+
+    @SuppressWarnings("unused")
+	private TmfEventContent() {
+    }
 
     // ========================================================================
     // Accessors
     // ========================================================================
 
 	/**
-	 * @return
+	 * @return the parent (containing) event
 	 */
-	public String getContent() {
-		return fContent;
+	public TmfEvent getEvent() {
+		return fParentEvent;
 	}
 
 	/**
-	 * @return
+	 * @return the event type
 	 */
-	public TmfEventFormat getFormat() {
-		return fFormat;
+	public TmfEventType getType() {
+		return fParentEvent.getType();
 	}
 
-    /**
-     * @return
-     */
-    public int getNbFields() {
-        return fNbFields;
-    }
+	/**
+	 * @return the raw content
+	 */
+	public Object getContent() {
+		return fRawContent;
+	}
 
 	/**
-	 * @return
+	 * Returns the list of fields in the same order as TmfEventType.getLabels()
+	 * 
+	 * @return the ordered set of fields (optional fields might be null)
 	 */
-	public TmfEventField[] getFields() {
-	    if (fFields == null) {
-	        fFields = fFormat.parse(fContent);
-	    }
+	public Object[] getFields() {
+		if (fFields == null) {
+			parseContent();
+		}
 		return fFields;
 	}
 
@@ -81,19 +96,56 @@ public class TmfEventContent {
 	 * @param id
 	 * @return
 	 */
-	public TmfEventField getField(int id) {
-        assert id >= 0 && id < fNbFields;
-        if (fFields == null) {
-            fFields = fFormat.parse(fContent);
-        }
-		return fFields[id];
+	public Object getField(String id) throws TmfNoSuchFieldException {
+		if (fFields == null) {
+			parseContent();
+		}
+		return fFields[getType().getFieldIndex(id)];
 	}
 
 	/**
+	 * @param n
 	 * @return
 	 */
-	public void setFields(TmfEventField[] fields) {
-        fFields = fields;
+	public Object getField(int n) {
+		if (fFields == null) {
+			parseContent();
+		}
+		if (n >= 0 && n < fFields.length)
+			return fFields[n];
+		return null;
 	}
+
+    // ========================================================================
+    // Operators
+    // ========================================================================
+
+	/**
+	 * Should be overridden (all fields are null by default)
+	 */
+	protected void parseContent() {
+		fFields = new Object[1];
+		fFields[0] = fRawContent;
+	}
+	
+	/**
+	 * Clone: shallow copy by default; override for deep copy.
+	 */
+    @Override
+    public TmfEventContent clone() {
+		return new TmfEventContent(this);
+    }
+
+    @Override
+	public String toString() {
+    	Object[] fields = getFields();
+    	String result = "[TmfEventContent(";
+    	for (int i = 0; i < fields.length; i++) {
+    		result += fields[i].toString() + ",";
+    	}
+    	result += ")]";
+
+    	return result;
+    }
 
 }

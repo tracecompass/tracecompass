@@ -3,22 +3,20 @@
  */
 package org.eclipse.linuxtools.lttng.jni;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
+import junit.framework.TestCase;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Test;
-
 /**
  * @author alvaro
  * 
  */
-public class Combinations {
+public class Combinations extends TestCase {
 
+	private final static boolean printLttDebug = false;
+	
     private final static String tracepath="traceset/trace-618339events-1293lost-1cpu";
 	private final static String eventName = "syscall_state";
 
@@ -93,14 +91,13 @@ public class Combinations {
 		JniEvent tmpEvent = null;
 		// This trace should be valid
 		try {
-			tmpEvent = new JniTrace(tracepath).requestEventByName(eventName);
+			tmpEvent = new JniTrace(tracepath, printLttDebug).requestEventByName(eventName);
 		} catch (JniException e) {
 		}
 
 		return tmpEvent;
 	}
-
-	@Test
+	
 	public void testGetSpecEventFields() {
 		JniEvent event = prepareEventToTest();
 		JniMarker dmarker = event.requestEventMarker();
@@ -111,12 +108,11 @@ public class Combinations {
 
 	}
 
-	@Test
 	public void testEventsLoop() {
 		JniTrace trace = null;
 		JniEvent event = null;
 		try {
-			trace = new JniTrace(tracepath);
+			trace = new JniTrace(tracepath, printLttDebug);
 		} catch (JniException e) {
 			e.printStackTrace();
 		}

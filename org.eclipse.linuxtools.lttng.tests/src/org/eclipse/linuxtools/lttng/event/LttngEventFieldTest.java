@@ -1,12 +1,10 @@
 package org.eclipse.linuxtools.lttng.event;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.fail;
+
 
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
-import org.junit.Test;
+import junit.framework.TestCase;
 
 /*
  Functions tested here :
@@ -17,7 +15,7 @@ import org.junit.Test;
 
  */
 
-public class LttngEventFieldTest {
+public class LttngEventFieldTest extends TestCase {
 	private final static boolean skipIndexing=true;
 	private final static boolean waitForCompletion=true;
     private final static String tracepath1="traceset/trace-618339events-1293lost-1cpu";
@@ -53,15 +51,15 @@ public class LttngEventFieldTest {
 		return tmpField;
 	}
 
-	@Test
 	public void testConstructors() {
+		LttngEventContent testContent = null;
 		LttngEventField testField 	= null;
 		@SuppressWarnings("unused")
 		LttngEventField testField2 	= null;
         
 	    // Default construction with good argument
         try {
-        	testField = new LttngEventField("test", "test");
+        	testField = new LttngEventField(testContent, "test", "test");
         }
         catch( Exception e) { 
         	fail("Default construction failed!");
@@ -69,7 +67,7 @@ public class LttngEventFieldTest {
         
         // Copy constructor with correct parameters
         try {
-        	testField = new LttngEventField("test", "test");
+        	testField = new LttngEventField(testContent, "test", "test");
         	testField2 = new LttngEventField(testField);
         }
         catch( Exception e) { 
@@ -78,8 +76,6 @@ public class LttngEventFieldTest {
         
 	}
 	
-	
-    @Test
 	public void testGetter() {
     	
     	// *** To "really" test the field, we will get a real field from LTTngTrace
@@ -88,13 +84,12 @@ public class LttngEventFieldTest {
     	LttngEventField testField 	= (LttngEventField)tmpStream.parseEvent( new TmfTraceContext(null, null, 0) ).getContent().getField(0);
     	assertNotSame("getField is null!",null,testField);
     	
-    	assertEquals("getName() returned unexpected result!",firstEventName, testField.getName().toString());
-    	assertEquals("getValue() returned unexpected result!",firstEventValue, testField.getValue().toString());
+    	assertTrue("getName() returned unexpected result!",firstEventName.equals(testField.getId().toString()));
+    	assertTrue("getValue() returned unexpected result!",firstEventValue.equals(testField.getValue().toString()));
     	
     	
     }
     
-    @Test
 	public void testToString() {
     	LttngEventField tmpField = prepareToTest();
     	

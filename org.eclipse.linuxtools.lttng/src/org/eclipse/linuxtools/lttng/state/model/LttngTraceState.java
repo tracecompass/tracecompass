@@ -23,7 +23,6 @@ import org.eclipse.linuxtools.lttng.state.StateStrings.ExecutionSubMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.IRQMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessStatus;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 /**
  * <b><u>LttngTraceState</u></b>
@@ -41,7 +40,7 @@ public class LttngTraceState implements Cloneable {
     
 	private Long save_interval = null;
 
-	private TmfTimestamp max_time_state_recomputed_in_seek = null;
+	private Long max_time_state_recomputed_in_seek = null;
 	private boolean has_precomputed_states = false;
 
 	private HashMap<ProcessStateKey, LttngProcessState> processes = new HashMap<ProcessStateKey, LttngProcessState>();
@@ -121,14 +120,7 @@ public class LttngTraceState implements Cloneable {
 			// Basic value only need to be assigned while cloning
 			newState.has_precomputed_states = this.has_precomputed_states;
 			newState.nb_events = this.nb_events;
-
-			// No clonable implemented in TMF, we will use copy constructor
-			// NOTE : we GOT to check for null to avoid crashing on null pointer
-			// here!
-			if (this.max_time_state_recomputed_in_seek != null) {
-				newState.max_time_state_recomputed_in_seek = new TmfTimestamp(
-						this.max_time_state_recomputed_in_seek);
-			}
+			newState.max_time_state_recomputed_in_seek = this.max_time_state_recomputed_in_seek;
 
 			// Clone should work correctly for all stack object that contain
 			// basic java object (String, Long, etc...)
@@ -228,7 +220,7 @@ public class LttngTraceState implements Cloneable {
 		traceId = inputDataRef.getTraceId();
 
 		// max time
-		setMax_time_state_recomputed_in_seek(new TmfTimestamp());
+		max_time_state_recomputed_in_seek = 0L;
 
 		// reset cpu_states
 		cpu_states.clear();
@@ -260,13 +252,7 @@ public class LttngTraceState implements Cloneable {
 
 		// bdev states
 		bdev_states.clear();
-
-		// JniTrace State
-		init_state(numCpus);
-
-	}
-
-	public void init_state(int numCpus) {
+		
 		processes.clear();
 
 		nb_events = 0;
@@ -274,8 +260,7 @@ public class LttngTraceState implements Cloneable {
 
 		/* Put the per cpu running_process to beginning state : process 0. */
 		for (Long i = 0L; i < numCpus; i++) {
-			LttngProcessState process = new LttngProcessState(timeWin
-					.getStartTime());
+			LttngProcessState process = new LttngProcessState(timeWin.getStartTime().getValue(), traceId );
 
 			/*
 			 * We are not sure is it's a kernel thread or normal thread, put the
@@ -353,12 +338,12 @@ public class LttngTraceState implements Cloneable {
 		return inputDataRef;
 	}
 
-	public TmfTimestamp getMax_time_state_recomputed_in_seek() {
+	public Long getMax_time_state_recomputed_in_seek() {
 		return max_time_state_recomputed_in_seek;
 	}
 
 	public void setMax_time_state_recomputed_in_seek(
-			TmfTimestamp maxTimeStateRecomputedInSeek) {
+			Long maxTimeStateRecomputedInSeek) {
 		max_time_state_recomputed_in_seek = maxTimeStateRecomputedInSeek;
 	}
 

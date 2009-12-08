@@ -275,7 +275,7 @@ public class TmfExperiment extends TmfComponent implements ITmfRequestHandler<Tm
 
 				// Extract the general request information
 				int blockSize = request.getBlockize();
-				int nbRequestedEvents = request.getNbRequestedItems();
+				int nbRequestedEvents = request.getNbRequestedEvents();
 				if (nbRequestedEvents == -1) {
 					nbRequestedEvents = Integer.MAX_VALUE;
 				}
@@ -461,23 +461,29 @@ public class TmfExperiment extends TmfComponent implements ITmfRequestHandler<Tm
 
 		job = new IndexingJob(fExperimentId);
 		job.schedule();
-		if (fWaitForIndexCompletion) {
-	        ProgressMonitorDialog dialog = new ProgressMonitorDialog(null);
-	        try {
-				// TODO: Handle cancel!
-	            dialog.run(true, true, new IRunnableWithProgress() {
-	                public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-	                    monitor.beginTask("Indexing " + fExperimentId, IProgressMonitor.UNKNOWN);
-	    				job.join();
-	                    monitor.done();
-	                }
-	            });
-	        } catch (InvocationTargetException e) {
-	            e.printStackTrace();
-	        } catch (InterruptedException e) {
-	            e.printStackTrace();
-	        }
+		try {
+			job.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+//		if (fWaitForIndexCompletion) {
+//	        ProgressMonitorDialog dialog = new ProgressMonitorDialog(null);
+//	        try {
+//				// TODO: Handle cancel!
+//	            dialog.run(true, true, new IRunnableWithProgress() {
+//	                public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+//	                    monitor.beginTask("Indexing " + fExperimentId, IProgressMonitor.UNKNOWN);
+//	    				job.join();
+//	                    monitor.done();
+//	                }
+//	            });
+//	        } catch (InvocationTargetException e) {
+//	            e.printStackTrace();
+//	        } catch (InterruptedException e) {
+//	            e.printStackTrace();
+//	        }
+//		}
 	}
 
 	private class IndexingJob extends Job {

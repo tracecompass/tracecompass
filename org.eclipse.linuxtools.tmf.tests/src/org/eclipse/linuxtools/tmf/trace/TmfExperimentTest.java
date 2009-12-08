@@ -12,10 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.trace;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.util.Vector;
 
@@ -23,15 +19,15 @@ import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
-import org.junit.BeforeClass;
-import org.junit.Test;
+
+import junit.framework.TestCase;
 
 /**
- * <b><u>TmfEventLogTest</u></b>
+ * <b><u>TmfExperimentTest</u></b>
  * <p>
  * TODO: Implement me. Please.
  */
-public class TmfExperimentTest {
+public class TmfExperimentTest extends TestCase {
 
     private static final String DIRECTORY   = "testfiles";
     private static final String TEST_STREAM = "M-Test-10K";
@@ -43,8 +39,12 @@ public class TmfExperimentTest {
     private static ITmfTrace fStream;
     private static TmfExperiment fExperiment;
 
-    @BeforeClass
-	public static void setUpBeforeClass() throws Exception {
+    // ========================================================================
+    // Housekeeping
+    // ========================================================================
+
+	public TmfExperimentTest(String name) throws Exception {
+		super(name);
     	String directory = new File(".").getCanonicalPath() + File.separator + DIRECTORY;
     	testfile = directory + File.separator + TEST_STREAM;
 
@@ -52,11 +52,20 @@ public class TmfExperimentTest {
         fExperiment = new TmfExperiment(EXPERIMENT, new ITmfTrace[] { fStream }, true);
 	}
 
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+	}
+
     // ========================================================================
     // Constructor
     // ========================================================================
 
-	@Test
 	public void testBasicTmfTrace() {
 		assertEquals("GetId", EXPERIMENT, fExperiment.getExperimentId());
         assertEquals("GetEpoch", TmfTimestamp.BigBang, fExperiment.getEpoch());
@@ -71,14 +80,13 @@ public class TmfExperimentTest {
     // processRequest
     // ========================================================================
 
-    @Test
     public void testProcessRequestForNbEvents() throws Exception {
         final int blockSize = 100;
         final int nbEvents = 1000;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 0, nbEvents, blockSize) {
+        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, nbEvents, blockSize) {
             @Override
             public void handleData() {
             	TmfEvent[] events = getData();
@@ -100,14 +108,13 @@ public class TmfExperimentTest {
         }
     }
     
-    @Test
     public void testProcessRequestForNbEvents2() throws Exception {
         final int blockSize = 2 * NB_EVENTS;
         final int nbEvents = 1000;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 0, nbEvents, blockSize) {
+        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, nbEvents, blockSize) {
             @Override
             public void handleData() {
             	TmfEvent[] events = getData();
@@ -129,7 +136,6 @@ public class TmfExperimentTest {
         }
     }
     
-    @Test
     public void testProcessRequestForAllEvents() throws Exception {
         final int nbEvents  = -1;
         final int blockSize =  1;
@@ -137,7 +143,7 @@ public class TmfExperimentTest {
         int nbExpectedEvents = fExperiment.getNbEvents();
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 0, nbEvents, blockSize) {
+        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, nbEvents, blockSize) {
             @Override
             public void handleData() {
             	TmfEvent[] events = getData();
@@ -163,14 +169,13 @@ public class TmfExperimentTest {
     // cancel
     // ========================================================================
 
-    @Test
     public void testCancel() throws Exception {
         final int nbEvents  = NB_EVENTS;
         final int blockSize =  fDefaultBlockSize;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 0, nbEvents, blockSize) {
+        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, nbEvents, blockSize) {
             @Override
             public void handleData() {
             	TmfEvent[] events = getData();
@@ -187,5 +192,4 @@ public class TmfExperimentTest {
         assertTrue("isCompleted", request.isCompleted());
         assertTrue("isCancelled", request.isCancelled());
     }
-
 }

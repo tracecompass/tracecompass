@@ -12,108 +12,120 @@
 
 package org.eclipse.linuxtools.tmf.event;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
+import junit.framework.TestCase;
 
 /**
  * <b><u>TmfEventTest</u></b>
  * <p>
- * JUNit test suite for the TmfEvent class.
+ * TODO: Implement me. Please.
  */
-public class TmfEventTest {
+public class TmfEventTest extends TestCase {
 
-    // ========================================================================
-    // Constructor
-    // ========================================================================
-    
-    @Test
-    public void testTmfEvent() {
-        TmfTimestamp      timestamp = new TmfTimestamp(12345, (byte) 2, 5);
-        TmfEventSource    source    = new TmfEventSource("Source");
-        TmfEventFormat    format    = new TmfEventFormat(new String[] { "field1", "field2" });
-        TmfEventType      type      = new TmfEventType("Type", format);
-        TmfEventContent   content   = new TmfEventContent("Some content", format);
-        TmfEventReference reference = new TmfEventReference("Reference");
+	private final String   fTypeId = "Some type";
+	private final String   fLabel0 = "label1";
+	private final String   fLabel1 = "label2";
+	private final String[] fLabels = new String[] { fLabel0, fLabel1 };
 
-        // Create the event
-        TmfEvent event = new TmfEvent(timestamp, source, type, content, reference);
+	private final TmfTimestamp      fTimestamp1 = new TmfTimestamp(12345, (byte) 2, 5);
+	private final TmfTimestamp      fTimestamp2 = new TmfTimestamp(12350, (byte) 2, 5);
+	private final TmfEventSource    fSource     = new TmfEventSource("Source");
+	private final TmfEventType      fType       = new TmfEventType(fTypeId, fLabels);
+	private final TmfEventReference fReference  = new TmfEventReference("Some reference");
 
-        // Check the event timestamp
-        TmfTimestamp ts = event.getTimestamp();
-        assertEquals("getValue", 12345, ts.getValue());
-        assertEquals("getscale",     2, ts.getScale());
-        assertEquals("getPrecision", 5, ts.getPrecision());
+	private final TmfEvent fEvent1;
+	private final TmfEvent fEvent2;
 
-        // Check the original event timestamp
-        ts = event.getOriginalTimestamp();
-        assertEquals("getValue", 12345, ts.getValue());
-        assertEquals("getscale",     2, ts.getScale());
-        assertEquals("getPrecision", 5, ts.getPrecision());
+	private final TmfEventContent fContent1;
+	private final TmfEventContent fContent2;
+	
+	// ========================================================================
+	// Housekeeping
+	// ========================================================================
 
-        // Check the event source
-        TmfEventSource src = event.getSource();
-        assertEquals("getValue", "Source", src.getSourceId());
+	public TmfEventTest(String name) {
+		super(name);
 
-        // Check the event type
-        TmfEventType tp = event.getType();
-        assertEquals("getValue", "Type", tp.getTypeId());
-        assertEquals("getFormat", "field1", tp.getFormat().getLabels()[0]);
-        assertEquals("getFormat", "field2", tp.getFormat().getLabels()[1]);
+		fEvent1 = new TmfEvent(fTimestamp1, fSource, fType, fReference);
+		fContent1 = new TmfEventContent(fEvent1, "Some content");
+		fEvent1.setContent(fContent1);
 
-        // Check the event content
-        TmfEventContent cnt = event.getContent();
-        assertEquals("getField", 1, cnt.getFields().length);
-        assertEquals("getField", "Some content", cnt.getField(0).toString());
+		fEvent2 = new TmfEvent(fTimestamp1, fTimestamp2, fSource, fType, fReference);
+		fContent2 = new TmfEventContent(fEvent2, "Some other content");
+		fEvent2.setContent(fContent2);
+	}
 
-        // Check the event reference
-        TmfEventReference ref = event.getReference();
-        assertEquals("getValue", "Reference", ref.getValue());
-    }
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
 
-    @Test
-    public void testTmfEvent2() {
-        TmfTimestamp      original  = new TmfTimestamp(12345, (byte) 2, 5);
-        TmfTimestamp      effective = new TmfTimestamp(12350, (byte) 2, 5);
-        TmfEventSource    source    = new TmfEventSource("Source");
-        TmfEventFormat    format    = new TmfEventFormat(new String[] { "field1", "field2" });
-        TmfEventType      type      = new TmfEventType("Type", format);
-        TmfEventContent   content   = new TmfEventContent("Some content", format);
-        TmfEventReference reference = new TmfEventReference("Reference");
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+	}
 
-        // Create the event
-        TmfEvent event = new TmfEvent(original, effective, source, type, content, reference);
+	// ========================================================================
+	// Constructors
+	// ========================================================================
 
-        // Check the event timestamp
-        TmfTimestamp ts = event.getTimestamp();
-        assertEquals("getValue", 12350, ts.getValue());
-        assertEquals("getscale",     2, ts.getScale());
-        assertEquals("getPrecision", 5, ts.getPrecision());
+	public void testTmfEvent() {
+		assertEquals("getTimestamp",         fTimestamp1, fEvent1.getTimestamp());
+		assertEquals("getOriginalTimestamp", fTimestamp1, fEvent1.getOriginalTimestamp());
+		assertEquals("getSource",            fSource,     fEvent1.getSource());
+		assertEquals("getType",              fType,       fEvent1.getType());
+		assertEquals("getContent",           fContent1,   fEvent1.getContent());
+		assertEquals("getReference",         fReference,  fEvent1.getReference());
+	}
 
-        // Check the original event timestamp
-        ts = event.getOriginalTimestamp();
-        assertEquals("getValue", 12345, ts.getValue());
-        assertEquals("getscale",     2, ts.getScale());
-        assertEquals("getPrecision", 5, ts.getPrecision());
+	public void testTmfEvent2() {
+		assertEquals("getTimestamp",         fTimestamp2, fEvent2.getTimestamp());
+		assertEquals("getOriginalTimestamp", fTimestamp1, fEvent2.getOriginalTimestamp());
+		assertEquals("getSource",            fSource,     fEvent2.getSource());
+		assertEquals("getType",              fType,       fEvent2.getType());
+		assertEquals("getContent",           fContent2,   fEvent2.getContent());
+		assertEquals("getReference",         fReference,  fEvent2.getReference());
+	}
 
-        // Check the event source
-        TmfEventSource src = event.getSource();
-        assertEquals("getValue", "Source", src.getSourceId());
+	public void testTmfEventCopy() {
+		TmfEvent event = new TmfEvent(fEvent1);
+		assertEquals("getTimestamp",         fTimestamp1, event.getTimestamp());
+		assertEquals("getOriginalTimestamp", fTimestamp1, event.getOriginalTimestamp());
+		assertEquals("getSource",            fSource,     event.getSource());
+		assertEquals("getType",              fType,       event.getType());
+		assertEquals("getContent",           fContent1,   event.getContent());
+		assertEquals("getReference",         fReference,  event.getReference());
+	}
 
-        // Check the event type
-        TmfEventType tp = event.getType();
-        assertEquals("getValue", "Type", tp.getTypeId());
-        assertEquals("getFormat", "field1", tp.getFormat().getLabels()[0]);
-        assertEquals("getFormat", "field2", tp.getFormat().getLabels()[1]);
+//	public void testTmfEventCloneShallowCopy() {
+//		TmfEvent event = fEvent1.clone();
+//		assertEquals("getTimestamp",         fTimestamp1, event.getTimestamp());
+//		assertEquals("getOriginalTimestamp", fTimestamp1, event.getOriginalTimestamp());
+//		assertEquals("getSource",            fSource,     event.getSource());
+//		assertEquals("getType",              fType,       event.getType());
+//		assertEquals("getContent",           fContent1,   event.getContent());
+//		assertEquals("getReference",         fReference,  event.getReference());
+//	}
 
-        // Check the event content
-        TmfEventContent cnt = event.getContent();
-        assertEquals("getField", 1, cnt.getFields().length);
-        assertEquals("getField", "Some content", cnt.getField(0).toString());
+//	public void testTmfEventCloneDeepCopy() {
+//		TmfEvent event = fEvent1.clone();
+//		assertEquals("getTimestamp",         fTimestamp1, event.getTimestamp());
+//		assertEquals("getOriginalTimestamp", fTimestamp1, event.getOriginalTimestamp());
+//		assertEquals("getSource",            fSource,     event.getSource());
+//		assertEquals("getType",              fType,       event.getType());
+//		assertEquals("getContent",           fContent1,   event.getContent());
+//		assertEquals("getReference",         fReference,  event.getReference());
+//	}
 
-        // Check the event reference
-        TmfEventReference ref = event.getReference();
-        assertEquals("getValue", "Reference", ref.getValue());
-    }
+	// ========================================================================
+	// Operators
+	// ========================================================================
+
+//	public void testToString() {
+//		String expected1 = "[TmfEventType:" + TmfEventType.DEFAULT_TYPE_ID + "]";
+//		assertEquals("toString", expected1, fEvent1.toString());
+//
+//		String expected2 = "[TmfEventType:" + fTypeId + "]";
+//		assertEquals("toString", expected2, fEvent2.toString());
+//	}
 
 }

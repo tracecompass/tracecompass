@@ -12,239 +12,90 @@
 
 package org.eclipse.linuxtools.tmf.request;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Vector;
+import junit.framework.TestCase;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.request.ITmfRequestHandler;
-import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 /**
  * <b><u>TmfDataRequestTest</u></b>
  * <p>
  * TODO: Implement me. Please.
  */
-public class TmfDataRequestTest {
+public class TmfDataRequestTest extends TestCase {
 
-    private static ITmfRequestHandler<TmfEvent> fProcessor = null;
+	// ========================================================================
+	// Housekeeping
+	// ========================================================================
 
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        fProcessor = new TmfRequestHandlerStub();
-    }
+	public TmfDataRequestTest(String name) {
+		super(name);
+	}
 
-    // ========================================================================
-    // Constructor
-    // ========================================================================
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
 
-    @Test
-    public void testConstructorForRange() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+	}
+
+	// ========================================================================
+	// Constructors
+	// ========================================================================
+
+	public void testTmfDataRequestIndexNbEvents() {
+        TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(10, 100);
+
+        assertEquals("getRange",            null, request.getRange());
+        assertEquals("getIndex",              10, request.getIndex());
+        assertEquals("getNbRequestedEvents", 100, request.getNbRequestedEvents());
+        assertEquals("getBlockize", TmfDataRequest.DEFAULT_BLOCK_SIZE, request.getBlockize());
+	}
+
+	public void testTmfDataRequestIndexNbEventsBlocksize() {
+        TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(10, 100, 200);
+
+        assertEquals("getRange",            null, request.getRange());
+        assertEquals("getIndex",              10, request.getIndex());
+        assertEquals("getNbRequestedEvents", 100, request.getNbRequestedEvents());
+        assertEquals("getBlockize",          200, request.getBlockize());
+	}
+
+	public void testTmfDataRequestTimeRange() {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 0, -1, 1);
+        TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range);
 
         assertEquals("StartTime", TmfTimestamp.BigBang,   request.getRange().getStartTime());
         assertEquals("EndTime",   TmfTimestamp.BigCrunch, request.getRange().getEndTime());
-        assertEquals("Offset",             0, request.getOffset());
-        assertEquals("NbRequestedEvents", -1, request.getNbRequestedItems());
-    }
+        assertEquals("getIndex",              0, request.getIndex());
+        assertEquals("getNbRequestedEvents", -1, request.getNbRequestedEvents());
+        assertEquals("getBlockize", TmfDataRequest.DEFAULT_BLOCK_SIZE, request.getBlockize());
+	}
 
-    @Test
-    public void testConstructorForNbEvents() throws Exception {
+	public void testTmfDataRequestTimeRangeNbEvents() {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 0, 10, 1);
+        TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 10);
 
         assertEquals("StartTime", TmfTimestamp.BigBang,   request.getRange().getStartTime());
         assertEquals("EndTime",   TmfTimestamp.BigCrunch, request.getRange().getEndTime());
-        assertEquals("Offset",             0, request.getOffset());
-        assertEquals("NbRequestedEvents", 10, request.getNbRequestedItems());
-    }
+        assertEquals("getIndex",              0, request.getIndex());
+        assertEquals("getNbRequestedEvents", 10, request.getNbRequestedEvents());
+        assertEquals("getBlockize", TmfDataRequest.DEFAULT_BLOCK_SIZE, request.getBlockize());
+	}
 
-    @Test
-    public void testConstructorWithOffset() throws Exception {
+	public void testTmfDataRequestTimeRangeNbEventsBlockSize() {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 5, 10, 1);
+        TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 10, 100);
 
         assertEquals("StartTime", TmfTimestamp.BigBang,   request.getRange().getStartTime());
         assertEquals("EndTime",   TmfTimestamp.BigCrunch, request.getRange().getEndTime());
-        assertEquals("Offset",             5, request.getOffset());
-        assertEquals("NbRequestedEvents", 10, request.getNbRequestedItems());
-    }
-
-    @Test
-    public void testConstructorWithNegativeOffset() throws Exception {
-        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, -5, 10, 1);
-
-        assertEquals("StartTime", TmfTimestamp.BigBang,   request.getRange().getStartTime());
-        assertEquals("EndTime",   TmfTimestamp.BigCrunch, request.getRange().getEndTime());
-        assertEquals("Offset",            -5, request.getOffset());
-        assertEquals("NbRequestedEvents", 10, request.getNbRequestedItems());
-    }
-
-    // ========================================================================
-    // process
-    // ========================================================================
-
-    @Test
-    public void testProcessRequestForNbEvents() throws Exception {
-
-        final int NB_EVENTS  = 10 * 1000;
-        final int BLOCK_SIZE = 100;
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
-
-        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 0, NB_EVENTS, BLOCK_SIZE) {
-            @Override
-            public void handleData() {
-            	TmfEvent[] events = getData();
-                for (TmfEvent e : events) {
-                    requestedEvents.add(e);
-                }
-            }
-        };
-        fProcessor.processRequest(request, true);
-
-        assertEquals("nbEvents", NB_EVENTS, requestedEvents.size());
-        assertTrue("isCompleted",  request.isCompleted());
-        assertFalse("isCancelled", request.isCancelled());
-
-        // Ensure that we have distinct events.
-        // Don't go overboard: we are not validating the stub! 
-        for (int i = 0; i < NB_EVENTS; i++) {
-            assertEquals("Distinct events", i+1, requestedEvents.get(i).getTimestamp().getValue());
-        }
-    }
-    
-    @Test
-    public void testProcessRequestForAllEvents() throws Exception {
-
-        final int NB_EVENTS  = -1;
-        final int BLOCK_SIZE =  1;
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
-        int nbExpectedEvents = TmfRequestHandlerStub.MAX_GENERATED_EVENTS;
-
-        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 0, NB_EVENTS, BLOCK_SIZE) {
-            @Override
-            public void handleData() {
-            	TmfEvent[] events = getData();
-                for (TmfEvent e : events) {
-                    requestedEvents.add(e);
-                }
-            }
-        };
-        fProcessor.processRequest(request, true);
-
-        assertEquals("nbEvents", nbExpectedEvents, requestedEvents.size());
-        assertTrue("isCompleted",  request.isCompleted());
-        assertFalse("isCancelled", request.isCancelled());
-
-        // Ensure that we have distinct events.
-        // Don't go overboard: we are not validating the stub! 
-        for (int i = 0; i < nbExpectedEvents; i++) {
-            assertEquals("Distinct events", i+1, requestedEvents.get(i).getTimestamp().getValue());
-        }
-    }
-    
-    // @Test
-    public void testProcessRequestWithOffset() throws Exception {
-
-        final int NB_EVENTS  = -1;
-        final int BLOCK_SIZE =  1;
-        final int OFFSET = 5;
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
-        int nbExpectedEvents = TmfRequestHandlerStub.MAX_GENERATED_EVENTS;
-
-        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, OFFSET, NB_EVENTS, BLOCK_SIZE) {
-            @Override
-            public void handleData() {
-            	TmfEvent[] events = getData();
-                for (TmfEvent e : events) {
-                    requestedEvents.add(e);
-                }
-            }
-        };
-        fProcessor.processRequest(request, true);
-
-        assertEquals("nbEvents", nbExpectedEvents, requestedEvents.size());
-        assertTrue("isCompleted",  request.isCompleted());
-        assertFalse("isCancelled", request.isCancelled());
-
-        // Ensure that we have distinct events.
-        // Don't go overboard: we are not validating the stub! 
-        for (int i = 0; i < nbExpectedEvents; i++) {
-            assertEquals("Distinct events", i + OFFSET, requestedEvents.get(i).getTimestamp().getValue());
-        }
-    }
-    
-    // l@Test
-    public void testProcessRequestWithNegativeOffset() throws Exception {
-
-        final int NB_EVENTS  = -1;
-        final int BLOCK_SIZE =  1;
-        final int OFFSET = -5;
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
-        int nbExpectedEvents = TmfRequestHandlerStub.MAX_GENERATED_EVENTS;
-
-        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, OFFSET, NB_EVENTS, BLOCK_SIZE) {
-            @Override
-            public void handleData() {
-            	TmfEvent[] events = getData();
-                for (TmfEvent e : events) {
-                    requestedEvents.add(e);
-                }
-            }
-        };
-        fProcessor.processRequest(request, true);
-
-        assertEquals("nbEvents", nbExpectedEvents, requestedEvents.size());
-        assertTrue("isCompleted",  request.isCompleted());
-        assertFalse("isCancelled", request.isCancelled());
-
-        // Ensure that we have distinct events.
-        // Don't go overboard: we are not validating the stub! 
-        for (int i = 0; i < nbExpectedEvents; i++) {
-            assertEquals("Distinct events", i + OFFSET, requestedEvents.get(i).getTimestamp().getValue());
-        }
-    }
-    
-    // ========================================================================
-    // cancel
-    // ========================================================================
-
-    @Test
-    public void testCancel() throws Exception {
-
-        final int NB_EVENTS  = 10 * 1000;
-        final int BLOCK_SIZE = 100;
-        final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
-
-        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 0, NB_EVENTS, BLOCK_SIZE) {
-            @Override
-            public void handleData() {
-            	TmfEvent[] events = getData();
-                for (TmfEvent e : events) {
-                    requestedEvents.add(e);
-                }
-                // Cancel request after the first chunk is received
-                cancel();
-            }
-        };
-        fProcessor.processRequest(request, true);
-
-        assertEquals("nbEvents",  BLOCK_SIZE, requestedEvents.size());
-        assertTrue("isCompleted", request.isCompleted());
-        assertTrue("isCancelled", request.isCancelled());
-    }
+        assertEquals("getIndex",              0, request.getIndex());
+        assertEquals("getNbRequestedEvents", 10, request.getNbRequestedEvents());
+        assertEquals("getBlockize",         100, request.getBlockize());
+	}
 
 }

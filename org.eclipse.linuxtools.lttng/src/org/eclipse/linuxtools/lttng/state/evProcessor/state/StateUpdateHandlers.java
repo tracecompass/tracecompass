@@ -902,16 +902,16 @@ class StateUpdateHandlers {
 							process.getState().setProc_status(
 									ProcessStatus.LTTV_STATE_WAIT);
 							process.getState().setChange_Time(
-									trcEvent.getTimestamp());
+									trcEvent.getTimestamp().getValue());
 							process.getState().setEntry_Time(
-									trcEvent.getTimestamp());
+									trcEvent.getTimestamp().getValue());
 						}
 					} else {
 						if (process.getState().getProc_status() == ProcessStatus.LTTV_STATE_EXIT) {
 							process.getState().setProc_status(
 									ProcessStatus.LTTV_STATE_ZOMBIE);
 							process.getState().setChange_Time(
-									trcEvent.getTimestamp());
+									trcEvent.getTimestamp().getValue());
 						} else {
 							if ((state_out != null)
 									&& (state_out.longValue() == 0L)) {
@@ -923,7 +923,7 @@ class StateUpdateHandlers {
 							}
 
 							process.getState().setChange_Time(
-									trcEvent.getTimestamp());
+									trcEvent.getTimestamp().getValue());
 						}
 
 						if ((state_out != null)
@@ -937,7 +937,7 @@ class StateUpdateHandlers {
 								process.getState().setProc_status(
 										ProcessStatus.LTTV_STATE_DEAD);
 								process.getState().setChange_Time(
-										trcEvent.getTimestamp());
+										trcEvent.getTimestamp().getValue());
 							}
 						}
 					}
@@ -948,7 +948,7 @@ class StateUpdateHandlers {
 				traceSt.getRunning_process().put(cpu, process);
 
 				process.getState().setProc_status(ProcessStatus.LTTV_STATE_RUN);
-				process.getState().setChange_Time(eventTime);
+				process.getState().setChange_Time(eventTime.getValue());
 				process.setCpu(cpu);
 				// process->state->s = LTTV_STATE_RUN;
 				// if(process->usertrace)
@@ -1073,7 +1073,7 @@ class StateUpdateHandlers {
 				if (child_process == null) {
 					child_process = create_process(traceSt, cpu, child_pid,
 							child_tgid, timeStamp);
-					child_process.setPpid(process.getPid(), timeStamp);
+					child_process.setPpid(process.getPid(), timeStamp.getValue());
 				} else {
 					/*
 					 * The process has already been created : due to time
@@ -1452,8 +1452,8 @@ class StateUpdateHandlers {
 						es
 								.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE
 										.getInName());
-						es.setEntry_Time(timestamp);
-						es.setChange_Time(timestamp);
+						es.setEntry_Time(timestamp.getValue());
+						es.setChange_Time(timestamp.getValue());
 						es.setCum_cpu_time(0L);
 						if (es.getProc_status() == ProcessStatus.LTTV_STATE_UNNAMED) {
 							es.setProc_status(ProcessStatus.LTTV_STATE_WAIT);
@@ -1466,8 +1466,8 @@ class StateUpdateHandlers {
 						es
 								.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE
 										.getInName());
-						es.setEntry_Time(timestamp);
-						es.setChange_Time(timestamp);
+						es.setEntry_Time(timestamp.getValue());
+						es.setChange_Time(timestamp.getValue());
 						es.setCum_cpu_time(0L);
 						if (es.getProc_status() == ProcessStatus.LTTV_STATE_UNNAMED) {
 							es.setProc_status(ProcessStatus.LTTV_STATE_RUN);
@@ -1494,8 +1494,8 @@ class StateUpdateHandlers {
 							es
 									.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE
 											.getInName());
-							es.setEntry_Time(timestamp);
-							es.setChange_Time(timestamp);
+							es.setEntry_Time(timestamp.getValue());
+							es.setChange_Time(timestamp.getValue());
 							es.setCum_cpu_time(0L);
 							es.setProc_status(ProcessStatus.LTTV_STATE_WAIT);
 
@@ -1534,13 +1534,14 @@ class StateUpdateHandlers {
 				Long tgid;
 				String command;
 				Long cpu = trcEvent.getCpuId();
+				
 				LttngProcessState process = traceSt.getRunning_process().get(
 						cpu);
 				LttngProcessState parent_process;
 				String type;
 				// String mode, submode, status;
 				LttngExecutionState es;
-
+				
 				/* PID */
 				pid = getAFieldLong(trcEvent, traceSt, Fields.LTT_FIELD_PID);
 
@@ -1607,7 +1608,7 @@ class StateUpdateHandlers {
 						process = create_process(traceSt, cpu, pid, tgid,
 								command, eventTime);
 						if (parent_process != null) {
-							process.setPpid(parent_process.getPid(), eventTime);
+							process.setPpid(parent_process.getPid(), eventTime.getValue());
 						}
 
 						/* Keep the stack bottom : a running user mode */

@@ -1,3 +1,4 @@
+package org.eclipse.linuxtools.lttng.jni;
 /*******************************************************************************
  * Copyright (c) 2009 Ericsson
  * 
@@ -10,7 +11,6 @@
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.jni;
 
 /**
  * <b><u>JniTime</u></b>
@@ -95,7 +95,28 @@ public final class JniTime extends Jni_C_Common implements Comparable<JniTime>
     public long getTime() {
         return time;
     }
-     
+    
+    /**
+     * Changes the current time for this object<p>
+     * 
+     * @param newTime	New time to set, in nanoseconds.
+     */
+    public void setTime(long newTime) {
+        time = newTime;
+    }
+    
+    /* 
+     * Populate this time object
+     * 
+     * Note: This function is called from C side.
+     * 
+     * @param newTime The time we want to populate
+     */
+    @SuppressWarnings("unused")
+    private void setTimeFromC(long newTime) {
+        time = newTime;
+    }
+    
     /**
      * Comparaison operator smaller or equal than "<=" .<p>
      * 
@@ -123,30 +144,18 @@ public final class JniTime extends Jni_C_Common implements Comparable<JniTime>
      * @return int of value -1, 0 or 1, as the pased argument is bigger, equal or smaller than this time
      */
     public int compareTo(JniTime right) {
+        long leftTime = this.getTime();
+        long rightTime = right.getTime();
         
-        JniTime left = this;
-        
-        if ( left.getTime() < right.getTime() ) {
+        if ( leftTime < rightTime ) { 
             return -1;
         }
-        else if ( left.getTime() > right.getTime() ) {
-            return 1;
+        else if ( leftTime > rightTime ) {
+            return  1;
         }
         else {
             return 0;
         }
-    }
-
-    /* 
-     * Populate this time object
-     * 
-     * Note: This function is called from C side.
-     * 
-     * @param newTime The time we want to populate
-     */
-    @SuppressWarnings("unused")
-    private void setTimeFromC(long newTime) {
-        time = newTime;
     }
     
     /**

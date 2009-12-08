@@ -12,7 +12,6 @@
 package org.eclipse.linuxtools.lttng.state.model;
 
 import org.eclipse.linuxtools.lttng.state.StateStrings;
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 /**
  * <b><u>LttngExecutionState</u></b>
@@ -23,8 +22,8 @@ public class LttngExecutionState implements Cloneable {
 	// ========================================================================
 	// Data
 	// =======================================================================
-	private TmfTimestamp entry_LttTime = null;
-	private TmfTimestamp change_LttTime = null;
+	private Long entry_LttTime = null;
+	private Long change_LttTime = null;
 	private Long cum_cpu_time_Timens = null;
 	
 	private StateStrings.ProcessStatus proc_status = StateStrings.ProcessStatus.LTTV_STATE_UNNAMED;
@@ -48,16 +47,8 @@ public class LttngExecutionState implements Cloneable {
             // ProcessStatus and ExecutionMode are enum, and so shouldn't be a problem to use their reference
             newState.proc_status = this.proc_status;
             newState.exec_mode = this.exec_mode;
-            
-            // No clonable implemented in TMF, we will use copy constructor
-            // NOTE : we GOT to check for null to avoid crashing on null pointer here!
-            if ( this.entry_LttTime != null ) {
-                newState.entry_LttTime = new TmfTimestamp(this.entry_LttTime);
-            }
-            
-            if ( this.change_LttTime != null ) {
-                newState.change_LttTime = new TmfTimestamp(this.change_LttTime);
-            }
+            newState.entry_LttTime = this.entry_LttTime;
+            newState.change_LttTime = this.change_LttTime;
         }
         catch ( CloneNotSupportedException e ) {
             System.out.println("Cloning failed with : " + e.getMessage() );
@@ -72,7 +63,7 @@ public class LttngExecutionState implements Cloneable {
 	/**
 	 * @return the entry_LttTime
 	 */
-	public TmfTimestamp getEntry_LttTime() {
+	public Long getEntry_LttTime() {
 		return entry_LttTime;
 	}
 
@@ -80,14 +71,14 @@ public class LttngExecutionState implements Cloneable {
 	 * @param entryLttTime
 	 *            the entry_LttTime to set
 	 */
-	public void setEntry_Time(TmfTimestamp entryLttTime) {
+	public void setEntry_Time(Long entryLttTime) {
 		entry_LttTime = entryLttTime;
 	}
 
 	/**
 	 * @return the change_LttTime
 	 */
-	public TmfTimestamp getChange_LttTime() {
+	public Long getChange_LttTime() {
 		return change_LttTime;
 	}
 
@@ -95,7 +86,7 @@ public class LttngExecutionState implements Cloneable {
 	 * @param changeLttTime
 	 *            the change_LttTime to set
 	 */
-	public void setChange_Time(TmfTimestamp changeLttTime) {
+	public void setChange_Time(Long changeLttTime) {
 		change_LttTime = changeLttTime;
 	}
 

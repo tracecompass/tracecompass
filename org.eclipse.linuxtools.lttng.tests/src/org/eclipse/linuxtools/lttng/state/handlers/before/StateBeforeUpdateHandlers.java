@@ -71,8 +71,8 @@ class StateBeforeUpdateHandlers {
 				exState = new LttngExecutionState();
 				exState.setExec_mode(ExecutionMode.LTTV_STATE_SYSCALL);
 				exState.setExec_submode(submode);
-				exState.setEntry_Time(trcEvent.getTimestamp());
-				exState.setChange_Time(trcEvent.getTimestamp());
+				exState.setEntry_Time(trcEvent.getTimestamp().getValue());
+				exState.setChange_Time(trcEvent.getTimestamp().getValue());
 				exState.setCum_cpu_time(0L);
 
 				return false;

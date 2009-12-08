@@ -1,12 +1,7 @@
 
 package org.eclipse.linuxtools.lttng.jni;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
-
-import org.junit.Test;
+import junit.framework.TestCase;
 
 /*
  Functions tested here :
@@ -52,8 +47,10 @@ import org.junit.Test;
  */
 
 
-public class JniTraceTest
+public class JniTraceTest extends TestCase
 {
+		private final static boolean printLttDebug = false;
+		
         private final static String tracepath1="traceset/trace-618339events-1293lost-1cpu";
         private final static String tracepath2="traceset/trace-1021events-nolost-1cpu";
         private final static String wrongTracePath="/somewhere/that/does/not/exist";
@@ -92,14 +89,13 @@ public class JniTraceTest
                 
                 // This trace should be valid
                 try {
-                        tmpTrace = new JniTrace(tracepath1);
+                        tmpTrace = new JniTrace(tracepath1, printLttDebug);
                 }
                 catch( JniException e) { }
                 
                 return tmpTrace;
         }
         
-        @Test
         public void testTraceConstructors() {
                 JniTrace testTrace1 = null;
                 @SuppressWarnings("unused")
@@ -107,7 +103,7 @@ public class JniTraceTest
                 
                 // Test constructor with argument on a wrong tracepath
                 try {
-                        testTrace1 = new JniTrace(wrongTracePath);
+                        testTrace1 = new JniTrace(wrongTracePath, printLttDebug);
                         fail("Construction with wrong tracepath should fail!");
                 }
                 catch( JniException e) { 
@@ -115,7 +111,7 @@ public class JniTraceTest
                 
                 // Test constructor with argument on a correct tracepath
                 try {
-                        testTrace1 = new JniTrace(tracepath1);
+                        testTrace1 = new JniTrace(tracepath1, printLttDebug);
                 }
                 catch( JniException e) {
                         fail("Construction with correct tracepath failed!");
@@ -123,7 +119,7 @@ public class JniTraceTest
                 
                 // Test copy constructor that take a pointer with a good pointer
                 try {
-                        testTrace1 = new JniTrace( new Jni_C_Pointer(0) );
+                        testTrace1 = new JniTrace( new Jni_C_Pointer(0), printLttDebug);
                         fail("Construction with wrong pointer should fail!");
                 }
                 catch( JniException e) { 
@@ -131,8 +127,8 @@ public class JniTraceTest
                 
                 // Test copy constructor that take a pointer with a good pointer
                 try {
-                        testTrace1 = new JniTrace(tracepath1); // This trace should be valid
-                        testTrace2 = new JniTrace( testTrace1.getTracePtr() );
+                        testTrace1 = new JniTrace(tracepath1, printLttDebug); // This trace should be valid
+                        testTrace2 = new JniTrace( testTrace1.getTracePtr(), printLttDebug);
                 }
                 catch( JniException e) { 
                         fail("Construction with correct pointer failed!");
@@ -140,7 +136,6 @@ public class JniTraceTest
                 
         }
         
-        @Test
         public void testTraceOpenClose() {
                 
                 JniTrace testTrace = prepareTraceToTest(); // This trace should be valid
@@ -182,7 +177,6 @@ public class JniTraceTest
                 }
         }
         
-        @Test
         public void testGetSet() {
                 
                 JniTrace testTrace = prepareTraceToTest();
@@ -210,7 +204,6 @@ public class JniTraceTest
                 
         }
         
-        @Test
         public void testPrintAndToString() {
                 
                 JniTrace testTrace = prepareTraceToTest();
@@ -227,7 +220,6 @@ public class JniTraceTest
                 assertNotSame("toString returned empty data","",testTrace.toString() );
         }
         
-        @Test
         public void testRequestFunctions() {
         
                 JniTrace testTrace = prepareTraceToTest();
@@ -241,7 +233,6 @@ public class JniTraceTest
                 assertSame("requestEventByName returned content on non existent name",null,testTrace.requestEventByName(wrongTracefileName) );
         }
         
-        @Test
         public void testEventDisplacement() {
         
                 JniEvent testEvent = null; 
@@ -343,7 +334,6 @@ public class JniTraceTest
                 assertEquals("seekToTime(time) timestamp after seek back is incoherent",firstEventTimestamp,testEvent.getEventTime().getTime());
         }
         
-        @Test
         public void testEventDisplacementByTracefile() {
         
                 JniEvent testEvent = null; 

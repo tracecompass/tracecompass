@@ -12,71 +12,93 @@
 
 package org.eclipse.linuxtools.tmf.event;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-
-import org.junit.Test;
+import junit.framework.TestCase;
 
 /**
  * <b><u>TmfTimeRangeTest</u></b>
  * <p>
- * JUnit test suite for the TmfTimeRange class.
+ * TODO: Implement me. Please.
  */
-public class TmfTimeRangeTest {
+public class TmfTimeRangeTest extends TestCase {
 
-    // ========================================================================
-    // Constructors
-    // ========================================================================
+	// ========================================================================
+	// Housekeeping
+	// ========================================================================
 
-    @Test
-    public void testConstructor() throws Exception {
-        TmfTimestamp ts1   = new TmfTimestamp(12345);
-        TmfTimestamp ts2   = new TmfTimestamp(12350);
-        TmfTimeRange range = new TmfTimeRange(ts1, ts2);
-        assertEquals("startTime", ts1, range.getStartTime());
-        assertEquals("endTime",   ts2, range.getEndTime());
-    }
+	public TmfTimeRangeTest(String name) {
+		super(name);
+	}
 
-    @Test
-    public void testOpenRange1() throws Exception {
-        TmfTimestamp ts2    = new TmfTimestamp(12350);
-        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, ts2);
-        assertEquals("startTime", TmfTimestamp.BigBang, range.getStartTime());
-        assertEquals("endTime",   ts2, range.getEndTime());
-    }
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
 
-    @Test
-    public void testOpenRange2() throws Exception {
-        TmfTimestamp ts1   = new TmfTimestamp(12345);
-        TmfTimeRange range = new TmfTimeRange(ts1, TmfTimestamp.BigCrunch);
-        assertEquals("startTime", ts1, range.getStartTime());
-        assertEquals("endTime",   TmfTimestamp.BigCrunch, range.getEndTime());
-    }
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+	}
 
-    @Test
-    public void testOpenRange3() throws Exception {
-        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        assertEquals("startTime", TmfTimestamp.BigBang,   range.getStartTime());
-        assertEquals("endTime",   TmfTimestamp.BigCrunch, range.getEndTime());
-    }
+	// ========================================================================
+	// Constructors
+	// ========================================================================
 
-    // ========================================================================
-    // Constructors
-    // ========================================================================
+	public void testConstructor() throws Exception {
+		TmfTimestamp ts1 = new TmfTimestamp(12345);
+		TmfTimestamp ts2 = new TmfTimestamp(12350);
+		TmfTimeRange range = new TmfTimeRange(ts1, ts2);
+		assertEquals("startTime", ts1, range.getStartTime());
+		assertEquals("endTime", ts2, range.getEndTime());
+	}
 
-    @Test
-    public void testContains() throws Exception {
-        TmfTimestamp ts1   = new TmfTimestamp(12345);
-        TmfTimestamp ts2   = new TmfTimestamp(12350);
-        TmfTimeRange range = new TmfTimeRange(ts1, ts2);
+	public void testOpenRange1() throws Exception {
+		TmfTimestamp ts2 = new TmfTimestamp(12350);
+		TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, ts2);
+		assertEquals("startTime", TmfTimestamp.BigBang, range.getStartTime());
+		assertEquals("endTime", ts2, range.getEndTime());
+	}
 
-        assertTrue("contains (lower bound)",   range.contains(new TmfTimestamp(12345)));
-        assertTrue("contains (higher bound)",  range.contains(new TmfTimestamp(12350)));
-        assertTrue("contains (within bounds)", range.contains(new TmfTimestamp(12346)));
+	public void testOpenRange2() throws Exception {
+		TmfTimestamp ts1 = new TmfTimestamp(12345);
+		TmfTimeRange range = new TmfTimeRange(ts1, TmfTimestamp.BigCrunch);
+		assertEquals("startTime", ts1, range.getStartTime());
+		assertEquals("endTime", TmfTimestamp.BigCrunch, range.getEndTime());
+	}
 
-        assertFalse("contains (low value)",   range.contains(new TmfTimestamp(12340)));
-        assertFalse("contains (high value)",  range.contains(new TmfTimestamp(12351)));
-    }
+	public void testOpenRange3() throws Exception {
+		TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang,	TmfTimestamp.BigCrunch);
+		assertEquals("startTime", TmfTimestamp.BigBang, range.getStartTime());
+		assertEquals("endTime", TmfTimestamp.BigCrunch, range.getEndTime());
+	}
+	
+	// ========================================================================
+	// contains
+	// ========================================================================
 
+	public void testContains() throws Exception {
+		TmfTimestamp ts1 = new TmfTimestamp(12345);
+		TmfTimestamp ts2 = new TmfTimestamp(12350);
+		TmfTimeRange range = new TmfTimeRange(ts1, ts2);
+
+		assertTrue("contains (lower bound)", range.contains(new TmfTimestamp(12345)));
+		assertTrue("contains (higher bound)", range.contains(new TmfTimestamp(12350)));
+		assertTrue("contains (within bounds)", range.contains(new TmfTimestamp(12346)));
+
+		assertFalse("contains (low value)", range.contains(new TmfTimestamp(12340)));
+		assertFalse("contains (high value)", range.contains(new TmfTimestamp(12351)));
+	}
+
+	// ========================================================================
+	// toString
+	// ========================================================================
+
+	public void testToString() throws Exception {
+		TmfTimestamp ts1 = new TmfTimestamp(12345);
+		TmfTimestamp ts2 = new TmfTimestamp(12350);
+		TmfTimeRange range = new TmfTimeRange(ts1, ts2);
+
+		String expected = "[TmfTimeRange(" + ts1.toString() + ":" + ts2.toString() + ")]";
+		assertEquals("toString", expected, range.toString());
+	}
+	
 }

@@ -44,7 +44,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfTraceCheckpoint;
  */
 public class StateManager extends Observable {
 
-	private static final long LTTNG_STATE_SAVE_INTERVAL = 50000L;
+	private static final long LTTNG_STATE_SAVE_INTERVAL = 5000000L;
 
 	// These are used in the building of the data request.
 	private static final long DEFAULT_OFFSET = 0L;
@@ -308,13 +308,13 @@ public class StateManager extends Observable {
 				|| (eventTime.getValue() > logRange.getEndTime().getValue())) {
 			return null;
 		}
-
+		
 		// The GUI can have time limits lower than this log, since GUI can
 		// handle multiple logs
 		if ((eventTime.getValue() < logRange.getStartTime().getValue())) {
 			eventTime = logRange.getStartTime();
 		}
-
+		
 		// Sort the checkpoints, required before the binary search
 		Collections.sort(timestampCheckpointsList);
 		// Initiate the compare with a checkpoint containing the target time
@@ -482,7 +482,7 @@ public class StateManager extends Observable {
 			@Override
 			public void handleData() {
 				TmfEvent[] result = getData();
-
+				
 				evt[0] = (result.length > 0) ? result[0] : null;
 				// Dispatch information for Event processing
 				stateIn.processEvent(evt[0]);

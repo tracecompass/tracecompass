@@ -49,8 +49,9 @@ public class StateDataRequest extends TmfDataRequest<TmfEvent> {
 	public StateDataRequest(TmfTimeRange range, long offset, int nbEvents,
 			int maxBlockSize, IStateDataRequestListener listener,
 			StateManager manager) {
-
-		super(range, offset, nbEvents, maxBlockSize);
+		
+		super(range, nbEvents, maxBlockSize);
+		//super(0, nbEvents, maxBlockSize);
 		this.manager = manager;
 		if (listener != null && !listeners.contains(listener)) {
 			listeners.add(listener);
