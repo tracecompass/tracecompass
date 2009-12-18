@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.events;
 
-import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.event.LttngEventContent;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.ui.views.TmfEventsView;

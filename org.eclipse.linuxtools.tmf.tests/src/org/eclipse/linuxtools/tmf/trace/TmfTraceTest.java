@@ -181,7 +181,7 @@ public class TmfTraceTest extends TestCase {
     public void testProcessRequestForAllEvents() throws Exception {
         final int BLOCK_SIZE =  1;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
-        long nbExpectedEvents = NB_EVENTS;
+//        long nbExpectedEvents = NB_EVENTS;
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, NB_EVENTS, BLOCK_SIZE) {

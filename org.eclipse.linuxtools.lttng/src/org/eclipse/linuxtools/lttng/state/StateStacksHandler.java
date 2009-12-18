@@ -17,8 +17,6 @@ import java.util.Vector;
 
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.event.LttngEventContent;
-import org.eclipse.linuxtools.lttng.event.LttngEventField;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.lttng.state.evProcessor.AbsEventProcessorFactory;
 import org.eclipse.linuxtools.lttng.state.evProcessor.EventProcessorProxy;
@@ -26,7 +24,6 @@ import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
 import org.eclipse.linuxtools.lttng.state.model.ILttngStateInputRef;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
 
 /**

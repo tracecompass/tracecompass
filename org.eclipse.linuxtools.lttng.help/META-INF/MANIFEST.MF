@@ -1,6 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: LTTng Help
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.linuxtools.lttng.help; singleton:=true
-Bundle-Version: 0.1.0.qualifier
-Bundle-Vendor: Ericsson
+Bundle-Version: 0.2.0.qualifier
+Bundle-Vendor: %Bundle-Vendor
+Bundle-Localization: plugin

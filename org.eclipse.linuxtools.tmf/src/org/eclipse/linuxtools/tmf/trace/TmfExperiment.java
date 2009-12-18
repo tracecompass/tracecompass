@@ -12,15 +12,12 @@
 
 package org.eclipse.linuxtools.tmf.trace;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.linuxtools.tmf.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
@@ -64,8 +61,8 @@ public class TmfExperiment extends TmfComponent implements ITmfRequestHandler<Tm
     // The experiment reference timestamp (default: BigBang)
     private TmfTimestamp fEpoch;
 
-    // Indicates if the stream should be indexed synchronously (default: false)
-    private final boolean fWaitForIndexCompletion;
+//    // Indicates if the stream should be indexed synchronously (default: false)
+//    private final boolean fWaitForIndexCompletion;
 
     // ========================================================================
     // Constructors/Destructor
@@ -104,7 +101,7 @@ public class TmfExperiment extends TmfComponent implements ITmfRequestHandler<Tm
     	}
     	fEpoch = epoch;
     	fIndexPageSize = indexPageSize;
-        fWaitForIndexCompletion = waitForIndexCompletion;
+//        fWaitForIndexCompletion = waitForIndexCompletion;
 
 		updateNbEvents();
 		updateTimeRange();

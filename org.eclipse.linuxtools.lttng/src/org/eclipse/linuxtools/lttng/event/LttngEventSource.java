@@ -49,7 +49,8 @@ public class LttngEventSource extends TmfEventSource {
     }
     
     
-    public String getSourceId() {
+    @Override
+	public String getSourceId() {
         return (String)fSourceId;
     }
     
@@ -57,7 +58,8 @@ public class LttngEventSource extends TmfEventSource {
         fSourceId = newSource;
     }
     
-    public String toString() {
+    @Override
+	public String toString() {
         return fSourceId.toString();
     }
 }

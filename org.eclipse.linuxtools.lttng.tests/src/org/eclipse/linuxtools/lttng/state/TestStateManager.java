@@ -14,11 +14,11 @@ package org.eclipse.linuxtools.lttng.state;
 
 import java.util.Set;
 
-import org.eclipse.linuxtools.lttng.ActivateDebugging;
+import junit.framework.TestCase;
+
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
-import junit.framework.TestCase;
 
 /**
  * @author alvaro

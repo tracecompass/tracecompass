@@ -12,7 +12,6 @@ package org.eclipse.linuxtools.lttng.ui.views.controlflow.evProcessor;
 
 import java.util.Vector;
 
-import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessStatus;
 import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
 import org.eclipse.linuxtools.lttng.state.model.LttngProcessState;

@@ -1,12 +1,12 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: LTTng
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.linuxtools.lttng
-Bundle-Version: 0.1.0.qualifier
+Bundle-Version: 0.2.0.qualifier
 Bundle-Activator: org.eclipse.linuxtools.lttng.LTTngCorePlugin
-Bundle-Vendor: Eclipse
+Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.linuxtools.tmf;bundle-version="0.0.1"
+ org.eclipse.linuxtools.tmf;bundle-version="0.2.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.linuxtools.lttng,
@@ -18,3 +18,4 @@ Export-Package: org.eclipse.linuxtools.lttng,
  org.eclipse.linuxtools.lttng.state.experiment,
  org.eclipse.linuxtools.lttng.state.model,
  org.eclipse.linuxtools.lttng.trace
+Bundle-Localization: plugin

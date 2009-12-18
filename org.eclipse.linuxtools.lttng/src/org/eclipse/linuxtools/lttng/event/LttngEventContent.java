@@ -70,7 +70,8 @@ public class LttngEventContent extends TmfEventContent {
     }
     
     
-    public LttngEvent getEvent() {
+    @Override
+	public LttngEvent getEvent() {
         return (LttngEvent)fParentEvent;
     }
     
@@ -81,7 +82,8 @@ public class LttngEventContent extends TmfEventContent {
     
     // *** VERIFY ***
     // These are not very useful, are they?
-    public LttngEventType getType() {
+    @Override
+	public LttngEventType getType() {
         return (LttngEventType)fParentEvent.getType();
 //        return (LttngEventType)fEventType;
     }

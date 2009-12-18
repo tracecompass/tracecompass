@@ -185,7 +185,7 @@ public class TmfEventsView extends TmfView {
     }
 
     // Events cache - temporary stuff
-    private final int CACHE_SIZE = 1;
+//    private final int CACHE_SIZE = 1;
     private TmfEvent[] cache;
     private int cacheStartIndex = 0;
     private int cacheEndIndex = 0;

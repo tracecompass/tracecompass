@@ -1,17 +1,18 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: LTTng UI
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.linuxtools.lttng.ui;singleton:=true
-Bundle-Version: 0.1.0.qualifier
+Bundle-Version: 0.2.0.qualifier
 Bundle-Activator: org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin
-Bundle-Vendor: Eclipse
+Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide;bundle-version="3.5.0",
  org.eclipse.core.resources;bundle-version="3.5.0",
  org.eclipse.core.filesystem;bundle-version="1.2.0",
  org.eclipse.core.runtime,
- org.eclipse.linuxtools.tmf;bundle-version="0.0.1",
- org.eclipse.linuxtools.tmf.ui;bundle-version="0.0.1",
- org.eclipse.linuxtools.lttng;bundle-version="0.0.1"
+ org.eclipse.linuxtools.tmf;bundle-version="0.2.0",
+ org.eclipse.linuxtools.tmf.ui;bundle-version="0.2.0",
+ org.eclipse.linuxtools.lttng;bundle-version="0.2.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
+Bundle-Localization: plugin

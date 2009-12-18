@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.linuxtools.lttng.feature"
-      label="Linux Tracing Toolkit (LTTng)"
-      version="0.1.0.qualifier"
-      provider-name="Eclipse"
+      id="org.eclipse.linuxtools.lttng"
+      label="%featureName"
+      version="0.2.0.qualifier"
+      provider-name="%featureProvider"
       os="linux">
 
    <description>
@@ -19,7 +19,7 @@
    </license>
 
    <requires>
-      <import feature="org.eclipse.linuxtools.tmf.feature" version="0.1.0.qualifier" match="compatible"/>
+      <import feature="org.eclipse.linuxtools.tmf" version="0.2.0.qualifier" match="compatible"/>
    </requires>
 
    <plugin

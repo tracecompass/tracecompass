@@ -3,22 +3,22 @@
 <plugin>
    <extension
          id="org,eclipse.linuxtools.lttng.ui.perspective"
-         name="LTTng Perspective"
+         name="%extension.name"
          point="org.eclipse.ui.perspectives">
       <perspective
             class="org.eclipse.linuxtools.lttng.ui.views.PerspectiveFactory"
             icon="icons/garland32.png"
             id="org.eclipse.linuxtools.lttng.ui.perspective"
-            name="LTTng">
+            name="%perspective.name">
       </perspective>
    </extension>
    <extension
          id="org.eclipse.linuxtools.lttng.ui.views"
-         name="LTTng Views"
+         name="%extension.name.0"
          point="org.eclipse.ui.views">
       <category
             id="org.eclipse.linuxtools.lttng.ui.views.category"
-            name="LTTng">
+            name="%category.name">
       </category>
       <view
             allowMultiple="false"
@@ -26,7 +26,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.project.ProjectView"
             icon="icons/project_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.project"
-            name="Project"
+            name="%view.name"
             restorable="true">
       </view>
       <view
@@ -35,7 +35,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.control.ControlView"
             icon="icons/control_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.control"
-            name="Control"
+            name="%view.name.0"
             restorable="true">
       </view>
       <view
@@ -44,7 +44,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.events.EventsView"
             icon="icons/events_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.events"
-            name="Events"
+            name="%view.name.1"
             restorable="true">
       </view>
       <view
@@ -53,7 +53,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.timeframe.TimeFrameView"
             icon="icons/time_frame_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.timeframe"
-            name="Time Frame"
+            name="%view.name.2"
             restorable="true">
       </view>
       <view
@@ -62,7 +62,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.controlflow.ControlFlowView"
             icon="icons/control_flow_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.controlflow"
-            name="Control Flow"
+            name="%view.name.3"
             restorable="true">
       </view>
       <view
@@ -71,7 +71,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.resources.ResourcesView"
             icon="icons/resources_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.resources"
-            name="Resources"
+            name="%view.name.4"
             restorable="true">
       </view>
       <view
@@ -80,7 +80,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.statistics.StatisticsView"
             icon="icons/statistics_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.statistics"
-            name="Statistics"
+            name="%view.name.5"
             restorable="true">
       </view>
       <view
@@ -89,17 +89,17 @@
             class="org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramView"
             icon="icons/histogram.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.histogram"
-            name="Histogram"
+            name="%view.name.6"
             restorable="true">
       </view>
    </extension>
    <extension
          id="org.eclipse.linuxtools.lttng.wizards.new"
-         name="LTTng New Wizards"
+         name="%extension.name.1"
          point="org.eclipse.ui.newWizards">
       <category
             id="org.eclipse.linuxtools.lttng.ui.wizards.new"
-            name="LTTng">
+            name="%category.name.0">
       </category>
       <wizard
             category="org.eclipse.linuxtools.lttng.ui.wizards.new"
@@ -108,16 +108,16 @@
             finalPerspective="org.eclipse.linuxtools.lttng.ui.perspective"
             icon="icons/garland16.png"
             id="org.eclipse.linuxtools.lttng.ui.views.ui.wizards.newProject"
-            name="LTTng Project"
+            name="%wizard.name"
             project="true">
          <description>
-            Create a new LTTng project
+            %wizard.description
          </description>
       </wizard>
    </extension>
    <extension
          id="org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature"
-         name="LTTng Project Nature"
+         name="%extension.name.2"
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
@@ -128,13 +128,13 @@
    <extension
          point="org.eclipse.ui.actionSets">
       <actionSet
-            description="LTTng project management options"
+            description="%actionSet.description"
             id="org.eclipse.linuxtools.lttng.ui.view.project.actionSet"
-            label="LTTng Project ActionSet"
+            label="%actionSet.label"
             visible="false">
          <menu
                id="org.eclipse.linuxtools.lttng.ui.view.project.menu"
-               label="&amp;LTTng"
+               label="%menu.label"
                path="additions">
             <groupMarker
                   name="content">
@@ -147,11 +147,11 @@
                class="org.eclipse.linuxtools.lttng.ui.views.project.actions.NewProjectActionDelegate"
                icon="icons/garland16.png"
                id="org.eclipse.linuxtools.lttng.ui.view.project.menu.newProjectAction"
-               label="New LTTng Project"
+               label="%action.label"
                menubarPath="org.eclipse.linuxtools.lttng.ui.view.project.menu/content"
                style="push"
                toolbarPath="Normal/additions"
-               tooltip="Create a new LTTng project">
+               tooltip="%action.tooltip">
          </action>
       </actionSet>
    </extension>
@@ -165,7 +165,7 @@
                class="org.eclipse.linuxtools.lttng.ui.views.project.actions.DeleteProjectActionDelegate"
                enablesFor="1"
                id="org.eclipse.linuxtools.lttng.ui.view.project.menu.deleteProjectAction"
-               label="Delete LTTng Project"
+               label="%action.label.0"
                menubarPath="additions">
          </action>
          <action
@@ -173,9 +173,9 @@
                enablesFor="?"
                icon="icons/garland16.png"
                id="org.eclipse.linuxtools.lttng.ui.view.project.menu.newProjectAction"
-               label="New LTTng Project"
+               label="%action.label.1"
                menubarPath="additions"
-               tooltip="Create a new LTTng project">
+               tooltip="%action.tooltip.0">
          </action>
       </objectContribution>
       <objectContribution
@@ -185,7 +185,7 @@
          <action
                class="org.eclipse.linuxtools.lttng.ui.views.project.actions.ImportTraceActionDelegate"
                id="org.eclipse.linuxtools.lttng.ui.view.project.menu.importTraceAction"
-               label="Import a Trace"
+               label="%action.label.2"
                menubarPath="additions">
          </action>
       </objectContribution>
@@ -196,7 +196,7 @@
          <action
                class="org.eclipse.linuxtools.lttng.ui.views.project.actions.DeleteTraceActionDelegate"
                id="org.eclipse.linuxtools.lttng.ui.view.project.menu.deleteTraceAction"
-               label="Delete Trace"
+               label="%action.label.3"
                menubarPath="additions">
          </action>
       </objectContribution>
@@ -207,7 +207,7 @@
          <action
                class="org.eclipse.linuxtools.lttng.ui.views.project.actions.NewExperimentActionDelegate"
                id="org.eclipse.linuxtools.lttng.ui.view.project.menu.newExperimentAction"
-               label="New Experiment"
+               label="%action.label.4"
                menubarPath="additions">
          </action>
       </objectContribution>
@@ -218,13 +218,13 @@
          <action
                class="org.eclipse.linuxtools.lttng.ui.views.project.actions.DeleteExperimentActionDelegate"
                id="org.eclipse.linuxtools.lttng.ui.view.project.menu.deleteExperimentAction"
-               label="Delete Experiment"
+               label="%action.label.5"
                menubarPath="additions">
          </action>
          <action
                class="org.eclipse.linuxtools.lttng.ui.views.project.actions.AddTraceActionDelegate"
                id="org.eclipse.linuxtools.lttng.ui.view.project.menu.addTraceExperimentAction"
-               label="Add Traces"
+               label="%action.label.6"
                menubarPath="additions">
          </action>
       </objectContribution>

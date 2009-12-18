@@ -55,11 +55,10 @@ public class LttngEventContentTest extends TestCase {
 	}
 
 	public void testConstructors() {
-		LttngEvent 		  testEvent = null;
-		LttngEventContent testContent 	= null;
-		@SuppressWarnings("unused")
-		LttngEventContent testContent2 	= null;
-        LttngEventField[] 	testFields  = new LttngEventField[1];
+		LttngEvent 		  testEvent    = null;
+		LttngEventContent testContent  = null;
+		LttngEventContent testContent2 = null;
+        LttngEventField[] testFields   = new LttngEventField[1];
         testFields[0] = new LttngEventField(testContent2, "test");
         
 	    // Default construction with good argument
@@ -93,7 +92,8 @@ public class LttngEventContentTest extends TestCase {
 	public void testGetter() {
     	LttngEventContent testContent = null;
     	LTTngTrace tmpStream = null;
-    	LttngEvent tmpEvent = null;
+    	@SuppressWarnings("unused")
+		LttngEvent tmpEvent = null;
     	TmfTraceContext tmpContext = null;
     	
     	// Require an event
