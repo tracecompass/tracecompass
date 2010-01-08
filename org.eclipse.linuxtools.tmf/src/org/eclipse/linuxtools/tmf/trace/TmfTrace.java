@@ -58,7 +58,7 @@ public abstract class TmfTrace extends TmfComponent implements ITmfTrace, ITmfRe
     private final String fName;
 
     // The cache page size AND checkpoints interval
-    private final int fCacheSize;
+    protected int fCacheSize;
 
     // Indicate if the stream should be pre-indexed
     private final boolean fWaitForIndexCompletion;
@@ -67,7 +67,7 @@ public abstract class TmfTrace extends TmfComponent implements ITmfTrace, ITmfRe
     protected Vector<TmfTraceCheckpoint> fCheckpoints = new Vector<TmfTraceCheckpoint>();
 
     // The number of events collected
-    private long fNbEvents = 0;
+    protected long fNbEvents = 0;
 
     // The time span of the event stream
     private TmfTimeRange fTimeRange = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigBang);
@@ -481,8 +481,8 @@ public abstract class TmfTrace extends TmfComponent implements ITmfTrace, ITmfRe
 		}
     }
 
-    private void notifyListeners(TmfTimeRange range) {
-    	broadcastSignal(new TmfTraceUpdatedSignal(this, this, range));
+    protected void notifyListeners(TmfTimeRange range) {
+    	broadcastSignal(new TmfTraceUpdatedSignal( (TmfTrace)this, (TmfTrace)this, range));
 	}
    
 //	/**

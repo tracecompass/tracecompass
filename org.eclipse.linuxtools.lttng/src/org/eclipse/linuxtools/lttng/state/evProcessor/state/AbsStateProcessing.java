@@ -31,16 +31,15 @@ public abstract class AbsStateProcessing {
 	 * @return
 	 */
 	protected Long getAFieldLong(LttngEvent trcEvent, LttngTraceState traceSt, Fields expectedField) {
-		Long fieldVal = null;
+		Long fieldVal = 0L;
 		
         String fieldname = expectedField.getInName();
 		LttngEventField field = ((LttngEventContent) trcEvent.getContent()).getField(fieldname);
 		
-//		if ( field == null ) {
-//		    System.out.println("****************** JOIE : " + fieldname);
-//		    System.out.println("***************** CONTENT : " + ((LttngEventContent) trcEvent.getContent()).toString());
-//		}
-//		else {
+		if ( field == null ) {
+			TraceDebug.debug("***************** CONTENT : " + ((LttngEventContent) trcEvent.getContent()).toString());
+		}
+		else {
             Object fieldObj = field.getValue();
             if ( (fieldObj instanceof Long) || (fieldObj instanceof Integer) ) {
                 // Expected numeric value found
@@ -51,7 +50,7 @@ public abstract class AbsStateProcessing {
                     TraceDebug.debug("Unexpected field Type. Expected: Long, Received: "+ fieldObj.getClass().getSimpleName());
                 }
             }
-//		}
+		}
 		
 		/*
 		// TmfEventField[] fields = trcEvent.getContent().getFields();
@@ -111,21 +110,26 @@ public abstract class AbsStateProcessing {
 	 */
 	protected String getAFieldString(LttngEvent trcEvent,
 			LttngTraceState traceSt, Fields expectedField) {
-		String fieldVal = null;
+		String fieldVal = "";
 		
 		String fieldname = expectedField.getInName();
         LttngEventField field = ((LttngEventContent) trcEvent.getContent()).getField(fieldname);
         
-        Object fieldObj = field.getValue();
-        if (fieldObj instanceof String) {
-            // Expected numeric value found
-            fieldVal = (String) field.getValue();
-        } 
-        else {
-            if (TraceDebug.isDEBUG()) {
-                TraceDebug.debug("Unexpected field Type. Expected: String, Received: "+ fieldObj.getClass().getSimpleName());
-            }
-        }
+		if ( field == null ) {
+			TraceDebug.debug("***************** CONTENT : " + ((LttngEventContent) trcEvent.getContent()).toString());
+		}
+		else {
+	        Object fieldObj = field.getValue();
+	        if (fieldObj instanceof String) {
+	            // Expected numeric value found
+	            fieldVal = (String) field.getValue();
+	        } 
+	        else {
+	            if (TraceDebug.isDEBUG()) {
+	                TraceDebug.debug("Unexpected field Type. Expected: String, Received: "+ fieldObj.getClass().getSimpleName());
+	            }
+	        }
+		}
 		
 		/*
 		// TmfEventField[] fields = trcEvent.getContent().getFields();

@@ -52,9 +52,10 @@ public class JniTrace extends Jni_C_Common {
     private long   startFreq = 0;
     private long   startTimestampCurrentCounter = 0;
     private long   startMonotonic = 0;
-    private JniTime   startTime = null;
-    private JniTime   startTimeFromTimestampCurrentCounter = null;
-
+    private JniTime startTimeNoAdjustement = null;
+    private JniTime startTime = null;
+    private JniTime endTime = null;
+    
     // This Map holds a reference to the tracefiles owned by this trace
     private HashMap<String, JniTracefile> tracefilesMap = null;
     // The priority queue (similar to heap) hold events 
@@ -91,8 +92,11 @@ public class JniTrace extends Jni_C_Common {
     private native void ltt_feedStartTimeFromTimestampCurrentCounter(long tracePtr, JniTime startTime);
 
     // Native function to fill out tracefilesMap
-    private native void ltt_getAllTracefiles(long tracePtr);
-
+    private native void ltt_feedAllTracefiles(long tracePtr);
+    
+    // Native function to fill out the start and end time of the trace
+    private native void ltt_feedTracefileTimeRange(long tracePtr, JniTime startTime, JniTime endTime);
+    
     // Debug native function, ask LTT to print trace structure
     private native void ltt_printTrace(long tracePtr);
 
@@ -145,8 +149,9 @@ public class JniTrace extends Jni_C_Common {
         startFreq       = oldTrace.startFreq;
         startTimestampCurrentCounter = oldTrace.startTimestampCurrentCounter;
         startMonotonic  = oldTrace.startMonotonic;
+        startTimeNoAdjustement = oldTrace.startTimeNoAdjustement;
         startTime       = oldTrace.startTime;
-        startTimeFromTimestampCurrentCounter = oldTrace.startTimeFromTimestampCurrentCounter;
+        endTime         = oldTrace.endTime;
 
         tracefilesMap = new HashMap<String, JniTracefile>(oldTrace.tracefilesMap.size());
         tracefilesMap = oldTrace.tracefilesMap;
@@ -277,18 +282,26 @@ public class JniTrace extends Jni_C_Common {
         startMonotonic = ltt_getStartMonotonic( thisTracePtr.getPointer() );
 
         // Creation of time is a bit different, we need to pass the object reference to C
+        //
+        // *** NOTE : LTTv consider "raw startTime" (time without any frequency adjustement) to be default startTime
+        //			  So "startTimeNoAdjustement" is obtain throught "ltt_feedStartTime()" and
+        //			  "startTime" is obtained from ltt_feedStartTimeFromTimestampCurrentCounter()
+        startTimeNoAdjustement = new JniTime();
+        ltt_feedStartTime( thisTracePtr.getPointer(), startTimeNoAdjustement );
+        
         startTime = new JniTime();
-        ltt_feedStartTime( thisTracePtr.getPointer(), startTime );
-
-        startTimeFromTimestampCurrentCounter = new JniTime();
-        ltt_feedStartTimeFromTimestampCurrentCounter( thisTracePtr.getPointer(), startTimeFromTimestampCurrentCounter );
+        ltt_feedStartTimeFromTimestampCurrentCounter( thisTracePtr.getPointer(), startTime );
 
         // Call the fill up function for the tracefiles map
         if ( tracefilesMap== null ) {
             tracefilesMap = new HashMap<String, JniTracefile>();
         }
+        ltt_feedAllTracefiles( thisTracePtr.getPointer() );
         
-        ltt_getAllTracefiles( thisTracePtr.getPointer() );
+        // Now, obtain the trace "endTime"
+        // Note that we discard "startTime" right away, as we already have it
+        endTime = new JniTime();
+        ltt_feedTracefileTimeRange(thisTracePtr.getPointer(), new JniTime(), endTime);
         
         if (eventsHeap == null) {
             eventsHeap = new PriorityQueue<JniEvent>(tracefilesMap.size());
@@ -635,11 +648,15 @@ public class JniTrace extends Jni_C_Common {
     public JniTime getStartTime() {
         return startTime;
     }
-
-    public JniTime getStartTimeFromTimestampCurrentCounter() {
-        return startTimeFromTimestampCurrentCounter;
+    
+    public JniTime getEndTime() {
+        return endTime;
     }
 
+    public JniTime getStartTimeNoAdjustement() {
+        return startTimeNoAdjustement;
+    }
+    
     public HashMap<String, JniTracefile> getTracefilesMap() {
         return tracefilesMap;
     }        
@@ -752,12 +769,15 @@ public class JniTrace extends Jni_C_Common {
         returnData += "startFreq                            : " + startFreq + "\n";
         returnData += "startTimestampCurrentCounter         : " + startTimestampCurrentCounter + "\n";
         returnData += "startMonotonic                       : " + startMonotonic + "\n";
+        returnData += "startTimeNoAdjustement               : " + startTimeNoAdjustement.getReferenceToString() + "\n";
+        returnData += "   seconds                           : " + startTimeNoAdjustement.getSeconds() + "\n";
+        returnData += "   nanoSeconds                       : " + startTimeNoAdjustement.getNanoSeconds() + "\n";
         returnData += "startTime                            : " + startTime.getReferenceToString() + "\n";
         returnData += "   seconds                           : " + startTime.getSeconds() + "\n";
         returnData += "   nanoSeconds                       : " + startTime.getNanoSeconds() + "\n";
-        returnData += "startTimeFromTimestampCurrentCounter : " + startTimeFromTimestampCurrentCounter.getReferenceToString() + "\n";
-        returnData += "   seconds                           : " + startTimeFromTimestampCurrentCounter.getSeconds() + "\n";
-        returnData += "   nanoSeconds                       : " + startTimeFromTimestampCurrentCounter.getNanoSeconds() + "\n";
+        returnData += "endTime                              : " + endTime.getReferenceToString() + "\n";
+        returnData += "   seconds                           : " + endTime.getSeconds() + "\n";
+        returnData += "   nanoSeconds                       : " + endTime.getNanoSeconds() + "\n";
         returnData += "tracefilesMap                        : " + tracefilesMap.keySet() + "\n";      // Hack to avoid ending up with tracefilesMap.toString()
 
         return returnData;

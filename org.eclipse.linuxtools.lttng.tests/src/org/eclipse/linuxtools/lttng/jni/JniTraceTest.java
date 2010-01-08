@@ -195,7 +195,7 @@ public class JniTraceTest extends TestCase
                 assertNotSame("getStartTimestampCurrentCounter is 0",0,testTrace.getStartTimestampCurrentCounter());
                 assertNotSame("getStartMonotonic is 0",0,testTrace.getStartMonotonic() );
                 assertNotSame("getStartTime is null",null,testTrace.getStartTime() );
-                assertNotSame("getStartTimeFromTimestampCurrentCounter is null",null,testTrace.getStartTimeFromTimestampCurrentCounter() );
+                assertNotSame("getStartTimeNoAdjustement is null",null,testTrace.getStartTimeNoAdjustement() );
                 assertNotSame("getTracefilesMap is null",null,testTrace.getTracefilesMap() );
                 // Also check that the map contain some tracefiles
                 assertSame("getTracefilesMap returned an unexpected number of tracefiles",numberOfTracefilesInTrace,testTrace.getTracefilesMap().size() );

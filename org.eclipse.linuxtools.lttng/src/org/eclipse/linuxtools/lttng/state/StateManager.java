@@ -21,14 +21,12 @@ import java.util.Vector;
 
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
-import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.lttng.state.evProcessor.AbsEventProcessorFactory;
 import org.eclipse.linuxtools.lttng.state.evProcessor.EventProcessorProxy;
 import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
 import org.eclipse.linuxtools.lttng.state.model.ILttngStateInputRef;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.state.model.StateModelFactory;
-import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
@@ -54,9 +52,8 @@ public class StateManager extends Observable {
 	// Data
 	// =======================================================================
 	private TmfExperiment fExperiment = null;
-	private LTTngTrace fEventLog = null;
+	private TmfTrace fEventLog = null;
 	private StateStacksHandler stateIn = null;
-	private JniTrace trace = null;
 	private Long eventCount = 0L;
 
 	private HashMap<Long, LttngTraceState> stateCheckpointsList = new HashMap<Long, LttngTraceState>();
@@ -127,11 +124,10 @@ public class StateManager extends Observable {
 			// if (fEventLog != null) {
 			// this.fEventLog.dispose();
 			// }
-
-			this.fEventLog = (LTTngTrace) experiment.getTraces()[0];
-			trace = fEventLog.getCurrentJniTrace();
+			
+			this.fEventLog = (TmfTrace)experiment.getTraces()[0];
 			try {
-				stateIn.init(trace, fEventLog);
+				stateIn.init(fEventLog);
 			} catch (LttngStateException e) {
 				e.printStackTrace();
 			}
@@ -330,8 +326,7 @@ public class StateManager extends Observable {
 		if (index == 0) {
 			// No checkpoint restore is needed, start with a brand new
 			// TraceState
-			ILttngStateInputRef inputDataRef = new LttngStateInputRef(trace,
-					fEventLog);
+			ILttngStateInputRef inputDataRef = new LttngStateInputRef(fEventLog);
 			traceState = StateModelFactory.getStateEntryInstance(inputDataRef);
 		} else {
 			// Useful CheckPoint found

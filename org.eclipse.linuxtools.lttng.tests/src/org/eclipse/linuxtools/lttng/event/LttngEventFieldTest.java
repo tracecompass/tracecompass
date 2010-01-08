@@ -2,9 +2,10 @@ package org.eclipse.linuxtools.lttng.event;
 
 
 
-import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 import junit.framework.TestCase;
+
+import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /*
  Functions tested here :
@@ -16,17 +17,16 @@ import junit.framework.TestCase;
  */
 
 public class LttngEventFieldTest extends TestCase {
-	private final static boolean skipIndexing=true;
-	private final static boolean waitForCompletion=true;
-    private final static String tracepath1="traceset/trace-618339events-1293lost-1cpu";
+    private final static String tracepath1="traceset/trace-15316events_nolost_newformat.txt";
+    private final static boolean skipIndexing=true;
     
     private final static String firstEventName 		= "alignment";
     private final static String firstEventValue 	= "0";
     
-    private LTTngTrace initializeEventStream() {
-    	LTTngTrace tmpStream = null;
+    private LTTngTextTrace initializeEventStream() {
+    	LTTngTextTrace tmpStream = null;
 		try {
-			tmpStream = new LTTngTrace(tracepath1, waitForCompletion, skipIndexing);
+			tmpStream = new LTTngTextTrace(tracepath1, skipIndexing);
 		} 
 		catch (Exception e) {
 			fail("ERROR : Could not open " + tracepath1 + ". Test failed!" );
@@ -41,8 +41,8 @@ public class LttngEventFieldTest extends TestCase {
 
 		// This trace should be valid
 		try {
-			LTTngTrace tmpStream = initializeEventStream();
-			tmpField = (LttngEventField)tmpStream.parseEvent( new TmfTraceContext(null, null, 0) ).getContent().getField(0);
+			LTTngTextTrace tmpStream = initializeEventStream();
+			tmpField = (LttngEventField)tmpStream.getNextEvent( new TmfTraceContext(0, new LttngTimestamp(0L), 0) ).getContent().getField(0);
 		} 
 		catch (Exception e) {
 			fail("ERROR : Failed to get field!");
@@ -79,9 +79,9 @@ public class LttngEventFieldTest extends TestCase {
 	public void testGetter() {
     	
     	// *** To "really" test the field, we will get a real field from LTTngTrace
-    	LTTngTrace tmpStream = initializeEventStream();
+    	LTTngTextTrace tmpStream = initializeEventStream();
     	
-    	LttngEventField testField 	= (LttngEventField)tmpStream.parseEvent( new TmfTraceContext(null, null, 0) ).getContent().getField(0);
+    	LttngEventField testField 	= (LttngEventField)tmpStream.getNextEvent( new TmfTraceContext(0, new LttngTimestamp(0L), 0) ).getContent().getField(0);
     	assertNotSame("getField is null!",null,testField);
     	
     	assertTrue("getName() returned unexpected result!",firstEventName.equals(testField.getId().toString()));

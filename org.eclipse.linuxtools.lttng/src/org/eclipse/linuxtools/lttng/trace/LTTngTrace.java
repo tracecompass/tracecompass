@@ -117,8 +117,10 @@ public class LTTngTrace extends TmfTrace {
         }
         
         // Set the start time of the trace
-        LttngTimestamp startTime = new LttngTimestamp(currentJniTrace.getStartTimeFromTimestampCurrentCounter().getTime());
-        setTimeRange(new TmfTimeRange(startTime, startTime));
+        setTimeRange( new TmfTimeRange( new LttngTimestamp(currentJniTrace.getStartTime().getTime()), 
+        			  				    new LttngTimestamp(currentJniTrace.getEndTime().getTime())
+                                      )
+                    );
         
         // Export all the event types from the JNI side 
         traceTypes      = new HashMap<String, LttngEventType>();
@@ -296,7 +298,7 @@ public class LTTngTrace extends TmfTrace {
 //        currentLttngEvent.setContent(eventContent);
         currentLttngEvent.setType(eventType);
         // Save the jni reference
-        currentLttngEvent.setJniEventReference(jniEvent);
+        currentLttngEvent.updateJniEventReference(jniEvent);
         
         // Parse now if was asked
         // Warning : THIS IS SLOW
@@ -353,7 +355,6 @@ public class LTTngTrace extends TmfTrace {
      */
     @Override
 	public Object getCurrentLocation() {
-        
         LttngTimestamp returnedLocation = null;
         JniEvent tmpJniEvent = currentJniTrace.findNextEvent();
         
@@ -390,6 +391,57 @@ public class LTTngTrace extends TmfTrace {
      */
     public LttngEvent getCurrentEvent() {
         return currentLttngEvent;
+    }
+    
+    /**
+     * Get the major version number for the current trace
+     * 
+     * @return Version major or -1 if unknown
+     * 
+     * @see org.eclipse.linuxtools.org.eclipse.linuxtools.lttng.jni.JniTrace
+     * 
+     */
+    public short getVersionMajor() {
+    	if ( currentJniTrace!= null ) {
+    		return currentJniTrace.getLttMajorVersion();
+    	}
+    	else {
+    		return -1;
+    	}
+    }
+    
+    /**
+     * Get the minor version number for the current trace
+     * 
+     * @return Version minor or -1 if unknown
+     * 
+     * @see org.eclipse.linuxtools.org.eclipse.linuxtools.lttng.jni.JniTrace
+     * 
+     */
+    public short getVersionMinor() {
+    	if ( currentJniTrace!= null ) {
+    		return currentJniTrace.getLttMinorVersion();
+    	}
+    	else {
+    		return -1;
+    	}
+    }
+    
+    /**
+     * Get the number of CPU for this trace
+     * 
+     * @return Number of CPU or -1 if unknown
+     * 
+     * @see org.eclipse.linuxtools.org.eclipse.linuxtools.lttng.jni.JniTrace
+     * 
+     */
+    public int getCpuNumber() {
+    	if ( currentJniTrace!= null ) {
+    		return currentJniTrace.getCpuNumber();
+    	}
+    	else {
+    		return -1;
+    	}
     }
     
     

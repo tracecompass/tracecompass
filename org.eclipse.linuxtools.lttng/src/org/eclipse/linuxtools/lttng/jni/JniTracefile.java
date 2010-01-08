@@ -102,11 +102,11 @@ public final class JniTracefile extends Jni_C_Common {
     private native long     ltt_getBufferSize(long tracefilePtr);
 
     // Method to fill a map with marker object
-    private native void ltt_getAllMarkers(long tracefilePtr);
-
+    private native void ltt_feedAllMarkers(long tracefilePtr);
+    
     // Debug native function, ask LTT to print tracefile structure
     private native void ltt_printTracefile(long tracefilePtr);
-
+    
     static {
         System.loadLibrary("lttvtraceread");
     }
@@ -243,7 +243,7 @@ public final class JniTracefile extends Jni_C_Common {
         bufferSize = ltt_getBufferSize( thisTracefilePtr.getPointer() );
 
         // To fill the map is a bit different
-        ltt_getAllMarkers( thisTracefilePtr.getPointer() );
+        ltt_feedAllMarkers( thisTracefilePtr.getPointer() );
 
         Jni_C_Pointer tmpEventPointer = new Jni_C_Pointer(ltt_getEventPtr(thisTracefilePtr.getPointer()));
         currentEvent = new JniEvent(tmpEventPointer , tracefileMarkersMap, this);
@@ -270,13 +270,13 @@ public final class JniTracefile extends Jni_C_Common {
         } catch (Exception e) {
             printlnC("Failed to add marker to tracefileMarkersMap!(addMarkersFromC)\n\tException raised : " + e.toString());
         }
-    }        
-
+    }
+    
     // Access to class variable. Most of them doesn't have setter
     public boolean getIsCpuOnline() {
         return isCpuOnline;
     }
-
+    
     public String getTracefilePath() {
         return tracefilePath;
     }

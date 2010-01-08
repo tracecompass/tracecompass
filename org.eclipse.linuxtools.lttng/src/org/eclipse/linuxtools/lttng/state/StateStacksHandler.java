@@ -17,7 +17,6 @@ import java.util.Vector;
 
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.lttng.state.evProcessor.AbsEventProcessorFactory;
 import org.eclipse.linuxtools.lttng.state.evProcessor.EventProcessorProxy;
 import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
@@ -56,15 +55,13 @@ public class StateStacksHandler {
 	 * @param log
 	 * 
 	 */
-	void init(JniTrace trace, TmfTrace log) throws LttngStateException {
-		if (trace == null || log == null) {
-			StringBuilder sb = new StringBuilder(
-					"No JniTrace object available, trace must be set via method setTrace(JniTrace trace)");
-			throw new LttngStateException(sb.toString());
+	void init(TmfTrace log) throws LttngStateException {
+		if (log == null) {
+			throw new LttngStateException("No TmfTrace object available!");
 		}
 
 		// this.trace = trace;
-		ILttngStateInputRef ref = new LttngStateInputRef(trace, log);
+		ILttngStateInputRef ref = new LttngStateInputRef(log);
 		this.traceStateModel.init(ref);
 	}
 

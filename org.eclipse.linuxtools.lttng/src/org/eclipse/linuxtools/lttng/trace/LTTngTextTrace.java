@@ -468,8 +468,7 @@ public class LTTngTextTrace extends TmfTrace implements ITmfTrace, ITmfRequestHa
 	    		// Look like : 
 	    		//		SYSCALL { ip = 0xb7f05422, syscall_id = 221 [sys_fcntl64+0x0/0x79] }
 	    		//
-	    		// NOTE : it seems some state system events do not respect this format as they have no payload. 
-	    		//		We will create empty payload then.
+	    		// NOTE : it seems some state system events do not respect this format as they have no payload. Skip them!
 	    		int tmpIndex = tmpContent.indexOf("{", tmpPrevIndex);
 	    		if ( tmpIndex != -1 ) {
 		    		tmpPrevIndex = tmpCurIndex+1;
@@ -508,27 +507,17 @@ public class LTTngTextTrace extends TmfTrace implements ITmfTrace, ITmfRequestHa
 		    			
 		    			tmpIndexBegin = tmpIndexEnd+1;
 		    		}
-	    		}
-	    		else {
-	    			fieldsMap = new HashMap<String, LttngEventField>(); 
+		    		eventContent = new TextLttngEventContent(currentLttngEvent, fieldsMap);
 		    		
-	    			markerName = "";
-	    			payload = "";
-	    			
-	    			LttngEventField tmpField = new LttngEventField(eventContent, markerName, payload);
-	    			fieldsMap.put(markerName, tmpField);
+		    		// We now have what we need for the type
+		    		String tmpTypeKey = tracefile + "/" + tmpCpu + "/" + marker;
+		    		if ( traceTypes.get(tmpTypeKey) == null ) {
+		    			traceTypes.put(tmpTypeKey, new LttngEventType(tracefile, tmpCpu, marker, fieldsMap.keySet().toArray(new String[fieldsMap.size()] )) );
+		    		}
+		    		
+		    		currentLttngEvent.setContent(eventContent);
+		    		currentLttngEvent.setType(traceTypes.get(tmpTypeKey));
 	    		}
-	    		
-	    		eventContent = new TextLttngEventContent(currentLttngEvent, fieldsMap);
-	    		
-	    		// We now have what we need for the type
-	    		String tmpTypeKey = tracefile + "/" + tmpCpu + "/" + marker;
-	    		if ( traceTypes.get(tmpTypeKey) == null ) {
-	    			traceTypes.put(tmpTypeKey, new LttngEventType(tracefile, tmpCpu, marker, fieldsMap.keySet().toArray(new String[fieldsMap.size()] )) );
-	    		}
-	    		
-	    		currentLttngEvent.setContent(eventContent);
-	    		currentLttngEvent.setType(traceTypes.get(tmpTypeKey));
 	    		
 	    		context.setTimestamp(eventTimestamp);
 	    		context.setLocation(nbCharRead);
@@ -538,18 +527,16 @@ public class LTTngTextTrace extends TmfTrace implements ITmfTrace, ITmfRequestHa
     		else if ( showDebug == true ) {
 					System.out.println("NULL READING");
 					System.out.println();
-					returnedEvent = null;
 			}
     	}
     	catch (Exception e) {
-    		System.out.println("Pos is :" + nbCharRead);
     		if ( tmpContent != null ) {
+    			System.out.println("Pos is :" + nbCharRead);
     			System.out.println("Erroneous content is :" + tmpContent);
     		}
     		
     		tmpContent = null;
     		e.printStackTrace();
-    		returnedEvent = null;
     	}
     	
     	return returnedEvent;

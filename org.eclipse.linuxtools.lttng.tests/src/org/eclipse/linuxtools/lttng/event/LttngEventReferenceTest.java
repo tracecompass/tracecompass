@@ -1,8 +1,9 @@
 package org.eclipse.linuxtools.lttng.event;
 
-import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 import junit.framework.TestCase;
+
+import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /*
  Functions tested here :
@@ -14,17 +15,16 @@ import junit.framework.TestCase;
  */
 
 public class LttngEventReferenceTest extends TestCase {
-	private final static boolean skipIndexing=true;
-	private final static boolean waitForCompletion=true;
-    private final static String tracepath1="traceset/trace-618339events-1293lost-1cpu";
+    private final static String tracepath1="traceset/trace-15316events_nolost_newformat.txt";
+    private final static boolean skipIndexing=true;
     
-    private final static String firstEventReference        = "trace-618339events-1293lost-1cpu";
+    private final static String firstEventReference        = "metadata_0";
     
     
-    private LTTngTrace initializeEventStream() {
-        LTTngTrace tmpStream = null;
+    private LTTngTextTrace initializeEventStream() {
+        LTTngTextTrace tmpStream = null;
         try {
-            tmpStream = new LTTngTrace(tracepath1, waitForCompletion, skipIndexing);
+            tmpStream = new LTTngTextTrace(tracepath1, skipIndexing);
         } 
         catch (Exception e) {
             fail("ERROR : Could not open " + tracepath1 + ". Test failed!" );
@@ -39,8 +39,8 @@ public class LttngEventReferenceTest extends TestCase {
 
         // This trace should be valid
         try {
-            LTTngTrace tmpStream = initializeEventStream();
-            tmpEventRef = (LttngEventReference)tmpStream.parseEvent(new TmfTraceContext(null, null, 0) ).getReference();
+            LTTngTextTrace tmpStream = initializeEventStream();
+            tmpEventRef = (LttngEventReference)tmpStream.getNextEvent(new TmfTraceContext(null, null, 0) ).getReference();
         } 
         catch (Exception e) {
             fail("ERROR : Failed to get reference!");

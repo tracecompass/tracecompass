@@ -205,7 +205,7 @@ public class LttngEventContent extends TmfEventContent {
         if ( returnedField == null ) {
             // *** VERIFY ***
             // Should we really make sure we didn't get null before creating/inserting a field?
-            Object newValue = ((LttngEvent)getEvent()).convertEventTmfToJni().parseFieldByName(name);
+        	Object newValue = ((LttngEvent)getEvent()).convertEventTmfToJni().parseFieldByName(name);
             
             if ( newValue!= null ) {
                 returnedField = new LttngEventField(this, name, newValue);

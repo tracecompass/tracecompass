@@ -1,8 +1,9 @@
 package org.eclipse.linuxtools.lttng.event;
 
-import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 import junit.framework.TestCase;
+
+import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /*
  Functions tested here :
@@ -14,18 +15,17 @@ import junit.framework.TestCase;
  */
 
 public class LttngTimestampTest extends TestCase {
-	private final static boolean skipIndexing=true;
-	private final static boolean waitForCompletion=true;
-    private final static String tracepath1="traceset/trace-618339events-1293lost-1cpu";
+	private final static String tracepath1="traceset/trace-15316events_nolost_newformat.txt";
+    private final static boolean skipIndexing=true;
     
-    private final static String firstEventTimeSecond     = "952";
-    private final static String firstEventTimeNano       = "088954601";
-    private final static long   firstEventTimeFull       = 952088954601L;
+    private final static String firstEventTimeSecond     = "13589";
+    private final static String firstEventTimeNano       = "759412127";
+    private final static long   firstEventTimeFull       = 13589759412127L;
     
-    private LTTngTrace initializeEventStream() {
-        LTTngTrace tmpStream = null;
+    private LTTngTextTrace initializeEventStream() {
+        LTTngTextTrace tmpStream = null;
         try {
-            tmpStream = new LTTngTrace(tracepath1, waitForCompletion, skipIndexing);
+            tmpStream = new LTTngTextTrace(tracepath1, skipIndexing);
         } 
         catch (Exception e) {
             fail("ERROR : Could not open " + tracepath1 + ". Test failed!" );
@@ -40,8 +40,8 @@ public class LttngTimestampTest extends TestCase {
 
         // This trace should be valid
         try {
-            LTTngTrace tmpStream = initializeEventStream();
-            tmpTime = (LttngTimestamp)tmpStream.parseEvent( new TmfTraceContext(null, null, 0) ).getTimestamp();
+            LTTngTextTrace tmpStream = initializeEventStream();
+            tmpTime = (LttngTimestamp)tmpStream.getNextEvent( new TmfTraceContext(null, null, 0) ).getTimestamp();
         } 
         catch (Exception e) {
             fail("ERROR : Failed to get reference!");

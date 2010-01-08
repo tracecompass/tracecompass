@@ -1,10 +1,8 @@
 package org.eclipse.linuxtools.lttng.event;
 
+import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfEventSource;
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.lttng.LttngException;
-import org.eclipse.linuxtools.lttng.jni.JniEvent;
 
 /**
  * <b><u>LttngEvent</u></b><p>
@@ -14,7 +12,6 @@ import org.eclipse.linuxtools.lttng.jni.JniEvent;
  * The main difference from the basic Tmf implementation is that we keep an internal reference to the JniEvent<br>
  * The conversion from this LttngEvent to the JniEvent is then possible.
  */
-@SuppressWarnings("unused")
 public class LttngEvent extends TmfEvent {
     
     // Reference to the JNI JniEvent. Should only be used INTERNALLY
@@ -48,9 +45,8 @@ public class LttngEvent extends TmfEvent {
      * Copy constructor.<p>
      * 
      * @param oldEvent		Event we want to copy from.
-     * 
      */
-    public LttngEvent(LttngEvent oldEvent) { 
+    public LttngEvent(LttngEvent oldEvent) {
         this(	(LttngTimestamp)oldEvent.getTimestamp(), 
         		(TmfEventSource)oldEvent.getSource(), 
         		(LttngEventType)oldEvent.getType(), 
@@ -67,15 +63,13 @@ public class LttngEvent extends TmfEvent {
      * @return Channel (tracefile) for this event
      */
     public String getChannelName() {
-        String returnedChannel = "";
-        
         return ( (LttngEventType)this.getType() ).getTracefileName();
     }
     
     /**
      * Cpu id number of this event.<p>
      * 
-     * @return Cpu id
+     * @return CpuId
      */
     public long getCpuId() {
         return ( (LttngEventType)this.getType() ).getCpuId();
@@ -87,17 +81,19 @@ public class LttngEvent extends TmfEvent {
      * @return Marker name
      */
     public String getMarkerName() {
-        String returnedValue = "";
-        
         return ( (LttngEventType)this.getType() ).getMarkerName();
     }
     
-    
-    public JniEvent getJniEventReference() {
-        return jniEventReference;
-    }
-    
-    public void setJniEventReference(JniEvent newJniEventReference) {
+    /**
+     * Set a new JniReference for this event.<p>
+     * 
+     * Note : Reference is used to get back to the Jni during event parsing and need to be consistent.
+     * 
+     * @param newJniEventReference	New reference
+     * 
+     * @see org.eclipse.linuxtools.org.eclipse.linuxtools.lttng.jni.JniEvent
+     */
+    public void updateJniEventReference(JniEvent newJniEventReference) {
         this.jniEventReference = newJniEventReference;
     }
     
@@ -142,7 +138,7 @@ public class LttngEvent extends TmfEvent {
             tmpEvent = jniEventReference;
         }
         else {
-            System.out.println("WRONG TIMESTAMP : " + getTimestamp().getValue() + " vs " + jniEventReference.getParentTracefile().getParentTrace().getCurrentEventTimestamp().getTime());
+            System.out.println("convertEventTmfToJni() failed: Unsynced Timestamp > TMF:" + getTimestamp().getValue() + " <--> JNI:" + jniEventReference.getParentTracefile().getParentTrace().getCurrentEventTimestamp().getTime());
         }
         return tmpEvent;
     }
@@ -153,7 +149,7 @@ public class LttngEvent extends TmfEvent {
     	
     	returnedData += "Event timestamp:" + this.getTimestamp().getValue() + " ";
     	returnedData += "Channel:" + getChannelName() + " ";
-    	returnedData += "CPU Id:" + getCpuId() + " ";
+    	returnedData += "CPU:" + getCpuId() + " ";
     	returnedData += "Marker:" + getMarkerName() + " ";
     	
     	return returnedData;

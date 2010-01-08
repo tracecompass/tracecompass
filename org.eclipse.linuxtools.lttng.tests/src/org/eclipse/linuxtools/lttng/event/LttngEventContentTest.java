@@ -1,8 +1,9 @@
 package org.eclipse.linuxtools.lttng.event;
 
-import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 import junit.framework.TestCase;
+
+import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /*
  Functions tested here :
@@ -17,19 +18,18 @@ import junit.framework.TestCase;
  */
 
 public class LttngEventContentTest extends TestCase {
-	private final static boolean skipIndexing=true;
-	private final static boolean waitForCompletion=true;
-    private final static String tracepath1="traceset/trace-618339events-1293lost-1cpu";
+    private final static String tracepath1="traceset/trace-15316events_nolost_newformat.txt";
+    private final static boolean skipIndexing=true;
     
     private final static String firstEventContentFirstField 	= "alignment:0";
     private final static String secondEventContentSecondField 	= "string:LTT state dump begin";
     
-    private final static long   timestampAfterMetadata 		 = 952090116049L;
+    private final static long   timestampAfterMetadata 		 = 13589760262237L;
     
-    private LTTngTrace initializeEventStream() {
-        LTTngTrace tmpStream = null;
+    private LTTngTextTrace initializeEventStream() {
+        LTTngTextTrace tmpStream = null;
 		try {
-			tmpStream = new LTTngTrace(tracepath1, waitForCompletion, skipIndexing);
+			tmpStream = new LTTngTextTrace(tracepath1, skipIndexing);
 		} 
 		catch (Exception e) {
 			fail("ERROR : Could not open " + tracepath1 + ". Test failed!" );
@@ -44,9 +44,9 @@ public class LttngEventContentTest extends TestCase {
 
 		// This trace should be valid
 		try {
-		    LTTngTrace tmpStream = initializeEventStream();
-			tmpEventContent = (LttngEventContent)tmpStream.parseEvent( new TmfTraceContext(null, null, 0) ).getContent();
-		} 
+		    LTTngTextTrace tmpStream = initializeEventStream();
+			tmpEventContent = (LttngEventContent)tmpStream.getNextEvent( new TmfTraceContext(0L, new LttngTimestamp(0L), 0) ).getContent();
+		}
 		catch (Exception e) {
 			fail("ERROR : Failed to get content!");
 		}
@@ -55,10 +55,10 @@ public class LttngEventContentTest extends TestCase {
 	}
 
 	public void testConstructors() {
-		LttngEvent 		  testEvent    = null;
-		LttngEventContent testContent  = null;
-		LttngEventContent testContent2 = null;
-        LttngEventField[] testFields   = new LttngEventField[1];
+		LttngEvent 		  testEvent = null;
+		LttngEventContent testContent 	= null;
+		LttngEventContent testContent2 	= null;
+        LttngEventField[] 	testFields  = new LttngEventField[1];
         testFields[0] = new LttngEventField(testContent2, "test");
         
 	    // Default construction with good argument
@@ -91,15 +91,14 @@ public class LttngEventContentTest extends TestCase {
 	
 	public void testGetter() {
     	LttngEventContent testContent = null;
-    	LTTngTrace tmpStream = null;
-    	@SuppressWarnings("unused")
-		LttngEvent tmpEvent = null;
+    	LTTngTextTrace tmpStream = null;
+    	LttngEvent tmpEvent = null;
     	TmfTraceContext tmpContext = null;
     	
     	// Require an event
     	tmpStream = initializeEventStream();
-    	tmpContext = new TmfTraceContext(null, null, 0);
-    	tmpEvent = (LttngEvent)tmpStream.parseEvent(tmpContext);
+    	tmpContext = new TmfTraceContext(0L, new LttngTimestamp(0L), 0);
+    	tmpEvent = (LttngEvent)tmpStream.getNextEvent(tmpContext);
     	
 		testContent = prepareToTest();
     	// getFieldS()
@@ -111,13 +110,16 @@ public class LttngEventContentTest extends TestCase {
     	
     	//*** To test getFiels with a fields number >0, we need to move to an event that have some more
     	tmpStream = initializeEventStream();
-    	tmpContext = new TmfTraceContext(null, null, 0);
+    	tmpContext = new TmfTraceContext(0L, new LttngTimestamp(0L), 0);
     	// Skip first events and seek to event pass metadata
-    	tmpContext= tmpStream.seekLocation(new LttngTimestamp(timestampAfterMetadata) );
+    	tmpContext= tmpStream.seekEvent(new LttngTimestamp(timestampAfterMetadata) );
     	// Skip first one 
-    	tmpEvent = (LttngEvent)tmpStream.parseEvent(tmpContext);
+    	tmpEvent = (LttngEvent)tmpStream.getNextEvent(tmpContext);
+    	
     	// Second event past metadata should have more fields
-    	tmpEvent = (LttngEvent)tmpStream.parseEvent(tmpContext);
+    	tmpEvent = (LttngEvent)tmpStream.getNextEvent(tmpContext);
+    	// Get the content
+    	testContent = tmpEvent.getContent();
     	
     	// getFieldS()
     	assertNotSame("getFields() returned null!",null,testContent.getFields() );
