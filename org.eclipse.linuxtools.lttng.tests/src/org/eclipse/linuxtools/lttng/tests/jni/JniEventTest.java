@@ -43,39 +43,39 @@ public class JniEventTest extends TestCase
 {
 		private final static boolean printLttDebug = false;
 	
-        private final static String tracepath="traceset/trace-15316events_nolost_newformat";
+        private final static String tracepath="traceset/trace-618339events-1293lost-1cpu";
         private final static String eventName="kernel0";
         
-        private final static int    numberOfMarkersInTracefile = 45;
+        private final static int    numberOfMarkersInTracefile = 46;
         
         private final static int    numberOfparsedFieldsFirstEvent = 1;
         private final static int    numberOfparsedFieldsSecondEvent = 3;
         
         private final static int    chosenPositionOfFieldsFirstEvent = 1;
         private final static int    chosenPositionOfFieldsSecondEvent = 0;
-        private final static int    chosenPositionOfFieldsAfterSeekEvent = 1;
+        private final static int    chosenPositionOfFieldsAfterSeekEvent = 0;
         
         private final static String chosenNameOfFieldsFirstEvent = "string";
         private final static String chosenNameOfFieldsSecondEvent = "ip";
-        private final static String chosenNameOfFieldsThirdEvent = "syscall_id";
+        private final static String chosenNameOfFieldsThirdEvent = "ret";
         
         private final static String contentOfFieldsFirstEvent = "LTT state dump begin";
-        private final static String   contentOfFieldsSecondEvent = "0xc142176d";
+        private final static long   contentOfFieldsSecondEvent = 3222386054L;
         private final static long   contentOfFieldsThirdEvent = 3L;
         
         private final static int    numberOfByteInContent = 4;
         
-        private final static long   firstEventTimestamp = 13589760262237L;
-        private final static long   secondEventTimestamp = 13589762149621L;
-        private final static long   thirdEventTimestamp = 13589762917527L;
+        private final static long   firstEventTimestamp = 952090116049L;
+        private final static long   secondEventTimestamp = 952092222957L;
+        private final static long   thirdEventTimestamp = 952102730748L;
         
-        private final static long   timestampToSeekTest1 = 13589807108560L;
-        private final static long   timestampAfterSeekTest1 = 13589807116344L;
+        private final static long   timestampToSeekTest1 = 953852206193L;
+        private final static long   timestampAfterSeekTest1 = 953852212349L;
         
-        private final static long   timestampToSeekLast = 13589906758692L;
+        private final static long   timestampToSeekLast = 960386638531L;
         
         private final static long   timestampToSeekTooFarAway = Long.MAX_VALUE;
-
+        
         private JniEvent prepareEventToTest() {
                 
                 JniEvent tmpEvent = null;
@@ -329,8 +329,9 @@ public class JniEventTest extends TestCase
                 // Test #1 readNextEvent()
                 testEvent.readNextEvent();
                 assertNotNull("parseFieldById returned null",testEvent.parseFieldById(chosenPositionOfFieldsSecondEvent) );
-                assertEquals("Content return by parseFieldById is invalid", contentOfFieldsSecondEvent, testEvent.parseFieldById(chosenPositionOfFieldsSecondEvent).toString() );
-                assertEquals("Content return by parseFieldByName is invalid",contentOfFieldsSecondEvent, testEvent.parseFieldByName(chosenNameOfFieldsSecondEvent).toString() );
+                assertEquals("Content return by parseFieldById is invalid",contentOfFieldsSecondEvent, testEvent.parseFieldById(chosenPositionOfFieldsSecondEvent) );
+                assertEquals("Content return by parseFieldByName is invalid",contentOfFieldsSecondEvent, testEvent.parseFieldByName(chosenNameOfFieldsSecondEvent) );
+                
                 
                 // Test  #1 of seekToTime()
                 testEvent.seekToTime(new JniTime(timestampToSeekTest1) );

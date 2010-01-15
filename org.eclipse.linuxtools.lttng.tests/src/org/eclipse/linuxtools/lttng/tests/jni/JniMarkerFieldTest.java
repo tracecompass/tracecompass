@@ -26,7 +26,7 @@ public class JniMarkerFieldTest extends TestCase
 {
 		private final static boolean printLttDebug = false;
 	
-        private final static String tracepath="traceset/trace-15316events_nolost_newformat";
+        private final static String tracepath="traceset/trace-618339events-1293lost-1cpu";
         private final static String eventName="kernel0";
         
         private JniMarkerField prepareMarkerFieldToTest() {

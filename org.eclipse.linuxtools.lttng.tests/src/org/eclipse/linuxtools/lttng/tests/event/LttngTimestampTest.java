@@ -1,29 +1,18 @@
 package org.eclipse.linuxtools.lttng.tests.event;
 
-import java.io.File;
-import java.net.URL;
-
 import junit.framework.TestCase;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
+
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
-import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /*
  Functions tested here :
-    public LttngTimestamp()
-    public LttngTimestamp(long newEventTime)
-    public LttngTimestamp(TmfTimestamp oldEventTime)
-    
-    public long getValue()
-    public String getSeconds()
-    public String getNanoSeconds()
-    
-    public void setValue(long newValue)
-    
-    public String toString()
+    public LttngTimestamp(TmfTimestamp newEventTime) 
+    public LttngTimestamp(long newEventTime) 
+    public String getSeconds() 
+    public String getNanoSeconds() 
+    public String toString() 
  */
 
 public class LttngTimestampTest extends TestCase {
@@ -34,23 +23,19 @@ public class LttngTimestampTest extends TestCase {
     private final static String firstEventTimeNano       = "759412127";
     private final static long   firstEventTimeFull       = 13589759412127L;
     
-    private static LTTngTextTrace testStream = null;
     private LTTngTextTrace initializeEventStream() {
-		if (testStream == null) {
-			try {
-				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(tracepath1), null);
-				File testfile = new File(FileLocator.toFileURL(location).toURI());
-				LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getPath(), skipIndexing);
-				testStream = tmpStream;
-			} 
-			catch (Exception e) {
-				System.out.println("ERROR : Could not open " + tracepath1);
-				testStream = null;
-			}
-		}
-		return testStream;
-	}
-
+        LTTngTextTrace tmpStream = null;
+        try {
+            tmpStream = new LTTngTextTrace(tracepath1, skipIndexing);
+        } 
+        catch (Exception e) {
+            fail("ERROR : Could not open " + tracepath1 + ". Test failed!" );
+        }
+        
+        return tmpStream;
+    }
+    
+    
     private LttngTimestamp prepareToTest() {
         LttngTimestamp tmpTime = null;
 
@@ -70,14 +55,6 @@ public class LttngTimestampTest extends TestCase {
         LttngTimestamp tmpTime = null;
         @SuppressWarnings("unused")
         LttngTimestamp tmpTime2 = null;
-        
-        // Default construction with no argument
-        try {
-            tmpTime = new LttngTimestamp();
-        }
-        catch( Exception e) { 
-            fail("Construction failed!");
-        }
         
         // Default construction with good argument
         try {
@@ -105,14 +82,6 @@ public class LttngTimestampTest extends TestCase {
         assertEquals("Time in nano second is wrong", firstEventTimeNano, tmpTime.getNanoSeconds() );
         
         assertEquals("Full time is wrong", firstEventTimeFull, tmpTime.getValue() );
-    }
-    
-    public void testSetter() {
-        LttngTimestamp tmpTime = prepareToTest();
-        
-        // We will set a time and we will make sure the set is working then
-        tmpTime.setValue(1);
-        assertEquals("Full time is wrong after set", 1, tmpTime.getValue() );
     }
     
     

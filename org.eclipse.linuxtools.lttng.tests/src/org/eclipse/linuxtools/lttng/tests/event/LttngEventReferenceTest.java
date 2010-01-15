@@ -1,29 +1,18 @@
 package org.eclipse.linuxtools.lttng.tests.event;
 
-import java.io.File;
-import java.net.URL;
-
 import junit.framework.TestCase;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
+
 import org.eclipse.linuxtools.lttng.event.LttngEventReference;
-import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /*
  Functions tested here :
-    public LttngEventReference(String newTraceName)
-    public LttngEventReference(String newTracefilePath, String newTraceName)
-    public LttngEventReference(LttngEventReference oldReference)
-    
-    public String getTracepath()
-    public String getValue()
-    
-    public void setTracepath(String tracename)
-    public void setValue(String newReference)
-    
-    public String toString()
+    public LttngEventReference(String newTracefilePath, String newTracePath) 
+    public LttngEventReference(LttngEventReference oldReference) 
+    public String getTracepath() 
+    public void setTracepath(String tracepath) 
+    public String toString() 
  */
 
 public class LttngEventReferenceTest extends TestCase {
@@ -32,26 +21,19 @@ public class LttngEventReferenceTest extends TestCase {
     
     private final static String firstEventReference        = "metadata_0";
     
-    private static LTTngTextTrace testStream = null;
+    
     private LTTngTextTrace initializeEventStream() {
-		if (testStream == null) {
-			try {
-				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(tracepath1), null);
-				File testfile = new File(FileLocator.toFileURL(location).toURI());
-				LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getPath(), skipIndexing);
-				testStream = tmpStream;
-			} 
-			catch (Exception e) {
-				System.out.println("ERROR : Could not open " + tracepath1);
-				testStream = null;
-			}
-		}
-		else {
-			testStream.seekEvent(0);
-		}
-		
-		return testStream;
-	}
+        LTTngTextTrace tmpStream = null;
+        try {
+            tmpStream = new LTTngTextTrace(tracepath1, skipIndexing);
+        } 
+        catch (Exception e) {
+            fail("ERROR : Could not open " + tracepath1 + ". Test failed!" );
+        }
+        
+        return tmpStream;
+    }
+    
     
     private LttngEventReference prepareToTest() {
         LttngEventReference tmpEventRef = null;
@@ -73,15 +55,7 @@ public class LttngEventReferenceTest extends TestCase {
         @SuppressWarnings("unused")
         LttngEventReference testRef2 = null;
         
-        // Default construction with good argument (newTracefilePath)
-        try {
-            testRef = new LttngEventReference("test");
-        }
-        catch( Exception e) { 
-            fail("Construction failed!");
-        }
-        
-        // Default construction with good arguments (newTracefilePath, newTraceName)
+        // Default construction with good argument
         try {
             testRef = new LttngEventReference("test", "test");
         }
@@ -105,25 +79,6 @@ public class LttngEventReferenceTest extends TestCase {
         
         assertTrue("Tracepath not what was expected!",((String)tmpRef.getValue()).contains(firstEventReference) );
         assertEquals("Content not what expected!",firstEventReference,tmpRef.getTracepath());
-    }
-    
-    public void testSetter() {
-    	// Not much to do here, we will just make sure the setter does not throw
-        LttngEventReference tmpRef = prepareToTest();
-        
-        try {
-        	tmpRef.setTracepath("test");
-    	}
-    	catch( Exception e) { 
-        	fail("setTracepath(string) failed!");
-        }
-    	
-    	try {
-        	tmpRef.setValue("test");
-    	}
-    	catch( Exception e) { 
-        	fail("setTracepath(string) failed!");
-        }
     }
     
     public void testToString() {

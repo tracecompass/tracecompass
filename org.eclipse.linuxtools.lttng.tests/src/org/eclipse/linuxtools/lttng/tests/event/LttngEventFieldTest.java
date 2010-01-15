@@ -2,17 +2,11 @@ package org.eclipse.linuxtools.lttng.tests.event;
 
 
 
-import java.io.File;
-import java.net.URL;
-
 import junit.framework.TestCase;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.lttng.event.LttngEventContent;
 import org.eclipse.linuxtools.lttng.event.LttngEventField;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
-import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
@@ -32,26 +26,18 @@ public class LttngEventFieldTest extends TestCase {
     private final static String firstEventName 		= "alignment";
     private final static String firstEventValue 	= "0";
     
-    private static LTTngTextTrace testStream = null;
     private LTTngTextTrace initializeEventStream() {
-		if (testStream == null) {
-			try {
-				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(tracepath1), null);
-				File testfile = new File(FileLocator.toFileURL(location).toURI());
-				LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getPath(), skipIndexing);
-				testStream = tmpStream;
-			} 
-			catch (Exception e) {
-				System.out.println("ERROR : Could not open " + tracepath1);
-				testStream = null;
-			}
-		}
-		else {
-			testStream.seekEvent(0);
+    	LTTngTextTrace tmpStream = null;
+		try {
+			tmpStream = new LTTngTextTrace(tracepath1, skipIndexing);
+		} 
+		catch (Exception e) {
+			fail("ERROR : Could not open " + tracepath1 + ". Test failed!" );
 		}
 		
-		return testStream;
-	}
+		return tmpStream;
+    }
+    
     
 	private LttngEventField prepareToTest() {
 		LttngEventField tmpField = null;
@@ -101,13 +87,7 @@ public class LttngEventFieldTest extends TestCase {
     	LttngEventField testField 	= (LttngEventField)tmpStream.getNextEvent( new TmfTraceContext(0, new LttngTimestamp(0L), 0) ).getContent().getField(0);
     	assertNotSame("getField is null!",null,testField);
     	
-    	// *** FIXME ***
-    	// Depending from the Java version because of the "hashcode()" on String. 
-    	// We can't really test that safetly
-    	//
-    	//assertTrue("getName() returned unexpected result!",firstEventName.equals(testField.getId().toString()));
-    	assertNotSame("getName() returned unexpected result!",null, testField.getId());
-    	
+    	assertTrue("getName() returned unexpected result!",firstEventName.equals(testField.getId().toString()));
     	assertTrue("getValue() returned unexpected result!",firstEventValue.equals(testField.getValue().toString()));
     	
     	
