@@ -12,8 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.tests.event;
 
-import junit.framework.TestCase;
-
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.event.TmfEventField;
@@ -23,34 +21,24 @@ import org.eclipse.linuxtools.tmf.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.event.TmfEventTypeStub;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
+import junit.framework.TestCase;
+
 /**
  * <b><u>TmfEventFieldTest</u></b>
  * <p>
- * Test suite for the TmfEventField class.
+ * TODO: Implement me. Please.
  */
 public class TmfEventFieldTest extends TestCase {
-
-	// ------------------------------------------------------------------------
-	// Variables
-	// ------------------------------------------------------------------------
 
 	private final TmfEventContent fContent;
 	private final String fFieldId = "Field";
 	private final Object fValue1  = new String("Value"); 
 	private final Object fValue2  = new Integer(10); 
 
-	private TmfEventField fField0;
-	private TmfEventField fField1;
-	private TmfEventField fField2;
-	private TmfEventField fField3;
-
-    // ------------------------------------------------------------------------
+	// ========================================================================
 	// Housekeeping
-    // ------------------------------------------------------------------------
+	// ========================================================================
 
-	/**
-	 * @param name the test name
-	 */
 	public TmfEventFieldTest(String name) {
 		super(name);
 		TmfTimestamp      fTimestamp   = new TmfTimestamp();
@@ -60,11 +48,6 @@ public class TmfEventFieldTest extends TestCase {
 		TmfEvent          fEvent       = new TmfEvent(fTimestamp, fEventSource, fEventType, fReference);
 
 		fContent = new TmfEventContent(fEvent, "Some content");
-
-		fField0 = new TmfEventField(fContent, fFieldId, fValue1);
-		fField1 = new TmfEventField(fContent, fFieldId, fValue1);
-		fField2 = new TmfEventField(fContent, fFieldId, fValue1);
-		fField3 = new TmfEventField(fContent, fFieldId, fValue2);
 	}
 
 	@Override
@@ -77,24 +60,15 @@ public class TmfEventFieldTest extends TestCase {
 		super.tearDown();
 	}
 
-    // ------------------------------------------------------------------------
+	// ========================================================================
 	// Constructors
-    // ------------------------------------------------------------------------
+	// ========================================================================
 
 	public void testTmfEventField() {
-		assertSame("getParent", fContent, fField0.getParent());
-		assertSame("getId",     fFieldId, fField0.getId());
-		assertSame("getValue",  fValue1,  fField0.getValue());
-	}
-
-	public void testTmfEventFieldBadArg() {
-		try {
-			new TmfEventField(fContent, null, fValue1);
-			fail("null copy");
-		}
-		catch (IllegalArgumentException e) {
-			// Success
-		}
+		TmfEventField field = new TmfEventField(fContent, fFieldId, fValue1);
+		assertSame("getParent", fContent, field.getParent());
+		assertSame("getId",     fFieldId, field.getId());
+		assertSame("getValue",  fValue1,  field.getValue());
 	}
 
 	public void testTmfEventFieldCopy() {
@@ -105,87 +79,28 @@ public class TmfEventFieldTest extends TestCase {
 		assertSame("getValue",  fValue1,  field.getValue());
 	}
 
-	public void testTmfEventFieldCopy2() {
-		try {
-			new TmfEventField(null);
-			fail("null copy");
-		}
-		catch (IllegalArgumentException e) {
-			// Success
-		}
-	}
-
-    // ------------------------------------------------------------------------
-	// Modifiers
-    // ------------------------------------------------------------------------
-
-	private class MyField extends TmfEventField {
-		public MyField(TmfEventContent parent, String id, Object value) {
-			super(parent, id, value);
-		}
-	    public MyField(TmfEventField field) {
-			super(field);
-		}
-		@Override
-		public void setValue(Object value) {
-	    	super.setValue(value);
-	    }
-	}
-
-	public void testSetValue() {
+	public void testCloneShallowCopy() {
 		TmfEventField original = new TmfEventField(fContent, fFieldId, fValue1);
-		TmfEventField field = new TmfEventField(original);
-
-		MyField myField = new MyField(field);
-		assertSame("getValue", fValue1,  myField.getValue());
-
-		myField.setValue(fValue2);
-		assertSame("getValue", fValue2,  myField.getValue());
+		TmfEventField field = original.clone();
+		assertSame("getParent", fContent, field.getParent());
+		assertSame("getId",     fFieldId, field.getId());
+		assertSame("getValue",  fValue1,  field.getValue());
 	}
 
-    // ------------------------------------------------------------------------
-	// equals
-    // ------------------------------------------------------------------------
+//	public void testCloneDeepCopy() {
+//		TmfEventField original = new TmfEventField(fContent, fFieldId, fValue1);
+//		TmfEventField field = original.clone();
+//		assertNotSame("getParent", fContent, field.getParent());
+//		assertNotSame("getId",     fFieldId, field.getId());
+//		assertNotSame("getValue",  fValue1,  field.getValue());
+//		assertEquals ("getParent", fContent, field.getParent());
+//		assertEquals ("getId",     fFieldId, field.getId());
+//		assertEquals ("getValue",  fValue1,  field.getValue());
+//	}
 
-	public void testEqualsReflexivity() throws Exception {
-		assertTrue("equals", fField0.equals(fField0));
-		assertTrue("equals", fField3.equals(fField3));
-
-		assertTrue("equals", !fField0.equals(fField3));
-		assertTrue("equals", !fField3.equals(fField0));
-	}
-	
-	public void testEqualsSymmetry() throws Exception {
-		assertTrue("equals", fField0.equals(fField1));
-		assertTrue("equals", fField1.equals(fField0));
-
-		assertTrue("equals", !fField0.equals(fField3));
-		assertTrue("equals", !fField3.equals(fField0));
-	}
-	
-	public void testEqualsTransivity() throws Exception {
-		assertTrue("equals", fField0.equals(fField1));
-		assertTrue("equals", fField1.equals(fField2));
-		assertTrue("equals", fField0.equals(fField2));
-	}
-	
-	public void testEqualsNull() throws Exception {
-		assertTrue("equals", !fField0.equals(null));
-		assertTrue("equals", !fField3.equals(null));
-	}
-	
-	// ------------------------------------------------------------------------
-	// hashCode
-	// ------------------------------------------------------------------------
-
-	public void testHashCode() throws Exception {
-		assertTrue("hashCode", fField0.hashCode() == fField1.hashCode());
-		assertTrue("hashCode", fField0.hashCode() != fField3.hashCode());
-	}
-	
-    // ------------------------------------------------------------------------
-	// toString
-    // ------------------------------------------------------------------------
+	// ========================================================================
+	// Operators
+	// ========================================================================
 
 	public void testToString() {
 		String expected1 = "[TmfEventField(" + fFieldId + ":" + fValue1.toString() + ")]";

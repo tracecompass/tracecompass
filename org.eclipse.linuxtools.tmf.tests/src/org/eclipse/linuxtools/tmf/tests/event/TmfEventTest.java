@@ -12,8 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.tests.event;
 
-import junit.framework.TestCase;
-
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.event.TmfEventReference;
@@ -21,16 +19,14 @@ import org.eclipse.linuxtools.tmf.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
+import junit.framework.TestCase;
+
 /**
  * <b><u>TmfEventTest</u></b>
  * <p>
- * Test suite for the TmfEvent class.
+ * TODO: Implement me. Please.
  */
 public class TmfEventTest extends TestCase {
-
-	// ------------------------------------------------------------------------
-	// Variables
-	// ------------------------------------------------------------------------
 
 	private final String   fTypeId = "Some type";
 	private final String   fLabel0 = "label1";
@@ -49,13 +45,10 @@ public class TmfEventTest extends TestCase {
 	private final TmfEventContent fContent1;
 	private final TmfEventContent fContent2;
 	
-	// ------------------------------------------------------------------------
+	// ========================================================================
 	// Housekeeping
-	// ------------------------------------------------------------------------
+	// ========================================================================
 
-	/**
-	 * @param name the test name
-	 */
 	public TmfEventTest(String name) {
 		super(name);
 
@@ -78,9 +71,9 @@ public class TmfEventTest extends TestCase {
 		super.tearDown();
 	}
 
-	// ------------------------------------------------------------------------
+	// ========================================================================
 	// Constructors
-	// ------------------------------------------------------------------------
+	// ========================================================================
 
 	public void testTmfEvent() {
 		assertEquals("getTimestamp",         fTimestamp1, fEvent1.getTimestamp());
@@ -110,94 +103,36 @@ public class TmfEventTest extends TestCase {
 		assertEquals("getReference",         fReference,  event.getReference());
 	}
 
-	public void testEventCopy2() throws Exception {
-		try {
-			new TmfEvent(null);
-			fail("null copy");
-		}
-		catch (IllegalArgumentException e) {
-			// Success
-		}
-	}
+//	public void testTmfEventCloneShallowCopy() {
+//		TmfEvent event = fEvent1.clone();
+//		assertEquals("getTimestamp",         fTimestamp1, event.getTimestamp());
+//		assertEquals("getOriginalTimestamp", fTimestamp1, event.getOriginalTimestamp());
+//		assertEquals("getSource",            fSource,     event.getSource());
+//		assertEquals("getType",              fType,       event.getType());
+//		assertEquals("getContent",           fContent1,   event.getContent());
+//		assertEquals("getReference",         fReference,  event.getReference());
+//	}
 
-	// ------------------------------------------------------------------------
-	// equals
-	// ------------------------------------------------------------------------
+//	public void testTmfEventCloneDeepCopy() {
+//		TmfEvent event = fEvent1.clone();
+//		assertEquals("getTimestamp",         fTimestamp1, event.getTimestamp());
+//		assertEquals("getOriginalTimestamp", fTimestamp1, event.getOriginalTimestamp());
+//		assertEquals("getSource",            fSource,     event.getSource());
+//		assertEquals("getType",              fType,       event.getType());
+//		assertEquals("getContent",           fContent1,   event.getContent());
+//		assertEquals("getReference",         fReference,  event.getReference());
+//	}
 
-	public void testEqualsReflexivity() throws Exception {
-		assertTrue("equals", fEvent1.equals(fEvent1));
-		assertTrue("equals", fEvent2.equals(fEvent2));
+	// ========================================================================
+	// Operators
+	// ========================================================================
 
-		assertTrue("equals", !fEvent1.equals(fEvent2));
-		assertTrue("equals", !fEvent2.equals(fEvent1));
-	}
-	
-	public void testEqualsSymmetry() throws Exception {
-		TmfEvent event1 = new TmfEvent(fEvent1);
-		TmfEvent event2 = new TmfEvent(fEvent2);
-
-		assertTrue("equals", event1.equals(fEvent1));
-		assertTrue("equals", fEvent1.equals(event1));
-
-		assertTrue("equals", event2.equals(fEvent2));
-		assertTrue("equals", fEvent2.equals(event2));
-	}
-	
-	public void testEqualsTransivity() throws Exception {
-		TmfEvent event1 = new TmfEvent(fEvent1);
-		TmfEvent event2 = new TmfEvent(fEvent1);
-		TmfEvent event3 = new TmfEvent(fEvent1);
-
-		assertTrue("equals", event1.equals(event2));
-		assertTrue("equals", event2.equals(event3));
-		assertTrue("equals", event1.equals(event3));
-	}
-	
-	public void testEqualsNull() throws Exception {
-		assertTrue("equals", !fEvent1.equals(null));
-		assertTrue("equals", !fEvent2.equals(null));
-	}
-	
-	// ------------------------------------------------------------------------
-	// hashCode
-	// ------------------------------------------------------------------------
-
-	public void testHashCode() throws Exception {
-		TmfEvent event1 = new TmfEvent(fEvent1);
-		TmfEvent event2 = new TmfEvent(fEvent2);
-
-		assertTrue("hashCode", fEvent1.hashCode() == event1.hashCode());
-		assertTrue("hashCode", fEvent2.hashCode() == event2.hashCode());
-
-		assertTrue("hashCode", fEvent1.hashCode() != event2.hashCode());
-		assertTrue("hashCode", fEvent2.hashCode() != event1.hashCode());
-	}
-	
-	// ------------------------------------------------------------------------
-	// toString
-	// ------------------------------------------------------------------------
-
-	public void testToString() {
-		String expected1 = "[TmfEvent(" + fTimestamp1 + "," + fSource + "," + fType + "," + fContent1 + ")]";
-		assertEquals("toString", expected1, fEvent1.toString());
-
-		String expected2 = "[TmfEvent(" + fTimestamp2 + "," + fSource + "," + fType + "," + fContent2 + ")]";
-		assertEquals("toString", expected2, fEvent2.toString());
-	}
-
-	// ------------------------------------------------------------------------
-	// setContent
-	// ------------------------------------------------------------------------
-
-	public void testSetContent() {
-		TmfEvent event = new TmfEvent(fEvent1);
-		assertEquals("setContent", fContent1, event.getContent());
-
-		event.setContent(fContent2);
-		assertEquals("setContent", fContent2, event.getContent());
-
-		event.setContent(fContent1);
-		assertEquals("setContent", fContent1, event.getContent());
-	}
+//	public void testToString() {
+//		String expected1 = "[TmfEventType:" + TmfEventType.DEFAULT_TYPE_ID + "]";
+//		assertEquals("toString", expected1, fEvent1.toString());
+//
+//		String expected2 = "[TmfEventType:" + fTypeId + "]";
+//		assertEquals("toString", expected2, fEvent2.toString());
+//	}
 
 }

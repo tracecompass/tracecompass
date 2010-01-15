@@ -24,13 +24,9 @@ import junit.framework.TestCase;
 /**
  * <b><u>TmfTraceEventTest</u></b>
  * <p>
- * Test suite for the TmfTraceEvent class.
+ * TODO: Implement me. Please.
  */
 public class TmfTraceEventTest extends TestCase {
-
-	// ------------------------------------------------------------------------
-	// Variables
-	// ------------------------------------------------------------------------
 
 	private final String   fTypeId = "Some type";
 	private final String   fLabel0 = "label1";
@@ -53,13 +49,10 @@ public class TmfTraceEventTest extends TestCase {
 	private final String fFile = "filename";
 	private final int    fLine = 10;
 
-    // ------------------------------------------------------------------------
+	// ========================================================================
 	// Housekeeping
-    // ------------------------------------------------------------------------
+	// ========================================================================
 
-	/**
-	 * @param name the test name
-	 */
 	public TmfTraceEventTest(String name) {
 		super(name);
 
@@ -82,9 +75,9 @@ public class TmfTraceEventTest extends TestCase {
 		super.tearDown();
 	}
 
-    // ------------------------------------------------------------------------
+	// ========================================================================
 	// Constructors
-    // ------------------------------------------------------------------------
+	// ========================================================================
 
     public void testTmfTraceEvent() throws Exception {
 		assertEquals("getTimestamp",         fTimestamp1, fEvent1.getTimestamp());
@@ -122,14 +115,6 @@ public class TmfTraceEventTest extends TestCase {
 		assertEquals("getFileName",          fFile,       event.getFileName());
 		assertEquals("getLineNumber",        fLine,       event.getLineNumber());
     }
-
-    // ------------------------------------------------------------------------
-	// equals
-    // ------------------------------------------------------------------------
-
-    // ------------------------------------------------------------------------
-	// toString
-    // ------------------------------------------------------------------------
 
 }
 
