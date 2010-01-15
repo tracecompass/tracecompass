@@ -66,7 +66,7 @@ public class StateStacksHandler {
 	}
 
 
-	void processEvent(TmfEvent tmfEvent) /* throws LttngStateException */{
+	protected void processEvent(TmfEvent tmfEvent) /* throws LttngStateException */{
 		if (tmfEvent == null) {
 			return;
 		}
