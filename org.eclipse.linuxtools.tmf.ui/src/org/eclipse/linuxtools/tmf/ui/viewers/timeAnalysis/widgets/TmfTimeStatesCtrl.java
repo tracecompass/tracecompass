@@ -2071,33 +2071,35 @@ class ItemData {
 		// Find the Trace item within the current list
 		TraceItem item = findTraceItem(parent);
 
-		if (item == null) {
-			// If the parent item is not found, make room for it in the current
-			// array
-			int length = 1;
-			Object[] traces;
-			if (_traces != null) {
-				length = _traces.length + 1;
-				traces = Arrays.copyOf(_traces, length);
-			} else {
-				traces = new Object[length];
-			}
-
-			// Add the new parent element to the end of the array.
-			traces[length - 1] = parent;
-
-			// update the filter array to accomodate a postion to the new
-			// element
-			traceFilter = new boolean[traces.length];
-			java.util.Arrays.fill(traceFilter, true);
-
-			// rebuild internal data
-			_traces = traces;
-			refreshData();
-
-			// item must be there
-			item = findTraceItem(parent);
-		}
+// This method is not used (yet) so this code can be commented out for now
+// FIXME: Arrays.copyOf is a Java6 feature
+//		if (item == null) {
+//			// If the parent item is not found, make room for it in the current
+//			// array
+//			int length = 1;
+//			Object[] traces;
+//			if (_traces != null) {
+//				length = _traces.length + 1;
+//				traces = Arrays.copyOf(_traces, length);
+//			} else {
+//				traces = new Object[length];
+//			}
+//
+//			// Add the new parent element to the end of the array.
+//			traces[length - 1] = parent;
+//
+//			// update the filter array to accomodate a postion to the new
+//			// element
+//			traceFilter = new boolean[traces.length];
+//			java.util.Arrays.fill(traceFilter, true);
+//
+//			// rebuild internal data
+//			_traces = traces;
+//			refreshData();
+//
+//			// item must be there
+//			item = findTraceItem(parent);
+//		}
 
 		ITmfTimeAnalysisEntry localTraceItem = item._trace;
 		// Local trace found
