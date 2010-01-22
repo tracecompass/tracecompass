@@ -12,15 +12,14 @@
 
 package org.eclipse.linuxtools.tmf;
 
-import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.osgi.framework.BundleContext;
+import org.eclipse.core.runtime.Plugin;
 
 /**
  * <b><u>TmfCorePlugin</u></b>
  * <p>
  * The activator class controls the plug-in life cycle
  */
-public class TmfCorePlugin extends AbstractUIPlugin {
+public class TmfCorePlugin extends Plugin {
 
     // ========================================================================
     // Attributes
@@ -40,6 +39,7 @@ public class TmfCorePlugin extends AbstractUIPlugin {
 	 * The constructor
 	 */
 	public TmfCorePlugin() {
+		plugin = this;
 	}
 
     // ========================================================================
@@ -52,29 +52,5 @@ public class TmfCorePlugin extends AbstractUIPlugin {
     public static TmfCorePlugin getDefault() {
         return plugin;
     }
-
-    // ========================================================================
-    // Operators
-    // ========================================================================
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
-	@Override
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
-	@Override
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
 
 }

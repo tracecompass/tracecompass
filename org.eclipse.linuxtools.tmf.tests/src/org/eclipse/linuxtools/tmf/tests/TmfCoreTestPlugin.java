@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,7 +13,6 @@
 package org.eclipse.linuxtools.tmf.tests;
 
 import org.eclipse.core.runtime.Plugin;
-import org.osgi.framework.BundleContext;
 
 /**
  * <b><u>TmfTestPlugin</u></b>
@@ -22,59 +21,36 @@ import org.osgi.framework.BundleContext;
  */
 public class TmfCoreTestPlugin extends Plugin {
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
     // Attributes
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.eclipse.linuxtools.tmf.tests";
 
 	// The shared instance
-	private static TmfCoreTestPlugin fPlugin;
+	private static TmfCoreTestPlugin plugin;
 	
-    // ------------------------------------------------------------------------
+    // ========================================================================
     // Constructors
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
 	/**
 	 * The constructor
 	 */
 	public TmfCoreTestPlugin() {
-		setDefault(this);
+		plugin = this;
 	}
 
-	// ------------------------------------------------------------------------
+    // ========================================================================
     // Accessors
-	// ------------------------------------------------------------------------
+    // ========================================================================
 
     /**
      * @return the shared instance
      */
-    public static TmfCoreTestPlugin getDefault() {
-        return fPlugin;
+    public static TmfCoreTestPlugin getPlugin() {
+        return plugin;
     }
-
-	/**
-	 * @param plugin the shared instance
-	 */
-	private static void setDefault(TmfCoreTestPlugin plugin) {
-		fPlugin = plugin;
-	}
-
-	// ------------------------------------------------------------------------
-    // Operations
-	// ------------------------------------------------------------------------
-
-	@Override
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		setDefault(this);
-	}
-
-	@Override
-	public void stop(BundleContext context) throws Exception {
-		setDefault(null);
-		super.stop(context);
-	}
 
 }

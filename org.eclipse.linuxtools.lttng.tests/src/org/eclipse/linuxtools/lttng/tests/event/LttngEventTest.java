@@ -1,13 +1,19 @@
 package org.eclipse.linuxtools.lttng.tests.event;
 
+import java.io.File;
+import java.net.URL;
+
 import junit.framework.TestCase;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.event.LttngEventContent;
 import org.eclipse.linuxtools.lttng.event.LttngEventReference;
 import org.eclipse.linuxtools.lttng.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
+import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.tmf.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
@@ -46,11 +52,28 @@ public class LttngEventTest extends TestCase {
     private final static String eventReference 	= eventChannel + "_" + eventCpu;
     
     
+    private static LTTngTextTrace testStream = null;
+    private LTTngTextTrace initializeEventStream() {
+		if (testStream == null) {
+			try {
+				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(tracepath1), null);
+				File testfile = new File(FileLocator.toFileURL(location).toURI());
+				LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getPath(), skipIndexing);
+				testStream = tmpStream;
+			} 
+			catch (Exception e) {
+				System.out.println("ERROR : Could not open " + tracepath1);
+				testStream = null;
+			}
+		}
+		return testStream;
+	}
+
     private LttngEvent prepareToTest() {
 		LttngEvent tmpEvent = null;
 		
 		try {
-			LTTngTextTrace tmpStream = new LTTngTextTrace(tracepath1, skipIndexing);
+			LTTngTextTrace tmpStream = initializeEventStream();
 			tmpEvent = (LttngEvent)tmpStream.getNextEvent(new TmfTraceContext(0, new LttngTimestamp(0L), 0) );
 		}
 		catch (Exception e) {

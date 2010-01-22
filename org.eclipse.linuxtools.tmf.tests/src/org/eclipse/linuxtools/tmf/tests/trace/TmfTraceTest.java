@@ -13,16 +13,22 @@
 package org.eclipse.linuxtools.tmf.tests.trace;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Vector;
 
+import junit.framework.TestCase;
+
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
-
-import junit.framework.TestCase;
 
 /**
  * <b><u>TmfTraceTest</u></b>
@@ -33,9 +39,8 @@ public class TmfTraceTest extends TestCase {
 
     private static final String DIRECTORY   = "testfiles";
     private static final String TEST_STREAM = "M-Test-10K";
-    private static String testfile;
     private static final int NB_EVENTS = 10000;
-    private static TmfTraceStub fTrace;
+    private static TmfTraceStub fTrace =  null;
 
     private static byte SCALE = (byte) -3;
 
@@ -43,16 +48,30 @@ public class TmfTraceTest extends TestCase {
     // Housekeeping
     // ========================================================================
 
-	public TmfTraceTest(String name) throws Exception {
+    private TmfTraceStub setupTrace(String path) {
+    	if (fTrace == null) {
+    		try {
+    	        URL location = FileLocator.find(TmfCoreTestPlugin.getPlugin().getBundle(), new Path(path), null);
+    			File test = new File(FileLocator.toFileURL(location).toURI());
+    			TmfTraceStub trace = new TmfTraceStub(test.getPath(), 500, true);
+    	        fTrace = trace;
+    		} catch (URISyntaxException e) {
+    			e.printStackTrace();
+    		} catch (IOException e) {
+    			e.printStackTrace();
+    		}
+    	}
+    	return fTrace;
+    }
+
+    public TmfTraceTest(String name) throws Exception {
 		super(name);
-    	String directory = new File(".").getCanonicalPath() + File.separator + DIRECTORY;
-    	testfile = directory + File.separator + TEST_STREAM;
-        fTrace = new TmfTraceStub(testfile, 500, true);
 	}
 
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
+		setupTrace(DIRECTORY + File.separator + TEST_STREAM);
 	}
 
 	@Override
@@ -65,9 +84,19 @@ public class TmfTraceTest extends TestCase {
     // ========================================================================
 
     public void testTmfTraceDefault() throws Exception {
-        TmfTraceStub trace = new TmfTraceStub(testfile, true);
+		TmfTraceStub trace = null;
+		try {
+	        URL location = FileLocator.find(TmfCoreTestPlugin.getPlugin().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
+			File test = new File(FileLocator.toFileURL(location).toURI());
+			trace = new TmfTraceStub(test.getPath(), true);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		assertTrue("Oen Trace", trace != null);
 
-        assertEquals("getCacheSize", TmfTraceStub.DEFAULT_CACHE_SIZE, trace.getCacheSize());
+		assertEquals("getCacheSize", TmfTraceStub.DEFAULT_CACHE_SIZE, trace.getCacheSize());
         assertEquals("getTraceSize",   0, trace.getNbEvents());
         assertEquals("getRange-start", 0, trace.getTimeRange().getStartTime().getValue());
         assertEquals("getRange-end",   0, trace.getTimeRange().getEndTime().getValue());

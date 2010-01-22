@@ -1,10 +1,17 @@
 package org.eclipse.linuxtools.lttng.tests.trace;
 
+import java.io.File;
+import java.net.URL;
+
+import junit.framework.TestCase;
+
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
-import junit.framework.TestCase;
 
 /*
  Functions tested here :
@@ -51,22 +58,25 @@ public class LTTngTextTraceTest extends TestCase {
     private final static long   locationToSeekLast = 3410544;
     private final static long   contextValueAfterSeekLast = 13589906758691L;
     private final static String seekLastEventReference = tracename + "/kernel_0"; 
-    
-	private LTTngTextTrace prepareStreamToTest() {
-		LTTngTextTrace tmpStream = null;
 
-		// This trace should be valid
-		try {
-			tmpStream = new LTTngTextTrace(tracepath1);
-		} 
-		catch (Exception e) {
-			System.out.println("ERROR : Could not open " + tracepath1);
+    private static LTTngTextTrace testStream = null;
+    private LTTngTextTrace prepareStreamToTest() {
+		if (testStream == null) {
+			try {
+				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(tracepath1), null);
+				File testfile = new File(FileLocator.toFileURL(location).toURI());
+				LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getPath());
+				testStream = tmpStream;
+			} 
+			catch (Exception e) {
+				System.out.println("ERROR : Could not open " + tracepath1);
+				testStream = null;
+			}
 		}
-
-		return tmpStream;
+		return testStream;
 	}
-	
-	public void testTraceConstructors() {
+
+    public void testTraceConstructors() {
 		@SuppressWarnings("unused")
 		LTTngTextTrace testStream1 = null;
         
@@ -81,7 +91,9 @@ public class LTTngTextTraceTest extends TestCase {
         
         // Test constructor with argument on a correct tracepath, skipping indexing
         try {
-        		testStream1 = new LTTngTextTrace(tracepath1, skipIndexing);
+            URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(tracepath1), null);
+            File testfile = new File(FileLocator.toFileURL(location).toURI());
+            testStream1 = new LTTngTextTrace(testfile.getPath(), skipIndexing);
         }
         catch( Exception e) {
                 fail("Construction with correct tracepath failed!");

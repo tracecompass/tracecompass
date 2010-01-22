@@ -53,7 +53,7 @@
 
 	<!-- This target runs the test suite. Any actions that need to happen -->
 	<!-- after all the tests have been run should go here. -->
-	<target name="run" depends="init,cleanup">
+	<target name="run" depends="init,lttng_event_test_suite,cleanup">
 		<ant target="collect" antfile="${library-file}" dir="${eclipse-home}">
 			<property name="includes" value="org*.xml" />
 			<property name="output-file" value="${plugin-name}.xml" />
