@@ -2,28 +2,37 @@ package org.eclipse.linuxtools.lttng.tests.event;
 
 import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
 
 import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.linuxtools.lttng.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.event.LttngEventContent;
-import org.eclipse.linuxtools.lttng.event.LttngEventField;
-import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
+import org.eclipse.linuxtools.lttng.event.*;
 import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /*
  Functions tested here :
-	public LttngEventContent(LttngEventFormat thisFormat)
-    public LttngEventContent(LttngEventFormat thisFormat, String thisParsedContent, LttngEventField[] thisFields)
+ 	
+	public LttngEventContent()
+    public LttngEventContent(LttngEvent thisParent)
+    public LttngEventContent(LttngEvent thisParent, HashMap<String, LttngEventField> thisContent)
     public LttngEventContent(LttngEventContent oldContent)
-    public TmfEventField[] getFields()
-    public LttngEventField getField(int id)
-    public TmfEventField[] getFields(LttngEvent thisEvent)
-    public LttngEventField getField(int id, LttngEvent thisEvent)
+    
+    public void emptyContent()
+    
+    public LttngEventField[] getFields()
+    public LttngEventField getField(int position)
+    public LttngEventField getField(String name)
+    public LttngEvent getEvent()
+    public LttngEventType getType()
+    public Object[] getContent()
+    public HashMap<String, LttngEventField> getRawContent()
+    
+    public void setType(LttngEventType newType)
+    public void setEvent(LttngEvent newParent)
+    
     public String toString()
  */
 
@@ -32,16 +41,23 @@ public class LttngEventContentTest extends TestCase {
     private final static boolean skipIndexing=true;
     
     private final static String firstEventContentFirstField 	= "alignment:0";
-    private final static String secondEventContentSecondField 	= "string:LTT state dump begin";  
+    private final static String firstEventContentFirstFieldName = "alignment";
+    private final static String firstEventContentType 			= "metadata/0/core_marker_id";
+    
+    private final static String secondEventContentSecondField 	= "string:LTT state dump begin";
+    private final static String secondEventContentSecondFieldName = "string";
+    private final static String secondEventContentType 			= "kernel/0/vprintk";
+    
     private final static long   timestampAfterMetadata 		 = 13589760262237L;
     
     private static LTTngTextTrace testStream = null;
+    
     private LTTngTextTrace initializeEventStream() {
-		if (testStream == null) {
+    	if (testStream == null) {
 			try {
 				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(tracepath1), null);
 				File testfile = new File(FileLocator.toFileURL(location).toURI());
-				LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getPath(), skipIndexing);
+				LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getPath());
 				testStream = tmpStream;
 			} 
 			catch (Exception e) {
@@ -50,13 +66,15 @@ public class LttngEventContentTest extends TestCase {
 			}
 		}
 		return testStream;
-	}
+    }
+    
     
 	private LttngEventContent prepareToTest() {
 		LttngEventContent tmpEventContent = null;
 
 		// This trace should be valid
 		try {
+			testStream = null;
 		    LTTngTextTrace tmpStream = initializeEventStream();
 			tmpEventContent = (LttngEventContent)tmpStream.getNextEvent( new TmfTraceContext(0L, new LttngTimestamp(0L), 0) ).getContent();
 		}
@@ -82,13 +100,23 @@ public class LttngEventContentTest extends TestCase {
         	fail("Construction with format failed!");
         }
         
-        // Construction with good parameters
+        // Construction with good parameters (parent event)
         try {
         	testContent = new LttngEventContent(testEvent);
         }
         catch( Exception e) { 
         	fail("Construction with format, content and fields failed!");
         }
+        
+        // Construction with good parameters (parent event and pre-parsed content)
+        try {
+        	HashMap<String, LttngEventField> parsedContent = new HashMap<String, LttngEventField>();
+        	testContent = new LttngEventContent(testEvent, parsedContent);
+        }
+        catch( Exception e) { 
+        	fail("Construction with format, content and fields failed!");
+        }
+        
         
         // Copy constructor with correct parameters
         try {
@@ -102,44 +130,111 @@ public class LttngEventContentTest extends TestCase {
 	}
 	
 	
-//	public void testGetter() {
-//    	LttngEventContent testContent = null;
-//    	LTTngTextTrace tmpStream = null;
-//    	LttngEvent tmpEvent = null;
-//    	TmfTraceContext tmpContext = null;
-//    	
-//    	// Require an event
-//    	tmpStream = initializeEventStream();
-//    	tmpContext = new TmfTraceContext(0L, new LttngTimestamp(0L), 0);
-//    	tmpEvent = (LttngEvent)tmpStream.getNextEvent(tmpContext);
-//    	
-//		testContent = prepareToTest();
-//    	// getFieldS()
-//    	assertNotSame("getFields() returned null!",null,testContent.getFields() );
-//    	// getField(int)
-//    	assertEquals("getField(int) returned unexpected result!",firstEventContentFirstField, testContent.getField(0).toString());
-//    	
-//    	
-//    	
-//    	//*** To test getFiels with a fields number >0, we need to move to an event that have some more
-//    	tmpStream = initializeEventStream();
-//    	tmpContext = new TmfTraceContext(0L, new LttngTimestamp(0L), 0);
-//    	// Skip first events and seek to event pass metadata
-//    	tmpContext= tmpStream.seekEvent(new LttngTimestamp(timestampAfterMetadata) );
-//    	// Skip first one 
-//    	tmpEvent = (LttngEvent)tmpStream.getNextEvent(tmpContext);
-//    	
-//    	// Second event past metadata should have more fields
-//    	tmpEvent = (LttngEvent)tmpStream.getNextEvent(tmpContext);
-//    	// Get the content
-//    	testContent = tmpEvent.getContent();
-//    	
-//    	// getFieldS()
-//    	assertNotSame("getFields() returned null!",null,testContent.getFields() );
-//    	// getField(int)
-//    	assertEquals("getField(int) returned unexpected result!",secondEventContentSecondField, testContent.getField(1).toString());
-//    	
-//    }
+	public void testGetter() {
+		LttngEventContent testContent = null;
+    	LTTngTextTrace tmpStream = null;
+    	LttngEvent tmpEvent = null;
+    	TmfTraceContext tmpContext = null;
+    	
+    	// Require an event
+    	tmpStream = initializeEventStream();
+    	tmpContext = new TmfTraceContext(0L, new LttngTimestamp(0L), 0);
+    	tmpEvent = (LttngEvent)tmpStream.getNextEvent(tmpContext);
+		testContent = prepareToTest();
+    	// getFieldS()
+    	assertNotSame("getFields() returned null!",null,testContent.getFields() );
+    	// getField(int)
+    	assertEquals("getField(int) returned unexpected result!",firstEventContentFirstField, testContent.getField(0).toString());
+    	// getField(name)
+    	assertEquals("getField(name) returned unexpected result!",firstEventContentFirstField, testContent.getField(firstEventContentFirstFieldName).toString());
+    	// getRawContent
+    	assertNotSame("getRawContent() returned null!",null, testContent.getRawContent());
+    	// Test that get event return the correct event
+    	assertTrue("getEvent() returned unexpected result!", tmpEvent.getTimestamp().getValue() == testContent.getEvent().getTimestamp().getValue());
+    	// getType()
+    	assertEquals("getType() returned unexpected result!",firstEventContentType, testContent.getType().toString());
+    	
+    	//*** To test getFields with a fields number >0, we need to move to an event that have some more
+    	tmpStream = initializeEventStream();
+    	tmpContext = new TmfTraceContext(0L, new LttngTimestamp(0L), 0);
+    	// Skip first events and seek to event pass metadata
+    	tmpContext= tmpStream.seekEvent(new LttngTimestamp(timestampAfterMetadata) );
+    	// Skip first one 
+    	tmpEvent = (LttngEvent)tmpStream.getNextEvent(tmpContext);
+    	
+    	// Second event past metadata should have more fields
+    	tmpEvent = (LttngEvent)tmpStream.getNextEvent(tmpContext);
+    	// Get the content
+    	testContent = tmpEvent.getContent();
+    	
+    	// Test that get event return the correct event
+    	assertTrue("getEvent() returned unexpected result!",tmpEvent.getTimestamp().getValue() == testContent.getEvent().getTimestamp().getValue());
+    	// getType()
+    	assertEquals("getType() returned unexpected result!",secondEventContentType, testContent.getType().toString());
+    	
+    	
+    	// getFieldS()
+    	assertNotSame("getFields() returned null!",null,testContent.getFields() );
+    	// getField(int)
+    	assertEquals("getField(int) returned unexpected result!",secondEventContentSecondField, testContent.getField(1).toString());
+    	// getField(name)
+    	assertEquals("getField(name) returned unexpected result!",secondEventContentSecondField, testContent.getField(secondEventContentSecondFieldName).toString());
+    	// getRawContent
+    	assertNotSame("getRawContent() returned null!",null, testContent.getRawContent());
+    	
+    }
+	
+	public void testSetter() {
+		// Not much to test here, we will just make sure the set does not fail for any reason.
+    	// It's pointless to test with a getter...
+    	LTTngTextTrace tmpStream = null;
+    	LttngEvent tmpEvent = null;
+    	TmfTraceContext tmpContext = null;
+    	
+    	// Require an event
+    	tmpStream = initializeEventStream();
+    	tmpContext = new TmfTraceContext(0L, new LttngTimestamp(0L), 0);
+    	tmpEvent = (LttngEvent)tmpStream.getNextEvent(tmpContext);
+		
+    	LttngEventContent tmpContent = prepareToTest();
+    	try {
+    		tmpContent.setEvent(tmpEvent);
+    	}
+    	catch( Exception e) { 
+        	fail("setEvent(event) failed!");
+        }
+    	
+    	
+    	LttngEventType testType = new LttngEventType();
+    	try {
+    		tmpContent.setType(testType);
+    	}
+    	catch( Exception e) { 
+        	fail("setType(type) failed!");
+        }
+	}
+	
+	public void testEmptyContent() {
+		LttngEventContent testContent = null;
+    	LTTngTextTrace tmpStream = null;
+    	LttngEvent tmpEvent = null;
+    	TmfTraceContext tmpContext = null;
+    	
+    	// Require an event
+    	tmpStream = initializeEventStream();
+    	tmpContext = new TmfTraceContext(0L, new LttngTimestamp(0L), 0);
+    	tmpEvent = (LttngEvent)tmpStream.getNextEvent(tmpContext);
+    	// Get the content
+    	testContent = tmpEvent.getContent();
+    	// Get all the fields to make sure there is something in the HashMap
+    	testContent.getFields();
+    	// Just making sure there is something in the HashMap
+    	assertNotSame("HashMap is empty but should not!", 0, testContent.getRawContent().size() );
+    	
+    	// This is the actual test
+    	testContent.emptyContent();
+    	assertSame("HashMap is not empty but should be!", 0, testContent.getRawContent().size() );
+	}
     
 	public void testToString() {
     	LttngEventContent tmpContent = prepareToTest();

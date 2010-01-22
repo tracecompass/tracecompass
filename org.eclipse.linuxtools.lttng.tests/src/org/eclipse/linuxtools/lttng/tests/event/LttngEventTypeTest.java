@@ -4,7 +4,6 @@ import java.io.File;
 import java.net.URL;
 
 import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.lttng.event.LttngEventType;
@@ -14,12 +13,15 @@ import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /*
  Functions tested here :
-    public LttngEventType(String thisChannelName, long thisCpuId, String thisMarkerName, LttngEventFormat thisFormat) 
-    public LttngEventType(LttngEventType oldType) 
-    public String getChannelName() 
-    public long getCpuId() 
-    public String getMarkerName() 
-    public String toString() 
+    public LttngEventType()
+    public LttngEventType(String thisTracefileName, Long thisCpuId, String thisMarkerName, String[] thisMarkerfieldsName)
+    public LttngEventType(LttngEventType oldType)
+    
+    public String getTracefileName()
+    public Long getCpuId()
+    public String getMarkerName()
+    
+    public String toString()
  */
 
 public class LttngEventTypeTest extends TestCase {
@@ -67,7 +69,15 @@ public class LttngEventTypeTest extends TestCase {
         @SuppressWarnings("unused")
         LttngEventType tmpEventType2 = null;
         
-        // Default construction with good argument
+        // Default construction, no argument
+        try {
+            tmpEventType = new LttngEventType();
+        }
+        catch( Exception e) { 
+            fail("Construction failed!");
+        }
+        
+        // Default construction with good arguments
         try {
             tmpEventType = new LttngEventType("test", 0L, "test",  new String[1]);
         }
@@ -93,7 +103,7 @@ public class LttngEventTypeTest extends TestCase {
         assertTrue("Cpu Id not what was expected!",firstEventCpu == tmpEventType.getCpuId() );
         assertTrue("Marker Name not what was expected!",firstEventMarker.equals((String)tmpEventType.getMarkerName()) );
         // Just test the non-nullity of labels
-        assertNotSame("getFormat returned null",null, tmpEventType.getLabels() );
+        assertNotSame("getLabels returned null",null, tmpEventType.getLabels() );
     }
     
     public void testToString() {

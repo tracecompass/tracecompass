@@ -4,7 +4,6 @@ import java.io.File;
 import java.net.URL;
 
 import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
@@ -14,11 +13,17 @@ import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /*
  Functions tested here :
-    public LttngTimestamp(TmfTimestamp newEventTime) 
-    public LttngTimestamp(long newEventTime) 
-    public String getSeconds() 
-    public String getNanoSeconds() 
-    public String toString() 
+    public LttngTimestamp()
+    public LttngTimestamp(long newEventTime)
+    public LttngTimestamp(TmfTimestamp oldEventTime)
+    
+    public long getValue()
+    public String getSeconds()
+    public String getNanoSeconds()
+    
+    public void setValue(long newValue)
+    
+    public String toString()
  */
 
 public class LttngTimestampTest extends TestCase {
@@ -66,6 +71,14 @@ public class LttngTimestampTest extends TestCase {
         @SuppressWarnings("unused")
         LttngTimestamp tmpTime2 = null;
         
+        // Default construction with no argument
+        try {
+            tmpTime = new LttngTimestamp();
+        }
+        catch( Exception e) { 
+            fail("Construction failed!");
+        }
+        
         // Default construction with good argument
         try {
             tmpTime = new LttngTimestamp(1);
@@ -92,6 +105,14 @@ public class LttngTimestampTest extends TestCase {
         assertEquals("Time in nano second is wrong", firstEventTimeNano, tmpTime.getNanoSeconds() );
         
         assertEquals("Full time is wrong", firstEventTimeFull, tmpTime.getValue() );
+    }
+    
+    public void testSetter() {
+        LttngTimestamp tmpTime = prepareToTest();
+        
+        // We will set a time and we will make sure the set is working then
+        tmpTime.setValue(1);
+        assertEquals("Full time is wrong after set", 1, tmpTime.getValue() );
     }
     
     

@@ -1,5 +1,6 @@
 package org.eclipse.linuxtools.lttng.tests.trace;
 
+import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import java.io.File;
 import java.net.URL;
 
@@ -9,29 +10,32 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /*
  Functions tested here :
-	public LTTngTextTrace(String path) throws Exception
-	
-    public TmfTraceContext seekLocation(Object location)
-    public TmfTraceContext seekEvent(TmfTimestamp timestamp)
-    public TmfTraceContext seekEvent(long position)
+ 	public LTTngTextTrace(String path) throws Exception
+    public LTTngTextTrace(String path, boolean skipIndexing) throws Exception
     
-    public TmfEvent getNextEvent(TmfTraceContext context)
+    public TmfTraceContext seekLocation(Object location) {
+    public TmfTraceContext seekEvent(TmfTimestamp timestamp) {
+    public TmfTraceContext seekEvent(long position) {
     
-    public Object getCurrentLocation()
+    public TmfEvent getNextEvent(TmfTraceContext context) {
+    public Object getCurrentLocation() {
     
-    public LttngEvent parseEvent(TmfTraceContext context)
+    public LttngEvent parseEvent(TmfTraceContext context) {
+    
+    public int getCpuNumber() {
  */
 
 public class LTTngTextTraceTest extends TestCase {
 	
     private final static String tracepath1="traceset/trace-15316events_nolost_newformat.txt";
     private final static String wrongTracePath="/somewhere/that/does/not/exist";
+    
+    private final static int 	traceCpuNumber=1;
     
     private final static boolean skipIndexing=true;
     
@@ -235,6 +239,8 @@ public class LTTngTextTraceTest extends TestCase {
 		assertNotSame("tmpContext is null after first seekEvent()",null,testStream1.getCurrentLocation() );
 		assertEquals("tmpContext has wrong timestamp after first seekEvent()",locationAfterFirstEvent,(Long)testStream1.getCurrentLocation() );
 		
+		// Test CPU number of the trace
+		assertSame("getCpuNumber() return wrong number of cpu",traceCpuNumber ,testStream1.getCpuNumber() );
     }
     
 	public void testToString() {
