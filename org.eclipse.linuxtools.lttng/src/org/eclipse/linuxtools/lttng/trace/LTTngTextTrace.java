@@ -200,7 +200,6 @@ public class LTTngTextTrace extends TmfTrace implements ITmfTrace, ITmfRequestHa
     	}
     }
     
-    @Override
     public TmfTraceContext seekLocation(Object location) {
     	if (location == null) {
     		location = 0L;
