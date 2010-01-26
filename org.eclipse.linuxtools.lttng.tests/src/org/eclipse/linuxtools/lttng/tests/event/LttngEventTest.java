@@ -42,7 +42,7 @@ public class LttngEventTest extends TestCase {
     private final static String tracepath1="traceset/trace-15316events_nolost_newformat.txt";
     private final static boolean skipIndexing=true;
     
-    private final static long   eventTimestamp 	= 13589759412128L;
+    private final static long   eventTimestamp 	= 13589759412127L;
     private final static String eventSource 	= "Kernel Core";
     private final static String eventType 		= "metadata/0/core_marker_id";
     private final static String eventChannel 	= "metadata";

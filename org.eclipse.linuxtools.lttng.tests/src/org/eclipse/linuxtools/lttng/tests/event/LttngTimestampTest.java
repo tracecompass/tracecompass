@@ -31,8 +31,8 @@ public class LttngTimestampTest extends TestCase {
     private final static boolean skipIndexing=true;
     
     private final static String firstEventTimeSecond     = "13589";
-    private final static String firstEventTimeNano       = "759412128";
-    private final static long   firstEventTimeFull       = 13589759412128L;
+    private final static String firstEventTimeNano       = "759412127";
+    private final static long   firstEventTimeFull       = 13589759412127L;
     
     private static LTTngTextTrace testStream = null;
     private LTTngTextTrace initializeEventStream() {

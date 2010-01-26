@@ -39,28 +39,28 @@ public class LTTngTextTraceTest extends TestCase {
     
     private final static boolean skipIndexing=true;
     
-    private final static long   firstEventTimestamp = 13589759412128L;
-    private final static long   secondEventTimestamp = 13589759419903L;
-    private final static Long   locationAfterFirstEvent = 304L;
+    private final static long   firstEventTimestamp = 13589759412127L;
+    private final static long   secondEventTimestamp = 13589759419902L;
+    private final static Long   locationAfterFirstEvent = 245L;
     
-    private final static String tracename = "traceset/trace-15316events_nolost_newformat";
+    private final static String tracename = "traceset/trace_15316events_nolost_newformat";
     
     private final static long	indexToSeekFirst = 0;
     private final static Long   locationToSeekFirst = 0L;
-    private final static long   contextValueAfterFirstEvent = 13589759412128L;
+    private final static long   contextValueAfterFirstEvent = 13589759412127L;
     private final static String firstEventReference = tracename + "/metadata_0";
     
     
     private final static long   timestampToSeekTest1 = 13589826657302L;
     private final static Long	indexToSeekTest1 = 7497L;
-    private final static long   locationToSeekTest1 = 2124565;
+    private final static long   locationToSeekTest1 = 1682942;
     private final static long   contextValueAfterSeekTest1 = 13589826657302L;
     private final static String seek1EventReference = tracename + "/vm_state_0"; 
     
-    private final static long   timestampToSeekLast = 13589906758692L;
+    private final static long   timestampToSeekLast = 13589906758691L;
     private final static Long	indexToSeekLast = 15315L;
-    private final static long   locationToSeekLast = 4313429;
-    private final static long   contextValueAfterSeekLast = 13589906758692L;
+    private final static long   locationToSeekLast = 3410544;
+    private final static long   contextValueAfterSeekLast = 13589906758691L;
     private final static String seekLastEventReference = tracename + "/kernel_0"; 
 
     private static LTTngTextTrace testStream = null;
