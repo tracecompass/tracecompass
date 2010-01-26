@@ -29,7 +29,7 @@ public final class JniTime extends Jni_C_Common implements Comparable<JniTime>
      * Note : Time will be set to 0.
      * 
      */
-    JniTime() {
+    public JniTime() {
         time = 0;
     }
 
@@ -38,7 +38,7 @@ public final class JniTime extends Jni_C_Common implements Comparable<JniTime>
      * 
      * @param oldTime   Reference to the JniTime you want to copy.           
      */
-    JniTime(JniTime oldTime) {
+    public JniTime(JniTime oldTime) {
         time = oldTime.getTime();
     }
 
@@ -50,7 +50,7 @@ public final class JniTime extends Jni_C_Common implements Comparable<JniTime>
      * @param newSec      Seconds of the JniTime
      * @param newNanoSec  Nanoseconds of the JniTime
      */
-    JniTime(long newSec, long newNanoSec) {
+    public JniTime(long newSec, long newNanoSec) {
         time = (newSec * NANO) + newNanoSec;
     }
 
