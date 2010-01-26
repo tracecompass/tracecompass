@@ -56,19 +56,19 @@ public class JniTracefileTest extends TestCase
 {
 		private final static boolean printLttDebug = false;
 		
-        private final static String tracepath1="traceset/trace-618339events-1293lost-1cpu";
+        private final static String tracepath1="traceset/trace-15316events_nolost_newformat";
         private final static String tracefileName1="kernel0";
         
-        private final static int    numberOfMarkersInTracefile = 46;
+        private final static int    numberOfMarkersInTracefile = 45;
         
-        private final static long   firstEventTimestamp = 952090116049L;
-        private final static long   secondEventTimestamp = 952092222957L;
-        private final static long   thirdEventTimestamp = 952102730748L;
+        private final static long   firstEventTimestamp = 13589760262237L;
+        private final static long   secondEventTimestamp = 13589762149621L;
+        private final static long   thirdEventTimestamp = 13589762917527L;
         
-        private final static long   timestampToSeekTest1 = 953852206193L;
-        private final static long   timestampAfterSeekTest1 = 953852212349L;
+        private final static long   timestampToSeekTest1 = 13589807108560L;
+        private final static long   timestampAfterSeekTest1 = 13589807116344L;
         
-        private final static long   timestampToSeekLast = 960386638531L;
+        private final static long   timestampToSeekLast = 13589906758692L;
         
         
         private JniTracefile prepareTracefileToTest() {

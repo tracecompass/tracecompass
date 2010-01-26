@@ -57,36 +57,36 @@ public class JniTraceTest extends TestCase
 {
 		private final static boolean printLttDebug = false;
 		
-        private final static String tracepath1="traceset/trace-618339events-1293lost-1cpu";
-        private final static String tracepath2="traceset/trace-1021events-nolost-1cpu";
+        private final static String tracepath1="traceset/trace-15316events_nolost_newformat";
+        private final static String tracepath2="traceset/trace-15471events_nolost_newformat";
         private final static String wrongTracePath="/somewhere/that/does/not/exist";
         
         private final static String correctTracefileName="kernel0";
         private final static String wrongTracefileName="somethingThatDoesNotExists";
         
-        private final static int   numberOfTracefilesInTrace = 18;
+        private final static int   numberOfTracefilesInTrace = 16;
         
-        private final static long   firstEventTimestamp = 952088954601L;
+        private final static long   firstEventTimestamp = 13589759412128L;
         private final static String firstEventTracefilename = "metadata0";
         
-        private final static long   secondEventTimestamp = 952088959952L;
+        private final static long   secondEventTimestamp = 13589759419903L;
         private final static String secondEventName = "metadata";
         
-        private final static long  thirdEventTimestamp = 952088965599L;
+        private final static long  thirdEventTimestamp = 13589759422785L;
         
-        private final static long   eventTimestampAfterMetadata = 952090116049L;
+        private final static long   eventTimestampAfterMetadata = 13589760262237L;
         private final static String eventTracefilenameAfterMetadata = "kernel0";
         
-        private final static long   timestampToSeekTest1 = 953852206193L;
+        private final static long   timestampToSeekTest1 = 13589821608319L;
         private final static String eventNameAfterSeekTest1 = "kernel";
         private final static String eventTracefilenameAfterSeekTest1 = "kernel0";
-        private final static String nextEventNameAfterSeekTest1 = "fs";
+        private final static String nextEventNameAfterSeekTest1 = "vm_state";
         
-        private final static long   timestampToSeekTest2 = 953852210706L;
+        private final static long   timestampToSeekTest2 = 13589861889350L;
         private final static String eventNameAfterSeekTest2 = "fs";
         private final static String nextEventNameAfterSeekTest2 = "kernel";
         
-        private final static long   timestampToSeekLast = 960386638531L;
+        private final static long   timestampToSeekLast = 13589906758692L;
         private final static String eventNameAfterSeekLast = "kernel";
         
         
@@ -96,6 +96,7 @@ public class JniTraceTest extends TestCase
                 // This trace should be valid
                 try {
                         tmpTrace = new JniTrace(tracepath1, printLttDebug);
+                        //tmpTrace.seekToTime(new JniTime(0L));
                 }
                 catch( JniException e) { }
                 
