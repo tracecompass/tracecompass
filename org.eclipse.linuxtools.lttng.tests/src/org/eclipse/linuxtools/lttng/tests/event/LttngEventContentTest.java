@@ -65,6 +65,10 @@ public class LttngEventContentTest extends TestCase {
 				testStream = null;
 			}
 		}
+    	else {
+    		testStream.seekEvent(0);
+    	}
+    	
 		return testStream;
     }
     
