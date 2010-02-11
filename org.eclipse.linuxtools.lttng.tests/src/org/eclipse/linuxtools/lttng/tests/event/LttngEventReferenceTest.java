@@ -9,7 +9,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.lttng.event.LttngEventReference;
 import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /*
  Functions tested here :
@@ -59,7 +59,7 @@ public class LttngEventReferenceTest extends TestCase {
         // This trace should be valid
         try {
             LTTngTextTrace tmpStream = initializeEventStream();
-            tmpEventRef = (LttngEventReference)tmpStream.getNextEvent(new TmfContext(null, 0) ).getReference();
+            tmpEventRef = (LttngEventReference)tmpStream.getNextEvent(new TmfTraceContext(null, null, 0) ).getReference();
         } 
         catch (Exception e) {
             fail("ERROR : Failed to get reference!");

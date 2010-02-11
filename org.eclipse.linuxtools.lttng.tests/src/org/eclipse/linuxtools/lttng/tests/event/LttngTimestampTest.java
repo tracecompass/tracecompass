@@ -4,13 +4,12 @@ import java.io.File;
 import java.net.URL;
 
 import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /*
  Functions tested here :
@@ -32,8 +31,8 @@ public class LttngTimestampTest extends TestCase {
     private final static boolean skipIndexing=true;
     
     private final static String firstEventTimeSecond     = "13589";
-    private final static String firstEventTimeNano       = "759412128";
-    private final static long   firstEventTimeFull       = 13589759412128L;
+    private final static String firstEventTimeNano       = "759412127";
+    private final static long   firstEventTimeFull       = 13589759412127L;
     
     private static LTTngTextTrace testStream = null;
     private LTTngTextTrace initializeEventStream() {
@@ -58,7 +57,7 @@ public class LttngTimestampTest extends TestCase {
         // This trace should be valid
         try {
             LTTngTextTrace tmpStream = initializeEventStream();
-            tmpTime = (LttngTimestamp)tmpStream.getNextEvent( new TmfContext(null, 0) ).getTimestamp();
+            tmpTime = (LttngTimestamp)tmpStream.getNextEvent( new TmfTraceContext(null, null, 0) ).getTimestamp();
         } 
         catch (Exception e) {
             fail("ERROR : Failed to get reference!");

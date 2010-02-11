@@ -1,13 +1,13 @@
 
 package org.eclipse.linuxtools.lttng.tests.jni;
 
+import org.eclipse.linuxtools.lttng.jni.JniEvent;
+import org.eclipse.linuxtools.lttng.jni.JniException;
+import org.eclipse.linuxtools.lttng.jni.JniMarker;
+import org.eclipse.linuxtools.lttng.jni.JniTrace;
+import org.eclipse.linuxtools.lttng.jni.Jni_C_Pointer;
 
 import junit.framework.TestCase;
-
-import org.eclipse.linuxtools.lttng.jni.JniEvent;
-import org.eclipse.linuxtools.lttng.jni.JniMarker;
-import org.eclipse.linuxtools.lttng.jni.exception.JniException;
-import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
 
 /*
  Functions tested here :
@@ -41,7 +41,7 @@ public class JniMarkerTest extends TestCase
                 // This trace should be valid
                 // We will read the second event to have something interesting to test on
                 try {
-                        tmpEvent = JniTraceFactory.getJniTrace(tracepath, printLttDebug).requestEventByName(eventName);
+                        tmpEvent = new JniTrace(tracepath, printLttDebug).requestEventByName(eventName);
                         tmpEvent.readNextEvent();
                         
                         tmpMarker = tmpEvent.requestEventMarker();
@@ -55,26 +55,32 @@ public class JniMarkerTest extends TestCase
                 
                 JniEvent tmpEvent = null;
                 
-                @SuppressWarnings("unused")
-				JniMarker testMarker1 = null;
-                @SuppressWarnings("unused")
-				JniMarker testMarker2 = null;
+                JniMarker testMarker1 = null;
+                JniMarker testMarker2 = null;
                 
                 // This event should be valid and will be used in test
                 try {
-                        tmpEvent = JniTraceFactory.getJniTrace(tracepath, printLttDebug).requestEventByName(eventName);
+                        tmpEvent = new JniTrace(tracepath, printLttDebug).requestEventByName(eventName);
                 }
                 catch( JniException e) { }
                 
+                // Test constructor with pointer on a wrong pointer
+                try {
+                        testMarker1 = new JniMarker( new Jni_C_Pointer(0) );
+                        fail("Construction with wrong pointer should fail!");
+                }
+                catch( JniException e) { 
+                }
+                
                 // Test constructor with pointer on a correct pointer
                 try {
-                        testMarker1 = tmpEvent.getParentTracefile().allocateNewJniMarker( tmpEvent.requestEventMarker().getMarkerPtr() );
+                        testMarker1 = new JniMarker( tmpEvent.requestEventMarker().getMarkerPtr() );
                 }
                 catch( JniException e) {
                         fail("Construction with correct pointer failed!");
                 }
                 
-                /*
+                
                 // Test copy constructor
                 try {
                         testMarker1 = new JniMarker( tmpEvent.requestEventMarker().getMarkerPtr() );
@@ -83,8 +89,8 @@ public class JniMarkerTest extends TestCase
                 catch( JniException e) {
                         fail("Copy constructor failed!");
                 }
+                
                 assertSame("JniMarker name not same after using copy constructor", testMarker1.getName() , testMarker2.getName());
-                */
                 
         }
         

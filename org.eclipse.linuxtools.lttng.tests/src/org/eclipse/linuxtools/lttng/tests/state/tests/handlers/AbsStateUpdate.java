@@ -4,12 +4,12 @@ import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.event.LttngEventField;
 import org.eclipse.linuxtools.lttng.state.StateStrings.Fields;
-import org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor;
+import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
 import org.eclipse.linuxtools.lttng.state.model.LttngExecutionState;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.tmf.event.TmfEventField;
 
-public abstract class AbsStateUpdate implements ILttngEventProcessor {
+public abstract class AbsStateUpdate implements IEventProcessing {
 
 	// ========================================================================
 	// Data

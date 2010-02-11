@@ -15,10 +15,8 @@ import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
-import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.event.TmfEventSource;
-import org.eclipse.linuxtools.tmf.trace.TmfContext;
-import org.eclipse.linuxtools.tmf.trace.TmfLocation;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /*
  Functions tested here :
@@ -44,13 +42,13 @@ public class LttngEventTest extends TestCase {
     private final static String tracepath1="traceset/trace-15316events_nolost_newformat.txt";
     private final static boolean skipIndexing=true;
     
-    private final static long   eventTimestamp 	= 13589759412128L;
+    private final static long   eventTimestamp 	= 13589759412127L;
     private final static String eventSource 	= "Kernel Core";
     private final static String eventType 		= "metadata/0/core_marker_id";
     private final static String eventChannel 	= "metadata";
     private final static long 	eventCpu 		= 0;
     private final static String eventMarker 	= "core_marker_id";
-//    private final static String eventContent 	= "alignment:0 size_t:4 int:4 name:vm_map pointer:4 event_id:0 long:4 channel:vm_state ";
+    private final static String eventContent 	= "alignment:0 size_t:4 int:4 name:vm_map pointer:4 event_id:0 long:4 channel:vm_state ";
     private final static String eventReference 	= eventChannel + "_" + eventCpu;
     
     
@@ -80,7 +78,7 @@ public class LttngEventTest extends TestCase {
 		
 		try {
 			LTTngTextTrace tmpStream = initializeEventStream();
-			tmpEvent = (LttngEvent)tmpStream.getNextEvent(new TmfContext(new TmfLocation<Long>(0L), 0) );
+			tmpEvent = (LttngEvent)tmpStream.getNextEvent(new TmfTraceContext(0, new LttngTimestamp(0L), 0) );
 		}
 		catch (Exception e) {
 			System.out.println("ERROR : Could not open " + tracepath1);
@@ -91,8 +89,7 @@ public class LttngEventTest extends TestCase {
 
 	public void testConstructors() {
         LttngEvent 			testEvent 		= null;
-        LTTngTrace			testTrace 		= null;
-		@SuppressWarnings("unused")
+        @SuppressWarnings("unused")
 		LttngEvent 			testAnotherEvent = null;
         LttngTimestamp		testTime		= null;
         TmfEventSource 		testSource 		= null;
@@ -120,7 +117,7 @@ public class LttngEventTest extends TestCase {
 		
         // Test constructor with correct information
         try {
-        		testEvent = new LttngEvent(testTrace, testTime, testSource, testType, testContent, testReference, testJniEvent);
+        		testEvent = new LttngEvent( testTime, testSource, testType, testContent, testReference, testJniEvent);
         }
         catch( Exception e) { 
                 fail("Construction with correct information failed!");
@@ -159,9 +156,6 @@ public class LttngEventTest extends TestCase {
     	assertEquals("Channel not what expected!",eventChannel,testEvent.getChannelName());
     	assertEquals("CpuId not what expected!",eventCpu,testEvent.getCpuId());
     	assertEquals("Marker not what expected!",eventMarker,testEvent.getMarkerName());
-    	
-    	// All events should have a parent
-    	assertNotNull("Trace parent for this event is null!", testEvent.getParentTrace() );
     	
     	// *** FIXME ***
     	// Depending from the Java version because of the "hashcode()" on String. 

@@ -1,13 +1,13 @@
 
 package org.eclipse.linuxtools.lttng.tests.jni;
 
-import junit.framework.TestCase;
-
+import org.eclipse.linuxtools.lttng.jni.JniException;
+import org.eclipse.linuxtools.lttng.jni.JniTime;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.lttng.jni.JniTracefile;
-import org.eclipse.linuxtools.lttng.jni.common.JniTime;
-import org.eclipse.linuxtools.lttng.jni.exception.JniException;
-import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
+import org.eclipse.linuxtools.lttng.jni.Jni_C_Pointer;
+
+import junit.framework.TestCase;
 
 /*
  Functions tested here :
@@ -77,7 +77,7 @@ public class JniTracefileTest extends TestCase
                 
                 // This trace should be valid
                 try {
-                        tmpTracefile = JniTraceFactory.getJniTrace(tracepath1, printLttDebug).requestTracefileByName(tracefileName1);
+                        tmpTracefile = new JniTrace(tracepath1, printLttDebug).requestTracefileByName(tracefileName1);
                         
                 }
                 catch( JniException e) { }
@@ -88,26 +88,33 @@ public class JniTracefileTest extends TestCase
         
         public void testTracefileConstructors() {
                 JniTrace testTrace = null;
-                @SuppressWarnings("unused")
-				JniTracefile testTracefile1 = null;
-                @SuppressWarnings("unused")
-				JniTracefile testTracefile2 = null;
+                JniTracefile testTracefile1 = null;
+                JniTracefile testTracefile2 = null;
                 
                 // This trace should be valid and will be used in test
                 try {
-                        testTrace = JniTraceFactory.getJniTrace(tracepath1, printLttDebug);
+                        testTrace = new JniTrace(tracepath1, printLttDebug);
                 }
                 catch( JniException e) { }
                 
+                
+                // Test constructor with pointer on a wrong pointer
+                try {
+                        testTracefile1 = new JniTracefile( new Jni_C_Pointer(0), testTrace );
+                        fail("Construction with wrong pointer should fail!");
+                }
+                catch( JniException e) { 
+                }
+                
                 // Test constructor with pointer on a correct pointer
                 try {
-                        testTracefile1 = testTrace.allocateNewJniTracefile( testTrace.requestEventByName(tracefileName1).getTracefilePtr(), testTrace );
+                        testTracefile1 = new JniTracefile( testTrace.requestEventByName(tracefileName1).getTracefilePtr(), testTrace );
                 }
                 catch( JniException e) {
                         fail("Construction with correct pointer failed!");
                 }
                 
-                /*
+                
                 // Test copy constructor
                 try {
                         testTracefile1 = new JniTracefile( testTrace.requestEventByName(tracefileName1).getTracefilePtr(), testTrace );
@@ -116,8 +123,8 @@ public class JniTracefileTest extends TestCase
                 catch( JniException e) {
                         fail("Copy constructor failed!");
                 }
+                
                 assertSame("JniTracefile name not same after using copy constructor", testTracefile1.getTracefileName() , testTracefile2.getTracefileName());
-                */
                 
         }
         
@@ -127,7 +134,6 @@ public class JniTracefileTest extends TestCase
                 
                 // Test that all Get/Set return data
                 //boolean getIsCpuOnline will always be sane...
-                assertNotSame("getIsCpuOnline() failed",null, testTracefile.getIsCpuOnline() );
                 assertNotSame("getTracefilePath is empty","",testTracefile.getTracefilePath() );
                 assertNotSame("getTracefileName is empty","",testTracefile.getTracefileName() );
                 assertNotSame("getCpuNumber is 0",0,testTracefile.getCpuNumber() );
@@ -140,9 +146,7 @@ public class JniTracefileTest extends TestCase
                 assertNotSame("getFileSize is 0",0,testTracefile.getFileSize() );
                 assertNotSame("getBlocksNumber is 0",0,testTracefile.getBlocksNumber() );
                 //boolean getIsBytesOrderReversed will always be sane...
-                assertNotSame("getIsBytesOrderReversed() failed",null, testTracefile.getIsBytesOrderReversed() );
                 //boolean getIsFloatWordOrdered will always be sane...
-                assertNotSame("getIsFloatWordOrdered() failed",null, testTracefile.getIsFloatWordOrdered() );
                 assertNotSame("getAlignement is 0",0,testTracefile.getAlignement() );
                 assertNotSame("getBufferHeaderSize is 0",0,testTracefile.getBufferHeaderSize() );
                 assertNotSame("getBitsOfCurrentTimestampCounter is 0",0,testTracefile.getBitsOfCurrentTimestampCounter() );

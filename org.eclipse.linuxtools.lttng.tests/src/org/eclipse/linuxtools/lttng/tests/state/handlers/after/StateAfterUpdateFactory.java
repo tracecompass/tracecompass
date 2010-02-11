@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.linuxtools.lttng.state.StateStrings;
-import org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor;
+import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
 
 /**
  * Builds a Map from string event name to a processing handler object, the
@@ -32,7 +32,7 @@ public class StateAfterUpdateFactory {
 	// ========================================================================
 	// Data
 	// =======================================================================
-	private final Map<String, ILttngEventProcessor> eventNametoProcessor = new HashMap<String, ILttngEventProcessor>();
+	private final Map<String, IEventProcessing> eventNametoProcessor = new HashMap<String, IEventProcessing>();
 	private static StateAfterUpdateFactory instance = null;
 	private StateAfterUpdateHandlers instantiateHandler = new StateAfterUpdateHandlers();
 
@@ -154,7 +154,7 @@ public class StateAfterUpdateFactory {
 	 * 
 	 * @return The Event Handler corresponding to the type of event
 	 */
-	public ILttngEventProcessor getEventNametoProcessor(String eventType) {
+	public IEventProcessing getEventNametoProcessor(String eventType) {
 		return eventNametoProcessor.get(eventType);
 	}
 }

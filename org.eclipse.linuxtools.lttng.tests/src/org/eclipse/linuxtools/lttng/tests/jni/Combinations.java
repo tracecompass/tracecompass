@@ -10,12 +10,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
+import org.eclipse.linuxtools.lttng.jni.JniException;
 import org.eclipse.linuxtools.lttng.jni.JniMarker;
 import org.eclipse.linuxtools.lttng.jni.JniMarkerField;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
-import org.eclipse.linuxtools.lttng.jni.exception.JniException;
-import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
-
 
 /**
  * @author alvaro
@@ -99,7 +97,7 @@ public class Combinations extends TestCase {
 		JniEvent tmpEvent = null;
 		// This trace should be valid
 		try {
-			tmpEvent = JniTraceFactory.getJniTrace(tracepath, printLttDebug).requestEventByName(eventName);
+			tmpEvent = new JniTrace(tracepath, printLttDebug).requestEventByName(eventName);
 		} catch (JniException e) {
 		}
 
@@ -120,7 +118,7 @@ public class Combinations extends TestCase {
 		JniTrace trace = null;
 		JniEvent event = null;
 		try {
-			trace = JniTraceFactory.getJniTrace(tracepath, printLttDebug);
+			trace = new JniTrace(tracepath, printLttDebug);
 		} catch (JniException e) {
 			e.printStackTrace();
 		}

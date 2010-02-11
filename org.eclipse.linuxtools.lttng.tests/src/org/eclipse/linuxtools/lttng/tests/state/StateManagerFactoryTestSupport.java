@@ -15,11 +15,9 @@ package org.eclipse.linuxtools.lttng.tests.state;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.linuxtools.lttng.model.LTTngTreeNode;
-import org.eclipse.linuxtools.lttng.state.LttngStateException;
-import org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager;
-import org.eclipse.linuxtools.lttng.state.trace.StateTraceManager;
-import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
+import org.eclipse.linuxtools.lttng.state.StateManager;
+import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
+import org.eclipse.linuxtools.lttng.state.model.StateModelFactory;
 
 /**
  * @author alvaro
@@ -30,8 +28,8 @@ public class StateManagerFactoryTestSupport {
 	// Data
 	// =======================================================================
 
-	private static final Map<String, IStateTraceManager> instanceBook = new HashMap<String, IStateTraceManager>();
-
+	private static final Map<String, StateManager> instanceBook = new HashMap<String, StateManager>();
+	
 	// ========================================================================
 	// Methods
 	// =======================================================================
@@ -41,9 +39,7 @@ public class StateManagerFactoryTestSupport {
 	 * 
 	 * @return
 	 */
-	public static IStateTraceManager getManager(ITmfTrace trace) {
-		String traceUniqueId = trace.getName();
-
+	public static StateManager getManager(String traceUniqueId) {
 		if (traceUniqueId == null) {
 			return null;
 		}
@@ -52,19 +48,9 @@ public class StateManagerFactoryTestSupport {
 			return instanceBook.get(traceUniqueId);
 		}
 
-		// LttngTraceState traceModel =
-		// StateModelFactory.getStateEntryInstance();
-		IStateTraceManager manager = null;
-
-		// catch construction problems
-		Long id = 0L;
-		LTTngTreeNode parent = null;
-
-		try {
-			manager = new StateTraceManager(id, parent, traceUniqueId, trace);
-		} catch (LttngStateException e) {
-			e.printStackTrace();
-		}
+		LttngTraceState traceModel = StateModelFactory.getStateEntryInstance();
+		StateStacksHandlerTestSupport stateInputHandler = new StateStacksHandlerTestSupport(traceModel);
+		StateManager manager = new StateManager(stateInputHandler);
 
 		instanceBook.put(traceUniqueId, manager);
 		return manager;

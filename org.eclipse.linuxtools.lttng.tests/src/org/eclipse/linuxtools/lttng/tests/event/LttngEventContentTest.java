@@ -5,18 +5,12 @@ import java.net.URL;
 import java.util.HashMap;
 
 import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.linuxtools.lttng.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.event.LttngEventContent;
-import org.eclipse.linuxtools.lttng.event.LttngEventField;
-import org.eclipse.linuxtools.lttng.event.LttngEventType;
-import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
+import org.eclipse.linuxtools.lttng.event.*;
 import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfContext;
-import org.eclipse.linuxtools.tmf.trace.TmfLocation;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /*
  Functions tested here :
@@ -44,7 +38,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfLocation;
 
 public class LttngEventContentTest extends TestCase {
     private final static String tracepath1="traceset/trace-15316events_nolost_newformat.txt";
-//    private final static boolean skipIndexing=true;
+    private final static boolean skipIndexing=true;
     
     private final static String firstEventContentFirstField 	= "alignment:0";
     private final static String firstEventContentFirstFieldName = "alignment";
@@ -86,7 +80,7 @@ public class LttngEventContentTest extends TestCase {
 		try {
 			testStream = null;
 		    LTTngTextTrace tmpStream = initializeEventStream();
-			tmpEventContent = (LttngEventContent)tmpStream.getNextEvent( new TmfContext(new TmfLocation<Long>(0L), 0) ).getContent();
+			tmpEventContent = (LttngEventContent)tmpStream.getNextEvent( new TmfTraceContext(0L, new LttngTimestamp(0L), 0) ).getContent();
 		}
 		catch (Exception e) {
 			fail("ERROR : Failed to get content!");
@@ -144,11 +138,11 @@ public class LttngEventContentTest extends TestCase {
 		LttngEventContent testContent = null;
     	LTTngTextTrace tmpStream = null;
     	LttngEvent tmpEvent = null;
-    	TmfContext tmpContext = null;
+    	TmfTraceContext tmpContext = null;
     	
     	// Require an event
     	tmpStream = initializeEventStream();
-    	tmpContext = new TmfContext(new TmfLocation<Long>(0L), 0);
+    	tmpContext = new TmfTraceContext(0L, new LttngTimestamp(0L), 0);
     	tmpEvent = (LttngEvent)tmpStream.getNextEvent(tmpContext);
 		testContent = prepareToTest();
     	// getFieldS()
@@ -174,7 +168,7 @@ public class LttngEventContentTest extends TestCase {
     	
     	//*** To test getFields with a fields number >0, we need to move to an event that have some more
     	tmpStream = initializeEventStream();
-    	tmpContext = new TmfContext(new TmfLocation<Long>(0L), 0);
+    	tmpContext = new TmfTraceContext(0L, new LttngTimestamp(0L), 0);
     	// Skip first events and seek to event pass metadata
     	tmpContext= tmpStream.seekEvent(new LttngTimestamp(timestampAfterMetadata) );
     	// Skip first one 
@@ -207,11 +201,11 @@ public class LttngEventContentTest extends TestCase {
     	// It's pointless to test with a getter...
     	LTTngTextTrace tmpStream = null;
     	LttngEvent tmpEvent = null;
-    	TmfContext tmpContext = null;
+    	TmfTraceContext tmpContext = null;
     	
     	// Require an event
     	tmpStream = initializeEventStream();
-    	tmpContext = new TmfContext(new TmfLocation<Long>(0L), 0);
+    	tmpContext = new TmfTraceContext(0L, new LttngTimestamp(0L), 0);
     	tmpEvent = (LttngEvent)tmpStream.getNextEvent(tmpContext);
 		
     	LttngEventContent tmpContent = prepareToTest();
@@ -236,11 +230,11 @@ public class LttngEventContentTest extends TestCase {
 		LttngEventContent testContent = null;
     	LTTngTextTrace tmpStream = null;
     	LttngEvent tmpEvent = null;
-    	TmfContext tmpContext = null;
+    	TmfTraceContext tmpContext = null;
     	
     	// Require an event
     	tmpStream = initializeEventStream();
-    	tmpContext = new TmfContext(new TmfLocation<Long>(0L), 0);
+    	tmpContext = new TmfTraceContext(0L, new LttngTimestamp(0L), 0);
     	tmpEvent = (LttngEvent)tmpStream.getNextEvent(tmpContext);
     	// Get the content
     	testContent = tmpEvent.getContent();
