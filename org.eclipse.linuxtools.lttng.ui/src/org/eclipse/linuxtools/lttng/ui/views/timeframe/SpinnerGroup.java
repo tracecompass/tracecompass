@@ -66,7 +66,6 @@ public class SpinnerGroup {
     private int currentSeconds;
     private int currentNanosec;
     
-	@SuppressWarnings("unused")
 	private TimeFrameView fOwner;
 
     /**
@@ -138,7 +137,7 @@ public class SpinnerGroup {
         long newCurrentTime = ((long) currentSeconds) * NS_PER_SECOND + currentNanosec;
         TmfTimestamp ts = new TmfTimestamp(newCurrentTime, NS_SCALING_FACTOR, 0);
         currentTime = ts;
-//        fOwner.synchTimeFrameWidgets(this);
+        fOwner.synchTimeFrameWidgets(this);
     }
 
     // ====================================================================
@@ -158,7 +157,7 @@ public class SpinnerGroup {
     }
 
     public TmfTimestamp getSpan() {
-        TmfTimestamp span = new TmfTimestamp(startTime.getAdjustment(endTime, NS_SCALING_FACTOR), NS_SCALING_FACTOR, 0);
+        TmfTimestamp span = new TmfTimestamp(startTime.getAdjustment(endTime), NS_SCALING_FACTOR, 0);
         return span;
     }
 
@@ -217,7 +216,7 @@ public class SpinnerGroup {
     	if (range != null) {
         	// Extract the time range
             TmfTimestamp start = range.getStartTime();
-            TmfTimestamp end   = range.getEndTime();
+            TmfTimestamp end = range.getEndTime();
 
             // Assume start time is OK
             setStartTime(start);
@@ -305,10 +304,8 @@ public class SpinnerGroup {
 
 		            // Refresh the spinners (value, range, increments, ...)
 					// To ensure that the spinners are properly set, the range has to be > 0 
-//					seconds.setValues(currentSeconds, startSeconds - 1, endSeconds + 1, 0, 1, 10);
-//					nanosec.setValues(currentNanosec, startns - 1, endns + 1, 0, 1, 1000000);
-					seconds.setValues(currentSeconds, startSeconds, endSeconds, 0, 1, 10);
-					nanosec.setValues(currentNanosec, startns, endns, 0, 100000, 10000000);
+					seconds.setValues(currentSeconds, startSeconds - 1, endSeconds + 1, 0, 1, 10);
+					nanosec.setValues(currentNanosec, startns - 1, endns + 1, 0, 1, 1000000);
 
 		            // If start == end (i.e. no range), disable the spinner
 		            // (if start == end, the spinner widget range is set to [0..100] by default)

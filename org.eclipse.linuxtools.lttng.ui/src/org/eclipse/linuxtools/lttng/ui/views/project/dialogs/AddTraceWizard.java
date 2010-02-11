@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -20,9 +20,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentNode;
-import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectNode;
-import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngTraceNode;
+import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentEntry;
+import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProject;
+import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngTraceEntry;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 
@@ -33,22 +33,25 @@ import org.eclipse.ui.IWorkbench;
  */
 public class AddTraceWizard extends Wizard implements IImportWizard {
 
-    private LTTngProjectNode fProject;
-    private LTTngExperimentNode fExperiment;
+    @SuppressWarnings("unused")
+	private IWorkbench fWorkbench;
+    private LTTngProject fProject;
+    private IStructuredSelection fSelection;
     private AddTraceWizardPage fMainPage;
 
     /**
      * @param project
      */
-    public AddTraceWizard(LTTngProjectNode project, LTTngExperimentNode experiment) {
+    public AddTraceWizard(LTTngProject project) {
     	fProject = project;
-    	fExperiment = experiment;
     }
 
     /* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
 	 */
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
+    	fWorkbench = workbench;
+    	fSelection = selection;
     	setWindowTitle("Adding traces to experiment");
 	}
 
@@ -60,6 +63,7 @@ public class AddTraceWizard extends Wizard implements IImportWizard {
         super.addPages();
         fMainPage = new AddTraceWizardPage(fProject, "Some string");
         addPage(fMainPage);
+        fMainPage.init(fSelection);
     }
 
 	/* (non-Javadoc)
@@ -68,27 +72,37 @@ public class AddTraceWizard extends Wizard implements IImportWizard {
 	@Override
 	public boolean performFinish() {
 
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IFolder experimentFolder = fExperiment.getFolder();
+		Object selection = fSelection.getFirstElement();
+		if (!(selection instanceof LTTngExperimentEntry)) {
+			return true;
+		}
 
-		LTTngTraceNode[] traces = fMainPage.getSelection();
-		for (LTTngTraceNode trace : traces) {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+
+		LTTngExperimentEntry experiment = (LTTngExperimentEntry) selection;
+		IFolder experimentFolder = experiment.getFolder();
+
+		LTTngTraceEntry[] traces = fMainPage.getSelection();
+		for (LTTngTraceEntry trace : traces) {
 			try {
 				IFolder folder = experimentFolder.getFolder(trace.getName());
-				IPath location = trace.getFolder().getLocation();
+				IPath location = trace.getResource().getLocation();
 				if (workspace.validateLinkLocation(folder, location).isOK()) {
 					folder.createLink(location, IResource.REPLACE, null);
-					fExperiment.addTrace(folder);
+					experiment.addTrace(trace);
 				}
 				else {
 					System.out.println("Problem");
 				}
 			} catch (CoreException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 
 		return true;
-	}	
+	}
+	
+	
 
 }

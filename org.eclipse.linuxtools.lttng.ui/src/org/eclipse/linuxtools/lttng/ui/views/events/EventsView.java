@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -30,9 +30,9 @@ public class EventsView extends TmfEventsView {
 
     public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.events";
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
     // Table data
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
     // Table column names
     private final String TIMESTAMP_COLUMN = "Timestamp";
@@ -62,19 +62,18 @@ public class EventsView extends TmfEventsView {
     };
 
     private ColumnData[] columnData = new ColumnData[] {
-        new ColumnData(columnProperties[0], 125, SWT.LEFT),
+        new ColumnData(columnProperties[0], 100, SWT.LEFT),
         new ColumnData(columnProperties[1], 100, SWT.LEFT),
-        new ColumnData(columnProperties[2], 200, SWT.LEFT),
-        new ColumnData(columnProperties[3], 200, SWT.LEFT),
+        new ColumnData(columnProperties[2], 100, SWT.LEFT),
+        new ColumnData(columnProperties[3], 100, SWT.LEFT),
         new ColumnData(columnProperties[4], 100, SWT.LEFT)
     };
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
     // Constructor
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
     public EventsView() {
-    	super(1);
     }
 
 	/**
@@ -83,7 +82,7 @@ public class EventsView extends TmfEventsView {
 	 * FIXME: Add support for column selection
 	 */
 	@Override
-	protected void createColumnHeaders(Table table) {
+	protected void setColumnHeaders(Table table) {
         for (int i = 0; i < columnData.length; i++) {
             final TableColumn column = new TableColumn(table, columnData[i].alignment, i);
             column.setText(columnData[i].header);

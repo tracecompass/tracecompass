@@ -26,7 +26,7 @@ class StatsModeEndHandler extends AbstractStatsEventHandler {
 	 * @see org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing#process(org.eclipse.linuxtools.lttng.event.LttngEvent, org.eclipse.linuxtools.lttng.state.model.LttngTraceState)
 	 */
 	public boolean process(LttngEvent event, LttngTraceState traceState) {
-		StatisticsTreeNode root = getStatisticsTree(traceState);
+		StatisticsTreeNode root = getStatisticsTree(event);
 		
 		String[][] paths = getRelevantPaths(event, traceState);
 		

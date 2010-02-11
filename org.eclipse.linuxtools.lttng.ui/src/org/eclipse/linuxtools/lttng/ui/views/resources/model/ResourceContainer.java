@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.eclipse.linuxtools.lttng.TraceDebug;
-import org.eclipse.linuxtools.lttng.ui.model.trange.ItemContainer;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource.ResourceTypes;
 
@@ -25,7 +24,7 @@ import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource.Resou
  * @author alvaro
  * 
  */
-public class ResourceContainer implements ItemContainer<TimeRangeEventResource> {
+public class ResourceContainer {
 	// ========================================================================
 	// Data
 	// ========================================================================
@@ -41,63 +40,73 @@ public class ResourceContainer implements ItemContainer<TimeRangeEventResource> 
 	 */
 	public ResourceContainer() { }
 	
-
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Interface to add resources.
 	 * 
-	 * @see
-	 * org.eclipse.linuxtools.lttng.ui.views.resources.model.ItemContainer#addItem
-	 * (org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.
-	 * ITmfTimeAnalysisEntry)
+	 * @param process
 	 */
-	public void addItem(TimeRangeEventResource newItem) {
-		if (newItem != null) {
-		    resources.put( new ResourceKey(newItem),newItem);
+	public void addResource(TimeRangeEventResource newResource) {
+		if (newResource != null) {
+		    resources.put( new ResourceKey(newResource),newResource);
 		}
 	}
 	
 	// ========================================================================
 	// Methods
 	// ========================================================================
-	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.lttng.ui.views.resources.model.ItemContainer#getUniqueId()
-	 */
+	/**
+     * Request a unique ID
+     * 
+     * @return Integer
+     */
     public Integer getUniqueId() {
         return uniqueId++;
     }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.lttng.ui.views.resources.model.ItemContainer#readItems()
+	/**
+	 * This method is intended for read only purposes in order to keep the
+	 * internal data structure in Synch
+	 * 
+	 * @return
 	 */
-	public TimeRangeEventResource[] readItems() {
+	public TimeRangeEventResource[] readResources() {
 		return resources.values().toArray(
 				new TimeRangeEventResource[resources.size()]);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.lttng.ui.views.resources.model.ItemContainer#clearChildren()
+	/**
+	 * Clear the children information for resources related to a specific trace
+	 * e.g. just before refreshing data with a new time range
+	 * 
+	 * @param traceId
 	 */
-	public void clearChildren() {
+	public void clearChildren(String traceId) {
 	    TimeRangeEventResource newRes = null;
         Iterator<ResourceKey> iterator = resources.keySet().iterator();
         
         while (iterator.hasNext()) {
-			newRes = resources.get(iterator.next());
-			newRes.reset();
+            newRes = resources.get(iterator.next());
+            
+            if (newRes.getTraceId().equals(traceId)) {
+				newRes.reset();
+            }
         }
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.lttng.ui.views.resources.model.ItemContainer#clearItems()
+	/**
+	 * Clear all resources items e.g. when a new experiment is selected
 	 */
-	public void clearItems() {
+	public void clearResources() {
 		resources.clear();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.lttng.ui.views.resources.model.ItemContainer#removeItems(java.lang.String)
+	/**
+	 * Remove the resources related to a specific trace e.g. during trace
+	 * removal
+	 * 
+	 * @param traceId
 	 */
-	public void removeItems(String traceId) {
+	public void removeResources(String traceId) {
 	    ResourceKey newKey = null;
 
 	    Iterator<ResourceKey> iterator = resources.keySet().iterator();
@@ -112,22 +121,18 @@ public class ResourceContainer implements ItemContainer<TimeRangeEventResource> 
 	
 	
 	/**
-	 * Search by keys (resourceId, traceId and type)
-	 * <p>
+	 * Search by keys (resourceId, traceId and type)<p>
 	 * 
-	 * A match is returned if the three arguments received match an entry
-	 * Otherwise null is returned
-	 * 
-	 * @param searchedId
-	 *            The ressourceId we are looking for
-	 * @param searchedType
-	 *            The ressourceType we are looking for
-	 * @param searchedTraceId
-	 *            The traceId (trace name?) we are looking for
-	 * 
-	 * @return TimeRangeEventResource
-	 */
-    public TimeRangeEventResource findItem(Long searchedId, ResourceTypes searchedType, String searchedTraceId) {
+     * A match is returned if the three arguments received match an entry
+     *  Otherwise null is returned
+     *  
+     * @param searchedId        The ressourceId we are looking for
+     * @param searchedType      The ressourceType we are looking for
+     * @param searchedTraceId   The traceId (trace name?) we are looking for
+     * 
+     * @return TimeRangeEventResource
+     */
+    public TimeRangeEventResource findResource(Long searchedId, ResourceTypes searchedType, String searchedTraceId) {
 		// Get the EventResource associated to a key we create here
         TimeRangeEventResource foundResource = resources.get( new ResourceKey(searchedId, searchedTraceId, searchedType) );
         

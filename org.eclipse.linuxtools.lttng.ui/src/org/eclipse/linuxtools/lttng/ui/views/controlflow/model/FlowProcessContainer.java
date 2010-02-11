@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.eclipse.linuxtools.lttng.TraceDebug;
-import org.eclipse.linuxtools.lttng.ui.model.trange.ItemContainer;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventProcess;
 
 /**
@@ -24,7 +23,7 @@ import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventProcess;
  * @author alvaro
  * 
  */
-public class FlowProcessContainer implements ItemContainer<TimeRangeEventProcess> {
+public class FlowProcessContainer {
 	// ========================================================================
 	// Data
 	// ========================================================================
@@ -52,9 +51,9 @@ public class FlowProcessContainer implements ItemContainer<TimeRangeEventProcess
 	 * 
 	 * @param newProcess   The process to add
 	 */
-	public void addItem(TimeRangeEventProcess newItem) {
-		if (newItem != null) {
-			allProcesses.put(new ProcessKey(newItem), newItem);
+	public void addProcess(TimeRangeEventProcess newProcess) {
+		if (newProcess != null) {
+			allProcesses.put(new ProcessKey(newProcess), newProcess);
 		}
 	}
 	
@@ -73,30 +72,37 @@ public class FlowProcessContainer implements ItemContainer<TimeRangeEventProcess
      * 
      * @return TimeRangeEventProcess[]
      */
-	public TimeRangeEventProcess[] readItems() {
+	public TimeRangeEventProcess[] readProcesses() {
 		
 	    // This allow us to return an Array of the correct type of the exact correct dimension, without looping
 		return allProcesses.values().toArray(new TimeRangeEventProcess[allProcesses.size()]);
 	}
 	
 	/**
-	 * Clear the children information for processes e.g. just before refreshing
-	 * data with a new time range
-	 */
-	public void clearChildren() {
+     * Clear the children information for processes related to a specific trace
+     * e.g. just before refreshing data with a new time range
+     * 
+     * @param traceId   The trace unique id (trace name?) on which we need to eliminate children.
+     */
+	public void clearChildren(String traceId) {
 	    TimeRangeEventProcess process = null;
         Iterator<ProcessKey> iterator = allProcesses.keySet().iterator();
         
         while (iterator.hasNext()) {
             process = allProcesses.get(iterator.next());
-			process.reset();
+            
+            if (process.getTraceID().equals(traceId)) {
+                // Reset clear childEventComposites() and traceEvents()
+                // Also restore the nextGoodTime to the insertionTime for the drawing
+                process.reset();
+            }
         }
 	}
 	
 	/**
      * Clear all process items
      */
-    public void clearItems() {
+    public void clearProcesses() {
         allProcesses.clear();
     }
 	
@@ -106,7 +112,7 @@ public class FlowProcessContainer implements ItemContainer<TimeRangeEventProcess
      * 
      * @param traceId   The trace unique id (trace name?) on which we want to remove process
      */
-	public void removeItems(String traceId) {
+	public void removeProcesses(String traceId) {
 	    ProcessKey iterKey = null;
 
         Iterator<ProcessKey> iterator = allProcesses.keySet().iterator();

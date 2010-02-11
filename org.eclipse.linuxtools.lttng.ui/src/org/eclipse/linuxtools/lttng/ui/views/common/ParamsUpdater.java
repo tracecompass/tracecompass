@@ -33,10 +33,9 @@ public class ParamsUpdater {
 	private long startTime = 0;
 	private long endTime = Long.MAX_VALUE;
 	private Long selectedTime = null;
-	private final int DEFAULT_WIDTH = 2000; // number of estimated pixels
-													// that
+	private final int defaultWidth = 2000; // number of estimated pixels that
 	// can hold the time range space
-	private int width = DEFAULT_WIDTH; // width in pixels used to represent the
+	private int width = defaultWidth; // width in pixels used to represent the
 	// time interval
 	private double pixelsPerNs = 0;
 	private int eventsDiscarded = 0;
@@ -61,14 +60,7 @@ public class ParamsUpdater {
 			int dwidth = event.getWidth();
 
 			updated = update(time0, time1, dwidth);
-
-			// initialization only, otherwise wait for the actual selection
-			// event to update its value. Note that the time must be different
-			// upon selection of a new time in order to trigger an update to all
-			if (selectedTime == null) {
-				setSelectedTime(event.getSelectedTime());
-			}
-
+			setSelectedTime(event.getSelectedTime());
 		}
 
 		return updated;
@@ -80,9 +72,11 @@ public class ParamsUpdater {
 	 * @param selTime
 	 */
 	public void setSelectedTime(long selTime) {
-		TraceDebug.debug("Selected time changed from: \n\t" + selectedTime
-				+ " to: \n\t" + selTime);
-		selectedTime = selTime;
+		if (selTime > startTime && selTime < endTime) {
+			selectedTime = selTime;
+		} else {
+			selectedTime = null;
+		}
 	}
 
 	/**
@@ -181,9 +175,9 @@ public class ParamsUpdater {
 	 */
 	public int getWidth() {
 		if (width == 0) {
-			TraceDebug
-					.debug("Unexpected width value of 0 pixels, returning default");
-			return DEFAULT_WIDTH;
+			return defaultWidth;
+		} else {
+			TraceDebug.debug("Unexpected width value of 0 pixels");
 		}
 
 		return width;

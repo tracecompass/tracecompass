@@ -102,8 +102,7 @@ public class TraceDebug {
 	}
 
 	private static String trace(StackTraceElement e[], int level) {
-		if (e != null) {
-			level = level >= e.length ? e.length - 1 : level;
+		if (e != null && e.length >= level) {
 			StackTraceElement s = e[level];
 			if (s != null) {
 				String simpleClassName = s.getClassName();
@@ -114,7 +113,6 @@ public class TraceDebug {
 						+ "." + s.getLineNumber() + "." + s.getMethodName();
 			}
 		}
-
 		return null;
 	}
 

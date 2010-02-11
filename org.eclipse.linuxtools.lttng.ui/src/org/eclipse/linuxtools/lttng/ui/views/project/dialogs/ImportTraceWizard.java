@@ -38,7 +38,7 @@ public class ImportTraceWizard extends Wizard implements IImportWizard {
     private IStructuredSelection fSelection;
     private ImportTraceWizardPage fMainPage;
 
-	/**
+    /**
      * 
      */
     public ImportTraceWizard() {
@@ -47,7 +47,6 @@ public class ImportTraceWizard extends Wizard implements IImportWizard {
         if (section == null) {
 			section = workbenchSettings.addNewSection("LTTngTraceImportWizard");
 		}
-        
         setDialogSettings(section);
     }
 
@@ -64,7 +63,7 @@ public class ImportTraceWizard extends Wizard implements IImportWizard {
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
      */
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
         fWorkbench = workbench;
         fSelection = selection;
@@ -73,45 +72,18 @@ public class ImportTraceWizard extends Wizard implements IImportWizard {
         if (!selectedResources.isEmpty()) {
             fSelection = new StructuredSelection(selectedResources);
         }
-        
+
         setWindowTitle(DataTransferMessages.DataTransfer_importTitle);
         setDefaultPageImageDescriptor(IDEWorkbenchPlugin.getIDEImageDescriptor("wizban/importdir_wiz.png"));
         setNeedsProgressMonitor(true);
     }
-	
-    public ImportTraceWizardPage getMainPage() {
-		return fMainPage;
-	}
-	
-	/**
-	 * performFinish is called after the "finish" button is pressed in the import wizard
-	 * If we return "false", the wizard will not close. 
-	 * 
-	 * We perform here version check on the imported LTTng trace
-	 * 
-	 */
+
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.wizard.Wizard#performFinish()
+     */
     @Override
 	public boolean performFinish() {
-    	
-    	if ( fMainPage.getDestination().equals( fMainPage.getInitialContainerString() ) ) {
-    		
-    		String errMessage[] = { "Error : import destination is wrong." }; 
-			errMessage = fMainPage.extendErrorMessage(errMessage, "");
-			errMessage = fMainPage.extendErrorMessage(errMessage, "You cannot import your trace directly into the \"" + fMainPage.getInitialContainerString() + "\"");
-			errMessage = fMainPage.extendErrorMessage(errMessage, "The trace has to be into a subdirectly, like \"" + fMainPage.getInitialContainerString() + "/MyTrace\"" );
-			errMessage = fMainPage.extendErrorMessage(errMessage, "");
-			errMessage = fMainPage.extendErrorMessage(errMessage, "Please change the destination folder.");
-			fMainPage.showVersionErrorPopup(errMessage);
-    		
-			return false;
-    	}
-    	
-    	return fMainPage.finish();
-    }
-    
-    @Override
-	public boolean canFinish() {
-    	return fMainPage.isSelectedElementsValidLttngTraces();
+        return fMainPage.finish();
     }
 
 }

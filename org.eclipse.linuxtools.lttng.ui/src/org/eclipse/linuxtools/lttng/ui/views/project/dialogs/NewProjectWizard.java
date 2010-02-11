@@ -26,12 +26,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
 import org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature;
-import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectNode;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 /**
  * <b><u>NewProjectWizard</u></b>
  * <p>
+ *
  * TODO: Implement me. Please.
  */
 public class NewProjectWizard extends BasicNewResourceWizard {
@@ -97,10 +97,6 @@ public class NewProjectWizard extends BasicNewResourceWizard {
         return true;
     }
 
-    public IProject getProject() {
-    	return fProject;
-    }
- 
     /**
      * @param projectName
      * @param projectLocation
@@ -128,11 +124,11 @@ public class NewProjectWizard extends BasicNewResourceWizard {
             description.setNatureIds(new String[] { LTTngProjectNature.ID } );
             project.setDescription(description, null);
 
-            IFolder folder = project.getFolder(LTTngProjectNode.TRACE_FOLDER_NAME);
+            IFolder folder = project.getFolder("Traces");
             if (!folder.exists())
                 folder.create(true, true, null);
 
-            folder = project.getFolder(LTTngProjectNode.EXPER_FOLDER_NAME);
+            folder = project.getFolder("Experiments");
             if (!folder.exists())
                 folder.create(true, true, null);
 

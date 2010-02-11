@@ -24,31 +24,25 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.linuxtools.lttng.request.ILttngSyntEventRequest;
-import org.eclipse.linuxtools.lttng.state.evProcessor.AbsEventToHandlerResolver;
-import org.eclipse.linuxtools.lttng.ui.TraceDebug;
-import org.eclipse.linuxtools.lttng.ui.model.trange.ItemContainer;
-import org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView;
-import org.eclipse.linuxtools.lttng.ui.views.common.ParamsUpdater;
+import org.eclipse.linuxtools.lttng.state.IStateDataRequestListener;
+import org.eclipse.linuxtools.lttng.state.RequestCompletedSignal;
+import org.eclipse.linuxtools.lttng.state.RequestStartedSignal;
+import org.eclipse.linuxtools.lttng.state.evProcessor.EventProcessorProxy;
+import org.eclipse.linuxtools.lttng.state.experiment.StateExperimentManager;
+import org.eclipse.linuxtools.lttng.state.experiment.StateManagerFactory;
+import org.eclipse.linuxtools.lttng.ui.views.statistics.evProcessor.StatsEventCountHandlerFactory;
 import org.eclipse.linuxtools.lttng.ui.views.statistics.evProcessor.StatsTimeCountHandlerFactory;
+import org.eclipse.linuxtools.lttng.ui.views.statistics.model.StatisticsTreeFactory;
 import org.eclipse.linuxtools.lttng.ui.views.statistics.model.StatisticsTreeNode;
-import org.eclipse.linuxtools.lttng.ui.views.statistics.model.StatisticsTreeRootFactory;
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
-import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
-import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
+import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.ISharedImages;
@@ -64,8 +58,11 @@ import org.eclipse.ui.PlatformUI;
  * TreeViewer. - The controller that keeps model and view synchronised is an
  * observer of the model.
  */
-public class StatisticsView extends AbsTimeUpdateView {
+public class StatisticsView extends TmfView implements
+		IStateDataRequestListener {
+
 	public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.statistics";
+
 	private TreeViewer treeViewer;
 
 	// Table column names
@@ -92,7 +89,6 @@ public class StatisticsView extends AbsTimeUpdateView {
 			.asList(new String[] { "Event Types" }));
 
 	private DecimalFormat decimalFormat = new DecimalFormat("0.#########");
-	private Cursor fwaitCursor = null;
 
 	// Used to draw bar charts in columns.
 	private interface ColumnPercentageProvider {
@@ -325,14 +321,6 @@ public class StatisticsView extends AbsTimeUpdateView {
 		}
 	}
 
-	public StatisticsView(String viewName) {
-		super(viewName);
-	}
-
-	public StatisticsView() {
-		this("StatisticsView");
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -342,6 +330,11 @@ public class StatisticsView extends AbsTimeUpdateView {
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
+		EventProcessorProxy.getInstance().addEventProcessorFactory(
+				StatsTimeCountHandlerFactory.getInstance());
+		EventProcessorProxy.getInstance().addEventProcessorFactory(
+				StatsEventCountHandlerFactory.getInstance());
+
 		parent.setLayout(new FillLayout());
 
 		treeViewer = new TreeViewer(parent, SWT.BORDER | SWT.H_SCROLL
@@ -444,24 +437,23 @@ public class StatisticsView extends AbsTimeUpdateView {
 		treeViewer.getTree().setSortColumn(treeViewer.getTree().getColumn(0));
 		treeViewer.getTree().setSortDirection(SWT.DOWN);
 
-		// Read current data if any available
-		TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
-		if (experiment != null) {
-			requestData(experiment);
-		} else {
-			TraceDebug.debug("No selected experiment information available");
-		}
-	}
+		treeViewer.setInput(StatisticsTreeFactory
+				.getStatisticsTree("Experiment"));
 
+		// Read current data if any available
+		StateExperimentManager experimentManger = StateManagerFactory
+				.getExperimentManager();
+		experimentManger.readExperiment("statisticsView", this);
+
+	}
 	@Override
 	public void dispose() {
 		super.dispose();
-		if (fwaitCursor != null) {
-			fwaitCursor.dispose();
-		}
+		EventProcessorProxy.getInstance().removeEventProcessorFactory(
+				StatsTimeCountHandlerFactory.getInstance());
+		EventProcessorProxy.getInstance().removeEventProcessorFactory(
+				StatsEventCountHandlerFactory.getInstance());
 
-		// clean the model
-		StatisticsTreeRootFactory.removeAll();
 	}
 
 	/*
@@ -474,184 +466,19 @@ public class StatisticsView extends AbsTimeUpdateView {
 		treeViewer.getTree().setFocus();
 	}
 
+	@TmfSignalHandler
+	public void processingStarted(RequestStartedSignal request) {
+		// Nothing to do for the time being
 
-	/**
-	 * @return
-	 */
-	@Override
-	public AbsEventToHandlerResolver getEventProcessor() {
-		return StatsTimeCountHandlerFactory.getInstance();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#waitCursor
-	 * (boolean)
-	 */
-	@Override
-	protected void waitCursor(final boolean waitInd) {
-		if (treeViewer == null) {
-			return;
-		}
-
-		Display display = treeViewer.getControl().getDisplay();
-		if (fwaitCursor == null) {
-			fwaitCursor = new Cursor(display, SWT.CURSOR_WAIT);
-		}
-
-		// Perform the updates on the UI thread
-		display.asyncExec(new Runnable() {
-			public void run() {
-				Cursor cursor = null; /* indicates default */
-				if (waitInd) {
-					cursor = fwaitCursor;
-				}
-				treeViewer.getControl().setCursor(cursor);
-			}
-		});
-	}
-
-	@Override
-	public void ModelUpdatePrep(TmfTimeRange timeRange, boolean clearAllData) {
-		Object input = treeViewer.getInput();
-		if (input != null && input instanceof StatisticsTreeNode) {
-			((StatisticsTreeNode) input).reset();
-			treeViewer.getTree().getDisplay().asyncExec(new Runnable() {
-				// @Override
-				public void run() {
-					treeViewer.refresh();
-				}
-			});
-		}
-	}
-
-	@Override
-	public void modelInputChanged(ILttngSyntEventRequest request, boolean complete) {
+	@TmfSignalHandler
+	public void processingCompleted(RequestCompletedSignal signal) {
 		treeViewer.getTree().getDisplay().asyncExec(new Runnable() {
 			// @Override
 			public void run() {
 				treeViewer.refresh();
 			}
 		});
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
-	 * modelIncomplete
-	 * (org.eclipse.linuxtools.lttng.request.ILttngSyntEventRequest)
-	 */
-	@Override
-	public void modelIncomplete(ILttngSyntEventRequest request) {
-		Object input = treeViewer.getInput();
-		if (input != null && input instanceof StatisticsTreeNode) {
-			// The data from this experiment is invalid and shall be removed to
-			// refresh upon next selection
-			String name = ((StatisticsTreeNode) input).getKey();
-			StatisticsTreeRootFactory.removeStatTreeRoot(name);
-		}
-	}
-
-	/**
-	 * @param signal
-	 */
-	@TmfSignalHandler
-	public void experimentSelected(TmfExperimentSelectedSignal<? extends TmfEvent> signal) {
-		if (signal != null) {
-			TmfExperiment<?> experiment = signal.getExperiment();
-			String experimentName =  experiment.getName();
-
-			if (StatisticsTreeRootFactory.containsTreeRoot(experimentName)) {
-				// The experiment root is already present
-				StatisticsTreeNode experimentTreeNode = StatisticsTreeRootFactory.getStatTreeRoot(experimentName);
-
-				ITmfTrace[] traces = experiment.getTraces();
-
-				// check if there is partial data loaded in the experiment
-				int numTraces = experiment.getTraces().length;
-				int numNodeTraces = experimentTreeNode.getNbChildren();
-
-				if (numTraces == numNodeTraces) {
-					boolean same = true;
-					// Detect if the experiment contains the same traces as when
-					// previously selected
-					for (int i = 0; i < numTraces; i++) {
-						String traceName = traces[i].getName();
-						if (!experimentTreeNode.containsChild(traceName)) {
-							same = false;
-							break;
-						}
-					}
-
-					if (same) {
-						// no need to reload data, all traces are already loaded
-						treeViewer.setInput(experimentTreeNode);
-						return;
-					}
-				}
-			}
-
-			// if the data is not available or has changed, reload it
-			requestData(experiment);
-		}
-	}
-
-	/**
-	 * @param experiment
-	 */
-	private void requestData(TmfExperiment<?> experiment) {
-		if (experiment != null) {
-			StatisticsTreeNode treeModelRoot = StatisticsTreeRootFactory.getStatTreeRoot(experiment.getName());
-
-			// if the model has contents, clear to start over
-			if (treeModelRoot.hasChildren()) {
-				treeModelRoot.reset();
-			}
-
-			// set input to a clean data model
-			treeViewer.setInput(treeModelRoot);
-			TmfTimeRange experimentTRange = experiment.getTimeRange();
-
-			// send the initial request, to start filling up model
-			dataRequest(experimentTRange, experimentTRange, true);
-		} else {
-			TraceDebug.debug("No selected experiment information available");
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#displayModel
-	 * (org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.
-	 * ITmfTimeAnalysisEntry[], long, long, boolean, long, long,
-	 * java.lang.Object)
-	 */
-	@Override
-	protected void displayModel(ITmfTimeAnalysisEntry[] items, long startBoundTime, long endBoundTime,
-			boolean updateTimeBounds, long startVisibleWindow, long endVisibleWindow, Object source) {
-		// No applicable to statistics view
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
-	 * getParamsUpdater()
-	 */
-	@Override
-	protected ParamsUpdater getParamsUpdater() {
-		// Not applicable to statistics view
-		return null;
-	}
-
-	@Override
-	protected ItemContainer<?> getItemContainer() {
-		// Not applicable to statistics view
-		return null;
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 2010 Ericsson
+ * Copyright (c) 2009 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,15 +12,13 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.timeframe;
 
-import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
-import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
-import org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal;
-import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
+import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
+import org.eclipse.linuxtools.tmf.trace.TmfExperimentSelectedSignal;
+import org.eclipse.linuxtools.tmf.trace.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -73,9 +71,9 @@ public class TimeFrameView extends TmfView {
     private byte fScale = 0;
 
     // Labels
-    private static final String START_TIME_LABEL   = "Window Start Time";
-    private static final String END_TIME_LABEL     = "Window End Time";
-    private static final String TIME_RANGE_LABEL   = "Window Range";
+    private static final String START_TIME_LABEL   = "Start Time";
+    private static final String END_TIME_LABEL     = "End Time";
+    private static final String TIME_RANGE_LABEL   = "Interval";
     private static final String CURRENT_TIME_LABEL = "Current Time";
 
     private static final int SLIDER_RANGE = 10000;
@@ -89,17 +87,13 @@ public class TimeFrameView extends TmfView {
     private Slider fSlider;
 
     // The current experiment
-    TmfExperiment<LttngEvent> fExperiment = null;
-	// notify external listeners may not be needed if the update originated
-	// externally
-	private boolean fupdateExternalListeners = true;
-
+    TmfExperiment fExperiment = null;
 
     /**
      * Constructor
      */
     public TimeFrameView() {
-    	super("TimeFrameView");
+    	super();
     }
 
     /* (non-Javadoc)
@@ -137,7 +131,6 @@ public class TimeFrameView extends TmfView {
      * One of the spinners has been updated. Synchronize the other widgets.
      */
     public void synchTimeFrameWidgets(SpinnerGroup trigger) {
-		boolean trangeUpdated = false;
 
         // Collect the data
         TmfTimestamp startTime   = fStartGroup.getCurrentTime();
@@ -149,7 +142,6 @@ public class TimeFrameView extends TmfView {
         if (trigger == fStartGroup) {
             if (startTime.compareTo(endTime, false) > 0) {
                 endTime = startTime;
-				trangeUpdated = true;
             }
         }
 
@@ -157,7 +149,6 @@ public class TimeFrameView extends TmfView {
         if (trigger == fEndGroup) {
             if (endTime.compareTo(startTime, false) < 0) {
                 startTime = endTime;
-				trangeUpdated = true;
             }
         }
 
@@ -170,13 +161,11 @@ public class TimeFrameView extends TmfView {
                 ts = fTraceEndTime.synchronize(fTraceEndTime.getValue(), startTime.getScale());
             }
             endTime = ts;
-			trangeUpdated = true;
         }
 
         // Compute the new time range
         TmfTimeRange subrange = new TmfTimeRange(startTime, endTime);
-        byte scale = startTime.getScale();
-        TmfTimestamp interval = new TmfTimestamp(startTime.getAdjustment(endTime, scale), scale, 0);
+        TmfTimestamp interval = new TmfTimestamp(startTime.getAdjustment(endTime), startTime.getScale(), 0);
 
         // Update the spinner groups
         fStartGroup.setContent(fTraceTimeRange, startTime);
@@ -185,18 +174,11 @@ public class TimeFrameView extends TmfView {
         fCurrentGroup.setContent(subrange, currentTime);
 
         updateSlider(subrange, currentTime);
-		// Notify other views, only if the update originated from this view
-		if (fupdateExternalListeners) {
-			if (!fCurrentTime.equals(currentTime)) {
-				fCurrentTime = currentTime;
-				broadcast(new TmfTimeSynchSignal(this, currentTime));
-			}
 
-			// Notify the views if the time range has been impacted
-			if (trangeUpdated) {
-				TmfTimeRange trange = new TmfTimeRange(startTime, endTime);
-				broadcast(new TmfRangeSynchSignal(this, trange, currentTime));
-			}
+        // Notify other views
+        if (!fCurrentTime.equals(currentTime)) {
+            fCurrentTime = currentTime;
+            broadcastSignal(new TmfTimeSynchSignal(this, currentTime));
         }
     }
 
@@ -240,9 +222,8 @@ public class TimeFrameView extends TmfView {
     private void updateSlider(TmfTimeRange range, TmfTimestamp timestamp) {
 
         // Determine the new relative position
-    	byte scale = range.getEndTime().getScale();
-        long total    = range.getStartTime().getAdjustment(range.getEndTime(), scale);
-        long relative = range.getStartTime().getAdjustment(timestamp, scale);
+        long total    = range.getStartTime().getAdjustment(range.getEndTime());
+        long relative = range.getStartTime().getAdjustment(timestamp);
 
         // Set the slider value
         final long position = (total > 0) ? (relative * SLIDER_RANGE / total) : 0;
@@ -270,15 +251,14 @@ public class TimeFrameView extends TmfView {
     // TMF Signal Handling
     // ========================================================================
 
-	/**
+    /**
      * @param signal
      */
-    @SuppressWarnings("unchecked")
     @TmfSignalHandler
-    public void experimentSelected(TmfExperimentSelectedSignal<LttngEvent> signal) {
+    public void experimentSelected(TmfExperimentSelectedSignal signal) {
 
         // Update the trace reference
-        fExperiment = (TmfExperiment<LttngEvent>) signal.getExperiment();
+        fExperiment = signal.getExperiment();
 
         // Update the time frame
         fTraceTimeRange = fExperiment.getTimeRange();
@@ -293,11 +273,9 @@ public class TimeFrameView extends TmfView {
 
         fCurrentTime = fTraceStartTime;
 
-        TmfTimestamp delta = new TmfTimestamp(fTraceStartTime.getAdjustment(fTraceEndTime, fScale), fScale, 0);
+        TmfTimestamp delta = new TmfTimestamp(fTraceStartTime.getAdjustment(fTraceEndTime), fScale, 0);
         fTraceSpan = new TmfTimeRange(new TmfTimestamp(0, fScale, 0), delta);
-//        fRangeGroup.setContent(fTraceSpan, delta);
-        TmfTimestamp start = new TmfTimestamp(1, (byte) -1, 0);
-        fRangeGroup.setContent(fTraceSpan, start);
+        fRangeGroup.setContent(fTraceSpan, delta);
     }
 
     /**
@@ -317,42 +295,10 @@ public class TimeFrameView extends TmfView {
         fEndGroup.setContent(fTraceTimeRange, fTraceEndTime);
         fCurrentGroup.setContent(fTraceTimeRange, fCurrentGroup.getCurrentTime());
 
-        TmfTimestamp delta = new TmfTimestamp(fTraceStartTime.getAdjustment(fTraceEndTime, fScale), fScale, 0);
+        TmfTimestamp delta = new TmfTimestamp(fTraceStartTime.getAdjustment(fTraceEndTime), fScale, 0);
         fTraceSpan = new TmfTimeRange(new TmfTimestamp(0, fScale, 0), delta);
         fRangeGroup.setContent(fTraceSpan, delta);
     }
-
-	/**
-	 * @param signal
-	 */
-	@TmfSignalHandler
-	public void currentTimeRangeUpdated(TmfRangeSynchSignal signal) {
-		if (signal.getSource() != this) {
-			// Update the time frame
-			TmfTimeRange selTimeRange = signal.getCurrentRange();
-			TmfTimestamp selStart = selTimeRange.getStartTime().synchronize(0,
-					fScale);
-			TmfTimestamp selEnd = selTimeRange.getEndTime().synchronize(0,
-					fScale);
-
-			fupdateExternalListeners = false;
-			// Update the widgets and prevent broadcast notifications to
-			// the views which have been notified already.
-			{
-				fStartGroup.setContent(fTraceTimeRange, selStart);
-				fEndGroup.setContent(fTraceTimeRange, selEnd);
-
-				TmfTimestamp delta = new TmfTimestamp(selStart.getAdjustment(
-						selEnd, fScale), fScale, 0);
-
-				fRangeGroup.setContent(fTraceSpan, delta);
-			}
-
-			// restore the external notification flag
-			fupdateExternalListeners = true;
-
-		}
-	}
 
     /**
      * @param signal
@@ -360,8 +306,6 @@ public class TimeFrameView extends TmfView {
     @TmfSignalHandler
     public void currentTimeUpdated(TmfTimeSynchSignal signal) {
     	if (signal.getSource() != this) {
-			// prevent loop to external notifications
-			fupdateExternalListeners = false;
             fCurrentTime = signal.getCurrentTime().synchronize(0, fStartGroup.getCurrentTime().getScale());
             if (fStartGroup.getCurrentTime().compareTo(fCurrentTime, false) > 0) {
             	fStartGroup.setContent(new TmfTimeRange(fCurrentTime, fEndGroup.getCurrentTime()), fCurrentTime);
@@ -371,9 +315,6 @@ public class TimeFrameView extends TmfView {
             }
             fCurrentGroup.setContent(null, fCurrentTime);
             updateSlider(fCurrentGroup.getTimeRange(), fCurrentTime);
-
-			// Enable external notifications
-			fupdateExternalListeners = true;
     	}
     }
 

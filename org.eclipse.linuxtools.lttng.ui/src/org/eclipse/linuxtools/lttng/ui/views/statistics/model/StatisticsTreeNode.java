@@ -35,20 +35,21 @@ public class StatisticsTreeNode {
 	private AbstractMap<String, StatisticsTreeNode> children;
 
 	/*
-	 * Construct a node with the given key
+	 * Construct a node with the given key and value.
 	 */
-	public StatisticsTreeNode(String key) {
-		this(null, key);
+	public StatisticsTreeNode(String key, Statistics value) {
+		this(null, key, value);
 	}
 
 	/*
 	 * Construct a node with the given parent, key and value.
 	 */
-	public StatisticsTreeNode(StatisticsTreeNode parent, String key) {
+	public StatisticsTreeNode(StatisticsTreeNode parent, String key,
+			Statistics value) {
 		super();
 		this.parent = parent;
 		this.key = key;
-		this.value = new Statistics();
+		this.value = value;
 		this.children = new HashMap<String, StatisticsTreeNode>();
 	}
 
@@ -78,8 +79,8 @@ public class StatisticsTreeNode {
 	 * 
 	 * @return children node that was created.
 	 */
-	public StatisticsTreeNode addChild(String key) {
-		StatisticsTreeNode created = new StatisticsTreeNode(this, key);
+	public StatisticsTreeNode addChild(String key, Statistics value) {
+		StatisticsTreeNode created = new StatisticsTreeNode(this, key, value);
 
 		this.children.put(key, created);
 
@@ -129,7 +130,8 @@ public class StatisticsTreeNode {
 		StatisticsTreeNode current = this;
 		for (String key : path) {
 			if (!current.children.containsKey(key)) {
-				current.children.put(key, new StatisticsTreeNode(current, key));
+				current.children.put(key, new StatisticsTreeNode(current, key,
+						new Statistics()));
 			}
 
 			// previous = current;
@@ -150,7 +152,8 @@ public class StatisticsTreeNode {
 		StatisticsTreeNode current = this;
 		for (String key : path.split("/")) {
 			if (!current.children.containsKey(key)) {
-				current.children.put(key, new StatisticsTreeNode(previous, key));
+				current.children.put(key, new StatisticsTreeNode(previous, key,
+						new Statistics()));
 			}
 
 			previous = current;
@@ -192,24 +195,5 @@ public class StatisticsTreeNode {
 	 */
 	public static String unescapeKey(String key) {
 		return key.replace("%2F", "/").replace("%25", "%");
-	}
-
-	/**
-	 * Start from creation time i.e. keep key and parent but new statistics and
-	 * no children
-	 */
-	public void reset() {
-		this.value = new Statistics();
-		this.children = new HashMap<String, StatisticsTreeNode>();
-	}
-
-	/**
-	 * 
-	 * @param key
-	 * @return true: if child with given key is present, false: if no child
-	 *         exists with given key name
-	 */
-	public boolean containsChild(String key) {
-		return children.containsKey(key);
 	}
 }

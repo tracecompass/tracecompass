@@ -11,11 +11,9 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.model.trange;
 
-
 import org.eclipse.linuxtools.lttng.state.StateStrings;
 import org.eclipse.linuxtools.lttng.state.model.LttngIRQState;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
-import org.eclipse.linuxtools.lttng.state.model.LttngTrapState;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource.ResourceTypes;
 
 /**
@@ -132,27 +130,17 @@ public class TimeRangeResourceFactory {
 			@Override
 			public String getStateMode(LttngTraceState traceSt) {
 				// Determine the trap state.
+				long trapState = traceSt.getTrap_states().get(getResourceId())
+						.getRunning().longValue();
 				String trapStateMode = "";
-				LttngTrapState ts = traceSt.getTrap_states().get(getResourceId());
-				
-				// *** Note : 
-				//	Ts might not have been created yet.
-				//	This is because the state system will be updated next to this before hook
-				//	It should be correct to create it here as Busy 
-				//		(traps are created with running++ so it wont be idle)
-				if ( ts != null ) {
-					Long trapState = ts.getRunning();
-					
-					if (trapState == 0) {
-						trapStateMode = StateStrings.TrapMode.LTTV_TRAP_IDLE.getInName();
-					} else {
-						trapStateMode = StateStrings.TrapMode.LTTV_TRAP_BUSY.getInName();
-					}
+				if (trapState == 0) {
+					trapStateMode = StateStrings.TrapMode.LTTV_TRAP_IDLE
+							.getInName();
+				} else {
+					trapStateMode = StateStrings.TrapMode.LTTV_TRAP_BUSY
+							.getInName();
 				}
-				else {
-					trapStateMode = StateStrings.TrapMode.LTTV_TRAP_BUSY.getInName();
-				}
-				
+
 				return trapStateMode;
 			}
 		};
