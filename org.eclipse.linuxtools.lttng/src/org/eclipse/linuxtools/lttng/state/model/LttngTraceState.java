@@ -22,7 +22,6 @@ import org.eclipse.linuxtools.lttng.state.StateStrings.ExecutionMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ExecutionSubMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.IRQMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessStatus;
-import org.eclipse.linuxtools.lttng.state.resource.ILttngStateContext;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 
 /**
@@ -66,7 +65,7 @@ public class LttngTraceState implements Cloneable {
 	private int nb_events = 0;
 
 	// reference to input data provider
-	ILttngStateContext fContext = null;
+	ILttngStateInputRef inputDataRef = null;
 	String traceId = "";
 
 	// ========================================================================
@@ -132,7 +131,7 @@ public class LttngTraceState implements Cloneable {
 			newState.irq_names = this.irq_names;
 
 			// This reference should never need to be updated, should it?
-			newState.fContext = this.fContext;
+			newState.inputDataRef = this.inputDataRef;
 
 			// *** We need loop on each ArrayList and HashMap, as java implement
 			// nothing that's remotely near deep copying.
@@ -206,19 +205,19 @@ public class LttngTraceState implements Cloneable {
 		return newState;
 	}
 
-	public void init(ILttngStateContext context)
+	public void init(ILttngStateInputRef inputReference)
 			throws LttngStateException {
-		if (context == null) {
+		if (inputReference == null) {
 			StringBuilder sb = new StringBuilder(
 					"The input provider reference must not be null");
 			throw new LttngStateException(sb.toString());
 		}
 
 		// Save the input data reference
-		fContext = context;
+		inputDataRef = inputReference;
 
 		// Save traceid
-		traceId = fContext.getTraceId();
+		traceId = inputDataRef.getTraceId();
 
 		// max time
 		max_time_state_recomputed_in_seek = 0L;
@@ -228,7 +227,7 @@ public class LttngTraceState implements Cloneable {
 		
 		// Obtain the total num of available CPUs and initialize the map
 		// to the corresponding size
-		int numCpus = fContext.getNumberOfCpus();
+		int numCpus = inputDataRef.getNumberOfCpus();
 		for (Long i = 0L; i < numCpus; i++) {
 			cpu_states.put(i, new LTTngCPUState());
 		}
@@ -257,7 +256,7 @@ public class LttngTraceState implements Cloneable {
 		processes.clear();
 
 		nb_events = 0;
-		TmfTimeRange timeWin = fContext.getTraceTimeWindow();
+		TmfTimeRange timeWin = inputDataRef.getTraceTimeWindow();
 
 		/* Put the per cpu running_process to beginning state : process 0. */
 		for (Long i = 0L; i < numCpus; i++) {
@@ -327,7 +326,7 @@ public class LttngTraceState implements Cloneable {
 	 * @return total number of CPUs registered as read from the Trace
 	 */
 	public int getNumberOfCPUs() {
-		return fContext.getNumberOfCpus();
+		return inputDataRef.getNumberOfCpus();
 	}
 
 	/**
@@ -335,8 +334,8 @@ public class LttngTraceState implements Cloneable {
 	 * 
 	 * @return
 	 */
-	public ILttngStateContext getContext() {
-		return fContext;
+	public ILttngStateInputRef getInputDataRef() {
+		return inputDataRef;
 	}
 
 	public Long getMax_time_state_recomputed_in_seek() {

@@ -18,7 +18,7 @@ import org.eclipse.linuxtools.lttng.state.StateStrings;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ExecutionMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.IRQMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessStatus;
-import org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor;
+import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
 import org.eclipse.linuxtools.lttng.state.model.LTTngCPUState;
 import org.eclipse.linuxtools.lttng.state.model.LttngBdevState;
 import org.eclipse.linuxtools.lttng.state.model.LttngExecutionState;
@@ -28,7 +28,7 @@ import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 public abstract class AbsStateUpdate extends AbsStateProcessing implements
-		ILttngEventProcessor {
+		IEventProcessing {
 
 	// ========================================================================
 	// Data
@@ -48,8 +48,7 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 		exe_state.setEntry_Time(eventTime.getValue());
 		exe_state.setChange_Time(eventTime.getValue());
 		exe_state.setCum_cpu_time(0L);
-//		if (process != null)
-			exe_state.setProc_status(process.getState().getProc_status());
+		exe_state.setProc_status(process.getState().getProc_status());
 		process.pushToExecutionStack(exe_state);
 	}
 

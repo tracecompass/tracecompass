@@ -23,16 +23,11 @@ public class LttngTrapState implements Cloneable {
 	// Data
     // =======================================================================
 	private Long running;
-	
+
 	
     // ========================================================================
     // Constructor
     // =======================================================================
-	
-	public LttngTrapState() {
-		this.running = 0L;
-	}
-	
 	public LttngTrapState(Long running) {
 		this.running = running;
 	}
@@ -77,10 +72,4 @@ public class LttngTrapState implements Cloneable {
 			running--;			
 		}
 	}
-	
-	@Override
-	public String toString() {
-		return "running : " + running;
-	}
-	
 }

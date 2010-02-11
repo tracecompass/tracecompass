@@ -14,9 +14,7 @@ package org.eclipse.linuxtools.lttng.event;
 
 import java.util.HashMap;
 
-import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.tmf.event.TmfEventContent;
-import org.eclipse.linuxtools.tmf.event.TmfNoSuchFieldException;
 
 /**
  * <b><u>LttngEventContent</u></b><p>
@@ -87,9 +85,11 @@ public class LttngEventContent extends TmfEventContent {
     @Override
 	public LttngEventType getType() {
         return (LttngEventType)fParentEvent.getType();
+//        return (LttngEventType)fEventType;
     }
     public void setType(LttngEventType newType) {
         ((LttngEvent)fParentEvent).setType(newType);
+//        fEventType = newType;
     }
     
     
@@ -100,7 +100,7 @@ public class LttngEventContent extends TmfEventContent {
     }
     
     // ***VERIFY***
-    // A bit weird to return the _currently_parsed fields (unlike all fields like getFields() )
+    // A bit weird to return the _currently_parsed fields (unlike all like getFields() )
     // Should we keep this?
     /**
      * Return currently parsed fields in an object array format.<p>
@@ -154,30 +154,17 @@ public class LttngEventContent extends TmfEventContent {
      * @see @see org.eclipse.linuxtools.lttng.event.LttngEventField
      */
     @Override
-    public synchronized LttngEventField[] getFields() {
-        if ( fFieldsMap.size() < fParentEvent.getType().getNbFields() ) {
-        	LttngEventField tmpField = null;
-        	LttngEventType tmpType = (LttngEventType)fParentEvent.getType();
-        	
-	        for ( int pos=0; pos<tmpType.getNbFields(); pos++ ) {
-	            String name = null;
-				JniEvent tmpEvent = ((LttngEvent)getEvent()).convertEventTmfToJni();
-				
-				// tmpEvent == null probably mean there is a discrepancy between Eclipse and C library
-				// An error was probably printed in convertEventTmfToJni() already, but keep in mind this is SERIOUS
-				if ( tmpEvent != null ) {
-					try {
-						name = tmpType.getLabel(pos);
-					
-						Object newValue = tmpEvent.parseFieldByName(name);
-						tmpField = new LttngEventField(this, name, newValue );
-						fFieldsMap.put(name, tmpField);
-					}
-					catch (TmfNoSuchFieldException e) {
-						System.out.println("Invalid field position requested : " + pos + ", ignoring (getFields).");
-					}
-	            }
-	        }
+    public LttngEventField[] getFields() {
+        LttngEventField tmpField = null;
+        
+        LttngEventType tmpType = (LttngEventType)fParentEvent.getType();
+        
+        for ( int pos=0; pos<tmpType.getNbFields(); pos++ ) {
+            String name = tmpType.getLabel(pos);
+            Object newValue = ((LttngEvent)getEvent()).convertEventTmfToJni().parseFieldByName(name);
+            
+            tmpField = new LttngEventField(this, name, newValue );
+            fFieldsMap.put(name, tmpField);
         }
         return fFieldsMap.values().toArray(new LttngEventField[fFieldsMap.size()]);
     }
@@ -192,15 +179,11 @@ public class LttngEventContent extends TmfEventContent {
     @Override
     public LttngEventField getField(int position) {
         LttngEventField returnedField = null;
-        String label = null;
-		try {
-			label = fParentEvent.getType().getLabel(position);
-			
-			returnedField = this.getField(label);
-		} 
-		catch (TmfNoSuchFieldException e) {
-			System.out.println("Invalid field position requested : " + position + ", ignoring (getField).");
-		}
+        String label = fParentEvent.getType().getLabel(position);
+        
+        if ( label != null ) {
+            returnedField = this.getField(label);
+        }
         
         return returnedField;
     }
@@ -213,8 +196,8 @@ public class LttngEventContent extends TmfEventContent {
      * @see @see org.eclipse.linuxtools.lttng.event.LttngEventField
      */
     @Override
-    public synchronized LttngEventField getField(String name) {
-    	// *** VERIFY ***
+    public LttngEventField getField(String name) {
+        // *** VERIFY ***
         // Should we check if the field exists in LttngType before parsing? 
         // It could avoid calling parse for non-existent fields but would waste some cpu cycle on check?
         LttngEventField returnedField = fFieldsMap.get(name);
@@ -222,16 +205,12 @@ public class LttngEventContent extends TmfEventContent {
         if ( returnedField == null ) {
             // *** VERIFY ***
             // Should we really make sure we didn't get null before creating/inserting a field?
-        	JniEvent tmpEvent = ((LttngEvent)getEvent()).convertEventTmfToJni();
-        	
-        	if ( tmpEvent != null) {
-	        	Object newValue =  tmpEvent.parseFieldByName(name);
-	            
-	            if ( newValue!= null ) {
-	                returnedField = new LttngEventField(this, name, newValue);
-	                fFieldsMap.put(name, returnedField );
-	            }
-        	}
+        	Object newValue = ((LttngEvent)getEvent()).convertEventTmfToJni().parseFieldByName(name);
+            
+            if ( newValue!= null ) {
+                returnedField = new LttngEventField(this, name, newValue);
+                fFieldsMap.put(name, returnedField );
+            }
         }
         
         return returnedField;
@@ -251,15 +230,15 @@ public class LttngEventContent extends TmfEventContent {
      */
     @Override
     public String toString() {
+        String returnedString = "";
+        
         LttngEventField[] allFields = getFields();
         
-        StringBuffer strBuffer = new StringBuffer();
         for ( int pos=0; pos < allFields.length; pos++) {
-        	if (pos != 0) strBuffer.append(",");
-        	strBuffer.append(allFields[pos].toString());
+            returnedString +=  allFields[pos].toString() + " ";
         }
         
-        return strBuffer.toString();
+        return returnedString;
         
     }
 }

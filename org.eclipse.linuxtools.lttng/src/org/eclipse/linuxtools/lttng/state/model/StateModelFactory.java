@@ -12,7 +12,6 @@
 package org.eclipse.linuxtools.lttng.state.model;
 
 import org.eclipse.linuxtools.lttng.state.LttngStateException;
-import org.eclipse.linuxtools.lttng.state.resource.ILttngStateContext;
 
 /**
  * Entry point to the package
@@ -48,7 +47,7 @@ public class StateModelFactory {
 	 * @return
 	 */
 	public static LttngTraceState getStateEntryInstance(
-			ILttngStateContext stateInputRef) {
+			ILttngStateInputRef stateInputRef) {
 		LttngTraceState traceState = new LttngTraceState();
 		try {
 			traceState.init(stateInputRef);

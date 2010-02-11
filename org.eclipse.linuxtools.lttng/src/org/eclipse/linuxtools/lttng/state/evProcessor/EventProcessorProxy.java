@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.linuxtools.lttng.TraceDebug;
-import org.eclipse.linuxtools.lttng.state.evProcessor.state.StateEventToHandlerFactory;
+import org.eclipse.linuxtools.lttng.state.evProcessor.state.StateUpdateFactory;
 
 /**
  * @author alvaro
@@ -27,7 +27,7 @@ public class EventProcessorProxy {
 	// Data
 	// =======================================================================
 	private static EventProcessorProxy instance = null;
-	private final Set<AbsEventToHandlerResolver> processingFactories = new HashSet<AbsEventToHandlerResolver>();
+	private final Set<AbsEventProcessorFactory> processingFactories = new HashSet<AbsEventProcessorFactory>();
 
 	
 	// ========================================================================
@@ -35,7 +35,7 @@ public class EventProcessorProxy {
 	// =======================================================================
 	public EventProcessorProxy() {
 		// Manual creation of State update factory
-		addEventProcessorFactory(StateEventToHandlerFactory.getInstance());
+		addEventProcessorFactory(StateUpdateFactory.getInstance());
 	}
 
 	// ========================================================================
@@ -44,7 +44,7 @@ public class EventProcessorProxy {
 	/**
 	 * @return the processingFactories
 	 */
-	public Set<AbsEventToHandlerResolver> getProcessingFactories() {
+	public Set<AbsEventProcessorFactory> getProcessingFactories() {
 		return processingFactories;
 	}
 
@@ -68,7 +68,7 @@ public class EventProcessorProxy {
 	 * @param handlersFactory
 	 */
 	public void addEventProcessorFactory(
-			AbsEventToHandlerResolver handlersFactory) {
+			AbsEventProcessorFactory handlersFactory) {
 		if (handlersFactory != null) {
 			//only add the listener if not already included
 			if (!processingFactories.contains(handlersFactory)) {
@@ -86,7 +86,7 @@ public class EventProcessorProxy {
 	 * @param handlersFactory
 	 */
 	public void removeEventProcessorFactory(
-			IEventToHandlerResolver handlersFactory) {
+			AbsEventProcessorFactory handlersFactory) {
 		if (handlersFactory != null) {
 			processingFactories.remove(handlersFactory);
 		} 

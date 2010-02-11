@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,13 +12,12 @@
 
 package org.eclipse.linuxtools.lttng.state.experiment;
 
-import org.eclipse.linuxtools.lttng.TraceDebug;
-import org.eclipse.linuxtools.lttng.model.LTTngTreeNode;
-import org.eclipse.linuxtools.lttng.state.LttngStateException;
-import org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager;
-import org.eclipse.linuxtools.lttng.state.trace.StateTraceManager;
-import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
-import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
+import java.util.Map;
+
+import org.eclipse.linuxtools.lttng.state.StateManager;
+import org.eclipse.linuxtools.lttng.state.StateStacksHandler;
+import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
+import org.eclipse.linuxtools.lttng.state.model.StateModelFactory;
 
 /**
  * @author alvaro
@@ -29,64 +28,36 @@ public class StateManagerFactory {
 	// Data
 	// =======================================================================
 
-	private static IStateExperimentManager experimentManager = null;
-	/**
-	 * Allows to modify the check point interval for every new instance of trace manager
-	 */
-	private static Long ftraceCheckPointInterval = null;
+	private static StateExperimentManager experimentManager = null;
+	private static Map<String, StateManager> instanceBook = null;
 
-	static {
-		initCheck();
-	}
 	// ========================================================================
 	// Methods
 	// =======================================================================
 
 	/**
-	 * @param traceUniqueId
-	 * @param experiment
+	 * Provide a stateManager instance per trace
+	 * 
 	 * @return
 	 */
-	public static LTTngTreeNode getManager(ITmfTrace rtrace,
-			LTTngTreeNode experiment) {
+	public static StateManager getManager(String traceUniqueId) {
 
-		// Validate
-		if (rtrace == null) {
-			return null;
-		}
-
-		String traceUniqueId = rtrace.getName();
 		if (traceUniqueId == null) {
 			return null;
 		}
 
+		initCheck();
 
-		LTTngTreeNode managerNode = null;
-		managerNode = experiment.getChildByName(traceUniqueId);
-
-		if (managerNode != null && managerNode instanceof IStateTraceManager) {
-			return managerNode;
+		if (instanceBook.containsKey(traceUniqueId)) {
+			return instanceBook.get(traceUniqueId);
 		}
 
-//		LttngTraceState traceModel = 
-//		StateModelFactory.getStateEntryInstance();
-		StateTraceManager manager = null;
+		LttngTraceState traceModel = StateModelFactory.getStateEntryInstance();
+		StateStacksHandler stateInputHandler = new StateStacksHandler(
+				traceModel);
+		StateManager manager = new StateManager(stateInputHandler);
 
-		// catch potential construction problems
-		try {
-			manager = new StateTraceManager(experiment.getNextUniqueId(), experiment, traceUniqueId, rtrace);
-
-			// Allow the possibility to configure the trace state check point
-			// interval at creation time
-			if (ftraceCheckPointInterval != null) {
-				manager.setCheckPointInterval(ftraceCheckPointInterval);
-			}
-
-		} catch (LttngStateException e) {
-			e.printStackTrace();
-		}
-
-		experiment.addChild(manager);
+		instanceBook.put(traceUniqueId, manager);
 		return manager;
 	}
 
@@ -95,7 +66,8 @@ public class StateManagerFactory {
 	 * 
 	 * @return
 	 */
-	public static IStateExperimentManager getExperimentManager() {
+	public static StateExperimentManager getExperimentManager() {
+		initCheck();
 		return experimentManager;
 	}
 
@@ -104,18 +76,10 @@ public class StateManagerFactory {
 	 * 
 	 * @param traceUniqueId
 	 */
-	public static void removeManager(ITmfTrace rtrace, LTTngTreeNode rexperiment) {
-		Object experimentObj = rexperiment.getValue();
-		if (rtrace != null && rexperiment != null
-				&& experimentObj instanceof TmfExperiment<?>) {
-			LTTngTreeNode childToremove = rexperiment.getChildByName(rtrace
-					.getName());
-			if (childToremove != null) {
-				rexperiment.removeChild(childToremove);
-			}
-		} else {
-			TraceDebug.debug("Invalid arguments to remove manager for trace: "
-					+ rtrace.getName());
+	public static void removeManager(String traceUniqueId) {
+		initCheck();
+		if (traceUniqueId != null && instanceBook.containsKey(traceUniqueId)) {
+			instanceBook.remove(traceUniqueId);
 		}
 	}
 
@@ -124,9 +88,8 @@ public class StateManagerFactory {
 	 */
 	private static void initCheck() {
 		if (experimentManager == null) {
-			Long id = 0L; // unique id
-			String name = "StateExperimentManager"; // name
-			experimentManager = new StateExperimentManager(id, name);
+			experimentManager = new StateExperimentManager();
+			instanceBook = experimentManager.getManagersByID();
 		}
 	}
 
@@ -135,22 +98,9 @@ public class StateManagerFactory {
 	 */
 	public static void dispose() {
 		if (experimentManager != null) {
+			experimentManager.dispose();
 			experimentManager = null;
+			instanceBook = null;
 		}
-	}
-
-	/**
-	 * @return the traceCheckPointInterval
-	 */
-	public static Long getTraceCheckPointInterval() {
-		return ftraceCheckPointInterval;
-	}
-
-	/**
-	 * @param traceCheckPointInterval
-	 *            the traceCheckPointInterval to set
-	 */
-	public static void setTraceCheckPointInterval(Long traceCheckPointInterval) {
-		StateManagerFactory.ftraceCheckPointInterval = traceCheckPointInterval;
 	}
 }

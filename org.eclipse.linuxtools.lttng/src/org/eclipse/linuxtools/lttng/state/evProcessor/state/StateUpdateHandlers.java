@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.lttng.state.StateStrings.Fields;
 import org.eclipse.linuxtools.lttng.state.StateStrings.IRQMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessStatus;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessType;
-import org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor;
+import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
 import org.eclipse.linuxtools.lttng.state.model.LTTngCPUState;
 import org.eclipse.linuxtools.lttng.state.model.LttngBdevState;
 import org.eclipse.linuxtools.lttng.state.model.LttngExecutionState;
@@ -45,8 +45,10 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
  */
 class StateUpdateHandlers {
 
-	final ILttngEventProcessor getSyscallEntryHandler() {
+	final IEventProcessing getSyscallEntryHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_SYSCALL_ENTRY;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -83,12 +85,19 @@ class StateUpdateHandlers {
 						submode, trcEvent.getTimestamp(), traceSt);
 				return false;
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
 
-	final ILttngEventProcessor getsySyscallExitHandler() {
+	final IEventProcessing getsySyscallExitHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_SYSCALL_EXIT;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -108,6 +117,11 @@ class StateUpdateHandlers {
 				return false;
 
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -117,8 +131,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getTrapEntryHandler() {
+	final IEventProcessing getTrapEntryHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_TRAP_ENTRY;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -149,24 +165,18 @@ class StateUpdateHandlers {
 				LTTngCPUState cpust = traceSt.getCpu_states().get(cpu);
 				cpu_push_mode(cpust, StateStrings.CpuMode.LTTV_CPU_TRAP);
 				cpust.pushToTrapStack(trap); /* update trap status */
-				
+
 				// update Trap State
-				LttngTrapState trap_state = null;
-				trap_state = traceSt.getTrap_states().get(trap);
-				
-				// If the trape_state exists, just increment it's counter, 
-				//	otherwise, create it
-				if ( trap_state == null ) {
-					trap_state = new LttngTrapState();
-					trap_state.incrementRunning();
-					traceSt.getTrap_states().put(trap, trap_state);
-				}
-				else {
-					trap_state.incrementRunning();
-				}
-				
+				LttngTrapState trap_state = traceSt.getTrap_states().get(trap);
+				trap_state.incrementRunning();
+
 				return false;
 
+			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
 			}
 		};
 		return handler;
@@ -176,8 +186,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getTrapExitHandler() {
+	final IEventProcessing getTrapExitHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_TRAP_EXIT;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -203,6 +215,11 @@ class StateUpdateHandlers {
 				return false;
 
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -211,8 +228,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getIrqEntryHandler() {
+	final IEventProcessing getIrqEntryHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_IRQ_ENTRY;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -221,10 +240,7 @@ class StateUpdateHandlers {
 
 				Long irq = getAFieldLong(trcEvent, traceSt,
 						Fields.LTT_FIELD_IRQ_ID);
-				if (irq == null || traceSt.getIrq_states().get(irq) == null) {
-					if (irq != null) {
-						System.out.println("Invalid irq (" + irq + "), ts = " + trcEvent.getOriginalTimestamp());
-					}
+				if (irq == null) {
 					return true;
 				}
 
@@ -254,6 +270,10 @@ class StateUpdateHandlers {
 				return false;
 
 			}
+
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -262,8 +282,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getSoftIrqExitHandler() {
+	final IEventProcessing getSoftIrqExitHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_SOFT_IRQ_EXIT;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -280,15 +302,18 @@ class StateUpdateHandlers {
 				if (softirq != -1) {
 					LttngSoftIRQState softIrqstate = traceSt
 							.getSoft_irq_states().get(softirq);
-					if (softIrqstate != null) {
-						softIrqstate.decrementRunning();
-					}
+					softIrqstate.decrementRunning();
 				}
 
 				/* update cpu status */
 				cpu_pop_mode(cpust);
 
 				return false;
+			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
 			}
 		};
 		return handler;
@@ -298,8 +323,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getIrqExitHandler() {
+	final IEventProcessing getIrqExitHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_IRQ_EXIT;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -325,6 +352,11 @@ class StateUpdateHandlers {
 				return false;
 
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -333,7 +365,7 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getSoftIrqRaiseHandler() {
+	final IEventProcessing getSoftIrqRaiseHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			private Events eventType = Events.LTT_EVENT_SOFT_IRQ_RAISE;
@@ -376,6 +408,11 @@ class StateUpdateHandlers {
 				return false;
 
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -384,8 +421,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getSoftIrqEntryHandler() {
+	final IEventProcessing getSoftIrqEntryHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_SOFT_IRQ_ENTRY;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -434,6 +473,11 @@ class StateUpdateHandlers {
 				return false;
 
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -443,7 +487,7 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getEnumInterruptHandler() {
+	final IEventProcessing getEnumInterruptHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			private Events eventType = Events.LTT_EVENT_LIST_INTERRUPT;
@@ -475,6 +519,11 @@ class StateUpdateHandlers {
 				return false;
 
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -484,8 +533,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getBdevRequestIssueHandler() {
+	final IEventProcessing getBdevRequestIssueHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_REQUEST_ISSUE;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -531,6 +582,11 @@ class StateUpdateHandlers {
 				return false;
 
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -545,8 +601,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getBdevRequestCompleteHandler() {
+	final IEventProcessing getBdevRequestCompleteHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_REQUEST_COMPLETE;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -586,6 +644,11 @@ class StateUpdateHandlers {
 				return false;
 
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -600,8 +663,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getFunctionEntryHandler() {
+	final IEventProcessing getFunctionEntryHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_FUNCTION_ENTRY;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -613,6 +678,11 @@ class StateUpdateHandlers {
 				return false;
 
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -621,8 +691,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getFunctionExitHandler() {
+	final IEventProcessing getFunctionExitHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_FUNCTION_EXIT;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -633,6 +705,11 @@ class StateUpdateHandlers {
 				pop_function(traceSt, trcEvent, funcptr);
 				return false;
 
+			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
 			}
 		};
 		return handler;
@@ -648,8 +725,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getDumpSyscallHandler() {
+	final IEventProcessing getDumpSyscallHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_SYS_CALL_TABLE;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -668,6 +747,11 @@ class StateUpdateHandlers {
 
 				return false;
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -682,8 +766,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getDumpKprobeHandler() {
+	final IEventProcessing getDumpKprobeHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_KPROBE_TABLE;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -696,6 +782,11 @@ class StateUpdateHandlers {
 
 				return false;
 
+			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
 			}
 		};
 		return handler;
@@ -711,8 +802,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getDumpSoftIrqHandler() {
+	final IEventProcessing getDumpSoftIrqHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_SOFTIRQ_VEC;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -734,6 +827,11 @@ class StateUpdateHandlers {
 				return false;
 
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -748,8 +846,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getSchedChangeHandler() {
+	final IEventProcessing getSchedChangeHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_SCHED_SCHEDULE;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -878,6 +978,11 @@ class StateUpdateHandlers {
 				return false;
 
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -893,8 +998,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getProcessForkHandler() {
+	final IEventProcessing getProcessForkHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_PROCESS_FORK;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -1007,6 +1114,11 @@ class StateUpdateHandlers {
 				return false;
 
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -1021,8 +1133,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getProcessKernelThreadHandler() {
+	final IEventProcessing getProcessKernelThreadHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_KTHREAD_CREATE;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -1058,6 +1172,11 @@ class StateUpdateHandlers {
 				return false;
 
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -1072,8 +1191,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getProcessExitHandler() {
+	final IEventProcessing getProcessExitHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_PROCESS_EXIT;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -1095,6 +1216,11 @@ class StateUpdateHandlers {
 				return false;
 
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -1109,8 +1235,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getProcessFreeHandler() {
+	final IEventProcessing getProcessFreeHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_PROCESS_FREE;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -1171,6 +1299,11 @@ class StateUpdateHandlers {
 				// return false;
 
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -1185,8 +1318,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getProcessExecHandler() {
+	final IEventProcessing getProcessExecHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_EXEC;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -1218,6 +1353,11 @@ class StateUpdateHandlers {
 				return false;
 
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -1232,8 +1372,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor GetThreadBrandHandler() {
+	final IEventProcessing GetThreadBrandHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_THREAD_BRAND;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -1248,6 +1390,11 @@ class StateUpdateHandlers {
 				return false;
 
 			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
+			}
 		};
 		return handler;
 	}
@@ -1255,8 +1402,10 @@ class StateUpdateHandlers {
 	/**
 	 * @return
 	 */
-	final ILttngEventProcessor getStateDumpEndHandler() {
+	final IEventProcessing getStateDumpEndHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_STATEDUMP_END;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -1276,6 +1425,11 @@ class StateUpdateHandlers {
 				
 				return false;
 
+			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
 			}
 
 			/**
@@ -1367,8 +1521,10 @@ class StateUpdateHandlers {
 	 * 
 	 * @return
 	 */
-	final ILttngEventProcessor getEnumProcessStateHandler() {
+	final IEventProcessing getEnumProcessStateHandler() {
 		AbsStateUpdate handler = new AbsStateUpdate() {
+
+			private Events eventType = Events.LTT_EVENT_PROCESS_STATE;
 
 			// @Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
@@ -1535,6 +1691,11 @@ class StateUpdateHandlers {
 
 				return false;
 
+			}
+
+			// @Override
+			public Events getEventHandleType() {
+				return eventType;
 			}
 		};
 		return handler;
