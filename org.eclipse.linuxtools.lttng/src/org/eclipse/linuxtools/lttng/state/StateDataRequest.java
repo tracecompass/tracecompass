@@ -15,6 +15,7 @@ import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
@@ -184,5 +185,26 @@ public class StateDataRequest extends TmfDataRequest<TmfEvent> {
 	 */
 	public boolean isclearDataInd() {
 		return clearDataInd;
+	}
+
+	/**
+	 * Compare the time range with a Data Request.
+	 * 
+	 * @param trange
+	 * @return
+	 */
+	public boolean equalTime(StateDataRequest otherRequest) {
+		TmfTimeRange trange = otherRequest.getRange();
+		TmfTimeRange myTimeRange = getRange();
+		TmfTimestamp myStartTime = myTimeRange.getStartTime();
+		TmfTimestamp myEndTime = myTimeRange.getEndTime();
+		
+		if (myStartTime.equals(trange.getStartTime())) {
+			if (myEndTime.equals(trange.getEndTime())) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 }

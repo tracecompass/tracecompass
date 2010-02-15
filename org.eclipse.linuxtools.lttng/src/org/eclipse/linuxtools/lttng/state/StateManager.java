@@ -176,7 +176,8 @@ public class StateManager extends Observable {
 	 * @param obs
 	 * @param transactionID
 	 */
-	public void executeDataRequest(TmfTimeRange trange, String transactionID,
+	public StateDataRequest executeDataRequest(TmfTimeRange trange,
+			String transactionID,
 			IStateDataRequestListener listener) {
 		TmfTimestamp restoredStartTime = restoreCheckPointByTimestamp(trange
 				.getStartTime());
@@ -189,7 +190,10 @@ public class StateManager extends Observable {
 		// Process request to that point
 		StateDataRequest request = getDataRequestByTimeRange(trange, listener);
 		// don't wait for completion i.e. allow cancellations
-		request.startRequestInd(fExperiment, false, false);
+		// TODO: Broadcast set to true to make all views participate as a work
+		// around until TMF supports data coalescing and event filtering within
+		// the request
+		request.startRequestInd(fExperiment, true, false);
 
 		if (TraceDebug.isDEBUG()) {
 			TraceDebug
@@ -199,6 +203,8 @@ public class StateManager extends Observable {
 					+ " Total number of processes in the State provider: "
 					+ stateIn.getTraceStateModel().getProcesses().length + " Completed");
 		}
+
+		return request;
 	}
 
 	/**

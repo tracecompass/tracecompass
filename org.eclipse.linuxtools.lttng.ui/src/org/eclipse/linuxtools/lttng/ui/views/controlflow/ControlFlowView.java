@@ -47,6 +47,7 @@ import org.eclipse.linuxtools.lttng.ui.views.common.ParamsUpdater;
 import org.eclipse.linuxtools.lttng.ui.views.controlflow.evProcessor.FlowTRangeUpdateFactory;
 import org.eclipse.linuxtools.lttng.ui.views.controlflow.model.FlowModelFactory;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
@@ -138,7 +139,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	private Action filterTraces;
 	private Action zoomIn;
 	private Action zoomOut;
-	private Action synch;
+	private boolean synch = true; // replaced a previous action
 
 	private ITimeAnalysisViewer tsfviewer;
 	private ViewProcessFilter tableFilter = null;
@@ -626,7 +627,6 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		// manager.add(filterTraces);
 		manager.add(zoomIn);
 		manager.add(zoomOut);
-		manager.add(synch);
 		manager.add(new Separator());
 	}
 
@@ -642,7 +642,6 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		// manager.add(filterTraces);
 		manager.add(zoomIn);
 		manager.add(zoomOut);
-		manager.add(synch);
 		manager.add(new Separator());
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
@@ -658,7 +657,6 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		// manager.add(filterTraces);
 		manager.add(zoomIn);
 		manager.add(zoomOut);
-		manager.add(synch);
 		manager.add(new Separator());
 	}
 
@@ -817,28 +815,6 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 				"icons/zoomout_nav.gif"));
 
 		// action11
-		synch = new Action() {
-			@Override
-			public void run() {
-				// Note: No action since the synch flag is used by Control flow
-				// view
-				// the actual viewer is set to accept api selections in
-				// createpartcontrol.
-
-				// if (synch.isChecked()) {
-				// tsfviewer.setAcceptSelectionAPIcalls(true);
-				// } else {
-				// tsfviewer.setAcceptSelectionAPIcalls(false);
-				// }
-			}
-		};
-		synch.setText(Messages.getString("ControlFlowView.Action.Synchronize")); //$NON-NLS-1$
-		synch.setToolTipText(Messages
-				.getString("ControlFlowView.Action.Synchronize.ToolTip")); //$NON-NLS-1$
-		synch.setChecked(false);
-		synch.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
-				Messages.getString("ControlFlowView.tmf.UI"),
-				"icons/synced.gif"));
 		// PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_SYNCED);
 
 		doubleClickAction = new Action() {
@@ -894,7 +870,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		// executing update
 		if (savedSelTime == null || savedSelTime != selTimens) {
 			// Notify listener views.
-			synchTimeNotification(selTimens);
+			synchTimeNotification(selTimens, source);
 
 			// Update the parameter updater to save the selected time
 			paramUpdater.setSelectedTime(selTimens);
@@ -921,8 +897,11 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 				// Read the updated time window
 				TmfTimeRange trange = paramUpdater.getTrange();
 				if (trange != null) {
-					// Request new data for specified time range
-					dataRequest(trange);
+
+					// Notify listener views. views to perform data requests
+					// upon the notification below
+					synchTimeRangeNotification(trange, paramUpdater
+							.getSelectedTime(), source);
 				}
 			}
 		}
@@ -1085,24 +1064,43 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	 * been performed vs a pure re-selection of the same time
 	 * 
 	 * @param time
+	 * @param source
 	 */
-	private void synchTimeNotification(long time) {
+	private void synchTimeNotification(long time, Object source) {
 		// if synchronisation selected
-		if (synch.isChecked()) {
+		if (synch) {
 			// Notify other views
-			TmfSignalManager.dispatchSignal(new TmfTimeSynchSignal(this,
+			TmfSignalManager.dispatchSignal(new TmfTimeSynchSignal(source,
 					new LttngTimestamp(time)));
 		}
 	}
 
 	/**
-	 * Registers as listener of time selection from other tmf views
+	 * Trigger time range synchronisation to other views this method shall be
+	 * called when a check has been performed to note that an actual change of
+	 * time range has been performed vs a pure re-selection of the same.
+	 * 
+	 * @param trange
+	 * @param source
+	 */
+	private void synchTimeRangeNotification(TmfTimeRange trange,
+			Long selectedTime, Object source) {
+		// if synchronisation selected
+		if (synch) {
+			// Notify other views
+			TmfSignalManager.dispatchSignal(new TmfRangeSynchSignal(source,
+					trange, new LttngTimestamp(selectedTime)));
+		}
+	}
+
+	/**
+	 * Registers as listener of time selection from other views
 	 * 
 	 * @param signal
 	 */
 	@TmfSignalHandler
 	public void synchToTime(TmfTimeSynchSignal signal) {
-		if (synch.isChecked()) {
+		if (synch) {
 			Object source = signal.getSource();
 			if (signal != null && source != null && source != this) {
 				// Internal value is expected in nano seconds.
@@ -1114,6 +1112,31 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		}
 	}
 
+	/**
+	 * Annotation Registers as listener of time range selection from other views
+	 * The implementation handles the entry of the signal.
+	 * 
+	 * @param signal
+	 */
+	@TmfSignalHandler
+	public void synchToTimeRange(TmfRangeSynchSignal signal) {
+		if (synch) {
+			Object source = signal.getSource();
+			if (signal != null && source != null && source != this) {
+				// Internal value is expected in nano seconds.
+				TmfTimeRange trange = signal.getCurrentRange();
+				if (tsfviewer != null) {
+					tsfviewer
+							.setSelectVisTimeWindow(trange.getStartTime()
+									.getValue(),
+									trange.getEndTime().getValue(), source);
+
+					// Request the data to populate the new selected time window
+					dataRequest(trange);
+				}
+			}
+		}
+	}
 	/*
 	 * (non-Javadoc)
 	 * 

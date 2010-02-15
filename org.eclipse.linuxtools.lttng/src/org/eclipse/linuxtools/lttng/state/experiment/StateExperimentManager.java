@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.linuxtools.lttng.state.IStateDataRequestListener;
+import org.eclipse.linuxtools.lttng.state.StateDataRequest;
 import org.eclipse.linuxtools.lttng.state.StateManager;
 import org.eclipse.linuxtools.tmf.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
@@ -68,17 +69,21 @@ public class StateExperimentManager extends TmfComponent {
 	 * @param transactionID
 	 * @param display
 	 */
-	public void readExperimentTimeWindow(TmfTimeRange trange,
+	public StateDataRequest readExperimentTimeWindow(TmfTimeRange trange,
 			String transactionID, IStateDataRequestListener listener) {
+		StateDataRequest request = null;
 		if (fExperiment != null) {
 			String id = fExperiment.getExperimentId();
 			StateManager manager = managersByID.get(id);
 			if (manager != null) {
 				// TODO: A loop to request data for each trace needs to be used
 				// here when multiple traces are supported.
-				manager.executeDataRequest(trange, transactionID, listener);
+				request = manager.executeDataRequest(trange, transactionID,
+						listener);
 			}
 		}
+
+		return request;
 	}
 
 	public void readExperiment(String transactionID,
