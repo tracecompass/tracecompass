@@ -25,9 +25,10 @@ import org.eclipse.linuxtools.lttng.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.lttng.jni.JniMarker;
-import org.eclipse.linuxtools.lttng.jni.JniTime;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.lttng.jni.JniTracefile;
+import org.eclipse.linuxtools.lttng.jni.common.JniTime;
+import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
@@ -110,7 +111,7 @@ public class LTTngTrace extends TmfTrace {
     public LTTngTrace(String path, boolean waitForCompletion, boolean bypassIndexing) throws Exception {
         super(path, CHECKPOINT_PAGE_SIZE, true);
         try {
-    		currentJniTrace = new JniTrace(path, SHOW_LTT_DEBUG_DEFAULT);
+    		currentJniTrace = JniTraceFactory.getJniTrace(path, SHOW_LTT_DEBUG_DEFAULT);
         }
         catch (Exception e) {
             throw new LTTngTraceException(e.getMessage());
