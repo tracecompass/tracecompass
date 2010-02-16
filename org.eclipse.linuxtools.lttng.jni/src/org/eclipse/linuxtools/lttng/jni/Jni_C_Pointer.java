@@ -1,4 +1,4 @@
-package org.eclipse.linuxtools.lttng.jni.common;
+package org.eclipse.linuxtools.lttng.jni;
 
 
 /**
@@ -8,7 +8,7 @@ package org.eclipse.linuxtools.lttng.jni.common;
  * 
  * Can transparently handle pointer of 32 or 64 bits.
  */
-public class Jni_C_Pointer extends Jni_C_Constant {
+public class Jni_C_Pointer extends Jni_C_Common {
 
     private long ptr = NULL;
     private boolean isLong = true;

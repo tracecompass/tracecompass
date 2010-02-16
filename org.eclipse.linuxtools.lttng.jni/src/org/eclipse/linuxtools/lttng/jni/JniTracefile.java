@@ -16,7 +16,6 @@ import java.util.HashMap;
 
 import org.eclipse.linuxtools.lttng.jni.common.JniTime;
 import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer;
-import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id;
 import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.exception.JniNoSuchEventException;
 import org.eclipse.linuxtools.lttng.jni.exception.JniTracefileException;
@@ -35,15 +34,11 @@ import org.eclipse.linuxtools.lttng.jni.exception.JniTracefileWithoutEventExcept
  * <li> a reference to a single event object
  * <li> a HashMap of marker associated with this tracefile
  * </ul>
- * <b>NOTE</b><p>
- * This class is ABSTRACT, you need to extends it to support your specific LTTng version.<br>
- * Please look at the abstract functions to override at the bottom of this file.<p>
- * 
  */
-public abstract class JniTracefile extends Jni_C_Common 
-{
+public abstract class JniTracefile extends Jni_C_Common {
+        
     // Internal C pointer of the JniTracefile used in LTT
-    private Jni_C_Pointer_And_Library_Id thisTracefilePtr = new Jni_C_Pointer_And_Library_Id();
+    private Jni_C_Pointer thisTracefilePtr = new Jni_C_Pointer();
     
     // Reference to the parent trace
     private JniTrace parentTrace = null;
@@ -60,7 +55,6 @@ public abstract class JniTracefile extends Jni_C_Common
     private long    creation = 0;
     
     // Internal C pointer for trace and marker
-    // Note : These are real Jni_C_Pointer, not Jni_C_Pointer_And_Library_Id
     private Jni_C_Pointer tracePtr = null;
     private Jni_C_Pointer markerDataPtr = null;
     
@@ -80,7 +74,6 @@ public abstract class JniTracefile extends Jni_C_Common
     private JniEvent   currentEvent = null;
     
     // Internal C pointer for trace and marker
-    // Note : This one is a real Jni_C_Pointer, not Jni_C_Pointer_And_Library_Id
     private Jni_C_Pointer bufferPtr = null;
     
     private long    bufferSize = 0;
@@ -89,41 +82,46 @@ public abstract class JniTracefile extends Jni_C_Common
     private HashMap<Integer, JniMarker> tracefileMarkersMap = null;        
 
     // Native access functions
-    protected native boolean  ltt_getIsCpuOnline(int libId, long tracefilePtr);
-    protected native String   ltt_getTracefilepath(int libId, long tracefilePtr);
-    protected native String   ltt_getTracefilename(int libId, long tracefilePtr);
-    protected native long     ltt_getCpuNumber(int libId, long tracefilePtr);
-    protected native long     ltt_getTid(int libId, long tracefilePtr);
-    protected native long     ltt_getPgid(int libId, long tracefilePtr);
-    protected native long     ltt_getCreation(int libId, long tracefilePtr);
-    protected native long     ltt_getTracePtr(int libId, long tracefilePtr);
-    protected native long     ltt_getMarkerDataPtr(int libId, long tracefilePtr);
-    protected native int      ltt_getCFileDescriptor(int libId, long tracefilePtr);
-    protected native long     ltt_getFileSize(int libId, long tracefilePtr);
-    protected native long     ltt_getBlockNumber(int libId, long tracefilePtr);
-    protected native boolean  ltt_getIsBytesOrderReversed(int libId, long tracefilePtr);
-    protected native boolean  ltt_getIsFloatWordOrdered(int libId, long tracefilePtr);
-    protected native long     ltt_getAlignement(int libId, long tracefilePtr);
-    protected native long     ltt_getBufferHeaderSize(int libId, long tracefilePtr);
-    protected native int      ltt_getBitsOfCurrentTimestampCounter(int libId, long tracefilePtr);
-    protected native int      ltt_getBitsOfEvent(int libId, long tracefilePtr);
-    protected native long     ltt_getCurrentTimestampCounterMask(int libId, long tracefilePtr);
-    protected native long     ltt_getCurrentTimestampCounterMaskNextBit(int libId, long tracefilePtr);
-    protected native long     ltt_getEventsLost(int libId, long tracefilePtr);
-    protected native long     ltt_getSubBufferCorrupt(int libId, long tracefilePtr);
-    protected native long     ltt_getEventPtr(int libId, long tracefilePtr);
-    protected native long     ltt_getBufferPtr(int libId, long tracefilePtr);
-    protected native long     ltt_getBufferSize(int libId, long tracefilePtr);
-    
+    protected native boolean  ltt_getIsCpuOnline(long tracefilePtr);
+    protected native String   ltt_getTracefilepath(long tracefilePtr);
+    protected native String   ltt_getTracefilename(long tracefilePtr);
+    protected native long     ltt_getCpuNumber(long tracefilePtr);
+    protected native long     ltt_getTid(long tracefilePtr);
+    protected native long     ltt_getPgid(long tracefilePtr);
+    protected native long     ltt_getCreation(long tracefilePtr);
+    protected native long     ltt_getTracePtr(long tracefilePtr);
+    protected native long     ltt_getMarkerDataPtr(long tracefilePtr);
+    protected native int      ltt_getCFileDescriptor(long tracefilePtr);
+    protected native long     ltt_getFileSize(long tracefilePtr);
+    protected native long     ltt_getBlockNumber(long tracefilePtr);
+    protected native boolean  ltt_getIsBytesOrderReversed(long tracefilePtr);
+    protected native boolean  ltt_getIsFloatWordOrdered(long tracefilePtr);
+    protected native long     ltt_getAlignement(long tracefilePtr);
+    protected native long     ltt_getBufferHeaderSize(long tracefilePtr);
+    protected native int      ltt_getBitsOfCurrentTimestampCounter(long tracefilePtr);
+    protected native int      ltt_getBitsOfEvent(long tracefilePtr);
+    protected native long     ltt_getCurrentTimestampCounterMask(long tracefilePtr);
+    protected native long     ltt_getCurrentTimestampCounterMaskNextBit(long tracefilePtr);
+    protected native long     ltt_getEventsLost(long tracefilePtr);
+    protected native long     ltt_getSubBufferCorrupt(long tracefilePtr);
+    protected native long     ltt_getEventPtr(long tracefilePtr);
+    protected native long     ltt_getBufferPtr(long tracefilePtr);
+    protected native long     ltt_getBufferSize(long tracefilePtr);
+
     // Method to fill a map with marker object
-    protected native void ltt_feedAllMarkers(int libId, long tracefilePtr);
+    protected native void ltt_feedAllMarkers(long tracefilePtr);
     
     // Debug native function, ask LTT to print tracefile structure
-    protected native void ltt_printTracefile(int libId, long tracefilePtr);
+    protected native void ltt_printTracefile(long tracefilePtr);
+    
+	static {
+		System.loadLibrary("lttvtraceread_loader");
+	}
         
     /*
      * Default constructor is forbidden
      */
+    @SuppressWarnings("unused")
     protected JniTracefile() {
     }
 
@@ -166,25 +164,24 @@ public abstract class JniTracefile extends Jni_C_Common
     /**
      * Constructor, using C pointer.<p>
      * 
-     * @param newPtr  			The pointer of an already opened LttTracefile C Structure
-     * @param newParentTrace	The JniTrace parent of this tracefile.
+     * @param newPtr  The pointer of an already opened LttTracefile C Structure
      * 
      * @exception JniException
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniTrace
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTrace
+     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
      */
-    public JniTracefile(Jni_C_Pointer_And_Library_Id newPtr, JniTrace newParentTrace) throws JniException {
-    	thisTracefilePtr = newPtr;
+    public JniTracefile(Jni_C_Pointer newPtr, JniTrace newParentTrace) throws JniException {
+        thisTracefilePtr = newPtr;
         parentTrace = newParentTrace;
         tracefileMarkersMap = new HashMap<Integer, JniMarker>();
 
         // Retrieve the trace file information and load the first event.
         try {
             populateTracefileInformation();
-        } 
-        catch (JniNoSuchEventException e) {
-            throw new JniTracefileWithoutEventException("JniEvent constructor reported that no event of this type are usable. (Jni_Tracefile)");
+        } catch (JniNoSuchEventException e) {
+            throw new JniTracefileWithoutEventException(
+                    "JniEvent constructor reported that no event of this type are usable. (Jaf_Tracefile)");
         }
     }        
 
@@ -193,9 +190,9 @@ public abstract class JniTracefile extends Jni_C_Common
      * 
      * Note : If the read succeed, the event will be populated.<p>
      *      
-     * @return LTT read status, as defined in Jni_C_Constant
+     * @return LTT read status, as defined in Jni_C_Common
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant
+     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Common
      */
     public int readNextEvent() {
         return currentEvent.readNextEvent();
@@ -208,9 +205,9 @@ public abstract class JniTracefile extends Jni_C_Common
      * 
      * @param seekTime      The timestamp where to seek.
      * 
-     * @return LTT read status, as defined in Jni_C_Constant
+     * @return LTT read status, as defined in Jni_C_Common
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant
+     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Common
      */
     public int seekToTime(JniTime seekTime) {
         return currentEvent.seekToTime(seekTime);
@@ -223,38 +220,39 @@ public abstract class JniTracefile extends Jni_C_Common
      */
     private void populateTracefileInformation() throws JniException {
         if (thisTracefilePtr.getPointer() == NULL) {
-            throw new JniTracefileException("Pointer is NULL, trace closed? (populateTracefileInformation)");
+            throw new JniTracefileException(
+                    "Pointer is NULL, trace closed? (populateTracefileInformation)");
         }
 
-        isCpuOnline = ltt_getIsCpuOnline(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer());
-        tracefilePath = ltt_getTracefilepath(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer());
-        tracefileName = ltt_getTracefilename(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer());
-        cpuNumber = ltt_getCpuNumber(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer());
-        tid = ltt_getTid(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer() );
-        pgid = ltt_getPgid(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer() );
-        creation = ltt_getCreation(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer() );
-        tracePtr = new Jni_C_Pointer(ltt_getTracePtr(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer()) );
-        markerDataPtr = new Jni_C_Pointer(ltt_getMarkerDataPtr(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer()) );
-        CFileDescriptor = ltt_getCFileDescriptor(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer() );
-        fileSize = ltt_getFileSize(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer() );
-        blocksNumber = ltt_getBlockNumber(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer() );
-        isBytesOrderReversed = ltt_getIsBytesOrderReversed(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer() );
-        isFloatWordOrdered = ltt_getIsFloatWordOrdered(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer() );
-        alignement = ltt_getAlignement(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer() );
-        bufferHeaderSize = ltt_getBufferHeaderSize(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer() );
-        bitsOfCurrentTimestampCounter = ltt_getBitsOfCurrentTimestampCounter(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer() );
-        bitsOfEvent = ltt_getBitsOfEvent(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer() );
-        currentTimestampCounterMask = ltt_getCurrentTimestampCounterMask(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer() );
-        currentTimestampCounterMaskNextBit = ltt_getCurrentTimestampCounterMaskNextBit(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer() );
-        eventsLost = ltt_getEventsLost(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer() );
-        subBufferCorrupt = ltt_getSubBufferCorrupt(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer() );
-        bufferPtr = new Jni_C_Pointer(ltt_getBufferPtr(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer()) );
-        bufferSize = ltt_getBufferSize(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer());
+        isCpuOnline = ltt_getIsCpuOnline( thisTracefilePtr.getPointer() );
+        tracefilePath = ltt_getTracefilepath( thisTracefilePtr.getPointer() );
+        tracefileName = ltt_getTracefilename( thisTracefilePtr.getPointer() );
+        cpuNumber = ltt_getCpuNumber( thisTracefilePtr.getPointer() );
+        tid = ltt_getTid( thisTracefilePtr.getPointer() );
+        pgid = ltt_getPgid( thisTracefilePtr.getPointer() );
+        creation = ltt_getCreation( thisTracefilePtr.getPointer() );
+        tracePtr = new Jni_C_Pointer(ltt_getTracePtr( thisTracefilePtr.getPointer()) );
+        markerDataPtr = new Jni_C_Pointer(ltt_getMarkerDataPtr( thisTracefilePtr.getPointer()) );
+        CFileDescriptor = ltt_getCFileDescriptor( thisTracefilePtr.getPointer() );
+        fileSize = ltt_getFileSize( thisTracefilePtr.getPointer() );
+        blocksNumber = ltt_getBlockNumber( thisTracefilePtr.getPointer() );
+        isBytesOrderReversed = ltt_getIsBytesOrderReversed( thisTracefilePtr.getPointer() );
+        isFloatWordOrdered = ltt_getIsFloatWordOrdered( thisTracefilePtr.getPointer() );
+        alignement = ltt_getAlignement( thisTracefilePtr.getPointer() );
+        bufferHeaderSize = ltt_getBufferHeaderSize( thisTracefilePtr.getPointer() );
+        bitsOfCurrentTimestampCounter = ltt_getBitsOfCurrentTimestampCounter( thisTracefilePtr.getPointer() );
+        bitsOfEvent = ltt_getBitsOfEvent( thisTracefilePtr.getPointer() );
+        currentTimestampCounterMask = ltt_getCurrentTimestampCounterMask( thisTracefilePtr.getPointer() );
+        currentTimestampCounterMaskNextBit = ltt_getCurrentTimestampCounterMaskNextBit( thisTracefilePtr.getPointer() );
+        eventsLost = ltt_getEventsLost( thisTracefilePtr.getPointer() );
+        subBufferCorrupt = ltt_getSubBufferCorrupt( thisTracefilePtr.getPointer() );
+        bufferPtr = new Jni_C_Pointer(ltt_getBufferPtr( thisTracefilePtr.getPointer()) );
+        bufferSize = ltt_getBufferSize( thisTracefilePtr.getPointer() );
 
         // To fill the map is a bit different
-        ltt_feedAllMarkers(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer() );
+        ltt_feedAllMarkers( thisTracefilePtr.getPointer() );
 
-        Jni_C_Pointer_And_Library_Id tmpEventPointer = new Jni_C_Pointer_And_Library_Id(thisTracefilePtr.getLibraryId(), ltt_getEventPtr(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer()));
+        Jni_C_Pointer tmpEventPointer = new Jni_C_Pointer(ltt_getEventPtr(thisTracefilePtr.getPointer()));
         currentEvent = allocateNewJniEvent(tmpEventPointer , tracefileMarkersMap, this);
     }        
     
@@ -268,15 +266,16 @@ public abstract class JniTracefile extends Jni_C_Common
      * @param markerId          Id of the marker (int)
      * @param markerInfoPtr     C Pointer to a marker_info C structure 
      */
-	private void addMarkersFromC(int markerId, long markerInfoPtr) {
+    @SuppressWarnings("unused")
+    private void addMarkersFromC(int markerId, long markerInfoPtr) {
         // Create a new tracefile object and insert it in the map
         // the tracefile fill itself with LTT data while being constructed
         try {
-            JniMarker newMarker = allocateNewJniMarker( new Jni_C_Pointer_And_Library_Id(thisTracefilePtr.getLibraryId(), markerInfoPtr) );
+            JniMarker newMarker = allocateNewJniMarker( new Jni_C_Pointer(markerInfoPtr) );
 
             tracefileMarkersMap.put(markerId, newMarker);
         } catch (Exception e) {
-            printlnC(thisTracefilePtr.getLibraryId(), "Failed to add marker to tracefileMarkersMap!(addMarkersFromC)\n\tException raised : " + e.toString());
+            printlnC("Failed to add marker to tracefileMarkersMap!(addMarkersFromC)\n\tException raised : " + e.toString());
         }
     }
     
@@ -390,7 +389,7 @@ public abstract class JniTracefile extends Jni_C_Common
      *
      * @return The parent trace
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniTrace
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTrace
      */
     public JniTrace getParentTrace() {
         return parentTrace;
@@ -404,9 +403,9 @@ public abstract class JniTracefile extends Jni_C_Common
      * 
      * @return The actual (long converted) pointer or NULL.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
      */
-    public Jni_C_Pointer_And_Library_Id getTracefilePtr() {
+    public Jni_C_Pointer getTracefilePtr() {
         return thisTracefilePtr;
     }
     
@@ -416,9 +415,18 @@ public abstract class JniTracefile extends Jni_C_Common
      * 
      * This function will call Ltt to print, so information printed will be the
      * one from the C structure, not the one populated in java.<p>
+     * 
+     * This function will not throw but will complain loudly if pointer is NULL.
      */
     public void printTracefileInformation() {
-        ltt_printTracefile(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer() );
+
+        // If null pointer, print a warning!
+        if (thisTracefilePtr.getPointer() == NULL) {
+            printlnC("Pointer is NULL, cannot print. (printTracefileInformation)");
+        } 
+        else {
+            ltt_printTracefile( thisTracefilePtr.getPointer() );
+        }
     }
     
     /**
@@ -462,52 +470,8 @@ public abstract class JniTracefile extends Jni_C_Common
     }
 	
 	
-	// ****************************
-    // **** ABSTRACT FUNCTIONS ****
-    // You MUST override those in your version specific implementation
-	
-	
-	/**
-     * Function place holder to allocate a new JniEvent.<p>
-     * <br>
-     * JniEvent constructor is non overridable so we need another overridable function to return the correct version of JniEvent.<br>
-     * Effect of this function should be the same (allocate a fresh new JniEvent).<br>
-     * <br>
-     * <b>!! Override this with you version specific implementation.</b><br>
-     * 
-     * @param newEventPtr			The pointer of an already opened LttEvent C Structure
-     * @param newMarkersMap			An already populated HashMap of JniMarker objects for this new event
-     * @param newParentTracefile	The JniTrace parent of this tracefile.
-     * 
-     * @return						The newly allocated JniEvent of the correct version
-     * 
-     * @throws JniException			The construction (allocation) failed.
-     * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
-     * @see org.eclipse.linuxtools.lttng.jni.JniMarker
-     * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
-     */
-	public abstract JniEvent allocateNewJniEvent(Jni_C_Pointer_And_Library_Id newEventPtr, HashMap<Integer, JniMarker> newMarkersMap, JniTracefile newParentTracefile) throws JniException;
-    
-	
-	/**
-     * Function place holder to allocate a new JniMarker.<p>
-     * <br>
-     * JniMarker constructor is non overridable so we need another overridable function to return the correct version of JniMarker.<br>
-     * Effect of this function should be the same (allocate a fresh new JniMarker).<br>
-     * <br>
-     * <b>!! Override this with you version specific implementation.</b><br>
-     * 
-     * @param newMarkerPtr			The pointer of an already opened marker_info C Structure
-     * 
-     * @return						The newly allocated JniMarker of the correct version
-     * 
-     * @throws JniException			The construction (allocation) failed.
-     * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniMarker
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
-     */
-	public abstract JniMarker allocateNewJniMarker(Jni_C_Pointer_And_Library_Id newMarkerPtr) throws JniException;
+	public abstract JniEvent allocateNewJniEvent(Jni_C_Pointer newEventPtr, HashMap<Integer, JniMarker> newMarkersMap, JniTracefile newParentTracefile) throws JniException;
+    public abstract JniMarker allocateNewJniMarker(Jni_C_Pointer newMarkerPtr) throws JniException;
 	
 }
+

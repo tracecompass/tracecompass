@@ -11,12 +11,13 @@ package org.eclipse.linuxtools.lttng.jni;
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
 import org.eclipse.linuxtools.lttng.jni.common.JniTime;
-import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id;
+import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer;
 import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.exception.JniOpenTraceFailedException;
 import org.eclipse.linuxtools.lttng.jni.exception.JniTraceException;
@@ -33,23 +34,19 @@ import org.eclipse.linuxtools.lttng.jni.exception.JniTracefileWithoutEventExcept
  * <li>a JniTrace path (a trace <b>directory</b>)
  * <li>a HashMap of tracefiles that exists in this trace
  * </ul>
- * <p>
- * <b>NOTE</b><p>
- * This class is ABSTRACT, you need to extends it to support your specific LTTng version.<br>
- * Please look at the abstract functions to override at the bottom of this file.<p>
  */
 public abstract class JniTrace extends Jni_C_Common {
     
     private final static boolean DEFAULT_LTT_DEBUG = false;
     
     // Internal C pointer of the JniTrace used in LTT
-    private Jni_C_Pointer_And_Library_Id thisTracePtr = new Jni_C_Pointer_And_Library_Id();
+    private Jni_C_Pointer thisTracePtr = new Jni_C_Pointer();
 
     // Data we should populate from LTT
     // Note that all type have been scaled up as there is no "unsigned" in java
     // This might be a problem about "unsigned long" as there is no equivalent
     // in java
-    
+
     private String tracepath = ""; // Path of the trace. Should be a directory (like : /tmp/traceX)
     private int    cpuNumber = 0;
     private long   archType = 0;
@@ -77,45 +74,47 @@ public abstract class JniTrace extends Jni_C_Common {
     // Should we print debug in the C library or not?
     private boolean printLttDebug = DEFAULT_LTT_DEBUG;
     
-    
     // This need to be called prior to any operation
-    protected native int ltt_initializeHandle(String libname);
-    
+    protected native boolean ltt_initializeHandle(String libname);
     // This need to be called at the very end (destructor)
-    protected native boolean ltt_freeHandle(int libId);
+    protected native boolean ltt_freeHandle();
     
     // Open/close native functions
-    protected native long ltt_openTrace(int libId, String pathname, boolean printDebug);
-    protected native void ltt_closeTrace(int libId, long tracePtr);
+    protected native long ltt_openTrace(String pathname, boolean printDebug);
+    protected native void ltt_closeTrace(long tracePtr);
 
     // Native access functions
-    protected native String ltt_getTracepath(int libId, long tracePtr);
-    protected native int    ltt_getCpuNumber(int libId, long tracePtr);
-    protected native long   ltt_getArchType(int libId, long tracePtr);
-    protected native long   ltt_getArchVariant(int libId, long tracePtr);
-    protected native short  ltt_getArchSize(int libId, long tracePtr);
-    protected native short  ltt_getLttMajorVersion(int libId, long tracePtr);
-    protected native short  ltt_getLttMinorVersion(int libId, long tracePtr);
-    protected native short  ltt_getFlightRecorder(int libId, long tracePtr);
-    protected native long   ltt_getFreqScale(int libId, long tracePtr);
-    protected native long   ltt_getStartFreq(int libId, long tracePtr);
-    protected native long   ltt_getStartTimestampCurrentCounter(int libId, long tracePtr);
-    protected native long   ltt_getStartMonotonic(int libId, long tracePtr);
+    protected native String ltt_getTracepath(long tracePtr);
+    protected native int    ltt_getCpuNumber(long tracePtr);
+    protected native long   ltt_getArchType(long tracePtr);
+    protected native long   ltt_getArchVariant(long tracePtr);
+    protected native short  ltt_getArchSize(long tracePtr);
+    protected native short  ltt_getLttMajorVersion(long tracePtr);
+    protected native short  ltt_getLttMinorVersion(long tracePtr);
+    protected native short  ltt_getFlightRecorder(long tracePtr);
+    protected native long   ltt_getFreqScale(long tracePtr);
+    protected native long   ltt_getStartFreq(long tracePtr);
+    protected native long   ltt_getStartTimestampCurrentCounter(long tracePtr);
+    protected native long   ltt_getStartMonotonic(long tracePtr);
     
     // Native function to fill out startTime
-    protected native void ltt_feedStartTime(int libId, long tracePtr, JniTime startTime);
+    protected native void ltt_feedStartTime(long tracePtr, JniTime startTime);
     
     // Native function to fill out startTimeFromTimestampCurrentCounter
-    protected native void ltt_feedStartTimeFromTimestampCurrentCounter(int libId, long tracePtr, JniTime startTime);
+    protected native void ltt_feedStartTimeFromTimestampCurrentCounter(long tracePtr, JniTime startTime);
 
     // Native function to fill out tracefilesMap
-    protected native void ltt_feedAllTracefiles(int libId, long tracePtr);
+    protected native void ltt_feedAllTracefiles(long tracePtr);
     
     // Native function to fill out the start and end time of the trace
-    protected native void ltt_feedTracefileTimeRange(int libId, long tracePtr, JniTime startTime, JniTime endTime);
+    protected native void ltt_feedTracefileTimeRange(long tracePtr, JniTime startTime, JniTime endTime);
     
     // Debug native function, ask LTT to print trace structure
-    protected native void ltt_printTrace(int libId, long tracePtr);
+    protected native void ltt_printTrace(long tracePtr);
+
+	static {
+		System.loadLibrary("lttvtraceread_loader");
+	}
     
     /*
      * Default constructor is forbidden
@@ -148,7 +147,7 @@ public abstract class JniTrace extends Jni_C_Common {
      */
     public JniTrace(String newpath, boolean newPrintDebug) throws JniException {
         tracepath = newpath;
-        thisTracePtr = new Jni_C_Pointer_And_Library_Id();
+        thisTracePtr = new Jni_C_Pointer();
         printLttDebug = newPrintDebug;
         
         openTrace(newpath);
@@ -179,10 +178,10 @@ public abstract class JniTrace extends Jni_C_Common {
         endTime         = oldTrace.endTime;
 
         tracefilesMap = new HashMap<String, JniTracefile>(oldTrace.tracefilesMap.size());
-        ltt_feedAllTracefiles(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
+        tracefilesMap = oldTrace.tracefilesMap;
         
         eventsHeap = new PriorityQueue<JniEvent>( oldTrace.eventsHeap.size());
-        populateEventHeap();
+        eventsHeap = oldTrace.eventsHeap;
         
         printLttDebug = oldTrace.printLttDebug;
     }        
@@ -195,9 +194,9 @@ public abstract class JniTrace extends Jni_C_Common {
      *            
      * @exception JniException
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
      */
-    public JniTrace(Jni_C_Pointer_And_Library_Id newPtr, boolean newPrintDebug) throws JniException {
+    public JniTrace(Jni_C_Pointer newPtr, boolean newPrintDebug) throws JniException {
         thisTracePtr = newPtr;
         printLttDebug = newPrintDebug;
         
@@ -206,14 +205,12 @@ public abstract class JniTrace extends Jni_C_Common {
     }
     
     
-    @Override
-	public void finalize() {
+    public void finalize() {
     	// If the trace is open, close it
         if (thisTracePtr.getPointer() != NULL) {
             closeTrace();
         }
         
-        // Tell the C to free the allocated memory
         freeLibrary();
     }
     
@@ -221,7 +218,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * Open an existing trace.<p>
      * 
      * The tracepath is a directory and needs to exist, otherwise
-     * a JniOpenTraceFailedException is throwed.
+     * a JafOpenTraceFailedException is throwed.
      * 
      * @param newPath The <b>directory</b> of the trace to be opened
      * 
@@ -257,29 +254,24 @@ public abstract class JniTrace extends Jni_C_Common {
             closeTrace();
         }
         
-        // Initialization of the library is made here
-        // It is very important that the id is kept!
-        int newLibraryId = initializeLibrary();
-        if ( newLibraryId != -1 ) {
+        if ( initializeLibrary() == true ) {
 	        // Call the LTT to open the trace
-        	// Note that the libraryId is not yet and the pointer
-	        long newPtr = ltt_openTrace(newLibraryId, tracepath, printLttDebug);
+	        long newPtr = ltt_openTrace(tracepath, printLttDebug);
 	        
 	        if (newPtr == NULL) {
-	        	thisTracePtr = new Jni_C_Pointer_And_Library_Id();
+	        	thisTracePtr = new Jni_C_Pointer(NULL);
 	            throw new JniOpenTraceFailedException("Error while opening trace. Is the tracepath correct? (openTrace)");
 	        }
 	        
 	        // This is OUR pointer
-	        thisTracePtr = new Jni_C_Pointer_And_Library_Id(newLibraryId, newPtr);
+	        thisTracePtr = new Jni_C_Pointer(newPtr);
 	
 	        // Populate the trace with LTT information
 	        populateTraceInformation();
         }
         else {
-        	thisTracePtr = new Jni_C_Pointer_And_Library_Id();
-        	throw new JniTraceException("Failed to initialize library! Is the trace version supported?\n" +
-        			                    "Make sure you have the correct LTTv library compiled. (openTrace)");
+        	thisTracePtr = new Jni_C_Pointer(NULL);
+        	throw new JniTraceException("Failed to initialize library! Trace version not supported? (openTrace)");
         }
     }
         
@@ -291,7 +283,7 @@ public abstract class JniTrace extends Jni_C_Common {
     public void closeTrace() {
     	
         if (thisTracePtr.getPointer() != NULL) {
-            ltt_closeTrace(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
+            ltt_closeTrace(thisTracePtr.getPointer());
             
             // Clear the tracefile map
             tracefilesMap.clear();
@@ -302,7 +294,11 @@ public abstract class JniTrace extends Jni_C_Common {
             eventsHeap = null;
             
             // Nullify the pointer
-            thisTracePtr = new Jni_C_Pointer_And_Library_Id();
+            thisTracePtr = new Jni_C_Pointer(NULL);
+            
+            // Ask the garbage collector to make a little pass here, as we could
+            // be left with 100's of unreferenced objects
+            System.gc();
         }
     }
     
@@ -312,7 +308,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * Note : No call to the library will work after this until ltt_initializeHandle is called again
      */
     public void freeLibrary() {
-    	ltt_freeHandle(thisTracePtr.getLibraryId());
+    	ltt_freeHandle();
     }
     
     /* 
@@ -326,18 +322,18 @@ public abstract class JniTrace extends Jni_C_Common {
         }
 
         // Populate from the LTT library
-        tracepath   = ltt_getTracepath(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
-        cpuNumber   = ltt_getCpuNumber(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
-        archType    = ltt_getArchType(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
-        archVariant = ltt_getArchVariant(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
-        archSize    = ltt_getArchSize(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
-        lttMajorVersion = ltt_getLttMajorVersion(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
-        lttMinorVersion = ltt_getLttMinorVersion(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
-        flightRecorder  = ltt_getFlightRecorder(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
-        freqScale   = ltt_getFreqScale(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
-        startFreq   = ltt_getStartFreq(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
-        startTimestampCurrentCounter = ltt_getStartTimestampCurrentCounter(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
-        startMonotonic = ltt_getStartMonotonic(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
+        tracepath   = ltt_getTracepath( thisTracePtr.getPointer() );
+        cpuNumber   = ltt_getCpuNumber( thisTracePtr.getPointer() );
+        archType    = ltt_getArchType( thisTracePtr.getPointer() );
+        archVariant = ltt_getArchVariant( thisTracePtr.getPointer() );
+        archSize    = ltt_getArchSize( thisTracePtr.getPointer() );
+        lttMajorVersion = ltt_getLttMajorVersion( thisTracePtr.getPointer() );
+        lttMinorVersion = ltt_getLttMinorVersion( thisTracePtr.getPointer() );
+        flightRecorder  = ltt_getFlightRecorder( thisTracePtr.getPointer() );
+        freqScale   = ltt_getFreqScale( thisTracePtr.getPointer() );
+        startFreq   = ltt_getStartFreq( thisTracePtr.getPointer() );
+        startTimestampCurrentCounter = ltt_getStartTimestampCurrentCounter( thisTracePtr.getPointer() );
+        startMonotonic = ltt_getStartMonotonic( thisTracePtr.getPointer() );
 
         // Creation of time is a bit different, we need to pass the object reference to C
         //
@@ -345,21 +341,21 @@ public abstract class JniTrace extends Jni_C_Common {
         //			  So "startTimeNoAdjustement" is obtain throught "ltt_feedStartTime()" and
         //			  "startTime" is obtained from ltt_feedStartTimeFromTimestampCurrentCounter()
         startTimeNoAdjustement = new JniTime();
-        ltt_feedStartTime(thisTracePtr.getLibraryId(), thisTracePtr.getPointer(), startTimeNoAdjustement);
+        ltt_feedStartTime( thisTracePtr.getPointer(), startTimeNoAdjustement );
         
         startTime = new JniTime();
-        ltt_feedStartTimeFromTimestampCurrentCounter(thisTracePtr.getLibraryId(), thisTracePtr.getPointer(), startTime);
+        ltt_feedStartTimeFromTimestampCurrentCounter( thisTracePtr.getPointer(), startTime );
 
         // Call the fill up function for the tracefiles map
         if ( tracefilesMap== null ) {
             tracefilesMap = new HashMap<String, JniTracefile>();
         }
-        ltt_feedAllTracefiles(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
+        ltt_feedAllTracefiles( thisTracePtr.getPointer() );
         
         // Now, obtain the trace "endTime"
         // Note that we discard "startTime" right away, as we already have it
         endTime = new JniTime();
-        ltt_feedTracefileTimeRange(thisTracePtr.getLibraryId(), thisTracePtr.getPointer(), new JniTime(), endTime);
+        ltt_feedTracefileTimeRange(thisTracePtr.getPointer(), new JniTime(), endTime);
         
         if (eventsHeap == null) {
             eventsHeap = new PriorityQueue<JniEvent>(tracefilesMap.size());
@@ -408,17 +404,17 @@ public abstract class JniTrace extends Jni_C_Common {
         // Create a new tracefile object and insert it in the map
         //    the tracefile fill itself with LTT data while being constructed
         try {
-            newTracefile = allocateNewJniTracefile(new Jni_C_Pointer_And_Library_Id(thisTracePtr.getLibraryId(), tracefilePtr), this);
+            newTracefile = allocateNewJniTracefile( new Jni_C_Pointer(tracefilePtr), this );
             getTracefilesMap().put( (tracefileName + newTracefile.getCpuNumber()), newTracefile);
         }
         catch(JniTracefileWithoutEventException e) {
         	if ( printLttDebug == true ) {
-        		printlnC(thisTracePtr.getLibraryId(), "JniTracefile " + tracefileName + " has no event (addTracefileFromC). Ignoring.");
+        		printlnC("JniTracefile " + tracefileName + " has no event (addTracefileFromC). Ignoring.");
         	}
         }
         catch(Exception e) {
         	if ( printLttDebug == true ) {
-        		printlnC(thisTracePtr.getLibraryId(), "Failed to add tracefile " + tracefileName + " to tracefilesMap!(addTracefileFromC)\n\tException raised : " + e.toString() );
+        		printlnC("Failed to add tracefile " + tracefileName + " to tracefilesMap!(addTracefileFromC)\n\tException raised : " + e.toString() );
         	}
         }
     }
@@ -430,7 +426,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * @return The top event in the stack or null if no event is available.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniEvent
      */
     public JniEvent findNextEvent() {
         return eventsHeap.peek();
@@ -441,7 +437,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * @return The next event in the trace or null if no event is available.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniEvent
      */
     public JniEvent readNextEvent() {
         // Get the "next" event on the top of the heap but DO NOT remove it
@@ -490,8 +486,8 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * @return The next event in the tracefile or null if no event is available.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
-     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTracefile
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniEvent
      */
     public JniEvent readNextEvent(JniTracefile targetTracefile) {
         JniEvent returnedEvent = null;
@@ -532,7 +528,7 @@ public abstract class JniTrace extends Jni_C_Common {
     * 
     * @param seekTime     The time where we want to seek to
     * 
-    * @see org.eclipse.linuxtools.lttng.jni.common.JniTime
+    * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.JniTime
     */
     public void seekToTime(JniTime seekTime) {
         
@@ -559,8 +555,8 @@ public abstract class JniTrace extends Jni_C_Common {
     * @param targetTracefile 	The tracefile object to read from
     * @param seekTime     		The time where we want to seek to
     * 
-    * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
-    * @see org.eclipse.linuxtools.lttng.jni.common.JniTime
+    * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTracefile
+    * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.JniTime
     */
     public void seekToTime(JniTime seekTime, JniTracefile targetTracefile) {
         // Invalidate the current read event
@@ -587,8 +583,8 @@ public abstract class JniTrace extends Jni_C_Common {
     * 
     * @return The event just after the seeked time or null if none available.
     * 
-    * @see org.eclipse.linuxtools.lttng.jni.JniEvent
-    * @see org.eclipse.linuxtools.lttng.jni.common.JniTime
+    * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniEvent
+    * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.JniTime
     */
     public JniEvent seekAndRead(JniTime seekTime) { 
          JniEvent returnedEvent = null;
@@ -607,14 +603,14 @@ public abstract class JniTrace extends Jni_C_Common {
     * 
     * Calling  readNextEvent() after this function will consider this tracefile moved and is then consistent.<br>
     * 
-    * @param targetTracefile    The tracefile object to read from
+    * @param tracefileName   The tracefile object to read from
     * @param seekTime           The time where we want to seek to
     * 
     * @return The event just after the seeked time or null if none available.
     * 
-    * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
-    * @see org.eclipse.linuxtools.lttng.jni.common.JniTime
-    * @see org.eclipse.linuxtools.lttng.jni.JniEvent
+    * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTracefile
+    * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.JniTime
+    * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniEvent
     */
     public JniEvent seekAndRead(JniTime seekTime, JniTracefile targetTracefile) { 
         seekToTime(seekTime, targetTracefile);
@@ -628,7 +624,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * @return The tracefile found or null if none.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTracefile
      */
     public JniTracefile requestTracefileByName(String tracefileName) {
         return tracefilesMap.get(tracefileName);
@@ -641,7 +637,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * @return Event of the tracefile or null if none found.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniEvent
      */
     public JniEvent requestEventByName(String tracefileName) {
         JniEvent returnValue = null;
@@ -729,7 +725,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * @return Time of the last event read
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.JniTime
+     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.JniTime
      */
     public JniTime getCurrentEventTimestamp() {
         JniTime returnedTime = null;
@@ -753,9 +749,9 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * @return The actual (long converted) pointer or NULL.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
      */
-    public Jni_C_Pointer_And_Library_Id getTracePtr() {
+    public Jni_C_Pointer getTracePtr() {
         return thisTracePtr;
     }        
     
@@ -777,7 +773,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * This function will call Ltt to print, so information printed will be the
      * one from the C structure, not the one populated in java.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
+     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTracefile
      */
     public void printAllTracefilesInformation() {
         JniTracefile tracefile = null;
@@ -795,9 +791,18 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * This function will call Ltt to print, so information printed will be the
      * one from the C structure, not the one populated in java.<p>
+     * <br>
+     * This function will not throw but will complain loudly if pointer is NULL
      */
     public void printTraceInformation() {
-        ltt_printTrace(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
+
+        // If null pointer, print a warning!
+        if (thisTracePtr.getPointer() == NULL) {
+            printlnC("Pointer is NULL, cannot print. (printTraceInformation)");
+        } 
+        else {
+            ltt_printTrace( thisTracePtr.getPointer() );
+        }
     }
         
     /**
@@ -835,43 +840,8 @@ public abstract class JniTrace extends Jni_C_Common {
         return returnData;
     }
     
+    public abstract boolean initializeLibrary();
     
-    // ****************************
-    // **** ABSTRACT FUNCTIONS ****
-    // You MUST override those in your version specific implementation
-    
-    /**
-     * Function place holder to load the correct C library.<p>
-     * <br>
-     * Can be as simple as calling ltt_initializeHandle(LIBRARY_NAME) with the correct .so instead of LIBRARY_NAME.<br>
-     * You may also want to perform some check or some additionnal validations.<br>
-     * <br>
-     * <b>!! Override this with you version specific implementation.</b><br>
-     * 
-     * @return integer that is the library id, or -1 if the load was unsuccessful
-     */
-    public abstract int initializeLibrary();
-    
-    
-    /**
-     * Function place holder to allocate a new JniTracefile.<p>
-     * 
-     * JniTracefile constructor is non overridable so we need another overridable function to return the correct version of JniTracefile.<br>
-     * Effect of this function should be the same (allocate a fresh new JniTracefile)<br>
-     * <br>
-     * <b>!! Override this with you version specific implementation.</b><br>
-     * 
-     * @param newPtr			The pointer of an already opened LttTracefile C Structure
-     * @param newParentTrace	The JniTrace parent of this tracefile.
-     * 
-     * @return					The newly allocated JniTracefile of the correct version
-     * 
-     * @throws JniException		The construction (allocation) failed.
-     * 
-     * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
-     * @see org.eclipse.linuxtools.lttng.jni.JniTrace
-     */
-    public abstract JniTracefile allocateNewJniTracefile(Jni_C_Pointer_And_Library_Id newPtr, JniTrace newParentTrace) throws JniException;
+    public abstract JniTracefile allocateNewJniTracefile(Jni_C_Pointer newPtr, JniTrace newParentTrace) throws JniException;
     
 }

@@ -18,17 +18,18 @@ import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant;
 /**
  * <b><u>Jni_C_Common</u></b>
  * <p>
- * Common constants and methods that should be shared between JNI objects.
- * 
- * <b>NOTE</b><p>
- * This class is ABSTRACT, and will be extended by each LTTng structure (Trac, Tracefile, Event, ...)
- * 
+ * Common constants and methods that should be shared between JNI objects
  */
-public abstract class Jni_C_Common extends Jni_C_Constant 
-{
-    // Native console printing function
-    protected native void ltt_printC(int libId, String string_to_print);
+public abstract class Jni_C_Common extends Jni_C_Constant {
     
+    // Native console printing function
+    protected native void ltt_printC(String string_to_print);
+
+    // Load LTTV library (order is important)
+	static {
+		System.loadLibrary("lttvtraceread_loader");
+	}
+
     /**
      * Java-side console printing function.<p>
      * 
@@ -36,10 +37,10 @@ public abstract class Jni_C_Common extends Jni_C_Constant
      * 
      * @param msg   The string to print in C.
      */
-    public void printC(int libId, String msg) {
+    public void printC(String msg) {
         // Need to escape "%" for C printf 
         msg = msg.replaceAll("%", "%%");
-        ltt_printC(libId, msg);
+        ltt_printC(msg);
     }
 
     /**
@@ -49,8 +50,7 @@ public abstract class Jni_C_Common extends Jni_C_Constant
      * 
      * @param msg   The string to print in C.
      */
-    public void printlnC(int libId, String msg) {
-        printC(libId, msg + "\n");
+    public void printlnC(String msg) {
+        printC(msg + "\n");
     }
-    
 }

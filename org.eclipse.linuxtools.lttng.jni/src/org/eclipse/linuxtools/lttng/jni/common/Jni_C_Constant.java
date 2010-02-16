@@ -11,12 +11,11 @@ package org.eclipse.linuxtools.lttng.jni.common;
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
+
 /**
  * <b><u>Jni_C_Common</u></b>
  * <p>
- * Common constants and methods that should be shared between JNI objects.<p>
- * 
- * This class is abstract and is intended to be extended by LTTng modules that need the constants.
+ * Common constants and methods that should be shared between JNI objects
  */
 public abstract class Jni_C_Constant {
     
@@ -30,12 +29,6 @@ public abstract class Jni_C_Constant {
     
     // Timestamps are in nanoseconds, this const ease up the math
     public static final long NANO = 1000000000;
-    
-    /**
-     * Default constructor
-     */
-    public Jni_C_Constant() {
-    }
     
     /**
      * "Alternate" .toString()<p>

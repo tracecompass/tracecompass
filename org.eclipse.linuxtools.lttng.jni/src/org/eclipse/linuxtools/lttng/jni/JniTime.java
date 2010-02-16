@@ -1,5 +1,15 @@
-package org.eclipse.linuxtools.lttng.jni.common;
-
+package org.eclipse.linuxtools.lttng.jni;
+/*******************************************************************************
+ * Copyright (c) 2009 Ericsson
+ * 
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *   William Bourque (wbourque@gmail.com) - Initial API and implementation
+ *******************************************************************************/
 
 
 /**
@@ -9,7 +19,7 @@ package org.eclipse.linuxtools.lttng.jni.common;
  * 
  * Mimic the behavior of the LttTime C structure.
  */
-public class JniTime extends Jni_C_Constant implements Comparable<JniTime>
+public class JniTime extends Jni_C_Common implements Comparable<JniTime>
 {
     private long time = 0;
 

@@ -1,6 +1,6 @@
 package org.eclipse.linuxtools.lttng.jni;
 
-import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id;
+import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer;
 import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.exception.JniMarkerFieldException;
 
@@ -16,35 +16,42 @@ import org.eclipse.linuxtools.lttng.jni.exception.JniMarkerFieldException;
  * <li> the name (field) of in String
  * <li> the marker field format (in C style printf format)
  * </ul>
- * 
- * <b>NOTE</b><p>
- * This class is ABSTRACT, you need to extends it to support your specific LTTng version.<p>
- * 
  */
 public abstract class JniMarkerField extends Jni_C_Common
 {
     // Internal C pointer of the JniEvent used in LTT
-    private Jni_C_Pointer_And_Library_Id thisMarkerFieldPtr = new Jni_C_Pointer_And_Library_Id();
+    private Jni_C_Pointer thisMarkerFieldPtr = new Jni_C_Pointer();
 
     private String field = "";
     private String format = "";
     
     // Native access method
-    protected native String ltt_getField(int libId, long markerFieldPtr);
-    protected native int ltt_getType(int libId, long markerFieldPtr);
-    protected native long ltt_getOffset(int libId, long markerFieldPtr);
-    protected native long ltt_getSize(int libId, long markerFieldPtr);
-    protected native long ltt_getAlignment(int libId, long markerFieldPtr);
-    protected native long ltt_getAttributes(int libId, long markerFieldPtr);
-    protected native int ltt_getStatic_offset(int libId, long markerFieldPtr);
-    protected native String ltt_getFormat(int libId, long markerFieldPtr);
+    protected native String ltt_getField(long markerFieldPtr);
+    @SuppressWarnings("unused")
+    protected native int ltt_getType(long markerFieldPtr);
+    @SuppressWarnings("unused")
+    protected native long ltt_getOffset(long markerFieldPtr);
+    @SuppressWarnings("unused")
+    protected native long ltt_getSize(long markerFieldPtr);
+    @SuppressWarnings("unused")
+    protected native long ltt_getAlignment(long markerFieldPtr);
+    @SuppressWarnings("unused")
+    protected native long ltt_getAttributes(long markerFieldPtr);
+    @SuppressWarnings("unused")
+    protected native int ltt_getStatic_offset(long markerFieldPtr);
+    protected native String ltt_getFormat(long markerFieldPtr);
 
     // Debug native function, ask LTT to print marker structure
-    protected native void ltt_printMarkerField(int libId, long markerFieldPtr);
+    protected native void ltt_printMarkerField(long markerFieldPtr);
+
+	static {
+		System.loadLibrary("lttvtraceread_loader");
+	}
 
     /*
      * Default constructor is forbidden
      */
+    @SuppressWarnings("unused")
     protected JniMarkerField() {
     }
 
@@ -65,10 +72,8 @@ public abstract class JniMarkerField extends Jni_C_Common
      * @param newMarkerFieldPtr  Pointer to a C marker_field structure
      * 
      * @exception JniException
-     * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
      */
-    public JniMarkerField(Jni_C_Pointer_And_Library_Id newMarkerFieldPtr) throws JniException {
+    public JniMarkerField(Jni_C_Pointer newMarkerFieldPtr) throws JniException {
         thisMarkerFieldPtr = newMarkerFieldPtr;
 
         // Populate the marker field
@@ -84,8 +89,8 @@ public abstract class JniMarkerField extends Jni_C_Common
             throw new JniMarkerFieldException(
                     "Pointer is NULL, trace closed? (populateMarkerInformation)");
         } else {
-            field = ltt_getField(thisMarkerFieldPtr.getLibraryId(), thisMarkerFieldPtr.getPointer());
-            format = ltt_getFormat(thisMarkerFieldPtr.getLibraryId(), thisMarkerFieldPtr.getPointer());
+            field = ltt_getField(thisMarkerFieldPtr.getPointer());
+            format = ltt_getFormat(thisMarkerFieldPtr.getPointer());
         }
     }
 
@@ -105,9 +110,9 @@ public abstract class JniMarkerField extends Jni_C_Common
      * 
      * @return The actual (long converted) pointer or NULL
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
      */
-    public Jni_C_Pointer_And_Library_Id getMarkerFieldPtr() {
+    public Jni_C_Pointer getMarkerFieldPtr() {
         return thisMarkerFieldPtr;
     }
     
@@ -116,9 +121,17 @@ public abstract class JniMarkerField extends Jni_C_Common
      * 
      * This function will call Ltt to print, so information printed will be the one from 
      * the C structure, not the one populated in java.<p>
+     * 
+     * This function will not throw but will complain loudly if pointer is NULL
      */
     public void printMarkerFieldInformation() {
-        ltt_printMarkerField(thisMarkerFieldPtr.getLibraryId(), thisMarkerFieldPtr.getPointer());
+
+        // If null pointer, print a warning!
+        if (thisMarkerFieldPtr.getPointer() == NULL) {
+            printlnC("Pointer is NULL, cannot print. (printMarkerFieldInformation)");
+        } else {
+            ltt_printMarkerField(thisMarkerFieldPtr.getPointer());
+        }
     }
     
     /**
@@ -135,5 +148,4 @@ public abstract class JniMarkerField extends Jni_C_Common
         
         return returnData;
     }
-    
 }
