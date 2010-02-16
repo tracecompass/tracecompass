@@ -2,10 +2,10 @@
 package org.eclipse.linuxtools.lttng.tests.jni;
 
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
-import org.eclipse.linuxtools.lttng.jni.JniException;
-import org.eclipse.linuxtools.lttng.jni.JniTime;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
-import org.eclipse.linuxtools.lttng.jni.Jni_C_Pointer;
+import org.eclipse.linuxtools.lttng.jni.common.JniTime;
+import org.eclipse.linuxtools.lttng.jni.exception.JniException;
+import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
 
 import junit.framework.TestCase;
 
@@ -95,7 +95,7 @@ public class JniTraceTest extends TestCase
                 
                 // This trace should be valid
                 try {
-                        tmpTrace = new JniTrace(tracepath1, printLttDebug);
+                        tmpTrace = JniTraceFactory.getJniTrace(tracepath1, printLttDebug);
                         //tmpTrace.seekToTime(new JniTime(0L));
                 }
                 catch( JniException e) { }
@@ -104,13 +104,14 @@ public class JniTraceTest extends TestCase
         }
         
         public void testTraceConstructors() {
-                JniTrace testTrace1 = null;
+                @SuppressWarnings("unused")
+				JniTrace testTrace1 = null;
                 @SuppressWarnings("unused")
                 JniTrace testTrace2 = null;
                 
                 // Test constructor with argument on a wrong tracepath
                 try {
-                        testTrace1 = new JniTrace(wrongTracePath, printLttDebug);
+                        testTrace1 = JniTraceFactory.getJniTrace(wrongTracePath, printLttDebug);
                         fail("Construction with wrong tracepath should fail!");
                 }
                 catch( JniException e) { 
@@ -118,12 +119,13 @@ public class JniTraceTest extends TestCase
                 
                 // Test constructor with argument on a correct tracepath
                 try {
-                        testTrace1 = new JniTrace(tracepath1, printLttDebug);
+                        testTrace1 = JniTraceFactory.getJniTrace(tracepath1, printLttDebug);
                 }
                 catch( JniException e) {
                         fail("Construction with correct tracepath failed!");
                 }
                 
+                /*
                 // Test copy constructor that take a pointer with a good pointer
                 try {
                         testTrace1 = new JniTrace( new Jni_C_Pointer(0), printLttDebug);
@@ -140,7 +142,7 @@ public class JniTraceTest extends TestCase
                 catch( JniException e) { 
                         fail("Construction with correct pointer failed!");
                 }
-                
+                */
         }
         
         public void testTraceOpenClose() {

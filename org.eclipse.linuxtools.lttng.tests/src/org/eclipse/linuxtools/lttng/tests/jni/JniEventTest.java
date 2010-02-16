@@ -30,12 +30,13 @@
 
 package org.eclipse.linuxtools.lttng.tests.jni;
 
+
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
-import org.eclipse.linuxtools.lttng.jni.JniException;
-import org.eclipse.linuxtools.lttng.jni.JniTime;
-import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.lttng.jni.JniTracefile;
-import org.eclipse.linuxtools.lttng.jni.Jni_C_Pointer;
+import org.eclipse.linuxtools.lttng.jni.common.JniTime;
+import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer;
+import org.eclipse.linuxtools.lttng.jni.exception.JniException;
+import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
 
 import junit.framework.TestCase;
 
@@ -82,7 +83,7 @@ public class JniEventTest extends TestCase
                 
                 // This trace should be valid
                 try {
-                        tmpEvent = new JniTrace(tracepath, printLttDebug).requestEventByName(eventName);
+                        tmpEvent = JniTraceFactory.getJniTrace(tracepath, printLttDebug).requestEventByName(eventName);
                 }
                 catch( JniException e) { }
                 
@@ -93,12 +94,14 @@ public class JniEventTest extends TestCase
         public void testEventConstructors() {
                 JniTracefile testTracefile = null;
                 
-                JniEvent testEvent1 = null;
-                JniEvent testEvent2 = null;
+                @SuppressWarnings("unused")
+				JniEvent testEvent1 = null;
+                @SuppressWarnings("unused")
+				JniEvent testEvent2 = null;
                 
                 // This trace should be valid and will be used in test
                 try {
-                        testTracefile = new JniTrace(tracepath, printLttDebug).requestTracefileByName(eventName);
+                        testTracefile = JniTraceFactory.getJniTrace(tracepath, printLttDebug).requestTracefileByName(eventName);
                 }
                 catch( JniException e) { }
                 
@@ -106,7 +109,7 @@ public class JniEventTest extends TestCase
                 // Test the constructor with parameters using wrong arguments
                 // Test constructor on a wrong event pointer
                 try {
-                        testEvent1 = new JniEvent( new Jni_C_Pointer(0), testTracefile.getTracefileMarkersMap(), testTracefile );
+                        testEvent1 = testTracefile.allocateNewJniEvent( new Jni_C_Pointer(0), testTracefile.getTracefileMarkersMap(), testTracefile );
                         fail("Construction with wrong event pointer should fail!");
                 }
                 catch( JniException e) { 
@@ -114,7 +117,7 @@ public class JniEventTest extends TestCase
                 
                 // Test constructor on a wrong marker HashMap
                 try {
-                        testEvent1 = new JniEvent( testTracefile.getCurrentEvent().getEventPtr(), null, testTracefile );
+                        testEvent1 = testTracefile.allocateNewJniEvent( testTracefile.getCurrentEvent().getEventPtr(), null, testTracefile );
                         fail("Construction with wrong marker hashmap should fail!");
                 }
                 catch( JniException e) { 
@@ -122,7 +125,7 @@ public class JniEventTest extends TestCase
                 
                 // Test constructor on a wrong tracefile reference
                 try {
-                        testEvent1 = new JniEvent( testTracefile.getCurrentEvent().getEventPtr(), testTracefile.getTracefileMarkersMap(), null );
+                        testEvent1 = testTracefile.allocateNewJniEvent( testTracefile.getCurrentEvent().getEventPtr(), testTracefile.getTracefileMarkersMap(), null );
                         fail("Construction with wrong tracefile reference should fail!");
                 }
                 catch( JniException e) { 
@@ -131,14 +134,13 @@ public class JniEventTest extends TestCase
                 
                 // Finally, test constructor with correct information
                 try {
-                        testEvent1 = new JniEvent( testTracefile.getCurrentEvent().getEventPtr(), testTracefile.getTracefileMarkersMap(), testTracefile );
-                        
+                        testEvent1 = testTracefile.allocateNewJniEvent( testTracefile.getCurrentEvent().getEventPtr(), testTracefile.getTracefileMarkersMap(), testTracefile );
                 }
                 catch( JniException e) { 
                         fail("Construction with correct information failed!");
                 }
                 
-                
+                /*
                 // Test copy constructor
                 try {
                         testEvent1 = new JniEvent( testTracefile.getCurrentEvent() );
@@ -147,8 +149,8 @@ public class JniEventTest extends TestCase
                 catch( Exception e) {
                         fail("Copy constructor failed!");
                 }
-                
                 assertEquals("JniEvent timestamp not same after using copy constructor", testEvent1.getEventTime().getTime() , testEvent2.getEventTime().getTime() );
+                */
                 
         }
         
