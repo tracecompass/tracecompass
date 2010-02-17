@@ -7,11 +7,7 @@ import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 
 public class JniTrace_v2_3 extends JniTrace {
 	
-	// *** FIXME ***
-	// Eventually, it should be something like this :
-	//	private static final String LIBRARY_NAME = "liblttvtraceread2.3.so";
-	// However, the C library is not ready yet, so we will keep the general one : 
-	private static final String LIBRARY_NAME = "liblttvtraceread.so";
+	private static final String LIBRARY_NAME = "liblttvtraceread2.3.so";
 	
 	protected JniTrace_v2_3() {
 		super();
@@ -36,7 +32,12 @@ public class JniTrace_v2_3 extends JniTrace {
     
     
     public boolean initializeLibrary() {
-    	return ltt_initializeHandle(LIBRARY_NAME);
+    	// *** FIXME ***
+    	// To change as soon as the library will be able to load multiple version at once
+    	//return ltt_initializeHandle(LIBRARY_NAME);
+    	// ***
+    	System.loadLibrary("lttvtraceread");
+    	return true;
     }
     
     

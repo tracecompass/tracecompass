@@ -26,9 +26,11 @@ public abstract class Jni_C_Common extends Jni_C_Constant {
     protected native void ltt_printC(String string_to_print);
 
     // Load LTTV library (order is important)
-	static {
-		System.loadLibrary("lttvtraceread_loader");
-	}
+    // *** FIXME ***
+    // To uncomment as soon as the library will be able to load multiple version at once
+	// static {
+	//	System.loadLibrary("lttvtraceread_loader");
+	//}
 
     /**
      * Java-side console printing function.<p>

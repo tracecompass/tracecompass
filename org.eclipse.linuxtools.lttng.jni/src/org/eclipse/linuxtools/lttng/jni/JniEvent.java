@@ -89,9 +89,11 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
     // Debug native function, ask LTT to print event structure
     protected native void     ltt_printEvent(long eventPtr);
 
-	static {
-		System.loadLibrary("lttvtraceread_loader");
-	}
+    // *** FIXME ***
+    // To uncomment as soon as the library will be able to load multiple version at once
+	// static {
+	//	System.loadLibrary("lttvtraceread_loader");
+	//}
 
     
     /**

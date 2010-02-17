@@ -28,9 +28,11 @@ public abstract class JniParser extends Jni_C_Common
 {
     protected static native void ltt_getParsedData(ParsedObjectContent parseddata, long eventPtr, long markerFieldPtr);
 
-	static {
-		System.loadLibrary("lttvtraceread_loader");
-	}
+    // *** FIXME ***
+    // To uncomment as soon as the library will be able to load multiple version at once
+	// static {
+	//	System.loadLibrary("lttvtraceread_loader");
+	//}
     
     // *** HACK ***
     // We cannot use "Object" directly as java does not support swapping primitive value
