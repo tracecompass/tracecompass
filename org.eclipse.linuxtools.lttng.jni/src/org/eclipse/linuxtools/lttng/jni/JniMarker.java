@@ -51,22 +51,14 @@ public abstract class JniMarker extends Jni_C_Common
     // Native access method
     protected native String ltt_getName(long markerPtr);   
     protected native String ltt_getFormatOverview(long markerPtr);
-    @SuppressWarnings("unused")
     protected native long ltt_getSize(long markerPtr);
-    @SuppressWarnings("unused")
     protected native short ltt_getLargestAlign(long markerPtr);
-    @SuppressWarnings("unused")
     protected native short ltt_getIntSize(long markerPtr);
-    @SuppressWarnings("unused")
     protected native short ltt_getLongSize(long markerPtr);
-    @SuppressWarnings("unused")
     protected native short ltt_getPointerSize(long markerPtr);
-    @SuppressWarnings("unused")
     protected native short ltt_getSize_tSize(long markerPtr);
     protected native void ltt_getAllMarkerFields(long tracePtr);
-    @SuppressWarnings("unused")
     protected native short ltt_getAlignement(long markerPtr);
-    @SuppressWarnings("unused")
     protected native long ltt_getNextMarkerPtr(long markerPtr);
 
     // Debug native function, ask LTT to print marker structure
@@ -81,7 +73,6 @@ public abstract class JniMarker extends Jni_C_Common
     /*
      * Default constructor is forbidden
      */
-    @SuppressWarnings("unused")
     protected JniMarker() {
     }
     

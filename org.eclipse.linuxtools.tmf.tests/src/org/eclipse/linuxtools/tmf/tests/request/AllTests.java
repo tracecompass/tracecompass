@@ -11,6 +11,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test suite for " + TmfCorePlugin.PLUGIN_ID + ".request"); //$NON-NLS-1$);
 		//$JUnit-BEGIN$
 		suite.addTestSuite(TmfDataRequestTest.class);
+		suite.addTestSuite(TmfEventRequestTest.class);
 		//$JUnit-END$
 		return suite;
 	}

@@ -16,8 +16,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.trace.ITmfEventParser;
+import org.eclipse.linuxtools.tmf.parser.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
@@ -26,7 +27,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
  * <p>
  * Dummy test trace. Use in conjunction with LTTngEventParserStub.
  */
-public class LTTngTraceStub extends TmfTrace {
+public class LTTngTraceStub extends TmfTrace<LttngEvent> {
 
     // ========================================================================
     // Attributes
@@ -58,10 +59,10 @@ public class LTTngTraceStub extends TmfTrace {
      * @throws FileNotFoundException
      */
     public LTTngTraceStub(String filename, int cacheSize) throws FileNotFoundException {
-        super(filename, cacheSize, false);
+        super(LttngEvent.class, filename, cacheSize);
         fTrace = new RandomAccessFile(filename, "r");
     	fParser = new LTTngEventParserStub();
-    	indexStream();
+    	indexTrace(true);
     }
 
     // ========================================================================
@@ -84,10 +85,10 @@ public class LTTngTraceStub extends TmfTrace {
        	try {
        		synchronized(fTrace) {
         		fTrace.seek((location != null) ? (Long) location : 0);
-        		context = new TmfTraceContext(getCurrentLocation(), null, 0);
-        		TmfTraceContext context2 = new TmfTraceContext(getCurrentLocation(), null, 0);
-        		TmfEvent event = parseEvent(context2);
-        		context.setTimestamp(event.getTimestamp());
+        		context = new TmfTraceContext(getCurrentLocation(), 0);
+//        		TmfTraceContext context2 = new TmfTraceContext(getCurrentLocation(), 0);
+//        		TmfEvent event = parseEvent(context2);
+//        		context.setTimestamp(event.getTimestamp());
        		}
         } catch (IOException e) {
         	// TODO Auto-generated catch block

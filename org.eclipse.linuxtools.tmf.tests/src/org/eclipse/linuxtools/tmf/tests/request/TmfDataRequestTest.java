@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2010 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,8 +15,6 @@ package org.eclipse.linuxtools.tmf.tests.request;
 import junit.framework.TestCase;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 
 /**
@@ -26,9 +24,9 @@ import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
  */
 public class TmfDataRequestTest extends TestCase {
 
-	// ========================================================================
+	// ------------------------------------------------------------------------
 	// Housekeeping
-	// ========================================================================
+	// ------------------------------------------------------------------------
 
 	public TmfDataRequestTest(String name) {
 		super(name);
@@ -44,59 +42,40 @@ public class TmfDataRequestTest extends TestCase {
 		super.tearDown();
 	}
 
-	// ========================================================================
+	// ------------------------------------------------------------------------
 	// Constructors
-	// ========================================================================
+	// ------------------------------------------------------------------------
 
-	public void testTmfDataRequestIndexNbEvents() {
-        TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(10, 100);
+	public void testTmfDataRequest() {
+        TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(TmfEvent.class);
 
-        assertEquals("getRange",            null, request.getRange());
+        assertEquals("getIndex",             0, request.getIndex());
+        assertEquals("getNbRequestedEvents", TmfDataRequest.ALL_DATA, request.getNbRequested());
+        assertEquals("getBlockize", TmfDataRequest.DEFAULT_BLOCK_SIZE, request.getBlockize());
+	}
+
+	public void testTmfDataRequestIndex() {
+        TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(TmfEvent.class, 10);
+
+        assertEquals("getIndex",             10, request.getIndex());
+        assertEquals("getNbRequestedEvents", TmfDataRequest.ALL_DATA, request.getNbRequested());
+        assertEquals("getBlockize", TmfDataRequest.DEFAULT_BLOCK_SIZE, request.getBlockize());
+	}
+
+	public void testTmfDataRequestIndexNbRequested() {
+        TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(TmfEvent.class, 10, 100);
+
         assertEquals("getIndex",              10, request.getIndex());
-        assertEquals("getNbRequestedEvents", 100, request.getNbRequestedEvents());
+        assertEquals("getNbRequestedEvents", 100, request.getNbRequested());
         assertEquals("getBlockize", TmfDataRequest.DEFAULT_BLOCK_SIZE, request.getBlockize());
 	}
 
 	public void testTmfDataRequestIndexNbEventsBlocksize() {
-        TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(10, 100, 200);
+        TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(TmfEvent.class, 10, 100, 200);
 
-        assertEquals("getRange",            null, request.getRange());
         assertEquals("getIndex",              10, request.getIndex());
-        assertEquals("getNbRequestedEvents", 100, request.getNbRequestedEvents());
+        assertEquals("getNbRequestedEvents", 100, request.getNbRequested());
         assertEquals("getBlockize",          200, request.getBlockize());
-	}
-
-	public void testTmfDataRequestTimeRange() {
-        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range);
-
-        assertEquals("StartTime", TmfTimestamp.BigBang,   request.getRange().getStartTime());
-        assertEquals("EndTime",   TmfTimestamp.BigCrunch, request.getRange().getEndTime());
-        assertEquals("getIndex",              0, request.getIndex());
-        assertEquals("getNbRequestedEvents", -1, request.getNbRequestedEvents());
-        assertEquals("getBlockize", TmfDataRequest.DEFAULT_BLOCK_SIZE, request.getBlockize());
-	}
-
-	public void testTmfDataRequestTimeRangeNbEvents() {
-        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 10);
-
-        assertEquals("StartTime", TmfTimestamp.BigBang,   request.getRange().getStartTime());
-        assertEquals("EndTime",   TmfTimestamp.BigCrunch, request.getRange().getEndTime());
-        assertEquals("getIndex",              0, request.getIndex());
-        assertEquals("getNbRequestedEvents", 10, request.getNbRequestedEvents());
-        assertEquals("getBlockize", TmfDataRequest.DEFAULT_BLOCK_SIZE, request.getBlockize());
-	}
-
-	public void testTmfDataRequestTimeRangeNbEventsBlockSize() {
-        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(range, 10, 100);
-
-        assertEquals("StartTime", TmfTimestamp.BigBang,   request.getRange().getStartTime());
-        assertEquals("EndTime",   TmfTimestamp.BigCrunch, request.getRange().getEndTime());
-        assertEquals("getIndex",              0, request.getIndex());
-        assertEquals("getNbRequestedEvents", 10, request.getNbRequestedEvents());
-        assertEquals("getBlockize",         100, request.getBlockize());
 	}
 
 }

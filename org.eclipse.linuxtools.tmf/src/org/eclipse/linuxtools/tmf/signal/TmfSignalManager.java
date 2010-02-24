@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2010 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -31,27 +31,28 @@ public class TmfSignalManager {
 
 	// The set of event listeners and their corresponding handler methods.
 	// Note: listeners could be restricted to ITmfComponents but there is no
-	// harm in letting anyone use this
+	// harm in letting anyone use this since it is not tied to anything but
+	// the signal data type.
 	static private Map<Object, Method[]> fListeners = new HashMap<Object, Method[]>();
 
 	// If requested, add universal signal tracer
-	// TODO: to be revisited... 
+	// TODO: Temporary solution: should be enabled/disabled dynamically 
 	private static boolean fTraceIsActive = false;
 	private static TmfSignalTracer fSignalTracer;
 	static {
 		if (fTraceIsActive) {
 			fSignalTracer = TmfSignalTracer.getInstance();
-			addListener(fSignalTracer);
+			register(fSignalTracer);
 		}
 	}
 
-	public static synchronized void addListener(Object listener) {
+	public static synchronized void register(Object listener) {
 		Method[] methods = getSignalHandlerMethods(listener);
 		if (methods.length > 0)
 			fListeners.put(listener, methods);
 	}
 
-	public static synchronized void removeListener(Object listener) {
+	public static synchronized void deregister(Object listener) {
 		fListeners.remove(listener);
 	}
 
@@ -101,7 +102,7 @@ public class TmfSignalManager {
 			}
 		}
 
-		// Call the signal handlers
+		// Call the signal handlers 
 		for (Map.Entry<Object, List<Method>> entry : listeners.entrySet()) {
 			for (Method method : entry.getValue()) {
 				try {

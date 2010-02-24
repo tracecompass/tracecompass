@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2010 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -17,17 +17,18 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.parser.ITmfEventParser;
 
 /**
  * <b><u>TmfTraceStub</u></b>
  * <p>
  * Dummy test trace. Use in conjunction with TmfEventParserStub.
  */
-public class TmfTraceStub extends TmfTrace {
+public class TmfTraceStub extends TmfTrace<TmfEvent> {
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Attributes
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
     // The actual stream
     private final RandomAccessFile fTrace;
@@ -35,9 +36,9 @@ public class TmfTraceStub extends TmfTrace {
     // The associated event parser
     private final ITmfEventParser fParser;
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Constructors
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
     /**
      * @param filename
@@ -45,6 +46,15 @@ public class TmfTraceStub extends TmfTrace {
      */
     public TmfTraceStub(String filename) throws FileNotFoundException {
         this(filename, DEFAULT_CACHE_SIZE, false);
+    }
+
+    /**
+     * @param filename
+     * @param cacheSize
+     * @throws FileNotFoundException
+     */
+    public TmfTraceStub(String filename, int cacheSize) throws FileNotFoundException {
+        this(filename, cacheSize, false);
     }
 
     /**
@@ -60,49 +70,41 @@ public class TmfTraceStub extends TmfTrace {
      * @param cacheSize
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(String filename, int cacheSize) throws FileNotFoundException {
-        this(filename, cacheSize, false);
-    }
-
-    /**
-     * @param filename
-     * @param cacheSize
-     * @throws FileNotFoundException
-     */
     public TmfTraceStub(String filename, int cacheSize, boolean waitForCompletion) throws FileNotFoundException {
-        super(filename, cacheSize, waitForCompletion);
+        super(TmfEvent.class, filename, cacheSize);
         fTrace = new RandomAccessFile(filename, "r");
         fParser = new TmfEventParserStub();
-        indexStream();
+        indexTrace(waitForCompletion);
     }
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Accessors
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
     public RandomAccessFile getStream() {
         return fTrace;
     }
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Operators
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.eventlog.ITmfStreamLocator#seekLocation(java.lang.Object)
      */
 	public TmfTraceContext seekLocation(Object location) {
-    	TmfTraceContext context = null;
         try {
         	synchronized(fTrace) {
+        		// Position the trace, read the event (to obtain its timestamp)
+        		// and then re-position the trace (not great...)
         		fTrace.seek((location != null) ? (Long) location : 0);
-        		context = new TmfTraceContext(getCurrentLocation(), null, 0);
+        		TmfTraceContext context = new TmfTraceContext(getCurrentLocation());
+        		return context;
         	}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return context;
+		return null;
     }
 
     /* (non-Javadoc)
@@ -127,9 +129,6 @@ public class TmfTraceStub extends TmfTrace {
        	try {
    			// paserNextEvent updates the context
    			TmfEvent event = fParser.parseNextEvent(this, context);
-   			if (event != null) {
-   				context.setTimestamp(event.getTimestamp());
-   			}
        		return event;
        	}
        	catch (IOException e) {
@@ -137,9 +136,5 @@ public class TmfTraceStub extends TmfTrace {
        	}
        	return null;
 	}
-
-	// ========================================================================
-    // Helper functions
-    // ========================================================================
 
 }

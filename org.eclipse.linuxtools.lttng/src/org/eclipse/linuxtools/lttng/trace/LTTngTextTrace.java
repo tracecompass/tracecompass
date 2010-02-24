@@ -15,7 +15,6 @@ package org.eclipse.linuxtools.lttng.trace;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
@@ -26,16 +25,15 @@ import org.eclipse.linuxtools.lttng.event.LttngEventSource;
 import org.eclipse.linuxtools.lttng.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.component.ITmfContext;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.request.ITmfRequestHandler;
+import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceCheckpoint;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
-public class LTTngTextTrace extends TmfTrace implements ITmfTrace, ITmfRequestHandler<TmfEvent> {
+public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 	private LttngTimestamp                  eventTimestamp   = null;
     private LttngEventSource                eventSource      = null;
     private LttngEventType                  eventType        = null;
@@ -53,14 +51,14 @@ public class LTTngTextTrace extends TmfTrace implements ITmfTrace, ITmfRequestHa
     
     private int cpuNumber = -1;
     
-    private  boolean showDebug = false;
+    private  boolean showDebug = true;
     
     public LTTngTextTrace(String path) throws Exception {
     	this(path, false);
     }
     
     public LTTngTextTrace(String path, boolean skipIndexing) throws Exception {
-        super(path, 1, true);
+        super(LttngEvent.class, path, 1);
         
         tracepath = path;
         traceTypes      = new HashMap<String, LttngEventType>();
@@ -85,13 +83,13 @@ public class LTTngTextTrace extends TmfTrace implements ITmfTrace, ITmfRequestHa
         		fCheckpoints.add(new TmfTraceCheckpoint(new LttngTimestamp(0L), 0L));
         	}
         	else {
-        		indexStream();
+        		indexTrace(true);
         	}
         	
         	Long endTime = currentLttngEvent.getTimestamp().getValue();
         	positionToFirstEvent();
         	
-        	getNextEvent(new TmfTraceContext(null, null, 0));
+        	getNextEvent(new TmfTraceContext(null, 0));
         	Long starTime = currentLttngEvent.getTimestamp().getValue();
         	positionToFirstEvent();
         	
@@ -103,57 +101,8 @@ public class LTTngTextTrace extends TmfTrace implements ITmfTrace, ITmfRequestHa
     
     
     private LTTngTextTrace(LTTngTrace oldStream) throws Exception { 
-    	super(null);
+    	super(LttngEvent.class, null);
     	throw new Exception("Copy constructor should never be use with a LTTngTrace!");
-    }
-    
-    @Override
-    public void indexStream() {
-    	// Position the trace at the beginning
-        TmfTraceContext context = seekLocation(null);
-        
-       	long nbEvents=1L;
-       	fCheckpoints.add(new TmfTraceCheckpoint(new LttngTimestamp(0L), 0L));
-       	
-       	LttngTimestamp startTime = null;
-       	LttngTimestamp lastTime  = new LttngTimestamp();
-       	LttngTimestamp timestamp = null;
-        Long previousCharRead = 0L;
-        
-        TextLttngEvent tmpEvent = (TextLttngEvent)getNextEvent(context);
-        
-        while ( tmpEvent != null) {
-        	timestamp = (LttngTimestamp)context.getTimestamp();
-        	previousCharRead = nbCharRead;
-        	
-        	if ( startTime == null ) {
-        		startTime = new LttngTimestamp(timestamp.getValue());
-        	}
-        	
-        	if ((++nbEvents % fCacheSize) == 0) {
-           		fCheckpoints.add(new TmfTraceCheckpoint(new LttngTimestamp(timestamp.getValue()), previousCharRead));
-        	}
-        	
-        	tmpEvent = (TextLttngEvent)getNextEvent(context);
-        }
-        
-        if (timestamp != null) {
-			lastTime.setValue(timestamp.getValue());
-				
-           		setTimeRange( new TmfTimeRange(startTime, lastTime) );
-           		notifyListeners(getTimeRange());
-		}
-        
-        fNbEvents = nbEvents;
-        
-        if ( showDebug == true ) {
-	        for ( int pos=0; pos < fCheckpoints.size(); pos++) {
-	        	System.out.print(pos + ": " + "\t");
-	        	System.out.print( fCheckpoints.get(pos).getTimestamp() + "\t" );
-	        	System.out.println( fCheckpoints.get(pos).getLocation() );
-	        }
-        }
-        
     }
     
     private boolean positionToFirstEvent() {
@@ -185,6 +134,10 @@ public class LTTngTextTrace extends TmfTrace implements ITmfTrace, ITmfRequestHa
     
     private void skipToPosition(Long skipPosition) {
     	try {
+    			if ( skipPosition < 0 ) {
+    				skipPosition = 0L;
+    			}
+    		
 				if ( showDebug == true ) {
 					System.out.println("skipToPosition(Long skipPosition)");
 					System.out.println("\tSkipping to : " + skipPosition);
@@ -201,133 +154,21 @@ public class LTTngTextTrace extends TmfTrace implements ITmfTrace, ITmfRequestHa
     }
     
     public TmfTraceContext seekLocation(Object location) {
+
     	if (location == null) {
     		location = 0L;
     	}
-    	
-    	TmfTraceContext tmpTraceContext =  new TmfTraceContext(nbCharRead, (LttngTimestamp)currentLttngEvent.getTimestamp(), 0L);
-		Long previousCharRead = nbCharRead;
-        Long previousTimestamp = currentLttngEvent.getTimestamp().getValue();
-    	Long tmploc = (Long)location;
-		
-		if ( showDebug == true ) {
-			System.out.println("seekLocation(Object location)");
-    		System.out.println("\ttimestamp: " + (LttngTimestamp)currentLttngEvent.getTimestamp());
-    		System.out.println("\tnbCharRead:" + nbCharRead);
-    		System.out.println("\tlocation:  " + location);
-    		System.out.println();
+
+    	if (!((Long) location).equals(nbCharRead)) {
+    		skipToPosition((Long) location);
     	}
-		
-		if ( tmploc < nbCharRead ) {
-			skipToPosition(tmploc);
-		}
-		
-		if ( tmploc > nbCharRead ) {
-			while ( tmploc > nbCharRead ) {
-				previousCharRead = nbCharRead;
-	        	previousTimestamp = currentLttngEvent.getTimestamp().getValue();
-				getNextEvent(tmpTraceContext);
-			}
-		}
-		
-		tmpTraceContext.setTimestamp(new LttngTimestamp(previousTimestamp));
-		tmpTraceContext.setLocation(previousCharRead);
+
+    	TmfTraceContext tmpTraceContext =  new TmfTraceContext(location, 0L);
     	
     	return tmpTraceContext;
     }
     
-    
-    @Override
-    public TmfTraceContext seekEvent(TmfTimestamp timestamp) {
-
-    	if (timestamp == null) {
-    		timestamp = getStartTime();
-    	}
-        
-    	int index = Collections.binarySearch(fCheckpoints, new TmfTraceCheckpoint(timestamp, 0));
-    	
-        if (index < 0) {
-            index = 0;
-        }
-        
-        Object location = (index < fCheckpoints.size()) ? fCheckpoints.elementAt(index).getLocation() : null;
-        
-    	if ( showDebug == true ) {
-    		System.out.println("seekEvent(TmfTimestamp timestamp)");
-    		System.out.println("\ttimestamp: " + timestamp.getValue());
-    		System.out.println("\tindex:     " + index);
-    		System.out.println("\tlocation:  " + location);
-    		System.out.println();
-    	}
-    	
-    	// *** HACK ***
-    	// We only know the timestamp AFTER we read the actual event
-    	// For this reason, we save the current "position" in byte (nbCharRead) and we seek back 1 event after we find our event
-        TmfTraceContext currentEventContext = seekLocation(location);
-        
-        Long previousCharRead = nbCharRead;
-        Long previousTimestamp = currentLttngEvent.getTimestamp().getValue();
-        TmfEvent event = getNextEvent(currentEventContext);
-        
-        while ( (event != null) && (event.getTimestamp().getValue() < timestamp.getValue()) ) {
-        	previousCharRead = nbCharRead;
-        	previousTimestamp = currentLttngEvent.getTimestamp().getValue();
-        	event = getNextEvent(currentEventContext);
-        }
-        
-        if ( event != null ) {
-        	skipToPosition(previousCharRead);
-        	currentEventContext.setLocation(previousCharRead);
-        	currentEventContext.setTimestamp(new LttngTimestamp(previousTimestamp));
-        }
-        
-        return currentEventContext;
-    }
-    
-    @Override
-    public TmfTraceContext seekEvent(long position) {
-    	
-        int checkPointPos = ((int)position / fCacheSize);
-        
-        Object location;
-        location = ( checkPointPos < fCheckpoints.size()) ? fCheckpoints.elementAt(checkPointPos).getLocation() : null;
-        
-        long index = ((position / fCacheSize)*fCacheSize)-1;
-        
-        if ( index < 0) { 
-        	index = 0; 
-        }
-        
-    	if ( showDebug == true ) {
-    		System.out.println("seekEvent(long position)");
-    		System.out.println("\tposition:  " + position);
-    		System.out.println("\tindex:     " + index);
-    		System.out.println("\tlocation:  " + location);
-    		System.out.println();
-    	}
-        TmfTraceContext currentEventContext = seekLocation(location);
-        Long previousCharRead = (Long)currentEventContext.getLocation();
-        Long previousTimestamp = currentEventContext.getTimestamp().getValue();
-        
-        TmfEvent event = null;
-        while (index < position) {
-        	event = getNextEvent(currentEventContext);
-        	previousCharRead = nbCharRead;
-        	previousTimestamp = currentLttngEvent.getTimestamp().getValue();
-        	index++;
-        }
-        
-        if ( event != null ) {
-        	skipToPosition(previousCharRead);
-        	currentEventContext.setLocation(previousCharRead);
-        	currentEventContext.setTimestamp(new LttngTimestamp(previousTimestamp));
-        }
-        
-        return currentEventContext;
-    }
-    
-    @Override
-    public TmfEvent getNextEvent(TmfTraceContext context) {
+     private LttngEvent parseMyNextEvent(TmfTraceContext context) {
     	
     	// All parsing variables declared here so to be able to print them into the catch if needed
     	String tmpContent = null;
@@ -372,14 +213,14 @@ public class LTTngTextTrace extends TmfTrace implements ITmfTrace, ITmfRequestHa
 	    		
 	    		// *** HACK ***
 	    		// Evil exit case here : the two last line of the text dump does not contain "."
-	    		// We should check in a better way (string comparaison and such) but it make the whole process to weight a lot more
+	    		// We should check in a better way (string comparison and such) but it make the whole process to weight a lot more
 	    		// Conclusion : this is ugly but fast.
 	    		if ( tmpCurIndex < 0 ) {
 	    			if ( showDebug == true ) {
 	    				System.out.println("END OF FILE.");
 	    				System.out.println();
 	    			}
-	    			return returnedEvent;
+	    			return null;
 	    		}
 	    		
 	    		tracefile = tmpContent.substring(tmpPrevIndex, tmpCurIndex ).trim();
@@ -530,9 +371,6 @@ public class LTTngTextTrace extends TmfTrace implements ITmfTrace, ITmfRequestHa
 	    		currentLttngEvent.setContent(eventContent);
 	    		currentLttngEvent.setType(traceTypes.get(tmpTypeKey));
 	    		
-	    		context.setTimestamp(eventTimestamp);
-	    		context.setLocation(nbCharRead);
-	    		
 	    		returnedEvent = currentLttngEvent;
     		}
     		else if ( showDebug == true ) {
@@ -560,32 +398,23 @@ public class LTTngTextTrace extends TmfTrace implements ITmfTrace, ITmfRequestHa
     	return nbCharRead;
     }
     
-    @Override
+	@Override
 	public LttngEvent parseEvent(TmfTraceContext context) {
-		Long location = null;
-		LttngEvent returnedEvent = null;
+		seekLocation(context.getLocation());
+		return parseMyNextEvent(context);
 		
-		if ( (currentLttngEvent!= null) && (! currentLttngEvent.getTimestamp().equals(context.getTimestamp()) ) ) {
-			seekEvent(context.getTimestamp());
-			getNextEvent(context);
-		}
-		
-		if ( currentLttngEvent != null ) {
-		    returnedEvent = currentLttngEvent;
-		}
-		
-		location = (Long)getCurrentLocation();
-    	
-   		context.setLocation(location);
-   		context.setTimestamp(currentLttngEvent.getTimestamp());
-   		context.incrIndex();
-   		
-   		return returnedEvent;
     }
     
-    public int getCpuNumber() {
+	public int getCpuNumber() {
     	return cpuNumber;
     }
+
+	@Override
+	public ITmfContext setContext(TmfDataRequest<LttngEvent> request) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
 
 

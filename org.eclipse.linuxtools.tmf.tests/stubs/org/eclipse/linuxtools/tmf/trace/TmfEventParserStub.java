@@ -23,6 +23,7 @@ import org.eclipse.linuxtools.tmf.event.TmfEventReference;
 import org.eclipse.linuxtools.tmf.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.parser.ITmfEventParser;
 
 /**
  * <b><u>TmfEventParserStub</u></b>
@@ -31,16 +32,16 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
  */
 public class TmfEventParserStub implements ITmfEventParser {
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Attributes
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
 	private final int NB_TYPES = 10;
     private final TmfEventType[] fTypes;
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Constructors
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
     public TmfEventParserStub() {
     	fTypes = new TmfEventType[NB_TYPES];
@@ -54,9 +55,9 @@ public class TmfEventParserStub implements ITmfEventParser {
     	}
     }
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Operators
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
     static final String typePrefix = "Type-";
     public TmfEvent parseNextEvent(ITmfTrace eventStream, TmfTraceContext context) throws IOException {
@@ -87,10 +88,6 @@ public class TmfEventParserStub implements ITmfEventParser {
         		for (int i = 0; i < typeIndex; i++) {
         			fields[i] = stream.readUTF();
         		}
-
-        		// Update the context
-        		context.setLocation(stream.getFilePointer());
-        		context.incrIndex();
 
         		String content = "[";
         		if (typeIndex > 0) {

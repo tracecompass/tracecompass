@@ -48,7 +48,7 @@ public class LttngEventTest extends TestCase {
     private final static String eventChannel 	= "metadata";
     private final static long 	eventCpu 		= 0;
     private final static String eventMarker 	= "core_marker_id";
-    private final static String eventContent 	= "alignment:0 size_t:4 int:4 name:vm_map pointer:4 event_id:0 long:4 channel:vm_state ";
+//    private final static String eventContent 	= "alignment:0 size_t:4 int:4 name:vm_map pointer:4 event_id:0 long:4 channel:vm_state ";
     private final static String eventReference 	= eventChannel + "_" + eventCpu;
     
     
@@ -78,7 +78,7 @@ public class LttngEventTest extends TestCase {
 		
 		try {
 			LTTngTextTrace tmpStream = initializeEventStream();
-			tmpEvent = (LttngEvent)tmpStream.getNextEvent(new TmfTraceContext(0, new LttngTimestamp(0L), 0) );
+			tmpEvent = (LttngEvent)tmpStream.getNextEvent(new TmfTraceContext(0L, 0) );
 		}
 		catch (Exception e) {
 			System.out.println("ERROR : Could not open " + tracepath1);

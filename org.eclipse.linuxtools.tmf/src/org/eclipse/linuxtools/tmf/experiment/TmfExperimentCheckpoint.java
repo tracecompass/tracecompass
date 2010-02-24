@@ -13,7 +13,7 @@
 package org.eclipse.linuxtools.tmf.experiment;
 
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /**
  * <b><u>TmfExperimentCheckpoint</u></b>
@@ -27,7 +27,7 @@ public class TmfExperimentCheckpoint implements Comparable<TmfExperimentCheckpoi
     // ------------------------------------------------------------------------
     
     private final TmfTimestamp fTimestamp;
-    private final TmfContext[] fContexts;
+    private final TmfTraceContext[] fContexts;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -37,7 +37,7 @@ public class TmfExperimentCheckpoint implements Comparable<TmfExperimentCheckpoi
      * @param ts
      * @param location
      */
-    public TmfExperimentCheckpoint(TmfTimestamp ts, TmfContext[] contexts) {
+    public TmfExperimentCheckpoint(TmfTimestamp ts, TmfTraceContext[] contexts) {
         fTimestamp = ts;
         fContexts = contexts;
     }
@@ -56,30 +56,10 @@ public class TmfExperimentCheckpoint implements Comparable<TmfExperimentCheckpoi
     /**
      * @return the checkpoint event stream location
      */
-    public TmfContext[] getContexts() {
+    public TmfTraceContext[] getContexts() {
         return fContexts;
     }
 
-    // ------------------------------------------------------------------------
-    // Object
-    // ------------------------------------------------------------------------
-
-    @Override
-    public int hashCode() {
-    	int result = 37;
-    	result = 17 * result + fTimestamp.hashCode();
-    	return result;
-    }
- 
-    @Override
-    public boolean equals(Object other) {
-    	if (!(other instanceof TmfExperimentCheckpoint)) {
-    		return false;
-    	}
-    	TmfExperimentCheckpoint o = (TmfExperimentCheckpoint) other;
-    	return fTimestamp.equals(o.fTimestamp);
-    }
- 
     // ------------------------------------------------------------------------
     // Comparable
     // ------------------------------------------------------------------------

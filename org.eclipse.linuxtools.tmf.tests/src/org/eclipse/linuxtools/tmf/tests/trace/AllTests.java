@@ -11,7 +11,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test suite for " + TmfCorePlugin.PLUGIN_ID + ".trace"); //$NON-NLS-1$);
 		//$JUnit-BEGIN$
 		suite.addTestSuite(TmfTraceTest.class);
-//		suite.addTestSuite(TmfExperimentTest.class);
+		suite.addTestSuite(TmfExperimentTest.class);
 		//$JUnit-END$
 		return suite;
 	}

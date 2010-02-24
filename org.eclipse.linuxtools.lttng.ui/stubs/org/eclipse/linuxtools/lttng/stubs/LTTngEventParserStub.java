@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Francois Chouinard (fchouinard@gmail.com) - Initial API and implementation
+ *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng.stubs;
@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.lttng.stubs;
 import java.io.IOException;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.trace.ITmfEventParser;
+import org.eclipse.linuxtools.tmf.parser.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 

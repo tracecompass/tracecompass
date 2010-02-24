@@ -49,7 +49,7 @@ class LTTngTraceException extends LttngException {
  * LTTng trace implementation. It accesses the C trace handling library
  * (seeking, reading and parsing) through the JNI component.
  */
-public class LTTngTrace extends TmfTrace {
+public class LTTngTrace extends TmfTrace<LttngEvent> {
     private final static boolean SHOW_LTT_DEBUG_DEFAULT = false;
 	private final static boolean IS_PARSING_NEEDED_DEFAULT = false;
 	private final static int     CHECKPOINT_PAGE_SIZE      = 1;
@@ -109,7 +109,7 @@ public class LTTngTrace extends TmfTrace {
      * 
      */
     public LTTngTrace(String path, boolean waitForCompletion, boolean bypassIndexing) throws Exception {
-        super(path, CHECKPOINT_PAGE_SIZE, true);
+        super(LttngEvent.class, path, CHECKPOINT_PAGE_SIZE);
         try {
     		currentJniTrace = JniTraceFactory.getJniTrace(path, SHOW_LTT_DEBUG_DEFAULT);
         }
@@ -122,6 +122,9 @@ public class LTTngTrace extends TmfTrace {
         			  				    new LttngTimestamp(currentJniTrace.getEndTime().getTime())
                                       )
                     );
+        
+        //System.out.println("START :" + currentJniTrace.getStartTime().getTime());
+        //System.out.println("END :" + currentJniTrace.getEndTime().getTime());
         
         // Export all the event types from the JNI side 
         traceTypes      = new HashMap<String, LttngEventType>();
@@ -144,7 +147,7 @@ public class LTTngTrace extends TmfTrace {
         
         // Bypass indexing if asked
         if ( bypassIndexing == false ) {
-            indexStream();
+            indexTrace(true);
         }
     }
     
@@ -156,7 +159,7 @@ public class LTTngTrace extends TmfTrace {
      * For this reason, copy constructor should NEVER be used.
      */
     private LTTngTrace(LTTngTrace oldStream) throws Exception { 
-    	super(null);
+    	super(LttngEvent.class, null);
     	throw new Exception("Copy constructor should never be use with a LTTngTrace!");
     }
     
@@ -226,6 +229,7 @@ public class LTTngTrace extends TmfTrace {
 		LttngEvent returnedEvent = null;
 		
     	synchronized (currentJniTrace) {
+    		
     	    // Seek to the context's location
     		seekLocation(context.getLocation());
     		
@@ -242,8 +246,8 @@ public class LTTngTrace extends TmfTrace {
     		timestamp = (LttngTimestamp) getCurrentLocation();
     	}
    		context.setLocation(timestamp);
-   		context.setTimestamp(timestamp);
-   		context.incrIndex();
+//   		context.setTimestamp(timestamp);
+//   		context.incrRank();
    		
    		return returnedEvent;
     }
@@ -327,14 +331,25 @@ public class LTTngTrace extends TmfTrace {
     	// If location is null, interpret this as a request to get back to the beginning of the trace
         //      in that case, just change the location, the seek will happen below
     	if (location == null) {
-    		location = getStartTime();
+    		// *** FIXME ***
+    		// Corrupted StartTime in TMF!!! 
+    		//location = getStartTime();
+    		location = new LttngTimestamp(currentJniTrace.getStartTime().getTime());
     	}
 
     	if (location instanceof TmfTimestamp) {
     		long value = ((TmfTimestamp) location).getValue();
+    		
     		if (value != currentJniTrace.getCurrentEventTimestamp().getTime()) {
+    			/*
+    			System.out.println("\nLOCATION IS : " + ((TmfTimestamp) location).getValue());
+        		System.out.println("JNI IS : " + currentJniTrace.getCurrentEventTimestamp().getTime());
+    			System.out.println("SEEKING");
+    			*/
+    			
     			synchronized (currentJniTrace) {
-    				currentJniTrace.seekToTime(new JniTime(value));
+    				//currentJniTrace.seekToTime(new JniTime(value));
+    				currentJniTrace.seekAndRead(new JniTime(value));
     				timestamp = (LttngTimestamp) getCurrentLocation();
     			}
     		}
@@ -343,10 +358,7 @@ public class LTTngTrace extends TmfTrace {
     	    System.out.println("ERROR : Location not instance of TmfTimestamp");
     	}
 
-    	// FIXME: LTTng hack - start
-    	// return new TmfTraceContext(timestamp, timestamp, 0);	// Original
-        return new TmfTraceContext(timestamp, timestamp, -1);	// Hacked
-    	// FIXME: LTTng hack - end
+    	 return new TmfTraceContext(timestamp, 0);	// Original
     }
     
     /**
@@ -456,6 +468,7 @@ public class LTTngTrace extends TmfTrace {
     	
     	return returnedData;
     }
+
 }
 
 /*

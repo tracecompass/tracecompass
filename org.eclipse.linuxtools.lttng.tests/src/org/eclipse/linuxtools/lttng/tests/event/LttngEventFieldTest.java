@@ -11,7 +11,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.lttng.event.LttngEventContent;
 import org.eclipse.linuxtools.lttng.event.LttngEventField;
-import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
@@ -29,7 +28,7 @@ public class LttngEventFieldTest extends TestCase {
     private final static String tracepath1="traceset/trace-15316events_nolost_newformat.txt";
     private final static boolean skipIndexing=true;
     
-    private final static String firstEventName 		= "alignment";
+//    private final static String firstEventName 		= "alignment";
     private final static String firstEventValue 	= "0";
     
     private static LTTngTextTrace testStream = null;
@@ -59,7 +58,7 @@ public class LttngEventFieldTest extends TestCase {
 		// This trace should be valid
 		try {
 			LTTngTextTrace tmpStream = initializeEventStream();
-			tmpField = (LttngEventField)tmpStream.getNextEvent( new TmfTraceContext(0, new LttngTimestamp(0L), 0) ).getContent().getField(0);
+			tmpField = (LttngEventField)tmpStream.getNextEvent( new TmfTraceContext(0L, 0) ).getContent().getField(0);
 		} 
 		catch (Exception e) {
 			fail("ERROR : Failed to get field!");
@@ -98,7 +97,7 @@ public class LttngEventFieldTest extends TestCase {
     	// *** To "really" test the field, we will get a real field from LTTngTrace
     	LTTngTextTrace tmpStream = initializeEventStream();
     	
-    	LttngEventField testField 	= (LttngEventField)tmpStream.getNextEvent( new TmfTraceContext(0, new LttngTimestamp(0L), 0) ).getContent().getField(0);
+    	LttngEventField testField 	= (LttngEventField)tmpStream.getNextEvent( new TmfTraceContext(0L, 0) ).getContent().getField(0);
     	assertNotSame("getField is null!",null,testField);
     	
     	// *** FIXME ***

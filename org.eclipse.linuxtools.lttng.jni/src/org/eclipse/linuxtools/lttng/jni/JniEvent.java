@@ -63,24 +63,16 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
         
     // Native access functions
     protected native long     ltt_getTracefilePtr(long eventPtr);
-    @SuppressWarnings("unused")
     protected native long     ltt_getBlock(long eventPtr);
-    @SuppressWarnings("unused")
     protected native long     ltt_getOffset(long eventPtr);
-    @SuppressWarnings("unused")
     protected native long     ltt_getCurrentTimestampCounter(long eventPtr);
-    @SuppressWarnings("unused")
     protected native long     ltt_getTimestamp(long eventPtr);
     protected native int      ltt_getEventMarkerId(long eventPtr);
     protected native long     ltt_getNanosencondsTime(long eventPtr);
-    @SuppressWarnings("unused")
     protected native void     ltt_feedEventTime(long eventPtr, JniTime eventTime);
     protected native long     ltt_getEventDataSize(long eventPtr);
-    @SuppressWarnings("unused")
     protected native long     ltt_getEventSize(long eventPtr);
-    @SuppressWarnings("unused")
     protected native int      ltt_getCount(long eventPtr);
-    @SuppressWarnings("unused")
     protected native long     ltt_getOverflowNanoSeconds(long eventPtr);
         
     // This method an event pointer
@@ -99,9 +91,8 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
     /**
      * Default constructor is forbidden
      */
-    @SuppressWarnings("unused")
     protected JniEvent() {
-    };
+    }
 
     /**
      * Copy constructor.<p>

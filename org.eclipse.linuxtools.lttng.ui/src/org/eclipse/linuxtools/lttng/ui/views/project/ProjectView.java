@@ -24,12 +24,13 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentEntry;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngTraceEntry;
+import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.experiment.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
-import org.eclipse.linuxtools.tmf.trace.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
@@ -55,7 +56,7 @@ public class ProjectView extends TmfView {
     private final IWorkspace fWorkspace;
     private final IResourceChangeListener fResourceChangeListener;
     private TreeViewer fViewer;
-    private TmfExperiment fExperiment = null;
+    private TmfExperiment<LttngEvent> fExperiment = null;
 //    private Object fSelection = null;
 
     // To perform updates on the UI thread
@@ -148,7 +149,7 @@ public class ProjectView extends TmfView {
 	private void selectExperiment(LTTngExperimentEntry experiment) {
     	String expId = experiment.getName();
         if (fExperiment != null)
-        	fExperiment.dispose();
+        	fExperiment.deregister();
         try {
         	LTTngTraceEntry[] traceEntries = experiment.getTraces();
         	int nbTraces = traceEntries.length;
@@ -159,8 +160,9 @@ public class ProjectView extends TmfView {
         		ITmfTrace trace = new LTTngTrace(location, waitForCompletion);
                 traces[i] = trace;
         	}
-            fExperiment = new TmfExperiment(expId, traces, waitForCompletion);
-            broadcastSignal(new TmfExperimentSelectedSignal(this, fExperiment));
+            fExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class, expId, traces);
+            fExperiment.indexExperiment(waitForCompletion);
+            broadcast(new TmfExperimentSelectedSignal(this, fExperiment));
         } catch (FileNotFoundException e) {
         	// TODO: Why not tell the user? He would appreciate...
 //            e.printStackTrace();

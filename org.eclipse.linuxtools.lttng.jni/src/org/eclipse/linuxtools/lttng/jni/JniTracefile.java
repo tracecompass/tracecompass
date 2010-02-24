@@ -123,7 +123,6 @@ public abstract class JniTracefile extends Jni_C_Common {
     /*
      * Default constructor is forbidden
      */
-    @SuppressWarnings("unused")
     protected JniTracefile() {
     }
 

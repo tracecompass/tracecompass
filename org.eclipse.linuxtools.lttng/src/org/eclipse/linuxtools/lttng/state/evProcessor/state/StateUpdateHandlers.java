@@ -165,11 +165,22 @@ class StateUpdateHandlers {
 				LTTngCPUState cpust = traceSt.getCpu_states().get(cpu);
 				cpu_push_mode(cpust, StateStrings.CpuMode.LTTV_CPU_TRAP);
 				cpust.pushToTrapStack(trap); /* update trap status */
-
+				
 				// update Trap State
-				LttngTrapState trap_state = traceSt.getTrap_states().get(trap);
-				trap_state.incrementRunning();
-
+				LttngTrapState trap_state = null;
+				trap_state = traceSt.getTrap_states().get(trap);
+				
+				// If the trape_state exists, just increment it's counter, 
+				//	otherwise, create it
+				if ( trap_state == null ) {
+					trap_state = new LttngTrapState();
+					trap_state.incrementRunning();
+					traceSt.getTrap_states().put(trap, trap_state);
+				}
+				else {
+					trap_state.incrementRunning();
+				}
+				
 				return false;
 
 			}

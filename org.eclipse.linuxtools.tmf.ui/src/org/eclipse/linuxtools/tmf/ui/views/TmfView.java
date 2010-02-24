@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2010 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,45 +19,46 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
 /**
- * <b><u>TmfViewer</u></b>
+ * <b><u>TmfView</u></b>
  * <p>
  * TODO: Implement me. Please.
  */
 public abstract class TmfView extends ViewPart implements ITmfComponent {
 
-	/**
-	 * Constructor
-	 */
+	// ------------------------------------------------------------------------
+	// Constructor
+	// ------------------------------------------------------------------------
+
 	public TmfView() {
-		TmfSignalManager.addListener(this);
+		super();
+		register();
 	}
 
-	/**
-	 * Destructor
-	 */
-	@Override
-	public void dispose() {
-		TmfSignalManager.removeListener(this);
+	// ------------------------------------------------------------------------
+	// ITmfComponent
+	// ------------------------------------------------------------------------
+
+	public void register() {
+		TmfSignalManager.register(this);
 	}
 
-	/**
-	 * broadcastSignal
-	 */
-	public void broadcastSignal(TmfSignal signal) {
+	public void deregister() {
+		TmfSignalManager.deregister(this);
+	}
+
+	public void broadcast(TmfSignal signal) {
 		TmfSignalManager.dispatchSignal(signal);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
+	// ------------------------------------------------------------------------
+	// ViewPart
+	// ------------------------------------------------------------------------
+	
 	@Override
 	public void createPartControl(Composite parent) {
 		// TODO Auto-generated method stub
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
 	@Override
 	public void setFocus() {
 		// TODO Auto-generated method stub

@@ -12,109 +12,56 @@
 
 package org.eclipse.linuxtools.tmf.experiment;
 
+import java.util.Vector;
+
+import org.eclipse.linuxtools.tmf.component.ITmfContext;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /**
  * <b><u>TmfExperimentContext</u></b>
  * <p>
- * The experiment keeps track of the next event from each of its traces so
- * it can pick the next one in chronological order.
- * <p>
- * This implies that the "next" event from each trace has already been
- * read and that we at least know its timestamp. This doesn't imply that a
- * full parse of the event content was performed (read: LTTng works like 
- * this).
- * <p>
- * The last trace refers to the trace from which the last event was
- * "consumed" at the experiment level.
+ * Implement me. Please.
  */
-public class TmfExperimentContext extends TmfContext {
+public class TmfExperimentContext implements ITmfContext, Cloneable {
 
-	// ------------------------------------------------------------------------
-	// Constants
-	// ------------------------------------------------------------------------
-	
-	 public static final int NO_TRACE = -1;
+	private ITmfTrace[]       fTraces = new ITmfTrace[0];	// The set of traces
+	private TmfTraceContext[] fContexts;					// The set of trace contexts
+	private TmfEvent[]        fEvents;
 
-	// ------------------------------------------------------------------------
-	// Attributes
-	// ------------------------------------------------------------------------
-
-	private ITmfTrace[]  fTraces = new ITmfTrace[0];
-	private TmfContext[] fContexts;
-	private TmfEvent[]   fEvents;
-	private int lastTrace;
-
-	// ------------------------------------------------------------------------
-	// Constructors
-	// ------------------------------------------------------------------------
-
-	public TmfExperimentContext(ITmfTrace[] traces, TmfContext[] contexts) {
-		super();
-		fTraces   = traces;
-		fContexts = contexts;
+	public TmfExperimentContext(Vector<ITmfTrace> traces) {
+		fTraces   = traces.toArray(fTraces);
+		fContexts = new TmfTraceContext[fTraces.length];
 		fEvents   = new TmfEvent[fTraces.length];
+	}
 
-		ITmfLocation<?>[] locations = new ITmfLocation[fTraces.length];
-		long[] ranks = new long[fTraces.length];
-		long rank = 0;
-		for (int i = 0; i < fTraces.length; i++) {
-			if (contexts[i] != null) {
-				locations[i] = contexts[i].getLocation();
-				ranks[i] = contexts[i].getRank();
-				rank += contexts[i].getRank();
-			}
+	public TmfExperimentContext clone() {
+		try {
+			return (TmfExperimentContext) super.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
 		}
-		
-		setLocation(new TmfExperimentLocation(locations, ranks));
-		setRank(rank);
-		lastTrace = NO_TRACE;
+		return null;
 	}
-
-	public TmfExperimentContext(ITmfTrace[] traces) {
-		this(traces, new TmfContext[traces.length]);
-	}
-
-	public TmfExperimentContext(TmfExperimentContext other) {
-		this(other.fTraces, other.cloneContexts());
-		fEvents = other.fEvents;
-		setLocation(other.getLocation().clone());
-		setRank(other.getRank());
-		setLastTrace(other.lastTrace);
-	}
-
-	private TmfContext[] cloneContexts() {
-		TmfContext[] contexts = new TmfContext[fContexts.length];
-		for (int i = 0; i < fContexts.length; i++)
-			contexts[i] = fContexts[i].clone();
-		return contexts;
-	}
-
-	// ------------------------------------------------------------------------
-	// Accessors
-	// ------------------------------------------------------------------------
 
 	public ITmfTrace[] getTraces() {
 		return fTraces;
 	}
 
-	public TmfContext[] getContexts() {
+	public TmfTraceContext[] getContexts() {
 		return fContexts;
+	}
+
+	public TmfTraceContext[] cloneContexts() {
+		TmfTraceContext[] contexts = new TmfTraceContext[fContexts.length];
+		for (int i = 0; i < fContexts.length; i++)
+			contexts[i] = fContexts[i].clone();
+		return contexts;
 	}
 
 	public TmfEvent[] getEvents() {
 		return fEvents;
-	}
-
-	public int getLastTrace() {
-		return lastTrace;
-	}
-
-	public void setLastTrace(int newIndex) {
-		lastTrace = newIndex;
 	}
 
 }

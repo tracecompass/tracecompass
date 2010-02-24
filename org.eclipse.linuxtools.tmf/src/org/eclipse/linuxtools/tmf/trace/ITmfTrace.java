@@ -66,4 +66,12 @@ public interface ITmfTrace {
      */
     public TmfEvent getNextEvent(TmfTraceContext context);
 
+    /**
+     * Return the event pointed by the supplied context (or null if
+     * no event left) and *does not* update the context.
+     * 
+     * @return the next event in the stream
+     */
+    public TmfEvent parseEvent(TmfTraceContext context);
+
 }

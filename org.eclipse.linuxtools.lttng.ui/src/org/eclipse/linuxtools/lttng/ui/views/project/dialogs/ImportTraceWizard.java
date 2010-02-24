@@ -63,7 +63,6 @@ public class ImportTraceWizard extends Wizard implements IImportWizard {
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
      */
-	@SuppressWarnings("unchecked")
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
         fWorkbench = workbench;
         fSelection = selection;

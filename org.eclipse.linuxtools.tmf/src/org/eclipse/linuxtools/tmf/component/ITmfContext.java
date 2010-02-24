@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2010 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,14 +13,11 @@
 package org.eclipse.linuxtools.tmf.component;
 
 /**
- * <b><u>ITmfTransform</u></b>
+ * <b><u>ITmfContext</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * This is a place-holder for the context objects.
  */
-public interface ITmfTransform extends ITmfComponent {
+public interface ITmfContext {
 
-	/**
-	 * 
-	 */
-	public void transformData();
+	public ITmfContext clone();
 }

@@ -112,6 +112,11 @@ public class NewExperimentDialog extends SelectionStatusDialog {
 					public String getValue() {
 						return folderNameField.getText();
 					}
+
+					public IResource getResource() {
+						// TODO Auto-generated method stub
+						return null;
+					}
 				});
 	}
 

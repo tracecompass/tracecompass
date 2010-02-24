@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
  * <p>
  * Implement me. Please.
  */
-public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest<T> implements ITmfEventRequest<T> {
+public class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest<T> {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -35,14 +35,14 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
     /**
      * @param range
      */
-    public TmfEventRequest(Class<T> dataType) {
+    public TmfEventRequest(Class<? extends TmfEvent> dataType) {
         this(dataType, TmfTimeRange.Eternity, ALL_DATA, DEFAULT_BLOCK_SIZE);
     }
 
     /**
      * @param range
      */
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range) {
+    public TmfEventRequest(Class<? extends TmfEvent> dataType, TmfTimeRange range) {
         this(dataType, range, ALL_DATA, DEFAULT_BLOCK_SIZE);
     }
 
@@ -50,7 +50,7 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
      * @param range
      * @param nbRequested
      */
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested) {
+    public TmfEventRequest(Class<? extends TmfEvent> dataType, TmfTimeRange range, int nbRequested) {
         this(dataType, range, nbRequested, DEFAULT_BLOCK_SIZE);
     }
     
@@ -59,7 +59,7 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
      * @param nbRequested
      * @param blockSize Size of the largest blocks expected
      */
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize) {
+    public TmfEventRequest(Class<? extends TmfEvent> dataType, TmfTimeRange range, int nbRequested, int blockSize) {
     	super(dataType, 0, nbRequested, blockSize);
     	fRange = range;
     }
@@ -73,31 +73,6 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
      */
     public TmfTimeRange getRange() {
         return fRange;
-    }
-
-    // ------------------------------------------------------------------------
-    // Object
-    // ------------------------------------------------------------------------
-
-    @Override
-    // All requests have a unique id
-    public int hashCode() {
-    	return getRequestId();
-    }
-
-    @Override
-    public boolean equals(Object other) {
-    	if (other instanceof TmfEventRequest<?>) {
-    		TmfEventRequest<?> request = (TmfEventRequest<?>) other;
-    		return super.equals(other) && request.fRange.equals(fRange);
-    	}
-    	return false;
-    }
-
-    @Override
-    public String toString() {
-		return "[TmfEventRequest(" + getRequestId() + "," + getDataType().getSimpleName() 
-			+ "," + getRange() + "," + getNbRequested() + "," + getBlockize() + ")]";
     }
 
 }

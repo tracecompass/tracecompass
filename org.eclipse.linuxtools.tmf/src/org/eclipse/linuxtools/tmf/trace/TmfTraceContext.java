@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2010 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,47 +12,94 @@
 
 package org.eclipse.linuxtools.tmf.trace;
 
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.component.ITmfContext;
 
 /**
  * <b><u>TmfTraceContext</u></b>
  * <p>
- * Trace context keeper. It ties a trace location to an event index and
- * timestamp. The context should be enough to restore the trace state
- * so the corresponding event can be read.
- * 
+ * Trace context structure. It ties a trace location to an event index and
+ * timestamp. The context should be enough to restore the trace state so the
+ * corresponding event can be read.
+ * <p>
  * Used to handle conflicting, concurrent accesses to the trace. 
  */
-public class TmfTraceContext {
+public class TmfTraceContext implements ITmfContext, Cloneable {
 
 	private Object location;
-	private TmfTimestamp timestamp;
-	private long index;
+//	private TmfTimestamp timestamp;
+	private long rank;
 	
-	public TmfTraceContext(Object loc, TmfTimestamp ts, long ind) {
+//	public TmfTraceContext(Object loc, TmfTimestamp ts, long ind) {
+//		location = loc;
+//		timestamp = ts;
+//		index = ind;
+//	}
+
+	public TmfTraceContext(Object loc, long ind) {
+//		this(loc, null, 0);
 		location = loc;
-		timestamp = ts;
-		index = ind;
+		rank = ind;
 	}
 
 	public TmfTraceContext(Object loc) {
-		this(loc, null, 0);
+		this(loc, 0);
 	}
 
 	public TmfTraceContext(TmfTraceContext other) {
-		this(other.location, other.timestamp, other.index);
+//		this(other.location, other.timestamp, other.index);
+		this(other.location, other.rank);
+	}
+
+	public TmfTraceContext clone() {
+		try {
+			return (TmfTraceContext) super.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public Object getLocation() {
-//		validateLocation(location);
 		return location;
 	}
 
-// The FW expects the trace events to be ordered in time.
-// If this is not the case, this invalidates the Trace index (at least)
-// TODO: Throw an exception
-//	private TmfTimestamp previous = TmfTimestamp.BigBang;
 	public void setLocation(Object loc) {
+		location = loc;
+	}
+
+//	public TmfTimestamp getTimestamp() {
+//		return timestamp;
+//	}
+
+//	public void setTimestamp(TmfTimestamp ts) {
+//		timestamp = ts;
+//	}
+
+	public void setRank(long value) {
+		rank = value;
+	}
+
+	public long getRank() {
+		return rank;
+	}
+
+	public void incrRank() {
+		rank++;
+	}
+
+//	// ========================================================================
+//	// Toubleshooting code
+//	// ========================================================================
+//
+//	public Object getLocation() {
+//		validateLocation(location);
+//		return location;
+//	}
+//
+//	// The FW expects the trace events to be ordered in time.
+//	// If this is not the case, this invalidates the Trace index (at least)
+//	private TmfTimestamp previous = TmfTimestamp.BigBang;
+//	public void setLocation(Object loc) {
 //		if (loc instanceof TmfTimestamp) {
 //			TmfTimestamp ts = (TmfTimestamp) loc;
 //			if (ts.compareTo(previous, false) < 0) {
@@ -61,32 +108,7 @@ public class TmfTraceContext {
 //			previous = ts;
 //		}
 //		validateLocation(loc);
-		location = loc;
-	}
-
-	public TmfTimestamp getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(TmfTimestamp ts) {
-		timestamp = ts;
-	}
-
-	public void setIndex(long value) {
-		index = value;
-	}
-
-	public long getIndex() {
-		return index;
-	}
-
-	public void incrIndex() {
-		index++;
-	}
-
-//	// ========================================================================
-//	// Toubleshooting code
-//	// ========================================================================
+//	}
 //
 //	static private DataInputStream in;
 //	static private int size = 100000;
@@ -94,7 +116,8 @@ public class TmfTraceContext {
 //	static public void init() {
 //		System.out.println("TmfTraceContext: Loading valid locations...");
 //		try {
-//			in = new DataInputStream(new BufferedInputStream(new FileInputStream("LTTngOffsets.dat")));
+//			// The trace context validation file is created by TmfTrace
+//			in = new DataInputStream(new BufferedInputStream(new FileInputStream("TmfTraceContext.dat")));
 //			int i = 0;
 //			while (i < size) {
 //				locations[i] = in.readUTF();
@@ -108,7 +131,7 @@ public class TmfTraceContext {
 //		}
 //		System.out.println("TmfTraceContext: Done.");
 //	}
-
+//
 //	private boolean bsearch(long key) {
 //		int first = 0;
 //		int last = size;

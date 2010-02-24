@@ -12,13 +12,14 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.timeframe;
 
+import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.experiment.TmfExperimentSelectedSignal;
+import org.eclipse.linuxtools.tmf.experiment.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
-import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
-import org.eclipse.linuxtools.tmf.trace.TmfExperimentSelectedSignal;
-import org.eclipse.linuxtools.tmf.trace.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -87,7 +88,7 @@ public class TimeFrameView extends TmfView {
     private Slider fSlider;
 
     // The current experiment
-    TmfExperiment fExperiment = null;
+    TmfExperiment<LttngEvent> fExperiment = null;
 
     /**
      * Constructor
@@ -178,7 +179,7 @@ public class TimeFrameView extends TmfView {
         // Notify other views
         if (!fCurrentTime.equals(currentTime)) {
             fCurrentTime = currentTime;
-            broadcastSignal(new TmfTimeSynchSignal(this, currentTime));
+            broadcast(new TmfTimeSynchSignal(this, currentTime));
         }
     }
 
@@ -251,14 +252,15 @@ public class TimeFrameView extends TmfView {
     // TMF Signal Handling
     // ========================================================================
 
-    /**
+    @SuppressWarnings("unchecked")
+	/**
      * @param signal
      */
     @TmfSignalHandler
     public void experimentSelected(TmfExperimentSelectedSignal signal) {
 
         // Update the trace reference
-        fExperiment = signal.getExperiment();
+        fExperiment = (TmfExperiment<LttngEvent>) signal.getExperiment();
 
         // Update the time frame
         fTraceTimeRange = fExperiment.getTimeRange();

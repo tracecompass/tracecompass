@@ -57,7 +57,7 @@ public class LttngTimestampTest extends TestCase {
         // This trace should be valid
         try {
             LTTngTextTrace tmpStream = initializeEventStream();
-            tmpTime = (LttngTimestamp)tmpStream.getNextEvent( new TmfTraceContext(null, null, 0) ).getTimestamp();
+            tmpTime = (LttngTimestamp)tmpStream.getNextEvent( new TmfTraceContext(null, 0) ).getTimestamp();
         } 
         catch (Exception e) {
             fail("ERROR : Failed to get reference!");

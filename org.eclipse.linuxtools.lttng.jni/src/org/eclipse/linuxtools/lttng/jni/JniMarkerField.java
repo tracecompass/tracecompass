@@ -27,17 +27,11 @@ public abstract class JniMarkerField extends Jni_C_Common
     
     // Native access method
     protected native String ltt_getField(long markerFieldPtr);
-    @SuppressWarnings("unused")
     protected native int ltt_getType(long markerFieldPtr);
-    @SuppressWarnings("unused")
     protected native long ltt_getOffset(long markerFieldPtr);
-    @SuppressWarnings("unused")
     protected native long ltt_getSize(long markerFieldPtr);
-    @SuppressWarnings("unused")
     protected native long ltt_getAlignment(long markerFieldPtr);
-    @SuppressWarnings("unused")
     protected native long ltt_getAttributes(long markerFieldPtr);
-    @SuppressWarnings("unused")
     protected native int ltt_getStatic_offset(long markerFieldPtr);
     protected native String ltt_getFormat(long markerFieldPtr);
 
@@ -53,7 +47,6 @@ public abstract class JniMarkerField extends Jni_C_Common
     /*
      * Default constructor is forbidden
      */
-    @SuppressWarnings("unused")
     protected JniMarkerField() {
     }
 

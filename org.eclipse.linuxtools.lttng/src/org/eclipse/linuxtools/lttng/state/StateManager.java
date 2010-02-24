@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.lttng.TraceDebug;
+import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.state.evProcessor.AbsEventProcessorFactory;
 import org.eclipse.linuxtools.lttng.state.evProcessor.EventProcessorProxy;
@@ -30,8 +31,8 @@ import org.eclipse.linuxtools.lttng.state.model.StateModelFactory;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
-import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceCheckpoint;
 
@@ -51,8 +52,8 @@ public class StateManager extends Observable {
 	// ========================================================================
 	// Data
 	// =======================================================================
-	private TmfExperiment fExperiment = null;
-	private TmfTrace fEventLog = null;
+	private TmfExperiment<LttngEvent> fExperiment = null;
+	private TmfTrace<LttngEvent> fEventLog = null;
 	private StateStacksHandler stateIn = null;
 	private Long eventCount = 0L;
 
@@ -111,12 +112,13 @@ public class StateManager extends Observable {
 	 * @param experiment
 	 * @param clearPreviousData
 	 */
-	public void setTraceSelection(TmfExperiment experiment,
+	@SuppressWarnings("unchecked")
+	public void setTraceSelection(TmfExperiment<LttngEvent> experiment,
 			boolean clearPreviousData) {
 		// New log in use, read all events and build state transition stack
 		if (experiment != null) {
 			if (fExperiment != null && fExperiment != experiment) {
-				this.fExperiment.dispose();
+				this.fExperiment.deregister();
 			}
 
 			this.fExperiment = experiment;
@@ -125,7 +127,7 @@ public class StateManager extends Observable {
 			// this.fEventLog.dispose();
 			// }
 			
-			this.fEventLog = (TmfTrace)experiment.getTraces()[0];
+			this.fEventLog = (TmfTrace<LttngEvent>) experiment.getTraces()[0];
 			try {
 				stateIn.init(fEventLog);
 			} catch (LttngStateException e) {
@@ -216,7 +218,7 @@ public class StateManager extends Observable {
 	 * 
 	 * @return
 	 */
-	public TmfTrace getEventLog() {
+	public TmfTrace<LttngEvent> getEventLog() {
 		return fEventLog;
 	}
 
@@ -427,7 +429,7 @@ public class StateManager extends Observable {
 
 		// Create the new request and override the handlePartialResult function
 		StateDataRequest request = new StateDataRequest(timeWindow,
-				DEFAULT_OFFSET, TmfDataRequest.ALL_EVENTS, DEFAULT_CHUNK,
+				DEFAULT_OFFSET, TmfDataRequest.ALL_DATA, DEFAULT_CHUNK,
 				listener, this) {
 			@Override
 			public void handleData() {
@@ -471,7 +473,7 @@ public class StateManager extends Observable {
 
 		// Create the new request and override the handlePartialResult function
 		StateDataRequest request = new StateDataRequest(timeWindow,
-				DEFAULT_OFFSET, TmfDataRequest.ALL_EVENTS, DEFAULT_CHUNK,
+				DEFAULT_OFFSET, TmfDataRequest.ALL_DATA, DEFAULT_CHUNK,
 				requestListener, this) {
 
 			@Override

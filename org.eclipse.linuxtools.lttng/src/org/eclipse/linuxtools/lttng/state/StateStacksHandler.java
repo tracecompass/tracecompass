@@ -66,6 +66,7 @@ public class StateStacksHandler {
 	}
 
 
+//	static int nbEvents = 0;
 	protected void processEvent(TmfEvent tmfEvent) /* throws LttngStateException */{
 		if (tmfEvent == null) {
 			return;
@@ -74,8 +75,11 @@ public class StateStacksHandler {
 		if (!(tmfEvent instanceof LttngEvent)) {
 			TraceDebug
 					.debug("The event received is not an instance of LttngEvent and can not be processed");
+			return;
 		}
 
+//		System.out.println("Event: " + nbEvents++ + ", timestamp: " + tmfEvent.getTimestamp());
+		
 		LttngEvent trcEvent = (LttngEvent) tmfEvent;
 //		LttngEventField[] fields = ((LttngEventContent)trcEvent.getContent()).getFields();
 
@@ -98,7 +102,6 @@ public class StateStacksHandler {
 			// Notify the before Handlers
 			Set<AbsEventProcessorFactory> handlerRegister = EventProcessorProxy
 					.getInstance().getProcessingFactories();
-
 			// Notify the state BEFORE update handlers
 			for (Iterator<AbsEventProcessorFactory> iterator = handlerRegister
 					.iterator(); iterator.hasNext();) {
@@ -112,7 +115,7 @@ public class StateStacksHandler {
 				}
 
 			}
-
+			
 			// Notify the STATE UPDATE handlers
 			// Only one state update expected
 			for (Iterator<AbsEventProcessorFactory> iterator = handlerRegister

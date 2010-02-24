@@ -11,6 +11,8 @@ Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.linuxtools.tmf,
  org.eclipse.linuxtools.tmf.component,
  org.eclipse.linuxtools.tmf.event,
+ org.eclipse.linuxtools.tmf.experiment,
+ org.eclipse.linuxtools.tmf.parser,
  org.eclipse.linuxtools.tmf.request,
  org.eclipse.linuxtools.tmf.signal,
  org.eclipse.linuxtools.tmf.trace

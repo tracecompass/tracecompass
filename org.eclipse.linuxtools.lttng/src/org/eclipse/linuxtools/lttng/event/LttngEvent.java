@@ -134,12 +134,13 @@ public class LttngEvent extends TmfEvent {
         
         // We don't want to send away events that are outdated as their informations could be invalid
         //  If the timestamp between the event and the trace are not coherent we will not perform the conversion
-        if ( jniEventReference.getParentTracefile().getParentTrace().getCurrentEventTimestamp().getTime() == getTimestamp().getValue() ) {
-            tmpEvent = jniEventReference;
-        }
-        else {
-            System.out.println("convertEventTmfToJni() failed: Unsynced Timestamp > TMF:" + getTimestamp().getValue() + " <--> JNI:" + jniEventReference.getParentTracefile().getParentTrace().getCurrentEventTimestamp().getTime());
-        }
+//        if ( jniEventReference.getParentTracefile().getParentTrace().getCurrentEventTimestamp().getTime() == getTimestamp().getValue() ) {
+//            tmpEvent = jniEventReference;
+//        }
+//        else {
+//            System.out.println("convertEventTmfToJni() failed: Unsynced Timestamp > TMF:" + getTimestamp().getValue() + " <--> JNI:" + jniEventReference.getParentTracefile().getParentTrace().getCurrentEventTimestamp().getTime());
+//        }
+        tmpEvent = jniEventReference;
         return tmpEvent;
     }
     

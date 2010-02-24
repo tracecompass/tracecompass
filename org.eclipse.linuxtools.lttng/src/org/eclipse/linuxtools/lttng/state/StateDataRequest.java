@@ -13,11 +13,11 @@ package org.eclipse.linuxtools.lttng.state;
 
 import java.util.Vector;
 
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
+import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
-import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
 
 /**
  * This class is an extension of Data Request which includes specific references
@@ -26,7 +26,8 @@ import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
  * @author alvaro
  * 
  */
-public class StateDataRequest extends TmfDataRequest<TmfEvent> {
+public class StateDataRequest extends TmfEventRequest<LttngEvent> {
+
 	// ========================================================================
 	// Data
 	// =======================================================================
@@ -36,6 +37,7 @@ public class StateDataRequest extends TmfDataRequest<TmfEvent> {
 	private long numOfEvents = 0;
 	private boolean broadcast = false;
 	private boolean clearDataInd = false;
+
 	// ========================================================================
 	// Constructors
 	// =======================================================================
@@ -50,7 +52,7 @@ public class StateDataRequest extends TmfDataRequest<TmfEvent> {
 			int maxBlockSize, IStateDataRequestListener listener,
 			StateManager manager) {
 		
-		super(range, nbEvents, maxBlockSize);
+		super(LttngEvent.class, range, nbEvents, maxBlockSize);
 		//super(0, nbEvents, maxBlockSize);
 		this.manager = manager;
 		if (listener != null && !listeners.contains(listener)) {
@@ -87,7 +89,7 @@ public class StateDataRequest extends TmfDataRequest<TmfEvent> {
 	 * @param broadcast
 	 *            true: All views, false: only to registered listeners
 	 */
-	public void startRequestInd(TmfExperiment experiment, boolean broadcast,
+	public void startRequestInd(TmfExperiment<LttngEvent> experiment, boolean broadcast,
 			boolean waitForCompletion) {
 		if (broadcast) {
 			// Notify all state views.

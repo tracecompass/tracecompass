@@ -10,40 +10,31 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.trace;
+package org.eclipse.linuxtools.tmf.experiment;
 
+import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.signal.TmfSignal;
 
 /**
- * <b><u>TmfExperimentUpdatedSignal</u></b>
+ * <b><u>TmfExperimentSelectedSignal</u></b>
  * <p>
  * TODO: Implement me. Please.
  */
-public class TmfExperimentUpdatedSignal extends TmfSignal {
+public class TmfExperimentSelectedSignal extends TmfSignal {
 
-	private final TmfExperiment fExperiment;
-	private final ITmfTrace fTrace;
+	private final TmfExperiment<? extends TmfEvent> fExperiment;
 	
-	public TmfExperimentUpdatedSignal(Object source, TmfExperiment experiment, ITmfTrace trace) {
+	public TmfExperimentSelectedSignal(Object source, TmfExperiment<? extends TmfEvent> experiment) {
 		super(source);
 		fExperiment = experiment;
-		fTrace = trace;
 	}
 
-	public TmfExperiment getExperiment() {
+	public TmfExperiment<? extends TmfEvent> getExperiment() {
 		return fExperiment;
 	}
 
-	public ITmfTrace getTrace() {
-		return fTrace;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
-		return "[TmfExperimentUpdatedSignal (" + fExperiment.toString() + ", " + fTrace.toString() + ")]";
+		return "[TmfExperimentSelectedSignal (" + fExperiment.getExperimentId() + ")]";
 	}
-
 }

@@ -14,13 +14,14 @@ package org.eclipse.linuxtools.lttng.state.experiment;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.state.IStateDataRequestListener;
 import org.eclipse.linuxtools.lttng.state.StateManager;
 import org.eclipse.linuxtools.tmf.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.experiment.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
-import org.eclipse.linuxtools.tmf.trace.TmfExperiment;
-import org.eclipse.linuxtools.tmf.trace.TmfExperimentSelectedSignal;
 
 /**
  * @author alvaro
@@ -33,7 +34,7 @@ public class StateExperimentManager extends TmfComponent {
 	// =======================================================================
 	
 	private final Map<String, StateManager> managersByID = new HashMap<String, StateManager>();
-	private TmfExperiment fExperiment = null; // one experiment supported
+	private TmfExperiment<LttngEvent> fExperiment = null; // one experiment supported
 
 	// ========================================================================
 	// Constructors
@@ -110,6 +111,7 @@ public class StateExperimentManager extends TmfComponent {
 	 * org.eclipse.linuxtools.tmf.eventlog.ITmfEventLogEventListener#handleEvent
 	 * (org.eclipse.linuxtools.tmf.eventlog.ITmfEventLogEvent)
 	 */
+	@SuppressWarnings("unchecked")
 	@TmfSignalHandler
 	public void experimentSelected(TmfExperimentSelectedSignal signal) {
 		// TmfExperiment experiment = signal.getExperiment();
@@ -118,7 +120,7 @@ public class StateExperimentManager extends TmfComponent {
 		//			
 		// }
 		if (signal != null) {
-			fExperiment = signal.getExperiment();
+			fExperiment = (TmfExperiment<LttngEvent>) signal.getExperiment();
 			traceSelected(fExperiment);
 		}
 	}
@@ -129,7 +131,7 @@ public class StateExperimentManager extends TmfComponent {
 	 * 
 	 * @param experiment
 	 */
-	private void traceSelected(TmfExperiment experiment) {
+	private void traceSelected(TmfExperiment<LttngEvent> experiment) {
 		// TODO: Re-factor when multiple traces are supported
 		// traceId, as well as when the request can be specified at the trace
 		// level
