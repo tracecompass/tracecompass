@@ -255,6 +255,7 @@ public class TmfEventsView extends TmfView {
 //        		// TODO: Potentially long operation. Add some feedback for the user
         		fTable.setSelection(0);
             	fTable.clearAll();
+				cacheStartIndex = cacheEndIndex = 0;	// Clear the cache
             	fTable.setItemCount(fExperiment.getNbEvents());        
         	}
         });
