@@ -1,5 +1,6 @@
 package org.eclipse.linuxtools.lttng.tests.trace;
 
+import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import java.io.File;
 import java.net.URL;
 
@@ -7,12 +8,11 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.linuxtools.lttng.event.LttngLocation;
+import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /*
  Functions tested here :
@@ -79,7 +79,7 @@ public class LTTngTraceTest extends TestCase {
 			}
 		}
 		else {
-			testStream.seekEvent(0L);
+			testStream.seekEvent(0);
 		}
 		
 		
@@ -114,7 +114,7 @@ public class LTTngTraceTest extends TestCase {
 		TmfEvent tmpEvent = null;
 		LTTngTrace testStream1 = prepareStreamToTest();
 		
-		TmfContext tmpContext = new TmfContext(null, 0);
+		TmfTraceContext tmpContext = new TmfTraceContext(null, 0);
 		// We should be at the beginning of the trace, so we will just read the first event now
 		tmpEvent = testStream1.getNextEvent(tmpContext );
 		assertNotSame("tmpEvent is null after first getNextEvent()",null,tmpEvent );
@@ -130,7 +130,7 @@ public class LTTngTraceTest extends TestCase {
 		TmfEvent tmpEvent = null;
 		LTTngTrace testStream1 = prepareStreamToTest();
 		
-		TmfContext tmpContext = new TmfContext(null, 0);
+		TmfTraceContext tmpContext = new TmfTraceContext(null, 0);
 		// We should be at the beginning of the trace, so we will just parse the first event now
 		tmpEvent = testStream1.parseEvent(tmpContext );
 		assertNotSame("tmpEvent is null after first parseEvent()",null,tmpEvent );
@@ -144,7 +144,7 @@ public class LTTngTraceTest extends TestCase {
 	
 	public void testSeekEventTimestamp() {
 		TmfEvent tmpEvent = null;
-		TmfContext tmpContext = new TmfContext(null, 0);
+		TmfTraceContext tmpContext = new TmfTraceContext(null, 0);
 		LTTngTrace testStream1 = prepareStreamToTest();
 		
 		// We should be at the beginning of the trace, we will seek at a certain timestamp
@@ -174,7 +174,7 @@ public class LTTngTraceTest extends TestCase {
 	
 	public void testSeekEventIndex() {
 		TmfEvent tmpEvent = null;
-		TmfContext tmpContext = new TmfContext(null, 0);
+		TmfTraceContext tmpContext = new TmfTraceContext(null, 0);
 		LTTngTrace testStream1 = prepareStreamToTest();
 		
 		// We should be at the beginning of the trace, we will seek at a certain timestamp
@@ -204,11 +204,11 @@ public class LTTngTraceTest extends TestCase {
 	
 	public void testSeekLocation() {
 		TmfEvent tmpEvent = null;
-		TmfContext tmpContext = new TmfContext(null, 0);
+		TmfTraceContext tmpContext = new TmfTraceContext(null, 0);
 		LTTngTrace testStream1 = prepareStreamToTest();
 		
 		// We should be at the beginning of the trace, we will seek at a certain timestamp
-		tmpContext = testStream1.seekLocation(new LttngLocation(locationToSeekTest1));
+		tmpContext = testStream1.seekLocation( new LttngTimestamp(locationToSeekTest1));
 		tmpEvent = testStream1.getNextEvent(tmpContext);
 		assertNotSame("tmpContext is null after first seekLocation()",null,tmpContext );
 		assertEquals("tmpContext has wrong timestamp after first seekLocation()",contextValueAfterSeekTest1,(long)((TmfTimestamp)tmpEvent.getTimestamp()).getValue() );
@@ -216,7 +216,7 @@ public class LTTngTraceTest extends TestCase {
 		assertTrue("tmpEvent has wrong reference after first seekLocation()", ((String)tmpEvent.getReference().getReference()).contains(seek1EventReference) );
 		
 		// Seek to the last timestamp
-		tmpContext = testStream1.seekLocation(new LttngLocation(locationToSeekLast));
+		tmpContext = testStream1.seekLocation(new LttngTimestamp(locationToSeekLast));
 		tmpEvent = testStream1.getNextEvent(tmpContext);
 		assertNotSame("tmpContext is null after first seekLocation()",null,tmpContext );
 		assertEquals("tmpContext has wrong timestamp after first seekLocation()",contextValueAfterSeekLast,(long)((TmfTimestamp)tmpEvent.getTimestamp()).getValue() );
@@ -224,7 +224,7 @@ public class LTTngTraceTest extends TestCase {
 		assertTrue("tmpEvent has wrong reference after seekLocation() to last",((String)tmpEvent.getReference().getReference()).contains(seekLastEventReference) );
 		
 		// Seek to the first timestamp (startTime)
-		tmpContext = testStream1.seekLocation(new LttngLocation(locationToSeekFirst));
+		tmpContext = testStream1.seekLocation(new LttngTimestamp(locationToSeekFirst));
 		tmpEvent = testStream1.getNextEvent(tmpContext);
 		assertNotSame("tmpContext is null after first seekLocation()",null,tmpContext );
 		assertEquals("tmpContext has wrong timestamp after first seekLocation()",contextValueAfterFirstEvent,(long)((TmfTimestamp)tmpEvent.getTimestamp()).getValue() );
@@ -237,13 +237,13 @@ public class LTTngTraceTest extends TestCase {
     	LTTngTrace testStream1 = prepareStreamToTest();
 		
 		// Move to the first event to have something to play with
-		tmpEvent = testStream1.parseEvent( new TmfContext(null, 0));
+		tmpEvent = testStream1.parseEvent( new TmfTraceContext(null, 0));
 		
 		// Test current event
 		assertNotSame("tmpEvent is null after first event",null,tmpEvent );
 		assertTrue("tmpEvent has wrong reference after first event",((String)tmpEvent.getReference().getReference()).contains(firstEventReference) );
 		assertNotSame("tmpContext is null after first seekEvent()",null,testStream1.getCurrentLocation() );
-		assertTrue("tmpContext has wrong timestamp after first seekEvent()",locationAfterFirstEvent.equals( ((LttngLocation)testStream1.getCurrentLocation()).getOperationTimeValue()) );
+		assertTrue("tmpContext has wrong timestamp after first seekEvent()",locationAfterFirstEvent.equals( ((TmfTimestamp)testStream1.getCurrentLocation()).getValue()) );
 		
 		// Test CPU number of the trace
 		assertSame("getCpuNumber() return wrong number of cpu",traceCpuNumber ,testStream1.getCpuNumber() );
@@ -253,7 +253,7 @@ public class LTTngTraceTest extends TestCase {
 		LTTngTrace testStream1 = prepareStreamToTest();
 		
 		// Move to the first event to have something to play with
-		testStream1.parseEvent( new TmfContext(null, 0) );
+		testStream1.parseEvent( new TmfTraceContext(null, 0) );
 		
 		// Just make sure toString() does not return null or the java reference
 		assertNotSame("toString returned null",null, testStream1.toString() );
