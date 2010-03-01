@@ -24,12 +24,14 @@ public class JniTracefile_v2_3 extends JniTracefile {
     }
 	
     
-    public JniEvent allocateNewJniEvent(Jni_C_Pointer newEventPtr, HashMap<Integer, JniMarker> newMarkersMap, JniTracefile newParentTracefile) throws JniException {
+    @Override
+	public JniEvent allocateNewJniEvent(Jni_C_Pointer newEventPtr, HashMap<Integer, JniMarker> newMarkersMap, JniTracefile newParentTracefile) throws JniException {
     	return new JniEvent_v2_3(newEventPtr, newMarkersMap, newParentTracefile);
     }
     
     
-    public JniMarker allocateNewJniMarker(Jni_C_Pointer newMarkerPtr) throws JniException {
+    @Override
+	public JniMarker allocateNewJniMarker(Jni_C_Pointer newMarkerPtr) throws JniException {
     	return new JniMarker_v2_3(newMarkerPtr);
     }
     

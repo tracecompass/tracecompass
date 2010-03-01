@@ -137,7 +137,8 @@ public class TmfEventsView extends TmfView {
         // Handle the table item requests 
         fTable.addSelectionListener(new SelectionAdapter() {
 
-        	public void widgetSelected(SelectionEvent e) {
+        	@Override
+			public void widgetSelected(SelectionEvent e) {
 				TmfTimestamp ts = (TmfTimestamp) fTable.getSelection()[0].getData();
 				broadcast(new TmfTimeSynchSignal(fTable, ts));
 			}

@@ -55,7 +55,7 @@ public class StateStacksHandler {
 	 * @param log
 	 * 
 	 */
-	void init(TmfTrace log) throws LttngStateException {
+	void init(TmfTrace<LttngEvent> log) throws LttngStateException {
 		if (log == null) {
 			throw new LttngStateException("No TmfTrace object available!");
 		}

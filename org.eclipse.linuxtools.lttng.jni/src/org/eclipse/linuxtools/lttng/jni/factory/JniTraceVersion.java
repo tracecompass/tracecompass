@@ -18,7 +18,6 @@ public class JniTraceVersion {
 	private int majorNumber = 0;
 	private int minorNumber = 0;
 	
-	@SuppressWarnings("unused")
 	private JniTraceVersion() {
 	}
 	
@@ -52,12 +51,12 @@ public class JniTraceVersion {
 		return minorNumber;
 	}
 	
-	@SuppressWarnings("unused")
     private void setTraceVersionFromC(int newMajor, int newMinor) {
 		majorNumber = newMajor;
 		minorNumber = newMinor;
     }
 	
+	@Override
 	public String toString() {
 		return majorNumber + "." + minorNumber;
 	}

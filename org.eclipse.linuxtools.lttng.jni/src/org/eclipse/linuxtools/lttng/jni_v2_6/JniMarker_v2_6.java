@@ -22,7 +22,8 @@ public class JniMarker_v2_6 extends JniMarker {
     }
 	
     
-    public JniMarkerField allocateNewJniMarkerField(Jni_C_Pointer newMarkerFieldPtr) throws JniException {
+    @Override
+	public JniMarkerField allocateNewJniMarkerField(Jni_C_Pointer newMarkerFieldPtr) throws JniException {
     	return new JniMarkerField_v2_6(newMarkerFieldPtr);
     }
     

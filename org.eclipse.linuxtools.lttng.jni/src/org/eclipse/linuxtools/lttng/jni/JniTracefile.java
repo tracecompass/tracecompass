@@ -267,7 +267,6 @@ public abstract class JniTracefile extends Jni_C_Common {
      * @param markerId          Id of the marker (int)
      * @param markerInfoPtr     C Pointer to a marker_info C structure 
      */
-    @SuppressWarnings("unused")
     private void addMarkersFromC(int markerId, long markerInfoPtr) {
         // Create a new tracefile object and insert it in the map
         // the tracefile fill itself with LTT data while being constructed

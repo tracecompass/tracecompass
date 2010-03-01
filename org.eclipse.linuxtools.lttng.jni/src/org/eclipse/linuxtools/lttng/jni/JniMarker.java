@@ -132,7 +132,6 @@ public abstract class JniMarker extends Jni_C_Common
      * @param markerName        Name of the parent marker
      * @param markerFieldPtr    C Pointer (converted in long) to marker_field C Structure
      */
-    @SuppressWarnings("unused")
     private void addMarkerFieldFromC(String markerFieldName, long markerFieldPtr) {
         // Create a new Jaf_markerField object and insert it in the map
         // the maker field fill itself with LTT data while being constructed

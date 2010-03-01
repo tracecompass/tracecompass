@@ -7,6 +7,7 @@ import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 
 public class JniTrace_v2_3 extends JniTrace {
 	
+	@SuppressWarnings("unused")
 	private static final String LIBRARY_NAME = "liblttvtraceread2.3.so";
 	
 	protected JniTrace_v2_3() {
@@ -31,7 +32,8 @@ public class JniTrace_v2_3 extends JniTrace {
     }
     
     
-    public boolean initializeLibrary() {
+    @Override
+	public boolean initializeLibrary() {
     	// *** FIXME ***
     	// To change as soon as the library will be able to load multiple version at once
     	//return ltt_initializeHandle(LIBRARY_NAME);
@@ -41,7 +43,8 @@ public class JniTrace_v2_3 extends JniTrace {
     }
     
     
-    public JniTracefile allocateNewJniTracefile(Jni_C_Pointer newPtr, JniTrace newParentTrace) throws JniException {
+    @Override
+	public JniTracefile allocateNewJniTracefile(Jni_C_Pointer newPtr, JniTrace newParentTrace) throws JniException {
     	return new JniTracefile_v2_3(newPtr, newParentTrace);
     }
     

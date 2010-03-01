@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.state;
 
+import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.state.model.ILttngStateInputRef;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
@@ -30,12 +31,12 @@ public class LttngStateInputRef implements ILttngStateInputRef {
 	// ========================================================================
 	// Table data
 	// =======================================================================
-	TmfTrace log = null;
+	TmfTrace<LttngEvent> log = null;
 
 	// ========================================================================
 	// Constructor
 	// ========================================================================
-	LttngStateInputRef(TmfTrace log) {
+	LttngStateInputRef(TmfTrace<LttngEvent> log) {
 		this.log = log;
 		
 		if ( log instanceof LTTngTrace) {

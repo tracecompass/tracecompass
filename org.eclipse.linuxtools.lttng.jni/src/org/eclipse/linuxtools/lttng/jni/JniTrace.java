@@ -207,7 +207,8 @@ public abstract class JniTrace extends Jni_C_Common {
     }
     
     
-    public void finalize() {
+    @Override
+	public void finalize() {
     	// If the trace is open, close it
         if (thisTracePtr.getPointer() != NULL) {
             closeTrace();

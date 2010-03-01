@@ -50,6 +50,7 @@ public class TmfTraceContext implements ITmfContext, Cloneable {
 		this(other.location, other.rank);
 	}
 
+	@Override
 	public TmfTraceContext clone() {
 		try {
 			return (TmfTraceContext) super.clone();

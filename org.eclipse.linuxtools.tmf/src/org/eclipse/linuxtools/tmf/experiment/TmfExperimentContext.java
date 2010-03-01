@@ -36,6 +36,7 @@ public class TmfExperimentContext implements ITmfContext, Cloneable {
 		fEvents   = new TmfEvent[fTraces.length];
 	}
 
+	@Override
 	public TmfExperimentContext clone() {
 		try {
 			return (TmfExperimentContext) super.clone();

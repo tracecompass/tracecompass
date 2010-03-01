@@ -78,6 +78,7 @@ public class LttngTrapState implements Cloneable {
 		}
 	}
 	
+	@Override
 	public String toString() {
 		return "running : " + running;
 	}
