@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentFolderNode;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
@@ -68,9 +69,9 @@ public class NewExperimentDialog extends SelectionStatusDialog {
 	 * @param parentShell parent of the new dialog
 	 * @param container parent of the new folder
 	 */
-	public NewExperimentDialog(Shell parentShell, IContainer container) {
+	public NewExperimentDialog(Shell parentShell, LTTngExperimentFolderNode experimentFolder) {
 		super(parentShell);
-		this.container = container;
+		this.container = experimentFolder.getFolder();
 		setTitle("LTTng Experiment");
 		setStatusLineAboveButtons(true);
 	}

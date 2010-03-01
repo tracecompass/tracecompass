@@ -17,13 +17,15 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.linuxtools.lttng.ui.views.project.ProjectView;
 import org.eclipse.linuxtools.lttng.ui.views.project.dialogs.NewProjectWizard;
+import org.eclipse.linuxtools.lttng.ui.views.project.model.ILTTngProjectTreeNode;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectRoot;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
@@ -47,12 +49,18 @@ public class NewProjectHandler implements IHandler {
 		if (window == null)
 			return false;
 
-		// Check if we are in the Project View
-		IWorkbenchPart part = window.getActivePage().getActivePart();
-		if (!(part instanceof ProjectView))
-			return false;
-
-		fProjectRoot = ((ProjectView) part).getRoot();
+		// Check if we can find the project model root node
+		ISelection selection = window.getActivePage().getSelection(ProjectView.ID);
+		if (selection instanceof StructuredSelection) {
+			Object element = ((StructuredSelection) selection).getFirstElement();
+			if (element instanceof ILTTngProjectTreeNode) {
+				ILTTngProjectTreeNode node = (ILTTngProjectTreeNode) element;
+				while (node != null && !(node instanceof LTTngProjectRoot)) {
+					node = node.getParent();
+				}
+				fProjectRoot = (node instanceof LTTngProjectRoot) ? (LTTngProjectRoot) node : null;
+			}
+		}
 
 		return (fProjectRoot != null);
 	}

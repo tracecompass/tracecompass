@@ -3,7 +3,7 @@
 <plugin>
    <extension
          id="org,eclipse.linuxtools.lttng.ui.perspective"
-         name="%extension.name"
+         name="%extension.name.0"
          point="org.eclipse.ui.perspectives">
       <perspective
             class="org.eclipse.linuxtools.lttng.ui.views.PerspectiveFactory"
@@ -14,7 +14,7 @@
    </extension>
    <extension
          id="org.eclipse.linuxtools.lttng.ui.views"
-         name="%extension.name.0"
+         name="%extension.name.1"
          point="org.eclipse.ui.views">
       <category
             id="org.eclipse.linuxtools.lttng.ui.views.category"
@@ -26,7 +26,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.project.ProjectView"
             icon="icons/project_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.project"
-            name="%view.name"
+            name="%view.name.0"
             restorable="true">
       </view>
       <view
@@ -35,7 +35,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.control.ControlView"
             icon="icons/control_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.control"
-            name="%view.name.0"
+            name="%view.name.1"
             restorable="true">
       </view>
       <view
@@ -44,7 +44,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.events.EventsView"
             icon="icons/events_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.events"
-            name="%view.name.1"
+            name="%view.name.2"
             restorable="true">
       </view>
       <view
@@ -53,7 +53,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.timeframe.TimeFrameView"
             icon="icons/time_frame_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.timeframe"
-            name="%view.name.2"
+            name="%view.name.3"
             restorable="true">
       </view>
       <view
@@ -62,7 +62,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.controlflow.ControlFlowView"
             icon="icons/control_flow_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.controlflow"
-            name="%view.name.3"
+            name="%view.name.4"
             restorable="true">
       </view>
       <view
@@ -71,7 +71,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.resources.ResourcesView"
             icon="icons/resources_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.resources"
-            name="%view.name.4"
+            name="%view.name.5"
             restorable="true">
       </view>
       <view
@@ -80,7 +80,7 @@
             class="org.eclipse.linuxtools.lttng.ui.views.statistics.StatisticsView"
             icon="icons/statistics_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.statistics"
-            name="%view.name.5"
+            name="%view.name.6"
             restorable="true">
       </view>
       <view
@@ -89,13 +89,13 @@
             class="org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramView"
             icon="icons/histogram.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.histogram"
-            name="%view.name.6"
+            name="%view.name.7"
             restorable="true">
       </view>
    </extension>
    <extension
          id="org.eclipse.linuxtools.lttng.wizards.new"
-         name="%extension.name.1"
+         name="%extension.name.2"
          point="org.eclipse.ui.newWizards">
       <category
             id="org.eclipse.linuxtools.lttng.ui.wizards.new"
@@ -108,16 +108,16 @@
             finalPerspective="org.eclipse.linuxtools.lttng.ui.perspective"
             icon="icons/garland16.png"
             id="org.eclipse.linuxtools.lttng.ui.views.ui.wizards.newProject"
-            name="%wizard.name"
+            name="%wizard.name.0"
             project="true">
          <description>
-            %wizard.description
+            %wizard.description.0
          </description>
       </wizard>
    </extension>
    <extension
          id="org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature"
-         name="%extension.name.2"
+         name="%extension.name.3"
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
@@ -126,108 +126,291 @@
       </runtime>
    </extension>
    <extension
+         id="org.eclipse.linuxtools.lttng.ui.actionSets"
+         name="LTTng Action Sets"
          point="org.eclipse.ui.actionSets">
       <actionSet
-            description="%actionSet.description"
-            id="org.eclipse.linuxtools.lttng.ui.view.project.actionSet"
-            label="%actionSet.label"
-            visible="false">
-         <menu
-               id="org.eclipse.linuxtools.lttng.ui.view.project.menu"
-               label="%menu.label"
-               path="additions">
-            <groupMarker
-                  name="content">
-            </groupMarker>
-            <groupMarker
-                  name="additions">
-            </groupMarker>
-         </menu>
-         <action
-               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.NewProjectActionDelegate"
-               icon="icons/garland16.png"
-               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.newProjectAction"
-               label="%action.label"
-               menubarPath="org.eclipse.linuxtools.lttng.ui.view.project.menu/content"
-               style="push"
-               toolbarPath="Normal/additions"
-               tooltip="%action.tooltip">
-         </action>
+            description="LTTng Action Set"
+            id="org.eclipse.linuxtools.lttng.ui.actionSet"
+            label="LTTng Action Set"
+            visible="true">
       </actionSet>
    </extension>
    <extension
-         point="org.eclipse.ui.popupMenus">
-      <objectContribution
-            adaptable="true"
-            id="org.eclipse.linuxtools.lttng.ui.view.project.projectMenu"
-            objectClass="org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProject">
-         <action
-               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.DeleteProjectActionDelegate"
-               enablesFor="1"
-               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.deleteProjectAction"
-               label="%action.label.0"
-               menubarPath="additions">
-         </action>
-         <action
-               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.NewProjectActionDelegate"
-               enablesFor="?"
+         id="org.eclipse.linuxtools.lttng.ui.commands"
+         name="LTTng Commands"
+         point="org.eclipse.ui.commands">
+      <category
+            description="LTTng Project Commands"
+            id="org.eclipse.linuxtools.lttng.ui.commands.project.category"
+            name="LTTng Project Commands">
+      </category>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.project.category"
+            description="Create an LTTng Project"
+            id="org.eclipse.linuxtools.lttng.ui.command.project.new"
+            name="New Project">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.project.category"
+            description="Open an LTTng Project"
+            id="org.eclipse.linuxtools.lttng.ui.command.project.open"
+            name="Open Project">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.project.category"
+            description="Close an LTTng Project"
+            id="org.eclipse.linuxtools.lttng.ui.command.project.close"
+            name="Close Project">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.project.category"
+            description="Rename an LTTng Project"
+            id="org.eclipse.linuxtools.lttng.ui.command.project.rename"
+            name="Rename Project">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.project.category"
+            description="Delete an LTTng Project"
+            id="org.eclipse.linuxtools.lttng.ui.command.project.delete"
+            name="Delete Project">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.project.category"
+            description="Import an LTTng Trace"
+            id="org.eclipse.linuxtools.lttng.ui.command.project.trace.import"
+            name="Import Trace">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.project.category"
+            description="Open an LTTng Trace"
+            id="org.eclipse.linuxtools.lttng.ui.command.project.trace.open"
+            name="Open Trace">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.project.category"
+            description="Rename an LTTng Trace"
+            id="org.eclipse.linuxtools.lttng.ui.command.project.trace.rename"
+            name="Rename Trace">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.project.category"
+            description="Delete an LTTng Trace"
+            id="org.eclipse.linuxtools.lttng.ui.command.project.trace.delete"
+            name="Delete Trace">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.project.category"
+            description="Create an LTTng Experiment"
+            id="org.eclipse.linuxtools.lttng.ui.command.project.experiment.new"
+            name="New Experiment">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.project.category"
+            description="Select LTTng Traces"
+            id="org.eclipse.linuxtools.lttng.ui.command.project.experiment.select"
+            name="Select Traces">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.project.category"
+            description="Open an LTTng Experiment"
+            id="org.eclipse.linuxtools.lttng.ui.command.project.experiment.open"
+            name="Open Experiment">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.project.category"
+            description="Rename an LTTng Experiment"
+            id="org.eclipse.linuxtools.lttng.ui.command.project.experiment.rename"
+            name="Rename Experiment">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.project.category"
+            description="Delete an LTTng Experiment"
+            id="org.eclipse.linuxtools.lttng.ui.command.project.experiment.delete"
+            name="Delete Experiment">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.project.category"
+            description="Refresh View"
+            id="org.eclipse.linuxtools.lttng.ui.command.project.refresh"
+            name="Refresh View">
+      </command>
+   </extension>
+   <extension
+         id="org.eclipse.linuxtools.lttng.ui.menus"
+         name="LTTng Menus"
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.linuxtools.lttng.ui.views.project?after=additions">
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.new"
                icon="icons/garland16.png"
-               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.newProjectAction"
-               label="%action.label.1"
-               menubarPath="additions"
-               tooltip="%action.tooltip.0">
-         </action>
-      </objectContribution>
-      <objectContribution
-            adaptable="true"
-            id="org.eclipse.linuxtools.lttng.ui.view.project.traceMenu"
-            objectClass="org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngTraceFolder">
-         <action
-               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.ImportTraceActionDelegate"
-               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.importTraceAction"
-               label="%action.label.2"
-               menubarPath="additions">
-         </action>
-      </objectContribution>
-      <objectContribution
-            adaptable="true"
-            id="org.eclipse.linuxtools.lttng.ui.view.project.traceEntryMenu"
-            objectClass="org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngTraceEntry">
-         <action
-               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.DeleteTraceActionDelegate"
-               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.deleteTraceAction"
-               label="%action.label.3"
-               menubarPath="additions">
-         </action>
-      </objectContribution>
-      <objectContribution
-            adaptable="true"
-            id="org.eclipse.linuxtools.lttng.ui.view.project.experimentMenu"
-            objectClass="org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentFolder">
-         <action
-               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.NewExperimentActionDelegate"
-               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.newExperimentAction"
-               label="%action.label.4"
-               menubarPath="additions">
-         </action>
-      </objectContribution>
-      <objectContribution
-            adaptable="true"
-            id="org.eclipse.linuxtools.lttng.ui.view.project.experimentEntryMenu"
-            objectClass="org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentEntry">
-         <action
-               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.DeleteExperimentActionDelegate"
-               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.deleteExperimentAction"
-               label="%action.label.5"
-               menubarPath="additions">
-         </action>
-         <action
-               class="org.eclipse.linuxtools.lttng.ui.views.project.actions.AddTraceActionDelegate"
-               id="org.eclipse.linuxtools.lttng.ui.view.project.menu.addTraceExperimentAction"
-               label="%action.label.6"
-               menubarPath="additions">
-         </action>
-      </objectContribution>
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.new"
+               label="New Project"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.open"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.open"
+               label="Open Project"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.close"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.close"
+               label="Close Project"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.rename"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.rename"
+               label="Rename Project"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.delete"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.delete"
+               label="Delete Project"
+               style="push">
+         </command>
+         <separator
+               name="org.eclipse.linuxtools.lttng.ui.menu.popup.project.separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.trace.import"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.trace.import"
+               label="Import Trace"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.trace.open"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.trace.open"
+               label="Open Trace"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.trace.rename"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.trace.rename"
+               label="Rename Trace"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.trace.delete"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.trace.delete"
+               label="Delete Trace"
+               style="push">
+         </command>
+         <separator
+               name="org.eclipse.linuxtools.lttng.ui.menu.popup.project.separator2"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.experiment.new"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.experiment.new"
+               label="New Experiment"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.experiment.select"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.experiment.select"
+               label="Select Traces"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.experiment.open"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.experiment.open"
+               label="Open Experiment"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.experiment.rename"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.experiment.rename"
+               label="Rename Experiment"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.experiment.delete"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.experiment.delete"
+               label="Delete Experiment"
+               style="push">
+         </command>
+         <separator
+               name="org.eclipse.linuxtools.lttng.ui.menu.popup.project.separator3"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.refresh"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.refresh"
+               label="Refresh View"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         id="org.eclipse.linuxtools.lttng.ui.handlers"
+         name="LTTng Command Handlers"
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.project.handlers.NewProjectHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.project.new">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.project.handlers.OpenProjectHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.project.open">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.project.handlers.CloseProjectHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.project.close">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.project.handlers.RenameProjectHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.project.rename">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.project.handlers.DeleteProjectHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.project.delete">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.project.handlers.ImportTraceHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.project.trace.import">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.project.handlers.OpenTraceHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.project.trace.open">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.project.handlers.RenameTraceHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.project.trace.rename">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.project.handlers.DeleteTraceHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.project.trace.delete">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.project.handlers.NewExperimentHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.project.experiment.new">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.project.handlers.SelectTracesHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.project.experiment.select">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.project.handlers.OpenExperimentHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.project.experiment.open">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.project.handlers.RenameExperimentHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.project.experiment.rename">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.project.handlers.DeleteExperimentHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.project.experiment.delete">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.project.handlers.RefreshHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.project.refresh">
+      </handler>
    </extension>
 
 </plugin>

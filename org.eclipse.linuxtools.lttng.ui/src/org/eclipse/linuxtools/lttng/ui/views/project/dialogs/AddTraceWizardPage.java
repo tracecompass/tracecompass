@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2010 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,11 +15,9 @@ package org.eclipse.linuxtools.lttng.ui.views.project.dialogs;
 import java.util.Vector;
 
 import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentEntry;
-import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProject;
-import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngTraceEntry;
+import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectNode;
+import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngTraceNode;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -35,12 +33,10 @@ import org.eclipse.swt.widgets.TableColumn;
  */
 public class AddTraceWizardPage extends WizardPage {
 
-	private LTTngProject fProject;
-	@SuppressWarnings("unused")
-	private LTTngExperimentEntry fExperiment;
+	private LTTngProjectNode fProject;
 	private CheckboxTableViewer fCheckboxTableViewer;
 	
-	protected AddTraceWizardPage(LTTngProject project, String pageName) {
+	protected AddTraceWizardPage(LTTngProjectNode project, String pageName) {
 		super(pageName);
 		setTitle("Select traces");
 		setDescription("Select the traces to add to the experiment");
@@ -53,8 +49,8 @@ public class AddTraceWizardPage extends WizardPage {
 		setControl(container);
 
 		fCheckboxTableViewer = CheckboxTableViewer.newCheckList(container, SWT.BORDER);
-		fCheckboxTableViewer.setContentProvider(new LTTngTraceContentProvider());
-		fCheckboxTableViewer.setLabelProvider(new LTTngTraceLabelProvider());
+		fCheckboxTableViewer.setContentProvider(new DialogTraceContentProvider());
+		fCheckboxTableViewer.setLabelProvider(new DialogTraceLabelProvider());
 
 		final Table table = fCheckboxTableViewer.getTable();
 		final FormData formData = new FormData();
@@ -72,21 +68,14 @@ public class AddTraceWizardPage extends WizardPage {
         fCheckboxTableViewer.setInput(fProject.getTracesFolder());
 	}
 
-	public void init(IStructuredSelection selection) {
-		Object sel = selection.getFirstElement();
-		if (sel instanceof LTTngExperimentEntry) {
-			fExperiment = (LTTngExperimentEntry) sel;
-		}
-	}
-
-	public LTTngTraceEntry[] getSelection() {
-		Vector<LTTngTraceEntry> traces = new Vector<LTTngTraceEntry>();
+	public LTTngTraceNode[] getSelection() {
+		Vector<LTTngTraceNode> traces = new Vector<LTTngTraceNode>();
 		Object[] selection = fCheckboxTableViewer.getCheckedElements();
 		for (Object sel : selection) {
-			if (sel instanceof LTTngTraceEntry)
-				traces.add((LTTngTraceEntry) sel);
+			if (sel instanceof LTTngTraceNode)
+				traces.add((LTTngTraceNode) sel);
 		}
-		LTTngTraceEntry[] result = new LTTngTraceEntry[traces.size()];
+		LTTngTraceNode[] result = new LTTngTraceNode[traces.size()];
 		traces.toArray(result); 
 		return result;
 	}
