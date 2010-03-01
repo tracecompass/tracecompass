@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.project.model;
 
+import java.lang.reflect.Array;
+
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -109,7 +111,8 @@ public class LTTngExperimentNode extends LTTngProjectTreeNode {
 	 * @return
 	 */
 	public LTTngTraceNode[] getTraces() {
-		return (LTTngTraceNode[]) fChildren.toArray();
+		LTTngTraceNode[] result = (LTTngTraceNode[]) Array.newInstance(LTTngTraceNode.class, fChildren.size());
+		return fChildren.toArray(result);
 	}
 
 	/**
