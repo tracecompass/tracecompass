@@ -78,6 +78,10 @@ public class ProjectView extends TmfView {
     	}
     };
 
+    public LTTngProjectRoot getRoot() {
+    	return fProjectRoot;
+    }
+   
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
