@@ -261,12 +261,12 @@
                label="Close Project"
                style="push">
          </command>
-         <command
+         <!-- command
                commandId="org.eclipse.linuxtools.lttng.ui.command.project.rename"
                id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.rename"
                label="Rename Project"
                style="push">
-         </command>
+         </command -->
          <command
                commandId="org.eclipse.linuxtools.lttng.ui.command.project.delete"
                id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.delete"
@@ -275,34 +275,6 @@
          </command>
          <separator
                name="org.eclipse.linuxtools.lttng.ui.menu.popup.project.separator1"
-               visible="true">
-         </separator>
-         <command
-               commandId="org.eclipse.linuxtools.lttng.ui.command.project.trace.import"
-               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.trace.import"
-               label="Import Trace"
-               style="push">
-         </command>
-         <command
-               commandId="org.eclipse.linuxtools.lttng.ui.command.project.trace.open"
-               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.trace.open"
-               label="Open Trace"
-               style="push">
-         </command>
-         <command
-               commandId="org.eclipse.linuxtools.lttng.ui.command.project.trace.rename"
-               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.trace.rename"
-               label="Rename Trace"
-               style="push">
-         </command>
-         <command
-               commandId="org.eclipse.linuxtools.lttng.ui.command.project.trace.delete"
-               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.trace.delete"
-               label="Delete Trace"
-               style="push">
-         </command>
-         <separator
-               name="org.eclipse.linuxtools.lttng.ui.menu.popup.project.separator2"
                visible="true">
          </separator>
          <command
@@ -323,16 +295,44 @@
                label="Open Experiment"
                style="push">
          </command>
-         <command
+         <!-- command
                commandId="org.eclipse.linuxtools.lttng.ui.command.project.experiment.rename"
                id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.experiment.rename"
                label="Rename Experiment"
                style="push">
-         </command>
+         </command -->
          <command
                commandId="org.eclipse.linuxtools.lttng.ui.command.project.experiment.delete"
                id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.experiment.delete"
                label="Delete Experiment"
+               style="push">
+         </command>
+         <separator
+               name="org.eclipse.linuxtools.lttng.ui.menu.popup.project.separator2"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.trace.import"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.trace.import"
+               label="Import Traces"
+               style="push">
+         </command>
+         <!-- command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.trace.open"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.trace.open"
+               label="Open Trace"
+               style="push">
+         </command -->
+         <!-- command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.trace.rename"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.trace.rename"
+               label="Rename Trace"
+               style="push">
+         </command -->
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.trace.delete"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.trace.delete"
+               label="Delete Trace"
                style="push">
          </command>
          <separator
