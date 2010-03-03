@@ -14,7 +14,6 @@ package org.eclipse.linuxtools.lttng.event;
 
 import java.util.HashMap;
 
-import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.tmf.event.TmfEventContent;
 
 /**

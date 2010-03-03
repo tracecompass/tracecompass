@@ -453,7 +453,6 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         return currentLocation;
     }
     
-    @Override
     public synchronized TmfContext seekLocation(ITmfLocation location) {
     	
     	if ( joie == true ) {
