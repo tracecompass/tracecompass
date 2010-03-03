@@ -33,6 +33,7 @@ import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
+import org.eclipse.linuxtools.tmf.trace.TmfCheckpoint;
 import org.eclipse.linuxtools.tmf.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
 
@@ -52,9 +53,12 @@ class LTTngTraceException extends LttngException {
  * (seeking, reading and parsing) through the JNI component.
  */
 public class LTTngTrace extends TmfTrace<LttngEvent> {
+	
+	public static boolean joie = false;
+	
     private final static boolean SHOW_LTT_DEBUG_DEFAULT = false;
 	private final static boolean IS_PARSING_NEEDED_DEFAULT = false;
-	private final static int     CHECKPOINT_PAGE_SIZE      = 1;
+	private final static int     CHECKPOINT_PAGE_SIZE      = 1000;
     
     // Reference to our JNI trace
     private JniTrace currentJniTrace = null;
@@ -69,6 +73,10 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     LttngEventReference             eventReference   = null;
     // The actual event
     LttngEvent                      currentLttngEvent = null;             
+    
+    // The current location
+    LttngLocation					currentLocation  = null;
+    
     
     // Hashmap of the possible types of events (Tracefile/CPU/Marker in the JNI)
     HashMap<String, LttngEventType> traceTypes       = null;
@@ -119,15 +127,6 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
             throw new LTTngTraceException(e.getMessage());
         }
         
-        // Set the start time of the trace
-        setTimeRange( new TmfTimeRange( new LttngTimestamp(currentJniTrace.getStartTime().getTime()), 
-        			  				    new LttngTimestamp(currentJniTrace.getEndTime().getTime())
-                                      )
-                    );
-        
-        //System.out.println("START :" + currentJniTrace.getStartTime().getTime());
-        //System.out.println("END :" + currentJniTrace.getEndTime().getTime());
-        
         // Export all the event types from the JNI side 
         traceTypes      = new HashMap<String, LttngEventType>();
         traceTypeNames  = new Vector<String>();
@@ -144,6 +143,10 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         // Create the skeleton event
         currentLttngEvent = new LttngEvent(eventTimestamp, eventSource, eventType, eventContent, eventReference, null);
         
+        // Create a new current location
+        currentLocation = new LttngLocation();
+        
+        
         // Set the currentEvent to the eventContent
         eventContent.setEvent(currentLttngEvent);
         
@@ -151,6 +154,16 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         if ( bypassIndexing == false ) {
             indexTrace(true);
         }
+        else {
+        	// Even if we don't have any index, set ONE checkpoint
+        	fCheckpoints.add(new TmfCheckpoint(new LttngTimestamp(0L) , new LttngLocation() ) );
+        	
+        	// Set the start time of the trace
+        	setTimeRange( new TmfTimeRange( new LttngTimestamp(currentJniTrace.getStartTime().getTime()), 
+        			  				    	new LttngTimestamp(currentJniTrace.getEndTime().getTime())
+                                      	  ) );
+        }
+        
     }
     
     /*
@@ -215,45 +228,6 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         this.traceTypeNames.add(newTypeKey);
     }
     
-    /** 
-     * Return the next event in the trace.<p>
-     * 
-     * @param context   The actual context of the trace
-     * 
-     * @return The next event, or null if none available
-     * 
-     * @see org.eclipse.linuxtools.lttng.event.LttngEvent
-     */ 
-    @Override
-	public LttngEvent parseEvent(TmfContext context) {
-		JniEvent jniEvent;
-		LttngTimestamp timestamp = null;
-		LttngEvent returnedEvent = null;
-		
-    	synchronized (currentJniTrace) {
-    		
-    	    // Seek to the context's location
-    		seekLocation(context.getLocation());
-    		
-    		// Read an event from the JNI and convert it into a LttngEvent
-    		jniEvent = currentJniTrace.readNextEvent();
-    		
-    		//currentLttngEvent = (jniEvent != null) ? convertJniEventToTmf(jniEvent, true) : null;
-    		if ( jniEvent != null ) {
-    		    currentLttngEvent = convertJniEventToTmf(jniEvent);
-    		    returnedEvent = currentLttngEvent;
-    		}
-    		
-    		// Save timestamp
-    		timestamp = (LttngTimestamp) getCurrentLocation();
-    	}
-   		context.setLocation(new LttngLocation(timestamp));
-//   		context.setTimestamp(timestamp);
-//   		context.incrRank();
-   		
-   		return returnedEvent;
-    }
-    
     /**
      * Method to convert a JniEvent into a LttngEvent.<p>
      * 
@@ -314,74 +288,6 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         }
         
         return currentLttngEvent;
-    }
-    
-    /**
-     * Seek (move) to a certain location in the trace.<p>
-     * 
-     * WARNING : No event is read by this function, it just seek to a certain time.<br>
-     * Use "parseEvent()" or "getNextEvent()" to get the event we seeked to. 
-     * 
-     * @param location  a TmfTimestamp of a position in the trace
-     * 
-     * @return TmfTraceContext pointing the position in the trace at the seek location 
-     */
-    public TmfContext seekLocation(ITmfLocation location) {
-        
-    	LttngTimestamp timestamp = null;
-
-    	// If location is null, interpret this as a request to get back to the beginning of the trace
-        //      in that case, just change the location, the seek will happen below
-    	if (location == null) {
-    		// *** FIXME ***
-    		// Corrupted StartTime in TMF!!! 
-    		//location = getStartTime();
-    		location = new LttngLocation(new LttngTimestamp(currentJniTrace.getStartTime().getTime()));
-    	}
-
-    	if (location instanceof TmfTimestamp) {
-    		long value = ((TmfTimestamp) location).getValue();
-    		
-    		if (value != currentJniTrace.getCurrentEventTimestamp().getTime()) {
-    			/*
-    			System.out.println("\nLOCATION IS : " + ((TmfTimestamp) location).getValue());
-        		System.out.println("JNI IS : " + currentJniTrace.getCurrentEventTimestamp().getTime());
-    			System.out.println("SEEKING");
-    			*/
-    			
-    			synchronized (currentJniTrace) {
-    				//currentJniTrace.seekToTime(new JniTime(value));
-    				currentJniTrace.seekAndRead(new JniTime(value));
-    				timestamp = (LttngTimestamp) getCurrentLocation();
-    			}
-    		}
-    	}
-    	else {
-    	    System.out.println("ERROR : Location not instance of TmfTimestamp");
-    	}
-
-    	 return new TmfContext(new LttngLocation(timestamp), 0);
-    }
-    
-    /**
-     * Location (timestamp) of our current position in the trace.<p>
-     * 
-     * @return The time (in LttngTimestamp format) of the current event or AFTER endTime if no more event is available.
-     */
-    @Override
-	public ITmfLocation getCurrentLocation() {
-
-    	LttngTimestamp returnedLocation = null;
-        JniEvent tmpJniEvent = currentJniTrace.findNextEvent();
-        
-        if ( tmpJniEvent != null  ) {
-            returnedLocation = new LttngTimestamp(tmpJniEvent.getEventTime().getTime());
-        }
-        else {
-            returnedLocation = new LttngTimestamp( getEndTime().getValue() + 1 );
-        }
-        
-        return new LttngLocation(returnedLocation);
     }
     
     /**
@@ -471,7 +377,261 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     	
     	return returnedData;
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    public void bidon_function() {
+    	
+    	System.out.println("START : " + getTimeRange().getStartTime().getValue());
+    	System.out.println("END   : " + getTimeRange().getEndTime().getValue());
+    	
+        for ( int pos=0; pos < fCheckpoints.size(); pos++) {
+            //for ( int pos=0; pos < 100; pos++) {
+            System.out.print(pos + ": " + "\t");
+            System.out.print( fCheckpoints.get(pos).getTimestamp() + "\t" );
+            System.out.println( fCheckpoints.get(pos).getLocation() );
+        }
+    }
+    
+    @Override
+    public synchronized void indexTrace(boolean useless) {
+    	
+        // Position the trace at the beginning
+        TmfContext context = seekEvent( new LttngTimestamp(0L) );
+        
+        long nbEvents=0L;
+//        joie = false;
+        
+        LttngTimestamp startTime = null;
+        LttngTimestamp lastTime  = new LttngTimestamp();
+        
+        LttngEvent tmpEvent = (LttngEvent)getNextEvent(context);
+        LttngLocation tmpLocation = (LttngLocation)context.getLocation();
+        
+    	
+        while ( tmpEvent != null) {
+        		tmpLocation = (LttngLocation)context.getLocation();
 
+                if ( startTime == null ) {
+                        startTime = new LttngTimestamp( tmpLocation.getCurrentTime() );
+                }
+                
+                lastTime.setValue(tmpEvent.getTimestamp().getValue());
+                
+                if ((nbEvents % getCacheSize()) == 0) {
+                        LttngTimestamp tmpTimestamp = new LttngTimestamp( tmpLocation.getCurrentTime() );
+                        LttngLocation  newLocation  = new LttngLocation(  tmpLocation.getCurrentTime() );
+                        
+                        fCheckpoints.add(new TmfCheckpoint(tmpTimestamp, newLocation ) );
+                }
+
+                nbEvents++;
+
+                tmpEvent = (LttngEvent)getNextEvent(context);
+        }
+
+        if (startTime != null) {
+            setTimeRange( new TmfTimeRange(startTime, lastTime) );
+            notifyListeners(getTimeRange() );
+        }
+        
+        fNbEvents = nbEvents;
+        //bidon_function();
+//        joie = true;
+        
+    }
+    
+    @Override
+	public ITmfLocation getCurrentLocation() {
+        return currentLocation;
+    }
+    
+    @Override
+    public synchronized TmfContext seekLocation(ITmfLocation location) {
+    	
+    	if ( joie == true ) {
+    		System.out.println("seekLocation(location) location -> " + location);
+    	}
+    	
+    	LttngTimestamp tmpTime = null;
+    	
+    	if ( location == null ) {
+    		tmpTime = (LttngTimestamp)getStartTime();
+    	}
+    	else {
+    		// *** FIXME ***
+    		// NEED TO AVOID TIMESTAMP CREATION
+    		tmpTime = new LttngTimestamp( ((LttngLocation)location).getCurrentTime() );
+    	}
+    	
+    	// The only seek valid in LTTng is with the time, we call seekEvent(timestamp)
+    	return seekEvent( tmpTime );
+    }
+    
+    @Override
+    public synchronized TmfContext seekEvent(TmfTimestamp timestamp) {
+    	
+    	if ( joie == true ) {
+    		System.out.println("seekEvent(timestamp) timestamp -> " + timestamp);
+    	}
+    	
+    	currentJniTrace.seekToTime(new JniTime(timestamp.getValue()));
+		
+		// Update the current time for the location
+		currentLocation.setCurrentTime( timestamp.getValue() );
+    	
+    	return new TmfContext(currentLocation);
+    }
+    
+    @Override
+    public synchronized TmfContext seekEvent(long position) {
+    	
+    	if ( joie == true ) {
+    		System.out.println("seekEvent(position) position -> " + position);
+    	}
+    	
+    	TmfTimestamp timestamp = null;
+        long index = position / getCacheSize();
+        
+        if (fCheckpoints.size() > 0) {
+                if (index >= fCheckpoints.size()) {
+                        index = fCheckpoints.size() - 1;
+                }
+                timestamp = (TmfTimestamp)fCheckpoints.elementAt((int)index).getTimestamp();
+        }
+        else {
+            timestamp = getStartTime();
+        }
+        
+        TmfContext 		tmpContext  = seekEvent(timestamp);
+        LttngLocation 	tmpLocation = (LttngLocation)tmpContext.getLocation();
+        
+        Long currentPosition = index * getCacheSize();
+        
+        JniEvent tmpJniEvent = currentJniTrace.findNextEvent();
+        while ( (tmpJniEvent != null) && ( currentPosition < position ) ) {
+                tmpJniEvent = currentJniTrace.readNextEvent();
+                currentPosition++;
+                tmpLocation.setCurrentTime( tmpJniEvent.getEventTime().getTime() );
+        }
+        
+        return tmpContext;
+    }
+    
+    
+    @Override
+    public synchronized LttngEvent getNextEvent(TmfContext context) {
+    	
+    	if ( joie == true ) {
+    		System.out.println("getNextEvent(context) context.getLocation() -> " + context.getLocation());
+    	}
+    	
+    	LttngEvent 	returnedEvent = null;
+    	LttngLocation tmpLocation = null;
+    	
+    	if ( context.getLocation() == null ) {
+    		tmpLocation = new LttngLocation();
+    		context.setLocation(tmpLocation);
+    	}
+    	else {
+    		tmpLocation = (LttngLocation)context.getLocation();
+    	}
+    	
+    	if ( tmpLocation.getCurrentTime() != currentJniTrace.getCurrentEventTimestamp().getTime() ) {
+    		seekLocation( tmpLocation );
+    	}
+    	
+    	returnedEvent = readEvent(tmpLocation);
+    	
+    	// No matter what happens, save the location
+    	currentLocation = tmpLocation;
+    	
+    	return returnedEvent;
+    	
+    }
+    
+    
+    @Override
+	public synchronized LttngEvent parseEvent(TmfContext context) {
+    	
+    	if ( joie == true ) {
+    		System.out.println("parseEvent(context) context.getLocation() -> " + context.getLocation());
+    	}
+    	
+    	LttngEvent 	returnedEvent = null;
+    	LttngLocation tmpLocation = null;
+    	
+    	if ( context.getLocation() == null ) {
+    		tmpLocation = new LttngLocation();
+    		context.setLocation(tmpLocation);
+    	}
+    	else {
+    		tmpLocation = (LttngLocation)context.getLocation();
+    	}
+    	
+    	if ( tmpLocation.getCurrentTime() != currentJniTrace.getCurrentEventTimestamp().getTime() ) {
+    		seekLocation( tmpLocation );
+    	}
+    	
+    	if ( currentLttngEvent.getTimestamp().getValue() != currentJniTrace.getCurrentEventTimestamp().getTime() ) {
+    		returnedEvent = readEvent(tmpLocation);
+    	}
+    	else {
+			returnedEvent = currentLttngEvent;
+		}
+    	
+    	// No matter what happens, save the location
+    	currentLocation = tmpLocation;
+    	
+    	return returnedEvent;
+    	
+    }
+    
+    
+    private synchronized LttngEvent readEvent(LttngLocation location) {
+    	LttngEvent 	returnedEvent = null;
+    	JniEvent tmpEvent = null;
+    	
+    	tmpEvent = currentJniTrace.readNextEvent();
+		
+		if ( tmpEvent != null ) {
+			// *** NOTE
+			// Convert will update the currentLttngEvent
+            returnedEvent = convertJniEventToTmf(tmpEvent);
+            
+            // *** NOTE 
+            // Set Last and Current time from the event read, as it could be different from the time requested 
+            location.setLastReadTime(returnedEvent.getTimestamp().getValue() );
+            location.setCurrentTime( returnedEvent.getTimestamp().getValue() );
+        }
+		// *** NOTE
+		// If the read failed (likely the last event in the trace), set the LastReadTime to the JNI time
+		// That way, even if we try to read again, we will step over the bogus seek and read
+		else {
+//			location.setLastReadTime( currentJniTrace.getEndTime().getTime() + 1 );
+//			location.setCurrentTime(  currentJniTrace.getEndTime().getTime() + 1 );
+			location.setLastReadTime( getEndTime().getValue() + 1 );
+			location.setCurrentTime(  getEndTime().getValue() + 1 );
+//			location.setLastReadTime( Long.MAX_VALUE );
+//			location.setCurrentTime(  Long.MAX_VALUE );
+//			location.setLastReadTime( currentJniTrace.getEndTime().getNanoSeconds() + 1 );
+//			location.setCurrentTime(  currentJniTrace.getEndTime().getNanoSeconds() + 1 );
+//			System.out.println("TMF End time " + getEndTime().getValue() );
+//			System.out.println("JNI End time " + currentJniTrace.getEndTime().getTime() );
+//			System.out.println("JNI Partial time " + currentJniTrace.getEndTime().getNanoSeconds() );
+		}
+		
+		return returnedEvent;
+    }
+    
+    
 }
 
 /*

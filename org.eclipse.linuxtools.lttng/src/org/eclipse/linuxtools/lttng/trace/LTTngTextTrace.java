@@ -53,7 +53,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     
     private int cpuNumber = -1;
     
-    private  boolean showDebug = true;
+    private  boolean showDebug = false;
     
     public LTTngTextTrace(String path) throws Exception {
     	this(path, false);

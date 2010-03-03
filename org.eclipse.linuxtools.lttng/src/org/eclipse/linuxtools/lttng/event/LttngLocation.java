@@ -17,9 +17,9 @@ public class LttngLocation implements ITmfLocation {
 		this(DEFAULT_LAST_TIME, DEFAULT_CURR_TIME);
 	}
 	
-	public LttngLocation(LttngTimestamp timestamp) {
-		this(DEFAULT_LAST_TIME, timestamp.getValue());
-	}
+//	public LttngLocation(LttngTimestamp timestamp) {
+//		this(DEFAULT_LAST_TIME, timestamp.getValue());
+//	}
 	
 	public LttngLocation(LttngLocation oldLocation) {
 		this(oldLocation.lastReadTime, oldLocation.currentTime);

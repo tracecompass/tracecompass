@@ -155,20 +155,14 @@ public class LttngEventContent extends TmfEventContent {
      * @see @see org.eclipse.linuxtools.lttng.event.LttngEventField
      */
     @Override
-    public LttngEventField[] getFields() {
+    public synchronized LttngEventField[] getFields() {
         LttngEventField tmpField = null;
         
         LttngEventType tmpType = (LttngEventType)fParentEvent.getType();
         
         for ( int pos=0; pos<tmpType.getNbFields(); pos++ ) {
             String name = tmpType.getLabel(pos);
-//            Object newValue = ((LttngEvent)getEvent()).convertEventTmfToJni().parseFieldByName(name);
-            JniEvent jniEvent = ((LttngEvent)getEvent()).convertEventTmfToJni();
-            if (jniEvent == null) {
-            	System.out.println("Bad event.");
-            }
-            Object newValue = (jniEvent != null) ? jniEvent.parseFieldByName(name) : null;
-            
+            Object newValue = ((LttngEvent)getEvent()).convertEventTmfToJni().parseFieldByName(name);
             tmpField = new LttngEventField(this, name, newValue );
             fFieldsMap.put(name, tmpField);
         }
@@ -202,7 +196,7 @@ public class LttngEventContent extends TmfEventContent {
      * @see @see org.eclipse.linuxtools.lttng.event.LttngEventField
      */
     @Override
-    public LttngEventField getField(String name) {
+    public synchronized LttngEventField getField(String name) {
     	// *** VERIFY ***
         // Should we check if the field exists in LttngType before parsing? 
         // It could avoid calling parse for non-existent fields but would waste some cpu cycle on check?
@@ -211,10 +205,7 @@ public class LttngEventContent extends TmfEventContent {
         if ( returnedField == null ) {
             // *** VERIFY ***
             // Should we really make sure we didn't get null before creating/inserting a field?
-//        	Object newValue = ((LttngEvent)getEvent()).convertEventTmfToJni().parseFieldByName(name);
-        	LttngEvent lttngEvent = (LttngEvent) getEvent();
-        	JniEvent jniEvent = lttngEvent.convertEventTmfToJni();
-        	Object newValue = (jniEvent != null) ? jniEvent.parseFieldByName(name) : null;
+        	Object newValue = ((LttngEvent)getEvent()).convertEventTmfToJni().parseFieldByName(name);
             
             if ( newValue!= null ) {
                 returnedField = new LttngEventField(this, name, newValue);
