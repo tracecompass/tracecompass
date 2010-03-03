@@ -248,7 +248,7 @@ public class TmfEventsView extends TmfView {
     public void experimentSelected(TmfExperimentSelectedSignal signal) {
 		// Update the trace reference
     	fExperiment = (TmfExperiment<TmfEvent>) signal.getExperiment();
-    	setPartName(fTitlePrefix + " - " + fExperiment.getExperimentId());
+    	setPartName(fTitlePrefix + " - " + fExperiment.getName());
 
         // Perform the updates on the UI thread
         fTable.getDisplay().asyncExec(new Runnable() {
@@ -257,7 +257,7 @@ public class TmfEventsView extends TmfView {
         		fTable.setSelection(0);
             	fTable.clearAll();
 				cacheStartIndex = cacheEndIndex = 0;	// Clear the cache
-            	fTable.setItemCount(fExperiment.getNbEvents());        
+            	fTable.setItemCount((int) fExperiment.getNbEvents());        
         	}
         });
     }
@@ -268,7 +268,7 @@ public class TmfEventsView extends TmfView {
     	fTable.getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				if (!fTable.isDisposed() && fExperiment != null) {
-			    	fTable.setItemCount(fExperiment.getNbEvents());        
+			    	fTable.setItemCount((int) fExperiment.getNbEvents());        
 				}
 			}
         });

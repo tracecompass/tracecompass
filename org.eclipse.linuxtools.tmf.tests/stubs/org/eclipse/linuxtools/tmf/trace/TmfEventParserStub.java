@@ -60,7 +60,8 @@ public class TmfEventParserStub implements ITmfEventParser {
     // ------------------------------------------------------------------------
 
     static final String typePrefix = "Type-";
-    public TmfEvent parseNextEvent(ITmfTrace eventStream, TmfTraceContext context) throws IOException {
+    @SuppressWarnings("unchecked")
+	public TmfEvent parseNextEvent(ITmfTrace eventStream, TmfContext context) throws IOException {
 
         if (! (eventStream instanceof TmfTraceStub)) {
             return null;
@@ -74,7 +75,7 @@ public class TmfEventParserStub implements ITmfEventParser {
         synchronized(stream) {
         	long location = 0;
         	if (context != null)
-        		location = (Long) (context.getLocation());
+        		location = ((TmfLocation<Long>) (context.getLocation())).getValue();
         	stream.seek(location);
 
         	try {

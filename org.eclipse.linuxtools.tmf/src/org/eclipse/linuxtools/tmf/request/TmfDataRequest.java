@@ -141,7 +141,7 @@ public class TmfDataRequest<T extends TmfData> {
 	/**
 	 * @return the index
 	 */
-	public int getIndex() {
+	public long getIndex() {
 		return fIndex;
 	}
 

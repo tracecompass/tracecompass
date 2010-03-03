@@ -14,11 +14,11 @@ package org.eclipse.linuxtools.tmf.tests.component;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.tmf.component.ITmfContext;
 import org.eclipse.linuxtools.tmf.component.TmfProvider;
 import org.eclipse.linuxtools.tmf.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.trace.ITmfContext;
 
 /**
  * <b><u>TmfProviderManagerTest</u></b>

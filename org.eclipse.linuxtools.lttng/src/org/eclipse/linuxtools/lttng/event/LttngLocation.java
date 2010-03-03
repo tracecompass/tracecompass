@@ -1,7 +1,9 @@
 package org.eclipse.linuxtools.lttng.event;
 
+import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
 
-public class LttngLocation implements Cloneable {
+
+public class LttngLocation implements ITmfLocation {
 	
 	private final static Long DEFAULT_LAST_TIME = -1L;
 	private final static Long DEFAULT_CURR_TIME =  0L;
@@ -13,6 +15,10 @@ public class LttngLocation implements Cloneable {
 	
 	public LttngLocation() {
 		this(DEFAULT_LAST_TIME, DEFAULT_CURR_TIME);
+	}
+	
+	public LttngLocation(LttngTimestamp timestamp) {
+		this(DEFAULT_LAST_TIME, timestamp.getValue());
 	}
 	
 	public LttngLocation(LttngLocation oldLocation) {

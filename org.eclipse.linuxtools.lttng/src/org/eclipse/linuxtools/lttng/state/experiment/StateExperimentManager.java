@@ -72,7 +72,7 @@ public class StateExperimentManager extends TmfComponent {
 	public void readExperimentTimeWindow(TmfTimeRange trange,
 			String transactionID, IStateDataRequestListener listener) {
 		if (fExperiment != null) {
-			String id = fExperiment.getExperimentId();
+			String id = fExperiment.getName();
 			StateManager manager = managersByID.get(id);
 			if (manager != null) {
 				// TODO: A loop to request data for each trace needs to be used
@@ -88,7 +88,7 @@ public class StateExperimentManager extends TmfComponent {
 		// loaded.
 		if (listener != null && fExperiment != null) {
 			TmfTimeRange trange = fExperiment.getTimeRange();
-			String experimentId = fExperiment.getExperimentId();
+			String experimentId = fExperiment.getName();
 
 			// FIXME: there should be an id field available at the trace level
 			// to be fixed with the support of multiple files.
@@ -136,7 +136,7 @@ public class StateExperimentManager extends TmfComponent {
 		// traceId, as well as when the request can be specified at the trace
 		// level
 		// For the moment it does work for only one trace per experiment.
-		String experimentId = experiment.getExperimentId();
+		String experimentId = experiment.getName();
 		StateManager manager = StateManagerFactory.getManager(experimentId);
 		// TODO: clearAllData shall not be applied to all manager calls below
 		// since that would clean all data loaded within previous iterations in

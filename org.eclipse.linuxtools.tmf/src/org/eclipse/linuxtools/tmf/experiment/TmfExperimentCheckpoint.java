@@ -13,7 +13,7 @@
 package org.eclipse.linuxtools.tmf.experiment;
 
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
+import org.eclipse.linuxtools.tmf.trace.TmfContext;
 
 /**
  * <b><u>TmfExperimentCheckpoint</u></b>
@@ -27,7 +27,7 @@ public class TmfExperimentCheckpoint implements Comparable<TmfExperimentCheckpoi
     // ------------------------------------------------------------------------
     
     private final TmfTimestamp fTimestamp;
-    private final TmfTraceContext[] fContexts;
+    private final TmfContext[] fContexts;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -37,7 +37,7 @@ public class TmfExperimentCheckpoint implements Comparable<TmfExperimentCheckpoi
      * @param ts
      * @param location
      */
-    public TmfExperimentCheckpoint(TmfTimestamp ts, TmfTraceContext[] contexts) {
+    public TmfExperimentCheckpoint(TmfTimestamp ts, TmfContext[] contexts) {
         fTimestamp = ts;
         fContexts = contexts;
     }
@@ -56,7 +56,7 @@ public class TmfExperimentCheckpoint implements Comparable<TmfExperimentCheckpoi
     /**
      * @return the checkpoint event stream location
      */
-    public TmfTraceContext[] getContexts() {
+    public TmfContext[] getContexts() {
         return fContexts;
     }
 

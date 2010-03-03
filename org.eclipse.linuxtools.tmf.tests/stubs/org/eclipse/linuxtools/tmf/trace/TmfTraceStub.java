@@ -89,16 +89,17 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     // Operators
     // ------------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.eventlog.ITmfStreamLocator#seekLocation(java.lang.Object)
-     */
-	public TmfTraceContext seekLocation(Object location) {
+	@SuppressWarnings("unchecked")
+	public TmfContext seekLocation(ITmfLocation location) {
         try {
         	synchronized(fTrace) {
-        		// Position the trace, read the event (to obtain its timestamp)
-        		// and then re-position the trace (not great...)
-        		fTrace.seek((location != null) ? (Long) location : 0);
-        		TmfTraceContext context = new TmfTraceContext(getCurrentLocation());
+        		// Position the trace at the requested location and
+        		// returns the corresponding context
+        		long loc = (location != null) ? ((TmfLocation<Long>) location).getValue() : 0;
+        		if (loc != fTrace.getFilePointer()) {
+        			fTrace.seek(loc);
+        		}
+        		TmfContext context = new TmfContext(getCurrentLocation(), 0);
         		return context;
         	}
 		} catch (IOException e) {
@@ -107,25 +108,18 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
 		return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.eventlog.ITmfStreamLocator#getCurrentLocation()
-     */
     @Override
-	public Object getCurrentLocation() {
+	public TmfLocation<Long> getCurrentLocation() {
         try {
-            return new Long(fTrace.getFilePointer());
+            return new TmfLocation<Long>(fTrace.getFilePointer());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return null;
     }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.tmf.trace.TmfTrace#parseEvent()
-	 */
 	@Override
-	public TmfEvent parseEvent(TmfTraceContext context) {
+	public TmfEvent parseEvent(TmfContext context) {
        	try {
    			// paserNextEvent updates the context
    			TmfEvent event = fParser.parseNextEvent(this, context);

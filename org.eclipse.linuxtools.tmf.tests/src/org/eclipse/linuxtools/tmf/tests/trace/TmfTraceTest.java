@@ -29,7 +29,7 @@ import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.tests.TmfCoreTestPlugin;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
+import org.eclipse.linuxtools.tmf.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
 
 /**
@@ -96,7 +96,7 @@ public class TmfTraceTest extends TestCase {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		assertTrue("Opened trace",   trace != null);
+		assertTrue("Open trace",     trace != null);
 		assertEquals("getCacheSize", TmfTraceStub.DEFAULT_CACHE_SIZE, trace.getCacheSize());
         assertEquals("getTraceSize", NB_EVENTS, trace.getNbEvents());
     }
@@ -113,7 +113,7 @@ public class TmfTraceTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testSeekOnCacheBoundary() throws Exception {
-    	TmfTraceContext context = fTrace.seekLocation(null);
+    	TmfContext context = fTrace.seekLocation(null);
 
     	context = fTrace.seekEvent(new TmfTimestamp(1, SCALE, 0));
     	TmfEvent event = fTrace.getNextEvent(context);
@@ -132,7 +132,7 @@ public class TmfTraceTest extends TestCase {
     }
 
     public void testSeekNotOnCacheBoundary() throws Exception {
-    	TmfTraceContext context = fTrace.seekLocation(null);
+    	TmfContext context = fTrace.seekLocation(null);
 
     	context = fTrace.seekEvent(new TmfTimestamp(10, SCALE, 0));
     	TmfEvent event = fTrace.getNextEvent(context);
@@ -156,7 +156,7 @@ public class TmfTraceTest extends TestCase {
     }
 
     public void testSeekForEventOutOfBounds() throws Exception {
-    	TmfTraceContext context = fTrace.seekLocation(null);
+    	TmfContext context = fTrace.seekLocation(null);
 
     	// On lower bound, returns the first event (ts = 1)
     	context = fTrace.seekEvent(new TmfTimestamp(-1, SCALE, 0));
@@ -170,7 +170,7 @@ public class TmfTraceTest extends TestCase {
     }
 
     public void testSeekOnIndex() throws Exception {
-    	TmfTraceContext context = fTrace.seekLocation(null);
+    	TmfContext context = fTrace.seekLocation(null);
 
     	// On lower bound, returns the first event (ts = 1)
     	context = fTrace.seekEvent(0);
@@ -193,7 +193,7 @@ public class TmfTraceTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testGetNextEvent() throws Exception {
-    	TmfTraceContext context = fTrace.seekLocation(null);
+    	TmfContext context = fTrace.seekLocation(null);
 
     	// On lower bound, returns the first event (ts = 0)
     	context = fTrace.seekEvent(new TmfTimestamp(0, SCALE, 0));
@@ -244,7 +244,6 @@ public class TmfTraceTest extends TestCase {
 	public void testProcessRequestForAllEvents() throws Exception {
         final int BLOCK_SIZE =  1;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
-//        long nbExpectedEvents = NB_EVENTS;
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {

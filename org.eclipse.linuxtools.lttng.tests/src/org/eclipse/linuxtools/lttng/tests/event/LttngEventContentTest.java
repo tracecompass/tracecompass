@@ -15,7 +15,8 @@ import org.eclipse.linuxtools.lttng.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
+import org.eclipse.linuxtools.tmf.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.trace.TmfLocation;
 
 /*
  Functions tested here :
@@ -85,7 +86,7 @@ public class LttngEventContentTest extends TestCase {
 		try {
 			testStream = null;
 		    LTTngTextTrace tmpStream = initializeEventStream();
-			tmpEventContent = (LttngEventContent)tmpStream.getNextEvent( new TmfTraceContext(0L, 0) ).getContent();
+			tmpEventContent = (LttngEventContent)tmpStream.getNextEvent( new TmfContext(new TmfLocation<Long>(0L), 0) ).getContent();
 		}
 		catch (Exception e) {
 			fail("ERROR : Failed to get content!");
@@ -143,11 +144,11 @@ public class LttngEventContentTest extends TestCase {
 		LttngEventContent testContent = null;
     	LTTngTextTrace tmpStream = null;
     	LttngEvent tmpEvent = null;
-    	TmfTraceContext tmpContext = null;
+    	TmfContext tmpContext = null;
     	
     	// Require an event
     	tmpStream = initializeEventStream();
-    	tmpContext = new TmfTraceContext(0L, 0);
+    	tmpContext = new TmfContext(new TmfLocation<Long>(0L), 0);
     	tmpEvent = (LttngEvent)tmpStream.getNextEvent(tmpContext);
 		testContent = prepareToTest();
     	// getFieldS()
@@ -173,7 +174,7 @@ public class LttngEventContentTest extends TestCase {
     	
     	//*** To test getFields with a fields number >0, we need to move to an event that have some more
     	tmpStream = initializeEventStream();
-    	tmpContext = new TmfTraceContext(0L, 0);
+    	tmpContext = new TmfContext(new TmfLocation<Long>(0L), 0);
     	// Skip first events and seek to event pass metadata
     	tmpContext= tmpStream.seekEvent(new LttngTimestamp(timestampAfterMetadata) );
     	// Skip first one 
@@ -206,11 +207,11 @@ public class LttngEventContentTest extends TestCase {
     	// It's pointless to test with a getter...
     	LTTngTextTrace tmpStream = null;
     	LttngEvent tmpEvent = null;
-    	TmfTraceContext tmpContext = null;
+    	TmfContext tmpContext = null;
     	
     	// Require an event
     	tmpStream = initializeEventStream();
-    	tmpContext = new TmfTraceContext(0L, 0);
+    	tmpContext = new TmfContext(new TmfLocation<Long>(0L), 0);
     	tmpEvent = (LttngEvent)tmpStream.getNextEvent(tmpContext);
 		
     	LttngEventContent tmpContent = prepareToTest();
@@ -235,11 +236,11 @@ public class LttngEventContentTest extends TestCase {
 		LttngEventContent testContent = null;
     	LTTngTextTrace tmpStream = null;
     	LttngEvent tmpEvent = null;
-    	TmfTraceContext tmpContext = null;
+    	TmfContext tmpContext = null;
     	
     	// Require an event
     	tmpStream = initializeEventStream();
-    	tmpContext = new TmfTraceContext(0L, 0);
+    	tmpContext = new TmfContext(new TmfLocation<Long>(0L), 0);
     	tmpEvent = (LttngEvent)tmpStream.getNextEvent(tmpContext);
     	// Get the content
     	testContent = tmpEvent.getContent();

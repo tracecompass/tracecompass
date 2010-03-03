@@ -44,7 +44,7 @@ public class TestStateManager extends TestCase {
 			TmfExperiment<LttngEvent> newExp = new TmfExperiment<LttngEvent>(LttngEvent.class, logName, streamList);
 			
 			//Get the Test StateManager
-			StateManager manager = StateManagerFactoryTestSupport.getManager(newExp.getExperimentId());
+			StateManager manager = StateManagerFactoryTestSupport.getManager(newExp.getName());
 			//Start execution.
 			manager.setTraceSelection(newExp, false);
 			

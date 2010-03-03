@@ -13,7 +13,8 @@ import org.eclipse.linuxtools.lttng.event.LttngEventContent;
 import org.eclipse.linuxtools.lttng.event.LttngEventField;
 import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
+import org.eclipse.linuxtools.tmf.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.trace.TmfLocation;
 
 /*
  Functions tested here :
@@ -58,7 +59,7 @@ public class LttngEventFieldTest extends TestCase {
 		// This trace should be valid
 		try {
 			LTTngTextTrace tmpStream = initializeEventStream();
-			tmpField = (LttngEventField)tmpStream.getNextEvent( new TmfTraceContext(0L, 0) ).getContent().getField(0);
+			tmpField = (LttngEventField)tmpStream.getNextEvent( new TmfContext(new TmfLocation<Long>(0L), 0) ).getContent().getField(0);
 		} 
 		catch (Exception e) {
 			fail("ERROR : Failed to get field!");
@@ -97,7 +98,7 @@ public class LttngEventFieldTest extends TestCase {
     	// *** To "really" test the field, we will get a real field from LTTngTrace
     	LTTngTextTrace tmpStream = initializeEventStream();
     	
-    	LttngEventField testField 	= (LttngEventField)tmpStream.getNextEvent( new TmfTraceContext(0L, 0) ).getContent().getField(0);
+    	LttngEventField testField 	= (LttngEventField)tmpStream.getNextEvent( new TmfContext(new TmfLocation<Long>(0L), 0) ).getContent().getField(0);
     	assertNotSame("getField is null!",null,testField);
     	
     	// *** FIXME ***

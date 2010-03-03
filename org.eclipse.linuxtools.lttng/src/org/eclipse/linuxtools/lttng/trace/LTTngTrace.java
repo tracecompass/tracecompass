@@ -22,6 +22,7 @@ import org.eclipse.linuxtools.lttng.event.LttngEventContent;
 import org.eclipse.linuxtools.lttng.event.LttngEventReference;
 import org.eclipse.linuxtools.lttng.event.LttngEventSource;
 import org.eclipse.linuxtools.lttng.event.LttngEventType;
+import org.eclipse.linuxtools.lttng.event.LttngLocation;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.lttng.jni.JniMarker;
@@ -31,8 +32,9 @@ import org.eclipse.linuxtools.lttng.jni.common.JniTime;
 import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
+import org.eclipse.linuxtools.tmf.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 
 class LTTngTraceException extends LttngException {
@@ -223,7 +225,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * @see org.eclipse.linuxtools.lttng.event.LttngEvent
      */ 
     @Override
-	public LttngEvent parseEvent(TmfTraceContext context) {
+	public LttngEvent parseEvent(TmfContext context) {
 		JniEvent jniEvent;
 		LttngTimestamp timestamp = null;
 		LttngEvent returnedEvent = null;
@@ -245,7 +247,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     		// Save timestamp
     		timestamp = (LttngTimestamp) getCurrentLocation();
     	}
-   		context.setLocation(timestamp);
+   		context.setLocation(new LttngLocation(timestamp));
 //   		context.setTimestamp(timestamp);
 //   		context.incrRank();
    		
@@ -324,7 +326,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * 
      * @return TmfTraceContext pointing the position in the trace at the seek location 
      */
-    public TmfTraceContext seekLocation(Object location) {
+    public TmfContext seekLocation(ITmfLocation location) {
         
     	LttngTimestamp timestamp = null;
 
@@ -334,7 +336,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     		// *** FIXME ***
     		// Corrupted StartTime in TMF!!! 
     		//location = getStartTime();
-    		location = new LttngTimestamp(currentJniTrace.getStartTime().getTime());
+    		location = new LttngLocation(new LttngTimestamp(currentJniTrace.getStartTime().getTime()));
     	}
 
     	if (location instanceof TmfTimestamp) {
@@ -358,7 +360,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     	    System.out.println("ERROR : Location not instance of TmfTimestamp");
     	}
 
-    	 return new TmfTraceContext(timestamp, 0);	// Original
+    	 return new TmfContext(new LttngLocation(timestamp), 0);
     }
     
     /**
@@ -367,8 +369,9 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * @return The time (in LttngTimestamp format) of the current event or AFTER endTime if no more event is available.
      */
     @Override
-	public Object getCurrentLocation() {
-        LttngTimestamp returnedLocation = null;
+	public ITmfLocation getCurrentLocation() {
+
+    	LttngTimestamp returnedLocation = null;
         JniEvent tmpJniEvent = currentJniTrace.findNextEvent();
         
         if ( tmpJniEvent != null  ) {
@@ -378,7 +381,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
             returnedLocation = new LttngTimestamp( getEndTime().getValue() + 1 );
         }
         
-        return returnedLocation;
+        return new LttngLocation(returnedLocation);
     }
     
     /**

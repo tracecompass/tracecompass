@@ -12,53 +12,73 @@
 
 package org.eclipse.linuxtools.tmf.experiment;
 
-import java.util.Vector;
-
-import org.eclipse.linuxtools.tmf.component.ITmfContext;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
+import org.eclipse.linuxtools.tmf.trace.TmfContext;
 
 /**
  * <b><u>TmfExperimentContext</u></b>
  * <p>
  * Implement me. Please.
  */
-public class TmfExperimentContext implements ITmfContext, Cloneable {
+public class TmfExperimentContext extends TmfContext {
 
-	private ITmfTrace[]       fTraces = new ITmfTrace[0];	// The set of traces
-	private TmfTraceContext[] fContexts;					// The set of trace contexts
-	private TmfEvent[]        fEvents;
+	private ITmfTrace[]  fTraces = new ITmfTrace[0];
+	private TmfContext[] fContexts;
+	private TmfEvent[]   fEvents;
 
-	public TmfExperimentContext(Vector<ITmfTrace> traces) {
-		fTraces   = traces.toArray(fTraces);
-		fContexts = new TmfTraceContext[fTraces.length];
+	// ------------------------------------------------------------------------
+	// Constructors
+	// ------------------------------------------------------------------------
+
+	public TmfExperimentContext(ITmfTrace[] traces, TmfContext[] contexts) {
+		super();
+		fTraces   = traces;
+		fContexts = contexts;
 		fEvents   = new TmfEvent[fTraces.length];
+
+		ITmfLocation[] locations = new ITmfLocation[fTraces.length];
+		long rank = 0;
+		for (int i = 0; i < fTraces.length; i++) {
+			if (contexts[i] != null) {
+				locations[i] = contexts[i].getLocation();
+				rank += contexts[i].getRank();
+			}
+		}
+		
+		setLocation(new TmfExperimentLocation(locations));
+		setRank(rank);
 	}
 
-	@Override
-	public TmfExperimentContext clone() {
-		try {
-			return (TmfExperimentContext) super.clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
-		return null;
+	public TmfExperimentContext(ITmfTrace[] traces) {
+		this(traces, new TmfContext[traces.length]);
 	}
+
+	public TmfExperimentContext(TmfExperimentContext other) {
+		this(other.fTraces, other.cloneContexts());
+		fEvents = other.fEvents;
+		setLocation(other.getLocation());
+		setRank(other.getRank());
+	}
+
+	private TmfContext[] cloneContexts() {
+		TmfContext[] contexts = new TmfContext[fContexts.length];
+		for (int i = 0; i < fContexts.length; i++)
+			contexts[i] = fContexts[i].clone();
+		return contexts;
+	}
+
+	// ------------------------------------------------------------------------
+	// Accessors
+	// ------------------------------------------------------------------------
 
 	public ITmfTrace[] getTraces() {
 		return fTraces;
 	}
 
-	public TmfTraceContext[] getContexts() {
+	public TmfContext[] getContexts() {
 		return fContexts;
-	}
-
-	public TmfTraceContext[] cloneContexts() {
-		TmfTraceContext[] contexts = new TmfTraceContext[fContexts.length];
-		for (int i = 0; i < fContexts.length; i++)
-			contexts[i] = fContexts[i].clone();
-		return contexts;
 	}
 
 	public TmfEvent[] getEvents() {

@@ -13,34 +13,30 @@
 package org.eclipse.linuxtools.tmf.experiment;
 
 import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
-import org.eclipse.linuxtools.tmf.trace.TmfLocation;
 
 /**
  * <b><u>TmfExperimentLocation</u></b>
  * <p>
  * The experiment location is the set of its traces' locations.
  */
-public class TmfExperimentLocation extends TmfLocation<ITmfLocation<?>[]> {
+public class TmfExperimentLocation implements ITmfLocation {
 
-    private long[] fRanks;
-
-	public TmfExperimentLocation(ITmfLocation<?>[] locations, long[] ranks) {
-		super(locations);
-		fRanks = ranks;
+	private ITmfLocation[] fLocations;
+	
+	public TmfExperimentLocation(ITmfLocation[] locations) {
+		fLocations = locations;
 	}
 
-	@Override
+	public ITmfLocation[] getLocations() {
+		return fLocations;
+	}
+
 	public TmfExperimentLocation clone() {
-		super.clone();	// To keep FindBugs happy
-		ITmfLocation<?>[] locations = (ITmfLocation<?>[]) getLocation();
-		ITmfLocation<?>[] clones = new ITmfLocation[locations.length];
-		for (int i = 0; i < locations.length; i++) {
-			clones[i] = locations[i].clone();
+		ITmfLocation[] locations = new ITmfLocation[fLocations.length];
+		for (int i = 0; i < fLocations.length; i++) {
+			locations[i] = fLocations[i].clone();
 		}
-		return new TmfExperimentLocation(clones, fRanks.clone());
+		return new TmfExperimentLocation(locations);
 	}
 
-	public long[] getRanks() {
-        return fRanks;
-    }
 }

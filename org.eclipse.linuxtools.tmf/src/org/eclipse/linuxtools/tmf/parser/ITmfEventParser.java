@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
+import org.eclipse.linuxtools.tmf.trace.TmfContext;
 
 /**
  * <b><u>ITmfEventParser</u></b>
@@ -29,5 +29,5 @@ public interface ITmfEventParser {
      * @return
      * @throws IOException 
      */
-    public TmfEvent parseNextEvent(ITmfTrace stream, TmfTraceContext context) throws IOException;
+    public TmfEvent parseNextEvent(ITmfTrace stream, TmfContext context) throws IOException;
 }

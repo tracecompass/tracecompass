@@ -17,7 +17,7 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 /**
  * <b><u>TmfCheckpoint</u></b>
  * <p>
- * This class maps an event timestamp to a generic location.
+ * This class maps an event timestamp with a location.
  */
 public class TmfCheckpoint implements Comparable<TmfCheckpoint> {
 
@@ -25,37 +25,20 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint> {
     // Attributes
     // ------------------------------------------------------------------------
     
-    private TmfTimestamp fTimestamp;
-    private ITmfLocation<?> fLocation;
+    private final TmfTimestamp fTimestamp;
+    private final ITmfLocation fLocation;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
-    @SuppressWarnings("unused")
-	private TmfCheckpoint() {
-        fTimestamp = null;
-        fLocation  = null;
-    }
-
     /**
-     * @param ts the checkpoint timestamp
-     * @param location the corresponding trace location
+     * @param ts
+     * @param location
      */
-    public TmfCheckpoint(TmfTimestamp ts, ITmfLocation<?> location) {
+    public TmfCheckpoint(TmfTimestamp ts, ITmfLocation location) {
         fTimestamp = ts;
         fLocation = location;
-    }
-
-    /**
-     * Deep copy constructor
-     * @param other the other checkpoint
-     */
-    public TmfCheckpoint(TmfCheckpoint other) {
-    	if (other == null)
-    		throw new IllegalArgumentException();
-        fTimestamp = (TmfTimestamp) other.fTimestamp.clone();
-        fLocation  = other.fLocation.clone();
     }
 
     // ------------------------------------------------------------------------
@@ -63,56 +46,19 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint> {
     // ------------------------------------------------------------------------
 
     /**
-     * @return the checkpoint timestamp
+     * @return the checkpoint event timestamp
      */
     public TmfTimestamp getTimestamp() {
         return fTimestamp;
     }
 
     /**
-     * @return the checkpoint stream location
+     * @return the checkpoint event stream location
      */
-    public ITmfLocation<?> getLocation() {
+    public ITmfLocation getLocation() {
         return fLocation;
     }
 
-    // ------------------------------------------------------------------------
-    // Object
-    // ------------------------------------------------------------------------
-
-    @Override
-    public TmfCheckpoint clone() {
-    	TmfCheckpoint result = null;
-		try {
-			result = (TmfCheckpoint) super.clone();
-	    	result.fTimestamp = new TmfTimestamp(fTimestamp);
-	    	result.fLocation  = fLocation.clone();
-	    	return result;
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
-		return result;
-    }
- 
-    @Override
-    public int hashCode() {
-    	return fTimestamp.hashCode();
-    }
- 
-    @Override
-    public boolean equals(Object other) {
-    	if (!(other instanceof TmfCheckpoint)) {
-    		return false;
-    	}
-    	TmfCheckpoint o = (TmfCheckpoint) other;
-    	return fTimestamp.equals(o.fTimestamp);
-    }
- 
-    @Override
-    public String toString() {
-    	return "[TmfCheckpoint(" + fTimestamp +  "," + fLocation + ")]";
-    }
- 
     // ------------------------------------------------------------------------
     // Comparable
     // ------------------------------------------------------------------------

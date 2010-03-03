@@ -19,8 +19,10 @@ import java.io.RandomAccessFile;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.parser.ITmfEventParser;
+import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
+import org.eclipse.linuxtools.tmf.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.trace.TmfLocation;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 /**
  * <b><u>LTTngTraceStub</u></b>
@@ -80,12 +82,13 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> {
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.eventlog.ITmfStreamLocator#seekLocation(java.lang.Object)
      */
-	public TmfTraceContext seekLocation(Object location) {
-        TmfTraceContext context = null;
+	@SuppressWarnings("unchecked")
+	public TmfContext seekLocation(ITmfLocation location) {
+        TmfContext context = null;
        	try {
        		synchronized(fTrace) {
-        		fTrace.seek((location != null) ? (Long) location : 0);
-        		context = new TmfTraceContext(getCurrentLocation(), 0);
+        		fTrace.seek((location != null) ? ((TmfLocation<Long>) location).getValue() : 0);
+        		context = new TmfContext(getCurrentLocation(), 0);
 //        		TmfTraceContext context2 = new TmfTraceContext(getCurrentLocation(), 0);
 //        		TmfEvent event = parseEvent(context2);
 //        		context.setTimestamp(event.getTimestamp());
@@ -101,9 +104,9 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> {
      * @see org.eclipse.linuxtools.tmf.eventlog.ITmfStreamLocator#getCurrentLocation()
      */
     @Override
-	public Object getCurrentLocation() {
+	public ITmfLocation getCurrentLocation() {
        	try {
-       		return new Long(fTrace.getFilePointer());
+       		return new TmfLocation<Long>(fTrace.getFilePointer());
        	} catch (IOException e) {
        		// TODO Auto-generated catch block
        		e.printStackTrace();
@@ -115,7 +118,7 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> {
 	 * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#parseEvent()
 	 */
 	@Override
-	public TmfEvent parseEvent(TmfTraceContext context) {
+	public TmfEvent parseEvent(TmfContext context) {
        	try {
    			// paserNextEvent updates the context
    			TmfEvent event = fParser.parseNextEvent(this, context);

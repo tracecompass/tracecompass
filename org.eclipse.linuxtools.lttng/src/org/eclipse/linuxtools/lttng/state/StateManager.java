@@ -33,8 +33,9 @@ import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.trace.TmfCheckpoint;
+import org.eclipse.linuxtools.tmf.trace.TmfLocation;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceCheckpoint;
 
 /**
  * 
@@ -58,7 +59,7 @@ public class StateManager extends Observable {
 	private Long eventCount = 0L;
 
 	private HashMap<Long, LttngTraceState> stateCheckpointsList = new HashMap<Long, LttngTraceState>();
-	private Vector<TmfTraceCheckpoint> timestampCheckpointsList = new Vector<TmfTraceCheckpoint>();
+	private Vector<TmfCheckpoint> timestampCheckpointsList = new Vector<TmfCheckpoint>();
 
 	// ========================================================================
 	// Constructor
@@ -159,7 +160,7 @@ public class StateManager extends Observable {
 				sb.append(" - " + new LttngTimestamp(logTimes.getEndTime()));
 
 				sb.append("\n\tCheckPoints available at: ");
-				for (TmfTraceCheckpoint cpoint : timestampCheckpointsList) {
+				for (TmfCheckpoint cpoint : timestampCheckpointsList) {
 					sb.append("\n\t" + cpoint.getTimestamp());
 				}
 				TraceDebug.debug(sb.toString());
@@ -264,19 +265,15 @@ public class StateManager extends Observable {
 	 * 
 	 * @return boolean True if a checkpoint was saved, false otherwise
 	 */
-	private boolean saveCheckPointIfNeeded(Long eventCounter,
-			TmfTimestamp eventTime) {
+	private boolean saveCheckPointIfNeeded(Long eventCounter, TmfTimestamp eventTime) {
 		boolean saveHappened = false;
-		// Crate new location to store checkpoint reference
-		Long location = new Long(eventCounter.longValue());
 		// Save a checkpoint every LTTNG_STATE_SAVE_INTERVAL event
-		if ((location % LTTNG_STATE_SAVE_INTERVAL) == 0) {
+		if ((eventCounter.longValue() % LTTNG_STATE_SAVE_INTERVAL) == 0) {
 			// Save the checkpoint
-			stateCheckpointsList.put(location, stateIn.traceStateModel.clone());
+			stateCheckpointsList.put(eventCounter, stateIn.traceStateModel.clone());
 			// Save correlation between timestamp and checkpoint index
 
-			timestampCheckpointsList.add(new TmfTraceCheckpoint(eventTime,
-					location));
+			timestampCheckpointsList.add(new TmfCheckpoint(eventTime, new TmfLocation<Long>(eventCounter)));
 
 			saveHappened = true;
 		}
@@ -296,6 +293,7 @@ public class StateManager extends Observable {
 	 * @return TmfTimestamp indicates the nearest time used to restore the
 	 *         state, null sent if input is invalid
 	 */
+	@SuppressWarnings("unchecked")
 	public TmfTimestamp restoreCheckPointByTimestamp(TmfTimestamp eventTime) {
 		TmfTimeRange logRange = fExperiment.getTimeRange();
 		TmfTimestamp nearestTimeStamp = logRange.getStartTime();
@@ -318,13 +316,13 @@ public class StateManager extends Observable {
 		// Initiate the compare with a checkpoint containing the target time
 		// stamp to find
 		int index = Collections.binarySearch(timestampCheckpointsList,
-				new TmfTraceCheckpoint(eventTime, 0));
+				new TmfCheckpoint(eventTime, new TmfLocation<Long>(0L)));
 		// adjust index to round down to earlier checkpoint when exact match not
 		// found
 		index = getPrevIndex(index);
 
 		LttngTraceState traceState;
-		Long location = 0L;
+		TmfLocation<Long> location = new TmfLocation<Long>(0L);
 		if (index == 0) {
 			// No checkpoint restore is needed, start with a brand new
 			// TraceState
@@ -332,16 +330,16 @@ public class StateManager extends Observable {
 			traceState = StateModelFactory.getStateEntryInstance(inputDataRef);
 		} else {
 			// Useful CheckPoint found
-			TmfTraceCheckpoint checkpoint = timestampCheckpointsList.get(index);
+			TmfCheckpoint checkpoint = timestampCheckpointsList.get(index);
 			nearestTimeStamp = checkpoint.getTimestamp();
 			// get the location associated with the checkpoint
-			location = (Long) (checkpoint.getLocation());
+			location = (TmfLocation<Long>) checkpoint.getLocation();
 			// reference a new copy of the checkpoint template
 			traceState = stateCheckpointsList.get(location).clone();
 		}
 
 		// Make sure eventCount stay consistent!
-		eventCount = new Long(location);
+		eventCount = location.getValue();
 
 		// Restore the stored traceState
 		stateIn.setTraceStateModel(traceState);

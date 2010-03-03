@@ -16,7 +16,8 @@ import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.tmf.event.TmfEventSource;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
+import org.eclipse.linuxtools.tmf.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.trace.TmfLocation;
 
 /*
  Functions tested here :
@@ -78,7 +79,7 @@ public class LttngEventTest extends TestCase {
 		
 		try {
 			LTTngTextTrace tmpStream = initializeEventStream();
-			tmpEvent = (LttngEvent)tmpStream.getNextEvent(new TmfTraceContext(0L, 0) );
+			tmpEvent = (LttngEvent)tmpStream.getNextEvent(new TmfContext(new TmfLocation<Long>(0L), 0) );
 		}
 		catch (Exception e) {
 			System.out.println("ERROR : Could not open " + tracepath1);

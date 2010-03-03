@@ -54,9 +54,9 @@ public interface ITmfTrace {
      * @param data.index
      * @return a context object for subsequent reads
      */
-    public TmfTraceContext seekLocation(Object location);
-    public TmfTraceContext seekEvent(TmfTimestamp timestamp);
-    public TmfTraceContext seekEvent(long index);
+    public TmfContext seekLocation(ITmfLocation location);
+    public TmfContext seekEvent(TmfTimestamp timestamp);
+    public TmfContext seekEvent(long rank);
 
     /**
      * Return the event pointed by the supplied context (or null if
@@ -64,7 +64,7 @@ public interface ITmfTrace {
      * 
      * @return the next event in the stream
      */
-    public TmfEvent getNextEvent(TmfTraceContext context);
+    public TmfEvent getNextEvent(TmfContext context);
 
     /**
      * Return the event pointed by the supplied context (or null if
@@ -72,6 +72,6 @@ public interface ITmfTrace {
      * 
      * @return the next event in the stream
      */
-    public TmfEvent parseEvent(TmfTraceContext context);
+    public TmfEvent parseEvent(TmfContext context);
 
 }

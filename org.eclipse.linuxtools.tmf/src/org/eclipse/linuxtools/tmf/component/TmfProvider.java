@@ -18,6 +18,7 @@ import java.util.Vector;
 import org.eclipse.linuxtools.tmf.event.TmfData;
 import org.eclipse.linuxtools.tmf.request.ITmfRequestHandler;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.trace.ITmfContext;
 
 /**
  * <b><u>TmfProvider</u></b>
@@ -142,7 +143,7 @@ public abstract class TmfProvider<T extends TmfData> extends TmfComponent implem
 
 	/**
 	 * Initialize the provider based on the request. The context is
-	 * application specific and will be updated by getNext().
+	 * provider specific and will be updated by getNext().
 	 * 
 	 * @param request
 	 * @return

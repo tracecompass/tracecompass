@@ -26,6 +26,7 @@ import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.experiment.TmfExperimentContext;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
@@ -46,6 +47,8 @@ public class TmfExperimentTest extends TestCase {
 
     private static ITmfTrace fTrace;
     private static TmfExperiment<TmfEvent> fExperiment;
+
+    private static byte SCALE = (byte) -3;
 
     // ------------------------------------------------------------------------
     // Housekeeping
@@ -94,8 +97,8 @@ public class TmfExperimentTest extends TestCase {
     // Constructor
     // ------------------------------------------------------------------------
 
-	public void testBasicTmfTrace() {
-		assertEquals("GetId", EXPERIMENT, fExperiment.getExperimentId());
+	public void testBasicTmfExperiment() {
+		assertEquals("GetId", EXPERIMENT, fExperiment.getName());
         assertEquals("GetEpoch", TmfTimestamp.Zero, fExperiment.getEpoch());
         assertEquals("GetNbEvents", NB_EVENTS, fExperiment.getNbEvents());
 
@@ -103,6 +106,86 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("getStartTime", 1, timeRange.getStartTime().getValue());
         assertEquals("getEndTime", NB_EVENTS, timeRange.getEndTime().getValue());
 	}
+
+    // ------------------------------------------------------------------------
+    // seek
+    // ------------------------------------------------------------------------
+
+    public void testSeekEOnCacheBoundary() throws Exception {
+    	TmfExperimentContext context = fExperiment.seekLocation(null);
+
+    	context = fExperiment.seekEvent(new TmfTimestamp(1, SCALE, 0));
+    	TmfEvent event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+        assertEquals("Event rank", 1, context.getRank());
+
+    	context = fExperiment.seekEvent(new TmfTimestamp(1001, SCALE, 0));
+        event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1001, event.getTimestamp().getValue());
+        assertEquals("Event rank", 1001, context.getRank());
+
+    	context = fExperiment.seekEvent(new TmfTimestamp(4001, SCALE, 0));
+        event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 4001, event.getTimestamp().getValue());
+        assertEquals("Event rank", 4001, context.getRank());
+    }
+
+    public void testSeekNotOnCacheBoundary() throws Exception {
+    	TmfExperimentContext context = fExperiment.seekLocation(null);
+
+    	context = fExperiment.seekEvent(new TmfTimestamp(10, SCALE, 0));
+    	TmfEvent event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 10, event.getTimestamp().getValue());
+        assertEquals("Event rank", 10, context.getRank());
+
+    	context = fExperiment.seekEvent(new TmfTimestamp(999, SCALE, 0));
+        event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 999, event.getTimestamp().getValue());
+        assertEquals("Event rank", 999, context.getRank());
+
+    	context = fExperiment.seekEvent(new TmfTimestamp(1001, SCALE, 0));
+        event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1001, event.getTimestamp().getValue());
+        assertEquals("Event rank", 1001, context.getRank());
+
+    	context = fExperiment.seekEvent(new TmfTimestamp(4499, SCALE, 0));
+        event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 4499, event.getTimestamp().getValue());
+        assertEquals("Event rank", 4499, context.getRank());
+    }
+
+    public void testSeekForEventOutOfBounds() throws Exception {
+    	TmfExperimentContext context = fExperiment.seekLocation(null);
+
+    	// On lower bound, returns the first event (ts = 1)
+    	context = fExperiment.seekEvent(new TmfTimestamp(-1, SCALE, 0));
+        TmfEvent event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+
+        // On higher bound, returns null (no event)
+    	context = fExperiment.seekEvent(new TmfTimestamp(NB_EVENTS + 1, SCALE, 0));
+        event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", null, event);
+    }
+
+    public void testSeekOnIndex() throws Exception {
+    	TmfExperimentContext context = fExperiment.seekLocation(null);
+
+    	// On lower bound, returns the first event (ts = 1)
+    	context = fExperiment.seekEvent(0);
+        TmfEvent event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+
+        // On higher bound
+    	context = fExperiment.seekEvent(NB_EVENTS - 1);
+        event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", NB_EVENTS, event.getTimestamp().getValue());
+
+        // Above high bound
+    	context = fExperiment.seekEvent(NB_EVENTS);
+        event = fExperiment.getNextEvent(context);
+        assertEquals("Event", null, event);
+    }
 
     // ------------------------------------------------------------------------
     // processRequest
@@ -168,7 +251,7 @@ public class TmfExperimentTest extends TestCase {
         final int nbEvents  = TmfEventRequest.ALL_DATA;
         final int blockSize =  1;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
-        int nbExpectedEvents = fExperiment.getNbEvents();
+        long nbExpectedEvents = fExperiment.getNbEvents();
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, nbEvents, blockSize) {

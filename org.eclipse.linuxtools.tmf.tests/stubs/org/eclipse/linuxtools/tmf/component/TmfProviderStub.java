@@ -24,7 +24,8 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.tests.TmfCoreTestPlugin;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
+import org.eclipse.linuxtools.tmf.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
 
 /**
@@ -50,7 +51,7 @@ public class TmfProviderStub extends TmfProvider<TmfEvent> {
 	@Override
 	public ITmfContext setContext(TmfDataRequest<TmfEvent> request) {
 		if (request instanceof TmfEventRequest<?>) {
-			TmfTraceContext context = fTrace.seekEvent(((TmfEventRequest<?>) request).getRange().getStartTime());
+			TmfContext context = fTrace.seekEvent(((TmfEventRequest<?>) request).getRange().getStartTime());
 			return context;
 		}
 		return null;

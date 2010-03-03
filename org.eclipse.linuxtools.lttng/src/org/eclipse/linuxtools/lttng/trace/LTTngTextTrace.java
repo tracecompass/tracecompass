@@ -25,13 +25,15 @@ import org.eclipse.linuxtools.lttng.event.LttngEventSource;
 import org.eclipse.linuxtools.lttng.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
-import org.eclipse.linuxtools.tmf.component.ITmfContext;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.trace.TmfCheckpoint;
+import org.eclipse.linuxtools.tmf.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.trace.TmfLocation;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceCheckpoint;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceContext;
 
 public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 	private LttngTimestamp                  eventTimestamp   = null;
@@ -76,11 +78,11 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
         	throw new IOException("Fail to position to the beginning of the trace");
         }
         else {
-        	fCacheSize = 1000;
+        	fIndexPageSize = 1000;
         	
         	// Skip indexing if asked
         	if ( skipIndexing == true ) {
-        		fCheckpoints.add(new TmfTraceCheckpoint(new LttngTimestamp(0L), 0L));
+        		fCheckpoints.add(new TmfCheckpoint(new LttngTimestamp(0L), new TmfLocation<Long>(0L)));
         	}
         	else {
         		indexTrace(true);
@@ -89,7 +91,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
         	Long endTime = currentLttngEvent.getTimestamp().getValue();
         	positionToFirstEvent();
         	
-        	getNextEvent(new TmfTraceContext(null, 0));
+        	getNextEvent(new TmfContext(null, 0));
         	Long starTime = currentLttngEvent.getTimestamp().getValue();
         	positionToFirstEvent();
         	
@@ -132,8 +134,9 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     	return isSuccessful;
     }
     
-    private void skipToPosition(Long skipPosition) {
+    private void skipToPosition(TmfLocation<Long> skip) {
     	try {
+    			long skipPosition = skip.getValue();
     			if ( skipPosition < 0 ) {
     				skipPosition = 0L;
     			}
@@ -153,22 +156,23 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     	}
     }
     
-    public TmfTraceContext seekLocation(Object location) {
+    @SuppressWarnings("unchecked")
+	public TmfContext seekLocation(ITmfLocation location) {
 
     	if (location == null) {
-    		location = 0L;
+    		location = new TmfLocation<Long>(0L);
     	}
 
-    	if (!((Long) location).equals(nbCharRead)) {
-    		skipToPosition((Long) location);
+    	if (!((TmfLocation<Long>) location).getValue().equals(nbCharRead)) {
+    		skipToPosition((TmfLocation<Long>) location);
     	}
 
-    	TmfTraceContext tmpTraceContext =  new TmfTraceContext(location, 0L);
+    	TmfContext tmpTraceContext =  new TmfContext(location, 0L);
     	
     	return tmpTraceContext;
     }
     
-     private LttngEvent parseMyNextEvent(TmfTraceContext context) {
+     private LttngEvent parseMyNextEvent(TmfContext context) {
     	
     	// All parsing variables declared here so to be able to print them into the catch if needed
     	String tmpContent = null;
@@ -394,13 +398,13 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     }
     
     @Override
-    public Object getCurrentLocation() {
-    	return nbCharRead;
+    public ITmfLocation getCurrentLocation() {
+    	return new TmfLocation<Long>(nbCharRead);
     }
     
 	@Override
-	public LttngEvent parseEvent(TmfTraceContext context) {
-		seekLocation(context.getLocation());
+	public LttngEvent parseEvent(TmfContext context) {
+		context = seekLocation(context.getLocation());
 		return parseMyNextEvent(context);
 		
     }
