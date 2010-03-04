@@ -31,6 +31,7 @@ public class TmfExperimentLocation implements ITmfLocation {
 		return fLocations;
 	}
 
+	@Override
 	public TmfExperimentLocation clone() {
 		ITmfLocation[] locations = new ITmfLocation[fLocations.length];
 		for (int i = 0; i < fLocations.length; i++) {

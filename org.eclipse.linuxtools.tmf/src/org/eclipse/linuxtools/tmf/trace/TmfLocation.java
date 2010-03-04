@@ -33,6 +33,7 @@ public class TmfLocation<T> implements ITmfLocation {
 		return fLocation;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public TmfLocation<T> clone() {
 		try {

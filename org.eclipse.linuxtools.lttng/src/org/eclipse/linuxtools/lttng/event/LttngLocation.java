@@ -84,6 +84,7 @@ public class LttngLocation implements ITmfLocation {
 	}
 	
 	
+	@Override
 	public String toString() {
 		return "\tLttngLocation[ Last : " + lastReadTime + "  Current : " + currentTime + " ]";
 	}
