@@ -245,7 +245,7 @@ public class LTTngTextTraceTest extends TestCase {
 		assertNotSame("tmpEvent is null after first event",null,tmpEvent );
 		assertTrue("tmpEvent has wrong reference after first event",((String)tmpEvent.getReference().getReference()).contains(firstEventReference) );
 		assertNotSame("tmpContext is null after first seekEvent()",null,testStream1.getCurrentLocation() );
-		assertEquals("tmpContext has wrong timestamp after first seekEvent()",locationAfterFirstEvent, ((TmfLocation<Long>) testStream1.getCurrentLocation()).getValue());
+		assertEquals("tmpContext has wrong timestamp after first seekEvent()",locationAfterFirstEvent, ((TmfLocation<Long>) testStream1.getCurrentLocation()).getLocation());
 		// Test CPU number of the trace
 		assertSame("getCpuNumber() return wrong number of cpu",traceCpuNumber ,testStream1.getCpuNumber() );
     }

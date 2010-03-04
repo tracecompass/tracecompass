@@ -449,11 +449,12 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     }
     
     @Override
-	public ITmfLocation getCurrentLocation() {
+	public ITmfLocation<?> getCurrentLocation() {
         return currentLocation;
     }
     
-    public synchronized TmfContext seekLocation(ITmfLocation location) {
+    @Override
+	public synchronized TmfContext seekLocation(ITmfLocation<?> location) {
     	
     	if ( joie == true ) {
     		System.out.println("seekLocation(location) location -> " + location);

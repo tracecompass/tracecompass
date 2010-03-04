@@ -19,11 +19,11 @@ package org.eclipse.linuxtools.tmf.trace;
  */
 public interface ITmfContext extends Cloneable {
 
-	public void setLocation(ITmfLocation location);
-	public ITmfLocation getLocation();
+	public void setLocation(ITmfLocation<?> location);
+	public ITmfLocation<?> getLocation();
 
-	public void setRank(long value);
+	public void setRank(long rank);
 	public long getRank();
-	public void updateRank(int value);
+	public void updateRank(int rank);
 
 }

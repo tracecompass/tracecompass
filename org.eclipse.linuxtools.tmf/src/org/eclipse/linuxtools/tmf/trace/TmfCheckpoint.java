@@ -26,7 +26,7 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint> {
     // ------------------------------------------------------------------------
     
     private final TmfTimestamp fTimestamp;
-    private final ITmfLocation fLocation;
+    private final ITmfLocation<?> fLocation;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -36,7 +36,7 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint> {
      * @param ts
      * @param location
      */
-    public TmfCheckpoint(TmfTimestamp ts, ITmfLocation location) {
+    public TmfCheckpoint(TmfTimestamp ts, ITmfLocation<?> location) {
         fTimestamp = ts;
         fLocation = location;
     }
@@ -55,7 +55,7 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint> {
     /**
      * @return the checkpoint event stream location
      */
-    public ITmfLocation getLocation() {
+    public ITmfLocation<?> getLocation() {
         return fLocation;
     }
 

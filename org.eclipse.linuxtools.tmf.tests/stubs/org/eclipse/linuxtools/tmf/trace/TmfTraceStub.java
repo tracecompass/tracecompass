@@ -89,13 +89,14 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     // Operators
     // ------------------------------------------------------------------------
 
+	@Override
 	@SuppressWarnings("unchecked")
-	public TmfContext seekLocation(ITmfLocation location) {
+	public TmfContext seekLocation(ITmfLocation<?> location) {
         try {
         	synchronized(fTrace) {
         		// Position the trace at the requested location and
         		// returns the corresponding context
-        		long loc = (location != null) ? ((TmfLocation<Long>) location).getValue() : 0;
+        		long loc = (location != null) ? ((TmfLocation<Long>) location).getLocation() : 0;
         		if (loc != fTrace.getFilePointer()) {
         			fTrace.seek(loc);
         		}

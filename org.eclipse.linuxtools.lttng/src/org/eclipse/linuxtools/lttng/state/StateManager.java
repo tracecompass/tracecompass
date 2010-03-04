@@ -339,7 +339,7 @@ public class StateManager extends Observable {
 		}
 
 		// Make sure eventCount stay consistent!
-		eventCount = location.getValue();
+		eventCount = location.getLocation();
 
 		// Restore the stored traceState
 		stateIn.setTraceStateModel(traceState);

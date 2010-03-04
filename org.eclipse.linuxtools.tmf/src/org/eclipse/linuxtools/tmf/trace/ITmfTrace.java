@@ -54,7 +54,7 @@ public interface ITmfTrace {
      * @param data.index
      * @return a context object for subsequent reads
      */
-    public TmfContext seekLocation(ITmfLocation location);
+    public TmfContext seekLocation(ITmfLocation<?> location);
     public TmfContext seekEvent(TmfTimestamp timestamp);
     public TmfContext seekEvent(long rank);
 

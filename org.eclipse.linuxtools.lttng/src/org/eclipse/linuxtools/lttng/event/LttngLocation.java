@@ -3,7 +3,7 @@ package org.eclipse.linuxtools.lttng.event;
 import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
 
 
-public class LttngLocation implements ITmfLocation {
+public class LttngLocation implements ITmfLocation<Long[]> {
 	
 	private final static Long DEFAULT_LAST_TIME = -1L;
 	private final static Long DEFAULT_CURR_TIME =  0L;
@@ -87,6 +87,19 @@ public class LttngLocation implements ITmfLocation {
 	@Override
 	public String toString() {
 		return "\tLttngLocation[ Last : " + lastReadTime + "  Current : " + currentTime + " ]";
+	}
+
+	// ------------------------------------------------------------------------
+	// ITmfLocation
+	// ------------------------------------------------------------------------
+
+	public void setLocation(Long[] location) {
+		lastReadTime = ((Long[]) location)[0];
+		currentTime  = ((Long[]) location)[1];
+	}
+
+	public Long[] getLocation() {
+		return new Long[] {lastReadTime, currentTime };
 	}
 	
 }

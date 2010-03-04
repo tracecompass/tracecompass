@@ -225,7 +225,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfProvider<T> implem
         }
 
         // Position the stream at the checkpoint
-        ITmfLocation location;
+        ITmfLocation<?> location;
         synchronized (fCheckpoints) {
         	if (fCheckpoints.size() > 0) {
         		if (index >= fCheckpoints.size()) {
@@ -259,7 +259,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfProvider<T> implem
 
         // Position the stream at the previous checkpoint
         int index = (int) rank / fIndexPageSize;
-        ITmfLocation location;
+        ITmfLocation<?> location;
         synchronized (fCheckpoints) {
         	if (fCheckpoints.size() > 0) {
         		if (index >= fCheckpoints.size()) {
@@ -312,7 +312,8 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfProvider<T> implem
     /**
      * To be implemented by the concrete class
      */
-	public abstract ITmfLocation getCurrentLocation();
+    public abstract TmfContext seekLocation(ITmfLocation<?> location);
+	public abstract ITmfLocation<?> getCurrentLocation();
     public abstract TmfEvent parseEvent(TmfContext context);
 
 	// ------------------------------------------------------------------------
@@ -373,7 +374,6 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfProvider<T> implem
 		/* (non-Javadoc)
 		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
 		 */
-		@SuppressWarnings("rawtypes")
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 
@@ -389,7 +389,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfProvider<T> implem
             try {
             	// Position the trace at the beginning
                 TmfContext context = seekLocation(null);
-                TmfLocation location = (TmfLocation) context.getLocation();
+                ITmfLocation<?> location = context.getLocation();
 
                 // Get the first event
                	TmfEvent event = getNextEvent(context);
@@ -418,7 +418,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfProvider<T> implem
 
                     // We will need this location at the next iteration
                     if ((nbEvents % fIndexPageSize) == 0) {
-                        location = (TmfLocation) context.getLocation();
+                        location = context.getLocation();
            			}
 
                     event = getNextEvent(context);

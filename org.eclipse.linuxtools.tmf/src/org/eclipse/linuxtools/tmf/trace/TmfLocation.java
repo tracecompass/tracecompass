@@ -15,32 +15,38 @@ package org.eclipse.linuxtools.tmf.trace;
 /**
  * <b><u>TmfLocation</u></b>
  * <p>
- * Implement me. Please.
+ * A generic implementation of ITmfLocation
  */
-public class TmfLocation<T> implements ITmfLocation {
+public class TmfLocation<L> implements ITmfLocation<L> {
 
-	private T fLocation;
+	private L fLocation;
 	
-	public TmfLocation(T location) {
+	public TmfLocation(L location) {
 		fLocation = location;
 	}
 
-	public void setValue(T location) {
+	public void setLocation(L location) {
 		fLocation = location;
 	}
 
-	public T getValue() {
+	public L getLocation() {
 		return fLocation;
 	}
 
 	@Override
+	public String toString() {
+		return fLocation.toString();
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
-	public TmfLocation<T> clone() {
+	public TmfLocation<L> clone() {
 		try {
-			return (TmfLocation<T>) super.clone();
+			return (TmfLocation<L>) super.clone();
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
+
 }

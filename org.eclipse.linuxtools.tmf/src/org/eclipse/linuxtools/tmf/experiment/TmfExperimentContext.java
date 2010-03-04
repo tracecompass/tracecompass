@@ -38,7 +38,7 @@ public class TmfExperimentContext extends TmfContext {
 		fContexts = contexts;
 		fEvents   = new TmfEvent[fTraces.length];
 
-		ITmfLocation[] locations = new ITmfLocation[fTraces.length];
+		ITmfLocation<?>[] locations = new ITmfLocation[fTraces.length];
 		long rank = 0;
 		for (int i = 0; i < fTraces.length; i++) {
 			if (contexts[i] != null) {

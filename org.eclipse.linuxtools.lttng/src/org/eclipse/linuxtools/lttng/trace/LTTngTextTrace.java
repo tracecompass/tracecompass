@@ -136,7 +136,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     
     private void skipToPosition(TmfLocation<Long> skip) {
     	try {
-    			long skipPosition = skip.getValue();
+    			long skipPosition = skip.getLocation();
     			if ( skipPosition < 0 ) {
     				skipPosition = 0L;
     			}
@@ -156,14 +156,15 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     	}
     }
     
-    @SuppressWarnings("unchecked")
-	public TmfContext seekLocation(ITmfLocation location) {
+    @Override
+	@SuppressWarnings("unchecked")
+	public TmfContext seekLocation(ITmfLocation<?> location) {
 
     	if (location == null) {
     		location = new TmfLocation<Long>(0L);
     	}
 
-    	if (!((TmfLocation<Long>) location).getValue().equals(nbCharRead)) {
+    	if (!((TmfLocation<Long>) location).getLocation().equals(nbCharRead)) {
     		skipToPosition((TmfLocation<Long>) location);
     	}
 
@@ -398,7 +399,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     }
     
     @Override
-    public ITmfLocation getCurrentLocation() {
+    public ITmfLocation<?> getCurrentLocation() {
     	return new TmfLocation<Long>(nbCharRead);
     }
     

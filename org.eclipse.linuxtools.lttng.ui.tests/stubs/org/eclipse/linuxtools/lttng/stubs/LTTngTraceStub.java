@@ -82,12 +82,13 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> {
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.eventlog.ITmfStreamLocator#seekLocation(java.lang.Object)
      */
+	@Override
 	@SuppressWarnings("unchecked")
-	public TmfContext seekLocation(ITmfLocation location) {
+	public TmfContext seekLocation(ITmfLocation<?> location) {
         TmfContext context = null;
        	try {
        		synchronized(fTrace) {
-        		fTrace.seek((location != null) ? ((TmfLocation<Long>) location).getValue() : 0);
+        		fTrace.seek((location != null) ? ((TmfLocation<Long>) location).getLocation() : 0);
         		context = new TmfContext(getCurrentLocation(), 0);
 //        		TmfTraceContext context2 = new TmfTraceContext(getCurrentLocation(), 0);
 //        		TmfEvent event = parseEvent(context2);
@@ -104,7 +105,7 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> {
      * @see org.eclipse.linuxtools.tmf.eventlog.ITmfStreamLocator#getCurrentLocation()
      */
     @Override
-	public ITmfLocation getCurrentLocation() {
+	public ITmfLocation<?> getCurrentLocation() {
        	try {
        		return new TmfLocation<Long>(fTrace.getFilePointer());
        	} catch (IOException e) {

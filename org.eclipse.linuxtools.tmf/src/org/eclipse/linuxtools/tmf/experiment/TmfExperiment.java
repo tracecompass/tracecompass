@@ -281,10 +281,10 @@ public class TmfExperiment<T extends TmfEvent> extends TmfProvider<T> implements
 	// Returns a brand new context based on the location provided
 	// Arms the event queues
 	// NOTE: This is a fine example of pathological coupling...
-	public TmfExperimentContext seekLocation(ITmfLocation location) {
+	public TmfExperimentContext seekLocation(ITmfLocation<?> location) {
 		if (location instanceof TmfExperimentLocation || location == null) {
-			ITmfLocation[] oldloc = (location != null) ? ((TmfExperimentLocation) location).getLocations() : new TmfExperimentLocation[fTraces.length];
-			ITmfLocation[] newloc = new ITmfLocation[fTraces.length];
+			ITmfLocation<?>[] oldloc = (location != null) ? ((TmfExperimentLocation) location).getLocation() : new TmfExperimentLocation[fTraces.length];
+			ITmfLocation<?>[] newloc = new ITmfLocation[fTraces.length];
 			TmfContext[] contexts = new TmfContext[fTraces.length];
 
 			TmfExperimentContext context = new TmfExperimentContext(fTraces, contexts);
@@ -321,7 +321,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfProvider<T> implements
         }
 
         // Position the experiment at the checkpoint
-        ITmfLocation location;
+        ITmfLocation<?> location;
         synchronized (fCheckpoints) {
         	if (fCheckpoints.size() > 0) {
         		if (index >= fCheckpoints.size()) {
@@ -448,7 +448,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfProvider<T> implements
 			TmfContext trcloc = expContext.getContexts()[trace];
 			TmfEvent event = expContext.getTraces()[trace].parseEvent(trcloc);
 			TmfExperimentLocation exploc = (TmfExperimentLocation) expContext.getLocation();
-			exploc.getLocations()[trace] = trcloc.getLocation().clone();
+			exploc.getLocation()[trace] = trcloc.getLocation().clone();
 			expContext.updateRank(1);
 			expContext.getEvents()[trace] = expContext.getTraces()[trace].getNextEvent(trcloc);
 			return event;
