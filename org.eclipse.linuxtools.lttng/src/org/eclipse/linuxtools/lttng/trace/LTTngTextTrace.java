@@ -159,7 +159,6 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     @Override
 	@SuppressWarnings("unchecked")
 	public TmfContext seekLocation(ITmfLocation<?> location) {
-
     	if (location == null) {
     		location = new TmfLocation<Long>(0L);
     	}

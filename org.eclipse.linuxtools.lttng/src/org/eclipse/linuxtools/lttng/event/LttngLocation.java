@@ -3,35 +3,40 @@ package org.eclipse.linuxtools.lttng.event;
 import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
 
 
-public class LttngLocation implements ITmfLocation<Long[]> {
+public class LttngLocation implements ITmfLocation<LttngTimestamp> {
 	
-	private final static Long DEFAULT_LAST_TIME = -1L;
-	private final static Long DEFAULT_CURR_TIME =  0L;
+	private final static long DEFAULT_CURR_TIME =  0L;
 	
-	private Long lastReadTime = null;
-	private Long currentTime = null;
+	private boolean isLastOperationParse = false ;
+	private boolean isLastOperationReadNext = false;
+	private boolean isLastOperationSeek = false;
 	
-	
+	private LttngTimestamp operationTime = null;
 	
 	public LttngLocation() {
-		this(DEFAULT_LAST_TIME, DEFAULT_CURR_TIME);
+		this( DEFAULT_CURR_TIME );
 	}
 	
-//	public LttngLocation(LttngTimestamp timestamp) {
-//		this(DEFAULT_LAST_TIME, timestamp.getValue());
-//	}
+	public LttngLocation(long newCurrentTimestampValue) {
+		isLastOperationParse = false;
+		isLastOperationReadNext = false;
+		isLastOperationSeek = false;
+		operationTime = new LttngTimestamp(newCurrentTimestampValue);
+	}
+	
+	public LttngLocation(LttngTimestamp newCurrentTimestamp) {
+		isLastOperationParse = false;
+		isLastOperationReadNext = false;
+		isLastOperationSeek = false;
+		operationTime = new LttngTimestamp(newCurrentTimestamp);
+	}
+	
 	
 	public LttngLocation(LttngLocation oldLocation) {
-		this(oldLocation.lastReadTime, oldLocation.currentTime);
-	}
-	
-	public LttngLocation(Long newCurrentTimestamp) {
-		this(DEFAULT_LAST_TIME, newCurrentTimestamp);
-	}
-	
-	public LttngLocation(Long newLastReadTime, Long newCurrentTimestamp) {
-		lastReadTime = newLastReadTime;
-		currentTime = newCurrentTimestamp;
+		this.isLastOperationParse = oldLocation.isLastOperationParse;
+		this.isLastOperationReadNext = oldLocation.isLastOperationReadNext;
+		this.isLastOperationSeek = oldLocation.isLastOperationSeek;
+		this.operationTime = oldLocation.operationTime;
 	}
 	
 	@Override
@@ -45,8 +50,12 @@ public class LttngLocation implements ITmfLocation<Long[]> {
 			// *** IMPORTANT ***
 			// Basic type in java are immutable!
 			// Thus, using assignation ("=") on basic type is VALID.
-			newLocation.currentTime  = this.currentTime;
-			newLocation.lastReadTime = this.lastReadTime;
+			newLocation.isLastOperationParse = this.isLastOperationParse;
+			newLocation.isLastOperationReadNext = this.isLastOperationReadNext;
+			newLocation.isLastOperationSeek = this.isLastOperationSeek;
+			
+			// For other type, we need to create a new timestamp
+			newLocation.operationTime  = new LttngTimestamp( this.operationTime );
 		} 
 		catch (CloneNotSupportedException e) {
 			System.out.println("Cloning failed with : " + e.getMessage());
@@ -55,51 +64,75 @@ public class LttngLocation implements ITmfLocation<Long[]> {
 		return newLocation;
 	}
 	
-	
-	public void resetLocation() {
-		resetLocation(DEFAULT_CURR_TIME);
+	public LttngTimestamp getOperationTime() {
+		return operationTime;
 	}
 	
-	public void resetLocation(Long newCurrentTimestamp) {
-		lastReadTime = DEFAULT_LAST_TIME;
-		lastReadTime = DEFAULT_CURR_TIME;
+	public long getOperationTimeValue() {
+		return operationTime.getValue();
+	}
+	
+	public void setOperationTime(LttngTimestamp newOperationTime) {
+		this.operationTime.setValue(newOperationTime.getValue());
+	}
+	
+	public void setOperationTime(Long newOperationTimeValue) {
+		this.operationTime.setValue(newOperationTimeValue);
 	}
 	
 	
-	
-	public Long getLastReadTime() {
-		return lastReadTime;
+	public void setLastOperationParse() {
+		isLastOperationParse = true;
+		isLastOperationReadNext  = false;
+		isLastOperationSeek  = false;
+	}
+
+	public boolean isLastOperationParse() {
+		return isLastOperationParse;
 	}
 	
-	public void setLastReadTime(Long newLastReadTime) {
-		this.lastReadTime = newLastReadTime;
+	
+	public void setLastOperationReadNext() {
+		isLastOperationParse = false;
+		isLastOperationReadNext  = true;
+		isLastOperationSeek  = false;
+	}
+
+	public boolean isLastOperationReadNext() {
+		return isLastOperationReadNext;
 	}
 	
-	public Long getCurrentTime() {
-		return currentTime;
+	
+	public void setLastOperationSeek() {
+		isLastOperationParse = false;
+		isLastOperationReadNext  = false;
+		isLastOperationSeek  = true;
+	}
+
+	public boolean isLastOperationSeek() {
+		return isLastOperationSeek;
 	}
 	
-	public void setCurrentTime(Long newCurrentTime) {
-		this.currentTime = newCurrentTime;
+	public void resetLocationState() {
+		isLastOperationParse = false;
+		isLastOperationReadNext = false;
+		isLastOperationSeek = false;
 	}
-	
 	
 	@Override
 	public String toString() {
-		return "\tLttngLocation[ Last : " + lastReadTime + "  Current : " + currentTime + " ]";
+		return "\tLttngLocation[ P/R/S : "  + isLastOperationParse + "/" + isLastOperationReadNext + "/" + isLastOperationSeek + "  Current : " + operationTime + " ]";
 	}
-
+	
 	// ------------------------------------------------------------------------
 	// ITmfLocation
 	// ------------------------------------------------------------------------
-
-	public void setLocation(Long[] location) {
-		lastReadTime = ((Long[]) location)[0];
-		currentTime  = ((Long[]) location)[1];
+	public void setLocation(LttngTimestamp location) {
+		operationTime  = (LttngTimestamp)location;
 	}
 
-	public Long[] getLocation() {
-		return new Long[] {lastReadTime, currentTime };
+	public LttngTimestamp getLocation() {
+		return new LttngTimestamp ( operationTime );
 	}
 	
 }
