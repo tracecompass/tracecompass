@@ -414,7 +414,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     }
 
 	@Override
-	public ITmfContext setContext(TmfDataRequest<LttngEvent> request) {
+	public ITmfContext armRequest(TmfDataRequest<LttngEvent> request) {
 		// TODO Auto-generated method stub
 		return null;
 	}

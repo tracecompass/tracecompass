@@ -44,7 +44,7 @@ public class StateExperimentManager extends TmfComponent {
 	 * package level constructor, creation from factory
 	 */
 	StateExperimentManager() {
-		super();
+		super("StateExperimentManager");
 	}
 
 	// ========================================================================

@@ -94,7 +94,7 @@ public class TimeFrameView extends TmfView {
      * Constructor
      */
     public TimeFrameView() {
-    	super();
+    	super("TimeFrameView");
     }
 
     /* (non-Javadoc)

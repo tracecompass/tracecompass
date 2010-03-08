@@ -58,8 +58,7 @@ import org.eclipse.ui.PlatformUI;
  * TreeViewer. - The controller that keeps model and view synchronised is an
  * observer of the model.
  */
-public class StatisticsView extends TmfView implements
-		IStateDataRequestListener {
+public class StatisticsView extends TmfView implements IStateDataRequestListener {
 
 	public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.statistics";
 
@@ -319,6 +318,10 @@ public class StatisticsView extends TmfView implements
 		// @Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
+	}
+
+	public StatisticsView(String viewName) {
+		super("StatisticsView");
 	}
 
 	/*

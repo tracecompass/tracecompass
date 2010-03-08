@@ -82,9 +82,20 @@ public class TmfSignalManager {
 	 * handlers shouldn't be too high, this is not a big performance issue
 	 * to pay for the flexibility.
 	 * 
-	 * @param signal
+	 * For synchronization purposes, the signal is bracketed by two synch signals.
+	 * 
+	 * @param signal the signal to dispatch
 	 */
+	static int fSynchId = 0;
 	static public synchronized void dispatchSignal(TmfSignal signal) {
+		fSynchId++;
+		sendSignal(new TmfStartSynchSignal(fSynchId));
+		signal.setReference(fSynchId);
+		sendSignal(signal);
+		sendSignal(new TmfEndSynchSignal(fSynchId));
+	}
+
+	static private void sendSignal(TmfSignal signal) {
 
 		// Build the list of listener methods that are registered for this signal
 		Class<?> signalClass = signal.getClass();

@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.linuxtools.tmf.component.TmfProvider;
+import org.eclipse.linuxtools.tmf.component.TmfEventProvider;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
@@ -38,7 +38,7 @@ import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
  * 
  * TODO: Add support for live streaming (notifications, incremental indexing, ...)
  */
-public abstract class TmfTrace<T extends TmfEvent> extends TmfProvider<T> implements ITmfTrace {
+public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> implements ITmfTrace {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -109,7 +109,8 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfProvider<T> implem
     /**
      * @return the trace name
      */
-    public String getName() {
+    @Override
+	public String getName() {
         return fName;
     }
 
@@ -169,7 +170,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfProvider<T> implem
 	// ------------------------------------------------------------------------
 
 	@Override
-	public ITmfContext setContext(TmfDataRequest<T> request) {
+	public ITmfContext armRequest(TmfDataRequest<T> request) {
 		if (request instanceof TmfEventRequest<?>) {
 			return seekEvent(((TmfEventRequest<T>) request).getRange().getStartTime());
 		}
@@ -192,13 +193,13 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfProvider<T> implem
 		return null;
 	}
 
-	@Override
-	public boolean isCompleted(TmfDataRequest<T> request, T data) {
-		if (request instanceof TmfEventRequest<?> && data != null) {
-			return data.getTimestamp().compareTo(((TmfEventRequest<T>) request).getRange().getEndTime(), false) > 0;
-		}
-		return true;
-	}
+//	@Override
+//	public boolean isCompleted(TmfDataRequest<T> request, T data) {
+//		if (request instanceof TmfEventRequest<?> && data != null) {
+//			return data.getTimestamp().compareTo(((TmfEventRequest<T>) request).getRange().getEndTime(), false) > 0;
+//		}
+//		return true;
+//	}
 
     
 	// ------------------------------------------------------------------------

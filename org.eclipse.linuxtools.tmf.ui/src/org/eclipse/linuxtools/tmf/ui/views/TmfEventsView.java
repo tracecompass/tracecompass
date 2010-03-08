@@ -102,7 +102,7 @@ public class TmfEventsView extends TmfView {
 	// ------------------------------------------------------------------------
 
     public TmfEventsView(int cacheSize) {
-    	super();
+    	super("TmfEventsView");
     	fCacheSize = cacheSize;
     }
 
@@ -253,7 +253,7 @@ public class TmfEventsView extends TmfView {
         // Perform the updates on the UI thread
         fTable.getDisplay().asyncExec(new Runnable() {
         	public void run() {
-//        		// TODO: Potentially long operation. Add some feedback for the user
+        		// TODO: Potentially long operation. Add some feedback for the user
         		fTable.setSelection(0);
             	fTable.clearAll();
 				cacheStartIndex = cacheEndIndex = 0;	// Clear the cache

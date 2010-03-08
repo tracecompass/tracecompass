@@ -24,6 +24,11 @@ import org.eclipse.linuxtools.tmf.signal.TmfSignal;
 public interface ITmfComponent {
 
 	/**
+	 * Get the component ID
+	 */
+	public String getName();
+
+	/**
 	 * Register to the signal manager
 	 */
 	public void register();

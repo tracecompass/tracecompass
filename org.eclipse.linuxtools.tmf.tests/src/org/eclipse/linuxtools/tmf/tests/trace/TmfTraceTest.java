@@ -22,7 +22,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.linuxtools.tmf.component.TmfProvider;
+import org.eclipse.linuxtools.tmf.component.TmfDataProvider;
 import org.eclipse.linuxtools.tmf.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
@@ -226,7 +226,7 @@ public class TmfTraceTest extends TestCase {
                 }
             }
         };
-        TmfProvider<TmfEvent>[] providers = (TmfProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        TmfDataProvider<TmfEvent>[] providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
         providers[0].processRequest(request, true);
 
         assertEquals("nbEvents", NB_EVENTS, requestedEvents.size());
@@ -255,7 +255,7 @@ public class TmfTraceTest extends TestCase {
                 }
             }
         };
-        TmfProvider<TmfEvent>[] providers = (TmfProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        TmfDataProvider<TmfEvent>[] providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
         providers[0].processRequest(request, true);
 
         assertEquals("nbEvents", NB_EVENTS, requestedEvents.size());
@@ -289,7 +289,7 @@ public class TmfTraceTest extends TestCase {
                 cancel();
             }
         };
-        TmfProvider<TmfEvent>[] providers = (TmfProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        TmfDataProvider<TmfEvent>[] providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
         providers[0].processRequest(request, true);
 
         assertEquals("nbEvents",  NB_EVENTS, requestedEvents.size());

@@ -51,6 +51,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	// Constructor
 	// ========================================================================
 	public AbsTimeUpdateView(String viewID) {
+		super("AbsTimeUpdateView");
 		this.viewID = viewID;
 	}
 

@@ -314,7 +314,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * @see org.eclipse.linuxtools.lttng.event.LttngLocation
      * @see org.eclipse.linuxtools.tmf.trace.TmfContext
      */
-    public synchronized TmfContext seekLocation(ITmfLocation<?> location) {
+    @Override
+	public synchronized TmfContext seekLocation(ITmfLocation<?> location) {
     	
     	if ( printDebug == true ) {
     		System.out.println("seekLocation(location) location -> " + location);

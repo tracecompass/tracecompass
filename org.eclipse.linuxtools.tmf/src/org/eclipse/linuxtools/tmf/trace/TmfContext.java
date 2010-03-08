@@ -44,7 +44,7 @@ public class TmfContext implements ITmfContext, Cloneable {
 		this(other.fLocation, other.fRank);
 	}
 
-	protected TmfContext() {
+	public TmfContext() {
 		this(null, 0);
 	}
 

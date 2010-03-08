@@ -78,11 +78,14 @@ public class TmfDataRequest<T extends TmfData> {
     // The request count for all the events
     public static final int ALL_DATA = Integer.MAX_VALUE;
     
+    private static int fRequestNumber = 0;
+  
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
     private final Class<? extends TmfData> fDataType;
+    private final int fRequestId;  			// A unique request ID
     private final int fIndex;      			// The index (rank) of the requested event
     private final int fNbRequested;  		// The number of requested events (ALL_DATA for all)
     private final int fBlockSize;          	// The maximum number of events per chunk
@@ -127,6 +130,7 @@ public class TmfDataRequest<T extends TmfData> {
      * @param blockSize
      */
     public TmfDataRequest(Class<? extends TmfData> dataType, int index, int nbRequested, int blockSize) {
+    	fRequestId   = fRequestNumber++;
     	fDataType    = dataType;
     	fIndex       = index;
     	fNbRequested = nbRequested;
@@ -137,6 +141,13 @@ public class TmfDataRequest<T extends TmfData> {
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
+
+	/**
+	 * @return the request ID
+	 */
+	public long getRequestId() {
+		return fRequestId;
+	}
 
 	/**
 	 * @return the index

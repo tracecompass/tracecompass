@@ -15,8 +15,7 @@ package org.eclipse.linuxtools.tmf.component;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfSyntheticEventStub;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
-import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
+import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.trace.TmfContext;
@@ -32,19 +31,19 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSynthetic
     public static final int NB_EVENTS  = 1000;
 
     public TmfSyntheticEventProviderStub() {
-		super("TmfSyntheticEventProviderStub", TmfSyntheticEventStub.class);
+		super(TmfSyntheticEventStub.class);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ITmfContext armRequest(final ITmfDataRequest<TmfSyntheticEventStub> request) {
+	public ITmfContext armRequest(final TmfDataRequest<TmfSyntheticEventStub> request) {
 
 		// Get the TmfSyntheticEventStub provider
-		ITmfDataProvider<TmfEvent>[] eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfEventProviderStub.class);
-		ITmfDataProvider<TmfEvent> provider = eventProviders[0];
+		TmfDataProvider<TmfEvent>[] eventProviders = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfEventProviderStub.class);
+		TmfDataProvider<TmfEvent> provider = eventProviders[0];
 
 		// make sure we have the right type of request
-		if (!(request instanceof ITmfEventRequest<?>)) {
+		if (!(request instanceof TmfEventRequest<?>)) {
 			request.cancel();
 			return null;
 		}
@@ -65,7 +64,7 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSynthetic
             		}
             	}
         	};
-        provider.sendRequest(subRequest);
+        provider.processRequest(subRequest, false);
 
         // Return a dummy context
         return new TmfContext();
@@ -73,22 +72,8 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSynthetic
 
 	// Queue 2 synthetic events per base event
 	private void handleIncomingData(TmfEvent e) {
-		try {
-			queueResult(new TmfSyntheticEventStub(e));
-			queueResult(new TmfSyntheticEventStub(e));
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
-	}
-
-	@Override
-	public void sendRequest(ITmfDataRequest<TmfSyntheticEventStub> request, ExecutionType execType) {
-		super.sendRequest(request, execType);
-	}
-	
-	@Override
-	public void sendRequest(ITmfDataRequest<TmfSyntheticEventStub> request) {
-		super.sendRequest(request);
+		queueResult(new TmfSyntheticEventStub(e));
+		queueResult(new TmfSyntheticEventStub(e));
 	}
 	
 }

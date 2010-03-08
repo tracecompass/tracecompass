@@ -25,12 +25,15 @@ import org.eclipse.ui.part.ViewPart;
  */
 public abstract class TmfView extends ViewPart implements ITmfComponent {
 
+	private final String fName;
+	
 	// ------------------------------------------------------------------------
 	// Constructor
 	// ------------------------------------------------------------------------
 
-	public TmfView() {
+	public TmfView(String viewName) {
 		super();
+		fName = viewName;
 		register();
 	}
 
@@ -38,6 +41,10 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
 	// ITmfComponent
 	// ------------------------------------------------------------------------
 
+	public String getName() {
+		return fName;
+	}
+	
 	public void register() {
 		TmfSignalManager.register(this);
 	}

@@ -20,10 +20,11 @@ import java.net.URL;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
-import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
+import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
 
 /**
@@ -34,13 +35,13 @@ import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
 public class TmfEventProviderStub extends TmfEventProvider<TmfEvent> {
 
     private static final String DIRECTORY   = "testfiles";
-    private static final String TEST_STREAM = "A-Test-10K";
+    private static final String TEST_STREAM = "M-Test-10K";
 
     private TmfTraceStub fTrace;
 
     public TmfEventProviderStub(String path) throws IOException {
-    	super(path, TmfEvent.class);
-        URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
+    	super(TmfEvent.class);
+        URL location = FileLocator.find(TmfCoreTestPlugin.getPlugin().getBundle(), new Path(path), null);
 		try {
 			File test = new File(FileLocator.toFileURL(location).toURI());
 			fTrace = new TmfTraceStub(test.getPath(), true);
@@ -52,21 +53,15 @@ public class TmfEventProviderStub extends TmfEventProvider<TmfEvent> {
     public TmfEventProviderStub() throws IOException {
     	this(DIRECTORY + File.separator + TEST_STREAM);
     }
-
-    @Override
-    public void dispose() {
-    	fTrace.dispose();
-    	super.dispose();
-    }
     
     // ------------------------------------------------------------------------
     // TmfEventProvider
     // ------------------------------------------------------------------------
 
 	@Override
-	public ITmfContext armRequest(ITmfDataRequest<TmfEvent> request) {
-		if (request instanceof ITmfEventRequest<?>) {
-			ITmfContext context = fTrace.seekEvent(((ITmfEventRequest<?>) request).getRange().getStartTime());
+	public ITmfContext armRequest(TmfDataRequest<TmfEvent> request) {
+		if (request instanceof TmfEventRequest<?>) {
+			TmfContext context = fTrace.seekEvent(((TmfEventRequest<?>) request).getRange().getStartTime());
 			return context;
 		}
 		return null;

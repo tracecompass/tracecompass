@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.linuxtools.tmf.component.TmfProvider;
+import org.eclipse.linuxtools.tmf.component.TmfEventProvider;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
@@ -41,7 +41,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfTraceUpdatedSignal;
  * that are part of a tracing experiment. 
  * <p>
  */
-public class TmfExperiment<T extends TmfEvent> extends TmfProvider<T> implements ITmfTrace {
+public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> implements ITmfTrace {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -129,6 +129,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfProvider<T> implements
 		return null;
 	}
 
+	@Override
 	public String getName() {
 		return fExperimentId;
 	}
@@ -247,7 +248,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfProvider<T> implements
     // ------------------------------------------------------------------------
 
 	@Override
-	public ITmfContext setContext(TmfDataRequest<T> request) {
+	public ITmfContext armRequest(TmfDataRequest<T> request) {
 		TmfTimestamp timestamp = (request instanceof TmfEventRequest<?>) ?
 			((TmfEventRequest<T>) request).getRange().getStartTime() : null;
 
@@ -264,14 +265,6 @@ public class TmfExperiment<T extends TmfEvent> extends TmfProvider<T> implements
 			return (T) getNextEvent((TmfExperimentContext) context);
 		}
 		return null;
-	}
-
-	@Override
-	public boolean isCompleted(TmfDataRequest<T> request, T data) {
-		if (request instanceof TmfEventRequest<?> && data != null) {
-			return data.getTimestamp().compareTo(((TmfEventRequest<T>) request).getRange().getEndTime(), false) > 0;
-		}
-		return false;
 	}
 
     // ------------------------------------------------------------------------

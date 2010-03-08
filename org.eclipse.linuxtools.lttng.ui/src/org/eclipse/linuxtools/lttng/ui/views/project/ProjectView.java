@@ -88,6 +88,7 @@ public class ProjectView extends TmfView {
 
 	public ProjectView() {
 		
+		super("ProjectView");
         fProjectRoot = new LTTngProjectRoot(this);
 
 		fWorkspace = ResourcesPlugin.getWorkspace();

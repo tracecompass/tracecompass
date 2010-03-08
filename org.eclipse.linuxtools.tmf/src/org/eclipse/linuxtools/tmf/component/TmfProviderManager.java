@@ -30,8 +30,8 @@ public class TmfProviderManager {
 	// Keeps track of the providers for each event type
 	// ------------------------------------------------------------------------
 	
-	private static Map<Class<? extends TmfData>, List<TmfProvider<? extends TmfData>>> fProviders =
-		   new HashMap<Class<? extends TmfData>, List<TmfProvider<? extends TmfData>>>();
+	private static Map<Class<? extends TmfData>, List<TmfDataProvider<? extends TmfData>>> fProviders =
+		   new HashMap<Class<? extends TmfData>, List<TmfDataProvider<? extends TmfData>>>();
 
 	/**
 	 * Registers [provider] as a provider of [eventType]
@@ -39,9 +39,9 @@ public class TmfProviderManager {
 	 * @param eventType
 	 * @param provider
 	 */
-	public static <T extends TmfData> void register(Class<T> eventType, TmfProvider<? extends TmfData> provider) {
+	public static <T extends TmfData> void register(Class<T> eventType, TmfDataProvider<? extends TmfData> provider) {
 		if (fProviders.get(eventType) == null)
-			fProviders.put(eventType, new ArrayList<TmfProvider<? extends TmfData>>());
+			fProviders.put(eventType, new ArrayList<TmfDataProvider<? extends TmfData>>());
 		assert(fProviders.get(eventType) != null);
 		fProviders.get(eventType).add(provider);
 	}
@@ -49,30 +49,30 @@ public class TmfProviderManager {
 	/**
 	 * Re-registers [provider] as a provider of [eventType]
 	 * 
-	 * @param eventType
+	 * @param dataClass
 	 * @param provider
 	 */
-	public static <T extends TmfData> void deregister(Class<T> eventType, TmfProvider<? extends TmfData> provider) {
-		List<TmfProvider<? extends TmfData>> list = fProviders.get(eventType);
+	public static <T extends TmfData> void deregister(Class<T> dataClass, TmfDataProvider<? extends TmfData> provider) {
+		List<TmfDataProvider<? extends TmfData>> list = fProviders.get(dataClass);
 		if (list != null) {
 			list.remove(provider);
 			if (list.size() == 0)
-				fProviders.remove(eventType);
+				fProviders.remove(dataClass);
 		}
 	}
 
 	/**
 	 * Returns the list of components that provide [eventType]
 	 * 
-	 * @param eventType
+	 * @param dataClass
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static TmfProvider<? extends TmfData>[] getProviders(Class<? extends TmfData> eventType) {
-		List<TmfProvider<? extends TmfData>> list = fProviders.get(eventType);
+	public static TmfDataProvider<? extends TmfData>[] getProviders(Class<? extends TmfData> dataClass) {
+		List<TmfDataProvider<? extends TmfData>> list = fProviders.get(dataClass);
 		if (list == null)
-			list = new ArrayList<TmfProvider<? extends TmfData>>(); 
-		TmfProvider<? extends TmfData>[] result = new TmfProvider[list.size()];
+			list = new ArrayList<TmfDataProvider<? extends TmfData>>(); 
+		TmfDataProvider<? extends TmfData>[] result = new TmfDataProvider[list.size()];
 		return list.toArray(result);
 	}
 
@@ -84,17 +84,20 @@ public class TmfProviderManager {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static TmfProvider<? extends TmfData>[] getProviders(Class<? extends TmfData> eventType, Class<? extends TmfProvider<? extends TmfData>> providerType) {
-		TmfProvider<? extends TmfData>[] list = getProviders(eventType);
-		List<TmfProvider<? extends TmfData>> result = new ArrayList<TmfProvider<? extends TmfData>>();
+	public static TmfDataProvider<? extends TmfData>[] getProviders(Class<? extends TmfData> dataClass, Class<? extends TmfDataProvider<? extends TmfData>> providerClass) {
+		if (providerClass == null) {
+			return getProviders(dataClass);
+		}
+		TmfDataProvider<? extends TmfData>[] list = getProviders(dataClass);
+		List<TmfDataProvider<? extends TmfData>> result = new ArrayList<TmfDataProvider<? extends TmfData>>();
 		if (list != null) {
-			for (TmfProvider<? extends TmfData> provider : list) {
-				if (provider.getClass() == providerType) {
+			for (TmfDataProvider<? extends TmfData> provider : list) {
+				if (provider.getClass() == providerClass) {
 					result.add(provider);
 				}
 			}
 		}
-		TmfProvider<? extends TmfData>[] array = new TmfProvider[result.size()];
+		TmfDataProvider<? extends TmfData>[] array = new TmfDataProvider[result.size()];
 		return result.toArray(array);
 	}
 

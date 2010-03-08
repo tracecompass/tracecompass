@@ -27,7 +27,10 @@ public interface ITmfRequestHandler<T extends TmfData> {
      * request is completed (e.g. for a specific range of events) or it
      * can choose to process the events asynchronously (e.g. for streaming).
      * 
-     * @param waitForCompletion Suspend the client thread until the request completes 
-     */
+     * If the request can't be serviced, it will fail (i.e. isFailed() will be set).
+     * 
+	 * @param request The request to process
+	 * @param waitForCompletion Suspend the client thread until the request completes
+	 */
 	public void processRequest(TmfDataRequest<T> request, boolean waitForCompletion);
 }
