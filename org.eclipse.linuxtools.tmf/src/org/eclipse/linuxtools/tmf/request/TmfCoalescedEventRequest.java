@@ -14,7 +14,6 @@ package org.eclipse.linuxtools.tmf.request;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 /**
  * <b><u>TmfCoalescedEventRequest</u></b>
@@ -27,7 +26,7 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
     // Attributes
     // ------------------------------------------------------------------------
 
-	private TmfTimeRange fRange;	// The requested events time range
+	private final TmfTimeRange fRange;	// The requested events time range
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -70,43 +69,15 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
     // ------------------------------------------------------------------------
 
 	@Override
-	public boolean isCompatible(ITmfDataRequest<T> request) {
-		if (request instanceof ITmfEventRequest<?>) {
+	public boolean isCompatible(TmfDataRequest<T> request) {
+		if (request instanceof TmfEventRequest<?>) {
 			boolean ok = getNbRequested() == request.getNbRequested();
 			ok &= getBlockize() == request.getBlockize();
-			if (ok) {
-				TmfTimestamp startTime = ((ITmfEventRequest<T>) request).getRange().getStartTime();
-				TmfTimestamp endTime   = ((ITmfEventRequest<T>) request).getRange().getEndTime();
-				if (!fRange.contains(startTime))
-					fRange = new TmfTimeRange(startTime, fRange.getEndTime());
-				if (!fRange.contains(endTime))
-					fRange = new TmfTimeRange(fRange.getStartTime(), endTime);
-			}
+			ok &= fRange.equals(((TmfEventRequest<T>) request).getRange());
 			return ok;
 		}
 		return false;
 	}
-
-    // ------------------------------------------------------------------------
-    // ITmfDataRequest
-    // ------------------------------------------------------------------------
-
-    @Override
-	public void handleData() {
-    	for (ITmfDataRequest<T> request : fRequests) {
-    		if (request instanceof TmfEventRequest) {
-    			TmfEventRequest<T> req = (TmfEventRequest<T>) request;
-        		T[] data = getData();
-        		if (data.length > 0 && req.getRange().contains(data[0].getTimestamp())) {
-            		req.setData(data);
-            		req.handleData();
-        		}
-    		}
-    		else {
-    			super.handleData();
-    		}
-    	}
-    }
 
     // ------------------------------------------------------------------------
     // ITmfEventRequest
@@ -116,35 +87,4 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
 		return fRange;
 	}
 	
-    // ------------------------------------------------------------------------
-    // Object
-    // ------------------------------------------------------------------------
-
-    @Override
-    // All requests have a unique id
-    public int hashCode() {
-    	return super.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object other) {
-    	if (other instanceof TmfCoalescedEventRequest<?>) {
-    		TmfCoalescedEventRequest<?> request = (TmfCoalescedEventRequest<?>) other;
-       		return 	(request.getDataType()    == getDataType()) &&
-       				(request.getIndex()       == getIndex())    &&
-       				(request.getNbRequested() == getNbRequested()) &&
-       	    		(request.getRange().equals(getRange()));
-       	}
-    	if (other instanceof TmfCoalescedDataRequest<?>) {
-       		return super.equals(other);
-    	}
-  		return false;
-    }
-
-    @Override
-    public String toString() {
-		return "[TmfCoalescedEventRequest(" + getRequestId() + "," + getDataType().getSimpleName() 
-			+ "," + getRange() + "," + getNbRequested() + "," + getBlockize() + ")]";
-    }
-
 }

@@ -33,7 +33,7 @@ public interface ITmfDataRequest<T extends TmfData> {
     /**
      * @return request ID
      */
-    public int getRequestId();
+    public long getRequestId();
 
     /**
 	 * @return the index of the first event requested
@@ -59,7 +59,6 @@ public interface ITmfDataRequest<T extends TmfData> {
 	// Request state
 	// ------------------------------------------------------------------------
 
-    public boolean isRunning();
     public boolean isCompleted();
     public boolean isFailed();
     public boolean isCancelled();
@@ -76,7 +75,6 @@ public interface ITmfDataRequest<T extends TmfData> {
 	// Request handling
 	// ------------------------------------------------------------------------
 
-    public void handleStarted();
     public void handleCompleted();
     public void handleSuccess();
     public void handleFailure();
@@ -86,13 +84,12 @@ public interface ITmfDataRequest<T extends TmfData> {
      * To suspend the client thread until the request completes
      * (or is canceled).
      */
-    public void waitForCompletion() throws InterruptedException;
+    public void waitForCompletion();
 
 	// ------------------------------------------------------------------------
 	// Request state modifiers
 	// ------------------------------------------------------------------------
 
-    public void start();
     public void done();
     public void fail();
     public void cancel();

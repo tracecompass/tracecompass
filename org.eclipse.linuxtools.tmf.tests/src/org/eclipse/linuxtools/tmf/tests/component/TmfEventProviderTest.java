@@ -31,7 +31,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
 /**
  * <b><u>TmfClientTest</u></b>
  * <p>
- * Test suite for the TmfEventProvider class.
+ * TODO: Implement me. Please.
  */
 public class TmfEventProviderTest extends TestCase {
 
@@ -52,8 +52,8 @@ public class TmfEventProviderTest extends TestCase {
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		fEventProvider.dispose();
-		fSyntheticEventProvider.dispose();
+		fEventProvider.deregister();
+		fSyntheticEventProvider.deregister();
 	}
 
 	// ------------------------------------------------------------------------
@@ -65,17 +65,17 @@ public class TmfEventProviderTest extends TestCase {
 
 		// There should be 2 TmfEvent providers: a TmfTraceStub and a TmfEventProviderStub
 		ITmfDataProvider<TmfEvent>[] eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
-		assertEquals("getProviders", 2, eventProviders.length);
+		assertTrue(eventProviders.length == 2);
 
 		eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
-		assertEquals("getProviders", 1, eventProviders.length);
+		assertTrue(eventProviders.length == 1);
 
 		eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfEventProviderStub.class);
-		assertEquals("getProviders", 1, eventProviders.length);
+		assertTrue(eventProviders.length == 1);
 
 		// There should be 1 TmfSyntheticEventStub provider
 		eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfSyntheticEventStub.class);
-		assertEquals("getProviders", 1, eventProviders.length);
+		assertTrue(eventProviders.length == 1);
 	}
 
 	// ------------------------------------------------------------------------
@@ -83,7 +83,7 @@ public class TmfEventProviderTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	@SuppressWarnings("unchecked")
-	public void testGetPlainEvents() throws InterruptedException {
+	public void testGetPlainEvents() {
 
         final int BLOCK_SIZE = 100;
         final int NB_EVENTS  = 1000;
@@ -119,7 +119,7 @@ public class TmfEventProviderTest extends TestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void getSyntheticData(final TmfTimeRange range, final int nbEvents, final int blockSize) throws InterruptedException {
+	private void getSyntheticData(final TmfTimeRange range, final int nbEvents, final int blockSize) {
 
         final Vector<TmfSyntheticEventStub> requestedEvents = new Vector<TmfSyntheticEventStub>();
 
@@ -156,36 +156,36 @@ public class TmfEventProviderTest extends TestCase {
 
 	// The following tests are the same but for the size of the requested blocks
 	// with regards to the size of the TmfSyntheticEventProviderStub block
-    public void testGetSyntheticEvents_EqualBlockSizes() throws InterruptedException {
+    public void testGetSyntheticEvents_EqualBlockSizes() {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
 		getSyntheticData(range, 1000, TmfSyntheticEventProviderStub.BLOCK_SIZE);
 	}
 
-	public void testGetSyntheticEvents_SmallerBlock() throws InterruptedException {
+	public void testGetSyntheticEvents_SmallerBlock() {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
 		getSyntheticData(range, 1000, TmfSyntheticEventProviderStub.BLOCK_SIZE / 2);
 	}
 
-	public void testGetSyntheticEvents_LargerBlock() throws InterruptedException {
+	public void testGetSyntheticEvents_LargerBlock() {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
 		getSyntheticData(range, 1000, TmfSyntheticEventProviderStub.BLOCK_SIZE * 2);
 	}
 
-	public void testGetSyntheticEvents_TimeRange() throws InterruptedException {
+	public void testGetSyntheticEvents_TimeRange() {
 		TmfTimestamp start = new TmfTimestamp(   1, (byte) -3, 0);
 		TmfTimestamp end   = new TmfTimestamp(1000, (byte) -3, 0);
         TmfTimeRange range = new TmfTimeRange(start, end);
 		getSyntheticData(range, -1, TmfSyntheticEventProviderStub.BLOCK_SIZE);
 	}
 
-	public void testGetSyntheticEvents_WeirdTimeRange1() throws InterruptedException {
+	public void testGetSyntheticEvents_WeirdTimeRange1() {
 		TmfTimestamp start = TmfTimestamp.BigBang;
 		TmfTimestamp end   = new TmfTimestamp(0, (byte) -3, 0);
         TmfTimeRange range = new TmfTimeRange(start, end);
 		getSyntheticData(range, -1, TmfSyntheticEventProviderStub.BLOCK_SIZE);
 	}
 
-	public void testGetSyntheticEvents_WeirdTimeRange2() throws InterruptedException {
+	public void testGetSyntheticEvents_WeirdTimeRange2() {
 		TmfTimestamp start = new TmfTimestamp(0, (byte) -3, 0);
 		TmfTimestamp end   = TmfTimestamp.BigCrunch;
         TmfTimeRange range = new TmfTimeRange(start, end);
@@ -201,17 +201,17 @@ public class TmfEventProviderTest extends TestCase {
 
 		// There should be 2 TmfEvent providers: a TmfTraceStub and a TmfEventProviderStub
 		ITmfDataProvider<TmfEvent>[] eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
-		assertEquals("getProviders", 2, eventProviders.length);
+		assertTrue(eventProviders.length == 2);
 
 		eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
-		assertEquals("getProviders", 1, eventProviders.length);
+		assertTrue(eventProviders.length == 1);
 
 		eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfEventProviderStub.class);
-		assertEquals("getProviders", 1, eventProviders.length);
+		assertTrue(eventProviders.length == 1);
 
 		// There should be 1 TmfSyntheticEventStub provider
 		eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfSyntheticEventStub.class);
-		assertEquals("getProviders", 1, eventProviders.length);
+		assertTrue(eventProviders.length == 1);
 	}
 
 }

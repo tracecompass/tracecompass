@@ -321,7 +321,11 @@ public class StatisticsView extends TmfView implements IStateDataRequestListener
 	}
 
 	public StatisticsView(String viewName) {
-		super("StatisticsView");
+		super(viewName);
+	}
+
+	public StatisticsView() {
+		this("StatisticsView");
 	}
 
 	/*

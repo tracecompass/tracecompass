@@ -89,8 +89,7 @@ public class StateDataRequest extends TmfEventRequest<LttngEvent> {
 	 * @param broadcast
 	 *            true: All views, false: only to registered listeners
 	 */
-	public void startRequestInd(TmfExperiment<LttngEvent> experiment, boolean broadcast,
-			boolean waitForCompletion) {
+	public void startRequestInd(TmfExperiment<LttngEvent> experiment, boolean broadcast) {
 		if (broadcast) {
 			// Notify all state views.
 			this.broadcast = broadcast;
@@ -103,7 +102,7 @@ public class StateDataRequest extends TmfEventRequest<LttngEvent> {
 		}
 
 		// trigger the start to process this request
-		experiment.processRequest(this, waitForCompletion);
+		experiment.sendRequest(this);
 	}
 
 	/**
@@ -186,5 +185,9 @@ public class StateDataRequest extends TmfEventRequest<LttngEvent> {
 	 */
 	public boolean isclearDataInd() {
 		return clearDataInd;
+	}
+
+	@Override
+	public void handleData() {
 	}
 }

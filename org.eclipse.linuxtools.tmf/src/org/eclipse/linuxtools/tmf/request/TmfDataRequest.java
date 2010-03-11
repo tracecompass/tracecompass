@@ -66,7 +66,7 @@ import org.eclipse.linuxtools.tmf.event.TmfData;
  * 
  * TODO: Implement request failures (codes, etc...)
  */
-public class TmfDataRequest<T extends TmfData> {
+public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataRequest<T> {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -84,7 +84,7 @@ public class TmfDataRequest<T extends TmfData> {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final Class<? extends TmfData> fDataType;
+    private final Class<T> fDataType;
     private final int fRequestId;  			// A unique request ID
     private final int fIndex;      			// The index (rank) of the requested event
     private final int fNbRequested;  		// The number of requested events (ALL_DATA for all)
@@ -105,14 +105,14 @@ public class TmfDataRequest<T extends TmfData> {
     /**
      * Default constructor
      */
-    public TmfDataRequest(Class<? extends TmfData> dataType) {
+    public TmfDataRequest(Class<T> dataType) {
         this(dataType, 0, ALL_DATA, DEFAULT_BLOCK_SIZE);
     }
 
     /**
      * @param nbRequested
      */
-    public TmfDataRequest(Class<? extends TmfData> dataType, int index) {
+    public TmfDataRequest(Class<T> dataType, int index) {
         this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE);
     }
 
@@ -120,7 +120,7 @@ public class TmfDataRequest<T extends TmfData> {
      * @param index
      * @param nbRequested
      */
-    public TmfDataRequest(Class<? extends TmfData> dataType, int index, int nbRequested) {
+    public TmfDataRequest(Class<T> dataType, int index, int nbRequested) {
         this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE);
     }
 
@@ -129,7 +129,7 @@ public class TmfDataRequest<T extends TmfData> {
      * @param nbRequested
      * @param blockSize
      */
-    public TmfDataRequest(Class<? extends TmfData> dataType, int index, int nbRequested, int blockSize) {
+    public TmfDataRequest(Class<T> dataType, int index, int nbRequested, int blockSize) {
     	fRequestId   = fRequestNumber++;
     	fDataType    = dataType;
     	fIndex       = index;
@@ -137,7 +137,24 @@ public class TmfDataRequest<T extends TmfData> {
     	fBlockSize   = blockSize;
     	fNbRead      = 0;
     }
-    
+
+    @Override
+    public boolean equals(Object other) {
+    	if (other instanceof TmfDataRequest<?>) {
+    		TmfDataRequest<?> request = (TmfDataRequest<?>) other;
+    		return 	(request.fDataType    == fDataType) &&
+    				(request.fIndex       == fIndex)    &&
+    				(request.fNbRequested == fNbRequested);
+    	}
+    	return false;
+    }
+
+//    @Override
+//    public int hashCode() {
+//    	int hash = 0;
+//    	return hash;
+//    }
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -150,9 +167,9 @@ public class TmfDataRequest<T extends TmfData> {
 	}
 
 	/**
-	 * @return the index
+	 * @return the index of the first event requested
 	 */
-	public long getIndex() {
+	public int getIndex() {
 		return fIndex;
 	}
 
@@ -201,7 +218,7 @@ public class TmfDataRequest<T extends TmfData> {
     /**
      * @return the requested data type
      */
-    public Class<?> getDataType() {
+    public Class<T> getDataType() {
         return fDataType;
     }
 
@@ -241,8 +258,7 @@ public class TmfDataRequest<T extends TmfData> {
      *
      * @param events - an array of events
      */
-    public void handleData() {
-    }
+    public abstract void handleData();
 
     /**
      * Handle the completion of the request. It is called when there is no more

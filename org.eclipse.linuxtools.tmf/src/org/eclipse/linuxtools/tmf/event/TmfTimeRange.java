@@ -13,7 +13,7 @@
 package org.eclipse.linuxtools.tmf.event;
 
 /**
- * <b><u>TmfTimeWindow</u></b>
+ * <b><u>TmfTimeRange</u></b>
  * <p>
  * A utility class to define time ranges.
  */
@@ -62,6 +62,16 @@ public class TmfTimeRange {
 		fStartTime = other.fStartTime;
 		fEndTime   = other.fEndTime;
 	}
+
+    @Override
+    public boolean equals(Object other) {
+    	if (other instanceof TmfTimeRange) {
+    		TmfTimeRange range = (TmfTimeRange) other;
+    		return range.fStartTime.equals(fStartTime) &&
+    		       range.fEndTime.equals(fEndTime);
+    	}
+    	return false;
+    }
 
     // ========================================================================
     // Accessors

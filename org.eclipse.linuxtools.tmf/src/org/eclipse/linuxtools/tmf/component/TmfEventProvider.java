@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.component;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.request.TmfCoalescedEventRequest;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 
@@ -40,6 +41,17 @@ public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvid
 			return data.getTimestamp().compareTo(endTime, false) > 0;
 		}
 		return dataRequestCompleted;
+	}
+
+	@Override
+	protected synchronized void newCoalescedDataRequest(TmfDataRequest<T> request) {
+		if (request instanceof TmfEventRequest<?>) {
+			TmfEventRequest<T> eventRequest = (TmfEventRequest<T>) request;
+			TmfCoalescedEventRequest<T> coalescedRequest = 
+				new TmfCoalescedEventRequest<T>(fType, eventRequest.getRange(), eventRequest.getNbRequested(), eventRequest.getBlockize());
+			coalescedRequest.addRequest(eventRequest);
+			fPendingCoalescedRequests.add(coalescedRequest);
+		}
 	}
 
 }

@@ -25,6 +25,7 @@ import org.eclipse.linuxtools.tmf.component.TmfEventProvider;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.request.TmfCoalescedEventRequest;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 
@@ -173,6 +174,9 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 	public ITmfContext armRequest(TmfDataRequest<T> request) {
 		if (request instanceof TmfEventRequest<?>) {
 			return seekEvent(((TmfEventRequest<T>) request).getRange().getStartTime());
+		}
+		if (request instanceof TmfCoalescedEventRequest<?>) {
+			return seekEvent(((TmfCoalescedEventRequest<T>) request).getRange().getStartTime());
 		}
 		return null;
 	}

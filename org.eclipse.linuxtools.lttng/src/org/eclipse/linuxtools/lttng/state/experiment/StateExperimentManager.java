@@ -113,7 +113,7 @@ public class StateExperimentManager extends TmfComponent {
 	 */
 	@SuppressWarnings("unchecked")
 	@TmfSignalHandler
-	public void experimentSelected(TmfExperimentSelectedSignal signal) {
+	public void experimentSelected(TmfExperimentSelectedSignal<LttngEvent> signal) {
 		// TmfExperiment experiment = signal.getExperiment();
 		// ITmfTrace[] traces = experiment.getTraces();
 		// for (ITmfTrace trace : traces) {

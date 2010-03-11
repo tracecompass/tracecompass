@@ -53,6 +53,12 @@ public class TmfEventProviderStub extends TmfEventProvider<TmfEvent> {
     public TmfEventProviderStub() throws IOException {
     	this(DIRECTORY + File.separator + TEST_STREAM);
     }
+
+    @Override
+    public void deregister() {
+    	fTrace.deregister();
+    	super.deregister();
+    }
     
     // ------------------------------------------------------------------------
     // TmfEventProvider

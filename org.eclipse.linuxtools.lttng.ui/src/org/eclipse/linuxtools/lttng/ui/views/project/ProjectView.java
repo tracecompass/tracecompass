@@ -178,7 +178,7 @@ public class ProjectView extends TmfView {
         	}
             fSelectedExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class, expId, traces);
             fSelectedExperiment.indexExperiment(waitForCompletion);
-            broadcast(new TmfExperimentSelectedSignal(this, fSelectedExperiment));
+            broadcast(new TmfExperimentSelectedSignal<LttngEvent>(this, fSelectedExperiment));
         } catch (FileNotFoundException e) {
             return;
         } catch (Exception e) {

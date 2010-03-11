@@ -22,7 +22,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.linuxtools.tmf.component.TmfDataProvider;
+import org.eclipse.linuxtools.tmf.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
@@ -226,8 +226,9 @@ public class TmfTraceTest extends TestCase {
                 }
             }
         };
-        TmfDataProvider<TmfEvent>[] providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
-        providers[0].processRequest(request, true);
+        ITmfDataProvider<TmfEvent>[] providers = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        providers[0].sendRequest(request);
+        request.waitForCompletion();
 
         assertEquals("nbEvents", NB_EVENTS, requestedEvents.size());
         assertTrue("isCompleted",  request.isCompleted());
@@ -255,8 +256,9 @@ public class TmfTraceTest extends TestCase {
                 }
             }
         };
-        TmfDataProvider<TmfEvent>[] providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
-        providers[0].processRequest(request, true);
+        ITmfDataProvider<TmfEvent>[] providers = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        providers[0].sendRequest(request);
+        request.waitForCompletion();
 
         assertEquals("nbEvents", NB_EVENTS, requestedEvents.size());
         assertTrue("isCompleted",  request.isCompleted());
@@ -289,8 +291,9 @@ public class TmfTraceTest extends TestCase {
                 cancel();
             }
         };
-        TmfDataProvider<TmfEvent>[] providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
-        providers[0].processRequest(request, true);
+        ITmfDataProvider<TmfEvent>[] providers = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
+        providers[0].sendRequest(request);
+        request.waitForCompletion();
 
         assertEquals("nbEvents",  NB_EVENTS, requestedEvents.size());
         assertTrue("isCompleted", request.isCompleted());

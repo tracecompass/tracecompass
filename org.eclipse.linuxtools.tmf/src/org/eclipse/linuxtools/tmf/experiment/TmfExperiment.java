@@ -370,50 +370,6 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 		return context;
 	}
 
-//	/**
-//	 * Given an experiment event index, position the set of traces so a call
-//	 * to getNextEvent() will retrieve the corresponding event.
-//	 * 
-//	 * @param index
-//	 * @param context
-//	 */
-//	private synchronized void positionTraces(long index, TmfExperimentContext context) {
-//
-//		// Extract the relevant information
-//		ITmfTrace[] traces = context.getTraces();
-//		TmfEvent[]  events = context.getEvents();
-//		TmfContext[] contexts = context.getContexts();
-//
-//		int page = 0;		// The checkpoint page
-//		int current = 0;	// The current event index (rank)
-//
-//		// If there is no checkpoint created yet, start from the beginning
-//		if (fCheckpoints.size() == 0) {
-//			for (int i = 0; i < contexts.length; i++) {
-//				contexts[i] = traces[i].seekLocation(null).clone();
-//				events[i] = traces[i].parseEvent(contexts[i]);
-//			}
-//		}
-//		else {
-//			page = (int) index / fIndexPageSize;
-//			if (page >= fCheckpoints.size()) {
-//				page = fCheckpoints.size() - 1;
-//			}
-//
-////			TmfContext[] checkpoint = fCheckpoints.elementAt(page).getContexts();
-//			for (int i = 0; i < contexts.length; i++) {
-//				contexts[i] = checkpoint[i].clone();
-//				events[i] = traces[i].parseEvent(contexts[i]);
-//			}
-//			current = page * fIndexPageSize;
-//		}
-//
-//		// Position the traces at the requested index
-//		while (current++ < index) {
-//			getNextEvent(context);
-//		}
-//	}
-
 	/**
 	 * Scan the next events from all traces and return the next one
 	 * in chronological order.
@@ -449,57 +405,10 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     	return null;
 	}
 
-	//	public TmfEvent getNextEvent(TmfExperimentContext context) {
-//		// TODO: Consider the time adjustment
-//		int trace = 0;
-//		TmfTimestamp timestamp = TmfTimestamp.BigCrunch;
-//		if (context.getEvents()[trace] != null) {
-//			timestamp = context.getEvents()[trace].getTimestamp();
-//		}
-//		for (int i = 1; i < context.getTraces().length; i++) {
-//			if (context.getEvents()[i].getTimestamp() != null) {
-//				TmfTimestamp otherTS = context.getEvents()[i].getTimestamp();
-//				if (otherTS.compareTo(timestamp, true) < 0) {
-//					trace = i;
-//					timestamp = otherTS;
-//				}
-//			}
-//		}
-//		TmfEvent event = context.getTraces()[trace].getNextEvent(context.getContexts()[trace]);
-//		context.getEvents()[trace] = context.getTraces()[trace].parseEvent(context.getContexts()[trace]);
-//		return event;
-//	}
-
 	public TmfEvent parseEvent(TmfContext context) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-//	/**
-//	 * Scan the next events from all traces and return the next one
-//	 * in chronological order.
-//	 * 
-//	 * @param context
-//	 * @return
-//	 */
-//	private TmfTimestamp getNextEventTimestamp(TmfExperimentContext context) {
-//		// TODO: Consider the time adjustment
-//		int trace = 0;
-//		TmfTimestamp timestamp = TmfTimestamp.BigCrunch;
-//		if (context.getEvents()[trace] != null) {
-//			timestamp = context.getEvents()[trace].getTimestamp();
-//		}
-//		for (int i = 1; i < context.getTraces().length; i++) {
-//			if (context.getEvents()[i].getTimestamp() != null) {
-//				TmfTimestamp otherTS = context.getEvents()[i].getTimestamp();
-//				if (otherTS.compareTo(timestamp, true) < 0) {
-//					trace = i;
-//					timestamp = otherTS;
-//				}
-//			}
-//		}
-//		return timestamp;
-//	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -679,7 +588,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     // ------------------------------------------------------------------------
 
     @TmfSignalHandler
-    public void experimentSelected(TmfExperimentSelectedSignal signal) {
+    public void experimentSelected(TmfExperimentSelectedSignal<T> signal) {
 		fCurrentExperiment = signal.getExperiment();
 //    	if (signal.getExperiment() == this) {
 //    		indexExperiment(true);

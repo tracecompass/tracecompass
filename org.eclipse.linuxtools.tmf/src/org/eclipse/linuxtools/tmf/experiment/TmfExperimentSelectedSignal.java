@@ -20,11 +20,11 @@ import org.eclipse.linuxtools.tmf.signal.TmfSignal;
  * <p>
  * TODO: Implement me. Please.
  */
-public class TmfExperimentSelectedSignal extends TmfSignal {
+public class TmfExperimentSelectedSignal<T extends TmfEvent> extends TmfSignal {
 
-	private final TmfExperiment<? extends TmfEvent> fExperiment;
+	private final TmfExperiment<T> fExperiment;
 	
-	public TmfExperimentSelectedSignal(Object source, TmfExperiment<? extends TmfEvent> experiment) {
+	public TmfExperimentSelectedSignal(Object source, TmfExperiment<T> experiment) {
 		super(source);
 		fExperiment = experiment;
 	}

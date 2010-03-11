@@ -171,7 +171,8 @@ public class TmfEventsView extends TmfView {
 						}
 					}
 				};
-				fExperiment.processRequest(request, true);
+				fExperiment.sendRequest(request);
+		        request.waitForCompletion();
 				
 				if (cache[0] != null && cacheStartIndex == index) {
 					item.setText(extractItemFields(cache[0]));
@@ -187,7 +188,7 @@ public class TmfEventsView extends TmfView {
     	// If an experiment is already selected, update the table
     	fExperiment = (TmfExperiment<TmfEvent>) TmfExperiment.getCurrentExperiment();
     	if (fExperiment != null) {
-    		experimentSelected(new TmfExperimentSelectedSignal(fTable, fExperiment));
+    		experimentSelected(new TmfExperimentSelectedSignal<TmfEvent>(fTable, fExperiment));
     	}
     }
 
@@ -245,7 +246,7 @@ public class TmfEventsView extends TmfView {
     
 	@SuppressWarnings("unchecked")
 	@TmfSignalHandler
-    public void experimentSelected(TmfExperimentSelectedSignal signal) {
+    public void experimentSelected(TmfExperimentSelectedSignal<TmfEvent> signal) {
 		// Update the trace reference
     	fExperiment = (TmfExperiment<TmfEvent>) signal.getExperiment();
     	setPartName(fTitlePrefix + " - " + fExperiment.getName());

@@ -27,7 +27,7 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
     // Attributes
     // ------------------------------------------------------------------------
 
-	protected Vector<ITmfDataRequest<T>> fRequests = new Vector<ITmfDataRequest<T>>();
+	protected Vector<TmfDataRequest<T>> fRequests = new Vector<TmfDataRequest<T>>();
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -68,13 +68,13 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
     // Management
     // ------------------------------------------------------------------------
 
-	public void addRequest(ITmfDataRequest<T> request) {
+	public void addRequest(TmfDataRequest<T> request) {
 		fRequests.add(request);
 	}
 
-	public boolean isCompatible(ITmfDataRequest<T> request) {
+	public boolean isCompatible(TmfDataRequest<T> request) {
 
-		boolean ok = request.getIndex() == getIndex();
+		boolean ok = request.getIndex() == getIndex();;
 		ok &= request.getNbRequested() == getNbRequested();
 		ok &= request.getBlockize() == getBlockize();
 		
@@ -87,61 +87,59 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
 
     @Override
 	public void handleData() {
-    	for (ITmfDataRequest<T> request : fRequests) {
+    	for (TmfDataRequest<T> request : fRequests) {
     		request.setData(getData());
     		request.handleData();
     	}
     }
 
     @Override
+    public void handleCompleted() {
+    	for (TmfDataRequest<T> request : fRequests) {
+    		request.handleCompleted();
+    	}
+    }
+
+    @Override
+    public void handleSuccess() {
+    	for (TmfDataRequest<T> request : fRequests) {
+    		request.handleSuccess();
+    	}
+    }
+
+    @Override
+    public void handleFailure() {
+    	for (TmfDataRequest<T> request : fRequests) {
+    		request.handleFailure();
+    	}
+    }
+
+    @Override
+    public void handleCancel() {
+    	for (TmfDataRequest<T> request : fRequests) {
+    		request.handleCancel();
+    	}
+    }
+
+    @Override
     public void done() {
-    	for (ITmfDataRequest<T> request : fRequests) {
+    	for (TmfDataRequest<T> request : fRequests) {
     		request.done();
     	}
-    	super.done();
     }
 
     @Override
     public void fail() {
-    	for (ITmfDataRequest<T> request : fRequests) {
+    	for (TmfDataRequest<T> request : fRequests) {
     		request.fail();
     	}
-    	super.fail();
     }
 
     @Override
     public void cancel() {
-    	for (ITmfDataRequest<T> request : fRequests) {
+    	for (TmfDataRequest<T> request : fRequests) {
     		request.cancel();
     	}
-    	super.cancel();
-    }
-
-    // ------------------------------------------------------------------------
-    // Object
-    // ------------------------------------------------------------------------
-
-    @Override
-    // All requests have a unique id
-    public int hashCode() {
-    	return super.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object other) {
-    	if (other instanceof TmfCoalescedDataRequest<?>) {
-    		TmfCoalescedDataRequest<?> request = (TmfCoalescedDataRequest<?>) other;
-       		return 	(request.getDataType()    == getDataType()) &&
-       				(request.getIndex()       == getIndex())    &&
-       				(request.getNbRequested() == getNbRequested());
-       	}
-       	return false;
-    }
-
-    @Override
-    public String toString() {
-		return "[TmfCoalescedDataRequest(" + getRequestId() + "," + getDataType().getSimpleName() 
-			+ "," + getIndex() + "," + getNbRequested() + "," + getBlockize() + ")]";
     }
 
 }

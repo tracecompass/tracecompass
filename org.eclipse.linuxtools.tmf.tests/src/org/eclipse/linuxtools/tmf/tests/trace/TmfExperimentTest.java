@@ -206,7 +206,8 @@ public class TmfExperimentTest extends TestCase {
                 }
             }
         };
-        fExperiment.processRequest(request, true);
+        fExperiment.sendRequest(request);
+        request.waitForCompletion();
 
         assertEquals("nbEvents", nbEvents, requestedEvents.size());
         assertTrue("isCompleted",  request.isCompleted());
@@ -234,7 +235,8 @@ public class TmfExperimentTest extends TestCase {
                 }
             }
         };
-        fExperiment.processRequest(request, true);
+        fExperiment.sendRequest(request);
+        request.waitForCompletion();
 
         assertEquals("nbEvents", nbEvents, requestedEvents.size());
         assertTrue("isCompleted",  request.isCompleted());
@@ -263,7 +265,8 @@ public class TmfExperimentTest extends TestCase {
                 }
             }
         };
-        fExperiment.processRequest(request, true);
+        fExperiment.sendRequest(request);
+        request.waitForCompletion();
 
         assertEquals("nbEvents", nbExpectedEvents, requestedEvents.size());
         assertTrue("isCompleted",  request.isCompleted());
@@ -297,7 +300,8 @@ public class TmfExperimentTest extends TestCase {
                 cancel();
             }
         };
-        fExperiment.processRequest(request, true);
+        fExperiment.sendRequest(request);
+        request.waitForCompletion();
 
         assertEquals("nbEvents",  blockSize, requestedEvents.size());
         assertTrue("isCompleted", request.isCompleted());

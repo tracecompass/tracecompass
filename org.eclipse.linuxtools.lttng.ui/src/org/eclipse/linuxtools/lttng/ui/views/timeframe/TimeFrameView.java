@@ -257,7 +257,7 @@ public class TimeFrameView extends TmfView {
      * @param signal
      */
     @TmfSignalHandler
-    public void experimentSelected(TmfExperimentSelectedSignal signal) {
+    public void experimentSelected(TmfExperimentSelectedSignal<LttngEvent> signal) {
 
         // Update the trace reference
         fExperiment = (TmfExperiment<LttngEvent>) signal.getExperiment();

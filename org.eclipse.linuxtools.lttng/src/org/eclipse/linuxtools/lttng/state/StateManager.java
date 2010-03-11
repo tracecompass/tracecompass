@@ -118,9 +118,9 @@ public class StateManager extends Observable {
 			boolean clearPreviousData) {
 		// New log in use, read all events and build state transition stack
 		if (experiment != null) {
-			if (fExperiment != null && fExperiment != experiment) {
-				this.fExperiment.deregister();
-			}
+//			if (fExperiment != null && fExperiment != experiment) {
+//				this.fExperiment.deregister();
+//			}
 
 			this.fExperiment = experiment;
 
@@ -146,8 +146,7 @@ public class StateManager extends Observable {
 					null);
 			request.setclearDataInd(clearPreviousData);
 
-			// Wait for completion
-			request.startRequestInd(fExperiment, true, true);
+			request.startRequestInd(fExperiment, true);
 
 			if (TraceDebug.isDEBUG()) {
 				StringBuilder sb = new StringBuilder(
@@ -192,7 +191,7 @@ public class StateManager extends Observable {
 		// Process request to that point
 		StateDataRequest request = getDataRequestByTimeRange(trange, listener);
 		// don't wait for completion i.e. allow cancellations
-		request.startRequestInd(fExperiment, false, false);
+		request.startRequestInd(fExperiment, false);
 
 		if (TraceDebug.isDEBUG()) {
 			TraceDebug

@@ -39,8 +39,8 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSynthetic
 	public ITmfContext armRequest(final TmfDataRequest<TmfSyntheticEventStub> request) {
 
 		// Get the TmfSyntheticEventStub provider
-		TmfDataProvider<TmfEvent>[] eventProviders = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfEventProviderStub.class);
-		TmfDataProvider<TmfEvent> provider = eventProviders[0];
+		ITmfDataProvider<TmfEvent>[] eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfEventProviderStub.class);
+		ITmfDataProvider<TmfEvent> provider = eventProviders[0];
 
 		// make sure we have the right type of request
 		if (!(request instanceof TmfEventRequest<?>)) {
@@ -64,7 +64,7 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSynthetic
             		}
             	}
         	};
-        provider.processRequest(subRequest, false);
+        provider.sendRequest(subRequest); // , false);
 
         // Return a dummy context
         return new TmfContext();
