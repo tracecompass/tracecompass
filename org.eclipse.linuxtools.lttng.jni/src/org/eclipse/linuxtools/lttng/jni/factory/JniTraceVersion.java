@@ -5,6 +5,7 @@ import org.eclipse.linuxtools.lttng.jni.exception.JniTraceVersionException;
 public class JniTraceVersion {
 	
 	protected native void ltt_getTraceVersion(String tracepath);
+	protected native void ltt_setLibraryPath(String ldLibraryPath);
 	
 	private int majorNumber = 0;
 	private int minorNumber = 0;
@@ -40,6 +41,11 @@ public class JniTraceVersion {
 			// Load the C library here. 
 			// If LD_LIBRARY_PATH is not set correctly this will raise a java.lang.UnsatisfiedLinkError
 			System.loadLibrary("lttvtraceread_loader");
+			
+			// The user's LD_LIBRARY_PATH environnement variable doesn't seem to be get passed to the C
+			// We will force C to load it here
+			String ldLibraryPath = "LD_LIBRARY_PATH:" + System.getenv("LD_LIBRARY_PATH");
+			ltt_setLibraryPath(ldLibraryPath);
 			
 			// Assuming the C library loaded correctly, call the JNI here.
 			ltt_getTraceVersion(tracepath);
