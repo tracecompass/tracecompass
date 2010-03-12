@@ -172,10 +172,15 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 					result.add(data);
 					if (++nbRead % blockSize == 0) {
 						pushData(request, result);
+//						data.setNull();
+//						result.add(data);
 					}
 					// To avoid an unnecessary read passed the last data requested
-					if (nbRead < nbRequested)
+					if (nbRead < nbRequested) {
 						data = getNext(context);
+//						while (data != null && data.isNull())
+//							data = getNext(context);
+					}
 				}
 				pushData(request, result);
 				request.done();

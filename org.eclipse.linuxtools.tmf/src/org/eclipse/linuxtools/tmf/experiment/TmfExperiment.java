@@ -187,7 +187,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
      */
     public TmfTimestamp getTimestamp(int index) {
     	TmfExperimentContext context = seekEvent(index);
-    	TmfEvent event = parseEvent(context);
+    	TmfEvent event = getNextEvent(context);
     	return (event != null) ? event.getTimestamp() : null;
     }
 
@@ -287,6 +287,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 			}
 			context.setLocation(new TmfExperimentLocation(newloc));
 			context.setRank(rank);
+			context.setLastTrace(-1);
 			return context;
 		}
 		return null;
@@ -328,9 +329,10 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         // And get the event
         TmfEvent event = parseEvent(context);
         while (event != null && event.getTimestamp().compareTo(timestamp, false) < 0) {
-        	getNextEvent(context);
-        	event = parseEvent(context);
+        	event = getNextEvent(context);
+//        	event = parseEvent(context);
         }
+    	context.setLastTrace(-1);
 
         return context;
 	}
@@ -372,6 +374,15 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 	public synchronized TmfEvent getNextEvent(TmfContext context) {
 		if (context instanceof TmfExperimentContext) {
 			TmfExperimentContext expContext = (TmfExperimentContext) context;
+			int lastTrace = expContext.getLastTrace();
+			if (lastTrace != -1) {
+				TmfContext traceContext = expContext.getContexts()[lastTrace];
+				expContext.getTraces()[lastTrace].getNextEvent(traceContext);
+				expContext.getEvents()[lastTrace] = expContext.getTraces()[lastTrace].parseEvent(traceContext);
+				TmfExperimentLocation expLocation = (TmfExperimentLocation) expContext.getLocation();
+				expLocation.getLocation()[lastTrace] = traceContext.getLocation().clone();
+				expContext.updateRank(1);
+			}
 			int trace = -1;
 			TmfTimestamp timestamp = TmfTimestamp.BigCrunch;
 			for (int i = 0; i < expContext.getTraces().length; i++) {
@@ -387,12 +398,14 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 			}
 
 			if (trace >= 0) {
-				TmfContext trcloc = expContext.getContexts()[trace];
-				TmfEvent event = expContext.getTraces()[trace].getNextEvent(trcloc);
-				TmfExperimentLocation exploc = (TmfExperimentLocation) expContext.getLocation();
-				exploc.getLocation()[trace] = trcloc.getLocation().clone();
-				expContext.getEvents()[trace] = expContext.getTraces()[trace].parseEvent(trcloc);
-				expContext.updateRank(1);
+				expContext.setLastTrace(trace);
+//				TmfContext traceContext = expContext.getContexts()[trace];
+				TmfEvent event = expContext.getEvents()[trace];
+//				TmfEvent event = expContext.getTraces()[trace].getNextEvent(trcloc);
+//				TmfEvent event = expContext.getTraces()[trace].parseEvent(traceContext);
+//				TmfExperimentLocation exploc = (TmfExperimentLocation) expContext.getLocation();
+//				exploc.getLocation()[trace] = trcloc.getLocation().clone();
+//				expContext.getEvents()[trace] = expContext.getTraces()[trace].parseEvent(trcloc);
 				return event;
 			}
 		}
@@ -521,7 +534,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
             	TmfExperimentLocation location = (TmfExperimentLocation) context.getLocation();
 
                 // Get the first event
-               	TmfEvent event = parseEvent(context);
+               	TmfEvent event = getNextEvent(context);
                	if (event != null) {
                     startTime = new TmfTimestamp(event.getTimestamp());
                	}
@@ -574,29 +587,30 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     	broadcast(new TmfRangeSynchSignal(this, range, null));
 	}
    
-//	// ========================================================================
-//	// Toubleshooting code
-//	// ========================================================================
-//
-//	private void dumpCheckpoints() {
-//		System.out.println("-----");
-//		System.out.println("Checkpoints of " + fExperimentId);
-//		for (int i = 0; i < fCheckpoints.size(); i++) {
-//        	System.out.println("Entry:" + i);
-//        	TmfCheckpoint checkpoint = fCheckpoints.get(i);
-////        	long rank = 0; 
-//        	for (int j = 0; j < fTraces.length; j++) {
-//        		ITmfTrace trace = fTraces[j];
-//            	TmfExperimentContext context = seekLocation(checkpoint.getLocation());
-//            	TmfContext[] traces = context.getContexts();
-////        		rank += context.getRank(); 
-//            	TmfEvent event = fTraces[j].getNextEvent(new TmfContext(traces[j]));
+	// ========================================================================
+	// Toubleshooting code
+	// ========================================================================
+
+	private void dumpCheckpoints() {
+		System.out.println("-----");
+		System.out.println("Checkpoints of " + fExperimentId);
+		for (int i = 0; i < fCheckpoints.size(); i++) {
+        	System.out.println("Entry:" + i);
+        	TmfCheckpoint checkpoint = fCheckpoints.get(i);
+//        	long rank = 0; 
+        	for (int j = 0; j < fTraces.length; j++) {
+        		ITmfTrace trace = fTraces[j];
+            	TmfExperimentContext context = seekLocation(checkpoint.getLocation());
+            	TmfContext[] traces = context.getContexts();
+//        		rank += context.getRank(); 
+            	TmfEvent event = fTraces[j].getNextEvent(new TmfContext(traces[j]));
 //            	System.out.println("  ["  + trace.getName() + "] rank: " + context.getRank() + ", timestamp: " + event.getTimestamp());
-//            	assert (checkpoint.getTimestamp().compareTo(event.getTimestamp(), false) == 0);
-//        	}
-////        	System.out.println("Sum of ranks: " + rank + " (expected: " + i * fIndexPageSize + ")");
-//        }
-//	}
+            	System.out.println("  ["  + trace.getName() + "] timestamp: " + event.getTimestamp());
+            	assert (checkpoint.getTimestamp().compareTo(event.getTimestamp(), false) == 0);
+        	}
+//        	System.out.println("Sum of ranks: " + rank + " (expected: " + i * fIndexPageSize + ")");
+        }
+	}
 
     // ------------------------------------------------------------------------
     // Signal handlers

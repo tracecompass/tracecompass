@@ -27,6 +27,7 @@ public class TmfExperimentContext extends TmfContext {
 	private ITmfTrace[]  fTraces = new ITmfTrace[0];
 	private TmfContext[] fContexts;
 	private TmfEvent[]   fEvents;
+	private int lastIndex;
 
 	// ------------------------------------------------------------------------
 	// Constructors
@@ -49,6 +50,7 @@ public class TmfExperimentContext extends TmfContext {
 		
 		setLocation(new TmfExperimentLocation(locations));
 		setRank(rank);
+		lastIndex = -1;
 	}
 
 	public TmfExperimentContext(ITmfTrace[] traces) {
@@ -83,6 +85,14 @@ public class TmfExperimentContext extends TmfContext {
 
 	public TmfEvent[] getEvents() {
 		return fEvents;
+	}
+
+	public int getLastTrace() {
+		return lastIndex;
+	}
+
+	public void setLastTrace(int newIndex) {
+		lastIndex = newIndex;
 	}
 
 }

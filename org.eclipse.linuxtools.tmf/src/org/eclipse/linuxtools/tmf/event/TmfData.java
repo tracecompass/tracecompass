@@ -22,4 +22,18 @@ package org.eclipse.linuxtools.tmf.event;
  */
 public abstract class TmfData {
 
+//	private boolean isNull = false;
+//	
+//	public void setNull() {
+//		isNull = true;
+//	}
+//	
+//	public void resetNull() {
+//		isNull = false;
+//	}
+//	
+//	public boolean isNull() {
+//		return isNull;
+//	}
+
 }
