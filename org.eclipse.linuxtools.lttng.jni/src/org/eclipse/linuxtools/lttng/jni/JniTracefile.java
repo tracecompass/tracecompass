@@ -113,12 +113,6 @@ public abstract class JniTracefile extends Jni_C_Common {
     
     // Debug native function, ask LTT to print tracefile structure
     protected native void ltt_printTracefile(long tracefilePtr);
-    
-    // *** FIXME ***
-    // To uncomment as soon as the library will be able to load multiple version at once
-	// static {
-	//	System.loadLibrary("lttvtraceread_loader");
-	//}
         
     /*
      * Default constructor is forbidden
@@ -267,7 +261,8 @@ public abstract class JniTracefile extends Jni_C_Common {
      * @param markerId          Id of the marker (int)
      * @param markerInfoPtr     C Pointer to a marker_info C structure 
      */
-    private void addMarkersFromC(int markerId, long markerInfoPtr) {
+    @SuppressWarnings("unused")
+	private void addMarkersFromC(int markerId, long markerInfoPtr) {
         // Create a new tracefile object and insert it in the map
         // the tracefile fill itself with LTT data while being constructed
         try {

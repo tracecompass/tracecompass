@@ -36,16 +36,7 @@ public class JniTraceFactory {
 			}
 		}
 		catch (JniTraceVersionException e) {
-			
-			// *** FIXME ***
-			// We should probably fail if the trace version can't be found, however unless
-			//	the C library is ajusted, we will always ends up here. 
-			// For now, we will default to the trace version 2.5 (what we use for unit tests) so it should still work. 
-			// ***
-			
-			//throw new JniException("ERROR : Call to JniTraceVersion() failed.");
-			System.out.println("WARNING : Call to JniTraceVersion() failed, defaulting to version 2.5.");
-			return new JniTrace_v2_5(path);
+			throw new JniException("ERROR : Call to JniTraceVersion() failed.");
 		}
 	}
 	

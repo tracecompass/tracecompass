@@ -111,12 +111,6 @@ public abstract class JniTrace extends Jni_C_Common {
     
     // Debug native function, ask LTT to print trace structure
     protected native void ltt_printTrace(long tracePtr);
-
-    // *** FIXME ***
-    // To uncomment as soon as the library will be able to load multiple version at once
-	// static {
-	//	System.loadLibrary("lttvtraceread_loader");
-	//}
     
     /*
      * Default constructor is forbidden
@@ -214,6 +208,7 @@ public abstract class JniTrace extends Jni_C_Common {
             closeTrace();
         }
         
+        // Tell the C to free the allocated memory
         freeLibrary();
     }
     
@@ -274,7 +269,8 @@ public abstract class JniTrace extends Jni_C_Common {
         }
         else {
         	thisTracePtr = new Jni_C_Pointer(NULL);
-        	throw new JniTraceException("Failed to initialize library! Trace version not supported? (openTrace)");
+        	throw new JniTraceException("Failed to initialize library! Is the trace version supported?\n" +
+        			                    "Make sure you have the correct LTTv library compiled. (openTrace)");
         }
     }
         

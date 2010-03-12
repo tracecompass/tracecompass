@@ -64,12 +64,6 @@ public abstract class JniMarker extends Jni_C_Common
     // Debug native function, ask LTT to print marker structure
     protected native void ltt_printMarker(long markerPtr);
 
-    // *** FIXME ***
-    // To uncomment as soon as the library will be able to load multiple version at once
-	// static {
-	//	System.loadLibrary("lttvtraceread_loader");
-	//}
-
     /*
      * Default constructor is forbidden
      */
@@ -132,7 +126,8 @@ public abstract class JniMarker extends Jni_C_Common
      * @param markerName        Name of the parent marker
      * @param markerFieldPtr    C Pointer (converted in long) to marker_field C Structure
      */
-    private void addMarkerFieldFromC(String markerFieldName, long markerFieldPtr) {
+    @SuppressWarnings("unused")
+	private void addMarkerFieldFromC(String markerFieldName, long markerFieldPtr) {
         // Create a new Jaf_markerField object and insert it in the map
         // the maker field fill itself with LTT data while being constructed
         try {

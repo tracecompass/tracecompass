@@ -27,12 +27,6 @@ import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer;
 public abstract class JniParser extends Jni_C_Common
 {
     protected static native void ltt_getParsedData(ParsedObjectContent parseddata, long eventPtr, long markerFieldPtr);
-
-    // *** FIXME ***
-    // To uncomment as soon as the library will be able to load multiple version at once
-	// static {
-	//	System.loadLibrary("lttvtraceread_loader");
-	//}
     
     // *** HACK ***
     // We cannot use "Object" directly as java does not support swapping primitive value
@@ -162,7 +156,8 @@ public abstract class JniParser extends Jni_C_Common
      * @param stringToAdd   The parsed data to add
      * @param formatToAdd   The format of the raw data
      */
-    static private void addStringToParsingFromC(Object contentHolder, String stringToAdd) {
+    @SuppressWarnings("unused")
+	static private void addStringToParsingFromC(Object contentHolder, String stringToAdd) {
         ((ParsedObjectContent)contentHolder).setData( stringToAdd);
     }
 
@@ -178,7 +173,8 @@ public abstract class JniParser extends Jni_C_Common
      * @param pointerToAdd  The parsed data to add (in 64 bits long!)
      * @param formatToAdd   The format of the raw data
      */
-    static private void addLongPointerToParsingFromC(Object contentHolder, long pointerToAdd) {
+    @SuppressWarnings("unused")
+	static private void addLongPointerToParsingFromC(Object contentHolder, long pointerToAdd) {
         ((ParsedObjectContent)contentHolder).setData( new Jni_C_Pointer((long) pointerToAdd));
     }
 
@@ -194,7 +190,8 @@ public abstract class JniParser extends Jni_C_Common
      * @param pointerToAdd  The parsed data to add (converted in 64 bits long!)
      * @param formatToAdd   The format of the raw data
      */
-    static private void addIntPointerToParsingFromC(Object contentHolder, long pointerToAdd) {
+    @SuppressWarnings("unused")
+	static private void addIntPointerToParsingFromC(Object contentHolder, long pointerToAdd) {
         ((ParsedObjectContent)contentHolder).setData( new Jni_C_Pointer((int) pointerToAdd));
     }
 
@@ -210,7 +207,8 @@ public abstract class JniParser extends Jni_C_Common
      * @param shortToAdd    The parsed data to add
      * @param formatToAdd   The format of the raw data
      */
-    static private void addShortToParsingFromC(Object contentHolder, short shortToAdd) {
+    @SuppressWarnings("unused")
+	static private void addShortToParsingFromC(Object contentHolder, short shortToAdd) {
         ((ParsedObjectContent)contentHolder).setData( new Short(shortToAdd));
     }
 
@@ -226,7 +224,8 @@ public abstract class JniParser extends Jni_C_Common
      * @param intToAdd      The parsed data to add
      * @param formatToAdd   The format of the raw data
      */
-    static private void addIntegerToParsingFromC(Object contentHolder, int intToAdd) {
+    @SuppressWarnings("unused")
+	static private void addIntegerToParsingFromC(Object contentHolder, int intToAdd) {
         ((ParsedObjectContent)contentHolder).setData( new Integer(intToAdd));
     }
 
@@ -242,7 +241,8 @@ public abstract class JniParser extends Jni_C_Common
      * @param longToAdd     The parsed data to add
      * @param formatToAdd   The format of the raw data
      */
-    static private void addLongToParsingFromC(Object contentHolder, long longToAdd) {
+    @SuppressWarnings("unused")
+	static private void addLongToParsingFromC(Object contentHolder, long longToAdd) {
         ((ParsedObjectContent)contentHolder).setData( new Long(longToAdd));
     }
 
@@ -258,7 +258,8 @@ public abstract class JniParser extends Jni_C_Common
      * @param floatToAdd    The parsed data to add
      * @param formatToAdd   The format of the raw data
      */
-    static private void addFloatToParsingFromC(Object contentHolder, float floatToAdd) {
+    @SuppressWarnings("unused")
+	static private void addFloatToParsingFromC(Object contentHolder, float floatToAdd) {
         ((ParsedObjectContent)contentHolder).setData( new Float(floatToAdd));
     }
 
@@ -275,7 +276,8 @@ public abstract class JniParser extends Jni_C_Common
      * @param doubleToAdd   The parsed data to add
      * @param formatToAdd   The format of the raw data
      */
-    static private void addDoubleToParsingFromC(Object contentHolder, double doubleToAdd) {
+    @SuppressWarnings("unused")
+	static private void addDoubleToParsingFromC(Object contentHolder, double doubleToAdd) {
         ((ParsedObjectContent)contentHolder).setData( new Double(doubleToAdd));
     }
     

@@ -38,12 +38,6 @@ public abstract class JniMarkerField extends Jni_C_Common
     // Debug native function, ask LTT to print marker structure
     protected native void ltt_printMarkerField(long markerFieldPtr);
 
-    // *** FIXME ***
-    // To uncomment as soon as the library will be able to load multiple version at once
-	// static {
-	//	System.loadLibrary("lttvtraceread_loader");
-	//}
-
     /*
      * Default constructor is forbidden
      */
