@@ -167,7 +167,7 @@ public class TmfEventsView extends TmfView {
 						if ( (tmpEvent != null) && (tmpEvent.length > 0) ) {
 							cache = tmpEvent;
 							cacheStartIndex = index;
-							cacheEndIndex = index + cache.length;
+							cacheEndIndex = index + tmpEvent.length;
 						}
 					}
 				};
@@ -255,7 +255,7 @@ public class TmfEventsView extends TmfView {
         fTable.getDisplay().asyncExec(new Runnable() {
         	public void run() {
         		// TODO: Potentially long operation. Add some feedback for the user
-        		fTable.setSelection(0);
+       			fTable.setSelection(0);
             	fTable.clearAll();
 				cacheStartIndex = cacheEndIndex = 0;	// Clear the cache
             	fTable.setItemCount((int) fExperiment.getNbEvents());        

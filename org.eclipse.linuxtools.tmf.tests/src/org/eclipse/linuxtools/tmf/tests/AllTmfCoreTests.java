@@ -15,9 +15,11 @@ import org.eclipse.linuxtools.tmf.tests.event.TmfTimeRangeTest;
 import org.eclipse.linuxtools.tmf.tests.event.TmfTimestampTest;
 import org.eclipse.linuxtools.tmf.tests.event.TmfTraceEventTest;
 import org.eclipse.linuxtools.tmf.tests.request.TmfCoalescedDataRequestTest;
+import org.eclipse.linuxtools.tmf.tests.request.TmfCoalescedEventRequestTest;
 import org.eclipse.linuxtools.tmf.tests.request.TmfDataRequestTest;
 import org.eclipse.linuxtools.tmf.tests.request.TmfEventRequestTest;
 import org.eclipse.linuxtools.tmf.tests.trace.TmfExperimentTest;
+import org.eclipse.linuxtools.tmf.tests.trace.TmfMultiTraceExperimentTest;
 import org.eclipse.linuxtools.tmf.tests.trace.TmfTraceTest;
 
 public class AllTmfCoreTests {
@@ -41,9 +43,11 @@ public class AllTmfCoreTests {
 		suite.addTestSuite(TmfDataRequestTest.class);
 		suite.addTestSuite(TmfEventRequestTest.class);
 		suite.addTestSuite(TmfCoalescedDataRequestTest.class);
+		suite.addTestSuite(TmfCoalescedEventRequestTest.class);
 
 		suite.addTestSuite(TmfTraceTest.class);
 		suite.addTestSuite(TmfExperimentTest.class);
+		suite.addTestSuite(TmfMultiTraceExperimentTest.class);
 		//$JUnit-END$
 		return suite;
 	}

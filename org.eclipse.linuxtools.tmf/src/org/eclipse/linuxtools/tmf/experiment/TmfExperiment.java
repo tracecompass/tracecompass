@@ -170,13 +170,11 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
      * Returns the rank of the first event with the requested timestamp.
      * If none, returns the index of the next event (if any).
      *  
-     * @param ts
+     * @param timestamp
      * @return
      */
-    public long getRank(TmfTimestamp ts) {
-        // FIXME: Go over all the traces
-    	ITmfTrace trace = fTraces[0];
-    	TmfContext context = trace.seekEvent(ts);
+    public long getRank(TmfTimestamp timestamp) {
+    	TmfExperimentContext context = seekEvent(timestamp);
     	return context.getRank();
     }
 
@@ -188,12 +186,9 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
      * @return
      */
     public TmfTimestamp getTimestamp(int index) {
-        // FIXME: Go over all the traces
-    	ITmfTrace trace = fTraces[0];
-    	TmfContext context = trace.seekEvent(index);
-    	TmfEvent event = trace.getNextEvent(context);
-    	TmfTimestamp timestamp = (event != null) ? event.getTimestamp() : null;
-    	return timestamp;
+    	TmfExperimentContext context = seekEvent(index);
+    	TmfEvent event = parseEvent(context);
+    	return (event != null) ? event.getTimestamp() : null;
     }
 
     // ------------------------------------------------------------------------
@@ -276,7 +271,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 	// NOTE: This is a fine example of pathological coupling...
 	public TmfExperimentContext seekLocation(ITmfLocation<?> location) {
 		if (location instanceof TmfExperimentLocation || location == null) {
-			ITmfLocation<?>[] oldloc = (location != null) ? ((TmfExperimentLocation) location).getLocation() : new TmfExperimentLocation[fTraces.length];
+			ITmfLocation<?>[] prvloc = (location != null) ? ((TmfExperimentLocation) location).getLocation() : new TmfExperimentLocation[fTraces.length];
 			ITmfLocation<?>[] newloc = new ITmfLocation[fTraces.length];
 			TmfContext[] contexts = new TmfContext[fTraces.length];
 
@@ -285,7 +280,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
 			long rank = 0;
 			for (int i = 0; i < fTraces.length; i++) {
-				contexts[i] = fTraces[i].seekLocation(oldloc[i]);
+				contexts[i] = fTraces[i].seekLocation(prvloc[i]);
 				newloc[i]   = contexts[i].getLocation();	// No clone here
 				events[i]   = fTraces[i].parseEvent(contexts[i]);
 				rank += contexts[i].getRank();
@@ -327,20 +322,17 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         	}
         }
 
-        TmfExperimentContext nextEventContext = seekLocation(location);
-        nextEventContext.setRank(index * fIndexPageSize);
-        TmfExperimentContext currentEventContext = new TmfExperimentContext(nextEventContext);
+        TmfExperimentContext context = seekLocation(location);
+        context.setRank(index * fIndexPageSize);
 
         // And get the event
-        TmfEvent event = getNextEvent(nextEventContext);
+        TmfEvent event = parseEvent(context);
         while (event != null && event.getTimestamp().compareTo(timestamp, false) < 0) {
-            currentEventContext = new TmfExperimentContext(nextEventContext);
-//        	currentEventContext.setLocation(nextEventContext.getLocation());
-//        	currentEventContext.updateRank(1);
-        	event = getNextEvent(nextEventContext);
+        	getNextEvent(context);
+        	event = parseEvent(context);
         }
 
-        return currentEventContext;
+        return context;
 	}
 
 	public TmfExperimentContext seekEvent(long rank) {
@@ -380,34 +372,56 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 	public synchronized TmfEvent getNextEvent(TmfContext context) {
 		if (context instanceof TmfExperimentContext) {
 			TmfExperimentContext expContext = (TmfExperimentContext) context;
-			int trace = 0;
+			int trace = -1;
 			TmfTimestamp timestamp = TmfTimestamp.BigCrunch;
-			if (expContext.getEvents()[trace] != null) {
-				timestamp = expContext.getEvents()[trace].getTimestamp();
-			}
-			for (int i = 1; i < expContext.getTraces().length; i++) {
-				if (expContext.getEvents()[i].getTimestamp() != null) {
-					TmfTimestamp otherTS = expContext.getEvents()[i].getTimestamp();
-					if (otherTS.compareTo(timestamp, true) < 0) {
-						trace = i;
-						timestamp = otherTS;
+			for (int i = 0; i < expContext.getTraces().length; i++) {
+				if (expContext.getEvents()[i] != null) {
+					if (expContext.getEvents()[i].getTimestamp() != null) {
+						TmfTimestamp otherTS = expContext.getEvents()[i].getTimestamp();
+						if (otherTS.compareTo(timestamp, true) < 0) {
+							trace = i;
+							timestamp = otherTS;
+						}
 					}
 				}
 			}
-			TmfContext trcloc = expContext.getContexts()[trace];
-			TmfEvent event = expContext.getTraces()[trace].parseEvent(trcloc);
-			TmfExperimentLocation exploc = (TmfExperimentLocation) expContext.getLocation();
-			exploc.getLocation()[trace] = trcloc.getLocation().clone();
-			expContext.updateRank(1);
-			expContext.getEvents()[trace] = expContext.getTraces()[trace].getNextEvent(trcloc);
-			return event;
+
+			if (trace >= 0) {
+				TmfContext trcloc = expContext.getContexts()[trace];
+				TmfEvent event = expContext.getTraces()[trace].getNextEvent(trcloc);
+				TmfExperimentLocation exploc = (TmfExperimentLocation) expContext.getLocation();
+				exploc.getLocation()[trace] = trcloc.getLocation().clone();
+				expContext.getEvents()[trace] = expContext.getTraces()[trace].parseEvent(trcloc);
+				expContext.updateRank(1);
+				return event;
+			}
 		}
     	return null;
 	}
 
 	public TmfEvent parseEvent(TmfContext context) {
-		// TODO Auto-generated method stub
-		return null;
+		if (context instanceof TmfExperimentContext) {
+			TmfExperimentContext expContext = (TmfExperimentContext) context;
+			int trace = -1;
+			TmfTimestamp timestamp = TmfTimestamp.BigCrunch;
+			for (int i = 0; i < expContext.getTraces().length; i++) {
+				if (expContext.getEvents()[i] != null) {
+					if (expContext.getEvents()[i].getTimestamp() != null) {
+						TmfTimestamp otherTS = expContext.getEvents()[i].getTimestamp();
+						if (otherTS.compareTo(timestamp, true) < 0) {
+							trace = i;
+							timestamp = otherTS;
+						}
+					}
+				}
+			}
+			if (trace >= 0) {
+				TmfContext trcloc = expContext.getContexts()[trace];
+				expContext.getEvents()[trace] = expContext.getTraces()[trace].parseEvent(trcloc);
+				return expContext.getEvents()[trace];
+			}
+		}
+    	return null;
 	}
 
 	/* (non-Javadoc)
@@ -507,7 +521,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
             	TmfExperimentLocation location = (TmfExperimentLocation) context.getLocation();
 
                 // Get the first event
-               	TmfEvent event = getNextEvent(context);
+               	TmfEvent event = parseEvent(context);
                	if (event != null) {
                     startTime = new TmfTimestamp(event.getTimestamp());
                	}
@@ -535,7 +549,8 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
                         location = (TmfExperimentLocation) context.getLocation();
            			}
 
-           			event = getNextEvent(context);
+           			getNextEvent(context);
+           			event = parseEvent(context);
                 }
 
             }
@@ -559,27 +574,27 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     	broadcast(new TmfRangeSynchSignal(this, range, null));
 	}
    
-	// ========================================================================
-	// Toubleshooting code
-	// ========================================================================
-
+//	// ========================================================================
+//	// Toubleshooting code
+//	// ========================================================================
+//
 //	private void dumpCheckpoints() {
 //		System.out.println("-----");
 //		System.out.println("Checkpoints of " + fExperimentId);
 //		for (int i = 0; i < fCheckpoints.size(); i++) {
 //        	System.out.println("Entry:" + i);
 //        	TmfCheckpoint checkpoint = fCheckpoints.get(i);
-//        	long rank = 0; 
+////        	long rank = 0; 
 //        	for (int j = 0; j < fTraces.length; j++) {
 //        		ITmfTrace trace = fTraces[j];
 //            	TmfExperimentContext context = seekLocation(checkpoint.getLocation());
 //            	TmfContext[] traces = context.getContexts();
-//        		rank += context.getRank(); 
+////        		rank += context.getRank(); 
 //            	TmfEvent event = fTraces[j].getNextEvent(new TmfContext(traces[j]));
 //            	System.out.println("  ["  + trace.getName() + "] rank: " + context.getRank() + ", timestamp: " + event.getTimestamp());
 //            	assert (checkpoint.getTimestamp().compareTo(event.getTimestamp(), false) == 0);
 //        	}
-//        	System.out.println("Sum of ranks: " + rank + " (expected: " + i * fIndexPageSize + ")");
+////        	System.out.println("Sum of ranks: " + rank + " (expected: " + i * fIndexPageSize + ")");
 //        }
 //	}
 

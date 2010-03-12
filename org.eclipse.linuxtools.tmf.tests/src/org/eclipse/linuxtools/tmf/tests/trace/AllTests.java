@@ -12,6 +12,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(TmfTraceTest.class);
 		suite.addTestSuite(TmfExperimentTest.class);
+		suite.addTestSuite(TmfMultiTraceExperimentTest.class);
 		//$JUnit-END$
 		return suite;
 	}

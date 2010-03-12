@@ -35,7 +35,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
 public class TmfEventProviderStub extends TmfEventProvider<TmfEvent> {
 
     private static final String DIRECTORY   = "testfiles";
-    private static final String TEST_STREAM = "M-Test-10K";
+    private static final String TEST_STREAM = "A-Test-10K";
 
     private TmfTraceStub fTrace;
 

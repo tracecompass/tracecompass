@@ -37,13 +37,14 @@ import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
  * <p>
  * TODO: Implement me. Please.
  */
-public class TmfExperimentTest extends TestCase {
+public class TmfMultiTraceExperimentTest extends TestCase {
 
-    private static final String DIRECTORY   = "testfiles";
-    private static final String TEST_STREAM = "A-Test-10K";
-    private static final String EXPERIMENT  = "MyExperiment";
-    private static int          NB_EVENTS   = 10000;
-    private static int    fDefaultBlockSize = 1000;
+    private static final String DIRECTORY    = "testfiles";
+    private static final String TEST_STREAM1 = "O-Test-10K";
+    private static final String TEST_STREAM2 = "E-Test-10K";
+    private static final String EXPERIMENT   = "MyExperiment";
+    private static int          NB_EVENTS    = 20000;
+    private static int    fDefaultBlockSize  = 1000;
 
     private static ITmfTrace[] fTrace;
     private static TmfExperiment<TmfEvent> fExperiment;
@@ -54,14 +55,18 @@ public class TmfExperimentTest extends TestCase {
     // Housekeeping
     // ------------------------------------------------------------------------
 
-    private ITmfTrace[] setupTrace(String path) {
+    private ITmfTrace[] setupTrace(String path1, String path2) {
     	if (fTrace == null) {
-    		fTrace = new ITmfTrace[1];
+    		fTrace = new ITmfTrace[2];
     		try {
-    	        URL location = FileLocator.find(TmfCoreTestPlugin.getPlugin().getBundle(), new Path(path), null);
+    	        URL location = FileLocator.find(TmfCoreTestPlugin.getPlugin().getBundle(), new Path(path1), null);
     			File test = new File(FileLocator.toFileURL(location).toURI());
-    			TmfTraceStub trace = new TmfTraceStub(test.getPath(), true);
-    			fTrace[0] = trace;
+    			TmfTraceStub trace1 = new TmfTraceStub(test.getPath(), true);
+    			fTrace[0] = trace1;
+    	        location = FileLocator.find(TmfCoreTestPlugin.getPlugin().getBundle(), new Path(path2), null);
+    			test = new File(FileLocator.toFileURL(location).toURI());
+    			TmfTraceStub trace2 = new TmfTraceStub(test.getPath(), true);
+    			fTrace[1] = trace2;
     		} catch (URISyntaxException e) {
     			e.printStackTrace();
     		} catch (IOException e) {
@@ -78,14 +83,14 @@ public class TmfExperimentTest extends TestCase {
     	}
     }
 
-	public TmfExperimentTest(String name) throws Exception {
+	public TmfMultiTraceExperimentTest(String name) throws Exception {
 		super(name);
 	}
 
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		setupTrace(DIRECTORY + File.separator + TEST_STREAM);
+		setupTrace(DIRECTORY + File.separator + TEST_STREAM1, DIRECTORY + File.separator + TEST_STREAM2);
 		setupExperiment();
 	}
 

@@ -40,7 +40,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
 public class TmfTraceTest extends TestCase {
 
     private static final String DIRECTORY   = "testfiles";
-    private static final String TEST_STREAM = "M-Test-10K";
+    private static final String TEST_STREAM = "A-Test-10K";
     private static final int    NB_EVENTS   = 10000;
     private static TmfTraceStub fTrace      = null;
 
