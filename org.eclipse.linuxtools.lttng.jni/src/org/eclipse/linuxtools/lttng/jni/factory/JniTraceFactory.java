@@ -32,11 +32,18 @@ public class JniTraceFactory {
 				return new JniTrace_v2_3(path);
 			}
 			else {
-				throw new JniException("ERROR : Unrecognized/unsupported trace version.");
+				String errMsg = "\nERROR : Unrecognized/unsupported trace version." +
+								"\nLibrary reported a trace version " + traceVersion.toString() + "." + 
+								"\nMake sure you installed the Lttv library that support this version (look for liblttvtraceread-" + traceVersion.toString() + ".so).\n"; 
+				throw new JniException(errMsg);
 			}
 		}
 		catch (JniTraceVersionException e) {
-			throw new JniException("ERROR : Call to JniTraceVersion() failed.");
+			String errMsg = "\nERROR : Call to JniTraceVersion() failed." +
+							"\nThis usually means that the library (liblttvtraceread_loader.so) could not be found." +
+							"\nMake sure the LTTv library is installed and that your LD_LIBRARY_PATH is set correctly (see help for more details)\n.";
+			
+			throw new JniException(errMsg);
 		}
 	}
 	
