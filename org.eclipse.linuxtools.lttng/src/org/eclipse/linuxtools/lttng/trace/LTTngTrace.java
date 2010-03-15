@@ -55,29 +55,35 @@ class LTTngTraceException extends LttngException {
 public class LTTngTrace extends TmfTrace<LttngEvent> {
 	
 	public static boolean printDebug = false;
+	public static boolean uniqueEvent = false;
 	
-    private final static boolean SHOW_LTT_DEBUG_DEFAULT = false;
+    private final static boolean SHOW_LTT_DEBUG_DEFAULT    = false;
 	private final static boolean IS_PARSING_NEEDED_DEFAULT = false;
 	private final static int     CHECKPOINT_PAGE_SIZE      = 1000;
     
     // Reference to our JNI trace
     private JniTrace currentJniTrace = null;
     
-    // *** HACK ***
-    // To save time, we will declare all component of the LttngEvent during the construction of the trace
-    //  Then, while reading the trace, we will just SET the values instead of declaring new object
+    // *** 
+    //   UNHACKED : 	We can no longer do that because TCF need to maintain several events at once.
+    //					This is very slow to do so in LTTng, this has to be temporary.
+    // 		*** HACK ***
+    // 		To save time, we will declare all component of the LttngEvent during the construction of the trace
+    //  	Then, while reading the trace, we will just SET the values instead of declaring new object
+    // ***
     LttngTimestamp                  eventTimestamp   = null;
     LttngEventSource                eventSource      = null;
-    LttngEventType                  eventType        = null;
     LttngEventContent               eventContent     = null;
     LttngEventReference             eventReference   = null;
+    
+    
     // The actual event
     LttngEvent                      currentLttngEvent = null;             
     
     // The current location
     LttngLocation					previousLocation  = null;
     
-    
+    LttngEventType                  eventType        = null;
     // Hashmap of the possible types of events (Tracefile/CPU/Marker in the JNI)
     HashMap<String, LttngEventType> traceTypes       = null;
     // This vector will be used to quickly find a marker name from a position 
@@ -666,33 +672,76 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * @see org.eclipse.linuxtools.lttng.event.LttngEvent
      */
     public LttngEvent convertJniEventToTmf(JniEvent jniEvent, boolean isParsingNeeded) {
-        // *** HACK *** 
-        // To save time here, we only set value instead of allocating new object
-        // This give an HUGE performance improvement
-        // all allocation done in the LttngTrace constructor
+    	
+    	if ( uniqueEvent == true ) {
+	    	
+	        // *** 
+	        //   UNHACKED : 	We can no longer do that because TCF need to maintain several events at once.
+	        //					This is very slow to do so in LTTng, this has to be temporary.
+	        // 		*** HACK *** 
+	        // 		To save time here, we only set value instead of allocating new object
+	        // 		This give an HUGE performance improvement
+	        // 		all allocation done in the LttngTrace constructor
+	        // ***
+	        eventTimestamp.setValue(jniEvent.getEventTime().getTime());
+	        eventSource.setSourceId(jniEvent.requestEventSource());
+	        
+	        eventType = traceTypes.get( EventTypeKey.getEventTypeKey(jniEvent) );
+	        
+	        eventReference.setValue(jniEvent.getParentTracefile().getTracefilePath());
+	        eventReference.setTracepath(this.getName());
+	        
+	        eventContent.emptyContent();
+	        
+	        currentLttngEvent.setType(eventType);
+	        // Save the jni reference
+	        currentLttngEvent.updateJniEventReference(jniEvent);
+	        
+	        // Parse now if was asked
+	        // Warning : THIS IS SLOW
+	        if (isParsingNeeded == true ) {
+	           eventContent.getFields();
+	        }
+	    	
+	    	return currentLttngEvent;
+    	}
+    	else {
+    		return convertJniEventToTmfMultipleEventEvilFix(jniEvent);
+    	}
+    	
+    }
+    
+    /**
+     * This method is a temporary fix to support multiple events at once in TMF
+     *		This is expected to be slow and should be fixed in another way.
+     * See comment in convertJniEventToTmf();
+     * 
+     * @param jniEvent	The current JNI Event
+     * @return Current 	Lttng Event fully parsed
+     */
+    private LttngEvent convertJniEventToTmfMultipleEventEvilFix(JniEvent jniEvent) {
+    	// *** HACK ***
+    	// Below : the "fix" with all the new and the full-parse
+    	// 		Allocating new memory is slow.
+    	//		Parsing every events is very slow.
+    	eventTimestamp        = new LttngTimestamp(jniEvent.getEventTime().getTime());
+        eventSource           = new LttngEventSource(jniEvent.requestEventSource());
+        eventReference        = new LttngEventReference(jniEvent.getParentTracefile().getTracefilePath(), this.getName());
+        eventType             = new LttngEventType(traceTypes.get( EventTypeKey.getEventTypeKey(jniEvent) ));
+        eventContent          = new LttngEventContent(currentLttngEvent);
+        currentLttngEvent = new LttngEvent(eventTimestamp, eventSource, eventType, eventContent, eventReference, null);
         
-        eventTimestamp.setValue(jniEvent.getEventTime().getTime());
-        eventSource.setSourceId(jniEvent.requestEventSource());
-        
-        eventType = traceTypes.get( EventTypeKey.getEventTypeKey(jniEvent) );
-        
-        eventReference.setValue(jniEvent.getParentTracefile().getTracefilePath());
-        eventReference.setTracepath(this.getName());
-        
-        eventContent.emptyContent();
-        
-        currentLttngEvent.setType(eventType);
-        // Save the jni reference
+        // The jni reference is no longer reliable but we will keep it anyhow
         currentLttngEvent.updateJniEventReference(jniEvent);
-        
-        // Parse now if was asked
-        // Warning : THIS IS SLOW
-        if (isParsingNeeded == true ) {
-            eventContent.getFields();
-        }
-        
+        // Ensure that the content is correctly set
+        eventContent.setEvent(currentLttngEvent);
+        // FORCE the full parse of every event :
+        eventContent.getFields();
+    	
         return currentLttngEvent;
     }
+    
+    
     
     /**
      * Reference to the current LttngTrace we are reading from.<p>
