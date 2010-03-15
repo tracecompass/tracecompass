@@ -42,11 +42,6 @@ public class JniTraceVersion {
 			// If LD_LIBRARY_PATH is not set correctly this will raise a java.lang.UnsatisfiedLinkError
 			System.loadLibrary("lttvtraceread_loader");
 			
-			// The user's LD_LIBRARY_PATH environnement variable doesn't seem to be get passed to the C
-			// We will force C to load it here
-			String ldLibraryPath = "LD_LIBRARY_PATH:" + System.getenv("LD_LIBRARY_PATH");
-			ltt_setLibraryPath(ldLibraryPath);
-			
 			// Assuming the C library loaded correctly, call the JNI here.
 			ltt_getTraceVersion(tracepath);
 		}
