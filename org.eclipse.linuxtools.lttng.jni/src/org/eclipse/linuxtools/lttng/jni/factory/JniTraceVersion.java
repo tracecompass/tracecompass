@@ -128,7 +128,7 @@ public class JniTraceVersion {
 		// The library was unable to load -> Lttv not installed or bad version of it? 
 		catch (java.lang.UnsatisfiedLinkError e) {
 			throw new JniTraceVersionException("\nERROR : Could not get trace version. Is the library missing?" +
-											   "\nMake sure you setted either \"java.library.path\" or \"LD_LIBRARY_PATH\" (readVersionNumber)\n");
+											   "\nMake sure your \"LD_LIBRARY_PATH\" is setted correctly (readVersionNumber)\n");
 		}
 		// Something else failed -> Possibly a bad tracepath was given 
 		catch (Exception e) {
