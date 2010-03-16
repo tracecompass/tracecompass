@@ -64,7 +64,7 @@ public class LTTngTraceVersion {
 			traceVersion.readVersionFromTrace(newTracepath);
 		}
 		catch (JniTraceVersionException e) {
-			throw new LttngException("Could not get trace version!\nReturned error was : " + e.toString() + " (fillJniTraceVersion)");
+			throw new LttngException( e.toString() );
 		}
 	}
 	
