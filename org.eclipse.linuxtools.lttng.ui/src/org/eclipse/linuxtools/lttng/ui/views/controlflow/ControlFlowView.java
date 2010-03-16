@@ -663,7 +663,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	}
 
 	private void makeActions() {
-		// action4
+		// resetScale
 		resetScale = new Action() {
 			@Override
 			public void run() {
@@ -681,7 +681,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 						.getString("ControlFlowView.tmf.UI"),
 						"icons/home_nav.gif"));
 
-		// action5
+		// nextEvent
 		nextEvent = new Action() {
 			@Override
 			public void run() {
@@ -699,7 +699,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 						.getString("ControlFlowView.tmf.UI"),
 						"icons/next_event.gif"));
 
-		// action6
+		// prevEvent
 		prevEvent = new Action() {
 		@Override
 		public void run() {
@@ -717,7 +717,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 						.getString("ControlFlowView.tmf.UI"),
 						"icons/prev_event.gif"));
 
-		// action7
+		// nextTrace
 		nextTrace = new Action() {
 			@Override
 			public void run() {
@@ -735,7 +735,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 						.getString("ControlFlowView.tmf.UI"),
 						"icons/next_item.gif"));
 
-		// action8
+		// prevTrace
 		prevTrace = new Action() {
 			@Override
 			public void run() {
@@ -753,7 +753,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 						.getString("ControlFlowView.tmf.UI"),
 						"icons/prev_item.gif"));
 
-		// action9
+		// showLegend
 		showLegend = new Action() {
 			@Override
 			public void run() {
@@ -766,7 +766,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		showLegend.setToolTipText(Messages
 				.getString("ControlFlowView.Action.Legend.ToolTip")); //$NON-NLS-1$
 
-		// action10
+		// filterTraces
 		filterTraces = new Action() {
 			@Override
 			public void run() {
@@ -784,7 +784,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 						.getString("ControlFlowView.tmf.UI"),
 						"icons/filter_items.gif"));
 
-		// action10
+		// zoomIn
 		zoomIn = new Action() {
 			@Override
 			public void run() {
@@ -800,7 +800,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 				Messages.getString("ControlFlowView.tmf.UI"),
 				"icons/zoomin_nav.gif"));
 
-		// action10
+		// zoomOut
 		zoomOut = new Action() {
 			@Override
 			public void run() {
@@ -815,8 +815,8 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		zoomOut.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
 				Messages.getString("ControlFlowView.tmf.UI"),
 				"icons/zoomout_nav.gif"));
-
-		// action11
+		
+		// synch
 		synch = new Action() {
 			@Override
 			public void run() {
