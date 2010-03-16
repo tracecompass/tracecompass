@@ -221,7 +221,6 @@ public class JniTraceVersion {
 	/*
 	 * This function is be called from the C side to assign the version number the Java variable.
 	 */
-    @SuppressWarnings("unused")
 	private void setTraceVersionFromC(int newMajor, int newMinor) {
 		majorNumber = newMajor;
 		minorNumber = newMinor;

@@ -591,26 +591,26 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 	// Toubleshooting code
 	// ========================================================================
 
-	private void dumpCheckpoints() {
-		System.out.println("-----");
-		System.out.println("Checkpoints of " + fExperimentId);
-		for (int i = 0; i < fCheckpoints.size(); i++) {
-        	System.out.println("Entry:" + i);
-        	TmfCheckpoint checkpoint = fCheckpoints.get(i);
-//        	long rank = 0; 
-        	for (int j = 0; j < fTraces.length; j++) {
-        		ITmfTrace trace = fTraces[j];
-            	TmfExperimentContext context = seekLocation(checkpoint.getLocation());
-            	TmfContext[] traces = context.getContexts();
-//        		rank += context.getRank(); 
-            	TmfEvent event = fTraces[j].getNextEvent(new TmfContext(traces[j]));
-//            	System.out.println("  ["  + trace.getName() + "] rank: " + context.getRank() + ", timestamp: " + event.getTimestamp());
-            	System.out.println("  ["  + trace.getName() + "] timestamp: " + event.getTimestamp());
-            	assert (checkpoint.getTimestamp().compareTo(event.getTimestamp(), false) == 0);
-        	}
-//        	System.out.println("Sum of ranks: " + rank + " (expected: " + i * fIndexPageSize + ")");
-        }
-	}
+//	private void dumpCheckpoints() {
+//		System.out.println("-----");
+//		System.out.println("Checkpoints of " + fExperimentId);
+//		for (int i = 0; i < fCheckpoints.size(); i++) {
+//        	System.out.println("Entry:" + i);
+//        	TmfCheckpoint checkpoint = fCheckpoints.get(i);
+////        	long rank = 0; 
+//        	for (int j = 0; j < fTraces.length; j++) {
+//        		ITmfTrace trace = fTraces[j];
+//            	TmfExperimentContext context = seekLocation(checkpoint.getLocation());
+//            	TmfContext[] traces = context.getContexts();
+////        		rank += context.getRank(); 
+//            	TmfEvent event = fTraces[j].getNextEvent(new TmfContext(traces[j]));
+////            	System.out.println("  ["  + trace.getName() + "] rank: " + context.getRank() + ", timestamp: " + event.getTimestamp());
+//            	System.out.println("  ["  + trace.getName() + "] timestamp: " + event.getTimestamp());
+//            	assert (checkpoint.getTimestamp().compareTo(event.getTimestamp(), false) == 0);
+//        	}
+////        	System.out.println("Sum of ranks: " + rank + " (expected: " + i * fIndexPageSize + ")");
+//        }
+//	}
 
     // ------------------------------------------------------------------------
     // Signal handlers
