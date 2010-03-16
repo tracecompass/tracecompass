@@ -11,7 +11,6 @@ package org.eclipse.linuxtools.lttng.jni.common;
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
-
 /**
  * <b><u>Jni_C_Common</u></b>
  * <p>
@@ -29,6 +28,12 @@ public abstract class Jni_C_Constant {
     
     // Timestamps are in nanoseconds, this const ease up the math
     public static final long NANO = 1000000000;
+    
+    /**
+     * Default constructor
+     */
+    public Jni_C_Constant() {
+    }
     
     /**
      * "Alternate" .toString()<p>

@@ -159,12 +159,13 @@ public abstract class JniTracefile extends Jni_C_Common {
     /**
      * Constructor, using C pointer.<p>
      * 
-     * @param newPtr  The pointer of an already opened LttTracefile C Structure
+     * @param newPtr  			The pointer of an already opened LttTracefile C Structure
+     * @param newParentTrace	The JniTrace parent of this tracefile.
      * 
      * @exception JniException
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTrace
-     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
+     * @see org.eclipse.linuxtools.lttng.jni.JniTrace
+     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer
      */
     public JniTracefile(Jni_C_Pointer newPtr, JniTrace newParentTrace) throws JniException {
         thisTracefilePtr = newPtr;
@@ -185,9 +186,9 @@ public abstract class JniTracefile extends Jni_C_Common {
      * 
      * Note : If the read succeed, the event will be populated.<p>
      *      
-     * @return LTT read status, as defined in Jni_C_Common
+     * @return LTT read status, as defined in Jni_C_Constant
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Common
+     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant
      */
     public int readNextEvent() {
         return currentEvent.readNextEvent();
@@ -200,9 +201,9 @@ public abstract class JniTracefile extends Jni_C_Common {
      * 
      * @param seekTime      The timestamp where to seek.
      * 
-     * @return LTT read status, as defined in Jni_C_Common
+     * @return LTT read status, as defined in Jni_C_Constant
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Common
+     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant
      */
     public int seekToTime(JniTime seekTime) {
         return currentEvent.seekToTime(seekTime);
@@ -384,7 +385,7 @@ public abstract class JniTracefile extends Jni_C_Common {
      *
      * @return The parent trace
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTrace
+     * @see org.eclipse.linuxtools.lttng.jni.JniTrace
      */
     public JniTrace getParentTrace() {
         return parentTrace;
@@ -398,7 +399,7 @@ public abstract class JniTracefile extends Jni_C_Common {
      * 
      * @return The actual (long converted) pointer or NULL.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
+     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer
      */
     public Jni_C_Pointer getTracefilePtr() {
         return thisTracefilePtr;
@@ -465,8 +466,52 @@ public abstract class JniTracefile extends Jni_C_Common {
     }
 	
 	
+	// ****************************
+    // **** ABSTRACT FUNCTIONS ****
+    // You MUST override those in your version specific implementation
+	
+	
+	/**
+     * Function place holder to allocate a new JniEvent.<p>
+     * <br>
+     * JniEvent constructor is non overridable so we need another overridable function to return the correct version of JniEvent.<br>
+     * Effect of this function should be the same (allocate a fresh new JniEvent).<br>
+     * <br>
+     * <b>!! Override this with you version specific implementation.</b><br>
+     * 
+     * @param newEventPtr			The pointer of an already opened LttEvent C Structure
+     * @param newMarkersMap			An already populated HashMap of JniMarker objects for this new event
+     * @param newParentTracefile	The JniTrace parent of this tracefile.
+     * 
+     * @return						The newly allocated JniEvent of the correct version
+     * 
+     * @throws JniException			The construction (allocation) failed.
+     * 
+     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer
+     * @see org.eclipse.linuxtools.lttng.jni.JniMarker
+     * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
+     */
 	public abstract JniEvent allocateNewJniEvent(Jni_C_Pointer newEventPtr, HashMap<Integer, JniMarker> newMarkersMap, JniTracefile newParentTracefile) throws JniException;
-    public abstract JniMarker allocateNewJniMarker(Jni_C_Pointer newMarkerPtr) throws JniException;
+    
+	
+	/**
+     * Function place holder to allocate a new JniMarker.<p>
+     * <br>
+     * JniMarker constructor is non overridable so we need another overridable function to return the correct version of JniMarker.<br>
+     * Effect of this function should be the same (allocate a fresh new JniMarker).<br>
+     * <br>
+     * <b>!! Override this with you version specific implementation.</b><br>
+     * 
+     * @param newMarkerPtr			The pointer of an already opened marker_info C Structure
+     * 
+     * @return						The newly allocated JniMarker of the correct version
+     * 
+     * @throws JniException			The construction (allocation) failed.
+     * 
+     * @see org.eclipse.linuxtools.lttng.jni.JniMarker
+     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer
+     */
+	public abstract JniMarker allocateNewJniMarker(Jni_C_Pointer newMarkerPtr) throws JniException;
 	
 }
-

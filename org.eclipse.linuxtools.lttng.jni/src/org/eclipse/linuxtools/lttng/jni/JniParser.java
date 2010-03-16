@@ -52,7 +52,7 @@ public abstract class JniParser extends Jni_C_Common
      * 
      * @return                  An Object that contain the JniEvent payload parsed by the C, or null, if if was impossible to parse (i.e., wrong position)
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
      */
     static public Object parseField(JniEvent eventToParse, int fieldPosition) {
         
@@ -80,7 +80,7 @@ public abstract class JniParser extends Jni_C_Common
      * 
      * @return                  An Object that contain the JniEvent payload parsed by the C, or null, if if was impossible to parse (i.e., wrong position)
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
      */
     static public Object parseField(JniEvent eventToParse, String fieldName) {
         
@@ -106,7 +106,7 @@ public abstract class JniParser extends Jni_C_Common
      * @param   eventToParse    The jni event we want to parse.  
      * @return                  An HashMap of Object that contain the is the JniEvent's payload parsed by the C
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
      */
     static public HashMap<String, Object> parseAllFields(JniEvent eventToParse) {
         HashMap<String,JniMarkerField> markerFieldData = eventToParse.requestEventMarker().getMarkerFieldsHashMap();
@@ -282,6 +282,7 @@ public abstract class JniParser extends Jni_C_Common
     }
     
 }
+
 
 /**
  * <b><u>ParsedObjectContent</u></b><p>

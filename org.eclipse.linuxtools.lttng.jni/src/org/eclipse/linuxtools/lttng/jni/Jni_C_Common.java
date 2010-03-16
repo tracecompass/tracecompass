@@ -48,4 +48,5 @@ public abstract class Jni_C_Common extends Jni_C_Constant {
     public void printlnC(String msg) {
         printC(msg + "\n");
     }
+    
 }

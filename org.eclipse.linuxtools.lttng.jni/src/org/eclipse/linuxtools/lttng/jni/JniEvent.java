@@ -114,9 +114,9 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      *            
      * @exception JniException
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniMarker
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTracefile
+     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer
+     * @see org.eclipse.linuxtools.lttng.jni.JniMarker
+     * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
      */
     public JniEvent(Jni_C_Pointer newEventPtr, HashMap<Integer, JniMarker> newMarkersMap, JniTracefile newParentTracefile) throws JniException {
 
@@ -153,9 +153,9 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * If the move fails, the event will not get populated and the last event data will still be available.
      * 
-     * @return LTT read status, as defined in Jni_C_Common.
+     * @return LTT read status, as defined in Jni_C_Constant.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Common
+     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant
      */
      public int readNextEvent() {
         // Ask Ltt to read the next event for this particular tracefile
@@ -178,9 +178,9 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * If the seek fails, the event will not get populated and the last event data will still be available.<p>
      * 
-     * @return LTT read status, as defined in Jni_C_Common
+     * @return LTT read status, as defined in Jni_C_Constant
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Common
+     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant
      */
     public int seekToTime(JniTime seekTime) {
         // Ask Ltt to read the next event for this particular tracefile
@@ -201,9 +201,9 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * If the seek fails, we will seek back to the previous position, so the event will stay in a consistent state.<p> 
      * 
-     * @return LTT read status, as defined in Jni_C_Common
+     * @return LTT read status, as defined in Jni_C_Constant
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Common
+     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant
      */
     public int seekOrFallBack(JniTime seekTime) {
         // Save the old time
@@ -231,9 +231,9 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * A status different of EOK probably means there is no event associated to this tracefile.
      * 
-     * @return LTT read status, as defined in Jni_C_Common
+     * @return LTT read status, as defined in Jni_C_Constant
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Common
+     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant
      */
     public int positionToFirstEvent() {
         eventState = ltt_positionToFirstEvent(tracefilePtr.getPointer());
@@ -246,7 +246,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * @return Reference to the marker for this tracefile's event or null if none.
      *  
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniMarker
+     * @see org.eclipse.linuxtools.lttng.jni.JniMarker
      */
     public JniMarker requestEventMarker() {
         return markersMap.get(getEventMarkerId());
@@ -275,7 +275,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * @return  Reference to the JniMarker object for this event or null if none. 
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniMarker
+     * @see org.eclipse.linuxtools.lttng.jni.JniMarker
      */
     public String requestEventSource() {
         // *** TODO ***
@@ -295,7 +295,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * @return Object that contain the parsed payload
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniParser
+     * @see org.eclipse.linuxtools.lttng.jni.JniParser
      */
     public Object parseFieldById(int fieldId) {
         return JniParser.parseField(this, fieldId);
@@ -310,7 +310,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * @return Object that contain the parsed payload
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniParser
+     * @see org.eclipse.linuxtools.lttng.jni.JniParser
      */
     public Object parseFieldByName(String fieldName) {
         return JniParser.parseField(this, fieldName);
@@ -321,7 +321,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * @return HashMap<String, Object> which is the parsedContent objects and their name as key.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniParser 
+     * @see org.eclipse.linuxtools.lttng.jni.JniParser 
      */
     public HashMap<String, Object> parseAllFields() {
         return JniParser.parseAllFields(this);
@@ -364,7 +364,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * @return The actual (long converted) pointer or NULL.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
+     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer
      */
     public Jni_C_Pointer getTracefilePtr() {
         return new Jni_C_Pointer( ltt_getTracefilePtr(thisEventPtr.getPointer()) );
@@ -378,7 +378,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * @return The actual (long converted) pointer or NULL.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
+     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer
      */
     public Jni_C_Pointer getEventPtr() {
         return thisEventPtr;
@@ -393,7 +393,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      *
      * @return  The parent tracefile 
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTracefile
+     * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
      */
     public JniTracefile getParentTracefile() {
         return parentTracefile;
@@ -467,4 +467,5 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
 
         return returnData;
     }
+    
 }

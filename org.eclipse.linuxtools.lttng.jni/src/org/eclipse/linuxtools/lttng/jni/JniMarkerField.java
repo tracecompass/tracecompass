@@ -61,6 +61,8 @@ public abstract class JniMarkerField extends Jni_C_Common
      * @param newMarkerFieldPtr  Pointer to a C marker_field structure
      * 
      * @exception JniException
+     * 
+     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer
      */
     public JniMarkerField(Jni_C_Pointer newMarkerFieldPtr) throws JniException {
         thisMarkerFieldPtr = newMarkerFieldPtr;
@@ -99,7 +101,7 @@ public abstract class JniMarkerField extends Jni_C_Common
      * 
      * @return The actual (long converted) pointer or NULL
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
+     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer
      */
     public Jni_C_Pointer getMarkerFieldPtr() {
         return thisMarkerFieldPtr;
@@ -137,4 +139,5 @@ public abstract class JniMarkerField extends Jni_C_Common
         
         return returnData;
     }
+    
 }

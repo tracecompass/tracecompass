@@ -11,7 +11,6 @@ package org.eclipse.linuxtools.lttng.jni;
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.PriorityQueue;
@@ -46,7 +45,7 @@ public abstract class JniTrace extends Jni_C_Common {
     // Note that all type have been scaled up as there is no "unsigned" in java
     // This might be a problem about "unsigned long" as there is no equivalent
     // in java
-
+    
     private String tracepath = ""; // Path of the trace. Should be a directory (like : /tmp/traceX)
     private int    cpuNumber = 0;
     private long   archType = 0;
@@ -190,7 +189,7 @@ public abstract class JniTrace extends Jni_C_Common {
      *            
      * @exception JniException
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
+     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer
      */
     public JniTrace(Jni_C_Pointer newPtr, boolean newPrintDebug) throws JniException {
         thisTracePtr = newPtr;
@@ -425,7 +424,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * @return The top event in the stack or null if no event is available.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
      */
     public JniEvent findNextEvent() {
         return eventsHeap.peek();
@@ -436,7 +435,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * @return The next event in the trace or null if no event is available.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
      */
     public JniEvent readNextEvent() {
         // Get the "next" event on the top of the heap but DO NOT remove it
@@ -485,8 +484,8 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * @return The next event in the tracefile or null if no event is available.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTracefile
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
+     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
      */
     public JniEvent readNextEvent(JniTracefile targetTracefile) {
         JniEvent returnedEvent = null;
@@ -527,7 +526,7 @@ public abstract class JniTrace extends Jni_C_Common {
     * 
     * @param seekTime     The time where we want to seek to
     * 
-    * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.JniTime
+    * @see org.eclipse.linuxtools.lttng.jni.common.JniTime
     */
     public void seekToTime(JniTime seekTime) {
         
@@ -554,8 +553,8 @@ public abstract class JniTrace extends Jni_C_Common {
     * @param targetTracefile 	The tracefile object to read from
     * @param seekTime     		The time where we want to seek to
     * 
-    * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTracefile
-    * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.JniTime
+    * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
+    * @see org.eclipse.linuxtools.lttng.jni.common.JniTime
     */
     public void seekToTime(JniTime seekTime, JniTracefile targetTracefile) {
         // Invalidate the current read event
@@ -582,8 +581,8 @@ public abstract class JniTrace extends Jni_C_Common {
     * 
     * @return The event just after the seeked time or null if none available.
     * 
-    * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniEvent
-    * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.JniTime
+    * @see org.eclipse.linuxtools.lttng.jni.JniEvent
+    * @see org.eclipse.linuxtools.lttng.jni.common.JniTime
     */
     public JniEvent seekAndRead(JniTime seekTime) { 
          JniEvent returnedEvent = null;
@@ -602,14 +601,14 @@ public abstract class JniTrace extends Jni_C_Common {
     * 
     * Calling  readNextEvent() after this function will consider this tracefile moved and is then consistent.<br>
     * 
-    * @param tracefileName   The tracefile object to read from
+    * @param targetTracefile    The tracefile object to read from
     * @param seekTime           The time where we want to seek to
     * 
     * @return The event just after the seeked time or null if none available.
     * 
-    * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTracefile
-    * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.JniTime
-    * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniEvent
+    * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
+    * @see org.eclipse.linuxtools.lttng.jni.common.JniTime
+    * @see org.eclipse.linuxtools.lttng.jni.JniEvent
     */
     public JniEvent seekAndRead(JniTime seekTime, JniTracefile targetTracefile) { 
         seekToTime(seekTime, targetTracefile);
@@ -623,7 +622,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * @return The tracefile found or null if none.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTracefile
+     * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
      */
     public JniTracefile requestTracefileByName(String tracefileName) {
         return tracefilesMap.get(tracefileName);
@@ -636,7 +635,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * @return Event of the tracefile or null if none found.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniEvent
+     * @see org.eclipse.linuxtools.lttng.jni.JniEvent
      */
     public JniEvent requestEventByName(String tracefileName) {
         JniEvent returnValue = null;
@@ -724,7 +723,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * @return Time of the last event read
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.JniTime
+     * @see org.eclipse.linuxtools.lttng.jni.common.JniTime
      */
     public JniTime getCurrentEventTimestamp() {
         JniTime returnedTime = null;
@@ -748,7 +747,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * @return The actual (long converted) pointer or NULL.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.eclipse.linuxtools.lttng.jni.Jni_C_Pointer
+     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer
      */
     public Jni_C_Pointer getTracePtr() {
         return thisTracePtr;
@@ -772,7 +771,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * This function will call Ltt to print, so information printed will be the
      * one from the C structure, not the one populated in java.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.eclipse.linuxtools.lttng.jni.JniTracefile
+     * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
      */
     public void printAllTracefilesInformation() {
         JniTracefile tracefile = null;
@@ -839,8 +838,43 @@ public abstract class JniTrace extends Jni_C_Common {
         return returnData;
     }
     
+    
+    // ****************************
+    // **** ABSTRACT FUNCTIONS ****
+    // You MUST override those in your version specific implementation
+    
+    /**
+     * Function place holder to load the correct C library.<p>
+     * <br>
+     * Can be as simple as calling ltt_initializeHandle(LIBRARY_NAME) with the correct .so instead of LIBRARY_NAME.<br>
+     * You may also want to perform some check or some additionnal validations.<br>
+     * <br>
+     * <b>!! Override this with you version specific implementation.</b><br>
+     * 
+     * @return boolean saying if the initialization was successful. 
+     */
     public abstract boolean initializeLibrary();
     
+    
+    /**
+     * Function place holder to allocate a new JniTracefile.<p>
+     * 
+     * JniTracefile constructor is non overridable so we need another overridable function to return the correct version of JniTracefile.<br>
+     * Effect of this function should be the same (allocate a fresh new JniTracefile)<br>
+     * <br>
+     * <b>!! Override this with you version specific implementation.</b><br>
+     * 
+     * @param newPtr			The pointer of an already opened LttTracefile C Structure
+     * @param newParentTrace	The JniTrace parent of this tracefile.
+     * 
+     * @return					The newly allocated JniTracefile of the correct version
+     * 
+     * @throws JniException		The construction (allocation) failed.
+     * 
+     * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
+     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer
+     * @see org.eclipse.linuxtools.lttng.jni.JniTrace
+     */
     public abstract JniTracefile allocateNewJniTracefile(Jni_C_Pointer newPtr, JniTrace newParentTrace) throws JniException;
     
 }
