@@ -11,4 +11,4 @@ Export-Package: org.eclipse.linuxtools.lttng.jni,
  org.eclipse.linuxtools.lttng.jni_v2_3,
  org.eclipse.linuxtools.lttng.jni_v2_5
 Bundle-Localization: plugin
-Bundle-Vendor: %Bundle-Version
+Bundle-Vendor: %Bundle-Vendor
