@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: JNI implementation for LTTng
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.linuxtools.lttng.jni
 Bundle-Version: 0.2.0.qualifier
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
@@ -10,3 +10,5 @@ Export-Package: org.eclipse.linuxtools.lttng.jni,
  org.eclipse.linuxtools.lttng.jni.factory,
  org.eclipse.linuxtools.lttng.jni_v2_3,
  org.eclipse.linuxtools.lttng.jni_v2_5
+Bundle-Localization: plugin
+Bundle-Vendor: %Bundle-Version
