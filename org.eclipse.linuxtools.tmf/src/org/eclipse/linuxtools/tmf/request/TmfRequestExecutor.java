@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.request;
 
 import java.util.Queue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -24,11 +25,11 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class TmfRequestExecutor implements Executor {
 
-	private final Executor fExecutor;
+	private final ExecutorService fExecutor;
 	private final Queue<Runnable> fRequests = new LinkedBlockingQueue<Runnable>();
 	private Runnable fRequest;
 	
-	public TmfRequestExecutor(Executor executor) {
+	public TmfRequestExecutor(ExecutorService executor) {
 		fExecutor = executor;
 	}
 
@@ -36,6 +37,14 @@ public class TmfRequestExecutor implements Executor {
 		this(Executors.newSingleThreadExecutor());
 	}
 
+	public void start() {
+		// Nothing to do
+	}
+
+	public void stop() {
+		fExecutor.shutdown();
+	}
+	
 	public void execute(final Runnable request) {
 		fRequests.offer(new Runnable() {
 			public void run() {

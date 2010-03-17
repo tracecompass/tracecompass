@@ -164,7 +164,7 @@ public class TmfEventsView extends TmfView {
 					@Override
 					public void handleData() {
 						TmfEvent[] tmpEvent = getData();
-						if ( (tmpEvent != null) && (tmpEvent.length > 0) ) {
+						if ((tmpEvent != null) && (tmpEvent.length > 0)) {
 							cache = tmpEvent;
 							cacheStartIndex = index;
 							cacheEndIndex = index + tmpEvent.length;

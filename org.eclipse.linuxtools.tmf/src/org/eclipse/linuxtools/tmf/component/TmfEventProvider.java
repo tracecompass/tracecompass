@@ -52,6 +52,9 @@ public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvid
 			coalescedRequest.addRequest(eventRequest);
 			fPendingCoalescedRequests.add(coalescedRequest);
 		}
+		else {
+			super.newCoalescedDataRequest(request);
+		}
 	}
 
 }

@@ -26,10 +26,10 @@ import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
-import org.eclipse.linuxtools.tmf.experiment.TmfExperimentContext;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
 
 /**
@@ -103,7 +103,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     // Constructor
     // ------------------------------------------------------------------------
 
-	public void testBasicTmfExperiment() {
+	public void testBasicTmfExperimentConstructor() {
 		assertEquals("GetId", EXPERIMENT, fExperiment.getName());
         assertEquals("GetEpoch", TmfTimestamp.Zero, fExperiment.getEpoch());
         assertEquals("GetNbEvents", NB_EVENTS, fExperiment.getNbEvents());
@@ -114,85 +114,380 @@ public class TmfMultiTraceExperimentTest extends TestCase {
 	}
 
     // ------------------------------------------------------------------------
-    // seek
+    // parseEvent - make sure parseEvent doesn't update the context
     // ------------------------------------------------------------------------
 
-    public void testSeekOnCacheBoundary() throws Exception {
-    	TmfExperimentContext context = fExperiment.seekLocation(null);
+    public void testParseEvent() throws Exception {
 
-    	context = fExperiment.seekEvent(new TmfTimestamp(1, SCALE, 0));
-    	TmfEvent event = fExperiment.getNextEvent(context);
+    	// On lower bound, returns the first event (ts = 0)
+    	TmfContext context = fExperiment.seekEvent(new TmfTimestamp(0, SCALE, 0));
+
+    	TmfEvent event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+
+        event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+
+        event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+
+        for (int i = 1; i < 20; i++) {
+            event = fExperiment.getNextEvent(context);
+            assertEquals("Event timestamp", i, event.getTimestamp().getValue());
+        }
+
+        event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 20, event.getTimestamp().getValue());
+
+        event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 20, event.getTimestamp().getValue());
+    }
+
+    // ------------------------------------------------------------------------
+    // getNextEvent - updates the context
+    // ------------------------------------------------------------------------
+
+    public void testGetNextEvent() throws Exception {
+
+    	// On lower bound, returns the first event (ts = 0)
+    	TmfContext context = fExperiment.seekEvent(new TmfTimestamp(0, SCALE, 0));
+        TmfEvent event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+
+        for (int i = 2; i < 20; i++) {
+            event = fExperiment.getNextEvent(context);
+            assertEquals("Event timestamp", i, event.getTimestamp().getValue());
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // seekLocation
+    // Note: seekLocation() does not reliably set the rank
+    // ------------------------------------------------------------------------
+
+    public void testSeekLocationOnCacheBoundary() throws Exception {
+
+    	// Position trace at event rank 0
+    	TmfContext context = fExperiment.seekLocation(null);
+//        assertEquals("Event rank", 0, context.getRank());
+    	TmfEvent event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+//        assertEquals("Event rank", 0, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+//        assertEquals("Event rank", 1, context.getRank());
+
+    	// Position trace at event rank 1000
+        TmfContext tmpContext = fExperiment.seekEvent(new TmfTimestamp(1001, SCALE, 0));
+        context = fExperiment.seekLocation(tmpContext.getLocation().clone());
+//        assertEquals("Event rank", 1000, context.getRank());
+    	event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 1001, event.getTimestamp().getValue());
+//        assertEquals("Event rank", 1000, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1001, event.getTimestamp().getValue());
+//        assertEquals("Event rank", 1001, context.getRank());
+
+    	// Position trace at event rank 4000
+        tmpContext = fExperiment.seekEvent(new TmfTimestamp(4001, SCALE, 0));
+        context = fExperiment.seekLocation(tmpContext.getLocation().clone());
+//        assertEquals("Event rank", 4000, context.getRank());
+    	event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 4001, event.getTimestamp().getValue());
+//        assertEquals("Event rank", 4000, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 4001, event.getTimestamp().getValue());
+//        assertEquals("Event rank", 4001, context.getRank());
+    }
+
+    public void testSeekLocationNotOnCacheBoundary() throws Exception {
+
+    	// Position trace at event rank 9
+    	TmfContext tmpContext = fExperiment.seekEvent(new TmfTimestamp(10, SCALE, 0));
+        TmfContext context = fExperiment.seekLocation(tmpContext.getLocation().clone());
+//        assertEquals("Event rank", 9, context.getRank());
+    	TmfEvent event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 10, event.getTimestamp().getValue());
+//        assertEquals("Event rank", 9, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 10, event.getTimestamp().getValue());
+//        assertEquals("Event rank", 10, context.getRank());
+
+    	// Position trace at event rank 999
+        tmpContext = fExperiment.seekEvent(new TmfTimestamp(1000, SCALE, 0));
+        context = fExperiment.seekLocation(tmpContext.getLocation().clone());
+//        assertEquals("Event rank", 999, context.getRank());
+    	event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 1000, event.getTimestamp().getValue());
+//        assertEquals("Event rank", 999, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1000, event.getTimestamp().getValue());
+//        assertEquals("Event rank", 1000, context.getRank());
+
+    	// Position trace at event rank 1001
+        tmpContext = fExperiment.seekEvent(new TmfTimestamp(1002, SCALE, 0));
+        context = fExperiment.seekLocation(tmpContext.getLocation().clone());
+//        assertEquals("Event rank", 1001, context.getRank());
+    	event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 1002, event.getTimestamp().getValue());
+//        assertEquals("Event rank", 1001, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1002, event.getTimestamp().getValue());
+//        assertEquals("Event rank", 1002, context.getRank());
+
+    	// Position trace at event rank 4500
+        tmpContext = fExperiment.seekEvent(new TmfTimestamp(4501, SCALE, 0));
+        context = fExperiment.seekLocation(tmpContext.getLocation().clone());
+//        assertEquals("Event rank", 4500, context.getRank());
+    	event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 4501, event.getTimestamp().getValue());
+//        assertEquals("Event rank", 4500, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 4501, event.getTimestamp().getValue());
+//        assertEquals("Event rank", 4501, context.getRank());
+    }
+
+    public void testSeekLocationOutOfScope() throws Exception {
+
+    	// Position trace at beginning
+    	TmfContext tmpContext = fExperiment.seekLocation(null);
+        TmfContext context = fExperiment.seekLocation(tmpContext.getLocation().clone());
+//        assertEquals("Event rank", 0, context.getRank());
+    	TmfEvent event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+//        assertEquals("Event rank", 0, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+//        assertEquals("Event rank", 1, context.getRank());
+
+    	// Position trace at event passed the end
+        tmpContext = fExperiment.seekEvent(new TmfTimestamp(NB_EVENTS + 1, SCALE, 0));
+        context = fExperiment.seekLocation(tmpContext.getLocation().clone());
+//        assertEquals("Event rank", NB_EVENTS, context.getRank());
+    	event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", null, event);
+//        assertEquals("Event rank", NB_EVENTS, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", null, event);
+//        assertEquals("Event rank", NB_EVENTS, context.getRank());
+    }
+
+    // ------------------------------------------------------------------------
+    // seekEvent on timestamp
+    // ------------------------------------------------------------------------
+
+    public void testSeekEventOnTimestampOnCacheBoundary() throws Exception {
+
+    	// Position trace at event rank 0
+    	TmfContext context = fExperiment.seekEvent(new TmfTimestamp(1, SCALE, 0));
+        assertEquals("Event rank", 0, context.getRank());
+    	TmfEvent event = fExperiment.parseEvent(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 0, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+        assertEquals("Event rank", 1, context.getRank());
 
-    	context = fExperiment.seekEvent(new TmfTimestamp(1001, SCALE, 0));
-        event = fExperiment.getNextEvent(context);
+    	// Position trace at event rank 1000
+        context = fExperiment.seekEvent(new TmfTimestamp(1001, SCALE, 0));
+        assertEquals("Event rank", 1000, context.getRank());
+    	event = fExperiment.parseEvent(context);
         assertEquals("Event timestamp", 1001, event.getTimestamp().getValue());
         assertEquals("Event rank", 1000, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1001, event.getTimestamp().getValue());
+        assertEquals("Event rank", 1001, context.getRank());
 
-    	context = fExperiment.seekEvent(new TmfTimestamp(4001, SCALE, 0));
-        event = fExperiment.getNextEvent(context);
+    	// Position trace at event rank 4000
+        context = fExperiment.seekEvent(new TmfTimestamp(4001, SCALE, 0));
+        assertEquals("Event rank", 4000, context.getRank());
+    	event = fExperiment.parseEvent(context);
         assertEquals("Event timestamp", 4001, event.getTimestamp().getValue());
         assertEquals("Event rank", 4000, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 4001, event.getTimestamp().getValue());
+        assertEquals("Event rank", 4001, context.getRank());
     }
 
-    public void testSeekNotOnCacheBoundary() throws Exception {
-    	TmfExperimentContext context = fExperiment.seekLocation(null);
+    public void testSeekEventOnTimestampNotOnCacheBoundary() throws Exception {
 
+    	// Position trace at event rank 1
+    	TmfContext context = fExperiment.seekEvent(new TmfTimestamp(2, SCALE, 0));
+        assertEquals("Event rank", 1, context.getRank());
+    	TmfEvent event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 2, event.getTimestamp().getValue());
+        assertEquals("Event rank", 1, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 2, event.getTimestamp().getValue());
+        assertEquals("Event rank", 2, context.getRank());
+
+    	// Position trace at event rank 9
     	context = fExperiment.seekEvent(new TmfTimestamp(10, SCALE, 0));
-    	TmfEvent event = fExperiment.getNextEvent(context);
+        assertEquals("Event rank", 9, context.getRank());
+    	event = fExperiment.parseEvent(context);
         assertEquals("Event timestamp", 10, event.getTimestamp().getValue());
         assertEquals("Event rank", 9, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 10, event.getTimestamp().getValue());
+        assertEquals("Event rank", 10, context.getRank());
 
-    	context = fExperiment.seekEvent(new TmfTimestamp(999, SCALE, 0));
-        event = fExperiment.getNextEvent(context);
-        assertEquals("Event timestamp", 999, event.getTimestamp().getValue());
-        assertEquals("Event rank", 998, context.getRank());
-
-    	context = fExperiment.seekEvent(new TmfTimestamp(1000, SCALE, 0));
-        event = fExperiment.getNextEvent(context);
+    	// Position trace at event rank 999
+        context = fExperiment.seekEvent(new TmfTimestamp(1000, SCALE, 0));
+        assertEquals("Event rank", 999, context.getRank());
+    	event = fExperiment.parseEvent(context);
         assertEquals("Event timestamp", 1000, event.getTimestamp().getValue());
         assertEquals("Event rank", 999, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1000, event.getTimestamp().getValue());
+        assertEquals("Event rank", 1000, context.getRank());
 
-    	context = fExperiment.seekEvent(new TmfTimestamp(4500, SCALE, 0));
-        event = fExperiment.getNextEvent(context);
-        assertEquals("Event timestamp", 4500, event.getTimestamp().getValue());
-        assertEquals("Event rank", 4499, context.getRank());
+    	// Position trace at event rank 1001
+        context = fExperiment.seekEvent(new TmfTimestamp(1002, SCALE, 0));
+        assertEquals("Event rank", 1001, context.getRank());
+    	event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 1002, event.getTimestamp().getValue());
+        assertEquals("Event rank", 1001, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1002, event.getTimestamp().getValue());
+        assertEquals("Event rank", 1002, context.getRank());
+
+    	// Position trace at event rank 4500
+        context = fExperiment.seekEvent(new TmfTimestamp(4501, SCALE, 0));
+        assertEquals("Event rank", 4500, context.getRank());
+    	event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 4501, event.getTimestamp().getValue());
+        assertEquals("Event rank", 4500, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 4501, event.getTimestamp().getValue());
+        assertEquals("Event rank", 4501, context.getRank());
     }
 
-    public void testSeekForEventOutOfBounds() throws Exception {
-    	TmfExperimentContext context = fExperiment.seekLocation(null);
+    public void testSeekEventOnTimestampoutOfScope() throws Exception {
 
-    	// On lower bound, returns the first event (ts = 1)
-    	context = fExperiment.seekEvent(new TmfTimestamp(-1, SCALE, 0));
-        TmfEvent event = fExperiment.getNextEvent(context);
+    	// Position trace at beginning
+    	TmfContext context = fExperiment.seekEvent(new TmfTimestamp(-1, SCALE, 0));
+        assertEquals("Event rank", 0, context.getRank());
+    	TmfEvent event = fExperiment.parseEvent(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+        assertEquals("Event rank", 0, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+        assertEquals("Event rank", 1, context.getRank());
 
-        // On higher bound, returns null (no event)
-    	context = fExperiment.seekEvent(new TmfTimestamp(NB_EVENTS + 1, SCALE, 0));
-        event = fExperiment.getNextEvent(context);
+    	// Position trace at event passed the end
+        context = fExperiment.seekEvent(new TmfTimestamp(NB_EVENTS + 1, SCALE, 0));
+        assertEquals("Event rank", NB_EVENTS, context.getRank());
+    	event = fExperiment.parseEvent(context);
         assertEquals("Event timestamp", null, event);
+        assertEquals("Event rank", NB_EVENTS, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", null, event);
+        assertEquals("Event rank", NB_EVENTS, context.getRank());
     }
 
-    public void testSeekOnIndex() throws Exception {
-    	TmfExperimentContext context = fExperiment.seekLocation(null);
+    // ------------------------------------------------------------------------
+    // seekEvent on rank
+    // ------------------------------------------------------------------------
+
+    public void testSeekOnRankOnCacheBoundary() throws Exception {
 
     	// On lower bound, returns the first event (ts = 1)
-    	context = fExperiment.seekEvent(0);
-        TmfEvent event = fExperiment.getNextEvent(context);
+    	TmfContext context = fExperiment.seekEvent(0);
+        assertEquals("Event rank", 0, context.getRank());
+    	TmfEvent event = fExperiment.parseEvent(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+        assertEquals("Event rank", 0, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+        assertEquals("Event rank", 1, context.getRank());
 
-        // On higher bound
-    	context = fExperiment.seekEvent(NB_EVENTS - 1);
-        event = fExperiment.getNextEvent(context);
-        assertEquals("Event timestamp", NB_EVENTS, event.getTimestamp().getValue());
+    	// Position trace at event rank 1000
+        context = fExperiment.seekEvent(1000);
+        assertEquals("Event rank", 1000, context.getRank());
+    	event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 1001, event.getTimestamp().getValue());
+        assertEquals("Event rank", 1000, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1001, event.getTimestamp().getValue());
+        assertEquals("Event rank", 1001, context.getRank());
 
-        // Above high bound
-    	context = fExperiment.seekEvent(NB_EVENTS);
-        event = fExperiment.getNextEvent(context);
-        assertEquals("Event", null, event);
+    	// Position trace at event rank 4000
+        context = fExperiment.seekEvent(4000);
+        assertEquals("Event rank", 4000, context.getRank());
+    	event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 4001, event.getTimestamp().getValue());
+        assertEquals("Event rank", 4000, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 4001, event.getTimestamp().getValue());
+        assertEquals("Event rank", 4001, context.getRank());
     }
 
+    public void testSeekOnRankNotOnCacheBoundary() throws Exception {
+
+    	// Position trace at event rank 9
+    	TmfContext context = fExperiment.seekEvent(9);
+        assertEquals("Event rank", 9, context.getRank());
+    	TmfEvent event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 10, event.getTimestamp().getValue());
+        assertEquals("Event rank", 9, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 10, event.getTimestamp().getValue());
+        assertEquals("Event rank", 10, context.getRank());
+
+    	// Position trace at event rank 999
+        context = fExperiment.seekEvent(999);
+        assertEquals("Event rank", 999, context.getRank());
+    	event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 1000, event.getTimestamp().getValue());
+        assertEquals("Event rank", 999, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1000, event.getTimestamp().getValue());
+        assertEquals("Event rank", 1000, context.getRank());
+
+    	// Position trace at event rank 1001
+        context = fExperiment.seekEvent(1001);
+        assertEquals("Event rank", 1001, context.getRank());
+    	event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 1002, event.getTimestamp().getValue());
+        assertEquals("Event rank", 1001, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1002, event.getTimestamp().getValue());
+        assertEquals("Event rank", 1002, context.getRank());
+
+    	// Position trace at event rank 4500
+        context = fExperiment.seekEvent(4500);
+        assertEquals("Event rank", 4500, context.getRank());
+    	event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 4501, event.getTimestamp().getValue());
+        assertEquals("Event rank", 4500, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 4501, event.getTimestamp().getValue());
+        assertEquals("Event rank", 4501, context.getRank());
+    }
+
+    public void testSeekEventOnRankOfScope() throws Exception {
+
+    	// Position trace at beginning
+    	TmfContext context = fExperiment.seekEvent(-1);
+        assertEquals("Event rank", 0, context.getRank());
+    	TmfEvent event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+        assertEquals("Event rank", 0, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
+        assertEquals("Event rank", 1, context.getRank());
+
+    	// Position trace at event passed the end
+        context = fExperiment.seekEvent(NB_EVENTS);
+        assertEquals("Event rank", NB_EVENTS, context.getRank());
+    	event = fExperiment.parseEvent(context);
+        assertEquals("Event timestamp", null, event);
+        assertEquals("Event rank", NB_EVENTS, context.getRank());
+    	event = fExperiment.getNextEvent(context);
+        assertEquals("Event timestamp", null, event);
+        assertEquals("Event rank", NB_EVENTS, context.getRank());
+    }
+    
     // ------------------------------------------------------------------------
     // processRequest
     // ------------------------------------------------------------------------

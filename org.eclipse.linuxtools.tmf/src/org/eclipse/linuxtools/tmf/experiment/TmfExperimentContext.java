@@ -60,8 +60,9 @@ public class TmfExperimentContext extends TmfContext {
 	public TmfExperimentContext(TmfExperimentContext other) {
 		this(other.fTraces, other.cloneContexts());
 		fEvents = other.fEvents;
-		setLocation(other.getLocation());
+		setLocation(other.getLocation().clone());
 		setRank(other.getRank());
+		setLastTrace(other.lastIndex);
 	}
 
 	private TmfContext[] cloneContexts() {

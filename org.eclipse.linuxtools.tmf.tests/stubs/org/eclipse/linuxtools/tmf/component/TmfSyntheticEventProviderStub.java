@@ -34,6 +34,11 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSynthetic
 		super(TmfSyntheticEventStub.class);
 	}
 
+    @Override
+    public void deregister() {
+    	super.deregister();
+    }
+    
 	@SuppressWarnings("unchecked")
 	@Override
 	public ITmfContext armRequest(final TmfDataRequest<TmfSyntheticEventStub> request) {
