@@ -72,9 +72,9 @@ public class TimeFrameView extends TmfView {
     private byte fScale = 0;
 
     // Labels
-    private static final String START_TIME_LABEL   = "Start Time";
-    private static final String END_TIME_LABEL     = "End Time";
-    private static final String TIME_RANGE_LABEL   = "Interval";
+    private static final String START_TIME_LABEL   = "Window Start Time";
+    private static final String END_TIME_LABEL     = "Window End Time";
+    private static final String TIME_RANGE_LABEL   = "Window Range";
     private static final String CURRENT_TIME_LABEL = "Current Time";
 
     private static final int SLIDER_RANGE = 10000;
@@ -252,10 +252,10 @@ public class TimeFrameView extends TmfView {
     // TMF Signal Handling
     // ========================================================================
 
-    @SuppressWarnings("unchecked")
 	/**
      * @param signal
      */
+    @SuppressWarnings("unchecked")
     @TmfSignalHandler
     public void experimentSelected(TmfExperimentSelectedSignal<LttngEvent> signal) {
 
@@ -277,7 +277,9 @@ public class TimeFrameView extends TmfView {
 
         TmfTimestamp delta = new TmfTimestamp(fTraceStartTime.getAdjustment(fTraceEndTime), fScale, 0);
         fTraceSpan = new TmfTimeRange(new TmfTimestamp(0, fScale, 0), delta);
-        fRangeGroup.setContent(fTraceSpan, delta);
+//        fRangeGroup.setContent(fTraceSpan, delta);
+        TmfTimestamp start = new TmfTimestamp(1, (byte) -1, 0);
+        fRangeGroup.setContent(fTraceSpan, start);
     }
 
     /**
