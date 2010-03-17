@@ -886,7 +886,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 			//
 			// For now, this little fix should do it... I hope.
 			int newItemHeight = (bound.height / items.length);
-			if ( newItemHeight > _itemHeight ) {
+			if ( (items.length > 12) && ( newItemHeight > _itemHeight ) ) {
 				_itemHeight = newItemHeight;
 			}
 			
