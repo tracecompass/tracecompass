@@ -18,7 +18,11 @@ import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant;
 /**
  * <b><u>Jni_C_Common</u></b>
  * <p>
- * Common constants and methods that should be shared between JNI objects
+ * Common constants and methods that should be shared between JNI objects.
+ * 
+ * <b>NOTE</b><p>
+ * This class is ABSTRACT, and will be extended by each LTTng structure (Trac, Tracefile, Event, ...)
+ * 
  */
 public abstract class Jni_C_Common extends Jni_C_Constant {
     

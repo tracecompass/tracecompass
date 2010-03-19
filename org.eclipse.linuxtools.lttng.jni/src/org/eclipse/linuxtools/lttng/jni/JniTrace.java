@@ -33,6 +33,10 @@ import org.eclipse.linuxtools.lttng.jni.exception.JniTracefileWithoutEventExcept
  * <li>a JniTrace path (a trace <b>directory</b>)
  * <li>a HashMap of tracefiles that exists in this trace
  * </ul>
+ * <p>
+ * <b>NOTE</b><p>
+ * This class is ABSTRACT, you need to extends it to support your specific LTTng version.<br>
+ * Please look at the abstract functions to override at the bottom of this file.<p>
  */
 public abstract class JniTrace extends Jni_C_Common {
     

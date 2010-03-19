@@ -32,6 +32,10 @@ import org.eclipse.linuxtools.lttng.jni.exception.JniNoSuchEventException;
  * </ul>
  * Note that the JniEvent content is not directly accessibe and should be obtained
  * using the parseAllFields() or parseFieldBy...() methods.
+ * 
+ * <b>NOTE</b><p>
+ * This class is ABSTRACT, you need to extends it to support your specific LTTng version.<p>
+ * 
  */
 public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEvent> {
     // Variables to detect if the event have been filled at least once

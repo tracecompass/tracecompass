@@ -33,6 +33,11 @@ import org.eclipse.linuxtools.lttng.jni.exception.JniMarkerException;
  * <li> an overview of the marker format (in C style printf format)
  * <li> a reference to an ArrayList that contains MarkerFields object of this JniMarker
  * </ul>
+ * 
+ * <b>NOTE</b><p>
+ * This class is ABSTRACT, you need to extends it to support your specific LTTng version.<br>
+ * Please look at the abstract functions to override at the bottom of this file.<p>
+ * 
  */
 public abstract class JniMarker extends Jni_C_Common
 {

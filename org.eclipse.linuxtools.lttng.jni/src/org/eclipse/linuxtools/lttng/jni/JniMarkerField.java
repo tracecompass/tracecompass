@@ -16,6 +16,10 @@ import org.eclipse.linuxtools.lttng.jni.exception.JniMarkerFieldException;
  * <li> the name (field) of in String
  * <li> the marker field format (in C style printf format)
  * </ul>
+ * 
+ * <b>NOTE</b><p>
+ * This class is ABSTRACT, you need to extends it to support your specific LTTng version.<p>
+ * 
  */
 public abstract class JniMarkerField extends Jni_C_Common
 {

@@ -14,7 +14,9 @@ package org.eclipse.linuxtools.lttng.jni.common;
 /**
  * <b><u>Jni_C_Common</u></b>
  * <p>
- * Common constants and methods that should be shared between JNI objects
+ * Common constants and methods that should be shared between JNI objects.<p>
+ * 
+ * This class is abstract and is intended to be extended by LTTng modules that need the constants.
  */
 public abstract class Jni_C_Constant {
     

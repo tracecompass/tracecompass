@@ -23,6 +23,10 @@ import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer;
  * JniParser is used to parse an event payload into something usable.<p>
  * 
  * All methods are static, the parser shouldn't be instantiated.
+ * 
+ * <b>NOTE</b><p>
+ * This class is ABSTRACT, you need to extends it to support your specific LTTng version.<p>
+ * 
  */
 public abstract class JniParser extends Jni_C_Common
 {
