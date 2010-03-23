@@ -71,7 +71,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
         eventContent          = new TextLttngEventContent(currentLttngEvent);
         eventReference        = new LttngEventReference(this.getName());
         
-        currentLttngEvent = new TextLttngEvent(eventTimestamp, eventSource, eventType, eventContent, eventReference);
+        currentLttngEvent = new TextLttngEvent(this, eventTimestamp, eventSource, eventType, eventContent, eventReference);
         eventContent.setEvent(currentLttngEvent);
         
         if ( positionToFirstEvent() == false ) {
@@ -425,17 +425,19 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 // Redefine event to override method we know won't work with a Text tracefile 
 class TextLttngEvent extends LttngEvent {
 	
-	public TextLttngEvent(	LttngTimestamp timestamp, 
+	public TextLttngEvent(	TmfTrace<LttngEvent> parent,
+							LttngTimestamp timestamp, 
 							LttngEventSource source, 
 							LttngEventType type, 
 							LttngEventContent content, 
 							LttngEventReference reference) 
 	{
-		super(timestamp, source, type, content, reference, null);
+		super(parent, timestamp, source, type, content, reference, null);
 	}
 	
 	public TextLttngEvent(TextLttngEvent oldEvent) {
 		this(
+				oldEvent.getParentTrace(),
 				(LttngTimestamp)oldEvent.getTimestamp(), 
 				(LttngEventSource)oldEvent.getSource(), 
 				(LttngEventType)oldEvent.getType(), 

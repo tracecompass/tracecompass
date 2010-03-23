@@ -147,7 +147,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         eventReference        = new LttngEventReference(this.getName());
         
         // Create the skeleton event
-        currentLttngEvent = new LttngEvent(eventTimestamp, eventSource, eventType, eventContent, eventReference, null);
+        currentLttngEvent = new LttngEvent(this, eventTimestamp, eventSource, eventType, eventContent, eventReference, null);
         
         // Create a new current location
         previousLocation = new LttngLocation();
@@ -729,7 +729,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         eventReference        = new LttngEventReference(jniEvent.getParentTracefile().getTracefilePath(), this.getName());
         eventType             = new LttngEventType(traceTypes.get( EventTypeKey.getEventTypeKey(jniEvent) ));
         eventContent          = new LttngEventContent(currentLttngEvent);
-        currentLttngEvent = new LttngEvent(eventTimestamp, eventSource, eventType, eventContent, eventReference, null);
+        currentLttngEvent = new LttngEvent(this, eventTimestamp, eventSource, eventType, eventContent, eventReference, null);
         
         // The jni reference is no longer reliable but we will keep it anyhow
         currentLttngEvent.updateJniEventReference(jniEvent);
