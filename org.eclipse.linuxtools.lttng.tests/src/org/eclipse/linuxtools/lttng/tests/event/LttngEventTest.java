@@ -15,6 +15,7 @@ import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
+import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.trace.TmfLocation;
@@ -90,7 +91,8 @@ public class LttngEventTest extends TestCase {
 
 	public void testConstructors() {
         LttngEvent 			testEvent 		= null;
-        @SuppressWarnings("unused")
+        LTTngTrace			testTrace 		= null;
+		@SuppressWarnings("unused")
 		LttngEvent 			testAnotherEvent = null;
         LttngTimestamp		testTime		= null;
         TmfEventSource 		testSource 		= null;
@@ -118,7 +120,7 @@ public class LttngEventTest extends TestCase {
 		
         // Test constructor with correct information
         try {
-        		testEvent = new LttngEvent( testTime, testSource, testType, testContent, testReference, testJniEvent);
+        		testEvent = new LttngEvent(testTrace, testTime, testSource, testType, testContent, testReference, testJniEvent);
         }
         catch( Exception e) { 
                 fail("Construction with correct information failed!");
@@ -157,6 +159,9 @@ public class LttngEventTest extends TestCase {
     	assertEquals("Channel not what expected!",eventChannel,testEvent.getChannelName());
     	assertEquals("CpuId not what expected!",eventCpu,testEvent.getCpuId());
     	assertEquals("Marker not what expected!",eventMarker,testEvent.getMarkerName());
+    	
+    	// All events should have a parent
+    	assertNotNull("Trace parent for this event is null!", testEvent.getParentTrace() );
     	
     	// *** FIXME ***
     	// Depending from the Java version because of the "hashcode()" on String. 
