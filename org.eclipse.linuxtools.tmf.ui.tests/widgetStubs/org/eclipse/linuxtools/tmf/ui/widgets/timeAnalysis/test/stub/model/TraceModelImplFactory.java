@@ -1,24 +1,39 @@
+/*******************************************************************************
+ * Copyright (c) 2009, 2010 Ericsson
+ * 
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.test.stub.model;
 
 import java.util.Date;
 
 public class TraceModelImplFactory {
-	private class TraceStrings {
-		public String name = "";
-		public String classNmme = name + " class";
-		public String groupName = "group " + classNmme;
-	}
 
+	// ========================================================================
+	// Data
+	// ========================================================================
 	private int count = 0;
 	private TraceStrings[] traceNames;
 	private static final long msTons = 1000000;
 	private Long timeRef = new Date().getTime() * msTons;
 
+	// ========================================================================
+	// Constructor
+	// ========================================================================
 	public TraceModelImplFactory() {
 		traceNames = new TraceStrings[17];
 		loadTraceNameStrings();
 	}
 
+	// ========================================================================
+	// Methods
+	// ========================================================================
 	public TraceImpl[] createTraces() {
 		TraceImpl trace;
 		TraceImpl[] traceArr = new TraceImpl[17];
@@ -207,5 +222,14 @@ public class TraceModelImplFactory {
 		traceNames[16].classNmme = "Board 11";
 		traceNames[16].groupName = "MISC";
 
+	}
+
+	// ========================================================================
+	// Inner Class
+	// ========================================================================
+	private class TraceStrings {
+		public String name = "";
+		public String classNmme = name + " class";
+		public String groupName = "group " + classNmme;
 	}
 }

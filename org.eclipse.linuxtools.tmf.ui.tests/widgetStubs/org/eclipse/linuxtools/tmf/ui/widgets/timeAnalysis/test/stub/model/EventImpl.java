@@ -1,9 +1,23 @@
+/*******************************************************************************
+ * Copyright (c) 2009, 2010 Ericsson
+ * 
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.test.stub.model;
 
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.TimeEvent;
 
 public class EventImpl extends TimeEvent {
+	// ========================================================================
+	// Data
+	// ========================================================================
 	public static enum Type {ERROR, WARNING, TIMEADJUSTMENT, ALARM, EVENT, INFORMATION, UNKNOWN, INFO1, INFO2, INFO3, INFO4, INFO5, INFO6, INFO7, INFO8, INFO9}
 
 	private long time = 0;
@@ -11,6 +25,9 @@ public class EventImpl extends TimeEvent {
 	private Type myType = Type.UNKNOWN; 
 	private long duration; 
 	
+	// ========================================================================
+	// Constructor
+	// ========================================================================
 	public EventImpl(long time, ITmfTimeAnalysisEntry trace, Type type) {
 		this.time = time;
 		this.trace = trace;
@@ -18,6 +35,9 @@ public class EventImpl extends TimeEvent {
 		this.setDuration(super.getDuration());
 	}
 	
+	// ========================================================================
+	// Methods
+	// ========================================================================
 	public Type getType() {
 		return myType;
 	}
