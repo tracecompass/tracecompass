@@ -11,13 +11,11 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
@@ -25,7 +23,7 @@ public class TraceCanvas extends Canvas implements MouseMoveListener, MouseListe
 //public class TraceCanvas extends Canvas implements FocusListener, KeyListener, MouseMoveListener, MouseListener, MouseWheelListener, ControlListener, SelectionListener, MouseTrackListener, TraverseListener
 {
 	
-	public Long BIDON_VARIABLE_WINDOW_SIZE = (long)(0.1 * 1000000000L); // 0.1 seconds
+	public Long BIDON_VARIABLE_WINDOW_SIZE = (long)(1 * 1000000000L); // 1 seconds
 	
 	
 	final static int DEFAULT_WIDTH_PER_COL = 2;
@@ -48,18 +46,18 @@ public class TraceCanvas extends Canvas implements MouseMoveListener, MouseListe
 		columnWidth = widthPerColumn;
 		columnMaxHeight = columnHeight;
 		
-		setSize(parent.getDisplay().getBounds().width, columnHeight);
+		//setSize(parent.getDisplay().getBounds().width, columnHeight);
 		
-		//int viewWidth = getParent().computeSize(SWT.DEFAULT,SWT.DEFAULT).x;
-		//System.out.println("*************** X " + viewWidth);
+//		int viewWidth = getParent().computeSize(SWT.DEFAULT,SWT.DEFAULT).x;
+//		System.out.println("*************** X " + viewWidth);
 		
-		int viewWidth = parent.getDisplay().getBounds().width;
-		
-		histogramContent = new HistogramContent( viewWidth / widthPerColumn, viewWidth, columnMaxHeight);
+		//int viewWidth = parent.getDisplay().getBounds().width;
+		//histogramContent = new HistogramContent( viewWidth / widthPerColumn, viewWidth, columnMaxHeight);
 		
 		addNeededListeners();
+		
 	}
-
+	
 	public void addNeededListeners() {
 		paintListener = new TraceCanvasPaintListener(getHistogramContent(), getColumnWidth(), getColumnMaxHeight() );
 		
@@ -76,6 +74,25 @@ public class TraceCanvas extends Canvas implements MouseMoveListener, MouseListe
 		this.addTraverseListener(this);
 		*/
 	}
+	
+	public void createNewHistogramContent() {
+		
+		/*
+		System.out.println("getBounds().width : " + getBounds().width);
+		System.out.println("getParent().computeSize(SWT.DEFAULT,SWT.DEFAULT).x; : " + getParent().computeSize(SWT.DEFAULT,SWT.DEFAULT).x);
+		System.out.println("getColumnWidth : " + getColumnWidth());
+		System.out.println("getLocation().x : " + getLocation().x);
+		System.out.println("getSize().x : " + getSize().x);
+		*/
+		
+		histogramContent = new HistogramContent( getSize().x / columnWidth, getSize().x, columnMaxHeight);
+		
+		// *** FIXME ***
+		// paintlistener need to know about the new content...
+		// This is nowhere near elegant, change me.
+		paintListener.setHistogramContent(histogramContent);
+	}
+	
 	
 	public void resetSelectedWindow() {
 		paintListener.setSelectedWindow(null);

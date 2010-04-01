@@ -24,6 +24,7 @@ import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 public class HistogramView extends TmfView {
@@ -47,20 +48,20 @@ public class HistogramView extends TmfView {
 		
 		Composite folderGroup = new Composite(parent, SWT.NONE);
 		
-//		GridLayout gl = new GridLayout();
-//		gl.marginHeight = 0;
-//		gl.marginWidth = 0;
-//		folderGroup.setLayout(gl);
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.marginHeight = 0;
+		gridLayout.marginWidth = 0;
+		folderGroup.setLayout(gridLayout);
 		
+		//folderGroup.setSize(parent.getDisplay().getBounds().width, parent.getDisplay().getBounds().height);
+		//folderGroup.setLayoutData(new GridData(GridData.FILL_BOTH));	
 		folderGroup.setSize(parent.getDisplay().getBounds().width, parent.getDisplay().getBounds().height);
-		folderGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		fullTraceCanvas = new TraceCanvas(folderGroup, SWT.NONE, 2, 50);
-		
-		
-//		GridData gd = new GridData(SWT.FILL, SWT.TOP, true, false);
-//		gd.heightHint = 50;
-//		fullTraceCanvas.setLayoutData(gd);
+		GridData gridData = new GridData(SWT.FILL, SWT.TOP, true, false);
+		gridData.heightHint = 50;
+		gridData.minimumHeight = 50;
+		fullTraceCanvas = new TraceCanvas(folderGroup, SWT.NONE, 1, 50);
+		fullTraceCanvas.setLayoutData(gridData);
 		
 		fullTraceCanvas.redraw();
 	}
@@ -73,6 +74,9 @@ public class HistogramView extends TmfView {
 		TmfExperiment<LttngEvent> tmpExperiment = (TmfExperiment<LttngEvent>)TmfExperiment.getCurrentExperiment();
 		
 		if ( (dataBackgroundFullRequest == null) && (tmpExperiment != null) ) {
+			
+			fullTraceCanvas.createNewHistogramContent();
+			
 	    	// Create a new time range from "start" to "end"
 	        //	That way, we will get "everything" in the trace
 	        LttngTimestamp ts1 = new LttngTimestamp( tmpExperiment.getStartTime() );
@@ -88,15 +92,15 @@ public class HistogramView extends TmfView {
     @SuppressWarnings("unchecked")
 	@TmfSignalHandler
     public void experimentSelected(TmfExperimentSelectedSignal<LttngEvent> signal) {
-    	fullTraceCanvas.getHistogramContent().resetContentData();
+    	
+    	fullTraceCanvas.createNewHistogramContent();
+    	
     	fullTraceCanvas.resetSelectedWindow();
     	
     	TmfExperiment<LttngEvent> tmpExperiment = (TmfExperiment<LttngEvent>)signal.getExperiment();
 		
     	// Create a new time range from "start" to "end"
         //	That way, we will get "everything" in the trace
-        //LttngTimestamp ts1 = new LttngTimestamp( tmpExperiment.getStartTime() );
-        //LttngTimestamp ts2 = new LttngTimestamp( tmpExperiment.getEndTime() );
     	LttngTimestamp ts1 = new LttngTimestamp( tmpExperiment.getStartTime() );
         LttngTimestamp ts2 = new LttngTimestamp( tmpExperiment.getEndTime() );
         TmfTimeRange tmpRange = new TmfTimeRange(ts1, ts2);
