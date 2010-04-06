@@ -22,16 +22,27 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 	
 	private TraceCanvas parentCanvas = null;
 	
+	private boolean requestCompleted = false;
+	
 	@SuppressWarnings("unchecked")
-	public HistogramRequest(Class<? extends TmfEvent> dataType, TmfTimeRange range, int nbRequested, HistogramContent newContent, TraceCanvas newParentCanvas) {
+	public HistogramRequest(Class<? extends TmfEvent> dataType, TmfTimeRange range, int nbRequested, HistogramContent newContent, TraceCanvas newParentCanvas, Long timeInterval) {
         super((Class<LttngEvent>)dataType, range, nbRequested, MAX_EVENTS_PER_REQUEST);
         
+        // *** FIXME ***
+        // This does not work! The request won't be processed or the number of events returned is wrong!
+        // We cannot use this !
+		//super((Class<LttngEvent>)dataType, range);
+		
         histogramContent = newContent;
         parentCanvas = newParentCanvas;
         
-        lastRangeTime = histogramContent.getStartTime();
-        
         histogramContent.resetContentData();
+        histogramContent.setStartTime(range.getStartTime().getValue());
+        histogramContent.setEndTime(range.getEndTime().getValue());
+        histogramContent.setIntervalTime(timeInterval);
+        histogramContent.resetTable();
+        
+        lastRangeTime = histogramContent.getStartTime();
     }
 
 	@Override
@@ -41,32 +52,61 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
         
         evt[0] = (result.length > 0) ? result[0] : null;
         
-        if ( evt[0] != null ) {
+        // *** FIXME ***
+    	// *** EVIL BUG ***
+        // The request by timerange only does not work! (see constructor above) 
+    	// 	However, the request with number of events will loop until it reach its number or EOF
+    	//  We have to filter out ourself the extra useless events!
+    	//
+        if ( (evt[0] != null) && (requestCompleted == false) ) {
         	LttngEvent tmpEvent = (LttngEvent)evt[0];
         	
-        	long distance = ( tmpEvent.getTimestamp().getValue() - lastRangeTime );
-			
-			if  ( distance > histogramContent.getIntervalTime() ) {
+        	// This check is linked to the evil fix mentionned above
+        	if ( tmpEvent.getTimestamp().getValue() <= histogramContent.getEndTime() ) {
+        	
+	        	long distance = ( tmpEvent.getTimestamp().getValue() - lastRangeTime );
 				
-				histogramContent.getElementByIndex(lastPos).intervalNbEvents = nbEventsInRange;
-				lastRangeTime = tmpEvent.getTimestamp().getValue();
-				
-				lastPos = (int)((lastRangeTime - histogramContent.getStartTime()) / histogramContent.getIntervalTime() );
-				histogramContent.getElementByIndex(lastPos).firstIntervalTimestamp = lastRangeTime;
-				
-				histogramContent.setReadyUpToPosition(lastPos);
-				
-				nbPosNotEmpty++;
-				nbEventsInRange = 1;
-			}
-			else {
-				nbEventsInRange++;
-				if ( nbEventsInRange > histogramContent.getHeighestEventCount() ) {
-					histogramContent.setHeighestEventCount(nbEventsInRange);
+				if  ( distance > histogramContent.getIntervalTime() ) {
+					
+					histogramContent.getElementByIndex(lastPos).intervalNbEvents = nbEventsInRange;
+					lastRangeTime = tmpEvent.getTimestamp().getValue();
+					
+					lastPos = (int)((lastRangeTime - histogramContent.getStartTime()) / histogramContent.getIntervalTime() );
+					
+					// *** HACK ***
+					// Because of the threads, weird phenomenons seem to happen here, like a position after the 
+					//	 element range because another request was issued.
+					// This enforce the position but may result in slightly inconsistent result (i.e. a weird misplaced bar sometime).
+					if ( lastPos < 0 ) {
+						lastPos = 0;
+					}
+					else if ( lastPos >= histogramContent.getNbElement() ) {
+						lastPos = (histogramContent.getNbElement()-1);
+					}
+					
+					histogramContent.getElementByIndex(lastPos).firstIntervalTimestamp = lastRangeTime;
+					histogramContent.setReadyUpToPosition(lastPos);
+					
+					nbPosNotEmpty++;
+					nbEventsInRange = 1;
 				}
-			}
-			
-			nbEventRead++;
+				else {
+					nbEventsInRange++;
+					if ( nbEventsInRange > histogramContent.getHeighestEventCount() ) {
+						histogramContent.setHeighestEventCount(nbEventsInRange);
+					}
+				}
+				
+				nbEventRead++;
+        	}
+        	else {
+        		// *** FIXME ***
+            	// *** EVIL FIX ***
+                // Because of the other evil bug (see above), we have to ignore extra useless events we will get
+        		// However, we might be far away from the end so we better start a redraw now
+        		redrawAsyncronously();
+        		requestCompleted = true;
+        	}
 			
 			if ( nbEventRead % REDRAW_EVERY_NB_EVENTS == 0 ) {
 				redrawAsyncronously();

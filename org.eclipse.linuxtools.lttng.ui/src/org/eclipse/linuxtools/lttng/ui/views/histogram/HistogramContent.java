@@ -4,7 +4,7 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 public class HistogramContent {
 	
-	final static double MAX_DIFFERENCE_TO_AVERAGE = 2.0;
+	final static double DEFAULT_DIFFERENCE_TO_AVERAGE = 100.0;
 	
 	private Long 	startTime = 0L;
 	private Long 	endTime   = 0L;
@@ -13,7 +13,8 @@ public class HistogramContent {
 	private Double 	heightFactor = 0.0;
 	private Long   	heighestEventCount = 0L;
 	private Integer maxHeight	 = 0;
-
+	private Double  maxDifferenceToAverage = 100.0;
+	
 	private Integer	readyUpToPosition = 0;
 	private Integer	fullWindowSize = 0;
 	
@@ -22,14 +23,18 @@ public class HistogramContent {
 	private HistogramElement[] elementTable;
 	
 	public HistogramContent(int tableSize, int newWindowsSize, int newMaxHeight) {
+		this(tableSize, newWindowsSize, newMaxHeight, DEFAULT_DIFFERENCE_TO_AVERAGE);
+	}
+	
+	public HistogramContent(int tableSize, int newWindowsSize, int newMaxHeight, double newDiffToAverage) {
 		fullWindowSize = newWindowsSize;
 		maxHeight = newMaxHeight;
+		maxDifferenceToAverage = newDiffToAverage;
 		
 		createNewTable(tableSize);
 	}
 	
 	public void createNewTable(int newTableSize) {
-		
 		elementTable = new HistogramElement[newTableSize];
 		
 		for ( int x=0; x<elementTable.length; x++) {
@@ -47,18 +52,26 @@ public class HistogramContent {
 		heighestEventCount = 0L;
 		
 		readyUpToPosition = 0;
-		
-		cleanTable();
 	}
 	
-	public void cleanTable() {
+	public void resetTable() {
 		for ( int x=0; x<elementTable.length; x++) {
 			elementTable[x].position = x;
-			elementTable[x].firstIntervalTimestamp = 0L;
+			elementTable[x].firstIntervalTimestamp = startTime + (x*intervalTime);
 			elementTable[x].intervalNbEvents = 0L;
 			elementTable[x].intervalHeight = 0;
-			elementTable[x].isInSelectedWindow = false;
 		}
+	}
+	
+	public void printContentInfo() {
+		System.out.println("startTime          : " + startTime);
+		System.out.println("endTime            : " + endTime );
+		System.out.println();
+		System.out.println("intervalTime       : " + intervalTime);
+		System.out.println("heightFactor       : " + heightFactor);
+		System.out.println("heighestEventCount : " + heighestEventCount);
+		System.out.println();
+		System.out.println("readyUpToPosition  : " + readyUpToPosition);
 	}
 	
 	public void printTable() {
@@ -69,8 +82,8 @@ public class HistogramContent {
 	
 	public void recalculateEventHeight() {
 		
-		if ( getHeighestEventCount() > (MAX_DIFFERENCE_TO_AVERAGE * averageNumberOfEvents) ) {
-			heightFactor = (double)maxHeight/( MAX_DIFFERENCE_TO_AVERAGE * (double)averageNumberOfEvents);
+		if ( getHeighestEventCount() > (maxDifferenceToAverage * averageNumberOfEvents) ) {
+			heightFactor = (double)maxHeight/( maxDifferenceToAverage * (double)averageNumberOfEvents);
 		}
 		else {
 			heightFactor = (double)maxHeight/(double)getHeighestEventCount();
@@ -114,12 +127,9 @@ public class HistogramContent {
 		if ( index < 0) {
 			index = 0;
 		}
-		
-		/*
-		System.out.println("position " + position);
-		System.out.println("fullWindowSize " + fullWindowSize);
-		System.out.println("index " + index);
-		*/
+		else if ( index >= elementTable.length ) {
+			index = (elementTable.length -1);
+		}
 		
 		returnedElement = elementTable[index];
 		
@@ -136,23 +146,17 @@ public class HistogramContent {
 			index = 0;
 		}
 		
-		/*
-		System.out.println("timestamp " + timestamp);
-		System.out.println("intervalTime " + intervalTime);
-		System.out.println("index " + index);
-		*/
-		
 		returnedElement = elementTable[index];
 		
 		return returnedElement;
 	}
 	
 	
-	public HistogramElement getClosestElementByTimeInterval(HistogramElement targetElement, Long intervalToElement) {
+	public HistogramElement getClosestElementByElementAndTimeInterval(HistogramElement targetElement, Long intervalToElement) {
 		
 		HistogramElement returnedElement = null;
 		
-		if ( targetElement != null) {
+		if ( (targetElement != null) && (intervalTime > 0) ) {
 			Long elementTime = targetElement.position * intervalTime;
 			
 			elementTime = elementTime + intervalToElement;
@@ -167,19 +171,28 @@ public class HistogramContent {
 				newPos = elementTable.length - 1;
 			}
 			
-			/*
-			System.out.println("targetElement.position " + targetElement.position);
-			System.out.println("intervalTime " + intervalTime);
-			System.out.println("intervalToElement " + intervalToElement);
-			System.out.println("elementTime " + elementTime);
-			System.out.println("newPos " + newPos);
-			*/
-			
 			returnedElement = elementTable[newPos];
 		}
 		
 		return returnedElement;
 	}
+	
+	public int getXPositionByPositionAndTimeInterval(int targetPosition, Long intervalToElement) {
+		int returnedValue = 0;
+		
+		HistogramElement targetElement = getElementFromXPosition(targetPosition);
+		
+		if ( targetElement != null ) {
+			HistogramElement newElement = getClosestElementByElementAndTimeInterval(targetElement, intervalToElement);
+			
+			if ( newElement != null ) {
+				returnedValue = getXPositionFromElement(newElement);
+			}
+		}
+		
+		return returnedValue;
+	}
+	
 	
 	public int getXPositionFromElement(HistogramElement targetElement) {
 		
@@ -240,7 +253,16 @@ public class HistogramContent {
 		this.maxHeight = maxHeight;
 	}
 	
-
+	
+	public Double getMaxDifferenceToAverage() {
+		return maxDifferenceToAverage;
+	}
+	
+	public void setMaxDifferenceToAverage(Double newDiffToAverage) {
+		maxDifferenceToAverage = newDiffToAverage;
+	}
+	
+	
 	public int getReadyUpToPosition() {
 		return readyUpToPosition;
 	}

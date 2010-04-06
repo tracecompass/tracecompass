@@ -40,12 +40,13 @@ public class TraceCanvasPaintListener implements PaintListener {
 		
 		drawHistogram(e);
 		
-		if ( selectedWindow != null) {
+		if ( (selectedWindow != null) && (selectedWindow.getSelectedWindowVisible() == true) ) {
 			drawSelectedWindow(e);
 		}
 	}
 	
 	public void clearDrawingSection(PaintEvent e) {
+		e.gc.setForeground(e.display.getSystemColor(EMPTY_BACKGROUND_COLOR));
 		e.gc.setBackground(e.display.getSystemColor(EMPTY_BACKGROUND_COLOR));
 		Rectangle allSection = new Rectangle(0, 0, e.width, e.height);
 		e.gc.fillRectangle(allSection);
@@ -56,25 +57,21 @@ public class TraceCanvasPaintListener implements PaintListener {
 	// Is it good to put this synchronized?
 	//
 	public synchronized void drawHistogram(PaintEvent e) {
-		e.gc.setBackground(e.display.getSystemColor(HISTOGRAM_BARS_COLOR));
+	    e.gc.setForeground(e.display.getSystemColor(EMPTY_BACKGROUND_COLOR));
 		Rectangle allSection = new Rectangle(0, 0, histogramContent.getReadyUpToPosition()*columnWidth, e.height);
 		e.gc.fillRectangle(allSection);
 		e.gc.drawRectangle(allSection);
 		
-	    e.gc.setForeground(e.display.getSystemColor(EMPTY_BACKGROUND_COLOR));
-	    e.gc.setBackground(e.display.getSystemColor(EMPTY_BACKGROUND_COLOR));
-	    
+	    e.gc.setBackground(e.display.getSystemColor(HISTOGRAM_BARS_COLOR));
 	    for ( int x=0; x<histogramContent.getReadyUpToPosition(); x++) {
-	    	Rectangle rect = new Rectangle(columnWidth*x, 0, columnWidth, columnHeight - histogramContent.getElementByIndex(x).intervalHeight );
-			e.gc.fillRectangle(rect);
-			e.gc.drawRectangle(rect);
+	    	Rectangle rect = new Rectangle(columnWidth*x, columnHeight - histogramContent.getElementByIndex(x).intervalHeight, columnWidth, histogramContent.getElementByIndex(x).intervalHeight);
+			
+	    	e.gc.fillRectangle(rect);
 	    }
 	    
-	    e.gc.setForeground(e.display.getSystemColor(EMPTY_BACKGROUND_COLOR));
 	    e.gc.setBackground(e.display.getSystemColor(EMPTY_BACKGROUND_COLOR));
 	    Rectangle rect = new Rectangle(columnWidth*histogramContent.getNbElement(), 0, e.width, columnHeight);
 		e.gc.fillRectangle(rect);
-		e.gc.drawRectangle(rect);
 	}
 	
 	public void drawSelectedWindow(PaintEvent e) {
@@ -84,14 +81,23 @@ public class TraceCanvasPaintListener implements PaintListener {
 		
 		e.gc.setLineWidth(SELECTION_LINE_WIDTH);
 	    
-		e.gc.drawLine(selectedWindow.selectionLeft, 0, selectedWindow.selectionLeft, e.height);
-	    e.gc.drawLine(selectedWindow.selectionLeft, e.height, selectedWindow.selectionRight, e.height);
-	    e.gc.drawLine(selectedWindow.selectionRight, e.height, selectedWindow.selectionRight, 0);
-	    e.gc.drawLine(selectedWindow.selectionLeft, 0, selectedWindow.selectionRight, 0);
+		int positionCenter = selectedWindow.getWindowCenterXPosition();
+		int positionLeft = selectedWindow.getWindowPositionLeft();
+		int positionRight = selectedWindow.getWindowPositionRight();
+		
+		if ( (positionRight - positionLeft) < 2 ) {
+			positionLeft = positionCenter - 1;
+			positionLeft = positionCenter + 1;
+		}
+		
+		e.gc.drawLine(positionLeft , 0       , positionLeft , e.height);
+	    e.gc.drawLine(positionLeft , e.height, positionRight, e.height);
+	    e.gc.drawLine(positionRight, e.height, positionRight, 0);
+	    e.gc.drawLine(positionLeft , 0       , positionRight, 0);
 	    
 	    
-	    e.gc.drawLine(selectedWindow.selectionCenter + SELECTION_CROSSHAIR_LENGTH, e.height/2, selectedWindow.selectionCenter - SELECTION_CROSSHAIR_LENGTH, e.height/2);
-	    e.gc.drawLine(selectedWindow.selectionCenter, (e.height/2) + SELECTION_CROSSHAIR_LENGTH, selectedWindow.selectionCenter, (e.height/2) - SELECTION_CROSSHAIR_LENGTH);
+	    e.gc.drawLine(positionCenter + SELECTION_CROSSHAIR_LENGTH, e.height/2, positionCenter - SELECTION_CROSSHAIR_LENGTH, e.height/2);
+	    e.gc.drawLine(positionCenter, (e.height/2) + SELECTION_CROSSHAIR_LENGTH, positionCenter, (e.height/2) - SELECTION_CROSSHAIR_LENGTH);
 	}
 	
 	

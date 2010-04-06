@@ -5,5 +5,4 @@ public class HistogramElement {
 	public Long firstIntervalTimestamp = 0L;
 	public Long intervalNbEvents = 0L;
 	public Integer intervalHeight = 0;
-	public Boolean isInSelectedWindow = false;
 }

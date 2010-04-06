@@ -13,32 +13,24 @@ package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
-public class TraceCanvas extends Canvas implements MouseMoveListener, MouseListener, FocusListener
-//public class TraceCanvas extends Canvas implements FocusListener, KeyListener, MouseMoveListener, MouseListener, MouseWheelListener, ControlListener, SelectionListener, MouseTrackListener, TraverseListener
+public class TraceCanvas extends Canvas implements MouseMoveListener, MouseListener, KeyListener ,FocusListener
 {
-	
-	public Long BIDON_VARIABLE_WINDOW_SIZE = (long)(1 * 1000000000L); // 1 seconds
-	
-	
-	final static int DEFAULT_WIDTH_PER_COL = 2;
-	final static int DEFAULT_MAX_HEIGHT_PER_COL = 50;
-	
 	private HistogramContent histogramContent = null;
-	
 	private TraceCanvasPaintListener paintListener = null;
 	
-	private int columnWidth = DEFAULT_WIDTH_PER_COL;
-	private int columnMaxHeight = DEFAULT_MAX_HEIGHT_PER_COL;
+	private int columnWidth = 0;
+	private int columnMaxHeight = 0;
 	
-	public TraceCanvas(Composite parent, int style) {
-		this(parent, style, DEFAULT_WIDTH_PER_COL, DEFAULT_MAX_HEIGHT_PER_COL);
-	}
+	private boolean isWindowMoving = false;
+	private HistogramSelectedWindow currentWindow = null;
 	
 	public TraceCanvas(Composite parent, int style, int widthPerColumn, int columnHeight) {
 		super (parent, style);
@@ -46,16 +38,7 @@ public class TraceCanvas extends Canvas implements MouseMoveListener, MouseListe
 		columnWidth = widthPerColumn;
 		columnMaxHeight = columnHeight;
 		
-		//setSize(parent.getDisplay().getBounds().width, columnHeight);
-		
-//		int viewWidth = getParent().computeSize(SWT.DEFAULT,SWT.DEFAULT).x;
-//		System.out.println("*************** X " + viewWidth);
-		
-		//int viewWidth = parent.getDisplay().getBounds().width;
-		//histogramContent = new HistogramContent( viewWidth / widthPerColumn, viewWidth, columnMaxHeight);
-		
 		addNeededListeners();
-		
 	}
 	
 	public void addNeededListeners() {
@@ -64,67 +47,70 @@ public class TraceCanvas extends Canvas implements MouseMoveListener, MouseListe
 		this.addPaintListener( paintListener );
 		this.addMouseListener(this);
 		this.addMouseMoveListener(this);
-		this.addFocusListener(this);
-		
-		/*
-		this.addControlListener(this);
 		this.addKeyListener(this);
-		this.addMouseWheelListener(this);
-		this.addMouseTrackListener(this);
-		this.addTraverseListener(this);
-		*/
+		this.addFocusListener(this);
 	}
 	
-	public void createNewHistogramContent() {
-		
-		/*
-		System.out.println("getBounds().width : " + getBounds().width);
-		System.out.println("getParent().computeSize(SWT.DEFAULT,SWT.DEFAULT).x; : " + getParent().computeSize(SWT.DEFAULT,SWT.DEFAULT).x);
-		System.out.println("getColumnWidth : " + getColumnWidth());
-		System.out.println("getLocation().x : " + getLocation().x);
-		System.out.println("getSize().x : " + getSize().x);
-		*/
-		
-		histogramContent = new HistogramContent( getSize().x / columnWidth, getSize().x, columnMaxHeight);
+	public void createNewHistogramContent(long windowSize, double maxBarsDifferenceToAverage) {
+		histogramContent = new HistogramContent( getSize().x / columnWidth, getSize().x, columnMaxHeight, maxBarsDifferenceToAverage);
 		
 		// *** FIXME ***
 		// paintlistener need to know about the new content...
 		// This is nowhere near elegant, change me.
 		paintListener.setHistogramContent(histogramContent);
+		
+		// New selected window, not visible by default
+		currentWindow = createNewSelectedWindow(windowSize);
 	}
 	
 	
-	public void resetSelectedWindow() {
-		paintListener.setSelectedWindow(null);
+	public HistogramSelectedWindow createNewSelectedWindow(long windowTimeDuration) {
+		
+		HistogramSelectedWindow returnedWindow = new HistogramSelectedWindow(histogramContent);
+		returnedWindow.setWindowTimeWidth(windowTimeDuration);
+		returnedWindow.setWindowCenterXPosition(0);
+		
+		setCurrentWindow( returnedWindow );
+		
+		return returnedWindow;
 	}
+	
+	public Long getSelectedWindowSize() {
+		return currentWindow.getWindowTimeWidth();
+	}
+	
+	public void setSelectedWindowSize(Long newSelectedWindowSize) {
+		currentWindow.setWindowTimeWidth(newSelectedWindowSize);
+	}
+	
+	public HistogramSelectedWindow getCurrentWindow() {
+		return currentWindow;
+	}
+	
+	public void setCurrentWindow(HistogramSelectedWindow newCurrentWindow) {
+		this.currentWindow = newCurrentWindow;
+		paintListener.setSelectedWindow(newCurrentWindow);
+	}
+
 	
 	public boolean positionMouseCursor(MouseEvent e) {
 		
 		boolean returnedValue = false;
 		
 		if ( histogramContent.getIntervalTime() != 0 ) {
+			
 			int centralPos = e.x;
-			HistogramElement centralElement = histogramContent.getElementFromXPosition(centralPos);
-			HistogramElement leftElement  = histogramContent.getClosestElementByTimeInterval(centralElement, -(BIDON_VARIABLE_WINDOW_SIZE / 2) );
-			HistogramElement rightElement = histogramContent.getClosestElementByTimeInterval(centralElement, +(BIDON_VARIABLE_WINDOW_SIZE / 2) );
 			
-			/*
-			System.out.println("X 		: " + e.x);
-			System.out.println("Y 		: " + e.y);
-			System.out.println("CENTRAL : " + centralElement.firstIntervalTimestamp);
-			System.out.println("LEFT 	: " + leftElement.firstIntervalTimestamp);
-			System.out.println("RIGHT 	: " + rightElement.firstIntervalTimestamp);
-			*/
+			if ( centralPos < 0 ) {
+				centralPos = 0;
+			}
+			else if ( centralPos > getParent().getSize().x ) {
+				centralPos = getParent().getSize().x;
+			}
 			
-			HistogramSelectedWindow tmpSelection = new HistogramSelectedWindow();
-			tmpSelection.selectionCenter = histogramContent.getXPositionFromElement(centralElement);
-			tmpSelection.selectionLeft = histogramContent.getXPositionFromElement(leftElement);
-			tmpSelection.selectionRight = histogramContent.getXPositionFromElement(rightElement);
-			
-			paintListener.setSelectedWindow(tmpSelection);
+			currentWindow.setWindowCenterXPosition(centralPos);
 			
 			returnedValue = true;
-			
 			redraw();
 		}
 		
@@ -132,12 +118,10 @@ public class TraceCanvas extends Canvas implements MouseMoveListener, MouseListe
 	}
 	
 	public void notifyTimeWindowChanged() {
-		// *** TODO ***
-		// Notify framework that the windows changed!
-		
-		System.out.println("NOTIFICATION");
+		// Nothing to do yet, this function is a place holder
 	}
 	
+
 	public HistogramContent getHistogramContent() {
 		return histogramContent;
 	}
@@ -149,8 +133,6 @@ public class TraceCanvas extends Canvas implements MouseMoveListener, MouseListe
 	public int getColumnMaxHeight() {
 		return columnMaxHeight;
 	}
-	
-	public boolean isWindowMoving = false;
 	
 	public void mouseDown(MouseEvent e) {
 		isWindowMoving = true;
@@ -176,12 +158,19 @@ public class TraceCanvas extends Canvas implements MouseMoveListener, MouseListe
 		System.out.println("mouseDoubleClick");
 	}
 	
-	
 	public void focusGained(FocusEvent e) {
 		System.out.println("focusGained");
 	}
-
+	
 	public void focusLost(FocusEvent e) {
 		System.out.println("focusLost");
+	}
+	
+	public void keyPressed(KeyEvent e) {
+		System.out.println("Key " + e.character + " (" + e.keyCode + ")" + " was pressed.");
+	}
+	
+	public void keyReleased(KeyEvent e) {
+		System.out.println("Key " + e.character + " (" + e.keyCode + ")" + " was released.");
 	}
 }
