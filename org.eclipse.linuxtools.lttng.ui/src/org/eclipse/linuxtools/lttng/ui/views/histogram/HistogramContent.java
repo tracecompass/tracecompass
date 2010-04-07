@@ -13,7 +13,7 @@ public class HistogramContent {
 	private Double 	heightFactor = 0.0;
 	private Long   	heighestEventCount = 0L;
 	private Integer maxHeight	 = 0;
-	private Double  maxDifferenceToAverage = 100.0;
+	private Double  maxDifferenceToAverage = DEFAULT_DIFFERENCE_TO_AVERAGE;
 	
 	private Integer	readyUpToPosition = 0;
 	private Integer	fullWindowSize = 0;
@@ -227,6 +227,9 @@ public class HistogramContent {
 		this.endTime = newEndTime;
 	}
 	
+	public Long getFullTraceInterval() {
+		return ( endTime - startTime );
+	}
 	
 	public Double getHeightFactor() {
 		return heightFactor;

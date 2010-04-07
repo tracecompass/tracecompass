@@ -23,9 +23,11 @@ import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 
 public class HistogramView extends TmfView {
 
@@ -42,7 +44,7 @@ public class HistogramView extends TmfView {
     
     // *** TODO ***
     // This need to be changed as soon the framework implement a "window"
-    private long timeWindowWidth = (1L * 1000000000); // 1 second   
+    private static long DEFAULT_WINDOW_SIZE = (1L * 1000000000);
     
     private TmfExperiment<LttngEvent> lastUsedExperiment = null;
     
@@ -52,41 +54,87 @@ public class HistogramView extends TmfView {
 	private HistogramRequest selectedWindowRequest = null;
     private ChildrenTraceCanvas selectedWindowCanvas = null;
     
+	private Label lblStartTime = null;
+	private Label lblStopTime = null;
+	private Label lblTopEvent = null;
+	private Label lblBottomEvent = null;
+    
 	public HistogramView() {
 		super(ID);
 	}
 	
-	
 	@Override
 	public void createPartControl(Composite parent) {
 		
+		Font font = parent.getFont();
 		Composite folderGroup = new Composite(parent, SWT.BORDER);
 		
 		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = 1;
-		gridLayout.verticalSpacing = 10;
+		gridLayout.numColumns = 3;
+		gridLayout.verticalSpacing = 2;
 		gridLayout.marginHeight = 0;
 		gridLayout.marginWidth = 0;
 		folderGroup.setLayout(gridLayout);
 		folderGroup.setSize(parent.getDisplay().getBounds().width, parent.getDisplay().getBounds().height);
 		
-		GridData gridData1 = new GridData(SWT.FILL, SWT.TOP, true, false);
+		GridData gridData1 = new GridData(SWT.FILL, SWT.TOP, true, false, 3, 2);
 		gridData1.heightHint = FULL_TRACE_CANVAS_HEIGHT;
 		gridData1.minimumHeight = FULL_TRACE_CANVAS_HEIGHT;
 		fullTraceCanvas = new ParentTraceCanvas(this, folderGroup, SWT.BORDER, FULL_TRACE_BAR_WIDTH, FULL_TRACE_CANVAS_HEIGHT);
 		fullTraceCanvas.setLayoutData(gridData1);
 		fullTraceCanvas.redraw();
 		
+		GridData gridData2 = new GridData(SWT.LEFT, SWT.TOP, true, false, 2, 2);
+		gridData2.minimumWidth = 200;
+		gridData2.grabExcessHorizontalSpace = true;
+		lblStartTime = new Label(folderGroup, SWT.LEFT | SWT.TOP);
+		lblStartTime.setFont(font);
+		lblStartTime.setText("");
+		lblStartTime.setAlignment(SWT.LEFT);
+		lblStartTime.setLayoutData(gridData2);
 		
-		GridData gridData2 = new GridData(0, SWT.TOP, true, false);
-		gridData2.heightHint = SELECTED_WINDOW_CANVAS_HEIGHT;
-		gridData2.minimumHeight = SELECTED_WINDOW_CANVAS_HEIGHT;
-		gridData2.widthHint = SELECTED_WINDOW_CANVAS_WIDTH;
-		gridData2.minimumWidth = SELECTED_WINDOW_CANVAS_WIDTH;
+		GridData gridData3 = new GridData(SWT.RIGHT, SWT.TOP, true, false, 1, 2);
+		gridData3.minimumWidth = 200;
+		gridData3.grabExcessHorizontalSpace = true;
+		lblStopTime = new Label(folderGroup, SWT.RIGHT | SWT.TOP);
+		lblStopTime.setFont(font);
+		lblStopTime.setAlignment(SWT.RIGHT);
+		lblStopTime.setText("");
+		lblStopTime.setLayoutData(gridData3);
+		
+		GridData gridDataSpace = new GridData(SWT.FILL, SWT.TOP, true, false, 3, 2);
+		gridDataSpace.minimumHeight = 20;
+		gridDataSpace.heightHint = 20;
+		Label lblSpace = new Label(folderGroup, SWT.TOP);
+		lblSpace.setFont(font);
+		lblSpace.setText("");
+		lblSpace.setLayoutData(gridDataSpace);
+		
+		GridData gridData4 = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 2);
+		gridData4.heightHint = SELECTED_WINDOW_CANVAS_HEIGHT;
+		gridData4.minimumHeight = SELECTED_WINDOW_CANVAS_HEIGHT;
+		gridData4.widthHint = SELECTED_WINDOW_CANVAS_WIDTH;
+		gridData4.minimumWidth = SELECTED_WINDOW_CANVAS_WIDTH;
 		selectedWindowCanvas = new ChildrenTraceCanvas(this, folderGroup, SWT.BORDER, SELECTED_WINDOW_BAR_WIDTH, SELECTED_WINDOW_CANVAS_HEIGHT);
-		selectedWindowCanvas.setLayoutData(gridData2);
+		selectedWindowCanvas.setLayoutData(gridData4);
 		selectedWindowCanvas.redraw();
 		
+		
+		GridData gridData5 = new GridData(SWT.LEFT, SWT.TOP, true, false, 2, 1);
+		gridData5.minimumWidth = 150;
+		gridData5.grabExcessHorizontalSpace = true;
+		lblTopEvent = new Label(folderGroup, SWT.LEFT | SWT.TOP);
+		lblTopEvent.setFont(font);
+		lblTopEvent.setText("");
+		lblTopEvent.setLayoutData(gridData5);
+		
+		GridData gridData6 = new GridData(SWT.LEFT, SWT.BOTTOM, true, false, 2, 1);
+		gridData6.minimumWidth = 150;
+		gridData6.grabExcessHorizontalSpace = true;
+		lblBottomEvent = new Label(folderGroup, SWT.LEFT | SWT.BOTTOM);
+		lblBottomEvent.setFont(font);
+		lblBottomEvent.setText("");
+		lblBottomEvent.setLayoutData(gridData6);
 	}
 	
 	
@@ -112,13 +160,22 @@ public class HistogramView extends TmfView {
     
     public void createCanvasAndRequests(TmfExperiment<LttngEvent> newExperiment) {
     	lastUsedExperiment = newExperiment;
-		
-		fullTraceCanvas.createNewHistogramContent(timeWindowWidth, FULL_TRACE_DIFFERENCE_TO_AVERAGE);
-		fullTraceCanvas.createNewSelectedWindow( getTimeWindowSize() );
-		fullTraceCanvas.getCurrentWindow().setSelectedWindowVisible(true);
-		performAllTraceEventsRequest(newExperiment);
-		
+    	
+    	lblStartTime.setText( "" +  newExperiment.getStartTime().getValue() );
+		lblStopTime.setText( "" + newExperiment.getEndTime().getValue() );
+    	
+		fullTraceCanvas.createNewHistogramContent( DEFAULT_WINDOW_SIZE, FULL_TRACE_DIFFERENCE_TO_AVERAGE);
 		selectedWindowCanvas.createNewHistogramContent(0, SELECTED_WINDOW_DIFFERENCE_TO_AVERAGE);
+		
+		// Redraw the canvas right away to have something "clean" as soon as we can
+    	if ( dataBackgroundFullRequest != null ) {
+    		fullTraceCanvas.redraw();
+    		selectedWindowCanvas.redraw();
+    	}
+		
+		fullTraceCanvas.getCurrentWindow().setSelectedWindowVisible(true);
+		
+		performAllTraceEventsRequest(newExperiment);
 		performSelectedWindowEventsRequest(newExperiment);
     }
     
@@ -148,7 +205,7 @@ public class HistogramView extends TmfView {
         //
         // long intervalTime = ((long)(0.001 * (double)1000000000));
         selectedWindowRequest = performRequest(experiment, selectedWindowCanvas, tmpRange, intervalTime);
-        selectedWindowCanvas.redraw();
+        selectedWindowCanvas.redrawAsynchronously();
     }
     
     public void performAllTraceEventsRequest(TmfExperiment<LttngEvent> experiment) {
@@ -162,7 +219,7 @@ public class HistogramView extends TmfView {
         long intervalTime = ( (ts2.getValue() - ts1.getValue()) / fullTraceCanvas.getHistogramContent().getNbElement() );
         
         dataBackgroundFullRequest = performRequest(experiment, fullTraceCanvas, tmpRange, intervalTime);
-        fullTraceCanvas.redraw();
+        fullTraceCanvas.redrawAsynchronously();
     }
     
     // *** VERIFY ***
@@ -188,15 +245,18 @@ public class HistogramView extends TmfView {
     
     public void windowChangedNotification() {
     	if ( lastUsedExperiment != null ) {
+    		if ( selectedWindowRequest.isCompleted() == false ) {
+    			selectedWindowRequest.cancel();
+    		}
     		performSelectedWindowEventsRequest(lastUsedExperiment);
     	}
     }
     
-    public boolean isRequestPending() {
-    	boolean returnedValue = false;
+    public boolean isRequestRunning() {
+    	boolean returnedValue = true;
     	
-    	if ( ( dataBackgroundFullRequest.isCompleted() == false ) || ( selectedWindowRequest.isCompleted() == false ) ) {
-    		returnedValue = true;
+    	if ( ( dataBackgroundFullRequest.isCompleted() == true ) && ( selectedWindowRequest.isCompleted() == true ) ) {
+    		returnedValue = false;
     	}
     	
     	return returnedValue;
@@ -227,14 +287,21 @@ public class HistogramView extends TmfView {
 	}
 	
 	public Long getTimeWindowSize() {
-		return timeWindowWidth;
+		return fullTraceCanvas.getSelectedWindowSize();
 	}
 	
 	public void setTimeWindowSize(long newTimeWidth) {
-		timeWindowWidth = newTimeWidth;
+		fullTraceCanvas.setSelectedWindowSize(newTimeWidth);
 	}
 	
-	public void changeTimeWindowByIncrement(double increment) {
-		timeWindowWidth = (long)((double)timeWindowWidth * increment);
+	public void updateViewInformation() {
+		lblStartTime.setText( fullTraceCanvas.getHistogramContent().getStartTime().toString() );
+		lblStopTime.setText( fullTraceCanvas.getHistogramContent().getEndTime().toString() );
+		
+		if ( selectedWindowRequest.isCompleted() == true ) {
+			lblTopEvent.setText( selectedWindowCanvas.getHistogramContent().getHeighestEventCount().toString() );
+			lblBottomEvent.setText("0");
+		}
 	}
+	
 }

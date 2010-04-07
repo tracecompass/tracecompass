@@ -13,24 +13,26 @@ package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
-public class TraceCanvas extends Canvas implements MouseMoveListener, MouseListener, KeyListener ,FocusListener
+public class TraceCanvas extends Canvas implements FocusListener
 {
-	private HistogramContent histogramContent = null;
-	private TraceCanvasPaintListener paintListener = null;
+	protected static Long	MINIMUM_WINDOW_SIZE = 1L;
+	protected static Double ZOOM_FACTOR = 0.1;
 	
-	private int columnWidth = 0;
-	private int columnMaxHeight = 0;
+	protected asyncCanvasRedrawer canvasRedrawer = null;
 	
-	private boolean isWindowMoving = false;
-	private HistogramSelectedWindow currentWindow = null;
+	protected HistogramContent histogramContent = null;
+	protected TraceCanvasPaintListener 	paintListener = null;
+	protected TraceCanvasMouseListener 	mouseListener = null;
+	protected TraceCanvasKeyListener 	keyListener = null;
+	
+	protected Integer columnWidth = 0;
+	protected Integer columnMaxHeight = 0;
+	
+	protected HistogramSelectedWindow currentWindow = null;
 	
 	public TraceCanvas(Composite parent, int style, int widthPerColumn, int columnHeight) {
 		super (parent, style);
@@ -42,12 +44,17 @@ public class TraceCanvas extends Canvas implements MouseMoveListener, MouseListe
 	}
 	
 	public void addNeededListeners() {
+		canvasRedrawer = new asyncCanvasRedrawer(this);
+		
 		paintListener = new TraceCanvasPaintListener(getHistogramContent(), getColumnWidth(), getColumnMaxHeight() );
+		mouseListener = new TraceCanvasMouseListener(this);
+		keyListener = new TraceCanvasKeyListener(this);
 		
 		this.addPaintListener( paintListener );
-		this.addMouseListener(this);
-		this.addMouseMoveListener(this);
-		this.addKeyListener(this);
+		this.addMouseListener(mouseListener);
+		this.addMouseMoveListener(mouseListener);
+		this.addMouseWheelListener(mouseListener);
+		this.addKeyListener(keyListener);
 		this.addFocusListener(this);
 	}
 	
@@ -60,17 +67,16 @@ public class TraceCanvas extends Canvas implements MouseMoveListener, MouseListe
 		paintListener.setHistogramContent(histogramContent);
 		
 		// New selected window, not visible by default
-		currentWindow = createNewSelectedWindow(windowSize);
+		createNewSelectedWindow(windowSize);
 	}
 	
 	
-	public HistogramSelectedWindow createNewSelectedWindow(long windowTimeDuration) {
-		
+	public HistogramSelectedWindow createNewSelectedWindow(Long windowTimeDuration) {
 		HistogramSelectedWindow returnedWindow = new HistogramSelectedWindow(histogramContent);
-		returnedWindow.setWindowTimeWidth(windowTimeDuration);
-		returnedWindow.setWindowCenterXPosition(0);
-		
 		setCurrentWindow( returnedWindow );
+		
+		currentWindow.setWindowTimeWidth(windowTimeDuration);
+		currentWindow.setWindowCenterXPosition(0);
 		
 		return returnedWindow;
 	}
@@ -80,6 +86,14 @@ public class TraceCanvas extends Canvas implements MouseMoveListener, MouseListe
 	}
 	
 	public void setSelectedWindowSize(Long newSelectedWindowSize) {
+		
+		if ( newSelectedWindowSize < MINIMUM_WINDOW_SIZE ) {
+			newSelectedWindowSize = MINIMUM_WINDOW_SIZE;
+		}
+		else if ( newSelectedWindowSize > histogramContent.getFullTraceInterval() ) {
+			newSelectedWindowSize = histogramContent.getFullTraceInterval();
+		}
+		
 		currentWindow.setWindowTimeWidth(newSelectedWindowSize);
 	}
 	
@@ -91,37 +105,42 @@ public class TraceCanvas extends Canvas implements MouseMoveListener, MouseListe
 		this.currentWindow = newCurrentWindow;
 		paintListener.setSelectedWindow(newCurrentWindow);
 	}
-
 	
-	public boolean positionMouseCursor(MouseEvent e) {
-		
-		boolean returnedValue = false;
-		
-		if ( histogramContent.getIntervalTime() != 0 ) {
-			
-			int centralPos = e.x;
-			
-			if ( centralPos < 0 ) {
-				centralPos = 0;
-			}
-			else if ( centralPos > getParent().getSize().x ) {
-				centralPos = getParent().getSize().x;
-			}
-			
-			currentWindow.setWindowCenterXPosition(centralPos);
-			
-			returnedValue = true;
-			redraw();
-		}
-		
-		return returnedValue;
+	public void slideWindow(int newRelativeXPosition) {
+		// Nothing : function is a place holder
+	}
+	
+	public void positionWindow(int newAbsoluteXPosition) {
+		// Nothing : function is a place holder
+	}
+	
+	public void resizeWindowByFactor(int newFactor) {
+		// Nothing : function is a place holder
+	}
+	
+	public boolean checkIfTimeWindowChanged(int newPosition) {
+		// Nothing : function is a place holder
+		return false;
 	}
 	
 	public void notifyTimeWindowChanged() {
-		// Nothing to do yet, this function is a place holder
+		// Nothing : function is a place holder
 	}
 	
-
+	public void updateParentInformation() {
+		// Nothing : function is a place holder
+	}
+	
+	public void redrawAsynchronously() {
+		
+		if ( canvasRedrawer == null ) {
+			canvasRedrawer = new asyncCanvasRedrawer(this);
+		}
+		
+		canvasRedrawer.asynchronousRedraw();
+	}
+	
+	
 	public HistogramContent getHistogramContent() {
 		return histogramContent;
 	}
@@ -134,30 +153,6 @@ public class TraceCanvas extends Canvas implements MouseMoveListener, MouseListe
 		return columnMaxHeight;
 	}
 	
-	public void mouseDown(MouseEvent e) {
-		isWindowMoving = true;
-		
-		positionMouseCursor(e);
-	}
-	
-	public void mouseUp(MouseEvent e) {
-		if ( positionMouseCursor(e) ) {
-			notifyTimeWindowChanged();
-		}
-		
-		isWindowMoving = false;
-	}
-	
-	public void mouseMove(MouseEvent e) {
-		if ( isWindowMoving == true ) {
-			positionMouseCursor(e);
-		}
-	}
-	
-	public void mouseDoubleClick(MouseEvent e) {
-		System.out.println("mouseDoubleClick");
-	}
-	
 	public void focusGained(FocusEvent e) {
 		System.out.println("focusGained");
 	}
@@ -165,12 +160,23 @@ public class TraceCanvas extends Canvas implements MouseMoveListener, MouseListe
 	public void focusLost(FocusEvent e) {
 		System.out.println("focusLost");
 	}
+}
+
+class asyncCanvasRedrawer {
 	
-	public void keyPressed(KeyEvent e) {
-		System.out.println("Key " + e.character + " (" + e.keyCode + ")" + " was pressed.");
+	private TraceCanvas parentCanvas = null; 
+	
+	public asyncCanvasRedrawer(TraceCanvas newCanvas) {
+		parentCanvas = newCanvas;
 	}
 	
-	public void keyReleased(KeyEvent e) {
-		System.out.println("Key " + e.character + " (" + e.keyCode + ")" + " was released.");
+	public void asynchronousRedraw() {
+		Display display = parentCanvas.getDisplay();
+		display.asyncExec(new Runnable() {
+			public void run() {
+				parentCanvas.updateParentInformation();
+				parentCanvas.redraw();
+			}
+		});
 	}
 }

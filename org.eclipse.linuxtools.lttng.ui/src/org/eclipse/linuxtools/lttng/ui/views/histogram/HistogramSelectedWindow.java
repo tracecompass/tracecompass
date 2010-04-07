@@ -10,11 +10,11 @@ public class HistogramSelectedWindow {
 	private HistogramContent histogramContent = null;
 
 	public HistogramSelectedWindow(HistogramContent newTraceContent) {
-		setTraceContent(newTraceContent);
+		histogramContent = newTraceContent;
 	}
 	
 	public HistogramSelectedWindow(HistogramContent newTraceContent, int centralPosition, long newWindowWidth) {
-		setTraceContent(newTraceContent);
+		histogramContent = newTraceContent;
 		windowCenterXPosition = centralPosition;
 		windowTimeWidth = newWindowWidth;
 	}

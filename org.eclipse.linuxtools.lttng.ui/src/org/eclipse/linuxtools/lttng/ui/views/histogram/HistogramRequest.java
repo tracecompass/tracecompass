@@ -4,7 +4,6 @@ import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
-import org.eclipse.swt.widgets.Display;
 
 public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 	
@@ -98,6 +97,10 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 				}
 				
 				nbEventRead++;
+				
+				if ( nbEventRead % REDRAW_EVERY_NB_EVENTS == 0 ) {
+					redrawAsyncronously();
+				}
         	}
         	else {
         		// *** FIXME ***
@@ -106,12 +109,12 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
         		// However, we might be far away from the end so we better start a redraw now
         		redrawAsyncronously();
         		requestCompleted = true;
+        		
+        		// Althought it won't do anything, try to call control functions to stop the request
+        		done();
+        		cancel();
+        		fail();
         	}
-			
-			if ( nbEventRead % REDRAW_EVERY_NB_EVENTS == 0 ) {
-				redrawAsyncronously();
-			}
-			
 		}
     }
 	
@@ -122,14 +125,18 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
     
     @Override
     public void handleSuccess() {
+    	// Nothing different from completed.
     }
     
     @Override
     public void handleFailure() {
+    	// Nothing different from cancel.
     }
     
     @Override
     public void handleCancel() {
+    	redrawAsyncronously();
+		requestCompleted = true;
     }
 	
     
@@ -141,13 +148,8 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
     
     public void redrawAsyncronously() {
     	updateEventsInfo();
-    	
-    	Display display = parentCanvas.getDisplay();
-		display.asyncExec(new Runnable() {
-			public void run() {
-				parentCanvas.redraw();
-			}
-		});
+    	// canvas redraw is already asynchronous
+    	parentCanvas.redrawAsynchronously();
     }
     
 }
