@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class ChildrenHistogramCanvas extends HistogramCanvas {
 	
-	protected HistogramView parentHistogramWindow = null; 
+	private HistogramView parentHistogramWindow = null; 
 	
 	/**
 	 * ChildrenHistogramCanvas constructor.<p>

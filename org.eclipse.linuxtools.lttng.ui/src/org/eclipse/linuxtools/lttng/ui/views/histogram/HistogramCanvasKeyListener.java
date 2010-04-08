@@ -23,8 +23,8 @@ import org.eclipse.swt.events.KeyListener;
  */
 public class HistogramCanvasKeyListener implements KeyListener 
 {
-	protected HistogramCanvas parentCanvas = null;
-	protected boolean isShiftPressed = false;
+	private HistogramCanvas parentCanvas = null;
+	private boolean isShiftPressed = false;
 	
 	/**
 	 * HistogramCanvasKeyListener constructor

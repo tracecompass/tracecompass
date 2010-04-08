@@ -24,10 +24,10 @@ import org.eclipse.swt.events.MouseWheelListener;
  */
 public class HistogramCanvasMouseListener implements MouseMoveListener, MouseListener, MouseWheelListener 
 {
-	protected DelayedMouseScroll mouseScrollListener = null;
-	protected HistogramCanvas parentCanvas = null;
+	private DelayedMouseScroll mouseScrollListener = null;
+	private HistogramCanvas parentCanvas = null;
 	
-	protected boolean isWindowMoving = false;
+	private boolean isWindowMoving = false;
 	
 	/**
 	 * HistogramCanvasMouseListener constructor
@@ -46,7 +46,7 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 	 */
 	public void mouseMove(MouseEvent event) {
 		if ( isWindowMoving == true ) {
-			parentCanvas.setWindowCenterPosition(event.x);
+			parentCanvas.centerWindow(event.x);
 		}
 	}
 	
@@ -59,7 +59,7 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 	public void mouseDown(MouseEvent event) {
 		if ( event.button == 1) {
 			isWindowMoving = true;
-			parentCanvas.setWindowCenterPosition(event.x);
+			parentCanvas.centerWindow(event.x);
 		}
 	}
 	
@@ -72,7 +72,7 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 	public void mouseUp(MouseEvent event) {
 		if ( event.button == 1) {
 			isWindowMoving = false;
-			parentCanvas.notifyParentSelectionWindowChangedAsynchronously();
+			parentCanvas.notifyParentSelectionWindowChanged();
 		}
 	}
 	
@@ -83,7 +83,7 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 	 * @param event  The generated mouse event when the mouse double-click was issued.
 	 */
 	public void mouseDoubleClick(MouseEvent event) {
-//		System.out.println("mouseDoubleClick");
+		System.out.println("mouseDoubleClick");
 	}
 	
 	/**
@@ -140,7 +140,7 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 		}
 		
 		// Resize the canvas selection window  
-		parentCanvas.resizeWindowByAbsoluteTime(ajustedTime);
+		parentCanvas.resizeWindowByTimeFactor(ajustedTime);
 	}
 	
 }
@@ -217,7 +217,6 @@ class DelayedMouseScroll extends Thread {
 	 * So, the "longest" we could wait after the last event is "waitTimeBetweenScroll" + "waitTimeBetweenCheck"
 	 * 
 	 */
-	@Override
 	public void run() {
 		// Check if we waited more than "waitTimeBetweenScroll"
 		while ( (System.currentTimeMillis() - lastScrollTime) < waitTimeBetweenScroll ) {

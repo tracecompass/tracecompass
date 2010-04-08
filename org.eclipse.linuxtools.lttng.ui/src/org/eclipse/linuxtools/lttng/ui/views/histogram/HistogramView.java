@@ -9,7 +9,6 @@
  * Contributors:
  *   William Bourque - Initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
 
@@ -49,10 +48,10 @@ public class HistogramView extends TmfView {
     private TmfExperiment<LttngEvent> lastUsedExperiment = null;
     
     private HistogramRequest dataBackgroundFullRequest = null;
-    private ParentTraceCanvas fullTraceCanvas = null;
+    private ParentHistogramCanvas fullTraceCanvas = null;
     
 	private HistogramRequest selectedWindowRequest = null;
-    private ChildrenTraceCanvas selectedWindowCanvas = null;
+    private ChildrenHistogramCanvas selectedWindowCanvas = null;
     
 	private Label lblStartTime = null;
 	private Label lblStopTime = null;
@@ -80,7 +79,7 @@ public class HistogramView extends TmfView {
 		GridData gridData1 = new GridData(SWT.FILL, SWT.TOP, true, false, 3, 2);
 		gridData1.heightHint = FULL_TRACE_CANVAS_HEIGHT;
 		gridData1.minimumHeight = FULL_TRACE_CANVAS_HEIGHT;
-		fullTraceCanvas = new ParentTraceCanvas(this, folderGroup, SWT.BORDER, FULL_TRACE_BAR_WIDTH, FULL_TRACE_CANVAS_HEIGHT);
+		fullTraceCanvas = new ParentHistogramCanvas(this, folderGroup, SWT.BORDER);
 		fullTraceCanvas.setLayoutData(gridData1);
 		fullTraceCanvas.redraw();
 		
@@ -115,7 +114,7 @@ public class HistogramView extends TmfView {
 		gridData4.minimumHeight = SELECTED_WINDOW_CANVAS_HEIGHT;
 		gridData4.widthHint = SELECTED_WINDOW_CANVAS_WIDTH;
 		gridData4.minimumWidth = SELECTED_WINDOW_CANVAS_WIDTH;
-		selectedWindowCanvas = new ChildrenTraceCanvas(this, folderGroup, SWT.BORDER, SELECTED_WINDOW_BAR_WIDTH, SELECTED_WINDOW_CANVAS_HEIGHT);
+		selectedWindowCanvas = new ChildrenHistogramCanvas(this, folderGroup, SWT.BORDER);
 		selectedWindowCanvas.setLayoutData(gridData4);
 		selectedWindowCanvas.redraw();
 		
@@ -161,11 +160,13 @@ public class HistogramView extends TmfView {
     public void createCanvasAndRequests(TmfExperiment<LttngEvent> newExperiment) {
     	lastUsedExperiment = newExperiment;
     	
-    	lblStartTime.setText( "" +  newExperiment.getStartTime().getValue() );
-		lblStopTime.setText( "" + newExperiment.getEndTime().getValue() );
+    	String startTime = formatNanoSecondsTime( newExperiment.getStartTime().getValue() );
+		String stopTime = formatNanoSecondsTime( newExperiment.getEndTime().getValue() );
+    	lblStartTime.setText( startTime );
+		lblStopTime.setText( stopTime );
     	
-		fullTraceCanvas.createNewHistogramContent( DEFAULT_WINDOW_SIZE, FULL_TRACE_DIFFERENCE_TO_AVERAGE);
-		selectedWindowCanvas.createNewHistogramContent(0, SELECTED_WINDOW_DIFFERENCE_TO_AVERAGE);
+		fullTraceCanvas.createNewHistogramContent( DEFAULT_WINDOW_SIZE, FULL_TRACE_BAR_WIDTH, FULL_TRACE_CANVAS_HEIGHT, FULL_TRACE_DIFFERENCE_TO_AVERAGE);
+		selectedWindowCanvas.createNewHistogramContent(0, SELECTED_WINDOW_BAR_WIDTH, SELECTED_WINDOW_CANVAS_HEIGHT, SELECTED_WINDOW_DIFFERENCE_TO_AVERAGE);
 		
 		// Redraw the canvas right away to have something "clean" as soon as we can
     	if ( dataBackgroundFullRequest != null ) {
@@ -184,7 +185,8 @@ public class HistogramView extends TmfView {
     	HistogramSelectedWindow curSelectedWindow = fullTraceCanvas.getCurrentWindow();
     	
     	if ( curSelectedWindow == null ) {
-    		curSelectedWindow = fullTraceCanvas.createNewSelectedWindow( getTimeWindowSize() );
+    		fullTraceCanvas.createNewSelectedWindow( getTimeWindowSize() );
+    		curSelectedWindow = fullTraceCanvas.getCurrentWindow();
     	}
     	
 		LttngTimestamp ts1 = new LttngTimestamp( curSelectedWindow.getTimestampLeft() );
@@ -224,18 +226,15 @@ public class HistogramView extends TmfView {
     
     // *** VERIFY ***
     // this function is synchronized, is it a good idea?
-    public synchronized HistogramRequest performRequest(TmfExperiment<LttngEvent> experiment, TraceCanvas targetCanvas, TmfTimeRange newRange, long newInterval) {
+    public synchronized HistogramRequest performRequest(TmfExperiment<LttngEvent> experiment, HistogramCanvas targetCanvas, TmfTimeRange newRange, long newInterval) {
     	HistogramRequest returnedRequest = null;
     	
-        // The content holder we will use
-        HistogramContent content = targetCanvas.getHistogramContent();
-        
         // *** FIXME ***
         // EVIL BUG!
 	    // We use integer.MAX_VALUE because we want every events BUT we don't know the number inside the range.
         // HOWEVER, this would cause the request to run forever (or until it reach the end of trace).
         // Seeting an EndTime does not seems to stop the request
-        returnedRequest = new HistogramRequest(LttngEvent.class, newRange, Integer.MAX_VALUE, content, targetCanvas, newInterval );
+        returnedRequest = new HistogramRequest(newRange, Integer.MAX_VALUE, targetCanvas, newInterval );
         
         experiment.sendRequest(returnedRequest);
         
@@ -294,14 +293,29 @@ public class HistogramView extends TmfView {
 		fullTraceCanvas.setSelectedWindowSize(newTimeWidth);
 	}
 	
-	public void updateViewInformation() {
-		lblStartTime.setText( fullTraceCanvas.getHistogramContent().getStartTime().toString() );
-		lblStopTime.setText( fullTraceCanvas.getHistogramContent().getEndTime().toString() );
-		
-		if ( selectedWindowRequest.isCompleted() == true ) {
-			lblTopEvent.setText( selectedWindowCanvas.getHistogramContent().getHeighestEventCount().toString() );
-			lblBottomEvent.setText("0");
+	public String formatNanoSecondsTime(Long nanosecTime) {
+		String returnedTime = nanosecTime.toString();
+		if ( returnedTime.length() > 9 ) {
+			returnedTime = returnedTime.substring(0, returnedTime.length() - 9 ) + "." + returnedTime.substring( returnedTime.length() - 9 );
 		}
+		
+		return returnedTime;
 	}
+	
+	public void updateFullTraceInformation() {
+		
+		String startTime = formatNanoSecondsTime( fullTraceCanvas.getHistogramContent().getStartTime() );
+		String stopTime = formatNanoSecondsTime( fullTraceCanvas.getHistogramContent().getEndTime() );
+		
+		lblStartTime.setText( startTime );
+		lblStopTime.setText( stopTime );
+	}
+	
+	public void updateSelectedWindowInformation() {
+		lblTopEvent.setText( selectedWindowCanvas.getHistogramContent().getHeighestEventCount().toString() );
+		lblBottomEvent.setText("0");
+	}
+	
+	
 	
 }

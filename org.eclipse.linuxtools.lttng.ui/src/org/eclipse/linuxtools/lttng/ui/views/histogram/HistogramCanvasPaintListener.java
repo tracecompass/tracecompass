@@ -15,153 +15,122 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Rectangle;
 
-/**
- * <b><u>HistogramCanvasPaintListener</u></b>
- * <p>
- * Implementation of a PaintListener for the need of the HistogramCanvas
- * <p> 
- */
-public class HistogramCanvasPaintListener implements PaintListener 
-{
-	protected HistogramCanvas  parentCanvas = null;
+public class HistogramCanvasPaintListener implements PaintListener {
+	private HistogramContent histogramContent = null;
+	private HistogramSelectedWindow selectedWindow = null;
 	
-	/**
-	 * HistogramCanvasPaintListener constructor
-	 * 
-	 * @param parentCanvas Related canvas
-	 */
-	public HistogramCanvasPaintListener(HistogramCanvas newParentCanvas) {
-		parentCanvas = newParentCanvas;
+	private int columnWidth = 0;
+	private int columnHeight = 0;
+	
+	public HistogramCanvasPaintListener(HistogramCanvas parentCanvas) {
+		histogramContent = parentCanvas.getHistogramContent();
 	}
 	
-	/**
-	 * Function called when the canvas need to redraw.<p>
-	 * 
-	 * @param event  The generated paint event when redraw is called.
-	 */
-	public void paintControl(PaintEvent event) {
+	public void paintControl(PaintEvent e) {
 		
-		// First clear the whole canvas to have a clean section where to draw
-		clearDrawingSection(event);
+		clearDrawingSection(e);
 		
-		// If the content is null or has rady to draw we quit the function here
-		if ( (parentCanvas.getHistogramContent() == null) || (parentCanvas.getHistogramContent().getReadyUpToPosition() == 0) ) {
+		if ( (histogramContent == null) || (histogramContent.getReadyUpToPosition() == 0) ) {
 			return;
 		}
 		
-		// Call the function that draw the bars
-		drawHistogram(event);
-		
-		// Pinpoint a position if set
-		if (parentCanvas.getHistogramContent().getSelectedEventTimeInWindow() > 0 ) {
-			drawSelectedEventInWindow(event);
+		if ( (e.height != columnHeight) && (columnHeight != 0) ) {
+			columnHeight = e.height;
 		}
 		
-		// If we have a selected window set to visible, call the function to draw it
-		if ( (parentCanvas.getCurrentWindow()  != null) && (parentCanvas.getCurrentWindow().getSelectedWindowVisible() == true) ) {
-			drawSelectedWindow(event);
+		drawHistogram(e);
+		
+		if ( (selectedWindow != null) && (selectedWindow.getSelectedWindowVisible() == true) ) {
+			drawSelectedWindow(e);
 		}
 	}
 	
-	/**
-	 * Clear the drawing section of the canvas<p>
-	 * This paint the whole background in EMPTY_BACKGROUND_COLOR, so we have something clean to draw on.
-	 * 
-	 * @param event The generated paint event when redraw is called.
-	 */
-	public void clearDrawingSection(PaintEvent event) {
-		event.gc.setForeground(event.display.getSystemColor(HistogramConstant.EMPTY_BACKGROUND_COLOR));
-		event.gc.setBackground(event.display.getSystemColor(HistogramConstant.EMPTY_BACKGROUND_COLOR));
-		Rectangle allSection = new Rectangle(0, 0, event.width, event.height);
-		event.gc.fillRectangle(allSection);
-		event.gc.drawRectangle(allSection);
+	public void clearDrawingSection(PaintEvent e) {
+		e.gc.setForeground(e.display.getSystemColor(HistogramConstant.EMPTY_BACKGROUND_COLOR));
+		e.gc.setBackground(e.display.getSystemColor(HistogramConstant.EMPTY_BACKGROUND_COLOR));
+		Rectangle allSection = new Rectangle(0, 0, e.width, e.height);
+		e.gc.fillRectangle(allSection);
+		e.gc.drawRectangle(allSection);
 	}
 	
 	// *** VERIFY ***
 	// Is it good to put this synchronized?
 	//
-	/**
-	 * Draw the histogram bars in the canvas.<p>
-	 * Use existing elements in HistogramContent to draw bars on the cancas; 
-	 * 	the element table in content need to be populated and have consistent value.  
-	 * 
-	 * @param event The generated paint event when redraw is called.
-	 */
-	public synchronized void drawHistogram(PaintEvent event) {
-		HistogramContent tmpContent = parentCanvas.getHistogramContent();
-		int tmpBarWidth = tmpContent.getBarsWidth();
+	public synchronized void drawHistogram(PaintEvent e) {
+	    e.gc.setForeground(e.display.getSystemColor(HistogramConstant.EMPTY_BACKGROUND_COLOR));
+		Rectangle allSection = new Rectangle(0, 0, histogramContent.getReadyUpToPosition()*columnWidth, e.height);
+		e.gc.fillRectangle(allSection);
+		e.gc.drawRectangle(allSection);
 		
-		// This will be the color for all the bars that wil be draw below.
-		event.gc.setBackground(event.display.getSystemColor(HistogramConstant.HISTOGRAM_BARS_COLOR));
-		
-		// *** NOTE *** 
-		// Y Position in a canvas is REVERSED, so "0" is on top of the screen and "MAX" is on bottom.
-		// Not very instinctive, isn't it?
-		
-		// Draw a bar from the left (pos X=0) until the pos=(NbBars*barWidth). If space is left, it will be blanked after.
-	    for ( int x=0; x<tmpContent.getReadyUpToPosition(); x++) {
-    		Rectangle rect = new Rectangle(tmpBarWidth*x, event.height - tmpContent.getElementByIndex(x).intervalHeight, tmpBarWidth, tmpContent.getElementByIndex(x).intervalHeight);
-    		event.gc.fillRectangle(rect);
+	    e.gc.setBackground(e.display.getSystemColor(HistogramConstant.HISTOGRAM_BARS_COLOR));
+	    for ( int x=0; x<histogramContent.getReadyUpToPosition(); x++) {
+	    	Rectangle rect = new Rectangle(columnWidth*x, columnHeight - histogramContent.getElementByIndex(x).intervalHeight, columnWidth, histogramContent.getElementByIndex(x).intervalHeight);
+			
+	    	e.gc.fillRectangle(rect);
 	    }
 	    
-	    // Clear the remaining space in the canvas (if any) so it appears clean.
-	    event.gc.setBackground(event.display.getSystemColor(HistogramConstant.EMPTY_BACKGROUND_COLOR));
-	    Rectangle rect = new Rectangle(tmpBarWidth*tmpContent.getNbElement(), 0, event.width, event.height);
-	    event.gc.fillRectangle(rect);
+	    e.gc.setBackground(e.display.getSystemColor(HistogramConstant.EMPTY_BACKGROUND_COLOR));
+	    Rectangle rect = new Rectangle(columnWidth*histogramContent.getNbElement(), 0, e.width, columnHeight);
+		e.gc.fillRectangle(rect);
 	}
 	
-	/**
-	 * Draw a certain event selected in the window.<p>
-	 * 
-	 * @param event The generated paint event when redraw is called.
-	 */
-	public synchronized void drawSelectedEventInWindow(PaintEvent event) {
-		HistogramContent tmpContent = parentCanvas.getHistogramContent();
-		int tmpBarWidth = tmpContent.getBarsWidth();
+	public void drawSelectedWindow(PaintEvent e) {
 		
-		// This will be the color for all the bars that wil be draw below.
-		event.gc.setBackground(event.display.getSystemColor(HistogramConstant.SELECTED_EVENT_COLOR));
+		e.gc.setForeground(e.display.getSystemColor(HistogramConstant.SELECTION_WINDOW_COLOR));
+	    e.gc.setBackground(e.display.getSystemColor(HistogramConstant.SELECTION_WINDOW_COLOR));
 		
-		int position = tmpContent.getClosestXPositionFromTimestamp(tmpContent.getSelectedEventTimeInWindow());
-		
-		Rectangle rect = new Rectangle(tmpBarWidth*position, 0, tmpBarWidth, event.height);
-		event.gc.fillRectangle(rect);
-	}
-	
-	/**
-	 * Draw the selection window in the canvas.<p>
-	 * This draw a square around the selected section with a crosshair in the middle.
-	 * The square cannot be smaller than "MINIMUM_WINDOW_WIDTH"
-	 * 
-	 * @param event The generated paint event when redraw is called.
-	 */
-	public void drawSelectedWindow(PaintEvent event) {
-		HistogramSelectedWindow tmpWindow = parentCanvas.getCurrentWindow();
-		
-		// Attributes (color and width) of the lines
-		event.gc.setForeground(event.display.getSystemColor(HistogramConstant.SELECTION_WINDOW_COLOR));
-		event.gc.setLineWidth(HistogramConstant.SELECTION_LINE_WIDTH);
+		e.gc.setLineWidth(HistogramConstant.SELECTION_LINE_WIDTH);
 	    
-		// Get the window position... this would fail if the window is not initialized yet
-		int positionCenter = tmpWindow.getWindowXPositionCenter();
-		int positionLeft = tmpWindow.getWindowXPositionLeft();
-		int positionRight = tmpWindow.getWindowXPositionRight();
+		int positionCenter = selectedWindow.getWindowCenterXPosition();
+		int positionLeft = selectedWindow.getWindowPositionLeft();
+		int positionRight = selectedWindow.getWindowPositionRight();
 		
-		// Minimal size verification.
 		if ( (positionRight - positionLeft) < HistogramConstant.MINIMUM_WINDOW_WIDTH ) {
 			positionLeft  = positionCenter - (HistogramConstant.MINIMUM_WINDOW_WIDTH/2);
 			positionRight = positionCenter + (HistogramConstant.MINIMUM_WINDOW_WIDTH/2);
 		}
 		
-		// Draw the selection window square
-		event.gc.drawLine(positionLeft , 0       	 , positionLeft , event.height);
-		event.gc.drawLine(positionLeft , event.height, positionRight, event.height);
-		event.gc.drawLine(positionRight, event.height, positionRight, 0);
-		event.gc.drawLine(positionLeft , 0       	 , positionRight, 0);
+		e.gc.drawLine(positionLeft , 0       , positionLeft , e.height);
+	    e.gc.drawLine(positionLeft , e.height, positionRight, e.height);
+	    e.gc.drawLine(positionRight, e.height, positionRight, 0);
+	    e.gc.drawLine(positionLeft , 0       , positionRight, 0);
 	    
-		// Draw the crosshair section
-		event.gc.drawLine(positionCenter + HistogramConstant.SELECTION_CROSSHAIR_LENGTH, event.height/2, positionCenter - HistogramConstant.SELECTION_CROSSHAIR_LENGTH, event.height/2);
-		event.gc.drawLine(positionCenter, (event.height/2) + HistogramConstant.SELECTION_CROSSHAIR_LENGTH, positionCenter, (event.height/2) - HistogramConstant.SELECTION_CROSSHAIR_LENGTH);
+	    
+	    e.gc.drawLine(positionCenter + HistogramConstant.SELECTION_CROSSHAIR_LENGTH, e.height/2, positionCenter - HistogramConstant.SELECTION_CROSSHAIR_LENGTH, e.height/2);
+	    e.gc.drawLine(positionCenter, (e.height/2) + HistogramConstant.SELECTION_CROSSHAIR_LENGTH, positionCenter, (e.height/2) - HistogramConstant.SELECTION_CROSSHAIR_LENGTH);
+	}
+	
+	
+	public HistogramContent getHistogramContent() {
+		return histogramContent;
+	}
+	
+	public void setHistogramContent(HistogramContent newhistogramContent) {
+		this.histogramContent = newhistogramContent;
+	}
+	
+	public int getColumnWidth() {
+		return columnWidth;
+	}
+	
+	public void setColumnWidth(int newcolumnWidth) {
+		this.columnWidth = newcolumnWidth;
+	}
+	
+	public int getColumnHeight() {
+		return columnHeight;
+	}
+	
+	public void setColumnHeight(int newcolumnHeight) {
+		this.columnHeight = newcolumnHeight;
+	}
+
+	public void setSelectedWindow(HistogramSelectedWindow newSelectedWindow) {
+		this.selectedWindow = newSelectedWindow;
+	}
+
+	public HistogramSelectedWindow getSelectedWindow() {
+		return selectedWindow;
 	}
 	
 }

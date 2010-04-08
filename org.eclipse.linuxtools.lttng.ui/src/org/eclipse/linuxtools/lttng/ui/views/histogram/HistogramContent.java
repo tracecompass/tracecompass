@@ -1,10 +1,19 @@
+/*******************************************************************************
+ * Copyright (c) 2009 Ericsson
+ * 
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *   William Bourque - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 public class HistogramContent {
-	
-	final static double DEFAULT_DIFFERENCE_TO_AVERAGE = 100.0;
 	
 	private Long 	startTime = 0L;
 	private Long 	endTime   = 0L;
@@ -13,7 +22,7 @@ public class HistogramContent {
 	private Double 	heightFactor = 0.0;
 	private Long   	heighestEventCount = 0L;
 	private Integer maxHeight	 = 0;
-	private Double  maxDifferenceToAverage = DEFAULT_DIFFERENCE_TO_AVERAGE;
+	private Double  maxDifferenceToAverage = HistogramConstant.DEFAULT_DIFFERENCE_TO_AVERAGE;
 	
 	private Integer	readyUpToPosition = 0;
 	private Integer	fullWindowSize = 0;
@@ -23,7 +32,7 @@ public class HistogramContent {
 	private HistogramElement[] elementTable;
 	
 	public HistogramContent(int tableSize, int newWindowsSize, int newMaxHeight) {
-		this(tableSize, newWindowsSize, newMaxHeight, DEFAULT_DIFFERENCE_TO_AVERAGE);
+		this(tableSize, newWindowsSize, newMaxHeight, HistogramConstant.DEFAULT_DIFFERENCE_TO_AVERAGE);
 	}
 	
 	public HistogramContent(int tableSize, int newWindowsSize, int newMaxHeight, double newDiffToAverage) {
@@ -93,14 +102,6 @@ public class HistogramContent {
 			elementTable[x].intervalHeight = (int)(elementTable[x].intervalNbEvents * heightFactor);
 		}
 	}
-	
-	/*
-	// *** VERIFY ***
-	// We don't need to expose the table, do we ?
-	public HistogramElement[] getElementTable() {
-		return elementTable;
-	}
-	*/
 	
 	public int getNbElement() {
 		return elementTable.length;
@@ -227,7 +228,7 @@ public class HistogramContent {
 		this.endTime = newEndTime;
 	}
 	
-	public Long getFullTraceInterval() {
+	public Long getCompleteTimeInterval() {
 		return ( endTime - startTime );
 	}
 	
