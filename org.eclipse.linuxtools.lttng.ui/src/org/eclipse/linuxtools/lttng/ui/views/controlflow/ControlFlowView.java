@@ -519,7 +519,10 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 		// Traces shall not be grouped to allow synchronisation
 		tsfviewer.groupTraces(false);
-		tsfviewer.setItemHeight(itemHeight);
+		
+		int swtBugAjustment = checkForSWTBugItemHeightAdjustement();
+		tsfviewer.setItemHeight(itemHeight + swtBugAjustment);
+		
 		tsfviewer.setBorderWidth(borderWidth);
 		tsfviewer.setHeaderHeight(headerHeight);
 		tsfviewer.setVisibleVerticalScroll(false);
@@ -1235,4 +1238,25 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 			TraceDebug.debug(sb.toString());
 		}
 	}
+	
+	// *** HACK ***
+	//
+	//
+	//
+	public int checkForSWTBugItemHeightAdjustement() {
+		int returnedAjustement = 0;
+		String desktopSessionName = System.getenv("DESKTOP_SESSION");
+		
+		// Gnome : most common case, no adjustement
+		if ( desktopSessionName.equals("gnome") ) {
+			returnedAjustement = 0;
+		}
+		// Kde : ajustement of 2 is needed
+		else if ( desktopSessionName.equals("kde") ) {
+			returnedAjustement = 2;
+		}
+		
+		return returnedAjustement;
+	}
 }
+
