@@ -94,8 +94,7 @@ public class HistogramCanvas extends Canvas
 		// paintlistener need to know about the new content...
 		// This is nowhere near elegant, change me.
 		paintListener.setHistogramContent(histogramContent);
-		paintListener.setColumnWidth(widthPerBar);
-		paintListener.setColumnHeight(barsHeight);
+		paintListener.setBarWidth(widthPerBar);
 		
 		// New selected window, not visible by default
 		createNewSelectedWindow(windowSize);

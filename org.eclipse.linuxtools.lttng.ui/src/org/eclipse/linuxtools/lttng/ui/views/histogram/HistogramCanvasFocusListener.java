@@ -22,7 +22,6 @@ import org.eclipse.swt.events.FocusListener;
  */
 public class HistogramCanvasFocusListener implements FocusListener {
 	
-	@SuppressWarnings("unused")
 	private HistogramCanvas parentCanvas = null;
 	
 	/**
@@ -37,12 +36,12 @@ public class HistogramCanvasFocusListener implements FocusListener {
 	/**
 	 * Function that is called when the canvas get focus.<p>
 	 * 
-	 * Doesn't do anything yet... 
+	 * Redraw the screen to make sure everything is sane. 
 	 * 
 	 * @param event  The focus event generated.
 	 */
 	public void focusGained(FocusEvent event) {
-		System.out.println("focusGained");
+		parentCanvas.redrawAsynchronously();
 	}
 	
 	/**

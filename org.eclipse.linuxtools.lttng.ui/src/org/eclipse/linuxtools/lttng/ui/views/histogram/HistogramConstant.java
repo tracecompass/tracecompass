@@ -23,10 +23,11 @@ public interface HistogramConstant {
 	// Constants relative to requests
 	final static int MAX_EVENTS_PER_READ = 1;
 	final static int REDRAW_EVERY_NB_EVENTS = 10000;
+	final static boolean SKIP_EMPTY_INTERVALS_WHEN_CALCULATING_AVERAGE = true;
 	
 	
 	// Constant relative to the content
-	final static double DEFAULT_DIFFERENCE_TO_AVERAGE = 100.0;
+	final static double DEFAULT_DIFFERENCE_TO_AVERAGE = 1000.0;
 	
 	
 	

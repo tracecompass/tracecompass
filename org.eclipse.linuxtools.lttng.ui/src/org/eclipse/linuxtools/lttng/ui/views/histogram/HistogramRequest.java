@@ -116,7 +116,7 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 					}
 					
 					// * NOTE * 
-					// We save the time we have. This mean only the FIRST time read in an interval will be saved. 
+					// We save the time we have here. This mean only the FIRST time read in an interval will be saved. 
 					histogramContent.getElementByIndex(lastInterval).firstIntervalTimestamp = lastRangeTime;
 					histogramContent.setReadyUpToPosition(lastInterval);
 					
@@ -193,10 +193,19 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 	
     /**
 	 * Update the HistogramContent with the latest information.<p>
-	 * This will perform some calculation that might be a bit harsh so it shouldnt be called too often.
+	 * This will perform some calculation that might be a bit harsh so it should'nt be called too often.
 	 */
     public void updateEventsInfo() {
-    	int averageNumberOfEvents = nbEventRead / nbIntervalNotEmpty;
+    	// *** Note *** 
+    	// The average number of event is calculated while skipping empty interval if asked
+    	int averageNumberOfEvents = 0;
+    	if ( HistogramConstant.SKIP_EMPTY_INTERVALS_WHEN_CALCULATING_AVERAGE ) {
+    		averageNumberOfEvents = nbEventRead / nbIntervalNotEmpty;
+    	}
+    	else {
+    		averageNumberOfEvents = nbEventRead / histogramContent.getNbElement();
+    	}
+    	
 		histogramContent.setAverageNumberOfEvents(averageNumberOfEvents);
 		histogramContent.recalculateEventHeight();
     }
