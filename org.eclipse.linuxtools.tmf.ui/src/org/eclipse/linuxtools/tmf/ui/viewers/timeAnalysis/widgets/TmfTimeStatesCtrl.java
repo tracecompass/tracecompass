@@ -872,24 +872,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		for (int i = _topItem; i < items.length; i++) {
 			Item item = (Item) items[i];
 			
-			// *** FIXME ***
-			// Everything in this file should be redone with comments.
-			// How the hell am I suppose to understand anything in here?
-			
-			// *** HACK ***
-			// The drawing of the rectangle can be wrong on some system.
-			// _itemHeight can be slightly smaller than the height space for the table (bound.height / items.length)
-			// This would cause the rectangle to slowly "slide" and to no longer get aligned with their text.
-			//
-			// ...There is probably a reason WHY the height space is different in the first hand 
-			//	but this code is a total mess, does not have any comments and is globally impossible to read/understand the way it is right now.
-			//
-			// For now, this little fix should do it... I hope.
-			int newItemHeight = (bound.height / items.length);
-			if ( (items.length > 12) && ( newItemHeight > _itemHeight ) ) {
-				_itemHeight = newItemHeight;
-			}
-			
 			getNameRect(_rect0, bound, i, nameWidth);
 			if (_rect0.y >= bound.y + bound.height)
 				break;
