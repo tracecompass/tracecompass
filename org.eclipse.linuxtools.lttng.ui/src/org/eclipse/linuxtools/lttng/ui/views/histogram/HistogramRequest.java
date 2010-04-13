@@ -54,18 +54,18 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
         // This does not work! The request won't be processed or the number of events returned is wrong!
         // We cannot use this !
 		//super((Class<LttngEvent>)dataType, range);
-		
+        
         parentCanvas = newParentCanvas;
         histogramContent = parentCanvas.getHistogramContent();
         
         // Reset the content of the HistogramContent... the given data better be valid or this will fail.
-        histogramContent.resetContentData();
-        histogramContent.setStartTime(range.getStartTime().getValue());
-        histogramContent.setEndTime(range.getEndTime().getValue());
-        histogramContent.setIntervalTime(timeInterval);
-        histogramContent.resetTable();
+        histogramContent.clearContentData();
+        histogramContent.resetTable(range.getStartTime().getValue(), range.getEndTime().getValue(), timeInterval);
         
-        lastRangeTime = histogramContent.getStartTime();
+        lastRangeTime = range.getStartTime().getValue();
+        
+        // Notify the UI even before the request started, so we set the timestamp already.
+        parentCanvas.notifyParentUpdatedInformationAsynchronously();
     }
 	
 	/**
@@ -89,7 +89,9 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
         	LttngEvent tmpEvent = (LttngEvent)evt[0];
         	
         	// This check is linked to the evil fix mentionned above
-        	if ( tmpEvent.getTimestamp().getValue() <= histogramContent.getEndTime() ) {
+        	if ( ( tmpEvent.getTimestamp().getValue() >= histogramContent.getStartTime() ) &&
+        		 ( tmpEvent.getTimestamp().getValue() <= histogramContent.getEndTime() ) )
+        	{
         		
         		// Distance (in time) between this event and the last one we read
 	        	long distance = ( tmpEvent.getTimestamp().getValue() - lastRangeTime );
@@ -140,17 +142,16 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 				}
         	}
         	else {
+        		//System.out.println("Requested Timerange is : " + histogramContent.getStartTime() + " / " + histogramContent.getEndTime());
+        		//System.out.println("Time is : " + tmpEvent.getTimestamp().getValue());
         		// *** FIXME ***
             	// *** EVIL FIX ***
                 // Because of the other evil bug (see above), we have to ignore extra useless events we will get
         		// However, we might be far away from the end so we better start a redraw now
-        		redrawAsyncronously();
-        		requestCompleted = true;
-        		
-        		// Althought it won't do anything, try to call control functions to stop the request
-        		done();
-        		cancel();
-        		fail();
+        		if (tmpEvent.getTimestamp().getValue() >= histogramContent.getEndTime()) {
+	        		redrawAsyncronously();
+	        		requestCompleted = true;
+        		}
         	}
 		}
     }
@@ -161,7 +162,7 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 	 */
     @Override
     public void handleCompleted() {
-    	parentCanvas.canvasRedrawer.asynchronousNotifyParentUpdatedInformation();
+    	parentCanvas.notifyParentUpdatedInformationAsynchronously();
 		redrawAsyncronously();
     }
     

@@ -72,7 +72,7 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 	public void mouseUp(MouseEvent event) {
 		if ( event.button == 1) {
 			isWindowMoving = false;
-			parentCanvas.notifyParentSelectionWindowChanged();
+			parentCanvas.notifyParentSelectionWindowChangedAsynchronously();
 		}
 	}
 	

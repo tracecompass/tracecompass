@@ -86,7 +86,7 @@ public class HistogramContent {
 	/**
 	 * Reset all HistogramContent attributes, but keep the elements table untouched.<p>
 	 */
-	public void resetContentData() {
+	public void clearContentData() {
 		startTime = 0L;
 		endTime = 0L;
 		
@@ -99,12 +99,45 @@ public class HistogramContent {
 	
 	/**
 	 * Reset the data in the elements table.<p>
-	 * NOTE : For this to be consistent and usuable, "startTime" and "intervalTime" need to be set.
+	 * NOTE : For this to be consistent and usuable, "startTime", "endTime" and "intervalTime" need to be set already.
 	 */
 	public void resetTable() {
 		for ( int x=0; x<elementTable.length; x++) {
 			elementTable[x].position = x;
 			elementTable[x].firstIntervalTimestamp = startTime + (x*intervalTime);
+			elementTable[x].intervalNbEvents = 0L;
+			elementTable[x].intervalHeight = 0;
+		}
+	}
+	
+	/**
+	 * Reset the data in the elements table.<p>
+	 * NOTE : For this to be consistent and usuable, "startTime" and "intervalTime" need to be set.
+	 */
+	public void resetTable(Long newStartTime, Long newEndTime, Long newIntervalTime) {
+		
+		startTime = newStartTime;
+		endTime = newEndTime;
+		intervalTime = newIntervalTime;
+		
+		for ( int x=0; x<elementTable.length; x++) {
+			elementTable[x].position = x;
+			elementTable[x].firstIntervalTimestamp = startTime + (x*intervalTime);
+			elementTable[x].intervalNbEvents = 0L;
+			elementTable[x].intervalHeight = 0;
+		}
+	}
+	
+	
+	/**
+	 * Clear (zeroed) the data in the elements table.<p>
+	 * NOTE : Unlike reset, this does not recalculate the content, 
+	 *			so it should be done either by hand or by calling reset table after.
+	 */
+	public void clearTable() {
+		for ( int x=0; x<elementTable.length; x++) {
+			elementTable[x].position = x;
+			elementTable[x].firstIntervalTimestamp = 0L;
 			elementTable[x].intervalNbEvents = 0L;
 			elementTable[x].intervalHeight = 0;
 		}
@@ -129,7 +162,7 @@ public class HistogramContent {
 	 */
 	public void printTable() {
 		for ( int x=0; x<elementTable.length; x++) {
-			System.out.println("X:" + x + " -> " + elementTable[x].intervalNbEvents + ":" + elementTable[x].intervalHeight);
+			System.out.println("X:" + x + " -> " + elementTable[x].intervalNbEvents + ":" + elementTable[x].intervalHeight + " (" + elementTable[x].firstIntervalTimestamp + ")");
 		}
 	}
 	
@@ -179,6 +212,21 @@ public class HistogramContent {
 	}
 	
 	/**
+	 * Return the closest element's timestamp to a X position on the canvas.<p>
+	 * Note : canvasFullSize need to be set correctly here, otherwise unexpected timestamp might be returned.<p>
+	 * <p>
+	 * NOTE : This <b>ALWAYS</b> return a timestamp; 
+	 * 		If calculation lead outside the table, the first or the last timestamp will be returned.  
+	 * 
+	 * @param position  The X position we are looking at (0 < pos < canvasWidth) 
+	 * 
+	 * @return	The <i>closest</i> timestamp found.
+	 */
+	public Long getClosestTimestampFromXPosition(int position) {
+		return getClosestElementFromXPosition(position).firstIntervalTimestamp;
+	}
+	
+	/**
 	 * Return the X position (relative to the canvas) of a certain element.<p>
 	 * Note : canvasFullSize need to be set correctly here, otherwise unexpected element might be returned.<p>
 	 * 
@@ -216,6 +264,21 @@ public class HistogramContent {
 		}
 		
 		return elementTable[index];
+	}
+	
+	/**
+	 * Return the closest X position to a timestamp (long) given.<p>
+	 * Note : startTime and intervalTime need to be set correctly here, otherwise unexpected position might be returned.<p>
+	 * <p>
+	 * NOTE : This <b>ALWAYS</b> return a position; 
+	 * 		If calculation lead outside the table, the first or the last position will be returned.  
+	 * 
+	 * @param timestamp  The timestamp (in nanosecond, as long) of the element we are looking for (startTime < timestamp < endTime) 
+	 * 
+	 * @return	The <i>closest</i> position found.
+	 */
+	public Integer getClosestXPositionFromTimestamp(long timestamp) {
+		return getXPositionFromElement(getClosestElementFromTimestamp(timestamp));
 	}
 	
 	/**

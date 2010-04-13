@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.lttng.ui.views.histogram;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperimentUpdatedSignal;
@@ -23,27 +24,42 @@ import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 
 public class HistogramView extends TmfView {
 
     public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.histogram";
     
-    private static int FULL_TRACE_CANVAS_HEIGHT = 50;
-    private static int FULL_TRACE_BAR_WIDTH = 1;
-    private static double FULL_TRACE_DIFFERENCE_TO_AVERAGE = 2.0;
     
-    private static int SELECTED_WINDOW_CANVAS_WIDTH = 300;
-    private static int SELECTED_WINDOW_CANVAS_HEIGHT = 100;
-    private static int SELECTED_WINDOW_BAR_WIDTH = 1;
-    private static double SELECTED_WINDOW_DIFFERENCE_TO_AVERAGE = 10.0;
+    private static final boolean TEST_UI = true;
+    
+    
+    private static final int FULL_TRACE_CANVAS_HEIGHT = 25;
+    private static final int FULL_TRACE_BAR_WIDTH = 1;
+    private static final double FULL_TRACE_DIFFERENCE_TO_AVERAGE = 2.0;
+    
+    private static final int SELECTED_WINDOW_CANVAS_WIDTH = 600;
+    private static final int SELECTED_WINDOW_CANVAS_HEIGHT = 75;
+    private static final int SELECTED_WINDOW_BAR_WIDTH = 1;
+    private static final double SELECTED_WINDOW_DIFFERENCE_TO_AVERAGE = 10.0;
+    
+    // For the two "events" label (Max and min number of events in the selection), we force a width
+    // This will prevent the control from moving horizontally if the number of events in the selection varies
+    private static final int NB_EVENTS_FIXED_WIDTH = 75;
+    
+    
+    // The "small font" height used to display time will be "default font" minus this constant
+    private static final int SMALL_FONT_MODIFIER = 2;
     
     // *** TODO ***
     // This need to be changed as soon the framework implement a "window"
     private static long DEFAULT_WINDOW_SIZE = (1L * 1000000000);
+    
     
     private TmfExperiment<LttngEvent> lastUsedExperiment = null;
     
@@ -53,11 +69,24 @@ public class HistogramView extends TmfView {
 	private HistogramRequest selectedWindowRequest = null;
     private ChildrenHistogramCanvas selectedWindowCanvas = null;
     
-	private Label lblStartTime = null;
-	private Label lblStopTime = null;
-	private Label lblTopEvent = null;
-	private Label lblBottomEvent = null;
     
+    
+    
+	private Text txtExperimentStartTime = null;
+	private Text txtExperimentStopTime = null;
+	
+	private Text  txtWindowStartTime = null;
+	private Text  txtWindowStopTime  = null;
+	private Label lblWindowMaxNbEvents = null;
+	private Label lblWindowMinNbEvents = null;
+    
+	private static final String WINDOW_TIMERANGE_LABEL_TEXT 	= "Window Timerange   ";
+	private static final String WINDOW_CURRENT_TIME_LABEL_TEXT 	= "Window Current Time";
+	private static final String EVENT_CURRENT_TIME_LABEL_TEXT 	= "Event Current Time ";
+	private NanosecTextGroup  ntgTimeRangeWindow = null;
+	private NanosecTextGroup  ntgCurrentWindowTime = null;
+	private NanosecTextGroup  ntgCurrentEventTime = null;
+	
 	public HistogramView() {
 		super(ID);
 	}
@@ -65,75 +94,188 @@ public class HistogramView extends TmfView {
 	@Override
 	public void createPartControl(Composite parent) {
 		
+		// Default font
 		Font font = parent.getFont();
-		Composite folderGroup = new Composite(parent, SWT.BORDER);
-		
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = 3;
-		gridLayout.verticalSpacing = 2;
-		gridLayout.marginHeight = 0;
-		gridLayout.marginWidth = 0;
-		folderGroup.setLayout(gridLayout);
-		folderGroup.setSize(parent.getDisplay().getBounds().width, parent.getDisplay().getBounds().height);
-		
-		GridData gridData1 = new GridData(SWT.FILL, SWT.TOP, true, false, 3, 2);
-		gridData1.heightHint = FULL_TRACE_CANVAS_HEIGHT;
-		gridData1.minimumHeight = FULL_TRACE_CANVAS_HEIGHT;
-		fullTraceCanvas = new ParentHistogramCanvas(this, folderGroup, SWT.BORDER);
-		fullTraceCanvas.setLayoutData(gridData1);
-		fullTraceCanvas.redraw();
-		
-		GridData gridData2 = new GridData(SWT.LEFT, SWT.TOP, true, false, 2, 2);
-		gridData2.minimumWidth = 200;
-		gridData2.grabExcessHorizontalSpace = true;
-		lblStartTime = new Label(folderGroup, SWT.LEFT | SWT.TOP);
-		lblStartTime.setFont(font);
-		lblStartTime.setText("");
-		lblStartTime.setAlignment(SWT.LEFT);
-		lblStartTime.setLayoutData(gridData2);
-		
-		GridData gridData3 = new GridData(SWT.RIGHT, SWT.TOP, true, false, 1, 2);
-		gridData3.minimumWidth = 200;
-		gridData3.grabExcessHorizontalSpace = true;
-		lblStopTime = new Label(folderGroup, SWT.RIGHT | SWT.TOP);
-		lblStopTime.setFont(font);
-		lblStopTime.setAlignment(SWT.RIGHT);
-		lblStopTime.setText("");
-		lblStopTime.setLayoutData(gridData3);
-		
-		GridData gridDataSpace = new GridData(SWT.FILL, SWT.TOP, true, false, 3, 2);
-		gridDataSpace.minimumHeight = 20;
-		gridDataSpace.heightHint = 20;
-		Label lblSpace = new Label(folderGroup, SWT.TOP);
-		lblSpace.setFont(font);
-		lblSpace.setText("");
-		lblSpace.setLayoutData(gridDataSpace);
-		
-		GridData gridData4 = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 2);
-		gridData4.heightHint = SELECTED_WINDOW_CANVAS_HEIGHT;
-		gridData4.minimumHeight = SELECTED_WINDOW_CANVAS_HEIGHT;
-		gridData4.widthHint = SELECTED_WINDOW_CANVAS_WIDTH;
-		gridData4.minimumWidth = SELECTED_WINDOW_CANVAS_WIDTH;
-		selectedWindowCanvas = new ChildrenHistogramCanvas(this, folderGroup, SWT.BORDER);
-		selectedWindowCanvas.setLayoutData(gridData4);
-		selectedWindowCanvas.redraw();
+		FontData tmpFontData = font.getFontData()[0];
+		// Slightly smaller font for time
+		Font smallFont = new Font(font.getDevice(), tmpFontData.getName(), tmpFontData.getHeight() - SMALL_FONT_MODIFIER, tmpFontData.getStyle());
 		
 		
-		GridData gridData5 = new GridData(SWT.LEFT, SWT.TOP, true, false, 2, 1);
-		gridData5.minimumWidth = 150;
-		gridData5.grabExcessHorizontalSpace = true;
-		lblTopEvent = new Label(folderGroup, SWT.LEFT | SWT.TOP);
-		lblTopEvent.setFont(font);
-		lblTopEvent.setText("");
-		lblTopEvent.setLayoutData(gridData5);
+		// Layout for the whole view, other elements will be in a child composite of this one 
+		// Contains :
+		// 		Composite layoutSelectionWindow
+		//		Composite layoutTimesSpinner
+		//		Composite layoutExperimentHistogram
+		Composite layoutFullView = new Composite(parent, SWT.NONE);
+		GridLayout gridFullView = new GridLayout();
+		gridFullView.numColumns = 2;
+		gridFullView.marginHeight = 0;
+		gridFullView.marginWidth = 0;
+		layoutFullView.setLayout(gridFullView);
+		//layoutFullView.setSize(parent.getDisplay().getBounds().width, parent.getDisplay().getBounds().height);
 		
-		GridData gridData6 = new GridData(SWT.LEFT, SWT.BOTTOM, true, false, 2, 1);
-		gridData6.minimumWidth = 150;
-		gridData6.grabExcessHorizontalSpace = true;
-		lblBottomEvent = new Label(folderGroup, SWT.LEFT | SWT.BOTTOM);
-		lblBottomEvent.setFont(font);
-		lblBottomEvent.setText("");
-		lblBottomEvent.setLayoutData(gridData6);
+		
+		// Layout that contain the SelectionWindow
+		// Contains : 
+		// 		Label lblWindowStartTime
+		// 		Label lblWindowStopTime
+		// 		Label lblWindowMaxNbEvents
+		// 		Label lblWindowMinNbEvents
+		// 		ChildrenHistogramCanvas selectedWindowCanvas
+		Composite layoutSelectionWindow = new Composite(layoutFullView, SWT.NONE);
+		GridLayout gridSelectionWindow = new GridLayout();
+		gridSelectionWindow.numColumns = 3;
+		gridSelectionWindow.marginHeight = 0;
+		gridSelectionWindow.marginWidth = 0;
+		layoutSelectionWindow.setLayout(gridSelectionWindow);
+		GridData gridDataSelectionWindow = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
+		layoutSelectionWindow.setLayoutData(gridDataSelectionWindow);
+		
+		
+		// Layout that contain the time spinner
+		// Contains : 
+		// 		NanosecTextGroup  spTimeRangeWindow
+		// 		NanosecTextGroup  spCurrentWindowTime
+		// 		NanosecTextGroup  spCurrentEventTime
+		Composite layoutTimesSpinner = new Composite(layoutFullView, SWT.NONE);
+		GridLayout gridTimesSpinner = new GridLayout();
+		
+		if ( TEST_UI ) {
+			gridTimesSpinner.numColumns = 3;
+		}
+		else {
+			gridTimesSpinner.numColumns = 2;
+		}
+		gridTimesSpinner.marginHeight = 0;
+		gridTimesSpinner.marginWidth = 0;
+		layoutTimesSpinner.setLayout(gridTimesSpinner);
+		GridData gridDataTimesSpinner = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+		layoutTimesSpinner.setLayoutData(gridDataTimesSpinner);
+		
+		
+		// Layout that contain the complete experiment histogram and related controls.
+		// Contains : 
+		//		Label lblExperimentStartTime
+		//		Label lblExperimentStopTime
+		// 		ParentHistogramCanvas fullTraceCanvas
+		Composite layoutExperimentHistogram = new Composite(layoutFullView, SWT.NONE);
+		GridLayout gridExperimentHistogram = new GridLayout();
+		gridExperimentHistogram.numColumns = 2;
+		gridExperimentHistogram.marginHeight = 0;
+		gridExperimentHistogram.marginWidth = 0;
+		layoutExperimentHistogram.setLayout(gridExperimentHistogram);
+		GridData gridDataExperimentHistogram = new GridData(SWT.FILL, SWT.TOP, true, false, 2, 1);
+		layoutExperimentHistogram.setLayoutData(gridDataExperimentHistogram);
+		
+		
+		
+		// *** Everything related to the selection window is below
+		GridData gridDataSelectionWindowCanvas = new GridData(SWT.FILL, SWT.TOP, true, false, 2, 2);
+		gridDataSelectionWindowCanvas.heightHint = SELECTED_WINDOW_CANVAS_HEIGHT;
+		gridDataSelectionWindowCanvas.minimumHeight = SELECTED_WINDOW_CANVAS_HEIGHT;
+		
+		int size = 0;
+		if ( TEST_UI ) {
+			size = SELECTED_WINDOW_CANVAS_WIDTH/2;
+		}
+		else {
+			size = SELECTED_WINDOW_CANVAS_WIDTH;
+		}
+		
+		gridDataSelectionWindowCanvas.widthHint = size;
+		gridDataSelectionWindowCanvas.minimumWidth = size;
+		
+		
+		selectedWindowCanvas = new ChildrenHistogramCanvas(this, layoutSelectionWindow, SWT.BORDER);
+		selectedWindowCanvas.setLayoutData(gridDataSelectionWindowCanvas);
+		
+		GridData gridDataWindowMaxEvents = new GridData(SWT.LEFT, SWT.TOP, true, false, 1, 1);
+		// Force a width, to avoid the control to enlarge if the number of events change
+		gridDataWindowMaxEvents.minimumWidth = NB_EVENTS_FIXED_WIDTH;
+		gridDataWindowMaxEvents.widthHint = NB_EVENTS_FIXED_WIDTH;
+		lblWindowMaxNbEvents = new Label(layoutSelectionWindow, SWT.NONE);
+		lblWindowMaxNbEvents.setFont(smallFont);
+		lblWindowMaxNbEvents.setText("");
+		lblWindowMaxNbEvents.setLayoutData(gridDataWindowMaxEvents);
+		
+		GridData gridDataWindowMinEvents = new GridData(SWT.LEFT, SWT.BOTTOM, true, false, 1, 1);
+		// Force a width, to avoid the control to enlarge if the number of events change
+		gridDataWindowMinEvents.minimumWidth = NB_EVENTS_FIXED_WIDTH;
+		gridDataWindowMinEvents.widthHint = NB_EVENTS_FIXED_WIDTH;
+		lblWindowMinNbEvents = new Label(layoutSelectionWindow, SWT.NONE);
+		lblWindowMinNbEvents.setFont(smallFont);
+		lblWindowMinNbEvents.setText("");
+		lblWindowMinNbEvents.setLayoutData(gridDataWindowMinEvents);
+		
+		GridData gridDataWindowStart = new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1);
+		txtWindowStartTime = new Text(layoutSelectionWindow, SWT.READ_ONLY);
+		txtWindowStartTime.setFont(smallFont);
+		txtWindowStartTime.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
+		txtWindowStartTime.setEditable(false);
+		txtWindowStartTime.setText("");
+		txtWindowStartTime.setLayoutData(gridDataWindowStart);
+		
+		GridData gridDataWindowStop = new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1);
+		txtWindowStopTime = new Text(layoutSelectionWindow, SWT.READ_ONLY);
+		txtWindowStopTime.setFont(smallFont);
+		txtWindowStopTime.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
+		txtWindowStopTime.setEditable(false);
+		txtWindowStopTime.setText("");
+		txtWindowStopTime.setLayoutData(gridDataWindowStop);
+		
+		
+		
+		// *** Everything related to the spinner is below
+		if ( TEST_UI ) {
+			GridData gridDataCurrentWindow = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 2);
+			ntgCurrentWindowTime = new NanosecTextGroup(layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
+			ntgCurrentWindowTime.setLayoutData(gridDataCurrentWindow);
+			
+			GridData gridDataTimeRange = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 2);
+			ntgTimeRangeWindow = new NanosecTextGroup(layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_TIMERANGE_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
+			ntgTimeRangeWindow.setLayoutData(gridDataTimeRange);
+			
+			GridData gridDataCurrentEvent = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 2);
+			ntgCurrentEventTime = new NanosecTextGroup(layoutTimesSpinner, SWT.BORDER, SWT.BORDER, EVENT_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
+			ntgCurrentEventTime.setLayoutData(gridDataCurrentEvent);
+		}
+		else {
+			GridData gridDataTimeRange = new GridData(SWT.CENTER, SWT.CENTER, true, false, 1, 1);
+			ntgTimeRangeWindow = new NanosecTextGroup(layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_TIMERANGE_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
+			ntgTimeRangeWindow.setLayoutData(gridDataTimeRange);
+			
+			GridData gridDataCurrentEvent = new GridData(SWT.CENTER, SWT.CENTER, true, false, 1, 2);
+			ntgCurrentEventTime = new NanosecTextGroup(layoutTimesSpinner, SWT.BORDER, SWT.BORDER, EVENT_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
+			ntgCurrentEventTime.setLayoutData(gridDataCurrentEvent);
+			
+			GridData gridDataCurrentWindow = new GridData(SWT.CENTER, SWT.BOTTOM, true, false, 1, 1);
+			ntgCurrentWindowTime = new NanosecTextGroup(layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
+			ntgCurrentWindowTime.setLayoutData(gridDataCurrentWindow);
+		}
+		
+		
+		// Everything related to the experiment canvas is below
+		GridData gridDataExperimentCanvas = new GridData(SWT.FILL, SWT.TOP, true, false, 2, 1);
+		gridDataExperimentCanvas.heightHint = FULL_TRACE_CANVAS_HEIGHT;
+		gridDataExperimentCanvas.minimumHeight = FULL_TRACE_CANVAS_HEIGHT;
+		fullTraceCanvas = new ParentHistogramCanvas(this, layoutExperimentHistogram, SWT.BORDER);
+		fullTraceCanvas.setLayoutData(gridDataExperimentCanvas);
+		
+		GridData gridDataExperimentStart = new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1);
+		txtExperimentStartTime = new Text(layoutExperimentHistogram, SWT.READ_ONLY);
+		txtExperimentStartTime.setFont(smallFont);
+		txtExperimentStartTime.setText("");
+		txtExperimentStartTime.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
+		txtExperimentStartTime.setEditable(false);
+		txtExperimentStartTime.setLayoutData(gridDataExperimentStart);
+		
+		GridData gridDataExperimentStop = new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1);
+		txtExperimentStopTime = new Text(layoutExperimentHistogram, SWT.READ_ONLY);
+		txtExperimentStopTime.setFont(smallFont);
+		txtExperimentStopTime.setText("");
+		txtExperimentStopTime.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
+		txtExperimentStopTime.setEditable(false);
+		txtExperimentStopTime.setLayoutData(gridDataExperimentStop);
 	}
 	
 	
@@ -157,16 +299,39 @@ public class HistogramView extends TmfView {
     	createCanvasAndRequests(tmpExperiment);
     }
     
+    @TmfSignalHandler
+    public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
+    	System.out.println("experimentUpdated");
+    	
+    	// *** TODO ***
+    	// Update the histogram if the time changed
+    	//
+    }
+    
+    @TmfSignalHandler
+    public void currentTimeUpdated(TmfTimeSynchSignal signal) {
+    	if (signal.getSource() != this) {
+            TmfTimestamp currentTime = signal.getCurrentTime();
+            ntgCurrentEventTime.setValue(currentTime.getValue());
+            
+            if ( (currentTime.getValue() < fullTraceCanvas.getCurrentWindow().getTimestampLeft() ) ||
+            	 (currentTime.getValue() > fullTraceCanvas.getCurrentWindow().getTimestampRight() ) )
+            {
+            	fullTraceCanvas.centerWindow( fullTraceCanvas.getHistogramContent().getClosestXPositionFromTimestamp(currentTime.getValue()) );
+            	windowChangedNotification();
+            }
+            
+    	}
+    }
+    
     public void createCanvasAndRequests(TmfExperiment<LttngEvent> newExperiment) {
     	lastUsedExperiment = newExperiment;
     	
-    	String startTime = formatNanoSecondsTime( newExperiment.getStartTime().getValue() );
-		String stopTime = formatNanoSecondsTime( newExperiment.getEndTime().getValue() );
-    	lblStartTime.setText( startTime );
-		lblStopTime.setText( stopTime );
-    	
 		fullTraceCanvas.createNewHistogramContent( DEFAULT_WINDOW_SIZE, FULL_TRACE_BAR_WIDTH, FULL_TRACE_CANVAS_HEIGHT, FULL_TRACE_DIFFERENCE_TO_AVERAGE);
 		selectedWindowCanvas.createNewHistogramContent(0, SELECTED_WINDOW_BAR_WIDTH, SELECTED_WINDOW_CANVAS_HEIGHT, SELECTED_WINDOW_DIFFERENCE_TO_AVERAGE);
+		
+		// Make sure the UI object are sane
+		resetLabelContent();
 		
 		// Redraw the canvas right away to have something "clean" as soon as we can
     	if ( dataBackgroundFullRequest != null ) {
@@ -194,7 +359,7 @@ public class HistogramView extends TmfView {
 		
         if ( ts2.getValue() > experiment.getEndTime().getValue() ) {
         	ts2 = new LttngTimestamp( experiment.getEndTime().getValue() );
-        } 
+        }
         
         TmfTimeRange tmpRange = new TmfTimeRange(ts1, ts2);
         
@@ -235,7 +400,6 @@ public class HistogramView extends TmfView {
         // HOWEVER, this would cause the request to run forever (or until it reach the end of trace).
         // Seeting an EndTime does not seems to stop the request
         returnedRequest = new HistogramRequest(newRange, Integer.MAX_VALUE, targetCanvas, newInterval );
-        
         experiment.sendRequest(returnedRequest);
         
         return returnedRequest;
@@ -243,10 +407,13 @@ public class HistogramView extends TmfView {
 
     
     public void windowChangedNotification() {
+    	// *** NO GUI UPDATE SHOULD BE DONE IN HERE !! ***
+    	
     	if ( lastUsedExperiment != null ) {
     		if ( selectedWindowRequest.isCompleted() == false ) {
     			selectedWindowRequest.cancel();
     		}
+    		
     		performSelectedWindowEventsRequest(lastUsedExperiment);
     	}
     }
@@ -262,25 +429,6 @@ public class HistogramView extends TmfView {
     }
     
     
-    @TmfSignalHandler
-    public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
-    	System.out.println("experimentUpdated");
-    	
-    	// *** TODO ***
-    	// Update the histogram if the time changed
-    	//
-    }
-    
-    
-    @TmfSignalHandler
-    public void currentTimeUpdated(TmfTimeSynchSignal signal) {
-    	System.out.println("currentTimeUpdated");
-    	
-    	// *** TODO ***
-    	// Update the histogram if the time changed
-    	//
-    }
-    
 	public TmfExperiment<LttngEvent> getLastUsedExperiment() {
 		return lastUsedExperiment;
 	}
@@ -293,29 +441,77 @@ public class HistogramView extends TmfView {
 		fullTraceCanvas.setSelectedWindowSize(newTimeWidth);
 	}
 	
-	public String formatNanoSecondsTime(Long nanosecTime) {
-		String returnedTime = nanosecTime.toString();
-		if ( returnedTime.length() > 9 ) {
-			returnedTime = returnedTime.substring(0, returnedTime.length() - 9 ) + "." + returnedTime.substring( returnedTime.length() - 9 );
+	public void resetLabelContent() {
+		
+		TmfExperiment<LttngEvent> tmpExperiment = getLastUsedExperiment();
+		
+		String startTime = null;
+		String stopTime = null;
+		if ( tmpExperiment != null ) {
+			startTime = HistogramConstant.formatNanoSecondsTime( tmpExperiment.getStartTime().getValue() );
+			stopTime = HistogramConstant.formatNanoSecondsTime( tmpExperiment.getEndTime().getValue() );
+		}
+		else {
+			startTime = HistogramConstant.formatNanoSecondsTime( 0L );
+			stopTime = HistogramConstant.formatNanoSecondsTime( 0L );
 		}
 		
-		return returnedTime;
+    	txtExperimentStartTime.setText( startTime );
+		txtExperimentStopTime.setText( stopTime );
+		txtExperimentStartTime.getParent().layout();
+		
+		lblWindowMaxNbEvents.setText("" + 0);
+		lblWindowMinNbEvents.setText("" + 0);
+		txtWindowStartTime.setText( HistogramConstant.formatNanoSecondsTime( 0L ) );
+		txtWindowStopTime.setText( HistogramConstant.formatNanoSecondsTime( 0L ) );
+		txtWindowStartTime.getParent().layout();
+		
+		ntgCurrentWindowTime.setValue( HistogramConstant.formatNanoSecondsTime( 0L ) );
+		ntgTimeRangeWindow.setValue( HistogramConstant.formatNanoSecondsTime( 0L ) );
+		ntgCurrentEventTime.setValue( HistogramConstant.formatNanoSecondsTime( 0L ) );
 	}
 	
 	public void updateFullTraceInformation() {
 		
-		String startTime = formatNanoSecondsTime( fullTraceCanvas.getHistogramContent().getStartTime() );
-		String stopTime = formatNanoSecondsTime( fullTraceCanvas.getHistogramContent().getEndTime() );
+		String startTime = HistogramConstant.formatNanoSecondsTime( fullTraceCanvas.getHistogramContent().getStartTime() );
+		String stopTime = HistogramConstant.formatNanoSecondsTime( fullTraceCanvas.getHistogramContent().getEndTime() );
 		
-		lblStartTime.setText( startTime );
-		lblStopTime.setText( stopTime );
+		txtExperimentStartTime.setText( startTime );
+		txtExperimentStopTime.setText( stopTime );
+		
+		// Take one of the parent and call its layout to update control size
+		// Since both control have the same parent, only one call is needed 
+		txtExperimentStartTime.getParent().layout();
+		
+		// Update the selected window, just in case
+		// This should give a better user experience and it is low cost 
+		updateSelectedWindowInformation();
 	}
 	
 	public void updateSelectedWindowInformation() {
-		lblTopEvent.setText( selectedWindowCanvas.getHistogramContent().getHeighestEventCount().toString() );
-		lblBottomEvent.setText("0");
+		// Update the timestamp as well
+		updateSelectedWindowTimestamp();
+		
+		lblWindowMaxNbEvents.setText( selectedWindowCanvas.getHistogramContent().getHeighestEventCount().toString() );
+		lblWindowMinNbEvents.setText("0");
+		
+		// Refresh the layout
+		lblWindowMaxNbEvents.getParent().layout();
 	}
 	
-	
+	public void updateSelectedWindowTimestamp() {
+		String startTime = HistogramConstant.formatNanoSecondsTime( selectedWindowCanvas.getHistogramContent().getStartTime() );
+		String stopTime = HistogramConstant.formatNanoSecondsTime( selectedWindowCanvas.getHistogramContent().getEndTime() );
+		txtWindowStartTime.setText( startTime );
+		txtWindowStopTime.setText( stopTime );
+		
+		ntgCurrentWindowTime.setValue( fullTraceCanvas.getCurrentWindow().getTimestampCenter() );
+		ntgTimeRangeWindow.setValue(  fullTraceCanvas.getCurrentWindow().getWindowTimeWidth() );
+		
+		// Take one control in each group to call to refresh the layout
+		// Since both control have the same parent, only one call is needed 
+		txtWindowStartTime.getParent().layout();
+		ntgCurrentWindowTime.getParent().layout();
+	}
 	
 }

@@ -12,6 +12,8 @@
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.widgets.Composite;
 
 /**
  * <b><u>HistogramConstant</u></b>
@@ -19,7 +21,7 @@ import org.eclipse.swt.SWT;
  * Empty interface class to hold the different constants needed by the histogram.
  * <p>
  */
-public interface HistogramConstant {
+public abstract class HistogramConstant {
 	// Constants relative to requests
 	final static int MAX_EVENTS_PER_READ = 1;
 	final static int REDRAW_EVERY_NB_EVENTS = 10000;
@@ -60,4 +62,32 @@ public interface HistogramConstant {
 	final static Integer MINIMUM_WINDOW_WIDTH = 3;
 	final static Integer SELECTION_LINE_WIDTH = 2;
 	final static Integer SELECTION_CROSSHAIR_LENGTH = 3;
+	
+	public static String formatNanoSecondsTime(Long nanosecTime) {
+		String returnedTime = nanosecTime.toString();
+		
+		if ( returnedTime.length() > 9 ) {
+			returnedTime = returnedTime.substring(0, returnedTime.length() - 9 ) + "." + returnedTime.substring( returnedTime.length() - 9 );
+		}
+		else {
+			int curSize = returnedTime.length();
+			for (int l=0; (curSize+l)< 9; l++) {
+				returnedTime = "0" + returnedTime;
+			}
+			returnedTime = "0." + returnedTime;
+		}
+		
+		return returnedTime;
+	}
+	
+	public static Integer getTextSizeInControl(Composite parent, String text) {
+		GC graphicContext = new GC(parent);
+        int textSize = 0;
+        for ( int pos=0; pos<text.length(); pos++ ) {
+        	textSize += graphicContext.getAdvanceWidth( text.charAt(pos) );
+        }
+        textSize += graphicContext.getAdvanceWidth( ' ' );
+        
+        return textSize;
+	}
 }

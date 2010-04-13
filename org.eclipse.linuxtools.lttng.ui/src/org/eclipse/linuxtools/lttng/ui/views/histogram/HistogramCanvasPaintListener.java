@@ -119,9 +119,9 @@ public class HistogramCanvasPaintListener implements PaintListener
 		event.gc.setLineWidth(HistogramConstant.SELECTION_LINE_WIDTH);
 	    
 		// Get the window position... this would fail if the window is not initialized yet
-		int positionCenter = selectedWindow.getWindowCenterXPosition();
-		int positionLeft = selectedWindow.getWindowPositionLeft();
-		int positionRight = selectedWindow.getWindowPositionRight();
+		int positionCenter = selectedWindow.getWindowXPositionCenter();
+		int positionLeft = selectedWindow.getWindowXPositionLeft();
+		int positionRight = selectedWindow.getWindowXPositionRight();
 		
 		// Minimal size verification.
 		if ( (positionRight - positionLeft) < HistogramConstant.MINIMUM_WINDOW_WIDTH ) {

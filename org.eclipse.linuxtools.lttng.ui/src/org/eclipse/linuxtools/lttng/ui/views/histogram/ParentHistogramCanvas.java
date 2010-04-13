@@ -48,10 +48,10 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 	 */
 	@Override
 	public void moveWindow(int newRelativeXPosition) {
-		int absolutePosition = currentWindow.getWindowCenterXPosition() + newRelativeXPosition;
+		int absolutePosition = currentWindow.getWindowXPositionCenter() + newRelativeXPosition;
 		
 		centerWindow(absolutePosition);
-		notifyParentSelectionWindowChanged();
+		notifyParentSelectionWindowChangedAsynchronously();
 	}
 	
 	/**
@@ -72,8 +72,8 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 			newAbsoluteXPosition = getParent().getSize().x;
 		}
 		
-		if ( newAbsoluteXPosition != currentWindow.getWindowCenterXPosition() ) {
-			currentWindow.setWindowCenterXPosition(newAbsoluteXPosition);
+		if ( newAbsoluteXPosition != currentWindow.getWindowXPositionCenter() ) {
+			currentWindow.setWindowXPositionCenter(newAbsoluteXPosition);
 			redrawAsynchronously();
 		}
 	}
@@ -91,7 +91,7 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 		if ( ajustedTime != getSelectedWindowSize() ) {
 			setSelectedWindowSize(ajustedTime);
 			
-			notifyParentSelectionWindowChanged();
+			notifyParentSelectionWindowChangedAsynchronously();
 			redrawAsynchronously();
 		}
 	}

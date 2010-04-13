@@ -111,7 +111,7 @@ public class HistogramCanvas extends Canvas
 		currentWindow = new HistogramSelectedWindow(histogramContent);
 		
 		currentWindow.setWindowTimeWidth(windowTimeDuration);
-		currentWindow.setWindowCenterXPosition(0);
+		currentWindow.setWindowXPositionCenter(0);
 		
 		// Warn the paint listener about the new window
 		paintListener.setSelectedWindow(currentWindow);
@@ -168,12 +168,40 @@ public class HistogramCanvas extends Canvas
 	 * 
 	 */
 	public void redrawAsynchronously() {
-		
 		// Create a new redrawer in case it doesn't exist yet (we never know with thread!)
 		if ( canvasRedrawer == null ) {
 			canvasRedrawer = new AsyncCanvasRedrawer(this);
 		}
+		
 		canvasRedrawer.asynchronousRedraw();
+	}
+	
+	/**
+	 * Method to call the "Asynchronous NotifyParentSelectionWindowChanged" for this canvas<p>
+	 * This allow safe update UI objects from different threads.
+	 * 
+	 */
+	public void notifyParentSelectionWindowChangedAsynchronously() {
+		// Create a new redrawer in case it doesn't exist yet (we never know with thread!)
+		if ( canvasRedrawer == null ) {
+			canvasRedrawer = new AsyncCanvasRedrawer(this);
+		}
+		
+		canvasRedrawer.asynchronousNotifyParentSelectionWindowChanged();
+	}
+	
+	/**
+	 * Method to call the "Asynchronous NotifyParentUpdatedInformation" for this canvas<p>
+	 * This allow safe redraw from different threads.
+	 * 
+	 */
+	public void notifyParentUpdatedInformationAsynchronously() {
+		// Create a new redrawer in case it doesn't exist yet (we never know with thread!)
+		if ( canvasRedrawer == null ) {
+			canvasRedrawer = new AsyncCanvasRedrawer(this);
+		}
+		
+		canvasRedrawer.asynchronousNotifyParentUpdatedInformation();
 	}
 	
 	/**
