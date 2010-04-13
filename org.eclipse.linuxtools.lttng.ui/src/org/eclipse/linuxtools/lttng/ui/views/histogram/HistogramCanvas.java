@@ -229,14 +229,14 @@ public class HistogramCanvas extends Canvas
 	}
 	
 	/**
-	 * Function that is called when the selection window size (time width) changed.<p>
-	 * Note: Given factor should be a time factor (in nanoseconds), positive or negative.
+	 * Function that is called when the selection window size (time width) changed by an absolute time.<p>
+	 * Note: Given time should be in nanoseconds, positive.
 	 * 
 	 * <B>METHOD INTENDED TO BE EXTENDED</B>
 	 * 
-	 * @param newTimeFactor	 Time difference (in nanoseconds) to apply to the window.
+	 * @param newTime	 New absoulte time (in nanoseconds) to apply to the window.
 	 */
-	public void resizeWindowByTimeFactor(long newTimeFactor) {
+	public void resizeWindowByAbsoluteTime(long newTime) {
 		// Nothing : function is a place holder
 	}
 	

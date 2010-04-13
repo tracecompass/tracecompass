@@ -79,17 +79,17 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 	}
 	
 	/**
-	 * Function that is called when the selection window size (time width) changed.<p>
-	 * Note: Given factor should be a time factor (in nanoseconds), positive or negative.<p>
+	 * Function that is called when the selection window size (time width) changed by an absolute time.<p>
+	 * Note: Given time should be in nanoseconds, positive.
 	 * 
 	 * Set the new window size and notify the HistogramView that the window changed.
 	 * 
-	 * @param newTimeFactor	 Time difference (in nanoseconds) to apply to the window.
+	 * @param newTime	 New absoulte time (in nanoseconds) to apply to the window.
 	 */
 	@Override
-	public void resizeWindowByTimeFactor(long ajustedTime) {
-		if ( ajustedTime != getSelectedWindowSize() ) {
-			setSelectedWindowSize(ajustedTime);
+	public void resizeWindowByAbsoluteTime(long newTime) {
+		if ( newTime != getSelectedWindowSize() ) {
+			setSelectedWindowSize(newTime);
 			
 			notifyParentSelectionWindowChangedAsynchronously();
 			redrawAsynchronously();

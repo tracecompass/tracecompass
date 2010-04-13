@@ -140,7 +140,7 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 		}
 		
 		// Resize the canvas selection window  
-		parentCanvas.resizeWindowByTimeFactor(ajustedTime);
+		parentCanvas.resizeWindowByAbsoluteTime(ajustedTime);
 	}
 	
 }

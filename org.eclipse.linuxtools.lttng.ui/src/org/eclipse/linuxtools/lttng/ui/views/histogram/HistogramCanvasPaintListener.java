@@ -23,6 +23,7 @@ import org.eclipse.swt.graphics.Rectangle;
  */
 public class HistogramCanvasPaintListener implements PaintListener 
 {
+	private HistogramCanvas  parentCanvas = null;
 	private HistogramContent histogramContent = null;
 	private HistogramSelectedWindow selectedWindow = null;
 	
@@ -33,7 +34,8 @@ public class HistogramCanvasPaintListener implements PaintListener
 	 * 
 	 * @param parentCanvas Related canvas
 	 */
-	public HistogramCanvasPaintListener(HistogramCanvas parentCanvas) {
+	public HistogramCanvasPaintListener(HistogramCanvas newParentCanvas) {
+		parentCanvas = newParentCanvas;
 		histogramContent = parentCanvas.getHistogramContent();
 	}
 	
@@ -54,6 +56,11 @@ public class HistogramCanvasPaintListener implements PaintListener
 		
 		// Call the function that draw the bars
 		drawHistogram(event);
+		
+		// Pinpoint a position if set
+		if (histogramContent.getSelectedEventTimeInWindow() > 0 ) {
+			drawSelectedEventInWindow(event);
+		}
 		
 		// If we have a selected window set to visible, call the function to draw it
 		if ( (selectedWindow != null) && (selectedWindow.getSelectedWindowVisible() == true) ) {
@@ -96,14 +103,29 @@ public class HistogramCanvasPaintListener implements PaintListener
 		
 		// Draw a bar from the left (pos X=0) until the pos=(NbBars*barWidth). If space is left, it will be blanked after.
 	    for ( int x=0; x<histogramContent.getReadyUpToPosition(); x++) {
-	    	Rectangle rect = new Rectangle(barsWidth*x, event.height - histogramContent.getElementByIndex(x).intervalHeight, barsWidth, histogramContent.getElementByIndex(x).intervalHeight);
-	    	event.gc.fillRectangle(rect);
+    		Rectangle rect = new Rectangle(barsWidth*x, event.height - histogramContent.getElementByIndex(x).intervalHeight, barsWidth, histogramContent.getElementByIndex(x).intervalHeight);
+    		event.gc.fillRectangle(rect);
 	    }
 	    
 	    // Clear the remaining space in the canvas (if any) so it appears clean.
 	    event.gc.setBackground(event.display.getSystemColor(HistogramConstant.EMPTY_BACKGROUND_COLOR));
 	    Rectangle rect = new Rectangle(barsWidth*histogramContent.getNbElement(), 0, event.width, event.height);
 	    event.gc.fillRectangle(rect);
+	}
+	
+	/**
+	 * Draw a certain event selected in the window.<p>
+	 * 
+	 * @param event The generated paint event when redraw is called.
+	 */
+	public synchronized void drawSelectedEventInWindow(PaintEvent event) {
+		// This will be the color for all the bars that wil be draw below.
+		event.gc.setBackground(event.display.getSystemColor(HistogramConstant.SELECTED_EVENT_COLOR));
+		
+		int position = histogramContent.getClosestXPositionFromTimestamp(histogramContent.getSelectedEventTimeInWindow());
+		
+		Rectangle rect = new Rectangle(barsWidth*position, 0, barsWidth, event.height);
+		event.gc.fillRectangle(rect);
 	}
 	
 	/**

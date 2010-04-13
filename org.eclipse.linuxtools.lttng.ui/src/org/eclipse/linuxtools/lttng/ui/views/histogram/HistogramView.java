@@ -61,6 +61,7 @@ public class HistogramView extends TmfView {
     private static long DEFAULT_WINDOW_SIZE = (1L * 1000000000);
     
     
+    
     private TmfExperiment<LttngEvent> lastUsedExperiment = null;
     
     private HistogramRequest dataBackgroundFullRequest = null;
@@ -68,8 +69,6 @@ public class HistogramView extends TmfView {
     
 	private HistogramRequest selectedWindowRequest = null;
     private ChildrenHistogramCanvas selectedWindowCanvas = null;
-    
-    
     
     
 	private Text txtExperimentStartTime = null;
@@ -83,9 +82,13 @@ public class HistogramView extends TmfView {
 	private static final String WINDOW_TIMERANGE_LABEL_TEXT 	= "Window Timerange   ";
 	private static final String WINDOW_CURRENT_TIME_LABEL_TEXT 	= "Window Current Time";
 	private static final String EVENT_CURRENT_TIME_LABEL_TEXT 	= "Event Current Time ";
-	private NanosecTextGroup  ntgTimeRangeWindow = null;
-	private NanosecTextGroup  ntgCurrentWindowTime = null;
-	private NanosecTextGroup  ntgCurrentEventTime = null;
+	private TimeTextGroup  ntgTimeRangeWindow = null;
+	private TimeTextGroup  ntgCurrentWindowTime = null;
+	private TimeTextGroup  ntgCurrentEventTime = null;
+	
+	private Long selectedWindowTime = 0L;
+	private Long selectedWindowTimerange = 0L;
+	private Long currentEventTime = 0L;
 	
 	public HistogramView() {
 		super(ID);
@@ -228,28 +231,28 @@ public class HistogramView extends TmfView {
 		// *** Everything related to the spinner is below
 		if ( TEST_UI ) {
 			GridData gridDataCurrentWindow = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 2);
-			ntgCurrentWindowTime = new NanosecTextGroup(layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
+			ntgCurrentWindowTime = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
 			ntgCurrentWindowTime.setLayoutData(gridDataCurrentWindow);
 			
 			GridData gridDataTimeRange = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 2);
-			ntgTimeRangeWindow = new NanosecTextGroup(layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_TIMERANGE_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
+			ntgTimeRangeWindow = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_TIMERANGE_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
 			ntgTimeRangeWindow.setLayoutData(gridDataTimeRange);
 			
 			GridData gridDataCurrentEvent = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 2);
-			ntgCurrentEventTime = new NanosecTextGroup(layoutTimesSpinner, SWT.BORDER, SWT.BORDER, EVENT_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
+			ntgCurrentEventTime = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, EVENT_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
 			ntgCurrentEventTime.setLayoutData(gridDataCurrentEvent);
 		}
 		else {
 			GridData gridDataTimeRange = new GridData(SWT.CENTER, SWT.CENTER, true, false, 1, 1);
-			ntgTimeRangeWindow = new NanosecTextGroup(layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_TIMERANGE_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
+			ntgTimeRangeWindow = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_TIMERANGE_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
 			ntgTimeRangeWindow.setLayoutData(gridDataTimeRange);
 			
 			GridData gridDataCurrentEvent = new GridData(SWT.CENTER, SWT.CENTER, true, false, 1, 2);
-			ntgCurrentEventTime = new NanosecTextGroup(layoutTimesSpinner, SWT.BORDER, SWT.BORDER, EVENT_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
+			ntgCurrentEventTime = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, EVENT_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
 			ntgCurrentEventTime.setLayoutData(gridDataCurrentEvent);
 			
 			GridData gridDataCurrentWindow = new GridData(SWT.CENTER, SWT.BOTTOM, true, false, 1, 1);
-			ntgCurrentWindowTime = new NanosecTextGroup(layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
+			ntgCurrentWindowTime = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
 			ntgCurrentWindowTime.setLayoutData(gridDataCurrentWindow);
 		}
 		
@@ -294,33 +297,43 @@ public class HistogramView extends TmfView {
     @SuppressWarnings("unchecked")
 	@TmfSignalHandler
     public void experimentSelected(TmfExperimentSelectedSignal<LttngEvent> signal) {
-    	
     	TmfExperiment<LttngEvent> tmpExperiment = (TmfExperiment<LttngEvent>)signal.getExperiment();
     	createCanvasAndRequests(tmpExperiment);
     }
     
-    @TmfSignalHandler
+    // *** VERIFY ***
+	// Not sure what this should do since I don't know when it will be called
+	// Let's do the same thing as experimentSelected for now
+	//
+    @SuppressWarnings("unchecked")
+	@TmfSignalHandler
     public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
-    	System.out.println("experimentUpdated");
+    	TmfExperiment<LttngEvent> tmpExperiment = (TmfExperiment<LttngEvent>)signal.getExperiment();
     	
-    	// *** TODO ***
-    	// Update the histogram if the time changed
-    	//
+    	// Make sure the UI object are sane
+		resetLabelContent();
+		
+		// Redraw the canvas right away to have something "clean" as soon as we can
+		fullTraceCanvas.redraw();
+		selectedWindowCanvas.redraw();
+		
+		performAllTraceEventsRequest(tmpExperiment);
+		performSelectedWindowEventsRequest(tmpExperiment);
     }
     
     @TmfSignalHandler
     public void currentTimeUpdated(TmfTimeSynchSignal signal) {
     	if (signal.getSource() != this) {
             TmfTimestamp currentTime = signal.getCurrentTime();
-            ntgCurrentEventTime.setValue(currentTime.getValue());
             
-            if ( (currentTime.getValue() < fullTraceCanvas.getCurrentWindow().getTimestampLeft() ) ||
-            	 (currentTime.getValue() > fullTraceCanvas.getCurrentWindow().getTimestampRight() ) )
+            currentEventTime = currentTime.getValue();
+            updateSelectedEventTime();
+            
+            if ( isGivenTimestampInSelectedWindow( currentEventTime ) == false)
             {
-            	fullTraceCanvas.centerWindow( fullTraceCanvas.getHistogramContent().getClosestXPositionFromTimestamp(currentTime.getValue()) );
+            	fullTraceCanvas.centerWindow( fullTraceCanvas.getHistogramContent().getClosestXPositionFromTimestamp(currentEventTime) );
             	windowChangedNotification();
             }
-            
     	}
     }
     
@@ -404,18 +417,59 @@ public class HistogramView extends TmfView {
         
         return returnedRequest;
     }
-
+    
     
     public void windowChangedNotification() {
-    	// *** NO GUI UPDATE SHOULD BE DONE IN HERE !! ***
     	
     	if ( lastUsedExperiment != null ) {
     		if ( selectedWindowRequest.isCompleted() == false ) {
     			selectedWindowRequest.cancel();
     		}
     		
+    		selectedWindowTime = fullTraceCanvas.getCurrentWindow().getTimestampCenter();
+    		selectedWindowTimerange = fullTraceCanvas.getCurrentWindow().getWindowTimeWidth();
+    		
+    		if ( isGivenTimestampInSelectedWindow(ntgCurrentEventTime.getValue()) == false ) {
+    			currentEventChangeNotification( selectedWindowTime );
+    		}
+    		
     		performSelectedWindowEventsRequest(lastUsedExperiment);
     	}
+    }
+    
+    
+    public void currentEventChangeNotification(Long newCurrentEventTime) {
+    	// Notify other views in the framework
+        if (currentEventTime != newCurrentEventTime) {
+        	currentEventTime = newCurrentEventTime;
+        	
+        	updateSelectedEventTime();
+        	
+            LttngTimestamp tmpTimestamp = new LttngTimestamp(newCurrentEventTime);
+            broadcast(new TmfTimeSynchSignal(this, tmpTimestamp));
+        }
+    }
+    
+    public void timeTextGroupChangeNotification() {
+    	
+    	Long newCurrentTime = ntgCurrentEventTime.getValue();
+    	Long newSelectedWindowTime = ntgCurrentWindowTime.getValue();
+    	Long newSelectedWindowTimeRange = ntgTimeRangeWindow.getValue();
+    	
+    	if ( newCurrentTime != currentEventTime ) {
+    		currentEventChangeNotification( newCurrentTime );
+    	}
+    	
+    	if ( newSelectedWindowTime != selectedWindowTime ) {
+    		selectedWindowTime = newSelectedWindowTime;
+    		fullTraceCanvas.centerWindow( fullTraceCanvas.getHistogramContent().getClosestXPositionFromTimestamp(selectedWindowTime) );
+    	}
+    	
+    	if ( newSelectedWindowTimeRange != selectedWindowTimerange ) {
+    		selectedWindowTimerange = newSelectedWindowTimeRange;
+    		fullTraceCanvas.resizeWindowByAbsoluteTime(selectedWindowTimerange);
+    	}
+    	
     }
     
     public boolean isRequestRunning() {
@@ -439,6 +493,18 @@ public class HistogramView extends TmfView {
 	
 	public void setTimeWindowSize(long newTimeWidth) {
 		fullTraceCanvas.setSelectedWindowSize(newTimeWidth);
+	}
+	
+	public boolean isGivenTimestampInSelectedWindow(Long timestamp) {
+		boolean returnedValue = true;
+		
+		if ( (timestamp < fullTraceCanvas.getCurrentWindow().getTimestampLeft()  ) ||
+	         (timestamp > fullTraceCanvas.getCurrentWindow().getTimestampRight() ) ) 
+		{
+			returnedValue = false;
+		}
+		
+		return returnedValue;
 	}
 	
 	public void resetLabelContent() {
@@ -508,10 +574,20 @@ public class HistogramView extends TmfView {
 		ntgCurrentWindowTime.setValue( fullTraceCanvas.getCurrentWindow().getTimestampCenter() );
 		ntgTimeRangeWindow.setValue(  fullTraceCanvas.getCurrentWindow().getWindowTimeWidth() );
 		
+		if ( isGivenTimestampInSelectedWindow(ntgCurrentEventTime.getValue()) == false ) {
+			currentEventChangeNotification( fullTraceCanvas.getCurrentWindow().getTimestampCenter() );
+		}
+		
 		// Take one control in each group to call to refresh the layout
 		// Since both control have the same parent, only one call is needed 
 		txtWindowStartTime.getParent().layout();
 		ntgCurrentWindowTime.getParent().layout();
+	}
+	
+	public void updateSelectedEventTime() {
+    	ntgCurrentEventTime.setValueAsynchronously(currentEventTime);
+    	selectedWindowCanvas.getHistogramContent().setSelectedEventTimeInWindow(currentEventTime);
+    	selectedWindowCanvas.redrawAsynchronously();
 	}
 	
 }

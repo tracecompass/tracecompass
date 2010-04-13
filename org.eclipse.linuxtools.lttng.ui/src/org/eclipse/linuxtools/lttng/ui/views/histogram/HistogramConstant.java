@@ -56,6 +56,7 @@ public abstract class HistogramConstant {
 	// Colors for the histogram. Background should be the same as the background in use
 	final static Integer EMPTY_BACKGROUND_COLOR = SWT.COLOR_WHITE;
 	final static Integer HISTOGRAM_BARS_COLOR = SWT.COLOR_DARK_CYAN;
+	final static Integer SELECTED_EVENT_COLOR = SWT.COLOR_RED;
 	final static Integer SELECTION_WINDOW_COLOR = SWT.COLOR_RED;
 	
 	// Dimension for the line of the "Selection Window"
@@ -79,6 +80,44 @@ public abstract class HistogramConstant {
 		
 		return returnedTime;
 	}
+	
+	public static Long convertStringToNanoseconds( String timeString ) {
+		Long returnedNumber = 0L;
+		
+	    try {
+	    	// Avoid simple commat/dot mistake
+	        timeString = timeString.replace(",", ".");
+	
+	        // If we have a dot, we have a decimal number to convert
+	        int dotPosition = timeString.indexOf(".");
+	        
+	        // If the user begun the line with a dot, we add a zero
+	        if ( dotPosition == 0 ) {
+                timeString = "0" + timeString;
+                dotPosition = 1;
+	        }
+	
+	        if ( dotPosition != -1 ) {
+                int decimalNumber = (timeString.length() - dotPosition -1);
+                
+                if ( decimalNumber < 9 ) {
+                    for ( int nbDec=decimalNumber; nbDec<9; nbDec++) {
+                        timeString += "0";
+                    }
+                }
+	        }
+	        
+	        // Conversion into decimal seconds
+	        Double dblMaxTimerange = Double.parseDouble(timeString);
+	        // Conversion into nanoseconds
+	        returnedNumber = (long)(dblMaxTimerange * 1000000000.0);
+	    }
+	    catch (NumberFormatException e) {
+	        System.out.println("Warning : Could not convert string into nanoseconds (convertStringToLong)");
+	    }
+	    
+	    return returnedNumber;
+    }
 	
 	public static Integer getTextSizeInControl(Composite parent, String text) {
 		GC graphicContext = new GC(parent);

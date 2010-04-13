@@ -27,6 +27,8 @@ package org.eclipse.linuxtools.lttng.ui.views.histogram;
  */
 public class HistogramSelectedWindow {
 	
+	
+	
 	private int windowCenterPosition = 0;
 	private long windowTimeWidth = 0;
 	
@@ -137,7 +139,6 @@ public class HistogramSelectedWindow {
 	public void setWindowXPositionCenter(int newPosCenter) {
 		this.windowCenterPosition = newPosCenter;
 	}
-	
 	
 	/**
 	 * Getter for the left border of the window.<p>

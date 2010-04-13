@@ -37,6 +37,8 @@ public class HistogramContent {
 	
 	private Integer	averageNumberOfEvents = 0;
 	
+	private Long selectedEventTimeInWindow = 0L;
+	
 	private HistogramElement[] elementTable;
 	
 	/**
@@ -164,6 +166,27 @@ public class HistogramContent {
 		for ( int x=0; x<elementTable.length; x++) {
 			System.out.println("X:" + x + " -> " + elementTable[x].intervalNbEvents + ":" + elementTable[x].intervalHeight + " (" + elementTable[x].firstIntervalTimestamp + ")");
 		}
+	}
+	
+	/**
+	 * Getter for the timestamp of the selected event in the window.<p>
+	 * 
+	 * @return	The time of the event.
+	 */
+	public Long getSelectedEventTimeInWindow() {
+		return selectedEventTimeInWindow;
+	}
+	
+	/**
+	 * Setter for the timestamp of the selected event in the window.<p>
+	 * 
+	 * This allow to pinpoint a certain event or position in the window.
+	 * Set to 0 or lower to ignore.
+	 * 
+	 * @param newPosition The new event time.
+	 */
+	public void setSelectedEventTimeInWindow(Long newTime) {
+		this.selectedEventTimeInWindow = newTime;
 	}
 	
 	/**
