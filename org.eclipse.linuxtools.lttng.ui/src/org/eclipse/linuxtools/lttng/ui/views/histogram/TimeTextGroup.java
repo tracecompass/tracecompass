@@ -34,6 +34,9 @@ public class TimeTextGroup implements FocusListener, KeyListener {
     private static final String		LONGEST_STRING_VALUE = "." + Long.MAX_VALUE;
     private static final Integer	MAX_CHAR_IN_TEXTBOX = LONGEST_STRING_VALUE.length();
     
+    // The "small font" height used to display time will be "default font" minus this constant
+    private static final Integer SMALL_FONT_MODIFIER = 1;
+    
     private HistogramView parentView = null;
     private AsyncTimeTextGroupRedrawer asyncRedrawer = null;
     
@@ -41,7 +44,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
     private Text 	txtNanosec 	= null;
     private Label 	lblNanosec 	= null;
     
-    private Long timeValue = 0L; 
+    private Long 	timeValue 	= 0L; 
     
     public TimeTextGroup(HistogramView newParentView, Composite parent, int textStyle, int groupStyle) {
     	this(newParentView, parent, textStyle, groupStyle, "", HistogramConstant.formatNanoSecondsTime(0L));
@@ -50,31 +53,40 @@ public class TimeTextGroup implements FocusListener, KeyListener {
     public TimeTextGroup(HistogramView newParentView, Composite parent, int textStyle, int groupStyle, String groupValue, String textValue) {
     	Font font = parent.getFont();
 		FontData tmpFontData = font.getFontData()[0];
-		//Font smallFont = new Font(font.getDevice(), tmpFontData.getName(), tmpFontData.getHeight()-1, tmpFontData.getStyle());
-		Font smallFont = new Font(font.getDevice(), tmpFontData.getName(), tmpFontData.getHeight(), tmpFontData.getStyle());
+		Font smallFont = new Font(font.getDevice(), tmpFontData.getName(), tmpFontData.getHeight()-SMALL_FONT_MODIFIER, tmpFontData.getStyle());
     	
 		parentView = newParentView;
 		
+		GridLayout gridLayoutgroup = new GridLayout(2, false);
+		gridLayoutgroup.horizontalSpacing = 0;
+		gridLayoutgroup.verticalSpacing = 0;
         grpName = new Group(parent, groupStyle);
         grpName.setText(groupValue);
         grpName.setFont(smallFont);
-        grpName.setLayout(new GridLayout(2, false));
+        grpName.setLayout(gridLayoutgroup);
         
         int textBoxSize = HistogramConstant.getTextSizeInControl(parent, LONGEST_STRING_VALUE);
         txtNanosec = new Text(grpName, textStyle);
         txtNanosec.setTextLimit( MAX_CHAR_IN_TEXTBOX );
         txtNanosec.setText( textValue );
-        txtNanosec.setOrientation(SWT.RIGHT_TO_LEFT);
-        GridData gridDataTextBox = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        txtNanosec.setFont(smallFont);
+        GridData gridDataTextBox = new GridData(SWT.LEFT, SWT.CENTER, true, false);
+        gridDataTextBox.horizontalIndent = 10;
+        gridDataTextBox.verticalIndent = 0;
         gridDataTextBox.widthHint = textBoxSize;
         gridDataTextBox.minimumWidth = textBoxSize;
-        txtNanosec.setFont(smallFont);
         txtNanosec.setLayoutData(gridDataTextBox);
         
+        int labelSize = HistogramConstant.getTextSizeInControl(parent, NANOSEC_LABEL);
         lblNanosec = new Label(grpName, SWT.LEFT);
         lblNanosec.setText(NANOSEC_LABEL);
         lblNanosec.setFont(smallFont);
-        lblNanosec.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+        GridData gridDataLabel = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+        gridDataLabel.widthHint = labelSize;
+        gridDataLabel.minimumWidth = labelSize;
+        gridDataLabel.horizontalIndent = 10;
+        gridDataLabel.verticalIndent = 0;
+        lblNanosec.setLayoutData(gridDataLabel);
         
         addNeededListeners();
     }
@@ -151,17 +163,14 @@ public class TimeTextGroup implements FocusListener, KeyListener {
     	parentView.timeTextGroupChangeNotification();
     }
     
-	@Override
 	public void focusGained(FocusEvent event) {
 		// Nothing to do yet
 	}
 	
-	@Override
 	public void focusLost(FocusEvent event) {
 		handleNewStringValue();
 	}
 	
-	@Override
 	public void keyPressed(KeyEvent event) {
 		switch (event.keyCode) {
 			// SWT.CR is "ENTER" Key
@@ -173,7 +182,6 @@ public class TimeTextGroup implements FocusListener, KeyListener {
 		}
 	}
 
-	@Override
 	public void keyReleased(KeyEvent e) {
 		
 	}
