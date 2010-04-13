@@ -45,14 +45,14 @@ public class HistogramCanvasFocusListener implements FocusListener {
 	}
 	
 	/**
-	 * Function that is called when the canvas get focus.<p>
+	 * Function that is called when the canvas loose focus.<p>
 	 * 
 	 * Doesn't do anything yet... 
 	 * 
 	 * @param event  The focus event generated.
 	 */
 	public void focusLost(FocusEvent event) {
-		System.out.println("focusLost");
+		// Nothing to do yet
 	}
 
 }

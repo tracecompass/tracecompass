@@ -48,7 +48,7 @@ public class HistogramContent {
 	 * @param newCanvasSize		The full size of the canvas. Used for positionning; need to be consistent with canvas.
 	 * @param newMaxHeight		The maximum height of a bar, usually same as the height of the canvas.
 	 */
-	public HistogramContent(int tableSize, int newCanvasSize, int newMaxHeight) {
+	public HistogramContent(Integer tableSize, Integer newCanvasSize, Integer newMaxHeight) {
 		this(tableSize, newCanvasSize, newMaxHeight, HistogramConstant.DEFAULT_DIFFERENCE_TO_AVERAGE);
 	}
 	
@@ -60,7 +60,7 @@ public class HistogramContent {
 	 * @param newMaxHeight		The maximum height of a bar, usually same as the height of the canvas.
 	 * @param newDiffToAverage  This value at which point we "cut" bar that are too tall.
 	 */
-	public HistogramContent(int tableSize, int newCanvasSize, int newMaxHeight, double newDiffToAverage) {
+	public HistogramContent(Integer tableSize, Integer newCanvasSize, Integer newMaxHeight, Double newDiffToAverage) {
 		canvasFullSize = newCanvasSize;
 		maxHeight = newMaxHeight;
 		maxDifferenceToAverage = newDiffToAverage;
@@ -76,7 +76,7 @@ public class HistogramContent {
 	 * 
 	 * @param newTableSize	The size (number of element) of the table.
 	 */
-	public void createNewTable(int newTableSize) {
+	public void createNewTable(Integer newTableSize) {
 		elementTable = new HistogramElement[newTableSize];
 		
 		for ( int x=0; x<elementTable.length; x++) {
@@ -198,7 +198,7 @@ public class HistogramContent {
 	 * 
 	 * @return The element found or null if the index is wrong.
 	 */
-	public HistogramElement getElementByIndex(int index) {
+	public HistogramElement getElementByIndex(Integer index) {
 		HistogramElement returnedElement = null;
 		
 		if ( (index >= 0) && (index < elementTable.length) ) {
@@ -219,7 +219,7 @@ public class HistogramContent {
 	 * 
 	 * @return	The <i>closest</i> element found.
 	 */
-	public HistogramElement getClosestElementFromXPosition(int position) {
+	public HistogramElement getClosestElementFromXPosition(Integer position) {
 		
 		int index = (int)(  ((double)elementTable.length)*((double)position/(double)canvasFullSize) );
 		
@@ -245,7 +245,7 @@ public class HistogramContent {
 	 * 
 	 * @return	The <i>closest</i> timestamp found.
 	 */
-	public Long getClosestTimestampFromXPosition(int position) {
+	public Long getClosestTimestampFromXPosition(Integer position) {
 		return getClosestElementFromXPosition(position).firstIntervalTimestamp;
 	}
 	
@@ -275,7 +275,7 @@ public class HistogramContent {
 	 * 
 	 * @return	The <i>closest</i> element found.
 	 */
-	public HistogramElement getClosestElementFromTimestamp(long timestamp) {
+	public HistogramElement getClosestElementFromTimestamp(Long timestamp) {
 		int index = (int)( (timestamp - startTime)/intervalTime );
 		
 		// If we are out of bound, return the closest border (first or last element)
@@ -300,7 +300,7 @@ public class HistogramContent {
 	 * 
 	 * @return	The <i>closest</i> position found.
 	 */
-	public Integer getClosestXPositionFromTimestamp(long timestamp) {
+	public Integer getClosestXPositionFromTimestamp(Long timestamp) {
 		return getXPositionFromElement(getClosestElementFromTimestamp(timestamp));
 	}
 	
@@ -641,7 +641,7 @@ public class HistogramContent {
 	 * 
 	 * @return Last position processed so far.
 	 */
-	public int getReadyUpToPosition() {
+	public Integer getReadyUpToPosition() {
 		return readyUpToPosition;
 	}
 	

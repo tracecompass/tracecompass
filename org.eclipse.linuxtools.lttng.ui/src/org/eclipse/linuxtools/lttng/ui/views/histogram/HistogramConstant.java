@@ -23,13 +23,13 @@ import org.eclipse.swt.widgets.Composite;
  */
 public abstract class HistogramConstant {
 	// Constants relative to requests
-	final static int MAX_EVENTS_PER_READ = 1;
-	final static int REDRAW_EVERY_NB_EVENTS = 10000;
-	final static boolean SKIP_EMPTY_INTERVALS_WHEN_CALCULATING_AVERAGE = true;
+	final static Integer MAX_EVENTS_PER_READ = 1;
+	final static Integer REDRAW_EVERY_NB_EVENTS = 10000;
+	final static Boolean SKIP_EMPTY_INTERVALS_WHEN_CALCULATING_AVERAGE = true;
 	
 	
 	// Constant relative to the content
-	final static double DEFAULT_DIFFERENCE_TO_AVERAGE = 1000.0;
+	final static Double DEFAULT_DIFFERENCE_TO_AVERAGE = 1000.0;
 	
 	
 	
@@ -64,12 +64,23 @@ public abstract class HistogramConstant {
 	final static Integer SELECTION_LINE_WIDTH = 2;
 	final static Integer SELECTION_CROSSHAIR_LENGTH = 3;
 	
+	
+	/**
+	 * Method to format a Long representing nanosecond into a proper String.<p>
+	 * The returned String will always be like "0.000000000", missing decimal will be added.
+	 * 
+	 * @param nanosecTime	This time to format
+	 * 
+	 * @return	The formatted string
+	 */
 	public static String formatNanoSecondsTime(Long nanosecTime) {
 		String returnedTime = nanosecTime.toString();
 		
+		// If our number has over 9 digits, just add a dot after the ninth digits
 		if ( returnedTime.length() > 9 ) {
 			returnedTime = returnedTime.substring(0, returnedTime.length() - 9 ) + "." + returnedTime.substring( returnedTime.length() - 9 );
 		}
+		// Otherwise, patch missing decimal with 0
 		else {
 			int curSize = returnedTime.length();
 			for (int l=0; (curSize+l)< 9; l++) {
@@ -81,6 +92,16 @@ public abstract class HistogramConstant {
 		return returnedTime;
 	}
 	
+	/**
+	 * Convert a String representing nanoseconds into a valid Long.<p>
+	 * This can handle number like "0.5", "0.123456789" as well as plain number like "12".<p>
+	 * 
+	 * Note : This function ALWAYS return a number, if conversion failed, 0 will be returned.<p>
+	 * 
+	 * @param timeString	The string to convert
+	 * 
+	 * @return				The converted nanoseconds time as Long
+	 */
 	public static Long convertStringToNanoseconds( String timeString ) {
 		Long returnedNumber = 0L;
 		
@@ -96,14 +117,20 @@ public abstract class HistogramConstant {
                 timeString = "0" + timeString;
                 dotPosition = 1;
 	        }
-	
+	        
+	        // If we found a dot, verify that we have 9 digits
 	        if ( dotPosition != -1 ) {
                 int decimalNumber = (timeString.length() - dotPosition -1);
                 
-                if ( decimalNumber < 9 ) {
+                // If we have less than 9 digits, we fill with 0
+                if ( decimalNumber <= 9 ) {
                     for ( int nbDec=decimalNumber; nbDec<9; nbDec++) {
                         timeString += "0";
                     }
+                }
+                // We have OVER 9 digits, skip the useless part
+                else {
+                	timeString = timeString.substring(dotPosition, 9);
                 }
 	        }
 	        
@@ -119,12 +146,23 @@ public abstract class HistogramConstant {
 	    return returnedNumber;
     }
 	
+	/**
+	 * Calculate the correcte width of a String.<p>
+	 * Useful to set a control to its maximum size; since the size depends on characters, 
+	 * 		this will calculate the correct sum... should be platform independant (we hope).
+	 * 
+	 * @param parent	Parent control we will use as a reference. Could be any composite.
+	 * @param text		The Text to measure the size from
+	 * 
+	 * @return			The size calculated.
+	 */
 	public static Integer getTextSizeInControl(Composite parent, String text) {
 		GC graphicContext = new GC(parent);
         int textSize = 0;
         for ( int pos=0; pos<text.length(); pos++ ) {
         	textSize += graphicContext.getAdvanceWidth( text.charAt(pos) );
         }
+        // Add an extra space in case there was trailing whitespace in the message
         textSize += graphicContext.getAdvanceWidth( ' ' );
         
         return textSize;

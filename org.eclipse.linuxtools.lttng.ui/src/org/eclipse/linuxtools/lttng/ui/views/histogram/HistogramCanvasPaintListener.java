@@ -27,7 +27,7 @@ public class HistogramCanvasPaintListener implements PaintListener
 	private HistogramContent histogramContent = null;
 	private HistogramSelectedWindow selectedWindow = null;
 	
-	private int barsWidth = 0;
+	private Integer barsWidth = 0;
 	
 	/**
 	 * HistogramCanvasPaintListener constructor
@@ -192,11 +192,11 @@ public class HistogramCanvasPaintListener implements PaintListener
 	
 	/**
 	 * Getter for the bars witdh of this paint listener.<p>
-	 * NOTE : This MUST be set before any draw is done.
+	 * NOTE : This MUST be set before any drawing is done.
 	 * 
 	 * @param newBarsWidth	The new width to use for the bars
 	 */
-	public void setBarWidth(int newBarsWidth) {
+	public void setBarWidth(Integer newBarsWidth) {
 		this.barsWidth = newBarsWidth;
 	}
 	

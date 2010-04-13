@@ -27,12 +27,10 @@ package org.eclipse.linuxtools.lttng.ui.views.histogram;
  */
 public class HistogramSelectedWindow {
 	
+	private Integer windowCenterPosition = 0;
+	private Long 	windowTimeWidth = 0L;
 	
-	
-	private int windowCenterPosition = 0;
-	private long windowTimeWidth = 0;
-	
-	private boolean isSelectedWindowVisible = false;
+	private Boolean isSelectedWindowVisible = false;
 	
 	private HistogramContent histogramContent = null;
 	
@@ -54,7 +52,7 @@ public class HistogramSelectedWindow {
 	 * @param centralPosition	Central X Position of the selection window in the canvas (0 to canvasWidth)
 	 * @param newWindowWidth	Time width (size) of the window. (0 or greater)
 	 */
-	public HistogramSelectedWindow(HistogramContent newTraceContent, int centralPosition, long newWindowWidth) {
+	public HistogramSelectedWindow(HistogramContent newTraceContent, Integer centralPosition, Long newWindowWidth) {
 		histogramContent = newTraceContent;
 		windowCenterPosition = centralPosition;
 		windowTimeWidth = newWindowWidth;
@@ -96,7 +94,7 @@ public class HistogramSelectedWindow {
 	 * 
 	 * @param newIsSelectedWindowVisible	The visibility value
 	 */
-	public void setSelectedWindowVisible(boolean newIsSelectedWindowVisible) {
+	public void setSelectedWindowVisible(Boolean newIsSelectedWindowVisible) {
 		this.isSelectedWindowVisible = newIsSelectedWindowVisible;
 	}
 	
@@ -116,7 +114,7 @@ public class HistogramSelectedWindow {
 	 * 
 	 * @param newWindowTimeWidth	The new time width
 	 */
-	public void setWindowTimeWidth(long newWindowTimeWidth) {
+	public void setWindowTimeWidth(Long newWindowTimeWidth) {
 		this.windowTimeWidth = newWindowTimeWidth;
 	}
 	
@@ -136,7 +134,7 @@ public class HistogramSelectedWindow {
 	 * 
 	 * @param newPosCenter	The new central position.
 	 */
-	public void setWindowXPositionCenter(int newPosCenter) {
+	public void setWindowXPositionCenter(Integer newPosCenter) {
 		this.windowCenterPosition = newPosCenter;
 	}
 	

@@ -42,7 +42,7 @@ public class HistogramCanvas extends Canvas
 	 * @param parent 		Composite control which will be the parent of the new instance (cannot be null)
 	 * @param 				Style the style of control to construct
 	 */
-	public HistogramCanvas(Composite parent, int style) {
+	public HistogramCanvas(Composite parent, Integer style) {
 		super(parent, style);
 		addNeededListeners();
 	}
@@ -87,7 +87,7 @@ public class HistogramCanvas extends Canvas
 	 * @param barsHeight   					Height of the histogram "bars"
 	 * @param maxBarsDifferenceToAverage	Factor used to "chop" bars that are too tall. Set to something big (100.0?) if not needed.
 	 */
-	public void createNewHistogramContent(long windowSize, int widthPerBar, int barsHeight, double maxBarsDifferenceToAverage) {
+	public void createNewHistogramContent(Long windowSize, Integer widthPerBar, Integer barsHeight, Double maxBarsDifferenceToAverage) {
 		histogramContent = new HistogramContent( getSize().x / widthPerBar, getSize().x, barsHeight, maxBarsDifferenceToAverage);
 		
 		// *** FIXME ***
@@ -212,7 +212,7 @@ public class HistogramCanvas extends Canvas
 	 * 
 	 * @param newRelativeXPosition	New position relative to the last known absolute position.
 	 */
-	public void moveWindow(int newRelativeXPosition) {
+	public void moveWindow(Integer newRelativeXPosition) {
 		// Nothing : function is a place holder
 	}
 	
@@ -224,7 +224,7 @@ public class HistogramCanvas extends Canvas
 	 * 
 	 * @param newRelativeXPosition	New absolute position.
 	 */
-	public void centerWindow(int newAbsoluteXPosition) {
+	public void centerWindow(Integer newAbsoluteXPosition) {
 		// Nothing : function is a place holder
 	}
 	
@@ -236,7 +236,7 @@ public class HistogramCanvas extends Canvas
 	 * 
 	 * @param newTime	 New absoulte time (in nanoseconds) to apply to the window.
 	 */
-	public void resizeWindowByAbsoluteTime(long newTime) {
+	public void resizeWindowByAbsoluteTime(Long newTime) {
 		// Nothing : function is a place holder
 	}
 	

@@ -31,7 +31,7 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 	 * @param parent 		Composite control which will be the parent of the new instance (cannot be null)
 	 * @param 				Style the style of control to construct
 	 */
-	public ParentHistogramCanvas(HistogramView newParentWindow, Composite parent, int style) {
+	public ParentHistogramCanvas(HistogramView newParentWindow, Composite parent, Integer style) {
 		super(parent, style);
 		
 		parentHistogramWindow = newParentWindow;
@@ -47,7 +47,7 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 	 * @param newRelativeXPosition	New position relative to the last known absolute position.
 	 */
 	@Override
-	public void moveWindow(int newRelativeXPosition) {
+	public void moveWindow(Integer newRelativeXPosition) {
 		int absolutePosition = currentWindow.getWindowXPositionCenter() + newRelativeXPosition;
 		
 		centerWindow(absolutePosition);
@@ -63,7 +63,7 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 	 * @param newRelativeXPosition	New absolute position.
 	 */
 	@Override
-	public void centerWindow(int newAbsoluteXPosition) {
+	public void centerWindow(Integer newAbsoluteXPosition) {
 		
 		if ( newAbsoluteXPosition < 0 ) {
 			newAbsoluteXPosition = 0;
@@ -87,7 +87,7 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 	 * @param newTime	 New absoulte time (in nanoseconds) to apply to the window.
 	 */
 	@Override
-	public void resizeWindowByAbsoluteTime(long newTime) {
+	public void resizeWindowByAbsoluteTime(Long newTime) {
 		if ( newTime != getSelectedWindowSize() ) {
 			setSelectedWindowSize(newTime);
 			
@@ -102,7 +102,7 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 	 */
 	@Override
 	public void notifyParentUpdatedInformation() {
-		parentHistogramWindow.updateFullTraceInformation();
+		parentHistogramWindow.updateFullExperimentInformation();
 	}
 	
 	/**

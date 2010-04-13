@@ -25,16 +25,16 @@ import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 	private HistogramContent histogramContent = null;
 	
-	private int  lastInterval = 0;
-	private long lastRangeTime = 0L;
-	private long nbEventsInInterval = 1;
+	private Integer lastInterval = 0;
+	private Long 	lastRangeTime = 0L;
+	private Long 	nbEventsInInterval = 1L;
 	
-	private int  nbIntervalNotEmpty = 1;
-	private int  nbEventRead = 0;
+	private Integer nbIntervalNotEmpty = 1;
+	private Integer nbEventRead = 0;
 	
 	private HistogramCanvas parentCanvas = null;
 	
-	private boolean requestCompleted = false;
+	private Boolean requestCompleted = false;
 	
 	/**
 	 * Constructor for HistogramRequest.<p>
@@ -47,7 +47,7 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 	 * 
 	 * @see org.eclipse.linuxtools.tmf.request.TmfEventRequest
 	 */
-	public HistogramRequest(TmfTimeRange range, int nbRequested, HistogramCanvas newParentCanvas, Long timeInterval) {
+	public HistogramRequest(TmfTimeRange range, Integer nbRequested, HistogramCanvas newParentCanvas, Long timeInterval) {
         super((Class<LttngEvent>)LttngEvent.class, range, nbRequested, HistogramConstant.MAX_EVENTS_PER_READ);
         
         // *** FIXME ***
@@ -123,7 +123,7 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 					histogramContent.setReadyUpToPosition(lastInterval);
 					
 					nbIntervalNotEmpty++;
-					nbEventsInInterval = 1;
+					nbEventsInInterval = 1L;
 				}
 				// We are still in the same interval, just keep counting
 				else {

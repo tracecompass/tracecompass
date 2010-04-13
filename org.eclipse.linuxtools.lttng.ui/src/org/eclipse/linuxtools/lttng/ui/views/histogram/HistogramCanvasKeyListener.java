@@ -82,7 +82,7 @@ public class HistogramCanvasKeyListener implements KeyListener
 	 * 
 	 * @param displacementFactor	The basic displacement to perform (positive or negative value)
 	 */
-	public void moveWindowPosition(int displacementFactor) {
+	public void moveWindowPosition(Integer displacementFactor) {
 		
 		// If we are in "fast move mode", multiply the basic displacement by a factor
 		if ( isShiftPressed == true ) {

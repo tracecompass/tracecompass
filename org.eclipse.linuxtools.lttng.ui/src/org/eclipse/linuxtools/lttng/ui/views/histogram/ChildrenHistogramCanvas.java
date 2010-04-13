@@ -31,7 +31,7 @@ public class ChildrenHistogramCanvas extends HistogramCanvas {
 	 * @param parent 		Composite control which will be the parent of the new instance (cannot be null)
 	 * @param 				Style the style of control to construct
 	 */
-	public ChildrenHistogramCanvas(HistogramView newParentWindow, Composite parent, int style) {
+	public ChildrenHistogramCanvas(HistogramView newParentWindow, Composite parent, Integer style) {
 		super(parent, style);
 		
 		parentHistogramWindow = newParentWindow;
