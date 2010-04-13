@@ -19,30 +19,26 @@ package org.eclipse.linuxtools.tmf.event;
  */
 public class TmfTimeRange {
 
-    // ========================================================================
+	// ------------------------------------------------------------------------
     // Constants
-    // ========================================================================
+	// ------------------------------------------------------------------------
 
-	public static TmfTimeRange Eternity = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+	public static final TmfTimeRange Eternity = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
 	
-    // ========================================================================
+	// ------------------------------------------------------------------------
     // Attributes
-    // ========================================================================
+	// ------------------------------------------------------------------------
 
 	private final TmfTimestamp fStartTime;
 	private final TmfTimestamp fEndTime;
 
-    // ========================================================================
+	// ------------------------------------------------------------------------
     // Constructors
-    // ========================================================================
+	// ------------------------------------------------------------------------
 
-	/**
-	 * 
-	 */
 	@SuppressWarnings("unused")
 	private TmfTimeRange() {
-		fStartTime = null;
-		fEndTime   = null;
+		throw new AssertionError();
 	}
 
 	/**
@@ -50,50 +46,46 @@ public class TmfTimeRange {
 	 * @param endTime
 	 */
 	public TmfTimeRange(TmfTimestamp startTime, TmfTimestamp endTime) {
-		fStartTime = startTime;
-		fEndTime   = endTime;
+		if (startTime == null || endTime == null) {
+    		throw new IllegalArgumentException();
+		}
+		fStartTime =  new TmfTimestamp(startTime);
+		fEndTime   =  new TmfTimestamp(endTime);
 	}
 	
 	/**
+	 * Copy constructor
 	 * @param other
 	 */
 	public TmfTimeRange(TmfTimeRange other) {
-		assert(other != null);
-		fStartTime = other.fStartTime;
-		fEndTime   = other.fEndTime;
+    	if (other == null) {
+    		throw new IllegalArgumentException();
+    	}
+		fStartTime = new TmfTimestamp(other.fStartTime);
+		fEndTime   = new TmfTimestamp(other.fEndTime);
 	}
 
-    @Override
-    public boolean equals(Object other) {
-    	if (other instanceof TmfTimeRange) {
-    		TmfTimeRange range = (TmfTimeRange) other;
-    		return range.fStartTime.equals(fStartTime) &&
-    		       range.fEndTime.equals(fEndTime);
-    	}
-    	return false;
-    }
-
-    // ========================================================================
+	// ------------------------------------------------------------------------
     // Accessors
-    // ========================================================================
+	// ------------------------------------------------------------------------
 
 	/**
 	 * @return The time range start time
 	 */
 	public TmfTimestamp getStartTime() {
-		return fStartTime;
+		return new TmfTimestamp(fStartTime);
 	}
 
 	/**
 	 * @return The time range end time
 	 */
 	public TmfTimestamp getEndTime() {
-		return fEndTime;
+		return new TmfTimestamp(fEndTime);
 	}
 
-    // ========================================================================
+	// ------------------------------------------------------------------------
     // Predicates
-    // ========================================================================
+	// ------------------------------------------------------------------------
 
 	/**
 	 * Check if the timestamp is within the time range
@@ -102,16 +94,32 @@ public class TmfTimeRange {
 	 * @return
 	 */
 	public boolean contains(TmfTimestamp ts) {
-		boolean result = (fStartTime.compareTo(ts, true) <= 0) && (fEndTime.compareTo(ts, true) >= 0);
-		return result;
+		return (fStartTime.compareTo(ts, true) <= 0) && (fEndTime.compareTo(ts, true) >= 0);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+	// ------------------------------------------------------------------------
+    // Object
+	// ------------------------------------------------------------------------
+
+	@Override
+    public int hashCode() {
+		int result = 17;
+		result = 37 * result + fStartTime.hashCode();
+		result = 37 * result + fEndTime.hashCode();
+        return result;
+    }
+
+	@Override
+    public boolean equals(Object other) {
+    	if (!(other instanceof TmfTimeRange))
+    		return false;
+   		TmfTimeRange range = (TmfTimeRange) other;
+   		return range.fStartTime.equals(fStartTime) && range.fEndTime.equals(fEndTime);
+    }
+
 	@Override
 	public String toString() {
-		return "[TmfTimeRange(" + fStartTime.toString() + ":" + fEndTime.toString() + ")]";
+		return "[TmfTimeRange(" + fStartTime + ":" + fEndTime + ")]";
 	}
 
 }

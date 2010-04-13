@@ -54,10 +54,10 @@ public class TmfCoalescedEventRequestTest extends TestCase {
     private TmfTraceStub setupTrace(String path) {
     	if (fTrace == null) {
     		try {
-    	        URL location = FileLocator.find(TmfCoreTestPlugin.getPlugin().getBundle(), new Path(path), null);
+    	        URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
     			File test = new File(FileLocator.toFileURL(location).toURI());
-    			TmfTraceStub trace = new TmfTraceStub(test.getPath(), 500, true);
-    	        fTrace = trace;
+    	        fTrace = new TmfTraceStub(test.getPath(), 500, true);
+    	        fTrace.register();
     		} catch (URISyntaxException e) {
     			e.printStackTrace();
     		} catch (IOException e) {

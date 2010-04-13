@@ -263,14 +263,14 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 
 	@TmfSignalHandler
 	public void startSynch(TmfStartSynchSignal signal) {
-		synchronized(fSynchDepth) {
+		synchronized(this) {
 			fSynchDepth++;
 		}
 	}
 
 	@TmfSignalHandler
 	public void endSynch(TmfEndSynchSignal signal) {
-		synchronized(fSynchDepth) {
+		synchronized(this) {
 			fSynchDepth--;
 			if (fSynchDepth == 0) {
 				fireRequests();

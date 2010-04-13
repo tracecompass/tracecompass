@@ -17,8 +17,6 @@ package org.eclipse.linuxtools.tmf.event;
  * <p>
  * This is just an empty base class for the data meant to navigate in the
  * framework.
- * <p>
- * TODO: Implement me. Please.
  */
 public abstract class TmfData {
 

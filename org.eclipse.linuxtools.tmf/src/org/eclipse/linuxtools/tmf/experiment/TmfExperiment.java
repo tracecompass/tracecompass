@@ -48,7 +48,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     // ------------------------------------------------------------------------
 
 	// The currently selected experiment
-    private static TmfExperiment<?> fCurrentExperiment;
+    private static TmfExperiment<?> fCurrentExperiment = null;
 
 	// The experiment ID
     private String fExperimentId;
@@ -117,12 +117,16 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 	public void deregister() {
     	fTraces = null;
     	fCheckpoints.clear();
-    	fCurrentExperiment= null;
+    	setCurrentExperiment(null);
         super.deregister();
     }
 
+    private static void setCurrentExperiment(TmfExperiment<?> experiment) {
+    	fCurrentExperiment = experiment;
+    }
+
     // ------------------------------------------------------------------------
-    // ITmfTrace accessors
+    // ITmfTrace
     // ------------------------------------------------------------------------
 
 	public String getPath() {
@@ -323,7 +327,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         }
 
         TmfExperimentContext context = seekLocation(location);
-        context.setRank(index * fIndexPageSize);
+        context.setRank((long) index * fIndexPageSize);
 
         // And locate the event
         TmfExperimentContext nextEventContext = new TmfExperimentContext(context);
@@ -359,7 +363,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         }
 
         TmfExperimentContext context = seekLocation(location);
-        long pos = index * fIndexPageSize;
+        long pos = (long) index * fIndexPageSize;
         context.setRank(pos);
 
         // And locate the event
@@ -501,7 +505,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 	 */
 	public void indexExperiment(boolean waitForCompletion) {
 
-		synchronized(fIndexing) {
+		synchronized(this) {
 			if (fIndexed || fIndexing) {
 				// An indexing job is already running but a new request came
 				// in (probably due to a change in the trace set). The index
@@ -614,7 +618,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
     @TmfSignalHandler
     public void experimentSelected(TmfExperimentSelectedSignal<T> signal) {
-		fCurrentExperiment = signal.getExperiment();
+		setCurrentExperiment(signal.getExperiment());
 //    	if (signal.getExperiment() == this) {
 //    		indexExperiment(true);
 //    	}

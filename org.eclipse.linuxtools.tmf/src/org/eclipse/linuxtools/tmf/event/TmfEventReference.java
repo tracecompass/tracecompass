@@ -17,62 +17,74 @@ package org.eclipse.linuxtools.tmf.event;
  * <p>
  * An application-defined event reference.
  */
-public class TmfEventReference implements Cloneable {
+public class TmfEventReference {
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Attributes
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
 	protected Object fReference;
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Constructors
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
 	/**
-	 * 
+	 * The default constructor
 	 */
 	public TmfEventReference() {
-		this(null);
+		fReference = null;
 	}
 
 	/**
-	 * @param reference
+	 * @param reference the event reference
 	 */
 	public TmfEventReference(Object reference) {
 		fReference = reference;
 	}
 
 	/**
-	 * @param other
+	 * Copy constructor
+	 * @param other the original event reference
 	 */
 	public TmfEventReference(TmfEventReference other) {
-		this((other != null) ? other.fReference : null);
+    	if (other == null)
+    		throw new IllegalArgumentException();
+    	TmfEventReference o = (TmfEventReference) other;
+    	fReference = o.fReference;
 	}
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Accessors
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
 	/**
-	 * @return
+	 * @return the event reference
 	 */
 	public Object getReference() {
 		return fReference;
 	}
 
-    // ========================================================================
-    // Operators
-    // ========================================================================
+    // ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
 
-    @Override
-    public TmfEventReference clone() {
-    	return new TmfEventReference(this);
+	@Override
+    public int hashCode() {
+        return (fReference != null) ? fReference.hashCode() : 0;
     }
 
-    @Override
+	@Override
     public String toString() {
         return "[TmfEventReference(" + ((fReference != null) ? fReference.toString() : "null") + ")]";
+    }
+
+	@Override
+    public boolean equals(Object other) {
+		if (!(other instanceof TmfEventReference))
+			return false;
+		TmfEventReference o = (TmfEventReference) other;
+        return fReference.equals(o.fReference);
     }
 
 }

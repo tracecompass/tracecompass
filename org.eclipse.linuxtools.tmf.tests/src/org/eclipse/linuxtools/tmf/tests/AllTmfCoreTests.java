@@ -27,6 +27,8 @@ public class AllTmfCoreTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite(AllTmfCoreTests.class.getName());
 		//$JUnit-BEGIN$
+		suite.addTestSuite(TmfCorePluginTest.class);
+
 		suite.addTestSuite(TmfEventProviderTest.class);
 		suite.addTestSuite(TmfProviderManagerTest.class);
 

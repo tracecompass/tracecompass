@@ -18,23 +18,23 @@ package org.eclipse.linuxtools.tmf.event;
  * <p>
  * The event content.
  */
-public class TmfEventContent implements Cloneable {
+public class TmfEventContent {
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Attributes
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
-	protected TmfEvent fParentEvent = null;
-	protected Object   fRawContent  = null;
-	protected Object[] fFields      = null;
+	protected TmfEvent fParentEvent;
+	protected Object   fRawContent;
+	protected Object[] fFields;
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Constructors
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
 	/**
-	 * @param parent
-	 * @param content
+	 * @param parent the parent event (owner)
+	 * @param content the raw content
 	 */
 	public TmfEventContent(TmfEvent parent, Object content) {
 		fParentEvent = parent;
@@ -42,10 +42,11 @@ public class TmfEventContent implements Cloneable {
 	}
 
     /**
-     * @param other
+     * @param other the original event content
      */
     public TmfEventContent(TmfEventContent other) {
-    	assert(other != null);
+    	if (other == null)
+    		throw new IllegalArgumentException();
     	fParentEvent = other.fParentEvent;
 		fRawContent  = other.fRawContent;
 		fFields      = other.fFields;
@@ -53,11 +54,12 @@ public class TmfEventContent implements Cloneable {
 
     @SuppressWarnings("unused")
 	private TmfEventContent() {
+		throw new AssertionError();
     }
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Accessors
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
 	/**
 	 * @return the parent (containing) event
@@ -93,8 +95,9 @@ public class TmfEventContent implements Cloneable {
 	}
 
 	/**
-	 * @param id
-	 * @return
+	 * @param id the field id
+	 * @return the corresponding field
+	 * @throws TmfNoSuchFieldException
 	 */
 	public Object getField(String id) throws TmfNoSuchFieldException {
 		if (fFields == null) {
@@ -104,8 +107,8 @@ public class TmfEventContent implements Cloneable {
 	}
 
 	/**
-	 * @param n
-	 * @return
+	 * @param n the field index as per TmfEventType.getLabels()
+	 * @return the corresponding field (null if non-existing)
 	 */
 	public Object getField(int n) {
 		if (fFields == null) {
@@ -113,39 +116,54 @@ public class TmfEventContent implements Cloneable {
 		}
 		if (n >= 0 && n < fFields.length)
 			return fFields[n];
+
 		return null;
 	}
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Operators
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
 	/**
-	 * Should be overridden (all fields are null by default)
+	 * Parse the content into fields. By default, a single field (the raw
+	 * content) is returned. 
+	 * Should be overridden.
 	 */
 	protected void parseContent() {
 		fFields = new Object[1];
 		fFields[0] = fRawContent;
 	}
 	
-	/**
-	 * Clone: shallow copy by default; override for deep copy.
-	 */
-    @Override
-    public TmfEventContent clone() {
-		return new TmfEventContent(this);
+    // ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
+
+	@Override
+    public int hashCode() {
+		int result = 17;
+		result = 37 * result + ((fParentEvent != null) ? fParentEvent.hashCode() : 0);
+		result = 37 * result + ((fRawContent  != null) ? fRawContent.hashCode()  : 0);
+        return result;
+    }
+
+	@Override
+    public boolean equals(Object other) {
+		if (!(other instanceof TmfEventContent))
+			return false;
+		TmfEventContent o = (TmfEventContent) other;
+        return fRawContent.equals(o.fRawContent);
     }
 
     @Override
 	public String toString() {
     	Object[] fields = getFields();
-    	String result = "[TmfEventContent(";
+    	StringBuilder result = new StringBuilder("[TmfEventContent(");
     	for (int i = 0; i < fields.length; i++) {
-    		result += fields[i].toString() + ",";
+    		if (i > 0) result.append(",");
+    		result.append(fields[i]);
     	}
-    	result += ")]";
-
-    	return result;
+    	result.append(")]");
+    	return result.toString();
     }
 
 }

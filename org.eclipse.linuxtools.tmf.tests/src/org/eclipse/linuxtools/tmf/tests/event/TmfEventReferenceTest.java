@@ -12,23 +12,36 @@
 
 package org.eclipse.linuxtools.tmf.tests.event;
 
-import org.eclipse.linuxtools.tmf.event.TmfEventReference;
-
 import junit.framework.TestCase;
+
+import org.eclipse.linuxtools.tmf.event.TmfEventReference;
 
 /**
  * <b><u>TmfEventReferenceTest</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * Test suite for the TmfEventReference class.
  */
 public class TmfEventReferenceTest extends TestCase {
 
-	private final Object fReference = new String("Some reference");
+	// ------------------------------------------------------------------------
+	// Variables
+	// ------------------------------------------------------------------------
 
-	// ========================================================================
+	private final Object reference0 = new String("Some reference");
+	private final Object reference2 = new String("Some other reference");
+
+	private TmfEventReference fReference0 = new TmfEventReference(reference0);
+	private TmfEventReference fReference1 = new TmfEventReference(reference0);
+	private TmfEventReference fReference2 = new TmfEventReference(reference0);
+	private TmfEventReference fReference3 = new TmfEventReference(reference2);
+
+	// ------------------------------------------------------------------------
 	// Housekeeping
-	// ========================================================================
+    // ------------------------------------------------------------------------
 
+	/**
+	 * @param name the test name
+	 */
 	public TmfEventReferenceTest(String name) {
 		super(name);
 	}
@@ -43,9 +56,9 @@ public class TmfEventReferenceTest extends TestCase {
 		super.tearDown();
 	}
 
-	// ========================================================================
+    // ------------------------------------------------------------------------
 	// Constructors
-	// ========================================================================
+    // ------------------------------------------------------------------------
 
 	public void testTmfEventReferenceDefault() {
 		TmfEventReference reference = new TmfEventReference();
@@ -53,40 +66,77 @@ public class TmfEventReferenceTest extends TestCase {
 	}
 
 	public void testTmfEventReference() {
-		TmfEventReference reference = new TmfEventReference(fReference);
-		assertSame("getReference", fReference, reference.getReference());
+		TmfEventReference reference = new TmfEventReference(reference0);
+		assertSame("getReference", reference0, reference.getReference());
 	}
 
 	public void testTmfEventReferenceCopy() {
-		TmfEventReference original = new TmfEventReference(fReference);
+		TmfEventReference original = new TmfEventReference(reference0);
 		TmfEventReference reference = new TmfEventReference(original);
-		assertSame("getReference", fReference, reference.getReference());
+		assertSame("getReference", reference0, reference.getReference());
 	}
 
-	public void testCloneShallowCopy() {
-		TmfEventReference original = new TmfEventReference(fReference);
-		TmfEventReference reference = original.clone();
-		assertSame("getReference", fReference, reference.getReference());
+	public void testTmfEventReferenceCopy2() {
+		try {
+			@SuppressWarnings("unused")
+			TmfEventReference reference = new TmfEventReference(null);
+			fail("null copy");
+		}
+		catch (IllegalArgumentException e) {
+			// Success
+		}
 	}
 
-//	public void testCloneDeepCopy() {
-//		TmfEventReference original = new TmfEventReference(fReference);
-//		TmfEventReference reference = original.clone();
-//		assertNotSame("getReference", fReference, reference.getReference());
-//		assertEquals ("getReference", fReference, reference.getReference());
-//	}
+    // ------------------------------------------------------------------------
+	// equals
+    // ------------------------------------------------------------------------
 
-	// ========================================================================
-	// Operators
-	// ========================================================================
+	public void testEqualsReflexivity() throws Exception {
+		assertTrue("equals", fReference0.equals(fReference0));
+		assertTrue("equals", fReference3.equals(fReference3));
+
+		assertTrue("equals", !fReference0.equals(fReference3));
+		assertTrue("equals", !fReference3.equals(fReference0));
+	}
+	
+	public void testEqualsSymmetry() throws Exception {
+		assertTrue("equals", fReference0.equals(fReference1));
+		assertTrue("equals", fReference1.equals(fReference0));
+
+		assertTrue("equals", !fReference0.equals(fReference3));
+		assertTrue("equals", !fReference3.equals(fReference0));
+	}
+	
+	public void testEqualsTransivity() throws Exception {
+		assertTrue("equals", fReference0.equals(fReference1));
+		assertTrue("equals", fReference1.equals(fReference2));
+		assertTrue("equals", fReference0.equals(fReference2));
+	}
+	
+	public void testEqualsConsistency() throws Exception {
+		assertTrue("equals", fReference0.equals(fReference0));
+		assertTrue("equals", fReference0.equals(fReference0));
+
+		assertTrue("equals", fReference3.equals(fReference3));
+		assertTrue("equals", fReference3.equals(fReference3));
+	}
+	
+	public void testEqualsNull() throws Exception {
+		assertTrue("equals", !fReference0.equals(null));
+		assertTrue("equals", !fReference3.equals(null));
+	}
+	
+    // ------------------------------------------------------------------------
+	// toString
+    // ------------------------------------------------------------------------
 
 	public void testToString() {
 		String expected1 = "[TmfEventReference(" + "null" + ")]";
 		TmfEventReference reference1 = new TmfEventReference();
 		assertEquals("toString", expected1, reference1.toString());
 
-		String expected2 = "[TmfEventReference(" + fReference.toString() + ")]";
-		TmfEventReference reference2 = new TmfEventReference(fReference);
+		String expected2 = "[TmfEventReference(" + reference0.toString() + ")]";
+		TmfEventReference reference2 = new TmfEventReference(reference0);
 		assertEquals("toString", expected2, reference2.toString());
 	}
 

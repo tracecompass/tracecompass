@@ -27,9 +27,13 @@ import junit.framework.TestCase;
 /**
  * <b><u>TmfEventContentTest</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * Test suite for the TmfEventContent class.
  */
 public class TmfEventContentTest extends TestCase {
+
+	// ------------------------------------------------------------------------
+	// Variables
+	// ------------------------------------------------------------------------
 
 	private final TmfTimestamp      fTimestamp;
 	private final TmfEventSource    fEventSource;
@@ -39,13 +43,20 @@ public class TmfEventContentTest extends TestCase {
 	private final TmfEvent          fEvent;
 	private final TmfEvent          fEventStub;
 
-	private final Object fRawContent = new String("Some content");
+	private final Object fRawContent0 = new String("Some content");
+	private final Object fRawContent1 = new String("Some other content");
 
-	private final TmfEventContent     fBasicContent;
+	private final TmfEventContent     fBasicContent0;
+	private final TmfEventContent     fBasicContent1;
+	private final TmfEventContent     fBasicContent2;
 	private final TmfEventContentStub fStubContent;
 
+	// ------------------------------------------------------------------------
+	// Housekeeping
+	// ------------------------------------------------------------------------
+
 	/**
-	 * @param name
+	 * @param name the test name
 	 */
 	public TmfEventContentTest(String name) {
 		super(name);
@@ -55,11 +66,13 @@ public class TmfEventContentTest extends TestCase {
 		fEventTypeStub = new TmfEventTypeStub();
 		fReference     = new TmfEventReference();
 
-		fEvent        = new TmfEvent(fTimestamp, fEventSource, fEventType, fReference);
-		fBasicContent = new TmfEventContent(fEvent, fRawContent);
+		fEvent         = new TmfEvent(fTimestamp, fEventSource, fEventType, fReference);
+		fBasicContent0 = new TmfEventContent(fEvent, fRawContent0);
+		fBasicContent1 = new TmfEventContent(fEvent, fRawContent0);
+		fBasicContent2 = new TmfEventContent(fEvent, fRawContent0);
 
 		fEventStub    = new TmfEvent(fTimestamp, fEventSource, fEventTypeStub, fReference);
-		fStubContent  = new TmfEventContentStub(fEventStub, fRawContent);
+		fStubContent  = new TmfEventContentStub(fEventStub, fRawContent1);
 	}
 
 	@Override
@@ -72,53 +85,108 @@ public class TmfEventContentTest extends TestCase {
 		super.tearDown();
 	}
 
-	// ========================================================================
+	// ------------------------------------------------------------------------
 	// Constructors
-	// ========================================================================
+	// ------------------------------------------------------------------------
 
 	public void testTmfEventContent() {
-		assertSame("getLabels",  fEvent,      fBasicContent.getEvent());
-		assertSame("getType",    fEventType,  fBasicContent.getType());
-		assertSame("getContent", fRawContent, fBasicContent.getContent());
+		assertSame("getLabels",    fEvent,       fBasicContent0.getEvent());
+		assertEquals("getType",    fEventType,   fBasicContent0.getType());
+		assertEquals("getContent", fRawContent0, fBasicContent0.getContent());
 	}
 
 	public void testTmfEventContentCopy() {
-		TmfEventContent content  = new TmfEventContent(fBasicContent);
-		assertSame("getLabels",  fEvent,      content.getEvent());
-		assertSame("getType",    fEventType,  content.getType());
-		assertSame("getContent", fRawContent, content.getContent());
+		TmfEventContent content  = new TmfEventContent(fBasicContent0);
+		assertSame("getLabels",    fEvent,       content.getEvent());
+		assertEquals("getType",    fEventType,   content.getType());
+		assertEquals("getContent", fRawContent0, content.getContent());
 	}
 
-	public void testCloneShallowCopy() {
-		TmfEventContent content  = fBasicContent.clone();
-		assertSame("getLabels",  fEvent,      content.getEvent());
-		assertSame("getType",    fEventType,  content.getType());
-		assertSame("getContent", fRawContent, content.getContent());
+	public void testTmfEventContentCopy2() {
+		try {
+			new TmfEventContent(null);
+			fail("null copy");
+		}
+		catch (IllegalArgumentException e) {
+			// Success
+		}
 	}
 
-	public void testCloneDeepCopy() {
-		TmfEventContent content  = fStubContent.clone();
-		assertSame   ("getEvent",   fEventStub,     content.getEvent());
-		assertSame   ("getType",    fEventTypeStub, content.getType());
-		assertNotSame("getContent", fRawContent,    content.getContent());
-		assertEquals ("getContent", fRawContent,    content.getContent());
+	// ------------------------------------------------------------------------
+	// equals
+	// ------------------------------------------------------------------------
+
+	public void testEqualsReflexivity() throws Exception {
+		@SuppressWarnings("unused")
+		Object[] fields1 = fBasicContent0.getFields(); 
+		@SuppressWarnings("unused")
+		Object[] fields2 = fStubContent.getFields(); 
+
+		assertTrue("equals", fBasicContent0.equals(fBasicContent0));
+		assertTrue("equals", fStubContent.equals(fStubContent));
+
+		assertTrue("equals", !fBasicContent0.equals(fStubContent));
+		assertTrue("equals", !fStubContent.equals(fBasicContent0));
+	}
+	
+	public void testEqualsSymmetry() throws Exception {
+		assertTrue("equals", fBasicContent0.equals(fBasicContent2));
+		assertTrue("equals", fBasicContent2.equals(fBasicContent0));
+
+		assertTrue("equals", !fBasicContent0.equals(fStubContent));
+		assertTrue("equals", !fStubContent.equals(fBasicContent0));
+	}
+	
+	public void testEqualsTransivity() throws Exception {
+		assertTrue("equals", fBasicContent0.equals(fBasicContent1));
+		assertTrue("equals", fBasicContent1.equals(fBasicContent2));
+		assertTrue("equals", fBasicContent0.equals(fBasicContent2));
+	}
+	
+	public void testEqualsConsistency() throws Exception {
+		assertTrue("equals", fBasicContent0.equals(fBasicContent0));
+		assertTrue("equals", fBasicContent0.equals(fBasicContent0));
+
+		assertTrue("equals", fStubContent.equals(fStubContent));
+		assertTrue("equals", fStubContent.equals(fStubContent));
+	}
+	
+	public void testEqualsNull() throws Exception {
+		assertTrue("equals", !fBasicContent0.equals(null));
+		assertTrue("equals", !fStubContent.equals(null));
+	}
+	
+	// ------------------------------------------------------------------------
+	// toString
+	// ------------------------------------------------------------------------
+
+	public void testToString() {
+		String expected = "[TmfEventContent(" + fRawContent0 + ")]";
+		TmfEventContent content = new TmfEventContent(fEvent, fRawContent0);
+		assertEquals("toString", expected, content.toString());
 	}
 
-	// ========================================================================
+	public void testToString2() {
+		String expected = "[TmfEventContent(1,-10,true,some string,[TmfTimestamp(1,2,3)])]";
+		TmfEventContentStub content = new TmfEventContentStub(fEvent, fRawContent0);
+		assertEquals("toString", expected, content.toString());
+	}
+
+	// ------------------------------------------------------------------------
 	// Basic content parsing
-	// ========================================================================
+	// ------------------------------------------------------------------------
 
 	public void testGetFields() {
-		Object[] fields = fBasicContent.getFields(); 
+		Object[] fields = fBasicContent0.getFields(); 
 		assertEquals("getFields", 1, fields.length);
-		assertEquals("getFields", fRawContent, fields[0].toString());
+		assertEquals("getFields", fRawContent0, fields[0].toString());
 	}
 
 	public void testGetFieldFromId() {
 		Object field;
 		try {
-			field = fBasicContent.getField("Content");
-			assertEquals("getField", fRawContent, field.toString());
+			field = fBasicContent0.getField("Content");
+			assertEquals("getField", fRawContent0, field.toString());
 		} catch (TmfNoSuchFieldException e) {
 			fail("Field not found");
 		} 
@@ -126,7 +194,7 @@ public class TmfEventContentTest extends TestCase {
 
 	public void testGetFieldFromIdFailed() {
 		try {
-			fBasicContent.getField("Dummy");
+			fBasicContent0.getField("Dummy");
 			fail("Found an inexisting field...");
 		} catch (TmfNoSuchFieldException e) {
 			// Success
@@ -134,13 +202,18 @@ public class TmfEventContentTest extends TestCase {
 	}
 
 	public void testGetFieldFromPos() {
-		Object field = fBasicContent.getField(0);
-		assertEquals("getField", fRawContent, field.toString());
+		Object field = fBasicContent0.getField(0);
+		assertEquals("getField", fRawContent0, field.toString());
 	}
 
-	// ========================================================================
+	public void testGetFieldFromPosFailed() {
+		Object field = fBasicContent0.getField(10);
+		assertEquals("getField", null, field);
+	}
+
+	// ------------------------------------------------------------------------
 	// Standard content parsing
-	// ========================================================================
+	// ------------------------------------------------------------------------
 
 	public void testGetFields2() {
 		Object[] fields = fStubContent.getFields(); 
@@ -171,9 +244,10 @@ public class TmfEventContentTest extends TestCase {
 	}
 
 	public void testGetFieldFromPos2() {
-		TmfEventContentStub content = new TmfEventContentStub(fEvent, fRawContent);
+		TmfEventContentStub content = new TmfEventContentStub(fEvent, fRawContent0);
 
-		Object field = content.getField(0);
+		Object field;
+		field = content.getField(0);
 		assertEquals("getField", new Integer(1), field);
 
 		field = content.getField(1);
@@ -187,16 +261,6 @@ public class TmfEventContentTest extends TestCase {
 
 		field = content.getField(4);
 		assertEquals("getField", new TmfTimestamp(1, (byte) 2, 3), field);
-	}
-
-	// ========================================================================
-	// Operators
-	// ========================================================================
-
-	public void testToString() {
-		String expected = "[TmfEventContent(" + fRawContent + ",)]";
-		TmfEventContent content = new TmfEventContent(fEvent, fRawContent);
-		assertEquals("toString", expected, content.toString());
 	}
 
 }

@@ -59,11 +59,11 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     	if (fTrace == null) {
     		fTrace = new ITmfTrace[2];
     		try {
-    	        URL location = FileLocator.find(TmfCoreTestPlugin.getPlugin().getBundle(), new Path(path1), null);
+    	        URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path1), null);
     			File test = new File(FileLocator.toFileURL(location).toURI());
     			TmfTraceStub trace1 = new TmfTraceStub(test.getPath(), true);
     			fTrace[0] = trace1;
-    	        location = FileLocator.find(TmfCoreTestPlugin.getPlugin().getBundle(), new Path(path2), null);
+    	        location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path2), null);
     			test = new File(FileLocator.toFileURL(location).toURI());
     			TmfTraceStub trace2 = new TmfTraceStub(test.getPath(), true);
     			fTrace[1] = trace2;

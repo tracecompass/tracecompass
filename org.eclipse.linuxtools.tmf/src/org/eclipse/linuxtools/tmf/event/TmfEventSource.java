@@ -17,23 +17,23 @@ package org.eclipse.linuxtools.tmf.event;
  * <p>
  * The event source.
  */
-public class TmfEventSource implements Cloneable {
+public class TmfEventSource {
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Attributes
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
 	protected Object fSourceId;
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Constructors
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
     /**
-     * 
+     * The default constructor
      */
     public TmfEventSource() {
-        this(null);
+    	fSourceId = null;
     }
 
 	/**
@@ -44,15 +44,19 @@ public class TmfEventSource implements Cloneable {
 	}
 
 	/**
+	 * Copy constructor
 	 * @param other
 	 */
 	public TmfEventSource(TmfEventSource other) {
-		this((other != null) ? other.fSourceId : null);
+    	if (other == null)
+    		throw new IllegalArgumentException();
+    	TmfEventSource o = (TmfEventSource) other;
+    	fSourceId = o.fSourceId;
 	}
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Accessors
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
 	/**
 	 * @return
@@ -61,14 +65,22 @@ public class TmfEventSource implements Cloneable {
 		return fSourceId;
 	}
 
-	// ========================================================================
-    // Operators
-    // ========================================================================
+    // ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
 
 	@Override
-	public TmfEventSource clone() {
-		return new TmfEventSource(this);
-	}
+    public int hashCode() {
+        return (fSourceId != null) ? fSourceId.hashCode() : 0;
+    }
+
+	@Override
+    public boolean equals(Object other) {
+		if (!(other instanceof TmfEventSource))
+			return false;
+		TmfEventSource o = (TmfEventSource) other;
+        return fSourceId.equals(o.fSourceId);
+    }
 
 	@Override
     public String toString() {

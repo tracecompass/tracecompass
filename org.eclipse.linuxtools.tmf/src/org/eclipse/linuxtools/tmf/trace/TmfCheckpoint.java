@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.tmf.trace;
 
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.experiment.TmfExperimentCheckpoint;
 
 /**
  * <b><u>TmfCheckpoint</u></b>
@@ -59,6 +60,26 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint> {
         return fLocation;
     }
 
+    // ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
+
+    @Override
+    public int hashCode() {
+    	int result = 37;
+    	result = 17 * result + fTimestamp.hashCode();
+    	return result;
+    }
+ 
+    @Override
+    public boolean equals(Object other) {
+    	if (!(other instanceof TmfCheckpoint)) {
+    		return false;
+    	}
+    	TmfCheckpoint o = (TmfCheckpoint) other;
+    	return fTimestamp.equals(o.fTimestamp);
+    }
+ 
     // ------------------------------------------------------------------------
     // Comparable
     // ------------------------------------------------------------------------

@@ -138,23 +138,6 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     	fNbRead      = 0;
     }
 
-    @Override
-    public boolean equals(Object other) {
-    	if (other instanceof TmfDataRequest<?>) {
-    		TmfDataRequest<?> request = (TmfDataRequest<?>) other;
-    		return 	(request.fDataType    == fDataType) &&
-    				(request.fIndex       == fIndex)    &&
-    				(request.fNbRequested == fNbRequested);
-    	}
-    	return false;
-    }
-
-//    @Override
-//    public int hashCode() {
-//    	int hash = 0;
-//    	return hash;
-//    }
-
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -337,6 +320,26 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
             fRequestCanceled = true;
             done();
         }
+    }
+
+    // ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
+
+    @Override
+    public int hashCode() {
+    	return fRequestId;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+    	if (other instanceof TmfDataRequest<?>) {
+    		TmfDataRequest<?> request = (TmfDataRequest<?>) other;
+    		return 	(request.fDataType    == fDataType) &&
+    				(request.fIndex       == fIndex)    &&
+    				(request.fNbRequested == fNbRequested);
+    	}
+    	return false;
     }
 
 }

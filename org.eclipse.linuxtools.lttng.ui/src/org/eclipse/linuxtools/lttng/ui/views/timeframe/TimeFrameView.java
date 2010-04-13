@@ -166,7 +166,8 @@ public class TimeFrameView extends TmfView {
 
         // Compute the new time range
         TmfTimeRange subrange = new TmfTimeRange(startTime, endTime);
-        TmfTimestamp interval = new TmfTimestamp(startTime.getAdjustment(endTime), startTime.getScale(), 0);
+        byte scale = startTime.getScale();
+        TmfTimestamp interval = new TmfTimestamp(startTime.getAdjustment(endTime, scale), scale, 0);
 
         // Update the spinner groups
         fStartGroup.setContent(fTraceTimeRange, startTime);
@@ -223,8 +224,9 @@ public class TimeFrameView extends TmfView {
     private void updateSlider(TmfTimeRange range, TmfTimestamp timestamp) {
 
         // Determine the new relative position
-        long total    = range.getStartTime().getAdjustment(range.getEndTime());
-        long relative = range.getStartTime().getAdjustment(timestamp);
+    	byte scale = range.getEndTime().getScale();
+        long total    = range.getStartTime().getAdjustment(range.getEndTime(), scale);
+        long relative = range.getStartTime().getAdjustment(timestamp, scale);
 
         // Set the slider value
         final long position = (total > 0) ? (relative * SLIDER_RANGE / total) : 0;
@@ -275,7 +277,7 @@ public class TimeFrameView extends TmfView {
 
         fCurrentTime = fTraceStartTime;
 
-        TmfTimestamp delta = new TmfTimestamp(fTraceStartTime.getAdjustment(fTraceEndTime), fScale, 0);
+        TmfTimestamp delta = new TmfTimestamp(fTraceStartTime.getAdjustment(fTraceEndTime, fScale), fScale, 0);
         fTraceSpan = new TmfTimeRange(new TmfTimestamp(0, fScale, 0), delta);
 //        fRangeGroup.setContent(fTraceSpan, delta);
         TmfTimestamp start = new TmfTimestamp(1, (byte) -1, 0);
@@ -299,7 +301,7 @@ public class TimeFrameView extends TmfView {
         fEndGroup.setContent(fTraceTimeRange, fTraceEndTime);
         fCurrentGroup.setContent(fTraceTimeRange, fCurrentGroup.getCurrentTime());
 
-        TmfTimestamp delta = new TmfTimestamp(fTraceStartTime.getAdjustment(fTraceEndTime), fScale, 0);
+        TmfTimestamp delta = new TmfTimestamp(fTraceStartTime.getAdjustment(fTraceEndTime, fScale), fScale, 0);
         fTraceSpan = new TmfTimeRange(new TmfTimestamp(0, fScale, 0), delta);
         fRangeGroup.setContent(fTraceSpan, delta);
     }

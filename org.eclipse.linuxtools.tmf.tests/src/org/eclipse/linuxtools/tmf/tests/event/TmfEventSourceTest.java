@@ -12,23 +12,36 @@
 
 package org.eclipse.linuxtools.tmf.tests.event;
 
-import org.eclipse.linuxtools.tmf.event.TmfEventSource;
-
 import junit.framework.TestCase;
+
+import org.eclipse.linuxtools.tmf.event.TmfEventSource;
 
 /**
  * <b><u>TmfEventSourceTest</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * Test suite for the TmfEventSource class.
  */
 public class TmfEventSourceTest extends TestCase {
 
-	private final Object fSource = new String("Some source");
+	// ------------------------------------------------------------------------
+	// Variables
+	// ------------------------------------------------------------------------
 
-	// ========================================================================
+	private final Object source1 = new String("Some source");
+	private final Object source2 = new String("Some other source");
+
+	private final TmfEventSource fSource0 = new TmfEventSource(source1);
+	private final TmfEventSource fSource1 = new TmfEventSource(source1);
+	private final TmfEventSource fSource2 = new TmfEventSource(source1);
+	private final TmfEventSource fSource3 = new TmfEventSource(source2);
+	
+	// ------------------------------------------------------------------------
 	// Housekeeping
-	// ========================================================================
+	// ------------------------------------------------------------------------
 
+	/**
+	 * @param name the test name
+	 */
 	public TmfEventSourceTest(String name) {
 		super(name);
 	}
@@ -43,9 +56,9 @@ public class TmfEventSourceTest extends TestCase {
 		super.tearDown();
 	}
 
-	// ========================================================================
+	// ------------------------------------------------------------------------
 	// Constructors
-	// ========================================================================
+	// ------------------------------------------------------------------------
 
 	public void testTmfEventSourceDefault() {
 		TmfEventSource source = new TmfEventSource();
@@ -53,41 +66,78 @@ public class TmfEventSourceTest extends TestCase {
 	}
 
 	public void testTmfEventSource() {
-		TmfEventSource source = new TmfEventSource(fSource);
-		assertSame("getSourceId", fSource, source.getSourceId());
+		TmfEventSource source = new TmfEventSource(source1);
+		assertSame("getSourceId", source1, source.getSourceId());
 	}
 
 	public void testTmfEventSourceCopy() {
-		TmfEventSource original = new TmfEventSource(fSource);
+		TmfEventSource original = new TmfEventSource(source1);
 		TmfEventSource source = new TmfEventSource(original);
-		assertSame("getSourceId", fSource, source.getSourceId());
+		assertSame("getSourceId", source1, source.getSourceId());
 	}
 
-	public void testCloneShallowCopy() {
-		TmfEventSource original = new TmfEventSource(fSource);
-		TmfEventSource source = original.clone();
-		assertSame("getSourceId", fSource, source.getSourceId());
+	public void testTmfEventSourceCopy2() {
+		try {
+			@SuppressWarnings("unused")
+			TmfEventSource source = new TmfEventSource(null);
+			fail("null copy");
+		}
+		catch (IllegalArgumentException e) {
+			// Success
+		}
 	}
 
-//	public void testCloneDeepCopy() {
-//		TmfEventSource original = new TmfEventSource(fSource);
-//		TmfEventSource source = original.clone();
-//		assertNotSame("getSourceId", fSource, source.getSourceId());
-//		assertEquals ("getSourceId", fSource, source.getSourceId());
-//	}
+	// ------------------------------------------------------------------------
+	// equals
+	// ------------------------------------------------------------------------
 
-	// ========================================================================
-	// Operators
-	// ========================================================================
+	public void testEqualsReflexivity() throws Exception {
+		assertTrue("equals", fSource0.equals(fSource0));
+		assertTrue("equals", fSource3.equals(fSource3));
+
+		assertTrue("equals", !fSource0.equals(fSource3));
+		assertTrue("equals", !fSource3.equals(fSource0));
+	}
+	
+	public void testEqualsSymmetry() throws Exception {
+		assertTrue("equals", fSource0.equals(fSource2));
+		assertTrue("equals", fSource2.equals(fSource0));
+
+		assertTrue("equals", !fSource0.equals(fSource3));
+		assertTrue("equals", !fSource3.equals(fSource0));
+	}
+	
+	public void testEqualsTransivity() throws Exception {
+		assertTrue("equals", fSource0.equals(fSource1));
+		assertTrue("equals", fSource1.equals(fSource2));
+		assertTrue("equals", fSource0.equals(fSource2));
+	}
+	
+	public void testEqualsConsistency() throws Exception {
+		assertTrue("equals", fSource0.equals(fSource0));
+		assertTrue("equals", fSource0.equals(fSource0));
+
+		assertTrue("equals", fSource3.equals(fSource3));
+		assertTrue("equals", fSource3.equals(fSource3));
+	}
+	
+	public void testEqualsNull() throws Exception {
+		assertTrue("equals", !fSource0.equals(null));
+		assertTrue("equals", !fSource3.equals(null));
+	}
+	
+	// ------------------------------------------------------------------------
+	// toString
+	// ------------------------------------------------------------------------
 
 	public void testToString() {
 		String expected1 = "[TmfEventSource(" + "null" + ")]";
-		TmfEventSource source1 = new TmfEventSource();
-		assertEquals("toString", expected1, source1.toString());
+		TmfEventSource nullSource = new TmfEventSource();
+		assertEquals("toString", expected1, nullSource.toString());
 
-		String expected2 = "[TmfEventSource(" + fSource.toString() + ")]";
-		TmfEventSource source2 = new TmfEventSource(fSource);
-		assertEquals("toString", expected2, source2.toString());
+		String expected2 = "[TmfEventSource(" + source1.toString() + ")]";
+		TmfEventSource source = new TmfEventSource(source1);
+		assertEquals("toString", expected2, source.toString());
 	}
 
 }

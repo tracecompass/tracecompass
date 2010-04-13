@@ -157,7 +157,7 @@ public class SpinnerGroup {
     }
 
     public TmfTimestamp getSpan() {
-        TmfTimestamp span = new TmfTimestamp(startTime.getAdjustment(endTime), NS_SCALING_FACTOR, 0);
+        TmfTimestamp span = new TmfTimestamp(startTime.getAdjustment(endTime, NS_SCALING_FACTOR), NS_SCALING_FACTOR, 0);
         return span;
     }
 

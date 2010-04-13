@@ -25,6 +25,7 @@ import org.eclipse.linuxtools.lttng.event.LttngEventSource;
 import org.eclipse.linuxtools.lttng.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
+import org.eclipse.linuxtools.tmf.event.TmfNoSuchFieldException;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.trace.ITmfContext;
@@ -492,7 +493,11 @@ class TextLttngEventContent extends LttngEventContent {
     @Override
     public LttngEventField getField(int position) {
     	LttngEventField returnedField = null;
-    	String label = fParentEvent.getType().getLabel(position);
+    	String label = null;
+		try {
+			label = fParentEvent.getType().getLabel(position);
+		} catch (TmfNoSuchFieldException e) {
+		}
         
         if ( label != null ) {
             returnedField = this.getField(label);

@@ -17,7 +17,7 @@ package org.eclipse.linuxtools.tmf.trace;
  * <p>
  * This is a place-holder for the context objects.
  */
-public interface ITmfContext extends Cloneable {
+public interface ITmfContext {
 
 	public void setLocation(ITmfLocation<?> location);
 	public ITmfLocation<?> getLocation();

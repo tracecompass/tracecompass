@@ -22,7 +22,7 @@ package org.eclipse.linuxtools.tmf.trace;
  * <p>
  * Used to handle conflicting, concurrent accesses to the trace. 
  */
-public class TmfContext implements ITmfContext {
+public class TmfContext implements ITmfContext, Cloneable {
 
 	private ITmfLocation<?> fLocation;
 	private long fRank;

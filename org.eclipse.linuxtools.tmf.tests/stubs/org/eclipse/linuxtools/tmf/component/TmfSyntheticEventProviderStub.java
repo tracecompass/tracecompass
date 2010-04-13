@@ -35,6 +35,11 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSynthetic
 	}
 
     @Override
+    public void register() {
+    	super.register();
+    }
+    
+    @Override
     public void deregister() {
     	super.deregister();
     }

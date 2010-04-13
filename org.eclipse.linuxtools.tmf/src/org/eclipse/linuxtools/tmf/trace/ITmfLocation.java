@@ -17,7 +17,7 @@ package org.eclipse.linuxtools.tmf.trace;
  * <p>
  * This is a place-holder for the location objects.
  */
-public interface ITmfLocation<L> extends Cloneable {
+public interface ITmfLocation<L> extends Cloneable{
 
 	public void setLocation(L location);
 

@@ -60,7 +60,7 @@ public class TmfExperimentTest extends TestCase {
     	if (fTraces == null) {
     		fTraces = new ITmfTrace[1];
     		try {
-    	        URL location = FileLocator.find(TmfCoreTestPlugin.getPlugin().getBundle(), new Path(path), null);
+    	        URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
     			File test = new File(FileLocator.toFileURL(location).toURI());
     			TmfTraceStub trace = new TmfTraceStub(test.getPath(), true);
     			fTraces[0] = trace;

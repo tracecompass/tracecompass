@@ -19,19 +19,24 @@ package org.eclipse.linuxtools.tmf.event;
  * 
  * TODO: Add support for field hierarchy.
  */
-public class TmfEventField implements Cloneable {
+public class TmfEventField {
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Attributes
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
 	private final TmfEventContent fParent;
     private final String fFieldId;
     private       Object fValue;
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Constructors
-    // ========================================================================
+    // ------------------------------------------------------------------------
+
+    @SuppressWarnings("unused")
+	private TmfEventField() {
+		throw new AssertionError();
+    }
 
     /**
      * @param parent
@@ -39,6 +44,9 @@ public class TmfEventField implements Cloneable {
      * @param value
      */
     public TmfEventField(TmfEventContent parent, String id, Object value) {
+    	if (id == null) {
+    		throw new IllegalArgumentException();
+    	}
     	fParent  = parent;
     	fFieldId = id;
         fValue   = value;
@@ -48,22 +56,16 @@ public class TmfEventField implements Cloneable {
      * @param other
      */
     public TmfEventField(TmfEventField other) {
-    	assert(other != null);
+    	if (other == null)
+    		throw new IllegalArgumentException();
     	fParent  = other.fParent;
     	fFieldId = other.fFieldId;
 		fValue   = other.fValue;
     }
 
-    @SuppressWarnings("unused")
-	private TmfEventField() {
-    	fParent  = null;
-    	fFieldId = null;
-        fValue   = null;
-    }
-
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Accessors
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
     /**
      * @return
@@ -87,22 +89,27 @@ public class TmfEventField implements Cloneable {
     }
 
     /**
-     * @param value
+     * @param value new field value
      */
     protected void setValue(Object value) {
         fValue = value;
     }
 
-    // ========================================================================
-    // Operators
-    // ========================================================================
+    // ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
 
-	/**
-	 * Clone: shallow copy by default; override for deep copy.
-	 */
     @Override
-    public TmfEventField clone() {
-    	return new TmfEventField(this);
+    public int hashCode() {
+        return fFieldId.hashCode();
+    }
+
+	@Override
+	public boolean equals(Object other) {
+    	if (!(other instanceof TmfEventField))
+    		return false;
+   		TmfEventField o = (TmfEventField) other;
+   		return fParent.equals(o.fParent) && fFieldId.equals(o.fFieldId) && fValue.equals(o.fValue); 
     }
 
     @Override

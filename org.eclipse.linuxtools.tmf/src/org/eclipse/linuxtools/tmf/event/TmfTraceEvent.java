@@ -21,20 +21,21 @@ package org.eclipse.linuxtools.tmf.event;
  * <p>
  * TODO: Concept is still a bit vague and should be aligned with the CDT
  * source lookup service.
+ * TODO: Consider composition instead of extension
  */
 public class TmfTraceEvent extends TmfEvent {
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Attributes
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
     private final String fSourcePath;
     private final String fFileName;
     private final int    fLineNumber;
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Constructors
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
 	/**
 	 * @param originalTS
@@ -85,9 +86,9 @@ public class TmfTraceEvent extends TmfEvent {
 		fLineNumber = other.fLineNumber;
 	}
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Accessors
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
     /**
      * @return
@@ -110,20 +111,32 @@ public class TmfTraceEvent extends TmfEvent {
         return fLineNumber;
     }
 
-    // ========================================================================
-    // Operators
-    // ========================================================================
+    // ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
 
-    // TODO: Deep copy
     @Override
-    public TmfTraceEvent clone() {
-    	return new TmfTraceEvent(this);
+    public int hashCode() {
+		int result = super.hashCode();
+		result = 37 * result + ((fSourcePath != null) ? fSourcePath.hashCode() : 0);
+		result = 37 * result + ((fFileName   != null) ? fFileName.hashCode()   : 0);
+		result = 37 * result + fLineNumber;
+        return result;
+    }
+
+    @Override
+	public boolean equals(Object other) {
+    	if (!(other instanceof TmfTraceEvent)) {
+    		return false; 
+    	}
+//		TmfTraceEvent o = (TmfTraceEvent) other;
+        return false;
     }
 
     // TODO: Proper format
     @Override
     public String toString() {
-    	return null;
+		return "[TmfTraceEvent(" + fSourcePath + "," + fFileName + "," + fLineNumber + ")]";
     }
 
 }

@@ -16,6 +16,7 @@ import java.util.HashMap;
 
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.tmf.event.TmfEventContent;
+import org.eclipse.linuxtools.tmf.event.TmfNoSuchFieldException;
 
 /**
  * <b><u>LttngEventContent</u></b><p>
@@ -161,7 +162,11 @@ public class LttngEventContent extends TmfEventContent {
         	LttngEventType tmpType = (LttngEventType)fParentEvent.getType();
         	
 	        for ( int pos=0; pos<tmpType.getNbFields(); pos++ ) {
-	            String name = tmpType.getLabel(pos);
+	            String name = null;
+				try {
+					name = tmpType.getLabel(pos);
+				} catch (TmfNoSuchFieldException e) {
+				}
 	            JniEvent tmpEvent = ((LttngEvent)getEvent()).convertEventTmfToJni();
 	            
 	            if ( tmpEvent != null ) {
@@ -184,7 +189,11 @@ public class LttngEventContent extends TmfEventContent {
     @Override
     public LttngEventField getField(int position) {
         LttngEventField returnedField = null;
-        String label = fParentEvent.getType().getLabel(position);
+        String label = null;
+		try {
+			label = fParentEvent.getType().getLabel(position);
+		} catch (TmfNoSuchFieldException e) {
+		}
         
         if ( label != null ) {
             returnedField = this.getField(label);

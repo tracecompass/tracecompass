@@ -27,13 +27,13 @@ package org.eclipse.linuxtools.tmf.event;
  * otherwise identical events.
  * 
  * Notice that for performance reasons TmfEvent is NOT immutable. If a copy
- * of the event is needed, use clone().
+ * of the event is needed, use the copy constructor.
  */
-public class TmfEvent extends TmfData implements Cloneable {
+public class TmfEvent extends TmfData {
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Attributes
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
 	protected TmfTimestamp      fEffectiveTimestamp;
 	protected TmfTimestamp      fOriginalTimestamp;
@@ -45,20 +45,23 @@ public class TmfEvent extends TmfData implements Cloneable {
 	// using setContent()
 	protected TmfEventContent   fContent;
 
-	// ========================================================================
+    // ------------------------------------------------------------------------
     // Constructors
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
 	/**
-	 * @param originalTS
-	 * @param effectiveTS
-	 * @param source
-	 * @param type
-	 * @param reference
+	 * @param originalTS the original timestamp
+	 * @param effectiveTS the effective timestamp
+	 * @param source the event source (generator)
+	 * @param type the event type
+	 * @param reference a free-form reference field
 	 */
 	public TmfEvent(TmfTimestamp originalTS, TmfTimestamp effectiveTS,
 			TmfEventSource source, TmfEventType type, TmfEventReference reference)
 	{
+		if (source == null || type == null || effectiveTS == null) {
+    		throw new IllegalArgumentException();
+		}
 		fOriginalTimestamp  = originalTS;
 		fEffectiveTimestamp = effectiveTS;
 		fSource             = source;
@@ -67,10 +70,10 @@ public class TmfEvent extends TmfData implements Cloneable {
 	}
 
 	/**
-	 * @param timestamp
-	 * @param source
-	 * @param type
-	 * @param reference
+	 * @param timestamp the effective timestamp
+	 * @param source the event source (generator)
+	 * @param type the event type
+	 * @param reference a free-form reference field
 	 */
 	public TmfEvent(TmfTimestamp timestamp, TmfEventSource source,
 			TmfEventType type, TmfEventReference reference)
@@ -79,97 +82,106 @@ public class TmfEvent extends TmfData implements Cloneable {
 	}
 
 	/**
-	 * Copy constructor (shallow)
+	 * Copy constructor
 	 * 
-	 * @param other
+	 * @param other the original event
 	 */
 	public TmfEvent(TmfEvent other) {
-		assert(other != null);
-		fOriginalTimestamp  = other.fOriginalTimestamp;
-		fEffectiveTimestamp = other.fEffectiveTimestamp;
-		fSource    			= other.fSource;
-		fType      			= other.fType;
-		fContent   			= other.fContent;
-		fReference			= other.fReference;
+    	if (other == null)
+    		throw new IllegalArgumentException();
+		fOriginalTimestamp  = new TmfTimestamp(other.fOriginalTimestamp);
+		fEffectiveTimestamp = new TmfTimestamp(other.fEffectiveTimestamp);
+		fSource    			= new TmfEventSource(other.fSource);
+		fType      			= new TmfEventType(other.fType);
+		fContent   			= new TmfEventContent(other.fContent);
+		fReference			= new TmfEventReference(other.fReference);
 	}
 
 	@SuppressWarnings("unused")
 	private TmfEvent() {
+		throw new AssertionError();
 	}
 
-    // ========================================================================
+	// ------------------------------------------------------------------------
     // Accessors
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
 	/**
-	 * @return
+	 * @return the effective event timestamp
 	 */
 	public TmfTimestamp getTimestamp() {
 		return fEffectiveTimestamp;
 	}
 
 	/**
-	 * @return
+	 * @return the original event timestamp
 	 */
 	public TmfTimestamp getOriginalTimestamp() {
 		return fOriginalTimestamp;
 	}
 
 	/**
-	 * @return
+	 * @return the event source
 	 */
 	public TmfEventSource getSource() {
 		return fSource;
 	}
 
 	/**
-	 * @return
+	 * @return the event type
 	 */
 	public TmfEventType getType() {
 		return fType;
 	}
 
 	/**
-	 * @return
-	 */
-	public void setContent(TmfEventContent content) {
-		fContent = content;
-	}
-
-	/**
-	 * @return
+	 * @return the event content
 	 */
 	public TmfEventContent getContent() {
 		return fContent;
 	}
 
 	/**
-	 * @return
+	 * @return the event reference
 	 */
 	public TmfEventReference getReference() {
 		return fReference;
 	}
 
-    // ========================================================================
-    // Operators
-    // ========================================================================
-
-	@Override
-	public TmfEvent clone() {
-		TmfEvent event = new TmfEvent(
-			fOriginalTimestamp.clone(),
-			fEffectiveTimestamp.clone(),
-		    fSource.clone(),
-		    fType.clone(),
-		    fReference.clone());
-		TmfEventContent content = fContent.clone();
-		event.setContent(content);
-		return event;
+	/**
+	 * @param content the new event content
+	 */
+	public void setContent(TmfEventContent content) {
+		fContent = content;
 	}
 
-	// TODO: Design a proper format...
+	// ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
+
+	@Override
+    public int hashCode() {
+		int result = 17;
+		result = 37 * result + fSource.hashCode();
+		result = 37 * result + fType.hashCode();
+		result = 37 * result + fEffectiveTimestamp.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof TmfEvent))
+        	return false;
+        TmfEvent o = (TmfEvent) other;
+        return fEffectiveTimestamp.equals(o.fEffectiveTimestamp) &&
+               fSource.equals(o.fSource) &&
+               fType.equals(o.fType) &&
+               fContent.equals(o.fContent);
+    }
+
 	@Override
 	public String toString() {
-		return fEffectiveTimestamp.toString();
+		return "[TmfEvent(" + fEffectiveTimestamp + "," + fSource + "," + fType + "," + fContent + ")]";
 	}
+
 }

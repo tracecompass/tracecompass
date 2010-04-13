@@ -350,11 +350,12 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 	private IndexingJob job;
 
 	// Indicates that an indexing job is already running
-	private Boolean fIndexing = false;
+	private Object  fIndexingLock = new Object();
+	private boolean fIndexing = false;
 	private Boolean fIndexed  = false;
 
 	public void indexTrace(boolean waitForCompletion) {
-    	synchronized (fIndexing) {
+    	synchronized (fIndexingLock) {
 			if (fIndexed || fIndexing) {
     			return;
     		}
