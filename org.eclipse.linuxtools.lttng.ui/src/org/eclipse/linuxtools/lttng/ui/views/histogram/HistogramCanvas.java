@@ -151,8 +151,8 @@ public class HistogramCanvas extends Canvas
 	 */
 	public void setSelectedWindowSize(Long newSelectedWindowSize) {
 		
-		if ( newSelectedWindowSize < histogramContent.getIntervalTime() ) {
-			newSelectedWindowSize = histogramContent.getIntervalTime();
+		if ( newSelectedWindowSize < histogramContent.getElementsTimeInterval() ) {
+			newSelectedWindowSize = histogramContent.getElementsTimeInterval();
 		}
 		
 		else if ( newSelectedWindowSize > (2*histogramContent.getCompleteTimeInterval()) ) {

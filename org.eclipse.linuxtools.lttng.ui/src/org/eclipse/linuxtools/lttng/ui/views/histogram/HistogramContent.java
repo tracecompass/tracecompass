@@ -23,7 +23,7 @@ public class HistogramContent {
 	private Long 	startTime = 0L;
 	private Long 	endTime   = 0L;
 	
-	private Long	intervalTime = 0L;
+	private Long	elementsTimeInterval = 0L;
 	private Double 	heightFactor = 0.0;
 	private Long   	heighestEventCount = 0L;
 	private Integer maxHeight	 = 0;
@@ -92,7 +92,7 @@ public class HistogramContent {
 		startTime = 0L;
 		endTime = 0L;
 		
-		intervalTime = 0L;
+		elementsTimeInterval = 0L;
 		heightFactor = 0.0;
 		heighestEventCount = 0L;
 		
@@ -106,7 +106,7 @@ public class HistogramContent {
 	public void resetTable() {
 		for ( int x=0; x<elementTable.length; x++) {
 			elementTable[x].position = x;
-			elementTable[x].firstIntervalTimestamp = startTime + (x*intervalTime);
+			elementTable[x].firstIntervalTimestamp = startTime + (x*elementsTimeInterval);
 			elementTable[x].intervalNbEvents = 0L;
 			elementTable[x].intervalHeight = 0;
 		}
@@ -114,22 +114,37 @@ public class HistogramContent {
 	
 	/**
 	 * Reset the data in the elements table.<p>
-	 * NOTE : For this to be consistent and usuable, "startTime" and "intervalTime" need to be set.
+	 * Start and EndTime will be used to calculate elementsTimeInterval.<p>
+	 * 
+	 *  @param	newStartTime	The new start time to use 
+	 *  @param	newEndTime		The new stop time to use
 	 */
-	public void resetTable(Long newStartTime, Long newEndTime, Long newIntervalTime) {
+	public void resetTable(Long newStartTime, Long newEndTime) {
+		recalculateElementsTimeInterval(newStartTime, newEndTime);
+		resetTable(newStartTime, newEndTime, elementsTimeInterval);
+	}
+	
+	/**
+	 * Reset the data in the elements table.<p>
+	 * elementsTimeInterval will be set to the one give, use this for fixed interval.<p>
+	 * 
+	 *  @param	newStartTime	The new start time to use 
+	 *  @param	newEndTime		The new stop time to use
+	 *  @param  newTimeInterval The new time interval to use
+	 */
+	public void resetTable(Long newStartTime, Long newEndTime, Long newTimeInterval) {
 		
 		startTime = newStartTime;
 		endTime = newEndTime;
-		intervalTime = newIntervalTime;
+		recalculateElementsTimeInterval(newStartTime, newEndTime);
 		
 		for ( int x=0; x<elementTable.length; x++) {
 			elementTable[x].position = x;
-			elementTable[x].firstIntervalTimestamp = startTime + (x*intervalTime);
+			elementTable[x].firstIntervalTimestamp = startTime + (x*elementsTimeInterval);
 			elementTable[x].intervalNbEvents = 0L;
 			elementTable[x].intervalHeight = 0;
 		}
 	}
-	
 	
 	/**
 	 * Clear (zeroed) the data in the elements table.<p>
@@ -152,7 +167,7 @@ public class HistogramContent {
 		System.out.println("startTime          : " + startTime);
 		System.out.println("endTime            : " + endTime );
 		System.out.println();
-		System.out.println("intervalTime       : " + intervalTime);
+		System.out.println("intervalTime       : " + elementsTimeInterval);
 		System.out.println("heightFactor       : " + heightFactor);
 		System.out.println("heighestEventCount : " + heighestEventCount);
 		System.out.println();
@@ -276,7 +291,7 @@ public class HistogramContent {
 	 * @return	The <i>closest</i> element found.
 	 */
 	public HistogramElement getClosestElementFromTimestamp(Long timestamp) {
-		int index = (int)( (timestamp - startTime)/intervalTime );
+		int index = (int)( (timestamp - startTime)/elementsTimeInterval );
 		
 		// If we are out of bound, return the closest border (first or last element)
 		if ( index < 0) {
@@ -495,11 +510,10 @@ public class HistogramContent {
 	}
 	
 	/**
-	 * Recalculate the height of each bar in the elements table.<p>
-	 * Need to be called at least once, or when value of "maxHeight", "heighestEventCount" or "averageNumberOfEvents" changes.
+	 * Recalculate the height factor of the element table.<p>
+	 * Assume values of "maxHeight", "heighestEventCount" or "averageNumberOfEvents" are set correctly.
 	 */
-	public void recalculateEventHeight() {
-		
+	public void recalculateHeightFactor() {
 		// Recalculate the new HeightFactor for the element; 
 		//		the highest bar will get "maxHeight" and other bar a fraction of it.
 		// If a maxDifferenceToAverage exist, this is considered here 
@@ -509,9 +523,40 @@ public class HistogramContent {
 		else {
 			heightFactor = (double)maxHeight/(double)heighestEventCount;
 		}
-		
+	}
+	
+	/**
+	 * Recalculate the height of each bar in the elements table.<p>
+	 * This assume "heightFactor" is already set correctly.<p>
+	 *  
+	 * NOTE : if "maxHeight", "heighestEventCount" or "averageNumberOfEvents" changes, 
+	 * 			recalculateHeightFactor() should be recalled.
+	 */
+	public void recalculateEventHeight() {
 		// Recalculate the height of the bars up to "readyUpToPosition"
 		for ( int x=0; x<readyUpToPosition; x++) {
+			elementTable[x].intervalHeight = (int)(elementTable[x].intervalNbEvents * heightFactor);
+		}
+	}
+	
+	/**
+	 * Recalculate the height of each bar in a certain interval of the elements table.<p>
+	 * Unlike recalculateEventHeight(), this only recalculate for the given range, not the whole table.
+	 * 
+	 */
+	public void recalculateEventHeightInInterval(Integer startPosition, Integer stopPosition) {
+		// Basic error checking on start : should be bigger than 0
+		if ( startPosition < 0 ) {
+			startPosition = 0;
+		}
+		
+		// Basic error checking on start : should be smaller than length - 1
+		if ( stopPosition >= elementTable.length) {
+			stopPosition = (elementTable.length-1);
+		}
+		
+		// Recalculate the height of the bars from startPosition to stopPosition
+		for ( int x=startPosition; x<stopPosition; x++) {
 			elementTable[x].intervalHeight = (int)(elementTable[x].intervalNbEvents * heightFactor);
 		}
 	}
@@ -617,8 +662,8 @@ public class HistogramContent {
 	 * 
 	 * @return	Currently used interval time.
 	 */
-	public Long getIntervalTime() {
-		return intervalTime;
+	public Long getElementsTimeInterval() {
+		return elementsTimeInterval;
 	}
 	
 	
@@ -630,8 +675,18 @@ public class HistogramContent {
 	 * 
 	 * @return New interval time.
 	 */
-	public void setIntervalTime(Long newInterval) {
-		this.intervalTime = newInterval;
+	public void setElementsTimeInterval(Long newInterval) {
+		this.elementsTimeInterval = newInterval;
+	}
+	
+	
+	/**
+	 * Calculate the correct time interval of each element from the given time.<p>
+	 * 
+	 * @return	The complete time interval
+	 */
+	public void recalculateElementsTimeInterval(Long startTime, Long endTime) {
+		this.elementsTimeInterval = ((endTime - startTime)/getNbElement());
 	}
 	
 	

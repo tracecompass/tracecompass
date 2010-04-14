@@ -32,6 +32,8 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 	private Integer nbIntervalNotEmpty = 1;
 	private Integer nbEventRead = 0;
 	
+	private Integer	lastDrawPosition = 0;
+	
 	private HistogramCanvas parentCanvas = null;
 	
 	private Boolean requestCompleted = false;
@@ -97,14 +99,14 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 	        	long distance = ( tmpEvent.getTimestamp().getValue() - lastRangeTime );
 				
 	        	// Check if we changed of interval (the distance is higher than the interval time)
-				if  ( distance > histogramContent.getIntervalTime() ) {
+				if  ( distance > histogramContent.getElementsTimeInterval() ) {
 					
 					histogramContent.getElementByIndex(lastInterval).intervalNbEvents = nbEventsInInterval;
 					lastRangeTime = tmpEvent.getTimestamp().getValue();
 					
 					// * NOTE *
 					// We can skip several interval at once, so we need to find what was our interval now
-					lastInterval = (int)((lastRangeTime - histogramContent.getStartTime()) / histogramContent.getIntervalTime() );
+					lastInterval = (int)((lastRangeTime - histogramContent.getStartTime()) / histogramContent.getElementsTimeInterval() );
 					
 					// *** HACK ***
 					// Because of the threads, weird phenomenons seem to happen here, like a position after the 
@@ -206,9 +208,21 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
     	else {
     		averageNumberOfEvents = nbEventRead / histogramContent.getNbElement();
     	}
+    	histogramContent.setAverageNumberOfEvents(averageNumberOfEvents);
     	
-		histogramContent.setAverageNumberOfEvents(averageNumberOfEvents);
-		histogramContent.recalculateEventHeight();
+    	// It is possible that the height factor didn't change; 
+    	//		If not, we only need to redraw the updated section, no the whole content
+    	// Save the actual height, recalculate the height and check if there was any changes
+    	double previousHeightFactor = histogramContent.getHeightFactor();
+    	histogramContent.recalculateHeightFactor();
+    	if ( histogramContent.getHeightFactor() != previousHeightFactor ) {
+			histogramContent.recalculateEventHeight();
+    	}
+    	else {
+    		histogramContent.recalculateEventHeightInInterval(lastDrawPosition, histogramContent.getReadyUpToPosition());
+    	}
+    	
+    	lastDrawPosition = histogramContent.getReadyUpToPosition();
     }
     
     /**

@@ -80,7 +80,7 @@ public class HistogramView extends TmfView {
     
     // For the two "events" label (Max and min number of events in the selection), we force a width
     // This will prevent the control from moving horizontally if the number of events in the selection varies
-    private static final int NB_EVENTS_FIXED_WIDTH = 75;
+    private static final int NB_EVENTS_FIXED_WIDTH = 50;
     
     
     // The "small font" height used to display time will be "default font" minus this constant
@@ -266,17 +266,17 @@ public class HistogramView extends TmfView {
 		
 		
 		// *** Everything related to the spinner is below
-		GridData gridDataCurrentWindow = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 2);
-		ntgCurrentWindowTime = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
-		ntgCurrentWindowTime.setLayoutData(gridDataCurrentWindow);
+		GridData gridDataCurrentEvent = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 2);
+		ntgCurrentEventTime = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, EVENT_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
+		ntgCurrentEventTime.setLayoutData(gridDataCurrentEvent);
 		
 		GridData gridDataTimeRange = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 2);
 		ntgTimeRangeWindow = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_TIMERANGE_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
 		ntgTimeRangeWindow.setLayoutData(gridDataTimeRange);
 		
-		GridData gridDataCurrentEvent = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 2);
-		ntgCurrentEventTime = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, EVENT_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
-		ntgCurrentEventTime.setLayoutData(gridDataCurrentEvent);
+		GridData gridDataCurrentWindow = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 2);
+		ntgCurrentWindowTime = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ));
+		ntgCurrentWindowTime.setLayoutData(gridDataCurrentWindow);
 		
 		
 		
@@ -393,8 +393,14 @@ public class HistogramView extends TmfView {
     private void createCanvasAndRequests(TmfExperiment<LttngEvent> newExperiment) {
     	lastUsedExperiment = newExperiment;
     	
+    	// Create the content for the full experiment. 
+    	// This NEED to be created first, as we use it in the selectedWindowCanvas
 		fullExperimentCanvas.createNewHistogramContent( DEFAULT_WINDOW_SIZE, FULL_TRACE_BAR_WIDTH, FULL_TRACE_CANVAS_HEIGHT, FULL_TRACE_DIFFERENCE_TO_AVERAGE);
+		fullExperimentCanvas.getHistogramContent().resetTable(newExperiment.getStartTime().getValue(), newExperiment.getEndTime().getValue());
+		
+		// Create the content for the selected window.  
 		selectedWindowCanvas.createNewHistogramContent(0L, SELECTED_WINDOW_BAR_WIDTH, SELECTED_WINDOW_CANVAS_HEIGHT, SELECTED_WINDOW_DIFFERENCE_TO_AVERAGE);
+		selectedWindowCanvas.getHistogramContent().resetTable(fullExperimentCanvas.getCurrentWindow().getTimestampLeft(), fullExperimentCanvas.getCurrentWindow().getTimestampRight());
 		
 		// Make sure the UI object are sane
 		resetControlsContent();
@@ -435,18 +441,6 @@ public class HistogramView extends TmfView {
     	if ( curSelectedWindow == null ) {
     		fullExperimentCanvas.createNewSelectedWindow( DEFAULT_WINDOW_SIZE );
     		curSelectedWindow = fullExperimentCanvas.getCurrentWindow();
-    	}
-    	
-    	// *** TODO ***
-    	// Selected window need the fullExperiment canvas's content to be created and initialized (reseted)
-    	// On te first request, this won't be done already, sine it is usually done inside the request
-    	// Therefore we force the reset rigth here, but it should be handled somewhere/somewhen else.
-    	// !! This is a very unelegant should be redone !!
-    	if ( dataBackgroundFullRequest == null ) {
-    		long startTime = experiment.getStartTime().getValue();
-    		long endTime = experiment.getEndTime().getValue();
-    		long intervalTime = ( (endTime - startTime) / fullExperimentCanvas.getHistogramContent().getNbElement() );
-    		fullExperimentCanvas.getHistogramContent().resetTable(startTime, endTime, intervalTime);
     	}
     	
     	// The request will go from the Left timestamp of the window to the Right timestamp
