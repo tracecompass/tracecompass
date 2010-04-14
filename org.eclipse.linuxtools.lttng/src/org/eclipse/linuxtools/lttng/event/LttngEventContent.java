@@ -155,24 +155,27 @@ public class LttngEventContent extends TmfEventContent {
      */
     @Override
     public synchronized LttngEventField[] getFields() {
-        
-        
         if ( fFieldsMap.size() < fParentEvent.getType().getNbFields() ) {
         	LttngEventField tmpField = null;
         	LttngEventType tmpType = (LttngEventType)fParentEvent.getType();
         	
 	        for ( int pos=0; pos<tmpType.getNbFields(); pos++ ) {
 	            String name = null;
-				try {
-					name = tmpType.getLabel(pos);
-				} catch (TmfNoSuchFieldException e) {
-				}
-	            JniEvent tmpEvent = ((LttngEvent)getEvent()).convertEventTmfToJni();
-	            
-	            if ( tmpEvent != null ) {
-		            Object newValue = tmpEvent.parseFieldByName(name);
-		            tmpField = new LttngEventField(this, name, newValue );
-		            fFieldsMap.put(name, tmpField);
+				JniEvent tmpEvent = ((LttngEvent)getEvent()).convertEventTmfToJni();
+				
+				// tmpEvent == null probably mean there is a discrepancy between Eclipse and C library
+				// An error was probably printed in convertEventTmfToJni() already, but keep in mind this is SERIOUS
+				if ( tmpEvent != null ) {
+					try {
+						name = tmpType.getLabel(pos);
+					
+						Object newValue = tmpEvent.parseFieldByName(name);
+						tmpField = new LttngEventField(this, name, newValue );
+						fFieldsMap.put(name, tmpField);
+					}
+					catch (TmfNoSuchFieldException e) {
+						System.out.println("Invalid field position requested : " + pos + ", ignoring (getFields).");
+					}
 	            }
 	        }
         }
@@ -192,12 +195,12 @@ public class LttngEventContent extends TmfEventContent {
         String label = null;
 		try {
 			label = fParentEvent.getType().getLabel(position);
-		} catch (TmfNoSuchFieldException e) {
+			
+			returnedField = this.getField(label);
+		} 
+		catch (TmfNoSuchFieldException e) {
+			System.out.println("Invalid field position requested : " + position + ", ignoring (getField).");
 		}
-        
-        if ( label != null ) {
-            returnedField = this.getField(label);
-        }
         
         return returnedField;
     }
