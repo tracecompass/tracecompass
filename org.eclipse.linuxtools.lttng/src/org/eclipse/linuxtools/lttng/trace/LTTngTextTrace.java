@@ -27,8 +27,6 @@ import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.tmf.event.TmfNoSuchFieldException;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
-import org.eclipse.linuxtools.tmf.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfCheckpoint;
@@ -413,13 +411,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 	public int getCpuNumber() {
     	return cpuNumber;
     }
-
-	@Override
-	public ITmfContext armRequest(TmfDataRequest<LttngEvent> request) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 }
 
 
@@ -496,12 +488,11 @@ class TextLttngEventContent extends LttngEventContent {
     	String label = null;
 		try {
 			label = fParentEvent.getType().getLabel(position);
-		} catch (TmfNoSuchFieldException e) {
+			returnedField = this.getField(label);
+		} 
+		catch (TmfNoSuchFieldException e) {
+			System.out.println("Invalid field position requested : " + position + ", ignoring (getField).");
 		}
-        
-        if ( label != null ) {
-            returnedField = this.getField(label);
-        }
         
         return returnedField;
     }
