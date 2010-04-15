@@ -217,6 +217,7 @@ class DelayedMouseScroll extends Thread {
 	 * So, the "longest" we could wait after the last event is "waitTimeBetweenScroll" + "waitTimeBetweenCheck"
 	 * 
 	 */
+	@Override
 	public void run() {
 		// Check if we waited more than "waitTimeBetweenScroll"
 		while ( (System.currentTimeMillis() - lastScrollTime) < waitTimeBetweenScroll ) {

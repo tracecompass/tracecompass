@@ -66,6 +66,7 @@ public class SpinnerGroup {
     private int currentSeconds;
     private int currentNanosec;
     
+	@SuppressWarnings("unused")
 	private TimeFrameView fOwner;
 
     /**
