@@ -20,14 +20,33 @@ import org.eclipse.linuxtools.tmf.trace.TmfContext;
 /**
  * <b><u>TmfExperimentContext</u></b>
  * <p>
- * Implement me. Please.
+ * The experiment keeps track of the next event from each of its traces so
+ * it can pick the next one in chronological order.
+ * <p>
+ * This implies that the "next" event from each trace has already been
+ * read and that we at least know its timestamp. This doesn't imply that a
+ * full parse of the event content was performed (read: LTTng works like 
+ * this).
+ * <p>
+ * The last trace refers to the trace from which the last event was
+ * "consumed" at the experiment level.
  */
 public class TmfExperimentContext extends TmfContext {
+
+	// ------------------------------------------------------------------------
+	// Constants
+	// ------------------------------------------------------------------------
+	
+	 public static final int NO_TRACE = -1;
+
+	// ------------------------------------------------------------------------
+	// Attributes
+	// ------------------------------------------------------------------------
 
 	private ITmfTrace[]  fTraces = new ITmfTrace[0];
 	private TmfContext[] fContexts;
 	private TmfEvent[]   fEvents;
-	private int lastIndex;
+	private int lastTrace;
 
 	// ------------------------------------------------------------------------
 	// Constructors
@@ -40,17 +59,19 @@ public class TmfExperimentContext extends TmfContext {
 		fEvents   = new TmfEvent[fTraces.length];
 
 		ITmfLocation<?>[] locations = new ITmfLocation[fTraces.length];
+		long[] ranks = new long[fTraces.length];
 		long rank = 0;
 		for (int i = 0; i < fTraces.length; i++) {
 			if (contexts[i] != null) {
 				locations[i] = contexts[i].getLocation();
+				ranks[i] = contexts[i].getRank();
 				rank += contexts[i].getRank();
 			}
 		}
 		
-		setLocation(new TmfExperimentLocation(locations));
+		setLocation(new TmfExperimentLocation(locations, ranks));
 		setRank(rank);
-		lastIndex = -1;
+		lastTrace = NO_TRACE;
 	}
 
 	public TmfExperimentContext(ITmfTrace[] traces) {
@@ -62,7 +83,7 @@ public class TmfExperimentContext extends TmfContext {
 		fEvents = other.fEvents;
 		setLocation(other.getLocation().clone());
 		setRank(other.getRank());
-		setLastTrace(other.lastIndex);
+		setLastTrace(other.lastTrace);
 	}
 
 	private TmfContext[] cloneContexts() {
@@ -89,11 +110,11 @@ public class TmfExperimentContext extends TmfContext {
 	}
 
 	public int getLastTrace() {
-		return lastIndex;
+		return lastTrace;
 	}
 
 	public void setLastTrace(int newIndex) {
-		lastIndex = newIndex;
+		lastTrace = newIndex;
 	}
 
 }

@@ -37,6 +37,12 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
 		register();
 	}
 
+	@Override
+	public void dispose() {
+		deregister();
+		super.dispose();
+	}
+
 	// ------------------------------------------------------------------------
 	// ITmfComponent
 	// ------------------------------------------------------------------------

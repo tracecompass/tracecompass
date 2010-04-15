@@ -118,6 +118,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 			return parent;
 		}
 
+		@Override
 		public String toString() {
 			return getName();
 		}
@@ -223,10 +224,12 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 	class ViewLabelProvider extends LabelProvider {
 
+		@Override
 		public String getText(Object obj) {
 			return obj.toString();
 		}
 
+		@Override
 		public Image getImage(Object obj) {
 			String imageKey = ISharedImages.IMG_OBJ_ELEMENT;
 			if (obj instanceof TreeParent)
@@ -246,6 +249,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 	 * This is a callback that will allow us to create the viewer and initialize
 	 * it.
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		final SashForm sashForm = new SashForm(parent, SWT.NONE);
 		final SashForm sashForm2 = new SashForm(sashForm, SWT.NONE);
@@ -349,6 +353,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 	private void makeActions() {
 		// action1
 		action1 = new Action() {
+			@Override
 			public void run() {
 				showMessage("Action 1 executed");
 			}
@@ -360,6 +365,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 		// action2
 		action2 = new Action() {
+			@Override
 			public void run() {
 				showMessage("Action 2 executed");
 			}
@@ -371,6 +377,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 		// action3
 		actGroup = new Action() {
+			@Override
 			public void run() {
 				ITimeAnalysisViewer inFocusViewer = getActiveTsfCtrl();
 				if (inFocusViewer != null) {
@@ -388,6 +395,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 		// action4
 		resetScale = new Action() {
+			@Override
 			public void run() {
 				ITimeAnalysisViewer inFocusViewer = getActiveTsfCtrl();
 				if (inFocusViewer != null) {
@@ -401,6 +409,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 		// action5
 		nextEvent = new Action() {
+			@Override
 			public void run() {
 				ITimeAnalysisViewer inFocusViewer = getActiveTsfCtrl();
 				if (inFocusViewer != null) {
@@ -413,6 +422,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 		// action6
 		prevEvent = new Action() {
+			@Override
 			public void run() {
 				ITimeAnalysisViewer inFocusViewer = getActiveTsfCtrl();
 				if (inFocusViewer != null) {
@@ -425,6 +435,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 		// action7
 		nextTrace = new Action() {
+			@Override
 			public void run() {
 				ITimeAnalysisViewer inFocusViewer = getActiveTsfCtrl();
 				if (inFocusViewer != null) {
@@ -437,6 +448,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 		// action8
 		prevTrace = new Action() {
+			@Override
 			public void run() {
 				ITimeAnalysisViewer inFocusViewer = getActiveTsfCtrl();
 				if (inFocusViewer != null) {
@@ -449,6 +461,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 		// action9
 		showLegent = new Action() {
+			@Override
 			public void run() {
 				ITimeAnalysisViewer inFocusViewer = getActiveTsfCtrl();
 				if (inFocusViewer != null) {
@@ -461,6 +474,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 		// action10
 		filterTraces = new Action() {
+			@Override
 			public void run() {
 				ITimeAnalysisViewer inFocusViewer = getActiveTsfCtrl();
 				if (inFocusViewer != null) {
@@ -473,6 +487,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 		// action10
 		zoomIn = new Action() {
+			@Override
 			public void run() {
 				ITimeAnalysisViewer inFocusViewer = getActiveTsfCtrl();
 				if (inFocusViewer != null) {
@@ -485,6 +500,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 		// action10
 		zoomOut = new Action() {
+			@Override
 			public void run() {
 				ITimeAnalysisViewer inFocusViewer = getActiveTsfCtrl();
 				if (inFocusViewer != null) {
@@ -507,6 +523,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 		// action11
 		synch = new Action() {
+			@Override
 			public void run() {
 				if (synch.isChecked()) {
 					tsfviewer.setAcceptSelectionAPIcalls(true);
@@ -524,6 +541,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 		// action12
 		events300K = new Action() {
+			@Override
 			public void run() {
 				ITimeAnalysisViewer inFocusViewer = getActiveTsfCtrl();
 				if (inFocusViewer != null) {
@@ -537,6 +555,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 		events300K.setToolTipText("Add 300K Events");
 
 		doubleClickAction = new Action() {
+			@Override
 			public void run() {
 				ISelection selection = viewer.getSelection();
 				Object obj = ((IStructuredSelection) selection)
@@ -562,6 +581,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
+	@Override
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}

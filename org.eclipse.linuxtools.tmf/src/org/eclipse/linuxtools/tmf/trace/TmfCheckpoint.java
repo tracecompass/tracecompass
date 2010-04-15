@@ -13,7 +13,6 @@
 package org.eclipse.linuxtools.tmf.trace;
 
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.experiment.TmfExperimentCheckpoint;
 
 /**
  * <b><u>TmfCheckpoint</u></b>

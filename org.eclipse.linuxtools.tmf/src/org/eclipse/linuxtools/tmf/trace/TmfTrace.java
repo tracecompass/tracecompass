@@ -290,7 +290,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
             }
         }
 
-        return new TmfContext(context.getLocation(), context.getRank());
+        return context;
     }
 
 	/* (non-Javadoc)
@@ -411,7 +411,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
                 	lastTime = event.getTimestamp();
            			if ((nbEvents++ % fIndexPageSize) == 0) {
            				lastTime = new TmfTimestamp(event.getTimestamp());
-                   		fCheckpoints.add(new TmfCheckpoint(lastTime, location.clone()));
+                   		fCheckpoints.add(new TmfCheckpoint(lastTime, location));
                    		fNbEvents = nbEvents;
                    		fTimeRange = new TmfTimeRange(startTime, lastTime);
                    		notifyListeners(new TmfTimeRange(startTime, lastTime));

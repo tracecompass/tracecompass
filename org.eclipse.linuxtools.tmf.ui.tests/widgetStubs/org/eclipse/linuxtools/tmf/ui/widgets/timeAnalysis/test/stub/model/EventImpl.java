@@ -74,6 +74,7 @@ public class EventImpl extends TimeEvent {
 	/**
 	 * @return the duration
 	 */
+	@Override
 	public long getDuration() {
 		return duration;
 	}

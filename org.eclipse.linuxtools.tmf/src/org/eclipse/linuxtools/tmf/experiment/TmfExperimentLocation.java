@@ -22,8 +22,11 @@ import org.eclipse.linuxtools.tmf.trace.TmfLocation;
  */
 public class TmfExperimentLocation extends TmfLocation<ITmfLocation<?>[]> {
 
-	public TmfExperimentLocation(ITmfLocation<?>[] locations) {
+    private long[] fRanks;
+
+	public TmfExperimentLocation(ITmfLocation<?>[] locations, long[] ranks) {
 		super(locations);
+		fRanks = ranks;
 	}
 
 	@Override
@@ -33,7 +36,10 @@ public class TmfExperimentLocation extends TmfLocation<ITmfLocation<?>[]> {
 		for (int i = 0; i < locations.length; i++) {
 			clones[i] = locations[i].clone();
 		}
-		return new TmfExperimentLocation(clones);
+		return new TmfExperimentLocation(clones, fRanks.clone());
 	}
 
+	public long[] getRanks() {
+        return fRanks;
+    }
 }
