@@ -21,7 +21,10 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
  * <p>
  */
 public interface ITmfTrace {
-
+	
+	public ITmfTrace createTraceCopy();
+	
+	
 	/**
 	 * @return the trace path 
 	 */

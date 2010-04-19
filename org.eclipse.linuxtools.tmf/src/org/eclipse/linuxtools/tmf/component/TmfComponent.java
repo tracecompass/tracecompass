@@ -34,7 +34,14 @@ public abstract class TmfComponent implements ITmfComponent {
 		fName = name;
 		TmfSignalManager.register(this);
 	}
+	
+	public TmfComponent(TmfComponent oldComponent) {
+        this.fName = oldComponent.fName;
 
+        // Should we register? Probably not but I'm not quite sure what this does
+        //register();
+	}
+	
 	// ------------------------------------------------------------------------
 	// ITmfComponent
 	// ------------------------------------------------------------------------

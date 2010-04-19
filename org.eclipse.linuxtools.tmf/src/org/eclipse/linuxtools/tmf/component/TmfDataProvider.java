@@ -71,7 +71,19 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 
 		TmfProviderManager.register(fType, this);
 	}
+	
+	public TmfDataProvider(TmfDataProvider<T> oldDataProvider) {
+        super(oldDataProvider);
 
+        this.fType = oldDataProvider.fType;
+        this.fQueueSize = oldDataProvider.fQueueSize;
+
+        this.fExecutor = new TmfRequestExecutor();
+        this.fDataQueue = (oldDataProvider.fQueueSize > 1) ? new LinkedBlockingQueue<T>(oldDataProvider.fQueueSize) : new SynchronousQueue<T>();
+
+        this.fSynchDepth = oldDataProvider.fSynchDepth;
+	}
+	
 	@Override
 	public void dispose() {
 		TmfProviderManager.deregister(fType, this);

@@ -32,7 +32,11 @@ public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvid
 	public TmfEventProvider(Class<T> type, int queueSize) {
 		super("TmfEventProvider", type, queueSize);
 	}
-
+	
+	public TmfEventProvider(TmfEventProvider<T> oldProvider) {
+		super(oldProvider);
+	}
+	
 	@Override
 	public boolean isCompleted(ITmfDataRequest<T> request, T data, int nbRead) {
 		boolean dataRequestCompleted = super.isCompleted(request, data, nbRead);

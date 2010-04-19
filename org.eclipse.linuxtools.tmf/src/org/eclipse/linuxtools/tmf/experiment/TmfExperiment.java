@@ -109,7 +109,34 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     public TmfExperiment(Class<T> type, String id, ITmfTrace[] traces, int indexPageSize) {
         this(type, id, traces, TmfTimestamp.Zero, indexPageSize);
     }
-
+    
+    
+    public TmfExperiment(TmfExperiment<T> oldExperiment) {
+    	super(oldExperiment.fType);
+    	
+    	this.fExperimentId = oldExperiment.fExperimentId;
+    	this.fEpoch = oldExperiment.fEpoch;
+    	
+    	this.fIndexPageSize = oldExperiment.fIndexPageSize;
+    	
+    	this.fTraces = new ITmfTrace[oldExperiment.fTraces.length];
+    	
+    	for ( int x=0; x<oldExperiment.fTraces.length; x++) {
+    		this.fTraces[x] = oldExperiment.fTraces[x].createTraceCopy();
+    	}
+    	
+    	// replace updateNbEvents()
+    	this.fNbEvents = oldExperiment.fNbEvents;
+    	
+    	// replace updateTimeRange()
+    	this.fTimeRange = oldExperiment.fTimeRange;
+    }
+    
+	public TmfExperiment<T> createTraceCopy() {
+		return new TmfExperiment<T>(this);
+	}
+    
+    
     /**
      * 
      */
