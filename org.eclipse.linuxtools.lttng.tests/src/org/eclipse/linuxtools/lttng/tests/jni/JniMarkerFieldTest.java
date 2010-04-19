@@ -7,7 +7,6 @@ import junit.framework.TestCase;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.lttng.jni.JniMarker;
 import org.eclipse.linuxtools.lttng.jni.JniMarkerField;
-import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer;
 import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
 
@@ -64,14 +63,6 @@ public class JniMarkerFieldTest extends TestCase
                         tmpMarker = JniTraceFactory.getJniTrace(tracepath, printLttDebug).requestEventByName(eventName).requestEventMarker();
                 }
                 catch( JniException e) { }
-                
-                // Test constructor with pointer on a wrong pointer
-                try {
-                        tmpMarkerField1 = tmpMarker.allocateNewJniMarkerField( new Jni_C_Pointer(0) );
-                        fail("Construction with wrong pointer should fail!");
-                }
-                catch( JniException e) {
-                }
                 
                 // Test constructor with pointer on a correct pointer
                 try {

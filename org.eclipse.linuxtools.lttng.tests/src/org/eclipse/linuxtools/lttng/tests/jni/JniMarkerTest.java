@@ -2,13 +2,12 @@
 package org.eclipse.linuxtools.lttng.tests.jni;
 
 
+import junit.framework.TestCase;
+
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.lttng.jni.JniMarker;
-import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer;
 import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
-
-import junit.framework.TestCase;
 
 /*
  Functions tested here :
@@ -66,14 +65,6 @@ public class JniMarkerTest extends TestCase
                         tmpEvent = JniTraceFactory.getJniTrace(tracepath, printLttDebug).requestEventByName(eventName);
                 }
                 catch( JniException e) { }
-                
-                // Test constructor with pointer on a wrong pointer
-                try {
-                        testMarker1 = tmpEvent.getParentTracefile().allocateNewJniMarker( new Jni_C_Pointer(0) );
-                        fail("Construction with wrong pointer should fail!");
-                }
-                catch( JniException e) { 
-                }
                 
                 // Test constructor with pointer on a correct pointer
                 try {

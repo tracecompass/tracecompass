@@ -31,14 +31,13 @@
 package org.eclipse.linuxtools.lttng.tests.jni;
 
 
+import junit.framework.TestCase;
+
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.lttng.jni.JniTracefile;
 import org.eclipse.linuxtools.lttng.jni.common.JniTime;
-import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer;
 import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
-
-import junit.framework.TestCase;
 
 public class JniEventTest extends TestCase
 {
@@ -105,15 +104,6 @@ public class JniEventTest extends TestCase
                 }
                 catch( JniException e) { }
                 
-                
-                // Test the constructor with parameters using wrong arguments
-                // Test constructor on a wrong event pointer
-                try {
-                        testEvent1 = testTracefile.allocateNewJniEvent( new Jni_C_Pointer(0), testTracefile.getTracefileMarkersMap(), testTracefile );
-                        fail("Construction with wrong event pointer should fail!");
-                }
-                catch( JniException e) { 
-                }
                 
                 // Test constructor on a wrong marker HashMap
                 try {

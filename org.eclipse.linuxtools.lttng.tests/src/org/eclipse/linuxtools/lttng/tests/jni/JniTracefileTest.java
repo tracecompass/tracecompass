@@ -1,14 +1,13 @@
 
 package org.eclipse.linuxtools.lttng.tests.jni;
 
+import junit.framework.TestCase;
+
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.lttng.jni.JniTracefile;
 import org.eclipse.linuxtools.lttng.jni.common.JniTime;
-import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer;
 import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
-
-import junit.framework.TestCase;
 
 /*
  Functions tested here :
@@ -99,15 +98,6 @@ public class JniTracefileTest extends TestCase
                         testTrace = JniTraceFactory.getJniTrace(tracepath1, printLttDebug);
                 }
                 catch( JniException e) { }
-                
-                
-                // Test constructor with pointer on a wrong pointer
-                try {
-                        testTracefile1 = testTrace.allocateNewJniTracefile( new Jni_C_Pointer(0), testTrace );
-                        fail("Construction with wrong pointer should fail!");
-                }
-                catch( JniException e) { 
-                }
                 
                 // Test constructor with pointer on a correct pointer
                 try {

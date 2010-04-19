@@ -124,25 +124,6 @@ public class JniTraceTest extends TestCase
                 catch( JniException e) {
                         fail("Construction with correct tracepath failed!");
                 }
-                
-                /*
-                // Test copy constructor that take a pointer with a good pointer
-                try {
-                        testTrace1 = new JniTrace( new Jni_C_Pointer(0), printLttDebug);
-                        fail("Construction with wrong pointer should fail!");
-                }
-                catch( JniException e) { 
-                }
-                
-                // Test copy constructor that take a pointer with a good pointer
-                try {
-                        testTrace1 = new JniTrace(tracepath1, printLttDebug); // This trace should be valid
-                        testTrace2 = new JniTrace( testTrace1.getTracePtr(), printLttDebug);
-                }
-                catch( JniException e) { 
-                        fail("Construction with correct pointer failed!");
-                }
-                */
         }
         
         public void testTraceOpenClose() {
