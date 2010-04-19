@@ -64,7 +64,18 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     public TmfTraceStub(String filename, boolean waitForCompletion) throws FileNotFoundException {
         this(filename, DEFAULT_CACHE_SIZE, waitForCompletion);
     }
-
+    
+    public ITmfTrace createTraceCopy() {
+		ITmfTrace returnedValue = null;
+		try {
+			returnedValue = new TmfTraceStub(this.getName());
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return returnedValue;
+	}
+    
     /**
      * @param filename
      * @param cacheSize
