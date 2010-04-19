@@ -63,9 +63,9 @@ public class JniTraceTest {
 		                    // *** Uncomment the following to print the parsed content
 		                    // Warning : this is VERY intensive
 		                    //if ( pos == (tmpFields.size() -1) ) {
-		                    //	tracetest.printC(tmpFields.get(pos).getField() + ":" + newValue + " ");
+		                    //	tmptrace.printC(tmpevent.getEventPtr().getLibraryId(), tmpFields.get(pos).getField() + ":" + newValue + " ");
 		                    //} else {
-		                    //	tracetest.printlnC(tmpFields.get(pos).getField() + ":" + newValue + " ");
+		                    //	tmptrace.printlnC(tmpevent.getEventPtr().getLibraryId(), tmpFields.get(pos).getField() + ":" + newValue + " ");
 		                    //}	
 		                }
 	            	}
