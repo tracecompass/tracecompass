@@ -29,9 +29,6 @@ public class AllTmfCoreTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(TmfCorePluginTest.class);
 
-		suite.addTestSuite(TmfEventProviderTest.class);
-		suite.addTestSuite(TmfProviderManagerTest.class);
-
 		suite.addTestSuite(TmfEventFieldTest.class);
 		suite.addTestSuite(TmfEventContentTest.class);
 		suite.addTestSuite(TmfEventTypeTest.class);
@@ -46,6 +43,10 @@ public class AllTmfCoreTests {
 		suite.addTestSuite(TmfEventRequestTest.class);
 		suite.addTestSuite(TmfCoalescedDataRequestTest.class);
 		suite.addTestSuite(TmfCoalescedEventRequestTest.class);
+//		suite.addTestSuite(TmfRequestExecutorTest.class);
+
+		suite.addTestSuite(TmfEventProviderTest.class);
+		suite.addTestSuite(TmfProviderManagerTest.class);
 
 		suite.addTestSuite(TmfTraceTest.class);
 		suite.addTestSuite(TmfExperimentTest.class);

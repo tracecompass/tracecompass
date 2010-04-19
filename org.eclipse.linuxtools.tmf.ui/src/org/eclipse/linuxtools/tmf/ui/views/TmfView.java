@@ -34,12 +34,12 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
 	public TmfView(String viewName) {
 		super();
 		fName = viewName;
-		register();
+		TmfSignalManager.register(this);
 	}
 
 	@Override
 	public void dispose() {
-		deregister();
+		TmfSignalManager.deregister(this);
 		super.dispose();
 	}
 
@@ -51,14 +51,6 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
 		return fName;
 	}
 	
-	public void register() {
-		TmfSignalManager.register(this);
-	}
-
-	public void deregister() {
-		TmfSignalManager.deregister(this);
-	}
-
 	public void broadcast(TmfSignal signal) {
 		TmfSignalManager.dispatchSignal(signal);
 	}

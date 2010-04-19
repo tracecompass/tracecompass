@@ -69,11 +69,11 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
     // ------------------------------------------------------------------------
 
 	@Override
-	public boolean isCompatible(TmfDataRequest<T> request) {
-		if (request instanceof TmfEventRequest<?>) {
+	public boolean isCompatible(ITmfDataRequest<T> request) {
+		if (request instanceof ITmfEventRequest<?>) {
 			boolean ok = getNbRequested() == request.getNbRequested();
 			ok &= getBlockize() == request.getBlockize();
-			ok &= fRange.equals(((TmfEventRequest<T>) request).getRange());
+			ok &= fRange.equals(((ITmfEventRequest<T>) request).getRange());
 			return ok;
 		}
 		return false;
@@ -87,4 +87,35 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
 		return fRange;
 	}
 	
+    // ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
+
+    @Override
+    // All requests have a unique id
+    public int hashCode() {
+    	return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+    	if (other instanceof TmfCoalescedEventRequest<?>) {
+    		TmfCoalescedEventRequest<?> request = (TmfCoalescedEventRequest<?>) other;
+       		return 	(request.getDataType()    == getDataType()) &&
+       				(request.getIndex()       == getIndex())    &&
+       				(request.getNbRequested() == getNbRequested()) &&
+       	    		(request.getRange().equals(getRange()));
+       	}
+    	if (other instanceof TmfCoalescedDataRequest<?>) {
+       		return super.equals(other);
+    	}
+  		return false;
+    }
+
+    @Override
+    public String toString() {
+		return "[TmfCoalescedEventRequest(" + getRequestId() + "," + getDataType().getSimpleName() 
+			+ "," + getRange() + "," + getNbRequested() + "," + getBlockize() + ")]";
+    }
+
 }

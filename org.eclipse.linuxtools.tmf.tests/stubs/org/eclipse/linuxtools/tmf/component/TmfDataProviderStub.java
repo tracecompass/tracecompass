@@ -20,11 +20,10 @@ import java.net.URL;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.tmf.event.TmfData;
-import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
-import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.trace.ITmfContext;
-import org.eclipse.linuxtools.tmf.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
 
 /**
@@ -59,9 +58,9 @@ public class TmfDataProviderStub extends TmfDataProvider<TmfData> {
     // ------------------------------------------------------------------------
 
 	@Override
-	public ITmfContext armRequest(TmfDataRequest<TmfData> request) {
-		if (request instanceof TmfEventRequest<?>) {
-			TmfContext context = fTrace.seekEvent(((TmfEventRequest<?>) request).getRange().getStartTime());
+	public ITmfContext armRequest(ITmfDataRequest<TmfData> request) {
+		if (request instanceof ITmfEventRequest<?>) {
+			ITmfContext context = fTrace.seekEvent(((ITmfEventRequest<?>) request).getRange().getStartTime());
 			return context;
 		}
 		return null;
@@ -73,7 +72,7 @@ public class TmfDataProviderStub extends TmfDataProvider<TmfData> {
 	}
 
 	@Override
-	public boolean isCompleted(TmfDataRequest<TmfData> request, TmfData data, int nbRead) {
+	public boolean isCompleted(ITmfDataRequest<TmfData> request, TmfData data, int nbRead) {
 		return false;
 	}
 

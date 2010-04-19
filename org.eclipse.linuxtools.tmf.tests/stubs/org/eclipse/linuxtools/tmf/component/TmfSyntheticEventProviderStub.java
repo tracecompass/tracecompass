@@ -15,7 +15,8 @@ package org.eclipse.linuxtools.tmf.component;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfSyntheticEventStub;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.trace.TmfContext;
@@ -34,26 +35,16 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSynthetic
 		super(TmfSyntheticEventStub.class);
 	}
 
-    @Override
-    public void register() {
-    	super.register();
-    }
-    
-    @Override
-    public void deregister() {
-    	super.deregister();
-    }
-    
 	@SuppressWarnings("unchecked")
 	@Override
-	public ITmfContext armRequest(final TmfDataRequest<TmfSyntheticEventStub> request) {
+	public ITmfContext armRequest(final ITmfDataRequest<TmfSyntheticEventStub> request) {
 
 		// Get the TmfSyntheticEventStub provider
 		ITmfDataProvider<TmfEvent>[] eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfEventProviderStub.class);
 		ITmfDataProvider<TmfEvent> provider = eventProviders[0];
 
 		// make sure we have the right type of request
-		if (!(request instanceof TmfEventRequest<?>)) {
+		if (!(request instanceof ITmfEventRequest<?>)) {
 			request.cancel();
 			return null;
 		}

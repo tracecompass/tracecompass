@@ -32,28 +32,24 @@ public abstract class TmfComponent implements ITmfComponent {
 
 	public TmfComponent(String name) {
 		fName = name;
-		register();
+		TmfSignalManager.register(this);
 	}
 
 	// ------------------------------------------------------------------------
 	// ITmfComponent
 	// ------------------------------------------------------------------------
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.linuxtools.tmf.component.ITmfComponent#getName()
+	 */
 	public String getName() {
 		return fName;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.tmf.component.ITmfComponent#register()
+	 * @see org.eclipse.linuxtools.tmf.component.ITmfComponent#dispose()
 	 */
-	public void register() {
-		TmfSignalManager.register(this);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.tmf.component.ITmfComponent#deregister()
-	 */
-	public void deregister() {
+	public void dispose() {
 		TmfSignalManager.deregister(this);
 	}
 

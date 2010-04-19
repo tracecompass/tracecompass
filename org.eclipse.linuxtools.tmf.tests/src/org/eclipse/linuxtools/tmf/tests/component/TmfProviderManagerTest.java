@@ -17,7 +17,7 @@ import junit.framework.TestCase;
 import org.eclipse.linuxtools.tmf.component.TmfDataProvider;
 import org.eclipse.linuxtools.tmf.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.trace.ITmfContext;
 
 /**
@@ -50,7 +50,7 @@ public class TmfProviderManagerTest extends TestCase {
 			super("TestProvider1", type);
 		}
 		@Override
-		public ITmfContext armRequest(TmfDataRequest<TmfEvent> request) {
+		public ITmfContext armRequest(ITmfDataRequest<TmfEvent> request) {
 			return null;
 		}
 		@Override
@@ -58,7 +58,7 @@ public class TmfProviderManagerTest extends TestCase {
 			return null;
 		}
 		@Override
-		public boolean isCompleted(TmfDataRequest<TmfEvent> request, TmfEvent data, int nbRead) {
+		public boolean isCompleted(ITmfDataRequest<TmfEvent> request, TmfEvent data, int nbRead) {
 			return false;
 		}
 	}
@@ -68,7 +68,7 @@ public class TmfProviderManagerTest extends TestCase {
 			super("TestProvider2", type);
 		}
 		@Override
-		public ITmfContext armRequest(TmfDataRequest<TmfEvent> request) {
+		public ITmfContext armRequest(ITmfDataRequest<TmfEvent> request) {
 			return null;
 		}
 		@Override
@@ -76,7 +76,7 @@ public class TmfProviderManagerTest extends TestCase {
 			return null;
 		}
 		@Override
-		public boolean isCompleted(TmfDataRequest<TmfEvent> request, TmfEvent data, int nbRead) {
+		public boolean isCompleted(ITmfDataRequest<TmfEvent> request, TmfEvent data, int nbRead) {
 			return false;
 		}
 	}
@@ -92,7 +92,7 @@ public class TmfProviderManagerTest extends TestCase {
 			super("TestProvider3", type);
 		}
 		@Override
-		public ITmfContext armRequest(TmfDataRequest<TmfEvent3> request) {
+		public ITmfContext armRequest(ITmfDataRequest<TmfEvent3> request) {
 			return null;
 		}
 		@Override
@@ -100,7 +100,7 @@ public class TmfProviderManagerTest extends TestCase {
 			return null;
 		}
 		@Override
-		public boolean isCompleted(TmfDataRequest<TmfEvent3> request, TmfEvent3 data, int nbRead) {
+		public boolean isCompleted(ITmfDataRequest<TmfEvent3> request, TmfEvent3 data, int nbRead) {
 			return false;
 		}
 	}
@@ -133,7 +133,7 @@ public class TmfProviderManagerTest extends TestCase {
 		assertTrue(providers[0] == testProvider1);
 
 		// Unregister it
-		testProvider1.deregister();
+		testProvider1.dispose();
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
 		assertTrue(providers.length == 0);
@@ -168,7 +168,7 @@ public class TmfProviderManagerTest extends TestCase {
 		assertTrue(providers[0] == testProvider2);
 
 		// Remove one
-		testProvider1.deregister();
+		testProvider1.dispose();
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
 		assertTrue(providers.length == 1);
@@ -182,7 +182,7 @@ public class TmfProviderManagerTest extends TestCase {
 		assertTrue(providers[0] == testProvider2);
 
 		// Remove the other
-		testProvider2.deregister();
+		testProvider2.dispose();
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
 		assertTrue(providers.length == 0);
@@ -229,7 +229,7 @@ public class TmfProviderManagerTest extends TestCase {
 		assertTrue(providers3[0] == testProvider3);
 
 		// Remove one
-		testProvider1.deregister();
+		testProvider1.dispose();
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
 		assertTrue(providers.length == 1);
@@ -251,7 +251,7 @@ public class TmfProviderManagerTest extends TestCase {
 		assertTrue(providers3[0] == testProvider3);
 
 		// Remove another one
-		testProvider2.deregister();
+		testProvider2.dispose();
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
 		assertTrue(providers.length == 0);
@@ -271,7 +271,7 @@ public class TmfProviderManagerTest extends TestCase {
 		assertTrue(providers3[0] == testProvider3);
 
 		// Remove the last one
-		testProvider3.deregister();
+		testProvider3.dispose();
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
 		assertTrue(providers.length == 0);

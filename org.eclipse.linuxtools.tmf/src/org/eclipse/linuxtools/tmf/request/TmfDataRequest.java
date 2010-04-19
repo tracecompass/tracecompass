@@ -91,10 +91,10 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     private final int fBlockSize;          	// The maximum number of events per chunk
     private       int fNbRead;           	// The number of reads so far
 
-    private Object  lock = new Object();
-    private boolean fRequestCompleted = false;
-    private boolean fRequestFailed    = false;
-    private boolean fRequestCanceled  = false;
+    private final Object lock;
+    private boolean fRequestCompleted;
+    private boolean fRequestFailed;
+    private boolean fRequestCanceled;
 
     private T[] fData;	// Data object
     
@@ -103,31 +103,43 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     // ------------------------------------------------------------------------
 
     /**
+     * Resets the request counter (used for testing)
+     */
+    public static void reset() {
+    	fRequestNumber = 0;
+    }
+
+    /**
      * Default constructor
+	 *
+     * @param dataType the requested data type
      */
     public TmfDataRequest(Class<T> dataType) {
         this(dataType, 0, ALL_DATA, DEFAULT_BLOCK_SIZE);
     }
 
     /**
-     * @param nbRequested
+     * @param dataType the requested data type
+     * @param nbRequested the number of data items requested
      */
     public TmfDataRequest(Class<T> dataType, int index) {
         this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE);
     }
 
     /**
-     * @param index
-     * @param nbRequested
+     * @param dataType the requested data type
+     * @param index the index (rank) of the first event requested
+     * @param blockSize the number of data items per block
      */
     public TmfDataRequest(Class<T> dataType, int index, int nbRequested) {
         this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE);
     }
 
     /**
-     * @param index
-     * @param nbRequested
-     * @param blockSize
+     * @param dataType the requested data type
+     * @param index the index (rank) of the first event requested
+     * @param nbRequested the number of data items requested
+     * @param blockSize the number of data items per block
      */
     public TmfDataRequest(Class<T> dataType, int index, int nbRequested, int blockSize) {
     	fRequestId   = fRequestNumber++;
@@ -136,6 +148,21 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     	fNbRequested = nbRequested;
     	fBlockSize   = blockSize;
     	fNbRead      = 0;
+        lock         = new Object();
+    }
+
+    /**
+     * Copy constructor
+     */
+    @SuppressWarnings("unused")
+	private TmfDataRequest(TmfDataRequest<T> other) {
+    	fRequestId   = 0;
+    	fDataType    = null;
+    	fIndex       = 0;
+    	fNbRequested = 0;
+    	fBlockSize   = 0;
+    	fNbRead      = 0;
+        lock         = new Object();
     }
 
     // ------------------------------------------------------------------------
@@ -145,7 +172,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
 	/**
 	 * @return the request ID
 	 */
-	public long getRequestId() {
+	public int getRequestId() {
 		return fRequestId;
 	}
 
@@ -173,7 +200,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     /**
      * @return the number of events read so far
      */
-    public int getNbRead() {
+    public synchronized int getNbRead() {
         return fNbRead;
     }
 
@@ -280,14 +307,10 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * 
      * @throws InterruptedException 
      */
-    public void waitForCompletion() {
+    public void waitForCompletion() throws InterruptedException {
         synchronized (lock) {
             while (!fRequestCompleted)
-                try {
-                    lock.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            	lock.wait();
         }
     }
 
@@ -327,8 +350,9 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     // ------------------------------------------------------------------------
 
     @Override
+    // All requests have a unique id
     public int hashCode() {
-    	return fRequestId;
+    	return getRequestId();
     }
 
     @Override
@@ -340,6 +364,12 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     				(request.fNbRequested == fNbRequested);
     	}
     	return false;
+    }
+
+    @Override
+    public String toString() {
+		return "[TmfDataRequest(" + fRequestId + "," + fDataType.getSimpleName() 
+			+ "," + fIndex + "," + fNbRequested + "," + fBlockSize + ")]";
     }
 
 }

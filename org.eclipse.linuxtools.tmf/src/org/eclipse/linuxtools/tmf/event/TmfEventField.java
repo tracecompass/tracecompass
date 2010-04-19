@@ -101,7 +101,10 @@ public class TmfEventField {
 
     @Override
     public int hashCode() {
-        return fFieldId.hashCode();
+		int result = 17;
+		result = 37 * result + fFieldId.hashCode();
+		result = 37 * result + fValue.hashCode();
+        return result;
     }
 
 	@Override

@@ -64,15 +64,6 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
     	fRange = range;
     }
 
-    @Override
-    public boolean equals(Object other) {
-    	if (other instanceof TmfEventRequest<?>) {
-    		TmfEventRequest<?> request = (TmfEventRequest<?>) other;
-    		return super.equals(other) && request.fRange.equals(fRange);
-    	}
-    	return false;
-    }
-
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -82,6 +73,31 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
      */
     public TmfTimeRange getRange() {
         return fRange;
+    }
+
+    // ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
+
+    @Override
+    // All requests have a unique id
+    public int hashCode() {
+    	return getRequestId();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+    	if (other instanceof TmfEventRequest<?>) {
+    		TmfEventRequest<?> request = (TmfEventRequest<?>) other;
+    		return super.equals(other) && request.fRange.equals(fRange);
+    	}
+    	return false;
+    }
+
+    @Override
+    public String toString() {
+		return "[TmfEventRequest(" + getRequestId() + "," + getDataType().getSimpleName() 
+			+ "," + getRange() + "," + getNbRequested() + "," + getBlockize() + ")]";
     }
 
 }

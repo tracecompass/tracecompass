@@ -127,6 +127,15 @@ public class TmfEventSourceTest extends TestCase {
 	}
 	
 	// ------------------------------------------------------------------------
+	// hashCode
+	// ------------------------------------------------------------------------
+
+	public void testHashCode() throws Exception {
+		assertTrue("hashCode", fSource0.hashCode() == fSource1.hashCode());
+		assertTrue("hashCode", fSource0.hashCode() != fSource3.hashCode());
+	}
+	
+	// ------------------------------------------------------------------------
 	// toString
 	// ------------------------------------------------------------------------
 

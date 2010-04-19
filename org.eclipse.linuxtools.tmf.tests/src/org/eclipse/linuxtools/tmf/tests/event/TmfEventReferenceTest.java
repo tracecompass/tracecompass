@@ -126,6 +126,21 @@ public class TmfEventReferenceTest extends TestCase {
 		assertTrue("equals", !fReference3.equals(null));
 	}
 	
+	// ------------------------------------------------------------------------
+	// hashCode
+	// ------------------------------------------------------------------------
+
+	public void testHashCode() throws Exception {
+		assertTrue("hashCode", fReference0.hashCode() == fReference1.hashCode());
+		assertTrue("hashCode", fReference0.hashCode() != fReference3.hashCode());
+	}
+	
+	public void testHashCode2() throws Exception {
+		TmfEventReference reference0 = new TmfEventReference();
+		assertTrue("hashCode", fReference0.hashCode() != reference0.hashCode());
+		assertTrue("hashCode", fReference3.hashCode() != reference0.hashCode());
+	}
+	
     // ------------------------------------------------------------------------
 	// toString
     // ------------------------------------------------------------------------

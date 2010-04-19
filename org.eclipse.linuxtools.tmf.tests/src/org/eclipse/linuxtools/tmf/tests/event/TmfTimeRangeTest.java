@@ -185,6 +185,24 @@ public class TmfTimeRangeTest extends TestCase {
 	}
 	
 	// ------------------------------------------------------------------------
+	// hashCode
+	// ------------------------------------------------------------------------
+
+	public void testHashCode() throws Exception {
+		TmfTimestamp ts1 = new TmfTimestamp(12345);
+		TmfTimestamp ts2 = new TmfTimestamp(12350);
+		TmfTimeRange range1 = new TmfTimeRange(ts1, ts2);
+		TmfTimeRange range1b = new TmfTimeRange(range1);
+		TmfTimeRange range2 = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+		TmfTimeRange range2b = new TmfTimeRange(range2);
+
+		assertTrue("hashCode", range1.hashCode() == range1b.hashCode());
+		assertTrue("hashCode", range2.hashCode() == range2b.hashCode());
+
+		assertTrue("hashCode", range1.hashCode() != range2.hashCode());
+	}
+	
+	// ------------------------------------------------------------------------
 	// toString
 	// ------------------------------------------------------------------------
 

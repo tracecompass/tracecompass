@@ -26,14 +26,14 @@ public class TmfEventRequestStub<T extends TmfEvent> extends TmfEventRequest<T> 
      * @param range
      */
     public TmfEventRequestStub(Class<T> dataType) {
-        this(dataType, TmfTimeRange.Eternity, ALL_DATA, DEFAULT_BLOCK_SIZE);
+    	super(dataType);
     }
 
     /**
      * @param range
      */
     public TmfEventRequestStub(Class<T> dataType, TmfTimeRange range) {
-        this(dataType, range, ALL_DATA, DEFAULT_BLOCK_SIZE);
+    	super(dataType, range);
     }
 
     /**
@@ -41,7 +41,7 @@ public class TmfEventRequestStub<T extends TmfEvent> extends TmfEventRequest<T> 
      * @param nbRequested
      */
     public TmfEventRequestStub(Class<T> dataType, TmfTimeRange range, int nbRequested) {
-        this(dataType, range, nbRequested, DEFAULT_BLOCK_SIZE);
+    	super(dataType, range, nbRequested);
     }
     
     /**

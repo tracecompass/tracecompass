@@ -126,6 +126,9 @@ public class TmfTraceEvent extends TmfEvent {
 
     @Override
 	public boolean equals(Object other) {
+    	if (other instanceof TmfEvent) {
+    		return super.equals(other); 
+    	}
     	if (!(other instanceof TmfTraceEvent)) {
     		return false; 
     	}

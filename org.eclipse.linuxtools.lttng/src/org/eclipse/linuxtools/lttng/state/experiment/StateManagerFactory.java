@@ -98,7 +98,7 @@ public class StateManagerFactory {
 	 */
 	public static void dispose() {
 		if (experimentManager != null) {
-			experimentManager.deregister();
+			experimentManager.dispose();
 			experimentManager = null;
 			instanceBook = null;
 		}

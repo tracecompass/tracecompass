@@ -14,9 +14,9 @@ package org.eclipse.linuxtools.tmf.component;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.request.TmfCoalescedEventRequest;
-import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
-import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 
 /**
  * <b><u>TmfEventProvider</u></b>
@@ -34,19 +34,19 @@ public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvid
 	}
 
 	@Override
-	public boolean isCompleted(TmfDataRequest<T> request, T data, int nbRead) {
+	public boolean isCompleted(ITmfDataRequest<T> request, T data, int nbRead) {
 		boolean dataRequestCompleted = super.isCompleted(request, data, nbRead);
-		if (!dataRequestCompleted && request instanceof TmfEventRequest<?> && data != null) {
-			TmfTimestamp endTime = ((TmfEventRequest<?>) request).getRange().getEndTime();
+		if (!dataRequestCompleted && request instanceof ITmfEventRequest<?> && data != null) {
+			TmfTimestamp endTime = ((ITmfEventRequest<?>) request).getRange().getEndTime();
 			return data.getTimestamp().compareTo(endTime, false) > 0;
 		}
 		return dataRequestCompleted;
 	}
 
 	@Override
-	protected synchronized void newCoalescedDataRequest(TmfDataRequest<T> request) {
-		if (request instanceof TmfEventRequest<?>) {
-			TmfEventRequest<T> eventRequest = (TmfEventRequest<T>) request;
+	protected synchronized void newCoalescedDataRequest(ITmfDataRequest<T> request) {
+		if (request instanceof ITmfEventRequest<?>) {
+			ITmfEventRequest<T> eventRequest = (ITmfEventRequest<T>) request;
 			TmfCoalescedEventRequest<T> coalescedRequest = 
 				new TmfCoalescedEventRequest<T>(fType, eventRequest.getRange(), eventRequest.getNbRequested(), eventRequest.getBlockize());
 			coalescedRequest.addRequest(eventRequest);

@@ -25,14 +25,14 @@ public class TmfDataRequestStub<T extends TmfData> extends TmfDataRequest<T> {
      * Default constructor
      */
     public TmfDataRequestStub(Class<T> dataType) {
-        this(dataType, 0, ALL_DATA, DEFAULT_BLOCK_SIZE);
+        super(dataType);
     }
 
     /**
      * @param nbRequested
      */
     public TmfDataRequestStub(Class<T> dataType, int index) {
-        this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE);
+        super(dataType, index);
     }
 
     /**
@@ -40,7 +40,7 @@ public class TmfDataRequestStub<T extends TmfData> extends TmfDataRequest<T> {
      * @param nbRequested
      */
     public TmfDataRequestStub(Class<T> dataType, int index, int nbRequested) {
-        this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE);
+    	super(dataType, index, nbRequested);
     }
 
     /**

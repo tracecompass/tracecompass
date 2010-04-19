@@ -196,6 +196,21 @@ public class TmfEventTest extends TestCase {
 	}
 	
 	// ------------------------------------------------------------------------
+	// hashCode
+	// ------------------------------------------------------------------------
+
+	public void testHashCode() throws Exception {
+		TmfEvent event1 = new TmfEvent(fEvent1);
+		TmfEvent event2 = new TmfEvent(fEvent2);
+
+		assertTrue("hashCode", fEvent1.hashCode() == event1.hashCode());
+		assertTrue("hashCode", fEvent2.hashCode() == event2.hashCode());
+
+		assertTrue("hashCode", fEvent1.hashCode() != event2.hashCode());
+		assertTrue("hashCode", fEvent2.hashCode() != event1.hashCode());
+	}
+	
+	// ------------------------------------------------------------------------
 	// toString
 	// ------------------------------------------------------------------------
 

@@ -12,11 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.tests.request;
 
-import java.util.concurrent.Executors;
-
 import junit.framework.TestCase;
-
-import org.eclipse.linuxtools.tmf.request.TmfRequestExecutor;
 
 /**
  * <b><u>TmfRequestExecutorTest</u></b>
@@ -25,92 +21,74 @@ import org.eclipse.linuxtools.tmf.request.TmfRequestExecutor;
  */
 public class TmfRequestExecutorTest extends TestCase {
 
-	// ------------------------------------------------------------------------
-	// Variables
-	// ------------------------------------------------------------------------
-
-	// ------------------------------------------------------------------------
-	// Housekeeping
-	// ------------------------------------------------------------------------
-
 	/**
-	 * @param name the test name
+	 * @param name
 	 */
 	public TmfRequestExecutorTest(String name) {
 		super(name);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#tearDown()
+	 */
 	protected void tearDown() throws Exception {
 		super.tearDown();
-	}
-
-	// ------------------------------------------------------------------------
-	// Constructors
-	// ------------------------------------------------------------------------
-
-	/**
-	 * Test method for {@link org.eclipse.linuxtools.tmf.request.TmfRequestExecutor#TmfRequestExecutor()}.
-	 */
-	public void testTmfRequestExecutor() {
-		TmfRequestExecutor executor = new TmfRequestExecutor();
-		assertEquals("nbPendingRequests", 0, executor.getNbPendingRequests());
-		assertFalse("isShutdown",   executor.isShutdown());
-		assertFalse("isTerminated", executor.isTerminated());
 	}
 
 	/**
 	 * Test method for {@link org.eclipse.linuxtools.tmf.request.TmfRequestExecutor#TmfRequestExecutor(java.util.concurrent.ExecutorService)}.
 	 */
 	public void testTmfRequestExecutorExecutorService() {
-		TmfRequestExecutor executor = new TmfRequestExecutor(Executors.newCachedThreadPool());
-		assertEquals("nbPendingRequests", 0, executor.getNbPendingRequests());
-		assertFalse("isShutdown",   executor.isShutdown());
-		assertFalse("isTerminated", executor.isTerminated());
+		fail("Not yet implemented");
+	}
+
+	/**
+	 * Test method for {@link org.eclipse.linuxtools.tmf.request.TmfRequestExecutor#TmfRequestExecutor()}.
+	 */
+	public void testTmfRequestExecutor() {
+		fail("Not yet implemented");
+	}
+
+	/**
+	 * Test method for {@link org.eclipse.linuxtools.tmf.request.TmfRequestExecutor#start()}.
+	 */
+	public void testStart() {
+		fail("Not yet implemented");
 	}
 
 	/**
 	 * Test method for {@link org.eclipse.linuxtools.tmf.request.TmfRequestExecutor#stop()}.
 	 */
 	public void testStop() {
-		TmfRequestExecutor executor = new TmfRequestExecutor();
-		executor.stop();
-		assertEquals("nbPendingRequests", 0, executor.getNbPendingRequests());
-		assertTrue("isShutdown",   executor.isShutdown());
-		assertTrue("isTerminated", executor.isTerminated());
+		fail("Not yet implemented");
 	}
-
-	// ------------------------------------------------------------------------
-	// execute
-	// ------------------------------------------------------------------------
 
 	/**
 	 * Test method for {@link org.eclipse.linuxtools.tmf.request.TmfRequestExecutor#execute(java.lang.Runnable)}.
 	 */
 	public void testExecute() {
-//		fail("Not yet implemented");
+		fail("Not yet implemented");
 	}
 
-	// ------------------------------------------------------------------------
-	// toString
-	// ------------------------------------------------------------------------
+	/**
+	 * Test method for {@link org.eclipse.linuxtools.tmf.request.TmfRequestExecutor#scheduleNext()}.
+	 */
+	public void testScheduleNext() {
+		fail("Not yet implemented");
+	}
 
 	/**
-	 * Test method for {@link org.eclipse.linuxtools.tmf.request.TmfRequestExecutor#toString()}.
+	 * Test method for {@link org.eclipse.linuxtools.tmf.request.TmfRequestExecutor#queueRequest(java.lang.Runnable)}.
 	 */
-	public void testToString() {
-//		TmfRequestExecutor executor1 = new TmfRequestExecutor();
-//		String expected1 = "[TmfRequestExecutor(DelegatedExecutorService)]";
-//		assertEquals("toString", expected1, executor1.toString());
-//
-//		TmfRequestExecutor executor2 = new TmfRequestExecutor(Executors.newCachedThreadPool());
-//		String expected2 = "[TmfRequestExecutor(ThreadPoolExecutor)]";
-//		assertEquals("toString", expected2, executor2.toString());
+	public void testQueueRequest() {
+		fail("Not yet implemented");
 	}
 
 }

@@ -15,6 +15,9 @@ package org.eclipse.linuxtools.tmf.tests.request;
 import junit.framework.TestCase;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.event.TmfEventReference;
+import org.eclipse.linuxtools.tmf.event.TmfEventSource;
+import org.eclipse.linuxtools.tmf.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
@@ -24,10 +27,26 @@ import org.eclipse.linuxtools.tmf.request.TmfEventRequestStub;
 /**
  * <b><u>TmfEventRequestTest</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * Test suite for the TmfEventRequest class.
  */
 public class TmfEventRequestTest extends TestCase {
 
+	// ------------------------------------------------------------------------
+	// Variables
+	// ------------------------------------------------------------------------
+
+	private static TmfTimeRange range1 = new TmfTimeRange(TmfTimeRange.Eternity);
+	private static TmfTimeRange range2 = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BigCrunch);
+	
+	private static TmfEventRequest<TmfEvent> fRequest1;
+	private static TmfEventRequest<TmfEvent> fRequest1b;
+	private static TmfEventRequest<TmfEvent> fRequest1c;
+	private static TmfEventRequest<TmfEvent> fRequest2;
+	private static TmfEventRequest<TmfEvent> fRequest3;
+	private static TmfEventRequest<TmfEvent> fRequest4;
+
+	private static int fRequestCount;
+	
 	// ------------------------------------------------------------------------
 	// Housekeeping
 	// ------------------------------------------------------------------------
@@ -39,6 +58,14 @@ public class TmfEventRequestTest extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
+		TmfDataRequest.reset();
+		fRequest1  = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range1, 100, 200);
+		fRequest2  = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range2, 100, 200);
+		fRequest3  = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range2, 200, 200);
+		fRequest4  = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range2, 200, 300);
+		fRequest1b = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range1, 100, 200);
+		fRequest1c = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range1, 100, 200);
+		fRequestCount = fRequest1c.getRequestId() + 1;
 	}
 
 	@Override
@@ -46,6 +73,33 @@ public class TmfEventRequestTest extends TestCase {
 		super.tearDown();
 	}
 
+	private TmfEventRequest<TmfEvent> setupTestRequest(final boolean[] flags) {
+		
+		TmfEventRequest<TmfEvent> request = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, new TmfTimeRange(TmfTimeRange.Eternity), 100, 200) {
+		    @Override
+			public void handleCompleted() {
+		    	super.handleCompleted();
+		    	flags[0] = true;
+		    }
+		    @Override
+		    public void handleSuccess() {
+		    	super.handleSuccess();
+		    	flags[1] = true;
+		    }
+		    @Override
+		    public void handleFailure() {
+		    	super.handleFailure();
+		    	flags[2] = true;
+		    }
+		    @Override
+		    public void handleCancel() {
+		    	super.handleCancel();
+		    	flags[3] = true;
+		    }
+		};
+		return request;
+	}
+	
 	// ------------------------------------------------------------------------
 	// Constructors
 	// ------------------------------------------------------------------------
@@ -53,92 +107,239 @@ public class TmfEventRequestTest extends TestCase {
 	public void testTmfEventRequest() {
         TmfEventRequest<TmfEvent> request = new TmfEventRequestStub<TmfEvent>(TmfEvent.class);
 
+        assertEquals("getRequestId", fRequestCount++, request.getRequestId());
+        assertEquals("getDataType",  TmfEvent.class, request.getDataType());
+
         assertEquals("StartTime", TmfTimestamp.BigBang,   request.getRange().getStartTime());
         assertEquals("EndTime",   TmfTimestamp.BigCrunch, request.getRange().getEndTime());
 
-        assertEquals("getIndex",             0, request.getIndex());
+        assertEquals("getIndex", 0, request.getIndex());
         assertEquals("getNbRequestedEvents", TmfDataRequest.ALL_DATA, request.getNbRequested());
         assertEquals("getBlockize", TmfDataRequest.DEFAULT_BLOCK_SIZE, request.getBlockize());
+
+        assertFalse("isCompleted", request.isCompleted());
+        assertFalse("isFailed", request.isFailed());
+        assertFalse("isCancelled", request.isCancelled());
+
+        assertEquals("getNbRead", 0, request.getNbRead());
 	}
 
 	public void testTmfEventRequestTimeRange() {
         TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BigCrunch);
         TmfEventRequest<TmfEvent> request = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range);
 
-        assertEquals("StartTime", range.getStartTime(), request.getRange().getStartTime());
-        assertEquals("EndTime",   range.getEndTime(),   request.getRange().getEndTime());
+        assertEquals("getRequestId", fRequestCount++, request.getRequestId());
+        assertEquals("getDataType",  TmfEvent.class, request.getDataType());
 
-        assertEquals("getIndex",             0, request.getIndex());
+        assertEquals("StartTime", new TmfTimestamp(), request.getRange().getStartTime());
+        assertEquals("EndTime",   TmfTimestamp.BigCrunch, request.getRange().getEndTime());
+
+        assertEquals("getIndex", 0, request.getIndex());
         assertEquals("getNbRequestedEvents", TmfDataRequest.ALL_DATA, request.getNbRequested());
         assertEquals("getBlockize", TmfDataRequest.DEFAULT_BLOCK_SIZE, request.getBlockize());
+
+        assertFalse("isCompleted", request.isCompleted());
+        assertFalse("isFailed", request.isFailed());
+        assertFalse("isCancelled", request.isCancelled());
+
+        assertEquals("getNbRead", 0, request.getNbRead());
 	}
 
 	public void testTmfEventRequestTimeRangeNbRequested() {
         TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BigCrunch);
         TmfEventRequest<TmfEvent> request = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range, 100);
 
-        assertEquals("StartTime", range.getStartTime(), request.getRange().getStartTime());
-        assertEquals("EndTime",   range.getEndTime(),   request.getRange().getEndTime());
+        assertEquals("getRequestId", fRequestCount++, request.getRequestId());
+        assertEquals("getDataType",  TmfEvent.class, request.getDataType());
 
-        assertEquals("getIndex",               0, request.getIndex());
+        assertEquals("StartTime", new TmfTimestamp(), request.getRange().getStartTime());
+        assertEquals("EndTime",   TmfTimestamp.BigCrunch, request.getRange().getEndTime());
+
+        assertEquals("getIndex", 0, request.getIndex());
         assertEquals("getNbRequestedEvents", 100, request.getNbRequested());
         assertEquals("getBlockize", TmfDataRequest.DEFAULT_BLOCK_SIZE, request.getBlockize());
+
+        assertFalse("isCompleted", request.isCompleted());
+        assertFalse("isFailed", request.isFailed());
+        assertFalse("isCancelled", request.isCancelled());
+
+        assertEquals("getNbRead", 0, request.getNbRead());
 	}
 
 	public void testTmfEventRequestTimeRangeNbRequestedBlocksize() {
         TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BigCrunch);
         TmfEventRequest<TmfEvent> request = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range, 100, 200);
 
-        assertEquals("StartTime", range.getStartTime(), request.getRange().getStartTime());
-        assertEquals("EndTime",   range.getEndTime(),   request.getRange().getEndTime());
+        assertEquals("getRequestId", fRequestCount++, request.getRequestId());
+        assertEquals("getDataType",  TmfEvent.class, request.getDataType());
 
-        assertEquals("getIndex",               0, request.getIndex());
+        assertEquals("StartTime", new TmfTimestamp(), request.getRange().getStartTime());
+        assertEquals("EndTime",   TmfTimestamp.BigCrunch, request.getRange().getEndTime());
+
+        assertEquals("getIndex", 0, request.getIndex());
         assertEquals("getNbRequestedEvents", 100, request.getNbRequested());
-        assertEquals("getBlockize",          200, request.getBlockize());
+        assertEquals("getBlockize", 200, request.getBlockize());
+
+        assertFalse("isCompleted", request.isCompleted());
+        assertFalse("isFailed", request.isFailed());
+        assertFalse("isCancelled", request.isCancelled());
+
+        assertEquals("getNbRead", 0, request.getNbRead());
 	}
 
 	// ------------------------------------------------------------------------
 	// equals
 	// ------------------------------------------------------------------------
 
-	public void testEquals_Reflexivity() {
-        TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BigCrunch);
-        TmfEventRequest<TmfEvent> request = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range, 100, 200);
+	public void testEqualsReflexivity() throws Exception {
+        assertTrue("equals", fRequest1.equals(fRequest1));
+        assertTrue("equals", fRequest2.equals(fRequest2));
 
-        assertTrue("request.equals(request)", request.equals(request));
+        assertFalse("equals", fRequest1.equals(fRequest2));
+        assertFalse("equals", fRequest2.equals(fRequest1));
 	}
 
-	public void testEquals_Symmetry() {
-        TmfTimeRange range1 = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BigCrunch);
-        TmfTimeRange range2 = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BigCrunch);
-        TmfTimeRange range3 = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.Zero);
+	public void testEqualsSymmetry() throws Exception {
+        assertTrue("equals", fRequest1.equals(fRequest1b));
+        assertTrue("equals", fRequest1b.equals(fRequest1));
 
-        TmfEventRequest<TmfEvent> request1 = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range1, 100, 200);
-        TmfEventRequest<TmfEvent> request2 = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range2, 100, 200);
-        TmfEventRequest<TmfEvent> request3 = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range3, 100, 200);
+        assertFalse("equals", fRequest1.equals(fRequest3));
+        assertFalse("equals", fRequest2.equals(fRequest3));
+        assertFalse("equals", fRequest3.equals(fRequest1));
+        assertFalse("equals", fRequest3.equals(fRequest2));
+	}
+	
+	public void testEqualsTransivity() throws Exception {
+        assertTrue("equals", fRequest1.equals(fRequest1b));
+        assertTrue("equals", fRequest1b.equals(fRequest1c));
+        assertTrue("equals", fRequest1.equals(fRequest1c));
+	}
+	
+	public void testEqualsConsistency() throws Exception {
+        assertTrue("equals", fRequest1.equals(fRequest1));
+        assertTrue("equals", fRequest1.equals(fRequest1));
 
-        assertTrue("request1.equals(request2)", request1.equals(request2));
-        assertTrue("request2.equals(request1)", request2.equals(request1));
-
-        assertFalse("request1.equals(request3)", request1.equals(request3));
-        assertFalse("request3.equals(request1)", request3.equals(request1));
-        assertFalse("request2.equals(request3)", request2.equals(request3));
-        assertFalse("request3.equals(request2)", request3.equals(request2));
+        assertTrue("equals", fRequest2.equals(fRequest2));
+        assertTrue("equals", fRequest2.equals(fRequest2));
+	}
+	
+	public void testEqualsNull() throws Exception {
+        assertFalse("equals", fRequest1.equals(null));
+        assertFalse("equals", fRequest2.equals(null));
 	}
 
-	public void testEquals_Transivity() {
-        TmfTimeRange range1 = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BigCrunch);
+	// ------------------------------------------------------------------------
+	// hashCode
+	// ------------------------------------------------------------------------
 
-        TmfEventRequest<TmfEvent> request1 = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range1, 100, 200);
-        TmfEventRequest<TmfEvent> request2 = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range1, 100, 200);
-        TmfEventRequest<TmfEvent> request3 = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range1, 100, 200);
-
-        assertTrue("request1.equals(request2)", request1.equals(request2));
-        assertTrue("request1.equals(request3)", request1.equals(request3));
-        assertTrue("request2.equals(request1)", request2.equals(request1));
-        assertTrue("request2.equals(request3)", request2.equals(request3));
-        assertTrue("request3.equals(request1)", request3.equals(request1));
-        assertTrue("request3.equals(request2)", request3.equals(request2));
+	public void testHashCode() throws Exception {
+        assertTrue("hashCode", fRequest1.hashCode() == fRequest1.hashCode());
+        assertTrue("hashCode", fRequest2.hashCode() == fRequest2.hashCode());
+		assertTrue("hashCode", fRequest1.hashCode() != fRequest2.hashCode());
 	}
+	
+	// ------------------------------------------------------------------------
+	// toString
+	// ------------------------------------------------------------------------
+
+	public void testToString() {
+        String expected1 = "[TmfEventRequest(0,TmfEvent," + range1 + ",100,200)]";
+        String expected2 = "[TmfEventRequest(1,TmfEvent," + range2 + ",100,200)]";
+        String expected3 = "[TmfEventRequest(2,TmfEvent," + range2 + ",200,200)]";
+        String expected4 = "[TmfEventRequest(3,TmfEvent," + range2 + ",200,300)]";
+
+        assertEquals("toString", expected1, fRequest1.toString());
+        assertEquals("toString", expected2, fRequest2.toString());
+        assertEquals("toString", expected3, fRequest3.toString());
+        assertEquals("toString", expected4, fRequest4.toString());
+	}
+
+	// ------------------------------------------------------------------------
+	// setData/getData
+	// ------------------------------------------------------------------------
+
+	public void testSetData() {
+		// Initialize the data
+		int nbEvents = 10;
+		TmfEvent[] events = new TmfEvent[nbEvents];
+		for (int i = 0; i < nbEvents; i++) {
+			events[i] = new TmfEvent(new TmfTimestamp(i), new TmfEventSource(),
+					new TmfEventType(), new TmfEventReference());
+		}
+
+		fRequest1.setData(events);
+		assertEquals("setData", nbEvents, fRequest1.getNbRead());
+
+		TmfEvent[] eventsRead = fRequest1.getData();
+		assertEquals("getData", nbEvents, eventsRead.length);
+
+		for (int i = 0; i < nbEvents; i++) {
+			assertEquals("getData", i, eventsRead[i].getTimestamp().getValue());
+		}
+	}
+
+	// ------------------------------------------------------------------------
+	// done
+	// ------------------------------------------------------------------------
+
+	public void testDone() {
+		
+		final boolean[] flags = new boolean[4];
+		TmfEventRequest<TmfEvent> request = setupTestRequest(flags);
+		request.done();
+
+		assertTrue ("isCompleted", request.isCompleted());
+		assertFalse("isFailed",    request.isFailed());
+		assertFalse("isCancelled", request.isCancelled());
+
+		assertTrue ("handleCompleted", flags[0]);
+		assertTrue ("handleSuccess",   flags[1]);
+		assertFalse("handleFailure",   flags[2]);
+		assertFalse("handleCancel",    flags[3]);
+	}
+
+	// ------------------------------------------------------------------------
+	// fail
+	// ------------------------------------------------------------------------
+
+	public void testFail() {
+		
+		final boolean[] flags = new boolean[4];
+		TmfEventRequest<TmfEvent> request = setupTestRequest(flags);
+		request.fail();
+
+		assertTrue ("isCompleted", request.isCompleted());
+		assertTrue ("isFailed",    request.isFailed());
+		assertFalse("isCancelled", request.isCancelled());
+
+		assertTrue ("handleCompleted", flags[0]);
+		assertFalse("handleSuccess",   flags[1]);
+		assertTrue ("handleFailure",   flags[2]);
+		assertFalse("handleCancel",    flags[3]);
+	}
+
+	// ------------------------------------------------------------------------
+	// cancel
+	// ------------------------------------------------------------------------
+
+	public void testCancel() {
+
+		final boolean[] flags = new boolean[4];
+		TmfEventRequest<TmfEvent> request = setupTestRequest(flags);
+		request.cancel();
+
+		assertTrue ("isCompleted", request.isCompleted());
+		assertFalse("isFailed",    request.isFailed());
+		assertTrue ("isCancelled", request.isCancelled());
+
+		assertTrue ("handleCompleted", flags[0]);
+		assertFalse("handleSuccess",   flags[1]);
+		assertFalse("handleFailure",   flags[2]);
+		assertTrue ("handleCancel",    flags[3]);
+	}
+
+	// ------------------------------------------------------------------------
+	// waitForCompletion
+	// ------------------------------------------------------------------------
 
 }

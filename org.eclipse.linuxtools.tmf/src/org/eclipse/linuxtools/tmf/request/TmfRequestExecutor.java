@@ -21,7 +21,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * <b><u>TmfRequestExecutor</u></b>
  *
- * Implement me. Please.
+ * A simple, straightforward request executor.
  */
 public class TmfRequestExecutor implements Executor {
 
@@ -41,11 +41,17 @@ public class TmfRequestExecutor implements Executor {
 		// Nothing to do
 	}
 
+	/**
+	 * Stops the executor
+	 */
 	public void stop() {
 		fExecutor.shutdown();
 	}
 	
-	public void execute(final Runnable request) {
+	/* (non-Javadoc)
+	 * @see java.util.concurrent.Executor#execute(java.lang.Runnable)
+	 */
+	public synchronized void execute(final Runnable request) {
 		fRequests.offer(new Runnable() {
 			public void run() {
 				try {
@@ -60,12 +66,20 @@ public class TmfRequestExecutor implements Executor {
 		}
 	}
 
+	/**
+	 * Executes the next pending request, if applicable.
+	 */
 	protected synchronized void scheduleNext() {
 		if ((fRequest = fRequests.poll()) != null) {
 			fExecutor.execute(fRequest);
 		}
 	}
 
+	/**
+	 * Queues the request and schedules it.
+	 * 
+	 * @param request the request to service
+	 */
 	public synchronized void queueRequest(Runnable request) {
 		fRequests.add(request);
 		scheduleNext();

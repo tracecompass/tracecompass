@@ -165,7 +165,7 @@ public class ProjectView extends TmfView {
 	public void selectExperiment(LTTngExperimentNode experiment) {
     	String expId = experiment.getName();
         if (fSelectedExperiment != null)
-        	fSelectedExperiment.deregister();
+        	fSelectedExperiment.dispose();
         try {
         	LTTngTraceNode[] traceEntries = experiment.getTraces();
         	int nbTraces = traceEntries.length;

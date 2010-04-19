@@ -31,6 +31,7 @@ public class TmfExperimentLocation extends TmfLocation<ITmfLocation<?>[]> {
 
 	@Override
 	public TmfExperimentLocation clone() {
+		super.clone();	// To keep FindBugs happy
 		ITmfLocation<?>[] locations = (ITmfLocation<?>[]) getLocation();
 		ITmfLocation<?>[] clones = new ITmfLocation[locations.length];
 		for (int i = 0; i < locations.length; i++) {

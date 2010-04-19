@@ -73,16 +73,10 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	}
 
 	@Override
-	public void register() {
-		super.register();
-		TmfProviderManager.register(fType, this);
-	}
-
-	@Override
-	public void deregister() {
+	public void dispose() {
 		TmfProviderManager.deregister(fType, this);
 		fExecutor.stop();
-		super.deregister();
+		super.dispose();
 	}
 
 	public int getQueueSize() {
@@ -93,7 +87,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	// ITmfRequestHandler
 	// ------------------------------------------------------------------------
 
-	public void sendRequest(final TmfDataRequest<T> request) {
+	public synchronized void sendRequest(final ITmfDataRequest<T> request) {
 
 		if (fSynchDepth > 0) {
 			// We are in coalescing mode: client should NEVER wait
@@ -123,14 +117,14 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 
 	protected Vector<TmfCoalescedDataRequest<T>> fPendingCoalescedRequests = new Vector<TmfCoalescedDataRequest<T>>();
 
-	protected synchronized void newCoalescedDataRequest(TmfDataRequest<T> request) {
+	protected synchronized void newCoalescedDataRequest(ITmfDataRequest<T> request) {
 		TmfCoalescedDataRequest<T> coalescedRequest =
 			new TmfCoalescedDataRequest<T>(fType, request.getIndex(), request.getNbRequested(), request.getBlockize());
 		coalescedRequest.addRequest(request);
 		fPendingCoalescedRequests.add(coalescedRequest);
 	}
 
-	protected synchronized void coalesceDataRequest(TmfDataRequest<T> request) {
+	protected synchronized void coalesceDataRequest(ITmfDataRequest<T> request) {
 		for (TmfCoalescedDataRequest<T> req : fPendingCoalescedRequests) {
 			if (req.isCompatible(request)) {
 				req.addRequest(request);
@@ -144,7 +138,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	// Request processing
 	// ------------------------------------------------------------------------
 
-	protected void queueRequest(final TmfDataRequest<T> request) {
+	protected void queueRequest(final ITmfDataRequest<T> request) {
 
 		// Process the request
 		Thread thread = new Thread() {
@@ -214,7 +208,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	 * @param request
 	 * @return an application specific context; null if request can't be serviced
 	 */
-	public abstract ITmfContext armRequest(TmfDataRequest<T> request);
+	public abstract ITmfContext armRequest(ITmfDataRequest<T> request);
 	
 	/**
 	 * Return the next piece of data based on the context supplied. The context
@@ -253,7 +247,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	 * @param data
 	 * @return
 	 */
-	public boolean isCompleted(TmfDataRequest<T> request, T data, int nbRead) {
+	public boolean isCompleted(ITmfDataRequest<T> request, T data, int nbRead) {
 		return request.isCompleted() || nbRead >= request.getNbRequested();
 	}
 

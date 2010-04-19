@@ -172,7 +172,11 @@ public class TmfEventsView extends TmfView {
 					}
 				};
 				fExperiment.sendRequest(request);
-		        request.waitForCompletion();
+		        try {
+					request.waitForCompletion();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 				
 				if (cache[0] != null && cacheStartIndex == index) {
 					item.setText(extractItemFields(cache[0]));

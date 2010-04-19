@@ -33,7 +33,7 @@ public interface ITmfDataRequest<T extends TmfData> {
     /**
      * @return request ID
      */
-    public long getRequestId();
+    public int getRequestId();
 
     /**
 	 * @return the index of the first event requested
@@ -84,7 +84,7 @@ public interface ITmfDataRequest<T extends TmfData> {
      * To suspend the client thread until the request completes
      * (or is canceled).
      */
-    public void waitForCompletion();
+    public void waitForCompletion() throws InterruptedException;
 
 	// ------------------------------------------------------------------------
 	// Request state modifiers

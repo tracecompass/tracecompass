@@ -29,14 +29,9 @@ public interface ITmfComponent {
 	public String getName();
 
 	/**
-	 * Register to the signal manager
+	 * Dispose of the component
 	 */
-	public void register();
-
-	/**
-	 * De-register from the signal manager
-	 */
-	public void deregister();
+	public void dispose();
 
 	/**
 	 * Broadcast a signal to all the interested listeners.

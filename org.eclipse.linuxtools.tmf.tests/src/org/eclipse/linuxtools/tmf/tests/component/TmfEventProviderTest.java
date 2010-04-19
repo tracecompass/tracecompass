@@ -52,8 +52,8 @@ public class TmfEventProviderTest extends TestCase {
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		fEventProvider.deregister();
-		fSyntheticEventProvider.deregister();
+		fEventProvider.dispose();
+		fSyntheticEventProvider.dispose();
 	}
 
 	// ------------------------------------------------------------------------
@@ -83,7 +83,7 @@ public class TmfEventProviderTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	@SuppressWarnings("unchecked")
-	public void testGetPlainEvents() {
+	public void testGetPlainEvents() throws InterruptedException {
 
         final int BLOCK_SIZE = 100;
         final int NB_EVENTS  = 1000;
@@ -119,7 +119,7 @@ public class TmfEventProviderTest extends TestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void getSyntheticData(final TmfTimeRange range, final int nbEvents, final int blockSize) {
+	private void getSyntheticData(final TmfTimeRange range, final int nbEvents, final int blockSize) throws InterruptedException {
 
         final Vector<TmfSyntheticEventStub> requestedEvents = new Vector<TmfSyntheticEventStub>();
 
@@ -156,36 +156,36 @@ public class TmfEventProviderTest extends TestCase {
 
 	// The following tests are the same but for the size of the requested blocks
 	// with regards to the size of the TmfSyntheticEventProviderStub block
-    public void testGetSyntheticEvents_EqualBlockSizes() {
+    public void testGetSyntheticEvents_EqualBlockSizes() throws InterruptedException {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
 		getSyntheticData(range, 1000, TmfSyntheticEventProviderStub.BLOCK_SIZE);
 	}
 
-	public void testGetSyntheticEvents_SmallerBlock() {
+	public void testGetSyntheticEvents_SmallerBlock() throws InterruptedException {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
 		getSyntheticData(range, 1000, TmfSyntheticEventProviderStub.BLOCK_SIZE / 2);
 	}
 
-	public void testGetSyntheticEvents_LargerBlock() {
+	public void testGetSyntheticEvents_LargerBlock() throws InterruptedException {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
 		getSyntheticData(range, 1000, TmfSyntheticEventProviderStub.BLOCK_SIZE * 2);
 	}
 
-	public void testGetSyntheticEvents_TimeRange() {
+	public void testGetSyntheticEvents_TimeRange() throws InterruptedException {
 		TmfTimestamp start = new TmfTimestamp(   1, (byte) -3, 0);
 		TmfTimestamp end   = new TmfTimestamp(1000, (byte) -3, 0);
         TmfTimeRange range = new TmfTimeRange(start, end);
 		getSyntheticData(range, -1, TmfSyntheticEventProviderStub.BLOCK_SIZE);
 	}
 
-	public void testGetSyntheticEvents_WeirdTimeRange1() {
+	public void testGetSyntheticEvents_WeirdTimeRange1() throws InterruptedException {
 		TmfTimestamp start = TmfTimestamp.BigBang;
 		TmfTimestamp end   = new TmfTimestamp(0, (byte) -3, 0);
         TmfTimeRange range = new TmfTimeRange(start, end);
 		getSyntheticData(range, -1, TmfSyntheticEventProviderStub.BLOCK_SIZE);
 	}
 
-	public void testGetSyntheticEvents_WeirdTimeRange2() {
+	public void testGetSyntheticEvents_WeirdTimeRange2() throws InterruptedException {
 		TmfTimestamp start = new TmfTimestamp(0, (byte) -3, 0);
 		TmfTimestamp end   = TmfTimestamp.BigCrunch;
         TmfTimeRange range = new TmfTimeRange(start, end);

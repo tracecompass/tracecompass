@@ -23,8 +23,8 @@ import org.eclipse.linuxtools.tmf.component.TmfEventProvider;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
-import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.trace.ITmfContext;
@@ -114,11 +114,11 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
      * 
      */
     @Override
-	public void deregister() {
+	public void dispose() {
     	fTraces = null;
     	fCheckpoints.clear();
     	setCurrentExperiment(null);
-        super.deregister();
+        super.dispose();
     }
 
     private static void setCurrentExperiment(TmfExperiment<?> experiment) {
@@ -244,14 +244,30 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     // ------------------------------------------------------------------------
 
 	@Override
-	public ITmfContext armRequest(TmfDataRequest<T> request) {
-		TmfTimestamp timestamp = (request instanceof TmfEventRequest<?>) ?
-			((TmfEventRequest<T>) request).getRange().getStartTime() : null;
-
+	public ITmfContext armRequest(ITmfDataRequest<T> request) {
+		
+		TmfTimestamp timestamp = (request instanceof ITmfEventRequest<?>) ?
+				((ITmfEventRequest<T>) request).getRange().getStartTime() : null;
+		 
+		
 		TmfExperimentContext context = (timestamp != null) ? 
 			seekEvent(timestamp) : seekEvent(request.getIndex());
 
 		return context;
+
+//		TmfTimestamp timestamp = null;
+//		
+//		if (request instanceof TmfEventRequest<?> == true) {
+//			timestamp = ((TmfEventRequest<T>) request).getRange().getStartTime();
+//		}
+//		else if (request instanceof TmfCoalescedEventRequest<?> == true) {
+//			timestamp = ((TmfCoalescedEventRequest<?>)request).getRange().getStartTime();
+//		}
+//		else {
+//			System.out.println("ERROR : request of unknown instance in armRequest(). Class is : " + request.getClass().toString() );
+//		}
+		
+		
 	}
 
 	@SuppressWarnings("unchecked")

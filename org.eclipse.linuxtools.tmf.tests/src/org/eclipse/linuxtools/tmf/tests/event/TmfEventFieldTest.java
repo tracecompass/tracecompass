@@ -182,6 +182,15 @@ public class TmfEventFieldTest extends TestCase {
 		assertTrue("equals", !fField3.equals(null));
 	}
 	
+	// ------------------------------------------------------------------------
+	// hashCode
+	// ------------------------------------------------------------------------
+
+	public void testHashCode() throws Exception {
+		assertTrue("hashCode", fField0.hashCode() == fField1.hashCode());
+		assertTrue("hashCode", fField0.hashCode() != fField3.hashCode());
+	}
+	
     // ------------------------------------------------------------------------
 	// toString
     // ------------------------------------------------------------------------

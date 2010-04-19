@@ -14,6 +14,7 @@ public class AllTests {
 		suite.addTestSuite(TmfEventRequestTest.class);
 		suite.addTestSuite(TmfCoalescedDataRequestTest.class);
 		suite.addTestSuite(TmfCoalescedEventRequestTest.class);
+//		suite.addTestSuite(TmfRequestExecutorTest.class);
 		//$JUnit-END$
 		return suite;
 	}

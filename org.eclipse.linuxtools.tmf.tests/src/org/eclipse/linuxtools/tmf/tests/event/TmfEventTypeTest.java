@@ -186,6 +186,15 @@ public class TmfEventTypeTest extends TestCase {
 	}
 	
 	// ------------------------------------------------------------------------
+	// hashCode
+	// ------------------------------------------------------------------------
+
+	public void testHashCode() throws Exception {
+		assertTrue("hashCode", fType0.hashCode() == fType1.hashCode());
+		assertTrue("hashCode", fType0.hashCode() != fType3.hashCode());
+	}
+	
+	// ------------------------------------------------------------------------
 	// toString
 	// ------------------------------------------------------------------------
 

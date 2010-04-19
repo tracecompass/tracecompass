@@ -165,6 +165,17 @@ public class TmfTimestampTest extends TestCase {
 	}
 	
 	// ------------------------------------------------------------------------
+	// hashCode
+	// ------------------------------------------------------------------------
+
+	public void testHashCode() throws Exception {
+		assertTrue("hashCode", ts0.hashCode() == ts0copy.hashCode());
+		assertTrue("hashCode", ts1.hashCode() == ts1copy.hashCode());
+
+		assertTrue("hashCode", ts0.hashCode() != ts1.hashCode());
+	}
+	
+	// ------------------------------------------------------------------------
 	// toString
 	// ------------------------------------------------------------------------
 

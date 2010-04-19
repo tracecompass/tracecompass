@@ -1,7 +1,7 @@
 package org.eclipse.linuxtools.tmf.component;
 
 import org.eclipse.linuxtools.tmf.event.TmfData;
-import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 
 public interface ITmfDataProvider<T extends TmfData> {
 
@@ -12,6 +12,6 @@ public interface ITmfDataProvider<T extends TmfData> {
      * 
 	 * @param request The request to process
 	 */
-	public void sendRequest(TmfDataRequest<T> request);
+	public void sendRequest(ITmfDataRequest<T> request);
 
 }
