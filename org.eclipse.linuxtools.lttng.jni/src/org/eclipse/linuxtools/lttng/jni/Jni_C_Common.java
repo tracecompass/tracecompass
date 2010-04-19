@@ -24,11 +24,11 @@ import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant;
  * This class is ABSTRACT, and will be extended by each LTTng structure (Trac, Tracefile, Event, ...)
  * 
  */
-public abstract class Jni_C_Common extends Jni_C_Constant {
-    
+public abstract class Jni_C_Common extends Jni_C_Constant 
+{
     // Native console printing function
-    protected native void ltt_printC(String string_to_print);
-
+    protected native void ltt_printC(int libId, String string_to_print);
+    
     /**
      * Java-side console printing function.<p>
      * 
@@ -36,10 +36,10 @@ public abstract class Jni_C_Common extends Jni_C_Constant {
      * 
      * @param msg   The string to print in C.
      */
-    public void printC(String msg) {
+    public void printC(int libId, String msg) {
         // Need to escape "%" for C printf 
         msg = msg.replaceAll("%", "%%");
-        ltt_printC(msg);
+        ltt_printC(libId, msg);
     }
 
     /**
@@ -49,8 +49,8 @@ public abstract class Jni_C_Common extends Jni_C_Constant {
      * 
      * @param msg   The string to print in C.
      */
-    public void printlnC(String msg) {
-        printC(msg + "\n");
+    public void printlnC(int libId, String msg) {
+        printC(libId, msg + "\n");
     }
     
 }

@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.lttng.jni_v2_3;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.lttng.jni.JniTracefile;
 import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer;
+import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id;
 import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 
 /**
@@ -53,7 +54,7 @@ public class JniTrace_v2_3 extends JniTrace {
     	super(oldTrace);
     }        
     
-    public JniTrace_v2_3(Jni_C_Pointer newPtr, boolean newPrintDebug) throws JniException {
+    public JniTrace_v2_3(Jni_C_Pointer_And_Library_Id newPtr, boolean newPrintDebug) throws JniException {
     	super(newPtr, newPrintDebug);
     }
     
@@ -63,10 +64,10 @@ public class JniTrace_v2_3 extends JniTrace {
      * 
      * Call the library loader with the .so we wish to load.
      * 
-     * @return 	True if the load went successful, false otherwise.
+     * @return 	The library id if sucessful, -1 if something went wrong
      */
     @Override
-	public boolean initializeLibrary() {
+	public int initializeLibrary() {
     	return ltt_initializeHandle(LIBRARY_NAME);
     }
     
@@ -81,7 +82,7 @@ public class JniTrace_v2_3 extends JniTrace {
      * @see org.eclipse.linuxtools.lttng.jni.JniTrace
      */
     @Override
-	public JniTracefile allocateNewJniTracefile(Jni_C_Pointer newPtr, JniTrace newParentTrace) throws JniException {
+	public JniTracefile allocateNewJniTracefile(Jni_C_Pointer_And_Library_Id newPtr, JniTrace newParentTrace) throws JniException {
     	return new JniTracefile_v2_3(newPtr, newParentTrace);
     }
 }

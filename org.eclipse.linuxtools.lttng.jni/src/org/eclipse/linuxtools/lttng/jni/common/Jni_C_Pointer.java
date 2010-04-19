@@ -20,8 +20,8 @@ package org.eclipse.linuxtools.lttng.jni.common;
  */
 public class Jni_C_Pointer extends Jni_C_Constant {
 
-    private long ptr = NULL;
-    private boolean isLong = true;
+    protected long ptr = NULL;
+    protected boolean isLong = true;
     
     /**
      * Default constructor.<p>

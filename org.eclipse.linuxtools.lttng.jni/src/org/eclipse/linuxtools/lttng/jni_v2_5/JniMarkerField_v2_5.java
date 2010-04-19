@@ -12,7 +12,7 @@ package org.eclipse.linuxtools.lttng.jni_v2_5;
  *******************************************************************************/
 
 import org.eclipse.linuxtools.lttng.jni.JniMarkerField;
-import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer;
+import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id;
 import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 
 /**
@@ -36,7 +36,7 @@ public class JniMarkerField_v2_5 extends JniMarkerField {
     	super(oldMarkerField);
     }
     
-    public JniMarkerField_v2_5(Jni_C_Pointer newMarkerFieldPtr) throws JniException {
+    public JniMarkerField_v2_5(Jni_C_Pointer_And_Library_Id newMarkerFieldPtr) throws JniException {
     	super(newMarkerFieldPtr);
     }
 }

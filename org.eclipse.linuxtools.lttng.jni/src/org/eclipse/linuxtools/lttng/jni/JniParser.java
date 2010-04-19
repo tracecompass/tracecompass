@@ -30,7 +30,7 @@ import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer;
  */
 public abstract class JniParser extends Jni_C_Common
 {
-    protected static native void ltt_getParsedData(ParsedObjectContent parseddata, long eventPtr, long markerFieldPtr);
+    protected static native void ltt_getParsedData(int libId, ParsedObjectContent parseddata, long eventPtr, long markerFieldPtr);
     
     // *** HACK ***
     // We cannot use "Object" directly as java does not support swapping primitive value
@@ -68,7 +68,7 @@ public abstract class JniParser extends Jni_C_Common
         JniMarkerField tmpField = eventToParse.requestEventMarker().getMarkerFieldsArrayList().get(fieldPosition);
         
         // Call the parsing function in C. The result will be put in parsedData object
-        ltt_getParsedData(parsedData, eventToParse.getEventPtr().getPointer(), tmpField.getMarkerFieldPtr().getPointer() );
+        ltt_getParsedData(eventToParse.getEventPtr().getLibraryId(), parsedData, eventToParse.getEventPtr().getPointer(), tmpField.getMarkerFieldPtr().getPointer());
         
         return parsedData.getData();
     }
@@ -95,7 +95,7 @@ public abstract class JniParser extends Jni_C_Common
             return null;
         }
         
-        ltt_getParsedData(parsedData, eventToParse.getEventPtr().getPointer(), tmpField.getMarkerFieldPtr().getPointer() );
+        ltt_getParsedData(eventToParse.getEventPtr().getLibraryId(), parsedData, eventToParse.getEventPtr().getPointer(), tmpField.getMarkerFieldPtr().getPointer());
         
         return parsedData.getData();
     }
@@ -139,7 +139,7 @@ public abstract class JniParser extends Jni_C_Common
             newKey = iterator.next();
             newMarkerField = markerFieldData.get(newKey);
             // Call the C to parse the data
-            ltt_getParsedData(parsedData, eventToParse.getEventPtr().getPointer(), newMarkerField.getMarkerFieldPtr().getPointer() );
+            ltt_getParsedData(eventToParse.getEventPtr().getLibraryId(), parsedData, eventToParse.getEventPtr().getPointer(), newMarkerField.getMarkerFieldPtr().getPointer());
             // Save the result into the HashMap
             parsedDataMap.put(newMarkerField.getField(), parsedData.getData() );
         }
