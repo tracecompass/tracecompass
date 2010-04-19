@@ -45,20 +45,20 @@ public class HistogramView extends TmfView {
 	// *** TODO ***
 	// Here is what's left to do in this view
 	//
-	// 1-Run the full experiment request in parallel
+	// 1-Run the full experiment request in parallel (bug 309347)
 	// 		Right now, the request for the full experiment is queue just like any other request.
 	// 		This is not good : this request is very long and should run in the background independently that any other request
 	// 		We need to add a way to tell the request to "copy" the experiment and to run idependently on this experiment.
 	//		This is made possible because there is no lock on opened file in Unix, unlike other more retarded OSes. 
 	//
-	// 2-Implement an algorithm to correctly "enlarge/shrink/resize" the canvas
+	// 2-Implement an algorithm to correctly "enlarge/shrink/resize" the canvas (bug 309351)
 	//		It is very hard to resize canvas right now because one interval == fixed amount of pixels.
 	//		The best way to do would be to use a canvas that is a power of 2 (256, 512, ...) and
 	//			then to correlate the position to the closest power of two for the resolution. 
 	//		"Gap" could be filled by using an interval size of 2 pixels instead of 1.
 	//		It would also be very easy to enlarge or shrink the canvas while using that kind of algorithm.
 	//
-	// 3- Make sure all control are thread safe
+	// 3- Make sure all control are thread safe (bug 309348)
 	//		Right now, all the basic controls (i.e. Text and Label) are sensible to "Thread Access Exception" if
 	//			updated from different threads; we need to carefully decide when/where to redraw them.
 	//		This is a real problem since there is a lot of thread going on in this view.
@@ -340,24 +340,26 @@ public class HistogramView extends TmfView {
 	//
     /**
 	 * Method called when an experiment is updated (??).<p>
-	 * ...for now, reset everything and fire new requests.
+	 * ...for now, do nothing, as udating an experimen running in the background might cause crash 
 	 * 
 	 * @param signal	Signal received from the framework. Contain the experiment.
 	 */
-    @SuppressWarnings("unchecked")
+//    @SuppressWarnings("unchecked")
 	@TmfSignalHandler
     public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
-    	TmfExperiment<LttngEvent> tmpExperiment = (TmfExperiment<LttngEvent>)signal.getExperiment();
-    	
-    	// Make sure the UI object are sane
-		resetControlsContent();
-		
-		// Redraw the canvas right away to have something "clean" as soon as we can
-		fullExperimentCanvas.redraw();
-		selectedWindowCanvas.redraw();
-		
-		// Recreate the request
-		createCanvasAndRequests(tmpExperiment);
+    	System.out.println("experimentUpdated");
+//    	
+//    	TmfExperiment<LttngEvent> tmpExperiment = (TmfExperiment<LttngEvent>)signal.getExperiment();
+//    	
+//    	// Make sure the UI object are sane
+//		resetControlsContent();
+//		
+//		// Redraw the canvas right away to have something "clean" as soon as we can
+//		fullExperimentCanvas.redraw();
+//		selectedWindowCanvas.redraw();
+//		
+//		// Recreate the request
+//		createCanvasAndRequests(tmpExperiment);
     }
     
     /**
@@ -393,6 +395,8 @@ public class HistogramView extends TmfView {
     private void createCanvasAndRequests(TmfExperiment<LttngEvent> newExperiment) {
     	lastUsedExperiment = newExperiment;
     	
+    	TmfExperiment<LttngEvent> experimentCopy = newExperiment.createTraceCopy();
+    	
     	// Create the content for the full experiment. 
     	// This NEED to be created first, as we use it in the selectedWindowCanvas
 		fullExperimentCanvas.createNewHistogramContent( DEFAULT_WINDOW_SIZE, FULL_TRACE_BAR_WIDTH, FULL_TRACE_CANVAS_HEIGHT, FULL_TRACE_DIFFERENCE_TO_AVERAGE);
@@ -422,7 +426,7 @@ public class HistogramView extends TmfView {
 		// Perform both request. 
 		// Order is important here, the small/synchronous request for the selection window should go first
 		performSelectedWindowEventsRequest(newExperiment);
-		performAllTraceEventsRequest(newExperiment);
+		performAllTraceEventsRequest(experimentCopy);
     }
     
     /**
