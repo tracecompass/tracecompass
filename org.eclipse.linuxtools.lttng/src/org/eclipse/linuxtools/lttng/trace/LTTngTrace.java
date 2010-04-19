@@ -169,19 +169,45 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         			  				    	new LttngTimestamp(currentJniTrace.getEndTime().getTime())
                                       	  ) );
         }
-        
     }
     
     /*
      * Copy constructor is forbidden for LttngEvenmStream
      * 
-     * Events are only valid for a very limited period of time and
-     *   JNI library does not support multiple access at once (yet?).
-     * For this reason, copy constructor should NEVER be used.
      */
-    private LTTngTrace(LTTngTrace oldStream) throws Exception { 
-    	super(LttngEvent.class, null);
-    	throw new Exception("Copy constructor should never be use with a LTTngTrace!");
+    public LTTngTrace(LTTngTrace oldTrace) throws Exception { 
+    	this(oldTrace.getPath(), false, true);
+    	
+    	// *** VERIFY ***
+    	// Is this safe?
+    	this.fCheckpoints = oldTrace.fCheckpoints;
+    	
+    	/*
+    	// This would only work if the index is already done
+    	this.fCheckpoints = new Vector<TmfCheckpoint>( oldTrace.fCheckpoints.size() );
+    	for (int x = 0; x<oldTrace.fCheckpoints.size(); x++){
+    		TmfCheckpoint tmpCheckPoint = oldTrace.fCheckpoints.get(x);
+    		this.fCheckpoints.add( new TmfCheckpoint(tmpCheckPoint.getTimestamp(), tmpCheckPoint.getLocation()) );
+    	}
+    	*/
+    	
+    	// Set the start time of the trace
+    	setTimeRange( new TmfTimeRange( new LttngTimestamp(oldTrace.getStartTime()), 
+    			  				    	new LttngTimestamp(oldTrace.getEndTime()))
+                                  	  );
+    }
+    
+    public LTTngTrace createTraceCopy() { 
+    	LTTngTrace returnedTrace = null;
+    	
+    	try {
+    		returnedTrace = new LTTngTrace(this);
+    	}
+    	catch (Exception e) {
+    		System.out.println("ERROR : Could not create LTTngTrace copy (createTraceCopy).\nError is : " + e.getStackTrace());
+    	}
+    	
+    	return returnedTrace;
     }
     
     /*

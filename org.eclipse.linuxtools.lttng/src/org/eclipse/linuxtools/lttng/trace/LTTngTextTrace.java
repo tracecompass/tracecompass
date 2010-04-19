@@ -101,10 +101,27 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     }
     
     
-    private LTTngTextTrace(LTTngTrace oldStream) throws Exception { 
-    	super(LttngEvent.class, null);
-    	throw new Exception("Copy constructor should never be use with a LTTngTrace!");
+    public LTTngTextTrace(LTTngTextTrace oldTrace) throws Exception { 
+    	this(oldTrace.getPath(), true);
+    	
+    	// *** VERIFY ***
+    	// Is this safe?
+    	fCheckpoints = oldTrace.fCheckpoints;
     }
+    
+	public LTTngTextTrace createTraceCopy() {
+		
+		LTTngTextTrace returnedTrace = null;
+    	
+    	try {
+    		returnedTrace = new LTTngTextTrace(this);
+    	}
+    	catch (Exception e) {
+    		System.out.println("ERROR : Could not create LTTngTextTrace copy (createTraceCopy).\nError is : " + e.getStackTrace());
+    	}
+    	
+    	return returnedTrace;
+	}
     
     private boolean positionToFirstEvent() {
     	
@@ -411,7 +428,6 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 	public int getCpuNumber() {
     	return cpuNumber;
     }
-	
 }
 
 
