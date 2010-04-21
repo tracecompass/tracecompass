@@ -33,6 +33,27 @@ public interface ITimeDataProvider {
 
 	long getMinTimeInterval();
 
+	/**
+	 * Receive Notification when any of the buttons of the mouse switch back to
+	 * up position, this method may trigger time update notification to
+	 * listeners
+	 */
+	void mouseUp();
+
+	/**
+	 * Updates the time range and notify registered listeners
+	 * 
+	 * @param time0
+	 * @param time1
+	 */
+	void setStartFinishTimeNotify(long time0, long time1);
+
+	/**
+	 * Update the time range but do not trigger event notification
+	 * 
+	 * @param time0
+	 * @param time1
+	 */
 	void setStartFinishTime(long time0, long time1);
 
 	void setSelectedTimeInt(long time, boolean ensureVisible);

@@ -54,6 +54,8 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	private long _time1;
 	private long _time0_;
 	private long _time1_;
+	private long _time0_InLastEvent = 0;
+	private long _time1_InLastEvent = 0;
 	private boolean _timeRangeFixed;
 	private int _nameWidthPref = 200;
 	private int _minNameWidth = 6;
@@ -120,7 +122,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 			if (updateTimeBounds) {
 				_timeRangeFixed = true;
 				// set window to match limits
-				setStartFinishTimeExt(_time0_, _time1_);
+				setStartFinishTime(_time0_, _time1_);
 			} else {
 				_stateCtrl.redraw();
 				_timeScaleCtrl.redraw();
@@ -287,8 +289,8 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 			// individual processes
 			setTimeRange(traces);
 		} else {
-			_endTime = end;
 			_beginTime = start;
+			_endTime = end;
 		}
 
 		refreshAllData(traces);
@@ -379,12 +381,38 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		return _time0_;
 	}
 
-	public void setStartFinishTime(long time0, long time1) {
-		setStartFinishTimeExt(time0, time1);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.ITimeDataProvider
+	 * #mouseUp()
+	 */
+	public void mouseUp() {
+		// refresh listeners with the new selected time if changed
+		notifyStartFinishTimeSelectionListeners(_time0, _time1);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.ITimeDataProvider
+	 * #setStartFinishTimeNotify(long, long)
+	 */
+	public void setStartFinishTimeNotify(long time0, long time1) {
+		setStartFinishTime(time0, time1);
 		notifyStartFinishTimeSelectionListeners(time0, time1);
 	}
 
-	public void setStartFinishTimeExt(long time0, long time1) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.ITimeDataProvider
+	 * #setStartFinishTime(long, long)
+	 */
+	public void setStartFinishTime(long time0, long time1) {
 		_time0 = time0;
 		if (_time0 < _time0_)
 			_time0 = _time0_;
@@ -400,7 +428,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	}
 
 	public void resetStartFinishTime() {
-		setStartFinishTime(_time0_, _time1_);
+		setStartFinishTimeNotify(_time0_, _time1_);
 		_timeRangeFixed = false;
 	}
 
@@ -607,7 +635,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 			return;
 		}
 
-		setStartFinishTimeExt(time0, time1);
+		setStartFinishTime(time0, time1);
 	}
 
 	public void setAcceptSelectionAPIcalls(boolean acceptCalls) {
@@ -642,15 +670,22 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 
 	public void notifyStartFinishTimeSelectionListeners(long _time0, long _time1) {
 		if (widgetTimeScaleSelectionListners.size() > 0) {
-			// Notify Time Scale Selection Listeners
-			TmfTimeScaleSelectionEvent event = new TmfTimeScaleSelectionEvent(
-					this, _time0, _time1, getTimeSpace(), getSelectedTime());
+			// Check if the time has actually changed from last notification
+			if (_time0 != _time0_InLastEvent || _time1 != _time1_InLastEvent) {
+				// Notify Time Scale Selection Listeners
+				TmfTimeScaleSelectionEvent event = new TmfTimeScaleSelectionEvent(
+						this, _time0, _time1, getTimeSpace(), getSelectedTime());
 
-			for (Iterator<ITmfTimeScaleSelectionListener> iter = widgetTimeScaleSelectionListners
-					.iterator(); iter.hasNext();) {
-				ITmfTimeScaleSelectionListener listener = (ITmfTimeScaleSelectionListener) iter
-						.next();
-				listener.tsfTmProcessTimeScaleEvent(event);
+				for (Iterator<ITmfTimeScaleSelectionListener> iter = widgetTimeScaleSelectionListners
+						.iterator(); iter.hasNext();) {
+					ITmfTimeScaleSelectionListener listener = (ITmfTimeScaleSelectionListener) iter
+							.next();
+					listener.tsfTmProcessTimeScaleEvent(event);
+				}
+
+				// last time notification cache
+				_time0_InLastEvent = _time0;
+				_time1_InLastEvent = _time1;
 			}
 		}
 	}

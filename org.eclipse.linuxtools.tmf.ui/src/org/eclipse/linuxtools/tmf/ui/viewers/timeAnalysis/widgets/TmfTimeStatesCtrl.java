@@ -68,6 +68,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 	public static final boolean DEFAULT_DRAW_THREAD_JOIN = true;
 	public static final boolean DEFAULT_DRAW_THREAD_WAIT = true;
 	public static final boolean DEFAULT_DRAW_THREAD_RELEASE = true;
+	public static final Integer H_SCROLLBAR_MAX = Integer.MAX_VALUE;
 
 	private final double zoomCoeff = 1.5;
 
@@ -85,7 +86,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 	private int _dragX = 0;
 	private int _idealNameWidth = 0;
 	// TODO: 050409
-	private double _timeStep = 0.001;
+	// private double _timeStep = 0.001;
 	// private double _timeStep = 10000000;
 	private long _time0bak;
 	private long _time1bak;
@@ -217,6 +218,8 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 			getHorizontalBar().setValues(0, 1, 1, 1, 1, 1);
 			return;
 		}
+
+		// Vertical scroll bar
 		int page = countPerPage();
 		if (_topItem + page > _data._items.length)
 			_topItem = _data._items.length - page;
@@ -224,34 +227,34 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 			_topItem = 0;
 		getVerticalBar().setValues(_topItem, 0, _data._items.length, page, 1,
 				page);
+
+		// HORIZONTAL BAR
+		// Visible window
 		long time0 = _timeProvider.getTime0();
 		long time1 = _timeProvider.getTime1();
+		// Time boundaries
 		long timeMin = _timeProvider.getMinTime();
 		long timeMax = _timeProvider.getMaxTime();
-
-		// int timePage = (int) ((time1 - time0) / _timeStep);
-		// int timePos = (int) (time0 / _timeStep);
-		// int minimum = (int) (timeMin / _timeStep);
-		// int maximum = (int) (timeMax / _timeStep);
 
 		long delta = timeMax - timeMin;
 
 		int timePos = 0;
-		int timePage = 0;
-		// Trace.debug("time0 - time1 = " + (time0 - timeMin));
+		int thumb = 0;
+
 		if (delta != 0) {
-			timePage = (int) (((double) (time1 - time0) / _timeStep) / delta);
-			timePos = (int) (((double) (time0 - timeMin) / _timeStep) / delta);
+			// Thumb size (page size)
+			thumb = Math
+					.max(
+							1,
+							(int) (H_SCROLLBAR_MAX * ((double) (time1 - time0) / delta)));
+			// At the beginning of visible window
+			timePos = (int) (H_SCROLLBAR_MAX * ((double) (time0 - timeMin) / delta));
 		}
 
-		int minimum = 0;
-		int maximum = 1000;
-		// Trace.debug("time0:" + time0 + " time1:" + time1 + " timeStep:"
-		// + _timeStep + " delta:" + delta);
-		// Trace.debug("selection:" + timePos + " min:" + minimum + " maximum:"
-		// + maximum + " Page:" + timePage);
-		getHorizontalBar().setValues(timePos, minimum, maximum, timePage, 1,
-				timePage);
+		// position, minimum, maximum, thumb size, increment (half page)t, page
+		// increment size (full page)
+		getHorizontalBar().setValues(timePos, 0, H_SCROLLBAR_MAX, thumb,
+				Math.max(1, thumb / 2), Math.max(2, thumb));
 	}
 
 	boolean ensureVisibleItem(int idx, boolean redraw) {
@@ -430,7 +433,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		// + time1 + " inaccuracy:" + inaccuracy);
 
 		if (inaccuracy > 0 && inaccuracy < 100) {
-			_timeProvider.setStartFinishTime(_timeProvider.getMinTime(),
+			_timeProvider.setStartFinishTimeNotify(_timeProvider.getMinTime(),
 					_timeProvider.getMaxTime());
 			return;
 		}
@@ -441,7 +444,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 			time1 = time0 + m;
 		}
 
-		_timeProvider.setStartFinishTime(time0, time1);
+		_timeProvider.setStartFinishTimeNotify(time0, time1);
 	}
 
 	public void zoomOut() {
@@ -458,12 +461,12 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 				.getMinTime())
 				- (time1 - time0);
 		if (inaccuracy > 0 && inaccuracy < 100) {
-			_timeProvider.setStartFinishTime(_timeProvider.getMinTime(),
+			_timeProvider.setStartFinishTimeNotify(_timeProvider.getMinTime(),
 					_timeProvider.getMaxTime());
 			return;
 		}
 
-		_timeProvider.setStartFinishTime(time0, time1);
+		_timeProvider.setStartFinishTimeNotify(time0, time1);
 	}
 
 	public void groupTraces(boolean on) {
@@ -1763,6 +1766,9 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 			}
 			_dragState = 0;
 		}
+
+		// Notify time provider to check the need for listener notification
+		_timeProvider.mouseUp();
 	}
 
 	public void controlMoved(ControlEvent e) {
@@ -1791,17 +1797,25 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 
 			long range = time1 - time0;
 			// _timeRangeFixed = true;
-			time0 = timeMin + (long) ((double) (startTime * _timeStep) * delta);
+			time0 = timeMin
+					+ (long) ((double) ((startTime * delta) / H_SCROLLBAR_MAX));
 			time1 = time0 + range;
 			// Trace.debug("\nstartTime:" + startTime + " time0:" + time0
 			// + " time1:" + time1 + " Delta:" + delta);
-			_timeProvider.setStartFinishTime(time0, time1);
+			_timeProvider.setStartFinishTimeNotify(time0, time1);
 		}
 	}
 
 	public void mouseEnter(MouseEvent e) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.MouseTrackListener#mouseExit(org.eclipse.swt.events
+	 * .MouseEvent)
+	 */
 	public void mouseExit(MouseEvent e) {
 		if (_mouseHover) {
 			_mouseHover = false;

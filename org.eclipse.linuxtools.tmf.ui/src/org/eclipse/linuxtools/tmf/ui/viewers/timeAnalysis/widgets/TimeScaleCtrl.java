@@ -288,6 +288,9 @@ public class TimeScaleCtrl extends TraceCtrl implements MouseListener,
 				_timeProvider.setStartFinishTime(time0, time1);
 			}
 		}
+
+		// Notify time provider to check the need for listener notification
+		_timeProvider.mouseUp();
 	}
 
 	public void mouseMove(MouseEvent e) {
