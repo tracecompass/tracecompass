@@ -18,6 +18,7 @@ import org.eclipse.linuxtools.tmf.tests.request.TmfCoalescedDataRequestTest;
 import org.eclipse.linuxtools.tmf.tests.request.TmfCoalescedEventRequestTest;
 import org.eclipse.linuxtools.tmf.tests.request.TmfDataRequestTest;
 import org.eclipse.linuxtools.tmf.tests.request.TmfEventRequestTest;
+import org.eclipse.linuxtools.tmf.tests.request.TmfRequestExecutorTest;
 import org.eclipse.linuxtools.tmf.tests.trace.TmfExperimentTest;
 import org.eclipse.linuxtools.tmf.tests.trace.TmfMultiTraceExperimentTest;
 import org.eclipse.linuxtools.tmf.tests.trace.TmfTraceTest;
@@ -43,7 +44,7 @@ public class AllTmfCoreTests {
 		suite.addTestSuite(TmfEventRequestTest.class);
 		suite.addTestSuite(TmfCoalescedDataRequestTest.class);
 		suite.addTestSuite(TmfCoalescedEventRequestTest.class);
-//		suite.addTestSuite(TmfRequestExecutorTest.class);
+		suite.addTestSuite(TmfRequestExecutorTest.class);
 
 		suite.addTestSuite(TmfEventProviderTest.class);
 		suite.addTestSuite(TmfProviderManagerTest.class);

@@ -26,21 +26,42 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class TmfRequestExecutor implements Executor {
 
 	private final ExecutorService fExecutor;
-	private final Queue<Runnable> fRequests = new LinkedBlockingQueue<Runnable>();
-	private Runnable fRequest;
+	private final Queue<Runnable> fRequestQueue = new LinkedBlockingQueue<Runnable>();
+	private Runnable fCurrentRequest;
 	
-	public TmfRequestExecutor(ExecutorService executor) {
-		fExecutor = executor;
-	}
-
+	// ------------------------------------------------------------------------
+	// Constructors
+	// ------------------------------------------------------------------------
+	
 	public TmfRequestExecutor() {
 		this(Executors.newSingleThreadExecutor());
 	}
 
-	public void start() {
-		// Nothing to do
+	public TmfRequestExecutor(ExecutorService executor) {
+		fExecutor = executor;
 	}
 
+	/**
+	 * @return the number of pending requests
+	 */
+	public int getNbPendingRequests() {
+		return fRequestQueue.size();
+	}
+	
+	/**
+	 * @return the shutdown state (i.e. if it is accepting new requests)
+	 */
+	public boolean isShutdown() {
+		return fExecutor.isShutdown();
+	}
+	
+	/**
+	 * @return the termination state
+	 */
+	public boolean isTerminated() {
+		return fExecutor.isTerminated();
+	}
+	
 	/**
 	 * Stops the executor
 	 */
@@ -48,11 +69,15 @@ public class TmfRequestExecutor implements Executor {
 		fExecutor.shutdown();
 	}
 	
+	// ------------------------------------------------------------------------
+	// Operations
+	// ------------------------------------------------------------------------
+	
 	/* (non-Javadoc)
 	 * @see java.util.concurrent.Executor#execute(java.lang.Runnable)
 	 */
 	public synchronized void execute(final Runnable request) {
-		fRequests.offer(new Runnable() {
+		fRequestQueue.offer(new Runnable() {
 			public void run() {
 				try {
 					request.run();
@@ -61,7 +86,7 @@ public class TmfRequestExecutor implements Executor {
 				}
 			}
 		});
-		if (fRequest == null) {
+		if (fCurrentRequest == null) {
 			scheduleNext();
 		}
 	}
@@ -70,19 +95,18 @@ public class TmfRequestExecutor implements Executor {
 	 * Executes the next pending request, if applicable.
 	 */
 	protected synchronized void scheduleNext() {
-		if ((fRequest = fRequests.poll()) != null) {
-			fExecutor.execute(fRequest);
+		if ((fCurrentRequest = fRequestQueue.poll()) != null) {
+			fExecutor.execute(fCurrentRequest);
 		}
 	}
 
-	/**
-	 * Queues the request and schedules it.
-	 * 
-	 * @param request the request to service
-	 */
-	public synchronized void queueRequest(Runnable request) {
-		fRequests.add(request);
-		scheduleNext();
+	// ------------------------------------------------------------------------
+	// Object
+	// ------------------------------------------------------------------------
+
+	@Override
+	public String toString() {
+		return "[TmfRequestExecutor(" + fExecutor.getClass().getSimpleName() + "" + ")]";
 	}
 
 }

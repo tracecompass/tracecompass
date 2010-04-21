@@ -190,7 +190,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 				request.done();
 			}
 		};
-		fExecutor.queueRequest(thread);
+		fExecutor.execute(thread);
 	}
 
 	/**
