@@ -19,27 +19,38 @@ package org.eclipse.linuxtools.lttng.ui.views.histogram;
  * <p>
  */
 public class HistogramContent {
+	// Start and end time of the content
+	protected Long 		startTime = 0L;
+	protected Long 		endTime   = 0L;
 	
-	private Long 	startTime = 0L;
-	private Long 	endTime   = 0L;
-	
-	private Long	elementsTimeInterval = 0L;
-	private Double 	heightFactor = 0.0;
-	private Long   	heighestEventCount = 0L;
-	private Integer maxHeight	 = 0;
+	// Some information about the content
+	// Most of them are required to calculate position and/or draw
+	// Make sure they stay consistent!
+	protected Long		elementsTimeInterval = 0L;
+	protected Double 	heightFactor = 0.0;
+	protected Long   	heighestEventCount = 0L;
+	protected Integer 	maxHeight	 = 0;
+	protected Integer	canvasWindowSize = 0;
+	protected Integer 	barsWidth = 0;
 	
 	// This value is used to calculate at which point we should "cut" bar that are too tall.
 	// Default value is large enought so that no bar should be cut
-	private Double  maxDifferenceToAverage = HistogramConstant.DEFAULT_DIFFERENCE_TO_AVERAGE;
+	protected Double  maxDifferenceToAverage = HistogramConstant.DEFAULT_DIFFERENCE_TO_AVERAGE;
 	
-	private Integer	readyUpToPosition = 0;
-	private Integer	canvasFullSize = 0;
+	// By default we will only consider element up to this position 
+	protected Integer	readyUpToPosition = 0;
 	
-	private Integer	averageNumberOfEvents = 0;
+	// The average number of events in the content
+	// Note : this IS needed to draw
+	protected Integer	averageNumberOfEvents = 0;
 	
-	private Long selectedEventTimeInWindow = 0L;
+	// This is to draw the selected event of the TMF framework in another color
+	// Set the 0 to ignore
+	protected Long selectedEventTimeInWindow = -1L;
 	
-	private HistogramElement[] elementTable;
+	// The table that hold the elements
+	protected HistogramElement[] elementTable;
+	
 	
 	/**
 	 * Default constructor for the HistogramContent.
@@ -48,8 +59,8 @@ public class HistogramContent {
 	 * @param newCanvasSize		The full size of the canvas. Used for positionning; need to be consistent with canvas.
 	 * @param newMaxHeight		The maximum height of a bar, usually same as the height of the canvas.
 	 */
-	public HistogramContent(Integer tableSize, Integer newCanvasSize, Integer newMaxHeight) {
-		this(tableSize, newCanvasSize, newMaxHeight, HistogramConstant.DEFAULT_DIFFERENCE_TO_AVERAGE);
+	public HistogramContent(Integer tableSize, Integer newCanvasSize, Integer newBarWidth, Integer newMaxHeight) {
+		this(tableSize, newCanvasSize, newBarWidth, newMaxHeight, HistogramConstant.DEFAULT_DIFFERENCE_TO_AVERAGE);
 	}
 	
 	/**
@@ -60,10 +71,13 @@ public class HistogramContent {
 	 * @param newMaxHeight		The maximum height of a bar, usually same as the height of the canvas.
 	 * @param newDiffToAverage  This value at which point we "cut" bar that are too tall.
 	 */
-	public HistogramContent(Integer tableSize, Integer newCanvasSize, Integer newMaxHeight, Double newDiffToAverage) {
-		canvasFullSize = newCanvasSize;
+	public HistogramContent(Integer tableSize, Integer newCanvasSize, Integer newBarWidth, Integer newMaxHeight, Double newDiffToAverage) {
+		canvasWindowSize = newCanvasSize;
+		barsWidth = newBarWidth;
 		maxHeight = newMaxHeight;
-		maxDifferenceToAverage = newDiffToAverage;
+		
+		// Max difference is a bit special, we need to call set
+		setMaxDifferenceToAverage(newDiffToAverage);
 		
 		// Create a new element table from the above value
 		// The table will not get initialized until resetTable() is called. 
@@ -81,7 +95,7 @@ public class HistogramContent {
 		
 		for ( int x=0; x<elementTable.length; x++) {
 			elementTable[x] = new HistogramElement();
-			elementTable[x].position = x;
+			elementTable[x].index = x;
 		}
 	}
 	
@@ -105,7 +119,7 @@ public class HistogramContent {
 	 */
 	public void resetTable() {
 		for ( int x=0; x<elementTable.length; x++) {
-			elementTable[x].position = x;
+			elementTable[x].index = x;
 			elementTable[x].firstIntervalTimestamp = startTime + (x*elementsTimeInterval);
 			elementTable[x].intervalNbEvents = 0L;
 			elementTable[x].intervalHeight = 0;
@@ -139,7 +153,7 @@ public class HistogramContent {
 		recalculateElementsTimeInterval(newStartTime, newEndTime);
 		
 		for ( int x=0; x<elementTable.length; x++) {
-			elementTable[x].position = x;
+			elementTable[x].index = x;
 			elementTable[x].firstIntervalTimestamp = startTime + (x*elementsTimeInterval);
 			elementTable[x].intervalNbEvents = 0L;
 			elementTable[x].intervalHeight = 0;
@@ -153,7 +167,7 @@ public class HistogramContent {
 	 */
 	public void clearTable() {
 		for ( int x=0; x<elementTable.length; x++) {
-			elementTable[x].position = x;
+			elementTable[x].index = x;
 			elementTable[x].firstIntervalTimestamp = 0L;
 			elementTable[x].intervalNbEvents = 0L;
 			elementTable[x].intervalHeight = 0;
@@ -225,7 +239,7 @@ public class HistogramContent {
 	
 	/**
 	 * Return the closest element to a X position on the canvas.<p>
-	 * Note : canvasFullSize need to be set correctly here, otherwise unexpected element might be returned.<p>
+	 * Note : canvasWindowSize need to be set correctly here, otherwise unexpected element might be returned.<p>
 	 * <p>
 	 * NOTE : This <b>ALWAYS</b> return an element; 
 	 * 		If calculation lead outside the table, the first or the last element will be returned.  
@@ -236,7 +250,7 @@ public class HistogramContent {
 	 */
 	public HistogramElement getClosestElementFromXPosition(Integer position) {
 		
-		int index = (int)(  ((double)elementTable.length)*((double)position/(double)canvasFullSize) );
+		int index = (int)Math.ceil((double)elementTable.length * ((double)position / (double)canvasWindowSize) );
 		
 		// If we are out of bound, return the closest border (first or last element)
 		if ( index < 0) {
@@ -251,7 +265,7 @@ public class HistogramContent {
 	
 	/**
 	 * Return the closest element's timestamp to a X position on the canvas.<p>
-	 * Note : canvasFullSize need to be set correctly here, otherwise unexpected timestamp might be returned.<p>
+	 * Note : canvasWindowSize need to be set correctly here, otherwise unexpected timestamp might be returned.<p>
 	 * <p>
 	 * NOTE : This <b>ALWAYS</b> return a timestamp; 
 	 * 		If calculation lead outside the table, the first or the last timestamp will be returned.  
@@ -266,7 +280,7 @@ public class HistogramContent {
 	
 	/**
 	 * Return the X position (relative to the canvas) of a certain element.<p>
-	 * Note : canvasFullSize need to be set correctly here, otherwise unexpected element might be returned.<p>
+	 * Note : canvasWindowSize need to be set correctly here, otherwise unexpected element might be returned.<p>
 	 * 
 	 * NOTE : This <b>ALWAYS</b> return an element; 
 	 * 		If calculation lead outside the table, the first or the last element will be returned.
@@ -276,7 +290,7 @@ public class HistogramContent {
 	 * @return					The <i>closest</i> found element. 
 	 */
 	public int getXPositionFromElement(HistogramElement targetElement) {
-		return (int)( ((double)targetElement.position / (double)elementTable.length)*(double)canvasFullSize );
+		return (int)Math.ceil( ((double)targetElement.index / (double)elementTable.length)*(double)canvasWindowSize );
 	}
 	
 	/**
@@ -434,7 +448,7 @@ public class HistogramContent {
 			totalNbEvents += elementTable[x].intervalNbEvents;
 		}
 		// Calculate the average here
-		averageNumberOfEvents = totalNbEvents / nbInterval;
+		averageNumberOfEvents = (int)((double)totalNbEvents / (double)nbInterval);
 	}
 	
 	/**
@@ -561,17 +575,24 @@ public class HistogramContent {
 		}
 	}
 	
-	// *** TODO ***
-	// It is not possible for now to resize the canvas without creating a new content.
-	// We need to implement this somehow.
 	/**
 	 * Getter for the full size of the canvas.<p>
 	 * This is used for the positionnal calculation so should be consistent with the real canvas size.
 	 * 
 	 * @return	Size of the canvas we currently use.
 	 */
-	public Integer getCanvasFullSize() {
-		return canvasFullSize;
+	public Integer getCanvasWindowSize() {
+		return canvasWindowSize;
+	}
+	
+	/**
+	 * Set a new full size of the canvas.<p>
+	 * This is used for the positionnal calculation so should be consistent with the real canvas size.
+	 * 
+	 * @param	newSize	New canvas size;
+	 */
+	public void setCanvasWindowSize(Integer newSize) {
+		canvasWindowSize = newSize;
 	}
 	
 	/**
@@ -647,12 +668,13 @@ public class HistogramContent {
 	 * This determine at which point a bar too tall is "cut". Set a very large value (like 1000.0) to ignore.
 	 * 
 	 * Note : this is used in some drawing calculation so make sure this number make sense.
+	 * Note : the given number is multiplied by the bar width, as we have bigger bar (so more events as average to consider)
 	 * Note : you might want to call recalculateEventHeight() if you change this.
 	 * 
 	 * @param newDiffToAverage	The new maximum difference to the average to use.
 	 */
 	public void setMaxDifferenceToAverage(Double newDiffToAverage) {
-		maxDifferenceToAverage = newDiffToAverage;
+		maxDifferenceToAverage = (newDiffToAverage*barsWidth);
 	}
 	
 	
@@ -708,6 +730,26 @@ public class HistogramContent {
 	 */
 	public void setReadyUpToPosition(int newReadyUpToPosition) {
 		this.readyUpToPosition = newReadyUpToPosition;
+	}
+	
+	/**
+	 * Getter for the bar width.<p>
+	 * This is needed by the paint listener usually.
+	 * 
+	 * @return current bars width;
+	 */
+	public Integer getBarsWidth() {
+		return barsWidth;
+	}
+	
+	/**
+	 * Setter for the bar width.<p>
+	 * Setting this to 0 will hide all the bar in the histogram.
+	 * 
+	 * @param newBarsWidth new bars width;
+	 */
+	public void setBarsWidth(Integer newBarsWidth) {
+		this.barsWidth = newBarsWidth;
 	}
 	
 }

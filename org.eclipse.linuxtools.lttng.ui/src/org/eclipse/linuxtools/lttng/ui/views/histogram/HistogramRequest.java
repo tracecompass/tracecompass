@@ -23,20 +23,20 @@ import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
  * <p>
  */
 public class HistogramRequest extends TmfEventRequest<LttngEvent> {
-	private HistogramContent histogramContent = null;
+	protected HistogramContent histogramContent = null;
 	
-	private Integer lastInterval = 0;
-	private Long 	lastRangeTime = 0L;
-	private Long 	nbEventsInInterval = 1L;
+	protected Integer 	lastInterval = 0;
+	protected Long 		lastRangeTime = 0L;
+	protected Long 		nbEventsInInterval = 1L;
 	
-	private Integer nbIntervalNotEmpty = 1;
-	private Integer nbEventRead = 0;
+	protected Integer 	nbIntervalNotEmpty = 1;
+	protected Integer 	nbEventRead = 0;
 	
-	private Integer	lastDrawPosition = 0;
+	protected Integer	lastDrawPosition = 0;
 	
-	private HistogramCanvas parentCanvas = null;
+	protected Boolean 	requestCompleted = false;
 	
-	private Boolean requestCompleted = false;
+	protected HistogramCanvas parentCanvas = null;
 	
 	/**
 	 * Constructor for HistogramRequest.<p>

@@ -36,21 +36,25 @@ import org.eclipse.swt.widgets.Text;
  */
 public class TimeTextGroup implements FocusListener, KeyListener {
 	
-    private static final String 	NANOSEC_LABEL = "sec";
-    private static final String		LONGEST_STRING_VALUE = "." + Long.MAX_VALUE;
-    private static final Integer	MAX_CHAR_IN_TEXTBOX = LONGEST_STRING_VALUE.length();
+	protected static final String 	NANOSEC_LABEL = "sec";
+	protected static final String	LONGEST_STRING_VALUE = "." + Long.MAX_VALUE;
+	protected static final Integer	MAX_CHAR_IN_TEXTBOX = LONGEST_STRING_VALUE.length();
     
     // The "small font" height used to display time will be "default font" minus this constant
-    private static final Integer SMALL_FONT_MODIFIER = 1;
+	protected static final Integer VERY_SMALL_FONT_MODIFIER = 2;
+    protected static final Integer SMALL_FONT_MODIFIER = 1;
     
-    private HistogramView parentView = null;
-    private AsyncTimeTextGroupRedrawer asyncRedrawer = null;
+    // Indentation size 
+    protected static final Integer DEFAULT_INDENT_SIZE = 10;
     
-    private Group 	grpName 	= null;
-    private Text 	txtNanosec 	= null;
-    private Label 	lblNanosec 	= null;
+    protected HistogramView parentView = null;
+    protected AsyncTimeTextGroupRedrawer asyncRedrawer = null;
     
-    private Long 	timeValue 	= 0L; 
+    protected Group grpName 	= null;
+    protected Text 	txtNanosec 	= null;
+    protected Label lblNanosec 	= null;
+    
+    protected Long 	timeValue 	= 0L; 
     
     /**
      * Default Constructor.<p>
@@ -61,7 +65,20 @@ public class TimeTextGroup implements FocusListener, KeyListener {
      * @param groupStyle		Style of the group.   Anything that suite a Text
      */
     public TimeTextGroup(HistogramView newParentView, Composite parent, int textStyle, int groupStyle) {
-    	this(newParentView, parent, textStyle, groupStyle, "", HistogramConstant.formatNanoSecondsTime(0L));
+    	this(newParentView, parent, textStyle, groupStyle, "", HistogramConstant.formatNanoSecondsTime(0L), false);
+    }
+    
+    /**
+     * Default Constructor with adjustement for small screen.<p>
+     * 
+     * @param newParentView		Parent HistogramView
+     * @param parent			Parent Composite, used to position the inner controls.
+     * @param textStyle			Style of the textbox. Usually SWT.BORDER or SWT.NONE (or anything that suit a Text)
+     * @param groupStyle		Style of the group.   Anything that suite a Text
+     * @param isSpaceSaverNeeded Value that tell if we try to save some space in the control.
+     */
+    public TimeTextGroup(HistogramView newParentView, Composite parent, int textStyle, int groupStyle, boolean isSpaceSaverNeeded) {
+    	this(newParentView, parent, textStyle, groupStyle, "", HistogramConstant.formatNanoSecondsTime(0L), isSpaceSaverNeeded);
     }
     
     /**
@@ -75,11 +92,49 @@ public class TimeTextGroup implements FocusListener, KeyListener {
      * @param textValue         Value of the textbox.
      */
     public TimeTextGroup(HistogramView newParentView, Composite parent, int textStyle, int groupStyle, String groupValue, String textValue) {
+    	this(newParentView, parent, textStyle, groupStyle, groupValue, textValue, false);
+    }
+    
+    /**
+     * Default Constructor with adjustement for small screen, allow you to give the groupname and the textbox value.<p>
+     * 
+     * @param newParentView		Parent HistogramView
+     * @param parent			Parent Composite, used to position the inner controls.
+     * @param textStyle			Style of the textbox. Usually SWT.BORDER or SWT.NONE (or anything that suit a Text)
+     * @param groupStyle		Style of the group.   Anything that suite a Text
+     * @param groupValue		Value (label) of the group. 
+     * @param textValue         Value of the textbox.
+     * @param isSpaceSaverNeeded Value that tell if we try to save some space in the control.
+     */
+    public TimeTextGroup(HistogramView newParentView, Composite parent, int textStyle, int groupStyle, String groupValue, String textValue, boolean isSpaceSaverNeeded) {
     	Font font = parent.getFont();
 		FontData tmpFontData = font.getFontData()[0];
-		// We will use a slightly smaller font than the default one to show, we calculate it here
-		Font smallFont = new Font(font.getDevice(), tmpFontData.getName(), tmpFontData.getHeight()-SMALL_FONT_MODIFIER, tmpFontData.getStyle());
-    	
+		
+		Font smallFont = null;
+		int textBoxSize = -1;
+		int indentSize = -1;
+		
+		// If we were asked to save size, calculate the correct value here
+		if ( isSpaceSaverNeeded == true ) {
+			smallFont = new Font(font.getDevice(), tmpFontData.getName(), tmpFontData.getHeight()-VERY_SMALL_FONT_MODIFIER, tmpFontData.getStyle());
+			
+			// No minimum textBoxSize and no indent size
+			textBoxSize = 0;
+	        indentSize = 0;
+		}
+		else {
+			// We use only a slightly smaller font
+			smallFont = new Font(font.getDevice(), tmpFontData.getName(), tmpFontData.getHeight()-SMALL_FONT_MODIFIER, tmpFontData.getStyle());
+			
+			// ** Creation of the textbox
+	        // Calculate the optimal size of the textbox already
+	        // This will avoid the control to move around and resize when bigger value are given 
+	        textBoxSize = HistogramConstant.getTextSizeInControl(parent, LONGEST_STRING_VALUE);
+			
+	        // Default indent
+	        indentSize = DEFAULT_INDENT_SIZE;
+		}
+			
 		parentView = newParentView;
 		
 		// ** Creation of the group
@@ -91,18 +146,13 @@ public class TimeTextGroup implements FocusListener, KeyListener {
         grpName.setFont(smallFont);
         grpName.setLayout(gridLayoutgroup);
         
-        // ** Creation of the textbox
-        // Calculate the optimal size of the textbox already
-        // This will avoid the control to move around and resize when bigger value are given 
-        int textBoxSize = HistogramConstant.getTextSizeInControl(parent, LONGEST_STRING_VALUE);
         txtNanosec = new Text(grpName, textStyle);
         txtNanosec.setTextLimit( MAX_CHAR_IN_TEXTBOX );
         txtNanosec.setText( textValue );
         txtNanosec.setFont(smallFont);
         GridData gridDataTextBox = new GridData(SWT.LEFT, SWT.CENTER, true, false);
-        gridDataTextBox.horizontalIndent = 10;
+        gridDataTextBox.horizontalIndent = indentSize;
         gridDataTextBox.verticalIndent = 0;
-        gridDataTextBox.widthHint = textBoxSize;
         gridDataTextBox.minimumWidth = textBoxSize;
         txtNanosec.setLayoutData(gridDataTextBox);
         
@@ -111,7 +161,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
         lblNanosec.setText(NANOSEC_LABEL);
         lblNanosec.setFont(smallFont);
         GridData gridDataLabel = new GridData(SWT.LEFT, SWT.CENTER, false, false);
-        gridDataLabel.horizontalIndent = 10;
+        gridDataLabel.horizontalIndent = indentSize;
         gridDataLabel.verticalIndent = 0;
         lblNanosec.setLayoutData(gridDataLabel);
         
@@ -122,7 +172,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
     /*
      * Create and add all listeners needed by our control.<p>
      */
-    private void addNeededListeners() {
+    protected void addNeededListeners() {
     	
     	// AsyncCanvasRedrawer is an internal class
 		// This is used to redraw the canvas without danger from a different thread
@@ -283,7 +333,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
      * This function is called when an user enter a new string in the control by hand.<p>
      * It will ensure the format of the String is valid.
      */
-    private void handleNewStringValue() {
+	protected void handleNewStringValue() {
     	String valueInText = txtNanosec.getText();
 		Long valueAsLong = HistogramConstant.convertStringToNanoseconds(valueInText);
 		

@@ -32,6 +32,7 @@ public class HistogramCanvas extends Canvas
 	protected HistogramCanvasMouseListener 		mouseListener = null;
 	protected HistogramCanvasKeyListener 		keyListener   = null;
 	protected HistogramCanvasFocusListener  	focusListener = null;
+	protected HistogramCanvasControlListener	controlListener = null;
 	
 	protected HistogramSelectedWindow currentWindow = null;
 	
@@ -45,59 +46,101 @@ public class HistogramCanvas extends Canvas
 	public HistogramCanvas(Composite parent, Integer style) {
 		super(parent, style);
 		addNeededListeners();
+		
+		// New selected window, not visible by default
+		createNewSelectedWindow(0L);
 	}
 	
 	/*
 	 * Create the needed "event listeners" and hook them to the Canvas.
+	 */
+	protected void addNeededListeners() {
+		createAndAddCanvasRedrawer();
+		createAndAddPaintListener();
+		createAndAddMouseListener();
+		createAndAddKeyListener();
+		createAndAddFocusListener();
+		createAndAddControlListener();
+	}
+	
+	/*
+	 * Create a canvas redrawer and bind it to this canvas.<p>
+	 * 
+	 * Note : AsyncCanvasRedrawer is an internal class
+	 * 	This is used to redraw the canvas from a different thread 
+	 * 		without^H^H^H with less danger.
+	 */
+	protected void createAndAddCanvasRedrawer() {
+		canvasRedrawer = new AsyncCanvasRedrawer(this);
+	}
+	
+	/*
+	 * Create a histogram paint listener and bind it to this canvas.<p>
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramCanvasPaintListener
-	 * @see org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramCanvasMouseListener
-	 * @see org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramCanvasKeyListener
-	 * @see org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramCanvasFocusListener
 	 */
-	private void addNeededListeners() {
-		// AsyncCanvasRedrawer is an internal class
-		// This is used to redraw the canvas without danger from a different thread
-		canvasRedrawer = new AsyncCanvasRedrawer(this);
-		
+	protected void createAndAddPaintListener() {
 		paintListener = new HistogramCanvasPaintListener(this);
-		mouseListener = new HistogramCanvasMouseListener(this);
-		keyListener   = new HistogramCanvasKeyListener(this);
-		focusListener = new HistogramCanvasFocusListener(this);
-		
 		this.addPaintListener( paintListener );
+	}
+	
+	/*
+	 * Create a histogram mouse listener and bind it to this canvas.<p>
+	 * Note : this mouse listener handle the mouse, the move and the wheel at once.
+	 * 
+	 * @see org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramCanvasMouseListener
+	 */
+	protected void createAndAddMouseListener() {
+		mouseListener = new HistogramCanvasMouseListener(this);
 		this.addMouseListener(mouseListener);
 		this.addMouseMoveListener(mouseListener);
 		this.addMouseWheelListener(mouseListener);
+	}
+	
+	/*
+	 * Create a histogram key listener and bind it to this canvas.<p>
+	 * 
+	 * @see org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramCanvasKeyListener
+	 */
+	protected void createAndAddKeyListener() {
+		keyListener   = new HistogramCanvasKeyListener(this);
 		this.addKeyListener(keyListener);
+	}
+	
+	/*
+	 * Create a histogram focus listener and bind it to this canvas.<p>
+	 * 
+	 *  @see org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramCanvasFocusListener
+	 */
+	protected void createAndAddFocusListener() {
+		focusListener = new HistogramCanvasFocusListener(this);
 		this.addFocusListener(focusListener);
+	}
+	
+	/*
+	 * Create a histogram control listener and bind it to this canvas.<p>
+	 * 
+	 *  @see org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramCanvasControlListener
+	 */
+	protected void createAndAddControlListener() {
+		controlListener = new HistogramCanvasControlListener(this);
+		this.addControlListener(controlListener);
 	}
 	
 	/**
 	 * Create a new HistogramContent for this HistogramCanvas<p>
-	 * A new <I>empty</I> canvas will then be created.
+	 * A new <I>empty</I> content will then be created.
 	 * 
 	 * IMPORTANT NOTE : Canvas size, bar width and bar height need to be known at this point, as these dimension are used to create a content 
-	 * 						of the correct size. This function should be recalled if the canvas size change.
+	 * 						of the correct size.
 	 * 
-	 * NOTE 		  : The selection windows won't be draw until its visible field is set to true. 
-	 * 
-	 * @param windowSize					Size of the selection window. Set to something very small (0?) if not needed.
+	 * @param canvasSize					Size of the parent canvas.
 	 * @param widthPerBar					Width of the histogram "bars"
 	 * @param barsHeight   					Height of the histogram "bars"
 	 * @param maxBarsDifferenceToAverage	Factor used to "chop" bars that are too tall. Set to something big (100.0?) if not needed.
 	 */
-	public void createNewHistogramContent(Long windowSize, Integer widthPerBar, Integer barsHeight, Double maxBarsDifferenceToAverage) {
-		histogramContent = new HistogramContent( getSize().x / widthPerBar, getSize().x, barsHeight, maxBarsDifferenceToAverage);
-		
-		// *** FIXME ***
-		// paintlistener need to know about the new content...
-		// This is nowhere near elegant, change me.
-		paintListener.setHistogramContent(histogramContent);
-		paintListener.setBarWidth(widthPerBar);
-		
-		// New selected window, not visible by default
-		createNewSelectedWindow(windowSize);
+	public void createNewHistogramContent(Integer canvasSize, Integer widthPerBar, Integer barsHeight, Double maxBarsDifferenceToAverage) {
+		histogramContent = new HistogramContent( canvasSize / widthPerBar, canvasSize, widthPerBar, barsHeight, maxBarsDifferenceToAverage);
 	}
 	
 	/**
@@ -112,9 +155,6 @@ public class HistogramCanvas extends Canvas
 		
 		currentWindow.setWindowTimeWidth(windowTimeDuration);
 		currentWindow.setWindowXPositionCenter(0);
-		
-		// Warn the paint listener about the new window
-		paintListener.setSelectedWindow(currentWindow);
 	}
 	
 	public HistogramContent getHistogramContent() {

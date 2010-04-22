@@ -18,11 +18,11 @@ import org.eclipse.swt.widgets.Composite;
  * <p>
  * Extended implementation of the HistogramCanvas.
  * <p>
- * This canvas goal is to display the "SelectionWindow" in details. 
+ * This canvas goal is to display the "Full experiment" histogram. 
  */
 public class ParentHistogramCanvas extends HistogramCanvas {
 	
-	private HistogramView parentHistogramWindow = null; 
+	protected HistogramView parentHistogramWindow = null; 
 	
 	/**
 	 * ParentHistogramCanvas constructor.<p>
@@ -35,6 +35,50 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 		super(parent, style);
 		
 		parentHistogramWindow = newParentWindow;
+	}
+	
+	/**
+	 * Create a new HistogramContent for this HistogramCanvas<p>
+	 * A new <I>empty</I> canvas will then be created.
+	 * 
+	 * IMPORTANT NOTE : This implementaton use the next power of 2 to the full screen resolution as the content size.
+	 * 					This allow us to resize the canvas at low cost (i.e. : no need to reissue a full request)
+	 * 					We need a "particular" paint listener that know about this.
+	 * 
+	 * @param canvasSize					Size of the parent canvas.
+	 * @param widthPerBar					Width of the histogram "bars"
+	 * @param barsHeight   					Height of the histogram "bars"
+	 * @param maxBarsDifferenceToAverage	Factor used to "chop" bars that are too tall. Set to something big (100.0?) if not needed.
+	 */
+	@Override
+	public void createNewHistogramContent(Integer canvasSize, Integer widthPerBar, Integer barsHeight, Double maxBarsDifferenceToAverage) {
+		
+		// *** FIXME ***
+		// Note there MIGHT be some unhandled case, like if the resolution of the screen change 
+		//		or if a new screen is plugged.
+		// Let's ignore them for now.
+		//
+		// The maximum size the canvas could ever had
+		int canvasMaxSize = getParent().getDisplay().getBounds().width;
+		
+		// Calculate the power of two superior to the max size
+		int exp = (int)Math.ceil( Math.log( (double)canvasMaxSize ) / Math.log(2.0) );
+		int contentSize = (int)Math.pow(2, exp);
+		
+		// Create the content
+		histogramContent = new HistogramContent( contentSize, canvasSize, widthPerBar, barsHeight, maxBarsDifferenceToAverage);
+	}
+	
+	/*
+	 * Create a histogram paint listener and bind it to this canvas.<p>
+	 * 
+	 * Note : This one is a bit particular, as it is made to draw content that is of a power of 2.
+	 * 			The default one draw content that is relative to the real pixels size.
+	 */
+	@Override
+	protected void createAndAddPaintListener() {
+		paintListener = new ParentHistogramCanvasPaintListener(this);;
+		this.addPaintListener( paintListener );
 	}
 	
 	/**

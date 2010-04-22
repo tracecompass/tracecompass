@@ -22,7 +22,7 @@ import org.eclipse.swt.events.FocusListener;
  */
 public class HistogramCanvasFocusListener implements FocusListener {
 	
-	private HistogramCanvas parentCanvas = null;
+	protected HistogramCanvas parentCanvas = null;
 	
 	/**
 	 * HistogramCanvasFocusListener constructor

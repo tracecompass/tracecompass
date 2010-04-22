@@ -24,10 +24,10 @@ import org.eclipse.swt.events.MouseWheelListener;
  */
 public class HistogramCanvasMouseListener implements MouseMoveListener, MouseListener, MouseWheelListener 
 {
-	private DelayedMouseScroll mouseScrollListener = null;
-	private HistogramCanvas parentCanvas = null;
+	protected DelayedMouseScroll mouseScrollListener = null;
+	protected HistogramCanvas parentCanvas = null;
 	
-	private boolean isWindowMoving = false;
+	protected boolean isWindowMoving = false;
 	
 	/**
 	 * HistogramCanvasMouseListener constructor

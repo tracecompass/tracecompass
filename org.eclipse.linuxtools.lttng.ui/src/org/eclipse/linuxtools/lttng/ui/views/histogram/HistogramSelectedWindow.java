@@ -27,12 +27,12 @@ package org.eclipse.linuxtools.lttng.ui.views.histogram;
  */
 public class HistogramSelectedWindow {
 	
-	private Integer windowCenterPosition = 0;
-	private Long 	windowTimeWidth = 0L;
+	protected Integer windowCenterPosition = 0;
+	protected Long 	windowTimeWidth = 0L;
 	
-	private Boolean isSelectedWindowVisible = false;
+	protected Boolean isSelectedWindowVisible = false;
 	
-	private HistogramContent histogramContent = null;
+	protected HistogramContent histogramContent = null;
 	
 	/**
 	 * Default constructor for HistogramSelectedWindow.<p>
