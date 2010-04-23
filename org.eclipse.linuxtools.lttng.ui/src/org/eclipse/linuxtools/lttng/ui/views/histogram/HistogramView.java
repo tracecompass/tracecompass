@@ -18,6 +18,7 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperimentUpdatedSignal;
+import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
@@ -607,6 +608,9 @@ public class HistogramView extends TmfView implements ControlListener {
     			currentEventChangeNotification( selectedWindowTime );
     		}
     		
+    		// Tell the framework that the timerange (time window) changed
+    		currentTimerangeChangeNotification();
+    		
     		// Perform a new request to read data about the new window
     		performSelectedWindowEventsRequest(lastUsedExperiment);
     	}
@@ -633,6 +637,21 @@ public class HistogramView extends TmfView implements ControlListener {
             LttngTimestamp tmpTimestamp = new LttngTimestamp(newCurrentEventTime);
             broadcast(new TmfTimeSynchSignal(this, tmpTimestamp));
         }
+    }
+    
+    /**
+     * Function used to tell that the timerange (window) changed.<p>
+     * This will most likely be called if the time window is resized.
+     * 
+     * We send a signal to notify other views of the new timerange.
+     */
+    public void currentTimerangeChangeNotification() {
+        LttngTimestamp tmpStartTime = new LttngTimestamp(fullExperimentCanvas.getCurrentWindow().getTimestampLeft());
+        LttngTimestamp tmpEndTime = new LttngTimestamp(fullExperimentCanvas.getCurrentWindow().getTimestampRight());
+        TmfTimeRange tmpTimeRange = new TmfTimeRange(tmpStartTime, tmpEndTime);
+        LttngTimestamp tmpEventTime = new LttngTimestamp(currentEventTime);
+        // Send a signal to the framework
+        broadcast(new TmfRangeSynchSignal(this, tmpTimeRange, tmpEventTime));
     }
     
     /**
