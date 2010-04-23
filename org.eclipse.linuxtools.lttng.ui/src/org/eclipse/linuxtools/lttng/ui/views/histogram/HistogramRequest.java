@@ -34,8 +34,6 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 	
 	protected Integer	lastDrawPosition = 0;
 	
-	protected Boolean 	requestCompleted = false;
-	
 	protected HistogramCanvas parentCanvas = null;
 	
 	/**
@@ -87,7 +85,8 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
     	// 	However, the request with number of events will loop until it reach its number or EOF
     	//  We have to filter out ourself the extra useless events!
     	//
-        if ( (evt[0] != null) && (requestCompleted == false) ) {
+        if (evt[0] != null) {
+        
         	LttngEvent tmpEvent = (LttngEvent)evt[0];
         	
         	// This check is linked to the evil fix mentionned above
@@ -143,19 +142,20 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 					redrawAsyncronously();
 				}
         	}
-        	else {
-        		//System.out.println("Requested Timerange is : " + histogramContent.getStartTime() + " / " + histogramContent.getEndTime());
-        		//System.out.println("Time is : " + tmpEvent.getTimestamp().getValue());
-        		// *** FIXME ***
-            	// *** EVIL FIX ***
-                // Because of the other evil bug (see above), we have to ignore extra useless events we will get
-        		// However, we might be far away from the end so we better start a redraw now
-        		if (tmpEvent.getTimestamp().getValue() >= histogramContent.getEndTime()) {
-	        		redrawAsyncronously();
-	        		requestCompleted = true;
-        		}
-        	}
 		}
+        // We got a null event! This mean we reach the end of the request. 
+        // Save the last interval we had, so we won't miss the very last events at the end. 
+        else {
+        	// Save the last events
+        	histogramContent.getElementByIndex(lastInterval).intervalNbEvents = nbEventsInInterval;
+        	// We reached the end of the request, so assume we fill up the content as well
+			histogramContent.setReadyUpToPosition(histogramContent.getNbElement());
+			
+			// If the interval wasn't null, count this as a "non empty" interval
+			if (nbEventsInInterval > 0) {
+				nbIntervalNotEmpty++;
+			}
+        }
     }
 	
 	/**
@@ -191,7 +191,6 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
     @Override
     public void handleCancel() {
     	redrawAsyncronously();
-		requestCompleted = true;
     }
 	
     /**

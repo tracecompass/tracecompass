@@ -57,6 +57,9 @@ public class ParentHistogramCanvasPaintListener extends HistogramCanvasPaintList
 		// Calculate the closest power of 2 just smaller than the canvas size
 		int closestPowerToCanvas = (int)Math.pow(2, Math.floor( Math.log( canvasSize ) / Math.log(2.0) ));
 		
+		// Make sure the canvas didn't change size, it which case we need to recalculate our heights
+		recalculateHeightIfCanvasSizeChanged();
+		
 		// Calculate the factor of difference between canvas and the power
 		double factor = (double)canvasSize / (double)closestPowerToCanvas;
 		// Calculate how many interval will need to be concatenated into one pixel
@@ -108,4 +111,32 @@ public class ParentHistogramCanvasPaintListener extends HistogramCanvasPaintList
 	    Rectangle rect = new Rectangle(widthFilled, 0, event.width, event.height);
 	    event.gc.fillRectangle(rect);
 	}
+	
+	/*
+	 * The function will make sure that the "max difference average" factor is still the same as before;
+	 * 		if not, the heigth of the events will be recalculated.<p>
+	 * 
+	 * The factor might change if the canvas is resized by a big factor.<p>
+	 */
+	protected void recalculateHeightIfCanvasSizeChanged() {
+		HistogramContent tmpContent = parentCanvas.getHistogramContent();
+		// We need to ajust the "maxDifferenceToAverageFactor" as the bars we draw might be slitghly larger than the value asked
+		// Each "interval" are concatenated when draw so the worst case should be : 
+		// contentSize / (closest power of 2 to canvasMaxSize)
+		// Ex : if canvasSize is 1500 -> (2048 / 1024) == 2  so maxDiff should be twice larger
+		//
+		// His is set in the create content of the canvas, but we need to recalculate it 
+		//	here because the window might have been resized!
+		int exp = (int)Math.floor( Math.log( (double)tmpContent.getCanvasWindowSize() ) / Math.log(2.0) );
+		int contentSize = (int)Math.pow(2, exp);
+		Double maxBarsDiffFactor = ((double)tmpContent.getNbElement() / (double)contentSize );
+		
+		if ( maxBarsDiffFactor != tmpContent.getMaxDifferenceToAverageFactor() ) {
+			// The factor changed! That's unfortunate because it will take a while to recalculate.
+			tmpContent.setMaxDifferenceToAverageFactor(maxBarsDiffFactor);
+			tmpContent.recalculateHeightFactor();
+			tmpContent.recalculateEventHeight();
+		}
+	}
+	
 }

@@ -67,6 +67,16 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 		
 		// Create the content
 		histogramContent = new HistogramContent( contentSize, canvasSize, widthPerBar, barsHeight, maxBarsDifferenceToAverage);
+		
+		// We need to ajust the "maxDifferenceToAverageFactor" as the bars we draw might be slitghly larger than the value asked
+		// Each "interval" are concatenated when draw so the worst case should be : 
+		// contentSize / (closest power of 2 to canvasMaxSize)
+		// Ex : if canvasSize is 1500 -> (2048 / 1024) == 2  so maxDiff should be twice larger
+		//
+		// Note : this is not perfect, if the screen is resized after we calculate this, the resulting output can be quite ugly
+		// For this reason, this will be recalculated in the paintListener as well. 
+		double maxBarsDiffFactor = ((double)contentSize / Math.pow(2, exp-1));
+		histogramContent.setMaxDifferenceToAverageFactor(maxBarsDiffFactor);
 	}
 	
 	/*

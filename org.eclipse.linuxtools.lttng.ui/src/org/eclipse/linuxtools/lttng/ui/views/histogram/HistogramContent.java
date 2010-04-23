@@ -36,6 +36,8 @@ public class HistogramContent {
 	// This value is used to calculate at which point we should "cut" bar that are too tall.
 	// Default value is large enought so that no bar should be cut
 	protected Double  maxDifferenceToAverage = HistogramConstant.DEFAULT_DIFFERENCE_TO_AVERAGE;
+	// This is a factor we might apply on the max difference to average, as example if we concatenate interval together
+	protected Double  maxDifferenceFactor = 1.0;
 	
 	// By default we will only consider element up to this position 
 	protected Integer	readyUpToPosition = 0;
@@ -75,9 +77,7 @@ public class HistogramContent {
 		canvasWindowSize = newCanvasSize;
 		barsWidth = newBarWidth;
 		maxHeight = newMaxHeight;
-		
-		// Max difference is a bit special, we need to call set
-		setMaxDifferenceToAverage(newDiffToAverage);
+		maxDifferenceToAverage = newDiffToAverage;
 		
 		// Create a new element table from the above value
 		// The table will not get initialized until resetTable() is called. 
@@ -480,9 +480,6 @@ public class HistogramContent {
 		return endTime;
 	}
 	
-	// *** TODO ***
-	// Implement a way to "compress" a table if the endtime change.
-	// That way, the end time could change without having to reset the table data.
 	/**
 	 * Setter for the end time of the content.<p>
 	 * Note : You probably want to call "resetTable()" if you change this, otherwise data might be inconsistent.
@@ -530,9 +527,9 @@ public class HistogramContent {
 	public void recalculateHeightFactor() {
 		// Recalculate the new HeightFactor for the element; 
 		//		the highest bar will get "maxHeight" and other bar a fraction of it.
-		// If a maxDifferenceToAverage exist, this is considered here 
-		if ( heighestEventCount > (maxDifferenceToAverage * averageNumberOfEvents) ) {
-			heightFactor = (double)maxHeight/( maxDifferenceToAverage * (double)averageNumberOfEvents);
+		double diffToConsider = (maxDifferenceToAverage * maxDifferenceFactor * (double)barsWidth);
+		if ( heighestEventCount > (int)(diffToConsider * (double)averageNumberOfEvents) ) {
+			heightFactor = (double)maxHeight/( diffToConsider * (double)averageNumberOfEvents);
 		}
 		else {
 			heightFactor = (double)maxHeight/(double)heighestEventCount;
@@ -668,13 +665,38 @@ public class HistogramContent {
 	 * This determine at which point a bar too tall is "cut". Set a very large value (like 1000.0) to ignore.
 	 * 
 	 * Note : this is used in some drawing calculation so make sure this number make sense.
-	 * Note : the given number is multiplied by the bar width, as we have bigger bar (so more events as average to consider)
 	 * Note : you might want to call recalculateEventHeight() if you change this.
 	 * 
 	 * @param newDiffToAverage	The new maximum difference to the average to use.
 	 */
 	public void setMaxDifferenceToAverage(Double newDiffToAverage) {
-		maxDifferenceToAverage = (newDiffToAverage*barsWidth);
+		maxDifferenceToAverage = newDiffToAverage;
+	}
+	
+	
+	/**
+	 * Getter for a factor applied to the max difference to the average height a bar can have.<p>
+	 * This is muliplied to maxDifferenceToAverage. Set to value 1.0 to ignore.
+	 * 
+	 * Note : this is useful if you concatenate some intervals to gether but want the average to be consistent
+	 * 
+	 * @return	maximum difference to the average we currently use.
+	 */
+	public Double getMaxDifferenceToAverageFactor() {
+		return maxDifferenceFactor;
+	}
+	
+	/**
+	 * Setter for a factor applied to the max difference to the average height a bar can have.<p>
+	 * 
+	 * Note : this is used in some drawing calculation so make sure this number make sense.
+	 * Note : you might want to call recalculateEventHeight() if you change this.
+	 * Note : setting to 0 will cause bar to have a zero size... use 1.0 to desactivate
+	 * 
+	 * @param newFactor		The new factor to use.
+	 */
+	public void setMaxDifferenceToAverageFactor(Double newFactor) {
+		maxDifferenceFactor = newFactor;
 	}
 	
 	
