@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, Intel Corporation.
+ * Copyright (c) 2007, 2010 Intel Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *    Intel Corporation - Initial API and implementation
  *    Ruslan A. Scherbakov, Intel - Initial API and implementation
- *    Alvaro Sanchex-Leon - Udpated for TMF
+ *    Alvaro Sanchex-Leon - Updated for TMF
  *
  * $Id: ITimeDataProvider.java,v 1.2 2007/02/27 18:37:36 ewchan Exp $ 
  *****************************************************************************/
@@ -32,13 +32,6 @@ public interface ITimeDataProvider {
 	long getTime1();
 
 	long getMinTimeInterval();
-
-	/**
-	 * Receive Notification when any of the buttons of the mouse switch back to
-	 * up position, this method may trigger time update notification to
-	 * listeners
-	 */
-	void mouseUp();
 
 	/**
 	 * Updates the time range and notify registered listeners

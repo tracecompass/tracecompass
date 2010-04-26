@@ -17,8 +17,8 @@ package org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.Messages;
+import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITimeAnalysisViewer.TimeFormat;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
@@ -131,19 +131,20 @@ public class TmfTimeTipHandler {
 						addItem(message, eventAddOns.get(message));
 					}
 
-					// start time
-					long startTime = threadEvent == null ? thrd.getStartTime()
-							: threadEvent.getTime();
-
-					long duration = threadEvent == null ? -1 : threadEvent
-							.getDuration();
-
-					if (duration < 0 && threadEvent != null
-							&& nextEvent != null) {
-						long stopTime = nextEvent.getTime();
-						duration = stopTime - startTime;
+					long eventStartTime = -1;
+					long eventDuration = -1;
+					long eventEndTime = -1;
+					
+					if (threadEvent != null) {
+					    eventStartTime = threadEvent.getTime();
+					    eventDuration = threadEvent.getDuration();
+					    if (eventDuration < 0 && nextEvent != null) {
+					        eventEndTime = nextEvent.getTime();
+					        eventDuration = eventEndTime - eventStartTime;
+					    } else {
+					        eventEndTime = eventStartTime + eventDuration;
+					    }
 					}
-					long eventEndtime = startTime + duration;
 
 // TODO: Check if we need "format"					
 //					TimeFormat format = TimeFormat.RELATIVE;
@@ -152,19 +153,44 @@ public class TmfTimeTipHandler {
 //						format = TimeFormat.ABSOLUTE; // Absolute format
 //														// (calendar)
 						// Add Date
-						addItem(Messages._TRACE_DATE, Utils
-								.formatDate(startTime));
+						addItem(Messages._TRACE_DATE, eventStartTime > -1 ?
+						        Utils.formatDate(eventStartTime)
+						        : "?");
+						if (eventDuration > 0) {
+                            addItem(Messages._TRACE_START_TIME, eventStartTime > -1 ?
+                                    Utils.formatTime(eventStartTime, TimeFormat.ABSOLUTE, res)
+                                    : "?");
+                            
+                            addItem(Messages._TRACE_STOP_TIME, eventEndTime > -1 ?
+                                    Utils.formatTime(eventEndTime, TimeFormat.ABSOLUTE, res)
+                                    : "?");
+						} else {
+                            addItem(Messages._TRACE_EVENT_TIME, eventStartTime > -1 ?
+                                    Utils.formatTime(eventStartTime, TimeFormat.ABSOLUTE, res)
+                                    : "?");
+						}
+					} else {
+						if (eventDuration > 0) {
+					        addItem(Messages._TRACE_START_TIME, eventStartTime > -1 ?
+					                Utils.formatTime(eventStartTime, TimeFormat.RELATIVE, res)
+					                : "?");
+					    
+					        addItem(Messages._TRACE_STOP_TIME, eventEndTime > -1 ?
+					                Utils.formatTime(eventEndTime, TimeFormat.RELATIVE, res)
+					                : "?");
+						} else {
+                            addItem(Messages._TRACE_EVENT_TIME, eventStartTime > -1 ?
+                                    Utils.formatTime(eventStartTime, TimeFormat.RELATIVE, res)
+                                    : "?");
+						}
 					}
-					addItem(Messages._TRACE_START_TIME, Utils.formatTime(
-							startTime, TimeFormat.RELATIVE, res));
 
-					addItem(Messages._TRACE_STOP_TIME, Utils.formatTime(
-							eventEndtime, TimeFormat.RELATIVE, res));
-
-					// Duration in relative format in any case
-					addItem(Messages._DURATION, duration > -1 ? Utils
-							.formatTime(duration, TimeFormat.RELATIVE, res)
-							: "?");
+					if (eventDuration > 0) {
+					    // Duration in relative format in any case
+					    addItem(Messages._DURATION, eventDuration > -1 ?
+					            Utils.formatTime(eventDuration, TimeFormat.RELATIVE, res)
+					            : "?");
+					}
 
 				} else if (item instanceof GroupItem) {
 					addItem(Messages._TRACE_GROUP_NAME, item.toString());

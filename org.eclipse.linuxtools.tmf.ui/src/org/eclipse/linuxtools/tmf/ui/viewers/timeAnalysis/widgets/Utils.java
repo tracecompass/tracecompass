@@ -19,12 +19,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITimeAnalysisViewer.TimeFormat;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.TimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
+import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.TimeEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
@@ -47,8 +48,12 @@ public class Utils {
 		SECONDS, MILLISEC, MICROSEC, NANOSEC
 	};
 
-	static private SimpleDateFormat stimeformat = new SimpleDateFormat("HH:mm:ss");
-	static private SimpleDateFormat sdateformat = new SimpleDateFormat("yyyy.MM.dd");
+	static private final SimpleDateFormat stimeformat = new SimpleDateFormat("HH:mm:ss");
+	static private final SimpleDateFormat sdateformat = new SimpleDateFormat("yyyy-MM-dd");
+	static {
+        stimeformat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        sdateformat.setTimeZone(TimeZone.getTimeZone("GMT"));
+	}
 
 //	static private String _externalPlugin[] = { "org.eclipse.debug.ui",
 //			"org.eclipse.debug.ui", "org.eclipse.debug.ui",
@@ -335,64 +340,49 @@ public class Utils {
 	 * @param n
 	 * @return
 	 */
-	static ITimeEvent findEvent(ITmfTimeAnalysisEntry thread, long time, int n) {
-		if (null == thread)
-			return null;
-		List<TimeEvent> list = thread.getTraceEvents();
-		Iterator<TimeEvent> it = list.iterator();
-		ITimeEvent event = null;
-		ITimeEvent prevEvent = null;
-		ITimeEvent nextEvent = null;
-		if (it.hasNext()) {
-			event = (ITimeEvent) it.next();
-			long currStartTime = event.getTime();
-			long currEndTime = currStartTime + event.getDuration();
+    static ITimeEvent findEvent(ITmfTimeAnalysisEntry thread, long time, int n) {
+        if (null == thread)
+            return null;
+        List<TimeEvent> list = thread.getTraceEvents();
+        Iterator<TimeEvent> it = list.iterator();
+        ITimeEvent nextEvent = null;
+        ITimeEvent currEvent = null;
+        ITimeEvent prevEvent = null;
 
-			if (time < currStartTime) {
-				if (1 != n)
-					event = null;
-				return event;
-			}
-			while (it.hasNext()) {
-				currStartTime = event.getTime();
-				currEndTime = currStartTime + event.getDuration();
-				nextEvent = (ITimeEvent) it.next();
-
-				long nextEventTime = nextEvent.getTime();
-				currEndTime = currEndTime >= nextEventTime ? (nextEventTime - 1)
-						: currEndTime;
-
-//				Trace.debug("currStartTime: " + currStartTime
-//						+ " currEndTime: " + currEndTime + " nextEventTime: "
-//						+ nextEventTime + " time: " + time);
-				if (currStartTime <= time && time <= currEndTime) {
-					if (1 == n)
-						event = nextEvent;
-					else if (-1 == n)
-						event = prevEvent;
-					return event;
-				}
-
-				if (time > currEndTime && time < nextEventTime) {
-					//Located in a non Event area
-					if (2 == n || -1 == n) {
-						return event;
-					} else if (1 == n) {
-						return nextEvent;
-					}
-					return null;
-				}
-
-				prevEvent = event;
-				event = nextEvent;
-			}
-		}
-		if (1 == n)
-			event = null;
-		else if (-1 == n)
-			event = prevEvent;
-		return event;
-	}
+        while (it.hasNext()) {
+            nextEvent = (ITimeEvent) it.next();
+            long nextStartTime = nextEvent.getTime();
+            
+            if (nextStartTime > time) {
+                break;
+            }
+            
+            if (currEvent == null || currEvent.getTime() != nextStartTime) {
+                prevEvent = currEvent;
+                currEvent = nextEvent;
+            }
+        }
+        
+        if (n == -1) { //previous
+            if (currEvent != null && currEvent.getTime() + currEvent.getDuration() >= time) {
+                return prevEvent;
+            } else {
+                return currEvent;
+            }
+        } else if (n == 0) { //current
+            if (currEvent != null && currEvent.getTime() + currEvent.getDuration() >= time) {
+                return currEvent;
+            } else {
+                return null;
+            }
+        } else if (n == 1) { //next
+            return nextEvent;
+        } else if (n == 2) { //current or previous when in empty space
+            return currEvent;
+        }
+        
+        return null;
+    }
 
 	// static public TRCPackage getPackage(Object element) {
 	// if (element instanceof TRCPackage)
