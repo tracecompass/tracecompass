@@ -55,8 +55,8 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	private long _time1;
 	private long _time0_;
 	private long _time1_;
-	private long _time0_InLastEvent = 0;
-	private long _time1_InLastEvent = 0;
+	private long _time0_extSynch = 0;
+	private long _time1_extSynch = 0;
 	private boolean _timeRangeFixed;
 	private int _nameWidthPref = 200;
 	private int _minNameWidth = 6;
@@ -625,12 +625,23 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		_stateCtrl.selectItem(trace, false);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITimeAnalysisViewer
+	 * #setSelectVisTimeWindow(long, long, java.lang.Object)
+	 */
 	public void setSelectVisTimeWindow(long time0, long time1, Object source) {
 		if (_acceptSetSelAPICalls == false || source == this) {
 			return;
 		}
 
 		setStartFinishTime(time0, time1);
+
+		// update notification time values since we are now in synch with the
+		// external application
+		updateExtSynchTimers();
 	}
 
 	public void setAcceptSelectionAPIcalls(boolean acceptCalls) {
@@ -666,7 +677,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	public void notifyStartFinishTimeSelectionListeners(long _time0, long _time1) {
 		if (widgetTimeScaleSelectionListners.size() > 0) {
 			// Check if the time has actually changed from last notification
-			if (_time0 != _time0_InLastEvent || _time1 != _time1_InLastEvent) {
+			if (_time0 != _time0_extSynch || _time1 != _time1_extSynch) {
 				// Notify Time Scale Selection Listeners
 				TmfTimeScaleSelectionEvent event = new TmfTimeScaleSelectionEvent(
 						this, _time0, _time1, getTimeSpace(), getSelectedTime());
@@ -678,11 +689,20 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 					listener.tsfTmProcessTimeScaleEvent(event);
 				}
 
-				// last time notification cache
-				_time0_InLastEvent = _time0;
-				_time1_InLastEvent = _time1;
+				// update external synch timers
+				updateExtSynchTimers();
 			}
 		}
+	}
+
+	/**
+	 * update the cache timers used to identify the need to send a time window
+	 * update to external registered listeners
+	 */
+	private void updateExtSynchTimers() {
+		// last time notification cache
+		_time0_extSynch = _time0;
+		_time1_extSynch = _time1;
 	}
 
 	public void setTimeCalendarFormat(boolean toAbsoluteCaltime) {
