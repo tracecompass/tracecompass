@@ -627,7 +627,13 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		int nameWidth = _timeProvider.getNameSpace();
 		x -= nameWidth;
 		if (x >= 0 && size.x >= nameWidth) {
-			hitTime = time0 + (long) ((time1 - time0) * ((double) (x + 1) / (size.x - nameWidth - 1))) - 1;
+		    if (time1 - time0 > size.x - nameWidth - RIGHT_MARGIN) {
+		        // get the last possible time represented by the pixel position
+		        // by taking the time of the next pixel position minus 1 nanosecond
+		        hitTime = time0 + (long) ((time1 - time0) * ((double) (x + 1) / (size.x - nameWidth - RIGHT_MARGIN))) - 1;
+		    } else {
+                hitTime = time0 + (long) ((time1 - time0) * ((double) (x) / (size.x - nameWidth - RIGHT_MARGIN)));
+		    }
 		}
 		return hitTime;
 	}
@@ -676,8 +682,12 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 
 	Point getCtrlSize() {
 		Point size = getSize();
-		size.x -= getVerticalBar().getSize().x;
-		size.y -= getHorizontalBar().getSize().y;
+		if (getVerticalBar().isVisible()) {
+			size.x -= getVerticalBar().getSize().x;
+		}
+		if (getHorizontalBar().isVisible()) {
+			size.y -= getHorizontalBar().getSize().y;
+		}
 		return size;
 	}
 
@@ -774,8 +784,8 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 			return;
 
 		int xr = bound.x + nameWidth;
-		double pixelsPerNanoSec = (bound.width - xr <= 2) ? 0
-				: (double) (bound.width - xr - 2) / (time1 - time0); // 2 pixels less to make sure end time is visible
+		double pixelsPerNanoSec = (bound.width - xr <= RIGHT_MARGIN) ? 0
+				: (double) (bound.width - xr - RIGHT_MARGIN) / (time1 - time0);
 
 		int x0 = xr + (int) ((e.getTime() - time0) * pixelsPerNanoSec);
 		if (x0 < xr)
@@ -1055,8 +1065,8 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 
 		Utils.init(_rect1, rect);
 		boolean selected = item._selected;
-		double pixelsPerNanoSec = (rect.width <= 2) ? 0
-				: (double) (rect.width - 2) / (time1 - time0); // 2 pixels less to make sure end time is visible
+		double pixelsPerNanoSec = (rect.width <= RIGHT_MARGIN) ? 0
+				: (double) (rect.width - RIGHT_MARGIN) / (time1 - time0);
 		boolean group = item instanceof GroupItem;
 
 		if (group) {
@@ -1195,8 +1205,8 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		Utils.init(_rect1, rect);
 		boolean selected = item._selected;
 		// K pixels per second
-		double pixelsPerNanoSec = (rect.width <= 2) ? 0
-				: (double) (rect.width - 2) / (time1 - time0); // 2 pixels less to make sure end time is visible
+		double pixelsPerNanoSec = (rect.width <= RIGHT_MARGIN) ? 0
+				: (double) (rect.width - RIGHT_MARGIN) / (time1 - time0);
 		// Trace.debug("Value of K: " + K + " width:" + rect.width + " time0: "
 		// + time0 + " time1:" + time1 + " endTime: " + endTime);
 
@@ -1370,8 +1380,8 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		Utils.init(_rect1, rect);
 		boolean selected = item._selected;
 		// K pixels per second
-		double pixelsPerNanoSec = (rect.width <= 2) ? 0
-				: (double) (rect.width - 2) / (time1 - time0); // 2 pixels lesser to make sure end time is visible
+		double pixelsPerNanoSec = (rect.width <= RIGHT_MARGIN) ? 0
+				: (double) (rect.width - RIGHT_MARGIN) / (time1 - time0);
 		// Trace.debug("Value of K: " + K + " width:" + rect.width + " time0: "
 		// + time0 + " time1:" + time1 + " endTime: " + endTime);
 
@@ -1461,10 +1471,10 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 					if (x1 >= rect.x && x0 <= xEnd) {
 						if (currEventDuration != 0) {
 							x0 = (double) (x0 >= rect.x ? x0 : rect.x);
+							_rect1.width = (int) ((x1 <= xEnd ? x1 : xEnd) - x0);
 						} else {
-							x1 = x0 + 2; // make punctual events 2 pixels wide
+                            _rect1.width = 2; // make punctual events 2 pixels wide
 						}
-						_rect1.width = (int) Math.round((x1 <= xEnd ? x1 : xEnd) - x0);
 						_rect1.x = (int) x0;
 						boolean timeSelected = currEventTime <= selectedTime
 								&& selectedTime < nextEventTime;
@@ -1640,8 +1650,8 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 			int x = e.x - nameWidth;
 			if (x > 0 && size.x > nameWidth && _dragX != x) {
 				_dragX = x;
-				double pixelsPerNanoSec = (size.x - nameWidth <= 2) ? 0
-						: (double) (size.x - nameWidth - 2) / (_time1bak - _time0bak); // 2 pixels less to make sure end time is visible
+				double pixelsPerNanoSec = (size.x - nameWidth <= RIGHT_MARGIN) ? 0
+						: (double) (size.x - nameWidth - RIGHT_MARGIN) / (_time1bak - _time0bak);
 				long timeDelta = (long) ((pixelsPerNanoSec == 0) ? 0 : ((_dragX - _dragX0) / pixelsPerNanoSec));
 				long time1 = _time1bak - timeDelta;
 				long maxTime = _timeProvider.getMaxTime();
@@ -1665,7 +1675,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 			// Make sure any time changes are notified to the application e.g.
 			// getting back from the horizontal scroll bar or zoomed using the
 			// mouse wheel
-			_timeProvider.setStartFinishTimeNotify(_timeProvider.getTime0(), _timeProvider.getTime1());
+			_timeProvider.notifyStartFinishTime();
 		}
 		updateCursor(e.x, e.y);
 	}
@@ -1783,7 +1793,10 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 	public void mouseUp(MouseEvent e) {
 		if (0 != _dragState) {
 			setCapture(false);
-			if (2 == _dragState) {
+			if (1 == _dragState) {
+			    // Notify time provider to check the need for listener notification
+			    _timeProvider.notifyStartFinishTime();
+			} else if (2 == _dragState) {
 				if (hitTest(e.x, e.y) == _hitIdx)
 					toggle(_hitIdx);
 			} else if (3 == _dragState) {
@@ -1791,9 +1804,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 			}
 			_dragState = 0;
 		}
-
-		// Notify time provider to check the need for listener notification
-		_timeProvider.setStartFinishTimeNotify(_timeProvider.getTime0(), _timeProvider.getTime1());
 	}
 
 	public void controlMoved(ControlEvent e) {

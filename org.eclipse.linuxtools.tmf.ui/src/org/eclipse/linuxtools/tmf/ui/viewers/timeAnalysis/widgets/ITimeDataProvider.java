@@ -49,6 +49,11 @@ public interface ITimeDataProvider {
 	 */
 	void setStartFinishTime(long time0, long time1);
 
+    /**
+     * Notify registered listeners without updating the time range
+     */
+    void notifyStartFinishTime();
+
 	void setSelectedTimeInt(long time, boolean ensureVisible);
 
 	void resetStartFinishTime();

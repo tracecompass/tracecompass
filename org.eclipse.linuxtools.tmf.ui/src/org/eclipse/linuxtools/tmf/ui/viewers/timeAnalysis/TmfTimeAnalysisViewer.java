@@ -155,7 +155,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	}
 
 	void loadOptions() {
-		_minTimeInterval = 500;
+		_minTimeInterval = 1;
 		_selectedTime = -1;
 		_nameWidth = Utils.loadIntOption(getPreferenceString("namewidth"),
 				_nameWidthPref, _minNameWidth, 1000);
@@ -268,6 +268,9 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 			_time0 = _time0_;
 			_time1 = _time1_;
 		}
+        if (_time1 - _time0 < _minTimeInterval) {
+            _time1 = _time0 + _minTimeInterval;
+        }
 	}
 
 	/**
@@ -400,7 +403,15 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		notifyStartFinishTimeSelectionListeners(time0, time1);
 	}
 
-	/*
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.ITimeDataProvider#notifyStartFinishTime()
+     */
+    public void notifyStartFinishTime() {
+        notifyStartFinishTimeSelectionListeners(_time0, _time1);
+    }
+
+    /*
 	 * (non-Javadoc)
 	 * 
 	 * @see
@@ -409,13 +420,17 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	 */
 	public void setStartFinishTime(long time0, long time1) {
 		_time0 = time0;
-		if (_time0 < _time0_)
-			_time0 = _time0_;
+        if (_time0 < _time0_)
+            _time0 = _time0_;
+        if (_time0 > _time1_)
+            _time0 = _time1_;
 		_time1 = time1;
+        if (_time1 < _time0_)
+            _time1 = _time0_;
+        if (_time1 > _time1_)
+            _time1 = _time1_;
 		if (_time1 - _time0 < _minTimeInterval)
-			_time1 = _time0 + _minTimeInterval;
-		if (_time1 > _time1_)
-			_time1 = _time1_;
+		    _time1 = _time0 + _minTimeInterval;
 		_timeRangeFixed = true;
 		_stateCtrl.adjustScrolls();
 		_stateCtrl.redraw();

@@ -83,7 +83,7 @@ public class TimeScaleCtrl extends TraceCtrl implements MouseListener,
     }
     
     private void calcTimeDelta(int width, double pixelsPerNanoSec) {
-        double minDelta = (double) ((pixelsPerNanoSec ==0) ? YEAR_IN_NS : width / pixelsPerNanoSec);
+        double minDelta = (double) ((pixelsPerNanoSec == 0) ? YEAR_IN_NS : width / pixelsPerNanoSec);
         long unit = 1;
         if (_timeProvider != null && _timeProvider.isCalendarFormat()) {
             if (minDelta > 6 * MONTH_IN_NS) {
@@ -222,8 +222,8 @@ public class TimeScaleCtrl extends TraceCtrl implements MouseListener,
 		int numDigits = calculateDigits(time0, time1);
 		
 		int labelWidth = gc.getCharWidth('0') * numDigits;
-		double pixelsPerNanoSec = (timeSpace <= 2) ? 0 :
-		    (double) (timeSpace - 2) / (time1 - time0); // 2 pixels less to make sure end time is visible
+		double pixelsPerNanoSec = (timeSpace <= RIGHT_MARGIN) ? 0 :
+		    (double) (timeSpace - RIGHT_MARGIN) / (time1 - time0);
 		calcTimeDelta(labelWidth, pixelsPerNanoSec);
 		
 		TimeDraw timeDraw = getTimeDraw(_timeDelta);
@@ -395,6 +395,11 @@ public class TimeScaleCtrl extends TraceCtrl implements MouseListener,
 		if (e.button == 1 && _dragState == 1) {
 			setCapture(false);
 			_dragState = 0;
+			
+	        // Notify time provider to check the need for listener notification
+			if (_dragX != _dragX0) {
+			    _timeProvider.setStartFinishTimeNotify(_timeProvider.getTime0(), _timeProvider.getTime1());
+			}
 		} else if (e.button == 3 && _dragState == 3 && null != _timeProvider) {
 		    _dragState = 0;
 			if (_dragX0 == _dragX) {
@@ -412,14 +417,11 @@ public class TimeScaleCtrl extends TraceCtrl implements MouseListener,
 				long time0 = _time0bak + (long) ((_time1bak - _time0bak) * ((double) _dragX0 / timeSpace));
 				long time1 = _time0bak + (long) ((_time1bak - _time0bak) * ((double) _dragX / timeSpace));
 
-				_timeProvider.setStartFinishTime(time0, time1);
+				_timeProvider.setStartFinishTimeNotify(time0, time1);
 	            _time0bak = _timeProvider.getTime0();
 	            _time1bak = _timeProvider.getTime1();
 			}
 		}
-
-		// Notify time provider to check the need for listener notification
-		_timeProvider.setStartFinishTimeNotify(_timeProvider.getTime0(), _timeProvider.getTime1());
 	}
 
 	public void mouseMove(MouseEvent e) {
