@@ -79,7 +79,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     private void setupExperiment() {
     	if (fExperiment == null) {
             fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, fTrace);
-            fExperiment.indexExperiment();
+            fExperiment.indexExperiment(true);
     	}
     }
 

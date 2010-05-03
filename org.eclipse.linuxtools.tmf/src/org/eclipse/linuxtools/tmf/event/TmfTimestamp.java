@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.event;
 
+
 /**
  * <b><u>TmfTimestamp</u></b>
  * <p>
@@ -40,7 +41,7 @@ package org.eclipse.linuxtools.tmf.event;
  * Notice that the adjusted timestamp value could be negative e.g. for events
  * that occurred before t0 wrt the reference clock.
  */
-public class TmfTimestamp {
+public class TmfTimestamp implements Cloneable {
 
 	// ------------------------------------------------------------------------
     // Attributes
@@ -279,6 +280,19 @@ public class TmfTimestamp {
     @Override
     public String toString() {
     	return "[TmfTimestamp(" + fValue + "," + fScale + "," + fPrecision + ")]";
+    }
+
+    @Override
+    public TmfTimestamp clone() {
+    	TmfTimestamp clone = null;
+		try {
+			clone = (TmfTimestamp) super.clone();
+	        clone.fValue = fValue;
+	        clone.fScale = fScale;
+	        clone.fPrecision = fPrecision;
+		} catch (CloneNotSupportedException e) {
+		}
+		return clone;
     }
 
 }

@@ -151,14 +151,6 @@ public class TmfTimestampTest extends TestCase {
 		assertTrue("equals", ts1.equals(ts1copy2));
 	}
 	
-	public void testEqualsConsistency() throws Exception {
-		assertTrue("equals", ts0.equals(ts0copy));
-		assertTrue("equals", ts0.equals(ts0copy));
-		
-		assertTrue("equals", ts1.equals(ts1copy));
-		assertTrue("equals", ts1.equals(ts1copy));
-	}
-	
 	public void testEqualsNull() throws Exception {
 		assertTrue("equals", !ts0.equals(null));
 		assertTrue("equals", !ts1.equals(null));
@@ -184,6 +176,32 @@ public class TmfTimestampTest extends TestCase {
 		assertEquals("toString", "[TmfTimestamp(12345,0,0)]",  ts1.toString());
 		assertEquals("toString", "[TmfTimestamp(12345,-1,0)]", ts2.toString());
 		assertEquals("toString", "[TmfTimestamp(12345,2,5)]",  ts3.toString());
+	}
+
+	// ------------------------------------------------------------------------
+	// clone
+	// ------------------------------------------------------------------------
+
+	public class MyTimestamp extends TmfTimestamp {
+		@Override
+		public boolean equals(Object other) {
+			return super.equals(other);
+		}
+		@Override
+		public MyTimestamp clone() {
+			return (MyTimestamp) super.clone();
+		}
+	}
+
+	public void testClone() throws Exception {
+		TmfTimestamp timestamp = ts0.clone();
+		assertEquals("clone", timestamp, ts0);
+	}
+
+	public void testClone2() throws Exception {
+		MyTimestamp timestamp = new MyTimestamp();
+		MyTimestamp clone = timestamp.clone();
+		assertEquals("clone", clone, timestamp);
 	}
 
 	// ------------------------------------------------------------------------

@@ -113,14 +113,6 @@ public class TmfEventSourceTest extends TestCase {
 		assertTrue("equals", fSource0.equals(fSource2));
 	}
 	
-	public void testEqualsConsistency() throws Exception {
-		assertTrue("equals", fSource0.equals(fSource0));
-		assertTrue("equals", fSource0.equals(fSource0));
-
-		assertTrue("equals", fSource3.equals(fSource3));
-		assertTrue("equals", fSource3.equals(fSource3));
-	}
-	
 	public void testEqualsNull() throws Exception {
 		assertTrue("equals", !fSource0.equals(null));
 		assertTrue("equals", !fSource3.equals(null));

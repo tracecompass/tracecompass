@@ -215,14 +215,6 @@ public class TmfEventRequestTest extends TestCase {
         assertTrue("equals", fRequest1.equals(fRequest1c));
 	}
 	
-	public void testEqualsConsistency() throws Exception {
-        assertTrue("equals", fRequest1.equals(fRequest1));
-        assertTrue("equals", fRequest1.equals(fRequest1));
-
-        assertTrue("equals", fRequest2.equals(fRequest2));
-        assertTrue("equals", fRequest2.equals(fRequest2));
-	}
-	
 	public void testEqualsNull() throws Exception {
         assertFalse("equals", fRequest1.equals(null));
         assertFalse("equals", fRequest2.equals(null));

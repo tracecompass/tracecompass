@@ -10,9 +10,10 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test suite for " + TmfCorePlugin.PLUGIN_ID + ".trace"); //$NON-NLS-1$);
 		//$JUnit-BEGIN$
+		suite.addTestSuite(TmfLocationTest.class);
+		suite.addTestSuite(TmfCheckpointTest.class);
+		suite.addTestSuite(TmfContextTest.class);
 		suite.addTestSuite(TmfTraceTest.class);
-		suite.addTestSuite(TmfExperimentTest.class);
-		suite.addTestSuite(TmfMultiTraceExperimentTest.class);
 		//$JUnit-END$
 		return suite;
 	}

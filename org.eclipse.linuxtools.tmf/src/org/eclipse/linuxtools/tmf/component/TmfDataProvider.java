@@ -95,6 +95,10 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 		return fQueueSize;
 	}
 
+	public Class<?> getType() {
+		return fType;
+	}
+
 	// ------------------------------------------------------------------------
 	// ITmfRequestHandler
 	// ------------------------------------------------------------------------

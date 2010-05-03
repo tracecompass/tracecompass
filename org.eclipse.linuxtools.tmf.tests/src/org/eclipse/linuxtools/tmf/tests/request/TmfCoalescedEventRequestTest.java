@@ -221,14 +221,6 @@ public class TmfCoalescedEventRequestTest extends TestCase {
         assertTrue("equals", fRequest1.equals(fRequest1c));
 	}
 	
-	public void testEqualsConsistency() throws Exception {
-        assertTrue("equals", fRequest1.equals(fRequest1));
-        assertTrue("equals", fRequest1.equals(fRequest1));
-
-        assertTrue("equals", fRequest2.equals(fRequest2));
-        assertTrue("equals", fRequest2.equals(fRequest2));
-	}
-	
 	public void testEqualsNull() throws Exception {
         assertFalse("equals", fRequest1.equals(null));
         assertFalse("equals", fRequest2.equals(null));
@@ -465,12 +457,12 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 
     // Initialize the test trace
     private static TmfTraceStub fTrace = null;
-    private TmfTraceStub setupTrace(String path) {
+    private synchronized TmfTraceStub setupTrace(String path) {
     	if (fTrace == null) {
     		try {
     	        URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
     			File test = new File(FileLocator.toFileURL(location).toURI());
-    	        fTrace = new TmfTraceStub(test.getPath(), 500, true);
+    	        fTrace = new TmfTraceStub(test.getPath(), 500);
     		} catch (URISyntaxException e) {
     			e.printStackTrace();
     		} catch (IOException e) {

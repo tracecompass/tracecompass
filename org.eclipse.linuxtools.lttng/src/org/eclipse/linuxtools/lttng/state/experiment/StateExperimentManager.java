@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.lttng.state.StateManager;
 import org.eclipse.linuxtools.tmf.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
-import org.eclipse.linuxtools.tmf.experiment.TmfExperimentSelectedSignal;
+import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 
 /**

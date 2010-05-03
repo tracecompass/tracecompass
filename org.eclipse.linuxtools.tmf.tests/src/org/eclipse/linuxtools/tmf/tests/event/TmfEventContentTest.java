@@ -143,14 +143,6 @@ public class TmfEventContentTest extends TestCase {
 		assertTrue("equals", fBasicContent0.equals(fBasicContent2));
 	}
 	
-	public void testEqualsConsistency() throws Exception {
-		assertTrue("equals", fBasicContent0.equals(fBasicContent0));
-		assertTrue("equals", fBasicContent0.equals(fBasicContent0));
-
-		assertTrue("equals", fStubContent.equals(fStubContent));
-		assertTrue("equals", fStubContent.equals(fStubContent));
-	}
-	
 	public void testEqualsNull() throws Exception {
 		assertTrue("equals", !fBasicContent0.equals(null));
 		assertTrue("equals", !fStubContent.equals(null));

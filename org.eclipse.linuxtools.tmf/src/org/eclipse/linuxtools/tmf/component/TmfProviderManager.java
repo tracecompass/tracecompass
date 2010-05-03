@@ -27,6 +27,12 @@ import org.eclipse.linuxtools.tmf.event.TmfData;
 public class TmfProviderManager {
 
 	// ------------------------------------------------------------------------
+	// No constructor
+	// ------------------------------------------------------------------------
+
+	private TmfProviderManager() {}
+	
+	// ------------------------------------------------------------------------
 	// Keeps track of the providers for each event type
 	// ------------------------------------------------------------------------
 	
@@ -42,7 +48,6 @@ public class TmfProviderManager {
 	public static <T extends TmfData> void register(Class<T> eventType, TmfDataProvider<? extends TmfData> provider) {
 		if (fProviders.get(eventType) == null)
 			fProviders.put(eventType, new ArrayList<TmfDataProvider<? extends TmfData>>());
-		assert(fProviders.get(eventType) != null);
 		fProviders.get(eventType).add(provider);
 	}
 

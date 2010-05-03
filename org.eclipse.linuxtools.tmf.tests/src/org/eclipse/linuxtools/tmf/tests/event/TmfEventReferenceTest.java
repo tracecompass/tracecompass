@@ -113,14 +113,6 @@ public class TmfEventReferenceTest extends TestCase {
 		assertTrue("equals", fReference0.equals(fReference2));
 	}
 	
-	public void testEqualsConsistency() throws Exception {
-		assertTrue("equals", fReference0.equals(fReference0));
-		assertTrue("equals", fReference0.equals(fReference0));
-
-		assertTrue("equals", fReference3.equals(fReference3));
-		assertTrue("equals", fReference3.equals(fReference3));
-	}
-	
 	public void testEqualsNull() throws Exception {
 		assertTrue("equals", !fReference0.equals(null));
 		assertTrue("equals", !fReference3.equals(null));

@@ -23,7 +23,7 @@ import org.eclipse.linuxtools.tmf.trace.ITmfContext;
 /**
  * <b><u>TmfProviderManagerTest</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * Test suite for the TmfProviderManager class.
  */
 public class TmfProviderManagerTest extends TestCase {
 
@@ -106,16 +106,16 @@ public class TmfProviderManagerTest extends TestCase {
 	}
 
 	// ------------------------------------------------------------------------
-	// register()
+	// register/dispose
 	// ------------------------------------------------------------------------
 
 	@SuppressWarnings("unchecked")
 	public void testRegister_0() {
 		TmfDataProvider<TmfEvent>[] providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
-		assertTrue(providers.length == 0);
+		assertEquals("getProviders", 0, providers.length);
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
-		assertTrue(providers.length == 0);
+		assertEquals("getProviders", 0, providers.length);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -125,21 +125,21 @@ public class TmfProviderManagerTest extends TestCase {
 		TestProvider1 testProvider1 = new TestProvider1(TmfEvent.class);
 
 		TmfDataProvider<TmfEvent>[] providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
-		assertTrue(providers.length == 1);
-		assertTrue(providers[0] == testProvider1);
+		assertEquals("getProviders", 1, providers.length);
+		assertEquals("getProviders", testProvider1, providers[0]);
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
-		assertTrue(providers.length == 1);
-		assertTrue(providers[0] == testProvider1);
+		assertEquals("getProviders", 1, providers.length);
+		assertEquals("getProviders", testProvider1, providers[0]);
 
 		// Unregister it
 		testProvider1.dispose();
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
-		assertTrue(providers.length == 0);
+		assertEquals("getProviders", 0, providers.length);
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
-		assertTrue(providers.length == 0);
+		assertEquals("getProviders", 0, providers.length);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -150,48 +150,49 @@ public class TmfProviderManagerTest extends TestCase {
 		TestProvider2 testProvider2 = new TestProvider2(TmfEvent.class);
 
 		TmfDataProvider<TmfEvent>[] providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
+		assertEquals("getProviders", 2, providers.length);
 		assertTrue(providers.length == 2);
 		if (providers[0] == testProvider1) {
-			assertTrue(providers[1] == testProvider2);
+			assertEquals("getProviders", testProvider2, providers[1]);
 		}
 		else {
-			assertTrue(providers[1] == testProvider1);
-			assertTrue(providers[0] == testProvider2);
+			assertEquals("getProviders", testProvider2, providers[0]);
+			assertEquals("getProviders", testProvider1, providers[1]);
 		}
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
-		assertTrue(providers.length == 1);
-		assertTrue(providers[0] == testProvider1);
+		assertEquals("getProviders", 1, providers.length);
+		assertEquals("getProviders", testProvider1, providers[0]);
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TestProvider2.class);
-		assertTrue(providers.length == 1);
-		assertTrue(providers[0] == testProvider2);
+		assertEquals("getProviders", 1, providers.length);
+		assertEquals("getProviders", testProvider2, providers[0]);
 
 		// Remove one
 		testProvider1.dispose();
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
-		assertTrue(providers.length == 1);
-		assertTrue(providers[0] == testProvider2);
+		assertEquals("getProviders", 1, providers.length);
+		assertEquals("getProviders", testProvider2, providers[0]);
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
-		assertTrue(providers.length == 0);
+		assertEquals("getProviders", 0, providers.length);
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TestProvider2.class);
-		assertTrue(providers.length == 1);
-		assertTrue(providers[0] == testProvider2);
+		assertEquals("getProviders", 1, providers.length);
+		assertEquals("getProviders", testProvider2, providers[0]);
 
 		// Remove the other
 		testProvider2.dispose();
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
-		assertTrue(providers.length == 0);
+		assertEquals("getProviders", 0, providers.length);
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
-		assertTrue(providers.length == 0);
+		assertEquals("getProviders", 0, providers.length);
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TestProvider2.class);
-		assertTrue(providers.length == 0);
+		assertEquals("getProviders", 0, providers.length);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -203,90 +204,118 @@ public class TmfProviderManagerTest extends TestCase {
 		TestProvider3 testProvider3 = new TestProvider3(TmfEvent3.class);
 
 		TmfDataProvider<TmfEvent>[] providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
-		assertTrue(providers.length == 2);
+		assertEquals("getProviders", 2, providers.length);
 		if (providers[0] == testProvider1) {
-			assertTrue(providers[1] == testProvider2);
+			assertEquals("getProviders", testProvider2, providers[1]);
 		}
 		else {
-			assertTrue(providers[1] == testProvider1);
-			assertTrue(providers[0] == testProvider2);
+			assertEquals("getProviders", testProvider2, providers[0]);
+			assertEquals("getProviders", testProvider1, providers[1]);
 		}
 
 		TmfDataProvider<TmfEvent3>[] providers3 = (TmfDataProvider<TmfEvent3>[]) TmfProviderManager.getProviders(TmfEvent3.class);
-		assertTrue(providers3.length == 1);
-		assertTrue(providers3[0] == testProvider3);
+		assertEquals("getProviders", 1, providers3.length);
+		assertEquals("getProviders", testProvider3, providers3[0]);
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
-		assertTrue(providers.length == 1);
-		assertTrue(providers[0] == testProvider1);
+		assertEquals("getProviders", 1, providers.length);
+		assertEquals("getProviders", testProvider1, providers[0]);
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TestProvider2.class);
-		assertTrue(providers.length == 1);
-		assertTrue(providers[0] == testProvider2);
+		assertEquals("getProviders", 1, providers.length);
+		assertEquals("getProviders", testProvider2, providers[0]);
 
 		providers3 = (TmfDataProvider<TmfEvent3>[]) TmfProviderManager.getProviders(TmfEvent3.class, TestProvider3.class);
-		assertTrue(providers3.length == 1);
-		assertTrue(providers3[0] == testProvider3);
+		assertEquals("getProviders", 1, providers3.length);
+		assertEquals("getProviders", testProvider3, providers3[0]);
 
 		// Remove one
 		testProvider1.dispose();
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
-		assertTrue(providers.length == 1);
-		assertTrue(providers[0] == testProvider2);
+		assertEquals("getProviders", 1, providers.length);
+		assertEquals("getProviders", testProvider2, providers[0]);
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
-		assertTrue(providers.length == 0);
+		assertEquals("getProviders", 0, providers.length);
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TestProvider2.class);
-		assertTrue(providers.length == 1);
-		assertTrue(providers[0] == testProvider2);
+		assertEquals("getProviders", 1, providers.length);
+		assertEquals("getProviders", testProvider2, providers[0]);
 
 		providers3 = (TmfDataProvider<TmfEvent3>[]) TmfProviderManager.getProviders(TmfEvent3.class);
-		assertTrue(providers3.length == 1);
-		assertTrue(providers3[0] == testProvider3);
+		assertEquals("getProviders", 1, providers3.length);
+		assertEquals("getProviders", testProvider3, providers3[0]);
 
 		providers3 = (TmfDataProvider<TmfEvent3>[]) TmfProviderManager.getProviders(TmfEvent3.class, TestProvider3.class);
-		assertTrue(providers3.length == 1);
-		assertTrue(providers3[0] == testProvider3);
+		assertEquals("getProviders", 1, providers3.length);
+		assertEquals("getProviders", testProvider3, providers3[0]);
 
 		// Remove another one
 		testProvider2.dispose();
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
-		assertTrue(providers.length == 0);
+		assertEquals("getProviders", 0, providers.length);
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
-		assertTrue(providers.length == 0);
+		assertEquals("getProviders", 0, providers.length);
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TestProvider2.class);
-		assertTrue(providers.length == 0);
+		assertEquals("getProviders", 0, providers.length);
 
 		providers3 = (TmfDataProvider<TmfEvent3>[]) TmfProviderManager.getProviders(TmfEvent3.class);
 		assertTrue(providers3.length == 1);
 		assertTrue(providers3[0] == testProvider3);
 
 		providers3 = (TmfDataProvider<TmfEvent3>[]) TmfProviderManager.getProviders(TmfEvent3.class, TestProvider3.class);
-		assertTrue(providers3.length == 1);
-		assertTrue(providers3[0] == testProvider3);
+		assertEquals("getProviders", 1, providers3.length);
+		assertEquals("getProviders", testProvider3, providers3[0]);
 
 		// Remove the last one
 		testProvider3.dispose();
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
-		assertTrue(providers.length == 0);
+		assertEquals("getProviders", 0, providers.length);
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TestProvider1.class);
-		assertTrue(providers.length == 0);
+		assertEquals("getProviders", 0, providers.length);
 
 		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TestProvider2.class);
-		assertTrue(providers.length == 0);
+		assertEquals("getProviders", 0, providers.length);
 
 		providers3 = (TmfDataProvider<TmfEvent3>[]) TmfProviderManager.getProviders(TmfEvent3.class);
-		assertTrue(providers3.length == 0);
+		assertEquals("getProviders", 0, providers.length);
 
 		providers3 = (TmfDataProvider<TmfEvent3>[]) TmfProviderManager.getProviders(TmfEvent3.class, TestProvider3.class);
-		assertTrue(providers3.length == 0);
+		assertEquals("getProviders", 0, providers.length);
+	}
+
+	@SuppressWarnings("unchecked")
+	public void testGetProvider() {
+
+		// Register 3 providers, mixed data types
+		TestProvider1 testProvider1 = new TestProvider1(TmfEvent.class);
+		TestProvider2 testProvider2 = new TestProvider2(TmfEvent.class);
+		TestProvider3 testProvider3 = new TestProvider3(TmfEvent3.class);
+
+		TmfDataProvider<TmfEvent>[] providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, null);
+		assertEquals("getProviders", 2, providers.length);
+		if (providers[0] == testProvider1) {
+			assertEquals("getProviders", testProvider2, providers[1]);
+		}
+		else {
+			assertEquals("getProviders", testProvider2, providers[0]);
+			assertEquals("getProviders", testProvider1, providers[1]);
+		}
+
+		providers = (TmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent3.class, null);
+		assertEquals("getProviders", 1, providers.length);
+		assertEquals("getProviders", testProvider3, providers[0]);
+
+		// Remove the providers
+		testProvider1.dispose();
+		testProvider2.dispose();
+		testProvider3.dispose();
 	}
 
 }

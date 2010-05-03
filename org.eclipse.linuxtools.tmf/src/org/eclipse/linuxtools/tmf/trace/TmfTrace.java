@@ -27,7 +27,7 @@ import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
-import org.eclipse.linuxtools.tmf.request.TmfCoalescedEventRequest;
+import org.eclipse.linuxtools.tmf.signal.TmfTraceUpdatedSignal;
 
 /**
  * <b><u>TmfTrace</u></b>
@@ -36,17 +36,20 @@ import org.eclipse.linuxtools.tmf.request.TmfCoalescedEventRequest;
  * class and provide implementation for <code>getCurrentLocation()</code> and
  * <code>seekLocation()</code>, as well as a proper parser, to have a working
  * concrete implementation.
- * 
+ * <p>
  * Note: The notion of event rank is still under heavy discussion. Although
- * used for by the Events View and probably useful in then general case, there
+ * used by the Events View and probably useful in the general case, there
  * is no easy way to implement it for LTTng (actually  a strong case is being
- * made that this is useless). Therefore, this is a minimal and partial
- * implementation and rank should not be relied upon in the general case (i.e.
- *  it was hacked to work for the Events View).
+ * made that this is useless).
+ * <p>
+ * That it is not supported by LTTng does by no mean indicate that it is not
+ * useful for (just about) every other tracing tool. Therefore, this class
+ * provides a minimal (and partial) implementation of rank. However, the current
+ * implementation should not be relied on in the general case.
  * 
  * TODO: Add support for live streaming (notifications, incremental indexing, ...)
  */
-public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> implements ITmfTrace {
+public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> implements ITmfTrace, Cloneable {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -84,6 +87,14 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 
     /**
      * @param path
+     * @throws FileNotFoundException
+     */
+    protected TmfTrace(Class<T> type, String path) throws FileNotFoundException {
+    	this(type, path, DEFAULT_CACHE_SIZE);
+    }
+
+    /**
+     * @param path
      * @param cacheSize
      * @throws FileNotFoundException
      */
@@ -95,12 +106,16 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
         fIndexPageSize = (cacheSize > 0) ? cacheSize : DEFAULT_CACHE_SIZE;
     }
 
-    /**
-     * @param path
-     * @throws FileNotFoundException
+    /* (non-Javadoc)
+     * @see java.lang.Object#clone()
      */
-    protected TmfTrace(Class<T> type, String path) throws FileNotFoundException {
-    	this(type, path, DEFAULT_CACHE_SIZE);
+    @SuppressWarnings("unchecked")
+	@Override
+	public TmfTrace<T> clone() throws CloneNotSupportedException {
+    	TmfTrace<T> clone = (TmfTrace<T>) super.clone();
+    	clone.fCheckpoints = (Vector<TmfCheckpoint>) fCheckpoints.clone(); 
+    	clone.fTimeRange = new TmfTimeRange(fTimeRange); 
+    	return clone;
     }
 
     // ------------------------------------------------------------------------
@@ -157,8 +172,9 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     	return fTimeRange.getEndTime();
     }
 
-    public Vector<TmfCheckpoint> getCheckpoints() {
-    	return fCheckpoints;
+    @SuppressWarnings("unchecked")
+	public Vector<TmfCheckpoint> getCheckpoints() {
+    	return (Vector<TmfCheckpoint>) fCheckpoints.clone();
     }
 
     // ------------------------------------------------------------------------
@@ -186,10 +202,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 		if (request instanceof ITmfEventRequest<?>) {
 			return seekEvent(((ITmfEventRequest<T>) request).getRange().getStartTime());
 		}
-		if (request instanceof TmfCoalescedEventRequest<?>) {
-			return seekEvent(((TmfCoalescedEventRequest<T>) request).getRange().getStartTime());
-		}
-		return null;
+		return seekEvent(request.getIndex());
 	}
 
 	/**
@@ -248,7 +261,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
         context.setRank(index * fIndexPageSize);
 
         // And locate the event
-        TmfContext nextEventContext = new TmfContext(context);
+        TmfContext nextEventContext = context.clone(); // Must use clone() to get the right subtype...
         TmfEvent event = getNextEvent(nextEventContext);
         while (event != null && event.getTimestamp().compareTo(timestamp, false) < 0) {
         	context.setLocation(nextEventContext.getLocation().clone());
@@ -313,7 +326,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 	 * 
 	 * @param event
 	 */
-	public void processEvent(TmfEvent event) {
+	protected void processEvent(TmfEvent event) {
 		// Do nothing by default
 	}
 
@@ -333,7 +346,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 	 */
 	@Override
 	public String toString() {
-		return "[TmfTrace (" + fName + "]";
+		return "[TmfTrace (" + fName + ")]";
 	}
 
     // ------------------------------------------------------------------------
@@ -341,21 +354,25 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     // ------------------------------------------------------------------------
 
 	/*
-	 * The purpose of the index is to keep the information needed to rapidly
-	 * access a trace event based on its timestamp or rank.
+	 * The purpose of the index is to perform a pass over the trace and collect
+	 * basic information that can be later used to rapidly access a trace events.
 	 * 
-	 * NOTE: As it is, doesn't work for streaming traces.
+	 * The information collected:
+	 * - fCheckpoints, the list of evenly separated checkpoints (timestamp + location)
+	 * - fTimeRange, the trace time span
+	 * - fNbEvents, the number of events in the trace
+	 * 
+	 * NOTE: Doesn't work for streaming traces.
 	 */
 
 	private IndexingJob job;
 
 	// Indicates that an indexing job is already running
-	private Object  fIndexingLock = new Object();
 	private boolean fIndexing = false;
 	private Boolean fIndexed  = false;
 
 	public void indexTrace(boolean waitForCompletion) {
-    	synchronized (fIndexingLock) {
+    	synchronized (this) {
 			if (fIndexed || fIndexing) {
     			return;
     		}

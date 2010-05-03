@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.parser.ITmfEventParser;
 
 /**
@@ -31,10 +33,10 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     // ------------------------------------------------------------------------
 
     // The actual stream
-    private final RandomAccessFile fTrace;
+    private RandomAccessFile fTrace;
 
     // The associated event parser
-    private final ITmfEventParser fParser;
+    private ITmfEventParser fParser;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -45,7 +47,9 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * @throws FileNotFoundException
      */
     public TmfTraceStub(String filename) throws FileNotFoundException {
-        this(filename, DEFAULT_CACHE_SIZE, false);
+        super(TmfEvent.class, filename);
+        fTrace  = new RandomAccessFile(filename, "r");
+        fParser = new TmfEventParserStub();
     }
 
     /**
@@ -59,12 +63,47 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
 
     /**
      * @param filename
+     * @param waitForCompletion
      * @throws FileNotFoundException
      */
     public TmfTraceStub(String filename, boolean waitForCompletion) throws FileNotFoundException {
         this(filename, DEFAULT_CACHE_SIZE, waitForCompletion);
     }
     
+    /**
+     * @param filename
+     * @param cacheSize
+     * @param waitForCompletion
+     * @throws FileNotFoundException
+     */
+    public TmfTraceStub(String filename, int cacheSize, boolean waitForCompletion) throws FileNotFoundException {
+        super(TmfEvent.class, filename, cacheSize);
+        fTrace = new RandomAccessFile(filename, "r");
+        fParser = new TmfEventParserStub();
+    }
+
+//    /**
+//     * @param other
+//     */
+//    public TmfTraceStub(TmfTraceStub other) {
+//        this(filename, DEFAULT_CACHE_SIZE, waitForCompletion);
+//    }
+    
+    /**
+     */
+    @Override
+	public TmfTraceStub clone() {
+    	TmfTraceStub clone = null;
+   		try {
+			clone = (TmfTraceStub) super.clone();
+	       	clone.fTrace  = new RandomAccessFile(getName(), "r");
+	       	clone.fParser = new TmfEventParserStub();
+		} catch (CloneNotSupportedException e) {
+		} catch (FileNotFoundException e) {
+		}
+    	return clone;
+    }
+ 
     public ITmfTrace createTraceCopy() {
 		ITmfTrace returnedValue = null;
 		try {
@@ -76,18 +115,6 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
 		return returnedValue;
 	}
     
-    /**
-     * @param filename
-     * @param cacheSize
-     * @throws FileNotFoundException
-     */
-    public TmfTraceStub(String filename, int cacheSize, boolean waitForCompletion) throws FileNotFoundException {
-        super(TmfEvent.class, filename, cacheSize);
-        fTrace = new RandomAccessFile(filename, "r");
-        fParser = new TmfEventParserStub();
-        indexTrace(waitForCompletion);
-    }
-
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -107,11 +134,16 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
         	synchronized(fTrace) {
         		// Position the trace at the requested location and
         		// returns the corresponding context
-        		long loc = (location != null) ? ((TmfLocation<Long>) location).getLocation() : 0;
+        		long loc  = 0;
+        		long rank = 0;
+        		if (location != null) {
+        			loc = ((TmfLocation<Long>) location).getLocation();
+        			rank = ITmfContext.UNKNOWN_RANK;
+        		}
         		if (loc != fTrace.getFilePointer()) {
         			fTrace.seek(loc);
         		}
-        		TmfContext context = new TmfContext(getCurrentLocation(), 0);
+        		TmfContext context = new TmfContext(getCurrentLocation(), rank);
         		return context;
         	}
 		} catch (IOException e) {
@@ -142,5 +174,20 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
        	}
        	return null;
 	}
+
+	@Override
+	public void setTimeRange(TmfTimeRange range) {
+    	super.setTimeRange(range);
+    }
+
+	@Override
+	public void setStartTime(TmfTimestamp startTime) {
+    	super.setStartTime(startTime);
+    }
+
+	@Override
+	public void setEndTime(TmfTimestamp endTime) {
+    	super.setEndTime(endTime);
+    }
 
 }

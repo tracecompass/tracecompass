@@ -19,8 +19,6 @@ package org.eclipse.linuxtools.tmf.trace;
  * Trace context structure. It ties a trace location to an event rank. The
  * context should be enough to restore the trace state so the corresponding
  * event can be read.
- * <p>
- * Used to handle conflicting, concurrent accesses to the trace. 
  */
 public class TmfContext implements ITmfContext, Cloneable {
 
@@ -49,20 +47,6 @@ public class TmfContext implements ITmfContext, Cloneable {
 	}
 
 	// ------------------------------------------------------------------------
-	// Cloneable
-	// ------------------------------------------------------------------------
-
-	@Override
-	public TmfContext clone() {
-		try {
-			return (TmfContext) super.clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	// ------------------------------------------------------------------------
 	// ITmfContext
 	// ------------------------------------------------------------------------
 
@@ -83,7 +67,46 @@ public class TmfContext implements ITmfContext, Cloneable {
 	}
 
 	public void updateRank(int delta) {
-		fRank += delta;
+		if (fRank != UNKNOWN_RANK)
+			fRank += delta;
+	}
+
+	// ------------------------------------------------------------------------
+	// Object
+	// ------------------------------------------------------------------------
+
+    @Override
+    public int hashCode() {
+		int result = 17;
+		result = 37 * result + fLocation.hashCode();
+		result = 37 * result + (int) (fRank ^ (fRank >>> 32));
+    	return result;
+    }
+ 
+    @Override
+    public boolean equals(Object other) {
+    	if (!(other instanceof TmfContext)) {
+    		return false;
+    	}
+    	TmfContext o = (TmfContext) other;
+    	return fLocation.equals(o.fLocation) && (fRank == o.fRank);
+    }
+ 
+    @Override
+    public String toString() {
+    	return "[TmfContext(" + fLocation.toString() +  "," + fRank + ")]";
+    }
+ 
+	@Override
+	public TmfContext clone() {
+		TmfContext clone = null;
+		try {
+			clone = (TmfContext) super.clone();
+			clone.fLocation = fLocation.clone();
+			clone.fRank = fRank;
+		} catch (CloneNotSupportedException e) {
+		}
+		return clone;
 	}
 
 }

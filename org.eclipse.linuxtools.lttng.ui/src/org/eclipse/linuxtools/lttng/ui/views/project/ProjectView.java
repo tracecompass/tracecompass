@@ -33,7 +33,7 @@ import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectLabelProv
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectRoot;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngTraceNode;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
-import org.eclipse.linuxtools.tmf.experiment.TmfExperimentSelectedSignal;
+import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;

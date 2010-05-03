@@ -25,14 +25,16 @@ import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
+import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
+import org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfCheckpoint;
 import org.eclipse.linuxtools.tmf.trace.TmfContext;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceUpdatedSignal;
 
 /**
  * <b><u>TmfExperiment</u></b>
@@ -138,13 +140,15 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     
     
     /**
-     * 
+     * Clears the experiment
      */
     @Override
 	public void dispose() {
+    	for (ITmfTrace trace : fTraces) {
+    		trace.dispose();
+    	}
     	fTraces = null;
     	fCheckpoints.clear();
-    	setCurrentExperiment(null);
         super.dispose();
     }
 
@@ -272,29 +276,11 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
 	@Override
 	public ITmfContext armRequest(ITmfDataRequest<T> request) {
-		
 		TmfTimestamp timestamp = (request instanceof ITmfEventRequest<?>) ?
 				((ITmfEventRequest<T>) request).getRange().getStartTime() : null;
-		 
-		
 		TmfExperimentContext context = (timestamp != null) ? 
 			seekEvent(timestamp) : seekEvent(request.getIndex());
-
 		return context;
-
-//		TmfTimestamp timestamp = null;
-//		
-//		if (request instanceof TmfEventRequest<?> == true) {
-//			timestamp = ((TmfEventRequest<T>) request).getRange().getStartTime();
-//		}
-//		else if (request instanceof TmfCoalescedEventRequest<?> == true) {
-//			timestamp = ((TmfCoalescedEventRequest<?>)request).getRange().getStartTime();
-//		}
-//		else {
-//			System.out.println("ERROR : request of unknown instance in armRequest(). Class is : " + request.getClass().toString() );
-//		}
-		
-		
 	}
 
 	@SuppressWarnings("unchecked")
@@ -677,7 +663,13 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
     @TmfSignalHandler
     public void experimentSelected(TmfExperimentSelectedSignal<T> signal) {
-		setCurrentExperiment(signal.getExperiment());
+    	TmfExperiment<?> experiment = signal.getExperiment();
+    	if (experiment == this) {
+    		setCurrentExperiment(experiment);
+    	}
+    	else {
+    		dispose();
+    	}
 //    	if (signal.getExperiment() == this) {
 //    		indexExperiment(true);
 //    	}

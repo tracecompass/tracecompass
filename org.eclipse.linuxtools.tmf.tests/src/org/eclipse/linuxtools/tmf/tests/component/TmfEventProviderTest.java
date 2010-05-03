@@ -31,7 +31,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
 /**
  * <b><u>TmfClientTest</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * Test suite for the TmfEventProvider class.
  */
 public class TmfEventProviderTest extends TestCase {
 
@@ -65,17 +65,17 @@ public class TmfEventProviderTest extends TestCase {
 
 		// There should be 2 TmfEvent providers: a TmfTraceStub and a TmfEventProviderStub
 		ITmfDataProvider<TmfEvent>[] eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
-		assertTrue(eventProviders.length == 2);
+		assertEquals("getProviders", 2, eventProviders.length);
 
 		eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
-		assertTrue(eventProviders.length == 1);
+		assertEquals("getProviders", 1, eventProviders.length);
 
 		eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfEventProviderStub.class);
-		assertTrue(eventProviders.length == 1);
+		assertEquals("getProviders", 1, eventProviders.length);
 
 		// There should be 1 TmfSyntheticEventStub provider
 		eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfSyntheticEventStub.class);
-		assertTrue(eventProviders.length == 1);
+		assertEquals("getProviders", 1, eventProviders.length);
 	}
 
 	// ------------------------------------------------------------------------
@@ -201,17 +201,17 @@ public class TmfEventProviderTest extends TestCase {
 
 		// There should be 2 TmfEvent providers: a TmfTraceStub and a TmfEventProviderStub
 		ITmfDataProvider<TmfEvent>[] eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class);
-		assertTrue(eventProviders.length == 2);
+		assertEquals("getProviders", 2, eventProviders.length);
 
 		eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
-		assertTrue(eventProviders.length == 1);
+		assertEquals("getProviders", 1, eventProviders.length);
 
 		eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfEventProviderStub.class);
-		assertTrue(eventProviders.length == 1);
+		assertEquals("getProviders", 1, eventProviders.length);
 
 		// There should be 1 TmfSyntheticEventStub provider
 		eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfSyntheticEventStub.class);
-		assertTrue(eventProviders.length == 1);
+		assertEquals("getProviders", 1, eventProviders.length);
 	}
 
 }

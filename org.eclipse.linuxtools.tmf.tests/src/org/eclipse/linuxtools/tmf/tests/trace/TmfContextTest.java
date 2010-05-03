@@ -73,7 +73,7 @@ public class TmfContextTest extends TestCase {
 	public void testTmfContextDefault() {
 		TmfContext context = new TmfContext();
 		assertEquals("getLocation", null, context.getLocation());
-		assertEquals("getRank", TmfContext.UNKNOWN_RANK, context.getRank());
+		assertEquals("getRank",        0, context.getRank());
 	}
 
 	public void testTmfContextNoRank() {
@@ -85,9 +85,9 @@ public class TmfContextTest extends TestCase {
 		assertEquals("getLocation", fLocation2, context2.getLocation());
 		assertEquals("getLocation", fLocation3, context3.getLocation());
 
-		assertEquals("getRank", TmfContext.UNKNOWN_RANK, context1.getRank());
-		assertEquals("getRank", TmfContext.UNKNOWN_RANK, context2.getRank());
-		assertEquals("getRank", TmfContext.UNKNOWN_RANK, context3.getRank());
+		assertEquals("getRank", 0, context1.getRank());
+		assertEquals("getRank", 0, context2.getRank());
+		assertEquals("getRank", 0, context3.getRank());
 	}
 
 	public void testTmfContext() {

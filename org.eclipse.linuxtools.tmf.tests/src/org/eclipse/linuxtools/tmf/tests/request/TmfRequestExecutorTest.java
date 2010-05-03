@@ -59,10 +59,6 @@ public class TmfRequestExecutorTest extends TestCase {
 	 */
 	public void testTmfRequestExecutor() {
 		TmfRequestExecutor executor = new TmfRequestExecutor();
-		assertTrue("TmfRequestExecutor", executor != null);
-		assertTrue("TmfRequestExecutor", executor instanceof TmfRequestExecutor);
-//		assertEquals("toString", "[TmfRequestExecutor(DelegatedExecutorService)]", executor.toString());
-
 		assertEquals("nbPendingRequests", 0, executor.getNbPendingRequests());
 		assertFalse("isShutdown",   executor.isShutdown());
 		assertFalse("isTerminated", executor.isTerminated());
@@ -73,10 +69,6 @@ public class TmfRequestExecutorTest extends TestCase {
 	 */
 	public void testTmfRequestExecutorExecutorService() {
 		TmfRequestExecutor executor = new TmfRequestExecutor(Executors.newCachedThreadPool());
-		assertTrue("TmfRequestExecutor", executor != null);
-		assertTrue("TmfRequestExecutor", executor instanceof TmfRequestExecutor);
-//		assertEquals("toString", "[TmfRequestExecutor(ThreadPoolExecutor)]", executor.toString());
-
 		assertEquals("nbPendingRequests", 0, executor.getNbPendingRequests());
 		assertFalse("isShutdown",   executor.isShutdown());
 		assertFalse("isTerminated", executor.isTerminated());
@@ -93,11 +85,32 @@ public class TmfRequestExecutorTest extends TestCase {
 		assertTrue("isTerminated", executor.isTerminated());
 	}
 
-//	/**
-//	 * Test method for {@link org.eclipse.linuxtools.tmf.request.TmfRequestExecutor#execute(java.lang.Runnable)}.
-//	 */
-//	public void testExecute() {
+	// ------------------------------------------------------------------------
+	// execute
+	// ------------------------------------------------------------------------
+
+	/**
+	 * Test method for {@link org.eclipse.linuxtools.tmf.request.TmfRequestExecutor#execute(java.lang.Runnable)}.
+	 */
+	public void testExecute() {
 //		fail("Not yet implemented");
-//	}
+	}
+
+	// ------------------------------------------------------------------------
+	// toString
+	// ------------------------------------------------------------------------
+
+	/**
+	 * Test method for {@link org.eclipse.linuxtools.tmf.request.TmfRequestExecutor#toString()}.
+	 */
+	public void testToString() {
+		TmfRequestExecutor executor1 = new TmfRequestExecutor();
+		String expected1 = "[TmfRequestExecutor(DelegatedExecutorService)]";
+		assertEquals("toString", expected1, executor1.toString());
+
+		TmfRequestExecutor executor2 = new TmfRequestExecutor(Executors.newCachedThreadPool());
+		String expected2 = "[TmfRequestExecutor(ThreadPoolExecutor)]";
+		assertEquals("toString", expected2, executor2.toString());
+	}
 
 }

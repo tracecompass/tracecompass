@@ -17,7 +17,7 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 /**
  * <b><u>TmfCheckpoint</u></b>
  * <p>
- * This class maps an event timestamp with a location.
+ * This class maps an event timestamp to a generic location.
  */
 public class TmfCheckpoint implements Comparable<TmfCheckpoint> {
 
@@ -32,13 +32,30 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint> {
     // Constructors
     // ------------------------------------------------------------------------
 
+    @SuppressWarnings("unused")
+	private TmfCheckpoint() {
+        fTimestamp = null;
+        fLocation  = null;
+    }
+
     /**
-     * @param ts
-     * @param location
+     * @param ts the checkpoint timestamp
+     * @param location the corresponding trace location
      */
     public TmfCheckpoint(TmfTimestamp ts, ITmfLocation<?> location) {
         fTimestamp = ts;
         fLocation = location;
+    }
+
+    /**
+     * Deep copy constructor
+     * @param other the other checkpoint
+     */
+    public TmfCheckpoint(TmfCheckpoint other) {
+    	if (other == null)
+    		throw new IllegalArgumentException();
+        fTimestamp = (TmfTimestamp) other.fTimestamp.clone();
+        fLocation  = other.fLocation.clone();
     }
 
     // ------------------------------------------------------------------------
@@ -46,14 +63,14 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint> {
     // ------------------------------------------------------------------------
 
     /**
-     * @return the checkpoint event timestamp
+     * @return the checkpoint timestamp
      */
     public TmfTimestamp getTimestamp() {
         return fTimestamp;
     }
 
     /**
-     * @return the checkpoint event stream location
+     * @return the checkpoint stream location
      */
     public ITmfLocation<?> getLocation() {
         return fLocation;
@@ -65,9 +82,7 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint> {
 
     @Override
     public int hashCode() {
-    	int result = 37;
-    	result = 17 * result + fTimestamp.hashCode();
-    	return result;
+    	return fTimestamp.hashCode();
     }
  
     @Override
@@ -77,6 +92,11 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint> {
     	}
     	TmfCheckpoint o = (TmfCheckpoint) other;
     	return fTimestamp.equals(o.fTimestamp);
+    }
+ 
+    @Override
+    public String toString() {
+    	return "[TmfCheckpoint(" + fTimestamp +  "," + fLocation + ")]";
     }
  
     // ------------------------------------------------------------------------

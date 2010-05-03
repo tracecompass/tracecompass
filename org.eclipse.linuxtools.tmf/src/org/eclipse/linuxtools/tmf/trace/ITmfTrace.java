@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.trace;
 
+import org.eclipse.linuxtools.tmf.component.ITmfComponent;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
@@ -20,7 +21,7 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
  * <b><u>ITmfTrace</u></b>
  * <p>
  */
-public interface ITmfTrace {
+public interface ITmfTrace extends ITmfComponent {
 	
 	public ITmfTrace createTraceCopy();
 	
@@ -47,7 +48,7 @@ public interface ITmfTrace {
     public TmfTimestamp getStartTime();
     public TmfTimestamp getEndTime();
 
-    /**
+	/**
      * Positions the trace at the first event with the specified
      * timestamp or index (i.e. the nth event in the trace).
      * 

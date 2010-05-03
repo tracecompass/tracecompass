@@ -172,14 +172,6 @@ public class TmfEventTypeTest extends TestCase {
 		assertTrue("equals", fType0.equals(fType2));
 	}
 	
-	public void testEqualsConsistency() throws Exception {
-		assertTrue("equals", fType0.equals(fType0));
-		assertTrue("equals", fType0.equals(fType0));
-
-		assertTrue("equals", fType3.equals(fType3));
-		assertTrue("equals", fType3.equals(fType3));
-	}
-	
 	public void testEqualsNull() throws Exception {
 		assertTrue("equals", !fType0.equals(null));
 		assertTrue("equals", !fType3.equals(null));

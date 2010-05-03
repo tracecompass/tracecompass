@@ -179,17 +179,6 @@ public class TmfEventTest extends TestCase {
 		assertTrue("equals", event1.equals(event3));
 	}
 	
-	public void testEqualsConsistency() throws Exception {
-		TmfEvent event1 = new TmfEvent(fEvent1);
-		TmfEvent event2 = new TmfEvent(fEvent2);
-
-		assertTrue("equals", event1.equals(fEvent1));
-		assertTrue("equals", event1.equals(fEvent1));
-
-		assertTrue("equals", event2.equals(fEvent2));
-		assertTrue("equals", event2.equals(fEvent2));
-	}
-	
 	public void testEqualsNull() throws Exception {
 		assertTrue("equals", !fEvent1.equals(null));
 		assertTrue("equals", !fEvent2.equals(null));

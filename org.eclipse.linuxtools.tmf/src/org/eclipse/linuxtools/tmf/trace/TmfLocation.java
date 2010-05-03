@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.trace;
 
+import java.lang.reflect.Method;
+
 /**
  * <b><u>TmfLocation</u></b>
  * <p>
@@ -21,8 +23,18 @@ public class TmfLocation<L> implements ITmfLocation<L> {
 
 	private L fLocation;
 	
+	@SuppressWarnings("unused")
+	private TmfLocation() {
+	}
+
 	public TmfLocation(L location) {
 		fLocation = location;
+	}
+
+	public TmfLocation(TmfLocation<L> other) {
+    	if (other == null)
+    		throw new IllegalArgumentException();
+    	fLocation = other.fLocation;
 	}
 
 	public void setLocation(L location) {
@@ -33,20 +45,44 @@ public class TmfLocation<L> implements ITmfLocation<L> {
 		return fLocation;
 	}
 
+	// ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
+
+	@Override
+    public int hashCode() {
+		return fLocation.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof TmfLocation<?>))
+        	return false;
+        TmfLocation<?> o = (TmfLocation<?>) other;
+        return fLocation.equals(o.fLocation);
+    }
+
 	@Override
 	public String toString() {
 		return fLocation.toString();
 	}
 
-	@Override
 	@SuppressWarnings("unchecked")
+	@Override
 	public TmfLocation<L> clone() {
+		TmfLocation<L> clone = null;
 		try {
-			return (TmfLocation<L>) super.clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
+			clone = (TmfLocation<L>) super.clone();
+			Class<?> clazz  = this.fLocation.getClass(); 
+			Method   method = clazz.getMethod("clone", new Class[0]);
+			Object   duplic = method.invoke(this.fLocation, new Object[0]);
+			clone.fLocation = (L) duplic;
+		} catch (NoSuchMethodException e) { 
+		      // exception suppressed 
+		} catch (Exception e) {
+			throw new InternalError(e.toString());
 		}
-		return null;
+		return clone;
 	}
 
 }

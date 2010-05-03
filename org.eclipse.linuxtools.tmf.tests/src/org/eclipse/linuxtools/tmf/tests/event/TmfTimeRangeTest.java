@@ -163,19 +163,6 @@ public class TmfTimeRangeTest extends TestCase {
 		assertTrue("equals", range1a.equals(range1c));
 	}
 	
-	public void testEqualsConsistency() throws Exception {
-		TmfTimestamp ts1 = new TmfTimestamp(12345);
-		TmfTimestamp ts2 = new TmfTimestamp(12350);
-		TmfTimeRange range1a = new TmfTimeRange(ts1, ts2);
-		TmfTimeRange range1b = new TmfTimeRange(ts1, ts2);
-
-		assertTrue("equals", range1a.equals(range1a));
-		assertTrue("equals", range1a.equals(range1a));
-
-		assertTrue("equals", range1b.equals(range1b));
-		assertTrue("equals", range1b.equals(range1b));
-	}
-	
 	public void testEqualsNull() throws Exception {
 		TmfTimestamp ts1 = new TmfTimestamp(12345);
 		TmfTimestamp ts2 = new TmfTimestamp(12350);
