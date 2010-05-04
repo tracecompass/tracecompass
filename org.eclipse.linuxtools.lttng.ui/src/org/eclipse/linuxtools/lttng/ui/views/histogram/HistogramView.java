@@ -478,8 +478,8 @@ public class HistogramView extends TmfView implements ControlListener {
 				// Notify control that the window changed
             	windowChangedNotification();
             	
+            	// Make sure we redraw the change
             	fullExperimentCanvas.redraw();
-            	selectedWindowCanvas.redraw();
 			}
 		}
 	}
@@ -491,9 +491,10 @@ public class HistogramView extends TmfView implements ControlListener {
      * @param newExperiment	Experiment we will use for the request
      */
     private void createCanvasAndRequests(TmfExperiment<LttngEvent> newExperiment) {
-    	
+    	// Save the experiment we are about to use
     	lastUsedExperiment = newExperiment;
     	
+    	// Create a copy of the trace that will be use only by the full experiment request
     	TmfExperiment<LttngEvent> experimentCopy = newExperiment.createTraceCopy();
     	
     	// Create the content for the full experiment. 
@@ -511,7 +512,6 @@ public class HistogramView extends TmfView implements ControlListener {
 		
     	// Make sure the UI object are sane
 		resetControlsContent();
-		
 		
 		// Redraw the canvas right away to have something "clean" as soon as we can
     	if ( dataBackgroundFullRequest != null ) {
@@ -666,9 +666,6 @@ public class HistogramView extends TmfView implements ControlListener {
         	
         	// Update the UI control
         	updateSelectedEventTime();
-        	
-        	// Send a signal to the framework
-        	//sendTmfTimeSynchSignalBroadcast();
         }
     }
     
@@ -694,7 +691,6 @@ public class HistogramView extends TmfView implements ControlListener {
     	// *** TODO ***
     	// Not very elegant... we need to chance this below.
     	//
-    	
     	long centerTime = fullExperimentCanvas.getCurrentWindow().getTimestampCenter();
     	long windowWidth = fullExperimentCanvas.getCurrentWindow().getWindowTimeWidth();
     	
@@ -709,11 +705,6 @@ public class HistogramView extends TmfView implements ControlListener {
     		endTime = fullExperimentCanvas.getHistogramContent().getEndTime();
     	}
     	LttngTimestamp tmpEndTime = new LttngTimestamp(endTime);
-        
-    	/*
-    	LttngTimestamp tmpStartTime = new LttngTimestamp(fullExperimentCanvas.getCurrentWindow().getTimestampLeft());
-    	LttngTimestamp tmpEndTime = new LttngTimestamp(fullExperimentCanvas.getCurrentWindow().getTimestampRight());
-    	*/
     	
         TmfTimeRange tmpTimeRange = new TmfTimeRange(tmpStartTime, tmpEndTime);
         LttngTimestamp tmpEventTime = new LttngTimestamp(currentEventTime);
@@ -823,6 +814,9 @@ public class HistogramView extends TmfView implements ControlListener {
 		
 		ntgCurrentWindowTime.setValue( HistogramConstant.formatNanoSecondsTime( 0L ) );
 		ntgTimeRangeWindow.setValue( HistogramConstant.formatNanoSecondsTime( 0L ) );
+		
+		// Using "startTime" here can avoid an useless TmfTimeSynchSignal here
+		// However it look ugly to have only this time
 		ntgCurrentEventTime.setValue( HistogramConstant.formatNanoSecondsTime( 0L ) );
 	}
 	
