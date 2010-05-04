@@ -26,6 +26,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class TmfRequestExecutor implements Executor {
 
 	private final ExecutorService fExecutor;
+	private final String fExecutorName;
 	private final Queue<Runnable> fRequestQueue = new LinkedBlockingQueue<Runnable>();
 	private Runnable fCurrentRequest;
 	
@@ -39,6 +40,8 @@ public class TmfRequestExecutor implements Executor {
 
 	public TmfRequestExecutor(ExecutorService executor) {
 		fExecutor = executor;
+		String canonicalName = fExecutor.getClass().getCanonicalName();
+		fExecutorName = canonicalName.substring(canonicalName.lastIndexOf('.') + 1);
 	}
 
 	/**
@@ -106,7 +109,7 @@ public class TmfRequestExecutor implements Executor {
 
 	@Override
 	public String toString() {
-		return "[TmfRequestExecutor(" + fExecutor.getClass().getSimpleName() + "" + ")]";
+		return "[TmfRequestExecutor(" + fExecutorName + ")]";
 	}
 
 }
