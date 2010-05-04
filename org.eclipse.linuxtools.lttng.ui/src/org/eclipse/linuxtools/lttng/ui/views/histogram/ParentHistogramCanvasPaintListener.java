@@ -129,7 +129,7 @@ public class ParentHistogramCanvasPaintListener extends HistogramCanvasPaintList
 		//	here because the window might have been resized!
 		int exp = (int)Math.floor( Math.log( (double)tmpContent.getCanvasWindowSize() ) / Math.log(2.0) );
 		int contentSize = (int)Math.pow(2, exp);
-		Double maxBarsDiffFactor = ((double)tmpContent.getNbElement() / (double)contentSize );
+		double maxBarsDiffFactor = ((double)tmpContent.getNbElement() / (double)contentSize );
 		
 		if ( maxBarsDiffFactor != tmpContent.getMaxDifferenceToAverageFactor() ) {
 			// The factor changed! That's unfortunate because it will take a while to recalculate.

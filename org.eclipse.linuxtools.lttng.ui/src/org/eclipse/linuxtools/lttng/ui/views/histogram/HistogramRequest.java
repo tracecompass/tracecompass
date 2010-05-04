@@ -25,14 +25,14 @@ import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 	protected HistogramContent histogramContent = null;
 	
-	protected Integer 	lastInterval = 0;
-	protected Long 		lastRangeTime = 0L;
-	protected Long 		nbEventsInInterval = 1L;
+	protected int 	lastInterval = 0;
+	protected long 		lastRangeTime = 0L;
+	protected long 		nbEventsInInterval = 1L;
 	
-	protected Integer 	nbIntervalNotEmpty = 1;
-	protected Integer 	nbEventRead = 0;
+	protected int 	nbIntervalNotEmpty = 1;
+	protected int 	nbEventRead = 0;
 	
-	protected Integer	lastDrawPosition = 0;
+	protected int	lastDrawPosition = 0;
 	
 	protected HistogramCanvas parentCanvas = null;
 	
@@ -47,7 +47,7 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 	 * 
 	 * @see org.eclipse.linuxtools.tmf.request.TmfEventRequest
 	 */
-	public HistogramRequest(TmfTimeRange range, Integer nbRequested, HistogramCanvas newParentCanvas, Long timeInterval) {
+	public HistogramRequest(TmfTimeRange range, int nbRequested, HistogramCanvas newParentCanvas, long timeInterval) {
         super((Class<LttngEvent>)LttngEvent.class, range, nbRequested, HistogramConstant.MAX_EVENTS_PER_READ);
         
         // *** FIXME ***
@@ -129,11 +129,11 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 				// We are still in the same interval, just keep counting
 				else {
 					nbEventsInInterval++;
-					if ( nbEventsInInterval > histogramContent.getHeighestEventCount() ) {
-						histogramContent.setHeighestEventCount(nbEventsInInterval);
-					}
 				}
 				
+				if ( nbEventsInInterval > histogramContent.getHeighestEventCount() ) {
+					histogramContent.setHeighestEventCount(nbEventsInInterval);
+				}
 				nbEventRead++;
 				
 				// Call an asynchronous redraw every REDRAW_EVERY_NB_EVENTS events
@@ -202,11 +202,12 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
     	// The average number of event is calculated while skipping empty interval if asked
     	int averageNumberOfEvents = 0;
     	if ( HistogramConstant.SKIP_EMPTY_INTERVALS_WHEN_CALCULATING_AVERAGE ) {
-    		averageNumberOfEvents = nbEventRead / nbIntervalNotEmpty;
+    		averageNumberOfEvents = (int)Math.ceil((double)nbEventRead / (double)nbIntervalNotEmpty);
     	}
     	else {
-    		averageNumberOfEvents = nbEventRead / histogramContent.getNbElement();
+    		averageNumberOfEvents = (int)Math.ceil((double)nbEventRead / (double)histogramContent.getNbElement());
     	}
+    	
     	histogramContent.setAverageNumberOfEvents(averageNumberOfEvents);
     	
     	// It is possible that the height factor didn't change; 

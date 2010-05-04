@@ -130,7 +130,7 @@ public class HistogramCanvasPaintListener implements PaintListener
 	
 	/**
 	 * Draw the selection window in the canvas.<p>
-	 * This draw a square ober the selected section with a crosshair in the middle.
+	 * This draw a square around the selected section with a crosshair in the middle.
 	 * The square cannot be smaller than "MINIMUM_WINDOW_WIDTH"
 	 * 
 	 * @param event The generated paint event when redraw is called.

@@ -46,7 +46,7 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 	 */
 	public void mouseMove(MouseEvent event) {
 		if ( isWindowMoving == true ) {
-			parentCanvas.centerWindow(event.x);
+			parentCanvas.setWindowCenterPosition(event.x);
 		}
 	}
 	
@@ -59,7 +59,7 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 	public void mouseDown(MouseEvent event) {
 		if ( event.button == 1) {
 			isWindowMoving = true;
-			parentCanvas.centerWindow(event.x);
+			parentCanvas.setWindowCenterPosition(event.x);
 		}
 	}
 	

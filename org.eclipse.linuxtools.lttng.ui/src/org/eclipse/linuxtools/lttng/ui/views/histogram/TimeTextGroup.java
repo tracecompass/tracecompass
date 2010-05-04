@@ -38,14 +38,14 @@ public class TimeTextGroup implements FocusListener, KeyListener {
 	
 	protected static final String 	NANOSEC_LABEL = "sec";
 	protected static final String	LONGEST_STRING_VALUE = "." + Long.MAX_VALUE;
-	protected static final Integer	MAX_CHAR_IN_TEXTBOX = LONGEST_STRING_VALUE.length();
+	protected static final int	MAX_CHAR_IN_TEXTBOX = LONGEST_STRING_VALUE.length();
     
     // The "small font" height used to display time will be "default font" minus this constant
-	protected static final Integer VERY_SMALL_FONT_MODIFIER = 2;
-    protected static final Integer SMALL_FONT_MODIFIER = 1;
+	protected static final int VERY_SMALL_FONT_MODIFIER = 2;
+    protected static final int SMALL_FONT_MODIFIER = 1;
     
     // Indentation size 
-    protected static final Integer DEFAULT_INDENT_SIZE = 10;
+    protected static final int DEFAULT_INDENT_SIZE = 10;
     
     protected HistogramView parentView = null;
     protected AsyncTimeTextGroupRedrawer asyncRedrawer = null;
@@ -54,7 +54,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
     protected Text 	txtNanosec 	= null;
     protected Label lblNanosec 	= null;
     
-    protected Long 	timeValue 	= 0L; 
+    protected long 	timeValue 	= 0L; 
     
     /**
      * Default Constructor.<p>
@@ -225,19 +225,19 @@ public class TimeTextGroup implements FocusListener, KeyListener {
      * 
      * @return	The nanoseconds time value
      */
-    public Long getValue() {
+    public long getValue() {
     	return timeValue;
     }
     
     /**
      * Set a new String value to the control.<p>
-     * Note : The String value will be converted in Long before being applied;
+     * Note : The String value will be converted in long before being applied;
      * 			if any conversion error occur, 0 will be used. <p>
      * 
      * @param newTimeAsString	The value to convert and set.
      */
     public void setValue(String newTimeAsString) {
-    	Long timeAsLong = HistogramConstant.convertStringToNanoseconds(newTimeAsString);
+    	long timeAsLong = HistogramConstant.convertStringToNanoseconds(newTimeAsString);
     	setValue( timeAsLong );
     }
     
@@ -248,7 +248,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
      * 
      * @param newTime	The value to set.
      */
-    public void setValue(Long newTime) {
+    public void setValue(long newTime) {
     	timeValue = newTime;
     	txtNanosec.setText( HistogramConstant.formatNanoSecondsTime(newTime) );
     }
@@ -260,17 +260,17 @@ public class TimeTextGroup implements FocusListener, KeyListener {
      * @param newTimeAsString	The value to convert and set.
      */
     public void setValueAsynchronously(String newTimeAsString) {
-    	Long timeAsLong = HistogramConstant.convertStringToNanoseconds(newTimeAsString);
+    	long timeAsLong = HistogramConstant.convertStringToNanoseconds(newTimeAsString);
     	setValueAsynchronously( timeAsLong );
     }
     
     /**
      * Set a new String value, asynchronously.<p>
-     * This will call setValue(Long) in async.Exec to avoid Thread Access problem to UI.<p>
+     * This will call setValue(long) in async.Exec to avoid Thread Access problem to UI.<p>
      * 
      * @param newTimeAsString	The value to set.
      */
-    public void setValueAsynchronously(Long newTime) {
+    public void setValueAsynchronously(long newTime) {
     	// Set the correct value ASAP
     	timeValue = newTime;
     	
@@ -293,7 +293,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
     
     /**
      * Set a new group name (label) for this control, asynchronously.<p>
-     * This will call setValue(Long) in async.Exec to avoid Thread Access problem to UI.<p>
+     * This will call setValue(long) in async.Exec to avoid Thread Access problem to UI.<p>
      * 
      * @param newName	The new name to set.
      */
@@ -335,7 +335,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
      */
 	protected void handleNewStringValue() {
     	String valueInText = txtNanosec.getText();
-		Long valueAsLong = HistogramConstant.convertStringToNanoseconds(valueInText);
+		long valueAsLong = HistogramConstant.convertStringToNanoseconds(valueInText);
 		
 		if ( getValue() != valueAsLong ) {
 			setValue(valueAsLong);
@@ -430,7 +430,7 @@ class AsyncTimeTextGroupRedrawer {
 	 * 
 	 * @param newTime 	The new time to set
 	 */
-	public void asynchronousSetValue(Long newTime) {
+	public void asynchronousSetValue(long newTime) {
 		final long tmpTime = newTime;
 		
 		Display display =  parentTimeTextGroup.getParent().getDisplay();

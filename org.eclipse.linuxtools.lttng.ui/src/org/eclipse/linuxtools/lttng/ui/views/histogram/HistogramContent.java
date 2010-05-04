@@ -19,36 +19,37 @@ package org.eclipse.linuxtools.lttng.ui.views.histogram;
  * <p>
  */
 public class HistogramContent {
+	
 	// Start and end time of the content
-	protected Long 		startTime = 0L;
-	protected Long 		endTime   = 0L;
+	protected long 		startTime = 0L;
+	protected long 		endTime   = 0L;
 	
 	// Some information about the content
 	// Most of them are required to calculate position and/or draw
 	// Make sure they stay consistent!
-	protected Long		elementsTimeInterval = 0L;
-	protected Double 	heightFactor = 0.0;
-	protected Long   	heighestEventCount = 0L;
-	protected Integer 	maxHeight	 = 0;
-	protected Integer	canvasWindowSize = 0;
-	protected Integer 	barsWidth = 0;
+	protected long		elementsTimeInterval = 1L;
+	protected double 	heightFactor = 100.0;
+	protected long   	heighestEventCount = 0L;
+	protected int 	maxHeight	 = 0;
+	protected int	canvasWindowSize = 0;
+	protected int 	barsWidth = 0;
 	
 	// This value is used to calculate at which point we should "cut" bar that are too tall.
 	// Default value is large enought so that no bar should be cut
-	protected Double  maxDifferenceToAverage = HistogramConstant.DEFAULT_DIFFERENCE_TO_AVERAGE;
+	protected double  maxDifferenceToAverage = HistogramConstant.DEFAULT_DIFFERENCE_TO_AVERAGE;
 	// This is a factor we might apply on the max difference to average, as example if we concatenate interval together
-	protected Double  maxDifferenceFactor = 1.0;
+	protected double  maxDifferenceFactor = 1.0;
 	
 	// By default we will only consider element up to this position 
-	protected Integer	readyUpToPosition = 0;
+	protected int	readyUpToPosition = 0;
 	
 	// The average number of events in the content
 	// Note : this IS needed to draw
-	protected Integer	averageNumberOfEvents = 0;
+	protected int	averageNumberOfEvents = 0;
 	
 	// This is to draw the selected event of the TMF framework in another color
 	// Set the 0 to ignore
-	protected Long selectedEventTimeInWindow = -1L;
+	protected long selectedEventTimeInWindow = -1L;
 	
 	// The table that hold the elements
 	protected HistogramElement[] elementTable;
@@ -61,7 +62,7 @@ public class HistogramContent {
 	 * @param newCanvasSize		The full size of the canvas. Used for positionning; need to be consistent with canvas.
 	 * @param newMaxHeight		The maximum height of a bar, usually same as the height of the canvas.
 	 */
-	public HistogramContent(Integer tableSize, Integer newCanvasSize, Integer newBarWidth, Integer newMaxHeight) {
+	public HistogramContent(int tableSize, int newCanvasSize, int newBarWidth, int newMaxHeight) {
 		this(tableSize, newCanvasSize, newBarWidth, newMaxHeight, HistogramConstant.DEFAULT_DIFFERENCE_TO_AVERAGE);
 	}
 	
@@ -73,7 +74,7 @@ public class HistogramContent {
 	 * @param newMaxHeight		The maximum height of a bar, usually same as the height of the canvas.
 	 * @param newDiffToAverage  This value at which point we "cut" bar that are too tall.
 	 */
-	public HistogramContent(Integer tableSize, Integer newCanvasSize, Integer newBarWidth, Integer newMaxHeight, Double newDiffToAverage) {
+	public HistogramContent(int tableSize, int newCanvasSize, int newBarWidth, int newMaxHeight, double newDiffToAverage) {
 		canvasWindowSize = newCanvasSize;
 		barsWidth = newBarWidth;
 		maxHeight = newMaxHeight;
@@ -90,7 +91,7 @@ public class HistogramContent {
 	 * 
 	 * @param newTableSize	The size (number of element) of the table.
 	 */
-	public void createNewTable(Integer newTableSize) {
+	public void createNewTable(int newTableSize) {
 		elementTable = new HistogramElement[newTableSize];
 		
 		for ( int x=0; x<elementTable.length; x++) {
@@ -106,8 +107,8 @@ public class HistogramContent {
 		startTime = 0L;
 		endTime = 0L;
 		
-		elementsTimeInterval = 0L;
-		heightFactor = 0.0;
+		elementsTimeInterval = 1L;
+		heightFactor = 100.0;
 		heighestEventCount = 0L;
 		
 		readyUpToPosition = 0;
@@ -133,7 +134,7 @@ public class HistogramContent {
 	 *  @param	newStartTime	The new start time to use 
 	 *  @param	newEndTime		The new stop time to use
 	 */
-	public void resetTable(Long newStartTime, Long newEndTime) {
+	public void resetTable(long newStartTime, long newEndTime) {
 		recalculateElementsTimeInterval(newStartTime, newEndTime);
 		resetTable(newStartTime, newEndTime, elementsTimeInterval);
 	}
@@ -146,7 +147,7 @@ public class HistogramContent {
 	 *  @param	newEndTime		The new stop time to use
 	 *  @param  newTimeInterval The new time interval to use
 	 */
-	public void resetTable(Long newStartTime, Long newEndTime, Long newTimeInterval) {
+	public void resetTable(long newStartTime, long newEndTime, long newTimeInterval) {
 		
 		startTime = newStartTime;
 		endTime = newEndTime;
@@ -202,7 +203,7 @@ public class HistogramContent {
 	 * 
 	 * @return	The time of the event.
 	 */
-	public Long getSelectedEventTimeInWindow() {
+	public long getSelectedEventTimeInWindow() {
 		return selectedEventTimeInWindow;
 	}
 	
@@ -214,7 +215,7 @@ public class HistogramContent {
 	 * 
 	 * @param newPosition The new event time.
 	 */
-	public void setSelectedEventTimeInWindow(Long newTime) {
+	public void setSelectedEventTimeInWindow(long newTime) {
 		this.selectedEventTimeInWindow = newTime;
 	}
 	
@@ -227,7 +228,7 @@ public class HistogramContent {
 	 * 
 	 * @return The element found or null if the index is wrong.
 	 */
-	public HistogramElement getElementByIndex(Integer index) {
+	public HistogramElement getElementByIndex(int index) {
 		HistogramElement returnedElement = null;
 		
 		if ( (index >= 0) && (index < elementTable.length) ) {
@@ -248,7 +249,7 @@ public class HistogramContent {
 	 * 
 	 * @return	The <i>closest</i> element found.
 	 */
-	public HistogramElement getClosestElementFromXPosition(Integer position) {
+	public HistogramElement getClosestElementFromXPosition(int position) {
 		
 		int index = (int)Math.round((double)elementTable.length * ((double)position / (double)canvasWindowSize) );
 		
@@ -274,7 +275,7 @@ public class HistogramContent {
 	 * 
 	 * @return	The <i>closest</i> timestamp found.
 	 */
-	public Long getClosestTimestampFromXPosition(Integer position) {
+	public long getClosestTimestampFromXPosition(int position) {
 		return getClosestElementFromXPosition(position).firstIntervalTimestamp;
 	}
 	
@@ -304,7 +305,7 @@ public class HistogramContent {
 	 * 
 	 * @return	The <i>closest</i> element found.
 	 */
-	public HistogramElement getClosestElementFromTimestamp(Long timestamp) {
+	public HistogramElement getClosestElementFromTimestamp(long timestamp) {
 		int index = (int)( (timestamp - startTime)/elementsTimeInterval );
 		
 		// If we are out of bound, return the closest border (first or last element)
@@ -329,7 +330,7 @@ public class HistogramContent {
 	 * 
 	 * @return	The <i>closest</i> position found.
 	 */
-	public Integer getClosestXPositionFromTimestamp(Long timestamp) {
+	public int getClosestXPositionFromTimestamp(long timestamp) {
 		return getXPositionFromElement(getClosestElementFromTimestamp(timestamp));
 	}
 	
@@ -344,11 +345,11 @@ public class HistogramContent {
 	 * 
 	 * @return	The <i>closest</i> found element, or null if given data are wrong.
 	 */
-	public HistogramElement getClosestElementByElementAndTimeInterval(HistogramElement targetElement, Long intervalToElement) {
+	public HistogramElement getClosestElementByElementAndTimeInterval(HistogramElement targetElement, long intervalToElement) {
 		
 		// Get the timestamp of the target element
 		// This should always be valid as long the table is initialized
-		Long elementTime = targetElement.firstIntervalTimestamp;
+		long elementTime = targetElement.firstIntervalTimestamp;
 		elementTime = elementTime + intervalToElement;
 		
 		return getClosestElementFromTimestamp(elementTime);
@@ -365,7 +366,7 @@ public class HistogramContent {
 	 * 
 	 * @return	The <i>closest</i> found element, or null if given data are wrong.
 	 */
-	public int getClosestElementByTimestampAndTimeInterval(Long timestamp, Long intervalToElement) {
+	public int getClosestElementByTimestampAndTimeInterval(long timestamp, long intervalToElement) {
 		HistogramElement targetElement = getClosestElementFromTimestamp(timestamp);
 		HistogramElement newElement = getClosestElementByElementAndTimeInterval(targetElement, intervalToElement);
 		
@@ -383,7 +384,7 @@ public class HistogramContent {
 	 * 
 	 * @return	The <i>closest</i> found element, or null if given data are wrong.
 	 */
-	public int getXPositionByPositionAndTimeInterval(int targetPosition, Long intervalToElement) {
+	public int getXPositionByPositionAndTimeInterval(int targetPosition, long intervalToElement) {
 		HistogramElement targetElement = getClosestElementFromXPosition(targetPosition);
 		HistogramElement newElement = getClosestElementByElementAndTimeInterval(targetElement, intervalToElement);
 		
@@ -456,7 +457,7 @@ public class HistogramContent {
 	 * 
 	 * @return The start time we currently use.
 	 */
-	public Long getStartTime() {
+	public long getStartTime() {
 		return startTime;
 	}
 	
@@ -466,7 +467,7 @@ public class HistogramContent {
 	 * 
 	 * @param newStartTime	the new start time
 	 */
-	public void setStartTime(Long newStartTime) {
+	public void setStartTime(long newStartTime) {
 		this.startTime = newStartTime;
 	}
 	
@@ -476,7 +477,7 @@ public class HistogramContent {
 	 * 
 	 * @return The end time we currently use.
 	 */
-	public Long getEndTime() {
+	public long getEndTime() {
 		return endTime;
 	}
 	
@@ -486,7 +487,7 @@ public class HistogramContent {
 	 * 
 	 * @param newStartTime	the new end time
 	 */
-	public void setEndTime(Long newEndTime) {
+	public void setEndTime(long newEndTime) {
 		this.endTime = newEndTime;
 	}
 	
@@ -496,7 +497,7 @@ public class HistogramContent {
 	 * 
 	 * @return	The complete time interval
 	 */
-	public Long getCompleteTimeInterval() {
+	public long getCompleteTimeInterval() {
 		return ( endTime - startTime );
 	}
 	
@@ -506,7 +507,7 @@ public class HistogramContent {
 	 * 
 	 * @return	The time interval of the position that are ready.
 	 */
-	public Long getReadyTimeInterval() {
+	public long getReadyTimeInterval() {
 		return ( elementTable[readyUpToPosition].firstIntervalTimestamp - elementTable[0].firstIntervalTimestamp );
 	}
 	
@@ -516,7 +517,7 @@ public class HistogramContent {
 	 * 
 	 * @return	Height factor currently used. 
 	 */
-	public Double getHeightFactor() {
+	public double getHeightFactor() {
 		return heightFactor;
 	}
 	
@@ -528,7 +529,8 @@ public class HistogramContent {
 		// Recalculate the new HeightFactor for the element; 
 		//		the highest bar will get "maxHeight" and other bar a fraction of it.
 		double diffToConsider = (maxDifferenceToAverage * maxDifferenceFactor * (double)barsWidth);
-		if ( heighestEventCount > (int)(diffToConsider * (double)averageNumberOfEvents) ) {
+		
+		if ( heighestEventCount > (long)(diffToConsider * (double)averageNumberOfEvents) ) {
 			heightFactor = (double)maxHeight/( diffToConsider * (double)averageNumberOfEvents);
 		}
 		else {
@@ -555,7 +557,7 @@ public class HistogramContent {
 	 * Unlike recalculateEventHeight(), this only recalculate for the given range, not the whole table.
 	 * 
 	 */
-	public void recalculateEventHeightInInterval(Integer startPosition, Integer stopPosition) {
+	public void recalculateEventHeightInInterval(int startPosition, int stopPosition) {
 		// Basic error checking on start : should be bigger than 0
 		if ( startPosition < 0 ) {
 			startPosition = 0;
@@ -578,7 +580,7 @@ public class HistogramContent {
 	 * 
 	 * @return	Size of the canvas we currently use.
 	 */
-	public Integer getCanvasWindowSize() {
+	public int getCanvasWindowSize() {
 		return canvasWindowSize;
 	}
 	
@@ -588,7 +590,7 @@ public class HistogramContent {
 	 * 
 	 * @param	newSize	New canvas size;
 	 */
-	public void setCanvasWindowSize(Integer newSize) {
+	public void setCanvasWindowSize(int newSize) {
 		canvasWindowSize = newSize;
 	}
 	
@@ -599,7 +601,7 @@ public class HistogramContent {
 	 * 
 	 * @return Current heighestEventCount
 	 */
-	public Long getHeighestEventCount() {
+	public long getHeighestEventCount() {
 		return heighestEventCount;
 	}
 	
@@ -611,7 +613,7 @@ public class HistogramContent {
 	 * 
 	 * @param newHeighestEventCount	Heighest event count for a single interval.
 	 */
-	public void setHeighestEventCount(Long newHeighestEventCount) {
+	public void setHeighestEventCount(long newHeighestEventCount) {
 		this.heighestEventCount = newHeighestEventCount;
 	}
 	
@@ -634,7 +636,7 @@ public class HistogramContent {
 	 * 
 	 * @return	maximum height for a bar we currently use.
 	 */
-	public Integer getMaxHeight() {
+	public int getMaxHeight() {
 		return maxHeight;
 	}
 	
@@ -646,7 +648,7 @@ public class HistogramContent {
 	 * 
 	 * @param maxHeight	The new maximum height for a bar to use.
 	 */
-	public void setMaxHeight(Integer maxHeight) {
+	public void setMaxHeight(int maxHeight) {
 		this.maxHeight = maxHeight;
 	}
 	
@@ -656,7 +658,7 @@ public class HistogramContent {
 	 * 
 	 * @return	maximum difference to the average we currently use.
 	 */
-	public Double getMaxDifferenceToAverage() {
+	public double getMaxDifferenceToAverage() {
 		return maxDifferenceToAverage;
 	}
 	
@@ -669,7 +671,7 @@ public class HistogramContent {
 	 * 
 	 * @param newDiffToAverage	The new maximum difference to the average to use.
 	 */
-	public void setMaxDifferenceToAverage(Double newDiffToAverage) {
+	public void setMaxDifferenceToAverage(double newDiffToAverage) {
 		maxDifferenceToAverage = newDiffToAverage;
 	}
 	
@@ -682,7 +684,7 @@ public class HistogramContent {
 	 * 
 	 * @return	maximum difference to the average we currently use.
 	 */
-	public Double getMaxDifferenceToAverageFactor() {
+	public double getMaxDifferenceToAverageFactor() {
 		return maxDifferenceFactor;
 	}
 	
@@ -695,7 +697,7 @@ public class HistogramContent {
 	 * 
 	 * @param newFactor		The new factor to use.
 	 */
-	public void setMaxDifferenceToAverageFactor(Double newFactor) {
+	public void setMaxDifferenceToAverageFactor(double newFactor) {
 		maxDifferenceFactor = newFactor;
 	}
 	
@@ -706,7 +708,7 @@ public class HistogramContent {
 	 * 
 	 * @return	Currently used interval time.
 	 */
-	public Long getElementsTimeInterval() {
+	public long getElementsTimeInterval() {
 		return elementsTimeInterval;
 	}
 	
@@ -719,7 +721,7 @@ public class HistogramContent {
 	 * 
 	 * @return New interval time.
 	 */
-	public void setElementsTimeInterval(Long newInterval) {
+	public void setElementsTimeInterval(long newInterval) {
 		this.elementsTimeInterval = newInterval;
 	}
 	
@@ -729,8 +731,14 @@ public class HistogramContent {
 	 * 
 	 * @return	The complete time interval
 	 */
-	public void recalculateElementsTimeInterval(Long startTime, Long endTime) {
-		this.elementsTimeInterval = ((endTime - startTime)/getNbElement());
+	public void recalculateElementsTimeInterval(long startTime, long endTime) {
+		long tmpInterval = ((endTime - startTime)/getNbElement());
+		
+		if ( tmpInterval <= 0 ) {
+			tmpInterval = 1L;
+		}
+		
+		this.elementsTimeInterval = tmpInterval;
 	}
 	
 	
@@ -740,7 +748,7 @@ public class HistogramContent {
 	 * 
 	 * @return Last position processed so far.
 	 */
-	public Integer getReadyUpToPosition() {
+	public int getReadyUpToPosition() {
 		return readyUpToPosition;
 	}
 	
@@ -760,7 +768,7 @@ public class HistogramContent {
 	 * 
 	 * @return current bars width;
 	 */
-	public Integer getBarsWidth() {
+	public int getBarsWidth() {
 		return barsWidth;
 	}
 	
@@ -770,7 +778,7 @@ public class HistogramContent {
 	 * 
 	 * @param newBarsWidth new bars width;
 	 */
-	public void setBarsWidth(Integer newBarsWidth) {
+	public void setBarsWidth(int newBarsWidth) {
 		this.barsWidth = newBarsWidth;
 	}
 	

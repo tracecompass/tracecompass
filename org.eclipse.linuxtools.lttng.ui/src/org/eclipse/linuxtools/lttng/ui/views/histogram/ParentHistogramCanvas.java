@@ -31,7 +31,7 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 	 * @param parent 		Composite control which will be the parent of the new instance (cannot be null)
 	 * @param 				Style the style of control to construct
 	 */
-	public ParentHistogramCanvas(HistogramView newParentWindow, Composite parent, Integer style) {
+	public ParentHistogramCanvas(HistogramView newParentWindow, Composite parent, int style) {
 		super(parent, style);
 		
 		parentHistogramWindow = newParentWindow;
@@ -51,7 +51,7 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 	 * @param maxBarsDifferenceToAverage	Factor used to "chop" bars that are too tall. Set to something big (100.0?) if not needed.
 	 */
 	@Override
-	public void createNewHistogramContent(Integer canvasSize, Integer widthPerBar, Integer barsHeight, Double maxBarsDifferenceToAverage) {
+	public void createNewHistogramContent(int canvasSize, int widthPerBar, int barsHeight, double maxBarsDifferenceToAverage) {
 		
 		// *** FIXME ***
 		// Note there MIGHT be some unhandled case, like if the resolution of the screen change 
@@ -101,10 +101,10 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 	 * @param newRelativeXPosition	New position relative to the last known absolute position.
 	 */
 	@Override
-	public void moveWindow(Integer newRelativeXPosition) {
+	public void moveWindow(int newRelativeXPosition) {
 		int absolutePosition = currentWindow.getWindowXPositionCenter() + newRelativeXPosition;
 		
-		centerWindow(absolutePosition);
+		setWindowCenterPosition(absolutePosition);
 		notifyParentSelectionWindowChangedAsynchronously();
 	}
 	
@@ -117,7 +117,7 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 	 * @param newRelativeXPosition	New absolute position.
 	 */
 	@Override
-	public void centerWindow(Integer newAbsoluteXPosition) {
+	public void setWindowCenterPosition(int newAbsoluteXPosition) {
 		
 		if ( newAbsoluteXPosition < 0 ) {
 			newAbsoluteXPosition = 0;
@@ -141,7 +141,7 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 	 * @param newTime	 New absoulte time (in nanoseconds) to apply to the window.
 	 */
 	@Override
-	public void resizeWindowByAbsoluteTime(Long newTime) {
+	public void resizeWindowByAbsoluteTime(long newTime) {
 		if ( newTime != getSelectedWindowSize() ) {
 			setSelectedWindowSize(newTime);
 			
@@ -167,5 +167,7 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 	public void notifyParentSelectionWindowChanged() {
 		// Notify the parent view that something changed
 		parentHistogramWindow.windowChangedNotification();
+		// Send a broadcast to the framework about the window change
+		parentHistogramWindow.sendTmfRangeSynchSignalBroadcast();
 	}
 }

@@ -20,8 +20,8 @@ package org.eclipse.linuxtools.lttng.ui.views.histogram;
  * Each "element" should represent a certain time interval
  */
 public class HistogramElement {
-	public Integer index = 0;					// Position of the element in the table (table index, obviously)
-	public Long firstIntervalTimestamp = 0L;	// The first timestamp recorded for this interval 
-	public Long intervalNbEvents = 0L;			// Number of events recorded in this interval
-	public Integer intervalHeight = 0;			// Height (in the canvas) of this element. Should be smaller than the canvas height.
+	public int index = 0;					// Position of the element in the table (table index, obviously)
+	public long firstIntervalTimestamp = 0L;	// The first timestamp recorded for this interval 
+	public long intervalNbEvents = 0L;			// Number of events recorded in this interval
+	public int intervalHeight = 0;			// Height (in the canvas) of this element. Should be smaller than the canvas height.
 }

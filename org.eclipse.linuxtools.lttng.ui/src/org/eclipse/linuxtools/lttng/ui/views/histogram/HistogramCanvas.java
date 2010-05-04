@@ -43,7 +43,7 @@ public class HistogramCanvas extends Canvas
 	 * @param parent 		Composite control which will be the parent of the new instance (cannot be null)
 	 * @param 				Style the style of control to construct
 	 */
-	public HistogramCanvas(Composite parent, Integer style) {
+	public HistogramCanvas(Composite parent, int style) {
 		super(parent, style);
 		addNeededListeners();
 		
@@ -139,7 +139,7 @@ public class HistogramCanvas extends Canvas
 	 * @param barsHeight   					Height of the histogram "bars"
 	 * @param maxBarsDifferenceToAverage	Factor used to "chop" bars that are too tall. Set to something big (100.0?) if not needed.
 	 */
-	public void createNewHistogramContent(Integer canvasSize, Integer widthPerBar, Integer barsHeight, Double maxBarsDifferenceToAverage) {
+	public void createNewHistogramContent(int canvasSize, int widthPerBar, int barsHeight, double maxBarsDifferenceToAverage) {
 		histogramContent = new HistogramContent( canvasSize / widthPerBar, canvasSize, widthPerBar, barsHeight, maxBarsDifferenceToAverage);
 	}
 	
@@ -150,7 +150,7 @@ public class HistogramCanvas extends Canvas
 	 * 
 	 * @param windowTimeDuration	Time width (in nanosecond) of the window.
 	 */
-	public void createNewSelectedWindow(Long windowTimeDuration) {
+	public void createNewSelectedWindow(long windowTimeDuration) {
 		currentWindow = new HistogramSelectedWindow(histogramContent);
 		
 		currentWindow.setWindowTimeWidth(windowTimeDuration);
@@ -177,7 +177,7 @@ public class HistogramCanvas extends Canvas
 	 * 
 	 * @return Time width (in nanosecond) of the selection window.
 	 */
-	public Long getSelectedWindowSize() {
+	public long getSelectedWindowSize() {
 		return currentWindow.getWindowTimeWidth();
 	}
 	
@@ -189,12 +189,11 @@ public class HistogramCanvas extends Canvas
 	 * 
 	 * @param newSelectedWindowSize	New time width (in nanosecond) of the selection window.
 	 */
-	public void setSelectedWindowSize(Long newSelectedWindowSize) {
+	public void setSelectedWindowSize(long newSelectedWindowSize) {
 		
-		if ( newSelectedWindowSize < histogramContent.getElementsTimeInterval() ) {
-			newSelectedWindowSize = histogramContent.getElementsTimeInterval();
+		if ( newSelectedWindowSize <= 0 ) {
+			newSelectedWindowSize = 1L;
 		}
-		
 		else if ( newSelectedWindowSize > (2*histogramContent.getCompleteTimeInterval()) ) {
 			newSelectedWindowSize = (2*histogramContent.getCompleteTimeInterval());
 		}
@@ -252,7 +251,7 @@ public class HistogramCanvas extends Canvas
 	 * 
 	 * @param newRelativeXPosition	New position relative to the last known absolute position.
 	 */
-	public void moveWindow(Integer newRelativeXPosition) {
+	public void moveWindow(int newRelativeXPosition) {
 		// Nothing : function is a place holder
 	}
 	
@@ -264,7 +263,7 @@ public class HistogramCanvas extends Canvas
 	 * 
 	 * @param newRelativeXPosition	New absolute position.
 	 */
-	public void centerWindow(Integer newAbsoluteXPosition) {
+	public void setWindowCenterPosition(int newAbsoluteXPosition) {
 		// Nothing : function is a place holder
 	}
 	
@@ -276,7 +275,7 @@ public class HistogramCanvas extends Canvas
 	 * 
 	 * @param newTime	 New absoulte time (in nanoseconds) to apply to the window.
 	 */
-	public void resizeWindowByAbsoluteTime(Long newTime) {
+	public void resizeWindowByAbsoluteTime(long newTime) {
 		// Nothing : function is a place holder
 	}
 	

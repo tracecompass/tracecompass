@@ -57,7 +57,7 @@ public class HistogramCanvasControlListener implements ControlListener {
 			//		and what it really points to. The user should reclick by himself to refresh it. 
 			int oldWindowCenter = parentCanvas.getCurrentWindow().getWindowXPositionCenter();
 			int newWindowCenter = (int)Math.ceil((double)newSize * ((double)oldWindowCenter / (double)oldSize));
-			parentCanvas.centerWindow(newWindowCenter);
+			parentCanvas.setWindowCenterPosition(newWindowCenter);
 		}
 	}
 }

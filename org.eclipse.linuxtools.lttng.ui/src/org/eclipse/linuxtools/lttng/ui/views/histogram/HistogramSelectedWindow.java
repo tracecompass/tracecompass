@@ -27,8 +27,8 @@ package org.eclipse.linuxtools.lttng.ui.views.histogram;
  */
 public class HistogramSelectedWindow {
 	
-	protected Integer windowCenterPosition = 0;
-	protected Long 	windowTimeWidth = 0L;
+	protected int windowCenterPosition = 0;
+	protected long 	windowTimeWidth = 0L;
 	
 	protected Boolean isSelectedWindowVisible = false;
 	
@@ -52,7 +52,7 @@ public class HistogramSelectedWindow {
 	 * @param centralPosition	Central X Position of the selection window in the canvas (0 to canvasWidth)
 	 * @param newWindowWidth	Time width (size) of the window. (0 or greater)
 	 */
-	public HistogramSelectedWindow(HistogramContent newTraceContent, Integer centralPosition, Long newWindowWidth) {
+	public HistogramSelectedWindow(HistogramContent newTraceContent, int centralPosition, long newWindowWidth) {
 		histogramContent = newTraceContent;
 		windowCenterPosition = centralPosition;
 		windowTimeWidth = newWindowWidth;
@@ -114,7 +114,7 @@ public class HistogramSelectedWindow {
 	 * 
 	 * @param newWindowTimeWidth	The new time width
 	 */
-	public void setWindowTimeWidth(Long newWindowTimeWidth) {
+	public void setWindowTimeWidth(long newWindowTimeWidth) {
 		this.windowTimeWidth = newWindowTimeWidth;
 	}
 	
@@ -134,7 +134,7 @@ public class HistogramSelectedWindow {
 	 * 
 	 * @param newPosCenter	The new central position.
 	 */
-	public void setWindowXPositionCenter(Integer newPosCenter) {
+	public void setWindowXPositionCenter(int newPosCenter) {
 		this.windowCenterPosition = newPosCenter;
 	}
 	
@@ -144,8 +144,15 @@ public class HistogramSelectedWindow {
 	 * 
 	 * @return The left position of the window, or 0 if it cannot compute it. 
 	 */
-	public Integer getWindowXPositionLeft() {
-		return histogramContent.getXPositionByPositionAndTimeInterval(windowCenterPosition, -(windowTimeWidth / 2) );
+	public int getWindowXPositionLeft() {
+		int tmpLeftPosition = histogramContent.getXPositionByPositionAndTimeInterval(windowCenterPosition, -(windowTimeWidth / 2) );
+		if ( (tmpLeftPosition == windowCenterPosition ) && (tmpLeftPosition>0) ) {
+			tmpLeftPosition = tmpLeftPosition-1;
+		}
+		
+		return tmpLeftPosition;
+		
+		//return histogramContent.getXPositionByPositionAndTimeInterval(windowCenterPosition, -(windowTimeWidth / 2) );
 	}
 	
 	/**
@@ -154,8 +161,16 @@ public class HistogramSelectedWindow {
 	 * 
 	 * @return The right position of the window, or 0 if it cannot compute it. 
 	 */
-	public Integer getWindowXPositionRight() {
-		return histogramContent.getXPositionByPositionAndTimeInterval(windowCenterPosition, +(windowTimeWidth / 2) );
+	public int getWindowXPositionRight() {
+		
+		int tmpRightPosition = histogramContent.getXPositionByPositionAndTimeInterval(windowCenterPosition, +(windowTimeWidth / 2) );
+		if ( (tmpRightPosition == windowCenterPosition ) && (tmpRightPosition<(histogramContent.getNbElement()-1) ) ) {
+			tmpRightPosition = tmpRightPosition+1;
+		}
+		
+		return tmpRightPosition;
+		
+		//return histogramContent.getXPositionByPositionAndTimeInterval(windowCenterPosition, +(windowTimeWidth / 2) );
 	}
 	
 	/**
@@ -164,7 +179,7 @@ public class HistogramSelectedWindow {
 	 * 
 	 * @return  The left timestamp of the window, or 0 if it cannot compute it. 
 	 */
-	public Long getTimestampLeft() {
+	public long getTimestampLeft() {
 		return histogramContent.getClosestElementFromXPosition( getWindowXPositionLeft() ).firstIntervalTimestamp;
 	}
 	
@@ -174,7 +189,7 @@ public class HistogramSelectedWindow {
 	 * 
 	 * @return  The center timestamp of the window, or 0 if it cannot compute it. 
 	 */
-	public Long getTimestampCenter() {
+	public long getTimestampCenter() {
 		return histogramContent.getClosestElementFromXPosition( getWindowXPositionCenter() ).firstIntervalTimestamp;
 	}
 	
@@ -184,7 +199,7 @@ public class HistogramSelectedWindow {
 	 * 
 	 * @return  The right timestamp of the window, or 0 if it cannot compute it. 
 	 */
-	public Long getTimestampRight() {
+	public long getTimestampRight() {
 		return histogramContent.getClosestElementFromXPosition( getWindowXPositionRight() ).firstIntervalTimestamp;
 	}
 }
