@@ -251,7 +251,7 @@ public class HistogramContent {
 	 */
 	public HistogramElement getClosestElementFromXPosition(int position) {
 		
-		int index = (int)Math.round((double)elementTable.length * ((double)position / (double)canvasWindowSize) );
+		int index = (int)((double)elementTable.length * ((double)position / (double)canvasWindowSize) );
 		
 		// If we are out of bound, return the closest border (first or last element)
 		if ( index < 0) {
@@ -291,7 +291,7 @@ public class HistogramContent {
 	 * @return					The <i>closest</i> found element. 
 	 */
 	public int getXPositionFromElement(HistogramElement targetElement) {
-		return (int)Math.round( ((double)targetElement.index / (double)elementTable.length)*(double)canvasWindowSize );
+		return (int)( ((double)targetElement.index / (double)elementTable.length)*(double)canvasWindowSize );
 	}
 	
 	/**
