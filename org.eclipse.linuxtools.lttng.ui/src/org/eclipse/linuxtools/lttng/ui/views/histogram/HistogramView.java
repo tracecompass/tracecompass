@@ -492,8 +492,9 @@ public class HistogramView extends TmfView implements ControlListener {
      */
     private void createCanvasAndRequests(TmfExperiment<LttngEvent> newExperiment) {
     	
+    	lastUsedExperiment = newExperiment;
+    	
     	TmfExperiment<LttngEvent> experimentCopy = newExperiment.createTraceCopy();
-    	lastUsedExperiment = experimentCopy;
     	
     	// Create the content for the full experiment. 
     	// This NEED to be created first, as we use it in the selectedWindowCanvas
