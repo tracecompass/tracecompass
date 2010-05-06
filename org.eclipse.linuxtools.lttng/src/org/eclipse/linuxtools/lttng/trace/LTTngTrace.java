@@ -680,7 +680,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * @see org.eclipse.linuxtools.org.eclipse.linuxtools.lttng.jni.JniEvent
      * @see org.eclipse.linuxtools.lttng.event.LttngEvent
      */
-	public LttngEvent convertJniEventToTmf(JniEvent newEvent) {
+	public synchronized LttngEvent convertJniEventToTmf(JniEvent newEvent) {
 	    currentLttngEvent = convertJniEventToTmf(newEvent, IS_PARSING_NEEDED_DEFAULT);
 	    
 	    return currentLttngEvent;
@@ -697,7 +697,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * @see org.eclipse.linuxtools.org.eclipse.linuxtools.lttng.jni.JniEvent
      * @see org.eclipse.linuxtools.lttng.event.LttngEvent
      */
-    public LttngEvent convertJniEventToTmf(JniEvent jniEvent, boolean isParsingNeeded) {
+    public synchronized LttngEvent convertJniEventToTmf(JniEvent jniEvent, boolean isParsingNeeded) {
     	
     	if ( uniqueEvent == true ) {
 	    	
@@ -745,7 +745,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * @param jniEvent	The current JNI Event
      * @return Current 	Lttng Event fully parsed
      */
-    private LttngEvent convertJniEventToTmfMultipleEventEvilFix(JniEvent jniEvent) {
+    private synchronized LttngEvent convertJniEventToTmfMultipleEventEvilFix(JniEvent jniEvent) {
     	// *** HACK ***
     	// Below : the "fix" with all the new and the full-parse
     	// 		Allocating new memory is slow.

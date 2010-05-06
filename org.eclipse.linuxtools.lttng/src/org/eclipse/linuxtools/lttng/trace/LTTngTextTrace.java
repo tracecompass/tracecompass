@@ -163,7 +163,10 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 					System.out.println();
 				}
 				positionToFirstEvent();
-				br.skip(skipPosition);
+				long nbSkipped = br.skip(skipPosition);
+				if ( nbSkipped != skipPosition) {
+					throw new IOException("Too few characters skipped, positionning failed! (skipToPosition)");
+				}
 				
 				nbCharRead = skipPosition;
     	}
