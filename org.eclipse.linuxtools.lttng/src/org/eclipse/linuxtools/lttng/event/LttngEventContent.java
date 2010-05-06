@@ -251,15 +251,14 @@ public class LttngEventContent extends TmfEventContent {
      */
     @Override
     public String toString() {
-        String returnedString = "";
-        
         LttngEventField[] allFields = getFields();
         
+        StringBuffer strBuffer = new StringBuffer();
         for ( int pos=0; pos < allFields.length; pos++) {
-            returnedString +=  allFields[pos].toString() + " ";
+        	strBuffer.append(allFields[pos].toString());
         }
         
-        return returnedString;
+        return strBuffer.toString();
         
     }
 }

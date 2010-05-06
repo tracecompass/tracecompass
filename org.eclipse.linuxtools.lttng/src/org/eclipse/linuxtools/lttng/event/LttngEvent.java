@@ -137,7 +137,7 @@ public class LttngEvent extends TmfEvent {
      * 
      * @see org.eclipse.linuxtools.org.eclipse.linuxtools.lttng.jni.JniEvent
      */
-    public void updateJniEventReference(JniEvent newJniEventReference) {
+    public synchronized void updateJniEventReference(JniEvent newJniEventReference) {
         this.jniEventReference = newJniEventReference;
     }
     
