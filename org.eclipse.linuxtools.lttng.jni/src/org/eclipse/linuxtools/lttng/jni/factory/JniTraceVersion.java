@@ -83,7 +83,9 @@ public class JniTraceVersion {
 		try {
 			readVersionFromTrace(tracepath);
 		}
-		catch(JniTraceVersionException e) { }
+		catch(JniTraceVersionException e) { 
+			// Yes, we do ignore exception.
+		}
 	}
 	
 	/**

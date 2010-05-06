@@ -158,6 +158,36 @@ public class JniTime extends Jni_C_Constant implements Comparable<JniTime>
     }
     
     /**
+     * Overrided equals for JniTime type
+     * 
+     * @param The object we want to compare too
+     * 
+     * @return true if the time is the same, false otherwise.
+     */
+    @Override
+    public boolean equals(Object obj) {
+    	boolean returnedValue = false;
+    	
+    	if ( obj instanceof JniTime ) {
+    		if ( ((JniTime)obj).time == this.time ) {
+    			returnedValue = true;
+    		}
+    	}
+    	
+    	return returnedValue;
+    }
+    
+    /**
+     * Overridden hash code for JniTime type 
+     * 
+     */
+    @Override
+    public int hashCode() {
+    	return this.toString().hashCode();
+    }
+    
+    
+    /**
      * toString() method.
      * <u>Intended to debug</u><p>
      * 

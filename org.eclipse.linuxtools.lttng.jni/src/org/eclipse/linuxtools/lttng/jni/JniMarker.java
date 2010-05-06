@@ -215,8 +215,8 @@ public abstract class JniMarker extends Jni_C_Common
 
         returnData += "name                    : " + name + "\n";
         returnData += "formatOverview          : " + formatOverview + "\n";
-        returnData += "markerFieldArrayList    : " + markerFieldsArrayList.toArray() + "\n";
-
+        returnData += "markerFieldArrayList    : " + markerFieldsArrayList.hashCode() + " (size : " + markerFieldsArrayList.size() + " )" + "\n";
+        
         return returnData;
     }
     

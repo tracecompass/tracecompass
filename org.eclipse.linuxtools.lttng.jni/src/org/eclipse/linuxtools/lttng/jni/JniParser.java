@@ -130,14 +130,12 @@ public abstract class JniParser extends Jni_C_Common
 		//       HashMap<String, Object> parsedDataMap = (HashMap<String, Object>)markerFieldData.clone();
 		// Or even safer, use HashMap constructor to do so : 
         HashMap<String, Object> parsedDataMap = new HashMap<String, Object>(markerFieldData);
-		 
-        String              newKey 	        = null; 
+		
         JniMarkerField      newMarkerField  = null;
         Iterator<String>    iterator        = markerFieldData.keySet().iterator();
         
         while ( iterator.hasNext() ) {
-            newKey = iterator.next();
-            newMarkerField = markerFieldData.get(newKey);
+            newMarkerField = markerFieldData.get(iterator.next());
             // Call the C to parse the data
             ltt_getParsedData(eventToParse.getEventPtr().getLibraryId(), parsedData, eventToParse.getEventPtr().getPointer(), newMarkerField.getMarkerFieldPtr().getPointer());
             // Save the result into the HashMap
@@ -209,7 +207,7 @@ public abstract class JniParser extends Jni_C_Common
      * @param formatToAdd   The format of the raw data
      */
 	static private void addShortToParsingFromC(Object contentHolder, short shortToAdd) {
-        ((ParsedObjectContent)contentHolder).setData( new Short(shortToAdd));
+        ((ParsedObjectContent)contentHolder).setData( Short.valueOf(shortToAdd));
     }
 
     /* 
@@ -225,7 +223,7 @@ public abstract class JniParser extends Jni_C_Common
      * @param formatToAdd   The format of the raw data
      */
 	static private void addIntegerToParsingFromC(Object contentHolder, int intToAdd) {
-        ((ParsedObjectContent)contentHolder).setData( new Integer(intToAdd));
+        ((ParsedObjectContent)contentHolder).setData( Integer.valueOf(intToAdd));
     }
 
     /* 
@@ -241,7 +239,7 @@ public abstract class JniParser extends Jni_C_Common
      * @param formatToAdd   The format of the raw data
      */
 	static private void addLongToParsingFromC(Object contentHolder, long longToAdd) {
-        ((ParsedObjectContent)contentHolder).setData( new Long(longToAdd));
+        ((ParsedObjectContent)contentHolder).setData( Long.valueOf(longToAdd));
     }
 
     /* 

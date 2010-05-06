@@ -179,10 +179,10 @@ public abstract class JniTrace extends Jni_C_Common {
         endTime         = oldTrace.endTime;
 
         tracefilesMap = new HashMap<String, JniTracefile>(oldTrace.tracefilesMap.size());
-        tracefilesMap = oldTrace.tracefilesMap;
+        ltt_feedAllTracefiles(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
         
         eventsHeap = new PriorityQueue<JniEvent>( oldTrace.eventsHeap.size());
-        eventsHeap = oldTrace.eventsHeap;
+        populateEventHeap();
         
         printLttDebug = oldTrace.printLttDebug;
     }        
@@ -303,10 +303,6 @@ public abstract class JniTrace extends Jni_C_Common {
             
             // Nullify the pointer
             thisTracePtr = new Jni_C_Pointer_And_Library_Id();
-            
-            // Ask the garbage collector to make a little pass here, as we could
-            // be left with 100's of unreferenced objects
-            System.gc();
         }
     }
     
