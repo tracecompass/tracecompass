@@ -251,7 +251,7 @@ public class HistogramContent {
 	 */
 	public HistogramElement getClosestElementFromXPosition(int position) {
 		
-		int index = (int)((double)elementTable.length * ((double)position / (double)canvasWindowSize) );
+		int index = (int)Math.round((double)elementTable.length * ((double)position / (double)canvasWindowSize) );
 		
 		// If we are out of bound, return the closest border (first or last element)
 		if ( index < 0) {
@@ -291,7 +291,7 @@ public class HistogramContent {
 	 * @return					The <i>closest</i> found element. 
 	 */
 	public int getXPositionFromElement(HistogramElement targetElement) {
-		return (int)( ((double)targetElement.index / (double)elementTable.length)*(double)canvasWindowSize );
+		return (int)Math.round( ((double)targetElement.index / (double)elementTable.length)*(double)canvasWindowSize );
 	}
 	
 	/**
@@ -306,7 +306,7 @@ public class HistogramContent {
 	 * @return	The <i>closest</i> element found.
 	 */
 	public HistogramElement getClosestElementFromTimestamp(long timestamp) {
-		int index = (int)( (timestamp - startTime)/elementsTimeInterval );
+		int index = (int)Math.round( (double)(timestamp - startTime)/(double)elementsTimeInterval );
 		
 		// If we are out of bound, return the closest border (first or last element)
 		if ( index < 0) {
@@ -449,7 +449,7 @@ public class HistogramContent {
 			totalNbEvents += elementTable[x].intervalNbEvents;
 		}
 		// Calculate the average here
-		averageNumberOfEvents = (int)((double)totalNbEvents / (double)nbInterval);
+		averageNumberOfEvents = (int)Math.round((double)totalNbEvents / (double)nbInterval);
 	}
 	
 	/**
@@ -548,7 +548,7 @@ public class HistogramContent {
 	public void recalculateEventHeight() {
 		// Recalculate the height of the bars up to "readyUpToPosition"
 		for ( int x=0; x<readyUpToPosition; x++) {
-			elementTable[x].intervalHeight = (int)(elementTable[x].intervalNbEvents * heightFactor);
+			elementTable[x].intervalHeight = (int)Math.ceil((double)elementTable[x].intervalNbEvents * heightFactor);
 		}
 	}
 	
@@ -570,7 +570,7 @@ public class HistogramContent {
 		
 		// Recalculate the height of the bars from startPosition to stopPosition
 		for ( int x=startPosition; x<stopPosition; x++) {
-			elementTable[x].intervalHeight = (int)(elementTable[x].intervalNbEvents * heightFactor);
+			elementTable[x].intervalHeight = (int)Math.ceil((double)elementTable[x].intervalNbEvents * heightFactor);
 		}
 	}
 	
@@ -732,7 +732,7 @@ public class HistogramContent {
 	 * @return	The complete time interval
 	 */
 	public void recalculateElementsTimeInterval(long startTime, long endTime) {
-		long tmpInterval = ((endTime - startTime)/getNbElement());
+		long tmpInterval = (long)Math.ceil((double)(endTime - startTime)/ (double)getNbElement());
 		
 		if ( tmpInterval <= 0 ) {
 			tmpInterval = 1L;

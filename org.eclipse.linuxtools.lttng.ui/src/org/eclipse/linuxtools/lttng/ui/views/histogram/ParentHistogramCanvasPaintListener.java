@@ -131,7 +131,9 @@ public class ParentHistogramCanvasPaintListener extends HistogramCanvasPaintList
 		int contentSize = (int)Math.pow(2, exp);
 		double maxBarsDiffFactor = ((double)tmpContent.getNbElement() / (double)contentSize );
 		
-		if ( maxBarsDiffFactor != tmpContent.getMaxDifferenceToAverageFactor() ) {
+		// Floating point comparaison : 
+		//	We consider it is different if the difference is greater than 10^-3
+		if ( Math.abs(maxBarsDiffFactor - tmpContent.getMaxDifferenceToAverageFactor()) > 0.001 ) {
 			// The factor changed! That's unfortunate because it will take a while to recalculate.
 			tmpContent.setMaxDifferenceToAverageFactor(maxBarsDiffFactor);
 			tmpContent.recalculateHeightFactor();

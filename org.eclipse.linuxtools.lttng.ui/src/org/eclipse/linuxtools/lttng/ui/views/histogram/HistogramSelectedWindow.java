@@ -145,14 +145,18 @@ public class HistogramSelectedWindow {
 	 * @return The left position of the window, or 0 if it cannot compute it. 
 	 */
 	public int getWindowXPositionLeft() {
-		int tmpLeftPosition = histogramContent.getXPositionByPositionAndTimeInterval(windowCenterPosition, -(windowTimeWidth / 2) );
-		if ( (tmpLeftPosition == windowCenterPosition ) && (tmpLeftPosition>0) ) {
-			tmpLeftPosition = tmpLeftPosition-1;
+		
+		// If the timewidth is too small, we would pick the same position as the center one.
+		// To avoid this, we take a "full interval" when the window size is too small
+		if ( windowTimeWidth < histogramContent.getElementsTimeInterval() ) {
+			// Use intervalTime and not intervalTime/2 to make sure we step into the next interval
+			// Otherwise, if we are in the beginning of an interval, adding IntervalTime/2 could lead us into the same one
+			// The rounding operation will then return a correct position
+			return histogramContent.getXPositionByPositionAndTimeInterval(windowCenterPosition, -(histogramContent.getElementsTimeInterval() ) );
 		}
-		
-		return tmpLeftPosition;
-		
-		//return histogramContent.getXPositionByPositionAndTimeInterval(windowCenterPosition, -(windowTimeWidth / 2) );
+		else {
+			return histogramContent.getXPositionByPositionAndTimeInterval(windowCenterPosition, -(windowTimeWidth / 2) );
+		}
 	}
 	
 	/**
@@ -162,15 +166,18 @@ public class HistogramSelectedWindow {
 	 * @return The right position of the window, or 0 if it cannot compute it. 
 	 */
 	public int getWindowXPositionRight() {
-		
-		int tmpRightPosition = histogramContent.getXPositionByPositionAndTimeInterval(windowCenterPosition, +(windowTimeWidth / 2) );
-		if ( (tmpRightPosition == windowCenterPosition ) && (tmpRightPosition<(histogramContent.getNbElement()-1) ) ) {
-			tmpRightPosition = tmpRightPosition+1;
+		// If the timewidth is too small, we would pick the same position as the center one.
+		// To avoid this, we take a "full interval" when the window size is too small
+		if ( windowTimeWidth < histogramContent.getElementsTimeInterval() ) {
+			// Use intervalTime and not intervalTime/2 to make sure we step into the next interval
+			// Otherwise, if we are in the beginning of an interval, adding IntervalTime/2 could lead us into the same one
+			// The rounding operation will then return a correct position
+			return histogramContent.getXPositionByPositionAndTimeInterval(windowCenterPosition, +(histogramContent.getElementsTimeInterval() ) );
+		}
+		else {
+			return histogramContent.getXPositionByPositionAndTimeInterval(windowCenterPosition, +(windowTimeWidth / 2) );
 		}
 		
-		return tmpRightPosition;
-		
-		//return histogramContent.getXPositionByPositionAndTimeInterval(windowCenterPosition, +(windowTimeWidth / 2) );
 	}
 	
 	/**
@@ -179,7 +186,7 @@ public class HistogramSelectedWindow {
 	 * 
 	 * @return  The left timestamp of the window, or 0 if it cannot compute it. 
 	 */
-	public long getTimestampLeft() {
+	public long getTimestampOfLeftPosition() {
 		return histogramContent.getClosestElementFromXPosition( getWindowXPositionLeft() ).firstIntervalTimestamp;
 	}
 	
@@ -189,7 +196,7 @@ public class HistogramSelectedWindow {
 	 * 
 	 * @return  The center timestamp of the window, or 0 if it cannot compute it. 
 	 */
-	public long getTimestampCenter() {
+	public long getTimestampOfCenterPosition() {
 		return histogramContent.getClosestElementFromXPosition( getWindowXPositionCenter() ).firstIntervalTimestamp;
 	}
 	
@@ -199,7 +206,7 @@ public class HistogramSelectedWindow {
 	 * 
 	 * @return  The right timestamp of the window, or 0 if it cannot compute it. 
 	 */
-	public long getTimestampRight() {
+	public long getTimestampOfRightPosition() {
 		return histogramContent.getClosestElementFromXPosition( getWindowXPositionRight() ).firstIntervalTimestamp;
 	}
 }

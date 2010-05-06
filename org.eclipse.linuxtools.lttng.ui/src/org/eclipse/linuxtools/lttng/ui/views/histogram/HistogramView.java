@@ -46,11 +46,23 @@ public class HistogramView extends TmfView implements ControlListener {
 	// *** TODO ***
 	// Here is what's left to do in this view
 	//
-	// 1- Make sure all control are thread safe (bug 309348)
+	// 1- Make sure the interval time is small enought on very big trace (bug 311930)
+	//		The interval time of the content is dynamically assigned from the screen width and trace duration.
+	//		However, on very big trace (more than 1 hour), we could end up with time interval that are > 1 seconds,
+	//			which is not very precise. 
+	//		An algorithm need to be implemented to make sure we "increase" the number of interval in the content if
+	//			their precision is getting too bad. 
+	//
+	// 2- Make sure all control are thread safe (bug 309348)
 	//		Right now, all the basic controls (i.e. Text and Label) are sensible to "Thread Access Exception" if
 	//			updated from different threads; we need to carefully decide when/where to redraw them.
 	//		This is a real problem since there is a lot of thread going on in this view.
 	//		All basic control should be subclassed to offer "Asynchronous" functions.
+	//
+	// 3- Implement a "preferences view" for the HistogramView (bug 311935)
+	//		There is a lot of ajustable preferences in the view, however there is no way to ajust them right now
+	//			at run time. There should be a view of some kind of "menu" to allow the user to change them while executing.
+	//		Most of the pertinent values are in HistogramConstant.java or in this file.
 	
     public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.histogram";
     
@@ -307,7 +319,7 @@ public class HistogramView extends TmfView implements ControlListener {
 		//
 		// So since SWT will only consider griddata with control, 
 		//		I need to create a totally useless control in the ??? section.
-		// That's ugly, useless and it generally a bad practice.
+		// That's ugly, useless and it is generally a bad practice.
 		//
 		// *** SUB-HACK ***
 		// Other interesting fact about SWT : the way it draws (Fill/Expand control in grid) will change if 
@@ -317,8 +329,8 @@ public class HistogramView extends TmfView implements ControlListener {
 		// 		(NB : No, I am NOT kidding, try it for yourself!)
 		//
 		// Soooooo I guess I will use a Text here. Way to go SWT!
-		// Downside is that disabled textbox has a slightly different color (even if you change it) so if I want
-		//		to make the text "invisible", I have to keep it selectable, so it can be clicked on.
+		// Downside is that disabled textbox has a slightly different color (even if you force it yourself) so if I want
+		//		to make the text "invisible", I have to keep it enabled (but read only), so it can be clicked on.
 		//
 		// Label uselessControlToByPassSWTStupidBug = new Label(layoutSelectionWindow, SWT.BORDER); // WON'T align correctly!!!
 		Text uselessControlToByPassSWTStupidBug = new Text(layoutSelectionWindow, SWT.READ_ONLY); // WILL align correctly!!!
@@ -508,7 +520,7 @@ public class HistogramView extends TmfView implements ControlListener {
 		
 		// Create the content for the selected window. 
 		selectedWindowCanvas.createNewHistogramContent(selectedWindowCanvas.getSize().x ,SELECTED_WINDOW_BAR_WIDTH, SELECTED_WINDOW_CANVAS_HEIGHT, SELECTED_WINDOW_DIFFERENCE_TO_AVERAGE);
-		selectedWindowCanvas.getHistogramContent().resetTable(fullExperimentCanvas.getCurrentWindow().getTimestampLeft(), fullExperimentCanvas.getCurrentWindow().getTimestampRight());
+		selectedWindowCanvas.getHistogramContent().resetTable(fullExperimentCanvas.getCurrentWindow().getTimestampOfLeftPosition(), fullExperimentCanvas.getCurrentWindow().getTimestampOfRightPosition());
 		
     	// Make sure the UI object are sane
 		resetControlsContent();
@@ -550,8 +562,8 @@ public class HistogramView extends TmfView implements ControlListener {
     	
     	// The request will go from the Left timestamp of the window to the Right timestamp
     	// This assume that out-of-bound value are handled by the SelectionWindow itself
-		LttngTimestamp ts1 = new LttngTimestamp( curSelectedWindow.getTimestampLeft() );
-		LttngTimestamp ts2 = new LttngTimestamp( curSelectedWindow.getTimestampRight() );
+		LttngTimestamp ts1 = new LttngTimestamp( curSelectedWindow.getTimestampOfLeftPosition() );
+		LttngTimestamp ts2 = new LttngTimestamp( curSelectedWindow.getTimestampOfRightPosition() );
         TmfTimeRange tmpRange = new TmfTimeRange(ts1, ts2);
         
         // Set a (dynamic) time interval
@@ -635,13 +647,13 @@ public class HistogramView extends TmfView implements ControlListener {
     		}
     		
     		// Get the latest window information
-    		selectedWindowTime = fullExperimentCanvas.getCurrentWindow().getTimestampCenter();
+    		selectedWindowTime = fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition();
     		selectedWindowTimerange = fullExperimentCanvas.getCurrentWindow().getWindowTimeWidth();
     		
     		// If the current event time is outside the new window, change the current event
     		//		The new current event will be the one closest to the LEFT side of the new window
     		if ( isGivenTimestampInSelectedWindow(currentEventTime) == false ) {
-    			currentEventChangeNotification( fullExperimentCanvas.getCurrentWindow().getTimestampLeft() );
+    			currentEventChangeNotification( fullExperimentCanvas.getCurrentWindow().getTimestampOfLeftPosition() );
     		}
     		
     		// Perform a new request to read data about the new window
@@ -691,7 +703,7 @@ public class HistogramView extends TmfView implements ControlListener {
     	// *** TODO ***
     	// Not very elegant... we need to chance this below.
     	//
-    	long centerTime = fullExperimentCanvas.getCurrentWindow().getTimestampCenter();
+    	long centerTime = fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition();
     	long windowWidth = fullExperimentCanvas.getCurrentWindow().getWindowTimeWidth();
     	
     	long startTime = centerTime-windowWidth;
@@ -773,8 +785,8 @@ public class HistogramView extends TmfView implements ControlListener {
 		boolean returnedValue = true;
 		
 		// If the content is not set correctly, this will return weird (or even null) result
-		if ( (timestamp < fullExperimentCanvas.getCurrentWindow().getTimestampLeft()  ) ||
-	         (timestamp > fullExperimentCanvas.getCurrentWindow().getTimestampRight() ) ) 
+		if ( (timestamp < fullExperimentCanvas.getCurrentWindow().getTimestampOfLeftPosition()  ) ||
+	         (timestamp > fullExperimentCanvas.getCurrentWindow().getTimestampOfRightPosition() ) ) 
 		{
 			returnedValue = false;
 		}
@@ -866,12 +878,12 @@ public class HistogramView extends TmfView implements ControlListener {
 		txtWindowStartTime.setText( startTime );
 		txtWindowStopTime.setText( stopTime );
 		
-		ntgCurrentWindowTime.setValue( fullExperimentCanvas.getCurrentWindow().getTimestampCenter() );
+		ntgCurrentWindowTime.setValue( fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition() );
 		ntgTimeRangeWindow.setValue(  fullExperimentCanvas.getCurrentWindow().getWindowTimeWidth() );
 		
 		// If the current event time is outside the selection window, recenter our window 
 		if ( isGivenTimestampInSelectedWindow(ntgCurrentEventTime.getValue()) == false ) {
-			currentEventChangeNotification( fullExperimentCanvas.getCurrentWindow().getTimestampCenter() );
+			currentEventChangeNotification( fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition() );
 		}
 		
 		// Take one control in each group to call to refresh the layout

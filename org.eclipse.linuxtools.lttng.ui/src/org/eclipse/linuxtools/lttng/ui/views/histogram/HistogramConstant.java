@@ -124,9 +124,11 @@ public abstract class HistogramConstant {
                 
                 // If we have less than 9 digits, we fill with 0
                 if ( decimalNumber <= 9 ) {
+                	StringBuffer strBuffer = new StringBuffer(timeString);
                     for ( int nbDec=decimalNumber; nbDec<9; nbDec++) {
-                        timeString += "0";
+                    	strBuffer.append("0");
                     }
+                    timeString = strBuffer.toString();
                 }
                 // We have OVER 9 digits, skip the useless part
                 else {

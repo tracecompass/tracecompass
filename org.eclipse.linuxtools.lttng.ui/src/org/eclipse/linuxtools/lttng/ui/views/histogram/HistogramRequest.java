@@ -27,7 +27,7 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 	
 	protected int 	lastInterval = 0;
 	protected long 		lastRangeTime = 0L;
-	protected long 		nbEventsInInterval = 1L;
+	protected long 		nbEventsInInterval = 0L;
 	
 	protected int 	nbIntervalNotEmpty = 1;
 	protected int 	nbEventRead = 0;
