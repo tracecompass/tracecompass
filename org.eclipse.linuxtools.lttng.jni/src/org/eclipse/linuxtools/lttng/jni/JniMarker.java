@@ -131,7 +131,7 @@ public abstract class JniMarker extends Jni_C_Common
      * @param markerFieldPtr    C Pointer (converted in long) to marker_field C Structure
      */
 	private void addMarkerFieldFromC(String markerFieldName, long markerFieldPtr) {
-        // Create a new Jaf_markerField object and insert it in the map
+        // Create a new Jni_markerField object and insert it in the map
         // the maker field fill itself with LTT data while being constructed
         try {
             JniMarkerField newMarkerField = allocateNewJniMarkerField( new Jni_C_Pointer_And_Library_Id(thisMarkerPtr.getLibraryId(), markerFieldPtr));

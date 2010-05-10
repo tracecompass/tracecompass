@@ -41,7 +41,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
 {
     // Variables to detect if the event have been filled at least once
     // this make possible the detection of "uninitialized" struct in Ltt
-    // Can be "EOK", "ERANGE" or "EPERM" (defined in Jaf_C_Common)
+    // Can be "EOK", "ERANGE" or "EPERM" (defined in Jni_C_Common)
     private int eventState = EPERM; // Start with EPERM to ensure sanity
 
     // Internal C pointer of the JniEvent used in LTT

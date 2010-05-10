@@ -28,7 +28,6 @@ public class JniTraceVersion {
 	
 	// Native access functions
 	protected native void ltt_getTraceVersion(String tracepath);
-	protected native void ltt_setLibraryPath(String ldLibraryPath);
 	
 	// Variables to store version number
 	private int majorNumber = 0;

@@ -221,7 +221,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * Open an existing trace.<p>
      * 
      * The tracepath is a directory and needs to exist, otherwise
-     * a JafOpenTraceFailedException is throwed.
+     * a JniOpenTraceFailedException is throwed.
      * 
      * @param newPath The <b>directory</b> of the trace to be opened
      * 

@@ -184,7 +184,7 @@ public abstract class JniTracefile extends Jni_C_Common
             populateTracefileInformation();
         } 
         catch (JniNoSuchEventException e) {
-            throw new JniTracefileWithoutEventException("JniEvent constructor reported that no event of this type are usable. (Jaf_Tracefile)");
+            throw new JniTracefileWithoutEventException("JniEvent constructor reported that no event of this type are usable. (Jni_Tracefile)");
         }
     }        
 
