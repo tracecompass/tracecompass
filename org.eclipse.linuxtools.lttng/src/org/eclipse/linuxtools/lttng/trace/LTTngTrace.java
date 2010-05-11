@@ -513,7 +513,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     	// TMF assumes it is possible to read (GetNextEvent) to the next Event once ParseEvent() is called
     	// In LTTNG, there is not difference between "Parsing" and "Reading" an event.
     	//  	Since parsing/reading invalidate the previous event, 
-    	//		we need to make sure the sequenceParseEvent() -> GetNextEvent() will not actually move to the next event.
+    	//		we need to make sure the sequence ParseEvent() -> GetNextEvent() will not actually move to the next event.
     	// To do so, we avoid moving for call to "GetNextEvent()" that follow call to a call to "ParseEvent()".
     	// However, calling ParseEvent() -> GetNextEvent() -> GetNextEvent() will only move next by one.
     	
@@ -732,7 +732,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 	    	return currentLttngEvent;
     	}
     	else {
-    		return convertJniEventToTmfMultipleEventEvilFix(jniEvent);
+    		return convertJniEventToTmfMultipleEventEvilFix(jniEvent, isParsingNeeded);
     	}
     	
     }
@@ -745,7 +745,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * @param jniEvent	The current JNI Event
      * @return Current 	Lttng Event fully parsed
      */
-    private synchronized LttngEvent convertJniEventToTmfMultipleEventEvilFix(JniEvent jniEvent) {
+    private synchronized LttngEvent convertJniEventToTmfMultipleEventEvilFix(JniEvent jniEvent, boolean isParsingNeeded) {
     	// *** HACK ***
     	// Below : the "fix" with all the new and the full-parse
     	// 		Allocating new memory is slow.
@@ -761,8 +761,13 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         currentLttngEvent.updateJniEventReference(jniEvent);
         // Ensure that the content is correctly set
         eventContent.setEvent(currentLttngEvent);
-        // FORCE the full parse of every event :
-        eventContent.getFields();
+        
+        // Parse the event if it was needed
+        // *** WARNING ***
+        // ONLY for testing, NOT parsing events with non-unique events WILL result in segfault in the JVM
+        if ( isParsingNeeded == true ) {
+        	eventContent.getFields();
+        }
     	
         return currentLttngEvent;
     }
