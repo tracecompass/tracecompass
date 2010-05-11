@@ -127,6 +127,7 @@ public class JniTracefileTest extends TestCase
                 
                 // Test that all Get/Set return data
                 //boolean getIsCpuOnline will always be sane...
+                assertNotSame("getIsCpuOnline() failed",null, testTracefile.getIsCpuOnline() );
                 assertNotSame("getTracefilePath is empty","",testTracefile.getTracefilePath() );
                 assertNotSame("getTracefileName is empty","",testTracefile.getTracefileName() );
                 assertNotSame("getCpuNumber is 0",0,testTracefile.getCpuNumber() );
@@ -139,7 +140,9 @@ public class JniTracefileTest extends TestCase
                 assertNotSame("getFileSize is 0",0,testTracefile.getFileSize() );
                 assertNotSame("getBlocksNumber is 0",0,testTracefile.getBlocksNumber() );
                 //boolean getIsBytesOrderReversed will always be sane...
+                assertNotSame("getIsBytesOrderReversed() failed",null, testTracefile.getIsBytesOrderReversed() );
                 //boolean getIsFloatWordOrdered will always be sane...
+                assertNotSame("getIsFloatWordOrdered() failed",null, testTracefile.getIsFloatWordOrdered() );
                 assertNotSame("getAlignement is 0",0,testTracefile.getAlignement() );
                 assertNotSame("getBufferHeaderSize is 0",0,testTracefile.getBufferHeaderSize() );
                 assertNotSame("getBitsOfCurrentTimestampCounter is 0",0,testTracefile.getBitsOfCurrentTimestampCounter() );

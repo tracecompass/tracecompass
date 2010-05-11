@@ -42,6 +42,7 @@ import junit.framework.TestCase;
         public long getStartTimestampCurrentCounter()
         public long getStartMonotonic()
         public JniTime getStartTime()
+        pubilc JniTime getEndTime()
         public JniTime getStartTimeFromTimestampCurrentCounter()
         public HashMap<String, JniTracefile> getTracefilesMap()
         public long getTracePtr()
@@ -185,6 +186,7 @@ public class JniTraceTest extends TestCase
                 assertNotSame("getStartTimestampCurrentCounter is 0",0,testTrace.getStartTimestampCurrentCounter());
                 assertNotSame("getStartMonotonic is 0",0,testTrace.getStartMonotonic() );
                 assertNotSame("getStartTime is null",null,testTrace.getStartTime() );
+                assertNotSame("getEndTime() is null", null, testTrace.getEndTime() );
                 assertNotSame("getStartTimeNoAdjustement is null",null,testTrace.getStartTimeNoAdjustement() );
                 assertNotSame("getTracefilesMap is null",null,testTrace.getTracefilesMap() );
                 // Also check that the map contain some tracefiles
