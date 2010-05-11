@@ -132,8 +132,10 @@ public class TmfTraceEvent extends TmfEvent {
     	if (!(other instanceof TmfTraceEvent)) {
     		return false; 
     	}
-//		TmfTraceEvent o = (TmfTraceEvent) other;
-        return false;
+		TmfTraceEvent o = (TmfTraceEvent) other;
+        return super.equals((TmfEvent) o) && fSourcePath.equals(o.fSourcePath) &&
+        		fFileName.equals(o.fFileName) && fLineNumber == o.fLineNumber;
+
     }
 
     // TODO: Proper format

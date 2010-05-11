@@ -32,6 +32,12 @@ package org.eclipse.linuxtools.tmf.event;
 public class TmfEvent extends TmfData {
 
     // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+
+	public static final TmfEvent NullEvent = new TmfEvent();
+	
+    // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
@@ -59,9 +65,6 @@ public class TmfEvent extends TmfData {
 	public TmfEvent(TmfTimestamp originalTS, TmfTimestamp effectiveTS,
 			TmfEventSource source, TmfEventType type, TmfEventReference reference)
 	{
-		if (source == null || type == null || effectiveTS == null) {
-    		throw new IllegalArgumentException();
-		}
 		fOriginalTimestamp  = originalTS;
 		fEffectiveTimestamp = effectiveTS;
 		fSource             = source;
@@ -97,9 +100,12 @@ public class TmfEvent extends TmfData {
 		fReference			= new TmfEventReference(other.fReference);
 	}
 
-	@SuppressWarnings("unused")
 	private TmfEvent() {
-		throw new AssertionError();
+	}
+
+	@Override
+	public boolean isNullRef() {
+		return this == NullEvent;
 	}
 
 	// ------------------------------------------------------------------------

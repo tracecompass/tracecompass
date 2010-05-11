@@ -429,9 +429,6 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
            			if ((nbEvents++ % fIndexPageSize) == 0) {
            				lastTime = new TmfTimestamp(event.getTimestamp());
                    		fCheckpoints.add(new TmfCheckpoint(lastTime, location));
-                   		fNbEvents = nbEvents;
-                   		fTimeRange = new TmfTimeRange(startTime, lastTime);
-                   		notifyListeners(new TmfTimeRange(startTime, lastTime));
 
                         monitor.worked(1);
 
@@ -457,7 +454,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
             		fIndexing = false;
             		fIndexed = true;
                 }
-                notifyListeners(new TmfTimeRange(startTime, lastTime));
+                notifyListeners(fTimeRange);
                 monitor.done();
             }
 

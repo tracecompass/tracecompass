@@ -266,8 +266,8 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 	    		if (traceEndTime.compareTo(endTime, true) > 0)
 	    			endTime = traceEndTime;
 			}
-			fTimeRange = new TmfTimeRange(startTime, endTime);
     	}
+		fTimeRange = new TmfTimeRange(startTime, endTime);
     }
 
     // ------------------------------------------------------------------------
@@ -617,9 +617,6 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
                 	lastTime = event.getTimestamp();
            			if ((nbEvents++ % fIndexPageSize) == 0) {
            				fCheckpoints.add(new TmfCheckpoint(lastTime, location));
-                   		fNbEvents = nbEvents;
-                   		fTimeRange = new TmfTimeRange(startTime, lastTime);
-                   		notifyListeners(new TmfTimeRange(startTime, lastTime));
 
                         monitor.worked(1);
 
@@ -646,6 +643,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
                 	fIndexing = false;
                 	fIndexed = true;
                 }
+       		    notifyListeners(fTimeRange);
                 monitor.done();
             }
 
@@ -654,7 +652,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     }
 
     protected void notifyListeners(TmfTimeRange range) {
-    	broadcast(new TmfRangeSynchSignal(this, range, null));
+    	broadcast(new TmfRangeSynchSignal(this, range, range.getStartTime()));
 	}
    
     // ------------------------------------------------------------------------

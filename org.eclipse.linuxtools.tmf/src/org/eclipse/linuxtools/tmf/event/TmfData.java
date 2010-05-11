@@ -20,4 +20,6 @@ package org.eclipse.linuxtools.tmf.event;
  */
 public abstract class TmfData {
 
+	public abstract boolean isNullRef();
+
 }

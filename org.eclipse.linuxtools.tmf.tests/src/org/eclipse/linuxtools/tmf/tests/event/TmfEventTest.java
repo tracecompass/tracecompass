@@ -100,32 +100,6 @@ public class TmfEventTest extends TestCase {
 		assertEquals("getReference",         fReference,  fEvent2.getReference());
 	}
 
-	public void testTmfEventBadArgs() {
-		try { // Bad timestamp
-			new TmfEvent(null, fSource, fType, fReference);
-			fail("null copy");
-		}
-		catch (IllegalArgumentException e) {
-			// Success
-		}
-
-		try { // Bad source
-			new TmfEvent(fTimestamp1, null, fType, fReference);
-			fail("null copy");
-		}
-		catch (IllegalArgumentException e) {
-			// Success
-		}
-
-		try { // Bad type
-			new TmfEvent(fTimestamp1, fSource, null, fReference);
-			fail("null copy");
-		}
-		catch (IllegalArgumentException e) {
-			// Success
-		}
-	}
-
 	public void testTmfEventCopy() {
 		TmfEvent event = new TmfEvent(fEvent1);
 		assertEquals("getTimestamp",         fTimestamp1, event.getTimestamp());

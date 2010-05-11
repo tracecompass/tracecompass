@@ -50,7 +50,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	protected final BlockingQueue<T> fDataQueue;
 	protected final TmfRequestExecutor fExecutor;
 
-	private Integer fSynchDepth;
+	private int fCoalescingLevel = 0;
 
 	// ------------------------------------------------------------------------
 	// Constructors
@@ -67,7 +67,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 		fDataQueue = (queueSize > 1) ? new LinkedBlockingQueue<T>(fQueueSize) : new SynchronousQueue<T>();
 
 		fExecutor = new TmfRequestExecutor();
-		fSynchDepth = 0;
+		fCoalescingLevel = 0;
 
 		TmfProviderManager.register(fType, this);
 	}
@@ -81,7 +81,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
         this.fExecutor = new TmfRequestExecutor();
         this.fDataQueue = (oldDataProvider.fQueueSize > 1) ? new LinkedBlockingQueue<T>(oldDataProvider.fQueueSize) : new SynchronousQueue<T>();
 
-        this.fSynchDepth = oldDataProvider.fSynchDepth;
+        this.fCoalescingLevel = 0;
 	}
 	
 	@Override
@@ -105,7 +105,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 
 	public synchronized void sendRequest(final ITmfDataRequest<T> request) {
 
-		if (fSynchDepth > 0) {
+		if (fCoalescingLevel > 0) {
 			// We are in coalescing mode: client should NEVER wait
 			// (otherwise we will have deadlock...)
 			coalesceDataRequest(request);
@@ -178,6 +178,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 				}
 
 				// Get the ordered events
+//				Tracer.trace("Thread #" + Thread.currentThread().getId() + ", request #" + request.getRequestId() + " starting");
 				T data = getNext(context);
 				while (data != null && !isCompleted(request, data, nbRead))
 				{
@@ -188,6 +189,9 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 					// To avoid an unnecessary read passed the last data requested
 					if (nbRead < nbRequested) {
 						data = getNext(context);
+//						if (data != null && data.isNull()) {
+//							Tracer.trace("Thread #" + Thread.currentThread().getId() + ", request #" + request.getRequestId() + " end of data");
+//						}
 					}
 				}
 				pushData(request, result);
@@ -264,7 +268,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	 * @return
 	 */
 	public boolean isCompleted(ITmfDataRequest<T> request, T data, int nbRead) {
-		return request.isCompleted() || nbRead >= request.getNbRequested();
+		return request.isCompleted() || nbRead >= request.getNbRequested() || data.isNullRef();
 	}
 
 	// ------------------------------------------------------------------------
@@ -274,15 +278,15 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	@TmfSignalHandler
 	public void startSynch(TmfStartSynchSignal signal) {
 		synchronized(this) {
-			fSynchDepth++;
+			fCoalescingLevel++;
 		}
 	}
 
 	@TmfSignalHandler
 	public void endSynch(TmfEndSynchSignal signal) {
 		synchronized(this) {
-			fSynchDepth--;
-			if (fSynchDepth == 0) {
+			fCoalescingLevel--;
+			if (fCoalescingLevel == 0) {
 				fireRequests();
 			}
 		}

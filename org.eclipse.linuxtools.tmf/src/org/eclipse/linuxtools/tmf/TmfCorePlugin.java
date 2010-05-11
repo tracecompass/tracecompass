@@ -70,6 +70,7 @@ public class TmfCorePlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		setDefault(this);
+		Tracer.init();
 	}
 
 	@Override

@@ -149,6 +149,9 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     	fBlockSize   = blockSize;
     	fNbRead      = 0;
         lock         = new Object();
+
+//        Tracer.trace("Thread #" + Thread.currentThread().getId() + ", request #" + fRequestId + " (" + getClass().getName() + ", " + fDataType.getName() + ") created");
+        
     }
 
     /**
@@ -282,13 +285,16 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      */
     public void handleCompleted() {
     	if (fRequestFailed) { 
+//            Tracer.trace("Thread #" + Thread.currentThread().getId() + ", request #" + fRequestId + " failed, completed");
     		handleFailure();
     	}
     	else if (fRequestCanceled) {
+//            Tracer.trace("Thread #" + Thread.currentThread().getId() + ", request #" + fRequestId + " cancelled, completed");
     		handleCancel();
     	}
     	else {
-    		handleSuccess();
+//			Tracer.trace("Thread #" + Thread.currentThread().getId() + ", request #" + fRequestId + " succeeded, completed");
+			handleSuccess();
     	}
     }
 
