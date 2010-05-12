@@ -64,12 +64,11 @@ public class ImportTraceWizard extends Wizard implements IImportWizard {
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
      */
-	@SuppressWarnings("rawtypes")
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
         fWorkbench = workbench;
         fSelection = selection;
 
-        List selectedResources = IDE.computeSelectedResources(selection);
+        List<?> selectedResources = IDE.computeSelectedResources(selection);
         if (!selectedResources.isEmpty()) {
             fSelection = new StructuredSelection(selectedResources);
         }
