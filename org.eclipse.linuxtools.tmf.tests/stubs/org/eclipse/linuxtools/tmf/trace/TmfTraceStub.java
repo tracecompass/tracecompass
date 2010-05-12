@@ -47,7 +47,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * @throws FileNotFoundException
      */
     public TmfTraceStub(String filename) throws FileNotFoundException {
-        super(TmfEvent.class, filename);
+        super("TmfTraceStub", TmfEvent.class, filename);
         fTrace  = new RandomAccessFile(filename, "r");
         fParser = new TmfEventParserStub();
     }
@@ -77,7 +77,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * @throws FileNotFoundException
      */
     public TmfTraceStub(String filename, int cacheSize, boolean waitForCompletion) throws FileNotFoundException {
-        super(TmfEvent.class, filename, cacheSize);
+        super(filename, TmfEvent.class, filename, cacheSize);
         fTrace = new RandomAccessFile(filename, "r");
         fParser = new TmfEventParserStub();
     }

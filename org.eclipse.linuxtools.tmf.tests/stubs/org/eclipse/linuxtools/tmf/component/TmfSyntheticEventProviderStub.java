@@ -32,7 +32,7 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSynthetic
     public static final int NB_EVENTS  = 1000;
 
     public TmfSyntheticEventProviderStub() {
-		super(TmfSyntheticEventStub.class);
+		super("TmfSyntheticEventProviderStub", TmfSyntheticEventStub.class);
 	}
 
 	@SuppressWarnings("unchecked")

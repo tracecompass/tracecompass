@@ -52,9 +52,6 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 	// The currently selected experiment
     private static TmfExperiment<?> fCurrentExperiment = null;
 
-	// The experiment ID
-    private String fExperimentId;
-
     // The set of traces that constitute the experiment
     private ITmfTrace[] fTraces;
 
@@ -82,9 +79,8 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
      * @param indexPageSize
      */
     public TmfExperiment(Class<T> type, String id, ITmfTrace[] traces, TmfTimestamp epoch, int indexPageSize) {
-    	super(type);
+    	super(id, type);
 
-    	fExperimentId = id;
     	fTraces = traces;
     	fEpoch = epoch;
     	fIndexPageSize = indexPageSize;
@@ -113,31 +109,24 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     }
     
     
-    public TmfExperiment(TmfExperiment<T> oldExperiment) {
-    	super(oldExperiment.fType);
+    public TmfExperiment(TmfExperiment<T> other) {
+    	super(other.getName(), other.fType);
     	
-    	this.fExperimentId = oldExperiment.fExperimentId;
-    	this.fEpoch = oldExperiment.fEpoch;
+    	fEpoch         = other.fEpoch;
+    	fIndexPageSize = other.fIndexPageSize;
     	
-    	this.fIndexPageSize = oldExperiment.fIndexPageSize;
-    	
-    	this.fTraces = new ITmfTrace[oldExperiment.fTraces.length];
-    	
-    	for ( int x=0; x<oldExperiment.fTraces.length; x++) {
-    		this.fTraces[x] = oldExperiment.fTraces[x].createTraceCopy();
+    	fTraces = new ITmfTrace[other.fTraces.length];
+    	for (int trace = 0; trace < other.fTraces.length; trace++) {
+    		fTraces[trace] = other.fTraces[trace].createTraceCopy();
     	}
     	
-    	// replace updateNbEvents()
-    	this.fNbEvents = oldExperiment.fNbEvents;
-    	
-    	// replace updateTimeRange()
-    	this.fTimeRange = oldExperiment.fTimeRange;
+    	fNbEvents  = other.fNbEvents;
+    	fTimeRange = other.fTimeRange;
     }
     
 	public TmfExperiment<T> createTraceCopy() {
 		return new TmfExperiment<T>(this);
 	}
-    
     
     /**
      * Clears the experiment
@@ -162,11 +151,6 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
 	public String getPath() {
 		return null;
-	}
-
-	@Override
-	public String getName() {
-		return fExperimentId;
 	}
 
 	public long getNbEvents() {
@@ -515,7 +499,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 	 */
 	@Override
 	public String toString() {
-		return "[TmfExperiment (" + fExperimentId + ")]";
+		return "[TmfExperiment (" + getName() + ")]";
 	}
 
     // ------------------------------------------------------------------------
@@ -562,7 +546,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 			fIndexing = true;
 		}
 
-		job = new IndexingJob(fExperimentId);
+		job = new IndexingJob(new TmfExperiment<T>(this));
 		job.schedule();
 
     	if (waitForCompletion) {
@@ -576,8 +560,14 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
 	private class IndexingJob extends Job {
 
-		public IndexingJob(String name) {
-			super(name);
+		private final String          experimentId;
+		private final ITmfTrace[]     traces;
+		private Vector<TmfCheckpoint> checkpoints;
+
+		public IndexingJob(TmfExperiment<T> experiment) {
+			super(experiment.getName());
+			experimentId = experiment.getName();
+			traces = experiment.getTraces();
 		}
 
 		/* (non-Javadoc)
@@ -587,19 +577,19 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 		protected IStatus run(IProgressMonitor monitor) {
 
 			// Minimal check
-			if (fTraces.length == 0) {
+			if (traces.length == 0) {
 	            fIndexing = false;
 				return Status.OK_STATUS;
 			}
 
-			monitor.beginTask("Indexing " + fExperimentId, IProgressMonitor.UNKNOWN);
+			monitor.beginTask("Indexing " + experimentId, IProgressMonitor.UNKNOWN);
 
             int nbEvents = 0;
             TmfTimestamp startTime = null;
             TmfTimestamp lastTime  = null;
 
             // Reset the index
-            fCheckpoints = new Vector<TmfCheckpoint>();
+            checkpoints = new Vector<TmfCheckpoint>();
             
             try {
             	// Position the trace at the beginning
@@ -616,7 +606,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
                	while (event != null) {
                 	lastTime = event.getTimestamp();
            			if ((nbEvents++ % fIndexPageSize) == 0) {
-           				fCheckpoints.add(new TmfCheckpoint(lastTime, location));
+           				checkpoints.add(new TmfCheckpoint(lastTime, location));
 
                         monitor.worked(1);
 
@@ -638,10 +628,11 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
             }
             finally {
                 synchronized(this) {
-                	fNbEvents = nbEvents;
-                	fTimeRange = new TmfTimeRange(startTime, lastTime);
-                	fIndexing = false;
-                	fIndexed = true;
+                	fCheckpoints = checkpoints;
+                	fNbEvents    = nbEvents;
+                	fTimeRange   = new TmfTimeRange(startTime, lastTime);
+                	fIndexing    = false;
+                	fIndexed     = true;
                 }
        		    notifyListeners(fTimeRange);
                 monitor.done();

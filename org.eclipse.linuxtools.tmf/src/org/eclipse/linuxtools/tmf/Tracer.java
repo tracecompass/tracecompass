@@ -18,7 +18,7 @@ public class Tracer {
 
 	public static void trace(String message) {
 		if (TRACE) {
-			System.out.println(message);
+			System.out.println(Thread.currentThread() + ": " + message);
 		}
 	}
 }

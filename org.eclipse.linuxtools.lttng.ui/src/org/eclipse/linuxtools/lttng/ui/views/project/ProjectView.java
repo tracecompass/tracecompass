@@ -160,7 +160,7 @@ public class ProjectView extends TmfView {
         });
     }
 
-	private boolean waitForCompletion = true;
+	private boolean waitForCompletion = false;
 
 	public void selectExperiment(LTTngExperimentNode experiment) {
     	String expId = experiment.getName();

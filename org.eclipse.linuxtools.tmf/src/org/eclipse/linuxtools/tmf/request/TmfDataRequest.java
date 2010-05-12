@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.request;
 
+import org.eclipse.linuxtools.tmf.Tracer;
 import org.eclipse.linuxtools.tmf.event.TmfData;
 
 /**
@@ -150,8 +151,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     	fNbRead      = 0;
         lock         = new Object();
 
-//        Tracer.trace("Thread #" + Thread.currentThread().getId() + ", request #" + fRequestId + " (" + getClass().getName() + ", " + fDataType.getName() + ") created");
-        
+        Tracer.trace("Request #" + fRequestId + " (" + getClass().getName() + ", " + fDataType.getName() + ") created");
     }
 
     /**
@@ -285,15 +285,15 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      */
     public void handleCompleted() {
     	if (fRequestFailed) { 
-//            Tracer.trace("Thread #" + Thread.currentThread().getId() + ", request #" + fRequestId + " failed, completed");
+            Tracer.trace("Request #" + fRequestId + " failed, completed");
     		handleFailure();
     	}
     	else if (fRequestCanceled) {
-//            Tracer.trace("Thread #" + Thread.currentThread().getId() + ", request #" + fRequestId + " cancelled, completed");
+            Tracer.trace("Request #" + fRequestId + " cancelled, completed");
     		handleCancel();
     	}
     	else {
-//			Tracer.trace("Thread #" + Thread.currentThread().getId() + ", request #" + fRequestId + " succeeded, completed");
+			Tracer.trace("Request #" + fRequestId + " succeeded, completed");
 			handleSuccess();
     	}
     }

@@ -25,12 +25,12 @@ import org.eclipse.linuxtools.tmf.request.TmfCoalescedEventRequest;
  */
 public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvider<T> {
 
-	public TmfEventProvider(Class<T> type) {
-		super("TmfEventProvider", type);
+	public TmfEventProvider(String name, Class<T> type) {
+		super(name, type);
 	}
 
-	public TmfEventProvider(Class<T> type, int queueSize) {
-		super("TmfEventProvider", type, queueSize);
+	public TmfEventProvider(String name, Class<T> type, int queueSize) {
+		super(name, type, queueSize);
 	}
 	
 	public TmfEventProvider(TmfEventProvider<T> oldProvider) {

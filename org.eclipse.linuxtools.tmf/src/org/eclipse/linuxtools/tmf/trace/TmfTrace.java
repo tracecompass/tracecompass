@@ -66,9 +66,6 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     // The trace path
     private final String fPath;
 
-    // The trace name
-    private final String fName;
-
     // The cache page size AND checkpoints interval
     protected int fIndexPageSize;
 
@@ -89,8 +86,8 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
      * @param path
      * @throws FileNotFoundException
      */
-    protected TmfTrace(Class<T> type, String path) throws FileNotFoundException {
-    	this(type, path, DEFAULT_CACHE_SIZE);
+    protected TmfTrace(String name, Class<T> type, String path) throws FileNotFoundException {
+    	this(name, type, path, DEFAULT_CACHE_SIZE);
     }
 
     /**
@@ -98,10 +95,11 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
      * @param cacheSize
      * @throws FileNotFoundException
      */
-    protected TmfTrace(Class<T> type, String path, int cacheSize) throws FileNotFoundException {
-    	super(type);
+    protected TmfTrace(String name, Class<T> type, String path, int cacheSize) throws FileNotFoundException {
+    	super(name, type);
     	int sep = path.lastIndexOf(File.separator);
-    	fName = (sep >= 0) ? path.substring(sep + 1) : path;
+    	String simpleName = (sep >= 0) ? path.substring(sep + 1) : path;
+    	setName(simpleName);
     	fPath = path;
         fIndexPageSize = (cacheSize > 0) ? cacheSize : DEFAULT_CACHE_SIZE;
     }
@@ -129,13 +127,13 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
         return fPath;
     }
 
-    /**
-     * @return the trace name
-     */
-    @Override
-	public String getName() {
-        return fName;
-    }
+//    /**
+//     * @return the trace name
+//     */
+//    @Override
+//	public String getName() {
+//        return fName;
+//    }
 
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.stream.ITmfEventStream#getNbEvents()
@@ -346,7 +344,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 	 */
 	@Override
 	public String toString() {
-		return "[TmfTrace (" + fName + ")]";
+		return "[TmfTrace (" + getName() + ")]";
 	}
 
     // ------------------------------------------------------------------------
@@ -379,7 +377,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     		fIndexing = true;
     	}
 
-    	job = new IndexingJob("Indexing " + fName);
+    	job = new IndexingJob("Indexing " + getName());
     	job.schedule();
 
     	if (waitForCompletion) {
@@ -403,7 +401,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 
-            monitor.beginTask("Indexing " + fName, IProgressMonitor.UNKNOWN);
+            monitor.beginTask("Indexing " + getName(), IProgressMonitor.UNKNOWN);
 
             int nbEvents = 0;
             TmfTimestamp startTime = null;

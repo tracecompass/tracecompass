@@ -18,6 +18,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 
+import org.eclipse.linuxtools.tmf.Tracer;
 import org.eclipse.linuxtools.tmf.event.TmfData;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfCoalescedDataRequest;
@@ -62,32 +63,34 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 
 	protected TmfDataProvider(String name, Class<T> type, int queueSize) {
 		super(name);
-		fQueueSize = queueSize;
 		fType = type;
+		fQueueSize = queueSize;
 		fDataQueue = (queueSize > 1) ? new LinkedBlockingQueue<T>(fQueueSize) : new SynchronousQueue<T>();
 
-		fExecutor = new TmfRequestExecutor();
+        Tracer.trace(getName() + " created");
+
+        fExecutor = new TmfRequestExecutor();
 		fCoalescingLevel = 0;
 
 		TmfProviderManager.register(fType, this);
-	}
+        Tracer.trace(getName() + " started");
+}
 	
-	public TmfDataProvider(TmfDataProvider<T> oldDataProvider) {
-        super(oldDataProvider);
+	public TmfDataProvider(TmfDataProvider<T> other) {
+        super(other);
+        fType = other.fType;
+        fQueueSize = other.fQueueSize;
+        fDataQueue = (fQueueSize > 1) ? new LinkedBlockingQueue<T>(fQueueSize) : new SynchronousQueue<T>();
 
-        this.fType = oldDataProvider.fType;
-        this.fQueueSize = oldDataProvider.fQueueSize;
-
-        this.fExecutor = new TmfRequestExecutor();
-        this.fDataQueue = (oldDataProvider.fQueueSize > 1) ? new LinkedBlockingQueue<T>(oldDataProvider.fQueueSize) : new SynchronousQueue<T>();
-
-        this.fCoalescingLevel = 0;
+        fExecutor = new TmfRequestExecutor();
+        fCoalescingLevel = 0;
 	}
 	
 	@Override
 	public void dispose() {
 		TmfProviderManager.deregister(fType, this);
 		fExecutor.stop();
+        Tracer.trace(getName() + " stopped");
 		super.dispose();
 	}
 
@@ -156,6 +159,8 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 
 	protected void queueRequest(final ITmfDataRequest<T> request) {
 
+		final String provider = getName();
+		
 		// Process the request
 		Thread thread = new Thread() {
 
@@ -178,8 +183,9 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 				}
 
 				// Get the ordered events
-//				Tracer.trace("Thread #" + Thread.currentThread().getId() + ", request #" + request.getRequestId() + " starting");
+				Tracer.trace("Request #" + request.getRequestId() + " is serviced by " + provider);
 				T data = getNext(context);
+				Tracer.trace("Request #" + request.getRequestId() + " read first event");
 				while (data != null && !isCompleted(request, data, nbRead))
 				{
 					result.add(data);
@@ -189,9 +195,9 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 					// To avoid an unnecessary read passed the last data requested
 					if (nbRead < nbRequested) {
 						data = getNext(context);
-//						if (data != null && data.isNull()) {
-//							Tracer.trace("Thread #" + Thread.currentThread().getId() + ", request #" + request.getRequestId() + " end of data");
-//						}
+						if (data == null || data.isNullRef()) {
+							Tracer.trace("Request #" + request.getRequestId() + " end of data");
+						}
 					}
 				}
 				pushData(request, result);

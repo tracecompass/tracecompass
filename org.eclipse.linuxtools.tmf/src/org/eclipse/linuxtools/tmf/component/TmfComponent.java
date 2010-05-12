@@ -24,7 +24,7 @@ import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
  */
 public abstract class TmfComponent implements ITmfComponent {
 
-	private final String fName;
+	private String fName;
 	
 	// ------------------------------------------------------------------------
 	// Constructor
@@ -42,6 +42,13 @@ public abstract class TmfComponent implements ITmfComponent {
         //register();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.linuxtools.tmf.component.ITmfComponent#getName()
+	 */
+	protected void setName(String name) {
+		fName = name;
+	}
+
 	// ------------------------------------------------------------------------
 	// ITmfComponent
 	// ------------------------------------------------------------------------

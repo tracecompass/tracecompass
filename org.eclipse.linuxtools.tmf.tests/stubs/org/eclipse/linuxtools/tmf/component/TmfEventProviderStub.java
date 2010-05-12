@@ -39,7 +39,7 @@ public class TmfEventProviderStub extends TmfEventProvider<TmfEvent> {
     private TmfTraceStub fTrace;
 
     public TmfEventProviderStub(String path) throws IOException {
-    	super(TmfEvent.class);
+    	super(path, TmfEvent.class);
         URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
 		try {
 			File test = new File(FileLocator.toFileURL(location).toURI());
