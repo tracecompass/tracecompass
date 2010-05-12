@@ -634,7 +634,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
                 	fIndexing    = false;
                 	fIndexed     = true;
                 }
-       		    notifyListeners(fTimeRange);
+//       		    notifyListeners(fTimeRange);
                 monitor.done();
             }
 
