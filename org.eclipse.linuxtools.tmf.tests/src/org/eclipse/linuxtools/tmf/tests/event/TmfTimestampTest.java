@@ -385,36 +385,36 @@ public class TmfTimestampTest extends TestCase {
 	}
 
 	public void testCompareToBigRanges() throws Exception {
-		TmfTimestamp ts0a = new TmfTimestamp(0, Byte.MAX_VALUE);
-		TmfTimestamp ts0b = new TmfTimestamp(0, Byte.MIN_VALUE);
-		TmfTimestamp ts1 = new TmfTimestamp(-1, Byte.MAX_VALUE);
-		TmfTimestamp ts2 = new TmfTimestamp(-1, Byte.MIN_VALUE);
-		TmfTimestamp ts3 = new TmfTimestamp(1, Byte.MAX_VALUE);
-		TmfTimestamp ts4 = new TmfTimestamp(1, Byte.MIN_VALUE);
+		TmfTimestamp ts0a = new TmfTimestamp( 0, Byte.MAX_VALUE);
+		TmfTimestamp ts0b = new TmfTimestamp( 0, Byte.MIN_VALUE);
+		TmfTimestamp ts1  = new TmfTimestamp(-1, Byte.MAX_VALUE);
+		TmfTimestamp ts2  = new TmfTimestamp(-1, Byte.MIN_VALUE);
+		TmfTimestamp ts3  = new TmfTimestamp( 1, Byte.MAX_VALUE);
+		TmfTimestamp ts4  = new TmfTimestamp( 1, Byte.MIN_VALUE);
 
-		assertTrue("CompareTo", ts0a.compareTo(TmfTimestamp.BigBang, false) > 0);
-		assertTrue("CompareTo", ts0a.compareTo(TmfTimestamp.BigCrunch, false) < 0);
+		assertEquals("CompareTo",  1, ts0a.compareTo(TmfTimestamp.BigBang,   false));
+		assertEquals("CompareTo", -1, ts0a.compareTo(TmfTimestamp.BigCrunch, false));
 
-		assertTrue("CompareTo", ts0b.compareTo(TmfTimestamp.BigBang, false) > 0);
-		assertTrue("CompareTo", ts0b.compareTo(TmfTimestamp.BigCrunch, false) < 0);
+		assertEquals("CompareTo",  1, ts0b.compareTo(TmfTimestamp.BigBang,   false));
+		assertEquals("CompareTo", -1, ts0b.compareTo(TmfTimestamp.BigCrunch, false));
 
-		assertTrue("CompareTo", ts0a.compareTo(ts0b, false) == 0);
-		assertTrue("CompareTo", ts0b.compareTo(ts0a, false) == 0);
+		assertEquals("CompareTo",  0, ts0a.compareTo(ts0b, false));
+		assertEquals("CompareTo",  0, ts0b.compareTo(ts0a, false));
 
-		assertTrue("CompareTo", ts0a.compareTo(TmfTimestamp.BigBang, false) > 0);
-		assertTrue("CompareTo", ts0a.compareTo(TmfTimestamp.BigCrunch, false) < 0);
+		assertEquals("CompareTo",  1, ts0a.compareTo(TmfTimestamp.BigBang,   false));
+		assertEquals("CompareTo", -1, ts0a.compareTo(TmfTimestamp.BigCrunch, false));
 
-		assertTrue("CompareTo", ts1.compareTo(TmfTimestamp.BigBang, false) > 0);
-		assertTrue("CompareTo", ts1.compareTo(TmfTimestamp.BigCrunch, false) < 0);
+		assertEquals("CompareTo",  1, ts1.compareTo(TmfTimestamp.BigBang,   false));
+		assertEquals("CompareTo", -1, ts1.compareTo(TmfTimestamp.BigCrunch, false));
 
-		assertTrue("CompareTo", ts2.compareTo(TmfTimestamp.BigBang, false) > 0);
-		assertTrue("CompareTo", ts2.compareTo(TmfTimestamp.BigCrunch, false) < 0);
+		assertEquals("CompareTo",  1, ts2.compareTo(TmfTimestamp.BigBang,   false));
+		assertEquals("CompareTo", -1, ts2.compareTo(TmfTimestamp.BigCrunch, false));
 
-		assertTrue("CompareTo", ts3.compareTo(TmfTimestamp.BigBang, false) > 0);
-		assertTrue("CompareTo", ts3.compareTo(TmfTimestamp.BigCrunch, false) < 0);
+		assertEquals("CompareTo",  1, ts3.compareTo(TmfTimestamp.BigBang,   false));
+		assertEquals("CompareTo", -1, ts3.compareTo(TmfTimestamp.BigCrunch, false));
 
-		assertTrue("CompareTo", ts4.compareTo(TmfTimestamp.BigBang, false) > 0);
-		assertTrue("CompareTo", ts4.compareTo(TmfTimestamp.BigCrunch, false) < 0);
+		assertEquals("CompareTo",  1, ts4.compareTo(TmfTimestamp.BigBang,   false));
+		assertEquals("CompareTo", -1, ts4.compareTo(TmfTimestamp.BigCrunch, false));
 	}
 
 }

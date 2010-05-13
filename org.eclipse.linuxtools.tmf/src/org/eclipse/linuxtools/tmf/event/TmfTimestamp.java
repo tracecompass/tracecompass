@@ -60,6 +60,15 @@ public class TmfTimestamp implements Cloneable {
     public static final TmfTimestamp BigCrunch = new TmfTimestamp(Long.MAX_VALUE, Byte.MAX_VALUE, 0);
     public static final TmfTimestamp Zero      = new TmfTimestamp(0, (byte) 0, 0);
 
+    /*
+     * A java <code>long</code> has a maximum of 19 significant digits.
+     * (-9,223,372,036,854,775,808 .. +9,223,372,036,854,775,807)
+     * 
+     * It is therefore useless to try to synchronize 2 timestamps whose
+     * difference in scale exceeds that value.
+     */
+    private int MAX_SCALING = 19;
+
 	// ------------------------------------------------------------------------
     // Constructors
 	// ------------------------------------------------------------------------
@@ -158,15 +167,6 @@ public class TmfTimestamp implements Cloneable {
      */
     public TmfTimestamp synchronize(long offset, byte newScale) throws ArithmeticException {
 
-        /*
-         * A java <code>long</code> has a maximum of 19 significant digits.
-         * (-9,223,372,036,854,775,808 .. +9,223,372,036,854,775,807)
-         * 
-         * It is therefore useless to try to synchronize 2 timestamps whose
-         * difference in scale exceeds that value.
-         */
-        int MAX_SCALING = 19;
-
     	long newValue = fValue;
         long newPrecision = fPrecision;
 
@@ -236,25 +236,33 @@ public class TmfTimestamp implements Cloneable {
         // then compare. If the scaling difference is too large, revert to
         // some heuristics. Hopefully, nobody will try to compare galactic and
         // quantic clock events...
+        if (Math.abs(fScale - other.fScale) > MAX_SCALING) {
+            return simpleCompare(other);
+        }
+
         byte newScale = (fScale < other.fScale) ? fScale : other.fScale;
         try {
             TmfTimestamp ts1 = this.synchronize(0, newScale);
             TmfTimestamp ts2 = other.synchronize(0, newScale);
             return ts1.compareTo(ts2, withinPrecision);
         } catch (ArithmeticException e) {
-            if ((fValue == 0) || (other.fValue == 0)) {
-                return (fValue == other.fValue) ? 0
-                        : (fValue < other.fValue) ? -1 : 1;
-            }
-            if ((fValue > 0) && (other.fValue > 0)) {
-                return (fScale < other.fScale) ? -1 : 1;
-            }
-            if ((fValue < 0) && (other.fValue < 0)) {
-                return (fScale > other.fScale) ? -1 : 1;
-            }
-            return (fValue < 0) ? -1 : 1;
+            return simpleCompare(other);
         }
     }
+
+	private int simpleCompare(final TmfTimestamp other) {
+		if ((fValue == 0) || (other.fValue == 0)) {
+		    return (fValue == other.fValue) ? 0
+		            : (fValue < other.fValue) ? -1 : 1;
+		}
+		if ((fValue > 0) && (other.fValue > 0)) {
+		    return (fScale < other.fScale) ? -1 : 1;
+		}
+		if ((fValue < 0) && (other.fValue < 0)) {
+		    return (fScale > other.fScale) ? -1 : 1;
+		}
+		return (fValue < 0) ? -1 : 1;
+	}
 
 	// ------------------------------------------------------------------------
     // Object
