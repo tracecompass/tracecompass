@@ -58,7 +58,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 	public static boolean uniqueEvent = false;
 	
     private final static boolean SHOW_LTT_DEBUG_DEFAULT    = false;
-	private final static boolean IS_PARSING_NEEDED_DEFAULT = false;
+	private final static boolean IS_PARSING_NEEDED_DEFAULT = true;
 	private final static int     CHECKPOINT_PAGE_SIZE      = 1000;
     
     // Reference to our JNI trace
