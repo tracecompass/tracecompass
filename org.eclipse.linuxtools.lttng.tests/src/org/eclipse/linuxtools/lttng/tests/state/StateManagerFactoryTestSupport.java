@@ -15,9 +15,16 @@ package org.eclipse.linuxtools.lttng.tests.state;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.linuxtools.lttng.state.StateManager;
+import org.eclipse.linuxtools.lttng.control.LttngCoreProviderFactory;
+import org.eclipse.linuxtools.lttng.event.LttngSyntheticEvent;
+import org.eclipse.linuxtools.lttng.model.LTTngTreeNode;
+import org.eclipse.linuxtools.lttng.state.LttngStateException;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.state.model.StateModelFactory;
+import org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager;
+import org.eclipse.linuxtools.lttng.state.trace.StateTraceManager;
+import org.eclipse.linuxtools.tmf.component.TmfEventProvider;
+import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 
 /**
  * @author alvaro
@@ -28,8 +35,8 @@ public class StateManagerFactoryTestSupport {
 	// Data
 	// =======================================================================
 
-	private static final Map<String, StateManager> instanceBook = new HashMap<String, StateManager>();
-	
+	private static final Map<String, IStateTraceManager> instanceBook = new HashMap<String, IStateTraceManager>();
+	private static TmfEventProvider<LttngSyntheticEvent> feventProvider = null;
 	// ========================================================================
 	// Methods
 	// =======================================================================
@@ -39,7 +46,9 @@ public class StateManagerFactoryTestSupport {
 	 * 
 	 * @return
 	 */
-	public static StateManager getManager(String traceUniqueId) {
+	public static IStateTraceManager getManager(ITmfTrace trace) {
+		String traceUniqueId = trace.getName();
+
 		if (traceUniqueId == null) {
 			return null;
 		}
@@ -49,8 +58,23 @@ public class StateManagerFactoryTestSupport {
 		}
 
 		LttngTraceState traceModel = StateModelFactory.getStateEntryInstance();
-		StateStacksHandlerTestSupport stateInputHandler = new StateStacksHandlerTestSupport(traceModel);
-		StateManager manager = new StateManager(stateInputHandler);
+		IStateTraceManager manager = null;
+
+		if (feventProvider == null) {
+			feventProvider = LttngCoreProviderFactory.getEventProvider();
+		}
+
+		// catch construction problems
+		Long id = 0L;
+		LTTngTreeNode parent = null;
+
+		try {
+			manager = new StateTraceManager(id, parent, traceUniqueId, trace,
+					traceModel,
+					feventProvider);
+		} catch (LttngStateException e) {
+			e.printStackTrace();
+		}
 
 		instanceBook.put(traceUniqueId, manager);
 		return manager;

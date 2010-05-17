@@ -14,37 +14,40 @@ package org.eclipse.linuxtools.lttng.state.experiment;
 
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.model.LTTngTreeNode;
+import org.eclipse.linuxtools.lttng.request.ILttngSyntEventRequest;
+import org.eclipse.linuxtools.lttng.request.IRequestStatusListener;
+import org.eclipse.linuxtools.lttng.state.evProcessor.ITransEventProcessor;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 
 public interface IStateExperimentManager {
 
-//	/**
-//	 * Read all available traces from the nearest checkpoint from start position
-//	 * to the end of a specified time range. One request per trace in the
-//	 * experiment will be triggered
-//	 * 
-//	 * @param trange
-//	 * @param obs
-//	 * @param transactionID
-//	 * @param display
-//	 * @return
-//	 */
-//	public abstract ILttngSyntEventRequest readExperimentTimeWindow(
-//			TmfTimeRange trange,
-//			Object origin, IRequestStatusListener listener,
-//			ITransEventProcessor processor);
-//
-//	/**
-//	 * Read available traces from the Experiment start time, One request per
-//	 * trace in the Experiment
-//	 * 
-//	 * @param source
-//	 * @param listener
-//	 * @param processor
-//	 */
-//	public abstract void readExperiment(Object source,
-//			IRequestStatusListener listener, ITransEventProcessor processor);
+	/**
+	 * Read all available traces from the nearest checkpoint from start position
+	 * to the end of a specified time range. One request per trace in the
+	 * experiment will be triggered
+	 * 
+	 * @param trange
+	 * @param obs
+	 * @param transactionID
+	 * @param display
+	 * @return
+	 */
+	public abstract ILttngSyntEventRequest readExperimentTimeWindow(
+			TmfTimeRange trange,
+			Object origin, IRequestStatusListener listener,
+			ITransEventProcessor processor);
+
+	/**
+	 * Read available traces from the Experiment start time, One request per
+	 * trace in the Experiment
+	 * 
+	 * @param source
+	 * @param listener
+	 * @param processor
+	 */
+	public abstract void readExperiment(Object source,
+			IRequestStatusListener listener, ITransEventProcessor processor);
 
 	/**
 	 * A new Experiment selected, notification received from the framework

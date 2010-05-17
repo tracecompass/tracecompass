@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2010 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,11 +13,12 @@ package org.eclipse.linuxtools.lttng.tests.state;
 
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.state.StateStacksHandler;
+import org.eclipse.linuxtools.lttng.request.RequestEventDispatcher;
 import org.eclipse.linuxtools.lttng.state.StateStrings;
 import org.eclipse.linuxtools.lttng.state.StateStrings.Events;
-import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
-import org.eclipse.linuxtools.lttng.state.evProcessor.state.StateUpdateFactory;
+import org.eclipse.linuxtools.lttng.state.evProcessor.IEventToHandlerResolver;
+import org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor;
+import org.eclipse.linuxtools.lttng.state.evProcessor.state.StateEventToHandlerFactory;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.tests.state.handlers.after.StateAfterUpdateFactory;
 import org.eclipse.linuxtools.lttng.tests.state.handlers.before.StateBeforeUpdateFactory;
@@ -28,7 +29,7 @@ import org.eclipse.linuxtools.tmf.event.TmfEventField;
  * @author Alvaro
  * 
  */
-public class StateStacksHandlerTestSupport extends StateStacksHandler {
+public class StateStacksHandlerTestSupport extends RequestEventDispatcher {
 
 	// ========================================================================
 	// Table data
@@ -40,9 +41,8 @@ public class StateStacksHandlerTestSupport extends StateStacksHandler {
 	// ========================================================================
 	// Constructors
 	// ========================================================================
-	StateStacksHandlerTestSupport(LttngTraceState model) {
-		// It's assumed to have one instance of this class per "TraceSet"
-		super(model);
+	public StateStacksHandlerTestSupport(IEventToHandlerResolver handlerRegistry) {
+		super(handlerRegistry);
 	}
 
 	// ========================================================================
@@ -50,7 +50,7 @@ public class StateStacksHandlerTestSupport extends StateStacksHandler {
 	// =======================================================================
 
 	@Override
-	protected void processEvent(TmfEvent tmfEvent) /* throws LttngStateException */{
+	public void process(TmfEvent tmfEvent, LttngTraceState traceStateModel) {
 		if (tmfEvent == null) {
 			return;
 		}
@@ -75,13 +75,13 @@ public class StateStacksHandlerTestSupport extends StateStacksHandler {
 				// check that received channel is the expected channel in the
 				// structure
 				if (inChannel.equals(expectedChannel)) {
-					IEventProcessing handlerBefore = StateBeforeUpdateFactory.getInstance()
+					ILttngEventProcessor handlerBefore = StateBeforeUpdateFactory.getInstance()
 					.getEventNametoProcessor(inEventName);
 
-					IEventProcessing handler = StateUpdateFactory.getInstance()
+					ILttngEventProcessor handler = StateEventToHandlerFactory.getInstance()
 					.getStateUpdaterProcessor(inEventName);
 					
-					IEventProcessing handlerAfter = StateAfterUpdateFactory.getInstance()
+					ILttngEventProcessor handlerAfter = StateAfterUpdateFactory.getInstance()
 					.getEventNametoProcessor(inEventName);
 					
 					

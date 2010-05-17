@@ -95,6 +95,8 @@ public class TraceDebug {
 		int earliestRequested = numOfStackLines > 0 ? stackCalledFromIdx
 				+ numOfStackLines : stackCalledFromIdx;
 		StringBuilder sb = new StringBuilder();
+		int max = Thread.currentThread().getStackTrace().length - 1;
+		earliestRequested = earliestRequested > max ? max : earliestRequested;
 		for (int i = earliestRequested; i >= stackCalledFromIdx; i--) {
 			sb.append(trace(Thread.currentThread().getStackTrace(), i) + "\n");
 		}
@@ -102,7 +104,8 @@ public class TraceDebug {
 	}
 
 	private static String trace(StackTraceElement e[], int level) {
-		if (e != null && e.length >= level) {
+		if (e != null) {
+			level = level >= e.length ? e.length - 1 : level;
 			StackTraceElement s = e[level];
 			if (s != null) {
 				String simpleClassName = s.getClassName();

@@ -15,13 +15,13 @@ import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.state.StateStrings.Events;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ExecutionMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessStatus;
-import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
+import org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor;
 import org.eclipse.linuxtools.lttng.state.model.LttngProcessState;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
-import org.eclipse.linuxtools.lttng.ui.views.statistics.model.StatisticsTreeFactory;
+import org.eclipse.linuxtools.lttng.ui.views.statistics.model.StatisticsTreeRootFactory;
 import org.eclipse.linuxtools.lttng.ui.views.statistics.model.StatisticsTreeNode;
 
-abstract class AbstractStatsEventHandler implements IEventProcessing {
+abstract class AbstractStatsEventHandler implements ILttngEventProcessor {
 	private Events eventType;
 	
 	public AbstractStatsEventHandler(Events eventType) {
@@ -32,8 +32,9 @@ abstract class AbstractStatsEventHandler implements IEventProcessing {
 	/**
 	 * @return root of of the tree for this experiment.
 	 */
-	protected StatisticsTreeNode getStatisticsTree(LttngEvent trcEvent) {
-		StatisticsTreeNode tree = StatisticsTreeFactory.getStatisticsTree("Experiment");
+	protected StatisticsTreeNode getStatisticsTree(LttngTraceState trcState) {
+		String experimentName = trcState.getContext().getExperimentName();
+		StatisticsTreeNode tree = StatisticsTreeRootFactory.getStatTreeRoot(experimentName);
 		return tree;
 	}
 	
@@ -42,7 +43,7 @@ abstract class AbstractStatsEventHandler implements IEventProcessing {
 	 */
 	protected String[][] getRelevantPaths(LttngEvent event,
 			LttngTraceState traceState) {
-		String trace = traceState.getInputDataRef().getTraceId();
+		String trace = traceState.getContext().getTraceId();
 		
 		Long cpu = event.getCpuId();
 		
@@ -82,7 +83,7 @@ abstract class AbstractStatsEventHandler implements IEventProcessing {
 	 */
 	protected String[][] getRelevantEventTypesPaths(LttngEvent event,
 			LttngTraceState traceState) {
-		String trace = traceState.getInputDataRef().getTraceId();
+		String trace = traceState.getContext().getTraceId();
 		
 		Long cpu = event.getCpuId();
 		
@@ -217,6 +218,26 @@ abstract class AbstractStatsEventHandler implements IEventProcessing {
 //	@Override
 	public Events getEventHandleType() {
 		return eventType;
+	}
+	
+	protected void stepCount(LttngEvent event, LttngTraceState traceState) {
+		StatisticsTreeNode root = getStatisticsTree(traceState);
+		
+		String[][] paths = getRelevantPaths(event, traceState);
+		
+		for (String[] path : paths) {
+			StatisticsTreeNode node = root.getOrCreateChildFromPath(path); 
+			
+			increaseNbEvents(node);
+		}
+		
+		String[][] eventTypesPaths = getRelevantEventTypesPaths(event, traceState);
+		
+		for (String[] path : eventTypesPaths) {
+			StatisticsTreeNode node = root.getOrCreateChildFromPath(path); 
+			
+			increaseNbEvents(node);
+		}
 	}
 
 }

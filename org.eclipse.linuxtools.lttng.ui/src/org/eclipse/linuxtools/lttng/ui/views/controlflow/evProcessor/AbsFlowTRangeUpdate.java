@@ -13,7 +13,7 @@ package org.eclipse.linuxtools.lttng.ui.views.controlflow.evProcessor;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessStatus;
-import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
+import org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor;
 import org.eclipse.linuxtools.lttng.state.model.LttngProcessState;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeComponent;
@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.lttng.ui.views.common.ParamsUpdater;
 import org.eclipse.linuxtools.lttng.ui.views.controlflow.model.FlowModelFactory;
 import org.eclipse.linuxtools.lttng.ui.views.controlflow.model.FlowProcessContainer;
 
-public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEventProcessing {
+public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements ILttngEventProcessor {
 
 	// ========================================================================
 	// Data
@@ -56,7 +56,7 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 		localProcess.setBrand(stateProcess.getBrand());
 		localProcess.setTraceID(traceId);
 		localProcess.setProcessType(stateProcess.getType().getInName());
-		procContainer.addProcess(localProcess);
+		procContainer.addItem(localProcess);
 		return localProcess;
 	}
 	
@@ -115,6 +115,12 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 			return false;
 		}
 
+		// Store the next good time to start drawing the next event
+		// this is done this early to display an accurate start time of the
+		// first event
+		// within the display window
+		// ****** moved at the end since it produces gaps among the coloured rectangles
+		// localProcess.setNext_good_time(etime);
 		if (!withinViewRange(stime, etime)) {
 			// No use to process the event since it's outside
 			// the visible time range of the window
@@ -128,10 +134,6 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 		double k = getPixelsPerNs(traceSt, params);
 		double pixels = duration * k;
 
-		// ***VERIFY***
-		// Is all this equivalent to this call in C??
-		// if(ltt_time_compare(hashed_process_data->next_good_time,evtime) > 0)
-		// ***
 		// Visibility check
 		// Display a "more information" indication by allowing non visible event
 		// as long as its previous event is visible.
@@ -146,12 +148,6 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 				TimeRangeComponent prevEvent = inMemEvents.get(inMemEvents
 						.size() - 1);
 				prevEventVisibility = prevEvent.isVisible();
-
-				// ***VERIFY***
-				// This replace all C Call like this one ?
-				// #ifdef EXTRA_CHECK if(ltt_time_compare(evtime,
-				// time_window.start_time) == -1 || ltt_time_compare(evtime,
-				// time_window.end_time) == 1)
 
 				// if previous event visibility is false and the time span
 				// between events less than two pixels, there is no need to
@@ -175,25 +171,12 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements IEv
 		}
 
 		// Create the time-range event
-		// *** VERIFY ***
-		// This should replace this C call, right?
-		// TimeWindow time_window =
-		// lttvwindow_get_time_window(control_flow_data->tab);
 		TimeRangeEvent time_window = new TimeRangeEvent(stime, etime,
 				localProcess, Type.PROCESS_MODE, stateMode);
 
-		// *** VERIFY ***
-		// This is added to replace the multiple draw and gtk/glib command but
-		// I'm not sure about it
 		time_window.setVisible(visible);
 		localProcess.getTraceEvents().add(time_window);
 		localProcess.setNext_good_time(etime);
-
-		// *** VERIFY ***
-		// Missing checks like this one?
-		// #ifdef EXTRA_CHECK if(ltt_time_compare(evtime,
-		// time_window.start_time) == -1 || ltt_time_compare(evtime,
-		// time_window.end_time) == 1)
 
 		return false;
 	}

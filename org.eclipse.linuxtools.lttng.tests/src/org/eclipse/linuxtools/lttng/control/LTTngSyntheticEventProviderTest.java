@@ -60,7 +60,7 @@ public class LTTngSyntheticEventProviderTest extends LttngTestPreparation {
 		// experiment selected, build experiment selection context and trigger
 		// check point creation
 		expManager.experimentSelected_prep(experiment);
-		// builds check points in parallel
+		// Action trigger
 		expManager.experimentSelected(this, experiment);
 
 		// Obtain the singleton event provider
@@ -77,7 +77,6 @@ public class LTTngSyntheticEventProviderTest extends LttngTestPreparation {
 		synProvider.sendRequest(request1);
 		synProvider.sendRequest(request2);
 		try {
-			request1.waitForCompletion();
 			request2.waitForCompletion();
 		} catch (InterruptedException e) {
 			e.printStackTrace();

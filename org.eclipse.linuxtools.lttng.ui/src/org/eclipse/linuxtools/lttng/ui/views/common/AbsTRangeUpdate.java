@@ -10,13 +10,13 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.common;
 
-import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
+import org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor;
 import org.eclipse.linuxtools.lttng.state.evProcessor.state.AbsStateProcessing;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 
 public abstract class AbsTRangeUpdate extends AbsStateProcessing implements
-		IEventProcessing {
+		ILttngEventProcessor {
 
     private static final long MINORBITS = 20;
     
@@ -46,7 +46,7 @@ public abstract class AbsTRangeUpdate extends AbsStateProcessing implements
     protected double getPixelsPerNs(LttngTraceState traceSt, ParamsUpdater params) {
         double pixPerNs = params.getPixelsPerNs();
         if (pixPerNs == 0) {
-            TmfTimeRange tsetRange = traceSt.getInputDataRef().getExperimentTimeWindow();
+            TmfTimeRange tsetRange = traceSt.getContext().getExperimentTimeWindow();
             
             long startTime = tsetRange.getStartTime().getValue();
             long endTime = tsetRange.getEndTime().getValue();

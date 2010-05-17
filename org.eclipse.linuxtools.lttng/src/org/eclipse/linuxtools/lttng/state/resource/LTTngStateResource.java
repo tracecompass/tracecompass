@@ -54,7 +54,6 @@ public class LTTngStateResource extends
 	 * org.eclipse.linuxtools.lttng.control.LTTngStateTreeNodeGeneric#getChildren
 	 * ()
 	 */
-	@Override
 	public LTTngStateResource[] getChildren() {
 		return childrenToArray(fchildren.values(), this.getClass());
 	}

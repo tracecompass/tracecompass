@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2010 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.controlflow;
 
-import java.util.Arrays;
 import java.util.Vector;
 
 import org.eclipse.jface.action.Action;
@@ -34,24 +33,24 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
-import org.eclipse.linuxtools.lttng.state.StateDataRequest;
-import org.eclipse.linuxtools.lttng.state.StateManager;
-import org.eclipse.linuxtools.lttng.state.evProcessor.EventProcessorProxy;
-import org.eclipse.linuxtools.lttng.state.experiment.StateExperimentManager;
-import org.eclipse.linuxtools.lttng.state.experiment.StateManagerFactory;
+import org.eclipse.linuxtools.lttng.request.ILttngSyntEventRequest;
+import org.eclipse.linuxtools.lttng.state.evProcessor.ITransEventProcessor;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
+import org.eclipse.linuxtools.lttng.ui.model.trange.ItemContainer;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventProcess;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeViewerProvider;
 import org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView;
 import org.eclipse.linuxtools.lttng.ui.views.common.ParamsUpdater;
-import org.eclipse.linuxtools.lttng.ui.views.controlflow.evProcessor.FlowTRangeUpdateFactory;
+import org.eclipse.linuxtools.lttng.ui.views.controlflow.evProcessor.FlowEventToHandlerFactory;
 import org.eclipse.linuxtools.lttng.ui.views.controlflow.model.FlowModelFactory;
+import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
+import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
-import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.ui.viewers.TmfViewerFactory;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITimeAnalysisViewer;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITmfTimeFilterSelectionListener;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITmfTimeScaleSelectionListener;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITmfTimeSelectionListener;
@@ -62,15 +61,11 @@ import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysis
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -85,8 +80,6 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * <b><u>ControlFlowView</u></b>
- * <p>
- * TODO: Implement me. Please.
  */
 /**
  * @author alvaro
@@ -138,13 +131,10 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	private Action filterTraces;
 	private Action zoomIn;
 	private Action zoomOut;
-	private Action synch;
+	private Action zoomFilter;
 
-	private ITimeAnalysisViewer tsfviewer;
 	private ViewProcessFilter tableFilter = null;
 	private ScrolledComposite scrollFrame = null;
-	private Composite wrapper = null;
-	private Composite top;
 
 	// private static SimpleDateFormat stimeformat = new SimpleDateFormat(
 	// "yy/MM/dd HH:mm:ss");
@@ -174,9 +164,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		public void inputChanged(Viewer v, Object oldInput, Object newInput) {
 			this.elements = (ITmfTimeAnalysisEntry[]) newInput;
 			if (elements != null) {
-				TraceDebug
-						.debug("Total number of processes provided to Control Flow view: "
-								+ elements.length);
+				TraceDebug.debug("Total number of processes provided to Control Flow view: " + elements.length);
 			} else {
 				TraceDebug.debug("New input = null");
 			}
@@ -194,7 +182,6 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 		// @Override
 		public Object[] getElements(Object inputElement) {
-			// TODO Auto-generated method stub
 			return elements;
 		}
 	}
@@ -307,113 +294,102 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	 * This is a callback that will allow us to create the viewer and initialize
 	 * it.
 	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.linuxtools.tmf.ui.views.TmfView#createPartControl(org.eclipse
+	 * .swt.widgets.Composite)
+	 */
 	@Override
 	public void createPartControl(Composite parent) {
-		top = new Composite(parent, SWT.BORDER);
 
-		top.setLayout(new FillLayout());
-
-		scrollFrame = new ScrolledComposite(top, SWT.V_SCROLL | SWT.H_SCROLL);
-		scrollFrame.setBounds(top.getClientArea());
-
-		wrapper = new Composite(scrollFrame, SWT.NONE);
-		scrollFrame.setEnabled(true);
-		scrollFrame.setRedraw(true);
+		scrollFrame = new ScrolledComposite(parent, SWT.V_SCROLL);
+		
 		scrollFrame.setExpandVertical(true);
 		scrollFrame.setExpandHorizontal(true);
-		scrollFrame.setContent(wrapper);
 		scrollFrame.setAlwaysShowScrollBars(true);
-		wrapper.setLayout(new FillLayout());
+		
+		SashForm sash = new SashForm(scrollFrame, SWT.NONE);
+		scrollFrame.setContent(sash);
 
-		SashForm sash = new SashForm(wrapper, SWT.NONE);
-		final Composite tableComposite = new Composite(sash, SWT.NO_SCROLL);
-		FillLayout layout = new FillLayout();
-		tableComposite.setLayout(layout);
-		tableViewer = new TableViewer(tableComposite, SWT.FULL_SELECTION
-				| SWT.H_SCROLL);
+		tableViewer = new TableViewer(sash, SWT.FULL_SELECTION | SWT.H_SCROLL);
 		tableViewer.setContentProvider(new ViewContentProvider(tableViewer));
 		tableViewer.setLabelProvider(new ViewLabelProvider());
 		Table table = tableViewer.getTable();
-		tableViewer
-				.addSelectionChangedListener(new ISelectionChangedListener() {
-					public void selectionChanged(SelectionChangedEvent event) {
-						ISelection sel = event.getSelection();
-						if (!sel.isEmpty()) {
-							Object firstSel = null;
-							if (sel instanceof IStructuredSelection) {
-								firstSel = ((IStructuredSelection) sel)
-										.getFirstElement();
+		tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(SelectionChangedEvent event) {
+				ISelection sel = event.getSelection();
+				if (!sel.isEmpty()) {
+					Object firstSel = null;
+					if (sel instanceof IStructuredSelection) {
+						firstSel = ((IStructuredSelection) sel).getFirstElement();
 
-								// Make sure the selection is visible
-								updateScrollOrigin();
+						// Make sure the selection is visible
+						updateScrollOrigin();
 
-								if (firstSel instanceof ITmfTimeAnalysisEntry) {
-									ITmfTimeAnalysisEntry trace = (ITmfTimeAnalysisEntry) firstSel;
-									tsfviewer.setSelectedTrace(trace);
-								}
-							}
+						if (firstSel instanceof ITmfTimeAnalysisEntry) {
+							ITmfTimeAnalysisEntry trace = (ITmfTimeAnalysisEntry) firstSel;
+							tsfviewer.setSelectedTrace(trace);
 						}
 					}
+				}
+			}
 
-					/**
-					 * Make sure the selected item is visible
-					 */
-					private void updateScrollOrigin() {
-						Table table = tableViewer.getTable();
-						if (table != null && table.getItemCount() > 0) {
-							TableItem item = table.getSelection()[0];
-							if (item == null) {
-								// no selected reference to go up or down
-								return;
-							}
+			/**
+			 * Make sure the selected item is visible
+			 */
+			private void updateScrollOrigin() {
+				Table table = tableViewer.getTable();
+				if (table != null && table.getItemCount() > 0) {
+					TableItem item = table.getSelection()[0];
+					if (item == null) {
+						// no selected reference to go up or down
+						return;
+					}
 
-							Rectangle itemRect = item.getBounds();
-							int step = itemRect.height;
+					Rectangle itemRect = item.getBounds();
+					int step = itemRect.height;
 
-							// calculate height of horizontal bar
-							int hscrolly = 0;
-							ScrollBar hbar = scrollFrame.getHorizontalBar();
-							if (hbar != null) {
-								hscrolly = hbar.getSize().y;
-							}
+					// calculate height of horizontal bar
+					int hscrolly = 0;
+					ScrollBar hbar = scrollFrame.getHorizontalBar();
+					if (hbar != null) {
+						hscrolly = hbar.getSize().y;
+					}
 
-							int visibleHeight = scrollFrame.getSize().y
-									- hscrolly;
+					int visibleHeight = scrollFrame.getSize().y - hscrolly;
 
-							// the current scrollbar offset to adjust i.e. start
-							// of
-							// the visible window
-							Point origin = scrollFrame.getOrigin();
-							// end of visible window
-							int endy = origin.y + visibleHeight;
+					// the current scrollbar offset to adjust i.e. start
+					// of
+					// the visible window
+					Point origin = scrollFrame.getOrigin();
+					// end of visible window
+					int endy = origin.y + visibleHeight;
 
-							int itemStartPos = itemRect.y
-									+ table.getHeaderHeight()
-									+ table.getBorderWidth()
-									+ table.getParent().getBorderWidth();
+					int itemStartPos = itemRect.y + table.getHeaderHeight() + table.getBorderWidth()
+							+ table.getParent().getBorderWidth();
 
-							// Item End Position
-							int itemEndPos = itemStartPos + step;
+					// Item End Position
+					int itemEndPos = itemStartPos + step;
 
-							// check if need to go up
-							if (origin.y >= step && itemStartPos < origin.y) {
-								// one step up
-								scrollFrame
-										.setOrigin(origin.x, origin.y - step);
+					// check if need to go up
+					if (origin.y >= step && itemStartPos < origin.y) {
+						// one step up
+						scrollFrame.setOrigin(origin.x, origin.y - step);
 
-							}
+					}
 
 							// check if it needs to go down
-							if (itemEndPos > endy) {
-								// one step down
-								scrollFrame
-										.setOrigin(origin.x, origin.y + step);
+					if (itemEndPos > endy) {
+						// one step down
+						scrollFrame.setOrigin(origin.x, origin.y + step);
 
 							}
-						}
-					}
-				});
-
+				}
+			}
+		});
+		
 		// Listen to page up /down and Home / Enc keys
 		tableViewer.getTable().addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e) {
@@ -507,7 +483,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 		int borderWidth = table.getBorderWidth();
 
-		int itemHeight = table.getItemHeight();
+		int itemHeight = table.getItemHeight() + checkForSWTBugItemHeightAdjustement();
 		int headerHeight = table.getHeaderHeight();
 		table.getVerticalBar().setVisible(false);
 
@@ -519,10 +495,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 		// Traces shall not be grouped to allow synchronisation
 		tsfviewer.groupTraces(false);
-		
-		int swtBugAjustment = checkForSWTBugItemHeightAdjustement();
-		tsfviewer.setItemHeight(itemHeight + swtBugAjustment);
-		
+		tsfviewer.setItemHeight(itemHeight);
 		tsfviewer.setBorderWidth(borderWidth);
 		tsfviewer.setHeaderHeight(headerHeight);
 		tsfviewer.setVisibleVerticalScroll(false);
@@ -548,54 +521,38 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		hookDoubleClickAction();
 		contributeToActionBars();
 
-		scrollFrame.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(ControlEvent e) {
-				tsfviewer.resizeControls();
-				updateScrolls(scrollFrame, wrapper);
-			}
-		});
-
-		tableComposite.addControlListener(new ControlListener() {
-			public void controlResized(ControlEvent e) {
-				scrollFrame.getParent().update();
-			}
-
-			public void controlMoved(ControlEvent e) {
-
-			}
-		});
-
-		// Register the updater in charge to refresh elements as we update the
-		// time ranges
-		// FlowParamsUpdater listener = FlowModelFactory.getParamsUpdater();
-		// tsfviewer.addWidgetTimeScaleSelectionListner(listener);
-
-		// Register this view to receive updates when the model is updated with
-		// fresh info
-		// ModelListenFactory.getRegister().addFlowModelUpdatesListener(this);
-
-		// Register the event processor factory in charge of event handling
-		EventProcessorProxy.getInstance().addEventProcessorFactory(
-				FlowTRangeUpdateFactory.getInstance());
+		// scrollFrame.addControlListener(new ControlAdapter() {
+		//
+		// @Override
+		// public void controlResized(ControlEvent e) {
+		// tsfviewer.resizeControls();
+		// updateScrolls(scrollFrame);
+		// }
+		// });
 
 		// set the initial view parameter values
 		// Experiment start and end time
 		// as well as time space width in pixels, used by the time analysis
 		// widget
-		ParamsUpdater paramUpdater = FlowModelFactory.getParamsUpdater();
-		StateExperimentManager experimentManger = StateManagerFactory
-				.getExperimentManager();
 		// Read relevant values
 		int timeSpaceWidth = tsfviewer.getTimeSpace();
-		TmfTimeRange timeRange = experimentManger.getExperimentTimeRange();
-		if (timeRange != null) {
-			long time0 = timeRange.getStartTime().getValue();
-			long time1 = timeRange.getEndTime().getValue();
-			paramUpdater.update(time0, time1, timeSpaceWidth);
+		if (timeSpaceWidth < 0) {
+			timeSpaceWidth = -timeSpaceWidth;
 		}
 
-		experimentManger.readExperiment("flowView", this);
+		TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
+		if (experiment != null) {
+			TmfTimeRange experimentTRange = experiment.getTimeRange();
+
+			// send request and received the adjusted time used
+			TmfTimeRange adjustedTimeRange = initialExperimentDataRequest(this,
+					experimentTRange);
+
+			// initialize widget time boundaries and filtering parameters
+			ModelUpdateInit(experimentTRange, adjustedTimeRange, this);
+		} else {
+			TraceDebug.debug("No selected experiment information available");
+		}
 	}
 
 	private void hookContextMenu() {
@@ -629,7 +586,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		// manager.add(filterTraces);
 		manager.add(zoomIn);
 		manager.add(zoomOut);
-		manager.add(synch);
+		manager.add(zoomFilter);
 		manager.add(new Separator());
 	}
 
@@ -645,7 +602,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		// manager.add(filterTraces);
 		manager.add(zoomIn);
 		manager.add(zoomOut);
-		manager.add(synch);
+		manager.add(zoomFilter);
 		manager.add(new Separator());
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
@@ -661,7 +618,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		// manager.add(filterTraces);
 		manager.add(zoomIn);
 		manager.add(zoomOut);
-		manager.add(synch);
+		manager.add(zoomFilter);
 		manager.add(new Separator());
 	}
 
@@ -818,30 +775,25 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		zoomOut.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
 				Messages.getString("ControlFlowView.tmf.UI"),
 				"icons/zoomout_nav.gif"));
-		
-		// synch
-		synch = new Action() {
+
+		// zoomFilter
+		zoomFilter = new Action() {
 			@Override
 			public void run() {
-				// Note: No action since the synch flag is used by Control flow
-				// view
-				// the actual viewer is set to accept api selections in
-				// createpartcontrol.
-
-				// if (synch.isChecked()) {
-				// tsfviewer.setAcceptSelectionAPIcalls(true);
-				// } else {
-				// tsfviewer.setAcceptSelectionAPIcalls(false);
-				// }
+				// Nothing to do, however the selection status is needed by the
+				// application
 			}
 		};
-		synch.setText(Messages.getString("ControlFlowView.Action.Synchronize")); //$NON-NLS-1$
-		synch.setToolTipText(Messages
-				.getString("ControlFlowView.Action.Synchronize.ToolTip")); //$NON-NLS-1$
-		synch.setChecked(false);
-		synch.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
-				Messages.getString("ControlFlowView.tmf.UI"),
-				"icons/synced.gif"));
+		zoomFilter.setText(Messages
+				.getString("ControlFlowView.Action.ZoomFilter")); //$NON-NLS-1$
+		zoomFilter.setToolTipText(Messages
+				.getString("ControlFlowView.Action.ZoomFilter.tooltip")); //$NON-NLS-1$
+		zoomFilter.setImageDescriptor(AbstractUIPlugin
+				.imageDescriptorFromPlugin(Messages
+						.getString("ControlFlowView.tmf.UI"),
+						"icons/filter_items.gif"));
+		zoomFilter.setChecked(false);
+
 		// PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_SYNCED);
 
 		doubleClickAction = new Action() {
@@ -876,85 +828,35 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		tableViewer.getControl().setFocus();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
+	 * tsfTmProcessSelEvent
+	 * (org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeSelectionEvent
+	 * )
+	 */
 	public void tsfTmProcessSelEvent(TmfTimeSelectionEvent event) {
-		Object source = event.getSource();
-		if (source == null) {
-			return;
-		}
+		// common implementation
+		super.tsfTmProcessSelEvent(event);
 
 		// Reselect the table viewer to widget selection
 		ISelection sel = tsfviewer.getSelectionTrace();
 		if (sel != null && !sel.isEmpty()) {
 			tableViewer.setSelection(sel);
 		}
-
-		ParamsUpdater paramUpdater = FlowModelFactory.getParamsUpdater();
-		Long savedSelTime = paramUpdater.getSelectedTime();
-
-		long selTimens = event.getSelectedTime();
-
-		// make sure the new selected time is different than saved before
-		// executing update
-		if (savedSelTime == null || savedSelTime != selTimens) {
-			// Notify listener views.
-			synchTimeNotification(selTimens);
-
-			// Update the parameter updater to save the selected time
-			paramUpdater.setSelectedTime(selTimens);
-
-			if (TraceDebug.isDEBUG()) {
-				// Object selection = event.getSelection();
-				TraceDebug.debug("Selected Time in control Flow View: "
-						+ new LttngTimestamp(selTimens));
-			}
-		}
 	}
 
-	public synchronized void tsfTmProcessTimeScaleEvent(
-			TmfTimeScaleSelectionEvent event) {
-		// source needed to keep track of source values
-		Object source = event.getSource();
-
-		if (source != null) {
-			// Update the parameter updater before carrying out a read request
-			ParamsUpdater paramUpdater = FlowModelFactory.getParamsUpdater();
-			boolean newParams = paramUpdater.processTimeScaleEvent(event);
-
-			if (newParams) {
-				// Read the updated time window
-				TmfTimeRange trange = paramUpdater.getTrange();
-				if (trange != null) {
-					// Request new data for specified time range
-					dataRequest(trange);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Obtains the remainder fraction on unit Seconds of the entered value in
-	 * nanoseconds. e.g. input: 1241207054171080214 ns The number of seconds can
-	 * be obtain by removing the last 9 digits: 1241207054 the fractional
-	 * portion of seconds, expressed in ns is: 171080214
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param v
-	 * @return
+	 * @see org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.
+	 * ITmfTimeScaleSelectionListener
+	 * #tsfTmProcessTimeScaleEvent(org.eclipse.linuxtools
+	 * .tmf.ui.viewers.timeAnalysis.TmfTimeScaleSelectionEvent)
 	 */
-	public String formatNs(long v) {
-		StringBuffer str = new StringBuffer();
-		boolean neg = v < 0;
-		if (neg) {
-			v = -v;
-			str.append('-');
-		}
-
-		String strVal = String.valueOf(v);
-		if (v < 1000000000) {
-			return strVal;
-		}
-
-		// Extract the last nine digits (e.g. fraction of a S expressed in ns
-		return strVal.substring(strVal.length() - 9);
+	public synchronized void tsfTmProcessTimeScaleEvent(TmfTimeScaleSelectionEvent event) {
+		super.tsfTmProcessTimeScaleEvent(event);
 	}
 
 	private void applyTableLayout(Table table) {
@@ -967,15 +869,19 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		table.setLinesVisible(true);
 	}
 
-	/**
-	 * @param items
-	 * @param startTime
-	 * @param endTime
-	 * @param updateTimeBounds - Update needed e.g. a new Experiment or trace selected
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#displayModel
+	 * (org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.
+	 * ITmfTimeAnalysisEntry[], long, long, boolean, long, long,
+	 * java.lang.Object)
 	 */
-	public void flowModelUpdates(final ITmfTimeAnalysisEntry[] items,
-			final long startTime, final long endTime,
-			final boolean updateTimeBounds) {
+	public void displayModel(final ITmfTimeAnalysisEntry[] items,
+			final long startBoundTime, final long endBoundTime,
+			final boolean updateTimeBounds, final long startVisibleWindow,
+			final long endVisibleWindow, final Object source) {
 		final Table table = tableViewer.getTable();
 		Display display = table.getDisplay();
 
@@ -992,14 +898,21 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 				table.update();
 				tableViewer.refresh();
 
-				tsfviewer.display(items, startTime, endTime, updateTimeBounds);
+				tsfviewer.display(items, startBoundTime, endBoundTime,
+						updateTimeBounds);
+
+				// validate visible boundaries
+				if (startVisibleWindow > -1 && endVisibleWindow > -1) {
+					tsfviewer.setSelectVisTimeWindow(startVisibleWindow,
+							endVisibleWindow, source);
+				}
+
 				tsfviewer.resizeControls();
 
 				// Adjust the size of the vertical scroll bar to fit the
 				// contents
-				if (scrollFrame != null && wrapper != null) {
-					updateScrolls(scrollFrame, wrapper);
-					// scrollFrame.update();
+				if (scrollFrame != null) {
+					updateScrolls(scrollFrame);
 				}
 			}
 		});
@@ -1009,12 +922,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	public void dispose() {
 		// dispose parent resources
 		super.dispose();
-		// Remove the event processor factory
-		EventProcessorProxy.getInstance().removeEventProcessorFactory(
-				FlowTRangeUpdateFactory.getInstance());
 
-		// Remove listener to model updates
-		// ModelListenFactory.getRegister().removeFlowModelUpdatesListener(this);
 		tsfviewer.removeFilterSelectionListner(this);
 		tsfviewer.removeWidgetSelectionListner(this);
 		tsfviewer.removeWidgetTimeScaleSelectionListner(this);
@@ -1056,187 +964,90 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	 * @param scrollFrame
 	 * @param wrapper
 	 */
-	private void updateScrolls(final ScrolledComposite scrollFrame,
-			final Composite wrapper) {
-
-		Point ptSize = wrapper.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		wrapper.setSize(ptSize);
-		scrollFrame.setMinSize(ptSize);
-
-		// calculate the increment area considering the table header height and
-		// borders
-		Rectangle area = top.getBounds();
-		int marginsHeight = tableViewer.getTable().getHeaderHeight();
-		marginsHeight -= top.getBorderWidth() + wrapper.getBorderWidth();
-		area.height -= marginsHeight;
-
-		// set page vertical increment area
-		ScrollBar verBar = scrollFrame.getVerticalBar();
-		ScrollBar horBar = scrollFrame.getHorizontalBar();
-		if (verBar != null) {
-			verBar.setPageIncrement(area.height);
-		}
-		if (horBar != null) {
-			horBar.setPageIncrement(area.width);
-		}
-
+	private void updateScrolls(final ScrolledComposite scrollFrame) {
+		scrollFrame.setMinSize(tableViewer.getTable().computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 
 	/**
-	 * Trigger time synchronisation to other views this method shall be called
-	 * when a check has been performed to note that an actual change of time has
-	 * been performed vs a pure re-selection of the same time
-	 * 
-	 * @param time
-	 */
-	private void synchTimeNotification(long time) {
-		// if synchronisation selected
-		if (synch.isChecked()) {
-			// Notify other views
-			TmfSignalManager.dispatchSignal(new TmfTimeSynchSignal(this,
-					new LttngTimestamp(time)));
-		}
-	}
-
-	/**
-	 * Registers as listener of time selection from other tmf views
+	 * Registers as listener of time selection from other views
 	 * 
 	 * @param signal
 	 */
 	@TmfSignalHandler
 	public void synchToTime(TmfTimeSynchSignal signal) {
-		if (synch.isChecked()) {
-			Object source = signal.getSource();
-			if (signal != null && source != null && source != this) {
-				// Internal value is expected in nano seconds.
-				long selectedTime = signal.getCurrentTime().getValue();
-				if (tsfviewer != null) {
-					tsfviewer.setSelectedTime(selectedTime, true, source);
-				}
-			}
+		super.synchToTime(signal);
+	}
+
+	/**
+	 * Annotation Registers as listener of time range selection from other views
+	 * The implementation handles the entry of the signal.
+	 * 
+	 * @param signal
+	 */
+	@TmfSignalHandler
+	public void synchToTimeRange(TmfRangeSynchSignal signal) {
+		if (zoomFilter != null) {
+			synchToTimeRange(signal, zoomFilter.isChecked());
 		}
+	}
+
+	@Override
+	public void modelIncomplete(ILttngSyntEventRequest request) {
+		// Nothing to do
+		// The data will be refreshed on the next request
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.linuxtools.lttng.ui.views.common.LttngTimeUpdateView#waitCursor
-	 * (boolean)
+	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
+	 * getEventProcessor()
 	 */
 	@Override
-	protected synchronized void waitCursor(final boolean waitInd) {
-		if (tsfviewer != null) {
-			Display display = tsfviewer.getControl().getDisplay();
+	public ITransEventProcessor getEventProcessor() {
+		return FlowEventToHandlerFactory.getInstance();
+	}
 
-			// Perform the updates on the UI thread
-			display.asyncExec(new Runnable() {
-				public void run() {
-					tsfviewer.waitCursor(waitInd);
-				}
-			});
+	/**
+	 * @param signal
+	 */
+	@TmfSignalHandler
+	public void experimentSelected(
+			TmfExperimentSelectedSignal<? extends TmfEvent> signal) {
+		if (signal != null) {
+			TmfTimeRange experimentTRange = signal.getExperiment()
+					.getTimeRange();
+
+			// prepare time intervals in widget
+			ModelUpdateInit(experimentTRange, experimentTRange, signal
+					.getSource());
+
+			// request initial data
+			initialExperimentDataRequest(signal
+					.getSource(), experimentTRange);
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
-	 * ModelUpdatePrep(java.lang.String, boolean)
+	/**
+	 * @param source
+	 * @param experimentTRange
+	 * @return Adjusted time window used for the request (smaller window to
+	 *         initialize view)
 	 */
-	@Override
-	public void ModelUpdatePrep(String traceId, boolean clearAllData,
-			TmfTimeRange trange) {
-		if (clearAllData) {
-			FlowModelFactory.getProcContainer().clearProcesses();
-			// Obtain the current process array
-			TimeRangeEventProcess[] processArr = FlowModelFactory
-					.getProcContainer().readProcesses();
-			
+	private TmfTimeRange initialExperimentDataRequest(Object source,
+			TmfTimeRange experimentTRange) {
+		// Adjust the initial time window to a shorter interval to allow
+		// user to select the interesting area based on the perspective
+		TmfTimeRange initTimeWindow = getInitTRange(experimentTRange);
 
-			// initialise to an empty model
-			flowModelUpdates(processArr, -1, -1, false);
-		} else {
-			FlowModelFactory.getProcContainer().clearChildren(traceId);
-		}
-
-		ParamsUpdater updater = FlowModelFactory.getParamsUpdater();
-		// Start over
-		updater.setEventsDiscarded(0);
-
-		// Update new visible time range if available
-		if (trange != null) {
-			updater.update(trange.getStartTime().getValue(), trange
-					.getEndTime().getValue());
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.linuxtools.lttng.ui.views.common.LttngTimeUpdateView#
-	 * ModelUpdateComplete(org.eclipse.linuxtools.lttng.state.StateDataRequest)
-	 */
-	@Override
-	public void ModelUpdateComplete(StateDataRequest request) {
-		long experimentStartTime = -1;
-		long experimentEndTime = -1;
-		StateManager smanager = request.getStateManager();
-		TmfTimeRange experimentTimeRange = smanager.getExperimentTimeWindow();
-		if (experimentTimeRange != null) {
-			experimentStartTime = experimentTimeRange.getStartTime().getValue();
-			experimentEndTime = experimentTimeRange.getEndTime().getValue();
-		}
-		// Obtain the current process array
-		TimeRangeEventProcess[] processArr = FlowModelFactory
-				.getProcContainer().readProcesses();
-		// Sort the array by pid
-		Arrays.sort(processArr);
-
-		// Update the view part
-		flowModelUpdates(processArr, experimentStartTime, experimentEndTime,
-				request.isclearDataInd());
-
-		// get back to user selected time if still within range
-		ParamsUpdater paramUpdater = FlowModelFactory.getParamsUpdater();
-		final Long selTime = paramUpdater.getSelectedTime();
-		if (selTime != null) {
-			Display display = tsfviewer.getControl().getDisplay();
-			display.asyncExec(new Runnable() {
-				public void run() {
-					tsfviewer.setSelectedTime(selTime, false, this);
-				}
-			});
-		}
-
+		dataRequest(initTimeWindow, experimentTRange, true);
 		if (TraceDebug.isDEBUG()) {
-			int eventCount = 0;
-			Long count = smanager.getEventCount();
-			for ( int pos = 0; pos<processArr.length; pos++ ) {
-				eventCount += processArr[pos].getTraceEvents().size();
-			}
-
-			int discarded = FlowModelFactory.getParamsUpdater()
-					.getEventsDiscarded();
-			int discardedOutofOrder = FlowModelFactory.getParamsUpdater()
-					.getEventsDiscardedWrongOrder();
-			TmfTimeRange range = request.getRange();
-			StringBuilder sb = new StringBuilder(
-					"Events handled: "
-							+ count
-							+ " Events loaded in Control Flow view: "
-							+ eventCount
-							+ " Number of events discarded: "
-							+ discarded
-							+ "\n\tNumber of events discarded with start time earlier than next good time: "
-							+ discardedOutofOrder);
-
-			sb.append("\n\t\tRequested Time Range: " + range.getStartTime()
-					+ "-" + range.getEndTime());
-			sb.append("\n\t\tExperiment Time Range: " + experimentStartTime
-					+ "-" + experimentEndTime);
-			TraceDebug.debug(sb.toString());
+			TraceDebug.debug("Initialization request time range is: "
+					+ initTimeWindow.getStartTime().toString() + "-"
+					+ initTimeWindow.getEndTime().toString());
 		}
+
+		return initTimeWindow;
 	}
 	
 	// *** HACK ***
@@ -1258,5 +1069,26 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		
 		return returnedAjustement;
 	}
-}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
+	 * getParamsUpdater()
+	 */
+	@Override
+	protected ParamsUpdater getParamsUpdater() {
+		return FlowModelFactory.getParamsUpdater();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
+	 * getItemContainer()
+	 */
+	@Override
+	protected ItemContainer<?> getItemContainer() {
+		return FlowModelFactory.getProcContainer();
+	}
+}

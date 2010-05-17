@@ -34,6 +34,7 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
+import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.trace.TmfContext;
@@ -56,10 +57,10 @@ public class LttngSyntheticEventProvider extends
 
 	// TmfDataProvider<LttngEvent> fExtProvider = null;
 	private ITmfDataRequest<LttngSyntheticEvent> fmainRequest = null;
-	private final Map<IStateTraceManager, LttngBaseEventRequest> fEventProviderRequests = new HashMap<IStateTraceManager, LttngBaseEventRequest>();
+	private final Map<IStateTraceManager, LttngBaseEventRequest> feventProviderRequests = new HashMap<IStateTraceManager, LttngBaseEventRequest>();
 	private final LttngSyntheticEvent fStatusEvent;
 	private final LttngSyntheticEvent fStatusEventAck;
-	private int fMainReqEventCount = 0;
+	private int fmainReqEventCount = 0;
 	volatile boolean startIndSent = false;
 	private LTTngTreeNode fExperiment = null;
 	private ITransEventProcessor fstateUpdateProcessor = StateEventToHandlerFactory
@@ -96,7 +97,6 @@ public class LttngSyntheticEventProvider extends
 	// ========================================================================
 	// Methods
 	// ========================================================================
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public ITmfContext armRequest(
@@ -119,7 +119,7 @@ public class LttngSyntheticEventProvider extends
 		reset(fExperiment);
 
 		// At least one base provider shall be available
-		if (fEventProviderRequests.size() < 1) {
+		if (feventProviderRequests.size() < 1) {
 			request.cancel();
 			TraceDebug.debug("No Base event providers available");
 			return null;
@@ -129,33 +129,29 @@ public class LttngSyntheticEventProvider extends
 		// define event data handling
 		ITmfEventRequest<LttngSyntheticEvent> eventRequest = (ITmfEventRequest<LttngSyntheticEvent>) fmainRequest;
 		TmfTimeRange reqWindow = eventRequest.getRange();
-
+		
 		TraceDebug.debug("Main Synthethic event request started on thread:  " + Thread.currentThread().getName());
 
 		// loop for every traceManager in current experiment
-		boolean subRequestQueued = false;
-		for (IStateTraceManager traceManager : fEventProviderRequests.keySet()) {
+		for (IStateTraceManager traceManager : feventProviderRequests
+				.keySet()) {
 
 			// restore trace state system to nearest check point
 			TmfTimestamp checkPoint = traceManager
 					.restoreCheckPointByTimestamp(reqWindow.getStartTime());
-
-			// adjust start time bound to check point
-
 			// validate so checkpoint restore is within requested bounds
 			TmfTimeRange traceRange = traceManager.getTrace().getTimeRange();
-			if ((checkPoint != null) && !(
-					checkPoint.getValue() >= traceRange.getStartTime().getValue() &&
-					checkPoint.getValue() <= traceRange.getEndTime().getValue() && 
-					checkPoint.getValue() < reqWindow.getEndTime().getValue())
-					) {
+			if (!(checkPoint.getValue() >= traceRange.getStartTime().getValue()
+					&& checkPoint.getValue() <= traceRange.getEndTime()
+							.getValue() && checkPoint.getValue() < reqWindow
+					.getEndTime().getValue())) {
 				// checkpoint is out of trace bounds
 				continue;
 			}
-			TmfTimeRange adjustedRange = reqWindow;
-			if (checkPoint != null) {
-				adjustedRange = new TmfTimeRange(checkPoint, reqWindow.getEndTime());
-			}
+
+			// adjust start time bound to check point
+			TmfTimeRange adjustedRange = new TmfTimeRange(checkPoint, reqWindow
+					.getEndTime());
 
 			LttngTraceState traceModel = traceManager.getStateModel();
 			// create sub-request for one trace within experiment
@@ -218,36 +214,36 @@ public class LttngSyntheticEventProvider extends
 					// queue the new event data and an ACK
 					updateSynEvent(e);
 
+
+
 					// If time at or above requested time, update application
-					try {
-						if (eventTime >= fDispatchTime) {
-							// Before update
-							syntheticEvent.setSequenceInd(SequenceInd.BEFORE);
-							queueResult(syntheticEvent);
-							queueResult(syntheticAckIndicator);
+					if (eventTime >= fDispatchTime) {
+						// Before update
+						syntheticEvent.setSequenceInd(SequenceInd.BEFORE);
+						queueResult(syntheticEvent);
+						queueResult(syntheticAckIndicator);
 
-							// Update state locally
-							syntheticEvent.setSequenceInd(SequenceInd.UPDATE);
-							fstateUpdateProcessor.process(syntheticEvent, fTraceModel);
+						// Update state locally
+						syntheticEvent.setSequenceInd(SequenceInd.UPDATE);
+						fstateUpdateProcessor.process(syntheticEvent,
+								fTraceModel);
 
-							// After Update
-							syntheticEvent.setSequenceInd(SequenceInd.AFTER);
-							queueResult(syntheticEvent);
-							queueResult(syntheticAckIndicator);
+						// After Update
+						syntheticEvent.setSequenceInd(SequenceInd.AFTER);
+						queueResult(syntheticEvent);
+						queueResult(syntheticAckIndicator);
 
-							// increment once per dispatch
-							incrementSynEvenCount();
-							subEventCount++;
-						} else {
-							// event time is between checkpoint adjusted time and
-							// requested time i.e. application does not expect the
-							// event, however the state system needs to be re-built
-							// to the dispatch point
-							syntheticEvent.setSequenceInd(SequenceInd.UPDATE);
-							fstateUpdateProcessor.process(syntheticEvent, fTraceModel);
-						}
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
+						// increment once per dispatch
+						incrementSynEvenCount();
+						subEventCount++;
+					} else {
+						// event time is between checkpoint adjusted time and
+						// requested time i.e. application does not expect the
+						// event, however the state system needs to be re-built
+						// to the dispatch point
+						syntheticEvent.setSequenceInd(SequenceInd.UPDATE);
+						fstateUpdateProcessor.process(syntheticEvent,
+								fTraceModel);
 					}
 				}
 
@@ -282,20 +278,19 @@ public class LttngSyntheticEventProvider extends
 					return syntheticEvent;
 				}
 			};
-						
+			
 			// preserve the associated sub request to control it e.g.
 			// cancellation
-			fEventProviderRequests.put(traceManager, subRequest);
+			feventProviderRequests.put(traceManager, subRequest);
 
 			// start request
 			TmfTrace<LttngEvent> provider = (TmfTrace<LttngEvent>) traceManager
 					.getTrace();
-			provider.sendRequest(subRequest, ExecutionType.LONG);
-			subRequestQueued = true;
+			provider.sendRequest(subRequest);
 		}
 
 		// Return a dummy context, not used for relay provider
-		return (subRequestQueued) ? new TmfContext() : null;
+		return new TmfContext();
 	}
 
 	/**
@@ -307,12 +302,8 @@ public class LttngSyntheticEventProvider extends
 		startIndEvent.setSequenceInd(SequenceInd.STARTREQ);
 
 		// Notify application
-		try {
-			queueResult(startIndEvent);
-			queueResult(fStatusEventAck);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		queueResult(startIndEvent);
+		queueResult(fStatusEventAck);
 
 		// Notify state event processor
 		fstateUpdateProcessor.process(startIndEvent, null);
@@ -330,7 +321,7 @@ public class LttngSyntheticEventProvider extends
 		// handle completion and cancellations properly
 
 		// Close the main request when all sub-requests are marked completed
-		for (LttngBaseEventRequest subRequest : fEventProviderRequests.values()) {
+		for (LttngBaseEventRequest subRequest : feventProviderRequests.values()) {
 			if (subRequest != null) {
 				if (!subRequest.isCompleted()) {
 					// Not ready to complete main request
@@ -345,29 +336,24 @@ public class LttngSyntheticEventProvider extends
 		LttngSyntheticEvent finishEvent = new LttngSyntheticEvent(fStatusEvent);
 		finishEvent.setSequenceInd(SequenceInd.ENDREQ);
 		finishEvent.setTraceModel(traceModel);
-
-		try {
-			queueResult(finishEvent);
-			queueResult(fStatusEventAck);
-			// End the loop in the main request
-			queueResult(LttngSyntheticEvent.NullEvent);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		queueResult(finishEvent);
+		queueResult(fStatusEventAck);
+		// End the loop in the main request
+		queueResult(LttngSyntheticEvent.NullEvent);
 	}
 
 	/**
 	 * Increment the global event counter i.e. events from any sub requests
 	 */
 	private synchronized void incrementSynEvenCount() {
-		fMainReqEventCount++;
+		fmainReqEventCount++;
 	}
 
 	/**
 	 * @return
 	 */
 	public synchronized int getSynEvenCount() {
-		return fMainReqEventCount;
+		return fmainReqEventCount;
 	}
 
 	/**
@@ -375,19 +361,19 @@ public class LttngSyntheticEventProvider extends
 	 * 
 	 * @param experimentNode
 	 */
-	public/* synchronized */void reset(LTTngTreeNode experimentNode) {
+	public /* synchronized */ void reset(LTTngTreeNode experimentNode) {
 
 		fmainRequest = null;
 
 		// Make sure previous request are terminated
-		for (LttngBaseEventRequest tmpRequest : fEventProviderRequests.values()) {
+		for (LttngBaseEventRequest tmpRequest : feventProviderRequests.values()) {
 			if (tmpRequest != null && !tmpRequest.isCompleted()) {
 				tmpRequest.cancel();
 			}
 		}
 
-		fEventProviderRequests.clear();
-		fMainReqEventCount = 0;
+		feventProviderRequests.clear();
+		fmainReqEventCount = 0;
 		startIndSent = false;
 
 		// set of base event providers
@@ -395,7 +381,7 @@ public class LttngSyntheticEventProvider extends
 			LTTngTreeNode[] traces = fExperiment.getChildren();
 			for (LTTngTreeNode trace : traces) {
 				IStateTraceManager traceBaseEventProvider = (IStateTraceManager) trace;
-				fEventProviderRequests.put(traceBaseEventProvider, null);
+				feventProviderRequests.put(traceBaseEventProvider, null);
 			}
 		}
 
@@ -427,7 +413,7 @@ public class LttngSyntheticEventProvider extends
 	 * org.eclipse.linuxtools.tmf.component.TmfDataProvider#sendRequest(org.
 	 * eclipse.linuxtools.tmf.request.TmfDataRequest)
 	 */
-	public void sendRequest(final ITmfDataRequest<LttngSyntheticEvent> request) {
+	public void sendRequest(final TmfDataRequest<LttngSyntheticEvent> request) {
 		super.sendRequest(request);
 		if (waitForRequest) {
 			try {

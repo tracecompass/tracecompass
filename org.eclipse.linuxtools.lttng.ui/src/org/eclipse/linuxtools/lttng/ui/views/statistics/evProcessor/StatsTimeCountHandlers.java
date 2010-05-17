@@ -11,8 +11,11 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.statistics.evProcessor;
 
+import org.eclipse.linuxtools.lttng.event.LttngEvent;
+import org.eclipse.linuxtools.lttng.state.StateStrings;
 import org.eclipse.linuxtools.lttng.state.StateStrings.Events;
-import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
+import org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor;
+import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 
 /**
  * Process the system call entry event
@@ -27,7 +30,7 @@ class StatsTimeCountHandlers {
 	 * 
 	 * @return
 	 */
-	final IEventProcessing getSyscallEntryBeforeHandler() {
+	final ILttngEventProcessor getSyscallEntryBeforeHandler() {
 		AbstractStatsEventHandler handler = new StatsModeChangeHandler(Events.LTT_EVENT_SYSCALL_ENTRY);
 		return handler;
 	}
@@ -37,7 +40,7 @@ class StatsTimeCountHandlers {
 	 * 
 	 * @return
 	 */
-	final IEventProcessing getsySyscallExitBeforeHandler() {
+	final ILttngEventProcessor getsySyscallExitBeforeHandler() {
 		AbstractStatsEventHandler handler = new StatsModeEndHandler(Events.LTT_EVENT_SYSCALL_EXIT);
 		return handler;
 	}
@@ -47,7 +50,7 @@ class StatsTimeCountHandlers {
 	 * 
 	 * @return
 	 */
-	final IEventProcessing getTrapEntryBeforeHandler() {
+	final ILttngEventProcessor getTrapEntryBeforeHandler() {
 		AbstractStatsEventHandler handler = new StatsModeChangeHandler(Events.LTT_EVENT_TRAP_ENTRY);
 		return handler;
 	}
@@ -57,7 +60,7 @@ class StatsTimeCountHandlers {
 	 * 
 	 * @return
 	 */
-	final IEventProcessing getTrapExitBeforeHandler() {
+	final ILttngEventProcessor getTrapExitBeforeHandler() {
 		AbstractStatsEventHandler handler = new StatsModeEndHandler(Events.LTT_EVENT_TRAP_EXIT);
 		return handler;
 	}
@@ -67,7 +70,7 @@ class StatsTimeCountHandlers {
 	 * 
 	 * @return
 	 */
-	final IEventProcessing getIrqEntryBeforeHandler() {
+	final ILttngEventProcessor getIrqEntryBeforeHandler() {
 		AbstractStatsEventHandler handler = new StatsModeChangeHandler(Events.LTT_EVENT_IRQ_ENTRY);
 		return handler;
 	}
@@ -77,7 +80,7 @@ class StatsTimeCountHandlers {
 	 * 
 	 * @return
 	 */
-	final IEventProcessing getIrqExitBeforeHandler() {
+	final ILttngEventProcessor getIrqExitBeforeHandler() {
 		AbstractStatsEventHandler handler = new StatsModeEndHandler(Events.LTT_EVENT_IRQ_EXIT);
 		return handler;
 	}
@@ -87,7 +90,7 @@ class StatsTimeCountHandlers {
 	 * 
 	 * @return
 	 */
-	final IEventProcessing getSoftIrqEntryBeforeHandler() {
+	final ILttngEventProcessor getSoftIrqEntryBeforeHandler() {
 		AbstractStatsEventHandler handler = new StatsModeChangeHandler(Events.LTT_EVENT_SOFT_IRQ_ENTRY);
 		return handler;
 	}
@@ -97,7 +100,7 @@ class StatsTimeCountHandlers {
 	 * 
 	 * @return
 	 */
-	final IEventProcessing getSoftIrqExitBeforeHandler() {
+	final ILttngEventProcessor getSoftIrqExitBeforeHandler() {
 		AbstractStatsEventHandler handler = new StatsModeEndHandler(Events.LTT_EVENT_SOFT_IRQ_EXIT);
 		return handler;
 	}
@@ -112,7 +115,7 @@ class StatsTimeCountHandlers {
 	 * 
 	 * @return
 	 */
-	final IEventProcessing getFunctionEntryBeforeHandler() {
+	final ILttngEventProcessor getFunctionEntryBeforeHandler() {
 		AbstractStatsEventHandler handler = new StatsModeChangeHandler(Events.LTT_EVENT_FUNCTION_ENTRY);
 		return handler;
 	}
@@ -121,7 +124,7 @@ class StatsTimeCountHandlers {
 	 * 
 	 * @return
 	 */
-	final IEventProcessing getFunctionExitBeforeHandler() {
+	final ILttngEventProcessor getFunctionExitBeforeHandler() {
 		AbstractStatsEventHandler handler = new StatsModeEndHandler(Events.LTT_EVENT_FUNCTION_EXIT);
 		return handler;
 	}
@@ -136,7 +139,7 @@ class StatsTimeCountHandlers {
 	 * 
 	 * @return
 	 */
-	final IEventProcessing getSchedChangeBeforeHandler() {
+	final ILttngEventProcessor getSchedChangeBeforeHandler() {
 		AbstractStatsEventHandler handler = new StatsModeChangeHandler(Events.LTT_EVENT_SCHED_SCHEDULE);
 		return handler;
 	}
@@ -151,8 +154,24 @@ class StatsTimeCountHandlers {
 	 * 
 	 * @return
 	 */
-	final IEventProcessing getSchedChangeAfterHandler() {
-		AbstractStatsEventHandler handler = new StatsModeChangeHandler(Events.LTT_EVENT_SCHED_SCHEDULE);
+	final ILttngEventProcessor getAfterHandler() {
+		AbstractStatsEventHandler handler = new StatsModeChangeHandler(null) {
+			int sched_hash = StateStrings.Events.LTT_EVENT_SCHED_SCHEDULE.getInName().hashCode();
+			public boolean process(LttngEvent event, LttngTraceState traceState) {
+				// Step the event counter for any after event
+				stepCount(event, traceState);
+
+				int eventNameHash = event.getMarkerName().hashCode();
+				// specific processing for after sched schedule
+				if (sched_hash == eventNameHash
+						&& event.getMarkerName().equals(StateStrings.Events.LTT_EVENT_SCHED_SCHEDULE.getInName())) {
+					return super.process(event, traceState);
+				}
+
+				return false;
+			}
+		};
+
 		return handler;
 	}
 	

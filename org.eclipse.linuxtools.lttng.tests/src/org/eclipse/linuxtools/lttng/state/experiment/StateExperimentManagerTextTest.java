@@ -51,7 +51,7 @@ public class StateExperimentManagerTextTest extends LttngTestPreparation {
 				.getChildById(0L);
 
 		// validate
-		int numProcesses = traceManager.getCheckPointStateModel().getProcesses().length;
+		int numProcesses = traceManager.getStateModel().getProcesses().length;
 		assertEquals("Total number of processes created", 276, numProcesses);
 
 	}
@@ -82,7 +82,7 @@ public class StateExperimentManagerTextTest extends LttngTestPreparation {
 				.getChildById(0L);
 
 		// validate
-		int numProcesses = traceManager.getCheckPointStateModel().getProcesses().length;
+		int numProcesses = traceManager.getStateModel().getProcesses().length;
 		assertEquals("Total number of processes created", 276, numProcesses);
 
 	}

@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
+import org.eclipse.linuxtools.lttng.state.experiment.StateManagerFactory;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.ILTTngProjectTreeNode;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentNode;
@@ -160,8 +161,11 @@ public class ProjectView extends TmfView {
         });
     }
 
-	private boolean waitForCompletion = false;
+	private boolean waitForCompletion = true;
 
+	/**
+	 * @param experiment
+	 */
 	public void selectExperiment(LTTngExperimentNode experiment) {
     	String expId = experiment.getName();
         if (fSelectedExperiment != null)
@@ -178,6 +182,11 @@ public class ProjectView extends TmfView {
         	}
             fSelectedExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class, expId, traces);
             fSelectedExperiment.indexExperiment(waitForCompletion);
+			// Make sure the lttng-core, experiment selection context is ready
+			// for an event request from any view
+			StateManagerFactory.getExperimentManager().experimentSelected_prep(
+					(TmfExperiment<LttngEvent>) fSelectedExperiment);
+
             broadcast(new TmfExperimentSelectedSignal<LttngEvent>(this, fSelectedExperiment));
         } catch (FileNotFoundException e) {
             return;

@@ -14,14 +14,15 @@ package org.eclipse.linuxtools.lttng.ui.views.resources.evProcessor;
 import java.util.Vector;
 
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
+import org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
+import org.eclipse.linuxtools.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeComponent;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEvent;
-import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource;
-import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeResourceFactory;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEvent.Type;
+import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource.ResourceTypes;
+import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeResourceFactory;
 import org.eclipse.linuxtools.lttng.ui.views.common.AbsTRangeUpdate;
 import org.eclipse.linuxtools.lttng.ui.views.common.ParamsUpdater;
 import org.eclipse.linuxtools.lttng.ui.views.resources.model.ResourceContainer;
@@ -29,7 +30,7 @@ import org.eclipse.linuxtools.lttng.ui.views.resources.model.ResourceModelFactor
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 
 public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
-		implements IEventProcessing {
+		implements ILttngEventProcessor {
 
 	// ========================================================================
 	// Data
@@ -53,7 +54,7 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 				.getInstance().createResource(resContainer.getUniqueId(),
 						traceStartTime, traceEndTime, resourceName, traceId,
 						"", type, resId, insertionTime);
-		resContainer.addResource(localRessource);
+		resContainer.addItem(localRessource);
 		return localRessource;
 	}
 
@@ -67,20 +68,35 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 		long windowStartTime = params.getStartTime();
 		long windowEndTime = params.getEndTime();
 
-		// start time is within window
-		if (stime >= windowStartTime && stime <= windowEndTime) {
-			// The event or part of it shall be displayed.
+		if (stime == 13589765052286L) {
+			TraceDebug.debug("Debug event catched");
+		}
+
+		// Start of event is already out of range
+		if (stime > windowEndTime) {
+			return false;
+		}
+
+		// End time within or beyond start of window as long as the start time
+		// is before the end of the window (condition above)
+		if (etime >= windowStartTime) {
 			return true;
 		}
 
-		// end time is within window
-		if (etime >= windowStartTime && etime <= windowEndTime) {
-			// The event or part of it shall be displayed.
-			return true;
-		}
+		// // start time is within window
+		// if (stime >= windowStartTime && stime <= windowEndTime) {
+		// // The event or part of it shall be displayed.
+		// return true;
+		// }
+		//
+		// // end time is within window
+		// if (etime >= windowStartTime && etime <= windowEndTime) {
+		// // The event or part of it shall be displayed.
+		// return true;
+		// }
 
-		// check that a portion is within the window
-		if (stime < windowStartTime && etime > windowEndTime) {
+		// crosses the window
+		if (stime <= windowStartTime && etime >= windowEndTime) {
 			// The time range is bigger than the selected time window and
 			// crosses it
 			return true;
@@ -130,7 +146,7 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 
 	public TimeRangeEventResource resourcelist_obtain_generic(Long resourceId,
 			ResourceTypes resourceType, String traceId) {
-		return resContainer.findResource(resourceId, resourceType, traceId);
+		return resContainer.findItem(resourceId, resourceType, traceId);
 	}
 
 	protected boolean globalProcessBeforeExecmode(LttngEvent trcEvent,
@@ -147,7 +163,7 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 				trcEvent.getCpuId());
 		Long cpu = trcEvent.getCpuId();
 		if (localResource == null) {
-			TmfTimeRange timeRange = traceSt.getInputDataRef()
+			TmfTimeRange timeRange = traceSt.getContext()
 					.getTraceTimeWindow();
 			localResource = addLocalResource(timeRange.getStartTime()
 					.getValue(), timeRange.getEndTime().getValue(), traceSt
@@ -175,27 +191,28 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 	 * @param stateMode
 	 * @return
 	 */
-	protected boolean makeDraw(LttngTraceState traceSt, long startTime,
-			long endTime, TimeRangeEventResource localResource,
+	protected boolean makeDraw(LttngTraceState traceSt, long stime, long etime,
+			TimeRangeEventResource localResource,
 			ParamsUpdater params, String stateMode) {
 
+		// Check if the event is out of range
+		if (!withinViewRange(stime, etime)) {
+			params.incrementEventsDiscarded();
+			return false;
+		}
+
 		// Check if the time range is consistent.
-		if (endTime < startTime) {
+		if (etime < stime) {
 			params.incrementEventsDiscardedWrongOrder();
 			return false;
 		}
 
-		// Determine start and end times to establish duration
-		long stime = startTime;
-		long windowEndTime = params.getEndTime();
-		long etime = endTime < windowEndTime ? endTime : windowEndTime;
-
-		if (etime < stime || !withinViewRange(stime, etime)) {
-			// No use to process the event since it's outside
-			// the visible time range of the window
-			params.incrementEventsDiscarded();
-			return false;
-		}
+		// Store the next good time to start drawing the next event
+		// this is done this early to display an accurate start time of the
+		// first event
+		// within the display window
+		// Moved at the end since it produces space gaps among events
+		// localResource.setNext_good_time(etime);
 
 		// Determine if the time range event will fit it the current
 		// pixel map
@@ -203,10 +220,6 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 		double k = getPixelsPerNs(traceSt, params);
 		double pixels = duration * k;
 
-		// ***VERIFY***
-		// Is all this equivalent to this call in C??
-		// if(ltt_time_compare(hashed_process_data->next_good_time,evtime) > 0)
-		// ***
 		// Visibility check
 		// Display a "more information" indication by allowing non visible event
 		// as long as its previous event is visible.
@@ -221,12 +234,6 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 				TimeRangeComponent prevEvent = inMemEvents.get(inMemEvents
 						.size() - 1);
 				prevEventVisibility = prevEvent.isVisible();
-
-				// ***VERIFY***
-				// This replace all C Call like this one ?
-				// #ifdef EXTRA_CHECK if(ltt_time_compare(evtime,
-				// time_window.start_time) == -1 || ltt_time_compare(evtime,
-				// time_window.end_time) == 1)
 
 				// if previous event visibility is false and the time span
 				// between events less than two pixels, there is no need to
@@ -251,19 +258,10 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 			TimeRangeEvent time_window = new TimeRangeEvent(stime, etime,
 					localResource, eventType, stateMode);
 
-			// *** VERIFY ***
-			// This is added to replace the multiple draw and gtk/glib command
-			// but
-			// I'm not sure about it
 			time_window.setVisible(visible);
 			localResource.addChildren(time_window);
-			// Store the next good time to start drawing the event.
+
 			localResource.setNext_good_time(etime);
-			// *** VERIFY ***
-			// Missing checks like this one?
-			// #ifdef EXTRA_CHECK if(ltt_time_compare(evtime,
-			// time_window.start_time) == -1 || ltt_time_compare(evtime,
-			// time_window.end_time) == 1)
 		}
 
 		return false;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2010 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -10,33 +10,29 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.resources;
 
-import java.util.Arrays;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
-import org.eclipse.linuxtools.lttng.state.StateDataRequest;
-import org.eclipse.linuxtools.lttng.state.StateManager;
-import org.eclipse.linuxtools.lttng.state.evProcessor.EventProcessorProxy;
-import org.eclipse.linuxtools.lttng.state.experiment.StateExperimentManager;
-import org.eclipse.linuxtools.lttng.state.experiment.StateManagerFactory;
+import org.eclipse.linuxtools.lttng.request.ILttngSyntEventRequest;
+import org.eclipse.linuxtools.lttng.state.evProcessor.ITransEventProcessor;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
-import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource;
+import org.eclipse.linuxtools.lttng.ui.model.trange.ItemContainer;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeViewerProvider;
 import org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView;
 import org.eclipse.linuxtools.lttng.ui.views.common.ParamsUpdater;
-import org.eclipse.linuxtools.lttng.ui.views.resources.evProcessor.ResourcesTRangeUpdateFactory;
+import org.eclipse.linuxtools.lttng.ui.views.resources.evProcessor.ResourcesEventToHandlerFactory;
 import org.eclipse.linuxtools.lttng.ui.views.resources.model.ResourceModelFactory;
+import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
+import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
-import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.ui.viewers.TmfViewerFactory;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITimeAnalysisViewer;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITmfTimeScaleSelectionListener;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITmfTimeSelectionListener;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeScaleSelectionEvent;
@@ -75,9 +71,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	private Action filterTraces;
 	private Action zoomIn;
 	private Action zoomOut;
-	private Action synch;
-
-	private ITimeAnalysisViewer tsfviewer;
+	private Action zoomFilter;
 	private Composite top;
 
 	// private static SimpleDateFormat stimeformat = new SimpleDateFormat(
@@ -134,39 +128,29 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		hookContextMenu();
 		contributeToActionBars();
 
-		// Register the updater in charge to refresh elements as we update the
-		// time ranges
-		// FlowParamsUpdater listener = FlowModelFactory.getParamsUpdater();
-		// tsfviewer.addWidgetTimeScaleSelectionListner(listener);
-
-		// TODO: re-factor registration / notification process
-		// Register this view to receive updates when the model is updated with
-		// fresh info
-		// ModelListenFactory.getRegister().addFlowModelUpdatesListener(this);
-
-		// Register the event processor factory in charge of event handling
-		EventProcessorProxy.getInstance().addEventProcessorFactory(
-				ResourcesTRangeUpdateFactory.getInstance());
-
-		// set the initial view parameter values
-		// Experiment start and end time
-		// as well as time space width in pixels, used by the time analysis
-		// widget
-		ParamsUpdater paramUpdater = ResourceModelFactory.getParamsUpdater();
-		StateExperimentManager experimentManger = StateManagerFactory
-				.getExperimentManager();
 		// Read relevant values
 		int timeSpaceWidth = tsfviewer.getTimeSpace();
-		TmfTimeRange timeRange = experimentManger.getExperimentTimeRange();
-		if (timeRange != null) {
-			long time0 = timeRange.getStartTime().getValue();
-			long time1 = timeRange.getEndTime().getValue();
-			paramUpdater.update(time0, time1, timeSpaceWidth);
+		if (timeSpaceWidth < 0) {
+			timeSpaceWidth = -timeSpaceWidth;
 		}
 
-		// Read current data if any available
-		StateManagerFactory.getExperimentManager().readExperiment(
-				"resourceView", this);
+		TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
+		if (experiment != null) {
+			TmfTimeRange experimentTRange = experiment.getTimeRange();
+			if (experimentTRange != null) {
+				long time0 = experimentTRange.getStartTime().getValue();
+				long time1 = experimentTRange.getEndTime().getValue();
+				ParamsUpdater paramUpdater = getParamsUpdater();
+				paramUpdater.update(time0, time1, timeSpaceWidth);
+			}
+			// send the initial request and obtained the adjusted time used
+			TmfTimeRange adjustedTimeRange = initialExperimentDataRequest(this, experimentTRange);
+
+			// initialize widget time boundaries and filtering parameters
+			ModelUpdateInit(experimentTRange, adjustedTimeRange, this);
+		} else {
+			TraceDebug.debug("No selected experiment information available");
+		}
 	}
 
 	private void hookContextMenu() {
@@ -202,7 +186,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		// manager.add(filterTraces);
 		manager.add(zoomIn);
 		manager.add(zoomOut);
-		manager.add(synch);
+		manager.add(zoomFilter);
 		manager.add(new Separator());
 	}
 
@@ -218,7 +202,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		// manager.add(filterTraces);
 		manager.add(zoomIn);
 		manager.add(zoomOut);
-		manager.add(synch);
+		manager.add(zoomFilter);
 		manager.add(new Separator());
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
@@ -234,7 +218,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		// manager.add(filterTraces);
 		manager.add(zoomIn);
 		manager.add(zoomOut);
-		manager.add(synch);
+		manager.add(zoomFilter);
 		manager.add(new Separator());
 	}
 
@@ -389,29 +373,21 @@ public class ResourcesView extends AbsTimeUpdateView implements
 				Messages.getString("ResourcesView.tmf.UI"),
 				"icons/zoomout_nav.gif"));
 
-		// action11
-		synch = new Action() {
+		// zoomFilter
+		zoomFilter = new Action() {
 			@Override
 			public void run() {
-				// Note: No action since the synch flag is used by Control flow
-				// view
-				// the actual viewer is set to accept api selections in
-				// createpartcontrol.
-
-				// if (synch.isChecked()) {
-				// tsfviewer.setAcceptSelectionAPIcalls(true);
-				// } else {
-				// tsfviewer.setAcceptSelectionAPIcalls(false);
-				// }
+				// Nothing to do, however the selection status is needed by the
+				// application
 			}
 		};
-		synch.setText(Messages.getString("ResourcesView.Action.Synchronize")); //$NON-NLS-1$
-		synch.setToolTipText(Messages
-				.getString("ResourcesView.Action.Synchronize.ToolTip")); //$NON-NLS-1$
-		synch.setChecked(false);
-		synch.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
-				Messages.getString("ResourcesView.tmf.UI"),
-						"icons/synced.gif"));
+
+		zoomFilter.setText(Messages.getString("ResourcesView.Action.ZoomFilter")); //$NON-NLS-1$
+		zoomFilter.setToolTipText(Messages.getString("ResourcesView.Action.ZoomFilter.tooltip")); //$NON-NLS-1$
+		zoomFilter.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(Messages
+				.getString("ResourcesView.tmf.UI"), "icons/filter_items.gif"));
+		zoomFilter.setChecked(false);
+
 		// PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_SYNCED);
 	}
 
@@ -423,44 +399,17 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		tsfviewer.getControl().setFocus();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
+	 * tsfTmProcessSelEvent
+	 * (org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeSelectionEvent
+	 * )
+	 */
 	public void tsfTmProcessSelEvent(TmfTimeSelectionEvent event) {
-		Object source = event.getSource();
-		if (source == null) {
-			return;
-		}
-
-		// TmfTimeAnalysisViewer rViewer = (TmfTimeAnalysisViewer)
-		// event.getSource();
-		// TmfTimeAnalysisViewer synchViewer = null;
-		// Synchronize viewer selections if Enabled,
-		// make sure the selection does not go in loops
-		// if (tsfviewer == rViewer) {
-		// synchViewer = tsfviewer2;
-		// } else {
-		// synchViewer = tsfviewer;
-		// }
-		// Notify listener views.
-
-		ParamsUpdater paramUpdater = ResourceModelFactory.getParamsUpdater();
-		Long savedSelTime = paramUpdater.getSelectedTime();
-
-		long selTimens = event.getSelectedTime();
-
-		// make sure the new selected time is different than saved before
-		// executing update
-		if (savedSelTime == null || savedSelTime != selTimens) {
-			// Notify listener views.
-			synchTimeNotification(selTimens);
-
-			// Update the parameter updater to save the selected time
-			paramUpdater.setSelectedTime(selTimens);
-
-			if (TraceDebug.isDEBUG()) {
-				// Object selection = event.getSelection();
-				TraceDebug.debug("Selected Time in Resource View: "
-						+ new LttngTimestamp(selTimens));
-			}
-		}
+		// common implementation
+		super.tsfTmProcessSelEvent(event);
 	}
 
 	/*
@@ -472,62 +421,31 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	 * .tmf.ui.viewers.timeAnalysis.TmfTimeScaleSelectionEvent)
 	 */
 	public void tsfTmProcessTimeScaleEvent(TmfTimeScaleSelectionEvent event) {
-		// source needed to keep track of source values
-		Object source = event.getSource();
-
-		if (source != null) {
-			// Update the parameter updater before carrying out a read request
-			ParamsUpdater paramUpdater = ResourceModelFactory
-					.getParamsUpdater();
-			boolean newParams = paramUpdater.processTimeScaleEvent(event);
-
-			if (newParams) {
-				// Read the updated time window
-				TmfTimeRange trange = paramUpdater.getTrange();
-				// Either send a new request or queue for next opportunity
-				dataRequest(trange);
-			}
-		}
+		super.tsfTmProcessTimeScaleEvent(event);
 	}
 
-	/**
-	 * Obtains the remainder fraction on unit Seconds of the entered value in
-	 * nanoseconds. e.g. input: 1241207054171080214 ns The number of seconds can
-	 * be obtain by removing the last 9 digits: 1241207054 the fractional
-	 * portion of seconds, expressed in ns is: 171080214
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param v
-	 * @return
+	 * @see
+	 * org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#displayModel
+	 * (org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.
+	 * ITmfTimeAnalysisEntry[], long, long, boolean, long, long,
+	 * java.lang.Object)
 	 */
-	public String formatNs(long v) {
-		StringBuffer str = new StringBuffer();
-		boolean neg = v < 0;
-		if (neg) {
-			v = -v;
-			str.append('-');
-		}
+	public void displayModel(final ITmfTimeAnalysisEntry[] items, final long startBoundTime,
+			final long endBoundTime, final boolean updateTimeBounds, final long startVisibleWindow,
+			final long endVisibleWindow, final Object source) {
 
-		String strVal = String.valueOf(v);
-		if (v < 1000000000) {
-			return strVal;
-		}
-
-		// Extract the last nine digits (e.g. fraction of a S expressed in ns
-		return strVal.substring(strVal.length() - 9);
-	}
-
-	/**
-	 * @param items
-	 * @param startTime
-	 * @param endTime
-	 * @param timeUpdate - Time bounds updated needed e.g. if a new Experiment or trace is selected
-	 */
-	public void resourceModelUpdates(final ITmfTimeAnalysisEntry[] items,
-			final long startTime, final long endTime, final boolean timeUpdate) {
-		tsfviewer.getControl().getDisplay().asyncExec(new Runnable() {
+		Display display = tsfviewer.getControl().getDisplay();
+		display.asyncExec(new Runnable() {
 
 			public void run() {
-				tsfviewer.display(items, startTime, endTime, timeUpdate);
+				tsfviewer.display(items, startBoundTime, endBoundTime, updateTimeBounds);
+				// validate visible boundaries
+				if (startVisibleWindow > -1 && endVisibleWindow > -1) {
+					tsfviewer.setSelectVisTimeWindow(startVisibleWindow, endVisibleWindow, source);
+				}
 				tsfviewer.resizeControls();
 			}
 		});
@@ -537,29 +455,10 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	public void dispose() {
 		// dispose parent resources
 		super.dispose();
-		// Remove the event processor factory
-		EventProcessorProxy.getInstance().removeEventProcessorFactory(
-				ResourcesTRangeUpdateFactory.getInstance());
 
 		tsfviewer.removeWidgetSelectionListner(this);
 		tsfviewer.removeWidgetTimeScaleSelectionListner(this);
 		tsfviewer = null;
-	}
-
-	/**
-	 * Trigger time synchronisation to other views this method shall be called
-	 * when a check has been performed to note that an actual change of time has
-	 * been performed vs a pure re-selection of the same time
-	 * 
-	 * @param time
-	 */
-	private void synchTimeNotification(long time) {
-		// if synchronisation selected
-		if (synch.isChecked()) {
-			// Notify other views
-			TmfSignalManager.dispatchSignal(new TmfTimeSynchSignal(this,
-					new LttngTimestamp(time)));
-		}
 	}
 
 	/**
@@ -569,126 +468,93 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	 */
 	@TmfSignalHandler
 	public void synchToTime(TmfTimeSynchSignal signal) {
-		if (synch.isChecked()) {
-			Object source = signal.getSource();
-			if (signal != null && source != null && source != this) {
-				// Internal value is expected in nano seconds.
-				long selectedTime = signal.getCurrentTime().getValue();
-				if (tsfviewer != null) {
-					tsfviewer.setSelectedTime(selectedTime, true, source);
-				}
-			}
+		super.synchToTime(signal);
+	}
+
+	/**
+	 * Annotation Registers as listener of time range selection from other views
+	 * The implementation handles the entry of the signal.
+	 * 
+	 * @param signal
+	 */
+	@TmfSignalHandler
+	public void synchToTimeRange(TmfRangeSynchSignal signal) {
+		if (zoomFilter != null) {
+			synchToTimeRange(signal, zoomFilter.isChecked());
 		}
+	}
+
+	@Override
+	public void modelIncomplete(ILttngSyntEventRequest request) {
+		// Nothing to do
+		// The data will be refreshed on the next request
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.linuxtools.lttng.ui.views.common.LttngTimeUpdateView#waitCursor
-	 * (boolean)
+	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
+	 * getEventProcessor()
 	 */
 	@Override
-	protected void waitCursor(final boolean waitInd) {
-		if (tsfviewer != null) {
-			Display display = tsfviewer.getControl().getDisplay();
+	public ITransEventProcessor getEventProcessor() {
+		return ResourcesEventToHandlerFactory.getInstance();
+	}
 
-			// Perform the updates on the UI thread
-			display.asyncExec(new Runnable() {
-				public void run() {
-					tsfviewer.waitCursor(waitInd);
-				}
-			});
+	/**
+	 * @param signal
+	 */
+	@TmfSignalHandler
+	public void experimentSelected(TmfExperimentSelectedSignal<? extends TmfEvent> signal) {
+		if (signal != null) {
+			TmfTimeRange experimentTRange = signal.getExperiment().getTimeRange();
+
+			// prepare time intervals in widget
+			ModelUpdateInit(experimentTRange, experimentTRange, signal.getSource());
+
+			// request initial data
+			initialExperimentDataRequest(signal.getSource(), experimentTRange);
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
-	 * ModelUpdatePrep(java.lang.String, boolean)
+	/**
+	 * @param source
+	 * @param experimentTRange
+	 * @return Adjusted time window used for the request (smaller window to
+	 *         initialize view)
 	 */
-	@Override
-	public void ModelUpdatePrep(String traceId, boolean clearAllData,
-			TmfTimeRange trange) {
-		if (clearAllData) {
-			ResourceModelFactory.getResourceContainer().clearResources();
-		} else {
-			ResourceModelFactory.getResourceContainer().clearChildren(traceId);
-		}
+	private TmfTimeRange initialExperimentDataRequest(Object source, TmfTimeRange experimentTRange) {
+		// Adjust the initial time window to a shorter interval to allow
+		// user to select the interesting area based on the perspective
+		TmfTimeRange initTimeWindow = getInitTRange(experimentTRange);
 
-		ParamsUpdater updater = ResourceModelFactory.getParamsUpdater();
-		// Start over
-		updater.setEventsDiscarded(0);
-
-		// Update new visible time range if available
-		if (trange != null) {
-			updater.update(trange.getStartTime().getValue(), trange
-					.getEndTime().getValue());
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.linuxtools.lttng.ui.views.common.LttngTimeUpdateView#
-	 * ModelUpdateComplete(org.eclipse.linuxtools.lttng.state.StateDataRequest)
-	 */
-	@Override
-	public void ModelUpdateComplete(StateDataRequest request) {
-		StateManager smanager = request.getStateManager();
-		long experimentStartTime = -1;
-		long experimentEndTime = -1;
-		TmfTimeRange experimentTimeRange = smanager.getExperimentTimeWindow();
-		if (experimentTimeRange != null) {
-			experimentStartTime = experimentTimeRange.getStartTime().getValue();
-			experimentEndTime = experimentTimeRange.getEndTime().getValue();
-		}
-
-		// Obtain the current resource list
-		TimeRangeEventResource[] resourceArr = ResourceModelFactory
-				.getResourceContainer().readResources();
-
-		// Sort the array by pid
-		Arrays.sort(resourceArr);
-
-		// Update the view part
-		resourceModelUpdates(resourceArr, experimentStartTime,
-				experimentEndTime, request.isclearDataInd());
-
-		// reselect to original time
-		ParamsUpdater paramUpdater = ResourceModelFactory.getParamsUpdater();
-		final Long selTime = paramUpdater.getSelectedTime();
-		if (selTime != null) {
-			Display display = tsfviewer.getControl().getDisplay();
-			display.asyncExec(new Runnable() {
-				public void run() {
-					tsfviewer.setSelectedTime(selTime, false, this);
-				}
-			});
-		}
-
+		dataRequest(initTimeWindow, experimentTRange, true);
 		if (TraceDebug.isDEBUG()) {
-			Long count = smanager.getEventCount();
-			int eventCount = 0;
-			for (TimeRangeEventResource resource : resourceArr) {
-				eventCount += resource.getTraceEvents().size();
-			}
-
-			int discarded = ResourceModelFactory.getParamsUpdater()
-					.getEventsDiscarded();
-			int discardedOutofOrder = ResourceModelFactory.getParamsUpdater()
-					.getEventsDiscardedWrongOrder();
-			TraceDebug
-					.debug("Events handled: "
-							+ count
-							+ " Events loaded in Resource view: "
-							+ eventCount
-							+ " Number of events discarded: "
-							+ discarded
-							+ "\n\tNumber of events discarded with start time earlier than next good time: "
-							+ discardedOutofOrder);
+			TraceDebug.debug("Initialization request time range is: " + initTimeWindow.getStartTime().toString() + "-"
+					+ initTimeWindow.getEndTime().toString());
 		}
 
+		return initTimeWindow;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
+	 * getParamsUpdater()
+	 */
+	protected ParamsUpdater getParamsUpdater() {
+		return ResourceModelFactory.getParamsUpdater();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
+	 * getItemContainer()
+	 */
+	@Override
+	protected ItemContainer<?> getItemContainer() {
+		return ResourceModelFactory.getResourceContainer();
 	}
 }

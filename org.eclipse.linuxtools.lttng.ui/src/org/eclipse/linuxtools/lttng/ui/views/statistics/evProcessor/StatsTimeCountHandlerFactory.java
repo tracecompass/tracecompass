@@ -16,8 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.linuxtools.lttng.state.StateStrings;
-import org.eclipse.linuxtools.lttng.state.evProcessor.AbsEventProcessorFactory;
-import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
+import org.eclipse.linuxtools.lttng.state.evProcessor.AbsEventToHandlerResolver;
+import org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor;
 
 /**
  * Provide the handlers that will count the CPU Time, Cumulative CPU Time and
@@ -33,12 +33,12 @@ import org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing;
  * @author alvaro
  * 
  */
-public class StatsTimeCountHandlerFactory extends AbsEventProcessorFactory{
+public class StatsTimeCountHandlerFactory extends AbsEventToHandlerResolver {
 	// ========================================================================
 	// Data
 	// =======================================================================
-	private final Map<String, IEventProcessing> eventNametoBeforeProcessor = new HashMap<String, IEventProcessing>();
-	private final Map<String, IEventProcessing> eventNametoAfterProcessor = new HashMap<String, IEventProcessing>();
+	private final Map<String, ILttngEventProcessor> eventNametoBeforeProcessor = new HashMap<String, ILttngEventProcessor>();
+	ILttngEventProcessor afterhandler;
 	private static StatsTimeCountHandlerFactory instance = null;
 	private StatsTimeCountHandlers instantiateHandler = new StatsTimeCountHandlers();
 
@@ -46,6 +46,7 @@ public class StatsTimeCountHandlerFactory extends AbsEventProcessorFactory{
 	// Constructors
 	// =======================================================================
 	private StatsTimeCountHandlerFactory() {
+		super();
 		//create one instance of each individual event handler and add the instance to the map
 		eventNametoBeforeProcessor.put(StateStrings.Events.LTT_EVENT_SYSCALL_ENTRY
 				.getInName(), instantiateHandler.getSyscallEntryBeforeHandler());
@@ -92,8 +93,7 @@ public class StatsTimeCountHandlerFactory extends AbsEventProcessorFactory{
 		eventNametoBeforeProcessor.put(StateStrings.Events.LTT_EVENT_SCHED_SCHEDULE
 				.getInName(), instantiateHandler.getSchedChangeBeforeHandler());
 		
-		eventNametoAfterProcessor.put(StateStrings.Events.LTT_EVENT_SCHED_SCHEDULE
-				.getInName(), instantiateHandler.getSchedChangeAfterHandler());
+		afterhandler = instantiateHandler.getAfterHandler();
 
 	}
 
@@ -106,7 +106,7 @@ public class StatsTimeCountHandlerFactory extends AbsEventProcessorFactory{
 	 * 
 	 * @return
 	 */
-	public static AbsEventProcessorFactory getInstance() {
+	public static AbsEventToHandlerResolver getInstance() {
 		if (instance == null) {
 			instance = new StatsTimeCountHandlerFactory();
 		}
@@ -115,18 +115,23 @@ public class StatsTimeCountHandlerFactory extends AbsEventProcessorFactory{
 
 
 	@Override
-	public IEventProcessing getAfterProcessor(String eventType) {
-		return eventNametoAfterProcessor.get(eventType);
+	public ILttngEventProcessor getAfterProcessor(String eventType) {
+		return afterhandler;
 	}
 
 	@Override
-	public IEventProcessing getBeforeProcessor(String eventType) {
+	public ILttngEventProcessor getBeforeProcessor(String eventType) {
 		return eventNametoBeforeProcessor.get(eventType);
 	}
 
 	@Override
-	public IEventProcessing getfinishProcessor() {
+	public ILttngEventProcessor getfinishProcessor() {
 		// No finishing processor used
+		return null;
+	}
+
+	@Override
+	public ILttngEventProcessor getStateUpdaterProcessor(String eventType) {
 		return null;
 	}
 }

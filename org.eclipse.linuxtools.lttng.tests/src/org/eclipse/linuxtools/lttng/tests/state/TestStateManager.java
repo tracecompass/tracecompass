@@ -12,15 +12,13 @@
 
 package org.eclipse.linuxtools.lttng.tests.state;
 
-import java.util.Set;
-
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.state.StateManager;
+import org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal;
 
 /**
  * @author alvaro
@@ -44,17 +42,18 @@ public class TestStateManager extends TestCase {
 			TmfExperiment<LttngEvent> newExp = new TmfExperiment<LttngEvent>(LttngEvent.class, logName, streamList);
 			
 			//Get the Test StateManager
-			StateManager manager = StateManagerFactoryTestSupport.getManager(newExp.getName());
+			IStateTraceManager manager = StateManagerFactoryTestSupport
+					.getManager(testStream);
 			//Start execution.
-			manager.setTraceSelection(newExp, false);
+			manager.experimentUpdated(new TmfExperimentUpdatedSignal(this, newExp, null), true);
 			
 			//Print events not handled.
-			Set<String> notHandledEvents = manager.getEventsNotHandled();
-			StringBuilder sb = new StringBuilder();
-			for (String event : notHandledEvents) {
-				sb.append("\n" + event);
-			}
-			TraceDebug.debug("Events not Handled: " + sb.toString());
+			// Set<String> notHandledEvents = manager.getEventsNotHandled();
+			// StringBuilder sb = new StringBuilder();
+			// for (String event : notHandledEvents) {
+			// sb.append("\n" + event);
+			// }
+			// TraceDebug.debug("Events not Handled: " + sb.toString());
 		}
 	}
 }

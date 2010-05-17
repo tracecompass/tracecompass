@@ -110,7 +110,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
 			returnedValue = new TmfTraceStub(this.getName());
 		}
 		catch (FileNotFoundException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 		return returnedValue;
 	}
