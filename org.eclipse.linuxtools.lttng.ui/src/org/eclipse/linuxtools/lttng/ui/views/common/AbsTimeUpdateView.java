@@ -347,6 +347,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 			 * org.eclipse.linuxtools.lttng.request.LttngSyntEventRequest#handleData
 			 * ()
 			 */
+			@Override
 			public void handleData() {
 				TmfEvent[] result = getData();
 	
@@ -385,6 +386,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 				notifyStarting();
 			}
 	
+			@Override
 			public void handleCompleted() {
 				super.handleCompleted();
 

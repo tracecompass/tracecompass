@@ -407,6 +407,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	 * (org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeSelectionEvent
 	 * )
 	 */
+	@Override
 	public void tsfTmProcessSelEvent(TmfTimeSelectionEvent event) {
 		// common implementation
 		super.tsfTmProcessSelEvent(event);
@@ -420,6 +421,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	 * #tsfTmProcessTimeScaleEvent(org.eclipse.linuxtools
 	 * .tmf.ui.viewers.timeAnalysis.TmfTimeScaleSelectionEvent)
 	 */
+	@Override
 	public void tsfTmProcessTimeScaleEvent(TmfTimeScaleSelectionEvent event) {
 		super.tsfTmProcessTimeScaleEvent(event);
 	}
@@ -433,6 +435,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	 * ITmfTimeAnalysisEntry[], long, long, boolean, long, long,
 	 * java.lang.Object)
 	 */
+	@Override
 	public void displayModel(final ITmfTimeAnalysisEntry[] items, final long startBoundTime,
 			final long endBoundTime, final boolean updateTimeBounds, final long startVisibleWindow,
 			final long endVisibleWindow, final Object source) {
@@ -466,6 +469,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	 * 
 	 * @param signal
 	 */
+	@Override
 	@TmfSignalHandler
 	public void synchToTime(TmfTimeSynchSignal signal) {
 		super.synchToTime(signal);
@@ -543,6 +547,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#
 	 * getParamsUpdater()
 	 */
+	@Override
 	protected ParamsUpdater getParamsUpdater() {
 		return ResourceModelFactory.getParamsUpdater();
 	}

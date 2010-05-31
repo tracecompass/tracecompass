@@ -13,6 +13,8 @@ package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
+import org.eclipse.linuxtools.tmf.component.ITmfDataProvider.ExecutionType;
+import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
@@ -21,6 +23,8 @@ import org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
+import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
@@ -506,17 +510,20 @@ public class HistogramView extends TmfView implements ControlListener {
     	// Save the experiment we are about to use
     	lastUsedExperiment = newExperiment;
     	
-    	// Create a copy of the trace that will be use only by the full experiment request
-    	TmfExperiment<LttngEvent> experimentCopy = newExperiment.createTraceCopy();
+//    	// Create a copy of the trace that will be use only by the full experiment request
+//    	TmfExperiment<LttngEvent> experimentCopy = newExperiment.createTraceCopy();
     	
     	// Create the content for the full experiment. 
     	// This NEED to be created first, as we use it in the selectedWindowCanvas
 		fullExperimentCanvas.createNewHistogramContent(fullExperimentCanvas.getSize().x, FULL_TRACE_BAR_WIDTH, FULL_TRACE_CANVAS_HEIGHT, FULL_TRACE_DIFFERENCE_TO_AVERAGE);
 		fullExperimentCanvas.createNewSelectedWindow(DEFAULT_WINDOW_SIZE);
-		currentEventTime = newExperiment.getStartTime().getValue();
-    	// Set the window of the fullTrace canvas visible.
+
+		TmfTimeRange timeRange = getExperimentTimeRange(newExperiment);
+		currentEventTime = timeRange.getStartTime().getValue();
+
+		// Set the window of the fullTrace canvas visible.
 		fullExperimentCanvas.getCurrentWindow().setSelectedWindowVisible(true);
-		fullExperimentCanvas.getHistogramContent().resetTable(newExperiment.getStartTime().getValue(), newExperiment.getEndTime().getValue());
+		fullExperimentCanvas.getHistogramContent().resetTable(timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue());
 		
 		// Create the content for the selected window. 
 		selectedWindowCanvas.createNewHistogramContent(selectedWindowCanvas.getSize().x ,SELECTED_WINDOW_BAR_WIDTH, SELECTED_WINDOW_CANVAS_HEIGHT, SELECTED_WINDOW_DIFFERENCE_TO_AVERAGE);
@@ -539,9 +546,34 @@ public class HistogramView extends TmfView implements ControlListener {
 		// Perform both request. 
 		// Order is important here, the small/synchronous request for the selection window should go first
 		performSelectedWindowEventsRequest(newExperiment);
-		performAllTraceEventsRequest(experimentCopy);
+//		performAllTraceEventsRequest(experimentCopy);
+		performAllTraceEventsRequest(newExperiment);
     }
-    
+
+	// Before completing its indexing, the experiment doesn't know start/end time.
+	// However, LTTng individual traces have this knowledge so we should ask them
+	// directly.
+    private TmfTimeRange getExperimentTimeRange(TmfExperiment<LttngEvent> experiment) {
+    	// Before completing its indexing, the experiment doesn't know start/end time.
+    	// However, LTTng individual traces have this knowledge so we should ask them
+    	// directly.
+		TmfTimestamp startTime = TmfTimestamp.BigCrunch;
+		TmfTimestamp endTime   = TmfTimestamp.BigBang;
+		for (ITmfTrace trace : experiment.getTraces()) {
+			TmfContext context = trace.seekLocation(null);
+			context.setRank(0);
+			TmfEvent event = trace.getNextEvent(context);
+			TmfTimestamp traceStartTime = event.getTimestamp();
+			if (traceStartTime.compareTo(startTime, true) < 0)
+				startTime = traceStartTime;
+			TmfTimestamp traceEndTime = trace.getEndTime();
+			if (traceEndTime.compareTo(endTime, true) > 0)
+				endTime = traceEndTime;
+    	}
+        TmfTimeRange tmpRange = new TmfTimeRange(startTime, endTime);
+        return tmpRange;
+    }
+
     /**
      * Perform a new request for the Selection window.<p>
      * This assume the full experiment canvas has correct information about the selected window; 
@@ -553,7 +585,7 @@ public class HistogramView extends TmfView implements ControlListener {
     	
     	HistogramSelectedWindow curSelectedWindow = fullExperimentCanvas.getCurrentWindow();
     	
-    	// If no selection window exists, we will try to cerate one; 
+    	// If no selection window exists, we will try to create one; 
     	//	however this will most likely fail as the content is probably not created either
     	if ( curSelectedWindow == null ) {
     		fullExperimentCanvas.createNewSelectedWindow( DEFAULT_WINDOW_SIZE );
@@ -569,7 +601,7 @@ public class HistogramView extends TmfView implements ControlListener {
         // Set a (dynamic) time interval
         long intervalTime = ( (ts2.getValue() - ts1.getValue()) / selectedWindowCanvas.getHistogramContent().getNbElement() );
         
-        selectedWindowRequest = performRequest(experiment, selectedWindowCanvas, tmpRange, intervalTime);
+        selectedWindowRequest = performRequest(experiment, selectedWindowCanvas, tmpRange, intervalTime, ExecutionType.SHORT);
         selectedWindowCanvas.redrawAsynchronously();
     }
     
@@ -582,12 +614,16 @@ public class HistogramView extends TmfView implements ControlListener {
     public void performAllTraceEventsRequest(TmfExperiment<LttngEvent> experiment) {
     	// Create a new time range from "start" to "end"
         //	That way, we will get "everything" in the trace
-        LttngTimestamp ts1 = new LttngTimestamp( experiment.getStartTime() );
-        LttngTimestamp ts2 = new LttngTimestamp( experiment.getEndTime() );
-        TmfTimeRange tmpRange = new TmfTimeRange(ts1, ts2);
+//        LttngTimestamp ts1 = new LttngTimestamp( experiment.getStartTime() );
+//        LttngTimestamp ts2 = new LttngTimestamp( experiment.getEndTime() );
+//        TmfTimeRange tmpRange = new TmfTimeRange(ts1, ts2);
+    	
+        TmfTimeRange tmpRange  = getExperimentTimeRange(experiment);
+		TmfTimestamp startTime = tmpRange.getStartTime();
+		TmfTimestamp endTime   = tmpRange.getEndTime();
         
         // Set a (dynamic) time interval
-        long intervalTime = ( (ts2.getValue() - ts1.getValue()) / fullExperimentCanvas.getHistogramContent().getNbElement() );
+        long intervalTime = ( (endTime.getValue() - startTime.getValue()) / fullExperimentCanvas.getHistogramContent().getNbElement() );
         
         // *** VERIFY ***
         // This would enable "fixed interval" instead of dynamic one.
@@ -599,7 +635,7 @@ public class HistogramView extends TmfView implements ControlListener {
         // It would be interesting if there was a way to tell the framework to run the request "in parallel" here.
         // Mean a completetly independant copy of the Expereiment would be done and we would proceed on that.
         //
-        dataBackgroundFullRequest = performRequest(experiment, fullExperimentCanvas, tmpRange, intervalTime);
+        dataBackgroundFullRequest = performRequest(experiment, fullExperimentCanvas, tmpRange, intervalTime, ExecutionType.LONG);
         fullExperimentCanvas.redrawAsynchronously();
     }
     
@@ -616,7 +652,7 @@ public class HistogramView extends TmfView implements ControlListener {
      * @param newRange			The range of the request
      * @param newInterval		The interval of time we use to store the result into the HistogramContent
      */
-    public synchronized HistogramRequest performRequest(TmfExperiment<LttngEvent> experiment, HistogramCanvas targetCanvas, TmfTimeRange newRange, long newInterval) {
+    private synchronized HistogramRequest performRequest(TmfExperiment<LttngEvent> experiment, HistogramCanvas targetCanvas, TmfTimeRange newRange, long newInterval, ExecutionType execType) {
     	HistogramRequest returnedRequest = null;
     	
         // *** FIXME ***
@@ -627,7 +663,7 @@ public class HistogramView extends TmfView implements ControlListener {
         returnedRequest = new HistogramRequest(newRange, Integer.MAX_VALUE, targetCanvas, newInterval );
         
         // Send the request to the framework : it will be queued and processed later
-        experiment.sendRequest(returnedRequest);
+        experiment.sendRequest(returnedRequest, execType);
         
         return returnedRequest;
     }
@@ -642,7 +678,7 @@ public class HistogramView extends TmfView implements ControlListener {
     	
     	if ( lastUsedExperiment != null ) {
     		// If a request is ongoing, try to stop it
-    		if ( selectedWindowRequest.isCompleted() == false ) {
+    		if ( selectedWindowRequest != null && selectedWindowRequest.isCompleted() == false ) {
     			selectedWindowRequest.cancel();
     		}
     		

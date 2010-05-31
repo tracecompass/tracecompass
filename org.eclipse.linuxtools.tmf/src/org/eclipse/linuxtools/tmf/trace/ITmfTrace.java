@@ -25,7 +25,6 @@ public interface ITmfTrace extends ITmfComponent {
 	
 	public ITmfTrace createTraceCopy();
 	
-	
 	/**
 	 * @return the trace path 
 	 */

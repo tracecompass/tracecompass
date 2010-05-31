@@ -97,6 +97,18 @@ public class TmfTimeRange {
 		return (fStartTime.compareTo(ts, true) <= 0) && (fEndTime.compareTo(ts, true) >= 0);
 	}
 
+	/**
+	 * Check if the time range is within the time range
+	 * 
+	 * @param range
+	 * @return
+	 */
+	public boolean contains(TmfTimeRange range) {
+		TmfTimestamp startTime = range.getStartTime();
+		TmfTimestamp endTime   = range.getEndTime();
+		return (fStartTime.compareTo(startTime, true) <= 0) && (fEndTime.compareTo(endTime, true) >= 0);
+	}
+
 	// ------------------------------------------------------------------------
     // Object
 	// ------------------------------------------------------------------------

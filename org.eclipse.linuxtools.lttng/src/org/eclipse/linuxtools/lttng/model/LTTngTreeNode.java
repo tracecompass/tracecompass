@@ -60,6 +60,7 @@ public class LTTngTreeNode extends
 	 * @see
 	 * org.eclipse.linuxtools.lttng.model.LTTngTreeNodeGeneric#getChildren()
 	 */
+	@Override
 	public LTTngTreeNode[] getChildren() {
 		return childrenToArray(fchildren.values(), this.getClass());
 	}

@@ -85,7 +85,7 @@ public class TmfTraceTest extends TestCase {
     	        URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
     			File test = new File(FileLocator.toFileURL(location).toURI());
     	        fTrace = new TmfTraceStub(test.getPath(), BLOCK_SIZE, false);
-    	        fTrace.indexTrace(true);
+//    	        fTrace.indexTrace(true);
     		} catch (URISyntaxException e) {
     			e.printStackTrace();
     		} catch (IOException e) {

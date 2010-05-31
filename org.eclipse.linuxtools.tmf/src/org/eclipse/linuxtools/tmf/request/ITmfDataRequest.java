@@ -59,6 +59,7 @@ public interface ITmfDataRequest<T extends TmfData> {
 	// Request state
 	// ------------------------------------------------------------------------
 
+    public boolean isRunning();
     public boolean isCompleted();
     public boolean isFailed();
     public boolean isCancelled();
@@ -75,6 +76,7 @@ public interface ITmfDataRequest<T extends TmfData> {
 	// Request handling
 	// ------------------------------------------------------------------------
 
+    public void handleStarted();
     public void handleCompleted();
     public void handleSuccess();
     public void handleFailure();
@@ -90,6 +92,7 @@ public interface ITmfDataRequest<T extends TmfData> {
 	// Request state modifiers
 	// ------------------------------------------------------------------------
 
+    public void start();
     public void done();
     public void fail();
     public void cancel();

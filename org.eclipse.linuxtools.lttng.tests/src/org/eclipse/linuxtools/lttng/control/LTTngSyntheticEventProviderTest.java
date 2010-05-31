@@ -60,7 +60,7 @@ public class LTTngSyntheticEventProviderTest extends LttngTestPreparation {
 		// experiment selected, build experiment selection context and trigger
 		// check point creation
 		expManager.experimentSelected_prep(experiment);
-		// Action trigger
+		// buils check points in parallel
 		expManager.experimentSelected(this, experiment);
 
 		// Obtain the singleton event provider

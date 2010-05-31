@@ -65,7 +65,7 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> {
         super(filename, LttngEvent.class, filename, cacheSize);
         fTrace = new RandomAccessFile(filename, "r");
     	fParser = new LTTngEventParserStub();
-    	indexTrace(true);
+//    	indexTrace(true);
     }
     
 	public ITmfTrace createTraceCopy() {

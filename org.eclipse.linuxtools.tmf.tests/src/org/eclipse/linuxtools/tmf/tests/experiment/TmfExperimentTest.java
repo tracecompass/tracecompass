@@ -76,7 +76,7 @@ public class TmfExperimentTest extends TestCase {
     private void setupExperiment() {
     	if (fExperiment == null) {
             fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, fTraces);
-            fExperiment.indexExperiment(true);
+            fExperiment.indexExperiment();
     	}
     }
 
@@ -137,7 +137,7 @@ public class TmfExperimentTest extends TestCase {
 
     public void testParseEvent() throws Exception {
 
-    	// On lower bound, returns the first event (ts = 0)
+    	// On lower bound, returns the first event (ts = 1)
     	TmfContext context = fExperiment.seekEvent(new TmfTimestamp(0, SCALE, 0));
 
     	TmfEvent event = fExperiment.parseEvent(context);

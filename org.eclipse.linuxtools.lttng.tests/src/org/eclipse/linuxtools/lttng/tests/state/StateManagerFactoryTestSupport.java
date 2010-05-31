@@ -19,8 +19,6 @@ import org.eclipse.linuxtools.lttng.control.LttngCoreProviderFactory;
 import org.eclipse.linuxtools.lttng.event.LttngSyntheticEvent;
 import org.eclipse.linuxtools.lttng.model.LTTngTreeNode;
 import org.eclipse.linuxtools.lttng.state.LttngStateException;
-import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
-import org.eclipse.linuxtools.lttng.state.model.StateModelFactory;
 import org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager;
 import org.eclipse.linuxtools.lttng.state.trace.StateTraceManager;
 import org.eclipse.linuxtools.tmf.component.TmfEventProvider;
@@ -57,7 +55,8 @@ public class StateManagerFactoryTestSupport {
 			return instanceBook.get(traceUniqueId);
 		}
 
-		LttngTraceState traceModel = StateModelFactory.getStateEntryInstance();
+		// LttngTraceState traceModel =
+		// StateModelFactory.getStateEntryInstance();
 		IStateTraceManager manager = null;
 
 		if (feventProvider == null) {
@@ -69,9 +68,7 @@ public class StateManagerFactoryTestSupport {
 		LTTngTreeNode parent = null;
 
 		try {
-			manager = new StateTraceManager(id, parent, traceUniqueId, trace,
-					traceModel,
-					feventProvider);
+			manager = new StateTraceManager(id, parent, traceUniqueId, trace, feventProvider);
 		} catch (LttngStateException e) {
 			e.printStackTrace();
 		}
