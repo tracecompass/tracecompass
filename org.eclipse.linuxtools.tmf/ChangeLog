@@ -1,0 +1,3 @@
+2009-06-16  Andrew Overholt  <overholt@redhat.com>
+
+	* META-INF/MANIFEST.MF: Change provider from Ericsson to Eclipse.
