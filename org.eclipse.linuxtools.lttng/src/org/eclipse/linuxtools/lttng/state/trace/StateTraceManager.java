@@ -32,19 +32,16 @@ import org.eclipse.linuxtools.lttng.state.model.StateModelFactory;
 import org.eclipse.linuxtools.lttng.state.resource.ILttngStateContext;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
-import org.eclipse.linuxtools.tmf.component.TmfEventProvider;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
-import org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfCheckpoint;
 import org.eclipse.linuxtools.tmf.trace.TmfLocation;
 
-public class StateTraceManager extends LTTngTreeNode implements
- IStateTraceManager, ILttngStateContext {
+public class StateTraceManager extends LTTngTreeNode implements IStateTraceManager, ILttngStateContext {
 
 	// constants
 	private static final long DEFAULT_OFFSET = 0L;
@@ -58,7 +55,6 @@ public class StateTraceManager extends LTTngTreeNode implements
 
 	// immutable Objects
 	private final ITmfTrace fTrace;
-	private final TmfTimestamp fCheckPointsStartTime;	
 	private int fcpuNumber = -1;
 	private final ITransEventProcessor fStateUpdateProcessor;
 
@@ -67,17 +63,10 @@ public class StateTraceManager extends LTTngTreeNode implements
 	private final Vector<TmfCheckpoint> timestampCheckpointsList = new Vector<TmfCheckpoint>();
 	private LttngTraceState fStateModel;
 	private LttngTraceState fCheckPointStateModel;
-	private int selectionCount = 0;
 
 	// locks
 	private Object checkPointsLock = new Object();
 
-	/**
-	 * Could be fixed to trace level from received trace, however preparation
-	 * for multiple threads is necessary, a common synthetic event provider at
-	 * experiment level is a good start although can be adjusted externally
-	 */
-	private TmfEventProvider<LttngSyntheticEvent> fSynEventProvider;
 
 	
 	// =======================================================================
@@ -88,14 +77,9 @@ public class StateTraceManager extends LTTngTreeNode implements
 	 * @param parent
 	 * @param name
 	 * @param trace
-	 * @param stateModel
-	 * @param eventProvider
 	 * @throws LttngStateException
 	 */
-	public StateTraceManager(Long id, LTTngTreeNode parent, String name,
-			ITmfTrace trace,
-			TmfEventProvider<LttngSyntheticEvent> eventProvider)
-			throws LttngStateException {
+	public StateTraceManager(Long id, LTTngTreeNode parent, String name, ITmfTrace trace) throws LttngStateException {
 		super(id, parent, name, trace);
 
 		if (trace == null) {
@@ -103,12 +87,10 @@ public class StateTraceManager extends LTTngTreeNode implements
 		}
 
 		fTrace = trace;
-		fCheckPointsStartTime = trace.getStartTime().clone();
 		fStateUpdateProcessor = StateEventToHandlerFactory.getInstance();
-		fSynEventProvider = eventProvider;
 
 		init();
-		
+
 		fStateModel = StateModelFactory.getStateEntryInstance(this);
 		fStateModel.init(this);
 
@@ -134,94 +116,10 @@ public class StateTraceManager extends LTTngTreeNode implements
 			fcpuNumber = ((LTTngTextTrace) fTrace).getCpuNumber();
 		}
 	}
+	
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.linuxtools.lttng.signal.ILttExperimentSelectedListener#
-	 * experimentSelected(java.lang.Object,
-	 * org.eclipse.linuxtools.tmf.experiment.TmfExperiment)
-	 */
-	public void experimentSelected(Object source,
-			TmfExperiment<LttngEvent> experiment) {
-		// Only update experiment is needed for the time being
-	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.linuxtools.lttng.signal.ILttExperimentSelectedListener#
-	 * experimentUpdated
-	 * (org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal)
-	 */
-	public void experimentUpdated(TmfExperimentUpdatedSignal signal, boolean wait) {
-		// initialise check points once per new experiment selection
 
-		synchronized (checkPointsLock) {
-			stateCheckpointsList.clear();
-			timestampCheckpointsList.clear();
-		}
-
-		// requested time window from trace start to end, this to
-		// make sure one thread is used so the events arrive in order for proper
-		// building of the checkpoints
-		TmfTimeRange adjustedRange = new TmfTimeRange(fCheckPointsStartTime, fTrace.getTimeRange().getEndTime());
-
-		// Obtain a dataRequest to pass to the processRequest function
-		ILttngSyntEventRequest request = getDataRequestStateSave(adjustedRange,
-				null, fStateUpdateProcessor);
-		request.setclearDataInd(true);
-		request.startRequestInd(fSynEventProvider);
-		if (wait) {
-			try {
-				request.waitForCompletion();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-//	/*
-//	 * (non-Javadoc)
-//	 * 
-//	 * @see org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager#
-//	 * executeDataRequest(org.eclipse.linuxtools.tmf.event.TmfTimeRange,
-//	 * java.lang.Object,
-//	 * org.eclipse.linuxtools.lttng.request.IRequestStatusListener,
-//	 * org.eclipse.linuxtools.lttng.state.evProcessor.ITransEventProcessor)
-//	 */
-//	public ILttngSyntEventRequest executeDataRequest(TmfTimeRange trange,
-//			Object source,
-//			IRequestStatusListener listener, ITransEventProcessor processor) {
-//		TmfTimestamp restoredStartTime = restoreCheckPointByTimestamp(trange
-//				.getStartTime());
-//		// Adjust the time range to consider rewinding to the start time
-//		trange = new TmfTimeRange(restoredStartTime, trange.getEndTime());
-//		// Get a data request for the time range we want (nearest checkpoint
-//		// to timestamp wanted)
-//
-//		// Process request to that point
-//		ILttngSyntEventRequest request = getDataRequestByTimeRange(trange,
-//				listener, processor);
-//		request.setSource(source);
-//
-//		// don't wait for completion i.e. allow cancellations
-//		request.startRequestInd(fSynEventProvider);
-//		// fSynEventProvider
-//		// .sendRequest((TmfDataRequest<LttngSyntheticEvent>) request);
-//
-//		if (TraceDebug.isDEBUG()) {
-//			TraceDebug
-//					.debug(" Time Window requested, (start adjusted to checkpoint): "
-//							+ trange.getStartTime()
-//							+ "-"
-//							+ trange.getEndTime()
-//							+ " Total number of processes in the State provider: "
-//							+ fStateModel.getProcesses().length + " Completed");
-//		}
-//
-//		return request;
-//	}
 
 	/*
 	 * (non-Javadoc)
@@ -245,8 +143,7 @@ public class StateTraceManager extends LTTngTreeNode implements
 	 * 
 	 * @return boolean True if a checkpoint was saved, false otherwise
 	 */
-	private void saveCheckPointIfNeeded(Long eventCounter,
-			TmfTimestamp eventTime) {
+	private void saveCheckPointIfNeeded(Long eventCounter, TmfTimestamp eventTime) {
 		// Save a checkpoint every LTTNG_STATE_SAVE_INTERVAL event
 		if ((eventCounter.longValue() % fcheckPointInterval) == 0) {
 			LttngTraceState stateCheckPoint;
@@ -264,9 +161,8 @@ public class StateTraceManager extends LTTngTreeNode implements
 				stateCheckpointsList.put(eventCounter, stateCheckPoint);
 				// Save correlation between timestamp and checkpoint index
 
-				timestampCheckpointsList.add(new TmfCheckpoint(
-						new TmfTimestamp(eventTime), new TmfLocation<Long>(
-								eventCounter)));
+				timestampCheckpointsList.add(new TmfCheckpoint(new TmfTimestamp(eventTime), new TmfLocation<Long>(
+						eventCounter)));
 			}
 		}
 	}
@@ -286,107 +182,60 @@ public class StateTraceManager extends LTTngTreeNode implements
 		this.fcheckPointInterval = check_point_interval;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager#restoreCheckPointByTimestamp(org.eclipse.linuxtools.tmf.event.TmfTimestamp)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager#
+	 * restoreCheckPointByTimestamp
+	 * (org.eclipse.linuxtools.tmf.event.TmfTimestamp)
 	 */
 	@SuppressWarnings("unchecked")
-	public TmfTimestamp restoreCheckPointByTimestamp(TmfTimestamp eventTime) { TmfTimeRange experimentRange = fExperiment.getTimeRange();
+	public TmfTimestamp restoreCheckPointByTimestamp(TmfTimestamp eventTime) {
+		TmfTimeRange experimentRange = fExperiment.getTimeRange();
 		TmfTimestamp nearestTimeStamp = fTrace.getStartTime();
 
 		// The GUI can have time limits higher than this log, since GUI can
 		// handle multiple logs
-		if ((eventTime.getValue() < 0)
-				|| (eventTime.getValue() > experimentRange.getEndTime().getValue())) {
+		if ((eventTime.getValue() < 0) || (eventTime.getValue() > experimentRange.getEndTime().getValue())) {
 			return null;
 		}
 
-//		// The GUI can have time limits lower than this trace, since experiment
-//		// can handle multiple traces
-//		if ((eventTime.getValue() < fTrace.getStartTime().getValue())) {
-//			eventTime = fTrace.getStartTime();
-//		}
-//
-//		// Sort the checkpoints, required before the binary search
-//		Collections.sort(timestampCheckpointsList);
-//		// Initiate the compare with a checkpoint containing the target time
-//		// stamp to find
-//		int index = Collections.binarySearch(timestampCheckpointsList,
-//				new TmfCheckpoint(eventTime, new TmfLocation<Long>(0L)));
-//		// adjust index to round down to earlier checkpoint when exact match not
-//		// found
-//		index = getPrevIndex(index);
-//
-		LttngTraceState traceState;
-//		if (index == 0) {
-//			// No checkpoint restore is needed, start with a brand new
-//			// TraceState
-//			traceState = StateModelFactory.getStateEntryInstance(this);
+		// The GUI can have time limits lower than this trace, since experiment
+		// can handle multiple traces
+		if ((eventTime.getValue() < fTrace.getStartTime().getValue())) {
+			eventTime = fTrace.getStartTime();
 
-		// The reference to fCheckPointsStartTime is used as the indicator to
-		// identify a state check point building request
-		if (eventTime == fCheckPointsStartTime) {
-			// indicates state checkpoint building request
-			nearestTimeStamp = fCheckPointsStartTime;
-			// starting from the trace start time with an empty state model
-			traceState = StateModelFactory.getStateEntryInstance(this);
-			// update the instance field variable pointing the the check point
-			// building state model
-			synchronized (fCheckPointStateModel) {
-				fCheckPointStateModel = traceState;
+			Collections.sort(timestampCheckpointsList);
+			// Initiate the compare with a checkpoint containing the target time
+			// stamp to find
+			int index = Collections.binarySearch(timestampCheckpointsList, new TmfCheckpoint(eventTime,
+					new TmfLocation<Long>(0L)));
+			// adjust index to round down to earlier checkpoint when exact match
+			// not
+			// found
+			index = getPrevIndex(index);
+
+			LttngTraceState traceState;
+			if (index == 0) {
+				// No checkpoint restore is needed, start with a brand new
+				// TraceState
+				traceState = StateModelFactory.getStateEntryInstance(this);
+			} else {
+				synchronized (checkPointsLock) {
+					// Useful CheckPoint found
+					TmfCheckpoint checkpoint = timestampCheckpointsList.get(index);
+					nearestTimeStamp = checkpoint.getTimestamp();
+					// get the location associated with the checkpoint
+					TmfLocation<Long> location = (TmfLocation<Long>) checkpoint.getLocation();
+					// reference a new copy of the checkpoint template
+					traceState = stateCheckpointsList.get(location.getLocation()).clone();
+				}
 			}
 
-		} else {
-//			synchronized (checkPointsLock) {
-//				// Useful CheckPoint found
-//				TmfCheckpoint checkpoint = timestampCheckpointsList.get(index);
-//				nearestTimeStamp = checkpoint.getTimestamp();
-//				// get the location associated with the checkpoint
-//				TmfLocation<Long> location = (TmfLocation<Long>) checkpoint
-//						.getLocation();
-//				// reference a new copy of the checkpoint template
-//				traceState = stateCheckpointsList.get(location.getLocation())
-//						.clone();
-				// The GUI requests can have time limits lower than this trace,
-				// since experiment can handle multiple traces
-				if ((eventTime.getValue() < fTrace.getStartTime().getValue())) {
-					eventTime = fTrace.getStartTime();
+			// Restore the stored traceState
+			synchronized (fStateModel) {
+				fStateModel = traceState;
 			}
-//		}
-
-//		// Restore the stored traceState
-//		synchronized (fStateModel) {
-//			fStateModel = traceState;
-				// Sort the checkpoints, required before the binary search
-				Collections.sort(timestampCheckpointsList);
-				// Initiate the compare with a checkpoint containing the target time
-				// stamp to find
-				int index = Collections.binarySearch(timestampCheckpointsList, new TmfCheckpoint(eventTime,
-						new TmfLocation<Long>(0L)));
-				// adjust index to round down to earlier checkpoint when exact match
-				// not
-				// found
-				index = getPrevIndex(index);
-				
-				if (index == 0) {
-					// No checkpoint restore is needed, start with a brand new
-					// TraceState
-					traceState = StateModelFactory.getStateEntryInstance(this);
-				} else {
-					synchronized (checkPointsLock) {
-						// Useful CheckPoint found
-						TmfCheckpoint checkpoint = timestampCheckpointsList.get(index);
-						nearestTimeStamp = checkpoint.getTimestamp();
-						// get the location associated with the checkpoint
-						TmfLocation<Long> location = (TmfLocation<Long>) checkpoint.getLocation();
-						// reference a new copy of the checkpoint template
-						traceState = stateCheckpointsList.get(location.getLocation()).clone();
-					}
-				}
-				
-				// Restore the stored traceState
-				synchronized (fStateModel) {
-					fStateModel = traceState;
-				}
 		}
 
 		return nearestTimeStamp;
@@ -409,7 +258,6 @@ public class StateTraceManager extends LTTngTreeNode implements
 		return roundDownPosition;
 	}
 
-
 	// TODO: Remove this request type when the UI handle their own requests
 	/**
 	 * Request Event data of a specified time range
@@ -419,102 +267,16 @@ public class StateTraceManager extends LTTngTreeNode implements
 	 * @param processor
 	 * @return ILttngEventRequest The request made
 	 */
-	ILttngSyntEventRequest getDataRequestByTimeRange(TmfTimeRange timeWindow,
-			IRequestStatusListener listener,
+	ILttngSyntEventRequest getDataRequestByTimeRange(TmfTimeRange timeWindow, IRequestStatusListener listener,
 			final ITransEventProcessor processor) {
 
-		ILttngSyntEventRequest request = new StateTraceManagerRequest(timeWindow,
-				DEFAULT_OFFSET, TmfDataRequest.ALL_DATA, DEFAULT_CHUNK,
-				listener, getExperimentTimeWindow(), processor) {
+		ILttngSyntEventRequest request = new StateTraceManagerRequest(timeWindow, DEFAULT_OFFSET,
+				TmfDataRequest.ALL_DATA, DEFAULT_CHUNK, listener, getExperimentTimeWindow(), processor) {
 		};
 
 		return request;
 	}
 
-	private ILttngSyntEventRequest getDataRequestStateSave(TmfTimeRange timeWindow,
-			IRequestStatusListener requestListener,
-			final ITransEventProcessor processor) {
-
-		// Create the new request and override the handlePartialResult function
-		ILttngSyntEventRequest request = new StateTraceManagerRequest(timeWindow,
-				DEFAULT_OFFSET, TmfDataRequest.ALL_DATA, DEFAULT_CHUNK,
-				requestListener, getExperimentTimeWindow(), processor) {
-
-			/* (non-Javadoc)
-			 * @see org.eclipse.linuxtools.lttng.request.LttngSyntEventRequest#handleCompleted()
-			 */
-			@Override
-			public void handleCompleted() {
-				if (isCancelled() || isFailed()) {
-					// No notification to end request handlers
-				} else {
-					// Indicates that trace selection has successfully completed
-					// i.e. check points have been already build if the number
-					// of events exceeded the interval
-					setTraceSelectCount(getTraceSelectCount() + 1);
-				}
-
-				super.handleCompleted();
-
-				if (TraceDebug.isDEBUG()) {
-					StringBuilder sb = new StringBuilder(
-							"Check Point build Request completed"
-									+ "\n\tEventCount: "
-									+ fprocessor.getStateUpdateCount()
-									+ "\tEvents for a different trace state received: "
-									+ fprocessor.getFilteredOutEventCount()
-									+ "\n\t"
-									+ fStateModel.getProcesses().length 
-									+ "\n\t" 
-									+ "Total number of processes in the Check point State model: " 
-									+ fCheckPointStateModel.getProcesses().length);
-
-					TmfTimeRange logTimes = fTrace.getTimeRange();
-					sb.append("\n\tTrace time interval for trace "
-							+ fTrace.getName()
-							+ "\n\t"
-							+ new LttngTimestamp(logTimes.getStartTime()));
-					sb.append(" - " + new LttngTimestamp(logTimes.getEndTime()));
-					sb.append("\n\tRequested Time: "
-							+ getRange().getStartTime().toString() + " - "
-							+ getRange().getEndTime().toString());
-					sb.append("\n\tCheckPoints available at: ");
-					for (TmfCheckpoint cpoint : timestampCheckpointsList) {
-						sb.append("\n\t" + "Location: " + cpoint.getLocation()
-								+ " - " + cpoint.getTimestamp());
-					}
-
-					TraceDebug.debug(sb.toString());
-				}
-			}
-
-			/* (non-Javadoc)
-			 * @see org.eclipse.linuxtools.lttng.state.trace.StateTraceManager.StateTraceManagerRequest#saveCheckPoint(java.lang.Long, org.eclipse.linuxtools.tmf.event.TmfTimestamp)
-			 */
-			@Override
-			public void saveCheckPoint(Long count, TmfTimestamp time) {
-				saveCheckPointIfNeeded(count, time);
-			}
-
-		};
-
-		return request;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	private synchronized int getTraceSelectCount() {
-		return selectionCount;
-	}
-
-	/**
-	 * @param value
-	 */
-	private synchronized void setTraceSelectCount(int value) {
-		selectionCount = value;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -532,28 +294,12 @@ public class StateTraceManager extends LTTngTreeNode implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager#getStateModel
-	 * (org.eclipse.linuxtools.tmf.event.TmfTimestamp)
+	 * @see org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager#
+	 * getCheckPointStateModel()
 	 */
-	public LttngTraceState getStateModel(TmfTimestamp checkPointReference) {
-		// validate
-		if (checkPointReference == null) {
-			return null;
-		}
-			
-		// Only two state models supported at this time e.g. one for checkpoint
-		// building and the second one is shared for UI requests which are
-		// either coalesced or sequential (i.e. within the same trace data
-		// provider)
-		if (checkPointReference == fCheckPointsStartTime) {
-			synchronized (fCheckPointStateModel) {
-				return fCheckPointStateModel;
-			}
-		} else {
-			synchronized (fStateModel) {
-				return fStateModel;
-			}
+	public LttngTraceState getCheckPointStateModel() {
+		synchronized (fStateModel) {
+			return fCheckPointStateModel;
 		}
 	}
 
@@ -585,13 +331,10 @@ public class StateTraceManager extends LTTngTreeNode implements
 		// =======================================================================
 		// Constructor
 		// =======================================================================
-		public StateTraceManagerRequest(TmfTimeRange range, long offset,
-				int nbEvents, int maxBlockSize,
-				IRequestStatusListener listener,
-				TmfTimeRange experimentTimeRange, ITransEventProcessor processor) {
+		public StateTraceManagerRequest(TmfTimeRange range, long offset, int nbEvents, int maxBlockSize,
+				IRequestStatusListener listener, TmfTimeRange experimentTimeRange, ITransEventProcessor processor) {
 
-			super(range, offset, nbEvents, maxBlockSize, listener,
-					experimentTimeRange, processor);
+			super(range, offset, nbEvents, maxBlockSize, listener, experimentTimeRange, processor);
 			fprocessor = processor;
 			TraceDebug.debug("Instance created for range: " + range.toString());
 			fCount = 0L;
@@ -623,8 +366,7 @@ public class StateTraceManager extends LTTngTreeNode implements
 
 					if (TraceDebug.isDEBUG()) {
 						if (fCount % 1000 == 0) {
-							TraceDebug.debug("handled: " + fCount
-									+ " sequence: " + synEvent.getSynType());
+							TraceDebug.debug("handled: " + fCount + " sequence: " + synEvent.getSynType());
 						}
 					}
 				}
@@ -728,9 +470,8 @@ public class StateTraceManager extends LTTngTreeNode implements
 		synchronized (checkPointsLock) {
 			stateCheckpointsList.clear();
 			timestampCheckpointsList.clear();
-			
-			fCheckPointStateModel = StateModelFactory
-					.getStateEntryInstance(this);
+
+			fCheckPointStateModel = StateModelFactory.getStateEntryInstance(this);
 			try {
 				fCheckPointStateModel.init(this);
 			} catch (LttngStateException e) {
@@ -738,7 +479,7 @@ public class StateTraceManager extends LTTngTreeNode implements
 			}
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -748,11 +489,11 @@ public class StateTraceManager extends LTTngTreeNode implements
 	 */
 	public void handleEvent(LttngSyntheticEvent synEvent, Long eventCount) {
 		fStateUpdateProcessor.process(synEvent, fCheckPointStateModel);
-	
+
 		// Save checkpoint as needed
 		saveCheckPointIfNeeded(eventCount - 1, synEvent.getTimestamp());
 	}
-		
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -763,7 +504,7 @@ public class StateTraceManager extends LTTngTreeNode implements
 		sb.append("\n\tTotal number of processes in the Shared State model: " + fStateModel.getProcesses().length
 				+ "\n\t" + "Total number of processes in the Check point State model: "
 				+ fCheckPointStateModel.getProcesses().length);
-	
+
 		TmfTimeRange traceTRange = fTrace.getTimeRange();
 		sb.append("\n\tTrace time interval for trace " + fTrace.getName() + "\n\t"
 				+ new LttngTimestamp(traceTRange.getStartTime()));
@@ -772,7 +513,7 @@ public class StateTraceManager extends LTTngTreeNode implements
 		for (TmfCheckpoint cpoint : timestampCheckpointsList) {
 			sb.append("\n\t" + "Location: " + cpoint.getLocation() + " - " + cpoint.getTimestamp());
 		}
-	
+
 		return sb.toString();
 	}
 

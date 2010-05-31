@@ -129,7 +129,7 @@ public class LttngSyntheticEventProvider extends
 		// define event data handling
 		ITmfEventRequest<LttngSyntheticEvent> eventRequest = (ITmfEventRequest<LttngSyntheticEvent>) fmainRequest;
 		TmfTimeRange reqWindow = eventRequest.getRange();
-		
+
 		TraceDebug.debug("Main Synthethic event request started on thread:  " + Thread.currentThread().getName());
 
 		// loop for every traceManager in current experiment
@@ -157,7 +157,7 @@ public class LttngSyntheticEventProvider extends
 				adjustedRange = new TmfTimeRange(checkPoint, reqWindow.getEndTime());
 			}
 
-			LttngTraceState traceModel = traceManager.getStateModel(checkPoint);
+			LttngTraceState traceModel = traceManager.getStateModel();
 			// create sub-request for one trace within experiment
 			final LttngBaseEventRequest subRequest = new LttngBaseEventRequest(
 					adjustedRange, reqWindow.getStartTime(), 0,
@@ -228,8 +228,7 @@ public class LttngSyntheticEventProvider extends
 
 							// Update state locally
 							syntheticEvent.setSequenceInd(SequenceInd.UPDATE);
-							fstateUpdateProcessor.process(syntheticEvent,
-								fTraceModel);
+							fstateUpdateProcessor.process(syntheticEvent, fTraceModel);
 
 							// After Update
 							syntheticEvent.setSequenceInd(SequenceInd.AFTER);
@@ -376,7 +375,7 @@ public class LttngSyntheticEventProvider extends
 	 * 
 	 * @param experimentNode
 	 */
-	public /* synchronized */ void reset(LTTngTreeNode experimentNode) {
+	public/* synchronized */void reset(LTTngTreeNode experimentNode) {
 
 		fmainRequest = null;
 

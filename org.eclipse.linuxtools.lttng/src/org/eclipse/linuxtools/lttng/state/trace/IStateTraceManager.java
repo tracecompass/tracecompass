@@ -1,13 +1,12 @@
 package org.eclipse.linuxtools.lttng.state.trace;
 
 import org.eclipse.linuxtools.lttng.event.LttngSyntheticEvent;
-import org.eclipse.linuxtools.lttng.signal.ILttExperimentSelectedListener;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 
-public interface IStateTraceManager extends ILttExperimentSelectedListener {
+public interface IStateTraceManager {
 //	/**
 //	 * TODO: Not ready for threading
 //	 * <p>
@@ -53,13 +52,12 @@ public interface IStateTraceManager extends ILttExperimentSelectedListener {
 	public abstract TmfTimeRange getExperimentTimeWindow();
 
 	/**
-	 * Returns the State model instance associated with this Trace and given
-	 * checkPointReference e.g. check point building state model, UI state
-	 * model, etc.
+	 * Returns the State model used to build the check points for the state
+	 * system
 	 * 
 	 * @return
 	 */
-	public abstract LttngTraceState getStateModel(TmfTimestamp startingCheckPointReference);
+	public abstract LttngTraceState getCheckPointStateModel();
 
 	/**
 	 * Returns the State model instance associated with this Trace i.e. not the

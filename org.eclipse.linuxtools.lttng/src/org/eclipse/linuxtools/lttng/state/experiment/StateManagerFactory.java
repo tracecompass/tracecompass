@@ -13,7 +13,6 @@
 package org.eclipse.linuxtools.lttng.state.experiment;
 
 import org.eclipse.linuxtools.lttng.TraceDebug;
-import org.eclipse.linuxtools.lttng.control.LttngCoreProviderFactory;
 import org.eclipse.linuxtools.lttng.model.LTTngTreeNode;
 import org.eclipse.linuxtools.lttng.state.LttngStateException;
 import org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager;
@@ -75,8 +74,7 @@ public class StateManagerFactory {
 
 		// catch potential construction problems
 		try {
-			manager = new StateTraceManager(experiment.getNextUniqueId(), experiment, traceUniqueId, rtrace,
-					LttngCoreProviderFactory.getEventProvider());
+			manager = new StateTraceManager(experiment.getNextUniqueId(), experiment, traceUniqueId, rtrace);
 
 			// Allow the possibility to configure the trace state check point
 			// interval at creation time
