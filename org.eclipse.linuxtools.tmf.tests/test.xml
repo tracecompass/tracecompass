@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+
+<project name="testsuite" default="run" basedir=".">
+	<property name="classname" value="org.eclipse.linuxtools.tmf.ui.tests" />
+	<property name="tmf-event-test-suite-classname"   value="org.eclipse.linuxtools.tmf.tests.event.AllTests" />
+	<property name="tmf-request-test-suite-classname" value="org.eclipse.linuxtools.tmf.tests.request.AllTests" />
+	<property name="tmf-trace-test-suite-classname"   value="org.eclipse.linuxtools.tmf.tests.trace.AllTests" />
+	<property name="plugin-name" value="org.eclipse.linuxtools.tmf.tests" />
+
+	<!-- The property ${eclipse-home} should be passed into this script -->
+	<!-- Set a meaningful default value for when it is not. -->
+	<property name="eclipse-home" value="${basedir}/../../" />
+
+	<property name="library-file" value="${eclipse-home}/dropins/${subProjectName2}/plugins/org.eclipse.test/library.xml" />
+
+	<!-- This target holds all initialization code that needs to be done for -->
+	<!-- all tests that are to be run. Initialization for individual tests -->
+	<!-- should be done within the body of the suite target. -->
+	<target name="init">
+		<tstamp />
+		<delete>
+			<fileset dir="${eclipse-home}" includes="org*.xml" />
+		</delete>
+	</target>
+
+	<!-- This target defines the tests that need to be run. -->
+	<target name="tmf_event_test_suite">
+		<property name="tmf-folder" value="${eclipse-home}/tmf_folder" />
+		<delete dir="${tmf-folder}" quiet="true" />
+		<ant target="ui-test" antfile="${library-file}" dir="${eclipse-home}">
+			<property name="data-dir" value="${tmf-folder}" />
+			<property name="plugin-name" value="${plugin-name}" />
+			<property name="classname" value="${tmf-event-test-suite-classname}" />
+		</ant>
+	</target>
+
+	<target name="tmf_request_test_suite">
+		<property name="tmf-folder" value="${eclipse-home}/tmf_folder" />
+		<delete dir="${tmf-folder}" quiet="true" />
+		<ant target="ui-test" antfile="${library-file}" dir="${eclipse-home}">
+			<property name="data-dir" value="${tmf-folder}" />
+			<property name="plugin-name" value="${plugin-name}" />
+			<property name="classname" value="${tmf-request-test-suite-classname}" />
+		</ant>
+	</target>
+
+	<target name="tmf_trace_test_suite">
+		<property name="tmf-folder" value="${eclipse-home}/tmf_folder" />
+		<delete dir="${tmf-folder}" quiet="true" />
+		<ant target="ui-test" antfile="${library-file}" dir="${eclipse-home}">
+			<property name="data-dir" value="${tmf-folder}" />
+			<property name="plugin-name" value="${plugin-name}" />
+			<property name="classname" value="${tmf-trace-test-suite-classname}" />
+		</ant>
+	</target>
+
+	<!-- This target holds code to cleanup the testing environment after  -->
+	<!-- all of the tests have been run. You can use this target to -->
+	<!-- delete temporary files that have been created. -->
+	<target name="cleanup">
+		<mkdir dir="${results}/consolelogs" />
+		<copy failonerror="false" file="${eclipse-home}/results/${classname}.txt" tofile="${results}/consolelogs/${classname}_${platform}.metadata.log.txt" />
+	</target>
+
+	<!-- This target runs the test suite. Any actions that need to happen -->
+	<!-- after all the tests have been run should go here. -->
+	<target name="run" depends="init,tmf_event_test_suite,tmf_request_test_suite,tmf_trace_test_suite,cleanup">
+		<ant target="collect" antfile="${library-file}" dir="${eclipse-home}">
+			<property name="includes" value="org*.xml" />
+			<property name="output-file" value="${plugin-name}.xml" />
+		</ant>
+	</target>
+
+    <target name="all" depends="run" description="Dummy target to run all tests">
+    </target>
+
+</project>
