@@ -1,4 +1,4 @@
-package org.eclipse.linuxtools.lttng.tests;
+package org.eclipse.linuxtools.lttng;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -22,10 +22,10 @@ import org.eclipse.linuxtools.lttng.tests.jni.JniTracefileTest;
 import org.eclipse.linuxtools.lttng.tests.trace.LTTngTextTraceTest;
 import org.eclipse.linuxtools.lttng.tests.trace.LTTngTraceTest;
 
-public class AllLTTngCoreTests {
+public class AllLTTngTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite(AllLTTngCoreTests.class.getName());
+		TestSuite suite = new TestSuite(AllLTTngTests.class.getName());
 		//$JUnit-BEGIN$
 
         suite.addTestSuite(LTTngTextTraceTest.class);
@@ -50,6 +50,7 @@ public class AllLTTngCoreTests {
 		suite.addTestSuite(LTTngTreeNodeTest.class);
 		suite.addTestSuite(StateExperimentManagerTextTest.class);
 		suite.addTestSuite(LTTngStateResourceTest.class);
+
 		//$JUnit-END$
 		return suite;
 	}
