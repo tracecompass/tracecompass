@@ -198,9 +198,9 @@ public class TimeRangeEventProcess extends TimeRangeComposite implements
 	public int compareTo(TimeRangeEventProcess process) {
 		if (process != null) {
 			int result = 0;
-			// Compare by trace first
-			String anotherTraceId = process.getTraceID();
-			result = traceID.compareTo(anotherTraceId);
+			// first compare by pid
+			Long anotherPid = process.getPid();
+			result = pid.compareTo(anotherPid);
 			if (result != 0) {
 				return result;
 			}
@@ -212,9 +212,9 @@ public class TimeRangeEventProcess extends TimeRangeComposite implements
 				return result;
 			}
 
-			// finally Compare by pid
-			Long anotherPid = process.getPid();
-			return pid.compareTo(anotherPid);
+			// finally by trace
+			String anotherTraceId = process.getTraceID();
+			return traceID.compareTo(anotherTraceId);
 		}
 
 		return 0;

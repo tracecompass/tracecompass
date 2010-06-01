@@ -170,24 +170,28 @@ class ProcessKey {
         if ( obj instanceof ProcessKey ) {
         	ProcessKey procKey = (ProcessKey) obj;
         	
-        	if ( valueRef != null ) {
-	            if ( (procKey.getPid().equals(valueRef.getPid()) ) &&
-	                 (procKey.getTraceId().equals(valueRef.getTraceID()) ) &&
-	                 (procKey.getCpuId().equals(valueRef.getCpu()) ) &&
-	                 (procKey.getCreationtime().equals(valueRef.getCreationTime()) )  )
-	            {
-	                isSame = true;
-	            }
-        	}
-        	else {
-        		if ( (procKey.getPid().equals(this.pid ) ) &&
-   	                 (procKey.getTraceId().equals(this.traceId ) ) &&
-   	                 (procKey.getCpuId().equals(this.cpuId ) ) &&
-   	                 (procKey.getCreationtime().equals(this.creationtime ) )  )
-   	            {
-   	                isSame = true;
-   	            }
-        	}
+			if (valueRef != null) {
+				if ((procKey.getPid().equals(valueRef.getPid()))
+						&& (procKey.getTraceId().equals(valueRef.getTraceID()))
+						&& (procKey.getCreationtime().equals(valueRef.getCreationTime()))) {
+					// use the cpu value to validate pid 0
+					if (valueRef.getPid().longValue() == 0L && !procKey.getCpuId().equals(valueRef.getCpu())) {
+						isSame = false;
+					} else {
+						isSame = true;
+					}
+				}
+			} else {
+				if ((procKey.getPid().equals(this.pid)) && (procKey.getTraceId().equals(this.traceId))
+						&& (procKey.getCreationtime().equals(this.creationtime))) {
+					// use the cpu value to validate pid 0
+					if (this.pid.longValue() == 0L && !procKey.getCpuId().equals(this.cpuId)) {
+						isSame = false;
+					} else {
+						isSame = true;
+					}
+				}
+			}
         }
         else {
         	TraceDebug.debug("ERROR : The given key is not of the type ProcessKey!" + obj.getClass().toString());
@@ -243,9 +247,17 @@ class ProcessKey {
     @Override
     public String toString() {
         if ( valueRef != null ) {
-            return (valueRef.getPid().toString() + ":" + valueRef.getCpu().toString() + ":" + valueRef.getTraceID().toString() + ":" + valueRef.getCreationTime().toString());
+			// return (valueRef.getPid().toString() + ":" +
+			// valueRef.getCpu().toString() + ":"
+			// + valueRef.getTraceID().toString() + ":" +
+			// valueRef.getCreationTime().toString());
+			return (valueRef.getPid().toString() + ":" + valueRef.getTraceID().toString() + ":" + valueRef
+					.getCreationTime().toString());
         } 
         
-        return (pid.toString() + ":" + cpuId.toString() + ":" + traceId.toString() + ":" + creationtime.toString());
+		// return (pid.toString() + ":" + cpuId.toString() + ":" +
+		// traceId.toString() + ":" + creationtime.toString());
+
+		return (pid.toString() + ":" + traceId.toString() + ":" + creationtime.toString());
     }
 }

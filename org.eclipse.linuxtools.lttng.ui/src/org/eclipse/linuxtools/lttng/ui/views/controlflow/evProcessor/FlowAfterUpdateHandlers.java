@@ -57,7 +57,8 @@ class FlowAfterUpdateHandlers {
                 }
 				
 				//hashed_process_data = processlist_get_process_data(process_list,pid_out,process->cpu,&birth,trace_num);
-				TimeRangeEventProcess localProcess = procContainer.findProcess(process_in.getPid(), process_in.getCpu(), traceSt.getTraceId(),process_in.getCreation_time() );
+				TimeRangeEventProcess localProcess = procContainer.findProcess(pid_in, process_in.getCpu(), traceSt
+						.getTraceId(), process_in.getCreation_time());
 				
 				if ( localProcess == null ) {
 					if ( (pid_in == 0) || (pid_in != process_in.getPpid()) ) {
@@ -328,8 +329,6 @@ class FlowAfterUpdateHandlers {
 				Long pid_in = getAFieldLong(trcEvent, traceSt,
 						Fields.LTT_FIELD_PID);
 			    
-                // Lttv assume that pid_in will NEVER be null or incoherent
-                // What if ... ?    (let's add some debug)
 			    if ( pid_in != null  ) {
     			    if(pid_in == 0L) {
 						first_cpu = 0;
@@ -341,7 +340,7 @@ class FlowAfterUpdateHandlers {
     			    }
     			    
 					for (int cpu = first_cpu; cpu < nb_cpus; cpu++) {
-    			        LttngProcessState process_in = lttv_state_find_process(traceSt, trcEvent.getCpuId(), pid_in );
+						LttngProcessState process_in = lttv_state_find_process(traceSt, Long.valueOf(cpu), pid_in);
     			        
     			        if ( process_in != null ) {
     			            TimeRangeEventProcess localProcess = procContainer.findProcess(process_in.getPid(), process_in.getCpu(), traceSt.getTraceId(), process_in.getCreation_time());
@@ -355,12 +354,12 @@ class FlowAfterUpdateHandlers {
                                     TraceDebug.debug("process pid is not 0 or pid equals ppid! (getEnumProcessStateHandler)");
                                 }
     			            }
-    			            else {
-    			                // If the process was found, it might be missing informations, add it here
-    			                localProcess.setName(process_in.getName());
-    			                localProcess.setPpid(process_in.getPpid());
-    			                localProcess.setTgid(process_in.getTgid());
-    			            }
+
+							// If the process was found, it might be missing
+							// informations, add it here
+							localProcess.setName(process_in.getName());
+							localProcess.setPpid(process_in.getPpid());
+							localProcess.setTgid(process_in.getTgid());
     			        }
     			        else {
     			            TraceDebug.debug("process_in is null! This should never happen. (getEnumProcessStateHandler)");

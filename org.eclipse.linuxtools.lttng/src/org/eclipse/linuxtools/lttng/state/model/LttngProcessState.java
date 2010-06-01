@@ -58,7 +58,7 @@ public class LttngProcessState implements Cloneable {
 		this.tgid = 0L;
 		this.name = StateStrings.ProcessStatus.LTTV_STATE_UNNAMED.getInName();
 		this.insertion_time = startTime;
-		this.trace_id = "";
+		this.trace_id = traceId;
 		init();
 	}
 
