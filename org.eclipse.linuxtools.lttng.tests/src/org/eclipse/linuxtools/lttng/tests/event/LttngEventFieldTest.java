@@ -93,32 +93,32 @@ public class LttngEventFieldTest extends TestCase {
         
 	}
 	
-	public void testGetter() {
-    	
-    	// *** To "really" test the field, we will get a real field from LTTngTrace
-    	LTTngTextTrace tmpStream = initializeEventStream();
-    	
-    	LttngEventField testField 	= (LttngEventField)tmpStream.getNextEvent( new TmfContext(new TmfLocation<Long>(0L), 0) ).getContent().getField(0);
-    	assertNotSame("getField is null!",null,testField);
-    	
-    	// *** FIXME ***
-    	// Depending from the Java version because of the "hashcode()" on String. 
-    	// We can't really test that safetly
-    	//
-    	//assertTrue("getName() returned unexpected result!",firstEventName.equals(testField.getId().toString()));
-    	assertNotSame("getName() returned unexpected result!",null, testField.getId());
-    	
-    	assertTrue("getValue() returned unexpected result!",firstEventValue.equals(testField.getValue().toString()));
-    	
-    	
-    }
-    
-	public void testToString() {
-    	LttngEventField tmpField = prepareToTest();
-    	
-		// Just make sure toString() does not return null or the java reference
-		assertNotSame("toString returned null",null, tmpField.toString() );
-		assertNotSame("toString is not overridded!", tmpField.getClass().getName() + '@' + Integer.toHexString(tmpField.hashCode()), tmpField.toString() );
-    }
+//	public void testGetter() {
+//    	
+//    	// *** To "really" test the field, we will get a real field from LTTngTrace
+//    	LTTngTextTrace tmpStream = initializeEventStream();
+//    	
+//    	LttngEventField testField 	= (LttngEventField)tmpStream.getNextEvent( new TmfContext(new TmfLocation<Long>(0L), 0) ).getContent().getField(0);
+//    	assertNotSame("getField is null!",null,testField);
+//    	
+//    	// *** FIXME ***
+//    	// Depending from the Java version because of the "hashcode()" on String. 
+//    	// We can't really test that safetly
+//    	//
+//    	//assertTrue("getName() returned unexpected result!",firstEventName.equals(testField.getId().toString()));
+//    	assertNotSame("getName() returned unexpected result!",null, testField.getId());
+//    	
+//    	assertTrue("getValue() returned unexpected result!",firstEventValue.equals(testField.getValue().toString()));
+//    	
+//    	
+//    }
+//    
+//	public void testToString() {
+//    	LttngEventField tmpField = prepareToTest();
+//    	
+//		// Just make sure toString() does not return null or the java reference
+//		assertNotSame("toString returned null",null, tmpField.toString() );
+//		assertNotSame("toString is not overridded!", tmpField.getClass().getName() + '@' + Integer.toHexString(tmpField.hashCode()), tmpField.toString() );
+//    }
 	
 }

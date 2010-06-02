@@ -100,38 +100,38 @@ public class LttngEventReferenceTest extends TestCase {
     }
     
     
-    public void testGetter() {
-        LttngEventReference tmpRef = prepareToTest();
-        
-        assertTrue("Tracepath not what was expected!",((String)tmpRef.getValue()).contains(firstEventReference) );
-        assertEquals("Content not what expected!",firstEventReference,tmpRef.getTracepath());
-    }
-    
-    public void testSetter() {
-    	// Not much to do here, we will just make sure the setter does not throw
-        LttngEventReference tmpRef = prepareToTest();
-        
-        try {
-        	tmpRef.setTracepath("test");
-    	}
-    	catch( Exception e) { 
-        	fail("setTracepath(string) failed!");
-        }
-    	
-    	try {
-        	tmpRef.setValue("test");
-    	}
-    	catch( Exception e) { 
-        	fail("setTracepath(string) failed!");
-        }
-    }
-    
-    public void testToString() {
-        LttngEventReference tmpRef = prepareToTest();
-        
-        // Just make sure toString() does not return null or the java reference
-        assertNotSame("toString returned null",null, tmpRef.toString() );
-        assertNotSame("toString is not overridded!", tmpRef.getClass().getName() + '@' + Integer.toHexString(tmpRef.hashCode()), tmpRef.toString() );
-    }
+//    public void testGetter() {
+//        LttngEventReference tmpRef = prepareToTest();
+//        
+//        assertTrue("Tracepath not what was expected!",((String)tmpRef.getValue()).contains(firstEventReference) );
+//        assertEquals("Content not what expected!",firstEventReference,tmpRef.getTracepath());
+//    }
+//    
+//    public void testSetter() {
+//    	// Not much to do here, we will just make sure the setter does not throw
+//        LttngEventReference tmpRef = prepareToTest();
+//        
+//        try {
+//        	tmpRef.setTracepath("test");
+//    	}
+//    	catch( Exception e) { 
+//        	fail("setTracepath(string) failed!");
+//        }
+//    	
+//    	try {
+//        	tmpRef.setValue("test");
+//    	}
+//    	catch( Exception e) { 
+//        	fail("setTracepath(string) failed!");
+//        }
+//    }
+//    
+//    public void testToString() {
+//        LttngEventReference tmpRef = prepareToTest();
+//        
+//        // Just make sure toString() does not return null or the java reference
+//        assertNotSame("toString returned null",null, tmpRef.toString() );
+//        assertNotSame("toString is not overridded!", tmpRef.getClass().getName() + '@' + Integer.toHexString(tmpRef.hashCode()), tmpRef.toString() );
+//    }
     
 }

@@ -99,30 +99,30 @@ public class LttngTimestampTest extends TestCase {
     }
     
     
-    public void testGetter() {
-        LttngTimestamp tmpTime = prepareToTest();
-        
-        assertEquals("Time in second is wrong", firstEventTimeSecond, tmpTime.getSeconds() );
-        assertEquals("Time in nano second is wrong", firstEventTimeNano, tmpTime.getNanoSeconds() );
-        
-        assertEquals("Full time is wrong", firstEventTimeFull, tmpTime.getValue() );
-    }
-    
-    public void testSetter() {
-        LttngTimestamp tmpTime = prepareToTest();
-        
-        // We will set a time and we will make sure the set is working then
-        tmpTime.setValue(1);
-        assertEquals("Full time is wrong after set", 1, tmpTime.getValue() );
-    }
-    
-    
-    public void testToString() {
-        LttngTimestamp tmpTime = prepareToTest();
-        
-        // Just make sure toString() does not return null or the java reference
-        assertNotSame("toString returned null",null, tmpTime.toString() );
-        assertNotSame("toString is not overridded!", tmpTime.getClass().getName() + '@' + Integer.toHexString(tmpTime.hashCode()), tmpTime.toString() );
-    }
+//    public void testGetter() {
+//        LttngTimestamp tmpTime = prepareToTest();
+//        
+//        assertEquals("Time in second is wrong", firstEventTimeSecond, tmpTime.getSeconds() );
+//        assertEquals("Time in nano second is wrong", firstEventTimeNano, tmpTime.getNanoSeconds() );
+//        
+//        assertEquals("Full time is wrong", firstEventTimeFull, tmpTime.getValue() );
+//    }
+//    
+//    public void testSetter() {
+//        LttngTimestamp tmpTime = prepareToTest();
+//        
+//        // We will set a time and we will make sure the set is working then
+//        tmpTime.setValue(1);
+//        assertEquals("Full time is wrong after set", 1, tmpTime.getValue() );
+//    }
+//    
+//    
+//    public void testToString() {
+//        LttngTimestamp tmpTime = prepareToTest();
+//        
+//        // Just make sure toString() does not return null or the java reference
+//        assertNotSame("toString returned null",null, tmpTime.toString() );
+//        assertNotSame("toString is not overridded!", tmpTime.getClass().getName() + '@' + Integer.toHexString(tmpTime.hashCode()), tmpTime.toString() );
+//    }
     
 }

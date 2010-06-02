@@ -100,22 +100,22 @@ public class LttngEventTypeTest extends TestCase {
     }
     
     
-    public void testGetter() {
-        LttngEventType tmpEventType = prepareToTest();
-        
-        assertTrue("Channel name not what was expected!",firstEventChannel.equals((String)tmpEventType.getTracefileName()) );
-        assertTrue("Cpu Id not what was expected!",firstEventCpu == tmpEventType.getCpuId() );
-        assertTrue("Marker Name not what was expected!",firstEventMarker.equals((String)tmpEventType.getMarkerName()) );
-        // Just test the non-nullity of labels
-        assertNotSame("getLabels returned null",null, tmpEventType.getLabels() );
-    }
-    
-    public void testToString() {
-        LttngEventType tmpEventType = prepareToTest();
-        
-        // Just make sure toString() does not return null or the java reference
-        assertNotSame("toString returned null",null, tmpEventType.toString() );
-        assertNotSame("toString is not overridded!", tmpEventType.getClass().getName() + '@' + Integer.toHexString(tmpEventType.hashCode()), tmpEventType.toString() );
-    }
+//    public void testGetter() {
+//        LttngEventType tmpEventType = prepareToTest();
+//        
+//        assertTrue("Channel name not what was expected!",firstEventChannel.equals((String)tmpEventType.getTracefileName()) );
+//        assertTrue("Cpu Id not what was expected!",firstEventCpu == tmpEventType.getCpuId() );
+//        assertTrue("Marker Name not what was expected!",firstEventMarker.equals((String)tmpEventType.getMarkerName()) );
+//        // Just test the non-nullity of labels
+//        assertNotSame("getLabels returned null",null, tmpEventType.getLabels() );
+//    }
+//    
+//    public void testToString() {
+//        LttngEventType tmpEventType = prepareToTest();
+//        
+//        // Just make sure toString() does not return null or the java reference
+//        assertNotSame("toString returned null",null, tmpEventType.toString() );
+//        assertNotSame("toString is not overridded!", tmpEventType.getClass().getName() + '@' + Integer.toHexString(tmpEventType.hashCode()), tmpEventType.toString() );
+//    }
     
 }

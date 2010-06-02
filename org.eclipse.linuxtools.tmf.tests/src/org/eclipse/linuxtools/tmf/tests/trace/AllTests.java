@@ -13,7 +13,7 @@ public class AllTests {
 		suite.addTestSuite(TmfLocationTest.class);
 		suite.addTestSuite(TmfCheckpointTest.class);
 		suite.addTestSuite(TmfContextTest.class);
-		suite.addTestSuite(TmfTraceTest.class);
+//		suite.addTestSuite(TmfTraceTest.class);
 		//$JUnit-END$
 		return suite;
 	}
