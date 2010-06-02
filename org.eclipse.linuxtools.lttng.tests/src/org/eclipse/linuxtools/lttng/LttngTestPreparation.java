@@ -180,8 +180,23 @@ public abstract class LttngTestPreparation extends TestCase {
 	 *            , > startIdx and between 0 - 31
 	 * @return
 	 */
+	protected <T extends LttngEvent> TmfEventRequest<T> prepareEventRequest(Class<T> k, int startIdx, int endIdx) {
+		return prepareEventRequest(k, startIdx, endIdx, true);
+	}
+
+	/**
+	 * @param <T>
+	 * @param k
+	 * @param startIdx
+	 *            , > 0 and between 0 - 31
+	 * @param endIdx
+	 *            , > startIdx and between 0 - 31
+	 * @param printFirst20
+	 *            , print the first expected events vs actual events
+	 * @return
+	 */
 	protected <T extends LttngEvent> TmfEventRequest<T> prepareEventRequest(
-			Class<T> k, int startIdx, int endIdx) {
+			Class<T> k, int startIdx, int endIdx, final boolean printFirst20) {
 		// verify bounds
 		if (!(endIdx > startIdx && startIdx >= 0 && endIdx <= 31)) {
 			TraceDebug.debug("Event request indexes out of bounds");
@@ -225,7 +240,7 @@ public abstract class LttngTestPreparation extends TestCase {
 				}
 	
 				// Validating the orders of the first 20 events
-				if (feventCount < 20) {
+				if (printFirst20 && feventCount < 20) {
 					long timevalue = event.getTimestamp().getValue();
 					if (timevalue != expectedEvents_T1[feventCount]) {
 						validSequence = false;

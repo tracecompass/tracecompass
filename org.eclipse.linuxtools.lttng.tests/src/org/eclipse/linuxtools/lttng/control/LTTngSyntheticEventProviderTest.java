@@ -68,21 +68,26 @@ public class LTTngSyntheticEventProviderTest extends LttngTestPreparation {
 				.getEventProvider();
 
 		// prepare synthetic event requests
-		TmfEventRequest<LttngSyntheticEvent> request1 = prepareEventRequest(
-				LttngSyntheticEvent.class, 5, 9); /* 2001 events*/
-		TmfEventRequest<LttngSyntheticEvent> request2 = prepareEventRequest(
-				LttngSyntheticEvent.class, 11, 13); /* 1001 events */
+		boolean printExpectedEvents = false;
+		TmfEventRequest<LttngSyntheticEvent> request1 = prepareEventRequest(LttngSyntheticEvent.class, 5, 9,
+				printExpectedEvents); /* 2001 events */
+		TmfEventRequest<LttngSyntheticEvent> request2 = prepareEventRequest(LttngSyntheticEvent.class, 11, 13,
+				printExpectedEvents); /* 1001 events */
 
 		// execute
 		synProvider.sendRequest(request1);
-		synProvider.sendRequest(request2);
 		try {
 			request1.waitForCompletion();
-			request2.waitForCompletion();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
+		synProvider.sendRequest(request2);
+		try {
+			request2.waitForCompletion();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 		// finish
 		assertEquals("Unexpected eventCount", 3002, feventCount);
