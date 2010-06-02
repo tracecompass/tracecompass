@@ -35,7 +35,7 @@ public class TmfContext implements ITmfContext, Cloneable {
 	}
 
 	public TmfContext(ITmfLocation<?> location) {
-		this(location, 0);
+		this(location, UNKNOWN_RANK);
 	}
 
 	public TmfContext(TmfContext other) {
@@ -43,7 +43,7 @@ public class TmfContext implements ITmfContext, Cloneable {
 	}
 
 	public TmfContext() {
-		this(null, 0);
+		this(null, UNKNOWN_RANK);
 	}
 
 	// ------------------------------------------------------------------------
@@ -67,8 +67,12 @@ public class TmfContext implements ITmfContext, Cloneable {
 	}
 
 	public void updateRank(int delta) {
-		if (fRank != UNKNOWN_RANK)
+		if (isValidRank())
 			fRank += delta;
+	}
+
+	public boolean isValidRank() {
+		return fRank != UNKNOWN_RANK;
 	}
 
 	// ------------------------------------------------------------------------

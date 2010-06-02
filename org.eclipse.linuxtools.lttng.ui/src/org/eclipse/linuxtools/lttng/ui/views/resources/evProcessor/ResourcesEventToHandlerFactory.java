@@ -132,6 +132,7 @@ public class ResourcesEventToHandlerFactory extends AbsEventToHandlerResolver {
 		return finishProcessor;
 	}
 
+	@Override
 	public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 		if (trcEvent instanceof LttngSyntheticEvent) {
 

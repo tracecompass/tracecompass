@@ -28,4 +28,5 @@ public interface ITmfContext {
 	public long getRank();
 	public void updateRank(int rank);
 
+	public boolean isValidRank();
 }

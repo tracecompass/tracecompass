@@ -1,0 +1,3 @@
+org.eclipse.linuxtools.lttng.ui/debug=false
+org.eclipse.linuxtools.lttng.ui/info=false
+org.eclipse.linuxtools.lttng.ui/warn=false

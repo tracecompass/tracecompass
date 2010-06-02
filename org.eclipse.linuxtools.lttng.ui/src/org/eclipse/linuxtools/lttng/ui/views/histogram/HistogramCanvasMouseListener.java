@@ -83,7 +83,7 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 	 * @param event  The generated mouse event when the mouse double-click was issued.
 	 */
 	public void mouseDoubleClick(MouseEvent event) {
-		System.out.println("mouseDoubleClick");
+//		System.out.println("mouseDoubleClick");
 	}
 	
 	/**

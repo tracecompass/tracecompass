@@ -489,8 +489,10 @@ class ProcessStateKey {
     
     @Override
     public boolean equals(Object obj) {
+
+    	if (obj == null) return false;
 		boolean isSame = true;
-        
+		
         if ( obj instanceof ProcessStateKey ) {
         	ProcessStateKey procKey = (ProcessStateKey) obj;
         	
@@ -524,6 +526,7 @@ class ProcessStateKey {
 			TraceDebug
 					.debug("ERROR : The received Key is not of the type ProcessStateKey! but "
 							+ obj.getClass().toString());
+			return false;
         }
         
         return isSame;

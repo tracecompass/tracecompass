@@ -345,6 +345,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 * 
 	 * @see org.eclipse.linuxtools.tmf.event.TmfData#isNullRef()
 	 */
+	@Override
 	public boolean isNullRef() {
 		return false;
 	}

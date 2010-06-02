@@ -22,6 +22,12 @@ import org.eclipse.linuxtools.tmf.event.TmfData;
 public interface ITmfDataRequest<T extends TmfData> {
 
 	// ------------------------------------------------------------------------
+	// Constants
+	// ------------------------------------------------------------------------
+
+    public enum ExecutionType { SHORT, LONG };
+    
+	// ------------------------------------------------------------------------
 	// Accessors
 	// ------------------------------------------------------------------------
 
@@ -34,6 +40,11 @@ public interface ITmfDataRequest<T extends TmfData> {
      * @return request ID
      */
     public int getRequestId();
+
+    /**
+     * @return request ID
+     */
+    public ExecutionType getExecType();
 
     /**
 	 * @return the index of the first event requested
@@ -59,6 +70,7 @@ public interface ITmfDataRequest<T extends TmfData> {
 	// Request state
 	// ------------------------------------------------------------------------
 
+    public boolean isRunning();
     public boolean isCompleted();
     public boolean isFailed();
     public boolean isCancelled();
@@ -75,6 +87,7 @@ public interface ITmfDataRequest<T extends TmfData> {
 	// Request handling
 	// ------------------------------------------------------------------------
 
+    public void handleStarted();
     public void handleCompleted();
     public void handleSuccess();
     public void handleFailure();
@@ -90,6 +103,7 @@ public interface ITmfDataRequest<T extends TmfData> {
 	// Request state modifiers
 	// ------------------------------------------------------------------------
 
+    public void start();
     public void done();
     public void fail();
     public void cancel();

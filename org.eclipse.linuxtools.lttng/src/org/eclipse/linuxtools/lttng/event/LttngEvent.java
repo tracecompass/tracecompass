@@ -170,13 +170,13 @@ public class LttngEvent extends TmfEvent {
     
     @Override
 	public String toString() {
-    	String returnedData="";
+    	StringBuffer result= new StringBuffer("[LttngEvent(");
+    	result.append("Timestamp:" + getTimestamp().getValue());
+    	result.append(",Channel:"  + getChannelName());
+    	result.append(",CPU:"      + getCpuId());
+    	result.append(",Marker:"   + getMarkerName());
+    	result.append(",Content:"  + getContent() + ")]");
     	
-    	returnedData += "Event timestamp:" + this.getTimestamp().getValue() + " ";
-    	returnedData += "Channel:" + getChannelName() + " ";
-    	returnedData += "CPU:" + getCpuId() + " ";
-    	returnedData += "Marker:" + getMarkerName() + " ";
-    	
-    	return returnedData;
+    	return result.toString();
     }
 }

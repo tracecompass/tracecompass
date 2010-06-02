@@ -168,8 +168,11 @@ public class ProjectView extends TmfView {
 	 */
 	public void selectExperiment(LTTngExperimentNode experiment) {
     	String expId = experiment.getName();
-        if (fSelectedExperiment != null)
+        if (fSelectedExperiment != null) {
+//        	System.out.println(fSelectedExperiment.getName() + ": nbEvents=" + fSelectedExperiment.getNbEvents() + 
+//        			", nbReads=" + ((LTTngTrace) fSelectedExperiment.getTraces()[0]).nbEventsRead);
         	fSelectedExperiment.dispose();
+        }
         try {
         	LTTngTraceNode[] traceEntries = experiment.getTraces();
         	int nbTraces = traceEntries.length;
@@ -181,7 +184,7 @@ public class ProjectView extends TmfView {
                 traces[i] = trace;
         	}
             fSelectedExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class, expId, traces);
-            fSelectedExperiment.indexExperiment(waitForCompletion);
+
 			// Make sure the lttng-core, experiment selection context is ready
 			// for an event request from any view
 			StateManagerFactory.getExperimentManager().experimentSelected_prep(

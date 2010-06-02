@@ -836,6 +836,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	 * (org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeSelectionEvent
 	 * )
 	 */
+	@Override
 	public void tsfTmProcessSelEvent(TmfTimeSelectionEvent event) {
 		// common implementation
 		super.tsfTmProcessSelEvent(event);
@@ -855,6 +856,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	 * #tsfTmProcessTimeScaleEvent(org.eclipse.linuxtools
 	 * .tmf.ui.viewers.timeAnalysis.TmfTimeScaleSelectionEvent)
 	 */
+	@Override
 	public synchronized void tsfTmProcessTimeScaleEvent(TmfTimeScaleSelectionEvent event) {
 		super.tsfTmProcessTimeScaleEvent(event);
 	}
@@ -878,6 +880,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	 * ITmfTimeAnalysisEntry[], long, long, boolean, long, long,
 	 * java.lang.Object)
 	 */
+	@Override
 	public void displayModel(final ITmfTimeAnalysisEntry[] items,
 			final long startBoundTime, final long endBoundTime,
 			final boolean updateTimeBounds, final long startVisibleWindow,
@@ -973,6 +976,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	 * 
 	 * @param signal
 	 */
+	@Override
 	@TmfSignalHandler
 	public void synchToTime(TmfTimeSynchSignal signal) {
 		super.synchToTime(signal);

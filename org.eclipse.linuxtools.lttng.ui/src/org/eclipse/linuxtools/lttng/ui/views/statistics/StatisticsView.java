@@ -478,6 +478,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 	/**
 	 * @return
 	 */
+	@Override
 	public AbsEventToHandlerResolver getEventProcessor() {
 		return StatsTimeCountHandlerFactory.getInstance();
 	}
@@ -489,6 +490,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 	 * org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#waitCursor
 	 * (boolean)
 	 */
+	@Override
 	protected void waitCursor(final boolean waitInd) {
 		if (treeViewer == null) {
 			return;

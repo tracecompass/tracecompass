@@ -36,14 +36,22 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
      * @param range
      */
     public TmfEventRequest(Class<T> dataType) {
-        this(dataType, TmfTimeRange.Eternity, ALL_DATA, DEFAULT_BLOCK_SIZE);
+        this(dataType, TmfTimeRange.Eternity, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.SHORT);
+    }
+
+    public TmfEventRequest(Class<T> dataType, ExecutionType execType) {
+        this(dataType, TmfTimeRange.Eternity, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
     }
 
     /**
      * @param range
      */
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range) {
-        this(dataType, range, ALL_DATA, DEFAULT_BLOCK_SIZE);
+        this(dataType, range, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.SHORT);
+    }
+
+    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, ExecutionType execType) {
+        this(dataType, range, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
     }
 
     /**
@@ -51,7 +59,11 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
      * @param nbRequested
      */
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested) {
-        this(dataType, range, nbRequested, DEFAULT_BLOCK_SIZE);
+        this(dataType, range, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.SHORT);
+    }
+    
+    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, ExecutionType execType) {
+        this(dataType, range, nbRequested, DEFAULT_BLOCK_SIZE, execType);
     }
     
     /**
@@ -60,7 +72,12 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
      * @param blockSize Size of the largest blocks expected
      */
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize) {
-    	super(dataType, 0, nbRequested, blockSize);
+    	super(dataType, 0, nbRequested, blockSize, ExecutionType.SHORT);
+    	fRange = range;
+    }
+
+    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize, ExecutionType execType) {
+    	super(dataType, 0, nbRequested, blockSize, execType);
     	fRange = range;
     }
 

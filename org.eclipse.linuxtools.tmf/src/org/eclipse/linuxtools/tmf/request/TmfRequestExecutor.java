@@ -18,8 +18,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.eclipse.linuxtools.tmf.Tracer;
-
 /**
  * <b><u>TmfRequestExecutor</u></b>
  *
@@ -44,7 +42,7 @@ public class TmfRequestExecutor implements Executor {
 		fExecutor = executor;
 		String canonicalName = fExecutor.getClass().getCanonicalName();
 		fExecutorName = canonicalName.substring(canonicalName.lastIndexOf('.') + 1);
-		Tracer.trace(fExecutor + " created");
+//		if (Tracer.COMPONENTS) Tracer.trace(fExecutor + " created");
 	}
 
 	/**
@@ -73,7 +71,7 @@ public class TmfRequestExecutor implements Executor {
 	 */
 	public void stop() {
 		fExecutor.shutdown();
-		Tracer.trace(fExecutor + " terminated");
+//		if (Tracer.COMPONENTS) Tracer.trace(fExecutor + " terminated");
 	}
 	
 	// ------------------------------------------------------------------------
@@ -84,13 +82,10 @@ public class TmfRequestExecutor implements Executor {
 	 * @see java.util.concurrent.Executor#execute(java.lang.Runnable)
 	 */
 	public synchronized void execute(final Runnable request) {
-		Tracer.trace("Queueing request " + request);
 		fRequestQueue.offer(new Runnable() {
 			public void run() {
 				try {
-					Tracer.trace("Processing request " + request);
 					request.run();
-					Tracer.trace("Finishing request " + request);
 				} finally {
 					scheduleNext();
 				}

@@ -85,17 +85,19 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final Class<T> fDataType;
-    private final int fRequestId;  			// A unique request ID
-    private final int fIndex;      			// The index (rank) of the requested event
-    private final int fNbRequested;  		// The number of requested events (ALL_DATA for all)
-    private final int fBlockSize;          	// The maximum number of events per chunk
-    private       int fNbRead;           	// The number of reads so far
+    private final Class<T>      fDataType;
+    private final ExecutionType fExecType;
+    private final int      		fRequestId;  	// A unique request ID
+    private final int      		fIndex;      	// The index (rank) of the requested event
+    private final int      		fNbRequested;	// The number of requested events (ALL_DATA for all)
+    private final int      		fBlockSize;     // The maximum number of events per chunk
+    private       int      		fNbRead;        // The number of reads so far
 
     private final Object lock;
-    private boolean fRequestCompleted;
-    private boolean fRequestFailed;
-    private boolean fRequestCanceled;
+    private boolean fRequestRunning   = false;
+    private boolean fRequestCompleted = false;
+    private boolean fRequestFailed    = false;
+    private boolean fRequestCanceled  = false;
 
     private T[] fData;	// Data object
     
@@ -116,7 +118,11 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * @param dataType the requested data type
      */
     public TmfDataRequest(Class<T> dataType) {
-        this(dataType, 0, ALL_DATA, DEFAULT_BLOCK_SIZE);
+        this(dataType, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.SHORT);
+    }
+
+    public TmfDataRequest(Class<T> dataType, ExecutionType execType) {
+        this(dataType, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
     }
 
     /**
@@ -124,7 +130,11 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * @param nbRequested the number of data items requested
      */
     public TmfDataRequest(Class<T> dataType, int index) {
-        this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE);
+        this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.SHORT);
+    }
+
+    public TmfDataRequest(Class<T> dataType, int index, ExecutionType execType) {
+        this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
     }
 
     /**
@@ -133,7 +143,11 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * @param blockSize the number of data items per block
      */
     public TmfDataRequest(Class<T> dataType, int index, int nbRequested) {
-        this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE);
+        this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.SHORT);
+    }
+
+    public TmfDataRequest(Class<T> dataType, int index, int nbRequested, ExecutionType execType) {
+        this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE, execType);
     }
 
     /**
@@ -143,15 +157,19 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * @param blockSize the number of data items per block
      */
     public TmfDataRequest(Class<T> dataType, int index, int nbRequested, int blockSize) {
+        this(dataType, index, nbRequested, blockSize, ExecutionType.SHORT);
+    }
+
+    public TmfDataRequest(Class<T> dataType, int index, int nbRequested, int blockSize, ExecutionType execType) {
     	fRequestId   = fRequestNumber++;
     	fDataType    = dataType;
     	fIndex       = index;
     	fNbRequested = nbRequested;
     	fBlockSize   = blockSize;
+    	fExecType    = execType;
     	fNbRead      = 0;
         lock         = new Object();
-
-        Tracer.trace("Request #" + fRequestId + " (" + getClass().getName() + ", " + fDataType.getName() + ") created");
+        if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "created");
     }
 
     /**
@@ -159,13 +177,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      */
     @SuppressWarnings("unused")
 	private TmfDataRequest(TmfDataRequest<T> other) {
-    	fRequestId   = 0;
-    	fDataType    = null;
-    	fIndex       = 0;
-    	fNbRequested = 0;
-    	fBlockSize   = 0;
-    	fNbRead      = 0;
-        lock         = new Object();
+    	this(null, 0, ALL_DATA, DEFAULT_BLOCK_SIZE);
     }
 
     // ------------------------------------------------------------------------
@@ -184,6 +196,13 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
 	 */
 	public int getIndex() {
 		return fIndex;
+	}
+
+	/**
+	 * @return the index of the first event requested
+	 */
+	public ExecutionType getExecType() {
+		return fExecType;
 	}
 
     /**
@@ -205,6 +224,13 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      */
     public synchronized int getNbRead() {
         return fNbRead;
+    }
+
+    /**
+     * @return indicates if the request is completed
+     */
+    public boolean isRunning() {
+        return fRequestRunning;
     }
 
     /**
@@ -273,6 +299,9 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      */
     public abstract void handleData();
 
+    public void handleStarted() {
+    }
+
     /**
      * Handle the completion of the request. It is called when there is no more
      * data available either because:
@@ -285,15 +314,15 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      */
     public void handleCompleted() {
     	if (fRequestFailed) { 
-            Tracer.trace("Request #" + fRequestId + " failed, completed");
+            if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "failed");
     		handleFailure();
     	}
     	else if (fRequestCanceled) {
-            Tracer.trace("Request #" + fRequestId + " cancelled, completed");
+            if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "cancelled");
     		handleCancel();
     	}
     	else {
-			Tracer.trace("Request #" + fRequestId + " succeeded, completed");
+            if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "succeeded");
 			handleSuccess();
     	}
     }
@@ -321,10 +350,25 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     }
 
     /**
+     * Called by the request processor upon starting to service the request.
+     */
+    public void start() {
+        if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "starting");
+        synchronized(lock) {
+            fRequestRunning = true;
+            lock.notify();
+        }
+        handleStarted();
+       if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "started");
+    }
+
+    /**
      * Called by the request processor upon completion.
      */
     public void done() {
+        if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "completing");
         synchronized(lock) {
+        	fRequestRunning   = false;
             fRequestCompleted = true;
             lock.notify();
         }

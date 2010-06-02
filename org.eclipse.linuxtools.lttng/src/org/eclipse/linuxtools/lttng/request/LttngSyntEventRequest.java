@@ -134,7 +134,7 @@ public class LttngSyntEventRequest extends TmfEventRequest<LttngSyntheticEvent>
 	 * org.eclipse.linuxtools.lttng.request.ILttngSyntEventRequest#getEventCount
 	 * ()
 	 */
-	public Long getSynEventCount() {
+	public synchronized Long getSynEventCount() {
 		return feventCount;
 	}
 
@@ -165,6 +165,7 @@ public class LttngSyntEventRequest extends TmfEventRequest<LttngSyntheticEvent>
 	 * 
 	 * @see org.eclipse.linuxtools.tmf.request.TmfDataRequest#handleCompleted()
 	 */
+	@Override
 	public void handleCompleted() {
 		// notify listeners
 		notifyCompletion();

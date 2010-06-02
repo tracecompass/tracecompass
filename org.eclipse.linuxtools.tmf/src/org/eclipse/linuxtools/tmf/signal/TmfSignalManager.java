@@ -93,6 +93,7 @@ public class TmfSignalManager {
 		signal.setReference(fSynchId);
 		sendSignal(signal);
 		sendSignal(new TmfEndSynchSignal(fSynchId));
+//		Tracer.traceSignal(signal);
 	}
 
 	static private void sendSignal(TmfSignal signal) {

@@ -15,20 +15,18 @@ package org.eclipse.linuxtools.tmf.experiment;
 import java.util.Collections;
 import java.util.Vector;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.component.TmfEventProvider;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
+import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal;
-import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
@@ -52,7 +50,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 	// The currently selected experiment
     private static TmfExperiment<?> fCurrentExperiment = null;
 
-    // The set of traces that constitute the experiment
+	// The set of traces that constitute the experiment
     private ITmfTrace[] fTraces;
 
     // The total number of events
@@ -84,10 +82,11 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     	fTraces = traces;
     	fEpoch = epoch;
     	fIndexPageSize = indexPageSize;
+    	fClone = createTraceCopy();
 
 		updateNbEvents();
 		updateTimeRange();
-    }
+	}
 
     /**
      * @param type
@@ -108,9 +107,8 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         this(type, id, traces, TmfTimestamp.Zero, indexPageSize);
     }
     
-    
     public TmfExperiment(TmfExperiment<T> other) {
-    	super(other.getName(), other.fType);
+    	super(other.getName() + "(clone)", other.fType);
     	
     	fEpoch         = other.fEpoch;
     	fIndexPageSize = other.fIndexPageSize;
@@ -122,10 +120,13 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     	
     	fNbEvents  = other.fNbEvents;
     	fTimeRange = other.fTimeRange;
+    	fClone = null;
     }
     
 	public TmfExperiment<T> createTraceCopy() {
-		return new TmfExperiment<T>(this);
+		TmfExperiment<T> experiment = new TmfExperiment<T>(this);
+		TmfSignalManager.deregister(experiment);
+		return experiment;
 	}
     
     /**
@@ -133,11 +134,15 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
      */
     @Override
 	public void dispose() {
-    	for (ITmfTrace trace : fTraces) {
-    		trace.dispose();
+    	if (fTraces != null) {
+    		for (ITmfTrace trace : fTraces) {
+    			trace.dispose();
+    		}
+    		fTraces = null;
     	}
-    	fTraces = null;
-    	fCheckpoints.clear();
+    	if (fCheckpoints != null) {
+    		fCheckpoints.clear();
+    	}
         super.dispose();
     }
 
@@ -241,15 +246,12 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 		TmfTimestamp endTime   = fTimeRange != null ? fTimeRange.getEndTime()   : TmfTimestamp.BigBang;
 
 		for (ITmfTrace trace : fTraces) {
-			if (trace.getNbEvents() > 0) {
-	    		TmfTimestamp traceStartTime = trace.getStartTime();
-	    		if (traceStartTime.compareTo(startTime, true) < 0)
-	    			startTime = traceStartTime;
-
-	    		TmfTimestamp traceEndTime = trace.getEndTime();
-	    		if (traceEndTime.compareTo(endTime, true) > 0)
-	    			endTime = traceEndTime;
-			}
+    		TmfTimestamp traceStartTime = trace.getStartTime();
+    		if (traceStartTime.compareTo(startTime, true) < 0)
+    			startTime = traceStartTime;
+    		TmfTimestamp traceEndTime = trace.getEndTime();
+    		if (traceEndTime.compareTo(endTime, true) > 0)
+    			endTime = traceEndTime;
     	}
 		fTimeRange = new TmfTimeRange(startTime, endTime);
     }
@@ -276,7 +278,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 		return null;
 	}
 
-    // ------------------------------------------------------------------------
+	// ------------------------------------------------------------------------
     // ITmfTrace trace positioning
     // ------------------------------------------------------------------------
 
@@ -444,6 +446,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 		// Update the experiment context and set the "next" event
 		TmfEvent event = null;
 		if (trace >= 0) {
+			long savedRank = expContext.getRank();
 			expContext.setLastTrace(trace);
 			expContext.updateRank(1);
 			TmfExperimentLocation expLocation = (TmfExperimentLocation) expContext.getLocation();
@@ -451,9 +454,24 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 			expLocation.getLocation()[trace] = traceContext.getLocation().clone();
 			expLocation.getRanks()[trace] = traceContext.getRank();
 			event = expContext.getEvents()[trace];
+			updateIndex(expContext, savedRank, timestamp);
 		}
 
 		return event;
+	}
+
+	public synchronized void updateIndex(ITmfContext context, long rank, TmfTimestamp timestamp) {
+		// Build the index as we go along
+		if (context.isValidRank() && (rank % fIndexPageSize) == 0) {
+			// Determine the table position
+			long position = context.getRank() / fIndexPageSize;
+			// Add new entry at proper location (if empty) 
+			if (fCheckpoints.size() == position) {
+				ITmfLocation<?> location = context.getLocation().clone();
+				fCheckpoints.add(new TmfCheckpoint(timestamp, location));
+//				System.out.println(this + "[" + (fCheckpoints.size() - 1) + "] " + timestamp + ", " + location.toString());
+			}
+		}
 	}
 
 	/* (non-Javadoc)
@@ -518,132 +536,78 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
 	// The index page size
 	private static final int DEFAULT_INDEX_PAGE_SIZE = 1000;
-	private final int fIndexPageSize;
+	private        final int fIndexPageSize;
 
-	// Indicates that an indexing job is already running
-	private Boolean fIndexing = false;
-	private Boolean fIndexed  = false;
+	@SuppressWarnings("unchecked")
+	public void indexExperiment() {
 
-	// The indexing job
-	private IndexingJob job;
+		final TmfExperiment<?> experiment = getCurrentExperiment();
+		fCheckpoints.clear();
 
-	/**
-	 * indexExperiment
-	 * 
-	 * Creates the experiment index.
-	 */
-	public void indexExperiment(boolean waitForCompletion) {
+		ITmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity, TmfDataRequest.ALL_DATA, 1, ITmfDataRequest.ExecutionType.LONG) {
 
-		synchronized(this) {
-			if (fIndexed || fIndexing) {
-				// An indexing job is already running but a new request came
-				// in (probably due to a change in the trace set). The index
-				// being currently built is therefore already invalid.
-				// TODO: Cancel and restart the job
-				// TODO: Add support for dynamically adding/removing traces
-				return;
+			// long indexingStart = System.nanoTime();
+			
+			TmfTimestamp startTime =  null;
+			TmfTimestamp lastTime  =  null;
+			int nbEvents = 0;
+
+			@Override
+			public void handleData() {
+				TmfEvent[] events = getData();
+				if (events.length > 0) {
+					nbEvents++;
+					TmfTimestamp ts = events[0].getTimestamp();
+					if (startTime == null)
+						startTime = new TmfTimestamp(ts);
+					lastTime = new TmfTimestamp(ts);
+
+					if ((nbEvents % DEFAULT_INDEX_PAGE_SIZE) == 0) {
+						updateExperiment();
+					}
+				}
 			}
-			fIndexing = true;
-		}
 
-		job = new IndexingJob(new TmfExperiment<T>(this));
-		job.schedule();
+			@Override
+			public void handleSuccess() {
+				// long indexingEnd = System.nanoTime();
 
-    	if (waitForCompletion) {
-    		try {
-    			job.join();
-    		} catch (InterruptedException e) {
-    			e.printStackTrace();
-    		}
-    	}
+				updateExperiment();
+//					experiment.fCheckpoints = new Vector<TmfCheckpoint>();
+//	            	for (int i = 0; i < fCheckpoints.size(); i++) {
+//	            		TmfCheckpoint checkpoint = fCheckpoints.get(i).clone();
+//	            		experiment.fCheckpoints.add(checkpoint);
+//	            		System.out.println("fCheckpoints[" + i + "] " + checkpoint.getTimestamp() + ", " + checkpoint.getLocation().toString());
+//	            	}
+
+//	            	clone.dispose();
+//	            	if (Tracer.INTERNALS) Tracer.trace(getName() + ": nbEvents=" + nbEvents + " (" + ((indexingEnd-indexingStart)/nbEvents)+ " ns/evt), start=" + startTime + ", end=" + lastTime);
+
+				// System.out.println(getName() + ": start=" + startTime +
+				// ", end=" + lastTime + ", elapsed=" + (indexingEnd*1.0 -
+				// indexingStart) / 1000000000);
+				// System.out.println(getName() + ": nbEvents=" + fNbEvents +
+				// " (" + ((indexingEnd-indexingStart)/nbEvents)+ " ns/evt)");
+//            	for (int i = 0; i < experiment.fCheckpoints.size(); i++) {
+//            		TmfCheckpoint checkpoint = experiment.fCheckpoints.get(i);
+//            		System.out.println("fCheckpoints[" + i + "] " + checkpoint.getTimestamp() + ", " + checkpoint.getLocation().toString());
+//            	}
+			}
+
+			private void updateExperiment() {
+				if (experiment == fCurrentExperiment)
+					experiment.fTimeRange   = new TmfTimeRange(startTime, new TmfTimestamp(lastTime));
+					experiment.fNbEvents    = nbEvents;
+					experiment.fCheckpoints = ((TmfExperiment<T>) fClone).fCheckpoints;
+					notifyListeners();
+			}
+		};
+
+		sendRequest((ITmfDataRequest<T>) request);
 	}
-
-	private class IndexingJob extends Job {
-
-		private final String          experimentId;
-		private final ITmfTrace[]     traces;
-		private Vector<TmfCheckpoint> checkpoints;
-
-		public IndexingJob(TmfExperiment<T> experiment) {
-			super(experiment.getName());
-			experimentId = experiment.getName();
-			traces = experiment.getTraces();
-		}
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
-		 */
-		@Override
-		protected IStatus run(IProgressMonitor monitor) {
-
-			// Minimal check
-			if (traces.length == 0) {
-	            fIndexing = false;
-				return Status.OK_STATUS;
-			}
-
-			monitor.beginTask("Indexing " + experimentId, IProgressMonitor.UNKNOWN);
-
-            int nbEvents = 0;
-            TmfTimestamp startTime = null;
-            TmfTimestamp lastTime  = null;
-
-            // Reset the index
-            checkpoints = new Vector<TmfCheckpoint>();
-            
-            try {
-            	// Position the trace at the beginning
-            	TmfExperimentContext context = seekLocation(null);
-            	TmfExperimentLocation location = (TmfExperimentLocation) context.getLocation().clone();
-
-                // Get the first event
-               	TmfEvent event = getNextEvent(context);
-               	if (event != null) {
-                    startTime = new TmfTimestamp(event.getTimestamp());
-               	}
-
-               	// Index the experiment
-               	while (event != null) {
-                	lastTime = event.getTimestamp();
-           			if ((nbEvents++ % fIndexPageSize) == 0) {
-           				checkpoints.add(new TmfCheckpoint(lastTime, location));
-
-                        monitor.worked(1);
-
-                        // Check monitor *after* fCheckpoints has been updated
-                        if (monitor.isCanceled()) {
-                            monitor.done();
-                        	return Status.CANCEL_STATUS;
-                        }
-                    }
-
-                    // We will need the contexts at the next iteration
-                    if ((nbEvents % fIndexPageSize) == 0) {
-                        location = (TmfExperimentLocation) context.getLocation().clone();
-           			}
-
-           			event = getNextEvent(context);
-                }
-
-            }
-            finally {
-                synchronized(this) {
-                	fCheckpoints = checkpoints;
-                	fNbEvents    = nbEvents;
-                	fTimeRange   = new TmfTimeRange(startTime, lastTime);
-                	fIndexing    = false;
-                	fIndexed     = true;
-                }
-//       		    notifyListeners(fTimeRange);
-                monitor.done();
-            }
-
-			return Status.OK_STATUS;
-		}
-    }
-
-    protected void notifyListeners(TmfTimeRange range) {
-    	broadcast(new TmfRangeSynchSignal(this, range, range.getStartTime()));
+	
+	protected void notifyListeners() {
+    	broadcast(new TmfExperimentUpdatedSignal(this, this, null));
 	}
    
     // ------------------------------------------------------------------------
@@ -655,18 +619,15 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     	TmfExperiment<?> experiment = signal.getExperiment();
     	if (experiment == this) {
     		setCurrentExperiment(experiment);
+    		indexExperiment();
     	}
     	else {
     		dispose();
     	}
-//    	if (signal.getExperiment() == this) {
-//    		indexExperiment(true);
-//    	}
     }
 
     @TmfSignalHandler
     public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
-//    	indexExperiment(true);
     }
 
     @TmfSignalHandler

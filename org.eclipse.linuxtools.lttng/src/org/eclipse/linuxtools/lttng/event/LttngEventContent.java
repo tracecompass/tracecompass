@@ -255,6 +255,7 @@ public class LttngEventContent extends TmfEventContent {
         
         StringBuffer strBuffer = new StringBuffer();
         for ( int pos=0; pos < allFields.length; pos++) {
+        	if (pos != 0) strBuffer.append(",");
         	strBuffer.append(allFields[pos].toString());
         }
         

@@ -13,11 +13,8 @@
 package org.eclipse.linuxtools.lttng.state.experiment;
 
 import org.eclipse.linuxtools.lttng.TraceDebug;
-import org.eclipse.linuxtools.lttng.control.LttngCoreProviderFactory;
 import org.eclipse.linuxtools.lttng.model.LTTngTreeNode;
 import org.eclipse.linuxtools.lttng.state.LttngStateException;
-import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
-import org.eclipse.linuxtools.lttng.state.model.StateModelFactory;
 import org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager;
 import org.eclipse.linuxtools.lttng.state.trace.StateTraceManager;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
@@ -71,14 +68,13 @@ public class StateManagerFactory {
 			return managerNode;
 		}
 
-		LttngTraceState traceModel = StateModelFactory.getStateEntryInstance();
+//		LttngTraceState traceModel = 
+//		StateModelFactory.getStateEntryInstance();
 		StateTraceManager manager = null;
 
 		// catch potential construction problems
 		try {
-			manager = new StateTraceManager(experiment.getNextUniqueId(),
-					experiment, traceUniqueId, rtrace, traceModel,
-					LttngCoreProviderFactory.getEventProvider());
+			manager = new StateTraceManager(experiment.getNextUniqueId(), experiment, traceUniqueId, rtrace);
 
 			// Allow the possibility to configure the trace state check point
 			// interval at creation time
@@ -109,9 +105,8 @@ public class StateManagerFactory {
 	 * @param traceUniqueId
 	 */
 	public static void removeManager(ITmfTrace rtrace, LTTngTreeNode rexperiment) {
-		Object experimentObj = rexperiment.getValue();
 		if (rtrace != null && rexperiment != null
-				&& experimentObj instanceof TmfExperiment<?>) {
+				&& rexperiment.getValue() instanceof TmfExperiment<?>) {
 			LTTngTreeNode childToremove = rexperiment.getChildByName(rtrace
 					.getName());
 			if (childToremove != null) {

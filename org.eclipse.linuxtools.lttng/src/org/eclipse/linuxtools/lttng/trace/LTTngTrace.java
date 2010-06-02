@@ -29,11 +29,11 @@ import org.eclipse.linuxtools.lttng.jni.JniMarker;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.lttng.jni.JniTracefile;
 import org.eclipse.linuxtools.lttng.jni.common.JniTime;
+import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
-import org.eclipse.linuxtools.tmf.trace.TmfCheckpoint;
 import org.eclipse.linuxtools.tmf.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
 
@@ -156,19 +156,19 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         // Set the currentEvent to the eventContent
         eventContent.setEvent(currentLttngEvent);
         
-        // Bypass indexing if asked
-        if ( bypassIndexing == false ) {
-            indexTrace(true);
-        }
-        else {
+//        // Bypass indexing if asked
+//        if ( bypassIndexing == false ) {
+//            indexTrace(true);
+//        }
+//        else {
         	// Even if we don't have any index, set ONE checkpoint
-        	fCheckpoints.add(new TmfCheckpoint(new LttngTimestamp(0L) , new LttngLocation() ) );
+//        	fCheckpoints.add(new TmfCheckpoint(new LttngTimestamp(0L) , new LttngLocation() ) );
         	
         	// Set the start time of the trace
         	setTimeRange( new TmfTimeRange( new LttngTimestamp(currentJniTrace.getStartTime().getTime()), 
         			  				    	new LttngTimestamp(currentJniTrace.getEndTime().getTime())
                                       	  ) );
-        }
+//        }
     }
     
     /*
@@ -209,6 +209,51 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     	
     	return returnedTrace;
     }
+    
+    @Override
+    public LTTngTrace clone() {
+    	LTTngTrace clone = null;
+    	try {
+    		clone = (LTTngTrace) super.clone();
+       		try {
+				clone.currentJniTrace = JniTraceFactory.getJniTrace(getPath(), SHOW_LTT_DEBUG_DEFAULT);
+			} catch (JniException e) {
+				e.printStackTrace();
+			}
+            
+            // Export all the event types from the JNI side 
+			clone.traceTypes      = new HashMap<String, LttngEventType>();
+			clone.traceTypeNames  = new Vector<String>();
+			clone.initialiseEventTypes(clone.currentJniTrace);
+            
+            // Verify that all those "default constructor" are safe to use
+			clone.eventTimestamp  = new LttngTimestamp();
+			clone.eventSource     = new LttngEventSource();
+			clone.eventType       = new LttngEventType();
+			clone.eventContent    = new LttngEventContent(clone.currentLttngEvent);
+			clone.eventReference  = new LttngEventReference(this.getName());
+            
+            // Create the skeleton event
+			clone.currentLttngEvent = new LttngEvent(this, clone.eventTimestamp, clone.eventSource, clone.eventType, clone.eventContent, clone.eventReference, null);
+            
+            // Create a new current location
+			clone.previousLocation = new LttngLocation();
+            
+            // Set the currentEvent to the eventContent
+			clone.eventContent.setEvent(clone.currentLttngEvent);
+            
+           	// Set the start time of the trace
+           	setTimeRange(new TmfTimeRange(
+           			new LttngTimestamp(clone.currentJniTrace.getStartTime().getTime()), 
+           			new LttngTimestamp(clone.currentJniTrace.getEndTime().getTime())
+                    ));
+    	}
+    	catch (CloneNotSupportedException e) {
+    	}
+
+    	return clone;
+    }
+    
     
     /*
      * Fill out the HashMap with "Type" (Tracefile/Marker)
@@ -260,65 +305,65 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         this.traceTypeNames.add(newTypeKey);
     }
     
-    /**
-     * Index the current trace.
-     * 
-     * @param useless  This boolean is only to comply to the interface and will be ignored.
-     */
-    @Override
-    public synchronized void indexTrace(boolean useless) {
-    	
-    	long nbEvents=0L;
-    	
-    	// Start time need to be null to detect none have been set 
-        // LastTime need to exist so we can ajust it as we go
-        LttngTimestamp startTime = null;
-        LttngTimestamp lastTime  = new LttngTimestamp();
-    	
-        // Position the trace at the beginning
-        TmfContext context = seekEvent( new LttngTimestamp(0L) );
-        
-        // Read the first event and extract the location
-        LttngEvent tmpEvent = (LttngEvent)getNextEvent(context);
-        
-        // If we read the first event, define the start time.
-        if ( tmpEvent != null ) {
-        	startTime = new LttngTimestamp( tmpEvent.getTimestamp() );
-        	lastTime.setValue(tmpEvent.getTimestamp().getValue());
-        }
-        
-        // Now, we read each event until we hit the end of the trace
-        // We will create a new checkpoint every "getCacheSize()" event
-        while ( tmpEvent != null) {
-    		// Update the last time each time we read a new event
-            lastTime.setValue(tmpEvent.getTimestamp().getValue());
-            
-            // Save a check point if needed
-            if ((nbEvents++ % getCacheSize()) == 0) {
-            	// *** IMPORTANT
-            	// We need to NEW each stuff we put in checkpoint
-            	//	Otherwise everything will be the same!
-                LttngTimestamp tmpTimestamp = new LttngTimestamp( (LttngTimestamp)tmpEvent.getTimestamp() );
-                LttngLocation  newLocation  = new LttngLocation(  (LttngTimestamp)tmpEvent.getTimestamp() );
-                
-                fCheckpoints.add(new TmfCheckpoint(tmpTimestamp, newLocation ) );
-            }
-            // Read the next event
-            tmpEvent = (LttngEvent)getNextEvent(context);
-        }
-        
-        // If we have a start time, we should have an end time as well
-        // Issue the new range
-        if (startTime != null) {
-            setTimeRange( new TmfTimeRange(startTime, lastTime) );
-            notifyListeners(getTimeRange() );
-        }
-        
-        // Ajust the total number of event in the trace
-        fNbEvents = nbEvents;
-        //printCheckpointsVector();
-        //printDebug = true;
-    }
+//    /**
+//     * Index the current trace.
+//     * 
+//     * @param useless  This boolean is only to comply to the interface and will be ignored.
+//     */
+//    @Override
+//    public synchronized void indexTrace(boolean useless) {
+//    	
+//    	long nbEvents=0L;
+//    	
+//    	// Start time need to be null to detect none have been set 
+//        // LastTime need to exist so we can ajust it as we go
+//        LttngTimestamp startTime = null;
+//        LttngTimestamp lastTime  = new LttngTimestamp();
+//    	
+//        // Position the trace at the beginning
+//        TmfContext context = seekEvent( new LttngTimestamp(0L) );
+//        
+//        // Read the first event and extract the location
+//        LttngEvent tmpEvent = (LttngEvent)getNextEvent(context);
+//        
+//        // If we read the first event, define the start time.
+//        if ( tmpEvent != null ) {
+//        	startTime = new LttngTimestamp( tmpEvent.getTimestamp() );
+//        	lastTime.setValue(tmpEvent.getTimestamp().getValue());
+//        }
+//        
+//        // Now, we read each event until we hit the end of the trace
+//        // We will create a new checkpoint every "getCacheSize()" event
+//        while ( tmpEvent != null) {
+//    		// Update the last time each time we read a new event
+//            lastTime.setValue(tmpEvent.getTimestamp().getValue());
+//            
+//            // Save a check point if needed
+//            if ((nbEvents++ % getCacheSize()) == 0) {
+//            	// *** IMPORTANT
+//            	// We need to NEW each stuff we put in checkpoint
+//            	//	Otherwise everything will be the same!
+//                LttngTimestamp tmpTimestamp = new LttngTimestamp( (LttngTimestamp)tmpEvent.getTimestamp() );
+//                LttngLocation  newLocation  = new LttngLocation(  (LttngTimestamp)tmpEvent.getTimestamp() );
+//                
+//                fCheckpoints.add(new TmfCheckpoint(tmpTimestamp, newLocation ) );
+//            }
+//            // Read the next event
+//            tmpEvent = (LttngEvent)getNextEvent(context);
+//        }
+//        
+//        // If we have a start time, we should have an end time as well
+//        // Issue the new range
+//        if (startTime != null) {
+//            setTimeRange( new TmfTimeRange(startTime, lastTime) );
+//            notifyListeners(getTimeRange() );
+//        }
+//        
+//        // Ajust the total number of event in the trace
+//        fNbEvents = nbEvents;
+//        //printCheckpointsVector();
+//        //printDebug = true;
+//    }
     
     /**
      * Return the latest saved location.
@@ -329,7 +374,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * @see org.eclipse.linuxtools.lttng.event.LttngLocation
      */
     @Override
-	public ITmfLocation<?> getCurrentLocation() {
+	public synchronized ITmfLocation<?> getCurrentLocation() {
         return previousLocation;
     }
     
@@ -489,6 +534,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * @see org.eclipse.linuxtools.lttng.event.LttngLocation
      * @see org.eclipse.linuxtools.tmf.trace.TmfContext
      */
+
+    public int nbEventsRead = 0;
     @Override
     public synchronized LttngEvent getNextEvent(TmfContext context) {
     	
@@ -517,7 +564,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     	// To do so, we avoid moving for call to "GetNextEvent()" that follow call to a call to "ParseEvent()".
     	// However, calling ParseEvent() -> GetNextEvent() -> GetNextEvent() will only move next by one.
     	
-    	// *** Positionning trick :
+    	// *** Positioning trick :
     	// GetNextEvent only read the trace if : 
     	// 1- The last operation was NOT a ParseEvent --> A read is required
     	// 	OR
@@ -533,6 +580,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 			}
 			// Read the next event from the trace. The last one will NO LONGER BE VALID.
 	    	returnedEvent = readEvent(curLocation);
+    		nbEventsRead++;
 	    	
 	    	// Set the operation marker as read to both location, to be able to detect we did "read" this event
 	    	previousLocation.setLastOperationReadNext();
@@ -552,6 +600,9 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     	if ( returnedEvent != null ) {
     		previousLocation.setOperationTime((LttngTimestamp)returnedEvent.getTimestamp());
     		curLocation.setOperationTime((LttngTimestamp)returnedEvent.getTimestamp());
+    		
+    		updateIndex(context, context.getRank(), returnedEvent.getTimestamp());
+    		context.updateRank(1);
     	}
     	
     	return returnedEvent;
@@ -795,7 +846,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * 
      * @see org.eclipse.linuxtools.lttng.event.LttngEvent
      */
-    public LttngEvent getCurrentEvent() {
+    public synchronized LttngEvent getCurrentEvent() {
         return currentLttngEvent;
     }
     

@@ -65,7 +65,7 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSynthetic
             		}
             	}
         	};
-        provider.sendRequest(subRequest); // , false);
+        provider.sendRequest(subRequest);
 
         // Return a dummy context
         return new TmfContext();
@@ -73,8 +73,17 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSynthetic
 
 	// Queue 2 synthetic events per base event
 	private void handleIncomingData(TmfEvent e) {
-		queueResult(new TmfSyntheticEventStub(e));
-		queueResult(new TmfSyntheticEventStub(e));
+		try {
+			queueResult(new TmfSyntheticEventStub(e));
+			queueResult(new TmfSyntheticEventStub(e));
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	@Override
+	public void sendRequest(ITmfDataRequest<TmfSyntheticEventStub> request) {
+		super.sendRequest(request);
 	}
 	
 }

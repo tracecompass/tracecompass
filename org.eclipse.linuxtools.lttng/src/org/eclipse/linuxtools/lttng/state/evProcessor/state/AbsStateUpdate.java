@@ -48,7 +48,8 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 		exe_state.setEntry_Time(eventTime.getValue());
 		exe_state.setChange_Time(eventTime.getValue());
 		exe_state.setCum_cpu_time(0L);
-		exe_state.setProc_status(process.getState().getProc_status());
+//		if (process != null)
+			exe_state.setProc_status(process.getState().getProc_status());
 		process.pushToExecutionStack(exe_state);
 	}
 
@@ -128,7 +129,7 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 		LttngProcessState process = traceSt.getRunning_process().get(cpu);
 		Long curr_function = process.getCurrent_function();
 
-		if (curr_function != null && curr_function != funcptr) {
+		if (curr_function != null && !curr_function.equals(funcptr)) {
 			TraceDebug.debug("Different functions: " + funcptr + " current: "
 					+ curr_function + " time stamp: "
 					+ trcEvent.getTimestamp().toString());

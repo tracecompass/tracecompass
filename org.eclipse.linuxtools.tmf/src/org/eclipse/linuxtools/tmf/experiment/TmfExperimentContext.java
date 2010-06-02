@@ -117,4 +117,33 @@ public class TmfExperimentContext extends TmfContext {
 		lastTrace = newIndex;
 	}
 
+	// ------------------------------------------------------------------------
+	// Object
+	// ------------------------------------------------------------------------
+
+    @Override
+    public int hashCode() {
+		int result = 17;
+    	for (int i = 0; i < fTraces.length; i++) {
+    		result = 37 * result + fTraces[i].hashCode();
+    		result = 37 * result + fContexts[i].hashCode();
+    	}
+    	return result;
+    }
+ 
+    @Override
+    public boolean equals(Object other) {
+    	if (!(other instanceof TmfExperimentContext)) {
+    		return false;
+    	}
+    	TmfExperimentContext o = (TmfExperimentContext) other;
+    	boolean isEqual = true;
+    	int i = 0;
+    	while (isEqual && i < fTraces.length) {
+    		isEqual &= fTraces[i].equals(o.fTraces[i]);
+    		isEqual &= fContexts[i].equals(o.fContexts[i]);
+    	}
+    	return isEqual;
+    }
+ 
 }

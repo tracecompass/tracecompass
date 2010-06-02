@@ -16,6 +16,7 @@ import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 
 /**
@@ -55,8 +56,8 @@ public abstract class LttngBaseEventRequest extends TmfEventRequest<LttngEvent> 
 	 */
 	public LttngBaseEventRequest(TmfTimeRange range, TmfTimestamp dispatchTime,
 			long offset, int nbEvents, int maxBlockSize,
-			LttngTraceState traceModel) {
-		super(LttngEvent.class, range, nbEvents, maxBlockSize);
+			LttngTraceState traceModel, ITmfDataRequest.ExecutionType execType) {
+		super(LttngEvent.class, range, nbEvents, maxBlockSize, execType);
 		ftraceModel = traceModel;
 		fDispatchTime = dispatchTime;
 	}

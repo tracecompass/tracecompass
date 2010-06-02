@@ -19,14 +19,14 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
  * <p>
  * This class maps an event timestamp to a generic location.
  */
-public class TmfCheckpoint implements Comparable<TmfCheckpoint> {
+public class TmfCheckpoint implements Comparable<TmfCheckpoint>, Cloneable {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
     
-    private final TmfTimestamp fTimestamp;
-    private final ITmfLocation<?> fLocation;
+    private TmfTimestamp fTimestamp;
+    private ITmfLocation<?> fLocation;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -80,6 +80,20 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint> {
     // Object
     // ------------------------------------------------------------------------
 
+    @Override
+    public TmfCheckpoint clone() {
+    	TmfCheckpoint result = null;
+		try {
+			result = (TmfCheckpoint) super.clone();
+	    	result.fTimestamp = new TmfTimestamp(fTimestamp);
+	    	result.fLocation  = fLocation.clone();
+	    	return result;
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return result;
+    }
+ 
     @Override
     public int hashCode() {
     	return fTimestamp.hashCode();

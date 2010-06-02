@@ -125,7 +125,8 @@ public class LttngSyntheticEvent extends LttngEvent {
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#getParentTrace()
 	 */
-    public TmfTrace<LttngEvent> getParentTrace() {
+	@Override
+   public TmfTrace<LttngEvent> getParentTrace() {
 		if (baseEvent != null) {
 			return baseEvent.getParentTrace();
 		} else {
@@ -140,6 +141,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 	 * org.eclipse.linuxtools.lttng.event.LttngEvent#setParentTrace(org.eclipse
 	 * .linuxtools.tmf.trace.TmfTrace)
 	 */
+	@Override
 	public void setParentTrace(TmfTrace<LttngEvent> parentTrace) {
 		if (baseEvent != null) {
 			baseEvent.setParentTrace(parentTrace);
@@ -153,6 +155,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#getChannelName()
 	 */
+	@Override
 	public String getChannelName() {
 		if (baseEvent != null) {
 			return baseEvent.getChannelName();
@@ -166,6 +169,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#getCpuId()
 	 */
+	@Override
 	public long getCpuId() {
 		if (baseEvent != null) {
 			return baseEvent.getCpuId();
@@ -179,6 +183,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#getMarkerName()
 	 */
+	@Override
 	public String getMarkerName() {
 		if (baseEvent != null) {
 			return baseEvent.getMarkerName();
@@ -192,6 +197,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#getContent()
 	 */
+	@Override
 	public LttngEventContent getContent() {
 		if (baseEvent != null) {
 			return baseEvent.getContent();
@@ -207,6 +213,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 	 * org.eclipse.linuxtools.lttng.event.LttngEvent#setContent(org.eclipse.
 	 * linuxtools.lttng.event.LttngEventContent)
 	 */
+	@Override
 	public void setContent(LttngEventContent newContent) {
 		if (baseEvent != null) {
 			baseEvent.setContent(newContent);
@@ -220,6 +227,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#getType()
 	 */
+	@Override
 	public LttngEventType getType() {
 		if (baseEvent != null) {
 			return baseEvent.getType();
@@ -235,6 +243,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 	 * org.eclipse.linuxtools.lttng.event.LttngEvent#setType(org.eclipse.linuxtools
 	 * .lttng.event.LttngEventType)
 	 */
+	@Override
 	public void setType(LttngEventType newType) {
 		if (baseEvent != null) {
 			baseEvent.setType(newType);
@@ -250,6 +259,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 	 * org.eclipse.linuxtools.lttng.event.LttngEvent#updateJniEventReference
 	 * (org.eclipse.linuxtools.lttng.jni.JniEvent)
 	 */
+	@Override
 	public void updateJniEventReference(JniEvent newJniEventReference) {
 		if (baseEvent != null) {
 			baseEvent.updateJniEventReference(newJniEventReference);
@@ -263,6 +273,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#convertEventTmfToJni()
 	 */
+	@Override
 	public JniEvent convertEventTmfToJni() {
 		if (baseEvent != null) {
 			return baseEvent.convertEventTmfToJni();
@@ -276,6 +287,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#isNullRef()
 	 */
+	@Override
 	public boolean isNullRef() {
 		return this == NullEvent;
 	}
@@ -285,6 +297,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#toString()
 	 */
+	@Override
 	public String toString() {
 		if (baseEvent != null) {
 			return baseEvent.toString();

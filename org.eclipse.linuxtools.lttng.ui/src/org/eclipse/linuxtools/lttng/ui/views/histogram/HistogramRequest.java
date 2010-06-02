@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.lttng.ui.views.histogram;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 
 /**
@@ -47,8 +48,8 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 	 * 
 	 * @see org.eclipse.linuxtools.tmf.request.TmfEventRequest
 	 */
-	public HistogramRequest(TmfTimeRange range, int nbRequested, HistogramCanvas newParentCanvas, long timeInterval) {
-        super((Class<LttngEvent>)LttngEvent.class, range, nbRequested, HistogramConstant.MAX_EVENTS_PER_READ);
+	public HistogramRequest(TmfTimeRange range, int nbRequested, HistogramCanvas newParentCanvas, long timeInterval, ITmfDataRequest.ExecutionType execType) {
+        super((Class<LttngEvent>)LttngEvent.class, range, nbRequested, HistogramConstant.MAX_EVENTS_PER_READ, execType);
         
         // *** FIXME ***
         // This does not work! The request won't be processed or the number of events returned is wrong!

@@ -53,21 +53,8 @@ public abstract class AbsEventToHandlerResolver implements
 	public abstract ILttngEventProcessor getStateUpdaterProcessor(
 			String eventType);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor#process
-	 * (org.eclipse.linuxtools.lttng.event.LttngEvent,
-	 * org.eclipse.linuxtools.lttng.state.model.LttngTraceState)
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor#process
-	 * (org.eclipse.linuxtools.lttng.event.LttngEvent,
-	 * org.eclipse.linuxtools.lttng.state.model.LttngTraceState)
+	/* (non-Javadoc)
+	 * @see org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor#process(org.eclipse.linuxtools.lttng.event.LttngEvent, org.eclipse.linuxtools.lttng.state.model.LttngTraceState)
 	 */
 	public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 		if (trcEvent instanceof LttngSyntheticEvent) {
@@ -108,14 +95,17 @@ public abstract class AbsEventToHandlerResolver implements
 
 				// TODO: Implement filter of events not associated to this trace
 				// Make sure the event received is associated to this trace
-				// handling context
-				if (traceSt != null
-						&& trcEvent.getParentTrace() != traceSt.getContext()
-								.getTraceIdRef()) {
-					// increment the number of events filtered out
-					filteredOutEventsCount++;
-					return false;
-				}
+				// handling context, Implementing a trace compare for each event
+				// is not acceptable due to performance, and a reference check
+				// may not be feasible since there are trace clones used either
+				// to build the state system check points or UI requests.
+
+				// if (traceSt != null && trcEvent.getParentTrace() !=
+				// traceSt.getContext().getTraceIdRef()) {
+				// // increment the number of events filtered out
+				// filteredOutEventsCount++;
+				// return false;
+				// }
 			}
 
 			if (processor != null) {

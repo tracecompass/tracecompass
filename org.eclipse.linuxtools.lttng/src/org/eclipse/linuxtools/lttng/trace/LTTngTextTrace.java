@@ -80,12 +80,12 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
         	fIndexPageSize = 1000;
         	
         	// Skip indexing if asked
-        	if ( skipIndexing == true ) {
+//        	if ( skipIndexing == true ) {
         		fCheckpoints.add(new TmfCheckpoint(new LttngTimestamp(0L), new TmfLocation<Long>(0L)));
-        	}
-        	else {
-        		indexTrace(true);
-        	}
+//        	}
+//        	else {
+//        		indexTrace(true);
+//        	}
         	
         	Long endTime = currentLttngEvent.getTimestamp().getValue();
         	positionToFirstEvent();
@@ -143,7 +143,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 	        // Make sure the event time is consistent
 	        eventTimestamp.setValue(0L);
     	}
-    	catch (Exception e) {
+    	catch (IOException e) {
     		isSuccessful = false;
     	}
     	

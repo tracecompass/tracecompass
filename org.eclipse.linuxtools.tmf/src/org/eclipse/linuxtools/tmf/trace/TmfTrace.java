@@ -17,17 +17,12 @@ import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.Vector;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.component.TmfEventProvider;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
-import org.eclipse.linuxtools.tmf.signal.TmfTraceUpdatedSignal;
 
 /**
  * <b><u>TmfTrace</u></b>
@@ -102,6 +97,12 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     	setName(simpleName);
     	fPath = path;
         fIndexPageSize = (cacheSize > 0) ? cacheSize : DEFAULT_CACHE_SIZE;
+
+        try {
+			fClone = clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
     }
 
     /* (non-Javadoc)
@@ -126,14 +127,6 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     public String getPath() {
         return fPath;
     }
-
-//    /**
-//     * @return the trace name
-//     */
-//    @Override
-//	public String getName() {
-//        return fName;
-//    }
 
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.stream.ITmfEventStream#getNbEvents()
@@ -312,10 +305,25 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 		TmfEvent event = parseEvent(context);
 		if (event != null) {
 			context.setLocation(getCurrentLocation());
+			updateIndex(context, context.getRank(), event.getTimestamp());
 			context.updateRank(1);
 			processEvent(event);
 		}
     	return event;
+	}
+
+	public synchronized void updateIndex(ITmfContext context, long rank, TmfTimestamp timestamp) {
+		// Build the index as we go along
+		if (context.isValidRank() && (rank % fIndexPageSize) == 0) {
+			// Determine the table position
+			long position = rank / fIndexPageSize;
+			// Add new entry at proper location (if empty) 
+			if (fCheckpoints.size() == position) {
+				ITmfLocation<?> location = getCurrentLocation().clone();
+				fCheckpoints.add(new TmfCheckpoint(timestamp, location));
+//				System.out.println(getName() + "[" + (fCheckpoints.size() - 1) + "] " + timestamp + ", " + location.toString());
+			}
+		}
 	}
 
     /**
@@ -345,123 +353,6 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 	@Override
 	public String toString() {
 		return "[TmfTrace (" + getName() + ")]";
-	}
-
-    // ------------------------------------------------------------------------
-    // Indexing
-    // ------------------------------------------------------------------------
-
-	/*
-	 * The purpose of the index is to perform a pass over the trace and collect
-	 * basic information that can be later used to rapidly access a trace events.
-	 * 
-	 * The information collected:
-	 * - fCheckpoints, the list of evenly separated checkpoints (timestamp + location)
-	 * - fTimeRange, the trace time span
-	 * - fNbEvents, the number of events in the trace
-	 * 
-	 * NOTE: Doesn't work for streaming traces.
-	 */
-
-	private IndexingJob job;
-
-	// Indicates that an indexing job is already running
-	private boolean fIndexing = false;
-	private Boolean fIndexed  = false;
-
-	public void indexTrace(boolean waitForCompletion) {
-    	synchronized (this) {
-			if (fIndexed || fIndexing) {
-    			return;
-    		}
-    		fIndexing = true;
-    	}
-
-    	job = new IndexingJob("Indexing " + getName());
-    	job.schedule();
-
-    	if (waitForCompletion) {
-    		try {
-    			job.join();
-    		} catch (InterruptedException e) {
-    			e.printStackTrace();
-    		}
-    	}
-    }
-
-    private class IndexingJob extends Job {
-
-		public IndexingJob(String name) {
-			super(name);
-		}
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
-		 */
-		@Override
-		protected IStatus run(IProgressMonitor monitor) {
-
-            monitor.beginTask("Indexing " + getName(), IProgressMonitor.UNKNOWN);
-
-            int nbEvents = 0;
-            TmfTimestamp startTime = null;
-            TmfTimestamp lastTime  = null;
-
-            // Reset the index
-            fCheckpoints = new Vector<TmfCheckpoint>();
-            
-            try {
-            	// Position the trace at the beginning
-                TmfContext context = seekLocation(null);
-                ITmfLocation<?> location = context.getLocation().clone();
-
-                // Get the first event
-               	TmfEvent event = getNextEvent(context);
-               	if (event != null) {
-                    startTime = new TmfTimestamp(event.getTimestamp());
-               	}
-
-               	// Index the trace
-               	while (event != null) {
-                	lastTime = event.getTimestamp();
-           			if ((nbEvents++ % fIndexPageSize) == 0) {
-           				lastTime = new TmfTimestamp(event.getTimestamp());
-                   		fCheckpoints.add(new TmfCheckpoint(lastTime, location));
-
-                        monitor.worked(1);
-
-                        // Check monitor *after* fCheckpoints has been updated
-                        if (monitor.isCanceled()) {
-                            monitor.done();
-                        	return Status.CANCEL_STATUS;
-                        }
-                    }
-
-                    // We will need this location at the next iteration
-                    if ((nbEvents % fIndexPageSize) == 0) {
-                        location = context.getLocation().clone();
-           			}
-
-                    event = getNextEvent(context);
-                }
-            }
-            finally {
-                synchronized(this) {
-                	fNbEvents = nbEvents;
-                	fTimeRange = new TmfTimeRange(startTime, lastTime);
-            		fIndexing = false;
-            		fIndexed = true;
-                }
-                notifyListeners(fTimeRange);
-                monitor.done();
-            }
-
-            return Status.OK_STATUS;
-		}
-    }
-
-    protected void notifyListeners(TmfTimeRange range) {
-    	broadcast(new TmfTraceUpdatedSignal(this, this, range));
 	}
    
 }

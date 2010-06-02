@@ -157,6 +157,7 @@ class StatsTimeCountHandlers {
 	final ILttngEventProcessor getAfterHandler() {
 		AbstractStatsEventHandler handler = new StatsModeChangeHandler(null) {
 			int sched_hash = StateStrings.Events.LTT_EVENT_SCHED_SCHEDULE.getInName().hashCode();
+			@Override
 			public boolean process(LttngEvent event, LttngTraceState traceState) {
 				// Step the event counter for any after event
 				stepCount(event, traceState);

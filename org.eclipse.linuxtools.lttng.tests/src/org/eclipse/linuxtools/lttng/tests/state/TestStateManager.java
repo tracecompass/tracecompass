@@ -14,18 +14,18 @@ package org.eclipse.linuxtools.lttng.tests.state;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.lttng.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
-import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
-import org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal;
 
 /**
  * @author alvaro
  * 
  */
 public class TestStateManager extends TestCase {
-	
+
+	/**
+	 * TODO: Not used for the time being, for experiment selection test cases
+	 * for package state.experiment
+	 */
 	public void testSetTraceSelection() {
 		String logName = "traceset/trace1";
 		
@@ -39,13 +39,15 @@ public class TestStateManager extends TestCase {
 		if (testStream != null) {
 		    LTTngTrace[] streamList = new LTTngTrace[1];
 			streamList[0] = testStream;
-			TmfExperiment<LttngEvent> newExp = new TmfExperiment<LttngEvent>(LttngEvent.class, logName, streamList);
+			// TmfExperiment<LttngEvent> newExp = new
+			// TmfExperiment<LttngEvent>(LttngEvent.class, logName, streamList);
 			
 			//Get the Test StateManager
-			IStateTraceManager manager = StateManagerFactoryTestSupport
-					.getManager(testStream);
+			// IStateTraceManager manager = StateManagerFactoryTestSupport
+			// .getManager(testStream);
 			//Start execution.
-			manager.experimentUpdated(new TmfExperimentUpdatedSignal(this, newExp, null), true);
+			// manager.experimentUpdated(new TmfExperimentUpdatedSignal(this,
+			// newExp, null), true);
 			
 			//Print events not handled.
 			// Set<String> notHandledEvents = manager.getEventsNotHandled();

@@ -347,11 +347,16 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 			 * org.eclipse.linuxtools.lttng.request.LttngSyntEventRequest#handleData
 			 * ()
 			 */
+			int handleDataCount = 0;
+			int handleDataValidCount = 0;
+			@Override
 			public void handleData() {
 				TmfEvent[] result = getData();
 	
 				TmfEvent evt = (result.length > 0) ? result[0] : null;
+				handleDataCount++;
 				if (evt != null) {
+					handleDataValidCount++;
 					LttngSyntheticEvent synEvent = (LttngSyntheticEvent) evt;
 					// process event
 					SequenceInd indicator = synEvent.getSynType();
@@ -384,7 +389,16 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 			public void handleRequestStarted() {
 				notifyStarting();
 			}
+
+			@Override
+			public void done() {
+				if (TraceDebug.isDEBUG()) {
+					TraceDebug.debug("AbsTimeUpdateView: Received=" + handleDataCount + ", Valid=" + handleDataCount + ", fCount=" + fCount);
+				}
+				super.done();
+			}
 	
+			@Override
 			public void handleCompleted() {
 				super.handleCompleted();
 

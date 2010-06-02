@@ -18,6 +18,7 @@ import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal;
+import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.swt.SWT;
@@ -168,6 +169,7 @@ public class TmfEventsView extends TmfView {
 							cache = tmpEvent;
 							cacheStartIndex = index;
 							cacheEndIndex = index + tmpEvent.length;
+//							System.out.println("TmfTableView: entry#" + index);
 						}
 					}
 				};
@@ -258,11 +260,9 @@ public class TmfEventsView extends TmfView {
         // Perform the updates on the UI thread
         fTable.getDisplay().asyncExec(new Runnable() {
         	public void run() {
-        		// TODO: Potentially long operation. Add some feedback for the user
        			fTable.setSelection(0);
-            	fTable.clearAll();
+            	fTable.removeAll();
 				cacheStartIndex = cacheEndIndex = 0;	// Clear the cache
-            	fTable.setItemCount((int) fExperiment.getNbEvents());        
         	}
         });
     }
@@ -273,10 +273,29 @@ public class TmfEventsView extends TmfView {
     	fTable.getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				if (!fTable.isDisposed() && fExperiment != null) {
-			    	fTable.setItemCount((int) fExperiment.getNbEvents());        
+					int nbEvents = (int) fExperiment.getNbEvents();
+			    	fTable.setItemCount((nbEvents > 100) ? nbEvents : 100);        
 				}
 			}
         });
+    }
+
+	private boolean fRefreshPending = false;
+	@TmfSignalHandler
+    public synchronized void rangeSynched(TmfRangeSynchSignal signal) {
+		if (!fRefreshPending) {
+			// Perform the refresh on the UI thread
+			fRefreshPending = true;
+			fTable.getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					fRefreshPending = false;
+					if (!fTable.isDisposed() && fExperiment != null) {
+						fTable.setItemCount((int) fExperiment.getNbEvents());
+//						if (Tracer.INTERNALS) Tracer.trace("TmfEventsView: itemCount=" + fTable.getItemCount());
+					}
+				}
+			});
+		}
     }
 
 //    @TmfSignalHandler
