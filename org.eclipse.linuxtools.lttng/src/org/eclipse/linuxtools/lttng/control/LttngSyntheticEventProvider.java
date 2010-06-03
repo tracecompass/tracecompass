@@ -82,7 +82,7 @@ public class LttngSyntheticEventProvider extends
 		TmfEventSource source = new TmfEventSource(this);
 		LttngEventType dtype = new LttngEventType();
 		LttngTimestamp statusTimeStamp = new LttngTimestamp(
-				TmfTimestamp.BigBang);
+				TmfTimestamp.Zero);
 
 		fStatusEvent = new LttngSyntheticEvent(null, statusTimeStamp, source,
 				dtype, null, null, null);
@@ -345,13 +345,13 @@ public class LttngSyntheticEventProvider extends
 		// All sub-requests are marked completed so the main request can be
 		// completed as well
 		// Notify application,
-//		LttngSyntheticEvent finishEvent = new LttngSyntheticEvent(fStatusEvent);
-//		finishEvent.setSequenceInd(SequenceInd.ENDREQ);
-//		finishEvent.setTraceModel(traceModel);
+		LttngSyntheticEvent finishEvent = new LttngSyntheticEvent(fStatusEvent);
+		finishEvent.setSequenceInd(SequenceInd.ENDREQ);
+		finishEvent.setTraceModel(traceModel);
 
 		try {
-//			queueResult(finishEvent);
-//			queueResult(fStatusEventAck);
+			queueResult(finishEvent);
+			queueResult(fStatusEventAck);
 			// End the loop in the main request
 			queueResult(LttngSyntheticEvent.NullEvent);
 		} catch (InterruptedException e) {

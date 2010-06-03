@@ -94,6 +94,8 @@ public class TmfTimeRange {
 	 * @return
 	 */
 	public boolean contains(TmfTimestamp ts) {
+		// Zero acts as a "universal donor" timestamp
+		if (ts.equals(TmfTimestamp.Zero)) return true;
 		return (fStartTime.compareTo(ts, true) <= 0) && (fEndTime.compareTo(ts, true) >= 0);
 	}
 
