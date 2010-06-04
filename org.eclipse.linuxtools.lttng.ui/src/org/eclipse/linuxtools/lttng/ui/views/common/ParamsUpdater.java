@@ -40,8 +40,13 @@ public class ParamsUpdater {
 	// time interval
 	private double pixelsPerNs = 0;
 	private int eventsDiscarded = 0;
+	private int eventsDiscardedOutOfView = 0;
+	private int eventsDiscardedNotVisible = 0;
 	private int eventsDiscardedWrongOrder = 0;
 	private TmfTimeRange trange = null;
+
+	public static final int OUT_OF_VIEWRANGE = 0;
+	public static final int NOT_VISIBLE = 1;
 
 	// ========================================================================
 	// Methods
@@ -218,13 +223,23 @@ public class ParamsUpdater {
 		eventsDiscarded = value;
 		if (value == 0) {
 			eventsDiscardedWrongOrder = 0;
+			eventsDiscardedNotVisible = 0;
+			eventsDiscardedOutOfView = 0;
 		}
 	}
 
 	/**
 	 * 
 	 */
-	public void incrementEventsDiscarded() {
+	public void incrementEventsDiscarded(int reason) {
+		if (reason == OUT_OF_VIEWRANGE) {
+			this.eventsDiscardedOutOfView++;
+		}
+
+		if (reason == NOT_VISIBLE) {
+			this.eventsDiscardedNotVisible++;
+		}
+
 		this.eventsDiscarded++;
 	}
 
@@ -249,6 +264,22 @@ public class ParamsUpdater {
 	 */
 	public int getEventsDiscardedWrongOrder() {
 		return eventsDiscardedWrongOrder;
+
+	}
+
+	/**
+	 * @return
+	 */
+	public int getEventsDiscardedNotVisible() {
+		return eventsDiscardedNotVisible;
+
+	}
+
+	/**
+	 * @return
+	 */
+	public int getEventsDiscardedOutOfViewRange() {
+		return eventsDiscardedOutOfView;
 
 	}
 

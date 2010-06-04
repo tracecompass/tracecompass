@@ -197,7 +197,7 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 
 		// Check if the event is out of range
 		if (!withinViewRange(stime, etime)) {
-			params.incrementEventsDiscarded();
+			params.incrementEventsDiscarded(ParamsUpdater.OUT_OF_VIEWRANGE);
 			return false;
 		}
 
@@ -243,7 +243,7 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 				Long eventSpan = stime - prevEvent.getStartTime();
 				if (prevEventVisibility == false
 						&& ((double) eventSpan * k) < 2) {
-					params.incrementEventsDiscarded();
+					params.incrementEventsDiscarded(ParamsUpdater.NOT_VISIBLE);
 					return false;
 				}
 			}

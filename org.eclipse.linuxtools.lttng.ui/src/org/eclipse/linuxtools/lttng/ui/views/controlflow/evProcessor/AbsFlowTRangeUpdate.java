@@ -109,6 +109,10 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements ILt
 		Long stime = startTime;
 		Long etime = endTime;
 
+//		if (etime == 13589873239052L || etime == 13589878374675L) {
+//			System.out.println("probe here, " + stime + "->" + etime);
+//		}
+
 		if (etime < stime) {
 			// Validate the sequential order of events
 			params.incrementEventsDiscardedWrongOrder();
@@ -124,7 +128,7 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements ILt
 		if (!withinViewRange(stime, etime)) {
 			// No use to process the event since it's outside
 			// the visible time range of the window
-			params.incrementEventsDiscarded();
+			params.incrementEventsDiscarded(ParamsUpdater.OUT_OF_VIEWRANGE);
 			return false;
 		}
 
@@ -159,7 +163,7 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements ILt
 						&& ((double) eventSpan * k) < 2) {
 
 					// discard the item
-					params.incrementEventsDiscarded();
+					params.incrementEventsDiscarded(ParamsUpdater.NOT_VISIBLE);
 					return false;
 
 				}

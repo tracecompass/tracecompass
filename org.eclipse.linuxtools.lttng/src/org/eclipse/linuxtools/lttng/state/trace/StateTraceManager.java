@@ -204,38 +204,38 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 		// can handle multiple traces
 		if ((eventTime.getValue() < fTrace.getStartTime().getValue())) {
 			eventTime = fTrace.getStartTime();
+		}
 
-			Collections.sort(timestampCheckpointsList);
-			// Initiate the compare with a checkpoint containing the target time
-			// stamp to find
-			int index = Collections.binarySearch(timestampCheckpointsList, new TmfCheckpoint(eventTime,
-					new TmfLocation<Long>(0L)));
-			// adjust index to round down to earlier checkpoint when exact match
-			// not
-			// found
-			index = getPrevIndex(index);
+		Collections.sort(timestampCheckpointsList);
+		// Initiate the compare with a checkpoint containing the target time
+		// stamp to find
+		int index = Collections.binarySearch(timestampCheckpointsList, new TmfCheckpoint(eventTime,
+				new TmfLocation<Long>(0L)));
+		// adjust index to round down to earlier checkpoint when exact match
+		// not
+		// found
+		index = getPrevIndex(index);
 
-			LttngTraceState traceState;
-			if (index == 0) {
-				// No checkpoint restore is needed, start with a brand new
-				// TraceState
-				traceState = StateModelFactory.getStateEntryInstance(this);
-			} else {
-				synchronized (checkPointsLock) {
-					// Useful CheckPoint found
-					TmfCheckpoint checkpoint = timestampCheckpointsList.get(index);
-					nearestTimeStamp = checkpoint.getTimestamp();
-					// get the location associated with the checkpoint
-					TmfLocation<Long> location = (TmfLocation<Long>) checkpoint.getLocation();
-					// reference a new copy of the checkpoint template
-					traceState = stateCheckpointsList.get(location.getLocation()).clone();
-				}
+		LttngTraceState traceState;
+		if (index == 0) {
+			// No checkpoint restore is needed, start with a brand new
+			// TraceState
+			traceState = StateModelFactory.getStateEntryInstance(this);
+		} else {
+			synchronized (checkPointsLock) {
+				// Useful CheckPoint found
+				TmfCheckpoint checkpoint = timestampCheckpointsList.get(index);
+				nearestTimeStamp = checkpoint.getTimestamp();
+				// get the location associated with the checkpoint
+				TmfLocation<Long> location = (TmfLocation<Long>) checkpoint.getLocation();
+				// reference a new copy of the checkpoint template
+				traceState = stateCheckpointsList.get(location.getLocation()).clone();
 			}
+		}
 
-			// Restore the stored traceState
-			synchronized (this) {
-				fStateModel = traceState;
-			}
+		// Restore the stored traceState
+		synchronized (this) {
+			fStateModel = traceState;
 		}
 
 		return nearestTimeStamp;

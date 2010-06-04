@@ -26,7 +26,6 @@ import org.eclipse.linuxtools.lttng.request.RequestStartedSignal;
 import org.eclipse.linuxtools.lttng.state.evProcessor.ITransEventProcessor;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.lttng.ui.model.trange.ItemContainer;
-import org.eclipse.linuxtools.lttng.ui.views.resources.model.ResourceModelFactory;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
@@ -570,7 +569,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 
 		if (complete) {
 			// reselect to original time
-			ParamsUpdater paramUpdater = ResourceModelFactory.getParamsUpdater();
+			ParamsUpdater paramUpdater = getParamsUpdater();
 			if (paramUpdater != null && tsfviewer != null) {
 				final Long selTime = paramUpdater.getSelectedTime();
 				if (selTime != null) {
@@ -590,13 +589,17 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 						eventCount += itemArr[pos].getTraceEvents().size();
 					}
 
-					int discarded = getParamsUpdater().getEventsDiscarded();
+					int discarded = paramUpdater.getEventsDiscarded();
 					int discardedOutofOrder = paramUpdater.getEventsDiscardedWrongOrder();
+					int discardedOutofViewRange = paramUpdater.getEventsDiscardedOutOfViewRange();
+					int dicardedNotVisible = paramUpdater.getEventsDiscardedNotVisible();
+
 					TmfTimeRange range = request.getRange();
 					StringBuilder sb = new StringBuilder("View: " + getName() + ", Events handled: " + count
 							+ ", Events loaded in view: " + eventCount + ", Number of events discarded: " + discarded
 							+ "\n\tNumber of events discarded with start time earlier than next good time: "
-							+ discardedOutofOrder);
+							+ discardedOutofOrder + "\n\tDiscarded Not visible: " + dicardedNotVisible
+							+ "\n\tDiscarded out of view Range: " + discardedOutofViewRange);
 
 					sb.append("\n\t\tRequested Time Range: " + range.getStartTime() + "-" + range.getEndTime());
 					sb.append("\n\t\tExperiment Time Range: " + experimentStartTime + "-" + experimentEndTime);
