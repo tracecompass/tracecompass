@@ -54,6 +54,9 @@ class LTTngTraceException extends LttngException {
  */
 public class LTTngTrace extends TmfTrace<LttngEvent> {
 	
+//	// [lmcfrch]
+//    private long lastTime = 0;
+
 	public static boolean printDebug = false;
 	public static boolean uniqueEvent = false;
 	
@@ -218,7 +221,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
        		try {
 				clone.currentJniTrace = JniTraceFactory.getJniTrace(getPath(), SHOW_LTT_DEBUG_DEFAULT);
 			} catch (JniException e) {
-				e.printStackTrace();
+//				e.printStackTrace();
 			}
             
             // Export all the event types from the JNI side 
@@ -393,6 +396,9 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      */
     @Override
 	public synchronized TmfContext seekLocation(ITmfLocation<?> location) {
+
+//    	// [lmcfrch]
+//    	lastTime = 0;
     	
     	if ( printDebug == true ) {
     		System.out.println("seekLocation(location) location -> " + location);
@@ -430,6 +436,9 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     @Override
     public synchronized TmfContext seekEvent(TmfTimestamp timestamp) {
     	
+//    	// [lmcfrch]
+//    	lastTime = 0;
+    	
     	if ( printDebug == true ) {
     		System.out.println("seekEvent(timestamp) timestamp -> " + timestamp);
     	}
@@ -465,6 +474,9 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      */
     @Override
     public synchronized TmfContext seekEvent(long position) {
+    	
+//    	// [lmcfrch]
+//    	lastTime = 0;
     	
     	if ( printDebug == true ) {
     		System.out.println("seekEvent(position) position -> " + position);
@@ -603,8 +615,15 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     		
     		updateIndex(context, context.getRank(), returnedEvent.getTimestamp());
     		context.updateRank(1);
+
+//    		// [lmcfrch]
+//        	long newTime = returnedEvent.getOriginalTimestamp().getValue();
+//        	if ((newTime-lastTime) <= 0)
+//        		System.out.println("Going back in time (or not moving): " + newTime + ", " + lastTime);
+//        	lastTime = newTime;
+//        	System.out.println(getName() + Thread.currentThread() + ", ts=" + lastTime);
     	}
-    	
+
     	return returnedEvent;
     }
     
@@ -932,6 +951,11 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     	
     	return returnedData;
     }
+
+	@Override
+	public void queueResult(LttngEvent data) throws InterruptedException {
+		super.queueResult(data);
+	}
 }
 
 /*

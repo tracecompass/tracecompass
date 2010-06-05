@@ -91,7 +91,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     private final int      		fIndex;      	// The index (rank) of the requested event
     private final int      		fNbRequested;	// The number of requested events (ALL_DATA for all)
     private final int      		fBlockSize;     // The maximum number of events per chunk
-    private       int      		fNbRead;        // The number of reads so far
+    protected     int      		fNbRead;        // The number of reads so far
 
     private final Object lock;
     private boolean fRequestRunning   = false;

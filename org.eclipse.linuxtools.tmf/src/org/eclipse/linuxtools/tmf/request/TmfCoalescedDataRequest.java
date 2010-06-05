@@ -37,14 +37,22 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
      * Default constructor
      */
     public TmfCoalescedDataRequest(Class<T> dataType) {
-        this(dataType, 0, ALL_DATA, DEFAULT_BLOCK_SIZE);
+        this(dataType, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.SHORT);
+    }
+
+    public TmfCoalescedDataRequest(Class<T> dataType, ExecutionType execType) {
+        this(dataType, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
     }
 
     /**
      * @param nbRequested
      */
     public TmfCoalescedDataRequest(Class<T> dataType, int index) {
-        this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE);
+        this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.SHORT);
+    }
+
+    public TmfCoalescedDataRequest(Class<T> dataType, int index, ExecutionType execType) {
+        this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
     }
 
     /**
@@ -52,7 +60,11 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
      * @param nbRequested
      */
     public TmfCoalescedDataRequest(Class<T> dataType, int index, int nbRequested) {
-        this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE);
+        this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.SHORT);
+    }
+
+    public TmfCoalescedDataRequest(Class<T> dataType, int index, int nbRequested, ExecutionType execType) {
+        this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE, execType);
     }
 
     /**
@@ -61,7 +73,11 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
      * @param blockSize
      */
     public TmfCoalescedDataRequest(Class<T> dataType, int index, int nbRequested, int blockSize) {
-        super(dataType, index, nbRequested, blockSize);
+        super(dataType, index, nbRequested, blockSize, ExecutionType.SHORT);
+    }
+
+    public TmfCoalescedDataRequest(Class<T> dataType, int index, int nbRequested, int blockSize, ExecutionType execType) {
+        super(dataType, index, nbRequested, blockSize, execType);
     }
 
     // ------------------------------------------------------------------------
@@ -75,8 +91,9 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
 	public boolean isCompatible(ITmfDataRequest<T> request) {
 
 		boolean ok = request.getIndex() == getIndex();
-		ok &= request.getNbRequested() == getNbRequested();
-		ok &= request.getBlockize() == getBlockize();
+		ok &= request.getNbRequested()  == getNbRequested();
+		ok &= request.getBlockize()     == getBlockize();
+		ok &= request.getExecType()     == getExecType();
 		
 		return ok;
 	}
@@ -131,9 +148,10 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
     public boolean equals(Object other) {
     	if (other instanceof TmfCoalescedDataRequest<?>) {
     		TmfCoalescedDataRequest<?> request = (TmfCoalescedDataRequest<?>) other;
-       		return 	(request.getDataType()    == getDataType()) &&
-       				(request.getIndex()       == getIndex())    &&
-       				(request.getNbRequested() == getNbRequested());
+       		return 	(request.getDataType()    == getDataType())   &&
+       				(request.getIndex()       == getIndex())      &&
+       				(request.getNbRequested() == getNbRequested() &&
+      				(request.getExecType()    == getExecType()));
        	}
        	return false;
     }

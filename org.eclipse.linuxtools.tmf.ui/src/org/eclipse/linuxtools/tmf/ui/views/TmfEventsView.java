@@ -150,7 +150,7 @@ public class TmfEventsView extends TmfView {
 
 			public void handleEvent(Event event) {
 
-        		TableItem item = (TableItem) event.item;
+        		final TableItem item = (TableItem) event.item;
 				final int index = fTable.indexOf(item);
 
 				// Note: this works because handleEvent() is called once for each row, in sequence  
@@ -176,15 +176,13 @@ public class TmfEventsView extends TmfView {
 				fExperiment.sendRequest(request);
 		        try {
 					request.waitForCompletion();
+					if (cache[0] != null && cacheStartIndex == index) {
+						item.setText(extractItemFields(cache[0]));
+						item.setData(new TmfTimestamp(cache[0].getTimestamp()));
+					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				
-				if (cache[0] != null && cacheStartIndex == index) {
-					item.setText(extractItemFields(cache[0]));
-					item.setData(new TmfTimestamp(cache[0].getTimestamp()));
-				}
-				
 			}
         });
 
@@ -298,27 +296,27 @@ public class TmfEventsView extends TmfView {
 		}
     }
 
-//    @TmfSignalHandler
-//    public void currentTimeUpdated(TmfTimeSynchSignal signal) {
-//    	if (signal.getSource() != fTable && fExperiment != null) {
-//    		final int index = (int) fExperiment.getRank(signal.getCurrentTime());
-//            // Perform the updates on the UI thread
-//            fTable.getDisplay().asyncExec(new Runnable() {
-//            	public void run() {
-//            		fTable.setSelection(index);
-//            		// The timestamp might not correspond to an actual event
-//            		// and the selection will point to the next experiment event.
-//            		// But we would like to display both the event before and
-//            		// after the selected timestamp.
-//            		// This works fine by default except when the selected event
-//            		// is the top displayed event. The following ensures that we
-//            		// always see both events.
-//            		if ((index > 0) && (index == fTable.getTopIndex())) {
-//            			fTable.setTopIndex(index - 1);
-//            		}
-//            	}
-//            });
-//    	}
-//    }
+    @TmfSignalHandler
+    public void currentTimeUpdated(TmfTimeSynchSignal signal) {
+    	if (signal.getSource() != fTable && fExperiment != null) {
+    		final int index = (int) fExperiment.getRank(signal.getCurrentTime());
+            // Perform the updates on the UI thread
+            fTable.getDisplay().asyncExec(new Runnable() {
+            	public void run() {
+            		fTable.setSelection(index);
+            		// The timestamp might not correspond to an actual event
+            		// and the selection will point to the next experiment event.
+            		// But we would like to display both the event before and
+            		// after the selected timestamp.
+            		// This works fine by default except when the selected event
+            		// is the top displayed event. The following ensures that we
+            		// always see both events.
+            		if ((index > 0) && (index == fTable.getTopIndex())) {
+            			fTable.setTopIndex(index - 1);
+            		}
+            	}
+            });
+    	}
+    }
 
 }

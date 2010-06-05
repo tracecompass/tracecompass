@@ -22,7 +22,6 @@ public class Tracer {
 	static Boolean REQUEST   = Boolean.FALSE;
 	static Boolean SIGNAL    = Boolean.FALSE;
 	static Boolean EVENT     = Boolean.FALSE;
-	static Boolean EXCEPTION = Boolean.FALSE;
 
 	private static BufferedWriter fTraceLog = null;
 
@@ -83,12 +82,6 @@ public class Tracer {
 			isTracing |= EVENT;
 		}
 
-		traceKey = Platform.getDebugOption(pluginID + "/exception");
-		if (traceKey != null) {
-			EXCEPTION = (Boolean.valueOf(traceKey)).booleanValue();
-			isTracing |= EXCEPTION;
-		}
-
 		// Create trace log file if needed
 		if (isTracing) {
 			fTraceLog = openLogFile("trace.log");
@@ -112,10 +105,6 @@ public class Tracer {
 		return EVENT;
 	}
 	
-	public static boolean isExceptionTraced() {
-		return EXCEPTION;
-	}
-
 	// Tracers
 	public static void trace(String msg) {
 		long currentTime = System.currentTimeMillis();
@@ -143,16 +132,16 @@ public class Tracer {
 	}
 
 	public static void traceRequest(ITmfDataRequest<?> request, String msg) {
-		String message = ("[REQ] Thread=" + Thread.currentThread().getId() + " Req=" + request.getRequestId() + ", Type=" + request.getDataType().getSimpleName() + " " + msg);
+		String message = ("[REQ] Thread=" + Thread.currentThread().getId() + " Req=" + request.getRequestId() + 
+				(request.getExecType() == ITmfDataRequest.ExecutionType.LONG ? "(long)" : "(short)") +
+				", Type=" + request.getClass().getName() + 
+				", DataType=" + request.getDataType().getSimpleName() + " " + msg);
 		trace(message);
 	}
 
 	public static void traceEvent(ITmfDataProvider<?> provider, ITmfDataRequest<?> request, TmfData data) {
 		String message = ("[EVT] Provider=" + provider.toString() + ", Req=" + request.getRequestId() + ", Event=" + data.toString());
 		trace(message);
-	}
-
-	public static void traceException(Exception e) {
 	}
 
 	public static void traceError(String msg) {

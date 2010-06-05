@@ -431,6 +431,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 	public int getCpuNumber() {
     	return cpuNumber;
     }
+
 }
 
 

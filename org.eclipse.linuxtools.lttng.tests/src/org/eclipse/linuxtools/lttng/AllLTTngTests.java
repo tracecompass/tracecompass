@@ -3,15 +3,11 @@ package org.eclipse.linuxtools.lttng;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.eclipse.linuxtools.lttng.control.LTTngSyntheticEventProviderTest;
-import org.eclipse.linuxtools.lttng.control.LTTngSyntheticEventProviderTextTest;
 import org.eclipse.linuxtools.lttng.model.LTTngTreeNodeTest;
-import org.eclipse.linuxtools.lttng.state.experiment.StateExperimentManagerTextTest;
 import org.eclipse.linuxtools.lttng.state.resource.LTTngStateResourceTest;
 import org.eclipse.linuxtools.lttng.tests.event.LttngEventContentTest;
 import org.eclipse.linuxtools.lttng.tests.event.LttngEventFieldTest;
 import org.eclipse.linuxtools.lttng.tests.event.LttngEventReferenceTest;
-import org.eclipse.linuxtools.lttng.tests.event.LttngEventTest;
 import org.eclipse.linuxtools.lttng.tests.event.LttngEventTypeTest;
 import org.eclipse.linuxtools.lttng.tests.event.LttngTimestampTest;
 import org.eclipse.linuxtools.lttng.tests.jni.JniEventTest;
@@ -19,8 +15,6 @@ import org.eclipse.linuxtools.lttng.tests.jni.JniMarkerFieldTest;
 import org.eclipse.linuxtools.lttng.tests.jni.JniMarkerTest;
 import org.eclipse.linuxtools.lttng.tests.jni.JniTraceTest;
 import org.eclipse.linuxtools.lttng.tests.jni.JniTracefileTest;
-import org.eclipse.linuxtools.lttng.tests.trace.LTTngTextTraceTest;
-import org.eclipse.linuxtools.lttng.tests.trace.LTTngTraceTest;
 
 public class AllLTTngTests {
 

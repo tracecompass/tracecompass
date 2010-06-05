@@ -46,7 +46,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     private static int          NB_EVENTS    = 20000;
     private static int    fDefaultBlockSize  = 1000;
 
-    private static ITmfTrace[] fTrace;
+    private static ITmfTrace[] fTraces;
     private static TmfExperiment<TmfEvent> fExperiment;
 
     private static byte SCALE = (byte) -3;
@@ -55,31 +55,32 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     // Housekeeping
     // ------------------------------------------------------------------------
 
-    private ITmfTrace[] setupTrace(String path1, String path2) {
-    	if (fTrace == null) {
-    		fTrace = new ITmfTrace[2];
+    private synchronized static ITmfTrace[] setupTrace(String path1, String path2) {
+    	if (fTraces == null) {
+    		fTraces = new ITmfTrace[2];
     		try {
     	        URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path1), null);
     			File test = new File(FileLocator.toFileURL(location).toURI());
     			TmfTraceStub trace1 = new TmfTraceStub(test.getPath(), true);
-    			fTrace[0] = trace1;
+    			fTraces[0] = trace1;
     	        location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path2), null);
     			test = new File(FileLocator.toFileURL(location).toURI());
     			TmfTraceStub trace2 = new TmfTraceStub(test.getPath(), true);
-    			fTrace[1] = trace2;
+    			fTraces[1] = trace2;
     		} catch (URISyntaxException e) {
     			e.printStackTrace();
     		} catch (IOException e) {
     			e.printStackTrace();
     		}
     	}
-    	return fTrace;
+    	return fTraces;
     }
 
-    private void setupExperiment() {
-    	if (fExperiment == null) {
-            fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, fTrace);
-            fExperiment.indexExperiment();
+    private synchronized static void setupExperiment() {
+    	synchronized (TmfMultiTraceExperimentTest.class) {
+    		if (fExperiment == null) {
+    			fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, fTraces, TmfTimestamp.Zero, 1000, true);
+    		}
     	}
     }
 
@@ -569,7 +570,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
         fExperiment.sendRequest(request);
         request.waitForCompletion();
 
-        assertEquals("nbEvents", nbExpectedEvents, requestedEvents.size());
+        assertEquals("nbEvents", NB_EVENTS, requestedEvents.size());
         assertTrue("isCompleted",  request.isCompleted());
         assertFalse("isCancelled", request.isCancelled());
 

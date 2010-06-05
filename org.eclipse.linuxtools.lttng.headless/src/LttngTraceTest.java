@@ -27,7 +27,7 @@ public class LttngTraceTest {
 	public static void main(String[] args) {
 		
 		// Path of the trace
-        final String TRACE_PATH = "/home/william/trace-614601events-nolost-newformat";
+        final String TRACE_PATH = "/home/francois/Desktop/Workspaces/LTTngTraces/trace_2GB";
 		
         // *** Change to true to use the "fake" LttngTextTrace instead of LTTngTrace
         // To use this, you need a ".txt" trace. 
@@ -59,7 +59,10 @@ public class LttngTraceTest {
 			LttngTimestamp tmpTime = new LttngTimestamp(0L);
             tmpContext = new TmfContext(new LttngLocation(0L), 0);
 			
-			for ( int nb=0; nb<NB_OF_PASS; nb++) {
+
+            long startTime = System.nanoTime();
+            System.out.println("Start: " + startTime);
+            for ( int nb=0; nb<NB_OF_PASS; nb++) {
 			    
 				// Seek to the beginning of the trace
 			    tmpContext = tmptrace.seekEvent( tmpTime  );
@@ -75,7 +78,7 @@ public class LttngTraceTest {
 						// *** Uncomment the following to print the parsed content
 	                    // Warning : this is VERY intensive
 						//
-						//System.out.println(testEvent.toString());
+//						System.out.println(tmpevent.toString());
 						//System.out.println(testEvent.getContent().toString());
 					}
 					
@@ -84,6 +87,11 @@ public class LttngTraceTest {
 			}
 			
 			System.out.println("NB events : " + nbEvent);
+
+            long endTime = System.nanoTime();
+            long elapsed = endTime - startTime;
+			System.out.println("End: " + endTime);
+			System.out.println("Elapsed: " + elapsed + ", Average: " + (elapsed/nbEvent) + "ns/evt");
 			
 		}
 		catch (Exception e) {

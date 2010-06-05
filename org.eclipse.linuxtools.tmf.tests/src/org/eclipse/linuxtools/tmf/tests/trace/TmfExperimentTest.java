@@ -76,7 +76,7 @@ public class TmfExperimentTest extends TestCase {
     private void setupExperiment() {
     	if (fExperiment == null) {
             fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, fTraces);
-            fExperiment.indexExperiment();
+//            fExperiment.indexExperiment();
     	}
     }
 

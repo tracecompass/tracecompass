@@ -352,7 +352,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 		 */
 		@Override
 		public void handleData() {
-			TmfEvent[] result = getData();
+			LttngSyntheticEvent[] result = getData();
 
 			evt[0] = (result.length > 0) ? result[0] : null;
 			if (evt[0] != null) {
@@ -499,6 +499,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(super.toString());
 		sb.append("\n\tTotal number of processes in the Shared State model: " + fStateModel.getProcesses().length

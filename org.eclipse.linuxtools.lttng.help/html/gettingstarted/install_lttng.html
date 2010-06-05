@@ -3,9 +3,10 @@
 <HEAD>
 	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
 	<TITLE></TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.1  (Linux)">
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Linux)">
 	<META NAME="CREATED" CONTENT="20091006;11250700">
-	<META NAME="CHANGED" CONTENT="20100312;12281000">
+	<META NAME="CHANGEDBY" CONTENT="Francois Godin">
+	<META NAME="CHANGED" CONTENT="20100603;15264500">
 	<STYLE TYPE="text/css">
 	<!--
 		@page { margin: 2cm }
@@ -26,15 +27,16 @@
 <P STYLE="margin-bottom: 0.21cm"><BR><BR>
 </P>
 <P STYLE="margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">This
-document will describe how to install and configure LTTv C-code
-library to work with eclipse LTTng plugin. </FONT>
+document describes how to install and configure the LTTv C-code
+library in order to load and parse LTTng traces with the Eclipse LTTng plugin. </FONT>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<H3 CLASS="western">For the impatients</H3>
+<H3 CLASS="western">For the impatient</H3>
+<P STYLE="margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">For each trace format version (v2.3, v2.5 and/or v2.6) you want to process :</P>
 <UL>
 	<LI><P STYLE="margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">Download
-	latest LTTv application, from
+	LTTv application, from
 	<A HREF="http://git.dorsal.polymtl.ca/?p=liblttngtrace.git;a=summary">http://git.dorsal.polymtl.ca/?p=liblttngtrace.git;a=summary</A></FONT></P>
 	<LI><P STYLE="margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">Compile
 	it with the JNI support activated :</FONT></P>
@@ -43,25 +45,31 @@ library to work with eclipse LTTng plugin. </FONT>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif">Start
 	Eclipse application making sure the library is in LD_LIBRARY_PATH.</FONT></P>
 </UL>
-<P STYLE="margin-bottom: 0cm"><BR>
+<P STYLE="margin-bottom: 0cm"><BR></P>
+<P STYLE="text-indent: 1.27cm; margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif">
+Note: Unless you plan to process legacy traces, version 2.5 and 2.6 should be sufficient for most needs.</FONT>
 </P>
-<P STYLE="text-indent: 1.27cm; margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif">It
-didn't work? Please read “Installation steps” section. </FONT>
+<P STYLE="text-indent: 1.27cm; margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif">
+It didn't work? Please read “Installation steps” section. </FONT>
 </P>
+<P STYLE="text-indent: 1.27cm; margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif">
+Make sure you install the latest version last (currently v2.6).</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <H3 CLASS="western">Why a C library ? 
 </H3>
-<P STYLE="margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">LTTng
-and LTTv are mostly made in C (and some part in more evil stuff) so
-their functionnality are not directly available in Java. Also, for
-the sake of performance, it was better for the project to use the
-native, multi-platform C library for most of the low-level functions
-than to try to re-implement the same in Java. Finally, the C library
+<P STYLE="margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">
+LTTng and LTTv are mostly coded in C (with some parts in even more evil stuff) so
+their functionalities are not directly available in Java. Also, for
+the sake of performance, it was decided to re-use the
+native, multi-platform C library for the low-level functions rather
+than re-implement them in Java. Also, the C library
 is under constant development and it would have been a bad idea to
 branch this one just yet.</FONT></P>
-<P STYLE="margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">So
-right now, the usual path for an event through LTTng would be the
+<P STYLE="margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">
+So right now, the normal path for an event through LTTng would be the
 following :</FONT></P>
 <P STYLE="margin-left: 0.5cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif"><I>Linux
 Kernel -&gt; Trace Directory</I></FONT></P>
@@ -69,12 +77,12 @@ Kernel -&gt; Trace Directory</I></FONT></P>
 Directory read by) LTTv C Library -&gt; JNI (C side) -&gt; JNI (Java
 Side) -&gt; Eclipse LTTng Plugin</I></FONT></P>
 <P STYLE="margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">(Note
-that the kernel is only called to record at trace). </FONT>
+that the kernel is only used to record at trace). </FONT>
 </P>
 <P STYLE="margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">For
 all these reasons, the LTTv C library and a JNI (Java Native
 Interface) is needed for java to process LTTng trace. The JNI itself,
-however, is already included in LTTV and it should be easy to build
+however, is already included in LTTv and it should be easy to build
 and to install (using this very installation guide). </FONT>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
@@ -83,17 +91,8 @@ and to install (using this very installation guide). </FONT>
 </H3>
 <P STYLE="margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">First
 on all, we need to download and compile the source of the LTTv
-application, with the JNI support enabled. To do so, there is 4 steps
-to follow. </FONT>
+application, with the JNI support enabled. To do so, follow the 4 steps described in this section.</FONT>
 </P>
-<P STYLE="margin-bottom: 0.21cm"><BR><BR>
-</P>
-<OL>
-	<LI><P STYLE="margin-bottom: 0.21cm; text-decoration: none"><FONT FACE="Nimbus Roman No9 L, serif"><I><B>Downloading
-	LTTv</B></I></FONT></P>
-</OL>
-<P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">There
-is actually three stage of LTTv available for download.</FONT></P>
 <P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif"><I><B>Note</B>
 : LTTv is responsible of handling the trace format for Eclipse.
 However, as the trace format changed overtime, you might need to
@@ -101,9 +100,28 @@ compile several versions of LTTv if you plan to support multiple
 trace formats. Each “branch” of LTTv should tell you by its name
 which version of the LTTng trace it supports. If you did not generate
 a trace already, you might want to stick with the latest LTTv
-version, otherwise, it is advice to compile all available versions. </I></FONT>
+version, otherwise, it is recommended to compile all available versions
+(currently v2.3, v2.5 and v2.6). </I></FONT>
 </P>
-<P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><BR><BR>
+<P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm; font-style: normal">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT COLOR="#ff950e"><SPAN STYLE="text-decoration: none"><B><SPAN STYLE="background: transparent">NOTE</SPAN></B></SPAN></FONT><SPAN STYLE="text-decoration: none"><B>:</B></SPAN>
+If you don't know which trace format you need, you may want to get all
+of them to support multiple versions of traces (2.5 and 2.6 are
+more or less mandatory).  Just perform the following instructions for each
+trace format.</FONT></P>
+<P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm; font-style: normal">
+<FONT FACE="Nimbus Roman No9 L, serif">In all case, make sure you
+install the latest version <i><u>last</u></i> (currently v2.6).</FONT></P>
+<P STYLE="margin-bottom: 0.21cm"><BR><BR>
+</P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0.21cm; text-decoration: none"><FONT FACE="Nimbus Roman No9 L, serif"><I><B>Downloading
+	LTTv</B></I></FONT></P>
+</OL>
+<P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">There
+are actually three variants of the LTTv library available for download.</FONT></P>
+<P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm; font-style: normal">
+<BR><BR>
 </P>
 <P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">-
 <B>Beta JNI build (git) </B><FONT COLOR="#ff950e"><B>(PLEASE USE
@@ -113,43 +131,45 @@ is the very beta tree of LTTv that include the newest JNI changes. It
 is under constant development, so there might be some bugs left, but
 it contains the newer JNI interface, which is probably what you need.</FONT></P>
 <P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">This
-is definitely what you should use, get it from :</FONT></P>
+is definitely what you should use. You can get it from :</FONT></P>
 <P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><A HREF="http://git.dorsal.polymtl.ca/?p=liblttngtrace.git;a=summary"><FONT FACE="Nimbus Roman No9 L, serif"><I>http://git.dorsal.polymtl.ca/?p=liblttngtrace.git;a=summary</I></FONT></A></P>
-<P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN STYLE="font-style: normal">Then,
-in the “</SPAN><I>head</I>” <SPAN STYLE="font-style: normal">section,
-click on the traceformat that suite your need</SPAN> <SPAN STYLE="font-style: normal">and
-then choose “</SPAN><I>snapshot</I>” <SPAN STYLE="font-style: normal">to
-download its archive.</SPAN></FONT></P>
-<P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm; font-style: normal">
-<FONT FACE="Nimbus Roman No9 L, serif">If you don't know which
-traceformat you need, you may want to get all of them to support
-multiple versions of traces. </FONT>
-</P>
+<P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN STYLE="font-style: normal">
+Then, in the “</SPAN><I><B>heads</B></I>”<SPAN STYLE="font-style: normal"> section 
+(below the “</SPAN><I><B>shortlog</B></I>”<SPAN STYLE="font-style: normal">section),
+click on the trace format that suits your need</SPAN> <SPAN STYLE="font-style: normal">.
+In the new download page, click the “</SPAN><I>snapshot</I>”<SPAN STYLE="font-style: normal"> link
+of the top entry (with a marker of the form 'traceformat-n.n') to download the corresponding archive.</SPAN></FONT></P>
 <P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><BR><BR>
 </P>
 <P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">-
 <B>Development build (git) </B></FONT>
 </P>
-<P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">This
-is the release candidate of the LTTv application. It contains
+<P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">
+This is the release candidate of the LTTv application. It contains
 features that are under development or too experimental to make it to
 the main tree. It also includes the JNI interface that you need to
-use for eclipse; however, this branch could be a little late on the
+use Eclipse; however, this branch could be a little late on the
 beta, so use at your own risk. </FONT>
 </P>
 <P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">If
-you want to try, get it from
-:<BR></FONT><A HREF="http://lttng.org/cgi-bin/gitweb.cgi?p=lttv.git;a=summary"><FONT FACE="Nimbus Roman No9 L, serif"><I>http://lttng.org/cgi-bin/gitweb.cgi?p=lttv.git;a=summary</I></FONT></A></P>
+you want to try, get it from :<BR></FONT></P>
+<P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><A HREF="http://lttng.org/cgi-bin/gitweb.cgi?p=lttv.git;a=summary"><FONT FACE="Nimbus Roman No9 L, serif"><I>http://lttng.org/cgi-bin/gitweb.cgi?p=lttv.git;a=summary</I></FONT></A></P>
+<P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN STYLE="font-style: normal">
+Then, in the “</SPAN><I><B>heads</B></I>”<SPAN STYLE="font-style: normal"> section 
+(below the “</SPAN><I><B>shortlog</B></I>”<SPAN STYLE="font-style: normal"> and “</SPAN><I><B>tags</B></I>”<SPAN STYLE="font-style: normal">section),
+click on the trace format that suits your need</SPAN> <SPAN STYLE="font-style: normal">.
+In the new download page, click the “</SPAN><I>snapshot</I>”<SPAN STYLE="font-style: normal"> link
+of the top entry (with a marker of the form 'traceformat-n.n') to download the corresponding archive.</SPAN></FONT></P>
+
+
+
+
+
 <P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN STYLE="font-style: normal">Then,
 in the “</SPAN><I>head</I>” <SPAN STYLE="font-style: normal">section,
 click on the traceformat that suite your need</SPAN> <SPAN STYLE="font-style: normal">and
 then choose “</SPAN><I>snapshot</I>” <SPAN STYLE="font-style: normal">to
 download its archive.</SPAN></FONT></P>
-<P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm; font-style: normal">
-<FONT FACE="Nimbus Roman No9 L, serif">If you don't know which
-traceformat you need, you may want to compile all of them to support
-multiple versions of traces. </FONT>
-</P>
 <P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><BR><BR>
 </P>
 <P STYLE="margin-left: 1.22cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">-
@@ -175,7 +195,7 @@ menu and pick the most recent (usually on top) release.</FONT></P>
 </OL>
 <P STYLE="margin-left: 1.27cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">You
 now need to archive files where you want them and to uncompress them.
-You need to do this for all the lttv version you downloaded.</FONT></P>
+You need to do this for each LTTv version you downloaded.</FONT></P>
 <P STYLE="margin-left: 1.27cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif">The
 way to do it in command line would be something like : </FONT>
 </P>
@@ -428,26 +448,25 @@ should be ready to start Eclipse now.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <H3 CLASS="western">FAQ</H3>
-<OL START=1>
+<OL>
 	<LI><P STYLE="margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif"><I>When
 	trying to start LTTng in Eclipse, I end up with the following
 	exception :<BR></I><FONT COLOR="#000080"><FONT FACE="Monospace"><FONT SIZE=2><I><U>org.eclipse.linuxtools.lttng.trace.LTTngTraceException</U></I></FONT></FONT></FONT><FONT COLOR="#ff0000"><FONT FACE="Monospace"><FONT SIZE=2><I>:
 	Failed to initialize library! Is the trace version supported?</I></FONT></FONT></FONT></FONT></P>
-<P ALIGN=LEFT><FONT COLOR="#ff0000"><FONT FACE="Monospace"><FONT SIZE=2>Make
-sure you have the correct LTTv library compiled. (openTrace)</FONT></FONT></FONT></P>
+	<P ALIGN=LEFT><FONT COLOR="#ff0000"><FONT FACE="Monospace"><FONT SIZE=2>Make
+	sure you have the correct LTTv library compiled. (openTrace)</FONT></FONT></FONT></P>
 	<P STYLE="margin-top: 0.3cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif"><FONT COLOR="#000000"><FONT SIZE=3><SPAN STYLE="font-style: normal">This
 	mean you do not have the correct LTTv library available on your
 	system. Go back to the section </SPAN></FONT></FONT><FONT COLOR="#000000"><FONT SIZE=3><I>&quot;1)
-	– Download”</I></FONT></FONT><FONT COLOR="#000000"><FONT SIZE=3><SPAN STYLE="font-style: normal">
-	and make sure you downloaded (and installed) the correct version of
-	LTTv to support the format of trace you want to read. As example, if
-	your trace is of LTTng format 2.3, you will need to download and
-	install the archive marked as “traceformat-2.3”.</SPAN></FONT></FONT></FONT></P>
-
+	– Download”</I></FONT></FONT><FONT COLOR="#000000"> </FONT><FONT COLOR="#000000"><FONT SIZE=3><SPAN STYLE="font-style: normal">and
+	make sure you downloaded (and installed) the correct version of LTTv
+	to support the format of trace you want to read. As example, if your
+	trace is of LTTng format 2.3, you will need to download and install
+	the archive marked as “traceformat-2.3”.</SPAN></FONT></FONT></FONT></P>
 </OL>
 <P STYLE="margin-bottom: 0.21cm"><BR><BR>
 </P>
-<OL START=2>	
+<OL START=2>
 	<LI><P STYLE="margin-top: 0.3cm; margin-bottom: 0.21cm"><FONT FACE="Nimbus Roman No9 L, serif"><I>When
 	trying to import a trace, I get an error message and I have one of
 	the following exception in the Eclipse Console :

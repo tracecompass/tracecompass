@@ -12,7 +12,6 @@
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
@@ -75,10 +74,8 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 	 */
 	@Override
     public void handleData() {
-        TmfEvent[] result = getData();
-        TmfEvent[] evt = new TmfEvent[1];
-        
-        evt[0] = (result.length > 0) ? result[0] : null;
+        LttngEvent[] result = getData();
+        LttngEvent event = (result.length > 0) ? result[0] : null;
         
         // *** FIXME ***
     	// *** EVIL BUG ***
@@ -86,9 +83,9 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
     	// 	However, the request with number of events will loop until it reach its number or EOF
     	//  We have to filter out ourself the extra useless events!
     	//
-        if (evt[0] != null) {
+        if (event != null) {
         
-        	LttngEvent tmpEvent = (LttngEvent)evt[0];
+        	LttngEvent tmpEvent = (LttngEvent) event;
         	
         	// This check is linked to the evil fix mentionned above
         	if ( ( tmpEvent.getTimestamp().getValue() >= histogramContent.getStartTime() ) &&

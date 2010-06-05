@@ -249,7 +249,9 @@ public class LttngSyntheticEventProvider extends
 							fstateUpdateProcessor.process(syntheticEvent, fTraceModel);
 						}
 					} catch (InterruptedException e1) {
-						e1.printStackTrace();
+						// TODO: Cancel this request
+						request.cancel();
+//						e1.printStackTrace();
 					}
 				}
 
@@ -314,7 +316,8 @@ public class LttngSyntheticEventProvider extends
 			queueResult(startIndEvent);
 			queueResult(fStatusEventAck);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			// TODO: cancel this request
+//			e.printStackTrace();
 		}
 
 		// Notify state event processor
@@ -357,7 +360,8 @@ public class LttngSyntheticEventProvider extends
 		} catch (InterruptedException e) {
 			// System.out.println(getName() +
 			// ":handleProviderDone() failed to queue request");
-			e.printStackTrace();
+			// TODO: Cancel the request
+//			e.printStackTrace();
 		}
 	}
 
@@ -432,6 +436,7 @@ public class LttngSyntheticEventProvider extends
 	 * org.eclipse.linuxtools.tmf.component.TmfDataProvider#sendRequest(org.
 	 * eclipse.linuxtools.tmf.request.TmfDataRequest)
 	 */
+	@Override
 	public void sendRequest(final ITmfDataRequest<LttngSyntheticEvent> request) {
 		super.sendRequest(request);
 		if (waitForRequest) {
@@ -456,6 +461,16 @@ public class LttngSyntheticEventProvider extends
 	 */
 	public void setWaitForRequest(boolean waitForRequest) {
 		this.waitForRequest = waitForRequest;
+	}
+
+	@Override
+	public LttngSyntheticEvent getNext(ITmfContext context)	throws InterruptedException {
+		return super.getNext(context);
+	}
+
+	@Override
+	public void queueResult(LttngSyntheticEvent data) throws InterruptedException {
+		super.queueResult(data);
 	}
 
 }

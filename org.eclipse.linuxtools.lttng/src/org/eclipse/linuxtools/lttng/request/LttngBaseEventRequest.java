@@ -62,6 +62,11 @@ public abstract class LttngBaseEventRequest extends TmfEventRequest<LttngEvent> 
 		fDispatchTime = dispatchTime;
 	}
 
+	@Override
+	public void cancel() {
+		super.cancel();
+	}
+
 	// ========================================================================
 	// Methods
 	// =======================================================================

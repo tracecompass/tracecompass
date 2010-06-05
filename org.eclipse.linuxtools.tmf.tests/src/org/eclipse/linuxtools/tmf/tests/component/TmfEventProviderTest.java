@@ -83,7 +83,7 @@ public class TmfEventProviderTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	@SuppressWarnings("unchecked")
-	public void testGetPlainEvents() throws InterruptedException {
+	public void testGetPlainEvents() {
 
         final int BLOCK_SIZE = 100;
         final int NB_EVENTS  = 1000;
@@ -105,17 +105,20 @@ public class TmfEventProviderTest extends TestCase {
             	}
         	};
         provider.sendRequest(request);
-        request.waitForCompletion();
+        try {
+			request.waitForCompletion();
+	        assertEquals("nbEvents", NB_EVENTS, requestedEvents.size());
+	        assertTrue("isCompleted",  request.isCompleted());
+	        assertFalse("isCancelled", request.isCancelled());
 
-        assertEquals("nbEvents", NB_EVENTS, requestedEvents.size());
-        assertTrue("isCompleted",  request.isCompleted());
-        assertFalse("isCancelled", request.isCancelled());
-
-        // Make that we have distinct events.
-        // Don't go overboard: we are not validating the stub! 
-        for (int i = 0; i < NB_EVENTS; i++) {
-            assertEquals("Distinct events", i+1, requestedEvents.get(i).getTimestamp().getValue());
-        }
+	        // Make that we have distinct events.
+	        // Don't go overboard: we are not validating the stub! 
+	        for (int i = 0; i < NB_EVENTS; i++) {
+	            assertEquals("Distinct events", i+1, requestedEvents.get(i).getTimestamp().getValue());
+	        }
+		} catch (InterruptedException e) {
+			fail();
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -138,58 +141,82 @@ public class TmfEventProviderTest extends TestCase {
             	}
         	};
         provider.sendRequest(request);
+
         request.waitForCompletion();
+	    if (nbEvents != -1)
+	       	assertEquals("nbEvents", nbEvents, requestedEvents.size());
+	    assertTrue("isCompleted", request.isCompleted());
+	    assertFalse("isCancelled", request.isCancelled());
 
-        if (nbEvents != -1)
-        	assertEquals("nbEvents", nbEvents, requestedEvents.size());
-        assertTrue("isCompleted", request.isCompleted());
-        assertFalse("isCancelled", request.isCancelled());
-
-        // For each base event, the stub will queue 2 identical synthetic events
-        // Ensure that the events are queued properly.
-        // Don't go overboard: we are not validating the stub!
-        for (int i = 0; i < (nbEvents / 2); i++) {
-            assertEquals("Distinct events", i+1, requestedEvents.get(2 * i + 0).getTimestamp().getValue());
-            assertEquals("Distinct events", i+1, requestedEvents.get(2 * i + 1).getTimestamp().getValue());
-        }
+	    // For each base event, the stub will queue 2 identical synthetic events
+	    // Ensure that the events are queued properly.
+	    // Don't go overboard: we are not validating the stub!
+	    for (int i = 0; i < (nbEvents / 2); i++) {
+	        assertEquals("Distinct events", i+1, requestedEvents.get(2 * i + 0).getTimestamp().getValue());
+	        assertEquals("Distinct events", i+1, requestedEvents.get(2 * i + 1).getTimestamp().getValue());
+	    }
 	}
 
 	// The following tests are the same but for the size of the requested blocks
 	// with regards to the size of the TmfSyntheticEventProviderStub block
-    public void testGetSyntheticEvents_EqualBlockSizes() throws InterruptedException {
+    public void testGetSyntheticEvents_EqualBlockSizes() {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-		getSyntheticData(range, 1000, TmfSyntheticEventProviderStub.BLOCK_SIZE);
+		try {
+			getSyntheticData(range, 1000, TmfSyntheticEventProviderStub.BLOCK_SIZE);
+		} catch (InterruptedException e) {
+			fail();
+		}
 	}
 
-	public void testGetSyntheticEvents_SmallerBlock() throws InterruptedException {
+	public void testGetSyntheticEvents_SmallerBlock() {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-		getSyntheticData(range, 1000, TmfSyntheticEventProviderStub.BLOCK_SIZE / 2);
+		try {
+			getSyntheticData(range, 1000, TmfSyntheticEventProviderStub.BLOCK_SIZE / 2);
+		} catch (InterruptedException e) {
+			fail();
+		}
 	}
 
-	public void testGetSyntheticEvents_LargerBlock() throws InterruptedException {
+	public void testGetSyntheticEvents_LargerBlock() {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-		getSyntheticData(range, 1000, TmfSyntheticEventProviderStub.BLOCK_SIZE * 2);
+		try {
+			getSyntheticData(range, 1000, TmfSyntheticEventProviderStub.BLOCK_SIZE * 2);
+		} catch (InterruptedException e) {
+			fail();
+		}
 	}
 
-	public void testGetSyntheticEvents_TimeRange() throws InterruptedException {
+	public void testGetSyntheticEvents_TimeRange() {
 		TmfTimestamp start = new TmfTimestamp(   1, (byte) -3, 0);
 		TmfTimestamp end   = new TmfTimestamp(1000, (byte) -3, 0);
         TmfTimeRange range = new TmfTimeRange(start, end);
-		getSyntheticData(range, -1, TmfSyntheticEventProviderStub.BLOCK_SIZE);
+		try {
+			getSyntheticData(range, -1, TmfSyntheticEventProviderStub.BLOCK_SIZE);
+		} catch (InterruptedException e) {
+			fail();
+		}
 	}
 
-	public void testGetSyntheticEvents_WeirdTimeRange1() throws InterruptedException {
+	public void testGetSyntheticEvents_WeirdTimeRange1() {
 		TmfTimestamp start = TmfTimestamp.BigBang;
 		TmfTimestamp end   = new TmfTimestamp(0, (byte) -3, 0);
         TmfTimeRange range = new TmfTimeRange(start, end);
-		getSyntheticData(range, -1, TmfSyntheticEventProviderStub.BLOCK_SIZE);
+		try {
+			getSyntheticData(range, -1, TmfSyntheticEventProviderStub.BLOCK_SIZE);
+		} catch (InterruptedException e) {
+			fail();
+		}
 	}
 
-	public void testGetSyntheticEvents_WeirdTimeRange2() throws InterruptedException {
+	public void testGetSyntheticEvents_WeirdTimeRange2() {
 		TmfTimestamp start = new TmfTimestamp(0, (byte) -3, 0);
 		TmfTimestamp end   = TmfTimestamp.BigCrunch;
         TmfTimeRange range = new TmfTimeRange(start, end);
-		getSyntheticData(range, -1, TmfSyntheticEventProviderStub.BLOCK_SIZE);
+		try {
+			getSyntheticData(range, -1, TmfSyntheticEventProviderStub.BLOCK_SIZE);
+		} catch (InterruptedException e) {
+			fail();
+		}
 	}
 
 	// ------------------------------------------------------------------------

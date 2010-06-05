@@ -71,7 +71,8 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     protected long fNbEvents = 0;
 
     // The time span of the event stream
-    private TmfTimeRange fTimeRange = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigBang);
+    private TmfTimestamp fStartTime = TmfTimestamp.BigCrunch;
+    private TmfTimestamp fEndTime   = TmfTimestamp.BigBang;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -112,8 +113,9 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 	@Override
 	public TmfTrace<T> clone() throws CloneNotSupportedException {
     	TmfTrace<T> clone = (TmfTrace<T>) super.clone();
-    	clone.fCheckpoints = (Vector<TmfCheckpoint>) fCheckpoints.clone(); 
-    	clone.fTimeRange = new TmfTimeRange(fTimeRange); 
+    	clone.fCheckpoints = (Vector<TmfCheckpoint>) fCheckpoints; 
+    	clone.fStartTime = new TmfTimestamp(fStartTime); 
+    	clone.fEndTime   = new TmfTimestamp(fEndTime); 
     	return clone;
     }
 
@@ -146,21 +148,21 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
      * @see org.eclipse.linuxtools.tmf.stream.ITmfEventStream#getTimeRange()
      */
     public TmfTimeRange getTimeRange() {
-        return fTimeRange;
+        return new TmfTimeRange(fStartTime, fEndTime);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#getStartTime()
      */
     public TmfTimestamp getStartTime() {
-    	return fTimeRange.getStartTime();
+    	return fStartTime;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#getEndTime()
      */
     public TmfTimestamp getEndTime() {
-    	return fTimeRange.getEndTime();
+    	return fEndTime;
     }
 
     @SuppressWarnings("unchecked")
@@ -173,15 +175,16 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     // ------------------------------------------------------------------------
 
     protected void setTimeRange(TmfTimeRange range) {
-    	fTimeRange = range;
+    	fStartTime = range.getStartTime();
+    	fEndTime   = range.getEndTime();
     }
 
     protected void setStartTime(TmfTimestamp startTime) {
-    	fTimeRange = new TmfTimeRange(startTime, fTimeRange.getEndTime());
+    	fStartTime = startTime;
     }
 
     protected void setEndTime(TmfTimestamp endTime) {
-    	fTimeRange = new TmfTimeRange(fTimeRange.getStartTime(), endTime);
+    	fEndTime = endTime;
     }
 
 	// ------------------------------------------------------------------------
@@ -304,24 +307,30 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 		// parseEvent() does not update the context
 		TmfEvent event = parseEvent(context);
 		if (event != null) {
-			context.setLocation(getCurrentLocation());
 			updateIndex(context, context.getRank(), event.getTimestamp());
+			context.setLocation(getCurrentLocation());
 			context.updateRank(1);
 			processEvent(event);
 		}
     	return event;
 	}
 
-	public synchronized void updateIndex(ITmfContext context, long rank, TmfTimestamp timestamp) {
-		// Build the index as we go along
-		if (context.isValidRank() && (rank % fIndexPageSize) == 0) {
-			// Determine the table position
-			long position = rank / fIndexPageSize;
-			// Add new entry at proper location (if empty) 
-			if (fCheckpoints.size() == position) {
-				ITmfLocation<?> location = getCurrentLocation().clone();
-				fCheckpoints.add(new TmfCheckpoint(timestamp, location));
-//				System.out.println(getName() + "[" + (fCheckpoints.size() - 1) + "] " + timestamp + ", " + location.toString());
+	protected synchronized void updateIndex(ITmfContext context, long rank, TmfTimestamp timestamp) {
+		if (fStartTime.compareTo(timestamp, false) > 0) fStartTime = timestamp;
+		if (fEndTime.compareTo(timestamp, false) < 0) fEndTime = timestamp;
+		if (context.isValidRank()) {
+			if (fNbEvents <= rank)
+				fNbEvents = rank + 1;
+			// Build the index as we go along
+			if ((rank % fIndexPageSize) == 0) {
+				// Determine the table position
+				long position = rank / fIndexPageSize;
+				// Add new entry at proper location (if empty) 
+				if (fCheckpoints.size() == position) {
+					ITmfLocation<?> location = context.getLocation().clone();
+					fCheckpoints.add(new TmfCheckpoint(timestamp, location));
+//					System.out.println(getName() + "[" + (fCheckpoints.size() - 1) + "] " + timestamp + ", " + location.toString());
+				}
 			}
 		}
 	}

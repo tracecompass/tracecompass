@@ -602,7 +602,7 @@ public class HistogramView extends TmfView implements ControlListener {
         // Set a (dynamic) time interval
         long intervalTime = ( (ts2.getValue() - ts1.getValue()) / selectedWindowCanvas.getHistogramContent().getNbElement() );
         
-        selectedWindowRequest = performRequest(experiment, selectedWindowCanvas, tmpRange, intervalTime, ExecutionType.SHORT);
+        selectedWindowRequest = performRequest(experiment, selectedWindowCanvas, tmpRange, intervalTime, ExecutionType.LONG);
         selectedWindowCanvas.redrawAsynchronously();
     }
     

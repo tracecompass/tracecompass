@@ -52,7 +52,7 @@ public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvid
 		if (request instanceof ITmfEventRequest<?>) {
 			ITmfEventRequest<T> eventRequest = (ITmfEventRequest<T>) request;
 			TmfCoalescedEventRequest<T> coalescedRequest = 
-				new TmfCoalescedEventRequest<T>(fType, eventRequest.getRange(), eventRequest.getNbRequested(), eventRequest.getBlockize());
+				new TmfCoalescedEventRequest<T>(fType, eventRequest.getRange(), eventRequest.getNbRequested(), eventRequest.getBlockize(), eventRequest.getExecType());
 			coalescedRequest.addRequest(eventRequest);
 			fPendingCoalescedRequests.add(coalescedRequest);
 		}

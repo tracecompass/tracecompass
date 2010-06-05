@@ -17,7 +17,6 @@ import org.eclipse.linuxtools.lttng.state.experiment.StateManagerFactory;
 import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
@@ -204,7 +203,6 @@ public abstract class LttngTestPreparation extends TestCase {
 		}
 
 		int DEFAULT_CHUNK = 1;
-		final TmfEvent[] evt = new TmfEvent[1];
 	
 		// time range
 		TmfTimeRange trange = new TmfTimeRange(new LttngTimestamp(
@@ -216,20 +214,17 @@ public abstract class LttngTestPreparation extends TestCase {
 		TmfEventRequest<T> request = new TmfEventRequest<T>(k,
 				trange, TmfDataRequest.ALL_DATA, DEFAULT_CHUNK) {
 	
-			@SuppressWarnings("unchecked")
 			@Override
 			public void handleData() {
-				TmfEvent[] result = getData();
+				T[] result = getData();
 	
-				evt[0] = (result.length > 0) ? result[0] : null;
-				if (evt[0] == null) {
+				T event = (result.length > 0) ? result[0] : null;
+				if (event == null) {
 					System.out
 							.println("Syntheric Event Received is null, after event: "
 									+ feventCount);
 					return;
 				}
-	
-				T event = (T) evt[0];
 	
 				// Listen to only one variant of synthetic event to keep
 				// track of

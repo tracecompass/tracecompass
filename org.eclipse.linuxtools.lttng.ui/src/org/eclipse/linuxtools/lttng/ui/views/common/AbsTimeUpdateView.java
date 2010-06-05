@@ -82,7 +82,9 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 									// option
 	protected ITimeAnalysisViewer tsfviewer = null;
 
-	// ========================================================================
+	private LttngSyntEventRequest fCurrentRequest = null;
+
+		// ========================================================================
 	// Constructor
 	// ========================================================================
 	public AbsTimeUpdateView(String viewID) {
@@ -331,7 +333,13 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 			return false;
 		}
 
-		LttngSyntEventRequest request = new LttngSyntEventRequest(
+		// Cancel the currently executing request before starting a new one
+		if (fCurrentRequest != null && !fCurrentRequest.isCompleted()) {
+			System.out.println("Cancelling request");
+//			fCurrentRequest.cancel();
+		}
+		
+		fCurrentRequest = new LttngSyntEventRequest(
 				requestTrange, DEFAULT_OFFSET, TmfDataRequest.ALL_DATA,
 				DEFAULT_CHUNK, this, experimentTRange, getEventProcessor()) {
 	
@@ -346,16 +354,16 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 			 * org.eclipse.linuxtools.lttng.request.LttngSyntEventRequest#handleData
 			 * ()
 			 */
-			int handleDataCount = 0;
-			int handleDataValidCount = 0;
+//			int handleDataCount = 0;
+//			int handleDataValidCount = 0;
 			@Override
 			public void handleData() {
-				TmfEvent[] result = getData();
+				LttngSyntheticEvent[] result = getData();
 	
 				TmfEvent evt = (result.length > 0) ? result[0] : null;
-				handleDataCount++;
+//				handleDataCount++;
 				if (evt != null) {
-					handleDataValidCount++;
+//					handleDataValidCount++;
 					LttngSyntheticEvent synEvent = (LttngSyntheticEvent) evt;
 					// process event
 					SequenceInd indicator = synEvent.getSynType();
@@ -391,9 +399,9 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 
 			@Override
 			public void done() {
-				if (TraceDebug.isDEBUG()) {
-					TraceDebug.debug("AbsTimeUpdateView: Received=" + handleDataCount + ", Valid=" + handleDataCount + ", fCount=" + fCount);
-				}
+//				if (TraceDebug.isDEBUG()) {
+//					TraceDebug.debug("AbsTimeUpdateView: Received=" + handleDataCount + ", Valid=" + handleDataCount + ", fCount=" + fCount);
+//				}
 				super.done();
 			}
 	
@@ -420,8 +428,8 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 				.getEventProvider();
 	
 		// send the request to TMF
-		request.startRequestInd(provider);
-		request.setclearDataInd(clearingData);
+		fCurrentRequest.startRequestInd(provider);
+		fCurrentRequest.setclearDataInd(clearingData);
 		return true;
 	}
 

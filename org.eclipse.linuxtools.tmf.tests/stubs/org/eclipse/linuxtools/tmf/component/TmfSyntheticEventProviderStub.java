@@ -77,7 +77,7 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSynthetic
 			queueResult(new TmfSyntheticEventStub(e));
 			queueResult(new TmfSyntheticEventStub(e));
 		} catch (InterruptedException e1) {
-			e1.printStackTrace();
+//			e1.printStackTrace();
 		}
 	}
 

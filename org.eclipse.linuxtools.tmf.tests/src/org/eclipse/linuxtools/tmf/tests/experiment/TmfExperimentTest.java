@@ -56,7 +56,7 @@ public class TmfExperimentTest extends TestCase {
     // Housekeeping
     // ------------------------------------------------------------------------
 
-    private ITmfTrace[] setupTrace(String path) {
+    private synchronized static ITmfTrace[] setupTrace(String path) {
     	if (fTraces == null) {
     		fTraces = new ITmfTrace[1];
     		try {
@@ -73,10 +73,9 @@ public class TmfExperimentTest extends TestCase {
     	return fTraces;
     }
 
-    private void setupExperiment() {
+    private synchronized static void setupExperiment() {
     	if (fExperiment == null) {
-            fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, fTraces);
-            fExperiment.indexExperiment();
+    		fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, fTraces, TmfTimestamp.Zero, 1000, true);
     	}
     }
 
@@ -101,6 +100,7 @@ public class TmfExperimentTest extends TestCase {
     // ------------------------------------------------------------------------
 
 	public void testBasicTmfExperimentConstructor() {
+
 		assertEquals("GetId", EXPERIMENT, fExperiment.getName());
         assertEquals("GetEpoch", TmfTimestamp.Zero, fExperiment.getEpoch());
         assertEquals("GetNbEvents", NB_EVENTS, fExperiment.getNbEvents());
@@ -137,7 +137,7 @@ public class TmfExperimentTest extends TestCase {
 
     public void testParseEvent() throws Exception {
 
-    	// On lower bound, returns the first event (ts = 1)
+		// On lower bound, returns the first event (ts = 1)
     	TmfContext context = fExperiment.seekEvent(new TmfTimestamp(0, SCALE, 0));
 
     	TmfEvent event = fExperiment.parseEvent(context);
@@ -511,7 +511,8 @@ public class TmfExperimentTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testProcessRequestForNbEvents() throws Exception {
-        final int blockSize = 100;
+
+		final int blockSize = 100;
         final int nbEvents  = 1000;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
 
@@ -540,7 +541,8 @@ public class TmfExperimentTest extends TestCase {
     }
     
     public void testProcessRequestForNbEvents2() throws Exception {
-        final int blockSize = 2 * NB_EVENTS;
+
+		final int blockSize = 2 * NB_EVENTS;
         final int nbEvents = 1000;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
 
@@ -569,10 +571,11 @@ public class TmfExperimentTest extends TestCase {
     }
     
     public void testProcessRequestForAllEvents() throws Exception {
-        final int nbEvents  = TmfEventRequest.ALL_DATA;
+
+		final int nbEvents  = TmfEventRequest.ALL_DATA;
         final int blockSize =  1;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
-        long nbExpectedEvents = fExperiment.getNbEvents();
+        long nbExpectedEvents = NB_EVENTS;
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, nbEvents, blockSize) {
@@ -603,8 +606,9 @@ public class TmfExperimentTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testCancel() throws Exception {
-        final int nbEvents  = NB_EVENTS;
-        final int blockSize =  fDefaultBlockSize;
+
+		final int nbEvents  = NB_EVENTS;
+        final int blockSize = fDefaultBlockSize;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
@@ -617,6 +621,12 @@ public class TmfExperimentTest extends TestCase {
                 }
                 // Cancel request after the first chunk is received
                 cancel();
+            }
+            @Override
+            public void handleCancel() {
+            	if (requestedEvents.size() < blockSize) {
+            		System.out.println("aie");
+            	}
             }
         };
         fExperiment.sendRequest(request);
@@ -632,7 +642,8 @@ public class TmfExperimentTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testGetRank() throws Exception {
-        assertEquals("getRank",    0, fExperiment.getRank(new TmfTimestamp()));
+
+		assertEquals("getRank",    0, fExperiment.getRank(new TmfTimestamp()));
         assertEquals("getRank",    0, fExperiment.getRank(new TmfTimestamp(   1, (byte) -3)));
         assertEquals("getRank",   10, fExperiment.getRank(new TmfTimestamp(  11, (byte) -3)));
         assertEquals("getRank",  100, fExperiment.getRank(new TmfTimestamp( 101, (byte) -3)));
@@ -646,7 +657,8 @@ public class TmfExperimentTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testGetTimestamp() throws Exception {
-        assertTrue("getTimestamp", fExperiment.getTimestamp(   0).equals(new TmfTimestamp(   1, (byte) -3)));
+
+		assertTrue("getTimestamp", fExperiment.getTimestamp(   0).equals(new TmfTimestamp(   1, (byte) -3)));
         assertTrue("getTimestamp", fExperiment.getTimestamp(  10).equals(new TmfTimestamp(  11, (byte) -3)));
         assertTrue("getTimestamp", fExperiment.getTimestamp( 100).equals(new TmfTimestamp( 101, (byte) -3)));
         assertTrue("getTimestamp", fExperiment.getTimestamp(1000).equals(new TmfTimestamp(1001, (byte) -3)));

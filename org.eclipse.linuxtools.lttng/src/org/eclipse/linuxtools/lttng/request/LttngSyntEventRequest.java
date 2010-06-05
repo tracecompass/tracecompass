@@ -17,6 +17,7 @@ import org.eclipse.linuxtools.lttng.event.LttngSyntheticEvent;
 import org.eclipse.linuxtools.lttng.state.evProcessor.ITransEventProcessor;
 import org.eclipse.linuxtools.tmf.component.TmfEventProvider;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 
 /**
@@ -53,7 +54,7 @@ public class LttngSyntEventRequest extends TmfEventRequest<LttngSyntheticEvent>
 			int maxBlockSize, IRequestStatusListener listener,
 			TmfTimeRange experimentTimeRange, ITransEventProcessor processor) {
 		
-		super(LttngSyntheticEvent.class, range, nbEvents, maxBlockSize);
+		super(LttngSyntheticEvent.class, range, nbEvents, maxBlockSize, ITmfDataRequest.ExecutionType.LONG);
 		//super(0, nbEvents, maxBlockSize);
 		fExperimentTimeRange = experimentTimeRange;
 		addListener(listener);

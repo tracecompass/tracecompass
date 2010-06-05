@@ -47,9 +47,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * @throws FileNotFoundException
      */
     public TmfTraceStub(String filename) throws FileNotFoundException {
-        super("TmfTraceStub", TmfEvent.class, filename);
-        fTrace  = new RandomAccessFile(filename, "r");
-        fParser = new TmfEventParserStub();
+        this(filename, DEFAULT_CACHE_SIZE, false);
     }
 
     /**
@@ -82,13 +80,6 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
         fParser = new TmfEventParserStub();
     }
 
-//    /**
-//     * @param other
-//     */
-//    public TmfTraceStub(TmfTraceStub other) {
-//        this(filename, DEFAULT_CACHE_SIZE, waitForCompletion);
-//    }
-    
     /**
      */
     @Override
@@ -96,7 +87,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     	TmfTraceStub clone = null;
    		try {
 			clone = (TmfTraceStub) super.clone();
-	       	clone.fTrace  = new RandomAccessFile(getName(), "r");
+	       	clone.fTrace  = new RandomAccessFile(getPath(), "r");
 	       	clone.fParser = new TmfEventParserStub();
 		} catch (CloneNotSupportedException e) {
 		} catch (FileNotFoundException e) {
@@ -106,12 +97,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
  
     public ITmfTrace createTraceCopy() {
 		ITmfTrace returnedValue = null;
-		try {
-			returnedValue = new TmfTraceStub(this.getName());
-		}
-		catch (FileNotFoundException e) {
-//			e.printStackTrace();
-		}
+		returnedValue = clone();
 		return returnedValue;
 	}
     
@@ -165,8 +151,8 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
 	@Override
 	public TmfEvent parseEvent(TmfContext context) {
        	try {
-   			// paserNextEvent updates the context
-   			TmfEvent event = fParser.parseNextEvent(this, context);
+   			// parseNextEvent will update the context
+   			TmfEvent event = fParser.parseNextEvent(this, context.clone());
        		return event;
        	}
        	catch (IOException e) {

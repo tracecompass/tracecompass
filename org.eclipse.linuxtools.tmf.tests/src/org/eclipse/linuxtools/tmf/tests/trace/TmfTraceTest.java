@@ -66,6 +66,13 @@ public class TmfTraceTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();	
 		fTrace = setupTrace(DIRECTORY + File.separator + TEST_STREAM);
+    	TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class) {
+			@Override
+			public void handleData() {
+			}
+    	};
+    	fTrace.sendRequest(request);
+    	request.waitForCompletion();
 	}
 
 	@Override
@@ -676,7 +683,7 @@ public class TmfTraceTest extends TestCase {
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-        final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, NB_EVENTS) {
+        final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
             @Override
             public void handleData() {
             	TmfEvent[] events = getData();
@@ -691,7 +698,7 @@ public class TmfTraceTest extends TestCase {
         providers[0].sendRequest(request);
         request.waitForCompletion();
 
-        assertEquals("nbEvents",  NB_EVENTS, requestedEvents.size());
+        assertEquals("nbEvents",  BLOCK_SIZE, requestedEvents.size());
         assertTrue("isCompleted", request.isCompleted());
         assertTrue("isCancelled", request.isCancelled());
     }

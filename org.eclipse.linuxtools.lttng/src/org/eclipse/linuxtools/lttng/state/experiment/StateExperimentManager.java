@@ -24,7 +24,6 @@ import org.eclipse.linuxtools.lttng.model.LTTngTreeNode;
 import org.eclipse.linuxtools.lttng.signal.ILttExperimentSelectedListener;
 import org.eclipse.linuxtools.lttng.signal.StateExperimentListener;
 import org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager;
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
@@ -340,7 +339,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			 */
 			@Override
 			public void handleData() {
-				TmfEvent[] events = getData();
+				LttngEvent[] events = getData();
 				if (events.length > 0) {
 					nbEvents++;
 		
@@ -367,6 +366,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			 * @see
 			 * org.eclipse.linuxtools.tmf.request.TmfDataRequest#handleFailure()
 			 */
+			@Override
 			public void handleFailure() {
 				printCompletedMessage();
 			}
@@ -377,6 +377,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			 * @see
 			 * org.eclipse.linuxtools.tmf.request.TmfDataRequest#handleCancel()
 			 */
+			@Override
 			public void handleCancel() {
 				printCompletedMessage();
 			}
@@ -387,6 +388,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			 * @see
 			 * org.eclipse.linuxtools.tmf.request.TmfDataRequest#handleSuccess()
 			 */
+			@Override
 			public void handleSuccess() {
 				printCompletedMessage();
 			}
