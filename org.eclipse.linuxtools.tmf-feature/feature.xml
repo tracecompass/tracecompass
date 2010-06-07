@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.linuxtools.tmf"
       label="%featureName"
-      version="0.3.0.qualifier"
+      version="0.2.0.qualifier"
       provider-name="%featureProvider">
 
    <description>
@@ -20,7 +20,7 @@
    <requires>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.linuxtools.tmf" version="0.3.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.tmf" version="0.2.0" match="greaterOrEqual"/>
       <import plugin="org.junit"/>
    </requires>
 
