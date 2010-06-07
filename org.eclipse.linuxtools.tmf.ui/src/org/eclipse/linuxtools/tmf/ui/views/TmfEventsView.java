@@ -12,6 +12,11 @@
 
 package org.eclipse.linuxtools.tmf.ui.views;
 
+import java.lang.reflect.InvocationTargetException;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
@@ -28,6 +33,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -46,6 +52,8 @@ public class TmfEventsView extends TmfView {
 
     private TmfExperiment<TmfEvent> fExperiment;
     private String fTitlePrefix;
+
+	private Shell fShell;
 
 	// ------------------------------------------------------------------------
     // Table data
@@ -119,6 +127,8 @@ public class TmfEventsView extends TmfView {
 	@Override
 	public void createPartControl(Composite parent) {
     	
+    	fShell = parent.getShell();
+    
     	// Create a virtual table
     	// TODO: change SINGLE to MULTI line selection and adjust the selection listener
         final int style = SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.VIRTUAL;
@@ -255,14 +265,32 @@ public class TmfEventsView extends TmfView {
     	fExperiment = (TmfExperiment<TmfEvent>) signal.getExperiment();
     	setPartName(fTitlePrefix + " - " + fExperiment.getName());
 
-        // Perform the updates on the UI thread
-        fTable.getDisplay().asyncExec(new Runnable() {
-        	public void run() {
-       			fTable.setSelection(0);
-            	fTable.removeAll();
-				cacheStartIndex = cacheEndIndex = 0;	// Clear the cache
-        	}
-        });
+    	ProgressMonitorDialog dialog = new ProgressMonitorDialog(fShell);
+    	try {
+			dialog.run(false, false, new IRunnableWithProgress() {
+			    public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+			        monitor.beginTask("Cleaning up, please wait", 0);
+
+			        // Perform the updates on the UI thread
+			        fTable.getDisplay().syncExec(new Runnable() {
+			        	public void run() {
+							fTable.setSelection(0);
+							fTable.removeAll();
+							cacheStartIndex = cacheEndIndex = 0; // Clear the cache
+
+							if (!fTable.isDisposed() && fExperiment != null) {
+								int nbEvents = (int) fExperiment.getNbEvents();
+								fTable.setItemCount((nbEvents > 100) ? nbEvents : 100);
+							}
+			        	}
+			        });
+
+			        monitor.done();
+			    }
+			  });
+		} catch (InvocationTargetException e) {
+		} catch (InterruptedException e) {
+		}
     }
 
 	@TmfSignalHandler
