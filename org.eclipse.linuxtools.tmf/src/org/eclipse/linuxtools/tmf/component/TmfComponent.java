@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.component;
 
-import org.eclipse.linuxtools.tmf.Tracer;
 import org.eclipse.linuxtools.tmf.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 
@@ -33,7 +32,7 @@ public abstract class TmfComponent implements ITmfComponent {
 
 	public TmfComponent(String name) {
 		fName = name;
-		if (Tracer.isComponentTraced()) Tracer.traceComponent(this, "created");
+//		if (Tracer.isComponentTraced()) Tracer.traceComponent(this, "created");
 		TmfSignalManager.register(this);
 	}
 	
@@ -67,7 +66,7 @@ public abstract class TmfComponent implements ITmfComponent {
 	 */
 	public void dispose() {
 		TmfSignalManager.deregister(this);
-		if (Tracer.isComponentTraced()) Tracer.traceComponent(this, "terminated");
+//		if (Tracer.isComponentTraced()) Tracer.traceComponent(this, "terminated");
 	}
 
 	/* (non-Javadoc)

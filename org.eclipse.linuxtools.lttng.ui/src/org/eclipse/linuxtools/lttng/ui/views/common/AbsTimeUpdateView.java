@@ -30,6 +30,7 @@ import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
@@ -205,7 +206,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 				}
 
 				// Clearing of process data is configurable
-				dataRequest(trange, experiment.getTimeRange(), clearingData);
+				dataRequest(trange, experiment.getTimeRange(), clearingData, ExecutionType.SHORT);
 			}
 		}
 	}
@@ -304,17 +305,34 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	/**
 	 * @param zoomedTRange
 	 * @param experimentTRange
+	 * @param execType 
 	 */
 	public void dataRequest(TmfTimeRange zoomedTRange,
-			TmfTimeRange experimentTRange, boolean clearingData) {
+			TmfTimeRange experimentTRange, boolean clearingData, ExecutionType execType) {
 
 		// timeRange is the Experiment time range
-		 boolean sent = processDataRequest(zoomedTRange, experimentTRange, clearingData);
+		 boolean sent = processDataRequest(zoomedTRange, experimentTRange, clearingData, execType);
 
 		if (sent) {
 			waitCursor(true);
 		}
 	}
+
+//	/**
+//	 * @param zoomedTRange
+//	 * @param experimentTRange
+//	 * @param execType 
+//	 */
+//	public void dataRequest(TmfTimeRange zoomedTRange,
+//			TmfTimeRange experimentTRange, boolean clearingData) {
+//
+//		// timeRange is the Experiment time range
+//		 boolean sent = processDataRequest(zoomedTRange, experimentTRange, clearingData);
+//
+//		if (sent) {
+//			waitCursor(true);
+//		}
+//	}
 
 	/**
 	 * send data request directly e.g. doesn't use a queue
@@ -322,11 +340,12 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	 * @param requestTrange
 	 * @param listener
 	 * @param experimentTRange
+	 * @param execType 
 	 * @param processor
 	 * @return
 	 */
 	private boolean processDataRequest(TmfTimeRange requestTrange,
-			TmfTimeRange experimentTRange, boolean clearingData) {
+			TmfTimeRange experimentTRange, boolean clearingData, ExecutionType execType) {
 		// Validate input
 		if (requestTrange == null || experimentTRange == null) {
 			TraceDebug.debug("Invalid input");
@@ -335,13 +354,13 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 
 		// Cancel the currently executing request before starting a new one
 		if (fCurrentRequest != null && !fCurrentRequest.isCompleted()) {
-			System.out.println("Cancelling request");
+//			System.out.println("Cancelling request");
 //			fCurrentRequest.cancel();
 		}
 		
 		fCurrentRequest = new LttngSyntEventRequest(
 				requestTrange, DEFAULT_OFFSET, TmfDataRequest.ALL_DATA,
-				DEFAULT_CHUNK, this, experimentTRange, getEventProcessor()) {
+				DEFAULT_CHUNK, this, experimentTRange, getEventProcessor(), execType) {
 	
 			Long fCount = getSynEventCount();
 			ITransEventProcessor processor = getProcessor();
@@ -589,6 +608,8 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 						}
 					});
 				}
+
+//				System.out.println(System.currentTimeMillis() + ": AbsTimeUpdate (" + getName() + ") completed");
 
 				if (TraceDebug.isDEBUG()) {
 					int eventCount = 0;

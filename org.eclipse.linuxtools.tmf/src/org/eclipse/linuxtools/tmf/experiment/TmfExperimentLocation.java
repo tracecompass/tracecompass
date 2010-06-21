@@ -40,6 +40,17 @@ public class TmfExperimentLocation extends TmfLocation<ITmfLocation<?>[]> {
 		return new TmfExperimentLocation(clones, fRanks.clone());
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder result = new StringBuilder("[TmfExperimentLocation");
+		ITmfLocation<?>[] locations = (ITmfLocation<?>[]) getLocation();
+		for (int i = 0; i < locations.length; i++) {
+			result.append("[" + locations[i].toString() + "," + fRanks[i] + "]");
+		}
+		result.append("]");
+		return result.toString();
+	}
+
 	public long[] getRanks() {
         return fRanks;
     }

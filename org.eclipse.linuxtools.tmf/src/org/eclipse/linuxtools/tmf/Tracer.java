@@ -23,6 +23,7 @@ public class Tracer {
 	static Boolean SIGNAL    = Boolean.FALSE;
 	static Boolean EVENT     = Boolean.FALSE;
 
+	private static String LOGNAME = "trace.log";
 	private static BufferedWriter fTraceLog = null;
 
 	private static BufferedWriter openLogFile(String filename) {
@@ -84,7 +85,19 @@ public class Tracer {
 
 		// Create trace log file if needed
 		if (isTracing) {
-			fTraceLog = openLogFile("trace.log");
+			fTraceLog = openLogFile(LOGNAME);
+		}
+	}
+
+	public static void stop() {
+		if (fTraceLog == null)
+			return;
+
+		try {
+			fTraceLog.close();
+			fTraceLog = null;
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -114,15 +127,16 @@ public class Tracer {
 		message.append(currentTime % 1000);
 		message.append("] ");
 		message.append(msg);
-		System.out.println(message);
-		try {
-			if (fTraceLog != null) {
+//		System.out.println(message);
+
+		if (fTraceLog != null) {
+			try {
 				fTraceLog.write(message.toString());
 				fTraceLog.newLine();
 				fTraceLog.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -146,6 +160,11 @@ public class Tracer {
 
 	public static void traceError(String msg) {
 		String message = ("[ERR] Thread=" + Thread.currentThread().getId() + " " + msg);
+		trace(message);
+	}
+
+	public static void traceInfo(String msg) {
+		String message = ("[INF] Thread=" + Thread.currentThread().getId() + " " + msg);
 		trace(message);
 	}
 

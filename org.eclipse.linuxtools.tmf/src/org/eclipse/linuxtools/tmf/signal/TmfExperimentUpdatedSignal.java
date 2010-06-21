@@ -14,7 +14,6 @@ package org.eclipse.linuxtools.tmf.signal;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
-import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 
 /**
  * <b><u>TmfExperimentUpdatedSignal</u></b>
@@ -24,28 +23,28 @@ import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 public class TmfExperimentUpdatedSignal extends TmfSignal {
 
 	private final TmfExperiment<? extends TmfEvent> fExperiment;
-	private final ITmfTrace fTrace;
+//	private final ITmfTrace fTrace;
 	
-	public TmfExperimentUpdatedSignal(Object source, TmfExperiment<? extends TmfEvent> experiment, ITmfTrace trace) {
+	public TmfExperimentUpdatedSignal(Object source, TmfExperiment<? extends TmfEvent> experiment) { // , ITmfTrace trace) {
 		super(source);
 		fExperiment = experiment;
-		fTrace = trace;
+//		fTrace = trace;
 	}
 
 	public TmfExperiment<? extends TmfEvent> getExperiment() {
 		return fExperiment;
 	}
 
-	public ITmfTrace getTrace() {
-		return fTrace;
-	}
+//	public ITmfTrace getTrace() {
+//		return fTrace;
+//	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "[TmfExperimentUpdatedSignal (" + fExperiment.toString() + ", " + fTrace.toString() + ")]";
+		return "[TmfExperimentUpdatedSignal (" + fExperiment.toString() /*+ ", " + fTrace.toString()*/ + ")]";
 	}
 
 }

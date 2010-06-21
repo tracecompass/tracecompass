@@ -75,6 +75,7 @@ public class TmfCorePlugin extends Plugin {
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
+		Tracer.stop();
 		setDefault(null);
 		super.stop(context);
 	}

@@ -19,7 +19,7 @@ package org.eclipse.linuxtools.tmf.trace;
  */
 public interface ITmfContext {
 
-	public long UNKNOWN_RANK = -1L;
+	public long UNKNOWN_RANK = -2L;
 
 	public void setLocation(ITmfLocation<?> location);
 	public ITmfLocation<?> getLocation();

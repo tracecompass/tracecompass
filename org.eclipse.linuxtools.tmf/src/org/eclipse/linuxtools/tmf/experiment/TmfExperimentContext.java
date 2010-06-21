@@ -46,7 +46,7 @@ public class TmfExperimentContext extends TmfContext {
 	private ITmfTrace[]  fTraces = new ITmfTrace[0];
 	private TmfContext[] fContexts;
 	private TmfEvent[]   fEvents;
-	private int lastTrace;
+	private int lastTraceRead;
 
 	// ------------------------------------------------------------------------
 	// Constructors
@@ -71,7 +71,7 @@ public class TmfExperimentContext extends TmfContext {
 		
 		setLocation(new TmfExperimentLocation(locations, ranks));
 		setRank(rank);
-		lastTrace = NO_TRACE;
+		lastTraceRead = NO_TRACE;
 	}
 
 	public TmfExperimentContext(ITmfTrace[] traces) {
@@ -81,9 +81,10 @@ public class TmfExperimentContext extends TmfContext {
 	public TmfExperimentContext(TmfExperimentContext other) {
 		this(other.fTraces, other.cloneContexts());
 		fEvents = other.fEvents;
-		setLocation(other.getLocation().clone());
+		if (other.getLocation() != null)
+			setLocation(other.getLocation().clone());
 		setRank(other.getRank());
-		setLastTrace(other.lastTrace);
+		setLastTrace(other.lastTraceRead);
 	}
 
 	private TmfContext[] cloneContexts() {
@@ -110,11 +111,11 @@ public class TmfExperimentContext extends TmfContext {
 	}
 
 	public int getLastTrace() {
-		return lastTrace;
+		return lastTraceRead;
 	}
 
 	public void setLastTrace(int newIndex) {
-		lastTrace = newIndex;
+		lastTraceRead = newIndex;
 	}
 
 	// ------------------------------------------------------------------------
@@ -142,6 +143,7 @@ public class TmfExperimentContext extends TmfContext {
     	while (isEqual && i < fTraces.length) {
     		isEqual &= fTraces[i].equals(o.fTraces[i]);
     		isEqual &= fContexts[i].equals(o.fContexts[i]);
+    		i++;
     	}
     	return isEqual;
     }

@@ -18,6 +18,7 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 
 /**
  * This class is an extension of Tmf Event Request which includes specific
@@ -35,6 +36,7 @@ public abstract class LttngBaseEventRequest extends TmfEventRequest<LttngEvent> 
 	private long numOfEvents = 0;
 	private boolean clearDataInd = false;
 	private final LttngTraceState ftraceModel;
+	private final ITmfTrace ftrace;
 	/**
 	 * The time to send events to the application as requested, Note: The start
 	 * time of the request for base events is adjusted to the nearest check
@@ -54,12 +56,13 @@ public abstract class LttngBaseEventRequest extends TmfEventRequest<LttngEvent> 
 	 * @param traceModel
 	 * @param listener
 	 */
-	public LttngBaseEventRequest(TmfTimeRange range, TmfTimestamp dispatchTime,
-			long offset, int nbEvents, int maxBlockSize,
-			LttngTraceState traceModel, ITmfDataRequest.ExecutionType execType) {
+	public LttngBaseEventRequest(TmfTimeRange range, TmfTimestamp dispatchTime, long offset, int nbEvents,
+			int maxBlockSize, LttngTraceState traceModel, ITmfDataRequest.ExecutionType execType, ITmfTrace trace) {
 		super(LttngEvent.class, range, nbEvents, maxBlockSize, execType);
 		ftraceModel = traceModel;
 		fDispatchTime = dispatchTime;
+		ftrace = trace;
+
 	}
 
 	@Override
@@ -131,5 +134,12 @@ public abstract class LttngBaseEventRequest extends TmfEventRequest<LttngEvent> 
 	 */
 	public TmfTimestamp getDispatchTime() {
 		return fDispatchTime;
+	}
+
+	/**
+	 * @return
+	 */
+	public ITmfTrace getTrace() {
+		return ftrace;
 	}
 }

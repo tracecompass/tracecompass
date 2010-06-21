@@ -35,7 +35,10 @@ import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.signal.TmfEndSynchSignal;
+import org.eclipse.linuxtools.tmf.signal.TmfStartSynchSignal;
 import org.eclipse.linuxtools.tmf.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
 
@@ -134,6 +137,8 @@ public class LttngSyntheticEventProvider extends
 
 		// loop for every traceManager in current experiment
 		boolean subRequestQueued = false;
+		TmfExperiment<LttngEvent> experiment = (TmfExperiment<LttngEvent>) fExperiment.getValue();
+		experiment.startSynch(new TmfStartSynchSignal(0));
 		for (IStateTraceManager traceManager : fEventProviderRequests.keySet()) {
 
 			// restore trace state system to nearest check point
@@ -158,10 +163,12 @@ public class LttngSyntheticEventProvider extends
 			}
 
 			LttngTraceState traceModel = traceManager.getStateModel();
+			// String key = (traceManager.getTrace().getPath() +
+			// traceManager.getTrace().getName()).hashCode();
+			ITmfTrace trace = traceManager.getTrace();
 			// create sub-request for one trace within experiment
-			final LttngBaseEventRequest subRequest = new LttngBaseEventRequest(
-					adjustedRange, reqWindow.getStartTime(), 0,
-					TmfEventRequest.ALL_DATA, BLOCK_SIZE, traceModel, ITmfDataRequest.ExecutionType.SHORT) {
+			final LttngBaseEventRequest subRequest = new LttngBaseEventRequest(adjustedRange, reqWindow.getStartTime(),
+					0, TmfEventRequest.ALL_DATA, BLOCK_SIZE, traceModel, ITmfDataRequest.ExecutionType.SHORT, trace) {
 
 				private LttngSyntheticEvent syntheticEvent = null;
 				private LttngSyntheticEvent syntheticAckIndicator = null;
@@ -180,6 +187,9 @@ public class LttngSyntheticEventProvider extends
 				@Override
 				public void handleData() {
 					LttngEvent[] events = getData();
+					
+//					Tracer.trace("Sep: " + events[0].getTimestamp());
+
 					if (events.length > 0) {
 						for (LttngEvent e : events) {
 							handleIncomingData(e);
@@ -217,6 +227,12 @@ public class LttngSyntheticEventProvider extends
 					// System.out.println("debug mark at 13589777932952L");
 					// }
 
+					TmfTrace<LttngEvent> inTrace =  e.getParentTrace();
+					if (!(inTrace == getTrace())) {
+//						System.out.println("Event from a different trace discarded");
+						return;
+					}
+					
 					// queue the new event data and an ACK
 					updateSynEvent(e);
 
@@ -292,12 +308,14 @@ public class LttngSyntheticEventProvider extends
 			fEventProviderRequests.put(traceManager, subRequest);
 
 			// start request
-			TmfTrace<LttngEvent> provider = (TmfTrace<LttngEvent>) traceManager
-					.getTrace();
-			// provider.sendRequest(subRequest, ExecutionType.LONG);
+			TmfExperiment<LttngEvent> provider = (TmfExperiment<LttngEvent>) fExperiment.getValue();
 			provider.sendRequest(subRequest);
+
+			// provider.sendRequest(subRequest, ExecutionType.LONG);
 			subRequestQueued = true;
 		}
+
+		experiment.endSynch(new TmfEndSynchSignal(0));
 
 		// Return a dummy context, not used for relay provider
 		return (subRequestQueued) ? new TmfContext() : null;

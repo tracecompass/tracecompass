@@ -97,7 +97,7 @@ public class HistogramView extends TmfView implements ControlListener {
     
     // *** TODO ***
     // This need to be changed as soon the framework implement a "window"
-    private static long DEFAULT_WINDOW_SIZE = (1L * 100 * 1000 * 1000); // 0.1sec
+    private static long DEFAULT_WINDOW_SIZE = (10L * 100 * 1000 * 1000); // 1sec
     
     // The last experiment received/used by the view
     private TmfExperiment<LttngEvent> lastUsedExperiment = null;
@@ -602,7 +602,8 @@ public class HistogramView extends TmfView implements ControlListener {
         // Set a (dynamic) time interval
         long intervalTime = ( (ts2.getValue() - ts1.getValue()) / selectedWindowCanvas.getHistogramContent().getNbElement() );
         
-        selectedWindowRequest = performRequest(experiment, selectedWindowCanvas, tmpRange, intervalTime, ExecutionType.LONG);
+		selectedWindowRequest = performRequest(experiment, selectedWindowCanvas, tmpRange, intervalTime,
+				ExecutionType.SHORT);
         selectedWindowCanvas.redrawAsynchronously();
     }
     
@@ -740,6 +741,9 @@ public class HistogramView extends TmfView implements ControlListener {
     	// *** TODO ***
     	// Not very elegant... we need to chance this below.
     	//
+    	if (TmfExperiment.getCurrentExperiment() == null)
+    		return;
+
     	long centerTime = fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition();
     	long windowWidth = fullExperimentCanvas.getCurrentWindow().getWindowTimeWidth();
     	

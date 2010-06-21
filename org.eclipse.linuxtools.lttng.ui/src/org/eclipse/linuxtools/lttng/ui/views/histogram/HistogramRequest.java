@@ -86,6 +86,8 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
         if (event != null) {
         
         	LttngEvent tmpEvent = (LttngEvent) event;
+
+//			Tracer.trace("Hst: " + event.getTimestamp());
         	
         	// This check is linked to the evil fix mentionned above
         	if ( ( tmpEvent.getTimestamp().getValue() >= histogramContent.getStartTime() ) &&
@@ -164,23 +166,25 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
     public void handleCompleted() {
     	parentCanvas.notifyParentUpdatedInformationAsynchronously();
 		redrawAsyncronously();
+		super.handleCompleted();
+//		System.out.println(System.currentTimeMillis() + ": HistogramView (" + ((getExecType() == ExecutionType.LONG) ? "long" : "short") + ") completed");
     }
     
-    /**
-	 * Function that is called when the request completed successfully.<p>
-	 */
-    @Override
-    public void handleSuccess() {
-    	// Nothing different from completed.
-    }
+//    /**
+//	 * Function that is called when the request completed successfully.<p>
+//	 */
+//    @Override
+//    public void handleSuccess() {
+//    	// Nothing different from completed.
+//    }
     
-    /**
-	 * Function that is called when the request completed in failure.<p>
-	 */
-    @Override
-    public void handleFailure() {
-    	// Nothing different from cancel.
-    }
+//    /**
+//	 * Function that is called when the request completed in failure.<p>
+//	 */
+//    @Override
+//    public void handleFailure() {
+//    	// Nothing different from cancel.
+//    }
     
     /**
 	 * Function that is called when the request was cancelled.<p>

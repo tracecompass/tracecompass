@@ -199,17 +199,18 @@ public class TmfEventProviderTest extends TestCase {
 
 	public void testGetSyntheticEvents_WeirdTimeRange1() {
 		TmfTimestamp start = TmfTimestamp.BigBang;
-		TmfTimestamp end   = new TmfTimestamp(0, (byte) -3, 0);
+		TmfTimestamp end   = TmfTimestamp.Zero; // new TmfTimestamp(0, (byte) -3, 0);
         TmfTimeRange range = new TmfTimeRange(start, end);
 		try {
 			getSyntheticData(range, -1, TmfSyntheticEventProviderStub.BLOCK_SIZE);
+//			System.out.println("aie");
 		} catch (InterruptedException e) {
 			fail();
 		}
 	}
 
 	public void testGetSyntheticEvents_WeirdTimeRange2() {
-		TmfTimestamp start = new TmfTimestamp(0, (byte) -3, 0);
+		TmfTimestamp start = TmfTimestamp.Zero; // new TmfTimestamp(0, (byte) -3, 0);
 		TmfTimestamp end   = TmfTimestamp.BigCrunch;
         TmfTimeRange range = new TmfTimeRange(start, end);
 		try {

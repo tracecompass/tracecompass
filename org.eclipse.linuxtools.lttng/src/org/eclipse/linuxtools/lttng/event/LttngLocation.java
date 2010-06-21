@@ -119,14 +119,30 @@ public class LttngLocation implements ITmfLocation<LttngTimestamp> {
 		isLastOperationSeek = false;
 	}
 	
+	// ------------------------------------------------------------------------
+	// Object
+	// ------------------------------------------------------------------------
+
+	@Override
+	public boolean equals(Object other) {
+    	if (!(other instanceof LttngLocation)) {
+    		return false;
+    	}
+    	LttngLocation o = (LttngLocation) other;
+    	return (operationTime.equals(o.operationTime)) && (isLastOperationParse == o.isLastOperationParse) &&
+    		   (isLastOperationReadNext == o.isLastOperationReadNext) && (isLastOperationSeek == o.isLastOperationSeek);
+	}
+	
 	@Override
 	public String toString() {
-		return "\tLttngLocation[ P/R/S : "  + isLastOperationParse + "/" + isLastOperationReadNext + "/" + isLastOperationSeek + "  Current : " + operationTime + " ]";
+//		return "\tLttngLocation[ P/R/S : "  + isLastOperationParse + "/" + isLastOperationReadNext + "/" + isLastOperationSeek + "  Current : " + operationTime + " ]";
+		return operationTime.toString();
 	}
 	
 	// ------------------------------------------------------------------------
 	// ITmfLocation
 	// ------------------------------------------------------------------------
+
 	public void setLocation(LttngTimestamp location) {
 		operationTime  = (LttngTimestamp)location;
 	}

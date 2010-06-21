@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.component;
 
+import org.eclipse.linuxtools.tmf.Tracer;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
@@ -54,6 +55,10 @@ public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvid
 			TmfCoalescedEventRequest<T> coalescedRequest = 
 				new TmfCoalescedEventRequest<T>(fType, eventRequest.getRange(), eventRequest.getNbRequested(), eventRequest.getBlockize(), eventRequest.getExecType());
 			coalescedRequest.addRequest(eventRequest);
+	        if (Tracer.isRequestTraced()) {
+		        Tracer.traceRequest(request, "coalesced with " + coalescedRequest.getRequestId());
+		        Tracer.traceRequest(coalescedRequest, "added " + request.getRequestId());
+	        }
 			fPendingCoalescedRequests.add(coalescedRequest);
 		}
 		else {

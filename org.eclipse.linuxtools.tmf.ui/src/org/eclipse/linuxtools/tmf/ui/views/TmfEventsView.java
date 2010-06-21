@@ -265,7 +265,7 @@ public class TmfEventsView extends TmfView {
     	fExperiment = (TmfExperiment<TmfEvent>) signal.getExperiment();
     	setPartName(fTitlePrefix + " - " + fExperiment.getName());
 
-    	ProgressMonitorDialog dialog = new ProgressMonitorDialog(fShell);
+        ProgressMonitorDialog dialog = new ProgressMonitorDialog(fShell);
     	try {
 			dialog.run(false, false, new IRunnableWithProgress() {
 			    public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {

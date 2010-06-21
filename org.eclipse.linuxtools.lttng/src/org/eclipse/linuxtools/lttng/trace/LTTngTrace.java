@@ -55,7 +55,7 @@ class LTTngTraceException extends LttngException {
 public class LTTngTrace extends TmfTrace<LttngEvent> {
 	
 //	// [lmcfrch]
-//    private long lastTime = 0;
+//	private long lastTime = 0;
 
 	public static boolean printDebug = false;
 	public static boolean uniqueEvent = false;
@@ -172,6 +172,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         			  				    	new LttngTimestamp(currentJniTrace.getEndTime().getTime())
                                       	  ) );
 //        }
+
     }
     
     /*
@@ -184,7 +185,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     	// *** VERIFY ***
     	// Is this safe?
     	this.fCheckpoints = oldTrace.fCheckpoints;
-    	
+
     	/*
     	// This would only work if the index is already done
     	this.fCheckpoints = new Vector<TmfCheckpoint>( oldTrace.fCheckpoints.size() );
@@ -214,7 +215,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     }
     
     @Override
-    public LTTngTrace clone() {
+    public synchronized LTTngTrace clone() {
     	LTTngTrace clone = null;
     	try {
     		clone = (LTTngTrace) super.clone();
@@ -437,7 +438,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     public synchronized TmfContext seekEvent(TmfTimestamp timestamp) {
     	
 //    	// [lmcfrch]
-//    	lastTime = 0;
+		// lastTime = 0;
     	
     	if ( printDebug == true ) {
     		System.out.println("seekEvent(timestamp) timestamp -> " + timestamp);
@@ -568,6 +569,10 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     		curLocation = (LttngLocation)context.getLocation();
     	}
     	
+////    	[lmcfrch]
+//    	TmfContext savedContext = context.clone();
+////    	[/lmcfrch]
+    	
     	// *** HACK ***
     	// TMF assumes it is possible to read (GetNextEvent) to the next Event once ParseEvent() is called
     	// In LTTNG, there is not difference between "Parsing" and "Reading" an event.
@@ -612,16 +617,18 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     	if ( returnedEvent != null ) {
     		previousLocation.setOperationTime((LttngTimestamp)returnedEvent.getTimestamp());
     		curLocation.setOperationTime((LttngTimestamp)returnedEvent.getTimestamp());
-    		
+
+////        	[lmcfrch]
+//    		LttngLocation prevLocation = (LttngLocation) savedContext.getLocation();
+//    		LttngLocation currLocation = (LttngLocation) context.getLocation();
+//    		Tracer.trace("Trc: " + context.getRank() + ": " + returnedEvent.getTimestamp().toString() + " (" +
+//    				(prevLocation.isLastOperationParse() ? "T" : "F") + "," + (prevLocation.isLastOperationReadNext() ? "T" : "F") + "," + (prevLocation.isLastOperationSeek() ? "T" : "F") + "), (" +
+//    				(currLocation.isLastOperationParse() ? "T" : "F") + "," + (currLocation.isLastOperationReadNext() ? "T" : "F") + "," + (currLocation.isLastOperationSeek() ? "T" : "F") + ")"
+//    				);
+////        	[/lmcfrch]
+
     		updateIndex(context, context.getRank(), returnedEvent.getTimestamp());
     		context.updateRank(1);
-
-//    		// [lmcfrch]
-//        	long newTime = returnedEvent.getOriginalTimestamp().getValue();
-//        	if ((newTime-lastTime) <= 0)
-//        		System.out.println("Going back in time (or not moving): " + newTime + ", " + lastTime);
-//        	lastTime = newTime;
-//        	System.out.println(getName() + Thread.currentThread() + ", ts=" + lastTime);
     	}
 
     	return returnedEvent;

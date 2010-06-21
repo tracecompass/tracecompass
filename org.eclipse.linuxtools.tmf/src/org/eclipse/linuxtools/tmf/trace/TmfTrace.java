@@ -98,12 +98,6 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     	setName(simpleName);
     	fPath = path;
         fIndexPageSize = (cacheSize > 0) ? cacheSize : DEFAULT_CACHE_SIZE;
-
-        try {
-			fClone = clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
     }
 
     /* (non-Javadoc)

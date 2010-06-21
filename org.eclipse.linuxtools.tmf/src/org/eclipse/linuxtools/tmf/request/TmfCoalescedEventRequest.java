@@ -91,6 +91,7 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
 		if (request instanceof ITmfEventRequest<?>) {
 			boolean ok = getNbRequested() == request.getNbRequested();
 			ok &= getBlockize() == request.getBlockize();
+			ok &= getExecType() == request.getExecType();
 			if (ok) {
 				TmfTimestamp startTime = ((ITmfEventRequest<T>) request).getRange().getStartTime();
 				TmfTimestamp endTime   = ((ITmfEventRequest<T>) request).getRange().getEndTime();
@@ -113,8 +114,9 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
     	for (ITmfDataRequest<T> request : fRequests) {
 			if (request instanceof TmfEventRequest<?>) {
     			TmfEventRequest<T> req = (TmfEventRequest<T>) request;
-        		T[] data = getData();
-        		if (data.length > 0 && req.getRange().contains(data[0].getTimestamp())) {
+    			T[] data = getData();
+    			TmfTimestamp ts = data[0].getTimestamp();
+        		if (data.length > 0 && req.getRange().contains(ts)) {
             		req.setData(data);
             		req.handleData();
         		}

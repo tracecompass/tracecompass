@@ -307,7 +307,8 @@ public class TimeFrameView extends TmfView {
     public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
 
         // Update the time frame
-       	fTraceTimeRange = signal.getTrace().getTimeRange();
+//      fTraceTimeRange = signal.getTrace().getTimeRange();
+       	fTraceTimeRange = signal.getExperiment().getTimeRange();
         fTraceStartTime = fTraceTimeRange.getStartTime();
         fTraceEndTime   = fTraceTimeRange.getEndTime();
         fScale          = fTraceStartTime.getScale();

@@ -1,0 +1,8 @@
+org.eclipse.linuxtools.tmf/error=false
+org.eclipse.linuxtools.tmf/warning=false
+org.eclipse.linuxtools.tmf/info=false
+
+org.eclipse.linuxtools.tmf/component=false
+org.eclipse.linuxtools.tmf/request=false
+org.eclipse.linuxtools.tmf/signals=false
+org.eclipse.linuxtools.tmf/event=false

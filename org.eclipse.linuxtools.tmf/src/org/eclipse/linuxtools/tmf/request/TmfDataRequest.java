@@ -93,7 +93,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     private final int      		fBlockSize;     // The maximum number of events per chunk
     protected     int      		fNbRead;        // The number of reads so far
 
-    private final Object lock;
+    private final   Object lock;
     private boolean fRequestRunning   = false;
     private boolean fRequestCompleted = false;
     private boolean fRequestFailed    = false;
@@ -359,7 +359,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
             lock.notify();
         }
         handleStarted();
-       if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "started");
+        if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "started");
     }
 
     /**
@@ -368,11 +368,13 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     public void done() {
         if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "completing");
         synchronized(lock) {
-        	fRequestRunning   = false;
-            fRequestCompleted = true;
+        	if (!fRequestCompleted) {
+            	fRequestRunning   = false;
+                fRequestCompleted = true;
+            }
+            handleCompleted();
             lock.notify();
         }
-        handleCompleted();
     }
 
     /**

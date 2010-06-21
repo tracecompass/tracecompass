@@ -28,6 +28,7 @@ import org.eclipse.linuxtools.lttng.ui.views.resources.model.ResourceModelFactor
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
@@ -532,7 +533,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		// user to select the interesting area based on the perspective
 		TmfTimeRange initTimeWindow = getInitTRange(experimentTRange);
 
-		dataRequest(initTimeWindow, experimentTRange, true);
+		dataRequest(initTimeWindow, experimentTRange, true, ExecutionType.SHORT);
 		if (TraceDebug.isDEBUG()) {
 			TraceDebug.debug("Initialization request time range is: " + initTimeWindow.getStartTime().toString() + "-"
 					+ initTimeWindow.getEndTime().toString());

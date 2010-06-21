@@ -12,11 +12,15 @@
 
 package org.eclipse.linuxtools.tmf.request;
 
-import java.util.Queue;
+import java.util.Comparator;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
+
+import org.eclipse.linuxtools.tmf.Tracer;
+import org.eclipse.linuxtools.tmf.component.TmfThread;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 
 /**
  * <b><u>TmfRequestExecutor</u></b>
@@ -27,7 +31,15 @@ public class TmfRequestExecutor implements Executor {
 
 	private final ExecutorService fExecutor;
 	private final String fExecutorName;
-	private final Queue<Runnable> fRequestQueue = new LinkedBlockingQueue<Runnable>();
+	private final PriorityBlockingQueue<TmfThread> fRequestQueue = new PriorityBlockingQueue<TmfThread>(100, new Comparator<TmfThread>() {
+		public int compare(TmfThread o1, TmfThread o2) {
+			if (o1.getExecType() == o2.getExecType())
+				return 0;
+			if (o1.getExecType() == ExecutionType.SHORT)
+				return 1;
+			return -1;
+		}
+	});
 	private Runnable fCurrentRequest;
 	
 	// ------------------------------------------------------------------------
@@ -42,7 +54,7 @@ public class TmfRequestExecutor implements Executor {
 		fExecutor = executor;
 		String canonicalName = fExecutor.getClass().getCanonicalName();
 		fExecutorName = canonicalName.substring(canonicalName.lastIndexOf('.') + 1);
-//		if (Tracer.COMPONENTS) Tracer.trace(fExecutor + " created");
+		if (Tracer.isComponentTraced()) Tracer.trace(fExecutor + " created");
 	}
 
 	/**
@@ -71,7 +83,7 @@ public class TmfRequestExecutor implements Executor {
 	 */
 	public void stop() {
 		fExecutor.shutdown();
-//		if (Tracer.COMPONENTS) Tracer.trace(fExecutor + " terminated");
+		if (Tracer.isComponentTraced()) Tracer.trace(fExecutor + " terminated");
 	}
 	
 	// ------------------------------------------------------------------------
@@ -81,11 +93,13 @@ public class TmfRequestExecutor implements Executor {
 	/* (non-Javadoc)
 	 * @see java.util.concurrent.Executor#execute(java.lang.Runnable)
 	 */
-	public synchronized void execute(final Runnable request) {
-		fRequestQueue.offer(new Runnable() {
+	public synchronized void execute(final Runnable requestThread) {
+		fRequestQueue.offer(new TmfThread(((TmfThread) requestThread).getExecType()) {
+			@Override
 			public void run() {
 				try {
-					request.run();
+					requestThread.run();
+				    if (Tracer.isRequestTraced()) Tracer.trace("[REQ] Request finished");
 				} finally {
 					scheduleNext();
 				}

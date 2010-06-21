@@ -36,6 +36,7 @@ import org.eclipse.linuxtools.lttng.ui.views.statistics.model.StatisticsTreeRoot
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
@@ -581,8 +582,8 @@ public class StatisticsView extends AbsTimeUpdateView {
 					for (int i = 0; i < numTraces; i++) {
 						String traceName = traces[i].getName();
 						if (!experimentTreeNode.containsChild(traceName)) {
-							same = false;
-							break;
+							 same = false;
+							 break;
 						}
 					}
 
@@ -616,7 +617,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 			TmfTimeRange experimentTRange = experiment.getTimeRange();
 
 			// send the initial request, to start filling up model
-			dataRequest(experimentTRange, experimentTRange, true);
+			dataRequest(experimentTRange, experimentTRange, true, ExecutionType.LONG);
 		} else {
 			TraceDebug.debug("No selected experiment information available");
 		}

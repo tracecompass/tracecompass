@@ -190,6 +190,7 @@ public class ProjectView extends TmfView {
 			StateManagerFactory.getExperimentManager().experimentSelected_prep(
 					(TmfExperiment<LttngEvent>) fSelectedExperiment);
 
+//			System.out.println(System.currentTimeMillis() + ": Experiment selected");
             broadcast(new TmfExperimentSelectedSignal<LttngEvent>(this, fSelectedExperiment));
         } catch (FileNotFoundException e) {
             return;

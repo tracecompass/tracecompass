@@ -344,6 +344,9 @@ public class StateExperimentManager extends LTTngTreeNode implements
 					nbEvents++;
 		
 					LttngEvent event = (LttngEvent) events[0];
+					
+//					Tracer.trace("Chk: " + event.getTimestamp());
+					
 					ITmfTrace trace = event.getParentTrace();
 					IStateTraceManager traceManager = ftraceToManagerMap.get(getTraceKey(trace));
 					if (traceManager != null) {
@@ -397,6 +400,8 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			 * @param header
 			 */
 			private void printCompletedMessage() {
+//				System.out.println(System.currentTimeMillis() + ": StateExperimentManager completed checkpoints");
+
 				// super.handleCompleted();
 				if (TraceDebug.isDEBUG()) {
 					TraceDebug.debug("Trace check point building completed, number of events handled: " + nbEvents
