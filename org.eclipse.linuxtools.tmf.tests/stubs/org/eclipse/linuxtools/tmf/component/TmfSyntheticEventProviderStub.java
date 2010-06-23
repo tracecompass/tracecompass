@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.component;
 
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfSyntheticEventStub;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
@@ -73,17 +75,35 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSynthetic
 
 	// Queue 2 synthetic events per base event
 	private void handleIncomingData(TmfEvent e) {
+		queueResult(new TmfSyntheticEventStub(e));
+		queueResult(new TmfSyntheticEventStub(e));
+	}
+
+	private static final int TIMEOUT = 10000;
+
+	public TmfSyntheticEventStub getNext(ITmfContext context) {
+		TmfSyntheticEventStub data = null;
 		try {
-			queueResult(new TmfSyntheticEventStub(e));
-			queueResult(new TmfSyntheticEventStub(e));
-		} catch (InterruptedException e1) {
-//			e1.printStackTrace();
+			data = fDataQueue.poll(TIMEOUT, TimeUnit.MILLISECONDS);
+			if (data == null) {
+				throw new InterruptedException();
+			}
+		}
+		catch (InterruptedException e) {
+		}
+		return data;
+	}
+
+	public void queueResult(TmfSyntheticEventStub data) {
+		boolean ok = false;
+		try {
+			ok = fDataQueue.offer(data, TIMEOUT, TimeUnit.MILLISECONDS);
+			if (!ok) {
+				throw new InterruptedException();
+			}
+		}
+		catch (InterruptedException e) {
 		}
 	}
 
-	@Override
-	public void sendRequest(ITmfDataRequest<TmfSyntheticEventStub> request) {
-		super.sendRequest(request);
-	}
-	
 }

@@ -31,5 +31,4 @@ public interface ITmfDataProvider<T extends TmfData> {
 	 */
 	public void sendRequest(ITmfDataRequest<T> request);
 	public void fireRequests();
-
 }

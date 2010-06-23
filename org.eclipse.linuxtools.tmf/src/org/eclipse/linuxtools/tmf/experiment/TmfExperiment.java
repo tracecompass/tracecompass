@@ -768,10 +768,10 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 		broadcast(new TmfExperimentUpdatedSignal(this, this)); // , signal.getTrace()));
     }
 
-	@Override
-	public void queueResult(T data) throws InterruptedException {
-		super.queueResult(data);
-	}
+//	@Override
+//	public void queueResult(T data) {
+////		super.queueResult(data);
+//	}
 
     // ------------------------------------------------------------------------
     // TmfDataProvider

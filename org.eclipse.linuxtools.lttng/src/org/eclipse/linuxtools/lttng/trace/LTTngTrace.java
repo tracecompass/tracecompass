@@ -959,10 +959,6 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     	return returnedData;
     }
 
-	@Override
-	public void queueResult(LttngEvent data) throws InterruptedException {
-		super.queueResult(data);
-	}
 }
 
 /*
