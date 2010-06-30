@@ -104,8 +104,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		top = new Composite(parent, SWT.BORDER);
 
 		top.setLayout(new FillLayout());
-		tsfviewer = TmfViewerFactory.createViewer(top,
-				new TimeRangeViewerProvider());
+		tsfviewer = TmfViewerFactory.createViewer(top, new TimeRangeViewerProvider(getParamsUpdater()));
 
 		tsfviewer.addWidgetSelectionListner(this);
 		tsfviewer.addWidgetTimeScaleSelectionListner(this);

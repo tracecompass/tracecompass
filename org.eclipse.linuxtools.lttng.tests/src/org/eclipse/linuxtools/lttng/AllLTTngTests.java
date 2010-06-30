@@ -3,6 +3,7 @@ package org.eclipse.linuxtools.lttng;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.eclipse.linuxtools.lttng.control.LTTngSyntheticEventProviderTest;
 import org.eclipse.linuxtools.lttng.model.LTTngTreeNodeTest;
 import org.eclipse.linuxtools.lttng.state.resource.LTTngStateResourceTest;
 import org.eclipse.linuxtools.lttng.tests.event.LttngEventContentTest;
@@ -39,8 +40,8 @@ public class AllLTTngTests {
 //        suite.addTestSuite(LTTngTextTraceTest.class);
 //        suite.addTestSuite(LTTngTraceTest.class);
 
-//		suite.addTestSuite(LTTngSyntheticEventProviderTest.class);
-//		suite.addTestSuite(LTTngSyntheticEventProviderTextTest.class);
+		suite.addTestSuite(LTTngSyntheticEventProviderTest.class);
+		// suite.addTestSuite(LTTngSyntheticEventProviderTextTest.class);
 		suite.addTestSuite(LTTngTreeNodeTest.class);
 //		suite.addTestSuite(StateExperimentManagerTextTest.class);
 		suite.addTestSuite(LTTngStateResourceTest.class);

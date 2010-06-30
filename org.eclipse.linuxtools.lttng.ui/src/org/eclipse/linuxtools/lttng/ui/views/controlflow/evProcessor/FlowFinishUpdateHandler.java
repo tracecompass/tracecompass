@@ -37,9 +37,17 @@ public class FlowFinishUpdateHandler extends AbsFlowTRangeUpdate
 	}
 
 	public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
-		// Draw a last known state to the end of the trace
-		long endReqTime = traceSt.getContext().getTraceTimeWindow()
-				.getEndTime().getValue();
+		// The end of the last state is unknown since it's beyond the requested time range window. Create this last
+		// event to half page after the visible window but not beyond the end of trace
+		long endOfTrace = traceSt.getContext().getTraceTimeWindow().getEndTime().getValue();
+		long halfWindow = (params.getEndTime() - params.getStartTime()) / 2;
+
+		// End of event common to all processes within the trace for this specific request
+		long endOfEvent = params.getEndTime() + halfWindow;
+		if (endOfEvent > endOfTrace) {
+			endOfEvent = endOfTrace;
+		}
+
 		TraceDebug.debug("Number of localProcesses: "
 				+ procContainer.readItems().length);
 		// to identify the process relevant to the traceState
@@ -79,12 +87,10 @@ public class FlowFinishUpdateHandler extends AbsFlowTRangeUpdate
 						// Draw with the Local information since the current
 						// request did
 						// not contain events related to this process
-						makeDraw(traceSt, nextGoodTime,
-								endReqTime, localProcess, params, stateMode);
+						makeDraw(traceSt, nextGoodTime, endOfEvent, localProcess, params, stateMode);
 					} else {
-						TraceDebug
-								.debug("previous event not instance of TimeRangeEvent?: "
-										+ prevEvent.getClass().getSimpleName());
+						TraceDebug.debug("previous event not instance of TimeRangeEvent?: "
+								+ prevEvent.getClass().getSimpleName());
 					}
 				} else {
 					numWithNoChildren++;
@@ -93,10 +99,10 @@ public class FlowFinishUpdateHandler extends AbsFlowTRangeUpdate
 				numLocalNotFound++;
 				continue;
 			}
+
 			numLocalFound++;
 			// Draw the last state for this process
-
-			makeDraw(traceSt, endReqTime, stateProcess, localProcess, params);
+			makeDraw(traceSt, endOfEvent, stateProcess, localProcess, params);
 		}
 
 		TraceDebug.debug("Print Last Event: NumLocalFound " + numLocalFound

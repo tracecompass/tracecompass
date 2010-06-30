@@ -17,7 +17,6 @@ import org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource;
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 
 /**
  * Creates specific finish state data request
@@ -35,10 +34,17 @@ public class ResourcesFinishUpdateHandler extends
 	}
 
 	public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
-		// Draw a last known state to the end of the trace
-		TmfTimestamp endReqTime = traceSt.getContext()
-				.getTraceTimeWindow().getEndTime();
+		// The end of the last state is unknown since it's beyond the requested time range window. Create this last
+		// event to half page after the visible window but not beyond the end of trace
+		long endOfTrace = traceSt.getContext().getTraceTimeWindow().getEndTime().getValue();
+		long halfWindow = (params.getEndTime() - params.getStartTime()) / 2;
 
+		// End of event common to all resources within the trace for this specific request
+		long endOfEvent = params.getEndTime() + halfWindow;
+		if (endOfEvent > endOfTrace) {
+			endOfEvent = endOfTrace;
+		}
+		
 		TraceDebug.debug("Number of localResources: "
 				+ resContainer.readItems().length);
 
@@ -54,8 +60,7 @@ public class ResourcesFinishUpdateHandler extends
 
 			// Insert an instance from previous time to end request time with
 			// the current state
-			makeDraw(traceSt, stime, endReqTime.getValue(),
-					localResource, params, stateMode);
+			makeDraw(traceSt, stime, endOfEvent, localResource, params, stateMode);
 		}
 
 		return false;

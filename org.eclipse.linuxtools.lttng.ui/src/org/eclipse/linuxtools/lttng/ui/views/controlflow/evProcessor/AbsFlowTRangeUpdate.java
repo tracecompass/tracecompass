@@ -18,8 +18,8 @@ import org.eclipse.linuxtools.lttng.state.model.LttngProcessState;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeComponent;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEvent;
-import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventProcess;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEvent.Type;
+import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventProcess;
 import org.eclipse.linuxtools.lttng.ui.views.common.AbsTRangeUpdate;
 import org.eclipse.linuxtools.lttng.ui.views.common.ParamsUpdater;
 import org.eclipse.linuxtools.lttng.ui.views.controlflow.model.FlowModelFactory;
@@ -109,9 +109,12 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements ILt
 		Long stime = startTime;
 		Long etime = endTime;
 
-//		if (etime == 13589873239052L || etime == 13589878374675L) {
-//			System.out.println("probe here, " + stime + "->" + etime);
-//		}
+		if (!withinViewRange(stime, etime)) {
+			// No use to process the event since it's outside
+			// the visible time range of the window
+			params.incrementEventsDiscarded(ParamsUpdater.OUT_OF_VIEWRANGE);
+			return false;
+		}
 
 		if (etime < stime) {
 			// Validate the sequential order of events
@@ -125,11 +128,21 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements ILt
 		// within the display window
 		// ****** moved at the end since it produces gaps among the coloured rectangles
 		// localProcess.setNext_good_time(etime);
-		if (!withinViewRange(stime, etime)) {
-			// No use to process the event since it's outside
-			// the visible time range of the window
-			params.incrementEventsDiscarded(ParamsUpdater.OUT_OF_VIEWRANGE);
-			return false;
+
+		// If First event of a process, initialise start time half page before to enable pagination to the left
+		if (stime < params.getStartTime()) {
+			// event start time is before the visible time window
+			long insertion = localProcess.getInsertionTime();
+			if (stime.longValue() == insertion) {
+				// if start time is equal to insertion this is the first event to be drawn for this process
+				long halfPage = (params.getEndTime() - params.getStartTime()) / 2;
+				long initTime = params.getStartTime() - halfPage;
+				if (initTime > insertion) {
+					// start time of this event is unknown, place it half page before visible window to allow left side
+					// pagination when selecting previous event
+					stime = initTime;
+				}
+			}
 		}
 
 		// Determine if the time range event will fit it the current

@@ -214,6 +214,22 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 		// Moved at the end since it produces space gaps among events
 		// localResource.setNext_good_time(etime);
 
+		// If First event of a resource, initialise start time half page before to enable pagination to the left
+		if (stime < params.getStartTime()) {
+			// event start time is before the visible time window
+			long insertion = localResource.getInsertionTime();
+			if (stime == insertion) {
+				// if start time is equal to insertion this is the first event to be drawn for this resource
+				long halfPage = (params.getEndTime() - params.getStartTime()) / 2;
+				long initTime = params.getStartTime() - halfPage;
+				if (initTime > insertion) {
+					// start time of this event is unknown, place it half page before visible window to allow left side
+					// pagination when selecting previous event
+					stime = initTime;
+				}
+			}
+		}
+
 		// Determine if the time range event will fit it the current
 		// pixel map
 		double duration = etime - stime;

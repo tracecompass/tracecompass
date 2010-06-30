@@ -21,6 +21,7 @@ import org.eclipse.linuxtools.lttng.state.StateStrings.IRQMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessStatus;
 import org.eclipse.linuxtools.lttng.state.StateStrings.SoftIRQMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.TrapMode;
+import org.eclipse.linuxtools.lttng.ui.views.common.ParamsUpdater;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
@@ -40,10 +41,12 @@ public class TimeRangeViewerProvider extends TmfTimeAnalysisProvider {
 	Map<String, StateColor> irqStateToColor = new HashMap<String, StateColor>(4);
 	Map<String, StateColor> cpuStateToColor = new HashMap<String, StateColor>(8);
 
+	private final ParamsUpdater fviewParameters;
+
 	// ========================================================================
 	// Constructors
 	// =======================================================================
-	public TimeRangeViewerProvider() {
+	public TimeRangeViewerProvider(ParamsUpdater paramsUpdater) {
 		// Fill the statemode to color maps
 		fillProcessStateToColor();
 		fillBdevStateToColor();
@@ -51,6 +54,7 @@ public class TimeRangeViewerProvider extends TmfTimeAnalysisProvider {
 		fillTrapStateToColor();
 		fillIrqStateToColor();
 		fillCpuStateToColor();
+		fviewParameters = paramsUpdater;
 	}
 
 	// ========================================================================
@@ -107,10 +111,24 @@ public class TimeRangeViewerProvider extends TmfTimeAnalysisProvider {
 		if (revent instanceof TimeRangeComponent) {
 			ITimeRangeComponent parent = ((TimeRangeComponent) revent)
 					.getEventParent();
+
+			// if the event start time is unknown, indicate it to the user
+			String extraInfo = "\ni.e. outside of data time window";
+			long eventStart = revent.getTime();
+			if (eventStart < fviewParameters.getStartTime()) {
+				toolTipEventMsgs.put("Start Time:", "Actual Event Start Time is undefined" + extraInfo);
+				// avoid repeated details
+				extraInfo = "";
+			}
+
+			long eventEnd = revent.getTime() + revent.getDuration();
+			if (eventEnd > fviewParameters.getEndTime()) {
+				toolTipEventMsgs.put("Stop Time:", "Actual Event Stop Time is undefined" + extraInfo);
+			}
+
 			if (parent != null && parent instanceof TimeRangeEventProcess) {
 				TimeRangeEventProcess localProcess = (TimeRangeEventProcess) parent;
-				toolTipEventMsgs.put("Process Type", localProcess
-						.getProcessType());
+				toolTipEventMsgs.put("Process Type", localProcess.getProcessType());
 			}
 		}
 

@@ -489,7 +489,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		table.getVerticalBar().setVisible(false);
 
 		tsfviewer = TmfViewerFactory.createViewer(sash,
-				new TimeRangeViewerProvider());
+ new TimeRangeViewerProvider(getParamsUpdater()));
 
 		tsfviewer.addWidgetSelectionListner(this);
 		tsfviewer.addWidgetTimeScaleSelectionListner(this);

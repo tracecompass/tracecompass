@@ -59,75 +59,6 @@ public abstract class LttngTestPreparation extends TestCase {
 		feventCount = 0;
 	}
 
-	protected LTTngTextTrace prepareTextStreamToTest() {
-		if (ftextStream_T1 == null) {
-			try {
-				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin()
-						.getBundle(), new Path(fTextTracepath_T1), null);
-				File testfile = new File(FileLocator.toFileURL(location)
-						.toURI());
-				LTTngTextTrace tmpStream = new LTTngTextTrace(testfile
-						.getPath());
-				ftextStream_T1 = tmpStream;
-	
-			} catch (Exception e) {
-				System.out.println("ERROR : Could not open " + fTextTracepath_T1);
-				ftextStream_T1 = null;
-			}
-		} else {
-			ftextStream_T1.seekEvent(0);
-		}
-	
-		return ftextStream_T1;
-	}
-
-	/**
-	 * @return
-	 */
-	protected TmfExperiment<LttngEvent> prepareTextExperimentToTest() {
-		if (fTestExperiment == null) {
-			String expId = "testExperiment";
-			int nbTraces = 1;
-	
-			// Define traces in experiment
-			ITmfTrace[] traces = new ITmfTrace[nbTraces];
-			ITmfTrace trace = prepareTextStreamToTest();
-			traces[0] = trace;
-	
-			// create experiment and associate traces
-			fTestExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class,
-					expId, traces);
-
-			// Set the current selected experiment as the test experiment
-			TmfExperimentSelectedSignal<LttngEvent> signal = new TmfExperimentSelectedSignal<LttngEvent>(
-					this, fTestExperiment);
-			fTestExperiment.experimentSelected(signal);
-
-		}
-	
-		return fTestExperiment;
-	}
-
-	protected LTTngTrace prepareStreamToTest() {
-		if (frealStream == null) {
-			try {
-				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin()
-						.getBundle(), new Path(ftracepath_T1), null);
-				File testfile = new File(FileLocator.toFileURL(location)
-						.toURI());
-				LTTngTrace tmpStream = new LTTngTrace(testfile.getPath());
-				frealStream = tmpStream;
-			} catch (Exception e) {
-				System.out.println("ERROR : Could not open " + ftracepath_T1);
-				frealStream = null;
-			}
-		} else {
-			frealStream.seekEvent(0L);
-		}
-
-		return frealStream;
-	}
-
 	/**
 	 * @return
 	 */
@@ -153,6 +84,72 @@ public abstract class LttngTestPreparation extends TestCase {
 		}
 
 		return fTestExperiment;
+	}
+
+	/**
+	 * @return
+	 */
+	protected TmfExperiment<LttngEvent> prepareTextExperimentToTest() {
+		if (fTestExperiment == null) {
+			String expId = "testExperiment";
+			int nbTraces = 1;
+
+			// Define traces in experiment
+			ITmfTrace[] traces = new ITmfTrace[nbTraces];
+			ITmfTrace trace = prepareTextStreamToTest();
+			traces[0] = trace;
+
+			// create experiment and associate traces
+			fTestExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class,
+					expId, traces);
+
+			// Set the current selected experiment as the test experiment
+			TmfExperimentSelectedSignal<LttngEvent> signal = new TmfExperimentSelectedSignal<LttngEvent>(
+					this, fTestExperiment);
+			fTestExperiment.experimentSelected(signal);
+
+		}
+
+		return fTestExperiment;
+	}
+
+	protected LTTngTrace prepareStreamToTest() {
+		if (frealStream == null) {
+			try {
+				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(ftracepath_T1),
+						null);
+				File testfile = new File(FileLocator.toFileURL(location).toURI());
+				LTTngTrace tmpStream = new LTTngTrace(testfile.getPath());
+				frealStream = tmpStream;
+			} catch (Exception e) {
+				System.out.println("ERROR : Could not open " + ftracepath_T1);
+				frealStream = null;
+			}
+		} else {
+			frealStream.seekEvent(0L);
+		}
+
+		return frealStream;
+	}
+
+	protected LTTngTextTrace prepareTextStreamToTest() {
+		if (ftextStream_T1 == null) {
+			try {
+				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(),
+						new Path(fTextTracepath_T1), null);
+				File testfile = new File(FileLocator.toFileURL(location).toURI());
+				LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getPath());
+				ftextStream_T1 = tmpStream;
+
+			} catch (Exception e) {
+				System.out.println("ERROR : Could not open " + fTextTracepath_T1);
+				ftextStream_T1 = null;
+			}
+		} else {
+			ftextStream_T1.seekEvent(0);
+		}
+
+		return ftextStream_T1;
 	}
 
 	protected IStateExperimentManager prepareExperimentContext(

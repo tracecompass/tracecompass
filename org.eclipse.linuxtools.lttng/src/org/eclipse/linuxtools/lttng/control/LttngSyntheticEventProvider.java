@@ -46,8 +46,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfTrace;
  * @author alvaro
  * 
  */
-public class LttngSyntheticEventProvider extends
-		TmfEventProvider<LttngSyntheticEvent> {
+public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSyntheticEvent> {
 
 	// ========================================================================
 	// Data
@@ -65,8 +64,7 @@ public class LttngSyntheticEventProvider extends
 	private int fMainReqEventCount = 0;
 	volatile boolean startIndSent = false;
 	private LTTngTreeNode fExperiment = null;
-	private ITransEventProcessor fstateUpdateProcessor = StateEventToHandlerFactory
-			.getInstance();
+	private ITransEventProcessor fstateUpdateProcessor = StateEventToHandlerFactory.getInstance();
 	private boolean waitForRequest = false;
 
 	// ========================================================================
@@ -84,15 +82,12 @@ public class LttngSyntheticEventProvider extends
 		// the framework
 		TmfEventSource source = new TmfEventSource(this);
 		LttngEventType dtype = new LttngEventType();
-		LttngTimestamp statusTimeStamp = new LttngTimestamp(
-				TmfTimestamp.Zero);
+		LttngTimestamp statusTimeStamp = new LttngTimestamp(TmfTimestamp.Zero);
 
-		fStatusEvent = new LttngSyntheticEvent(null, statusTimeStamp, source,
-				dtype, null, null, null);
+		fStatusEvent = new LttngSyntheticEvent(null, statusTimeStamp, source, dtype, null, null, null);
 		fStatusEvent.setSequenceInd(SequenceInd.STARTREQ);
 
-		fStatusEventAck = new LttngSyntheticEvent(null, statusTimeStamp,
-				source, dtype, null, null, null);
+		fStatusEventAck = new LttngSyntheticEvent(null, statusTimeStamp, source, dtype, null, null, null);
 		fStatusEventAck.setSequenceInd(SequenceInd.ACK);
 	}
 
@@ -102,8 +97,7 @@ public class LttngSyntheticEventProvider extends
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ITmfContext armRequest(
-			final ITmfDataRequest<LttngSyntheticEvent> request) {
+	public ITmfContext armRequest(final ITmfDataRequest<LttngSyntheticEvent> request) {
 		// validate
 		// make sure we have the right type of request
 		if (!(request instanceof ITmfEventRequest<?>)) {
@@ -142,8 +136,7 @@ public class LttngSyntheticEventProvider extends
 		for (IStateTraceManager traceManager : fEventProviderRequests.keySet()) {
 
 			// restore trace state system to nearest check point
-			TmfTimestamp checkPoint = traceManager
-					.restoreCheckPointByTimestamp(reqWindow.getStartTime());
+			TmfTimestamp checkPoint = traceManager.restoreCheckPointByTimestamp(reqWindow.getStartTime());
 
 			// adjust start time bound to check point
 
@@ -176,28 +169,25 @@ public class LttngSyntheticEventProvider extends
 
 				private final long fDispatchTime = getDispatchTime().getValue();
 				private final LttngTraceState fTraceModel = getTraceModel();
+				private LttngSyntheticEvent[] fresult = new LttngSyntheticEvent[1];
 
 				/*
 				 * (non-Javadoc)
 				 * 
-				 * @see
-				 * org.eclipse.linuxtools.lttng.control.LttngEventRequest#handleData
-				 * ()
+				 * @see org.eclipse.linuxtools.lttng.control.LttngEventRequest#handleData ()
 				 */
 				@Override
 				public void handleData() {
 					LttngEvent[] events = getData();
-					
-//					Tracer.trace("Sep: " + events[0].getTimestamp());
+
+					// Tracer.trace("Sep: " + events[0].getTimestamp());
 
 					if (events.length > 0) {
-						for (LttngEvent e : events) {
-							handleIncomingData(e);
-						}
+						handleIncomingData(events[0]);
 					} else {
 						TraceDebug.debug("handle data received with no data");
-//						handleProviderDone(getTraceModel());
-//						done();
+						// handleProviderDone(getTraceModel());
+						// done();
 					}
 				}
 
@@ -210,10 +200,10 @@ public class LttngSyntheticEventProvider extends
 				public void done() {
 					// mark this sub-request as completed
 					super.done();
-					handleProviderDone(getTraceModel());
-//					super.done();
+					handleProviderDone();
+					// super.done();
 				}
-				
+
 				/**
 				 * Trigger the Analysis and sequential control of the events.
 				 * 
@@ -222,51 +212,43 @@ public class LttngSyntheticEventProvider extends
 				private void handleIncomingData(LttngEvent e) {
 					long eventTime = e.getTimestamp().getValue();
 
-					// if (eventTime == 13589777932952L) {
-					// // syscall entry id 78 expected
-					// System.out.println("debug mark at 13589777932952L");
-					// }
-
-					TmfTrace<LttngEvent> inTrace =  e.getParentTrace();
+					TmfTrace<LttngEvent> inTrace = e.getParentTrace();
 					if (!(inTrace == getTrace())) {
-//						System.out.println("Event from a different trace discarded");
+						// System.out.println("Event from a different trace discarded");
 						return;
 					}
-					
+
 					// queue the new event data and an ACK
 					updateSynEvent(e);
 
 					// If time at or above requested time, update application
 					if (eventTime >= fDispatchTime) {
-						// Before update
+						// Load synthetic event as the result data
+						fresult[0] = syntheticEvent;
+
+						// BEFORE UPDATE : update to the before state-update handlers
 						syntheticEvent.setSequenceInd(SequenceInd.BEFORE);
-//						queueResult(syntheticEvent);
-//						queueResult(syntheticAckIndicator);
-
-						LttngSyntheticEvent[] result = new LttngSyntheticEvent[1];
-						result[0] = syntheticEvent;
-						fmainRequest.setData(result);
+						// queueResult(syntheticEvent);
+						// queueResult(syntheticAckIndicator);
+						fmainRequest.setData(fresult);
 						fmainRequest.handleData();
-						result[0] = syntheticAckIndicator;
-						fmainRequest.setData(result);
-						fmainRequest.handleData();
+						// result[0] = syntheticAckIndicator;
+						// fmainRequest.setData(result);
+						// fmainRequest.handleData();
 
-						// Update state locally
+						// STATE UPDATE: local handlers
 						syntheticEvent.setSequenceInd(SequenceInd.UPDATE);
 						fstateUpdateProcessor.process(syntheticEvent, fTraceModel);
 
-						// After Update
+						// AFTER UPDATE: update to the after state-update handlers
 						syntheticEvent.setSequenceInd(SequenceInd.AFTER);
-//						queueResult(syntheticEvent);
-//						queueResult(syntheticAckIndicator);
-
-						result = new LttngSyntheticEvent[1];
-						result[0] = syntheticEvent;
-						fmainRequest.setData(result);
+						// queueResult(syntheticEvent);
+						// queueResult(syntheticAckIndicator);
+						fmainRequest.setData(fresult);
 						fmainRequest.handleData();
-						result[0] = syntheticAckIndicator;
-						fmainRequest.setData(result);
-						fmainRequest.handleData();
+						// result[0] = syntheticAckIndicator;
+						// fmainRequest.setData(result);
+						// fmainRequest.handleData();
 
 						// increment once per dispatch
 						incrementSynEvenCount();
@@ -282,18 +264,16 @@ public class LttngSyntheticEventProvider extends
 				}
 
 				/**
-				 * Create a synthetic event from the received new reference, if
-				 * the reference is the same there is no need for a new instance
+				 * Create a synthetic event from the received new reference, if the reference is the same there is no
+				 * need for a new instance
 				 * 
-				 * if this is the first event for this request, call start
-				 * handler
+				 * if this is the first event for this request, call start handler
 				 * 
 				 * @param e
 				 * @return
 				 */
 				private LttngSyntheticEvent updateSynEvent(LttngEvent e) {
-					if (syntheticEvent == null
-							|| syntheticEvent.getBaseEvent() != e) {
+					if (syntheticEvent == null || syntheticEvent.getBaseEvent() != e) {
 						syntheticEvent = new LttngSyntheticEvent(e);
 						syntheticAckIndicator = new LttngSyntheticEvent(e);
 						syntheticAckIndicator.setSequenceInd(SequenceInd.ACK);
@@ -312,7 +292,7 @@ public class LttngSyntheticEventProvider extends
 					return syntheticEvent;
 				}
 			};
-						
+
 			// preserve the associated sub request to control it e.g.
 			// cancellation
 			fEventProviderRequests.put(traceManager, subRequest);
@@ -343,27 +323,26 @@ public class LttngSyntheticEventProvider extends
 		result[0] = startIndEvent;
 		fmainRequest.setData(result);
 		fmainRequest.handleData();
-		result[0] = fStatusEventAck;
-		fmainRequest.setData(result);
-		fmainRequest.handleData();
+		// result[0] = fStatusEventAck;
+		// fmainRequest.setData(result);
+		// fmainRequest.handleData();
 
-//		try {
-//			queueResult(startIndEvent);
-//			queueResult(fStatusEventAck);
-//		} catch (InterruptedException e) {
-//			// TODO: cancel this request
-//			e.printStackTrace();
-//		}
+		// try {
+		// queueResult(startIndEvent);
+		// queueResult(fStatusEventAck);
+		// } catch (InterruptedException e) {
+		// // TODO: cancel this request
+		// e.printStackTrace();
+		// }
 
 		// Notify state event processor
 		fstateUpdateProcessor.process(startIndEvent, null);
 	}
 
 	/**
-	 * Notify listeners, no more events for the current request will be
-	 * distributed e.g. update view.
+	 * Notify listeners, no more events for the current request will be distributed e.g. update view.
 	 */
-	public synchronized void handleProviderDone(LttngTraceState traceModel) {
+	public synchronized void handleProviderDone() {
 		// TODO: The use of a thread per main request and thread per sub-request
 		// requires
 		// to make sure the proper main request is marked completed. So a
@@ -380,34 +359,44 @@ public class LttngSyntheticEventProvider extends
 			}
 		}
 
-		// All sub-requests are marked completed so the main request can be
-		// completed as well
-		// Notify application,
-		LttngSyntheticEvent finishEvent = new LttngSyntheticEvent(fStatusEvent);
-		finishEvent.setSequenceInd(SequenceInd.ENDREQ);
-		finishEvent.setTraceModel(traceModel);
+		// Notify application. One notification per trace so the last state of each trace can be
+		// drawn
+		LttngTraceState traceModel;
+		for (IStateTraceManager traceMgr : fEventProviderRequests.keySet()) {
+			traceModel = traceMgr.getStateModel();
 
-		LttngSyntheticEvent[] result = new LttngSyntheticEvent[1];
-		result[0] = finishEvent;
-		fmainRequest.setData(result);
-		fmainRequest.handleData();
-		result[0] = fStatusEventAck;
-		fmainRequest.setData(result);
-		fmainRequest.handleData();
-		
+			LttngSyntheticEvent finishEvent = new LttngSyntheticEvent(fStatusEvent);
+			// finishEvent.setTraceModel(traceModel);
+			// finishEvent.setParentTrace((TmfTrace<LttngEvent>) traceModel.getContext().getTraceIdRef());
+			finishEvent.setSequenceInd(SequenceInd.ENDREQ);
+			finishEvent.setTraceModel(traceModel);
+
+			LttngSyntheticEvent[] result = new LttngSyntheticEvent[1];
+			// End Request indication
+			result[0] = finishEvent;
+			fmainRequest.setData(result);
+			fmainRequest.handleData();
+
+			// // End Request processed indication
+			// result[0] = fStatusEventAck;
+			// fmainRequest.setData(result);
+			// fmainRequest.handleData();
+		}
+
+		// All sub-requests are marked completed so the main request can be completed as well
 		fmainRequest.done();
 
-		//		try {
-//			queueResult(finishEvent);
-//			queueResult(fStatusEventAck);
-//			// End the loop in the main request
-//			queueResult(LttngSyntheticEvent.NullEvent);
-//		} catch (InterruptedException e) {
-//			// System.out.println(getName() +
-//			// ":handleProviderDone() failed to queue request");
-//			// TODO: Cancel the request
-////			e.printStackTrace();
-//		}
+		// try {
+		// queueResult(finishEvent);
+		// queueResult(fStatusEventAck);
+		// // End the loop in the main request
+		// queueResult(LttngSyntheticEvent.NullEvent);
+		// } catch (InterruptedException e) {
+		// // System.out.println(getName() +
+		// // ":handleProviderDone() failed to queue request");
+		// // TODO: Cancel the request
+		// // e.printStackTrace();
+		// }
 	}
 
 	/**
@@ -464,21 +453,18 @@ public class LttngSyntheticEventProvider extends
 	 * @param experiment
 	 */
 	private synchronized void updateExperimentNode(LTTngTreeNode experiment) {
-		if (experiment != null
-				&& experiment.getValue() instanceof TmfExperiment<?>) {
+		if (experiment != null && experiment.getValue() instanceof TmfExperiment<?>) {
 			fExperiment = experiment;
 		} else {
 			TraceDebug
-					.debug("Experiment received is not instance of TmfExperiment: "
-							+ experiment.getClass().getName());
+					.debug("Experiment received is not instance of TmfExperiment: " + experiment.getClass().getName());
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.linuxtools.tmf.component.TmfDataProvider#sendRequest(org.
+	 * @see org.eclipse.linuxtools.tmf.component.TmfDataProvider#sendRequest(org.
 	 * eclipse.linuxtools.tmf.request.TmfDataRequest)
 	 */
 	@Override
@@ -518,14 +504,14 @@ public class LttngSyntheticEventProvider extends
 		return null;
 	}
 
-//	@Override
-//	public LttngSyntheticEvent getNext(ITmfContext context) {
-//		return super.getNext(context);
-//	}
+	// @Override
+	// public LttngSyntheticEvent getNext(ITmfContext context) {
+	// return super.getNext(context);
+	// }
 
-//	@Override
-//	public void queueResult(LttngSyntheticEvent data) {
-//		super.queueResult(data);
-//	}
+	// @Override
+	// public void queueResult(LttngSyntheticEvent data) {
+	// super.queueResult(data);
+	// }
 
 }

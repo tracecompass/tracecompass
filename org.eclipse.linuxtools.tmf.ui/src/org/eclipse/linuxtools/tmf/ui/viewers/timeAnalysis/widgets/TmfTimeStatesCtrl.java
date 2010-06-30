@@ -396,7 +396,17 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		if (null == nextEvent && -1 == n)
 			nextEvent = Utils.getFirstEvent(trace);
 		if (null != nextEvent) {
-			_timeProvider.setSelectedTimeInt(nextEvent.getTime(), true);
+			long nextTime = nextEvent.getTime();
+			// If last event detected e.g. going back or not moving to a next event
+			if (nextTime <= selectedTime && n == 1) {
+				// Select to the end of this last event
+				nextTime = nextEvent.getTime() + nextEvent.getDuration();
+				// but not beyond the end of the trace
+				if (nextTime > endTime) {
+					nextTime = endTime;
+				}
+			}
+			_timeProvider.setSelectedTimeInt(nextTime, true);
 			fireSelectionChanged();
 		} else if (1 == n) {
 			_timeProvider.setSelectedTimeInt(endTime, true);
@@ -406,10 +416,14 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 
 	public void selectNextEvent() {
 		selectEvent(1);
+		// Notify if visible time window has been adjusted
+		_timeProvider.setStartFinishTimeNotify(_timeProvider.getTime0(), _timeProvider.getTime1());
 	}
 
 	public void selectPrevEvent() {
 		selectEvent(-1);
+		// Notify if visible time window has been adjusted
+		_timeProvider.setStartFinishTimeNotify(_timeProvider.getTime0(), _timeProvider.getTime1());
 	}
 
 	public void selectNextTrace() {
