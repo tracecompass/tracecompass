@@ -1,3 +1,7 @@
+2010-07-08  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/trace/TmfTrace.java (indexTrace): New method + renamed a constant
+
 2009-06-16  Andrew Overholt  <overholt@redhat.com>
 
 	* META-INF/MANIFEST.MF: Change provider from Ericsson to Eclipse.

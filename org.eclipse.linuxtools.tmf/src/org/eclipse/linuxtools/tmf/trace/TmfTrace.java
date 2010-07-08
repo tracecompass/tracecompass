@@ -23,6 +23,9 @@ import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
+import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.signal.TmfTraceUpdatedSignal;
 
 /**
  * <b><u>TmfTrace</u></b>
@@ -52,7 +55,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 
     // The default number of events to cache
 	// TODO: Make the DEFAULT_CACHE_SIZE a preference
-    public static final int DEFAULT_CACHE_SIZE = 1000;
+    public static final int DEFAULT_INDEX_PAGE_SIZE = 1000;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -83,7 +86,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
      * @throws FileNotFoundException
      */
     protected TmfTrace(String name, Class<T> type, String path) throws FileNotFoundException {
-    	this(name, type, path, DEFAULT_CACHE_SIZE);
+    	this(name, type, path, DEFAULT_INDEX_PAGE_SIZE);
     }
 
     /**
@@ -97,7 +100,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     	String simpleName = (sep >= 0) ? path.substring(sep + 1) : path;
     	setName(simpleName);
     	fPath = path;
-        fIndexPageSize = (cacheSize > 0) ? cacheSize : DEFAULT_CACHE_SIZE;
+        fIndexPageSize = (cacheSize > 0) ? cacheSize : DEFAULT_INDEX_PAGE_SIZE;
     }
 
     /* (non-Javadoc)
@@ -356,6 +359,68 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 	@Override
 	public String toString() {
 		return "[TmfTrace (" + getName() + ")]";
+	}
+   
+    // ------------------------------------------------------------------------
+    // Indexing
+    // ------------------------------------------------------------------------
+
+	/*
+	 * The purpose of the index is to keep the information needed to rapidly
+	 * restore the traces contexts at regular intervals (every INDEX_PAGE_SIZE
+	 * event).
+	 */
+
+	@SuppressWarnings({ "unchecked", "unused" })
+	private void indexTrace(boolean waitForCompletion) {
+
+		fCheckpoints.clear();
+		
+		ITmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity, TmfDataRequest.ALL_DATA, 1, ITmfDataRequest.ExecutionType.LONG) {
+
+			TmfTimestamp startTime =  null;
+			TmfTimestamp lastTime  =  null;
+
+			@Override
+			public void handleData() {
+				TmfEvent[] events = getData();
+				if (events.length > 0) {
+					TmfTimestamp ts = events[0].getTimestamp();
+					if (startTime == null) {
+						startTime = new TmfTimestamp(ts);
+						fStartTime = startTime;
+					}
+					lastTime = new TmfTimestamp(ts);
+
+					if ((fNbRead % DEFAULT_INDEX_PAGE_SIZE) == 0) {
+						updateTraceData();
+					}
+				}
+			}
+
+			@Override
+			public void handleSuccess() {
+				updateTraceData();
+			}
+
+			private void updateTraceData() {
+				fEndTime  = new TmfTimestamp(lastTime);
+				fNbEvents = fNbRead;
+				notifyListeners();
+			}
+		};
+
+		sendRequest((ITmfDataRequest<T>) request);
+		if (waitForCompletion)
+			try {
+				request.waitForCompletion();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+	}
+	
+	protected void notifyListeners() {
+    	broadcast(new TmfTraceUpdatedSignal(this, this, new TmfTimeRange(fStartTime, fEndTime)));
 	}
    
 }

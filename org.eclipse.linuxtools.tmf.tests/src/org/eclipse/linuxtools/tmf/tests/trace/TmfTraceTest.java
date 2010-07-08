@@ -122,7 +122,7 @@ public class TmfTraceTest extends TestCase {
 		assertEquals("getType",      TmfEvent.class, trace.getType());
 		assertEquals("getPath",      testfile.getPath(), trace.getPath());
 		assertEquals("getName",      TEST_STREAM, trace.getName());
-		assertEquals("getCacheSize", TmfTrace.DEFAULT_CACHE_SIZE, trace.getCacheSize());
+		assertEquals("getCacheSize", TmfTrace.DEFAULT_INDEX_PAGE_SIZE, trace.getCacheSize());
     }
 
     public void testTmfTraceDefaultCacheSize() throws Exception {
@@ -141,7 +141,7 @@ public class TmfTraceTest extends TestCase {
 		assertEquals("getType",      TmfEvent.class, trace.getType());
 		assertEquals("getPath",      testfile.getPath(), trace.getPath());
 		assertEquals("getName",      TEST_STREAM, trace.getName());
-		assertEquals("getCacheSize", TmfTrace.DEFAULT_CACHE_SIZE, trace.getCacheSize());
+		assertEquals("getCacheSize", TmfTrace.DEFAULT_INDEX_PAGE_SIZE, trace.getCacheSize());
     }
 
     public void testTmfTrace() throws Exception {

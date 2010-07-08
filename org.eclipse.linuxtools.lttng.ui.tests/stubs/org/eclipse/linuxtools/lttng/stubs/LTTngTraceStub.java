@@ -52,7 +52,7 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> {
      * @throws FileNotFoundException
      */
     public LTTngTraceStub(String filename) throws FileNotFoundException {
-        this(filename, DEFAULT_CACHE_SIZE);
+        this(filename, DEFAULT_INDEX_PAGE_SIZE);
     }
 
     /**

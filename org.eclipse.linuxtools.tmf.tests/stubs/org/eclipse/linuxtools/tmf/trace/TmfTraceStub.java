@@ -47,7 +47,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * @throws FileNotFoundException
      */
     public TmfTraceStub(String filename) throws FileNotFoundException {
-        this(filename, DEFAULT_CACHE_SIZE, false);
+        this(filename, DEFAULT_INDEX_PAGE_SIZE, false);
     }
 
     /**
@@ -65,7 +65,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * @throws FileNotFoundException
      */
     public TmfTraceStub(String filename, boolean waitForCompletion) throws FileNotFoundException {
-        this(filename, DEFAULT_CACHE_SIZE, waitForCompletion);
+        this(filename, DEFAULT_INDEX_PAGE_SIZE, waitForCompletion);
     }
     
     /**
