@@ -1,3 +1,18 @@
+2010-07-12  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/signal/TmfTraceClosedSignal.java: New file.
+	* src/org/eclipse/linuxtools/tmf/signal/TmfTraceOpenedSignal.java: New file.
+	* src/org/eclipse/linuxtools/tmf/signal/TmfTraceParserUpdatedSignal.java: New file.
+	* src/org/eclipse/linuxtools/tmf/signal/TmfTraceSelectedSignal.java: New file.
+	* META-INF/MANIFEST.MF: Added a dependency on org.eclipse.core.resources
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java (seekEvent): Commented out useless statements
+	* src/org/eclipse/linuxtools/tmf/trace/ITmfContext.java: Added a constant
+	* src/org/eclipse/linuxtools/tmf/trace/ITmfTrace.java: Added APIs
+	* src/org/eclipse/linuxtools/tmf/trace/TmfLocation.java: Added validation on location
+	* src/org/eclipse/linuxtools/tmf/trace/TmfTrace.java (getRank): Added
+	(indexTrace): Cleaned up warning
+	(queueLongRequest): Added background process handling
+
 2010-07-08  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/tmf/trace/TmfTrace.java (indexTrace): New method + renamed a constant

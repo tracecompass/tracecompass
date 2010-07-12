@@ -10,24 +10,32 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.trace;
+package org.eclipse.linuxtools.tmf.ui.views.project.model;
+
+import java.util.List;
 
 /**
- * <b><u>ITmfContext</u></b>
+ * <b><u>ITmfProjectTreeNode</u></b>
  * <p>
- * This is a place-holder for the context objects.
+ * TODO: Implement me. Please.
+ * TODO: Make ITmfProjectTreeNode extends IAdaptable
  */
-public interface ITmfContext {
+public interface ITmfProjectTreeNode {
 
-	public long UNKNOWN_RANK = -2L;
-    public long INITIAL_RANK = -1L;
+	public String getName();
 
-	public void setLocation(ITmfLocation<?> location);
-	public ITmfLocation<?> getLocation();
+	public ITmfProjectTreeNode getParent();
 
-	public void setRank(long rank);
-	public long getRank();
-	public void updateRank(int rank);
+	public boolean hasChildren();
+	
+	public List<ITmfProjectTreeNode> getChildren();
+	
+	public void removeChild(ITmfProjectTreeNode child);
 
-	public boolean isValidRank();
+	public void removeChildren();
+
+	public void refreshChildren();
+
+	public void refresh();
+
 }

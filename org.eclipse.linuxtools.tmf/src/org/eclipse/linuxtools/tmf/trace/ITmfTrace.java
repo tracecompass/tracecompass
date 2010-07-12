@@ -35,6 +35,11 @@ public interface ITmfTrace extends ITmfComponent {
 	 */
 	public String getName();
 
+    /**
+     * @return the cache size 
+     */
+    public int getCacheSize();
+
 	/**
 	 * @return the number of events in the trace
 	 */
@@ -61,6 +66,15 @@ public interface ITmfTrace extends ITmfComponent {
     public TmfContext seekEvent(TmfTimestamp timestamp);
     public TmfContext seekEvent(long rank);
 
+    /**
+     * Returns the rank of the first event with the requested timestamp.
+     * If none, returns the index of the next event (if any).
+     *  
+     * @param timestamp
+     * @return
+     */
+    public long getRank(TmfTimestamp timestamp);
+    
     /**
      * Return the event pointed by the supplied context (or null if
      * no event left) and updates the context to the next event.

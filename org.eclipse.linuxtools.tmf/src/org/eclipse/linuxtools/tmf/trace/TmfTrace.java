@@ -22,9 +22,12 @@ import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfTraceUpdatedSignal;
 
 /**
@@ -165,6 +168,18 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     @SuppressWarnings("unchecked")
 	public Vector<TmfCheckpoint> getCheckpoints() {
     	return (Vector<TmfCheckpoint>) fCheckpoints.clone();
+    }
+
+    /**
+     * Returns the rank of the first event with the requested timestamp.
+     * If none, returns the index of the next event (if any).
+     *  
+     * @param timestamp
+     * @return
+     */
+    public long getRank(TmfTimestamp timestamp) {
+        TmfContext context = seekEvent(timestamp);
+        return context.getRank();
     }
 
     // ------------------------------------------------------------------------
@@ -371,7 +386,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 	 * event).
 	 */
 
-	@SuppressWarnings({ "unchecked", "unused" })
+	@SuppressWarnings("unchecked")
 	private void indexTrace(boolean waitForCompletion) {
 
 		fCheckpoints.clear();
@@ -423,4 +438,113 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     	broadcast(new TmfTraceUpdatedSignal(this, this, new TmfTimeRange(fStartTime, fEndTime)));
 	}
    
+	// ------------------------------------------------------------------------
+	// TmfDataProvider
+	// ------------------------------------------------------------------------
+
+	@Override
+    protected void queueLongRequest(final ITmfDataRequest<T> request) {
+
+        // TODO: Handle the data requests also...
+        if (!(request instanceof ITmfEventRequest<?>)) {
+            super.queueRequest(request);
+            return;
+        }
+
+        final TmfTrace<T> trace = this;
+        
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                
+//              final long requestStart = System.nanoTime();
+
+                final Integer[] CHUNK_SIZE = new Integer[1];
+                CHUNK_SIZE[0] = fIndexPageSize + 1;
+                
+                final ITmfEventRequest<T> req = (ITmfEventRequest<T>) request;
+                
+                final Integer[] nbRead = new Integer[1];
+                nbRead[0] = 0;
+
+//              final TmfTimestamp[] timestamp = new TmfTimestamp[1];
+//              timestamp[0] = new TmfTimestamp(req.getRange().getStartTime());
+//              final TmfTimestamp endTS = req.getRange().getEndTime();
+
+                final Boolean[] isFinished = new Boolean[1];
+                isFinished[0] = Boolean.FALSE;
+
+                while (!isFinished[0]) {
+
+//                  TmfEventRequest<T> subRequest = new TmfEventRequest<T>(req.getDataType(), new TmfTimeRange(timestamp[0], endTS), 
+//                          requestedSize, req.getBlockize(), ExecutionType.LONG)
+                    TmfDataRequest<T> subRequest = new TmfDataRequest<T>(req.getDataType(), nbRead[0], CHUNK_SIZE[0],
+                            req.getBlockize(), ExecutionType.LONG)
+                    {
+//                      int count = 0;
+                        @Override
+                        public void handleData() {
+                            T[] data = getData();
+//                          if (count == 0) {
+//                              System.out.println("First event of the block: " + data[0].getTimestamp());
+//                          }
+//                          count++;
+//                          Tracer.trace("Ndx: " + ((TmfEvent) data[0]).getTimestamp());
+                            req.setData(data);
+                            req.handleData();
+                            if (fNbRead == CHUNK_SIZE[0]) {
+                                nbRead[0] += fNbRead;
+//                              System.out.println("fNbRead=" + fNbRead + ", count=" + count +", total=" + nbRead[0] + ", TS=" + data[0].getTimestamp());
+                            }
+                            if (fNbRead > CHUNK_SIZE[0]) {
+                                System.out.println("ERROR - Read too many events");
+                            }
+                        }
+                        @Override
+                        public void handleCompleted() {
+//                          System.out.println("Request completed at: " + timestamp[0]);
+                            if (fNbRead < CHUNK_SIZE[0]) {
+                                req.done();
+                                isFinished[0] = Boolean.TRUE;
+                                nbRead[0] += fNbRead;
+//                              System.out.println("fNbRead=" + fNbRead + ", count=" + count +", total=" + nbRead[0]);
+                            }
+                            super.handleCompleted();
+                        }
+                    };
+
+                    if (!isFinished[0]) {
+                        trace.queueRequest(subRequest);
+
+                        try {
+                            subRequest.waitForCompletion();
+//                          System.out.println("Finished at " + timestamp[0]);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+//                      TmfTimestamp newTS = new TmfTimestamp(timestamp[0].getValue() + 1, timestamp[0].getScale(), timestamp[0].getPrecision());
+//                      timestamp[0] = newTS;
+                        CHUNK_SIZE[0] = fIndexPageSize;
+//                      System.out.println("New timestamp: " + timestamp[0]);
+                    }
+                }
+//              final long requestEnded = System.nanoTime();
+//              System.out.println("Background request completed. Elapsed= " + (requestEnded * 1.0 - requestStart) / 1000000000);
+            }
+        };
+        thread.start();
+    }
+
+	// ------------------------------------------------------------------------
+	// Signal handlers
+	// ------------------------------------------------------------------------
+
+	@TmfSignalHandler
+	public void traceOpened(TmfTraceOpenedSignal signal) {
+	    ITmfTrace trace = signal.getTrace();
+	    if (trace == this) {
+	        indexTrace(false);
+	    }
+	}
 }

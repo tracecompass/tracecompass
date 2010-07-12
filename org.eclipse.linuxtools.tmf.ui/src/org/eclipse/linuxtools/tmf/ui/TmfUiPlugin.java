@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.ui;
 
+import org.eclipse.linuxtools.tmf.ui.parsers.ParserProviderManager;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -67,9 +69,10 @@ public class TmfUiPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		ParserProviderManager.init();
 	}
 
-	/*
+    /*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
@@ -78,5 +81,10 @@ public class TmfUiPlugin extends AbstractUIPlugin {
 		plugin = null;
 		super.stop(context);
 	}
+
+    public Image getImageFromPath(String path)
+    {
+        return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path).createImage();
+    }
 
 }

@@ -378,7 +378,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         TmfExperimentContext nextEventContext = new TmfExperimentContext(context);
         TmfEvent event = parseEvent(nextEventContext);
         while (event != null && event.getTimestamp().compareTo(timestamp, false) < 0) {
-            context = new TmfExperimentContext(nextEventContext);
+//            context = new TmfExperimentContext(nextEventContext);
         	event = getNextEvent(nextEventContext);
         }
 
@@ -426,7 +426,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         TmfEvent event = parseEvent(nextEventContext);
         long pos = context.getRank();
         while (event != null && pos++ <= rank) {
-            context = new TmfExperimentContext(nextEventContext);
+//            context = new TmfExperimentContext(nextEventContext);
         	event = getNextEvent(nextEventContext);
         }
 

@@ -51,6 +51,8 @@ public class TmfLocation<L> implements ITmfLocation<L> {
 
 	@Override
     public int hashCode() {
+	    if (fLocation == null)
+	        return -1;
 		return fLocation.hashCode();
     }
 
@@ -59,11 +61,15 @@ public class TmfLocation<L> implements ITmfLocation<L> {
         if (!(other instanceof TmfLocation<?>))
         	return false;
         TmfLocation<?> o = (TmfLocation<?>) other;
+        if (fLocation == null)
+            return (o.fLocation == null);
         return fLocation.equals(o.fLocation);
     }
 
 	@Override
 	public String toString() {
+	    if (fLocation == null)
+	        return "null";
 		return fLocation.toString();
 	}
 
@@ -73,10 +79,12 @@ public class TmfLocation<L> implements ITmfLocation<L> {
 		TmfLocation<L> clone = null;
 		try {
 			clone = (TmfLocation<L>) super.clone();
-			Class<?> clazz  = this.fLocation.getClass(); 
-			Method   method = clazz.getMethod("clone", new Class[0]);
-			Object   duplic = method.invoke(this.fLocation, new Object[0]);
-			clone.fLocation = (L) duplic;
+			if (this.fLocation != null) {
+			    Class<?> clazz  = this.fLocation.getClass(); 
+			    Method   method = clazz.getMethod("clone", new Class[0]);
+			    Object   duplic = method.invoke(this.fLocation, new Object[0]);
+			    clone.fLocation = (L) duplic;
+			}
 		} catch (NoSuchMethodException e) { 
 		      // exception suppressed 
 		} catch (Exception e) {

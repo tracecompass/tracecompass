@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,24 +10,23 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.trace;
+package org.eclipse.linuxtools.tmf.ui.views.project.dialogs;
+
+import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
 /**
- * <b><u>ITmfContext</u></b>
+ * <b><u>NewProjectMainWizardPage</u></b>
  * <p>
- * This is a place-holder for the context objects.
+ *
+ * TODO: Implement me. Please.
  */
-public interface ITmfContext {
+public class NewProjectMainWizardPage extends WizardNewProjectCreationPage {
 
-	public long UNKNOWN_RANK = -2L;
-    public long INITIAL_RANK = -1L;
+    /**
+     * @param pageName
+     */
+    public NewProjectMainWizardPage(String pageName) {
+        super(pageName);
+    }
 
-	public void setLocation(ITmfLocation<?> location);
-	public ITmfLocation<?> getLocation();
-
-	public void setRank(long rank);
-	public long getRank();
-	public void updateRank(int rank);
-
-	public boolean isValidRank();
 }

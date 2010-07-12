@@ -1,0 +1,56 @@
+2010-07-12  Francois Chouinard  <fchouinar@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/ui/TmfUiPlugin.java: 
+		- Initialized ParserProviderManager
+		- Added getImageFromPath() 
+	* src/org/eclipse/linuxtools/tmf/ui/editors/ITmfTraceEditor.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/editors/TmfEditor.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/editors/TmfEditorInput.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/editors/TmfEventsEditor.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/editors/TmfMultiPageEditorPart.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/parsers/IParserProvider.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/parsers/ParserProviderManager.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/TmfEventsView.java: Use TmfEventsTable instead of Table 
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/ProjectView.java: New file. 
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/TmfProjectNature.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/dialogs/AddTraceWizard.java: 
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/dialogs/AddTraceWizardPage.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/dialogs/DialogTraceContentProvider.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/dialogs/DialogTraceLabelProvider.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/dialogs/ImportTraceWizard.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/dialogs/ImportTraceWizardPage.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/dialogs/NewExperimentDialog.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/dialogs/NewProjectMainWizardPage.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/dialogs/NewProjectWizard.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/CloseProjectHandler.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/DeleteExperimentHandler.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/DeleteProjectHandler.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/DeleteTraceHandler.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/ImportTraceHandler.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/NewExperimentHandler.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/NewProjectHandler.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/OpenExperimentHandler.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/OpenProjectHandler.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/OpenTraceHandler.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/RefreshHandler.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/RenameExperimentHandler.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/RenameProjectHandler.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/RenameTraceHandler.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/SelectParserContributionItem.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/SelectParserHandler.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/SelectTracesHandler.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/model/ITmfProjectTreeNode.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/model/TmfExperimentFolderNode.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/model/TmfExperimentNode.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/model/TmfProjectContentProvider.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/model/TmfProjectLabelProvider.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/model/TmfProjectNode.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/model/TmfProjectRoot.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/model/TmfTraceFolderNode.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/model/TmfProjectTreeNode.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/model/TmfTraceNode.java: New file.
+	* schema/org.eclipse.linuxtools.tmf.ui.parserprovider.exsd: Extension point for parser providers
+	* META-INF/MANIFEST.MF: Added plugin.xml in includes
+	* build.properties: Added plugin.xml in includes
+	* plugin.xml: New file (extensions used by TmfEditor, TmfTable, TmfProject)
+	
