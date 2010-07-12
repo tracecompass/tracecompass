@@ -1,5 +1,39 @@
 2010-07-12  Francois Chouinard  <fchouinar@gmail.com>
 
+	* icons/add_button.gif: New file.
+	* icons/addchild_button.gif: New file.
+	* icons/addmany_button.gif: New file.
+	* icons/addnext_button.gif: New file.
+	* icons/customparser_wizard.gif: New file.
+	* icons/delete_button.gif: New file.
+	* icons/down_button.gif: New file.
+	* icons/element_icon.gif: New file.
+	* icons/help_button.gif: New file.
+	* icons/line_icon.gif: New file.
+	* icons/movedown_button.gif: New file.
+	* icons/moveup_button.gif: New file.
+	* icons/up_button.gif: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/commands/ManageCustomParsersCommandHandler.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/dialogs/ManageCustomParsersDialog.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/parsers/custom/CustomEvent.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/parsers/custom/CustomEventsTable.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/parsers/custom/CustomParserProvider.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/parsers/custom/CustomTraceDefinition.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/parsers/custom/CustomTxtEvent.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/parsers/custom/CustomTxtTrace.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/parsers/custom/CustomTxtTraceContext.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/parsers/custom/CustomTxtTraceDefinition.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/parsers/custom/CustomXmlEvent.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/parsers/custom/CustomXmlTrace.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/parsers/custom/CustomXmlTraceContext.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/parsers/custom/CustomXmlTraceDefinition.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/wizards/CustomTxtParserInputWizardPage.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/wizards/CustomTxtParserOutputWizardPage.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/wizards/CustomTxtParserWizard.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/wizards/CustomXmlParserInputWizardPage.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/wizards/CustomXmlParserOutputWizardPage.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/wizards/CustomXmlParserWizard.java: New file.
+
 	* src/org/eclipse/linuxtools/tmf/ui/TmfUiPlugin.java: 
 		- Initialized ParserProviderManager
 		- Added getImageFromPath() 
