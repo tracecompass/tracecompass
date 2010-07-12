@@ -58,6 +58,20 @@
             %wizard.description.0
          </description>
       </wizard>
+      <wizard
+            category="org.eclipse.linuxtools.tmf.ui.wizards.new"
+            class="org.eclipse.linuxtools.tmf.ui.wizards.CustomTxtParserWizard"
+            icon="icons/customparser_wizard.gif"
+            id="org.eclipse.linuxtools.tmf.ui.wizards.custom.text"
+            name="Custom Text Parser">
+      </wizard>
+      <wizard
+            category="org.eclipse.linuxtools.tmf.ui.wizards.new"
+            class="org.eclipse.linuxtools.tmf.ui.wizards.CustomXmlParserWizard"
+            icon="icons/customparser_wizard.gif"
+            id="org.eclipse.linuxtools.tmf.ui.wizards.custom.xml"
+            name="Custom XML Parser">
+      </wizard>
    </extension>
    <extension
          id="org.eclipse.linuxtools.tmf.ui.views.project.TmfProjectNature"
@@ -190,6 +204,10 @@
             id="org.eclipse.linuxtools.tmf.ui.command.project.refresh"
             name="Refresh View">
       </command>
+      <command
+            id="org.eclipse.linuxtools.tmf.ui.command.managecustomparsers"
+            name="Manage Custom Parsers">
+      </command>
    </extension>
    <extension
          id="org.eclipse.linuxtools.tmf.ui.menus"
@@ -290,6 +308,14 @@
                style="push">
          </command>
       </menuContribution>
+      <menuContribution
+            locationURI="menu:org.eclipse.linuxtools.tmf.ui.views.project">
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.managecustomparsers"
+               id="org.eclipse.linuxtools.tmf.ui.menu.managecustomparsers"
+               style="push">
+         </command>
+      </menuContribution>
    </extension>
    <extension
          id="org.eclipse.linuxtools.tmf.ui.handlers"
@@ -359,6 +385,10 @@
             class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.SelectParserHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.selectparser">
       </handler>
+      <handler
+            class="org.eclipse.linuxtools.tmf.ui.commands.ManageCustomParsersCommandHandler"
+            commandId="org.eclipse.linuxtools.tmf.ui.command.managecustomparsers">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
@@ -374,6 +404,12 @@
             name="TMF Trace"
             priority="normal">
       </content-type>
+   </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.ui.parserProviders">
+      <parserProvider
+            class="org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomParserProvider">
+      </parserProvider>
    </extension>
 
 </plugin>
