@@ -19,7 +19,6 @@ import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Table;
 
 /**
  * <b><u>TmfEventsView</u></b>
@@ -96,14 +95,6 @@ public class TmfEventsView extends TmfView {
     @Override
 	public String toString() {
     	return "[TmfEventsView]";
-    }
-
-    protected void createColumnHeaders(Table table) {
-    	fEventsTable.createColumnHeaders(table);
-    }
-
-    protected String[] extractItemFields(TmfEvent event) {
-    	return fEventsTable.extractItemFields(event);
     }
 
     // ------------------------------------------------------------------------

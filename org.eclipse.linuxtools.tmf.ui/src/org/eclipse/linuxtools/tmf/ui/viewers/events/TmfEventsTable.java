@@ -196,7 +196,7 @@ public class TmfEventsTable extends TmfComponent {
      * 
      * FIXME: Add support for column selection
      */
-    public void createColumnHeaders(Table table) {
+    protected void createColumnHeaders(Table table) {
         for (int i = 0; i < columnData.length; i++) {
             TableColumn column = new TableColumn(table, columnData[i].alignment, i);
             column.setText(columnData[i].header);
@@ -222,7 +222,7 @@ public class TmfEventsTable extends TmfComponent {
      * 
      * FIXME: Add support for column selection
      */
-    public String[] extractItemFields(TmfEvent event) {
+    protected String[] extractItemFields(TmfEvent event) {
         String[] fields = new String[0];
         if (event != null) {
             fields = new String[] {

@@ -1,5 +1,8 @@
 2010-07-13  Francois Chouinard  <fchouinard@gmail.com>
 
+	* src/org/eclipse/linuxtools/lttng/ui/views/events/EventsTable.java: New file.
+	* src/org/eclipse/linuxtools/lttng/ui/views/events/EventsView.java: Separated the Events Table (widget) from the View
+
 	* src/org/eclipse/linuxtools/lttng/ui/views/controlflow/ControlFlowView.java: Added null pointer checks
 	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/ChildrenHistogramCanvas.java: Displaced funtionality from parent class 
 	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramCanvasControlListener.java: Displaced the recentering code

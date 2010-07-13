@@ -1,3 +1,8 @@
+2010-07-13  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/ui/viewers/events/TmfEventsTable.java: Changed visibility of 2 methods (from public to protected)
+	* src/org/eclipse/linuxtools/tmf/ui/views/TmfEventsView.java: Removed unnecessary methods
+
 2010-07-12  Francois Chouinard  <fchouinar@gmail.com>
 
 	* icons/add_button.gif: New file.
