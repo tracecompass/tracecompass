@@ -719,9 +719,11 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 			}
 
 			private void updateExperiment() {
-				fTimeRange = new TmfTimeRange(startTime, new TmfTimestamp(lastTime));
-				fNbEvents  = fNbRead;
-				notifyListeners();
+				if (fNbRead != 0) {
+					fTimeRange = new TmfTimeRange(startTime, new TmfTimestamp(lastTime));
+					fNbEvents  = fNbRead;
+					notifyListeners();
+				}
 			}
 		};
 

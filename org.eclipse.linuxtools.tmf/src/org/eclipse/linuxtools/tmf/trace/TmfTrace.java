@@ -419,9 +419,11 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 			}
 
 			private void updateTraceData() {
-				fEndTime  = new TmfTimestamp(lastTime);
-				fNbEvents = fNbRead;
-				notifyListeners();
+				if (fNbRead != 0) {
+					fEndTime  = new TmfTimestamp(lastTime);
+					fNbEvents = fNbRead;
+					notifyListeners();
+				}
 			}
 		};
 
