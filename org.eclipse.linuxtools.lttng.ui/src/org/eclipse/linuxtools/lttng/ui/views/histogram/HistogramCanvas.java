@@ -8,6 +8,9 @@
  * 
  * Contributors:
  *   William Bourque - Initial API and implementation
+ *   
+ * Modifications:
+ * 2010-06-20 Yuriy Vashchuk - Histogram optimisations.
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
@@ -45,7 +48,10 @@ public class HistogramCanvas extends Canvas
 	 */
 	public HistogramCanvas(Composite parent, int style) {
 		super(parent, style);
+/*
+		// 2010-06-20 Yuriy: Moved to derived classes.
 		addNeededListeners();
+*/		
 		
 		// New selected window, not visible by default
 		createNewSelectedWindow(0L);
@@ -54,6 +60,8 @@ public class HistogramCanvas extends Canvas
 	/*
 	 * Create the needed "event listeners" and hook them to the Canvas.
 	 */
+/*
+	// 2010-06-20 Yuriy: Moved to derived classes.
 	protected void addNeededListeners() {
 		createAndAddCanvasRedrawer();
 		createAndAddPaintListener();
@@ -62,6 +70,7 @@ public class HistogramCanvas extends Canvas
 		createAndAddFocusListener();
 		createAndAddControlListener();
 	}
+*/	
 	
 	/*
 	 * Create a canvas redrawer and bind it to this canvas.<p>
@@ -329,12 +338,14 @@ class AsyncCanvasRedrawer {
 	 * 
 	 */
 	public void asynchronousRedraw() {
-		Display display = parentCanvas.getDisplay();
-		display.asyncExec(new Runnable() {
-			public void run() {
-				parentCanvas.redraw();
-			}
-		});
+		if (parentCanvas != null) {
+			Display display = parentCanvas.getDisplay();
+			display.asyncExec(new Runnable() {
+				public void run() {
+					parentCanvas.redraw();
+				}
+			});
+		}
 	}
 	
 	/**
@@ -344,12 +355,14 @@ class AsyncCanvasRedrawer {
 	 * 
 	 */
 	public void asynchronousNotifyParentSelectionWindowChanged() {
-		Display display = parentCanvas.getDisplay();
-		display.asyncExec(new Runnable() {
-			public void run() {
-				parentCanvas.notifyParentSelectionWindowChanged();
-			}
-		});
+		if(parentCanvas != null) {
+			Display display = parentCanvas.getDisplay();
+			display.asyncExec(new Runnable() {
+				public void run() {
+					parentCanvas.notifyParentSelectionWindowChanged();
+				}
+			});
+		}
 	}
 	
 	/**
@@ -359,11 +372,13 @@ class AsyncCanvasRedrawer {
 	 * 
 	 */
 	public void asynchronousNotifyParentUpdatedInformation() {
-		Display display = parentCanvas.getDisplay();
-		display.asyncExec(new Runnable() {
-			public void run() {
-				parentCanvas.notifyParentUpdatedInformation();
-			}
-		});
+		if(parentCanvas != null) {
+			Display display = parentCanvas.getDisplay();
+			display.asyncExec(new Runnable() {
+				public void run() {
+					parentCanvas.notifyParentUpdatedInformation();
+				}
+			});
+		}
 	}
 }

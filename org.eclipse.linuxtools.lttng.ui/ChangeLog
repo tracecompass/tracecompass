@@ -1,0 +1,13 @@
+2010-07-13  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/ui/views/controlflow/ControlFlowView.java: Added null pointer checks
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/ChildrenHistogramCanvas.java: Displaced funtionality from parent class 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramCanvasControlListener.java: Displaced the recentering code
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramCanvasMouseListener.java: Added null pointer checks
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramContent.java: Removed a duplicate function call
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramView.java: GUI reorganisation, simplification and some related code improvements
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/ParentHistogramCanvas.java: Added event listeners
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/ParentHistogramCanvasControlListener.java: New file
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/ParentHistogramCanvasPaintListener.java: Cosmetic change.
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/TimeTextGroup.java: Updates of text parts of the view
+	

@@ -886,40 +886,43 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 			final long startBoundTime, final long endBoundTime,
 			final boolean updateTimeBounds, final long startVisibleWindow,
 			final long endVisibleWindow, final Object source) {
-		final Table table = tableViewer.getTable();
-		Display display = table.getDisplay();
-
-		// Perform the updates on the UI thread)
-		display.asyncExec(new Runnable() {
-			public void run() {
-
-				tableViewer.setInput(items); // This shall be the minimal
-				// initial
-				tableFilter = new ViewProcessFilter(tableViewer);
-				tableViewer.setFilters(new ViewerFilter[] { tableFilter });
-
-				resizeTableColumns(table);
-				table.update();
-				tableViewer.refresh();
-
-				tsfviewer.display(items, startBoundTime, endBoundTime,
-						updateTimeBounds);
-
-				// validate visible boundaries
-				if (startVisibleWindow > -1 && endVisibleWindow > -1) {
-					tsfviewer.setSelectVisTimeWindow(startVisibleWindow,
-							endVisibleWindow, source);
+		
+		if(tableViewer != null) {
+			final Table table = tableViewer.getTable();
+			Display display = table.getDisplay();
+	
+			// Perform the updates on the UI thread)
+			display.asyncExec(new Runnable() {
+				public void run() {
+	
+					tableViewer.setInput(items); // This shall be the minimal
+					// initial
+					tableFilter = new ViewProcessFilter(tableViewer);
+					tableViewer.setFilters(new ViewerFilter[] { tableFilter });
+	
+					resizeTableColumns(table);
+					table.update();
+					tableViewer.refresh();
+	
+					tsfviewer.display(items, startBoundTime, endBoundTime,
+							updateTimeBounds);
+	
+					// validate visible boundaries
+					if (startVisibleWindow > -1 && endVisibleWindow > -1) {
+						tsfviewer.setSelectVisTimeWindow(startVisibleWindow,
+								endVisibleWindow, source);
+					}
+	
+					tsfviewer.resizeControls();
+	
+					// Adjust the size of the vertical scroll bar to fit the
+					// contents
+					if (scrollFrame != null) {
+						updateScrolls(scrollFrame);
+					}
 				}
-
-				tsfviewer.resizeControls();
-
-				// Adjust the size of the vertical scroll bar to fit the
-				// contents
-				if (scrollFrame != null) {
-					updateScrolls(scrollFrame);
-				}
-			}
-		});
+			});
+		}
 	}
 
 	@Override

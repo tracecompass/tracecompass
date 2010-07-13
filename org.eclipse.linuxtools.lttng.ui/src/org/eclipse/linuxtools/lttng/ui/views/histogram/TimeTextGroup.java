@@ -35,8 +35,11 @@ import org.eclipse.swt.widgets.Text;
  * This control will give you a group, a text box and a label at once.
  */
 public class TimeTextGroup implements FocusListener, KeyListener {
-	
+
+/*	
+	// 2010-06-10 Yuriy: Has been moved to header into HistogramView.java
 	protected static final String 	NANOSEC_LABEL = "sec";
+*/	
 	protected static final String	LONGEST_STRING_VALUE = "." + Long.MAX_VALUE;
 	protected static final int	MAX_CHAR_IN_TEXTBOX = LONGEST_STRING_VALUE.length();
     
@@ -157,6 +160,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
         txtNanosec.setLayoutData(gridDataTextBox);
         
         // ** Creation of the label
+/*        
         lblNanosec = new Label(grpName, SWT.LEFT);
         lblNanosec.setText(NANOSEC_LABEL);
         lblNanosec.setFont(smallFont);
@@ -164,6 +168,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
         gridDataLabel.horizontalIndent = indentSize;
         gridDataLabel.verticalIndent = 0;
         lblNanosec.setLayoutData(gridDataLabel);
+*/
         
         // Add all listener
         addNeededListeners();

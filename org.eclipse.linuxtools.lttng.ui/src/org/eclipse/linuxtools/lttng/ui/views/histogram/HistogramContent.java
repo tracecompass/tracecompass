@@ -135,7 +135,6 @@ public class HistogramContent {
 	 *  @param	newEndTime		The new stop time to use
 	 */
 	public void resetTable(long newStartTime, long newEndTime) {
-		recalculateElementsTimeInterval(newStartTime, newEndTime);
 		resetTable(newStartTime, newEndTime, elementsTimeInterval);
 	}
 	

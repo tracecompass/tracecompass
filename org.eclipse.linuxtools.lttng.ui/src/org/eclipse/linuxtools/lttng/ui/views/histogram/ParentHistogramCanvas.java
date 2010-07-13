@@ -8,6 +8,9 @@
  * 
  * Contributors:
  *   William Bourque - Initial API and implementation
+ *   
+ * Modifications:
+ * 2010-06-20 Yuriy Vashchuk - Histogram optimisations.   
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
@@ -35,6 +38,14 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 		super(parent, style);
 		
 		parentHistogramWindow = newParentWindow;
+		
+		// 2010-06-20 Yuriy: Moved from parent class
+		createAndAddCanvasRedrawer();
+		createAndAddPaintListener();
+		createAndAddMouseListener();
+		createAndAddKeyListener();
+		createAndAddFocusListener();
+		createAndAddControlListener();
 	}
 	
 	/**
@@ -87,9 +98,21 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 	 */
 	@Override
 	protected void createAndAddPaintListener() {
-		paintListener = new ParentHistogramCanvasPaintListener(this);;
+		paintListener = new ParentHistogramCanvasPaintListener(this);
 		this.addPaintListener( paintListener );
 	}
+	
+	/*
+	 * Create a histogram control listener and bind it to this canvas.<p>
+	 * 
+	 *  @see org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramCanvasControlListener
+	 */
+	@Override
+	protected void createAndAddControlListener() {
+		controlListener = new ParentHistogramCanvasControlListener(this);
+		this.addControlListener(controlListener);
+	}
+	
 	
 	/**
 	 * Function that is called when the selection window is moved.<p>

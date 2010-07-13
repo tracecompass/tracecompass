@@ -8,6 +8,10 @@
  * 
  * Contributors:
  *   William Bourque - Initial API and implementation
+ *   
+ * Modifications:
+ * 2010-06-20 Yuriy Vashchuk - Selection "red square" window optimisation.
+ * 							   Null pointer exception correction.
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
@@ -45,7 +49,7 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 	 * @param event  The generated mouse event when the mouse moved.
 	 */
 	public void mouseMove(MouseEvent event) {
-		if ( isWindowMoving == true ) {
+		if ( parentCanvas.getHistogramContent() != null && isWindowMoving == true ) {
 			parentCanvas.setWindowCenterPosition(event.x);
 		}
 	}
@@ -57,7 +61,7 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 	 * @param event  The generated mouse event when the mouse button was pressed.
 	 */
 	public void mouseDown(MouseEvent event) {
-		if ( event.button == 1) {
+		if ( parentCanvas.getHistogramContent() != null && event.button == 1) {
 			isWindowMoving = true;
 			parentCanvas.setWindowCenterPosition(event.x);
 		}
@@ -70,7 +74,7 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 	 * @param event  The generated mouse event when the mouse button was released.
 	 */
 	public void mouseUp(MouseEvent event) {
-		if ( event.button == 1) {
+		if ( parentCanvas.getHistogramContent() != null && event.button == 1) {
 			isWindowMoving = false;
 			parentCanvas.notifyParentSelectionWindowChangedAsynchronously();
 		}
@@ -122,27 +126,30 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 	 * @param nbMouseScroll
 	 */
 	public void receiveMouseScrollCount(int nbMouseScroll) {
-		mouseScrollListener = null;
 		
-		long ajustedTime = 0;
+		if(parentCanvas.getHistogramContent() != null) { 
 		
-		// If we received Negative scroll event, ZoomOut by ZOOM_OUT_FACTOR * the number of scroll events received.
-		if ( nbMouseScroll < 0 ) {
-			ajustedTime = (long)((double)parentCanvas.getSelectedWindowSize() * HistogramConstant.ZOOM_OUT_FACTOR);
-			ajustedTime = ajustedTime * Math.abs(nbMouseScroll);
-			ajustedTime = parentCanvas.getSelectedWindowSize() + ajustedTime;
+			mouseScrollListener = null;
+			
+			long ajustedTime = 0;
+			
+			// If we received Negative scroll event, ZoomOut by ZOOM_OUT_FACTOR * the number of scroll events received.
+			if ( nbMouseScroll < 0 ) {
+				ajustedTime = (long)((double)parentCanvas.getSelectedWindowSize() * HistogramConstant.ZOOM_OUT_FACTOR);
+				ajustedTime = ajustedTime * Math.abs(nbMouseScroll);
+				ajustedTime = parentCanvas.getSelectedWindowSize() + ajustedTime;
+			}
+			// If we received Positive scroll event, ZoomIn by ZOOM_IN_FACTOR * the number of scroll events received.
+			else {
+				ajustedTime = (long)((double)parentCanvas.getSelectedWindowSize() * HistogramConstant.ZOOM_IN_FACTOR);
+				ajustedTime = ajustedTime * Math.abs(nbMouseScroll);
+				ajustedTime = parentCanvas.getSelectedWindowSize() - ajustedTime;
+			}
+			
+			// Resize the canvas selection window  
+			parentCanvas.resizeWindowByAbsoluteTime(ajustedTime);
 		}
-		// If we received Positive scroll event, ZoomIn by ZOOM_IN_FACTOR * the number of scroll events received.
-		else {
-			ajustedTime = (long)((double)parentCanvas.getSelectedWindowSize() * HistogramConstant.ZOOM_IN_FACTOR);
-			ajustedTime = ajustedTime * Math.abs(nbMouseScroll);
-			ajustedTime = parentCanvas.getSelectedWindowSize() - ajustedTime;
-		}
-		
-		// Resize the canvas selection window  
-		parentCanvas.resizeWindowByAbsoluteTime(ajustedTime);
 	}
-	
 }
 
 /**

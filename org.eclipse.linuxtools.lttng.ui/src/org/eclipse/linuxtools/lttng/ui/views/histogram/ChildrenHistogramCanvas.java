@@ -8,6 +8,9 @@
  * 
  * Contributors:
  *   William Bourque - Initial API and implementation
+ *   
+ * Modifications:
+ * 2010-06-20 Yuriy Vashchuk - Histogram optimisations.   
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
@@ -35,6 +38,34 @@ public class ChildrenHistogramCanvas extends HistogramCanvas {
 		super(parent, style);
 		
 		parentHistogramWindow = newParentWindow;
+		
+		// 2010-06-20 Yuriy: Moved from parent class
+		createAndAddCanvasRedrawer();
+		createAndAddPaintListener();
+		createAndAddControlListener();
+	}
+			
+	/*
+	 * Create a histogram paint listener and bind it to this canvas.<p>
+	 * 
+	 * Note : This one is a bit particular, as it is made to draw content that is of a power of 2.
+	 * 			The default one draw content that is relative to the real pixels size.
+	 */
+	@Override
+	protected void createAndAddPaintListener() {
+		paintListener = new HistogramCanvasPaintListener(this);
+		this.addPaintListener( paintListener );
+	}
+	
+	/*
+	 * Create a histogram control listener and bind it to this canvas.<p>
+	 * 
+	 *  @see org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramCanvasControlListener
+	 */
+	@Override
+	protected void createAndAddControlListener() {
+		controlListener = new HistogramCanvasControlListener(this);
+		this.addControlListener(controlListener);
 	}
 	
 	/**
@@ -43,6 +74,8 @@ public class ChildrenHistogramCanvas extends HistogramCanvas {
 	 */
 	@Override
 	public void notifyParentUpdatedInformation() {
-		parentHistogramWindow.updateSelectedWindowInformation();
+		if(parentHistogramWindow != null) {
+			parentHistogramWindow.updateSelectedWindowInformation();
+		}
 	}
 }

@@ -8,7 +8,13 @@
  * 
  * Contributors:
  *   William Bourque - Initial API and implementation
+ * 
+ * Modifications:
+ * 2010-06-10 Yuriy Vashchuk - GUI reorganisation, simplification and some
+ *                             related code improvements.
+ * 2010-06-20 Yuriy Vashchuk - Histograms optimisation. *   
  *******************************************************************************/
+
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
@@ -20,7 +26,6 @@ import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
-import org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
@@ -51,7 +56,7 @@ public class HistogramView extends TmfView implements ControlListener {
 	// *** TODO ***
 	// Here is what's left to do in this view
 	//
-	// 1- Make sure the interval time is small enought on very big trace (bug 311930)
+	// 1- Make sure the interval time is small enough on very big trace (bug 311930)
 	//		The interval time of the content is dynamically assigned from the screen width and trace duration.
 	//		However, on very big trace (more than 1 hour), we could end up with time interval that are > 1 seconds,
 	//			which is not very precise. 
@@ -65,7 +70,7 @@ public class HistogramView extends TmfView implements ControlListener {
 	//		All basic control should be subclassed to offer "Asynchronous" functions.
 	//
 	// 3- Implement a "preferences view" for the HistogramView (bug 311935)
-	//		There is a lot of ajustable preferences in the view, however there is no way to ajust them right now
+	//		There is a lot of adjustable preferences in the view, however there is no way to adjust them right now
 	//			at run time. There should be a view of some kind of "menu" to allow the user to change them while executing.
 	//		Most of the pertinent values are in HistogramConstant.java or in this file.
 	
@@ -74,22 +79,27 @@ public class HistogramView extends TmfView implements ControlListener {
     // "Minimum" screen width size. On smaller screen, we will apply several space saving technique
     private static final int SCREEN_SMALL_IF_SMALLER_THAN = 1600;
     
-    // Size of the "fulll trace" canvas
+/*
+    // 2010-06-20 Yuriy: We will use the dynamic height.
+    // Size of the "full trace" canvas
     private static final int FULL_TRACE_CANVAS_HEIGHT = 25;
+*/    
     private static final int FULL_TRACE_BAR_WIDTH = 1;
     private static final double FULL_TRACE_DIFFERENCE_TO_AVERAGE = 1.5;
     
     // Size of the "Selected Window" canvas
+/*    
+    // 2010-06-20 Yuriy 
     private static final int SELECTED_WINDOW_CANVAS_WIDTH = 300;
     private static final int SMALL_SELECTED_WINDOW_CANVAS_WIDTH = 200;
     private static final int SELECTED_WINDOW_CANVAS_HEIGHT = 60;
+*/    
     private static final int SELECTED_WINDOW_BAR_WIDTH = 1;
     private static final double SELECTED_WINDOW_DIFFERENCE_TO_AVERAGE = 10.0;
     
-    // For the two "events" label (Max and min number of events in the selection), we force a width
+    // For the two "events" label (Max and Min number of events in the selection), we force a width
     // This will prevent the control from moving horizontally if the number of events in the selection varies
     private static final int NB_EVENTS_FIXED_WIDTH = 50;
-    
     
     // The "small font" height used to display time will be "default font" minus this constant
     private static final int SMALL_FONT_MODIFIER = 2;
@@ -132,9 +142,11 @@ public class HistogramView extends TmfView implements ControlListener {
 	private Text  txtWindowMaxNbEvents = null;
 	private Text  txtWindowMinNbEvents = null;
     
-	private static final String WINDOW_TIMERANGE_LABEL_TEXT 	= "Window Timerange   ";
-	private static final String WINDOW_CURRENT_TIME_LABEL_TEXT 	= "Cursor Centered on ";
-	private static final String EVENT_CURRENT_TIME_LABEL_TEXT 	= "Current Event Time ";
+	// We move the time label to header from TimeTextGroup.java
+	protected static final String NANOSEC_LABEL = "(sec)";
+	private static final String WINDOW_TIMERANGE_LABEL_TEXT 	= "Window Timerange, " + NANOSEC_LABEL;
+	private static final String WINDOW_CURRENT_TIME_LABEL_TEXT 	= "Cursor Centered on, " + NANOSEC_LABEL;
+	private static final String EVENT_CURRENT_TIME_LABEL_TEXT 	= "Current Event Time, " + NANOSEC_LABEL;
 	private TimeTextGroup  ntgTimeRangeWindow = null;
 	private TimeTextGroup  ntgCurrentWindowTime = null;
 	private TimeTextGroup  ntgCurrentEventTime = null;
@@ -168,33 +180,45 @@ public class HistogramView extends TmfView implements ControlListener {
 		
 		// Calculate if we need "small screen" fixes
 		if ( parent.getDisplay().getBounds().width < SCREEN_SMALL_IF_SMALLER_THAN ) {
+			
 			// A lot smaller font for timstampe
 			smallFont = new Font(font.getDevice(), tmpFontData.getName(), tmpFontData.getHeight() - VERY_SMALL_FONT_MODIFIER, tmpFontData.getStyle());
 			
+/*			
+			// 2010-06-20 Yuriy
 			// Smaller selection window canvas
 			selectedCanvasWidth = SMALL_SELECTED_WINDOW_CANVAS_WIDTH;
+*/			
 			// Smaller event number text field
 			nbEventWidth = NB_EVENTS_FIXED_WIDTH/2;
 			
 			// Tell the text group to ajust
 			doesTimeTextGroupNeedAdjustment = true;
-		}
-		else {
+
+		} else {
+			
 			// Slightly smaller font for timestamp
 			smallFont = new Font(font.getDevice(), tmpFontData.getName(), tmpFontData.getHeight() - SMALL_FONT_MODIFIER, tmpFontData.getStyle());
 			// Usual size for selected window and event number text field
 			nbEventWidth = NB_EVENTS_FIXED_WIDTH;
+/*			
+			// 2010-06-20 Yuriy
 			selectedCanvasWidth = SELECTED_WINDOW_CANVAS_WIDTH;
+*/			
 			// No ajustement needed by the text group
 			doesTimeTextGroupNeedAdjustment = false;
+			
 		}
+
 		
+		/////////////////////////////////////////////////////////////////////////////////////
 		// Layout for the whole view, other elements will be in a child composite of this one 
 		// Contains :
 		// 		Composite layoutSelectionWindow
 		//		Composite layoutTimesSpinner
 		//		Composite layoutExperimentHistogram
-		Composite layoutFullView = new Composite(parent, SWT.NONE);
+		/////////////////////////////////////////////////////////////////////////////////////
+		Composite layoutFullView = new Composite(parent, SWT.FILL);
 		GridLayout gridFullView = new GridLayout();
 		gridFullView.numColumns = 2;
 		gridFullView.horizontalSpacing = 0;
@@ -202,32 +226,15 @@ public class HistogramView extends TmfView implements ControlListener {
 		gridFullView.marginHeight = 0;
 		gridFullView.marginWidth = 0;
 		layoutFullView.setLayout(gridFullView);
+
 		
-		
-		// Layout that contain the SelectionWindow
-		// Contains : 
-		// 		Label lblWindowStartTime
-		// 		Label lblWindowStopTime
-		// 		Label lblWindowMaxNbEvents
-		// 		Label lblWindowMinNbEvents
-		// 		ChildrenHistogramCanvas selectedWindowCanvas
-		Composite layoutSelectionWindow = new Composite(layoutFullView, SWT.NONE);
-		GridLayout gridSelectionWindow = new GridLayout();
-		gridSelectionWindow.numColumns = 3;
-		gridSelectionWindow.marginHeight = 0;
-		gridSelectionWindow.marginWidth = 0;
-		gridSelectionWindow.horizontalSpacing = 0;
-		gridSelectionWindow.verticalSpacing = 0;
-		layoutSelectionWindow.setLayout(gridSelectionWindow);
-		GridData gridDataSelectionWindow = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
-		layoutSelectionWindow.setLayoutData(gridDataSelectionWindow);
-		
-		
+		/////////////////////////////////////////////////////////////////////////////////////
 		// Layout that contain the time spinner
 		// Contains : 
 		// 		NanosecTextGroup  spTimeRangeWindow
 		// 		NanosecTextGroup  spCurrentWindowTime
 		// 		NanosecTextGroup  spCurrentEventTime
+		/////////////////////////////////////////////////////////////////////////////////////
 		Composite layoutTimesSpinner = new Composite(layoutFullView, SWT.NONE);
 		GridLayout gridTimesSpinner = new GridLayout();
 		gridTimesSpinner.numColumns = 3;
@@ -236,75 +243,112 @@ public class HistogramView extends TmfView implements ControlListener {
 		gridTimesSpinner.horizontalSpacing = 0;
 		gridTimesSpinner.verticalSpacing = 0;
 		layoutTimesSpinner.setLayout(gridTimesSpinner);
-		GridData gridDataTimesSpinner = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-		layoutTimesSpinner.setLayoutData(gridDataTimesSpinner);
+		
+		GridData gridDataCurrentEvent = new GridData();
+		gridDataCurrentEvent.horizontalAlignment = SWT.LEFT;
+		gridDataCurrentEvent.verticalAlignment = SWT.CENTER;
+		ntgCurrentEventTime = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, EVENT_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ), doesTimeTextGroupNeedAdjustment);
+		ntgCurrentEventTime.setLayoutData(gridDataCurrentEvent);		
+		
+		GridData gridDataTimeRange = new GridData();
+		gridDataCurrentEvent.horizontalAlignment = SWT.CENTER;
+		gridDataCurrentEvent.verticalAlignment = SWT.CENTER;
+		ntgTimeRangeWindow = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_TIMERANGE_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ), doesTimeTextGroupNeedAdjustment);
+		ntgTimeRangeWindow.setLayoutData(gridDataTimeRange);
+		 		
+		GridData gridDataCurrentWindow = new GridData();
+		gridDataCurrentEvent.horizontalAlignment = SWT.RIGHT;
+		gridDataCurrentEvent.verticalAlignment = SWT.CENTER;	
+		ntgCurrentWindowTime = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ), doesTimeTextGroupNeedAdjustment);
+		ntgCurrentWindowTime.setLayoutData(gridDataCurrentWindow);
 		
 		
-		// Layout that contain the complete experiment histogram and related controls.
+		/////////////////////////////////////////////////////////////////////////////////////
+		// Layout that contain the SelectionWindow
 		// Contains : 
-		//		Label lblExperimentStartTime
-		//		Label lblExperimentStopTime
-		// 		ParentHistogramCanvas fullTraceCanvas
-		Composite layoutExperimentHistogram = new Composite(layoutFullView, SWT.NONE);
-		GridLayout gridExperimentHistogram = new GridLayout();
-		gridExperimentHistogram.numColumns = 2;
-		gridExperimentHistogram.marginHeight = 0;
-		gridExperimentHistogram.marginWidth = 0;
-		gridExperimentHistogram.horizontalSpacing = 0;
-		gridExperimentHistogram.verticalSpacing = 0;
-		layoutExperimentHistogram.setLayout(gridExperimentHistogram);
-		GridData gridDataExperimentHistogram = new GridData(SWT.FILL, SWT.TOP, true, false, 2, 1);
-		layoutExperimentHistogram.setLayoutData(gridDataExperimentHistogram);
+		// 		Label txtWindowStartTime
+		// 		Label txtWindowStopTime
+		// 		Label txtWindowMaxNbEvents
+		// 		Label txtWindowMinNbEvents
+		// 		ChildrenHistogramCanvas selectedWindowCanvas
+		/////////////////////////////////////////////////////////////////////////////////////
+		Composite layoutSelectionWindow = new Composite(layoutFullView, SWT.FILL);
+		GridLayout gridSelectionWindow = new GridLayout();
+		gridSelectionWindow.numColumns = 3;
+		gridSelectionWindow.marginHeight = 0;
+		gridSelectionWindow.marginWidth = 0;
+		gridSelectionWindow.horizontalSpacing = 0;
+		gridSelectionWindow.verticalSpacing = 0;
+		layoutSelectionWindow.setLayout(gridSelectionWindow);
 		
+		GridData gridDataSelectionWindow = new GridData();
+		gridDataSelectionWindow.horizontalAlignment = SWT.FILL;
+		gridDataSelectionWindow.verticalAlignment = SWT.FILL;	
+		layoutSelectionWindow.setLayoutData(gridDataSelectionWindow);
 		
-		
-		// *** Everything related to the selection window is below
-		GridData gridDataSelectionWindowCanvas = new GridData(SWT.LEFT, SWT.TOP, true, false, 2, 2);
+		GridData gridDataSelectionWindowCanvas = new GridData();
+		gridDataSelectionWindowCanvas.horizontalSpan = 2;
+		gridDataSelectionWindowCanvas.verticalSpan = 2;
+		gridDataSelectionWindowCanvas.horizontalAlignment = SWT.FILL;
+		gridDataSelectionWindowCanvas.grabExcessHorizontalSpace = true;
+		gridDataSelectionWindowCanvas.verticalAlignment = SWT.FILL;
+/*
+ 		// 2010-06-20 Yuriy 
 		gridDataSelectionWindowCanvas.heightHint = SELECTED_WINDOW_CANVAS_HEIGHT;
 		gridDataSelectionWindowCanvas.minimumHeight = SELECTED_WINDOW_CANVAS_HEIGHT;
+*/		
 		gridDataSelectionWindowCanvas.widthHint = selectedCanvasWidth;
 		gridDataSelectionWindowCanvas.minimumWidth = selectedCanvasWidth;
 		selectedWindowCanvas = new ChildrenHistogramCanvas(this, layoutSelectionWindow, SWT.BORDER);
 		selectedWindowCanvas.setLayoutData(gridDataSelectionWindowCanvas);
 		
-		GridData gridDataWindowMaxEvents = new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1);
+		GridData gridDataWindowMaxEvents = new GridData();
+		gridDataWindowMaxEvents.horizontalAlignment = SWT.RIGHT;
+		gridDataWindowMaxEvents.verticalAlignment = SWT.TOP;
 		// Force a width, to avoid the control to enlarge if the number of events change
 		gridDataWindowMaxEvents.minimumWidth = nbEventWidth;
 		txtWindowMaxNbEvents = new Text(layoutSelectionWindow, SWT.READ_ONLY);
 		txtWindowMaxNbEvents.setFont(smallFont);
 		txtWindowMaxNbEvents.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		txtWindowMaxNbEvents.setEditable(false);
-		txtWindowMaxNbEvents.setText("");
+		txtWindowMaxNbEvents.setText("0");
 		txtWindowMaxNbEvents.setLayoutData(gridDataWindowMaxEvents);
 		
-		GridData gridDataWindowMinEvents = new GridData(SWT.LEFT, SWT.BOTTOM, true, false, 1, 1);
+		GridData gridDataWindowMinEvents = new GridData();
+		gridDataWindowMinEvents.horizontalAlignment = SWT.RIGHT;
+		gridDataWindowMinEvents.verticalAlignment = SWT.BOTTOM;
 		// Force a width, to avoid the control to enlarge if the number of events change
 		gridDataWindowMinEvents.minimumWidth = nbEventWidth;
 		txtWindowMinNbEvents = new Text(layoutSelectionWindow, SWT.READ_ONLY);
 		txtWindowMinNbEvents.setFont(smallFont);
 		txtWindowMinNbEvents.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		txtWindowMinNbEvents.setEditable(false);
-		txtWindowMinNbEvents.setText("");
+		txtWindowMinNbEvents.setText("0");
 		txtWindowMinNbEvents.setLayoutData(gridDataWindowMinEvents);
 		
-		GridData gridDataWindowStart = new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1);
+		GridData gridDataWindowStart = new GridData();
+		gridDataWindowStart.horizontalAlignment = SWT.LEFT;
+		gridDataWindowStart.verticalAlignment = SWT.BOTTOM;
 		txtWindowStartTime = new Text(layoutSelectionWindow, SWT.READ_ONLY);
 		txtWindowStartTime.setFont(smallFont);
 		txtWindowStartTime.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		txtWindowStartTime.setEditable(false);
-		txtWindowStartTime.setText("");
+		txtWindowStartTime.setText("0.000000000");
 		txtWindowStartTime.setLayoutData(gridDataWindowStart);
 		
-		GridData gridDataWindowStop = new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1);
+		GridData gridDataWindowStop = new GridData();
+		gridDataWindowStop.horizontalAlignment = SWT.RIGHT;
+		gridDataWindowStop.verticalAlignment = SWT.BOTTOM;
 		txtWindowStopTime = new Text(layoutSelectionWindow, SWT.READ_ONLY);
 		txtWindowStopTime.setFont(smallFont);
 		txtWindowStopTime.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		txtWindowStopTime.setEditable(false);
-		txtWindowStopTime.setText("");
+		txtWindowStopTime.setText("0.000000000");
 		txtWindowStopTime.setLayoutData(gridDataWindowStop);
 		
-		GridData gridDataSpacer = new GridData(SWT.FILL, SWT.TOP, true, true, 1, 1);
-		gridDataSpacer.minimumWidth = nbEventWidth;
+
+/*
+		// 2010-06-10 Yuriy: NOT NEEDED AFTER GUI IMPROVEMENTS. WORK FINE WITOUT THIS HACK 
 		// *** HACK ***
 		// To align properly AND to make sure the canvas size is fixed, we NEED to make sure all "section" of the 
 		//		gridlayout are taken (and if possible of a fixed size).
@@ -338,47 +382,73 @@ public class HistogramView extends TmfView implements ControlListener {
 		//		to make the text "invisible", I have to keep it enabled (but read only), so it can be clicked on.
 		//
 		// Label uselessControlToByPassSWTStupidBug = new Label(layoutSelectionWindow, SWT.BORDER); // WON'T align correctly!!!
+		//GridData gridDataSpacer = new GridData(SWT.FILL, SWT.TOP, true, true, 1, 1);
+		GridData gridDataSpacer = new GridData();
+		gridDataWindowStop.horizontalAlignment = SWT.FILL;
+		gridDataWindowStop.verticalAlignment = SWT.TOP;
+		gridDataSpacer.minimumWidth = nbEventWidth;
 		Text uselessControlToByPassSWTStupidBug = new Text(layoutSelectionWindow, SWT.READ_ONLY); // WILL align correctly!!!
 		uselessControlToByPassSWTStupidBug.setEditable(false);
 		uselessControlToByPassSWTStupidBug.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		uselessControlToByPassSWTStupidBug.setLayoutData(gridDataSpacer);
+*/		
 		
 		
+		/////////////////////////////////////////////////////////////////////////////////////
+		// Layout that contain the complete experiment histogram and related controls.
+		// Contains : 
+		// 		ParentHistogramCanvas fullExperimentCanvas
+		//		Text txtExperimentStartTime
+		//		Text txtExperimentStopTime
+		/////////////////////////////////////////////////////////////////////////////////////
+		Composite layoutExperimentHistogram = new Composite(layoutFullView, SWT.FILL);
 		
-		// *** Everything related to the time text group is below
-		GridData gridDataCurrentEvent = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 2);
-		ntgCurrentEventTime = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, EVENT_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ), doesTimeTextGroupNeedAdjustment);
-		ntgCurrentEventTime.setLayoutData(gridDataCurrentEvent);
+		GridLayout gridExperimentHistogram = new GridLayout();
+		gridExperimentHistogram.numColumns = 2;
+		gridExperimentHistogram.marginHeight = 0;
+		gridExperimentHistogram.marginWidth = 0;
+		gridExperimentHistogram.horizontalSpacing = 0;
+		gridExperimentHistogram.verticalSpacing = 0;
+		layoutExperimentHistogram.setLayout(gridExperimentHistogram);
 		
-		GridData gridDataTimeRange = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 2);
-		ntgTimeRangeWindow = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_TIMERANGE_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ), doesTimeTextGroupNeedAdjustment);
-		ntgTimeRangeWindow.setLayoutData(gridDataTimeRange);
-		
-		GridData gridDataCurrentWindow = new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 2);
-		ntgCurrentWindowTime = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ), doesTimeTextGroupNeedAdjustment);
-		ntgCurrentWindowTime.setLayoutData(gridDataCurrentWindow);
-		
-		
+/*
+		// 2010-06-10 Yuriy: NOT NEEDED AFTER GUI IMPROVEMENTS
+		GridData gridDataExperimentHistogram = new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1);
+		layoutExperimentHistogram.setLayoutData(gridDataExperimentHistogram);
+*/
 		
 		// *** Everything related to the experiment canvas is below
-		GridData gridDataExperimentCanvas = new GridData(SWT.FILL, SWT.TOP, true, false, 2, 1);
+		GridData gridDataExperimentCanvas = new GridData();
+		gridDataExperimentCanvas.horizontalSpan = 2;
+		gridDataExperimentCanvas.horizontalAlignment = SWT.FILL;
+		gridDataExperimentCanvas.grabExcessHorizontalSpace = true;
+		gridDataExperimentCanvas.verticalAlignment = SWT.FILL;
+		gridDataExperimentCanvas.grabExcessVerticalSpace = true;
+/*		
+		// 2010-06-20 Yuriy: We use the dynamic height.
 		gridDataExperimentCanvas.heightHint = FULL_TRACE_CANVAS_HEIGHT;
 		gridDataExperimentCanvas.minimumHeight = FULL_TRACE_CANVAS_HEIGHT;
+*/		
 		fullExperimentCanvas = new ParentHistogramCanvas(this, layoutExperimentHistogram, SWT.BORDER);
 		fullExperimentCanvas.setLayoutData(gridDataExperimentCanvas);
+		layoutExperimentHistogram.setLayoutData(gridDataExperimentCanvas);
 		
-		GridData gridDataExperimentStart = new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1);
+		GridData gridDataExperimentStart = new GridData();
+		gridDataExperimentStart.horizontalAlignment = SWT.LEFT;
+		gridDataExperimentStart.verticalAlignment = SWT.BOTTOM;
 		txtExperimentStartTime = new Text(layoutExperimentHistogram, SWT.READ_ONLY);
 		txtExperimentStartTime.setFont(smallFont);
-		txtExperimentStartTime.setText("");
+		txtExperimentStartTime.setText("0.000000000");
 		txtExperimentStartTime.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		txtExperimentStartTime.setEditable(false);
 		txtExperimentStartTime.setLayoutData(gridDataExperimentStart);
 		
-		GridData gridDataExperimentStop = new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1);
+		GridData gridDataExperimentStop = new GridData();
+		gridDataExperimentStop.horizontalAlignment = SWT.RIGHT;
+		gridDataExperimentStop.verticalAlignment = SWT.BOTTOM;
 		txtExperimentStopTime = new Text(layoutExperimentHistogram, SWT.READ_ONLY);
 		txtExperimentStopTime.setFont(smallFont);
-		txtExperimentStopTime.setText("");
+		txtExperimentStopTime.setText("0.000000000");
 		txtExperimentStopTime.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		txtExperimentStopTime.setEditable(false);
 		txtExperimentStopTime.setLayoutData(gridDataExperimentStop);
@@ -417,6 +487,7 @@ public class HistogramView extends TmfView implements ControlListener {
     	createCanvasAndRequests(tmpExperiment);
     }
     
+
     // *** VERIFY ***
 	// Not sure what this should do since I don't know when it will be called
 	// Let's do the same thing as experimentSelected for now
@@ -427,22 +498,24 @@ public class HistogramView extends TmfView implements ControlListener {
 	 * 
 	 * @param signal	Signal received from the framework. Contain the experiment.
 	 */
-//    @SuppressWarnings("unchecked")
+/*
+    @SuppressWarnings("unchecked")
 	@TmfSignalHandler
     public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
-//    	
-//    	TmfExperiment<LttngEvent> tmpExperiment = (TmfExperiment<LttngEvent>)signal.getExperiment();
-//    	
-//    	// Make sure the UI object are sane
-//		resetControlsContent();
-//		
-//		// Redraw the canvas right away to have something "clean" as soon as we can
-//		fullExperimentCanvas.redraw();
-//		selectedWindowCanvas.redraw();
-//		
-//		// Recreate the request
-//		createCanvasAndRequests(tmpExperiment);
+		    	
+		TmfExperiment<LttngEvent> tmpExperiment = (TmfExperiment<LttngEvent>)signal.getExperiment();
+		    	
+		// Make sure the UI object are sane
+		resetControlsContent();
+				
+		// Redraw the canvas right away to have something "clean" as soon as we can
+		fullExperimentCanvas.redraw();
+		selectedWindowCanvas.redraw();
+		
+		// Recreate the request
+		createCanvasAndRequests(tmpExperiment);
     }
+*/
     
     /**
      * Method called when synchonization is active and that the user select an event.<p>
@@ -453,7 +526,7 @@ public class HistogramView extends TmfView implements ControlListener {
     @TmfSignalHandler
     public void currentTimeUpdated(TmfTimeSynchSignal signal) {
     	// In case we received our own signal
-    	if (signal.getSource() != this) {
+    	if ( (signal != null) && (signal.getSource() != this) ) {
             TmfTimestamp currentTime = signal.getCurrentTime();
             
             // Update the current event controls
@@ -516,7 +589,16 @@ public class HistogramView extends TmfView implements ControlListener {
     	
     	// Create the content for the full experiment. 
     	// This NEED to be created first, as we use it in the selectedWindowCanvas
-		fullExperimentCanvas.createNewHistogramContent(fullExperimentCanvas.getSize().x, FULL_TRACE_BAR_WIDTH, FULL_TRACE_CANVAS_HEIGHT, FULL_TRACE_DIFFERENCE_TO_AVERAGE);
+		fullExperimentCanvas.createNewHistogramContent(
+			fullExperimentCanvas.getSize().x,
+			FULL_TRACE_BAR_WIDTH,
+/*
+			// 2010-06-20 Yuriy: We will use the dynamic height.
+			FULL_TRACE_CANVAS_HEIGHT
+*/
+		  	fullExperimentCanvas.getSize().y / 2,
+			FULL_TRACE_DIFFERENCE_TO_AVERAGE
+		);		
 		fullExperimentCanvas.createNewSelectedWindow(DEFAULT_WINDOW_SIZE);
 
 		TmfTimeRange timeRange = getExperimentTimeRange(newExperiment);
@@ -527,7 +609,7 @@ public class HistogramView extends TmfView implements ControlListener {
 		fullExperimentCanvas.getHistogramContent().resetTable(timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue());
 		
 		// Create the content for the selected window. 
-		selectedWindowCanvas.createNewHistogramContent(selectedWindowCanvas.getSize().x ,SELECTED_WINDOW_BAR_WIDTH, SELECTED_WINDOW_CANVAS_HEIGHT, SELECTED_WINDOW_DIFFERENCE_TO_AVERAGE);
+		selectedWindowCanvas.createNewHistogramContent(selectedWindowCanvas.getSize().x ,SELECTED_WINDOW_BAR_WIDTH, selectedWindowCanvas.getSize().y, SELECTED_WINDOW_DIFFERENCE_TO_AVERAGE);
 		selectedWindowCanvas.getHistogramContent().resetTable(fullExperimentCanvas.getCurrentWindow().getTimestampOfLeftPosition(), fullExperimentCanvas.getCurrentWindow().getTimestampOfRightPosition());
 		
     	// Make sure the UI object are sane
@@ -547,7 +629,6 @@ public class HistogramView extends TmfView implements ControlListener {
 		// Perform both request. 
 		// Order is important here, the small/synchronous request for the selection window should go first
 		performSelectedWindowEventsRequest(newExperiment);
-//		performAllTraceEventsRequest(experimentCopy);
 		performAllTraceEventsRequest(newExperiment);
     }
 
@@ -584,27 +665,30 @@ public class HistogramView extends TmfView implements ControlListener {
      */
     public void performSelectedWindowEventsRequest(TmfExperiment<LttngEvent> experiment) {
     	
-    	HistogramSelectedWindow curSelectedWindow = fullExperimentCanvas.getCurrentWindow();
-    	
-    	// If no selection window exists, we will try to create one; 
-    	//	however this will most likely fail as the content is probably not created either
-    	if ( curSelectedWindow == null ) {
-    		fullExperimentCanvas.createNewSelectedWindow( DEFAULT_WINDOW_SIZE );
-    		curSelectedWindow = fullExperimentCanvas.getCurrentWindow();
+    	if(fullExperimentCanvas != null) {
+	    	HistogramSelectedWindow curSelectedWindow = fullExperimentCanvas.getCurrentWindow();
+	    	
+	    	// If no selection window exists, we will try to create one; 
+	    	//	however this will most likely fail as the content is probably not created either
+	    	if ( curSelectedWindow == null ) {
+	    		fullExperimentCanvas.createNewSelectedWindow( DEFAULT_WINDOW_SIZE );
+	    		curSelectedWindow = fullExperimentCanvas.getCurrentWindow();
+	    	}
+	    	
+	    	// The request will go from the Left timestamp of the window to the Right timestamp
+	    	// This assume that out-of-bound value are handled by the SelectionWindow itself
+			LttngTimestamp ts1 = new LttngTimestamp( curSelectedWindow.getTimestampOfLeftPosition() );
+			LttngTimestamp ts2 = new LttngTimestamp( curSelectedWindow.getTimestampOfRightPosition() );
+	        TmfTimeRange tmpRange = new TmfTimeRange(ts1, ts2);
+	        
+	        // Set a (dynamic) time interval
+	        long intervalTime = ( (ts2.getValue() - ts1.getValue()) / selectedWindowCanvas.getHistogramContent().getNbElement() );
+	        
+			selectedWindowRequest = performRequest(experiment, selectedWindowCanvas, tmpRange, intervalTime,
+					ExecutionType.SHORT);
+	        selectedWindowCanvas.redrawAsynchronously();
     	}
     	
-    	// The request will go from the Left timestamp of the window to the Right timestamp
-    	// This assume that out-of-bound value are handled by the SelectionWindow itself
-		LttngTimestamp ts1 = new LttngTimestamp( curSelectedWindow.getTimestampOfLeftPosition() );
-		LttngTimestamp ts2 = new LttngTimestamp( curSelectedWindow.getTimestampOfRightPosition() );
-        TmfTimeRange tmpRange = new TmfTimeRange(ts1, ts2);
-        
-        // Set a (dynamic) time interval
-        long intervalTime = ( (ts2.getValue() - ts1.getValue()) / selectedWindowCanvas.getHistogramContent().getNbElement() );
-        
-		selectedWindowRequest = performRequest(experiment, selectedWindowCanvas, tmpRange, intervalTime,
-				ExecutionType.SHORT);
-        selectedWindowCanvas.redrawAsynchronously();
     }
     
     /**
@@ -684,15 +768,17 @@ public class HistogramView extends TmfView implements ControlListener {
     			selectedWindowRequest.cancel();
     		}
     		
-    		// Get the latest window information
-    		selectedWindowTime = fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition();
-    		selectedWindowTimerange = fullExperimentCanvas.getCurrentWindow().getWindowTimeWidth();
-    		
-    		// If the current event time is outside the new window, change the current event
-    		//		The new current event will be the one closest to the LEFT side of the new window
-    		if ( isGivenTimestampInSelectedWindow(currentEventTime) == false ) {
-    			currentEventChangeNotification( fullExperimentCanvas.getCurrentWindow().getTimestampOfLeftPosition() );
-    		}
+    		if(fullExperimentCanvas != null) {
+	    		// Get the latest window information
+	    		selectedWindowTime = fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition();
+	    		selectedWindowTimerange = fullExperimentCanvas.getCurrentWindow().getWindowTimeWidth();
+	    		
+	    		// If the current event time is outside the new window, change the current event
+	    		//		The new current event will be the one closest to the LEFT side of the new window
+	    		if ( isGivenTimestampInSelectedWindow(currentEventTime) == false ) {
+	    			currentEventChangeNotification( fullExperimentCanvas.getCurrentWindow().getTimestampOfLeftPosition() );
+	    		}
+     		}
     		
     		// Perform a new request to read data about the new window
     		performSelectedWindowEventsRequest(lastUsedExperiment);
@@ -736,24 +822,16 @@ public class HistogramView extends TmfView implements ControlListener {
      */
     public void sendTmfRangeSynchSignalBroadcast() {
     	
-//    	System.out.println("sendTmfRangeSynchSignalBroadcast " + System.currentTimeMillis());
-    	
-    	// *** TODO ***
-    	// Not very elegant... we need to chance this below.
-    	//
     	if (TmfExperiment.getCurrentExperiment() == null)
     		return;
 
-    	long centerTime = fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition();
-    	long windowWidth = fullExperimentCanvas.getCurrentWindow().getWindowTimeWidth();
-    	
-    	long startTime = centerTime-windowWidth;
+    	long startTime = fullExperimentCanvas.getCurrentWindow().getTimestampOfLeftPosition();
     	if ( startTime < fullExperimentCanvas.getHistogramContent().getStartTime() ) {
     		startTime = fullExperimentCanvas.getHistogramContent().getStartTime();
     	}
         LttngTimestamp tmpStartTime = new LttngTimestamp(startTime);
         
-        long endTime = centerTime+windowWidth;
+        long endTime = fullExperimentCanvas.getCurrentWindow().getTimestampOfRightPosition();
     	if ( endTime > fullExperimentCanvas.getHistogramContent().getEndTime() ) {
     		endTime = fullExperimentCanvas.getHistogramContent().getEndTime();
     	}
@@ -772,34 +850,38 @@ public class HistogramView extends TmfView implements ControlListener {
      */
     public void timeTextGroupChangeNotification() {
     	
-    	// Get all the time text group value
-    	long newCurrentTime = ntgCurrentEventTime.getValue();
-    	long newSelectedWindowTime = ntgCurrentWindowTime.getValue();
-    	long newSelectedWindowTimeRange = ntgTimeRangeWindow.getValue();
+    	if(ntgCurrentEventTime != null) {
+	    	// If the user changed the current event time, call the notification
+	    	long newCurrentTime = ntgCurrentEventTime.getValue();
+	    	if ( newCurrentTime != currentEventTime ) {
+	    		currentEventChangeNotification( newCurrentTime );
+	    		// Send a broadcast to the framework about the window change
+	    		sendTmfTimeSynchSignalBroadcast();
+	    	}
+     	}
     	
-    	// If the user changed the current event time, call the notification
-    	if ( newCurrentTime != currentEventTime ) {
-    		currentEventChangeNotification( newCurrentTime );
-    		// Send a broadcast to the framework about the window change
-    		sendTmfTimeSynchSignalBroadcast();
+    	if(ntgCurrentWindowTime != null && fullExperimentCanvas != null) {
+	    	// If the user changed the selected window time, recenter the window and call the notification
+	    	long newSelectedWindowTime = ntgCurrentWindowTime.getValue();
+	    	if ( newSelectedWindowTime != selectedWindowTime ) {
+	    		selectedWindowTime = newSelectedWindowTime;
+	    		fullExperimentCanvas.setWindowCenterPosition( fullExperimentCanvas.getHistogramContent().getClosestXPositionFromTimestamp(selectedWindowTime) );
+	    		windowChangedNotification();
+	    		// Send a broadcast to the framework about the window change
+	    		sendTmfRangeSynchSignalBroadcast();
+	    	}
     	}
     	
-    	// If the user changed the selected window time, recenter the window and call the notification
-    	if ( newSelectedWindowTime != selectedWindowTime ) {
-    		selectedWindowTime = newSelectedWindowTime;
-    		fullExperimentCanvas.setWindowCenterPosition( fullExperimentCanvas.getHistogramContent().getClosestXPositionFromTimestamp(selectedWindowTime) );
-    		windowChangedNotification();
-    		// Send a broadcast to the framework about the window change
-    		sendTmfRangeSynchSignalBroadcast();
-    	}
-    	
-    	// If the user changed the selected window size, resize the window and call the notification
-    	if ( newSelectedWindowTimeRange != selectedWindowTimerange ) {
-    		selectedWindowTimerange = newSelectedWindowTimeRange;
-    		fullExperimentCanvas.resizeWindowByAbsoluteTime(selectedWindowTimerange);
-    		windowChangedNotification();
-    		// Send a broadcast to the framework about the window change
-    		sendTmfRangeSynchSignalBroadcast();
+    	if(ntgTimeRangeWindow != null && fullExperimentCanvas != null) {
+	    	// If the user changed the selected window size, resize the window and call the notification
+	    	long newSelectedWindowTimeRange = ntgTimeRangeWindow.getValue();
+	    	if ( newSelectedWindowTimeRange != selectedWindowTimerange ) {
+	    		selectedWindowTimerange = newSelectedWindowTimeRange;
+	    		fullExperimentCanvas.resizeWindowByAbsoluteTime(selectedWindowTimerange);
+	    		windowChangedNotification();
+	    		// Send a broadcast to the framework about the window change
+	    		sendTmfRangeSynchSignalBroadcast();
+	    	}
     	}
     	
     }
@@ -879,11 +961,13 @@ public class HistogramView extends TmfView implements ControlListener {
 	 */
 	public void updateFullExperimentInformation() {
 		
-		String startTime = HistogramConstant.formatNanoSecondsTime( fullExperimentCanvas.getHistogramContent().getStartTime() );
-		String stopTime = HistogramConstant.formatNanoSecondsTime( fullExperimentCanvas.getHistogramContent().getEndTime() );
-		
-		txtExperimentStartTime.setText( startTime );
-		txtExperimentStopTime.setText( stopTime );
+		if(fullExperimentCanvas != null) {
+			String startTime = HistogramConstant.formatNanoSecondsTime( fullExperimentCanvas.getHistogramContent().getStartTime() );
+			String stopTime = HistogramConstant.formatNanoSecondsTime( fullExperimentCanvas.getHistogramContent().getEndTime() );
+			
+			txtExperimentStartTime.setText( startTime );
+			txtExperimentStopTime.setText( stopTime );
+		}
 		
 		// Take one of the parent and call its layout to update control size
 		// Since both control have the same parent, only one call is needed 
@@ -902,8 +986,10 @@ public class HistogramView extends TmfView implements ControlListener {
 		// Update the timestamp as well
 		updateSelectedWindowTimestamp();
 		
-		txtWindowMaxNbEvents.setText( Long.toString(selectedWindowCanvas.getHistogramContent().getHeighestEventCount()) );
-		txtWindowMinNbEvents.setText(Long.toString(0));
+		if(selectedWindowCanvas != null) {
+			txtWindowMaxNbEvents.setText( Long.toString(selectedWindowCanvas.getHistogramContent().getHeighestEventCount()) );
+			txtWindowMinNbEvents.setText(Long.toString(0));
+		}
 		
 		// Refresh the layout
 		txtWindowMaxNbEvents.getParent().layout();
@@ -914,17 +1000,22 @@ public class HistogramView extends TmfView implements ControlListener {
 	 * WARNING : Calls in there are not thread safe and can't be called from different thread than "main"
 	 */
 	public void updateSelectedWindowTimestamp() {
-		String startTime = HistogramConstant.formatNanoSecondsTime( selectedWindowCanvas.getHistogramContent().getStartTime() );
-		String stopTime = HistogramConstant.formatNanoSecondsTime( selectedWindowCanvas.getHistogramContent().getEndTime() );
-		txtWindowStartTime.setText( startTime );
-		txtWindowStopTime.setText( stopTime );
 		
-		ntgCurrentWindowTime.setValue( fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition() );
-		ntgTimeRangeWindow.setValue(  fullExperimentCanvas.getCurrentWindow().getWindowTimeWidth() );
+		if(selectedWindowCanvas != null) {
+			String startTime = HistogramConstant.formatNanoSecondsTime( selectedWindowCanvas.getHistogramContent().getStartTime() );
+			String stopTime = HistogramConstant.formatNanoSecondsTime( selectedWindowCanvas.getHistogramContent().getEndTime() );
+			txtWindowStartTime.setText( startTime );
+			txtWindowStopTime.setText( stopTime );
+		}
 		
-		// If the current event time is outside the selection window, recenter our window 
-		if ( isGivenTimestampInSelectedWindow(ntgCurrentEventTime.getValue()) == false ) {
-			currentEventChangeNotification( fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition() );
+		if(fullExperimentCanvas != null) {
+			ntgCurrentWindowTime.setValue( fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition() );
+			ntgTimeRangeWindow.setValue(  fullExperimentCanvas.getCurrentWindow().getWindowTimeWidth() );
+			
+			// If the current event time is outside the selection window, recenter our window 
+			if ( isGivenTimestampInSelectedWindow(ntgCurrentEventTime.getValue()) == false ) {
+				currentEventChangeNotification( fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition() );
+			}
 		}
 		
 		// Take one control in each group to call to refresh the layout
