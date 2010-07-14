@@ -7,7 +7,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="org.eclipse.linuxtools.lttng.ui.views.PerspectiveFactory"
-            icon="icons/garland32.png"
+            icon="icons/garland16.png"
             id="org.eclipse.linuxtools.lttng.ui.perspective"
             name="%perspective.name">
       </perspective>
