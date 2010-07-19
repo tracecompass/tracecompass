@@ -1,3 +1,7 @@
+2010-07-19  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Some modifications to make the experiment more generic.
+
 2010-07-13  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java (.updateExperiment): Added check for empty experiment
