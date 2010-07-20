@@ -39,7 +39,6 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.jface.viewers.ViewerSorter;
@@ -67,9 +66,11 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IReusableEditor;
@@ -304,8 +305,9 @@ public class ProjectView extends TmfView {
         fViewer.getTree().addMouseListener(new MouseAdapter() {
         	@Override
 			public void mouseDoubleClick(MouseEvent event) {
-                TreeSelection selection = (TreeSelection) fViewer.getSelection();
-                Object element = selection.getFirstElement();
+                TreeItem treeItem = fViewer.getTree().getItem(new Point(event.x, event.y));
+                if (treeItem == null) return;
+                Object element = treeItem.getData();
                 if (element instanceof TmfExperimentNode) {
                 	TmfExperimentNode experiment = (TmfExperimentNode) element;
                 	selectExperiment(experiment);                

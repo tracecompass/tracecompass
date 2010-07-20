@@ -13,6 +13,10 @@
 
 package org.eclipse.linuxtools.tmf.ui.viewers.events;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
@@ -51,12 +55,12 @@ public class TmfEventsTable extends TmfComponent {
     protected boolean fPackDone = false;
 
     // Table column names
-    private final String TIMESTAMP_COLUMN = "Timestamp";
-    private final String SOURCE_COLUMN    = "Source";
-    private final String TYPE_COLUMN      = "Type";
-    private final String REFERENCE_COLUMN = "File";
-    private final String CONTENT_COLUMN   = "Content";
-    private final String[] columnProperties =  new String[] {
+    static private final String TIMESTAMP_COLUMN = "Timestamp";
+    static private final String SOURCE_COLUMN    = "Source";
+    static private final String TYPE_COLUMN      = "Type";
+    static private final String REFERENCE_COLUMN = "File";
+    static private final String CONTENT_COLUMN   = "Content";
+    static private final String[] COLUMN_NAMES =  new String[] {
         TIMESTAMP_COLUMN,
         SOURCE_COLUMN,
         TYPE_COLUMN,
@@ -65,7 +69,7 @@ public class TmfEventsTable extends TmfComponent {
     };
 
     // Column data
-    private class ColumnData {
+    static private class ColumnData {
         public final String header;
         public final int    width;
         public final int    alignment;
@@ -77,12 +81,12 @@ public class TmfEventsTable extends TmfComponent {
         }
     };
 
-    private ColumnData[] columnData = new ColumnData[] {
-        new ColumnData(columnProperties[0], 100, SWT.LEFT),
-        new ColumnData(columnProperties[1], 100, SWT.LEFT),
-        new ColumnData(columnProperties[2], 100, SWT.LEFT),
-        new ColumnData(columnProperties[3], 100, SWT.LEFT),
-        new ColumnData(columnProperties[4], 100, SWT.LEFT)
+    static private ColumnData[] COLUMN_DATA = new ColumnData[] {
+        new ColumnData(COLUMN_NAMES[0], 100, SWT.LEFT),
+        new ColumnData(COLUMN_NAMES[1], 100, SWT.LEFT),
+        new ColumnData(COLUMN_NAMES[2], 100, SWT.LEFT),
+        new ColumnData(COLUMN_NAMES[3], 100, SWT.LEFT),
+        new ColumnData(COLUMN_NAMES[4], 100, SWT.LEFT)
     };
 
     // ------------------------------------------------------------------------
@@ -93,6 +97,7 @@ public class TmfEventsTable extends TmfComponent {
     private TmfEvent[] cache = new TmfEvent[1];
     private int cacheStartIndex = 0;
     private int cacheEndIndex = 0;
+    private boolean fDisposeOnClose;
 //    private IResourceChangeListener fResourceChangeListener;
 
     // ------------------------------------------------------------------------
@@ -181,7 +186,7 @@ public class TmfEventsTable extends TmfComponent {
 
     public void dispose() {
         fTable.dispose();
-        if (fTrace != null) {
+        if (fTrace != null && fDisposeOnClose) {
             fTrace.dispose();
         }
         super.dispose();
@@ -197,10 +202,10 @@ public class TmfEventsTable extends TmfComponent {
      * FIXME: Add support for column selection
      */
     protected void createColumnHeaders(Table table) {
-        for (int i = 0; i < columnData.length; i++) {
-            TableColumn column = new TableColumn(table, columnData[i].alignment, i);
-            column.setText(columnData[i].header);
-            column.setWidth(columnData[i].width);
+        for (int i = 0; i < COLUMN_DATA.length; i++) {
+            TableColumn column = new TableColumn(table, COLUMN_DATA[i].alignment, i);
+            column.setText(COLUMN_DATA[i].header);
+            column.setWidth(COLUMN_DATA[i].width);
         }
     }
 
@@ -240,13 +245,21 @@ public class TmfEventsTable extends TmfComponent {
         fTable.setFocus();
     }
 
-    public void setTrace(ITmfTrace trace) {
+    /**
+     * @param trace
+     * @param disposeOnClose true if the trace should be disposed when the table is disposed
+     */
+    public void setTrace(ITmfTrace trace, boolean disposeOnClose) {
+        if (fTrace != null && fDisposeOnClose) {
+            fTrace.dispose();
+        }
         fTrace = trace;
+        fDisposeOnClose = disposeOnClose;
         
         // Perform the updates on the UI thread
         fTable.getDisplay().syncExec(new Runnable() {
             public void run() {
-                //fTable.setSelection(0); PATA
+                //fTable.setSelection(0);
                 fTable.removeAll();
                 cacheStartIndex = cacheEndIndex = 0; // Clear the cache
                 
@@ -322,25 +335,31 @@ public class TmfEventsTable extends TmfComponent {
     }
     
     @TmfSignalHandler
-    public void currentTimeUpdated(TmfTimeSynchSignal signal) {
+    public void currentTimeUpdated(final TmfTimeSynchSignal signal) {
         if (signal.getSource() != fTable && fTrace != null) {
-            final int index = (int) fTrace.getRank(signal.getCurrentTime());
-            // Perform the updates on the UI thread
-            fTable.getDisplay().asyncExec(new Runnable() {
-                public void run() {
-                    fTable.setSelection(index);
-                    // The timestamp might not correspond to an actual event
-                    // and the selection will point to the next experiment event.
-                    // But we would like to display both the event before and
-                    // after the selected timestamp.
-                    // This works fine by default except when the selected event
-                    // is the top displayed event. The following ensures that we
-                    // always see both events.
-                    if ((index > 0) && (index == fTable.getTopIndex())) {
-                        fTable.setTopIndex(index - 1);
-                    }
-                }
-            });
+            Job job = new Job("seeking...") {
+                @Override
+                protected IStatus run(IProgressMonitor monitor) {
+                    final int index = (int) fTrace.getRank(signal.getCurrentTime());
+                    // Perform the updates on the UI thread
+                    fTable.getDisplay().asyncExec(new Runnable() {
+                        public void run() {
+                            fTable.setSelection(index);
+                            // The timestamp might not correspond to an actual event
+                            // and the selection will point to the next experiment event.
+                            // But we would like to display both the event before and
+                            // after the selected timestamp.
+                            // This works fine by default except when the selected event
+                            // is the top displayed event. The following ensures that we
+                            // always see both events.
+                            if ((index > 0) && (index == fTable.getTopIndex())) {
+                                fTable.setTopIndex(index - 1);
+                            }
+                        }
+                    });
+                    return Status.OK_STATUS;
+                }};
+            job.schedule();
         }
     }
 }

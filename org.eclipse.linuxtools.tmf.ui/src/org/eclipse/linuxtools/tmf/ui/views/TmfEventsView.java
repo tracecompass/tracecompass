@@ -34,7 +34,7 @@ public class TmfEventsView extends TmfView {
 
     private TmfExperiment<TmfEvent> fExperiment;
     private TmfEventsTable fEventsTable;
-    private static final int DEFAULT_CACHE_SIZE = 1000;
+    private static final int DEFAULT_CACHE_SIZE = 100;
     private final int fCacheSize;
     private String fTitlePrefix;
     
@@ -109,7 +109,7 @@ public class TmfEventsView extends TmfView {
         setPartName(fTitlePrefix + " - " + fExperiment.getName());
 
         if (fEventsTable != null) {
-            fEventsTable.setTrace(fExperiment);
+            fEventsTable.setTrace(fExperiment, false);
         }
     }
 

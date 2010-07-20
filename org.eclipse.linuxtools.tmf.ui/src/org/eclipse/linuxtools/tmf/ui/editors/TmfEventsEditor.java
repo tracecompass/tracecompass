@@ -107,7 +107,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             fEventsTable.dispose();
             if (fTrace != null) {
                 fEventsTable = createEventsTable(fParent, fTrace.getCacheSize());
-                fEventsTable.setTrace(fTrace);
+                fEventsTable.setTrace(fTrace, true);
                 broadcast(new TmfTraceOpenedSignal(this, fTrace));
             } else {
                 fEventsTable = new TmfEventsTable(fParent, 0);
@@ -122,7 +122,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         setPartName(getEditorInput().getName());
         if (fTrace != null) {
             fEventsTable = createEventsTable(parent, fTrace.getCacheSize());
-            fEventsTable.setTrace(fTrace);
+            fEventsTable.setTrace(fTrace, true);
             broadcast(new TmfTraceOpenedSignal(this, fTrace));
         } else {
             fEventsTable = new TmfEventsTable(parent, 0);
@@ -175,7 +175,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             fEventsTable.dispose();
             if (fTrace != null) {
                 fEventsTable = createEventsTable(fParent, fTrace.getCacheSize());
-                fEventsTable.setTrace(fTrace);
+                fEventsTable.setTrace(fTrace, true);
                 broadcast(new TmfTraceOpenedSignal(this, fTrace));
             } else {
                 fEventsTable = new TmfEventsTable(fParent, 0);

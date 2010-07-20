@@ -1,3 +1,21 @@
+2010-07-20  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/ui/editors/TmfEventsEditor.java 
+		- Enable the dispose of trace when events table is disposed
+	* src/org/eclipse/linuxtools/tmf/ui/viewers/events/TmfEventsTable.java
+		- Use static defaults for column data
+		- Make optional the dispose of trace when table is disposed
+		- Perform the seek on timestamp in a background job in TmfTimeSynchSignal handler
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/ProjectView.java
+		- Fix tree item selection on mouse double-click 
+	* src/org/eclipse/linuxtools/tmf/ui/views/TmfEventsView.java
+		- Reduce default cache size to 100
+		- Disable the dispose of trace when events table is disposed 
+	* src/org/eclipse/linuxtools/tmf/ui/wizards/CustomTxtParserOutputWizardPage.java
+		- Enable the dispose of trace when events table is disposed
+	* src/org/eclipse/linuxtools/tmf/ui/wizards/CustomXmlParserOutputWizardPage.java 
+		- Enable the dispose of trace when events table is disposed
+
 2010-07-13  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/tmf/ui/viewers/events/TmfEventsTable.java: Changed visibility of 2 methods (from public to protected)

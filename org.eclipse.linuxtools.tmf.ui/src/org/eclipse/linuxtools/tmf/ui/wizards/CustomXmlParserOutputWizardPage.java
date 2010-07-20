@@ -205,7 +205,7 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
             ITmfTrace trace = new CustomXmlTrace(tmpFile.getName(), definition, tmpFile.getAbsolutePath(), MAX_NUM_ENTRIES);
             previewTable.dispose();
             previewTable = new CustomEventsTable(definition, tableContainer, MAX_NUM_ENTRIES);
-            previewTable.setTrace(trace);
+            previewTable.setTrace(trace, true);
             previewTable.getTable().setItemCount(MAX_NUM_ENTRIES); // Trigger parsing
         } catch (FileNotFoundException e) {
             e.printStackTrace();
