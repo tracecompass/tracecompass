@@ -20,10 +20,10 @@ import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
-import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
@@ -80,7 +80,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
      * @param indexPageSize
      */
     public TmfExperiment(Class<T> type, String id, ITmfTrace[] traces, TmfTimestamp epoch, int indexPageSize) {
-        this(type, id, traces, TmfTimestamp.Zero, DEFAULT_INDEX_PAGE_SIZE, false);
+        this(type, id, traces, TmfTimestamp.Zero, indexPageSize, false);
 	}
 
     public TmfExperiment(Class<T> type, String id, ITmfTrace[] traces, TmfTimestamp epoch, int indexPageSize, boolean preIndexExperiment) {
@@ -537,7 +537,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#peekEvent(org.eclipse.linuxtools.tmf.trace.TmfContext)
+	 * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#parseEvent(org.eclipse.linuxtools.tmf.trace.TmfContext)
 	 */
 	public TmfEvent parseEvent(TmfContext context) {
 		
@@ -559,6 +559,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 		    TmfContext traceContext = expContext.getContexts()[lastTrace];
 			expContext.getEvents()[lastTrace] = expContext.getTraces()[lastTrace].getNextEvent(traceContext);
 			expContext.setLastTrace(TmfExperimentContext.NO_TRACE);
+	        fSavedContext = new TmfExperimentContext(expContext);
 		}
 
 		// Scan the candidate events and identify the "next" trace to read from 

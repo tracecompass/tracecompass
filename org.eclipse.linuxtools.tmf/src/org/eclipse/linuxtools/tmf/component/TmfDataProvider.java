@@ -66,6 +66,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	protected final TmfRequestExecutor fExecutor;
 
 	private int fSignalDepth = 0;
+    private final Object fLock = new Object();
 
 	// ------------------------------------------------------------------------
 	// Constructors
@@ -125,7 +126,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	// ------------------------------------------------------------------------
 
 	public void sendRequest(final ITmfDataRequest<T> request) {
-		synchronized(this) {
+		synchronized(fLock) {
 			if (fSignalDepth > 0) {
 				coalesceDataRequest(request);
 			} else {
@@ -140,7 +141,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	 * @param thread
 	 */
 	public void fireRequests() {
-		synchronized(this) {
+		synchronized(fLock) {
 			for (TmfDataRequest<T> request : fPendingCoalescedRequests) {
 				dispatchRequest(request);
 			}
@@ -155,7 +156,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	protected Vector<TmfCoalescedDataRequest<T>> fPendingCoalescedRequests = new Vector<TmfCoalescedDataRequest<T>>();
 
 	protected void newCoalescedDataRequest(ITmfDataRequest<T> request) {
-		synchronized(this) {
+		synchronized(fLock) {
 			TmfCoalescedDataRequest<T> coalescedRequest =
 				new TmfCoalescedDataRequest<T>(fType, request.getIndex(), request.getNbRequested(), request.getBlockize(), request.getExecType());
 			coalescedRequest.addRequest(request);
@@ -167,8 +168,8 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 		}
 	}
 
-	protected synchronized void coalesceDataRequest(ITmfDataRequest<T> request) {
-		synchronized(this) {
+	protected void coalesceDataRequest(ITmfDataRequest<T> request) {
+		synchronized(fLock) {
 			for (TmfCoalescedDataRequest<T> req : fPendingCoalescedRequests) {
 				if (req.isCompatible(request)) {
 					req.addRequest(request);
@@ -196,6 +197,11 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 
 	protected void queueRequest(final ITmfDataRequest<T> request) {
 
+	    if (fExecutor.isShutdown()) {
+	        request.cancel();
+	        return;
+	    }
+	    
 		final TmfDataProvider<T> provider = this;
 
 		// Process the request
@@ -357,16 +363,20 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	// ------------------------------------------------------------------------
 
 	@TmfSignalHandler
-	public synchronized void startSynch(TmfStartSynchSignal signal) {
-		fSignalDepth++;
+	public void startSynch(TmfStartSynchSignal signal) {
+	    synchronized (fLock) {
+	        fSignalDepth++;
+	    }
 	}
 
 	@TmfSignalHandler
-	public synchronized void endSynch(TmfEndSynchSignal signal) {
-		fSignalDepth--;
-		if (fSignalDepth == 0) {
-			fireRequests();
-		}
+	public void endSynch(TmfEndSynchSignal signal) {
+        synchronized (fLock) {
+    		fSignalDepth--;
+    		if (fSignalDepth == 0) {
+    			fireRequests();
+    		}
+        }
 	}
 
 }
