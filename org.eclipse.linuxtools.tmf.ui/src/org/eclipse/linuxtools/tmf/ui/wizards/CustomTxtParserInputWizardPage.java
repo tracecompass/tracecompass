@@ -166,7 +166,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         dateFormatHelpButton.setImage(helpImage);
         dateFormatHelpButton.setToolTipText("Date Format Help");
         dateFormatHelpButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 openHelpShell(SIMPLE_DATE_FORMAT_URL);
             }
         });
@@ -189,6 +190,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         removeButton.setImage(deleteImage);
         removeButton.setToolTipText("Remove line");
         removeButton.addSelectionListener(new SelectionAdapter() {
+        	@Override
             public void widgetSelected(SelectionEvent e) {
                 if (treeViewer.getSelection().isEmpty() || selectedLine == null) return;
                 removeLine();
@@ -207,6 +209,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         addNextButton.setImage(addNextImage);
         addNextButton.setToolTipText("Add next line");
         addNextButton.addSelectionListener(new SelectionAdapter() {
+        	@Override
             public void widgetSelected(SelectionEvent e) {
                 InputLine inputLine = new InputLine(Cardinality.ZERO_OR_MORE, "", null);
                 if (((List<?>) treeViewer.getInput()).size() == 0) {
@@ -233,7 +236,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         addChildButton.setImage(addChildImage);
         addChildButton.setToolTipText("Add child line");
         addChildButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+        	@Override
+        	public void widgetSelected(SelectionEvent e) {
                 InputLine inputLine = new InputLine(Cardinality.ZERO_OR_MORE, "", null);
                 if (((List<?>) treeViewer.getInput()).size() == 0) {
                     definition.inputs.add(inputLine);
@@ -251,6 +255,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         moveUpButton.setImage(moveUpImage);
         moveUpButton.setToolTipText("Move up");
         moveUpButton.addSelectionListener(new SelectionAdapter() {
+        	@Override
             public void widgetSelected(SelectionEvent e) {
                 if (treeViewer.getSelection().isEmpty()) return;
                 InputLine inputLine = (InputLine) ((IStructuredSelection) treeViewer.getSelection()).getFirstElement();
@@ -273,6 +278,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         moveDownButton.setImage(moveDownImage);
         moveDownButton.setToolTipText("Move down");
         moveDownButton.addSelectionListener(new SelectionAdapter() {
+        	@Override
             public void widgetSelected(SelectionEvent e) {
                 if (treeViewer.getSelection().isEmpty()) return;
                 InputLine inputLine = (InputLine) ((IStructuredSelection) treeViewer.getSelection()).getFirstElement();
@@ -356,6 +362,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         highlightAllButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
         highlightAllButton.setText("Highlight All");
         highlightAllButton.addSelectionListener(new SelectionAdapter() {
+        	@Override
             public void widgetSelected(SelectionEvent e) {
                 updatePreviews(true);
             }
@@ -366,6 +373,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         legendButton.setToolTipText("Preview Legend");
         legendButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
         legendButton.addSelectionListener(new SelectionAdapter() {
+        	@Override
             public void widgetSelected(SelectionEvent e) {
                 openLegend();
             }
@@ -975,7 +983,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             regexHelpButton.setImage(helpImage);
             regexHelpButton.setToolTipText("Regular Expression Help");
             regexHelpButton.addSelectionListener(new SelectionAdapter() {
-                public void widgetSelected(SelectionEvent e) {
+            	@Override
+            	public void widgetSelected(SelectionEvent e) {
                     openHelpShell(PATTERN_URL);
                 }
             });
@@ -1134,6 +1143,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             addGroupButton.setImage(addImage);
             addGroupButton.setToolTipText("Add group");
             addGroupButton.addSelectionListener(new SelectionAdapter() {
+            	@Override
                 public void widgetSelected(SelectionEvent e) {
                     removeAddGroupButton();
                     inputs.add(new InputGroup(group, Line.this, inputs.size()+1));
@@ -1266,6 +1276,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             deleteButton.setImage(deleteImage);
             deleteButton.setToolTipText("Remove group");
             deleteButton.addSelectionListener(new SelectionAdapter() {
+            	@Override
                 public void widgetSelected(SelectionEvent e) {
                     InputGroup.this.line.removeInput(InputGroup.this.inputNumber);
                     validate();

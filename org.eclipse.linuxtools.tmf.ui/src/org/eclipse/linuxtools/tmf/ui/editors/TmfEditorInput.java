@@ -72,7 +72,8 @@ public class TmfEditorInput implements IEditorInput {
         return fTrace;
     }
 
-    public boolean equals(Object obj) {
+    @Override
+	public boolean equals(Object obj) {
         if (obj instanceof TmfEditorInput) {
             return fResource.equals(((TmfEditorInput) obj).fResource);
         } else if (obj instanceof IFileEditorInput) {

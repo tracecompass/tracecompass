@@ -251,6 +251,7 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
             enabledButton.setToolTipText("Visible");
             enabledButton.setSelection(true);
             enabledButton.addSelectionListener(new SelectionAdapter() {
+            	@Override
                 public void widgetSelected(SelectionEvent e) {
                     updatePreviewTable();
                 }
@@ -268,6 +269,7 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
             upButton.setImage(upImage);
             upButton.setToolTipText("Move Before");
             upButton.addSelectionListener(new SelectionAdapter() {
+            	@Override
                 public void widgetSelected(SelectionEvent e) {
                     moveBefore(Output.this);
                 }
@@ -278,6 +280,7 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
             downButton.setImage(downImage);
             downButton.setToolTipText("Move After");
             downButton.addSelectionListener(new SelectionAdapter() {
+            	@Override
                 public void widgetSelected(SelectionEvent e) {
                     moveAfter(Output.this);
                 }

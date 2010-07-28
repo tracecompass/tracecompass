@@ -1,0 +1,3 @@
+2010-07-28  Francois Chouinard  <fchouinard@gmail.com>
+
+	* stubs/org/eclipse/linuxtools/tmf/component/TmfSyntheticEventProviderStub.java: Missing @Override

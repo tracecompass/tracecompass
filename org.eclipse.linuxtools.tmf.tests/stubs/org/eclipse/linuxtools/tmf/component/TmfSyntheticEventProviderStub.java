@@ -81,6 +81,7 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSynthetic
 
 	private static final int TIMEOUT = 10000;
 
+	@Override
 	public TmfSyntheticEventStub getNext(ITmfContext context) {
 		TmfSyntheticEventStub data = null;
 		try {

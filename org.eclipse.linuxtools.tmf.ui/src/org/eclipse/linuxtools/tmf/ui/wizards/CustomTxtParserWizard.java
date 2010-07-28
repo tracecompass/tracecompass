@@ -61,7 +61,8 @@ public class CustomTxtParserWizard extends Wizard implements INewWizard {
      * Adding the page to the wizard.
      */
 
-    public void addPages() {
+    @Override
+	public void addPages() {
         inputPage = new CustomTxtParserInputWizardPage(selection, definition);
         addPage(inputPage);
         outputPage = new CustomTxtParserOutputWizardPage(this);

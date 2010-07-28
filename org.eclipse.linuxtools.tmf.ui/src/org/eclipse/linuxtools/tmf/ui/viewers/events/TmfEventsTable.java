@@ -9,6 +9,7 @@
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Patrick Tasse - Factored out from events view
+ *   Francois Chouinard - Replaced Table by TmfVirtualTable
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.viewers.events;
@@ -28,6 +29,8 @@ import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.ui.widgets.ColumnData;
+import org.eclipse.linuxtools.tmf.ui.widgets.TmfVirtualTable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -35,7 +38,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
@@ -50,7 +52,7 @@ public class TmfEventsTable extends TmfComponent {
     // Table data
     // ------------------------------------------------------------------------
 
-    protected Table fTable;
+    protected TmfVirtualTable fTable;
     protected ITmfTrace fTrace;
     protected boolean fPackDone = false;
 
@@ -68,19 +70,6 @@ public class TmfEventsTable extends TmfComponent {
         CONTENT_COLUMN
     };
 
-    // Column data
-    static private class ColumnData {
-        public final String header;
-        public final int    width;
-        public final int    alignment;
-
-        public ColumnData(String h, int w, int a) {
-            header = h;
-            width = w;
-            alignment = a;
-        }
-    };
-
     static private ColumnData[] COLUMN_DATA = new ColumnData[] {
         new ColumnData(COLUMN_NAMES[0], 100, SWT.LEFT),
         new ColumnData(COLUMN_NAMES[1], 100, SWT.LEFT),
@@ -93,28 +82,30 @@ public class TmfEventsTable extends TmfComponent {
     // Event cache
     // ------------------------------------------------------------------------
 
-    private final int fCacheSize;
-    private TmfEvent[] cache = new TmfEvent[1];
-    private int cacheStartIndex = 0;
-    private int cacheEndIndex = 0;
+    private final int  fCacheSize;
+    private TmfEvent[] fCache;
+    private int fCacheStartIndex = 0;
+    private int fCacheEndIndex   = 0;
+
     private boolean fDisposeOnClose;
-//    private IResourceChangeListener fResourceChangeListener;
 
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
 
     public TmfEventsTable(Composite parent, int cacheSize) {
+    	this(parent, cacheSize, COLUMN_DATA);
+    }
+
+    public TmfEventsTable(Composite parent, int cacheSize, ColumnData[] columnData) {
         super("TmfEventsTable");
         
         fCacheSize = cacheSize;
-        
-//        fShell = parent.getShell();
+        fCache = new TmfEvent[fCacheSize];
         
         // Create a virtual table
-        // TODO: change SINGLE to MULTI line selection and adjust the selection listener
-        final int style = SWT.SINGLE | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.VIRTUAL;
-        fTable = new Table(parent, style);
+        final int style = SWT.SINGLE | SWT.FULL_SELECTION | SWT.BORDER;
+        fTable = new TmfVirtualTable(parent, style);
 
         // Set the table layout
         GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -125,11 +116,10 @@ public class TmfEventsTable extends TmfComponent {
         fTable.setLinesVisible(true);
 
         // Set the columns
-        createColumnHeaders(fTable);
+        setColumnHeaders(columnData);
 
         // Handle the table item requests 
         fTable.addSelectionListener(new SelectionAdapter() {
-
             @Override
             public void widgetSelected(SelectionEvent e) {
                 TmfTimestamp ts = (TmfTimestamp) fTable.getSelection()[0].getData();
@@ -147,10 +137,10 @@ public class TmfEventsTable extends TmfComponent {
                 final int index = fTable.indexOf(item);
 
                 // Note: this works because handleEvent() is called once for each row, in sequence  
-                if ((index >= cacheStartIndex ) && (index < cacheEndIndex)) {
-                    int i = index - cacheStartIndex;
-                    item.setText(extractItemFields(cache[i]));
-                    item.setData(new TmfTimestamp(cache[i].getTimestamp()));
+                if ((index >= fCacheStartIndex) && (index < fCacheEndIndex)) {
+                    int i = index - fCacheStartIndex;
+                    item.setText(extractItemFields(fCache[i]));
+                    item.setData(new TmfTimestamp(fCache[i].getTimestamp()));
                     return;
                 }
 
@@ -159,9 +149,9 @@ public class TmfEventsTable extends TmfComponent {
                     public void handleData() {
                         TmfEvent[] tmpEvent = getData();
                         if ((tmpEvent != null) && (tmpEvent.length > 0)) {
-                            cache = tmpEvent;
-                            cacheStartIndex = index;
-                            cacheEndIndex = index + tmpEvent.length;
+                            fCache = tmpEvent;
+                            fCacheStartIndex = index;
+                            fCacheEndIndex = index + tmpEvent.length;
                         }
                     }
                 };
@@ -172,10 +162,10 @@ public class TmfEventsTable extends TmfComponent {
                     e.printStackTrace();
                 }
                 
-                if (cache[0] != null && cacheStartIndex == index) {
-                    item.setText(extractItemFields(cache[0]));
-                    item.setData(new TmfTimestamp(cache[0].getTimestamp()));
-                    packColumns(fTable);
+                if (fCache[0] != null && fCacheStartIndex == index) {
+                    item.setText(extractItemFields(fCache[0]));
+                    item.setData(new TmfTimestamp(fCache[0].getTimestamp()));
+                    packColumns();
                 }
                 
             }
@@ -184,7 +174,8 @@ public class TmfEventsTable extends TmfComponent {
         fTable.setItemCount(0);
     }
 
-    public void dispose() {
+    @Override
+	public void dispose() {
         fTable.dispose();
         if (fTrace != null && fDisposeOnClose) {
             fTrace.dispose();
@@ -192,7 +183,7 @@ public class TmfEventsTable extends TmfComponent {
         super.dispose();
     }
 
-    public Table getTable() {
+    public TmfVirtualTable getTable() {
         return fTable;
     }
     
@@ -201,15 +192,11 @@ public class TmfEventsTable extends TmfComponent {
      * 
      * FIXME: Add support for column selection
      */
-    protected void createColumnHeaders(Table table) {
-        for (int i = 0; i < COLUMN_DATA.length; i++) {
-            TableColumn column = new TableColumn(table, COLUMN_DATA[i].alignment, i);
-            column.setText(COLUMN_DATA[i].header);
-            column.setWidth(COLUMN_DATA[i].width);
-        }
+    protected void setColumnHeaders(ColumnData[] columnData) {
+    	fTable.setColumnHeaders(columnData);
     }
 
-    protected void packColumns(Table table) {
+    protected void packColumns() {
         if (fPackDone) return;
         for (TableColumn column : fTable.getColumns()) {
             int headerWidth = column.getWidth();
@@ -261,7 +248,7 @@ public class TmfEventsTable extends TmfComponent {
             public void run() {
                 //fTable.setSelection(0);
                 fTable.removeAll();
-                cacheStartIndex = cacheEndIndex = 0; // Clear the cache
+                fCacheStartIndex = fCacheEndIndex = 0; // Clear the cache
                 
                 if (!fTable.isDisposed() && fTrace != null) {
                     //int nbEvents = (int) fTrace.getNbEvents();
@@ -270,19 +257,6 @@ public class TmfEventsTable extends TmfComponent {
                 }
             }
         });
-//        ProgressMonitorDialog dialog = new ProgressMonitorDialog(fShell);
-//        try {
-//            dialog.run(false, false, new IRunnableWithProgress() {
-//                public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-//                    monitor.beginTask("Cleaning up, please wait", 0);
-//
-//
-//                    monitor.done();
-//                }
-//              });
-//        } catch (InvocationTargetException e) {
-//        } catch (InterruptedException e) {
-//        }
     }
 
     // ------------------------------------------------------------------------
@@ -297,6 +271,7 @@ public class TmfEventsTable extends TmfComponent {
             public void run() {
                 if (!fTable.isDisposed() && fTrace != null) {
                     fTable.setItemCount((int) fTrace.getNbEvents());
+                    fTable.refresh();
                 }
             }
         });

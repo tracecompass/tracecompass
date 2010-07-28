@@ -172,6 +172,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         dateFormatHelpButton.setImage(helpImage);
         dateFormatHelpButton.setToolTipText("Date Format Help");
         dateFormatHelpButton.addSelectionListener(new SelectionAdapter() {
+        	@Override
             public void widgetSelected(SelectionEvent e) {
                 openHelpShell(SIMPLE_DATE_FORMAT_URL);
             }
@@ -292,6 +293,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         removeButton.setImage(deleteImage);
         removeButton.setToolTipText("Remove element");
         removeButton.addSelectionListener(new SelectionAdapter() {
+        	@Override
             public void widgetSelected(SelectionEvent e) {
                 if (treeViewer.getSelection().isEmpty() || selectedElement == null) return;
                 removeElement();
@@ -321,6 +323,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         addChildButton.setImage(addChildImage);
         addChildButton.setToolTipText("Add child element");
         addChildButton.addSelectionListener(new SelectionAdapter() {
+        	@Override
             public void widgetSelected(SelectionEvent e) {
                 InputElement inputElement = new InputElement("", false, CustomXmlTraceDefinition.TAG_IGNORE, 0, "", null);
                 if (definition.rootInputElement == null) {
@@ -342,6 +345,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         addNextButton.setImage(addNextImage);
         addNextButton.setToolTipText("Add next element");
         addNextButton.addSelectionListener(new SelectionAdapter() {
+        	@Override
             public void widgetSelected(SelectionEvent e) {
                 InputElement inputElement = new InputElement("", false, CustomXmlTraceDefinition.TAG_IGNORE, 0, "", null);
                 if (definition.rootInputElement == null) {
@@ -367,6 +371,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         feelingLuckyButton.setImage(addManyImage);
         feelingLuckyButton.setToolTipText("Feeling lucky");
         feelingLuckyButton.addSelectionListener(new SelectionAdapter() {
+        	@Override
             public void widgetSelected(SelectionEvent e) {
                 InputElement inputElement = null;
                 if (definition.rootInputElement == null) {
@@ -391,6 +396,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         moveUpButton.setImage(moveUpImage);
         moveUpButton.setToolTipText("Move up");
         moveUpButton.addSelectionListener(new SelectionAdapter() {
+        	@Override
             public void widgetSelected(SelectionEvent e) {
                 if (treeViewer.getSelection().isEmpty()) return;
                 InputElement inputElement = (InputElement) ((IStructuredSelection) treeViewer.getSelection()).getFirstElement();
@@ -409,6 +415,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         moveDownButton.setImage(moveDownImage);
         moveDownButton.setToolTipText("Move down");
         moveDownButton.addSelectionListener(new SelectionAdapter() {
+        	@Override
             public void widgetSelected(SelectionEvent e) {
                 if (treeViewer.getSelection().isEmpty()) return;
                 InputElement inputElement = (InputElement) ((IStructuredSelection) treeViewer.getSelection()).getFirstElement();
@@ -1035,6 +1042,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             addAttributeButton.setImage(addImage);
             addAttributeButton.setToolTipText("Add attribute");
             addAttributeButton.addSelectionListener(new SelectionAdapter() {
+            	@Override
                 public void widgetSelected(SelectionEvent e) {
                     removeAddButton();
                     String attributeName = getAttributeNameSuggestion(inputElement);
@@ -1147,6 +1155,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             deleteButton.setImage(deleteImage);
             deleteButton.setToolTipText("Remove attribute");
             deleteButton.addSelectionListener(new SelectionAdapter() {
+            	@Override
                 public void widgetSelected(SelectionEvent e) {
                     Attribute.this.element.removeAttribute(Attribute.this.attributeNumber);
                     validate();

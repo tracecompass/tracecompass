@@ -61,7 +61,8 @@ public class CustomXmlParserWizard extends Wizard implements INewWizard {
      * Adding the page to the wizard.
      */
 
-    public void addPages() {
+    @Override
+	public void addPages() {
         inputPage = new CustomXmlParserInputWizardPage(selection, definition);
         addPage(inputPage);
         outputPage = new CustomXmlParserOutputWizardPage(this);

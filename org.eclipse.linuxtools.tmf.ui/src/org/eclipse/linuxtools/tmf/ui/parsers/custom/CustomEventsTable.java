@@ -13,15 +13,16 @@
 package org.eclipse.linuxtools.tmf.ui.parsers.custom;
 
 import java.text.SimpleDateFormat;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.TimeZone;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
+import org.eclipse.linuxtools.tmf.ui.widgets.ColumnData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 
 public class CustomEventsTable extends TmfEventsTable {
 
@@ -30,7 +31,7 @@ public class CustomEventsTable extends TmfEventsTable {
     public CustomEventsTable(CustomTraceDefinition definition, Composite parent, int cacheSize) {
         super(parent, cacheSize);
         fDefinition = definition;
-        createColumnHeaders(fTable);
+        createColumnHeaders();
     }
 
     public static final String TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
@@ -39,15 +40,26 @@ public class CustomEventsTable extends TmfEventsTable {
         TIMESTAMP_SIMPLE_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
-    @Override
-    public void createColumnHeaders(final Table table) {
-        if (fDefinition == null) return; // ignore when called by the super constructor
-        for (OutputColumn outputColumn : fDefinition.outputs) {
-            TableColumn column = new TableColumn(table, SWT.LEFT);
-            column.setText(outputColumn.name);
-            column.pack();
-        }
+    protected void createColumnHeaders() {
+		if (fDefinition == null)
+			return;
+    	List<ColumnData> columnData = new LinkedList<ColumnData>();
+		for (OutputColumn outputColumn : fDefinition.outputs) {
+			ColumnData column = new ColumnData(outputColumn.name, 0, SWT.LEFT);
+			columnData.add(column);
+		}
+    	setColumnHeaders((ColumnData[]) columnData.toArray());
     }
+
+//    @Override
+//    public void createColumnHeaders(final Table table) {
+//        if (fDefinition == null) return; // ignore when called by the super constructor
+//        for (OutputColumn outputColumn : fDefinition.outputs) {
+//            TableColumn column = new TableColumn(table, SWT.LEFT);
+//            column.setText(outputColumn.name);
+//            column.pack();
+//        }
+//    }
 
     @Override
     public String[] extractItemFields(TmfEvent event) {

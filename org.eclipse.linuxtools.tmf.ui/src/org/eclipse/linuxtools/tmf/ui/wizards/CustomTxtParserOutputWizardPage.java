@@ -12,9 +12,9 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomEventsTable;
+import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTraceDefinition;
-import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -250,6 +250,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
             enabledButton.setToolTipText("Visible");
             enabledButton.setSelection(true);
             enabledButton.addSelectionListener(new SelectionAdapter() {
+            	@Override
                 public void widgetSelected(SelectionEvent e) {
                     updatePreviewTable();
                 }
@@ -267,6 +268,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
             upButton.setImage(upImage);
             upButton.setToolTipText("Move Before");
             upButton.addSelectionListener(new SelectionAdapter() {
+            	@Override
                 public void widgetSelected(SelectionEvent e) {
                     moveBefore(Output.this);
                 }
@@ -277,6 +279,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
             downButton.setImage(downImage);
             downButton.setToolTipText("Move After");
             downButton.addSelectionListener(new SelectionAdapter() {
+            	@Override
                 public void widgetSelected(SelectionEvent e) {
                     moveAfter(Output.this);
                 }

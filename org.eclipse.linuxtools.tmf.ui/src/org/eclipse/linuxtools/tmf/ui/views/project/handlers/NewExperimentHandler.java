@@ -42,6 +42,7 @@ public class NewExperimentHandler extends AbstractHandler {
 	// Validation
 	// ------------------------------------------------------------------------
 
+	@Override
 	public boolean isEnabled() {
 
 		// Check if we are closing down

@@ -167,10 +167,12 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         }
     }
 
+	@Override
     public void save() {
         save(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME);
     }
     
+	@Override
     public void save(String path) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

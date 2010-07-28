@@ -36,6 +36,7 @@ public class OpenExperimentHandler extends AbstractHandler {
 	// Validation
 	// ------------------------------------------------------------------------
 
+	@Override
 	public boolean isEnabled() {
 		// Check if we are closing down
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

@@ -32,6 +32,7 @@ public class RenameExperimentHandler extends AbstractHandler {
 	// Validation
 	// ------------------------------------------------------------------------
 
+	@Override
 	public boolean isEnabled() {
 		return (fExperiment != null);
 	}

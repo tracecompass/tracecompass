@@ -40,6 +40,7 @@ public class SelectTracesHandler extends AbstractHandler {
 	// Validation
 	// ------------------------------------------------------------------------
 
+	@Override
 	public boolean isEnabled() {
 
 		// Check if we are closing down

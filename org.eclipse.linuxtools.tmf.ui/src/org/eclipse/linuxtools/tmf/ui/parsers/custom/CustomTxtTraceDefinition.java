@@ -251,11 +251,13 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
         }
     }
     
-    public void save() {
+    @Override
+	public void save() {
         save(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME);
     }
     
-    public void save(String path) {
+    @Override
+	public void save(String path) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();

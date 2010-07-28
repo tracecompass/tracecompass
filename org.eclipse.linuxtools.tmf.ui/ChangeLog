@@ -1,3 +1,36 @@
+2010-07-28  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/ui/widgets/ColumnData.java: New file.
+	* src/org/eclipse/linuxtools/tmf/ui/widgets/TmfVirtualTable.java: New file.
+	* META-INF/MANIFEST.MF: Export org.eclipse.linuxtools.tmf.ui.widgets
+	* src/org/eclipse/linuxtools/tmf/ui/editors/TmfEditorInput.java: Missing @Override
+	* src/org/eclipse/linuxtools/tmf/ui/parsers/custom/CustomEventsTable.java: Missing @Override 
+	* src/org/eclipse/linuxtools/tmf/ui/parsers/custom/CustomTxtTraceDefinition.java: Missing @Override 
+	* src/org/eclipse/linuxtools/tmf/ui/parsers/custom/CustomXmlTraceDefinition.java: Missing @Override 
+	* src/org/eclipse/linuxtools/tmf/ui/viewers/events/TmfEventsTable.java: Replace Table by TmfVirtualTable
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/CloseProjectHandler.java: Missing @Override
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/DeleteExperimentHandler.java: Missing @Override 
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/DeleteProjectHandler.java : Missing @Override
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/DeleteTraceHandler.java: Missing @Override
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/ImportTraceHandler.java: Missing @Override
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/NewExperimentHandler.java: Missing @Override 
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/NewProjectHandler.java: Missing @Override
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/OpenExperimentHandler.java: Missing @Override
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/OpenProjectHandler.java: Missing @Override
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/OpenTraceHandler.java: Missing @Override
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/RefreshHandler.java: Missing @Override
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/RenameExperimentHandler.java: Missing @Override 
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/RenameProjectHandler.java: Missing @Override
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/RenameTraceHandler.java: Missing @Override
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/SelectParserHandler.java: Missing @Override
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/handlers/SelectTracesHandler.java: Missing @Override
+	* src/org/eclipse/linuxtools/tmf/ui/wizards/CustomTxtParserInputWizardPage.java: Missing @Override
+	* src/org/eclipse/linuxtools/tmf/ui/wizards/CustomTxtParserOutputWizardPage.java: Missing @Override 
+	* src/org/eclipse/linuxtools/tmf/ui/wizards/CustomTxtParserWizard.java: Missing @Override
+	* src/org/eclipse/linuxtools/tmf/ui/wizards/CustomXmlParserInputWizardPage.java: Missing @Override
+	* src/org/eclipse/linuxtools/tmf/ui/wizards/CustomXmlParserOutputWizardPage.java: Missing @Override
+	* src/org/eclipse/linuxtools/tmf/ui/wizards/CustomXmlParserWizard.java: Missing @Override
+
 2010-07-20  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/tmf/ui/editors/TmfEventsEditor.java 

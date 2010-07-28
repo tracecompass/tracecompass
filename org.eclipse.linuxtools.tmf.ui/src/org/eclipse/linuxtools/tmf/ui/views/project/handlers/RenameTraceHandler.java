@@ -32,6 +32,7 @@ public class RenameTraceHandler extends AbstractHandler {
 	// Validation
 	// ------------------------------------------------------------------------
 
+	@Override
 	public boolean isEnabled() {
 		return (fTrace != null);
 	}

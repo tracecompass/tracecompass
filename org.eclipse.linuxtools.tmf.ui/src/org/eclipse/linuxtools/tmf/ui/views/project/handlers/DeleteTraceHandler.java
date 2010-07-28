@@ -41,6 +41,7 @@ public class DeleteTraceHandler extends AbstractHandler {
 	// Validation
 	// ------------------------------------------------------------------------
 
+	@Override
 	public boolean isEnabled() {
 		
 		// Check if we are closing down

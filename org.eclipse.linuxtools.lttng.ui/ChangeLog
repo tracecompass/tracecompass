@@ -1,3 +1,7 @@
+2010-07-28  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/ui/views/events/EventsTable.java: Cleanup 
+
 2010-07-14  Francois Chouinard  <fchouinard@gmail.com>
 
 	* plugin.xml: Point to the 16x16 LTTng icon for the perspective
