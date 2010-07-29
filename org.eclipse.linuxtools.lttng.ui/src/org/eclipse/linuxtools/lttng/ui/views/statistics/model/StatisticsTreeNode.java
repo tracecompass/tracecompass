@@ -8,208 +8,105 @@
  * 
  * Contributors:
  *   Yann N. Dauphin     (dhaemon@gmail.com)  - Implementation for stats
+ *   Francois Godin (copelnug@gmail.com)  - Re-design for new stats structure
  *******************************************************************************/
+
 package org.eclipse.linuxtools.lttng.ui.views.statistics.model;
 
-import java.util.AbstractMap;
 import java.util.Collection;
-import java.util.HashMap;
 
-/*
- * A tree where nodes can be accessed efficiently using paths.
+/**
+ * <h4>A tree where nodes can be accessed efficiently using paths.</h4>
  * 
- * It works like file systems. Each node is identified by a key. A path is a list of keys separated by the character '/'.
- * For example, the path 'persons/yann' will browse to the child 'persons' and return it's 'yann' child.
- * 
- * If a key might contains the character '/', use the #escapeKey method to get an escaped key. Use the #unescapeKey
- * method to unescaped the key.
+ * <p>It works like file systems. Each node is identified by a key. A path is an array ({@link FixedArray}) of String. The elements of the array represent the path from the root to this node.</p>
  */
 public class StatisticsTreeNode {
-
-	private StatisticsTreeNode parent;
-
-	private String key;
-
-	private Statistics value;
-
-	private AbstractMap<String, StatisticsTreeNode> children;
-
-	/*
-	 * Construct a node with the given key
-	 */
-	public StatisticsTreeNode(String key) {
-		this(null, key);
-	}
-
-	/*
-	 * Construct a node with the given parent, key and value.
-	 */
-	public StatisticsTreeNode(StatisticsTreeNode parent, String key) {
-		super();
-		this.parent = parent;
-		this.key = key;
-		this.value = new Statistics();
-		this.children = new HashMap<String, StatisticsTreeNode>();
-	}
-
-	/*
-	 * @return key associated with this node.
-	 */
-	public StatisticsTreeNode getParent() {
-		return this.parent;
-	}
-
-	/*
-	 * @return key associated with this node.
-	 */
-	public String getKey() {
-		return this.key;
-	}
-
-	/*
-	 * @return value associated with this node.
-	 */
-	public Statistics getValue() {
-		return this.value;
-	}
-
-	/*
-	 * Add a direct child with the given value at the given path.
-	 * 
-	 * @return children node that was created.
-	 */
-	public StatisticsTreeNode addChild(String key) {
-		StatisticsTreeNode created = new StatisticsTreeNode(this, key);
-
-		this.children.put(key, created);
-
-		return created;
-	}
-
-	/*
-	 * @return direct children node with the given key. null if not found.
-	 */
-	public StatisticsTreeNode getChild(String key) {
-		if (!this.children.containsKey(key)) {
-			return null;
-		}
-
-		return this.children.get(key);
-	}
-
-	/*
-	 * @return number of direct children of this node.
-	 */
-	public boolean hasChildren() {
-		return getNbChildren() > 0;
-	}
-
-	/*
-	 * @return direct children of this node.
-	 */
-	public Collection<StatisticsTreeNode> getChildren() {
-		return children.values();
-	}
-
-	/*
-	 * @return number of direct children of this node.
-	 */
-	public int getNbChildren() {
-		return children.size();
-	}
-
-	/*
-	 * Get the node at the given path. If it doesn't exist each node in the path
-	 * will be created with the given class.
-	 * 
-	 * @return children node with the given path. null if not found.
-	 */
-	public StatisticsTreeNode getOrCreateChildFromPath(String[] path) {
-		// StatisticsTreeNode previous = this.parent;
-		StatisticsTreeNode current = this;
-		for (String key : path) {
-			if (!current.children.containsKey(key)) {
-				current.children.put(key, new StatisticsTreeNode(current, key));
-			}
-
-			// previous = current;
-			current = current.children.get(key);
-		}
-
-		return current;
-	}
-
-	/*
-	 * Get the node at the given path. If it doesn't exist each node in the path
-	 * will be created with the given class.
-	 * 
-	 * @return children node with the given path. null if not found.
-	 */
-	public StatisticsTreeNode getOrCreateChildFromPath(String path) {
-		StatisticsTreeNode previous = this.parent;
-		StatisticsTreeNode current = this;
-		for (String key : path.split("/")) {
-			if (!current.children.containsKey(key)) {
-				current.children.put(key, new StatisticsTreeNode(previous, key));
-			}
-
-			previous = current;
-			current = current.children.get(key);
-		}
-
-		return current;
-	}
-
-	/*
-	 * @return children node with the given path. null if not found.
-	 */
-	public StatisticsTreeNode getChildFromPath(String path) {
-		StatisticsTreeNode current = this;
-		for (String key : path.split("/")) {
-			if (!current.children.containsKey(key)) {
-				return null;
-			}
-
-			current = current.children.get(key);
-		}
-
-		return current;
-	}
-
-	/*
-	 * Use this to escape a key that might contain the '/' character.
-	 * 
-	 * @return escaped key
-	 */
-	public static String escapeKey(String key) {
-		return key.replace("%", "%25").replace("/", "%2F");
-	}
-
-	/*
-	 * Use this to unescape a key.
-	 * 
-	 * @return unescaped key
-	 */
-	public static String unescapeKey(String key) {
-		return key.replace("%2F", "/").replace("%25", "%");
-	}
-
 	/**
-	 * Start from creation time i.e. keep key and parent but new statistics and
-	 * no children
+	 * <h4>Value of the node.</h4>
 	 */
-	public void reset() {
-		this.value = new Statistics();
-		this.children = new HashMap<String, StatisticsTreeNode>();
-	}
-
+	private Statistics fValue;
 	/**
-	 * 
-	 * @param key
-	 * @return true: if child with given key is present, false: if no child
-	 *         exists with given key name
+	 * <h4>Path of the node.</h4>
+	 */
+	private FixedArray<String> fPath;
+	/**
+	 * <h4>Corresponding StatisticsData.</h4>
+	 */
+	private StatisticsData fNodes;
+	/**
+	 * <h4>Constructor.</h4>
+	 * @param path Path to the node.
+	 * @param nodes Corresponding StatisticsData.
+	 */
+	public StatisticsTreeNode(final FixedArray<String> path, StatisticsData nodes) {
+		fPath = path;
+		fNodes = nodes;
+		fValue = new Statistics();
+	}
+	/**
+	 * <h4>Test if a node contain the specified child.</h4>
+	 * @param key Name of the child.
+	 * @return true: if child with given key is present, false: if no child exists with given key name
 	 */
 	public boolean containsChild(String key) {
-		return children.containsKey(key);
+		if(StatisticsData.ROOT.equals(fPath))
+			return fNodes.get(new FixedArray<String>(key)) != null;
+		return (fNodes.get(fPath.append(key)) != null);
+	}
+	/**
+	 * <h4>Get the children of this node.</h4>
+	 * @return Direct children of this node.
+	 */
+	public Collection<StatisticsTreeNode> getChildren() {
+		return fNodes.getChildren(fPath);
+	}
+	/**
+	 * <h4>Get the key for this node.</h4>
+	 * @return Key associated with this node.
+	 */
+	public String getKey() {
+		return fPath.get(fPath.size() - 1);
+	}
+	/**
+	 * <h4>Get the number of children this node have.</h4>
+	 * @return Number of direct children of this node.
+	 */
+	public int getNbChildren() {
+		return fNodes.getChildren(fPath).size();
+	}
+	/**
+	 * <h4>Return the parent node.</h4>
+	 * @return Parent node.
+	 */
+	public StatisticsTreeNode getParent() {
+		return fNodes.getParent(fPath);
+	}
+	/**
+	 * <h4>Get the path of the node.</h4>
+	 * @return The path of the node.
+	 */
+	public FixedArray<String> getPath() {
+		return fPath;
+	}
+	/**
+	 * <h4>Get the value of this node.</h4>
+	 * @return Value associated with this node.
+	 */
+	public Statistics getValue() {
+		return fValue;
+	}
+	/**
+	 * <h4>Indicate if the node have children.</h4>
+	 * @return True if the node has children.
+	 */
+	public boolean hasChildren() {
+		return !fNodes.getChildren(fPath).isEmpty();
+	}
+	/**
+	 * <h4>Start from creation time i.e. keep key and parent but new statistics and no children.</h4>
+	 */
+	public void reset() {
+		fValue = new Statistics();
+		fNodes.reset(fPath);
 	}
 }

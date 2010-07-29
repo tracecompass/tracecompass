@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2010 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Yann N. Dauphin     (dhaemon@gmail.com)  - Implementation for stats
+ *   Francois Godin (copelnug@gmail.com)  - Initial design and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng.ui.views.statistics.evProcessor;
@@ -17,19 +17,27 @@ import org.eclipse.linuxtools.lttng.state.StateStrings.Events;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.ui.views.statistics.model.StatisticsData;
 
-class StatsModeEndHandler extends AbstractStatsEventHandler {
-	
-	public StatsModeEndHandler(Events eventType) {
-		super(eventType);
+/**
+ * <h4>Handler for process exit event statistics</h4>
+ */
+public class StatsProcessExitHandler extends AbstractStatsEventHandler {
+	/**
+	 * <h4>Constructor</h4>
+	 * <p>
+	 * Define the LTT_EVENT_PROCESS_EXIT type.
+	 * </p>
+	 */
+	public StatsProcessExitHandler() {
+		super(Events.LTT_EVENT_PROCESS_EXIT);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing#process(org.eclipse.linuxtools.lttng.event.LttngEvent, org.eclipse.linuxtools.lttng.state.model.LttngTraceState)
+	 * @see org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor#process(org.eclipse.linuxtools.lttng.event.LttngEvent, org.eclipse.linuxtools.lttng.state.model.LttngTraceState)
 	 */
 	public boolean process(LttngEvent event, LttngTraceState traceState) {
 		StatisticsData tree = getStatisticsTree(traceState);
-		tree.increase(event, traceState, StatisticsData.Values.CPU_TIME | StatisticsData.Values.ELAPSED_TIME | StatisticsData.Values.CUMULATIVE_CPU_TIME);
+		tree.process_exit(event, traceState);
+
 		return false;
 	}
-
 }

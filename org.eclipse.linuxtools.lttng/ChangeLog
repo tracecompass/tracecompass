@@ -1,0 +1,4 @@
+2010-07-29  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/state/evProcessor/state/StateUpdateHandlers.java: Fixed state of running process
+	* src/org/eclipse/linuxtools/lttng/state/evProcessor/AbsEventToHandlerResolver.java: Optimized condition handling

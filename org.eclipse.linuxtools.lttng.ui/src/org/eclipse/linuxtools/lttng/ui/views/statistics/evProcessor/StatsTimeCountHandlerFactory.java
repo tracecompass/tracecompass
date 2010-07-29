@@ -10,6 +10,7 @@
  *   Yann N. Dauphin     (dhaemon@gmail.com)  - Implementation for stats
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.linuxtools.lttng.ui.views.statistics.evProcessor;
 
 import java.util.HashMap;
@@ -34,17 +35,20 @@ import org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor;
  * 
  */
 public class StatsTimeCountHandlerFactory extends AbsEventToHandlerResolver {
-	// ========================================================================
+
+	// -----------------------------------------------------------------------
 	// Data
-	// =======================================================================
+	// -----------------------------------------------------------------------
+
 	private final Map<String, ILttngEventProcessor> eventNametoBeforeProcessor = new HashMap<String, ILttngEventProcessor>();
 	ILttngEventProcessor afterhandler;
 	private static StatsTimeCountHandlerFactory instance = null;
 	private StatsTimeCountHandlers instantiateHandler = new StatsTimeCountHandlers();
 
-	// ========================================================================
+	// -----------------------------------------------------------------------
 	// Constructors
-	// =======================================================================
+	// -----------------------------------------------------------------------
+
 	private StatsTimeCountHandlerFactory() {
 		super();
 		//create one instance of each individual event handler and add the instance to the map
@@ -93,13 +97,16 @@ public class StatsTimeCountHandlerFactory extends AbsEventToHandlerResolver {
 		eventNametoBeforeProcessor.put(StateStrings.Events.LTT_EVENT_SCHED_SCHEDULE
 				.getInName(), instantiateHandler.getSchedChangeBeforeHandler());
 		
+		eventNametoBeforeProcessor.put(StateStrings.Events.LTT_EVENT_PROCESS_EXIT
+				.getInName(), instantiateHandler.getProcessExitHandler());
+		
 		afterhandler = instantiateHandler.getAfterHandler();
 
 	}
 
-	// ========================================================================
+	// -----------------------------------------------------------------------
 	// Public methods
-	// =======================================================================
+	// -----------------------------------------------------------------------
 	/**
 	 * The event processors are common to all traces an multiple instances will
 	 * use more memory unnecessarily
@@ -126,8 +133,7 @@ public class StatsTimeCountHandlerFactory extends AbsEventToHandlerResolver {
 
 	@Override
 	public ILttngEventProcessor getfinishProcessor() {
-		// No finishing processor used
-		return null;
+		return instantiateHandler.getTracesetEndHandler();
 	}
 
 	@Override

@@ -83,13 +83,11 @@ public abstract class AbsEventToHandlerResolver implements
 					// prevent duplicated updates in the state system
 					incrementBeforeEventCount();
 				}
-
-				if (synEvent.getSynType() == SequenceInd.UPDATE) {
+				else if (synEvent.getSynType() == SequenceInd.UPDATE) {
 					processor = getStateUpdaterProcessor(eventType);
 					incrementStateUpdateCount();
 				}
-
-				if (synEvent.getSynType() == SequenceInd.AFTER) {
+				else if (synEvent.getSynType() == SequenceInd.AFTER) {
 					processor = getAfterProcessor(eventType);
 				}
 

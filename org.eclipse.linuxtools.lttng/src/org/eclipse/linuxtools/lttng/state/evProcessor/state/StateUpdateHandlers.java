@@ -9,6 +9,7 @@
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.linuxtools.lttng.state.evProcessor.state;
 
 import java.util.Map;
@@ -1273,6 +1274,11 @@ class StateUpdateHandlers {
 				for (int pos = 0; pos < processes.length; pos++) {
 					fix_process(processes[pos], time);
 				}
+				
+				// Set the current process to be running
+				// TODO Should we do it for all process running on a cpu?
+				LttngProcessState process = traceSt.getRunning_process().get(trcEvent.getCpuId());
+				process.getState().setProc_status(ProcessStatus.LTTV_STATE_RUN);
 				
 				return false;
 

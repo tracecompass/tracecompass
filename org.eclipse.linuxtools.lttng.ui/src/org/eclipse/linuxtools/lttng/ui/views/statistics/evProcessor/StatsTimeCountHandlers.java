@@ -9,6 +9,7 @@
  * Contributors:
  *   Yann N. Dauphin     (dhaemon@gmail.com)  - Implementation for stats
  *******************************************************************************/
+
 package org.eclipse.linuxtools.lttng.ui.views.statistics.evProcessor;
 
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
@@ -175,5 +176,20 @@ class StatsTimeCountHandlers {
 
 		return handler;
 	}
-	
+	/**
+	 * <h4>Get the trace end handler</h4>
+	 * <p>Allow to do some calculations when the trace is finished.</p>
+	 * @return The handler.
+	 */
+	ILttngEventProcessor getTracesetEndHandler() {
+		return new StatsTracesetEndHandler();
+	}
+	/**
+	 * <h4>Get the process exit handler</h4>
+	 * <p> Handles: {@link org.eclipse.linuxtools.lttng.state.StateStrings.Events#LTT_EVENT_PROCESS_EXIT}.</p>
+	 * @return The handler.
+	 */
+	ILttngEventProcessor getProcessExitHandler() {
+		return new StatsProcessExitHandler();
+	}
 }

@@ -1,3 +1,19 @@
+2010-07-29  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/evProcessor/StatsProcessExitHandler.java: New file.
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/evProcessor/StatsTracesetEndHandler.java: New file.
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/model/FixedArray.java: New file.
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/model/KernelStatisticsData.java: New file.
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/model/StatisticsData.java: New file.
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/evProcessor/AbstractStatsEventHandler.java: Adjusted for new stats internal structure 
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/evProcessor/StatsModeChangeHandler.java: Adjusted for new stats internal structure
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/evProcessor/StatsModeEndHandler.java: Adjusted for new stats internal structure
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/evProcessor/StatsTimeCountHandlerFactory.java: Hooked to ProcessExitHandler 
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/evProcessor/StatsTimeCountHandlers.java: Hooked to ProcessExitHandler and TracesetEndHandler
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/model/Statistics.java: Added comments
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/model/StatisticsTreeNode.java: Adapted to new stats structure
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/model/StatisticsTreeRootFactory.java: Adapted to new stats structure
+
 2010-07-28  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/ui/views/events/EventsTable.java: Cleanup 
