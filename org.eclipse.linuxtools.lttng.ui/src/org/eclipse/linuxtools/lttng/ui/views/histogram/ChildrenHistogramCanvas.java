@@ -11,6 +11,7 @@
  *   
  * Modifications:
  * 2010-06-20 Yuriy Vashchuk - Histogram optimisations.   
+ * 2010-07-16 Yuriy Vashchuk - Base Histogram class simplification.
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
@@ -25,7 +26,8 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class ChildrenHistogramCanvas extends HistogramCanvas {
 	
-	protected HistogramView parentHistogramWindow = null; 
+ 	private HistogramCanvasPaintListener	paintListener = null;
+	private HistogramCanvasControlListener	controlListener = null;
 	
 	/**
 	 * ChildrenHistogramCanvas constructor.<p>
@@ -34,25 +36,21 @@ public class ChildrenHistogramCanvas extends HistogramCanvas {
 	 * @param parent 		Composite control which will be the parent of the new instance (cannot be null)
 	 * @param 				Style the style of control to construct
 	 */
-	public ChildrenHistogramCanvas(HistogramView newParentWindow, Composite parent, int style) {
-		super(parent, style);
-		
-		parentHistogramWindow = newParentWindow;
+	public ChildrenHistogramCanvas(HistogramView histogramView, Composite parent, int style) {
+		super(histogramView, parent, style);
 		
 		// 2010-06-20 Yuriy: Moved from parent class
-		createAndAddCanvasRedrawer();
 		createAndAddPaintListener();
 		createAndAddControlListener();
 	}
-			
+
 	/*
 	 * Create a histogram paint listener and bind it to this canvas.<p>
 	 * 
 	 * Note : This one is a bit particular, as it is made to draw content that is of a power of 2.
 	 * 			The default one draw content that is relative to the real pixels size.
 	 */
-	@Override
-	protected void createAndAddPaintListener() {
+	private void createAndAddPaintListener() {
 		paintListener = new HistogramCanvasPaintListener(this);
 		this.addPaintListener( paintListener );
 	}
@@ -62,8 +60,7 @@ public class ChildrenHistogramCanvas extends HistogramCanvas {
 	 * 
 	 *  @see org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramCanvasControlListener
 	 */
-	@Override
-	protected void createAndAddControlListener() {
+	private void createAndAddControlListener() {
 		controlListener = new HistogramCanvasControlListener(this);
 		this.addControlListener(controlListener);
 	}
@@ -74,8 +71,8 @@ public class ChildrenHistogramCanvas extends HistogramCanvas {
 	 */
 	@Override
 	public void notifyParentUpdatedInformation() {
-		if(parentHistogramWindow != null) {
-			parentHistogramWindow.updateSelectedWindowInformation();
+		if(getHistogramView() != null) {
+			getHistogramView().updateSelectedWindowInformation();
 		}
 	}
 }

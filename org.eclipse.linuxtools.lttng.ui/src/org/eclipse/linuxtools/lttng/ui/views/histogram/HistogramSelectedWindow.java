@@ -8,6 +8,10 @@
  * 
  * Contributors:
  *   William Bourque - Initial API and implementation
+ *
+ * Modifications:
+ * 2010-07-16 Yuriy Vashchuk - Heritage correction and selection window
+ * 							   optimisations.
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
@@ -27,22 +31,14 @@ package org.eclipse.linuxtools.lttng.ui.views.histogram;
  */
 public class HistogramSelectedWindow {
 	
-	protected int windowCenterPosition = 0;
-	protected long 	windowTimeWidth = 0L;
-	
-	protected Boolean isSelectedWindowVisible = false;
-	
-	protected HistogramContent histogramContent = null;
-	
-	/**
-	 * Default constructor for HistogramSelectedWindow.<p>
-	 * Position and TimeWidth are both set to 0
-	 * 
-	 * @param newTraceContent	HistogramContent to read window's data from
-	 */
-	public HistogramSelectedWindow(HistogramContent newTraceContent) {
-		histogramContent = newTraceContent;
-	}
+	private long timestampOfLeftPosition = 0;
+	private long timestampOfCenterPosition = 0;
+	private long timestampOfRightPosition = 0;
+	private long windowTimeWidth = 0L;
+	private int windowXPositionLeft = 0; 
+	private int windowXPositionCenter = 0; 
+	private int windowXPositionRight = 0; 
+	private Boolean isSelectedWindowVisible = false;
 	
 	/**
 	 * Default constructor for HistogramSelectedWindow.<p>
@@ -52,32 +48,14 @@ public class HistogramSelectedWindow {
 	 * @param centralPosition	Central X Position of the selection window in the canvas (0 to canvasWidth)
 	 * @param newWindowWidth	Time width (size) of the window. (0 or greater)
 	 */
-	public HistogramSelectedWindow(HistogramContent newTraceContent, int centralPosition, long newWindowWidth) {
-		histogramContent = newTraceContent;
-		windowCenterPosition = centralPosition;
-		windowTimeWidth = newWindowWidth;
+	public HistogramSelectedWindow(HistogramContent newTraceContent, long timestampOfLeftPosition, long newWindowWidth) {
+		if(newTraceContent != null) {
+			setWindowTimeWidth(newWindowWidth);
+			setTimestampOfLeftPosition(timestampOfLeftPosition);
+			setTimestampOfRightPosition(timestampOfLeftPosition + newWindowWidth);
+			setTimestampOfCenterPosition(timestampOfLeftPosition + newWindowWidth / 2);
+		}
 	}
-	
-	/** 
-	 * Getter for the HistogramContent used by the window.<p>
-	 * 
-	 * @return HistogramContent tied to this selection window.
-	 */
-	public HistogramContent getTraceContent() {
-		return histogramContent;
-	}
-	
-	/**
-	 * Setter for the HistogramContent used by the window.<p>
-	 * This need to be a valid, initialized HistogramContent;
-	 * 	the data in the content are needed for positionning the window.
-	 * 
-	 * @param newTraceContent  A new HistogramContent
-	 */
-	public void setTraceContent(HistogramContent newTraceContent) {
-		this.histogramContent = newTraceContent;
-	}
-	
 	
 	/**
 	 * Getter for the window visibility.<p>
@@ -118,68 +96,6 @@ public class HistogramSelectedWindow {
 		this.windowTimeWidth = newWindowTimeWidth;
 	}
 	
-	
-	/**
-	 * Getter for the central position of the window.<p>
-	 * 
-	 * @return Center X position of this window on the canvas.
-	 */
-	public int getWindowXPositionCenter() {
-		return windowCenterPosition;
-	}
-	
-	/**
-	 * Setter for the central position of the window.<p>
-	 * The new position need to be valid on the canvas (0 to canvasWidth).
-	 * 
-	 * @param newPosCenter	The new central position.
-	 */
-	public void setWindowXPositionCenter(int newPosCenter) {
-		this.windowCenterPosition = newPosCenter;
-	}
-	
-	/**
-	 * Getter for the left border of the window.<p>
-	 * Compute the position from the HistogramContent data; may return 0 if the content data are wrong.  
-	 * 
-	 * @return The left position of the window, or 0 if it cannot compute it. 
-	 */
-	public int getWindowXPositionLeft() {
-		
-		// If the timewidth is too small, we would pick the same position as the center one.
-		// To avoid this, we take a "full interval" when the window size is too small
-		if ( windowTimeWidth < histogramContent.getElementsTimeInterval() ) {
-			// Use intervalTime and not intervalTime/2 to make sure we step into the next interval
-			// Otherwise, if we are in the beginning of an interval, adding IntervalTime/2 could lead us into the same one
-			// The rounding operation will then return a correct position
-			return histogramContent.getXPositionByPositionAndTimeInterval(windowCenterPosition, -(histogramContent.getElementsTimeInterval() ) );
-		}
-		else {
-			return histogramContent.getXPositionByPositionAndTimeInterval(windowCenterPosition, -(windowTimeWidth / 2) );
-		}
-	}
-	
-	/**
-	 * Getter for the right border of the window.<p>
-	 * Compute the position from the HistogramContent data; may return 0 if the content data are wrong.  
-	 * 
-	 * @return The right position of the window, or 0 if it cannot compute it. 
-	 */
-	public int getWindowXPositionRight() {
-		// If the timewidth is too small, we would pick the same position as the center one.
-		// To avoid this, we take a "full interval" when the window size is too small
-		if ( windowTimeWidth < histogramContent.getElementsTimeInterval() ) {
-			// Use intervalTime and not intervalTime/2 to make sure we step into the next interval
-			// Otherwise, if we are in the beginning of an interval, adding IntervalTime/2 could lead us into the same one
-			// The rounding operation will then return a correct position
-			return histogramContent.getXPositionByPositionAndTimeInterval(windowCenterPosition, +(histogramContent.getElementsTimeInterval() ) );
-		}
-		else {
-			return histogramContent.getXPositionByPositionAndTimeInterval(windowCenterPosition, +(windowTimeWidth / 2) );
-		}
-		
-	}
-	
 	/**
 	 * Getter for the timestamp of left border of the window.<p>
 	 * Compute the timestamp from the HistogramContent data; may return 0 if the content data are wrong.  
@@ -187,8 +103,16 @@ public class HistogramSelectedWindow {
 	 * @return  The left timestamp of the window, or 0 if it cannot compute it. 
 	 */
 	public long getTimestampOfLeftPosition() {
-		return histogramContent.getClosestElementFromXPosition( getWindowXPositionLeft() ).firstIntervalTimestamp;
+		return timestampOfLeftPosition;
 	}
+	
+	/**
+	 * Setter for the timestamp of left border of the window.<p>
+	 * @param  timestampOfLeftPosition The left timestamp of the window. 
+	 */
+	public void setTimestampOfLeftPosition(long timestampOfLeftPosition) {
+		this.timestampOfLeftPosition = timestampOfLeftPosition;
+	}		
 	
 	/**
 	 * Getter for the timestamp of the center of the window.<p>
@@ -197,8 +121,24 @@ public class HistogramSelectedWindow {
 	 * @return  The center timestamp of the window, or 0 if it cannot compute it. 
 	 */
 	public long getTimestampOfCenterPosition() {
-		return histogramContent.getClosestElementFromXPosition( getWindowXPositionCenter() ).firstIntervalTimestamp;
+		return timestampOfCenterPosition;
 	}
+
+	/**
+	 * Setter for the timestamp of center border of the window.<p>
+	 */
+	public void setTimestampOfCenterPosition(long timestampOfCenterPosition) {
+		this.timestampOfCenterPosition = timestampOfCenterPosition;
+	}
+	
+	/**
+	 * Setter for the timestamp of center border of the window.<p>
+	 */
+	public void setTimestampOfLeftCenterRightPositions(long timestampOfCenterPosition) {
+		this.timestampOfLeftPosition = timestampOfCenterPosition - windowTimeWidth / 2;
+		this.timestampOfCenterPosition = timestampOfCenterPosition;
+		this.timestampOfRightPosition = timestampOfCenterPosition + windowTimeWidth / 2;
+	}		
 	
 	/**
 	 * Getter for the timestamp of right border of the window.<p>
@@ -207,6 +147,65 @@ public class HistogramSelectedWindow {
 	 * @return  The right timestamp of the window, or 0 if it cannot compute it. 
 	 */
 	public long getTimestampOfRightPosition() {
-		return histogramContent.getClosestElementFromXPosition( getWindowXPositionRight() ).firstIntervalTimestamp;
+		return timestampOfRightPosition;
+	}
+	
+	/**
+	 * Setter for the timestamp of right border of the window.<p>
+	 * @param  timestampOfRightPosition The right timestamp of the window. 
+	 */
+	public void setTimestampOfRightPosition(long timestampOfRightPosition) {
+		this.timestampOfRightPosition = timestampOfRightPosition;
+	}
+
+	/**
+	 * Getter for the coordinate of left border of the window.<p>
+	 * 
+	 * @return  The left coordinate. 
+	 */
+	public int getWindowXPositionLeft() {
+		return windowXPositionLeft;
+	}
+
+	/**
+	 * Setter for the coordinate of left border of the window.<p>
+	 * @param  windowXPositionLeft The left coordinate of the window. 
+	 */
+	public void setWindowXPositionLeft(int windowXPositionLeft) {
+		this.windowXPositionLeft = windowXPositionLeft;
+	}
+
+	/**
+	 * Getter for the coordinate of center border of the window.<p>
+	 * 
+	 * @return  The center coordinate. 
+	 */
+	public int getWindowXPositionCenter() {
+		return windowXPositionCenter;
+	}
+
+	/**
+	 * Setter for the coordinate of center of the window.<p>
+	 * @param  windowXPositionCenter The center coordinate of the window. 
+	 */
+	public void setWindowXPositionCenter(int windowXPositionCenter) {
+		this.windowXPositionCenter = windowXPositionCenter;
+	}
+
+	/**
+	 * Getter for the coordinate of right border of the window.<p>
+	 * 
+	 * @return  The right coordinate. 
+	 */
+	public int getWindowXPositionRight() {
+		return windowXPositionRight;
+	}
+
+	/**
+	 * Setter for the coordinate of right border of the window.<p>
+	 * @param  windowXPositionRight The right coordinate of the window. 
+	 */
+	public void setWindowXPositionRight(int windowXPositionRight) {
+		this.windowXPositionRight = windowXPositionRight;
 	}
 }

@@ -41,7 +41,7 @@ public abstract class HistogramConstant {
 	// Constants relative to wait time while listening for scroll events
 	// "FULL" is time to wait to stop "to count" mouse scroll click events
 	// "INTERVAL" is time to wait between polling for scroll click events
-	public final static long FULL_WAIT_MS_TIME_BETWEEN_MOUSE_SCROLL = 500L;
+	public final static long FULL_WAIT_MS_TIME_BETWEEN_MOUSE_SCROLL = 1000L;
 	public final static long INTERVAL_WAIT_MS_TIME_BETWEEN_POLL = 100L;
 	
 	
@@ -62,7 +62,7 @@ public abstract class HistogramConstant {
 	// Dimension for the line of the "Selection Window"
 	public final static int MINIMUM_WINDOW_WIDTH = 3;
 	public final static int SELECTION_LINE_WIDTH = 2;
-	public final static int SELECTION_CROSSHAIR_LENGTH = 3;
+	public final static int SELECTION_CROSSHAIR_LENGTH = 6;
 	
 	
 	/**

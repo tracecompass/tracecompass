@@ -40,24 +40,24 @@ public class TimeTextGroup implements FocusListener, KeyListener {
 	// 2010-06-10 Yuriy: Has been moved to header into HistogramView.java
 	protected static final String 	NANOSEC_LABEL = "sec";
 */	
-	protected static final String	LONGEST_STRING_VALUE = "." + Long.MAX_VALUE;
-	protected static final int	MAX_CHAR_IN_TEXTBOX = LONGEST_STRING_VALUE.length();
+	private static final String	LONGEST_STRING_VALUE = "." + Long.MAX_VALUE;
+	private static final int	MAX_CHAR_IN_TEXTBOX = LONGEST_STRING_VALUE.length();
     
     // The "small font" height used to display time will be "default font" minus this constant
-	protected static final int VERY_SMALL_FONT_MODIFIER = 2;
-    protected static final int SMALL_FONT_MODIFIER = 1;
+	private static final int VERY_SMALL_FONT_MODIFIER = 2;
+	private static final int SMALL_FONT_MODIFIER = 1;
     
     // Indentation size 
-    protected static final int DEFAULT_INDENT_SIZE = 10;
+	private static final int DEFAULT_INDENT_SIZE = 10;
     
-    protected HistogramView parentView = null;
-    protected AsyncTimeTextGroupRedrawer asyncRedrawer = null;
+	private HistogramView parentView = null;
+	private AsyncTimeTextGroupRedrawer asyncRedrawer = null;
     
-    protected Group grpName 	= null;
-    protected Text 	txtNanosec 	= null;
-    protected Label lblNanosec 	= null;
+	private Group grpName 	= null;
+	private Text 	txtNanosec 	= null;
+	private Label lblNanosec 	= null;
     
-    protected long 	timeValue 	= 0L; 
+	private long 	timeValue 	= 0L; 
     
     /**
      * Default Constructor.<p>

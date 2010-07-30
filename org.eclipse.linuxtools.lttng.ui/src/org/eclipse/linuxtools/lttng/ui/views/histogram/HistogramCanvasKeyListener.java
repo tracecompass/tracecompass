@@ -23,15 +23,15 @@ import org.eclipse.swt.events.KeyListener;
  */
 public class HistogramCanvasKeyListener implements KeyListener 
 {
-	protected HistogramCanvas parentCanvas = null;
-	protected boolean isShiftPressed = false;
+	private ParentHistogramCanvas parentCanvas = null;
+	private boolean isShiftPressed = false;
 	
 	/**
 	 * HistogramCanvasKeyListener constructor
 	 * 
 	 * @param newCanvas Related canvas
 	 */
-	public HistogramCanvasKeyListener(HistogramCanvas newCanvas) {
+	public HistogramCanvasKeyListener(ParentHistogramCanvas newCanvas) {
 		parentCanvas = newCanvas;
 	}
 	

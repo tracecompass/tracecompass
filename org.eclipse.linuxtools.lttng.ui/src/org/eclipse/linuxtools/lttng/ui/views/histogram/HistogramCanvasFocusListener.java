@@ -8,6 +8,9 @@
  * 
  * Contributors:
  *   William Bourque - Initial API and implementation
+ *   
+ * Modifications:
+ * 2010-07-16 Yuriy Vashchuk - Heritage corrections.
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
@@ -22,7 +25,7 @@ import org.eclipse.swt.events.FocusListener;
  */
 public class HistogramCanvasFocusListener implements FocusListener {
 	
-	protected HistogramCanvas parentCanvas = null;
+	private HistogramCanvas ourCanvas = null;
 	
 	/**
 	 * HistogramCanvasFocusListener constructor
@@ -30,7 +33,7 @@ public class HistogramCanvasFocusListener implements FocusListener {
 	 * @param newCanvas Related canvas
 	 */
 	public HistogramCanvasFocusListener(HistogramCanvas newCanvas) {
-		parentCanvas = newCanvas;
+		ourCanvas = newCanvas;
 	}
 	
 	/**
@@ -41,7 +44,7 @@ public class HistogramCanvasFocusListener implements FocusListener {
 	 * @param event  The focus event generated.
 	 */
 	public void focusGained(FocusEvent event) {
-		parentCanvas.redrawAsynchronously();
+		ourCanvas.redrawAsynchronously();
 	}
 	
 	/**

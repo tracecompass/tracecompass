@@ -12,7 +12,8 @@
  * Modifications:
  * 2010-06-10 Yuriy Vashchuk - GUI reorganisation, simplification and some
  *                             related code improvements.
- * 2010-06-20 Yuriy Vashchuk - Histograms optimisation. *   
+ * 2010-06-20 Yuriy Vashchuk - Histograms optimisation.   
+ * 2010-07-16 Yuriy Vashchuk - Histogram Canvas Heritage correction
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
@@ -117,17 +118,15 @@ public class HistogramView extends TmfView implements ControlListener {
     
     // Request and canvas for the "full trace" part
     private HistogramRequest dataBackgroundFullRequest = null;
-    private ParentHistogramCanvas fullExperimentCanvas = null;
+    private static ParentHistogramCanvas fullExperimentCanvas = null;
     
     // Request and canvas for the "selected window"
 	private HistogramRequest selectedWindowRequest = null;
-    private ChildrenHistogramCanvas selectedWindowCanvas = null;
+    private static ChildrenHistogramCanvas selectedWindowCanvas = null;
     
     // Content of the timeTextGroup
     //	Since the user can modify them with erroneous value, 
     //	we will keep track of the value internally 
-	private long selectedWindowTime = 0L;
-	private long selectedWindowTimerange = 0L;
 	private long currentEventTime = 0L;
 	
     // *** All the UI control below
@@ -554,8 +553,8 @@ public class HistogramView extends TmfView implements ControlListener {
 				long windowTimeWidth 	= (windowEnd - windowStart); 
 				
 				// Recenter the window
-				fullExperimentCanvas.setWindowCenterPosition( fullExperimentCanvas.getHistogramContent().getClosestXPositionFromTimestamp(windowStart + (windowTimeWidth/2)) );
 				fullExperimentCanvas.setSelectedWindowSize(windowTimeWidth);
+				fullExperimentCanvas.setWindowCenterPosition( fullExperimentCanvas.getHistogramContent().getClosestXPositionFromTimestamp(windowStart + (windowTimeWidth/2)) );
 				
 				// *** HACK ***
 				// Views could send us incorrect current event value (event outside the current window)
@@ -598,18 +597,36 @@ public class HistogramView extends TmfView implements ControlListener {
 */
 		  	fullExperimentCanvas.getSize().y / 2,
 			FULL_TRACE_DIFFERENCE_TO_AVERAGE
-		);		
-		fullExperimentCanvas.createNewSelectedWindow(DEFAULT_WINDOW_SIZE);
+		);
 
 		TmfTimeRange timeRange = getExperimentTimeRange(newExperiment);
+
+		// We will take the half of the full experiment length in case of bigger window size than the full experiment length
+		if(timeRange.getEndTime().getValue() - timeRange.getStartTime().getValue() >  DEFAULT_WINDOW_SIZE ) {
+			fullExperimentCanvas.createNewSelectedWindow(
+					timeRange.getStartTime().getValue(),
+					DEFAULT_WINDOW_SIZE
+					);
+		} else {
+			fullExperimentCanvas.createNewSelectedWindow(
+					timeRange.getStartTime().getValue(),
+					(timeRange.getEndTime().getValue() - timeRange.getStartTime().getValue() ) / 2
+					);
+		}
+
 		currentEventTime = timeRange.getStartTime().getValue();
 
 		// Set the window of the fullTrace canvas visible.
 		fullExperimentCanvas.getCurrentWindow().setSelectedWindowVisible(true);
 		fullExperimentCanvas.getHistogramContent().resetTable(timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue());
-		
+
 		// Create the content for the selected window. 
-		selectedWindowCanvas.createNewHistogramContent(selectedWindowCanvas.getSize().x ,SELECTED_WINDOW_BAR_WIDTH, selectedWindowCanvas.getSize().y, SELECTED_WINDOW_DIFFERENCE_TO_AVERAGE);
+		selectedWindowCanvas.createNewHistogramContent(
+				selectedWindowCanvas.getSize().x,
+				SELECTED_WINDOW_BAR_WIDTH,
+				selectedWindowCanvas.getSize().y,
+				SELECTED_WINDOW_DIFFERENCE_TO_AVERAGE
+				);
 		selectedWindowCanvas.getHistogramContent().resetTable(fullExperimentCanvas.getCurrentWindow().getTimestampOfLeftPosition(), fullExperimentCanvas.getCurrentWindow().getTimestampOfRightPosition());
 		
     	// Make sure the UI object are sane
@@ -668,10 +685,23 @@ public class HistogramView extends TmfView implements ControlListener {
     	if(fullExperimentCanvas != null) {
 	    	HistogramSelectedWindow curSelectedWindow = fullExperimentCanvas.getCurrentWindow();
 	    	
+	    	TmfTimeRange timeRange = getExperimentTimeRange(experiment);
+	    	
 	    	// If no selection window exists, we will try to create one; 
 	    	//	however this will most likely fail as the content is probably not created either
 	    	if ( curSelectedWindow == null ) {
-	    		fullExperimentCanvas.createNewSelectedWindow( DEFAULT_WINDOW_SIZE );
+	    		// We will take the half of the full experiment length in case of bigger window size than the full experiment length
+	    		if(timeRange.getEndTime().getValue() - timeRange.getStartTime().getValue() >  DEFAULT_WINDOW_SIZE ) {
+	    			fullExperimentCanvas.createNewSelectedWindow(
+	    					timeRange.getStartTime().getValue(),
+	    					DEFAULT_WINDOW_SIZE
+	    					);
+	    		} else {
+	    			fullExperimentCanvas.createNewSelectedWindow(
+	    					timeRange.getStartTime().getValue(),
+	    					(timeRange.getEndTime().getValue() - timeRange.getStartTime().getValue() ) / 2
+	    					);
+	    		}
 	    		curSelectedWindow = fullExperimentCanvas.getCurrentWindow();
 	    	}
 	    	
@@ -722,6 +752,12 @@ public class HistogramView extends TmfView implements ControlListener {
         // Mean a completetly independant copy of the Expereiment would be done and we would proceed on that.
         //
         dataBackgroundFullRequest = performRequest(experiment, fullExperimentCanvas, tmpRange, intervalTime, ExecutionType.LONG);
+        
+		
+        fullExperimentCanvas.getCurrentWindow().setWindowXPositionLeft(fullExperimentCanvas.getHistogramContent().getClosestXPositionFromTimestamp(fullExperimentCanvas.getCurrentWindow().getTimestampOfLeftPosition()));
+        fullExperimentCanvas.getCurrentWindow().setWindowXPositionCenter(fullExperimentCanvas.getHistogramContent().getClosestXPositionFromTimestamp(fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition()));
+        fullExperimentCanvas.getCurrentWindow().setWindowXPositionRight(fullExperimentCanvas.getHistogramContent().getClosestXPositionFromTimestamp(fullExperimentCanvas.getCurrentWindow().getTimestampOfRightPosition()));
+
         fullExperimentCanvas.redrawAsynchronously();
     }
     
@@ -769,10 +805,6 @@ public class HistogramView extends TmfView implements ControlListener {
     		}
     		
     		if(fullExperimentCanvas != null) {
-	    		// Get the latest window information
-	    		selectedWindowTime = fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition();
-	    		selectedWindowTimerange = fullExperimentCanvas.getCurrentWindow().getWindowTimeWidth();
-	    		
 	    		// If the current event time is outside the new window, change the current event
 	    		//		The new current event will be the one closest to the LEFT side of the new window
 	    		if ( isGivenTimestampInSelectedWindow(currentEventTime) == false ) {
@@ -863,9 +895,8 @@ public class HistogramView extends TmfView implements ControlListener {
     	if(ntgCurrentWindowTime != null && fullExperimentCanvas != null) {
 	    	// If the user changed the selected window time, recenter the window and call the notification
 	    	long newSelectedWindowTime = ntgCurrentWindowTime.getValue();
-	    	if ( newSelectedWindowTime != selectedWindowTime ) {
-	    		selectedWindowTime = newSelectedWindowTime;
-	    		fullExperimentCanvas.setWindowCenterPosition( fullExperimentCanvas.getHistogramContent().getClosestXPositionFromTimestamp(selectedWindowTime) );
+	    	if ( newSelectedWindowTime != fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition() ) {
+	    		fullExperimentCanvas.setWindowCenterPosition(newSelectedWindowTime);	
 	    		windowChangedNotification();
 	    		// Send a broadcast to the framework about the window change
 	    		sendTmfRangeSynchSignalBroadcast();
@@ -875,9 +906,8 @@ public class HistogramView extends TmfView implements ControlListener {
     	if(ntgTimeRangeWindow != null && fullExperimentCanvas != null) {
 	    	// If the user changed the selected window size, resize the window and call the notification
 	    	long newSelectedWindowTimeRange = ntgTimeRangeWindow.getValue();
-	    	if ( newSelectedWindowTimeRange != selectedWindowTimerange ) {
-	    		selectedWindowTimerange = newSelectedWindowTimeRange;
-	    		fullExperimentCanvas.resizeWindowByAbsoluteTime(selectedWindowTimerange);
+	    	if ( newSelectedWindowTimeRange != fullExperimentCanvas.getCurrentWindow().getWindowTimeWidth() ) {
+	    		fullExperimentCanvas.resizeWindowByAbsoluteTime(newSelectedWindowTimeRange);
 	    		windowChangedNotification();
 	    		// Send a broadcast to the framework about the window change
 	    		sendTmfRangeSynchSignalBroadcast();
@@ -1065,4 +1095,49 @@ public class HistogramView extends TmfView implements ControlListener {
 		}
 		
 	}
+
+	/*
+	 * Getter of FullExperimentCanvas
+	 * 
+	 * @return FullExperimentCanvas object
+	 */
+	public static ParentHistogramCanvas getFullExperimentCanvas() {
+		return fullExperimentCanvas;
+	}
+
+	/*
+	 * Getter of SelectedWindowCanvas
+	 * 
+	 * @return SelectedWindowCanvas object
+	 */
+	public static ChildrenHistogramCanvas getSelectedWindowCanvas() {
+		return selectedWindowCanvas;
+	}
+
+	
+	/*
+	 * Getter of DEFAULT_WINDOW_SIZE
+	 * 
+	 * @return DEFAULT_WINDOW_SIZE value
+	 */
+	public static long getDEFAULT_WINDOW_SIZE() {
+		return DEFAULT_WINDOW_SIZE;
+	}
+
+	/**
+	 * Getter for dataBackgroundFullRequest variable
+	 * @return the dataBackgroundFullRequest instance
+	 */
+	public HistogramRequest getDataBackgroundFullRequest() {
+		return dataBackgroundFullRequest;
+	}
+
+	/**
+	 * Getter for selectedWindowRequest variable
+	 * @return the selectedWindowRequest instance
+	 */
+	public HistogramRequest getSelectedWindowRequest() {
+		return selectedWindowRequest;
+	}
+
 }

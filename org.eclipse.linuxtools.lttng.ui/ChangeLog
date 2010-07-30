@@ -1,3 +1,22 @@
+2010-07-30  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/ChildrenHistogramCanvas.java: 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramCanvas.java: 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramCanvasControlListener.java: 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramCanvasFocusListener.java: 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramCanvasKeyListener.java: 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramCanvasMouseListener.java: 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramCanvasPaintListener.java: 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramConstant.java: 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramContent.java: 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramRequest.java: 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramSelectedWindow.java: 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramView.java: 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/ParentHistogramCanvas.java: 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/ParentHistogramCanvasControlListener.java: 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/ParentHistogramCanvasPaintListener.java: 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/TimeTextGroup.java: 
+
 2010-07-29  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/evProcessor/StatsProcessExitHandler.java: New file.

@@ -11,6 +11,9 @@
  *   
  * Modifications:
  * 2010-06-20 Yuriy Vashchuk - Histogram optimisations.
+ * 2010-07-16 Yuriy Vashchuk - Histogram class simplification.
+ * 							   Selection Window related methods has been
+ * 							   implemented in Parent Histogram.
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
@@ -28,17 +31,24 @@ import org.eclipse.swt.widgets.Display;
  */
 public class HistogramCanvas extends Canvas
 {
+	private static HistogramView histogramView = null; 
+
 	protected AsyncCanvasRedrawer 	canvasRedrawer 	 = null;
 	protected HistogramContent 		histogramContent = null;
 	
-	protected HistogramCanvasPaintListener 		paintListener = null;
+/*	
+	// 2010-07-16 Yuriy: Moved to child classes.
+ 	protected HistogramCanvasPaintListener 		paintListener = null;
 	protected HistogramCanvasMouseListener 		mouseListener = null;
 	protected HistogramCanvasKeyListener 		keyListener   = null;
-	protected HistogramCanvasFocusListener  	focusListener = null;
 	protected HistogramCanvasControlListener	controlListener = null;
+*/
+	protected HistogramCanvasFocusListener  	focusListener = null;
 	
+/*	
+	// 2010-07-16 Yuriy: Moved to parent histogram class.
 	protected HistogramSelectedWindow currentWindow = null;
-	
+*/	
 	
 	/**
 	 * HistogramCanvas constructor
@@ -46,31 +56,34 @@ public class HistogramCanvas extends Canvas
 	 * @param parent 		Composite control which will be the parent of the new instance (cannot be null)
 	 * @param 				Style the style of control to construct
 	 */
-	public HistogramCanvas(Composite parent, int style) {
+	public HistogramCanvas(HistogramView histogramView, Composite parent, int style) {
 		super(parent, style);
-/*
-		// 2010-06-20 Yuriy: Moved to derived classes.
+		HistogramCanvas.histogramView = histogramView;
 		addNeededListeners();
-*/		
 		
+/*
+		// 2010-06-20 Yuriy: Moved to parent hitogram class.
 		// New selected window, not visible by default
 		createNewSelectedWindow(0L);
+*/		
 	}
 	
 	/*
 	 * Create the needed "event listeners" and hook them to the Canvas.
 	 */
-/*
-	// 2010-06-20 Yuriy: Moved to derived classes.
+
 	protected void addNeededListeners() {
 		createAndAddCanvasRedrawer();
+		createAndAddFocusListener();
+		
+/*
+		// 2010-06-20 Yuriy: Moved to derived classes.
 		createAndAddPaintListener();
 		createAndAddMouseListener();
 		createAndAddKeyListener();
-		createAndAddFocusListener();
 		createAndAddControlListener();
+*/		
 	}
-*/	
 	
 	/*
 	 * Create a canvas redrawer and bind it to this canvas.<p>
@@ -82,40 +95,47 @@ public class HistogramCanvas extends Canvas
 	protected void createAndAddCanvasRedrawer() {
 		canvasRedrawer = new AsyncCanvasRedrawer(this);
 	}
-	
+
 	/*
 	 * Create a histogram paint listener and bind it to this canvas.<p>
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramCanvasPaintListener
 	 */
+/*	
+	// 2010-07-16 Yuriy: Moved to derived classes.
 	protected void createAndAddPaintListener() {
 		paintListener = new HistogramCanvasPaintListener(this);
 		this.addPaintListener( paintListener );
 	}
-	
+*/	
 	/*
 	 * Create a histogram mouse listener and bind it to this canvas.<p>
 	 * Note : this mouse listener handle the mouse, the move and the wheel at once.
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramCanvasMouseListener
 	 */
+/*
+	// 2010-07-16 Yuriy: Moved to parent histogram class
 	protected void createAndAddMouseListener() {
 		mouseListener = new HistogramCanvasMouseListener(this);
 		this.addMouseListener(mouseListener);
 		this.addMouseMoveListener(mouseListener);
 		this.addMouseWheelListener(mouseListener);
 	}
+*/	
 	
 	/*
 	 * Create a histogram key listener and bind it to this canvas.<p>
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramCanvasKeyListener
 	 */
+/*	
+	// 2010-07-16 Yuriy: Moved to parent histogram class
 	protected void createAndAddKeyListener() {
 		keyListener   = new HistogramCanvasKeyListener(this);
 		this.addKeyListener(keyListener);
 	}
-	
+*/	
 	/*
 	 * Create a histogram focus listener and bind it to this canvas.<p>
 	 * 
@@ -125,17 +145,19 @@ public class HistogramCanvas extends Canvas
 		focusListener = new HistogramCanvasFocusListener(this);
 		this.addFocusListener(focusListener);
 	}
-	
+
 	/*
 	 * Create a histogram control listener and bind it to this canvas.<p>
 	 * 
 	 *  @see org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramCanvasControlListener
 	 */
+/*
+	// 2010-07-16 Yuriy: Moved to derived classes.
 	protected void createAndAddControlListener() {
 		controlListener = new HistogramCanvasControlListener(this);
 		this.addControlListener(controlListener);
 	}
-	
+*/	
 	/**
 	 * Create a new HistogramContent for this HistogramCanvas<p>
 	 * A new <I>empty</I> content will then be created.
@@ -159,13 +181,15 @@ public class HistogramCanvas extends Canvas
 	 * 
 	 * @param windowTimeDuration	Time width (in nanosecond) of the window.
 	 */
+/*	
+	// 2010-07-16 Yuriy: Moved to parent histogram class.
 	public void createNewSelectedWindow(long windowTimeDuration) {
 		currentWindow = new HistogramSelectedWindow(histogramContent);
 		
 		currentWindow.setWindowTimeWidth(windowTimeDuration);
 		currentWindow.setWindowXPositionCenter(0);
 	}
-	
+*/	
 	public HistogramContent getHistogramContent() {
 		return histogramContent;
 	}
@@ -177,18 +201,24 @@ public class HistogramCanvas extends Canvas
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramSelectedWindow
 	 */
+/*	
+	// 2010-07-16 Yuriy: Moved to parent histogram class.
 	public HistogramSelectedWindow getCurrentWindow() {
 		return currentWindow;
 	}
+*/
 	
 	/**
 	 * Getter for the selection window width<p>
 	 * 
 	 * @return Time width (in nanosecond) of the selection window.
 	 */
+/*	
+	// 2010-07-16 Yuriy: Moved to parent histogram class.
 	public long getSelectedWindowSize() {
 		return currentWindow.getWindowTimeWidth();
 	}
+*/
 	
 	/**
 	 * Setter for the selection window width<p>
@@ -198,6 +228,8 @@ public class HistogramCanvas extends Canvas
 	 * 
 	 * @param newSelectedWindowSize	New time width (in nanosecond) of the selection window.
 	 */
+/*	
+	// 2010-07-16 Yuriy: Moved to parent histogram class.
 	public void setSelectedWindowSize(long newSelectedWindowSize) {
 		
 		if ( newSelectedWindowSize <= 0 ) {
@@ -209,7 +241,7 @@ public class HistogramCanvas extends Canvas
 		
 		currentWindow.setWindowTimeWidth(newSelectedWindowSize);
 	}
-	
+*/	
 	/**
 	 * Method to call the "Asynchronous redrawer" for this canvas<p>
 	 * This allow safe redraw from different threads.
@@ -229,6 +261,8 @@ public class HistogramCanvas extends Canvas
 	 * This allow safe update UI objects from different threads.
 	 * 
 	 */
+/*
+	// 2010-07-16 Yuriy: Moved to parent histogram class.
 	public void notifyParentSelectionWindowChangedAsynchronously() {
 		// Create a new redrawer in case it doesn't exist yet (we never know with thread!)
 		if ( canvasRedrawer == null ) {
@@ -237,6 +271,7 @@ public class HistogramCanvas extends Canvas
 		
 		canvasRedrawer.asynchronousNotifyParentSelectionWindowChanged();
 	}
+*/	
 	
 	/**
 	 * Method to call the "Asynchronous NotifyParentUpdatedInformation" for this canvas<p>
@@ -260,10 +295,13 @@ public class HistogramCanvas extends Canvas
 	 * 
 	 * @param newRelativeXPosition	New position relative to the last known absolute position.
 	 */
+/*
+ 	// 2010-07-16 Yuriy: Moved to parent histogram class.
 	public void moveWindow(int newRelativeXPosition) {
 		// Nothing : function is a place holder
 	}
-	
+*/
+
 	/**
 	 * Function that is called when the selection window is re-centered.<p>
 	 * Note: Given position should be absolute to the window and need to be the selection window center.
@@ -272,9 +310,12 @@ public class HistogramCanvas extends Canvas
 	 * 
 	 * @param newRelativeXPosition	New absolute position.
 	 */
+/*
+ 	// 2010-07-16 Yuriy: Moved to parent histogram class.
 	public void setWindowCenterPosition(int newAbsoluteXPosition) {
 		// Nothing : function is a place holder
 	}
+*/
 	
 	/**
 	 * Function that is called when the selection window size (time width) changed by an absolute time.<p>
@@ -284,20 +325,25 @@ public class HistogramCanvas extends Canvas
 	 * 
 	 * @param newTime	 New absoulte time (in nanoseconds) to apply to the window.
 	 */
+/*
+/*
+ 	// 2010-07-16 Yuriy: Moved to parent histogram class.
 	public void resizeWindowByAbsoluteTime(long newTime) {
 		// Nothing : function is a place holder
 	}
-	
+*/	
 	/**
 	 * Function that is called to tell the parent that the selection window changed.<p>
 	 * 
 	 * <B>METHOD INTENDED TO BE EXTENDED</B>
 	 * 
 	 */
+/*
+ 	// 2010-07-16 Yuriy: Moved to parent histogram class.
 	public void notifyParentSelectionWindowChanged() {
 		// Nothing : function is a place holder
 	}
-	
+*/	
 	/**
 	 * Function that is called to tell the parent that some information changed.<p>
 	 * 
@@ -306,6 +352,25 @@ public class HistogramCanvas extends Canvas
 	 */
 	public void notifyParentUpdatedInformation() {
 		// Nothing : function is a place holder
+	}
+	
+	/**
+	 * Getter for View
+	 * 
+	 * @return view instance
+	 * 
+	 */
+	public static HistogramView getHistogramView() {
+		return histogramView;
+	}
+
+	/**
+	 * Setter for View
+	 * 
+	 * @param histogramView reference to object
+	 */
+	public static void setHistogramView(HistogramView histogramView) {
+		HistogramCanvas.histogramView = histogramView;
 	}
 }
 
@@ -354,6 +419,8 @@ class AsyncCanvasRedrawer {
 	 * Basically, it just run "notifyParentSelectionWindowChanged()" in asyncExec.
 	 * 
 	 */
+/*	
+	// 2010-07-16 Yuriy: Moved to parent histogram class.
 	public void asynchronousNotifyParentSelectionWindowChanged() {
 		if(parentCanvas != null) {
 			Display display = parentCanvas.getDisplay();
@@ -364,6 +431,7 @@ class AsyncCanvasRedrawer {
 			});
 		}
 	}
+*/	
 	
 	/**
 	 * Function to asynchonously notify the parent of the related canvas that information changed.<p>

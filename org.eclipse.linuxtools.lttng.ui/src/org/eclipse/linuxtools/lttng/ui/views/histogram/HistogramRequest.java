@@ -8,6 +8,9 @@
  * 
  * Contributors:
  *   William Bourque - Initial API and implementation
+ *
+ * Modifications:
+ * 2010-07-16 Yuriy Vashchuk - Heritage correction.
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
@@ -23,18 +26,22 @@ import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
  * <p>
  */
 public class HistogramRequest extends TmfEventRequest<LttngEvent> {
-	protected HistogramContent histogramContent = null;
+/*	
+	private HistogramContent histogramContent = null;
+*/	
 	
-	protected int 	lastInterval = 0;
-	protected long 		lastRangeTime = 0L;
-	protected long 		nbEventsInInterval = 0L;
+	private int 	lastInterval = 0;
+	private long 	lastRangeTime = 0L;
+	private long 	nbEventsInInterval = 0L;
 	
-	protected int 	nbIntervalNotEmpty = 1;
-	protected int 	nbEventRead = 0;
+	private int 	nbIntervalNotEmpty = 1;
+	private int 	nbEventRead = 0;
 	
-	protected int	lastDrawPosition = 0;
+	private int	lastDrawPosition = 0;
 	
-	protected HistogramCanvas parentCanvas = null;
+	private HistogramCanvas parentCanvas = null;
+	
+	private boolean	isCompleted = false;
 	
 	/**
 	 * Constructor for HistogramRequest.<p>
@@ -50,17 +57,18 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 	public HistogramRequest(TmfTimeRange range, int nbRequested, HistogramCanvas newParentCanvas, long timeInterval, ITmfDataRequest.ExecutionType execType) {
         super((Class<LttngEvent>)LttngEvent.class, range, nbRequested, HistogramConstant.MAX_EVENTS_PER_READ, execType);
         
+    	setIsCompleted(false);
+        
         // *** FIXME ***
         // This does not work! The request won't be processed or the number of events returned is wrong!
         // We cannot use this !
 		//super((Class<LttngEvent>)dataType, range);
         
         parentCanvas = newParentCanvas;
-        histogramContent = parentCanvas.getHistogramContent();
         
         // Reset the content of the HistogramContent... the given data better be valid or this will fail.
-        histogramContent.clearContentData();
-        histogramContent.resetTable(range.getStartTime().getValue(), range.getEndTime().getValue(), timeInterval);
+        parentCanvas.getHistogramContent().clearContentData();
+        parentCanvas.getHistogramContent().resetTable(range.getStartTime().getValue(), range.getEndTime().getValue(), timeInterval);
         
         lastRangeTime = range.getStartTime().getValue();
         
@@ -90,22 +98,22 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 //			Tracer.trace("Hst: " + event.getTimestamp());
         	
         	// This check is linked to the evil fix mentionned above
-        	if ( ( tmpEvent.getTimestamp().getValue() >= histogramContent.getStartTime() ) &&
-        		 ( tmpEvent.getTimestamp().getValue() <= histogramContent.getEndTime() ) )
+        	if ( ( tmpEvent.getTimestamp().getValue() >= parentCanvas.getHistogramContent().getStartTime() ) &&
+        		 ( tmpEvent.getTimestamp().getValue() <= parentCanvas.getHistogramContent().getEndTime() ) )
         	{
         		
         		// Distance (in time) between this event and the last one we read
 	        	long distance = ( tmpEvent.getTimestamp().getValue() - lastRangeTime );
 				
 	        	// Check if we changed of interval (the distance is higher than the interval time)
-				if  ( distance > histogramContent.getElementsTimeInterval() ) {
+				if  ( distance > parentCanvas.getHistogramContent().getElementsTimeInterval() ) {
 					
-					histogramContent.getElementByIndex(lastInterval).intervalNbEvents = nbEventsInInterval;
+					parentCanvas.getHistogramContent().getElementByIndex(lastInterval).intervalNbEvents = nbEventsInInterval;
 					lastRangeTime = tmpEvent.getTimestamp().getValue();
 					
 					// * NOTE *
 					// We can skip several interval at once, so we need to find what was our interval now
-					lastInterval = (int)((lastRangeTime - histogramContent.getStartTime()) / histogramContent.getElementsTimeInterval() );
+					lastInterval = (int)((lastRangeTime - parentCanvas.getHistogramContent().getStartTime()) / parentCanvas.getHistogramContent().getElementsTimeInterval() );
 					
 					// *** HACK ***
 					// Because of the threads, weird phenomenons seem to happen here, like a position after the 
@@ -114,14 +122,14 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 					if ( lastInterval < 0 ) {
 						lastInterval = 0;
 					}
-					else if ( lastInterval >= histogramContent.getNbElement() ) {
-						lastInterval = (histogramContent.getNbElement()-1);
+					else if ( lastInterval >= parentCanvas.getHistogramContent().getNbElement() ) {
+						lastInterval = (parentCanvas.getHistogramContent().getNbElement()-1);
 					}
 					
 					// * NOTE * 
 					// We save the time we have here. This mean only the FIRST time read in an interval will be saved. 
-					histogramContent.getElementByIndex(lastInterval).firstIntervalTimestamp = lastRangeTime;
-					histogramContent.setReadyUpToPosition(lastInterval);
+					parentCanvas.getHistogramContent().getElementByIndex(lastInterval).firstIntervalTimestamp = lastRangeTime;
+					parentCanvas.getHistogramContent().setReadyUpToPosition(lastInterval);
 					
 					nbIntervalNotEmpty++;
 					nbEventsInInterval = 1L;
@@ -131,8 +139,8 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 					nbEventsInInterval++;
 				}
 				
-				if ( nbEventsInInterval > histogramContent.getHeighestEventCount() ) {
-					histogramContent.setHeighestEventCount(nbEventsInInterval);
+				if ( nbEventsInInterval > parentCanvas.getHistogramContent().getHeighestEventCount() ) {
+					parentCanvas.getHistogramContent().setHeighestEventCount(nbEventsInInterval);
 				}
 				nbEventRead++;
 				
@@ -147,9 +155,9 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
         // Save the last interval we had, so we won't miss the very last events at the end. 
         else {
         	// Save the last events
-        	histogramContent.getElementByIndex(lastInterval).intervalNbEvents = nbEventsInInterval;
+        	parentCanvas.getHistogramContent().getElementByIndex(lastInterval).intervalNbEvents = nbEventsInInterval;
         	// We reached the end of the request, so assume we fill up the content as well
-			histogramContent.setReadyUpToPosition(histogramContent.getNbElement());
+        	parentCanvas.getHistogramContent().setReadyUpToPosition(parentCanvas.getHistogramContent().getNbElement());
 			
 			// If the interval wasn't null, count this as a "non empty" interval
 			if (nbEventsInInterval > 0) {
@@ -164,6 +172,7 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 	 */
     @Override
     public void handleCompleted() {
+    	setIsCompleted(true);
     	parentCanvas.notifyParentUpdatedInformationAsynchronously();
 		redrawAsyncronously();
 		super.handleCompleted();
@@ -207,24 +216,24 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
     		averageNumberOfEvents = (int)Math.ceil((double)nbEventRead / (double)nbIntervalNotEmpty);
     	}
     	else {
-    		averageNumberOfEvents = (int)Math.ceil((double)nbEventRead / (double)histogramContent.getNbElement());
+    		averageNumberOfEvents = (int)Math.ceil((double)nbEventRead / (double)parentCanvas.getHistogramContent().getNbElement());
     	}
     	
-    	histogramContent.setAverageNumberOfEvents(averageNumberOfEvents);
+    	parentCanvas.getHistogramContent().setAverageNumberOfEvents(averageNumberOfEvents);
     	
     	// It is possible that the height factor didn't change; 
     	//		If not, we only need to redraw the updated section, no the whole content
     	// Save the actual height, recalculate the height and check if there was any changes
-    	double previousHeightFactor = histogramContent.getHeightFactor();
-    	histogramContent.recalculateHeightFactor();
-    	if ( histogramContent.getHeightFactor() != previousHeightFactor ) {
-			histogramContent.recalculateEventHeight();
+    	double previousHeightFactor = parentCanvas.getHistogramContent().getHeightFactor();
+    	parentCanvas.getHistogramContent().recalculateHeightFactor();
+    	if ( parentCanvas.getHistogramContent().getHeightFactor() != previousHeightFactor ) {
+    		parentCanvas.getHistogramContent().recalculateEventHeight();
     	}
     	else {
-    		histogramContent.recalculateEventHeightInInterval(lastDrawPosition, histogramContent.getReadyUpToPosition());
+    		parentCanvas.getHistogramContent().recalculateEventHeightInInterval(lastDrawPosition, parentCanvas.getHistogramContent().getReadyUpToPosition());
     	}
     	
-    	lastDrawPosition = histogramContent.getReadyUpToPosition();
+    	lastDrawPosition = parentCanvas.getHistogramContent().getReadyUpToPosition();
     }
     
     /**
@@ -235,5 +244,21 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
     	// Canvas redraw is already asynchronous
     	parentCanvas.redrawAsynchronously();
     }
+
+	/**
+	 * Getter for isCompleted variable
+	 * @return true if the request is completed
+	 */
+	public boolean getIsCompleted() {
+		return isCompleted;
+	}
+
+	/**
+	 * Setter for isCompleted variable
+	 * @param isCompleted value to set the completed flag
+	 */
+	public void setIsCompleted(boolean isCompleted) {
+		this.isCompleted = isCompleted;
+	}
     
 }

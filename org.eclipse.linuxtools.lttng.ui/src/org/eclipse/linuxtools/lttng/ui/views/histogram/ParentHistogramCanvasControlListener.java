@@ -8,6 +8,9 @@
  * 
  * Contributors:
  *   2010-06-20 Yuriy Vashchuk - Initial API and implementation
+ *   
+ * Modifications:
+ * 2010-07-16 Yuriy Vashchuk - Base class simplification.   
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
@@ -21,14 +24,16 @@ import org.eclipse.swt.events.ControlEvent;
  * <p> 
  */
 public class ParentHistogramCanvasControlListener extends HistogramCanvasControlListener {
+
+	private ParentHistogramCanvas ourCanvas = null;
 	
 	/**
 	 * ParentHistogramCanvasControlListenerl constructor
 	 * 
 	 * @param newCanvas Related canvas
 	 */
-	public ParentHistogramCanvasControlListener(HistogramCanvas newCanvas) {
-		super(newCanvas);
+	public ParentHistogramCanvasControlListener(ParentHistogramCanvas newCanvas) {
+		ourCanvas = newCanvas;
 	}
 	
 	
@@ -42,21 +47,21 @@ public class ParentHistogramCanvasControlListener extends HistogramCanvasControl
 	@Override
 	public void controlResized(ControlEvent event) {
 		
-		if ( (parentCanvas != null) && (parentCanvas.getHistogramContent() != null) ) {
-			int newSize = parentCanvas.getSize().x;
-			int oldSize = parentCanvas.getHistogramContent().getCanvasWindowSize();
+		if ( (ourCanvas != null) && (ourCanvas.getHistogramContent() != null) ) {
+			int newSize = ourCanvas.getSize().x;
+			int oldSize = ourCanvas.getHistogramContent().getCanvasWindowSize();
 			
 			// Set the new canvas size
-			parentCanvas.getHistogramContent().setCanvasWindowSize(newSize);
+			ourCanvas.getHistogramContent().setCanvasWindowSize(newSize);
 			
 			// Try to recenter to window at the same place it was
 			// Note : this is a best hope approach and is not intended to be precise;
 			//		the idea is to avoid issuing a (maybe) long request fo the selection window;
 			// There WILL be slight discrepancy between the "window values" (timestamp, etc...) showed 
 			//		and what it really points to. The user should reclick by himself to refresh it. 
-			int oldWindowCenter = parentCanvas.getCurrentWindow().getWindowXPositionCenter();
+			int oldWindowCenter = ourCanvas.getCurrentWindow().getWindowXPositionCenter();
 			int newWindowCenter = (int)Math.ceil((double)newSize * ((double)oldWindowCenter / (double)oldSize));
-			parentCanvas.setWindowCenterPosition(newWindowCenter);
+			ourCanvas.setWindowCenterPosition(newWindowCenter);
 		}
 	}
 }

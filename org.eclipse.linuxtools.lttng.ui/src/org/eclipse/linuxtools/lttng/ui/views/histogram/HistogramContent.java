@@ -8,6 +8,9 @@
  * 
  * Contributors:
  *   William Bourque - Initial API and implementation
+ *   
+ * Modifications:
+ * 2010-07-16 Yuriy Vashchuk - Heritage correction.
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
@@ -21,38 +24,38 @@ package org.eclipse.linuxtools.lttng.ui.views.histogram;
 public class HistogramContent {
 	
 	// Start and end time of the content
-	protected long 		startTime = 0L;
-	protected long 		endTime   = 0L;
+	private long 		startTime = 0L;
+	private long 		endTime   = 0L;
 	
 	// Some information about the content
 	// Most of them are required to calculate position and/or draw
 	// Make sure they stay consistent!
-	protected long		elementsTimeInterval = 1L;
-	protected double 	heightFactor = 100.0;
-	protected long   	heighestEventCount = 0L;
-	protected int 	maxHeight	 = 0;
-	protected int	canvasWindowSize = 0;
-	protected int 	barsWidth = 0;
+	private long		elementsTimeInterval = 1L;
+	private double 	heightFactor = 100.0;
+	private long   	heighestEventCount = 0L;
+	private int 	maxHeight	 = 0;
+	private int	canvasWindowSize = 0;
+	private int 	barsWidth = 0;
 	
 	// This value is used to calculate at which point we should "cut" bar that are too tall.
 	// Default value is large enought so that no bar should be cut
-	protected double  maxDifferenceToAverage = HistogramConstant.DEFAULT_DIFFERENCE_TO_AVERAGE;
+	private double  maxDifferenceToAverage = HistogramConstant.DEFAULT_DIFFERENCE_TO_AVERAGE;
 	// This is a factor we might apply on the max difference to average, as example if we concatenate interval together
-	protected double  maxDifferenceFactor = 1.0;
+	private double  maxDifferenceFactor = 1.0;
 	
 	// By default we will only consider element up to this position 
-	protected int	readyUpToPosition = 0;
+	private int	readyUpToPosition = 0;
 	
 	// The average number of events in the content
 	// Note : this IS needed to draw
-	protected int	averageNumberOfEvents = 0;
+	private int	averageNumberOfEvents = 0;
 	
 	// This is to draw the selected event of the TMF framework in another color
 	// Set the 0 to ignore
-	protected long selectedEventTimeInWindow = -1L;
+	private long selectedEventTimeInWindow = -1L;
 	
 	// The table that hold the elements
-	protected HistogramElement[] elementTable;
+	private HistogramElement[] elementTable;
 	
 	
 	/**
