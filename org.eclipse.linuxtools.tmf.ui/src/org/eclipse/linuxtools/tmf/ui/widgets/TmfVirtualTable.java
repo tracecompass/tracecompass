@@ -22,7 +22,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -94,9 +93,9 @@ public class TmfVirtualTable extends Composite {
 		addMouseWheelListener(new MouseWheelListener() {
 			public void mouseScrolled(MouseEvent event) {
 				fFirstRowOffset -= event.count;
-				int lastFirstRowOffset = fTableItemCount - fRowsDisplayed - 1;
-				if (fFirstRowOffset > lastFirstRowOffset) {
-					fFirstRowOffset = lastFirstRowOffset;
+				int previousFirstRowOffset = fTableItemCount - fRowsDisplayed - 1;
+				if (fFirstRowOffset > previousFirstRowOffset) {
+					fFirstRowOffset = previousFirstRowOffset;
 				} else if (fFirstRowOffset < 0) {
 					fFirstRowOffset = 0;
 				}
@@ -284,13 +283,6 @@ public class TmfVirtualTable extends Composite {
 		fSlider.setMinimum(0);
 		fSlider.setMaximum(0);
 
-		fSlider.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				setSelection();
-			}
-		});
-
 		fSlider.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event event) {
 				switch (event.detail) {
@@ -362,14 +354,21 @@ public class TmfVirtualTable extends Composite {
 	private void resize() {
 
 		// Compute the numbers of rows that fit the new area
-		Rectangle clientArea = getClientArea();
-		int tableHeight = clientArea.height - fTable.getHeaderHeight();
+		int tableHeight = fTable.getBounds().height - fTable.getHeaderHeight();
 		int itemHeight = fTable.getItemHeight();
 		fRowsDisplayed = tableHeight / itemHeight + 1;	// For partial rows
 		if (fTableItemCount == 0) {
 			fRowsDisplayed = 0;
 		}
-
+		
+		// If we are at the end, get elements before to populate
+		if(fFirstRowOffset + fRowsDisplayed >= fTableItemCount) {
+			fFirstRowOffset = fTableItemCount - fRowsDisplayed;
+		}
+		
+		// Set the slider thumb size
+		fSlider.setThumb(fRowsDisplayed);
+		
 		// Re-size and re-create the virtual table if needed
 		int delta = fTable.getItemCount() - fRowsDisplayed;
 		if (delta != 0) {

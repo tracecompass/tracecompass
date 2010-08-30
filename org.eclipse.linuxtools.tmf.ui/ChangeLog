@@ -1,3 +1,7 @@
+2010-08-30  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/ui/widgets/TmfVirtualTable.java: Fix for the calculation of the number of rows
+
 2010-07-28  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/tmf/ui/widgets/ColumnData.java: New file.
