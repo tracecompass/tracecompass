@@ -33,6 +33,7 @@ import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
@@ -409,6 +410,9 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     	LttngLocation curLocation = null;
     	if ( location == null ) {
     		curLocation = new LttngLocation();
+    		TmfContext context = seekEvent(curLocation.getOperationTime());
+    		context.setRank(ITmfContext.INITIAL_RANK);
+    		return context;
     	}
     	else {
     		curLocation = (LttngLocation)location;
@@ -418,7 +422,21 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     	// Update to location should (and will) be done in SeekEvent.
     	
     	// The only seek valid in LTTng is with the time, we call seekEvent(timestamp)
-    	return seekEvent( curLocation.getOperationTime() );
+    	TmfContext context = seekEvent(curLocation.getOperationTime());
+
+//    	// Adjust the previousLocation flags
+//    	if (location instanceof LttngLocation) {
+//        	LttngLocation lttngLocation = (LttngLocation) location;
+//        	if (lttngLocation.isLastOperationReadNext())  {
+//        		previousLocation.setLastOperationReadNext();
+//        	} else if (lttngLocation.isLastOperationParse()) {
+//        		previousLocation.setLastOperationParse();
+//        	} else if (lttngLocation.isLastOperationSeek()) {
+//        		previousLocation.setLastOperationSeek();
+//        	}
+//    	}
+
+    	return context;
     }
     
     /**
@@ -621,6 +639,9 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 ////        	[lmcfrch]
 //    		LttngLocation prevLocation = (LttngLocation) savedContext.getLocation();
 //    		LttngLocation currLocation = (LttngLocation) context.getLocation();
+//    		if (prevLocation.equals(currLocation)) {
+//    			System.out.println("Aie");
+//    		}
 //    		Tracer.trace("Trc: " + context.getRank() + ": " + returnedEvent.getTimestamp().toString() + " (" +
 //    				(prevLocation.isLastOperationParse() ? "T" : "F") + "," + (prevLocation.isLastOperationReadNext() ? "T" : "F") + "," + (prevLocation.isLastOperationSeek() ? "T" : "F") + "), (" +
 //    				(currLocation.isLastOperationParse() ? "T" : "F") + "," + (currLocation.isLastOperationReadNext() ? "T" : "F") + "," + (currLocation.isLastOperationSeek() ? "T" : "F") + ")"

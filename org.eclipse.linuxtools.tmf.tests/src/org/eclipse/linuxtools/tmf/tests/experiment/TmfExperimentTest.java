@@ -106,6 +106,9 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("GetEpoch", TmfTimestamp.Zero, fExperiment.getEpoch());
         assertEquals("GetNbEvents", NB_EVENTS, fExperiment.getNbEvents());
 
+        long nbTraceEvents = fExperiment.getTraces()[0].getNbEvents();
+        assertEquals("GetNbEvents", NB_EVENTS, nbTraceEvents);
+
         TmfTimeRange timeRange = fExperiment.getTimeRange();
         assertEquals("getStartTime", 1, timeRange.getStartTime().getValue());
         assertEquals("getEndTime", NB_EVENTS, timeRange.getEndTime().getValue());

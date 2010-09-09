@@ -1,3 +1,7 @@
+2010-09-09  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/ui/views/project/ProjectView.java: Hook to LTTngExperiment
+
 2010-07-30  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/ChildrenHistogramCanvas.java: 

@@ -122,7 +122,10 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
         		}
     		}
     		else {
-    			super.handleData();
+    			TmfDataRequest<T> req = (TmfDataRequest<T>) request;
+    			T[] data = getData();
+        		req.setData(data);
+        		req.handleData();
     		}
     	}
     }

@@ -1,0 +1,4 @@
+2010-09-09  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/tests/AllLTTngCoreTests.java: Invoke new test
+	* src/org/eclipse/linuxtools/lttng/tests/trace/LTTngExperimentTest.java: New test

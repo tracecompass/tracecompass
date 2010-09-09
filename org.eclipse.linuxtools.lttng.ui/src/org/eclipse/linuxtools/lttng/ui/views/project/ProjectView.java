@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.state.experiment.StateManagerFactory;
+import org.eclipse.linuxtools.lttng.trace.LTTngExperiment;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.ILTTngProjectTreeNode;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentNode;
@@ -59,7 +60,7 @@ public class ProjectView extends TmfView {
 
     private TreeViewer fViewer;
     private LTTngProjectRoot fProjectRoot;
-    private TmfExperiment<LttngEvent> fSelectedExperiment = null;
+    private LTTngExperiment<LttngEvent> fSelectedExperiment = null;
 
     private IWorkspace fWorkspace;
     private IResourceChangeListener fResourceChangeListener;
@@ -183,7 +184,7 @@ public class ProjectView extends TmfView {
         		ITmfTrace trace = new LTTngTrace(location, waitForCompletion);
                 traces[i] = trace;
         	}
-            fSelectedExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class, expId, traces);
+            fSelectedExperiment = new LTTngExperiment<LttngEvent>(LttngEvent.class, expId, traces);
 
 			// Make sure the lttng-core, experiment selection context is ready
 			// for an event request from any view

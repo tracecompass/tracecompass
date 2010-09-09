@@ -1,3 +1,8 @@
+2010-09-09  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/request/TmfCoalescedEventRequest.java: Fix in handleData()
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Made class extendable
+
 2010-07-20  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/tmf/component/TmfDataProvider.java:

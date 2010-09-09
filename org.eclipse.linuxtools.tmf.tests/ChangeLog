@@ -1,3 +1,7 @@
+2010-09-09  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/tests/experiment/TmfExperimentTest.java: Added a few checks
+
 2010-07-28  Francois Chouinard  <fchouinard@gmail.com>
 
 	* stubs/org/eclipse/linuxtools/tmf/component/TmfSyntheticEventProviderStub.java: Missing @Override

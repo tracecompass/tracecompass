@@ -19,6 +19,7 @@ import org.eclipse.linuxtools.lttng.tests.jni.JniMarkerFieldTest;
 import org.eclipse.linuxtools.lttng.tests.jni.JniMarkerTest;
 import org.eclipse.linuxtools.lttng.tests.jni.JniTraceTest;
 import org.eclipse.linuxtools.lttng.tests.jni.JniTracefileTest;
+import org.eclipse.linuxtools.lttng.tests.trace.LTTngExperimentTest;
 import org.eclipse.linuxtools.lttng.tests.trace.LTTngTextTraceTest;
 import org.eclipse.linuxtools.lttng.tests.trace.LTTngTraceTest;
 
@@ -43,6 +44,7 @@ public class AllLTTngCoreTests {
         
         suite.addTestSuite(LTTngTextTraceTest.class);
         suite.addTestSuite(LTTngTraceTest.class);
+        suite.addTestSuite(LTTngExperimentTest.class);
 
 		suite.addTestSuite(LTTngSyntheticEventProviderTest.class);
 		suite.addTestSuite(LTTngSyntheticEventProviderTextTest.class);
