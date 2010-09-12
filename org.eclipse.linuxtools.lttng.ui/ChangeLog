@@ -1,3 +1,7 @@
+2010-09-12  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/ui/views/events/EventsView.java: Fixed the events cache size
+
 2010-09-09  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/ui/views/project/ProjectView.java: Hook to LTTngExperiment

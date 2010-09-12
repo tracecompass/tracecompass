@@ -25,12 +25,14 @@ public class EventsView extends TmfEventsView {
 
     public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.events";
 
+    private static final int BUFFERED_EVENTS = 1000;
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
 
     public EventsView() {
-    	super(1);
+    	super(BUFFERED_EVENTS);
     }
 
     @Override
