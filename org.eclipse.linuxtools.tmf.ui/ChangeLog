@@ -1,3 +1,7 @@
+2010-09-12  francois  <francois@sushi>
+
+	* src/org/eclipse/linuxtools/tmf/ui/widgets/TmfVirtualTable.java: Fixed table scrolling issues
+
 2010-08-30  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/tmf/ui/parsers/custom/CustomEventsTable.java (createColumnHeaders): Added dummy param to create array of correct type (ColumnData)

@@ -13,6 +13,9 @@
 
 package org.eclipse.linuxtools.tmf.ui.widgets;
 
+import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
+import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -47,18 +50,20 @@ import org.eclipse.swt.widgets.TableItem;
 public class TmfVirtualTable extends Composite {
 
 	// The table
-	private Table fTable;
-	private int   fFirstRowOffset = 0;
-	private int   fTableRow       = 0; 
-	private int   fEffectiveRow   = 0; 
+	private Table   fTable;
+	private int     fTableRows         = 0;      // Number of table rows
+	private boolean fPartialRowVisible = false;  // Indicates that a row is partially displayed
+	private int     fSelectedRow       = 0;      // Currently selected row in the table 
 
-	private TableItem fSelectedItems[] = null;
+	private int     fTableTopEventRank = 0;      // Global rank of the first entry displayed
+	private int     fSelectedEventRank = 0;      // Global rank of the selected event
+
+	private TableItem fSelectedItems[] = new TableItem[1];
 	private int       fTableItemCount  = 0;
-	private int       fRowsDisplayed;
 	private TableItem fTableItems[];
 
 	// The slider
-	private Slider  fSlider;
+	private Slider fSlider;
 
 	// ------------------------------------------------------------------------
 	// Constructor
@@ -72,15 +77,16 @@ public class TmfVirtualTable extends Composite {
 		super(parent, style | SWT.BORDER & (~SWT.H_SCROLL) & (~SWT.V_SCROLL));
 
 		// Create the controls
-		createTable();
+		createTable(style);
 		createSlider();
 
 		// Set the layout
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = 2;
 		gridLayout.horizontalSpacing = 0;
-		gridLayout.verticalSpacing = 0;
-		gridLayout.marginWidth = 0;
+		gridLayout.verticalSpacing   = 0;
+		gridLayout.marginWidth  = 0;
+		gridLayout.marginHeight = 0;
 		setLayout(gridLayout);
 		
 		GridData tableGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -90,17 +96,19 @@ public class TmfVirtualTable extends Composite {
 		fSlider.setLayoutData(sliderGridData);
 
 		// Add the listeners
-		addMouseWheelListener(new MouseWheelListener() {
+		fTable.addMouseWheelListener(new MouseWheelListener() {
 			public void mouseScrolled(MouseEvent event) {
-				fFirstRowOffset -= event.count;
-				int previousFirstRowOffset = fTableItemCount - fRowsDisplayed - 1;
-				if (fFirstRowOffset > previousFirstRowOffset) {
-					fFirstRowOffset = previousFirstRowOffset;
-				} else if (fFirstRowOffset < 0) {
-					fFirstRowOffset = 0;
+				fTableTopEventRank -= event.count;
+				if (fTableTopEventRank < 0) {
+					fTableTopEventRank = 0;
 				}
-				fSlider.setSelection(fFirstRowOffset);
-				setSelection();
+				int latestFirstRowOffset = fTableItemCount - fTableRows;
+				if (fTableTopEventRank > latestFirstRowOffset) {
+					fTableTopEventRank = latestFirstRowOffset;
+				}
+
+				fSlider.setSelection(fTableTopEventRank);
+				refreshTable();
 			}
 		});
 
@@ -122,8 +130,9 @@ public class TmfVirtualTable extends Composite {
 	/**
 	 * Create the table and add listeners
 	 */
-	private void createTable() {
+	private void createTable(int style) {
 
+//		int tableStyle = SWT.NO_SCROLL | SWT.H_SCROLL | SWT.SINGLE | SWT.FULL_SELECTION; 
 		int tableStyle = SWT.NO_SCROLL | SWT.SINGLE | SWT.FULL_SELECTION; 
 		fTable = new Table(this, tableStyle);
 
@@ -134,7 +143,7 @@ public class TmfVirtualTable extends Composite {
 			}
 		});
 
-		fTable.addKeyListener(new KeyListener() {
+        fTable.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent event) {
 				handleTableKeyEvent(event);
 			}
@@ -147,128 +156,138 @@ public class TmfVirtualTable extends Composite {
 	 * Update the rows and selected item
 	 */
 	private void handleTableSelection() {
-		fTableRow = fTable.getSelectionIndices()[0];
-		fEffectiveRow = fFirstRowOffset + fTableRow;
-		fSelectedItems = new TableItem[1];
-		fSelectedItems[0] = fTable.getSelection()[0];
+		fSelectedRow       = fTable.getSelectionIndices()[0];
+		fSelectedEventRank = fTableTopEventRank + fSelectedRow;
+		fSelectedItems[0]  = fTable.getSelection()[0];
 	}
 
 	/**
 	 * Handle key-based navigation in table.
 	 * 
-	 * The key variables are:
-	 * - fFirstRowOffset: the absolute index (in the data set) of the first row displayed
-	 * - fTableRow: the index of the selected event in the table window
-	 * - fEffectiveRow: the absolute index of the selected event (in the data set)
-	 * 
-	 * At all times, the following relation should hold true:
-	 * 		fEffectiveRow = fFirstRowOffset + fTableRow
-	 * 
 	 * @param event
 	 */
 	private void handleTableKeyEvent(KeyEvent event) {
 
-		boolean needsUpdate    = false;
-		final int lastTableRow = fTableItemCount - 1;
-		int lastRowDisplayed = ((fTableItemCount < fRowsDisplayed) ?  fTableItemCount : fRowsDisplayed) - 1;
+		int lastEventRank        = fTableItemCount - 1;
+		int lastPageTopEntryRank = fTableItemCount - fTableRows;
 
-		// We are handling things
+		int lastRowIndex = ((fTableItemCount < fTableRows) ? fTableItemCount : fTableRows) - 1;
+		int numberOfFullyVisibleRows = fTableRows - ((fPartialRowVisible) ? 1 : 0);
+
+		boolean needsRefresh = false;
+
+		// We are handling things...
 		event.doit = false;
 
+		// In all case, perform the following steps:
+		// - Update the selected entry rank (within valid range)
+		// - Update the selected row
+		// - Update the page's top entry if necessary (which also adjusts the selected row)
+		// - If the top displayed entry was changed, table refresh is needed
 		switch (event.keyCode) {
 
 			case SWT.ARROW_DOWN: {
-				if (fEffectiveRow < lastTableRow) {
-					fEffectiveRow++;
-					if (fTableRow < lastRowDisplayed) {
-						fTableRow++;
-					} else if (fTableRow < fEffectiveRow) {
-						fFirstRowOffset++;
-						needsUpdate = true;
+				if (fSelectedEventRank < lastEventRank) {
+					fSelectedEventRank++;
+					fSelectedRow = fSelectedEventRank - fTableTopEventRank;
+					if (fSelectedRow > lastRowIndex) {
+						fTableTopEventRank++;
+						fSelectedRow = lastRowIndex;
+						needsRefresh = true;
 					}
 				}
 				break;
 			}
 
-			case SWT.PAGE_DOWN: {
-				if (fEffectiveRow < lastTableRow) {
-					if ((lastTableRow - fEffectiveRow) >= fRowsDisplayed) {
-						fEffectiveRow   += fRowsDisplayed;
-						fFirstRowOffset += fRowsDisplayed;
-					} else {
-						fEffectiveRow = lastTableRow;
-						fTableRow = lastRowDisplayed;
+			case SWT.ARROW_UP: {
+				if (fSelectedEventRank > 0) {
+					fSelectedEventRank--;
+					fSelectedRow = fSelectedEventRank - fTableTopEventRank;
+					if (fSelectedRow < 0) {
+						fTableTopEventRank--;
+						fSelectedRow = 0;
+						needsRefresh = true;
 					}
-					needsUpdate = true;
 				}
 				break;
 			}
 
 			case SWT.END: {
-				fEffectiveRow = lastTableRow;
-				fTableRow = lastRowDisplayed;
-				if (lastTableRow > lastRowDisplayed) {
-					fFirstRowOffset = fTableItemCount - fRowsDisplayed;
-				}
-				needsUpdate = true;
+				fTableTopEventRank = lastPageTopEntryRank;
+				fSelectedEventRank = lastEventRank;
+				fSelectedRow = lastRowIndex;
+				needsRefresh = true;
 				break;
 			}
 
-			case SWT.ARROW_UP: {
-				if (fEffectiveRow > 0) {
-					fEffectiveRow--;
-					if (fTableRow > 0) {
-						fTableRow--;
-					} else {
-						fFirstRowOffset--;
-						needsUpdate = true;
+			case SWT.HOME: {
+				fSelectedEventRank = 0;
+				fSelectedRow       = 0;
+				fTableTopEventRank = 0;
+				needsRefresh       = true;
+				break;
+			}
+
+			case SWT.PAGE_DOWN: {
+				if (fSelectedEventRank < lastEventRank) {
+					fSelectedEventRank += numberOfFullyVisibleRows;
+					if (fSelectedEventRank > lastEventRank) {
+						fSelectedEventRank = lastEventRank;
+					}
+					fSelectedRow = fSelectedEventRank - fTableTopEventRank;
+					if (fSelectedRow > numberOfFullyVisibleRows - 1) {
+						fTableTopEventRank += numberOfFullyVisibleRows;
+						if (fTableTopEventRank > lastPageTopEntryRank) {
+							fTableTopEventRank = lastPageTopEntryRank;
+						}
+						fSelectedRow = fSelectedEventRank - fTableTopEventRank;
+						needsRefresh = true;
 					}
 				}
 				break;
 			}
 
 			case SWT.PAGE_UP: {
-				if (fEffectiveRow > 0) {
-					if (fEffectiveRow > fRowsDisplayed - 1) {
-						fEffectiveRow   -= fRowsDisplayed;
-						fFirstRowOffset -= fRowsDisplayed;
-					} else {
-						fEffectiveRow = 0;
-						fTableRow = 0;
+				if (fSelectedEventRank > 0) {
+					fSelectedEventRank -= numberOfFullyVisibleRows;
+					if (fSelectedEventRank < 0) {
+						fSelectedEventRank = 0;
 					}
-					needsUpdate = true;
+					fSelectedRow = fSelectedEventRank - fTableTopEventRank;
+					if (fSelectedRow < 0) {
+						fSelectedRow = 0;
+						fTableTopEventRank -= numberOfFullyVisibleRows;
+						if (fTableTopEventRank < 0) {
+							fTableTopEventRank = 0;
+						}
+						fSelectedRow = fSelectedEventRank - fTableTopEventRank;
+						needsRefresh = true;
+					}
 				}
-				break;
-			}
-
-			case SWT.HOME: {
-				fEffectiveRow   = 0;
-				fTableRow       = 0;
-				fFirstRowOffset = 0;
-				needsUpdate     = true;
 				break;
 			}
 		}
 	
-		if (needsUpdate) {
+		if (needsRefresh) {
 			for (int i = 0; i < fTableItems.length; i++) {
-				setDataItem(fTableItems[i]);
+				setDataItem(i, fTableItems[i]);
 			}
 		}
 
-		fTable.setSelection(fTableRow);
-		fSlider.setSelection(fEffectiveRow);
+		fSlider.setSelection(fSelectedEventRank);
+		fTable.setSelection(fSelectedRow);
+		fTable.showSelection();
+		fSelectedItems[0] = fTable.getSelection()[0];
 
-//		System.out.println("1st: " + fFirstRowOffset + ", TR: " + fTableRow + ", ER: " + fEffectiveRow +
-//				", Valid: " + ((fFirstRowOffset >= 0) && (fEffectiveRow == (fFirstRowOffset + fTableRow))));
+        TmfTimestamp ts = (TmfTimestamp) fSelectedItems[0].getData();
+        TmfSignalManager.dispatchSignal(new TmfTimeSynchSignal(this, ts));
 	}
 
-	private void setDataItem(TableItem item) {
-		int index = fTable.indexOf(item); 
+	private void setDataItem(int index, TableItem item) {
 		if( index != -1) {
 			Event event = new Event();
 			event.item  = item;
-			event.index = index + fFirstRowOffset;
+			event.index = index + fTableTopEventRank;
 			event.doit  = true;
 			notifyListeners(SWT.SetData, event);
 		}
@@ -293,8 +312,8 @@ public class TmfVirtualTable extends Composite {
 					case SWT.HOME:
 					case SWT.PAGE_DOWN:
 					case SWT.PAGE_UP: {
-			        	fFirstRowOffset = fSlider.getSelection();
-						setSelection();
+			        	fTableTopEventRank = fSlider.getSelection();
+						refreshTable();
 						break;
 					}
 		        }
@@ -336,7 +355,7 @@ public class TmfVirtualTable extends Composite {
 	}
 
 	public int getTopIndex() {
-		return fFirstRowOffset;
+		return fTableTopEventRank;
 	}
 
 	public void setTopIndex(int i) {
@@ -354,23 +373,32 @@ public class TmfVirtualTable extends Composite {
 	private void resize() {
 
 		// Compute the numbers of rows that fit the new area
-		int tableHeight = fTable.getBounds().height - fTable.getHeaderHeight();
-		int itemHeight = fTable.getItemHeight();
-		fRowsDisplayed = tableHeight / itemHeight + 1;	// For partial rows
-		if (fTableItemCount == 0) {
-			fRowsDisplayed = 0;
+		int tableHeight = fTable.getClientArea().height - fTable.getHeaderHeight();
+
+		if (tableHeight < 0) tableHeight = 0;
+		int itemHeight  = fTable.getItemHeight();
+		fTableRows  = tableHeight / itemHeight;
+		fPartialRowVisible = false;
+		if (fTableRows * itemHeight < tableHeight) {
+			fTableRows++;	// For partial rows
+			fPartialRowVisible = true;
+		}
+		if (fTableRows > fTableItemCount) {
+			fTableRows = fTableItemCount;
 		}
 		
 		// If we are at the end, get elements before to populate
-		if(fFirstRowOffset + fRowsDisplayed >= fTableItemCount) {
-			fFirstRowOffset = fTableItemCount - fRowsDisplayed;
+		if (fTableTopEventRank + fTableRows >= fTableItemCount) {
+			fTableTopEventRank = fTableItemCount - fTableRows;
 		}
 		
 		// Set the slider thumb size
-		fSlider.setThumb(fRowsDisplayed);
+		if (fTableItemCount > 0) {
+			fSlider.setThumb(fTableRows);
+		}
 		
 		// Re-size and re-create the virtual table if needed
-		int delta = fTable.getItemCount() - fRowsDisplayed;
+		int delta = fTable.getItemCount() - fTableRows;
 		if (delta != 0) {
 			fTable.removeAll();
 			if (fTableItems != null) {
@@ -381,7 +409,7 @@ public class TmfVirtualTable extends Composite {
 					fTableItems[i] = null;
 				}
 			}
-			fTableItems = new TableItem[fRowsDisplayed];
+			fTableItems = new TableItem[fTableRows];
 			for (int i = 0; i < fTableItems.length; i++) {
 				fTableItems[i] = new TableItem(fTable, i);
 			}
@@ -404,7 +432,7 @@ public class TmfVirtualTable extends Composite {
 	}
 	
 	public void refresh() {
-		setSelection();
+		refreshTable();
 	}
 
 	public void setColumnHeaders(ColumnData columnData[]) {
@@ -425,16 +453,17 @@ public class TmfVirtualTable extends Composite {
 		return 0;
 	}
 	
-	private void setSelection() {
-		if ((fEffectiveRow >= fFirstRowOffset) && (fEffectiveRow < (fFirstRowOffset + fRowsDisplayed))) {
-			fTableRow = fEffectiveRow - fFirstRowOffset;
-			fTable.setSelection(fTableRow);
+	private void refreshTable() {
+		int lastRowOffset = fTableTopEventRank + fTableRows - 1;
+		if ((fSelectedEventRank >= fTableTopEventRank) && (fSelectedEventRank <= lastRowOffset)) {
+			fSelectedRow = fSelectedEventRank - fTableTopEventRank;
+			fTable.setSelection(fSelectedRow);
 		} else {
-			fTable.deselect(fTableRow);
+			fTable.deselect(fSelectedRow);
 		}
 
-		for (int i = 0; i < fRowsDisplayed; i++) {
-			setDataItem(fTableItems[i]);
+		for (int i = 0; i < fTableRows; i++) {
+			setDataItem(i, fTableItems[i]);
 		}
 	}
 
@@ -443,7 +472,15 @@ public class TmfVirtualTable extends Composite {
 			i = Math.min(i, fTableItemCount);
 			i = Math.max(i, 0);
 			fSlider.setSelection(i);
-			setSelection();
+
+			fSelectedEventRank = i;
+			fTableTopEventRank = i - (fTableRows / 2);
+			if (fTableTopEventRank < 0) {
+				fTableTopEventRank = 0;
+			}
+			fSelectedRow = fSelectedEventRank - fTableTopEventRank;
+			
+			refreshTable();
 		}
 	}
 
