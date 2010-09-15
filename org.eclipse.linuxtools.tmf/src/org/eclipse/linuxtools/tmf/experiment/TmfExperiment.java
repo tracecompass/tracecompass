@@ -20,10 +20,10 @@ import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
-import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
@@ -66,7 +66,8 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 	// The experiment index
     protected Vector<TmfCheckpoint> fCheckpoints = new Vector<TmfCheckpoint>();
 
-    protected TmfExperimentContext fSavedContext;
+    // The current experiment context
+    protected TmfExperimentContext fExperimentContext;
 	
     // ------------------------------------------------------------------------
     // Constructors
@@ -118,6 +119,10 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         this(type, id, traces, TmfTimestamp.Zero, indexPageSize);
     }
     
+    /**
+     * Copy constructor
+     * @param other
+     */
     public TmfExperiment(TmfExperiment<T> other) {
     	super(other.getName() + "(clone)", other.fType);
     	
@@ -156,10 +161,6 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         super.dispose();
     }
 
-    private static void setCurrentExperiment(TmfExperiment<?> experiment) {
-    	fCurrentExperiment = experiment;
-    }
-
     // ------------------------------------------------------------------------
     // ITmfTrace
     // ------------------------------------------------------------------------
@@ -195,6 +196,10 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
+
+    private static void setCurrentExperiment(TmfExperiment<?> experiment) {
+    	fCurrentExperiment = experiment;
+    }
 
     public static TmfExperiment<?> getCurrentExperiment() {
     	return fCurrentExperiment;
@@ -335,7 +340,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 		context.setLastTrace(TmfExperimentContext.NO_TRACE);
 		context.setRank(rank);
 
-		fSavedContext = new TmfExperimentContext(context);
+		fExperimentContext = context;
 
 		return context;
 	}
@@ -385,14 +390,12 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         	event = parseEvent(context);
         }
 
-        if (event != null) {
-			fSavedContext = new TmfExperimentContext(context);
-        }
-        else {
+        if (event == null) {
         	context.setLocation(null);
         	context.setRank(ITmfContext.UNKNOWN_RANK);
         }
-		return context;
+
+        return context;
 	}
 
 	/* (non-Javadoc)
@@ -428,13 +431,11 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         	event = parseEvent(context);
         }
 
-        if (event != null) {
-			fSavedContext = new TmfExperimentContext(context);
-        }
-        else {
+        if (event == null) {
         	context.setLocation(null);
         	context.setRank(ITmfContext.UNKNOWN_RANK);
         }
+
 		return context;
 	}
 
@@ -470,7 +471,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 			return null;	// Throw an exception?
 		}
 
-		if (!fSavedContext.equals(context)) {
+		if (!context.equals(fExperimentContext)) {
 //    		Tracer.trace("Ctx: Restoring context");
 			seekLocation(context.getLocation());
 		}
@@ -524,8 +525,6 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 //    		Tracer.trace("Ctx: Event returned= " + event.getTimestamp().toString());
 //		}
 
-		fSavedContext = new TmfExperimentContext(expContext);
-		
 		return event;
 	}
 
@@ -554,7 +553,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 			return null;	// Throw an exception?
 		}
 
-		if (!fSavedContext.equals(context)) {
+		if (!context.equals(fExperimentContext)) {
 //    		Tracer.trace("Ctx: Restoring context");
 			seekLocation(context.getLocation());
 		}
@@ -567,7 +566,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 		    TmfContext traceContext = expContext.getContexts()[lastTrace];
 			expContext.getEvents()[lastTrace] = expContext.getTraces()[lastTrace].getNextEvent(traceContext);
 			expContext.setLastTrace(TmfExperimentContext.NO_TRACE);
-	        fSavedContext = new TmfExperimentContext(expContext);
+	        fExperimentContext = (TmfExperimentContext) context;
 		}
 
 		// Scan the candidate events and identify the "next" trace to read from 
@@ -588,6 +587,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 		if (trace != TmfExperimentContext.NO_TRACE) {
 			event = expContext.getEvents()[trace];
 		}
+
 		return event;
 	}
 
@@ -636,7 +636,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 //		fEventLog = openLogFile("TraceEvent.log");
 //		System.out.println(System.currentTimeMillis() + ": Experiment indexing started");
 
-		ITmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity, TmfDataRequest.ALL_DATA, 1, ITmfDataRequest.ExecutionType.LONG) {
+		ITmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity, TmfDataRequest.ALL_DATA, 1, ITmfDataRequest.ExecutionType.BACKGROUND) {
 
 //			long indexingStart = System.nanoTime();
 			
@@ -756,16 +756,15 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     // ------------------------------------------------------------------------
 
 	@Override
-	protected void queueLongRequest(final ITmfDataRequest<T> request) {
+	protected void queueBackgroundRequest(final ITmfDataRequest<T> request, final int blockSize, final boolean indexing) {
 
 		// TODO: Handle the data requests also...
 		if (!(request instanceof ITmfEventRequest<?>)) {
 			super.queueRequest(request);
 			return;
 		}
+		final ITmfEventRequest<T> eventRequest = (ITmfEventRequest<T>) request;
 
-		final TmfExperiment<T> experiment = this;
-		
 		Thread thread = new Thread() {
 			@Override
 			public void run() {
@@ -773,38 +772,35 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 //				final long requestStart = System.nanoTime();
 
 				final Integer[] CHUNK_SIZE = new Integer[1];
-				CHUNK_SIZE[0] = fIndexPageSize + 1;
-				
-				final ITmfEventRequest<T> req = (ITmfEventRequest<T>) request;
+				CHUNK_SIZE[0] = blockSize + ((indexing) ? 1 : 0);
 				
 				final Integer[] nbRead = new Integer[1];
 				nbRead[0] = 0;
 
 //				final TmfTimestamp[] timestamp = new TmfTimestamp[1];
-//				timestamp[0] = new TmfTimestamp(req.getRange().getStartTime());
-//				final TmfTimestamp endTS = req.getRange().getEndTime();
+//				timestamp[0] = new TmfTimestamp(eventRequest.getRange().getStartTime());
+//				final TmfTimestamp endTS = eventRequest.getRange().getEndTime();
 
 				final Boolean[] isFinished = new Boolean[1];
 				isFinished[0] = Boolean.FALSE;
 
 				while (!isFinished[0]) {
 
-//					TmfEventRequest<T> subRequest = new TmfEventRequest<T>(req.getDataType(), new TmfTimeRange(timestamp[0], endTS), 
-//							requestedSize, req.getBlockize(), ExecutionType.LONG)
-					TmfDataRequest<T> subRequest = new TmfDataRequest<T>(req.getDataType(), nbRead[0], CHUNK_SIZE[0],
-							req.getBlockize(), ExecutionType.LONG)
+//					TmfEventRequest<T> subRequest = new TmfEventRequest<T>(eventRequest.getDataType(), new TmfTimeRange(timestamp[0], endTS), CHUNK_SIZE[0], eventRequest.getBlockize(), ExecutionType.BACKGROUND)
+					TmfDataRequest<T> subRequest = new TmfDataRequest<T>(eventRequest.getDataType(), nbRead[0], CHUNK_SIZE[0], eventRequest.getBlockize(), ExecutionType.BACKGROUND)
 					{
-						int count = 0;
+//						int count = 0;
 						@Override
 						public void handleData() {
 							T[] data = getData();
+//							timestamp[0] = data[data.length-1].getTimestamp();
 //							if (count == 0) {
 //								System.out.println("First event of the block: " + data[0].getTimestamp());
 //							}
-							count++;
+//							count++;
 //							Tracer.trace("Ndx: " + ((TmfEvent) data[0]).getTimestamp());
-							req.setData(data);
-							req.handleData();
+							eventRequest.setData(data);
+							eventRequest.handleData();
 							if (fNbRead == CHUNK_SIZE[0]) {
 								nbRead[0] += fNbRead;
 //								System.out.println("fNbRead=" + fNbRead + ", count=" + count +", total=" + nbRead[0] + ", TS=" + data[0].getTimestamp());
@@ -817,7 +813,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 						public void handleCompleted() {
 //							System.out.println("Request completed at: " + timestamp[0]);
 							if (fNbRead < CHUNK_SIZE[0]) {
-								req.done();
+								eventRequest.done();
 								isFinished[0] = Boolean.TRUE;
 								nbRead[0] += fNbRead;
 //								System.out.println("fNbRead=" + fNbRead + ", count=" + count +", total=" + nbRead[0]);
@@ -827,7 +823,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 					};
 
 					if (!isFinished[0]) {
-						experiment.queueRequest(subRequest);
+						queueRequest(subRequest);
 
 						try {
 							subRequest.waitForCompletion();
@@ -838,7 +834,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
 //						TmfTimestamp newTS = new TmfTimestamp(timestamp[0].getValue() + 1, timestamp[0].getScale(), timestamp[0].getPrecision());
 //						timestamp[0] = newTS;
-						CHUNK_SIZE[0] = fIndexPageSize;
+						CHUNK_SIZE[0] = blockSize;
 //						System.out.println("New timestamp: " + timestamp[0]);
 					}
 				}
@@ -846,6 +842,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 //				System.out.println("Background request completed. Elapsed= " + (requestEnded * 1.0 - requestStart) / 1000000000);
 			}
 		};
+
 		thread.start();
 	}
 

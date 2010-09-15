@@ -1,3 +1,11 @@
+2010-09-15  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/StatisticsView.java: ExecutionType update
+	* src/org/eclipse/linuxtools/lttng/ui/views/resources/ResourcesView.java: ExecutionType update
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramView.java: ExecutionType update
+	* src/org/eclipse/linuxtools/lttng/ui/views/controlflow/ControlFlowView.java: ExecutionType update
+	* src/org/eclipse/linuxtools/lttng/ui/views/common/AbsTimeUpdateView.java: ExecutionType update
+
 2010-09-12  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/ui/views/events/EventsView.java: Fixed the events cache size

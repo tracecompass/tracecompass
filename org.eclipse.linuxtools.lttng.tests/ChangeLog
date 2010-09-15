@@ -1,3 +1,8 @@
+2010-09-15  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/control/LTTngSyntheticEventProviderTest.java: Problematic test
+	* src/org/eclipse/linuxtools/lttng/LttngTestPreparation.java: Problematic test
+
 2010-09-09  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/tests/AllLTTngCoreTests.java: Invoke new test

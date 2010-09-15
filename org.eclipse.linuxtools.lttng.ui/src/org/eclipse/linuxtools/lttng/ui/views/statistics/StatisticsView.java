@@ -617,7 +617,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 			TmfTimeRange experimentTRange = experiment.getTimeRange();
 
 			// send the initial request, to start filling up model
-			dataRequest(experimentTRange, experimentTRange, true, ExecutionType.LONG);
+			dataRequest(experimentTRange, experimentTRange, true, ExecutionType.BACKGROUND);
 		} else {
 			TraceDebug.debug("No selected experiment information available");
 		}

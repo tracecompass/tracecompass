@@ -37,7 +37,7 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
      * @param range
      */
     public TmfCoalescedEventRequest(Class<T> dataType) {
-        this(dataType, TmfTimeRange.Eternity, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.SHORT);
+        this(dataType, TmfTimeRange.Eternity, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
     public TmfCoalescedEventRequest(Class<T> dataType, ExecutionType execType) {
@@ -48,7 +48,7 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
      * @param range
      */
     public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range) {
-        this(dataType, range, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.SHORT);
+        this(dataType, range, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
     public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, ExecutionType execType) {
@@ -60,7 +60,7 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
      * @param nbRequested
      */
     public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested) {
-        this(dataType, range, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.SHORT);
+        this(dataType, range, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
     
     public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, ExecutionType execType) {
@@ -73,7 +73,7 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
      * @param blockSize Size of the largest blocks expected
      */
     public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize) {
-    	super(dataType, 0, nbRequested, blockSize, ExecutionType.SHORT);
+    	super(dataType, 0, nbRequested, blockSize, ExecutionType.FOREGROUND);
     	fRange = range;
     }
 

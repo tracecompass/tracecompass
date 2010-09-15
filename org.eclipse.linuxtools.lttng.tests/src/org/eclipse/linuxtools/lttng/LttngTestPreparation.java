@@ -18,6 +18,7 @@ import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
@@ -74,7 +75,7 @@ public abstract class LttngTestPreparation extends TestCase {
 
 			// create experiment and associate traces
 			fTestExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class,
-					expId, traces);
+					expId, traces, TmfTimestamp.Zero, TmfExperiment.DEFAULT_BLOCK_SIZE, true);
 			// fTestExperiment.indexExperiment(waitForCompletion);
 
 			// Set the current selected experiment as the test experiment
@@ -192,7 +193,7 @@ public abstract class LttngTestPreparation extends TestCase {
 	 * @return
 	 */
 	protected <T extends LttngEvent> TmfEventRequest<T> prepareEventRequest(
-			Class<T> k, int startIdx, int endIdx, final boolean printFirst20) {
+			Class<T> k, final int startIdx, int endIdx, final boolean printFirst20) {
 		// verify bounds
 		if (!(endIdx > startIdx && startIdx >= 0 && endIdx <= 31)) {
 			TraceDebug.debug("Event request indexes out of bounds");
@@ -265,8 +266,99 @@ public abstract class LttngTestPreparation extends TestCase {
 				// requestCompleted();
 				// }
 	
-				System.out.println("Number of events processed x: "
-						+ feventCount);
+				System.out.println("handleCompleted(request:" + startIdx + ") Number of events processed: " + feventCount);
+			}
+	
+		};
+		return request;
+	}
+
+	/**
+	 * @param <T>
+	 * @param k
+	 * @param startIdx
+	 *            , > 0 and between 0 - 31
+	 * @param endIdx
+	 *            , > startIdx and between 0 - 31
+	 * @param printFirst20
+	 *            , print the first expected events vs actual events
+	 * @return
+	 */
+	protected <T extends LttngEvent> TmfEventRequest<T> prepareEventRequest2(
+			Class<T> k, final int startIdx, int endIdx, final boolean printFirst20) {
+		// verify bounds
+		if (!(endIdx > startIdx && startIdx >= 0 && endIdx <= 31)) {
+			TraceDebug.debug("Event request indexes out of bounds");
+			return null;
+		}
+
+		int DEFAULT_CHUNK = 1;
+	
+		// time range
+		TmfTimeRange trange = new TmfTimeRange(new LttngTimestamp(
+				requestIntervals_T1[startIdx]), new LttngTimestamp(
+				requestIntervals_T1[endIdx]));
+	
+		// request
+		validSequence = true;
+		TmfEventRequest<T> request = new TmfEventRequest<T>(k,
+				trange, TmfDataRequest.ALL_DATA, DEFAULT_CHUNK) {
+	
+			@Override
+			public void handleData() {
+				T[] result = getData();
+	
+				T event = (result.length > 0) ? result[0] : null;
+				if (event == null) {
+					System.out
+							.println("Syntheric Event Received is null, after event: "
+									+ feventCount);
+					return;
+				}
+	
+				// Listen to only one variant of synthetic event to keep
+				// track of
+				if (event instanceof LttngSyntheticEvent) {
+					if (((LttngSyntheticEvent) event).getSynType() != SequenceInd.BEFORE) {
+						return;
+					}
+				}
+	
+				// Validating the orders of the first 20 events
+				if (printFirst20 && feventCount < 20) {
+					long timevalue = event.getTimestamp().getValue();
+					if (timevalue != expectedEvents_T1[feventCount]) {
+						validSequence = false;
+						System.out.println("Expected Event: "
+								+ expectedEvents_T1[feventCount] + " actual: "
+								+ event.getTimestamp().getValue());
+					} else {
+						System.out.println("Synthetic Event: " + feventCount
+								+ " matched expected time");
+					}
+				}
+	
+				// increment count
+				incrementCount();
+			}
+
+			/**
+			 * possibly increased by multiple request threads
+			 */
+			private synchronized void incrementCount() {
+				feventCount++;
+			}
+
+			@Override
+			public void handleCompleted() {
+				// if (isCancelled() || isFailed()) {
+				// // No notification to end request handlers
+				// } else {
+				// // notify the associated end request handlers
+				// requestCompleted();
+				// }
+	
+				System.out.println("handleCompleted(request:" + startIdx + ") Number of events processed: " + feventCount);
 			}
 	
 		};

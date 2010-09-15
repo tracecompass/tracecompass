@@ -1048,7 +1048,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		// user to select the interesting area based on the perspective
 		TmfTimeRange initTimeWindow = getInitTRange(experimentTRange);
 
-		dataRequest(initTimeWindow, experimentTRange, true, ExecutionType.SHORT);
+		dataRequest(initTimeWindow, experimentTRange, true, ExecutionType.FOREGROUND);
 		if (TraceDebug.isDEBUG()) {
 			TraceDebug.debug("Initialization request time range is: "
 					+ initTimeWindow.getStartTime().toString() + "-"

@@ -53,7 +53,7 @@ public class LttngSyntEventRequest extends TmfEventRequest<LttngSyntheticEvent>
 			int maxBlockSize, IRequestStatusListener listener,
 			TmfTimeRange experimentTimeRange, ITransEventProcessor processor) {
 		
-		this(range, offset, nbEvents, maxBlockSize, listener, experimentTimeRange, processor, ExecutionType.SHORT);
+		this(range, offset, nbEvents, maxBlockSize, listener, experimentTimeRange, processor, ExecutionType.FOREGROUND);
 	}
 
 	/**

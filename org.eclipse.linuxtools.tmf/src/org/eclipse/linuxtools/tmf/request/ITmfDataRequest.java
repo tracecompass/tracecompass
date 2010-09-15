@@ -25,7 +25,7 @@ public interface ITmfDataRequest<T extends TmfData> {
 	// Constants
 	// ------------------------------------------------------------------------
 
-    public enum ExecutionType { SHORT, LONG };
+    public enum ExecutionType { BACKGROUND, FOREGROUND };
     
 	// ------------------------------------------------------------------------
 	// Accessors

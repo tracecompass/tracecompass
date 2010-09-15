@@ -1,3 +1,10 @@
+2010-09-15  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/trace/LTTngExperiment.java: ExecutionType update
+	* src/org/eclipse/linuxtools/lttng/state/experiment/StateExperimentManager.java: ExecutionType update
+	* src/org/eclipse/linuxtools/lttng/request/LttngSyntEventRequest.java: ExecutionType update
+	* src/org/eclipse/linuxtools/lttng/control/LttngSyntheticEventProvider.java: ExecutionType update
+
 2010-09-09  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/trace/LTTngTrace.java: Fixed a ranking problem on a seek()

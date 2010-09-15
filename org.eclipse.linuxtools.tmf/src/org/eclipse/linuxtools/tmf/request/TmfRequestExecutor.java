@@ -35,7 +35,7 @@ public class TmfRequestExecutor implements Executor {
 		public int compare(TmfThread o1, TmfThread o2) {
 			if (o1.getExecType() == o2.getExecType())
 				return 0;
-			if (o1.getExecType() == ExecutionType.SHORT)
+			if (o1.getExecType() == ExecutionType.BACKGROUND)
 				return 1;
 			return -1;
 		}

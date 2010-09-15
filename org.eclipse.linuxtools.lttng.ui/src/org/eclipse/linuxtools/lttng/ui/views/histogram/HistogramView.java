@@ -108,7 +108,8 @@ public class HistogramView extends TmfView implements ControlListener {
     
     // *** TODO ***
     // This need to be changed as soon the framework implement a "window"
-    private static long DEFAULT_WINDOW_SIZE = (10L * 100 * 1000 * 1000); // 1sec
+//    private static long DEFAULT_WINDOW_SIZE = (10L * 100 * 1000 * 1000); // 1sec
+    private static long DEFAULT_WINDOW_SIZE = (1L * 100 * 1000 * 1000); // .1sec
     
     // The last experiment received/used by the view
     private TmfExperiment<LttngEvent> lastUsedExperiment = null;
@@ -715,7 +716,7 @@ public class HistogramView extends TmfView implements ControlListener {
 	        long intervalTime = ( (ts2.getValue() - ts1.getValue()) / selectedWindowCanvas.getHistogramContent().getNbElement() );
 	        
 			selectedWindowRequest = performRequest(experiment, selectedWindowCanvas, tmpRange, intervalTime,
-					ExecutionType.SHORT);
+					ExecutionType.FOREGROUND);
 	        selectedWindowCanvas.redrawAsynchronously();
     	}
     	
@@ -751,7 +752,7 @@ public class HistogramView extends TmfView implements ControlListener {
         // It would be interesting if there was a way to tell the framework to run the request "in parallel" here.
         // Mean a completetly independant copy of the Expereiment would be done and we would proceed on that.
         //
-        dataBackgroundFullRequest = performRequest(experiment, fullExperimentCanvas, tmpRange, intervalTime, ExecutionType.LONG);
+        dataBackgroundFullRequest = performRequest(experiment, fullExperimentCanvas, tmpRange, intervalTime, ExecutionType.BACKGROUND);
         
 		
         fullExperimentCanvas.getCurrentWindow().setWindowXPositionLeft(fullExperimentCanvas.getHistogramContent().getClosestXPositionFromTimestamp(fullExperimentCanvas.getCurrentWindow().getTimestampOfLeftPosition()));

@@ -89,6 +89,9 @@ public class TmfContext implements ITmfContext, Cloneable {
  
     @Override
     public boolean equals(Object other) {
+    	if (other == this) {
+    		return true;
+    	}
     	if (!(other instanceof TmfContext)) {
     		return false;
     	}

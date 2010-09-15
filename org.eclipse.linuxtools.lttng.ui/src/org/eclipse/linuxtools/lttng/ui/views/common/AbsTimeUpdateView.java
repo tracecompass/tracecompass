@@ -206,7 +206,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 				}
 
 				// Clearing of process data is configurable
-				dataRequest(trange, experiment.getTimeRange(), clearingData, ExecutionType.SHORT);
+				dataRequest(trange, experiment.getTimeRange(), clearingData, ExecutionType.FOREGROUND);
 			}
 		}
 	}

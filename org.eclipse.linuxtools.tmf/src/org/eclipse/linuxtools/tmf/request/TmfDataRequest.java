@@ -118,7 +118,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * @param dataType the requested data type
      */
     public TmfDataRequest(Class<T> dataType) {
-        this(dataType, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.SHORT);
+        this(dataType, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
     public TmfDataRequest(Class<T> dataType, ExecutionType execType) {
@@ -130,7 +130,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * @param nbRequested the number of data items requested
      */
     public TmfDataRequest(Class<T> dataType, int index) {
-        this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.SHORT);
+        this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
     public TmfDataRequest(Class<T> dataType, int index, ExecutionType execType) {
@@ -143,7 +143,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * @param blockSize the number of data items per block
      */
     public TmfDataRequest(Class<T> dataType, int index, int nbRequested) {
-        this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.SHORT);
+        this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
     public TmfDataRequest(Class<T> dataType, int index, int nbRequested, ExecutionType execType) {
@@ -157,7 +157,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * @param blockSize the number of data items per block
      */
     public TmfDataRequest(Class<T> dataType, int index, int nbRequested, int blockSize) {
-        this(dataType, index, nbRequested, blockSize, ExecutionType.SHORT);
+        this(dataType, index, nbRequested, blockSize, ExecutionType.FOREGROUND);
     }
 
     public TmfDataRequest(Class<T> dataType, int index, int nbRequested, int blockSize, ExecutionType execType) {

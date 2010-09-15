@@ -161,7 +161,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 			ITmfTrace trace = traceManager.getTrace();
 			// create sub-request for one trace within experiment
 			final LttngBaseEventRequest subRequest = new LttngBaseEventRequest(adjustedRange, reqWindow.getStartTime(),
-					0, TmfEventRequest.ALL_DATA, BLOCK_SIZE, traceModel, ITmfDataRequest.ExecutionType.SHORT, trace) {
+					0, TmfEventRequest.ALL_DATA, BLOCK_SIZE, traceModel, ITmfDataRequest.ExecutionType.FOREGROUND, trace) {
 
 				private LttngSyntheticEvent syntheticEvent = null;
 				private LttngSyntheticEvent syntheticAckIndicator = null;

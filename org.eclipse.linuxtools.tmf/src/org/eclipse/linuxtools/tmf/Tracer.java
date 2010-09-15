@@ -147,7 +147,7 @@ public class Tracer {
 
 	public static void traceRequest(ITmfDataRequest<?> request, String msg) {
 		String message = ("[REQ] Thread=" + Thread.currentThread().getId() + " Req=" + request.getRequestId() + 
-				(request.getExecType() == ITmfDataRequest.ExecutionType.LONG ? "(long)" : "(short)") +
+				(request.getExecType() == ITmfDataRequest.ExecutionType.BACKGROUND ? "(BG)" : "(FG)") +
 				", Type=" + request.getClass().getName() + 
 				", DataType=" + request.getDataType().getSimpleName() + " " + msg);
 		trace(message);

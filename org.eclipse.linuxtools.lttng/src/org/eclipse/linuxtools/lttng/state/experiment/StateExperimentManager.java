@@ -327,7 +327,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 		// Prepare event data request to build state model
 		ITmfEventRequest<LttngEvent> request = new TmfEventRequest<LttngEvent>(
 				LttngEvent.class, TmfTimeRange.Eternity,
-				TmfDataRequest.ALL_DATA, 1, ITmfDataRequest.ExecutionType.LONG) {
+				TmfDataRequest.ALL_DATA, 1, ITmfDataRequest.ExecutionType.BACKGROUND) {
 		
 			Long nbEvents = 0L;
 		

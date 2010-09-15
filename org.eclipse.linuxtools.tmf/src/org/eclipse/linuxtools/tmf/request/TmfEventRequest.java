@@ -36,7 +36,7 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
      * @param range
      */
     public TmfEventRequest(Class<T> dataType) {
-        this(dataType, TmfTimeRange.Eternity, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.SHORT);
+        this(dataType, TmfTimeRange.Eternity, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
     public TmfEventRequest(Class<T> dataType, ExecutionType execType) {
@@ -47,7 +47,7 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
      * @param range
      */
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range) {
-        this(dataType, range, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.SHORT);
+        this(dataType, range, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range, ExecutionType execType) {
@@ -59,7 +59,7 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
      * @param nbRequested
      */
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested) {
-        this(dataType, range, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.SHORT);
+        this(dataType, range, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
     
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, ExecutionType execType) {
@@ -72,7 +72,7 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
      * @param blockSize Size of the largest blocks expected
      */
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize) {
-    	super(dataType, 0, nbRequested, blockSize, ExecutionType.SHORT);
+    	super(dataType, 0, nbRequested, blockSize, ExecutionType.FOREGROUND);
     	fRange = range;
     }
 

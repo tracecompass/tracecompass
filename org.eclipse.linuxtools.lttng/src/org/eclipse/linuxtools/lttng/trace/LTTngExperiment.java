@@ -103,7 +103,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
 			return null;	// Throw an exception?
 		}
 
-		if (!fSavedContext.equals(context)) {
+		if (!context.equals(fExperimentContext)) {
 //    		Tracer.trace("Ctx: Restoring context");
 			seekLocation(context.getLocation());
 		}
@@ -157,8 +157,6 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
 //    		Tracer.trace("Ctx: Event returned= " + event.getTimestamp().toString());
 //		}
 
-		fSavedContext = new TmfExperimentContext(expContext);
-		
 		return event;
 	}
 

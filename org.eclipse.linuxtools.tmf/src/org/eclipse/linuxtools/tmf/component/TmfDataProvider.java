@@ -60,7 +60,9 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	final protected boolean  fLogData;
 	final protected boolean  fLogError;
 
+	public static final int DEFAULT_BLOCK_SIZE = 5000;
 	public static final int DEFAULT_QUEUE_SIZE = 1000;
+
 	protected final int fQueueSize;
 	protected final BlockingQueue<T> fDataQueue;
 	protected final TmfRequestExecutor fExecutor;
@@ -189,10 +191,10 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	// ------------------------------------------------------------------------
 
 	private void dispatchRequest(final ITmfDataRequest<T> request) {
-		if (request.getExecType() == ExecutionType.SHORT)
+		if (request.getExecType() == ExecutionType.FOREGROUND)
 			queueRequest(request);
 		else
-			queueLongRequest(request);
+			queueBackgroundRequest(request, DEFAULT_BLOCK_SIZE, true);
 	}
 
 	protected void queueRequest(final ITmfDataRequest<T> request) {
@@ -202,7 +204,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	        return;
 	    }
 	    
-		final TmfDataProvider<T> provider = this;
+//		final TmfDataProvider<T> provider = this;
 
 		// Process the request
 		TmfThread thread = new TmfThread(request.getExecType()) {
@@ -210,7 +212,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 			@Override
 			public void run() {
 
-				if (Tracer.isRequestTraced()) Tracer.traceRequest(request, "started");
+//				if (Tracer.isRequestTraced()) Tracer.traceRequest(request, "started");
 
 				// Extract the generic information
 				request.start();
@@ -230,12 +232,12 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 
 				try {
 					// Get the ordered events
-					if (Tracer.isRequestTraced()) Tracer.trace("Request #" + request.getRequestId() + " is being serviced by " + provider.getName());
+//					if (Tracer.isRequestTraced()) Tracer.trace("Request #" + request.getRequestId() + " is being serviced by " + provider.getName());
 					T data = getNext(context);
-					if (Tracer.isRequestTraced()) Tracer.trace("Request #" + request.getRequestId() + " read first event");
+//					if (Tracer.isRequestTraced()) Tracer.trace("Request #" + request.getRequestId() + " read first event");
 					while (data != null && !isCompleted(request, data, nbRead))
 					{
-						if (fLogData) Tracer.traceEvent(provider, request, data);
+//						if (fLogData) Tracer.traceEvent(provider, request, data);
 						result.add(data);
 						if (++nbRead % blockSize == 0) {
 							pushData(request, result);
@@ -268,8 +270,8 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
         if (Tracer.isRequestTraced()) Tracer.traceRequest(request, "queued");
 	}
 
-	// By default, same behavior as a short request
-	protected void queueLongRequest(final ITmfDataRequest<T> request) {
+	// By default, same behavior as a foreground request
+	protected void queueBackgroundRequest(final ITmfDataRequest<T> request, final int blockSize, boolean indexing) {
 		queueRequest(request);
 	}
 
