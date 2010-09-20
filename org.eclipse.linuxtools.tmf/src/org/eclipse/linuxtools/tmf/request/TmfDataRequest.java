@@ -90,8 +90,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     private final int      		fRequestId;  	// A unique request ID
     private final int      		fIndex;      	// The index (rank) of the requested event
     private final int      		fNbRequested;	// The number of requested events (ALL_DATA for all)
-    private final int      		fBlockSize;     // The maximum number of events per chunk
-    protected     int      		fNbRead;        // The number of reads so far
+    private       int      		fNbRead;        // The number of reads so far
 
     private final   Object lock;
     private boolean fRequestRunning   = false;
@@ -99,8 +98,6 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     private boolean fRequestFailed    = false;
     private boolean fRequestCanceled  = false;
 
-    private T[] fData;	// Data object
-    
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -165,7 +162,6 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     	fDataType    = dataType;
     	fIndex       = index;
     	fNbRequested = nbRequested;
-    	fBlockSize   = blockSize;
     	fExecType    = execType;
     	fNbRead      = 0;
         lock         = new Object();
@@ -210,13 +206,6 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      */
     public int getNbRequested() {
         return fNbRequested;
-    }
-
-    /**
-     * @return the block size
-     */
-    public int getBlockize() {
-        return fBlockSize;
     }
 
     /**
@@ -268,20 +257,9 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     /** 
      * Sets the data object to specified value. To be called by the 
      * asynchronous method implementor.
+     * 
      * @param data Data value to set.
      */
-    public synchronized void setData(T[] data) {
-    	fNbRead += data.length;
-    	fData = data;
-    }
-    
-    /**
-     * Returns the data value, null if not set.
-     */
-    public synchronized T[] getData() {
-    	return fData;
-    }
-    
     /**
      * Handle a block of incoming data. This method is called every time
      * a block of data becomes available.
@@ -295,9 +273,13 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      *   (or a copy) if some persistence is needed between invocations.
      * - When there is no more data, done() is called. 
      *
-     * @param events - an array of events
+     * @param events - an events
      */
-    public abstract void handleData();
+    public void handleData(T data) {
+        if (data != null) {
+        	fNbRead++;
+        }
+    }
 
     public void handleStarted() {
     }
@@ -356,7 +338,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
         if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "starting");
         synchronized(lock) {
             fRequestRunning = true;
-            lock.notify();
+            lock.notifyAll();
         }
         handleStarted();
         if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "started");
@@ -373,7 +355,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
                 fRequestCompleted = true;
             }
             handleCompleted();
-            lock.notify();
+            lock.notifyAll();
         }
     }
 
@@ -421,7 +403,6 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     @Override
     public String toString() {
 		return "[TmfDataRequest(" + fRequestId + "," + fDataType.getSimpleName() 
-			+ "," + fIndex + "," + fNbRequested + "," + fBlockSize + ")]";
+			+ "," + fIndex + "," + fNbRequested + ")]";
     }
-
 }

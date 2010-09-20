@@ -55,17 +55,14 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSynthetic
         TmfTimeRange range = eventRequest.getRange();
         final TmfEventRequest<TmfEvent> subRequest =
         	new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
-            	@Override
-            	public void handleData() {
-            		TmfEvent[] events = getData();
-            		if (events.length > 0) {
-            			for (TmfEvent e : events) {
-            				handleIncomingData(e);
-            			}
-            		} else {
-            			request.done();
-            		}
-            	}
+        		@Override
+        		public void handleData(TmfEvent event) {
+            		super.handleData(event);
+        			if (event != null)
+        				handleIncomingData(event);
+        			else
+        				request.done();
+        		}
         	};
         provider.sendRequest(subRequest);
 

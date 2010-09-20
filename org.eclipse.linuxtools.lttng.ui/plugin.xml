@@ -2,7 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         id="org,eclipse.linuxtools.lttng.ui.perspective"
+         id="org.eclipse.linuxtools.lttng.ui.perspective"
          name="%extension.name.0"
          point="org.eclipse.ui.perspectives">
       <perspective

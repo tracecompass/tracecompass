@@ -69,7 +69,8 @@ public class TmfTraceTest extends TestCase {
 		// Dummy request to force the trace indexing
     	TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class) {
 			@Override
-			public void handleData() {
+			public void handleData(TmfEvent event) {
+        		super.handleData(event);
 			}
     	};
     	fTrace.sendRequest(request);
@@ -705,13 +706,11 @@ public class TmfTraceTest extends TestCase {
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
-            @Override
-            public void handleData() {
-            	TmfEvent[] events = getData();
-                for (TmfEvent e : events) {
-                    requestedEvents.add(e);
-                }
-            }
+        	@Override
+        	public void handleData(TmfEvent event) {
+        		super.handleData(event);
+        		requestedEvents.add(event);
+        	}
         };
         ITmfDataProvider<TmfEvent>[] providers = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
@@ -735,13 +734,11 @@ public class TmfTraceTest extends TestCase {
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
-            @Override
-            public void handleData() {
-            	TmfEvent[] events = getData();
-                for (TmfEvent e : events) {
-                    requestedEvents.add(e);
-                }
-            }
+        	@Override
+        	public void handleData(TmfEvent event) {
+        		super.handleData(event);
+        		requestedEvents.add(event);
+        	}
         };
         ITmfDataProvider<TmfEvent>[] providers = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);
@@ -768,15 +765,14 @@ public class TmfTraceTest extends TestCase {
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
-            @Override
-            public void handleData() {
-            	TmfEvent[] events = getData();
-                for (TmfEvent e : events) {
-                    requestedEvents.add(e);
-                }
-                // Cancel request after the first chunk is received
-                cancel();
-            }
+        	int nbRead = 0;
+        	@Override
+        	public void handleData(TmfEvent event) {
+        		super.handleData(event);
+        		requestedEvents.add(event);
+        		if (++nbRead == BLOCK_SIZE)
+        			cancel();
+        	}
         };
         ITmfDataProvider<TmfEvent>[] providers = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfTraceStub.class);
         providers[0].sendRequest(request);

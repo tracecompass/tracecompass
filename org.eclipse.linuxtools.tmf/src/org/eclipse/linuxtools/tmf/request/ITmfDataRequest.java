@@ -57,11 +57,6 @@ public interface ITmfDataRequest<T extends TmfData> {
     public int getNbRequested();
 
     /**
-     * @return the block size
-     */
-    public int getBlockize();
-
-    /**
      * @return the number of events read so far
      */
     public int getNbRead();
@@ -79,9 +74,7 @@ public interface ITmfDataRequest<T extends TmfData> {
 	// Data handling
 	// ------------------------------------------------------------------------
 
-    public void setData(T[] data);
-    public T[] getData();
-    public void handleData();
+    public void handleData(T data);
 
 	// ------------------------------------------------------------------------
 	// Request handling

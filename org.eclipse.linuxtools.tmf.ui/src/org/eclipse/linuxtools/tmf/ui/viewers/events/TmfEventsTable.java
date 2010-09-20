@@ -144,17 +144,33 @@ public class TmfEventsTable extends TmfComponent {
                     return;
                 }
 
+                fCacheStartIndex = index;
+                fCacheEndIndex = index;
+
                 TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(TmfEvent.class, index, fCacheSize) {
-                    @Override
-                    public void handleData() {
-                        TmfEvent[] tmpEvent = getData();
-                        if ((tmpEvent != null) && (tmpEvent.length > 0)) {
-                            fCache = tmpEvent;
-                            fCacheStartIndex = index;
-                            fCacheEndIndex = index + tmpEvent.length;
+//                    @Override
+//                    public void handleData() {
+//                        TmfEvent[] tmpEvent = getData();
+//                        if ((tmpEvent != null) && (tmpEvent.length > 0)) {
+//                            fCache = tmpEvent;
+//                            fCacheStartIndex = index;
+//                            fCacheEndIndex = index + tmpEvent.length;
+//                        }
+//                    }
+
+                	private int count = 0;
+
+                	@Override
+                    public void handleData(TmfEvent event) {
+                		super.handleData(event);
+                        if (event != null) {
+                            fCache[count++] = event.clone();
+                            fCacheEndIndex++;
                         }
                     }
+
                 };
+
                 ((ITmfDataProvider<TmfEvent>) fTrace).sendRequest(request);
                 try {
                     request.waitForCompletion();

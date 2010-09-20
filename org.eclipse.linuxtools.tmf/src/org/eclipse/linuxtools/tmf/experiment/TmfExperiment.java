@@ -636,7 +636,8 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 //		fEventLog = openLogFile("TraceEvent.log");
 //		System.out.println(System.currentTimeMillis() + ": Experiment indexing started");
 
-		ITmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity, TmfDataRequest.ALL_DATA, 1, ITmfDataRequest.ExecutionType.BACKGROUND) {
+		ITmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity,
+				TmfDataRequest.ALL_DATA, 1, ITmfDataRequest.ExecutionType.BACKGROUND) {
 
 //			long indexingStart = System.nanoTime();
 			
@@ -644,26 +645,15 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 			TmfTimestamp lastTime  =  null;
 
 			@Override
-			public void handleData() {
-				TmfEvent[] events = getData();
-				if (events.length > 0) {
-
-//					try {
-//						if (fEventLog != null) {
-//							fEventLog.write(events[0].getTimestamp().toString());
-//							fEventLog.newLine();
-//							fEventLog.flush();
-//						}
-//					} catch (IOException e) {
-//						e.printStackTrace();
-//					}
-					
-					TmfTimestamp ts = events[0].getTimestamp();
+			public void handleData(TmfEvent event) {
+        		super.handleData(event);
+				if (event != null) {
+					TmfTimestamp ts = event.getTimestamp();
 					if (startTime == null)
 						startTime = new TmfTimestamp(ts);
 					lastTime = new TmfTimestamp(ts);
 
-					if ((fNbRead % DEFAULT_INDEX_PAGE_SIZE) == 0) {
+					if ((getNbRead() % DEFAULT_INDEX_PAGE_SIZE) == 0) {
 						updateExperiment();
 					}
 				}
@@ -671,33 +661,21 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
 			@Override
 			public void handleSuccess() {
-
-//				try {
-//					fEventLog.close();
-//					fEventLog = null;
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
-
 //				long indexingEnd = System.nanoTime();
 
 				updateExperiment();
 //				System.out.println(System.currentTimeMillis() + ": Experiment indexing completed");
-//
+
 //				long average = (indexingEnd - indexingStart) / fNbEvents;
 //				System.out.println(getName() + ": start=" + startTime + ", end=" + lastTime + ", elapsed=" + (indexingEnd * 1.0 - indexingStart) / 1000000000);
 //				System.out.println(getName() + ": nbEvents=" + fNbEvents + " (" + (average / 1000) + "." + (average % 1000) + " us/evt)");
-
-//				 for (int i = 0; i < fCheckpoints.size(); i++) {
-//					 TmfCheckpoint checkpoint = fCheckpoints.get(i);
-//					 System.out.println("fCheckpoints[" + i + "] " + checkpoint.getTimestamp() + ", " + checkpoint.getLocation().toString());
-//				 }
 			}
 
 			private void updateExperiment() {
-				if (fNbRead != 0) {
+				int nbRead = getNbRead();
+				if (nbRead != 0) {
 					fTimeRange = new TmfTimeRange(startTime, new TmfTimestamp(lastTime));
-					fNbEvents  = fNbRead;
+					fNbEvents  = nbRead;
 					notifyListeners();
 				}
 			}
@@ -746,11 +724,6 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 		broadcast(new TmfExperimentUpdatedSignal(this, this)); // , signal.getTrace()));
     }
 
-//	@Override
-//	public void queueResult(T data) {
-////		super.queueResult(data);
-//	}
-
     // ------------------------------------------------------------------------
     // TmfDataProvider
     // ------------------------------------------------------------------------
@@ -787,35 +760,28 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 				while (!isFinished[0]) {
 
 //					TmfEventRequest<T> subRequest = new TmfEventRequest<T>(eventRequest.getDataType(), new TmfTimeRange(timestamp[0], endTS), CHUNK_SIZE[0], eventRequest.getBlockize(), ExecutionType.BACKGROUND)
-					TmfDataRequest<T> subRequest = new TmfDataRequest<T>(eventRequest.getDataType(), nbRead[0], CHUNK_SIZE[0], eventRequest.getBlockize(), ExecutionType.BACKGROUND)
+//					TmfDataRequest<T> subRequest = new TmfDataRequest<T>(eventRequest.getDataType(), nbRead[0], CHUNK_SIZE[0], eventRequest.getBlockize(), ExecutionType.BACKGROUND)
+					TmfDataRequest<T> subRequest = new TmfDataRequest<T>(eventRequest.getDataType(), nbRead[0], CHUNK_SIZE[0], ExecutionType.BACKGROUND)
 					{
-//						int count = 0;
 						@Override
-						public void handleData() {
-							T[] data = getData();
-//							timestamp[0] = data[data.length-1].getTimestamp();
-//							if (count == 0) {
-//								System.out.println("First event of the block: " + data[0].getTimestamp());
-//							}
-//							count++;
-//							Tracer.trace("Ndx: " + ((TmfEvent) data[0]).getTimestamp());
-							eventRequest.setData(data);
-							eventRequest.handleData();
-							if (fNbRead == CHUNK_SIZE[0]) {
-								nbRead[0] += fNbRead;
-//								System.out.println("fNbRead=" + fNbRead + ", count=" + count +", total=" + nbRead[0] + ", TS=" + data[0].getTimestamp());
+						public void handleData(T data) {
+							super.handleData(data);
+							eventRequest.handleData(data);
+							if (getNbRead() == CHUNK_SIZE[0]) {
+								nbRead[0] += getNbRead();
 							}
-							if (fNbRead > CHUNK_SIZE[0]) {
+							if (getNbRead() > CHUNK_SIZE[0]) {
 								System.out.println("ERROR - Read too many events");
 							}
 						}
+
 						@Override
 						public void handleCompleted() {
 //							System.out.println("Request completed at: " + timestamp[0]);
-							if (fNbRead < CHUNK_SIZE[0]) {
+							if (getNbRead() < CHUNK_SIZE[0]) {
 								eventRequest.done();
 								isFinished[0] = Boolean.TRUE;
-								nbRead[0] += fNbRead;
+								nbRead[0] += getNbRead();
 //								System.out.println("fNbRead=" + fNbRead + ", count=" + count +", total=" + nbRead[0]);
 							}
 							super.handleCompleted();

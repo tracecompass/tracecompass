@@ -12,6 +12,9 @@
 package org.eclipse.linuxtools.lttng.control;
 
 import org.eclipse.linuxtools.lttng.LttngTestPreparation;
+import org.eclipse.linuxtools.lttng.event.LttngEvent;
+import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 
 public class LTTngSyntheticEventProviderTest extends LttngTestPreparation {
 	// ========================================================================
@@ -19,29 +22,31 @@ public class LTTngSyntheticEventProviderTest extends LttngTestPreparation {
 	// ========================================================================
 
 	public void testPlainDataRequest() {
-//		// prepare
-//		init();
-//		TmfExperiment<LttngEvent> experiment = prepareExperimentToTest();
-//		TmfEventRequest<LttngEvent> request = prepareEventRequest(LttngEvent.class, 0, 31);
-//
-//		// execute
-//		experiment.sendRequest(request);
-//		try {
-//			request.waitForCompletion();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//
-//		// finish
-//		assertEquals("Unexpected eventCount", 15316, feventCount);
-//		boolean expected = true;
-//		assertEquals("Events received out of expected order", expected, validSequence);
+		// prepare
+		init();
+		TmfExperiment<LttngEvent> experiment = prepareExperimentToTest();
+		TmfEventRequest<LttngEvent> request = prepareEventRequest(
+				LttngEvent.class, 0, 31);
+
+		// execute
+		experiment.sendRequest(request);
+		try {
+			request.waitForCompletion();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		// finish
+		assertEquals("Unexpected eventCount", 15316, feventCount);
+		boolean expected = true;
+		assertEquals("Events received out of expected order", expected,
+				validSequence);
 	}
 
-	/**
-	 * 
-	 */
-	public void testSyntheticEventRequest() {
+//	/**
+//	 * 
+//	 */
+//	public void testSyntheticEventRequest() {
 //		init();
 //		// Create a new Experiment manager context
 //		IStateExperimentManager expManager = prepareExperimentContext(false);
@@ -57,36 +62,35 @@ public class LTTngSyntheticEventProviderTest extends LttngTestPreparation {
 //		expManager.experimentSelected(this, experiment);
 //
 //		// Obtain the singleton event provider
-//		LttngSyntheticEventProvider synProvider = LttngCoreProviderFactory.getEventProvider();
+//		LttngSyntheticEventProvider synProvider = LttngCoreProviderFactory
+//				.getEventProvider();
 //
 //		// prepare synthetic event requests
 //		boolean printExpectedEvents = false;
 //		TmfEventRequest<LttngSyntheticEvent> request1 = prepareEventRequest(LttngSyntheticEvent.class, 5, 9,
 //				printExpectedEvents); /* 2001 events */
-//		TmfEventRequest<LttngSyntheticEvent> request2 = prepareEventRequest2(LttngSyntheticEvent.class, 11, 13,
+//		TmfEventRequest<LttngSyntheticEvent> request2 = prepareEventRequest(LttngSyntheticEvent.class, 11, 13,
 //				printExpectedEvents); /* 1001 events */
 //
 //		// execute
 //		synProvider.sendRequest(request1);
-//		System.out.println("Request1 sent");
 //		try {
 //			request1.waitForCompletion();
 //		} catch (InterruptedException e) {
 //			e.printStackTrace();
 //		}
-//		System.out.println("Event Count=" + feventCount);
+//		System.out.println("EventCount " + feventCount);
 //
 //		synProvider.sendRequest(request2);
-//		System.out.println("Request2 sent");
 //		try {
 //			request2.waitForCompletion();
 //		} catch (InterruptedException e) {
 //			e.printStackTrace();
 //		}
-//		System.out.println("Event Count=" + feventCount);
+//		System.out.println("EventCount " + feventCount);
 //
 //		// finish
 //		assertEquals("Unexpected eventCount", 3002, feventCount);
-	}
+//	}
 
 }

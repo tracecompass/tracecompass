@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.component;
 
-import java.lang.reflect.Array;
 import java.util.Vector;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -159,8 +158,8 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 
 	protected void newCoalescedDataRequest(ITmfDataRequest<T> request) {
 		synchronized(fLock) {
-			TmfCoalescedDataRequest<T> coalescedRequest =
-				new TmfCoalescedDataRequest<T>(fType, request.getIndex(), request.getNbRequested(), request.getBlockize(), request.getExecType());
+			TmfCoalescedDataRequest<T> coalescedRequest = new TmfCoalescedDataRequest<T>(
+					fType, request.getIndex(), request.getNbRequested(),request.getExecType());
 			coalescedRequest.addRequest(request);
 	        if (Tracer.isRequestTraced()) {
 	        	Tracer.traceRequest(request, "coalesced with " + coalescedRequest.getRequestId());
@@ -204,7 +203,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	        return;
 	    }
 	    
-//		final TmfDataProvider<T> provider = this;
+		final TmfDataProvider<T> provider = this;
 
 		// Process the request
 		TmfThread thread = new TmfThread(request.getExecType()) {
@@ -212,15 +211,11 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 			@Override
 			public void run() {
 
-//				if (Tracer.isRequestTraced()) Tracer.traceRequest(request, "started");
+				if (Tracer.isRequestTraced()) Tracer.traceRequest(request, "started");
 
 				// Extract the generic information
 				request.start();
-				int blockSize   = request.getBlockize();
 				int nbRequested = request.getNbRequested();
-			 
-				// Create the result buffer
-				Vector<T> result = new Vector<T>();
 				int nbRead = 0;
 
 				// Initialize the execution
@@ -232,26 +227,21 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 
 				try {
 					// Get the ordered events
-//					if (Tracer.isRequestTraced()) Tracer.trace("Request #" + request.getRequestId() + " is being serviced by " + provider.getName());
+					if (Tracer.isRequestTraced()) Tracer.trace("Request #" + request.getRequestId() + " is being serviced by " + provider.getName());
 					T data = getNext(context);
-//					if (Tracer.isRequestTraced()) Tracer.trace("Request #" + request.getRequestId() + " read first event");
+					if (Tracer.isRequestTraced()) Tracer.trace("Request #" + request.getRequestId() + " read first event");
 					while (data != null && !isCompleted(request, data, nbRead))
 					{
-//						if (fLogData) Tracer.traceEvent(provider, request, data);
-						result.add(data);
-						if (++nbRead % blockSize == 0) {
-							pushData(request, result);
-						}
+						if (fLogData) Tracer.traceEvent(provider, request, data);
+						request.handleData(data);
+
 						// To avoid an unnecessary read passed the last data requested
-						if (nbRead < nbRequested) {
+						if (++nbRead < nbRequested) {
 							data = getNext(context);
 							if (Tracer.isRequestTraced() && (data == null || data.isNullRef())) {
 								Tracer.trace("Request #" + request.getRequestId() + " end of data");
 							}
 						}
-					}
-					if (result.size() > 0) {
-						pushData(request, result);
 					}
 					request.done();
 
@@ -260,7 +250,6 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 				catch (Exception e) {
 			        if (Tracer.isRequestTraced()) Tracer.traceRequest(request, "exception (failed)");
 					request.fail();
-//					e.printStackTrace();
 				}
 			}
 		};
@@ -276,26 +265,6 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	}
 
 	/**
-	 * Format the result data and forwards it to the requester.
-	 * Note: after handling, the data is *removed*.
-	 * 
-	 * @param request
-	 * @param data
-	 */
-	@SuppressWarnings("unchecked")
-	protected void pushData(ITmfDataRequest<T> request, Vector<T> data) {
-		synchronized(request) {
-			if (!request.isCompleted()) {
-				T[] result = (T[]) Array.newInstance(fType, data.size());
-				data.toArray(result);
-				request.setData(result);
-				request.handleData();
-				data.removeAllElements();
-			}
-		}
-	}
-
-	/**
 	 * Initialize the provider based on the request. The context is
 	 * provider specific and will be updated by getNext().
 	 * 
@@ -304,50 +273,6 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	 */
 	public abstract ITmfContext armRequest(ITmfDataRequest<T> request);
 	public abstract T getNext(ITmfContext context);
-
-//	public abstract void queueResult(T data);
-
-	/**
-	 * Return the next piece of data based on the context supplied. The context
-	 * would typically be updated for the subsequent read.
-	 * 
-	 * @param context
-	 * @return
-	 */
-//	private static final int TIMEOUT = 10000;
-////	public abstract T getNext(ITmfContext context) throws InterruptedException;
-////	private int getLevel = 0;
-//	public T getNext(ITmfContext context) throws InterruptedException {
-////		String name = Thread.currentThread().getName(); getLevel++;
-////		System.out.println("[" + System.currentTimeMillis() + "] " + name + " " + (getLevel) + " getNext() - entering");
-//		T data = fDataQueue.poll(TIMEOUT, TimeUnit.MILLISECONDS);
-//		if (data == null) {
-////			if (Tracer.isErrorTraced()) Tracer.traceError(getName() + ": Request timeout on read");
-//			throw new InterruptedException();
-//		}
-////		System.out.println("[" + System.currentTimeMillis() + "] " + name + " " + (getLevel) + " getNext() - leaving");
-////		getLevel--;
-//		return data;
-//	}
-//
-//	/**
-//	 * Makes the generated result data available for getNext()
-//	 * 
-//	 * @param data
-//	 */
-////	public abstract void queueResult(T data) throws InterruptedException;
-////	private int putLevel = 0;
-//	public void queueResult(T data) throws InterruptedException {
-////		String name = Thread.currentThread().getName(); putLevel++;
-////		System.out.println("[" + System.currentTimeMillis() + "] " + name + " " + (putLevel) + " queueResult() - entering");
-//		boolean ok = fDataQueue.offer(data, TIMEOUT, TimeUnit.MILLISECONDS);
-//		if (!ok) {
-////			if (Tracer.isErrorTraced()) Tracer.traceError(getName() + ": Request timeout on write");
-//			throw new InterruptedException();
-//		}
-////		System.out.println("[" + System.currentTimeMillis() + "] " + name + " " + (putLevel) + " queueResult() - leaving");
-////		putLevel--;
-//	}
 
 	/**
 	 * Checks if the data meets the request completion criteria.

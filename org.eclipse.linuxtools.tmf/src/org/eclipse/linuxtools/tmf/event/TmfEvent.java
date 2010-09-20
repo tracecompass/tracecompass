@@ -29,7 +29,7 @@ package org.eclipse.linuxtools.tmf.event;
  * Notice that for performance reasons TmfEvent is NOT immutable. If a copy
  * of the event is needed, use the copy constructor.
  */
-public class TmfEvent extends TmfData {
+public class TmfEvent extends TmfData implements Cloneable {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -188,6 +188,11 @@ public class TmfEvent extends TmfData {
 	@Override
 	public String toString() {
 		return "[TmfEvent(" + fEffectiveTimestamp + "," + fSource + "," + fType + "," + fContent + ")]";
+	}
+
+	@Override
+	public TmfEvent clone() {
+		return new TmfEvent(this);
 	}
 
 }

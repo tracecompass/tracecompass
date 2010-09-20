@@ -203,22 +203,6 @@ public class StateExperimentManager extends LTTngTreeNode implements
 
 		// trigger data request to build the state system check points
 		fStateCheckPointRequest = buildCheckPoints(experiment);
-
-//		LTTngTreeNode experimentNode = getChildByName(experiment.getName());
-//		if (experimentNode != null) {
-//			// get the trace manager nodes
-//			LTTngTreeNode[] traceNodes = experimentNode.getChildren();
-//			for (LTTngTreeNode traceStateManagerNode : traceNodes) {
-//				// The trace node needs to perform its first data request
-//				// for this experiment with the main goal of building its
-//				// checkpoints
-//				if (traceStateManagerNode instanceof ILttExperimentSelectedListener) {
-//					// no need to provide the trace to the trace manager
-//					((ILttExperimentSelectedListener) traceStateManagerNode).experimentUpdated(
-//							new TmfExperimentUpdatedSignal(source, experiment, null), fwaitForCompletion);
-//				}
-//			}
-//		}
 	}
 
 	/*
@@ -338,15 +322,10 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			 * org.eclipse.linuxtools.tmf.request.TmfDataRequest#handleData()
 			 */
 			@Override
-			public void handleData() {
-				LttngEvent[] events = getData();
-				if (events.length > 0) {
-					nbEvents++;
-		
-					LttngEvent event = (LttngEvent) events[0];
-					
+			public void handleData(LttngEvent event) {
+				super.handleData(event);
+				if (event != null) {
 //					Tracer.trace("Chk: " + event.getTimestamp());
-					
 					ITmfTrace trace = event.getParentTrace();
 					IStateTraceManager traceManager = ftraceToManagerMap.get(getTraceKey(trace));
 					if (traceManager != null) {
@@ -400,9 +379,6 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			 * @param header
 			 */
 			private void printCompletedMessage() {
-//				System.out.println(System.currentTimeMillis() + ": StateExperimentManager completed checkpoints");
-
-				// super.handleCompleted();
 				if (TraceDebug.isDEBUG()) {
 					TraceDebug.debug("Trace check point building completed, number of events handled: " + nbEvents
 							+ "\n\t\t");

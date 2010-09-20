@@ -96,14 +96,12 @@ public class TmfEventProviderTest extends TestCase {
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest<TmfEvent> request =
         	new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
-            	@Override
-            	public void handleData() {
-            		TmfEvent[] events = getData();
-            		for (TmfEvent e : events) {
-            			requestedEvents.add(e);
-            		}
-            	}
-        	};
+        	@Override
+        	public void handleData(TmfEvent event) {
+        	super.handleData(event);
+        		requestedEvents.add(event);
+        	}
+        };
         provider.sendRequest(request);
         try {
 			request.waitForCompletion();
@@ -132,13 +130,11 @@ public class TmfEventProviderTest extends TestCase {
 
         final TmfEventRequest<TmfSyntheticEventStub> request =
         	new TmfEventRequest<TmfSyntheticEventStub>(TmfSyntheticEventStub.class, range, nbEvents, blockSize) {
-            	@Override
-            	public void handleData() {
-            		TmfSyntheticEventStub[] events = getData();
-            		for (TmfSyntheticEventStub e : events) {
-            			requestedEvents.add(e);
-            		}
-            	}
+        		@Override
+        		public void handleData(TmfSyntheticEventStub event) {
+            		super.handleData(event);
+        			requestedEvents.add(event);
+        		}
         	};
         provider.sendRequest(request);
 
@@ -203,7 +199,6 @@ public class TmfEventProviderTest extends TestCase {
         TmfTimeRange range = new TmfTimeRange(start, end);
 		try {
 			getSyntheticData(range, -1, TmfSyntheticEventProviderStub.BLOCK_SIZE);
-//			System.out.println("aie");
 		} catch (InterruptedException e) {
 			fail();
 		}

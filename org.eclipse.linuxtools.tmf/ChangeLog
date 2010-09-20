@@ -1,3 +1,27 @@
+2010-09-17  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/component/TmfDataProvider.java: Adjusted to new handleData() API 
+	* src/org/eclipse/linuxtools/tmf/component/TmfEventProvider.java: Adjusted to new handleData() API 
+	* src/org/eclipse/linuxtools/tmf/event/TmfEvent.java: Support for single event 
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Adjusted to new handleData() API  
+	* src/org/eclipse/linuxtools/tmf/request/ITmfDataRequest.java: Adjusted to new handleData() API  
+	* src/org/eclipse/linuxtools/tmf/request/TmfCoalescedDataRequest.java: Adjusted to new handleData() API  
+	* src/org/eclipse/linuxtools/tmf/request/TmfCoalescedEventRequest.java: Adjusted to new handleData() API  
+	* src/org/eclipse/linuxtools/tmf/request/TmfDataRequest.java: Adjusted to new handleData() API 
+	* src/org/eclipse/linuxtools/tmf/request/TmfEventRequest.java: Adjusted to new handleData() API 
+
+2010-09-17  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/component/TmfDataProvider.java: Adjusted to new handleData() API 
+	* src/org/eclipse/linuxtools/tmf/component/TmfEventProvider.java: Adjusted to new handleData() API 
+	* src/org/eclipse/linuxtools/tmf/event/TmfEvent.java: Support for single event 
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Adjusted to new handleData() API  
+	* src/org/eclipse/linuxtools/tmf/request/ITmfDataRequest.java: Adjusted to new handleData() API  
+	* src/org/eclipse/linuxtools/tmf/request/TmfCoalescedDataRequest.java: Adjusted to new handleData() API  
+	* src/org/eclipse/linuxtools/tmf/request/TmfCoalescedEventRequest.java: Adjusted to new handleData() API  
+	* src/org/eclipse/linuxtools/tmf/request/TmfDataRequest.java: Adjusted to new handleData() API 
+	* src/org/eclipse/linuxtools/tmf/request/TmfEventRequest.java: Adjusted to new handleData() API 
+
 2010-09-15  Francois Chouinard  <fchouinard@gmail.com>
 
     * src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Optimized TmfExperimentContext handling 

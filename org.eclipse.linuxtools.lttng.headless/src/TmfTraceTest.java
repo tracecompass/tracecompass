@@ -80,15 +80,11 @@ public class TmfTraceTest extends TmfEventRequest<LttngEvent> {
 
 	}
 
-
 	@Override
-    public void handleData() {
-        LttngEvent[] result = getData();
-        
-        LttngEvent evt = (result.length > 0) ? result[0] : null;
-        
-        if ( (evt != null) && (PARSE_EVENTS) ) {
-            ((LttngEvent) evt).getContent().getFields();
+    public void handleData(LttngEvent event) {
+		super.handleData(event);
+        if ( (event != null) && (PARSE_EVENTS) ) {
+            ((LttngEvent) event).getContent().getFields();
             
             // *** Uncomment the following to print the parsed content
             // Warning : this is VERY intensive

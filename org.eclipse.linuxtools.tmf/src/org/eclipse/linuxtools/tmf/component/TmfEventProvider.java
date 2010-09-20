@@ -40,12 +40,12 @@ public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvid
 	
 	@Override
 	public boolean isCompleted(ITmfDataRequest<T> request, T data, int nbRead) {
-		boolean dataRequestCompleted = super.isCompleted(request, data, nbRead);
-		if (!dataRequestCompleted && request instanceof ITmfEventRequest<?> && !data.isNullRef()) {
+		boolean requestCompleted = super.isCompleted(request, data, nbRead);
+		if (!requestCompleted && request instanceof ITmfEventRequest<?> && !data.isNullRef()) {
 			TmfTimestamp endTime = ((ITmfEventRequest<?>) request).getRange().getEndTime();
 			return data.getTimestamp().compareTo(endTime, false) > 0;
 		}
-		return dataRequestCompleted;
+		return requestCompleted;
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvid
 		if (request instanceof ITmfEventRequest<?>) {
 			ITmfEventRequest<T> eventRequest = (ITmfEventRequest<T>) request;
 			TmfCoalescedEventRequest<T> coalescedRequest = 
-				new TmfCoalescedEventRequest<T>(fType, eventRequest.getRange(), eventRequest.getNbRequested(), eventRequest.getBlockize(), eventRequest.getExecType());
+				new TmfCoalescedEventRequest<T>(fType, eventRequest.getRange(), eventRequest.getNbRequested(), eventRequest.getExecType());
 			coalescedRequest.addRequest(eventRequest);
 	        if (Tracer.isRequestTraced()) {
 		        Tracer.traceRequest(request, "coalesced with " + coalescedRequest.getRequestId());

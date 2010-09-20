@@ -114,7 +114,7 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
     @Override
     public String toString() {
 		return "[TmfEventRequest(" + getRequestId() + "," + getDataType().getSimpleName() 
-			+ "," + getRange() + "," + getNbRequested() + "," + getBlockize() + ")]";
+			+ "," + getRange() + "," + getNbRequested() + ")]";
     }
 
 }

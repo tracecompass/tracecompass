@@ -80,11 +80,15 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 	 * HandleData function : will be called by TMF each time a new event is receive for the request.<p>
 	 * Calculation for the content is done here.
 	 */
-	@Override
-    public void handleData() {
-        LttngEvent[] result = getData();
-        LttngEvent event = (result.length > 0) ? result[0] : null;
+//	@Override
+//    public void handleData() {
+//        LttngEvent[] result = getData();
+//        LttngEvent event = (result.length > 0) ? result[0] : null;
         
+	@Override
+    public void handleData(LttngEvent event) {
+		super.handleData(event);
+
         // *** FIXME ***
     	// *** EVIL BUG ***
         // The request by timerange only does not work! (see constructor above) 
@@ -93,23 +97,21 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
     	//
         if (event != null) {
         
-        	LttngEvent tmpEvent = (LttngEvent) event;
-
 //			Tracer.trace("Hst: " + event.getTimestamp());
         	
         	// This check is linked to the evil fix mentionned above
-        	if ( ( tmpEvent.getTimestamp().getValue() >= parentCanvas.getHistogramContent().getStartTime() ) &&
-        		 ( tmpEvent.getTimestamp().getValue() <= parentCanvas.getHistogramContent().getEndTime() ) )
+        	if ( ( event.getTimestamp().getValue() >= parentCanvas.getHistogramContent().getStartTime() ) &&
+        		 ( event.getTimestamp().getValue() <= parentCanvas.getHistogramContent().getEndTime() ) )
         	{
         		
         		// Distance (in time) between this event and the last one we read
-	        	long distance = ( tmpEvent.getTimestamp().getValue() - lastRangeTime );
+	        	long distance = ( event.getTimestamp().getValue() - lastRangeTime );
 				
 	        	// Check if we changed of interval (the distance is higher than the interval time)
 				if  ( distance > parentCanvas.getHistogramContent().getElementsTimeInterval() ) {
 					
 					parentCanvas.getHistogramContent().getElementByIndex(lastInterval).intervalNbEvents = nbEventsInInterval;
-					lastRangeTime = tmpEvent.getTimestamp().getValue();
+					lastRangeTime = event.getTimestamp().getValue();
 					
 					// * NOTE *
 					// We can skip several interval at once, so we need to find what was our interval now

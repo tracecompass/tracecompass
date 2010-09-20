@@ -53,8 +53,8 @@ public class TmfDataRequestStub<T extends TmfData> extends TmfDataRequest<T> {
     }
 
 	@Override
-	public void handleData() {
-		// TODO Auto-generated method stub
+	public void handleData(T data) {
+		super.handleData(data);
 	}
 
 }

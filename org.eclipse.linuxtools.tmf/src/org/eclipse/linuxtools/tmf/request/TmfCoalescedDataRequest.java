@@ -88,13 +88,11 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
 		fRequests.add(request);
 	}
 
-	public synchronized boolean isCompatible(ITmfDataRequest<T> request) {
+	public boolean isCompatible(ITmfDataRequest<T> request) {
 
-		boolean ok = !isCompleted();
-		ok &= request.getIndex()       == getIndex();
-		ok &= request.getNbRequested() == getNbRequested();
-		ok &= request.getBlockize()    == getBlockize();
-		ok &= request.getExecType()    == getExecType();
+		boolean ok = request.getIndex() == getIndex();
+		ok &= request.getNbRequested()  == getNbRequested();
+		ok &= request.getExecType()     == getExecType();
 		
 		return ok;
 	}
@@ -104,15 +102,20 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
     // ------------------------------------------------------------------------
 
     @Override
-	public synchronized void handleData() {
-    	for (ITmfDataRequest<T> request : fRequests) {
-    		request.setData(getData());
-    		request.handleData();
-    	}
+	public void handleData(T data) {
+		super.handleData(data);
+    	// Don't call sub-requests handleData() unless this is a
+		// TmfCoalescedDataRequest; extended classes should call
+		// the sub-requests handleData().
+		if (getClass() == TmfCoalescedDataRequest.class) {
+	    	for (ITmfDataRequest<T> request : fRequests) {
+	    		request.handleData(data);
+	    	}
+		}
     }
 
-    @Override
-    public synchronized void done() {
+	@Override
+    public void done() {
     	for (ITmfDataRequest<T> request : fRequests) {
     		request.done();
     	}
@@ -120,7 +123,7 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
     }
 
     @Override
-    public synchronized void fail() {
+    public void fail() {
     	for (ITmfDataRequest<T> request : fRequests) {
     		request.fail();
     	}
@@ -128,7 +131,7 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
     }
 
     @Override
-    public synchronized void cancel() {
+    public void cancel() {
     	for (ITmfDataRequest<T> request : fRequests) {
     		request.cancel();
     	}
@@ -160,7 +163,7 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
     @Override
     public String toString() {
 		return "[TmfCoalescedDataRequest(" + getRequestId() + "," + getDataType().getSimpleName() 
-			+ "," + getIndex() + "," + getNbRequested() + "," + getBlockize() + ")]";
+			+ "," + getIndex() + "," + getNbRequested() + ")]";
     }
 
 }

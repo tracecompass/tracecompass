@@ -31,6 +31,9 @@ import org.eclipse.ui.IPerspectiveFactory;
  */
 public class PerspectiveFactory implements IPerspectiveFactory {
 
+	// Perspective ID
+    public static final String ID = "org.eclipse.linuxtools.lttng.ui.perspective";
+	
     // LTTng views
     private static final String PROJECT_VIEW_ID      = ProjectView.ID;
     private static final String CONTROL_VIEW_ID      = ControlView.ID;

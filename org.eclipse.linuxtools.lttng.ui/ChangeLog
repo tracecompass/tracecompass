@@ -1,3 +1,10 @@
+2010-09-17  Francois Chouinard  <fchouinard@gmail.com>
+
+	* plugin.xml: Fixed perspective ID
+	* src/org/eclipse/linuxtools/lttng/ui/views/common/AbsTimeUpdateView.java: Adjusted to new handleData() API 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramRequest.java: Adjusted to new handleData() API
+	* src/org/eclipse/linuxtools/lttng/ui/views/PerspectiveFactory.java: Fixed perspective ID
+
 2010-09-15  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/StatisticsView.java: ExecutionType update

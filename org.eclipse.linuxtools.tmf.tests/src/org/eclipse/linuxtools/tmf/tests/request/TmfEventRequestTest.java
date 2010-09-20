@@ -15,9 +15,6 @@ package org.eclipse.linuxtools.tmf.tests.request;
 import junit.framework.TestCase;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.event.TmfEventReference;
-import org.eclipse.linuxtools.tmf.event.TmfEventSource;
-import org.eclipse.linuxtools.tmf.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
@@ -115,7 +112,6 @@ public class TmfEventRequestTest extends TestCase {
 
         assertEquals("getIndex", 0, request.getIndex());
         assertEquals("getNbRequestedEvents", TmfDataRequest.ALL_DATA, request.getNbRequested());
-        assertEquals("getBlockize", TmfDataRequest.DEFAULT_BLOCK_SIZE, request.getBlockize());
 
         assertFalse("isCompleted", request.isCompleted());
         assertFalse("isFailed", request.isFailed());
@@ -136,7 +132,6 @@ public class TmfEventRequestTest extends TestCase {
 
         assertEquals("getIndex", 0, request.getIndex());
         assertEquals("getNbRequestedEvents", TmfDataRequest.ALL_DATA, request.getNbRequested());
-        assertEquals("getBlockize", TmfDataRequest.DEFAULT_BLOCK_SIZE, request.getBlockize());
 
         assertFalse("isCompleted", request.isCompleted());
         assertFalse("isFailed", request.isFailed());
@@ -157,7 +152,6 @@ public class TmfEventRequestTest extends TestCase {
 
         assertEquals("getIndex", 0, request.getIndex());
         assertEquals("getNbRequestedEvents", 100, request.getNbRequested());
-        assertEquals("getBlockize", TmfDataRequest.DEFAULT_BLOCK_SIZE, request.getBlockize());
 
         assertFalse("isCompleted", request.isCompleted());
         assertFalse("isFailed", request.isFailed());
@@ -178,7 +172,6 @@ public class TmfEventRequestTest extends TestCase {
 
         assertEquals("getIndex", 0, request.getIndex());
         assertEquals("getNbRequestedEvents", 100, request.getNbRequested());
-        assertEquals("getBlockize", 200, request.getBlockize());
 
         assertFalse("isCompleted", request.isCompleted());
         assertFalse("isFailed", request.isFailed());
@@ -235,39 +228,15 @@ public class TmfEventRequestTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testToString() {
-        String expected1 = "[TmfEventRequest(0,TmfEvent," + range1 + ",100,200)]";
-        String expected2 = "[TmfEventRequest(1,TmfEvent," + range2 + ",100,200)]";
-        String expected3 = "[TmfEventRequest(2,TmfEvent," + range2 + ",200,200)]";
-        String expected4 = "[TmfEventRequest(3,TmfEvent," + range2 + ",200,300)]";
+        String expected1 = "[TmfEventRequest(0,TmfEvent," + range1 + ",100)]";
+        String expected2 = "[TmfEventRequest(1,TmfEvent," + range2 + ",100)]";
+        String expected3 = "[TmfEventRequest(2,TmfEvent," + range2 + ",200)]";
+        String expected4 = "[TmfEventRequest(3,TmfEvent," + range2 + ",200)]";
 
         assertEquals("toString", expected1, fRequest1.toString());
         assertEquals("toString", expected2, fRequest2.toString());
         assertEquals("toString", expected3, fRequest3.toString());
         assertEquals("toString", expected4, fRequest4.toString());
-	}
-
-	// ------------------------------------------------------------------------
-	// setData/getData
-	// ------------------------------------------------------------------------
-
-	public void testSetData() {
-		// Initialize the data
-		int nbEvents = 10;
-		TmfEvent[] events = new TmfEvent[nbEvents];
-		for (int i = 0; i < nbEvents; i++) {
-			events[i] = new TmfEvent(new TmfTimestamp(i), new TmfEventSource(),
-					new TmfEventType(), new TmfEventReference());
-		}
-
-		fRequest1.setData(events);
-		assertEquals("setData", nbEvents, fRequest1.getNbRead());
-
-		TmfEvent[] eventsRead = fRequest1.getData();
-		assertEquals("getData", nbEvents, eventsRead.length);
-
-		for (int i = 0; i < nbEvents; i++) {
-			assertEquals("getData", i, eventsRead[i].getTimestamp().getValue());
-		}
 	}
 
 	// ------------------------------------------------------------------------

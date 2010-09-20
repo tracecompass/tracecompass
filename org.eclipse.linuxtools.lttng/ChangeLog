@@ -1,3 +1,12 @@
+2010-09-17  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/control/LttngSyntheticEventProvider.java: Adjusted to new handleData() API
+	* src/org/eclipse/linuxtools/lttng/event/LttngEvent.java: Adjusted to new handleData() API
+	* src/org/eclipse/linuxtools/lttng/request/LttngSyntEventRequest.java: Adjusted to new handleData() API
+	* src/org/eclipse/linuxtools/lttng/state/experiment/StateExperimentManager.java: Adjusted to new handleData() API
+	* src/org/eclipse/linuxtools/lttng/state/trace/StateTraceManager.java: Adjusted to new handleData() API
+	* src/org/eclipse/linuxtools/lttng/trace/LTTngTrace.java: Adjusted to new handleData() API
+
 2010-09-15  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/trace/LTTngExperiment.java: ExecutionType update

@@ -90,7 +90,6 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
 	public boolean isCompatible(ITmfDataRequest<T> request) {
 		if (request instanceof ITmfEventRequest<?>) {
 			boolean ok = getNbRequested() == request.getNbRequested();
-			ok &= getBlockize() == request.getBlockize();
 			ok &= getExecType() == request.getExecType();
 			if (ok) {
 				TmfTimestamp startTime = ((ITmfEventRequest<T>) request).getRange().getStartTime();
@@ -110,22 +109,23 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
     // ------------------------------------------------------------------------
 
     @Override
-	public void handleData() {
+	public void handleData(T data) {
+    	super.handleData(data);
     	for (ITmfDataRequest<T> request : fRequests) {
-			if (request instanceof TmfEventRequest<?>) {
-    			TmfEventRequest<T> req = (TmfEventRequest<T>) request;
-    			T[] data = getData();
-    			TmfTimestamp ts = data[0].getTimestamp();
-        		if (data.length > 0 && req.getRange().contains(ts)) {
-            		req.setData(data);
-            		req.handleData();
-        		}
-    		}
-    		else {
-    			TmfDataRequest<T> req = (TmfDataRequest<T>) request;
-    			T[] data = getData();
-        		req.setData(data);
-        		req.handleData();
+    		if (data == null) {
+    			request.handleData(null);
+    		} else {
+    			if (request instanceof TmfEventRequest<?>) {
+    				TmfEventRequest<T> req = (TmfEventRequest<T>) request;
+    				TmfTimestamp ts = data.getTimestamp();
+    				if (req.getRange().contains(ts)) {
+    					req.handleData(data);
+    				}
+    			}
+    			else {
+    				TmfDataRequest<T> req = (TmfDataRequest<T>) request;
+    				req.handleData(data);
+    			}
     		}
     	}
     }
@@ -166,7 +166,7 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
     @Override
     public String toString() {
 		return "[TmfCoalescedEventRequest(" + getRequestId() + "," + getDataType().getSimpleName() 
-			+ "," + getRange() + "," + getNbRequested() + "," + getBlockize() + ")]";
+			+ "," + getRange() + "," + getNbRequested() + ")]";
     }
 
 }

@@ -351,12 +351,10 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 		 * ()
 		 */
 		@Override
-		public void handleData() {
-			LttngSyntheticEvent[] result = getData();
-
-			evt[0] = (result.length > 0) ? result[0] : null;
-			if (evt[0] != null) {
-				synEvent = (LttngSyntheticEvent) evt[0];
+		public void handleData(LttngSyntheticEvent event) {
+			super.handleData(event);
+			if (event != null) {
+				synEvent = event;
 				if (synEvent.getSynType() == SequenceInd.AFTER) {
 					// Note : We call this function before incrementing
 					// eventCount to save a default check point at the "0th"

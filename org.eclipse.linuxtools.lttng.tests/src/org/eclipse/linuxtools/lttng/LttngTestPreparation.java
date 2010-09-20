@@ -209,14 +209,10 @@ public abstract class LttngTestPreparation extends TestCase {
 	
 		// request
 		validSequence = true;
-		TmfEventRequest<T> request = new TmfEventRequest<T>(k,
-				trange, TmfDataRequest.ALL_DATA, DEFAULT_CHUNK) {
+		TmfEventRequest<T> request = new TmfEventRequest<T>(k, trange, TmfDataRequest.ALL_DATA, DEFAULT_CHUNK) {
 	
 			@Override
-			public void handleData() {
-				T[] result = getData();
-	
-				T event = (result.length > 0) ? result[0] : null;
+			public void handleData(T event) {
 				if (event == null) {
 					System.out
 							.println("Syntheric Event Received is null, after event: "
@@ -301,14 +297,10 @@ public abstract class LttngTestPreparation extends TestCase {
 	
 		// request
 		validSequence = true;
-		TmfEventRequest<T> request = new TmfEventRequest<T>(k,
-				trange, TmfDataRequest.ALL_DATA, DEFAULT_CHUNK) {
+		TmfEventRequest<T> request = new TmfEventRequest<T>(k, trange, TmfDataRequest.ALL_DATA, DEFAULT_CHUNK) {
 	
 			@Override
-			public void handleData() {
-				T[] result = getData();
-	
-				T event = (result.length > 0) ? result[0] : null;
+			public void handleData(T event) {
 				if (event == null) {
 					System.out
 							.println("Syntheric Event Received is null, after event: "

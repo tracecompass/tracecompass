@@ -517,13 +517,11 @@ public class TmfExperimentTest extends TestCase {
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, nbEvents, blockSize) {
-            @Override
-            public void handleData() {
-            	TmfEvent[] events = getData();
-                for (TmfEvent e : events) {
-                    requestedEvents.add(e);
-                }
-            }
+        	@Override
+        	public void handleData(TmfEvent event) {
+        		super.handleData(event);
+        		requestedEvents.add(event);
+        	}
         };
         fExperiment.sendRequest(request);
         request.waitForCompletion();
@@ -546,13 +544,11 @@ public class TmfExperimentTest extends TestCase {
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, nbEvents, blockSize) {
-            @Override
-            public void handleData() {
-            	TmfEvent[] events = getData();
-                for (TmfEvent e : events) {
-                    requestedEvents.add(e);
-                }
-            }
+        	@Override
+        	public void handleData(TmfEvent event) {
+        		super.handleData(event);
+        		requestedEvents.add(event);
+        	}
         };
         fExperiment.sendRequest(request);
         request.waitForCompletion();
@@ -576,13 +572,11 @@ public class TmfExperimentTest extends TestCase {
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, nbEvents, blockSize) {
-            @Override
-            public void handleData() {
-            	TmfEvent[] events = getData();
-                for (TmfEvent e : events) {
-                    requestedEvents.add(e);
-                }
-            }
+        	@Override
+        	public void handleData(TmfEvent event) {
+        		super.handleData(event);
+        		requestedEvents.add(event);
+        	}
         };
         fExperiment.sendRequest(request);
         request.waitForCompletion();
@@ -609,15 +603,14 @@ public class TmfExperimentTest extends TestCase {
 
         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
         final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, nbEvents, blockSize) {
-            @Override
-            public void handleData() {
-            	TmfEvent[] events = getData();
-                for (TmfEvent e : events) {
-                    requestedEvents.add(e);
-                }
-                // Cancel request after the first chunk is received
-                cancel();
-            }
+      	int nbRead = 0;
+      	@Override
+      	public void handleData(TmfEvent event) {
+    		super.handleData(event);
+      		requestedEvents.add(event);
+      		if (++nbRead == blockSize)
+      			cancel();
+      	}
         };
         fExperiment.sendRequest(request);
         request.waitForCompletion();

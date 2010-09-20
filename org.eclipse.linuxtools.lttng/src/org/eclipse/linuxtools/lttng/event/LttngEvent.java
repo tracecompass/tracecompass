@@ -65,7 +65,7 @@ public class LttngEvent extends TmfEvent {
     
     
     /**
-     * Return the parent trace asoociated with this event
+     * Return the parent trace associated with this event
      * 
      * @return Parent trace
      */
@@ -178,5 +178,10 @@ public class LttngEvent extends TmfEvent {
     	result.append(",Content:"  + getContent() + ")]");
     	
     	return result.toString();
+    }
+    
+    @Override
+	public LttngEvent clone() {
+    	return new LttngEvent(this);
     }
 }
