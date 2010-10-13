@@ -72,7 +72,7 @@ public class ProjectView extends TmfView {
     // Perform updates on the UI thread
     private Runnable fViewRefresher = new Runnable() {
     	public void run() {
-    		if (fViewer != null) {
+    		if ((fViewer != null) && (!fViewer.getTree().isDisposed())) {
     			Object[] elements = fViewer.getExpandedElements();
     			fViewer.refresh();
     			fViewer.setExpandedElements(elements);

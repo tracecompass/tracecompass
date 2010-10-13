@@ -439,17 +439,21 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	public void displayModel(final ITmfTimeAnalysisEntry[] items, final long startBoundTime,
 			final long endBoundTime, final boolean updateTimeBounds, final long startVisibleWindow,
 			final long endVisibleWindow, final Object source) {
-
+		
+		// Return if disposed
+		if ((tsfviewer == null) || (tsfviewer.getControl().isDisposed())) return;
+		
 		Display display = tsfviewer.getControl().getDisplay();
 		display.asyncExec(new Runnable() {
-
 			public void run() {
-				tsfviewer.display(items, startBoundTime, endBoundTime, updateTimeBounds);
-				// validate visible boundaries
-				if (startVisibleWindow > -1 && endVisibleWindow > -1) {
-					tsfviewer.setSelectVisTimeWindow(startVisibleWindow, endVisibleWindow, source);
+				if ((tsfviewer != null) && (!tsfviewer.getControl().isDisposed())) {
+					tsfviewer.display(items, startBoundTime, endBoundTime, updateTimeBounds);
+					// validate visible boundaries
+					if (startVisibleWindow > -1 && endVisibleWindow > -1) {
+						tsfviewer.setSelectVisTimeWindow(startVisibleWindow, endVisibleWindow, source);
+					}
+					tsfviewer.resizeControls();
 				}
-				tsfviewer.resizeControls();
 			}
 		});
 	}

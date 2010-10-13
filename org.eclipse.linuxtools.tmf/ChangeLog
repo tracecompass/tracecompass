@@ -1,6 +1,7 @@
 2010-10-13  Francois Chouinard  <fchouinard@gmail.com>
 
-	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Fixed comments
+	* src/org/eclipse/linuxtools/tmf/request/TmfRequestExecutor.java: Added checks for disposed widget 
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Added checks for disposed widget 
 	* src/org/eclipse/linuxtools/tmf/request/TmfDataRequest.java: Added waitForStart() API 
 	* src/org/eclipse/linuxtools/tmf/event/TmfEventContent.java: Added setEvent() 
 	* src/org/eclipse/linuxtools/tmf/event/TmfTimeRange.java: Added getIntersection() 

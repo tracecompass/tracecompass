@@ -889,36 +889,41 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		
 		if(tableViewer != null) {
 			final Table table = tableViewer.getTable();
+			
+			// Ignore update if widget is disposed
+			if (table.isDisposed()) return;
+			
 			Display display = table.getDisplay();
-	
+
 			// Perform the updates on the UI thread)
 			display.asyncExec(new Runnable() {
 				public void run() {
-	
-					tableViewer.setInput(items); // This shall be the minimal
-					// initial
-					tableFilter = new ViewProcessFilter(tableViewer);
-					tableViewer.setFilters(new ViewerFilter[] { tableFilter });
-	
-					resizeTableColumns(table);
-					table.update();
-					tableViewer.refresh();
-	
-					tsfviewer.display(items, startBoundTime, endBoundTime,
-							updateTimeBounds);
-	
-					// validate visible boundaries
-					if (startVisibleWindow > -1 && endVisibleWindow > -1) {
-						tsfviewer.setSelectVisTimeWindow(startVisibleWindow,
-								endVisibleWindow, source);
-					}
-	
-					tsfviewer.resizeControls();
-	
-					// Adjust the size of the vertical scroll bar to fit the
-					// contents
-					if (scrollFrame != null) {
-						updateScrolls(scrollFrame);
+					if (!table.isDisposed()) {
+						tableViewer.setInput(items); // This shall be the minimal
+						// initial
+						tableFilter = new ViewProcessFilter(tableViewer);
+						tableViewer.setFilters(new ViewerFilter[] { tableFilter });
+
+						resizeTableColumns(table);
+						table.update();
+						tableViewer.refresh();
+
+						tsfviewer.display(items, startBoundTime, endBoundTime,
+								updateTimeBounds);
+
+						// validate visible boundaries
+						if (startVisibleWindow > -1 && endVisibleWindow > -1) {
+							tsfviewer.setSelectVisTimeWindow(startVisibleWindow,
+									endVisibleWindow, source);
+						}
+
+						tsfviewer.resizeControls();
+
+						// Adjust the size of the vertical scroll bar to fit the
+						// contents
+						if (scrollFrame != null) {
+							updateScrolls(scrollFrame);
+						}
 					}
 				}
 			});

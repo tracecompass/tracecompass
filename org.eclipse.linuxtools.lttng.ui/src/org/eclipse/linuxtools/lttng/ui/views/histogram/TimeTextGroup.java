@@ -436,12 +436,17 @@ class AsyncTimeTextGroupRedrawer {
 	 * @param newTime 	The new time to set
 	 */
 	public void asynchronousSetValue(long newTime) {
+		// Ignore setting of value if widget is disposed
+		if (parentTimeTextGroup.getParent().isDisposed()) return;
+		
 		final long tmpTime = newTime;
 		
 		Display display =  parentTimeTextGroup.getParent().getDisplay();
 		display.asyncExec(new Runnable() {
 			public void run() {
-				parentTimeTextGroup.setValue(tmpTime);
+				if (!parentTimeTextGroup.getParent().isDisposed()) {
+					parentTimeTextGroup.setValue(tmpTime);
+				}
 			}
 		});
 	}
@@ -454,12 +459,16 @@ class AsyncTimeTextGroupRedrawer {
 	 * @param newGroupName 	The new group name to set
 	 */
 	public void asynchronousSetGroupName(String newGroupName) {
+		// Ignore setting of name if widget is disposed
+		if (parentTimeTextGroup.getParent().isDisposed()) return;
+
 		final String tmpName = newGroupName;
-		
 		Display display =  parentTimeTextGroup.getParent().getDisplay();
 		display.asyncExec(new Runnable() {
 			public void run() {
-				parentTimeTextGroup.setGroupName(tmpName);
+				if (!parentTimeTextGroup.getParent().isDisposed()) {
+					parentTimeTextGroup.setGroupName(tmpName);
+				}
 			}
 		});
 	}
@@ -471,10 +480,15 @@ class AsyncTimeTextGroupRedrawer {
 	 * 
 	 */
 	public void asynchronousRedraw() {
+		// Ignore redraw if widget is disposed
+		if (parentTimeTextGroup.getParent().isDisposed()) return;
+
 		Display display =  parentTimeTextGroup.getParent().getDisplay();
 		display.asyncExec(new Runnable() {
 			public void run() {
-				parentTimeTextGroup.getParent().redraw();
+				if (!parentTimeTextGroup.getParent().isDisposed()) {
+					parentTimeTextGroup.getParent().redraw();
+				}
 			}
 		});
 	}

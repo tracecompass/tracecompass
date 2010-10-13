@@ -67,7 +67,7 @@ public class TmfRequestExecutor implements Executor {
 	/**
 	 * @return the shutdown state (i.e. if it is accepting new requests)
 	 */
-	public boolean isShutdown() {
+	public synchronized boolean isShutdown() {
 		return fExecutor.isShutdown();
 	}
 	
@@ -115,7 +115,8 @@ public class TmfRequestExecutor implements Executor {
 	 */
 	protected synchronized void scheduleNext() {
 		if ((fCurrentRequest = fRequestQueue.poll()) != null) {
-			fExecutor.execute(fCurrentRequest);
+			if (!isShutdown())
+				fExecutor.execute(fCurrentRequest);
 		}
 	}
 

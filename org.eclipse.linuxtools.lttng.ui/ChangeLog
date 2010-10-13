@@ -1,7 +1,15 @@
 2010-10-13  Francois Chouinard  <fchouinard@gmail.com>
 
+	* src/org/eclipse/linuxtools/lttng/ui/views/controlflow/ControlFlowView.java: Added checks for disposed widget  
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramCanvas.java: Added checks for disposed widget 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/ParentHistogramCanvas.java: Added checks for disposed widget
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/TimeTextGroup.java : Added checks for disposed widget
+	* src/org/eclipse/linuxtools/lttng/ui/views/project/ProjectView.java: Added checks for disposed widget
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/StatisticsView.java: Added checks for disposed widget
+	* src/org/eclipse/linuxtools/lttng/ui/views/timeframe/SpinnerGroup.java: Added checks for disposed widget
+	* src/org/eclipse/linuxtools/lttng/ui/views/timeframe/TimeFrameView.java : Added checks for disposed widget
 	* .options: TraceDebug options file
-	* src/org/eclipse/linuxtools/lttng/ui/LTTngUiPlugin.java (stop): Closes the tarce log file 
+	* src/org/eclipse/linuxtools/lttng/ui/LTTngUiPlugin.java (stop): Closes the trace log file 
 	* src/org/eclipse/linuxtools/lttng/ui/model/trange/TimeRangeComponent.java (toString): Added
 	* src/org/eclipse/linuxtools/lttng/ui/model/trange/TimeRangeComposite.java (toString): Added
 	* src/org/eclipse/linuxtools/lttng/ui/model/trange/TimeRangeEventProcess.java (toString): Added

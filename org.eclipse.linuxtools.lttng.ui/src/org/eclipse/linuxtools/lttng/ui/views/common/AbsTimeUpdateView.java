@@ -480,13 +480,15 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	 * @param waitInd
 	 */
 	protected void waitCursor(final boolean waitInd) {
-		if (tsfviewer != null) {
+		if ((tsfviewer != null) && (!tsfviewer.getControl().isDisposed())) {
 			Display display = tsfviewer.getControl().getDisplay();
 
 			// Perform the updates on the UI thread
 			display.asyncExec(new Runnable() {
 				public void run() {
-					tsfviewer.waitCursor(waitInd);
+					if ((tsfviewer != null) && (!tsfviewer.getControl().isDisposed())) {
+						tsfviewer.waitCursor(waitInd);
+					}
 				}
 			});
 		}
@@ -596,14 +598,16 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 		if (complete) {
 			// reselect to original time
 			ParamsUpdater paramUpdater = getParamsUpdater();
-			if (paramUpdater != null && tsfviewer != null) {
+			if ((paramUpdater != null) && (tsfviewer != null) && (!tsfviewer.getControl().isDisposed())) {
 				final Long selTime = paramUpdater.getSelectedTime();
 				if (selTime != null) {
 					TraceDebug.debug("View: " + getName() + "\n\t\tRestoring the selected time to: " + selTime);
 					Display display = tsfviewer.getControl().getDisplay();
 					display.asyncExec(new Runnable() {
 						public void run() {
-							tsfviewer.setSelectedTime(selTime, false, this);
+							if ((tsfviewer != null) && (!tsfviewer.getControl().isDisposed())) {
+								tsfviewer.setSelectedTime(selTime, false, this);
+							}
 						}
 					});
 				}

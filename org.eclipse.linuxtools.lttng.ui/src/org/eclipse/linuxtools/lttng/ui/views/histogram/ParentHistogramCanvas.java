@@ -470,10 +470,14 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 	 * 
 	 */
 	public void asynchronousNotifyParentSelectionWindowChanged() {
+		// Ignore update if widget is disposed
+		if (this.isDisposed()) return;
+
 		Display display = this.getDisplay();
 		display.asyncExec(new Runnable() {
 			public void run() {
-				notifyParentSelectionWindowChanged();
+				if(!ParentHistogramCanvas.this.isDisposed())
+					notifyParentSelectionWindowChanged();
 			}
 		});
 	}	

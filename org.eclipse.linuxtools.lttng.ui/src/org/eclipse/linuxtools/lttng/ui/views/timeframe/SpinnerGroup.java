@@ -275,7 +275,9 @@ public class SpinnerGroup {
      * Perform the update on the UI thread
      */
     public void updateSpinners() {
-
+    	// Ignore update if disposed
+    	if (seconds.isDisposed()) return;
+    	
         seconds.getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				if (!seconds.isDisposed() && !nanosec.isDisposed()) {

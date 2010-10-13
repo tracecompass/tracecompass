@@ -1,6 +1,7 @@
 2010-10-13  Francois Chouinard  <fchouinard@gmail.com>
 
-	* src/org/eclipse/linuxtools/tmf/ui/viewers/events/TmfEventsTable.java: Fixed comments
+	* src/org/eclipse/linuxtools/tmf/ui/views/project/ProjectView.java: Added checks for disposed widget 
+	* src/org/eclipse/linuxtools/tmf/ui/viewers/events/TmfEventsTable.java: Added checks for disposed widget 
 
 2010-09-12  francois  <francois@sushi>
 

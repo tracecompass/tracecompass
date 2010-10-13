@@ -239,6 +239,9 @@ public class TimeFrameView extends TmfView {
      */
     private void updateSlider(TmfTimeRange range, TmfTimestamp timestamp) {
 
+    	// Ignore update if disposed
+    	if (fSlider.isDisposed()) return;
+    	
         // Determine the new relative position
     	byte scale = range.getEndTime().getScale();
         long total    = range.getStartTime().getAdjustment(range.getEndTime(), scale);

@@ -148,7 +148,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
      * Clears the experiment
      */
     @Override
-	public void dispose() {
+	public synchronized void dispose() {
     	if (fTraces != null) {
     		for (ITmfTrace trace : fTraces) {
     			trace.dispose();
