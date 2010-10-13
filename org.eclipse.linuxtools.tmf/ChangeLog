@@ -1,3 +1,9 @@
+2010-10-13  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/event/TmfEventContent.java: Added setEvent() 
+	* src/org/eclipse/linuxtools/tmf/event/TmfTimeRange.java: Added getIntersection() 
+	* src/org/eclipse/linuxtools/tmf/event/TmfTimestamp.java: Improved timestamp comparison 
+
 2010-09-17  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/tmf/component/TmfDataProvider.java: Adjusted to new handleData() API 

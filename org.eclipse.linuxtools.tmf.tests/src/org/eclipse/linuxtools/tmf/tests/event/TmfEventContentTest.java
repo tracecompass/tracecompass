@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.tests.event;
 
+import junit.framework.TestCase;
+
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.event.TmfEventContentStub;
@@ -21,8 +23,6 @@ import org.eclipse.linuxtools.tmf.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.event.TmfEventTypeStub;
 import org.eclipse.linuxtools.tmf.event.TmfNoSuchFieldException;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-
-import junit.framework.TestCase;
 
 /**
  * <b><u>TmfEventContentTest</u></b>
@@ -61,7 +61,7 @@ public class TmfEventContentTest extends TestCase {
 	public TmfEventContentTest(String name) {
 		super(name);
 		fTimestamp     = new TmfTimestamp();
-		fEventSource   = new TmfEventSource();
+		fEventSource   = new TmfEventSource(new Object());
 		fEventType     = new TmfEventType();
 		fEventTypeStub = new TmfEventTypeStub();
 		fReference     = new TmfEventReference();
@@ -110,6 +110,23 @@ public class TmfEventContentTest extends TestCase {
 		catch (IllegalArgumentException e) {
 			// Success
 		}
+	}
+
+	// ------------------------------------------------------------------------
+	// setEvent
+	// ------------------------------------------------------------------------
+
+	public void testSetEvent() {
+		TmfEvent event = new TmfEvent(fTimestamp, fEventSource, fEventType, fReference);
+		TmfEventContent content1 = new TmfEventContent(event, fRawContent0);
+		event.setContent(content1);
+		TmfEventContent content2 = new TmfEventContent(null, fRawContent1);
+
+		content2.setEvent(event);
+
+		assertEquals("setEvent", event, content2.getEvent());
+//		assertEquals("setEvent", content2, event.getContent());
+//		assertEquals("setEvent", null, content1.getEvent());
 	}
 
 	// ------------------------------------------------------------------------

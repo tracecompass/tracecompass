@@ -1,3 +1,8 @@
+2010-10-13  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/tests/event/TmfEventContentTest.java: Added unit test for setEvent() 
+	* src/org/eclipse/linuxtools/tmf/tests/event/TmfTimeRangeTest.java: Adde unit test for getIntersection() 
+
 2010-09-09  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/tmf/tests/experiment/TmfExperimentTest.java: Added a few checks

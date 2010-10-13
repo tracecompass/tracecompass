@@ -125,6 +125,13 @@ public class TmfEventContent {
     // ------------------------------------------------------------------------
 
 	/**
+	 * @param event
+	 */
+	public void setEvent(TmfEvent event) {
+		fParentEvent = event;
+	}
+
+	/**
 	 * Parse the content into fields. By default, a single field (the raw
 	 * content) is returned. 
 	 * Should be overridden.

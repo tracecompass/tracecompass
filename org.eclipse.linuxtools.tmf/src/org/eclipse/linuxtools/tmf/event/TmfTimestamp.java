@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Thomas Gatterweh	- Updated scaling / synchronization
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.event;
@@ -59,15 +60,6 @@ public class TmfTimestamp implements Cloneable {
     public static final TmfTimestamp BigBang   = new TmfTimestamp(Long.MIN_VALUE, Byte.MAX_VALUE, 0);
     public static final TmfTimestamp BigCrunch = new TmfTimestamp(Long.MAX_VALUE, Byte.MAX_VALUE, 0);
     public static final TmfTimestamp Zero      = new TmfTimestamp(0, (byte) 0, 0);
-
-    /*
-     * A java <code>long</code> has a maximum of 19 significant digits.
-     * (-9,223,372,036,854,775,808 .. +9,223,372,036,854,775,807)
-     * 
-     * It is therefore useless to try to synchronize 2 timestamps whose
-     * difference in scale exceeds that value.
-     */
-    private int MAX_SCALING = 19;
 
 	// ------------------------------------------------------------------------
     // Constructors
@@ -167,21 +159,22 @@ public class TmfTimestamp implements Cloneable {
      */
     public TmfTimestamp synchronize(long offset, byte newScale) throws ArithmeticException {
 
-    	long newValue = fValue;
+        long newValue = fValue;
         long newPrecision = fPrecision;
 
+        // Handle the easy case
+        if (fScale == newScale && offset == 0)
+        	return this;
+        
         // Determine the scaling factor
         if (fScale != newScale) {
             int scaleDiff = Math.abs(fScale - newScale);
             // Let's try to be realistic...
-            if (scaleDiff > MAX_SCALING) {
+            if (scaleDiff >= scalingFactors.length) {
                 throw new ArithmeticException("Scaling exception");
             }
-            // Not pretty...
-            long scalingFactor = 1;
-            for (int i = 0; i < scaleDiff; i++) {
-                scalingFactor *= 10;
-            }
+            // Adjust the timestamp
+            long scalingFactor = scalingFactors[scaleDiff];
             if (newScale < fScale) {
                 newValue *= scalingFactor;
                 newPrecision *= scalingFactor;
@@ -191,9 +184,64 @@ public class TmfTimestamp implements Cloneable {
             }
         }
 
-        return new TmfTimestamp(newValue + offset, newScale, newPrecision);
+        if (offset < 0) {
+        	newValue = (newValue < Long.MIN_VALUE - offset) ? Long.MIN_VALUE : newValue + offset;
+        } else {
+        	newValue = (newValue > Long.MAX_VALUE - offset) ? Long.MAX_VALUE : newValue + offset;
+        }
+
+        return new TmfTimestamp(newValue, newScale, newPrecision);
     }
 
+    private static final long scalingFactors[] = new long[] {
+    	1L,
+    	10L,
+    	100L,
+    	1000L,
+    	10000L,
+    	100000L,
+    	1000000L,
+    	10000000L,
+    	100000000L,
+    	1000000000L,
+    	10000000000L,
+    	100000000000L,
+    	1000000000000L,
+    	10000000000000L,
+    	100000000000000L,
+    	1000000000000000L,
+    	10000000000000000L,
+    	100000000000000000L,
+    	1000000000000000000L,
+    };
+
+    private static final long scalingLimits[] = new long[] {
+    	Long.MAX_VALUE / 1L,
+    	Long.MAX_VALUE / 10L,
+    	Long.MAX_VALUE / 100L,
+    	Long.MAX_VALUE / 1000L,
+    	Long.MAX_VALUE / 10000L,
+    	Long.MAX_VALUE / 100000L,
+    	Long.MAX_VALUE / 1000000L,
+    	Long.MAX_VALUE / 10000000L,
+    	Long.MAX_VALUE / 100000000L,
+    	Long.MAX_VALUE / 1000000000L,
+    	Long.MAX_VALUE / 10000000000L,
+    	Long.MAX_VALUE / 100000000000L,
+    	Long.MAX_VALUE / 1000000000000L,
+    	Long.MAX_VALUE / 10000000000000L,
+    	Long.MAX_VALUE / 100000000000000L,
+    	Long.MAX_VALUE / 1000000000000000L,
+    	Long.MAX_VALUE / 10000000000000000L,
+    	Long.MAX_VALUE / 100000000000000000L,
+    	Long.MAX_VALUE / 1000000000000000000L,
+    };
+
+    public static long getScalingFactor(byte scale)
+    {
+    	return scalingFactors[scale];
+    }
+    
     /**
      * Compute the adjustment, in the reference scale, needed to synchronize
      * this timestamp with a reference timestamp.
@@ -220,48 +268,69 @@ public class TmfTimestamp implements Cloneable {
      */
     public int compareTo(final TmfTimestamp other, boolean withinPrecision) {
 
-    	// If values have the same time scale, perform the comparison
-        if (fScale == other.fScale) {
-            if (withinPrecision) {
-                if ((fValue + fPrecision) < (other.fValue - other.fPrecision))
-                    return -1;
-                if ((fValue - fPrecision) > (other.fValue + other.fPrecision))
-                    return 1;
-                return 0;
-            }
-            return (fValue == other.fValue) ? 0 : (fValue < other.fValue) ? -1 : 1;
-        }
+		// If values have the same time scale, perform the comparison
+		if (fScale == other.fScale) {
+			if (withinPrecision)
+				return compareWithinPrecision(this.fValue, this.fPrecision, other.fValue, other.fPrecision);
+			else
+				return compareNoPrecision(this.fValue, other.fValue);
+		}
 
-        // If values have different time scales, adjust to the finest one and
-        // then compare. If the scaling difference is too large, revert to
-        // some heuristics. Hopefully, nobody will try to compare galactic and
-        // quantic clock events...
-        if (Math.abs(fScale - other.fScale) > MAX_SCALING) {
-            return simpleCompare(other);
-        }
+		// If values have different time scales, adjust to the finest one and
+		// then compare. If the scaling difference is too large, revert to
+		// some heuristics. Hopefully, nobody will try to compare galactic and
+		// quantic clock events...
+		int scaleDiff = Math.abs(fScale - other.fScale);
+		long factor, limit;
+		if (scaleDiff < scalingFactors.length) {
+			factor = scalingFactors[scaleDiff];
+			limit = scalingLimits[scaleDiff];
+		} else {
+			factor = 0;
+			limit = 0; // !!! 0 can always be scaled!!!
+		}
 
-        byte newScale = (fScale < other.fScale) ? fScale : other.fScale;
-        try {
-            TmfTimestamp ts1 = this.synchronize(0, newScale);
-            TmfTimestamp ts2 = other.synchronize(0, newScale);
-            return ts1.compareTo(ts2, withinPrecision);
-        } catch (ArithmeticException e) {
-            return simpleCompare(other);
-        }
+		if (fScale < other.fScale) {
+			// this has finer scale, so other should be scaled
+			if (withinPrecision)
+				if (other.fValue > limit || other.fValue < -limit
+						|| other.fPrecision > limit
+						|| other.fPrecision < -limit)
+					return other.fValue > 0 ? -1 : +1; // other exceeds scaling limit
+				else
+					return compareWithinPrecision(this.fValue, this.fPrecision,
+							other.fValue * factor, other.fPrecision * factor);
+			else if (other.fValue > limit || other.fValue < -limit)
+				return other.fValue > 0 ? -1 : +1; // other exceeds scaling limit
+			else
+				return compareNoPrecision(this.fValue, other.fValue * factor);
+		} else {
+			// other has finer scale, so this should be scaled
+			if (withinPrecision)
+				if (this.fValue > limit || this.fValue < -limit
+						|| this.fPrecision > limit || this.fPrecision < -limit)
+					return this.fValue > 0 ? +1 : -1; // we exceed scaling limit
+				else
+					return compareWithinPrecision(this.fValue * factor,
+							this.fPrecision * factor, other.fValue,
+							other.fPrecision);
+			else if (this.fValue > limit || this.fValue < -limit)
+				return this.fValue > 0 ? +1 : -1; // we exceed scaling limit
+			else
+				return compareNoPrecision(this.fValue * factor, other.fValue);
+		}
     }
 
-	private int simpleCompare(final TmfTimestamp other) {
-		if ((fValue == 0) || (other.fValue == 0)) {
-		    return (fValue == other.fValue) ? 0
-		            : (fValue < other.fValue) ? -1 : 1;
-		}
-		if ((fValue > 0) && (other.fValue > 0)) {
-		    return (fScale < other.fScale) ? -1 : 1;
-		}
-		if ((fValue < 0) && (other.fValue < 0)) {
-		    return (fScale > other.fScale) ? -1 : 1;
-		}
-		return (fValue < 0) ? -1 : 1;
+	private static int compareNoPrecision(long thisValue, long otherValue) {
+		return (thisValue == otherValue) ? 0 : (thisValue < otherValue) ? -1 : 1;
+	}
+
+	private static int compareWithinPrecision(long thisValue, long thisPrecision, long otherValue, long otherPrecision) {
+		if ((thisValue + thisPrecision) < (otherValue - otherPrecision))
+			return -1;
+		if ((thisValue - thisPrecision) > (otherValue + otherPrecision))
+			return 1;
+		return 0;
 	}
 
 	// ------------------------------------------------------------------------

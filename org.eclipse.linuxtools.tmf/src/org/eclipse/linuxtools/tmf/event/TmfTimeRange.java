@@ -100,6 +100,23 @@ public class TmfTimeRange {
 	}
 
 	/**
+	 * Get intersection of two time ranges
+	 * 
+	 * @param other
+	 *            the other time range
+	 * @return the intersection time range, or null if no intersection exists
+	 */
+	public TmfTimeRange getIntersection(TmfTimeRange other)
+	{
+		if (fStartTime.compareTo(other.fEndTime, true) > 0 || fEndTime.compareTo(other.fStartTime, true) < 0)
+			return null; // no intersection
+
+		return new TmfTimeRange(
+			fStartTime.compareTo(other.fStartTime, true) < 0 ? other.fStartTime : fStartTime,
+			fEndTime.compareTo(other.fEndTime, true) > 0 ? other.fEndTime : fEndTime);
+	}
+	
+	/**
 	 * Check if the time range is within the time range
 	 * 
 	 * @param range
