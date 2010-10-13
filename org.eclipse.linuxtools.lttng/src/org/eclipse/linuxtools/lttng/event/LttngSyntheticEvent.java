@@ -42,7 +42,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 	 * </p>
 	 */
 	public enum SequenceInd {
-		STARTREQ, BEFORE, UPDATE, AFTER, ENDREQ, ACK
+		STARTREQ, BEFORE, UPDATE, AFTER, ENDREQ
 	};
 
 	private SequenceInd sequence = SequenceInd.BEFORE;

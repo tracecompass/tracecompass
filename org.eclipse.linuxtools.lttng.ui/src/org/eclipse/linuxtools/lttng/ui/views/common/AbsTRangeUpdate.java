@@ -45,7 +45,7 @@ public abstract class AbsTRangeUpdate extends AbsStateProcessing implements
 	 */
     protected double getPixelsPerNs(LttngTraceState traceSt, ParamsUpdater params) {
         double pixPerNs = params.getPixelsPerNs();
-        if (pixPerNs == 0) {
+        if (pixPerNs == 0.0) {
             TmfTimeRange tsetRange = traceSt.getContext().getExperimentTimeWindow();
             
             long startTime = tsetRange.getStartTime().getValue();

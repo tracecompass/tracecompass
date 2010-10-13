@@ -1,3 +1,11 @@
+2010-10-13  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/control/LttngSyntheticEventProvider.java: Removed unecessary ACK event
+	* src/org/eclipse/linuxtools/lttng/event/LttngSyntheticEvent.java: Removed unecessary ACK event
+	* src/org/eclipse/linuxtools/lttng/state/model/LttngExecutionState.java (toString): Added 
+	* src/org/eclipse/linuxtools/lttng/state/model/LttngProcessState.java (toString): Added
+	* src/org/eclipse/linuxtools/lttng/trace/LTTngTrace.java: Cleanup comment 
+
 2010-09-17  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/control/LttngSyntheticEventProvider.java: Adjusted to new handleData() API

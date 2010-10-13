@@ -219,4 +219,12 @@ public class TimeRangeEventProcess extends TimeRangeComposite implements
 
 		return 0;
 	}
+	
+    @Override
+    public String toString() {
+		return "[TimeRangeEventProcess:" + super.toString() +
+		",pid=" + pid + ",tgid=" + tgid + ",ppid=" + ppid + ",ctime=" + creationTime +
+		",trace=" + traceID + ",ptype=" + processType + ",cpu=" + cpu + ",brand=" + brand + "]";
+    }
+
 }

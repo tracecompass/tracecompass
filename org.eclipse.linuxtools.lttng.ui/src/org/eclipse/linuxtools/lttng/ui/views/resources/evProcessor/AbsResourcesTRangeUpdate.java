@@ -55,6 +55,11 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 						traceStartTime, traceEndTime, resourceName, traceId,
 						"", type, resId, insertionTime);
 		resContainer.addItem(localRessource);
+
+		if (TraceDebug.isRV()) {
+			TraceDebug.traceRV("addLocalResource():" + localRessource);
+		}
+
 		return localRessource;
 	}
 
@@ -67,10 +72,6 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 	protected boolean withinViewRange(long stime, long etime) {
 		long windowStartTime = params.getStartTime();
 		long windowEndTime = params.getEndTime();
-
-		if (stime == 13589765052286L) {
-			TraceDebug.debug("Debug event catched");
-		}
 
 		// Start of event is already out of range
 		if (stime > windowEndTime) {
@@ -163,11 +164,10 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 				trcEvent.getCpuId());
 		Long cpu = trcEvent.getCpuId();
 		if (localResource == null) {
-			TmfTimeRange timeRange = traceSt.getContext()
-					.getTraceTimeWindow();
+			TmfTimeRange timeRange = traceSt.getContext().getTraceTimeWindow();
 			localResource = addLocalResource(timeRange.getStartTime()
-					.getValue(), timeRange.getEndTime().getValue(), traceSt
-					.getTraceId(), ResourceTypes.CPU, cpu, trcEvent
+					.getValue(), timeRange.getEndTime().getValue(),
+					traceSt.getTraceId(), ResourceTypes.CPU, cpu, trcEvent
 					.getTimestamp().getValue());
 		}
 
@@ -192,8 +192,12 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 	 * @return
 	 */
 	protected boolean makeDraw(LttngTraceState traceSt, long stime, long etime,
-			TimeRangeEventResource localResource,
-			ParamsUpdater params, String stateMode) {
+			TimeRangeEventResource localResource, ParamsUpdater params,
+			String stateMode) {
+
+		if (TraceDebug.isRV()) {
+			TraceDebug.traceRV("makeDraw():[" + localResource + ",candidate=[stime=" + stime + ",etime=" + etime + ",state=" + stateMode + "]]");
+		}
 
 		// Check if the event is out of range
 		if (!withinViewRange(stime, etime)) {
@@ -240,7 +244,7 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 		// Display a "more information" indication by allowing non visible event
 		// as long as its previous event is visible.
 		boolean visible = true;
-		if (pixels < 1) {
+		if (pixels < 1.0) {
 			boolean prevEventVisibility = true;
 			// Get the visibility indication on previous event for
 			// this process
@@ -258,7 +262,7 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 				// return i.e. event discarded to free up memory
 				Long eventSpan = stime - prevEvent.getStartTime();
 				if (prevEventVisibility == false
-						&& ((double) eventSpan * k) < 2) {
+						&& ((double) eventSpan * k) < 2.0) {
 					params.incrementEventsDiscarded(ParamsUpdater.NOT_VISIBLE);
 					return false;
 				}

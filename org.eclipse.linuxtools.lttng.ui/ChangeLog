@@ -1,3 +1,18 @@
+2010-10-13  Francois Chouinard  <fchouinard@gmail.com>
+
+	* .options: TraceDebug options file
+	* src/org/eclipse/linuxtools/lttng/ui/LTTngUiPlugin.java (stop): Closes the tarce log file 
+	* src/org/eclipse/linuxtools/lttng/ui/model/trange/TimeRangeComponent.java (toString): Added
+	* src/org/eclipse/linuxtools/lttng/ui/model/trange/TimeRangeComposite.java (toString): Added
+	* src/org/eclipse/linuxtools/lttng/ui/model/trange/TimeRangeEventProcess.java (toString): Added
+	* src/org/eclipse/linuxtools/lttng/ui/model/trange/TimeRangeEventResource.java (toString): Added
+	* src/org/eclipse/linuxtools/lttng/ui/TraceDebug.java: Support for new traces (CFV/RV) 
+	* src/org/eclipse/linuxtools/lttng/ui/views/common/AbsTimeUpdateView.java: Fixed a few constants 
+	* src/org/eclipse/linuxtools/lttng/ui/views/common/AbsTRangeUpdate.java (getPixelsPerNs): Adjusted field type 
+	* src/org/eclipse/linuxtools/lttng/ui/views/controlflow/evProcessor/AbsFlowTRangeUpdate.java: Added debug tracing 
+	* src/org/eclipse/linuxtools/lttng/ui/views/resources/evProcessor/AbsResourcesTRangeUpdate.java: Added debug tracing 
+	* src/org/eclipse/linuxtools/lttng/ui/views/resources/ResourcesView.java: Use default pixels/ns
+
 2010-10-06  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/ui/views/common/AbsTimeUpdateView.java: Fixed initial time window size (0.1s)

@@ -487,4 +487,15 @@ public class LttngProcessState implements Cloneable {
     public LttngExecutionState getFirstElementFromExecutionStack() {
         return execution_stack.firstElement();
     }
+
+    @Override
+    public String toString() {
+    	String stateSt  = state.toString();
+    	String eStackSt = execution_stack.toString();
+    	
+		return "[LttngProcessState: " + "cpu=" + cpu + ",pid=" + pid + ",tgid=" + tgid + ",name=" + name + ",ctime=" + creation_time +
+		",brand=" + brand + ",type=" + type + ",cfunc=" + current_function + ",ppid=" + ppid + ",itime=" + insertion_time + ",ptime=" + pid_time +
+		",fevents=" + free_events + ",state=" + stateSt + ",estack=" + eStackSt + ",ustack=" + user_stack + ",utrace=" + userTrace +
+		",tpid=" + target_pid + ",trace=" + trace_id + "]";
+    }
 }

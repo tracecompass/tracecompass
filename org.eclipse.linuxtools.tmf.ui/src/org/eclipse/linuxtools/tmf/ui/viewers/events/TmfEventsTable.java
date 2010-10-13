@@ -148,16 +148,6 @@ public class TmfEventsTable extends TmfComponent {
                 fCacheEndIndex = index;
 
                 TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(TmfEvent.class, index, fCacheSize) {
-//                    @Override
-//                    public void handleData() {
-//                        TmfEvent[] tmpEvent = getData();
-//                        if ((tmpEvent != null) && (tmpEvent.length > 0)) {
-//                            fCache = tmpEvent;
-//                            fCacheStartIndex = index;
-//                            fCacheEndIndex = index + tmpEvent.length;
-//                        }
-//                    }
-
                 	private int count = 0;
 
                 	@Override

@@ -1,5 +1,8 @@
 package org.eclipse.linuxtools.lttng.ui;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -14,10 +17,17 @@ public class TraceDebug {
 	static boolean INFO = false;
 	static boolean WARN = false;
 
+	static boolean CFV = false;
+	static boolean RV = false;
+
 	private static Plugin plugin = LTTngUiPlugin.getDefault();
 	private static String pluginID = LTTngUiPlugin.PLUGIN_ID;
 	private static SimpleDateFormat stimeformat = new SimpleDateFormat(
 			"HH:mm:ss:SSS");
+
+	// Note: files are created in $HOME
+	static private PrintWriter fCFVfile = null;
+	static private PrintWriter fRVfile  = null;
 
 	public static void init() {
 		// Update Trace configuration options
@@ -35,6 +45,56 @@ public class TraceDebug {
 
 		if (warnTrace != null) {
 			WARN = (new Boolean(warnTrace)).booleanValue();
+		}
+
+		String cfvTrace = Platform.getDebugOption(pluginID + "/cfv");
+		if (cfvTrace != null) {
+			CFV = (new Boolean(cfvTrace)).booleanValue();
+			if (CFV) {
+				try {
+					fCFVfile = new PrintWriter(new FileWriter("CFVTrace.txt"));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		String rvTrace = Platform.getDebugOption(pluginID + "/rv");
+		if (rvTrace != null) {
+			RV = (new Boolean(rvTrace)).booleanValue();
+			if (RV) {
+				try {
+					fRVfile = new PrintWriter(new FileWriter("RVTrace.txt"));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static void stop() {
+		if (fCFVfile != null) {
+			fCFVfile.close();
+			fCFVfile = null;
+		}
+
+		if (fRVfile != null) {
+			fRVfile.close();
+			fRVfile = null;
+		}
+	}
+
+	public static void traceCFV(String trace) {
+		if (CFV && fCFVfile != null) {
+			fCFVfile.println(trace);
+			fCFVfile.flush();
+		}
+	}
+
+	public static void traceRV(String trace) {
+		if (RV && fRVfile != null) {
+			fRVfile.println(trace);
+			fRVfile.flush();
 		}
 	}
 
@@ -128,5 +188,13 @@ public class TraceDebug {
 
 	public static boolean isWARN() {
 		return WARN;
+	}
+
+	public static boolean isCFV() {
+		return CFV;
+	}
+
+	public static boolean isRV() {
+		return RV;
 	}
 }

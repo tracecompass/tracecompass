@@ -319,6 +319,20 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     }
 
     /**
+     * To suspend the client thread until the request starts (or is
+     * canceled).
+     * 
+     * @throws InterruptedException 
+     */
+    public void waitForStart() throws InterruptedException {
+        synchronized (lock) {
+            while (!fRequestRunning) {
+            	lock.wait();
+            }
+        }
+    }
+
+    /**
      * To suspend the client thread until the request completes (or is
      * canceled).
      * 
@@ -326,8 +340,9 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      */
     public void waitForCompletion() throws InterruptedException {
         synchronized (lock) {
-            while (!fRequestCompleted)
+            while (!fRequestCompleted) {
             	lock.wait();
+            }
         }
     }
 

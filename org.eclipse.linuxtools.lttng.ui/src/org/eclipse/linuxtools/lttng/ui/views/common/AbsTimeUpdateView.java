@@ -63,7 +63,10 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	// Data
 	// ========================================================================
 
-	private static final long INITIAL_WINDOW_OFFSET = (1L * 100 * 1000 * 1000); // .1sec
+//	 private static final long INITIAL_WINDOW_OFFSET = (1L * 1    * 1000 * 1000); // .001sec
+//	 private static final long INITIAL_WINDOW_OFFSET = (1L * 10   * 1000 * 1000); // .01sec
+	 private static final long INITIAL_WINDOW_OFFSET = (1L * 100  * 1000 * 1000); // .1sec
+//	 private static final long INITIAL_WINDOW_OFFSET = (1L * 1000 * 1000 * 1000); // 1sec
 
 	/**
 	 * Number of events before a GUI refresh
@@ -72,8 +75,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	private static final long DEFAULT_OFFSET = 0L;
 	private static final int DEFAULT_CHUNK = 1;
 
-	protected boolean synch = true; // time synchronisation, used to be an
-									// option
+	protected boolean synch = true; // time synchronization, used to be an option
 	protected ITimeAnalysisViewer tsfviewer = null;
 
 	private LttngSyntEventRequest fCurrentRequest = null;

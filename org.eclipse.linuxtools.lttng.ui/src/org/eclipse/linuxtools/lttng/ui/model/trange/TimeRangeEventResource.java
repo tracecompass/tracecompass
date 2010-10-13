@@ -128,13 +128,19 @@ public abstract class TimeRangeEventResource extends TimeRangeComposite
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
-	@Override
-	public String toString() {
-		return getResourceId().toString() + ":" + getTraceId().toString() + ":"
-				+ getType().toString();
-	}
+//	@Override
+//	public String toString() {
+//		return getResourceId().toString() + ":" + getTraceId().toString() + ":"
+//				+ getType().toString();
+//	}
 
-	/**
+    @Override
+    public String toString() {
+		return "[TimeRangeEventResource: " + super.toString() +
+		",type=" + type + ",resourceId=" + resourceId + "]";
+    }
+
+    /**
 	 * Compare function to implement Comparable<br>
 	 * <br>
 	 * Compare by traceId THEN IF EQUAL by resourceType THEN IF EQUAL by

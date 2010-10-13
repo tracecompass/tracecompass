@@ -115,8 +115,8 @@ public class ResourcesView extends AbsTimeUpdateView implements
 
 		// Viewer to notify selection to this class
 		// This class will synchronise selections with table.
-		tsfviewer.addWidgetSelectionListner(this);
-		tsfviewer.addWidgetTimeScaleSelectionListner(this);
+//		tsfviewer.addWidgetSelectionListner(this);
+//		tsfviewer.addWidgetTimeScaleSelectionListner(this);
 
 		// Create the help context id for the viewer's control
 		// TODO: Associate with help system
@@ -128,11 +128,11 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		hookContextMenu();
 		contributeToActionBars();
 
-		// Read relevant values
-		int timeSpaceWidth = tsfviewer.getTimeSpace();
-		if (timeSpaceWidth < 0) {
-			timeSpaceWidth = -timeSpaceWidth;
-		}
+//		// Read relevant values
+//		int timeSpaceWidth = tsfviewer.getTimeSpace();
+//		if (timeSpaceWidth < 0) {
+//			timeSpaceWidth = -timeSpaceWidth;
+//		}
 
 		TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
 		if (experiment != null) {
@@ -141,7 +141,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 				long time0 = experimentTRange.getStartTime().getValue();
 				long time1 = experimentTRange.getEndTime().getValue();
 				ParamsUpdater paramUpdater = getParamsUpdater();
-				paramUpdater.update(time0, time1, timeSpaceWidth);
+				paramUpdater.update(time0, time1); // , timeSpaceWidth);
 			}
 			// send the initial request and obtained the adjusted time used
 			TmfTimeRange adjustedTimeRange = initialExperimentDataRequest(this, experimentTRange);

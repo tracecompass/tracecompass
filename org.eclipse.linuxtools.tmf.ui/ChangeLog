@@ -1,3 +1,7 @@
+2010-10-13  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/ui/viewers/events/TmfEventsTable.java: Fixed comments
+
 2010-09-12  francois  <francois@sushi>
 
 	* src/org/eclipse/linuxtools/tmf/ui/widgets/TmfVirtualTable.java: Fixed table scrolling issues

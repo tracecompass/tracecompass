@@ -16,6 +16,7 @@ import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessStatus;
 import org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor;
 import org.eclipse.linuxtools.lttng.state.model.LttngProcessState;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
+import org.eclipse.linuxtools.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeComponent;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEvent;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEvent.Type;
@@ -57,6 +58,11 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements ILt
 		localProcess.setTraceID(traceId);
 		localProcess.setProcessType(stateProcess.getType().getInName());
 		procContainer.addItem(localProcess);
+
+		if (TraceDebug.isCFV()) {
+			TraceDebug.traceCFV("addLocalProcess():" + localProcess);
+		}
+
 		return localProcess;
 	}
 	
@@ -104,6 +110,10 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements ILt
 	protected boolean makeDraw(LttngTraceState traceSt, long startTime,
 			long endTime, TimeRangeEventProcess localProcess,
 			ParamsUpdater params, String stateMode) {
+
+		if (TraceDebug.isCFV()) {
+			TraceDebug.traceCFV("makeDraw():[" + localProcess + ",candidate=[stime=" + startTime + ",etime=" + endTime + ",state=" + stateMode + "]]");
+		}
 
 		// Determine start and end times to establish duration
 		Long stime = startTime;
@@ -155,7 +165,7 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements ILt
 		// Display a "more information" indication by allowing non visible event
 		// as long as its previous event is visible.
 		boolean visible = true;
-		if (pixels < 1) {
+		if (pixels < 1.0) {
 			boolean prevEventVisibility = true;
 			// Get the visibility indication on previous event for
 			// this process
@@ -173,7 +183,7 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements ILt
 				// return i.e. event discarded to free up memory
 				Long eventSpan = stime - prevEvent.getStartTime();
 				if (prevEventVisibility == false
-						&& ((double) eventSpan * k) < 2) {
+						&& ((double) eventSpan * k) < 2.0) {
 
 					// discard the item
 					params.incrementEventsDiscarded(ParamsUpdater.NOT_VISIBLE);

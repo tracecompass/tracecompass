@@ -55,9 +55,6 @@ class LTTngTraceException extends LttngException {
  */
 public class LTTngTrace extends TmfTrace<LttngEvent> {
 	
-//	// [lmcfrch]
-//	private long lastTime = 0;
-
 	public static boolean printDebug  = false;
 	public static boolean uniqueEvent = false;
 	
@@ -494,9 +491,6 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     @Override
     public synchronized TmfContext seekEvent(long position) {
     	
-//    	// [lmcfrch]
-//    	lastTime = 0;
-    	
     	if ( printDebug == true ) {
     		System.out.println("seekEvent(position) position -> " + position);
     	}
@@ -518,6 +512,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         
         // Seek to the found time
         TmfContext tmpContext  = seekEvent(timestamp);
+        tmpContext.setRank((index + 1) * fIndexPageSize);
         previousLocation = (LttngLocation)tmpContext.getLocation();
         
         // Ajust the index of the event we found at this check point position

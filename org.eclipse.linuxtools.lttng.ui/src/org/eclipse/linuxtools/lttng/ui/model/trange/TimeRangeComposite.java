@@ -202,4 +202,13 @@ ITmfTimeAnalysisEntry {
 	public long getInsertionTime() {
 		return insertionTime;
 	}
+
+    @Override
+    public String toString() {
+		return "[TimeRangeComposite:" + super.toString() +
+		",id=" + id + ",name=" + name + ",group=" + groupName + ",class=" + className +
+		",ctype=" + contType + ",itime=" + insertionTime + 
+		",leaves=" + ChildEventLeafs + ",composites=" + ChildEventComposites + "]";
+    }
+
 }

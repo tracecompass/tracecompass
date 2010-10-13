@@ -90,4 +90,11 @@ public abstract class TimeRangeComponent implements ITimeRangeComponent {
 	public boolean isVisible() {
 		return visible;
 	}
+
+    @Override
+    public String toString() {
+		return "[TimeRangeComponent:" + "startTime=" + startTime + ",stopTime=" + stopTime +
+		",parent=" + (eventParent != null ? eventParent.id : "null") + "]";
+    }
+
 }
