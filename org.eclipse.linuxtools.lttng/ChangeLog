@@ -1,3 +1,9 @@
+2010-10-14  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/control/LttngSyntheticEventProvider.java: Handle processing through a coalesced request
+	* src/org/eclipse/linuxtools/lttng/request/LttngBaseEventRequest.java: Removed references to trace and trace model
+	* src/org/eclipse/linuxtools/lttng/state/experiment/StateExperimentManager.java: Replaced map key from trace path (String) to actual trace (ITmfTrace)
+
 2010-10-13  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/control/LttngSyntheticEventProvider.java: Removed unecessary ACK event

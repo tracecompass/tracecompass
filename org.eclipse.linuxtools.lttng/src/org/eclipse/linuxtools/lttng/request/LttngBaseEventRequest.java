@@ -8,17 +8,16 @@
  * 
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
+ *   Marc Dumais (marc.dumais@ericsson.com) - Fix for 316455 (first part)
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.request;
 
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
-import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 
 /**
  * This class is an extension of Tmf Event Request which includes specific
@@ -35,8 +34,6 @@ public abstract class LttngBaseEventRequest extends TmfEventRequest<LttngEvent> 
 	// =======================================================================
 	private long numOfEvents = 0;
 	private boolean clearDataInd = false;
-	private final LttngTraceState ftraceModel;
-	private final ITmfTrace ftrace;
 	/**
 	 * The time to send events to the application as requested, Note: The start
 	 * time of the request for base events is adjusted to the nearest check
@@ -53,16 +50,13 @@ public abstract class LttngBaseEventRequest extends TmfEventRequest<LttngEvent> 
 	 * @param offset
 	 * @param nbEvents
 	 * @param maxBlockSize
-	 * @param traceModel
+	 * @param traceState
 	 * @param listener
 	 */
 	public LttngBaseEventRequest(TmfTimeRange range, TmfTimestamp dispatchTime, long offset, int nbEvents,
-			int maxBlockSize, LttngTraceState traceModel, ITmfDataRequest.ExecutionType execType, ITmfTrace trace) {
-		super(LttngEvent.class, range, nbEvents, maxBlockSize, execType);
-		ftraceModel = traceModel;
+			int maxBlockSize, ITmfDataRequest.ExecutionType execType) {
+		super(LttngEvent.class, range, nbEvents, maxBlockSize, execType);		
 		fDispatchTime = dispatchTime;
-		ftrace = trace;
-
 	}
 
 	@Override
@@ -123,23 +117,10 @@ public abstract class LttngBaseEventRequest extends TmfEventRequest<LttngEvent> 
 	}
 
 	/**
-	 * @return the ftraceModel, Trace state-data-model associated to this event
-	 */
-	public LttngTraceState getTraceModel() {
-		return ftraceModel;
-	}
-
-	/**
 	 * @return The time to start dispatching events to the application
 	 */
 	public TmfTimestamp getDispatchTime() {
 		return fDispatchTime;
 	}
-
-	/**
-	 * @return
-	 */
-	public ITmfTrace getTrace() {
-		return ftrace;
-	}
+	
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
-+ * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009, 2010 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
+ *   Marc Dumais (marc.dumais@ericsson.com) - Fix for 316455 (second part)
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.state.experiment;
 
@@ -51,7 +52,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 	 * Used to route incoming events to proper trace manager, during check point
 	 * building
 	 */
-	private final Map<String, IStateTraceManager> ftraceToManagerMap = new HashMap<String, IStateTraceManager>();
+	private final Map<ITmfTrace, IStateTraceManager> ftraceToManagerMap = new HashMap<ITmfTrace, IStateTraceManager>();
 	private LttngSyntheticEvent syntheticEvent = null;
 	private ITmfEventRequest<LttngEvent> fStateCheckPointRequest = null;
 
@@ -298,7 +299,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			// build the trace to manager mapping for event dispatching
 			trace = traceManager.getTrace();
 			synchronized (this) {
-				ftraceToManagerMap.put(getTraceKey(trace), traceManager);
+				ftraceToManagerMap.put(trace, traceManager);
 			}
 		}
 		
@@ -327,7 +328,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 				if (event != null) {
 //					Tracer.trace("Chk: " + event.getTimestamp());
 					ITmfTrace trace = event.getParentTrace();
-					IStateTraceManager traceManager = ftraceToManagerMap.get(getTraceKey(trace));
+					IStateTraceManager traceManager = ftraceToManagerMap.get(trace);
 					if (traceManager != null) {
 						// obtain synthetic event
 						LttngSyntheticEvent synEvent = updateSynEvent(event,
@@ -403,16 +404,6 @@ public class StateExperimentManager extends LTTngTreeNode implements
 		return request;
 	}
 
-	/**
-	 * Simplified trace key used to identify trace within experiment
-	 * 
-	 * @param trace
-	 * @return
-	 */
-	private String getTraceKey(ITmfTrace trace) {
-		String traceKey = trace.getPath() + trace.getName();
-		return traceKey;
-	}
 
 	private LttngSyntheticEvent updateSynEvent(LttngEvent e, IStateTraceManager stateTraceManager) {
 		if (syntheticEvent == null || syntheticEvent.getBaseEvent() != e) {
