@@ -416,7 +416,7 @@ class AsyncCanvasRedrawer {
 	}
 	
 	/**
-	 * Function to asynchonously notify the parent of the related canvas that the window changed.<p>
+	 * Function to asynchronously notify the parent of the related canvas that the window changed.<p>
 	 * 
 	 * Basically, it just run "notifyParentSelectionWindowChanged()" in asyncExec.
 	 * 

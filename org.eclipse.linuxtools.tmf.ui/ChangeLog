@@ -1,3 +1,7 @@
+2010-10-15  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/ui/viewers/events/TmfEventsTable.java: Small cleanup
+	
 2010-10-13  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/tmf/ui/views/project/ProjectView.java: Added checks for disposed widget 

@@ -85,4 +85,11 @@ public class LttngEventReference extends TmfEventReference {
     	return tracename;
     }
     
+	@Override
+	public LttngEventReference clone() {
+		LttngEventReference clone = (LttngEventReference) super.clone();
+		clone.fReference = new String((String) fReference);
+		clone.tracename  = new String((String) tracename);
+		return clone;
+	}
 }

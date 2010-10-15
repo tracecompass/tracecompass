@@ -62,4 +62,11 @@ public class LttngEventSource extends TmfEventSource {
 	public String toString() {
         return fSourceId.toString();
     }
+
+	@Override
+	public LttngEventSource clone() {
+		LttngEventSource clone = (LttngEventSource) super.clone();
+		clone.fSourceId = new String((String) fSourceId);
+		return clone;
+	}
 }

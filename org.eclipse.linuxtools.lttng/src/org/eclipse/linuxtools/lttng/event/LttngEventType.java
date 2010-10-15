@@ -84,4 +84,14 @@ public class LttngEventType extends TmfEventType {
         //  ...but maybe we should?
         return tracefileName + "/" + cpuId.toString() + "/" + markerName;
     }
+
+    @Override
+	public LttngEventType clone() {
+    	LttngEventType clone = (LttngEventType) super.clone();
+		clone.tracefileName = new String(tracefileName);
+		clone.cpuId         = new Long(cpuId);
+		clone.markerName    = new String(markerName);
+    	return clone;
+    }
+
 }

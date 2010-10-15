@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.request;
 
+import java.util.concurrent.CountDownLatch;
+
 import org.eclipse.linuxtools.tmf.Tracer;
 import org.eclipse.linuxtools.tmf.event.TmfData;
 
@@ -92,7 +94,8 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     private final int      		fNbRequested;	// The number of requested events (ALL_DATA for all)
     private       int      		fNbRead;        // The number of reads so far
 
-    private final   Object lock;
+    private CountDownLatch startedLatch   = new CountDownLatch(1);
+    private CountDownLatch completedLatch = new CountDownLatch(1);
     private boolean fRequestRunning   = false;
     private boolean fRequestCompleted = false;
     private boolean fRequestFailed    = false;
@@ -164,7 +167,6 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     	fNbRequested = nbRequested;
     	fExecType    = execType;
     	fNbRead      = 0;
-        lock         = new Object();
         if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "created");
     }
 
@@ -325,11 +327,9 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * @throws InterruptedException 
      */
     public void waitForStart() throws InterruptedException {
-        synchronized (lock) {
-            while (!fRequestRunning) {
-            	lock.wait();
-            }
-        }
+		while (!fRequestRunning) {
+			startedLatch.await();
+		}
     }
 
     /**
@@ -339,11 +339,9 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * @throws InterruptedException 
      */
     public void waitForCompletion() throws InterruptedException {
-        synchronized (lock) {
-            while (!fRequestCompleted) {
-            	lock.wait();
-            }
-        }
+		while (!fRequestCompleted) {
+			completedLatch.await();
+		}
     }
 
     /**
@@ -351,11 +349,11 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      */
     public void start() {
         if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "starting");
-        synchronized(lock) {
+        synchronized(this) {
             fRequestRunning = true;
-            lock.notifyAll();
         }
         handleStarted();
+        startedLatch.countDown();
         if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "started");
     }
 
@@ -364,34 +362,30 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      */
     public void done() {
         if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "completing");
-        synchronized(lock) {
+        synchronized(this) {
         	if (!fRequestCompleted) {
             	fRequestRunning   = false;
                 fRequestCompleted = true;
             }
-            handleCompleted();
-            lock.notifyAll();
         }
+		handleCompleted();
+		completedLatch.countDown();
     }
 
     /**
      * Called by the request processor upon failure.
      */
-    public void fail() {
-        synchronized(lock) {
-            fRequestFailed = true;
-            done();
-        }
+    public synchronized void fail() {
+        fRequestFailed = true;
+        done();
     }
 
     /**
      * Called by the request processor upon cancellation.
      */
-    public void cancel() {
-        synchronized(lock) {
-            fRequestCanceled = true;
-            done();
-        }
+    public synchronized void cancel() {
+		fRequestCanceled = true;
+		done();
     }
 
     // ------------------------------------------------------------------------
@@ -417,7 +411,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
 
     @Override
     public String toString() {
-		return "[TmfDataRequest(" + fRequestId + "," + fDataType.getSimpleName() 
-			+ "," + fIndex + "," + fNbRequested + ")]";
+		return "[TmfDataRequest(" + fRequestId + "," + fDataType.getSimpleName() + 
+			"," + fIndex + "," + fNbRequested + ")]";
     }
 }

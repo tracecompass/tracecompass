@@ -46,8 +46,6 @@ import org.eclipse.swt.widgets.TableItem;
  */
 public class TmfEventsTable extends TmfComponent {
 
-//    private Shell fShell;
-    
     // ------------------------------------------------------------------------
     // Table data
     // ------------------------------------------------------------------------

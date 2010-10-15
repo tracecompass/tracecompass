@@ -19,15 +19,15 @@ package org.eclipse.linuxtools.tmf.event;
  * 
  * TODO: Add support for field hierarchy.
  */
-public class TmfEventField {
+public class TmfEventField implements Cloneable {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-	private final TmfEventContent fParent;
-    private final String fFieldId;
-    private       Object fValue;
+	protected TmfEventContent fParent;
+	protected String fFieldId;
+	protected Object fValue;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -119,5 +119,19 @@ public class TmfEventField {
 	public String toString() {
         return "[TmfEventField(" + fFieldId + ":" + fValue.toString() + ")]";
     }
+    @Override
+	public TmfEventField clone() {
+    	TmfEventField clone = null;
+    	try {
+			clone = (TmfEventField) super.clone();
+			clone.fParent = fParent;
+			clone.fFieldId = new String(fFieldId);
+			clone.fValue = null;			
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return clone;
+    }
+
 
 }

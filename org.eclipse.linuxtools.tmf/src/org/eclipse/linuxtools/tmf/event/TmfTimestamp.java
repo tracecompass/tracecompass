@@ -13,7 +13,6 @@
 
 package org.eclipse.linuxtools.tmf.event;
 
-
 /**
  * <b><u>TmfTimestamp</u></b>
  * <p>

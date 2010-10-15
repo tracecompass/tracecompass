@@ -42,7 +42,7 @@ public class LTTngExperimentTest extends TestCase {
     private static int          NB_EVENTS   = 15316;
 
     // Note: Start/end times are for the LTTng *trace*, not the actual events
-    private static final TmfTimestamp  fStartTime = new TmfTimestamp(13589692331524L, (byte) -9);
+    private static final TmfTimestamp  fStartTime = new TmfTimestamp(13589759412128L, (byte) -9);
     private static final TmfTimestamp  fEndTime   = new TmfTimestamp(13589907059242L, (byte) -9);
 
     private static ITmfTrace[] fTraces;

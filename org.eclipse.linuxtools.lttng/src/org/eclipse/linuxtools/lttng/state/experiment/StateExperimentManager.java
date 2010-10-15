@@ -53,6 +53,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 	 * building
 	 */
 	private final Map<ITmfTrace, IStateTraceManager> ftraceToManagerMap = new HashMap<ITmfTrace, IStateTraceManager>();
+	private final Map<ITmfTrace, Long> ftraceEventsReadMap = new HashMap<ITmfTrace, Long>();
 	private LttngSyntheticEvent syntheticEvent = null;
 	private ITmfEventRequest<LttngEvent> fStateCheckPointRequest = null;
 
@@ -62,8 +63,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 	// =======================================================================
 	public StateExperimentManager(Long id, String name) {
 		super(id, null, name, null);
-		fexperimentListener = new StateExperimentListener("Experiment Manager",
-				this);
+		fexperimentListener = new StateExperimentListener("Experiment Manager", this);
 	}
 
 
@@ -280,6 +280,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 		LTTngTreeNode[] traceNodes = experimentNode.getChildren();
 		synchronized (this) {
 			ftraceToManagerMap.clear();
+			ftraceEventsReadMap.clear();
 		}
 		
 		ITmfTrace trace;
@@ -300,6 +301,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			trace = traceManager.getTrace();
 			synchronized (this) {
 				ftraceToManagerMap.put(trace, traceManager);
+				ftraceEventsReadMap.put(trace, new Long(0));
 			}
 		}
 		
@@ -314,8 +316,8 @@ public class StateExperimentManager extends LTTngTreeNode implements
 				LttngEvent.class, TmfTimeRange.Eternity,
 				TmfDataRequest.ALL_DATA, 1, ITmfDataRequest.ExecutionType.BACKGROUND) {
 		
-			Long nbEvents = 0L;
-		
+			long nbEventsHandled = 0;
+			
 			/*
 			 * (non-Javadoc)
 			 * 
@@ -327,12 +329,14 @@ public class StateExperimentManager extends LTTngTreeNode implements
 				super.handleData(event);
 				if (event != null) {
 //					Tracer.trace("Chk: " + event.getTimestamp());
+					nbEventsHandled++;
 					ITmfTrace trace = event.getParentTrace();
 					IStateTraceManager traceManager = ftraceToManagerMap.get(trace);
+					long nbEvents = ftraceEventsReadMap.get(trace) + 1;
+					ftraceEventsReadMap.put(trace, nbEvents);
 					if (traceManager != null) {
 						// obtain synthetic event
-						LttngSyntheticEvent synEvent = updateSynEvent(event,
-								traceManager);
+						LttngSyntheticEvent synEvent = updateSynEvent(event, traceManager);
 						// update state system, and save check points as needed
 						traceManager.handleEvent(synEvent, nbEvents);
 					} else {
@@ -381,7 +385,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			 */
 			private void printCompletedMessage() {
 				if (TraceDebug.isDEBUG()) {
-					TraceDebug.debug("Trace check point building completed, number of events handled: " + nbEvents
+					TraceDebug.debug("Trace check point building completed, number of events handled: " + nbEventsHandled
 							+ "\n\t\t");
 					for (IStateTraceManager traceMgr : ftraceToManagerMap.values()) {
 						TraceDebug.debug(traceMgr.toString() + "\n\t\t");

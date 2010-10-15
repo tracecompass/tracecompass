@@ -537,7 +537,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 			// Add new entry at proper location (if empty) 
 			if (fCheckpoints.size() == position) {
 				ITmfLocation<?> location = context.getLocation().clone();
-				fCheckpoints.add(new TmfCheckpoint(timestamp, location));
+				fCheckpoints.add(new TmfCheckpoint(timestamp.clone(), location));
 //				System.out.println(this + "[" + (fCheckpoints.size() - 1) + "] " + timestamp + ", " + location.toString());
 			}
 		}

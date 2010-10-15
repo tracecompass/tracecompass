@@ -13,14 +13,13 @@
 package org.eclipse.linuxtools.tmf.event;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <b><u>TmfEventType</u></b>
  * <p>
  * The event type.
  */
-public class TmfEventType {
+public class TmfEventType implements Cloneable {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -33,10 +32,10 @@ public class TmfEventType {
     // Attributes
     // ------------------------------------------------------------------------
 
-	private final String   fTypeId;
-	private final String[] fFieldLabels;
-	private final int      fNbFields;
-	private final Map<String, Integer> fFieldMap;
+	private String   fTypeId;
+	private String[] fFieldLabels;
+	private int      fNbFields;
+	private HashMap<String, Integer> fFieldMap;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -144,4 +143,27 @@ public class TmfEventType {
     	return "[TmfEventType:" + fTypeId + "]";
     }
 
+	@Override
+	public TmfEventType clone() {
+		TmfEventType clone = null;
+		try {
+			clone = (TmfEventType) super.clone();
+			clone.fTypeId = new String(fTypeId);
+			clone.fNbFields = fNbFields;
+			// Clone the field labels
+			clone.fFieldLabels = new String[fFieldLabels.length];
+			for (int i = 0; i < fFieldLabels.length; i++) {
+				clone.fFieldLabels[i] = new String(fFieldLabels[i]);
+			}
+			// Clone the fields
+			clone.fFieldMap = new HashMap<String, Integer>();
+			for (String key : fFieldMap.keySet()) {
+				clone.fFieldMap.put(new String(key), new Integer(fFieldMap.get(key)));
+			}
+		}
+		catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return clone;
+	}
 }

@@ -1,3 +1,10 @@
+2010-10-15  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramCanvas.java (asynchronousNotifyParentUpdatedInformation): Fixed typo
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramCanvasControlListener.java (controlMoved): Check for NPE
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramView.java: Cosmetic adjustemnts
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/TimeTextGroup.java: Cosmetic adjustemnts
+
 2010-10-13  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/ui/views/controlflow/ControlFlowView.java: Added checks for disposed widget  

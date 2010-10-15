@@ -17,7 +17,7 @@ package org.eclipse.linuxtools.tmf.event;
  * <p>
  * The event source.
  */
-public class TmfEventSource {
+public class TmfEventSource implements Cloneable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -87,4 +87,16 @@ public class TmfEventSource {
         return "[TmfEventSource(" + ((fSourceId != null) ? fSourceId.toString() : "null") + ")]";
     }
 
+	@Override
+	public TmfEventSource clone() {
+		TmfEventSource clone = null;
+		try {
+			clone = (TmfEventSource) super.clone();
+			clone.fSourceId = null;
+		}
+		catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return clone;
+	}
 }

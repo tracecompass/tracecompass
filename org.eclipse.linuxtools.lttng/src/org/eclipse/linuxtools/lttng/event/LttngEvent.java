@@ -182,6 +182,11 @@ public class LttngEvent extends TmfEvent {
     
     @Override
 	public LttngEvent clone() {
-    	return new LttngEvent(this);
+    	LttngEvent clone = (LttngEvent) super.clone();
+    	clone.getContent().setEvent(clone);
+		clone.parentTrace = parentTrace;
+		clone.jniEventReference = jniEventReference;
+    	return clone;
     }
+
 }

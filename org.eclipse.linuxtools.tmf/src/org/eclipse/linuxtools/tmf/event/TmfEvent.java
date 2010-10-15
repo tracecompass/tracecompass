@@ -192,7 +192,21 @@ public class TmfEvent extends TmfData implements Cloneable {
 
 	@Override
 	public TmfEvent clone() {
-		return new TmfEvent(this);
+		TmfEvent clone = null;
+		try {
+			clone = (TmfEvent) super.clone();
+			clone.fOriginalTimestamp  = fOriginalTimestamp.clone();
+			clone.fEffectiveTimestamp = fEffectiveTimestamp.clone();
+			clone.fSource             = fSource.clone();
+			clone.fType               = fType.clone();
+			clone.fReference          = fReference.clone();
+			clone.fContent            = fContent.clone();
+		}
+		catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+
+		return clone;
 	}
 
 }

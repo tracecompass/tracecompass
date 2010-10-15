@@ -17,7 +17,7 @@ package org.eclipse.linuxtools.tmf.event;
  * <p>
  * An application-defined event reference.
  */
-public class TmfEventReference {
+public class TmfEventReference implements Cloneable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -87,4 +87,16 @@ public class TmfEventReference {
         return fReference.equals(o.fReference);
     }
 
+	@Override
+	public TmfEventReference clone() {
+		TmfEventReference clone = null;
+		try {
+			clone = (TmfEventReference) super.clone();
+			clone.fReference = null;
+		}
+		catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return clone;
+	}
 }

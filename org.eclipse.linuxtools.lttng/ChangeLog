@@ -1,3 +1,18 @@
+2010-10-15  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/event/LttngEvent.java: Implement cloning
+	* src/org/eclipse/linuxtools/lttng/event/LttngEventContent.java: Implement cloning 
+	* src/org/eclipse/linuxtools/lttng/event/LttngEventField.java: Implement cloning
+	* src/org/eclipse/linuxtools/lttng/event/LttngEventReference.java (clone): Implement cloning
+	* src/org/eclipse/linuxtools/lttng/event/LttngEventSource.java (clone): Implement cloning
+	* src/org/eclipse/linuxtools/lttng/event/LttngEventType.java (clone): Implement cloning
+	* src/org/eclipse/linuxtools/lttng/event/LttngTimestamp.java (clone): Implement cloning
+	* src/org/eclipse/linuxtools/lttng/state/experiment/StateExperimentManager.java: (StateExperimentManager): Counter fix 
+	(buildCheckPoints):  Proper timestamp cloning
+	(.handleData): Per-trace event counter (bug...)
+	* src/org/eclipse/linuxtools/lttng/trace/LTTngTrace.java (currentLttngEvent): Make the event unique (single)
+	(LTTngTrace): Fix the trace time range to start at first event
+
 2010-10-14  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/control/LttngSyntheticEventProvider.java: Handle processing through a coalesced request

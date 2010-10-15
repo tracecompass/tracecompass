@@ -57,7 +57,15 @@ public class LttngEventField extends TmfEventField {
 	
 	@Override
 	public String toString() {
-	    return getId().toString() + ":" + getValue().toString();
+		Object value = getValue();
+	    return getId() + ":" + ((value != null) ? value.toString() : "null");
+	}
+	
+	@Override
+	public LttngEventField clone() {
+		LttngEventField clone = (LttngEventField) super.clone();
+		clone.fValue = fValue;
+		return clone;
 	}
 	
 }

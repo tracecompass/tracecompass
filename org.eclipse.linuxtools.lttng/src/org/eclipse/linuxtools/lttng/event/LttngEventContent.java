@@ -260,6 +260,21 @@ public class LttngEventContent extends TmfEventContent {
         }
         
         return strBuffer.toString();
-        
     }
+
+	@Override
+	public LttngEventContent clone() {
+		LttngEventContent clone = (LttngEventContent) super.clone();
+		LttngEventField[] fields = getFields();
+		clone.fFields = new LttngEventField[fields.length];
+		for (int i = 0; i < fields.length; i++) {
+			clone.fFields[i] = fields[i].clone();
+		}
+		clone.fFieldsMap = new HashMap<String, LttngEventField>();
+		for (String key : fFieldsMap.keySet()) {
+			clone.fFieldsMap.put(new String(key), ((LttngEventField) fFieldsMap.get(key)).clone());
+		}
+		return clone;
+	}
+
 }

@@ -49,7 +49,7 @@ import org.eclipse.swt.widgets.Text;
  * View that contain an visual approach to the window that control the request.
  * This is intended to replace the TimeFrameView
  * <p>
- * This view is composed of 2 canvas, one for the whole experiment and one for the selectionned window in the experiment.
+ * This view is composed of 2 canvas, one for the whole experiment and one for the selected window in the experiment.
  * It also contain a certain number of controls to print or change informations about the experiment.
  */
 public class HistogramView extends TmfView implements ControlListener {
@@ -143,16 +143,19 @@ public class HistogramView extends TmfView implements ControlListener {
 	private Text  txtWindowMinNbEvents = null;
     
 	// We move the time label to header from TimeTextGroup.java
-	protected static final String NANOSEC_LABEL = "(sec)";
-	private static final String WINDOW_TIMERANGE_LABEL_TEXT 	= "Window Timerange, " + NANOSEC_LABEL;
-	private static final String WINDOW_CURRENT_TIME_LABEL_TEXT 	= "Cursor Centered on, " + NANOSEC_LABEL;
-	private static final String EVENT_CURRENT_TIME_LABEL_TEXT 	= "Current Event Time, " + NANOSEC_LABEL;
-	private TimeTextGroup  ntgTimeRangeWindow = null;
-	private TimeTextGroup  ntgCurrentWindowTime = null;
+//	protected static final String NANOSEC_LABEL = "(sec)";
+//	private static final String WINDOW_TIMERANGE_LABEL_TEXT 	= "Window Timerange, " + NANOSEC_LABEL;
+//	private static final String WINDOW_CURRENT_TIME_LABEL_TEXT 	= "Cursor Centered on, " + NANOSEC_LABEL;
+//	private static final String EVENT_CURRENT_TIME_LABEL_TEXT 	= "Current Event Time, " + NANOSEC_LABEL;
+	private static final String WINDOW_TIMESPAN_LABEL_TEXT 	    = "Window Span (sec)";
+	private static final String WINDOW_CENTER_TIME_LABEL_TEXT 	= "Window Center (sec)";
+	private static final String CURRENT_EVENT_TIME_LABEL_TEXT 	= "Current Event (sec)";
+	private TimeTextGroup  ntgWindowTimeSpan = null;
+	private TimeTextGroup  ntgWindowCenterTime = null;
 	private TimeTextGroup  ntgCurrentEventTime = null;
 	
 	/**
-	 * Default contructor of the view
+	 * Default constructor of the view
 	 */
 	public HistogramView() {
 		super(ID);
@@ -181,7 +184,7 @@ public class HistogramView extends TmfView implements ControlListener {
 		// Calculate if we need "small screen" fixes
 		if ( parent.getDisplay().getBounds().width < SCREEN_SMALL_IF_SMALLER_THAN ) {
 			
-			// A lot smaller font for timstampe
+			// A lot smaller font for timestamp
 			smallFont = new Font(font.getDevice(), tmpFontData.getName(), tmpFontData.getHeight() - VERY_SMALL_FONT_MODIFIER, tmpFontData.getStyle());
 			
 /*			
@@ -229,38 +232,41 @@ public class HistogramView extends TmfView implements ControlListener {
 
 		
 		/////////////////////////////////////////////////////////////////////////////////////
-		// Layout that contain the time spinner
+		// Layout that contain the time spinners
 		// Contains : 
-		// 		NanosecTextGroup  spTimeRangeWindow
-		// 		NanosecTextGroup  spCurrentWindowTime
-		// 		NanosecTextGroup  spCurrentEventTime
+		// 		NanosecTextGroup  ntgCurrentEventTime
+		// 		NanosecTextGroup  ntgTimeRangeWindow
+		// 		NanosecTextGroup  ntgCurrentWindowTime
 		/////////////////////////////////////////////////////////////////////////////////////
-		Composite layoutTimesSpinner = new Composite(layoutFullView, SWT.NONE);
+		Composite layoutTimeSpinners = new Composite(layoutFullView, SWT.NONE);
 		GridLayout gridTimesSpinner = new GridLayout();
 		gridTimesSpinner.numColumns = 3;
 		gridTimesSpinner.marginHeight = 0;
 		gridTimesSpinner.marginWidth = 0;
-		gridTimesSpinner.horizontalSpacing = 0;
+		gridTimesSpinner.horizontalSpacing = 5;
 		gridTimesSpinner.verticalSpacing = 0;
-		layoutTimesSpinner.setLayout(gridTimesSpinner);
+		gridTimesSpinner.makeColumnsEqualWidth = true;
+		gridTimesSpinner.marginLeft = 5;
+		gridTimesSpinner.marginRight = 5;
+		layoutTimeSpinners.setLayout(gridTimesSpinner);
 		
 		GridData gridDataCurrentEvent = new GridData();
 		gridDataCurrentEvent.horizontalAlignment = SWT.LEFT;
 		gridDataCurrentEvent.verticalAlignment = SWT.CENTER;
-		ntgCurrentEventTime = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, EVENT_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ), doesTimeTextGroupNeedAdjustment);
+		ntgCurrentEventTime = new TimeTextGroup(this, layoutTimeSpinners, SWT.BORDER, SWT.BORDER, CURRENT_EVENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime(0L), doesTimeTextGroupNeedAdjustment);
 		ntgCurrentEventTime.setLayoutData(gridDataCurrentEvent);		
 		
-		GridData gridDataTimeRange = new GridData();
-		gridDataCurrentEvent.horizontalAlignment = SWT.CENTER;
-		gridDataCurrentEvent.verticalAlignment = SWT.CENTER;
-		ntgTimeRangeWindow = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_TIMERANGE_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ), doesTimeTextGroupNeedAdjustment);
-		ntgTimeRangeWindow.setLayoutData(gridDataTimeRange);
+		GridData gridDataTimeSpan = new GridData();
+		gridDataTimeSpan.horizontalAlignment = SWT.CENTER;
+		gridDataTimeSpan.verticalAlignment = SWT.CENTER;
+		ntgWindowTimeSpan = new TimeTextGroup(this, layoutTimeSpinners, SWT.BORDER, SWT.BORDER, WINDOW_TIMESPAN_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime(0L), doesTimeTextGroupNeedAdjustment);
+		ntgWindowTimeSpan.setLayoutData(gridDataTimeSpan);
 		 		
-		GridData gridDataCurrentWindow = new GridData();
-		gridDataCurrentEvent.horizontalAlignment = SWT.RIGHT;
-		gridDataCurrentEvent.verticalAlignment = SWT.CENTER;	
-		ntgCurrentWindowTime = new TimeTextGroup(this, layoutTimesSpinner, SWT.BORDER, SWT.BORDER, WINDOW_CURRENT_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime( 0L ), doesTimeTextGroupNeedAdjustment);
-		ntgCurrentWindowTime.setLayoutData(gridDataCurrentWindow);
+		GridData gridDataWindowCenter = new GridData();
+		gridDataWindowCenter.horizontalAlignment = SWT.RIGHT;
+		gridDataWindowCenter.verticalAlignment = SWT.CENTER;	
+		ntgWindowCenterTime = new TimeTextGroup(this, layoutTimeSpinners, SWT.BORDER, SWT.BORDER, WINDOW_CENTER_TIME_LABEL_TEXT, HistogramConstant.formatNanoSecondsTime(0L), doesTimeTextGroupNeedAdjustment);
+		ntgWindowCenterTime.setLayoutData(gridDataWindowCenter);
 		
 		
 		/////////////////////////////////////////////////////////////////////////////////////
@@ -276,7 +282,8 @@ public class HistogramView extends TmfView implements ControlListener {
 		GridLayout gridSelectionWindow = new GridLayout();
 		gridSelectionWindow.numColumns = 3;
 		gridSelectionWindow.marginHeight = 0;
-		gridSelectionWindow.marginWidth = 0;
+		gridSelectionWindow.marginWidth = 2;
+		gridSelectionWindow.marginTop = 5;
 		gridSelectionWindow.horizontalSpacing = 0;
 		gridSelectionWindow.verticalSpacing = 0;
 		layoutSelectionWindow.setLayout(gridSelectionWindow);
@@ -409,6 +416,8 @@ public class HistogramView extends TmfView implements ControlListener {
 		gridExperimentHistogram.marginWidth = 0;
 		gridExperimentHistogram.horizontalSpacing = 0;
 		gridExperimentHistogram.verticalSpacing = 0;
+		gridExperimentHistogram.marginLeft = 5;
+		gridExperimentHistogram.marginRight = 5;
 		layoutExperimentHistogram.setLayout(gridExperimentHistogram);
 		
 /*
@@ -518,7 +527,7 @@ public class HistogramView extends TmfView implements ControlListener {
 */
     
     /**
-     * Method called when synchonization is active and that the user select an event.<p>
+     * Method called when synchronization is active and that the user select an event.
      * We update the current event timeTextGroup and move the selected window if needed.
      * 
      * @param signal	Signal received from the framework. Contain the event.
@@ -715,8 +724,7 @@ public class HistogramView extends TmfView implements ControlListener {
 	        // Set a (dynamic) time interval
 	        long intervalTime = ( (ts2.getValue() - ts1.getValue()) / selectedWindowCanvas.getHistogramContent().getNbElement() );
 	        
-			selectedWindowRequest = performRequest(experiment, selectedWindowCanvas, tmpRange, intervalTime,
-					ExecutionType.FOREGROUND);
+			selectedWindowRequest = performRequest(experiment, selectedWindowCanvas, tmpRange, intervalTime, ExecutionType.FOREGROUND);
 	        selectedWindowCanvas.redrawAsynchronously();
     	}
     	
@@ -801,7 +809,7 @@ public class HistogramView extends TmfView implements ControlListener {
     	
     	if ( lastUsedExperiment != null ) {
     		// If a request is ongoing, try to stop it
-    		if ( selectedWindowRequest != null && selectedWindowRequest.isCompleted() == false ) {
+    		if (selectedWindowRequest != null && !selectedWindowRequest.isCompleted()) {
     			selectedWindowRequest.cancel();
     		}
     		
@@ -893,9 +901,9 @@ public class HistogramView extends TmfView implements ControlListener {
 	    	}
      	}
     	
-    	if(ntgCurrentWindowTime != null && fullExperimentCanvas != null) {
+    	if(ntgWindowCenterTime != null && fullExperimentCanvas != null) {
 	    	// If the user changed the selected window time, recenter the window and call the notification
-	    	long newSelectedWindowTime = ntgCurrentWindowTime.getValue();
+	    	long newSelectedWindowTime = ntgWindowCenterTime.getValue();
 	    	if ( newSelectedWindowTime != fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition() ) {
 	    		fullExperimentCanvas.setWindowCenterPosition(newSelectedWindowTime);	
 	    		windowChangedNotification();
@@ -904,9 +912,9 @@ public class HistogramView extends TmfView implements ControlListener {
 	    	}
     	}
     	
-    	if(ntgTimeRangeWindow != null && fullExperimentCanvas != null) {
+    	if(ntgWindowTimeSpan != null && fullExperimentCanvas != null) {
 	    	// If the user changed the selected window size, resize the window and call the notification
-	    	long newSelectedWindowTimeRange = ntgTimeRangeWindow.getValue();
+	    	long newSelectedWindowTimeRange = ntgWindowTimeSpan.getValue();
 	    	if ( newSelectedWindowTimeRange != fullExperimentCanvas.getCurrentWindow().getWindowTimeWidth() ) {
 	    		fullExperimentCanvas.resizeWindowByAbsoluteTime(newSelectedWindowTimeRange);
 	    		windowChangedNotification();
@@ -978,8 +986,8 @@ public class HistogramView extends TmfView implements ControlListener {
 		txtWindowStopTime.setText( HistogramConstant.formatNanoSecondsTime( 0L ) );
 		txtWindowStartTime.getParent().layout();
 		
-		ntgCurrentWindowTime.setValue( HistogramConstant.formatNanoSecondsTime( 0L ) );
-		ntgTimeRangeWindow.setValue( HistogramConstant.formatNanoSecondsTime( 0L ) );
+		ntgWindowCenterTime.setValue( HistogramConstant.formatNanoSecondsTime( 0L ) );
+		ntgWindowTimeSpan.setValue( HistogramConstant.formatNanoSecondsTime( 0L ) );
 		
 		// Using "startTime" here can avoid an useless TmfTimeSynchSignal here
 		// However it look ugly to have only this time
@@ -1040,8 +1048,8 @@ public class HistogramView extends TmfView implements ControlListener {
 		}
 		
 		if(fullExperimentCanvas != null) {
-			ntgCurrentWindowTime.setValue( fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition() );
-			ntgTimeRangeWindow.setValue(  fullExperimentCanvas.getCurrentWindow().getWindowTimeWidth() );
+			ntgWindowCenterTime.setValue( fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition() );
+			ntgWindowTimeSpan.setValue(  fullExperimentCanvas.getCurrentWindow().getWindowTimeWidth() );
 			
 			// If the current event time is outside the selection window, recenter our window 
 			if ( isGivenTimestampInSelectedWindow(ntgCurrentEventTime.getValue()) == false ) {
@@ -1052,7 +1060,7 @@ public class HistogramView extends TmfView implements ControlListener {
 		// Take one control in each group to call to refresh the layout
 		// Since both control have the same parent, only one call is needed 
 		txtWindowStartTime.getParent().layout();
-		ntgCurrentWindowTime.getParent().layout();
+		ntgWindowCenterTime.getParent().layout();
 	}
 	
 	/**
@@ -1061,6 +1069,7 @@ public class HistogramView extends TmfView implements ControlListener {
 	 */
 	public void updateSelectedEventTime() {
     	ntgCurrentEventTime.setValueAsynchronously(currentEventTime);
+//    	sendTmfTimeSynchSignalBroadcast();
     	// Tell the selection canvas which event is currently selected
     	// This give a nice graphic output
     	selectedWindowCanvas.getHistogramContent().setSelectedEventTimeInWindow(currentEventTime);
@@ -1072,7 +1081,7 @@ public class HistogramView extends TmfView implements ControlListener {
 	 * 
 	 * Just redraw everything...
 	 * 
-	 * @param event 	The controle event generated by the move.
+	 * @param event 	The control event generated by the move.
 	 */
 	public void controlMoved(ControlEvent event) {
 		parent.redraw();

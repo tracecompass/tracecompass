@@ -48,7 +48,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
 	private static final int SMALL_FONT_MODIFIER = 1;
     
     // Indentation size 
-	private static final int DEFAULT_INDENT_SIZE = 10;
+//	private static final int DEFAULT_INDENT_SIZE = 10;
     
 	private HistogramView parentView = null;
 	private AsyncTimeTextGroupRedrawer asyncRedrawer = null;
@@ -99,14 +99,14 @@ public class TimeTextGroup implements FocusListener, KeyListener {
     }
     
     /**
-     * Default Constructor with adjustement for small screen, allow you to give the groupname and the textbox value.<p>
-     * 
+     * Default Constructor with adjustment for small screen, allow you to give the group name and the text box value.<p>
+     *  
      * @param newParentView		Parent HistogramView
      * @param parent			Parent Composite, used to position the inner controls.
-     * @param textStyle			Style of the textbox. Usually SWT.BORDER or SWT.NONE (or anything that suit a Text)
+     * @param textStyle			Style of the text box. Usually SWT.BORDER or SWT.NONE (or anything that suit a Text)
      * @param groupStyle		Style of the group.   Anything that suite a Text
      * @param groupValue		Value (label) of the group. 
-     * @param textValue         Value of the textbox.
+     * @param textValue         Value of the text box.
      * @param isSpaceSaverNeeded Value that tell if we try to save some space in the control.
      */
     public TimeTextGroup(HistogramView newParentView, Composite parent, int textStyle, int groupStyle, String groupValue, String textValue, boolean isSpaceSaverNeeded) {
@@ -115,7 +115,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
 		
 		Font smallFont = null;
 		int textBoxSize = -1;
-		int indentSize = -1;
+//		int indentSize = -1;
 		
 		// If we were asked to save size, calculate the correct value here
 		if ( isSpaceSaverNeeded == true ) {
@@ -123,7 +123,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
 			
 			// No minimum textBoxSize and no indent size
 			textBoxSize = 0;
-	        indentSize = 0;
+//	        indentSize = 0;
 		}
 		else {
 			// We use only a slightly smaller font
@@ -135,13 +135,14 @@ public class TimeTextGroup implements FocusListener, KeyListener {
 	        textBoxSize = HistogramConstant.getTextSizeInControl(parent, LONGEST_STRING_VALUE);
 			
 	        // Default indent
-	        indentSize = DEFAULT_INDENT_SIZE;
+//	        indentSize = DEFAULT_INDENT_SIZE;
 		}
 			
 		parentView = newParentView;
 		
 		// ** Creation of the group
-		GridLayout gridLayoutgroup = new GridLayout(2, false);
+//		GridLayout gridLayoutgroup = new GridLayout(2, false);
+		GridLayout gridLayoutgroup = new GridLayout(1, false);
 		gridLayoutgroup.horizontalSpacing = 0;
 		gridLayoutgroup.verticalSpacing = 0;
         grpName = new Group(parent, groupStyle);
@@ -151,10 +152,10 @@ public class TimeTextGroup implements FocusListener, KeyListener {
         
         txtNanosec = new Text(grpName, textStyle);
         txtNanosec.setTextLimit( MAX_CHAR_IN_TEXTBOX );
-        txtNanosec.setText( textValue );
+        txtNanosec.setText(textValue);
         txtNanosec.setFont(smallFont);
         GridData gridDataTextBox = new GridData(SWT.LEFT, SWT.CENTER, true, false);
-        gridDataTextBox.horizontalIndent = indentSize;
+        gridDataTextBox.horizontalIndent = 0; // indentSize;
         gridDataTextBox.verticalIndent = 0;
         gridDataTextBox.minimumWidth = textBoxSize;
         txtNanosec.setLayoutData(gridDataTextBox);
@@ -435,17 +436,15 @@ class AsyncTimeTextGroupRedrawer {
 	 * 
 	 * @param newTime 	The new time to set
 	 */
-	public void asynchronousSetValue(long newTime) {
+	public void asynchronousSetValue(final long newTime) {
 		// Ignore setting of value if widget is disposed
 		if (parentTimeTextGroup.getParent().isDisposed()) return;
-		
-		final long tmpTime = newTime;
 		
 		Display display =  parentTimeTextGroup.getParent().getDisplay();
 		display.asyncExec(new Runnable() {
 			public void run() {
 				if (!parentTimeTextGroup.getParent().isDisposed()) {
-					parentTimeTextGroup.setValue(tmpTime);
+					parentTimeTextGroup.setValue(newTime);
 				}
 			}
 		});

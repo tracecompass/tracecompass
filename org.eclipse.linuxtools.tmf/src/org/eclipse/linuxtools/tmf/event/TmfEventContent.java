@@ -12,13 +12,12 @@
 
 package org.eclipse.linuxtools.tmf.event;
 
-
 /**
  * <b><u>TmfEventContent</u></b>
  * <p>
  * The event content.
  */
-public class TmfEventContent {
+public class TmfEventContent implements Cloneable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -173,4 +172,18 @@ public class TmfEventContent {
     	return result.toString();
     }
 
+	@Override
+	public TmfEventContent clone() {
+		TmfEventContent clone = null;
+		try {
+			clone = (TmfEventContent) super.clone();
+			clone.fParentEvent = fParentEvent;
+			clone.fRawContent = null;
+			clone.fFields = null;
+		}
+		catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return clone;
+	}
 }

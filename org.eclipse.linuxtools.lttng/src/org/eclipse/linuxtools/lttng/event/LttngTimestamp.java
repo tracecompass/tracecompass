@@ -158,4 +158,10 @@ public class LttngTimestamp extends TmfTimestamp {
 
         return result;
     }
+
+    @Override
+    public LttngTimestamp clone() {
+    	return (LttngTimestamp) super.clone();
+    }
+
 }

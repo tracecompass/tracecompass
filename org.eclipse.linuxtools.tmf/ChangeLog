@@ -1,3 +1,16 @@
+2010-10-15  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/event/TmfEvent.java: Implement cloning
+	* src/org/eclipse/linuxtools/tmf/event/TmfEventContent.java: Implement cloning
+	* src/org/eclipse/linuxtools/tmf/event/TmfEventField.java: Implement cloning
+	* src/org/eclipse/linuxtools/tmf/event/TmfEventReference.java: Implement cloning
+	* src/org/eclipse/linuxtools/tmf/event/TmfEventSource.java: Implement cloning
+	* src/org/eclipse/linuxtools/tmf/event/TmfEventType.java: Implement cloning
+	* src/org/eclipse/linuxtools/tmf/event/TmfTimestamp.java: Implement cloning
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java (updateIndex): Fixed timestamp cloning
+	* src/org/eclipse/linuxtools/tmf/request/TmfDataRequest.java: Replaced lock.wait() by CountDownLatch
+	* src/org/eclipse/linuxtools/tmf/trace/TmfTrace.java (updateIndex): Fixed timestamp cloning
+
 2010-10-13  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/tmf/request/TmfRequestExecutor.java: Added checks for disposed widget 
