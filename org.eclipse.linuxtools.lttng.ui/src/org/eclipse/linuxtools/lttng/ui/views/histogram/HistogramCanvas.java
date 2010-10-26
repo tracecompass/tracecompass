@@ -17,6 +17,7 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -57,7 +58,7 @@ public class HistogramCanvas extends Canvas
 	 * @param 				Style the style of control to construct
 	 */
 	public HistogramCanvas(HistogramView histogramView, Composite parent, int style) {
-		super(parent, style);
+		super(parent, style | SWT.DOUBLE_BUFFERED);
 		HistogramCanvas.histogramView = histogramView;
 		addNeededListeners();
 		

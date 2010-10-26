@@ -16,8 +16,10 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 
@@ -64,10 +66,11 @@ public class ParentHistogramCanvasPaintListener extends HistogramCanvasPaintList
 		final HistogramContent tmpContent = parentCanvas.getHistogramContent();
 		final int tmpBarWidth = tmpContent.getBarsWidth();
 		
-		imageGC.setBackground(parentCanvas.getDisplay().getSystemColor(HistogramConstant.HISTOGRAM_BARS_COLOR));
-		
 		// Calculate the closest power of 2 just smaller than the canvas size
 		final int closestPowerToCanvas = (int)Math.pow(2, Math.floor( Math.log( image.getBounds().width ) / Math.log(2.0) ));
+
+		// First clear the whole canvas to have a clean section where to draw
+		clearDrawingSection(imageGC, image, parentCanvas);
 		
 		// Make sure the canvas didn't change size, it which case we need to recalculate our heights
 		recalculateHeightIfCanvasSizeChanged();
@@ -83,6 +86,9 @@ public class ParentHistogramCanvasPaintListener extends HistogramCanvasPaintList
 		int posInPower = 0;
 		int widthFilled = 0;
 		
+		// This will be the color for all the bars that wil be draw below.
+		imageGC.setBackground( new Color( imageGC.getDevice(), 74, 112, 139) );
+
 		// Read from 0 up to the currently ready position
 		// We advance by "intervalDifference" as the bars migth not represent 1 interval only
 		int itemWidth = 0;
@@ -98,9 +104,8 @@ public class ParentHistogramCanvasPaintListener extends HistogramCanvasPaintList
 			// Ex : if power == 1024 and content == 2048, every (2048/1024)*bars_width will be concatenated 
 	    	thisElementHeight = 0;
 	    	for ( int concatPos=0; concatPos<intervalDifference; concatPos++) {
-	    		final int updatedPos = contentPos + concatPos;
 	    		// Make sure we don't cross the last element available.
-	    		if ( updatedPos < tmpContent.getReadyUpToPosition() ) {
+	    		if ( contentPos + concatPos < tmpContent.getReadyUpToPosition() ) {
 	    			thisElementHeight += tmpContent.getElementByIndex(contentPos + concatPos).intervalHeight;
 	    		}
 	    	}
@@ -108,11 +113,10 @@ public class ParentHistogramCanvasPaintListener extends HistogramCanvasPaintList
 	    	// *** NOTE *** 
 			// Y Position in a canvas is REVERSED, so "0" is on top of the screen and "MAX" is on bottom.
 			// Not very instinctive, isn't it?
-	    	
-	    	// Draw our rectangle 
+			// Draw our rectangle
     		imageGC.fillRectangle(
     				widthFilled,
-    				image.getBounds().height - thisElementHeight,
+    				(thisElementHeight > image.getBounds().height ? 0 : image.getBounds().height - thisElementHeight),
     				itemWidth,
     				thisElementHeight
     				);
@@ -167,39 +171,48 @@ public class ParentHistogramCanvasPaintListener extends HistogramCanvasPaintList
 			
 			// Creates new image only absolutely necessary.
 			if (image == null
-					|| image.getBounds().width != parentCanvas.getBounds().width
-					|| image.getBounds().height != parentCanvas.getBounds().height) {
+					|| image.getBounds().width != parentCanvas.getClientArea().width
+					|| image.getBounds().height != parentCanvas.getClientArea().height) {
 
 				image =	new Image(
 						event.display,
-						parentCanvas.getBounds().width,
-						parentCanvas.getBounds().height
+						parentCanvas.getClientArea().width,
+						parentCanvas.getClientArea().height
 						);
 
 				parentCanvas.setData("double-buffer-image", image);
+				isFinished = false;
 			}
 			
 			// Initializes the graphics context of the image. 
 	        GC imageGC = new GC(image);
 	        
-			// First clear the whole canvas to have a clean section where to draw
-			clearDrawingSection(imageGC, image, parentCanvas);
-	        
 			// If the content is null or has rady to draw we quit the function here
-			if ( (parentCanvas.getHistogramContent() != null) && (parentCanvas.getHistogramContent().getReadyUpToPosition() != 0) ) {
+			if ( (parentCanvas.getHistogramContent() != null)
+					&& (parentCanvas.getHistogramContent().getReadyUpToPosition() != 0)	) {
+				
 				// Call the function that draw the bars
-				drawHistogram(imageGC, image);
+				if (!isFinished) {
+					drawHistogram(imageGC, image);
+					isFinished = HistogramCanvas.getHistogramView().getDataBackgroundFullRequest().isCompleted();
+				}
+
+				Image img = new Image (image.getDevice(), image, SWT.IMAGE_COPY);
+				GC imgGC = new GC(img);
 				
 				// If we have a selected window set to visible, call the function to draw it
 				if ( (parentCanvas.getCurrentWindow() != null) && (parentCanvas.getCurrentWindow().getSelectedWindowVisible()) ) {
 					drawSelectedWindow(
-							imageGC,
-							image
+							imgGC,
+							img
 							);
 				}
 
 				// Draws the buffer image onto the canvas. 
-				event.gc.drawImage(image, 0, 0);
+				event.gc.drawImage(img, 0, 0);
+				
+				imgGC.dispose();
+				img.dispose();
 			}
 
 			imageGC.dispose();
@@ -222,23 +235,53 @@ public class ParentHistogramCanvasPaintListener extends HistogramCanvasPaintList
 		final int positionRight = parentCanvas.getCurrentWindow().getWindowXPositionRight();
 		
 		final int imageHeight = image.getBounds().height;
+		final int imageHalfHeight = image.getBounds().height / 2;
+		final int crosshairHalfWidth = HistogramConstant.SELECTION_CROSSHAIR_WIDTH / 2;
+		final int lineHalfWidth = HistogramConstant.SELECTION_LINE_WIDTH / 2;
+		
+		// Draw the crosshair
+		imageGC.setForeground( new Color (imageGC.getDevice(), 255, 128, 0) );
+		imageGC.setLineWidth(HistogramConstant.SELECTION_CROSSHAIR_WIDTH);
+		imageGC.setLineStyle(SWT.LINE_SOLID);
+		if(imageHeight > 40) {
+			imageGC.drawLine(
+					positionCenter - crosshairHalfWidth,
+					imageHalfHeight - 20,
+					positionCenter - crosshairHalfWidth,
+					imageHalfHeight + 20
+					);
+		}
+		if(positionRight - positionLeft > 40) {
+			imageGC.drawLine(
+					positionCenter - 20,
+					imageHalfHeight - crosshairHalfWidth,
+					positionCenter + 20,
+					imageHalfHeight - crosshairHalfWidth
+					);
+		}
 		
 		// Draw the selection window square
-		// Attributes (color and width) of the lines
-		imageGC.setForeground(parentCanvas.getDisplay().getSystemColor(HistogramConstant.SELECTION_WINDOW_COLOR));
 		imageGC.setLineWidth(HistogramConstant.SELECTION_LINE_WIDTH);
-		imageGC.drawLine(positionLeft , 0       	 , positionLeft , imageHeight);
-		imageGC.drawLine(positionLeft , imageHeight, positionRight, imageHeight);
-		imageGC.drawLine(positionRight, imageHeight, positionRight, 0);
-		imageGC.drawLine(positionLeft , 0       	 , positionRight, 0);	
+		imageGC.setLineStyle(SWT.LINE_SOLID);
+		imageGC.drawRoundRectangle(
+				positionLeft + lineHalfWidth,
+				lineHalfWidth,
+				(positionRight - positionLeft) - lineHalfWidth,
+				imageHeight - HistogramConstant.SELECTION_LINE_WIDTH,
+				15,
+				15
+				);
 
-		// Draw the crosshair section
-		imageGC.setBackground(parentCanvas.getDisplay().getSystemColor(HistogramConstant.SELECTION_WINDOW_COLOR));
-		imageGC.fillOval(
-				positionCenter,
-				imageHeight / 2,
-				HistogramConstant.SELECTION_CROSSHAIR_LENGTH,
-				HistogramConstant.SELECTION_CROSSHAIR_LENGTH
+		// Show the selection
+		imageGC.setBackground( new Color (imageGC.getDevice(), 255, 128, 0) );
+		imageGC.setAlpha(25);
+		imageGC.fillRoundRectangle(
+				positionLeft + 1,
+				lineHalfWidth + 1,
+				(positionRight - positionLeft) - lineHalfWidth - 1,
+				imageHeight - lineHalfWidth - 1,
+				15,
+				15
 				);
 	}
 	

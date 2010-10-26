@@ -1,3 +1,10 @@
+2010-10-26  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramCanvas.java: Double-buffering
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramCanvasPaintListener.java: Double-buffering 
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramConstant.java: Fixed a few constants for the selected window display
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/ParentHistogramCanvasPaintListener.java: Double-buffering
+
 2010-10-15  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramCanvas.java (asynchronousNotifyParentUpdatedInformation): Fixed typo

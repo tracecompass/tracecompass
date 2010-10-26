@@ -18,6 +18,7 @@ package org.eclipse.linuxtools.lttng.ui.views.histogram;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 
@@ -30,6 +31,7 @@ import org.eclipse.swt.graphics.Image;
 public class HistogramCanvasPaintListener implements PaintListener 
 {
 	private static ChildrenHistogramCanvas childrenCanvas = null;
+	protected boolean isFinished = false;
 	
 	/**
 	 * HistogramCanvasPaintListener default constructor
@@ -77,10 +79,13 @@ public class HistogramCanvasPaintListener implements PaintListener
 			clearDrawingSection(imageGC, image, childrenCanvas);
 	        
 			// If the content is null or has rady to draw we quit the function here
-			if ( (childrenCanvas.getHistogramContent() != null) && (childrenCanvas.getHistogramContent().getReadyUpToPosition() != 0) ) {
+			if ( (childrenCanvas.getHistogramContent() != null)
+					&& (childrenCanvas.getHistogramContent().getReadyUpToPosition() != 0) ) {
 				
 				// Call the function that draw the bars
-				drawHistogram(imageGC, image);
+//				if (!isFinished) {
+					drawHistogram(imageGC, image);
+//				}
 				
 				// Pinpoint a position if set
 				if (childrenCanvas.getHistogramContent().getSelectedEventTimeInWindow() > 0 ) {
@@ -104,10 +109,8 @@ public class HistogramCanvasPaintListener implements PaintListener
 	 * @param ourCanvas Canvas to clean.
 	 */
 	public void clearDrawingSection(GC imageGC, Image image, HistogramCanvas ourCanvas) {
-		imageGC.setBackground(ourCanvas.getDisplay().getSystemColor(HistogramConstant.EMPTY_BACKGROUND_COLOR));
-		imageGC.setForeground(ourCanvas.getDisplay().getSystemColor(HistogramConstant.EMPTY_BACKGROUND_COLOR));
-
 		// Fills background. 
+		imageGC.setBackground(ourCanvas.getDisplay().getSystemColor(HistogramConstant.EMPTY_BACKGROUND_COLOR));
         imageGC.fillRectangle(0, 0, image.getBounds().width + 1, image.getBounds().height + 1);		
 	}
 	
@@ -124,13 +127,13 @@ public class HistogramCanvasPaintListener implements PaintListener
 	 */
 	public synchronized void drawHistogram(GC imageGC, Image image) {
 		
-		// This will be the color for all the bars that wil be draw below.
-		imageGC.setBackground(childrenCanvas.getDisplay().getSystemColor(HistogramConstant.HISTOGRAM_BARS_COLOR));
+		// This will be the bottom color for all the bars that wil be draw below.
+		imageGC.setBackground( new Color( imageGC.getDevice(), 74, 112, 139) );
 		
 		// *** NOTE *** 
 		// Y Position in a canvas is REVERSED, so "0" is on top of the screen and "MAX" is on bottom.
 		// Not very instinctive, isn't it?
-		
+
 		// Draw a bar from the left (pos X=0) until the pos=(NbBars*barWidth). If space is left, it will be blanked after.
 	    for ( int x = 0; x < childrenCanvas.getHistogramContent().getReadyUpToPosition(); x++) {
 	    	imageGC.fillRectangle(
@@ -166,4 +169,10 @@ public class HistogramCanvasPaintListener implements PaintListener
 				);
 		}
 	
+	/**
+	 * @param isFinished the flag value
+	 */
+	public void setIsFinished(boolean isFinished) {
+		this.isFinished = isFinished;
+	}		
 }

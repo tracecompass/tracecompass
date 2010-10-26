@@ -12,6 +12,7 @@
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
 
@@ -55,14 +56,12 @@ public abstract class HistogramConstant {
 	// Constants relative to the drawing of the Histogram
 	// Colors for the histogram. Background should be the same as the background in use
 	public final static int EMPTY_BACKGROUND_COLOR = SWT.COLOR_WHITE;
-	public final static int HISTOGRAM_BARS_COLOR = SWT.COLOR_DARK_CYAN;
 	public final static int SELECTED_EVENT_COLOR = SWT.COLOR_RED;
-	public final static int SELECTION_WINDOW_COLOR = SWT.COLOR_RED;
 	
 	// Dimension for the line of the "Selection Window"
 	public final static int MINIMUM_WINDOW_WIDTH = 3;
-	public final static int SELECTION_LINE_WIDTH = 2;
-	public final static int SELECTION_CROSSHAIR_LENGTH = 6;
+	public final static int SELECTION_LINE_WIDTH = 1;
+	public final static int SELECTION_CROSSHAIR_WIDTH = 1;
 	
 	
 	/**
