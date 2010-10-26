@@ -12,7 +12,6 @@
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
 
