@@ -142,7 +142,8 @@ public class JniTime extends Jni_C_Constant implements Comparable<JniTime>
      * 
      * @return int of value -1, 0 or 1, as the pased argument is bigger, equal or smaller than this time
      */
-    public int compareTo(JniTime right) {
+    @Override
+	public int compareTo(JniTime right) {
         long leftTime = this.getTime();
         long rightTime = right.getTime();
         

@@ -59,6 +59,7 @@ public class RenameProjectHandler extends AbstractHandler {
 	// Execution
 	// ------------------------------------------------------------------------
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());

@@ -140,6 +140,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		mouseScrollFilterListener = new Listener() {
 			// This filter is used to prevent scrolling of the view when the
 			// mouse wheel is used to zoom
+			@Override
 			public void handleEvent(Event event) {
 				event.doit = false;
 			}
@@ -292,6 +293,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		return changed;
 	}
 
+	@Override
 	public ISelection getSelection() {
 		PlainSelection sel = new PlainSelection();
 		ITmfTimeAnalysisEntry trace = getSelectedTrace();
@@ -1572,12 +1574,14 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		}
 	}
 
+	@Override
 	public void keyTraversed(TraverseEvent e) {
 		if ((e.detail == SWT.TRAVERSE_TAB_NEXT)
 				|| (e.detail == SWT.TRAVERSE_TAB_PREVIOUS))
 			e.doit = true;
 	}
 
+	@Override
 	public void keyPressed(KeyEvent e) {
 		int idx = -1;
 		if (SWT.HOME == e.keyCode) {
@@ -1632,15 +1636,18 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		}
 	}
 
+	@Override
 	public void keyReleased(KeyEvent e) {
 	}
 
+	@Override
 	public void focusGained(FocusEvent e) {
 		_isInFocus = true;
 		redraw();
 		getDisplay().addFilter(SWT.MouseWheel, mouseScrollFilterListener);
 	}
 
+	@Override
 	public void focusLost(FocusEvent e) {
 		_isInFocus = false;
 		if (0 != _dragState) {
@@ -1655,6 +1662,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		return _isInFocus;
 	}
 
+	@Override
 	public void mouseMove(MouseEvent e) {
 		if (null == _timeProvider)
 			return;
@@ -1694,6 +1702,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		updateCursor(e.x, e.y);
 	}
 
+	@Override
 	public void mouseDoubleClick(MouseEvent e) {
 		if (null == _timeProvider)
 			return;
@@ -1760,6 +1769,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		_isDragCursor3 = false;
 	}
 
+	@Override
 	public void mouseDown(MouseEvent e) {
 		if (null == _timeProvider)
 			return;
@@ -1804,6 +1814,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		}
 	}
 
+	@Override
 	public void mouseUp(MouseEvent e) {
 		if (0 != _dragState) {
 			setCapture(false);
@@ -1820,16 +1831,20 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		}
 	}
 
+	@Override
 	public void controlMoved(ControlEvent e) {
 	}
 
+	@Override
 	public void controlResized(ControlEvent e) {
 		adjustScrolls();
 	}
 
+	@Override
 	public void widgetDefaultSelected(SelectionEvent e) {
 	}
 
+	@Override
 	public void widgetSelected(SelectionEvent e) {
 		if (e.widget == getVerticalBar()) {
 			_topItem = getVerticalBar().getSelection();
@@ -1860,9 +1875,11 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		}
 	}
 
+	@Override
 	public void mouseEnter(MouseEvent e) {
 	}
 
+	@Override
 	public void mouseExit(MouseEvent e) {
 		if (_mouseHover) {
 			_mouseHover = false;
@@ -1870,9 +1887,11 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 		}
 	}
 
+	@Override
 	public void mouseHover(MouseEvent e) {
 	}
 
+	@Override
 	public void mouseScrolled(MouseEvent e) {
 		if (!_isInFocus)
 			return;
@@ -1925,6 +1944,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 	}
 
 //	@Override
+	@Override
 	public void addSelectionChangedListener(ISelectionChangedListener listener) {
 		if (listener != null) {
 			if (!_selectionChangedListeners.contains(listener)) {
@@ -1934,6 +1954,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 	}
 
 //	@Override
+	@Override
 	public void removeSelectionChangedListener(
 			ISelectionChangedListener listener) {
 		if (listener != null) {
@@ -1942,6 +1963,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 	}
 
 //	@Override
+	@Override
 	public void setSelection(ISelection selection) {
 		if (selection instanceof PlainSelection) {
 			PlainSelection sel = (PlainSelection) selection;

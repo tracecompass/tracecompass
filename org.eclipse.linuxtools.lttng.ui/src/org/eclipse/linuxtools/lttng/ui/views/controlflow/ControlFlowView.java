@@ -162,6 +162,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 			cviewer = v;
 		}
 
+		@Override
 		public void inputChanged(Viewer v, Object oldInput, Object newInput) {
 			this.elements = (ITmfTimeAnalysisEntry[]) newInput;
 			if (elements != null) {
@@ -171,6 +172,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 			}
 		}
 
+		@Override
 		public void dispose() {
 
 		}
@@ -181,14 +183,14 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 			cviewer.replace(elements[index], index);
 		}
 
-		// @Override
+		@Override
 		public Object[] getElements(Object inputElement) {
 			return elements;
 		}
 	}
 
-	class ViewLabelProvider extends LabelProvider implements
-			ITableLabelProvider {
+	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
+		@Override
 		public String getColumnText(Object obj, int index) {
 			String strRes = ""; //$NON-NLS-1$
 			LttngTimestamp time;
@@ -236,6 +238,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 			return strRes;
 		}
 
+		@Override
 		public Image getColumnImage(Object obj, int index) {
 			return getImage(obj);
 		}
@@ -319,6 +322,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		tableViewer.setLabelProvider(new ViewLabelProvider());
 		Table table = tableViewer.getTable();
 		tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				ISelection sel = event.getSelection();
 				if (!sel.isEmpty()) {
@@ -393,6 +397,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		
 		// Listen to page up /down and Home / Enc keys
 		tableViewer.getTable().addKeyListener(new KeyListener() {
+			@Override
 			public void keyPressed(KeyEvent e) {
 				Table table = tableViewer.getTable();
 				Point origin = scrollFrame.getOrigin();
@@ -431,6 +436,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 				}
 			}
 
+			@Override
 			public void keyReleased(KeyEvent e) {
 				// Nothing to do
 
@@ -560,6 +566,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				ControlFlowView.this.fillContextMenu(manager);
 			}
@@ -810,6 +817,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 	private void hookDoubleClickAction() {
 		tableViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(DoubleClickEvent event) {
 				doubleClickAction.run();
 			}
@@ -897,6 +905,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 			// Perform the updates on the UI thread)
 			display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					if (!table.isDisposed()) {
 						tableViewer.setInput(items); // This shall be the minimal
@@ -959,7 +968,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		}
 	}
 
-	// @Override
+	@Override
 	public void tmfTaProcessFilterSelection(TmfTimeFilterSelectionEvent event) {
 		if (tableFilter != null) {
 			Vector<ITmfTimeAnalysisEntry> filteredout = event.getFilteredOut();

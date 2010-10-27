@@ -48,6 +48,7 @@ public class LTTngProjectRoot extends LTTngProjectTreeNode {
 	// LTTngProjectTreeNode
 	// ------------------------------------------------------------------------
 
+	@Override
 	public String getName() {
 		return null;
 	}

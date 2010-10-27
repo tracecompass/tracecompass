@@ -50,27 +50,33 @@ public class TmfContext implements ITmfContext, Cloneable {
 	// ITmfContext
 	// ------------------------------------------------------------------------
 
+	@Override
 	public void setLocation(ITmfLocation<?> location) {
 		fLocation = location;
 	}
 
+	@Override
 	public ITmfLocation<?> getLocation() {
 		return fLocation;
 	}
 
+	@Override
 	public void setRank(long rank) {
 		fRank = rank;
 	}
 
+	@Override
 	public long getRank() {
 		return fRank;
 	}
 
+	@Override
 	public void updateRank(int delta) {
 		if (isValidRank())
 			fRank += delta;
 	}
 
+	@Override
 	public boolean isValidRank() {
 		return fRank != UNKNOWN_RANK;
 	}

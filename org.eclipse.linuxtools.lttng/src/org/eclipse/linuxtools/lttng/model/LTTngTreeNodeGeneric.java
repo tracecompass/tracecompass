@@ -87,6 +87,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.control.ILTTngAnalysisResource#getId()
 	 */
+	@Override
 	public Long getId() {
 		return fid;
 	}
@@ -97,6 +98,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 * @see
 	 * org.eclipse.linuxtools.lttng.control.ILTTngAnalysisResource#getType()
 	 */
+	@Override
 	public Object getType() {
 		return ftype;
 	}
@@ -108,6 +110,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 * org.eclipse.linuxtools.lttng.control.ILTTngAnalysisResource#getChildByName
 	 * ()
 	 */
+	@Override
 	public E getChildByName(String name) {
 		E child = null;
 		if (name != null) {
@@ -154,6 +157,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.model.ILTTngTreeNode#getChildren()
 	 */
+	@Override
 	public abstract E[] getChildren();
 	// {
 	// return (T[]) childrenToArray(fchildren.values(), this.getClass());
@@ -193,6 +197,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 * org.eclipse.linuxtools.lttng.control.ILTTngAnalysisResource#getChildById
 	 * (java.lang.Long)
 	 */
+	@Override
 	public E getChildById(Long id) {
 		if (id == null)
 			return null;
@@ -206,6 +211,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 * @see
 	 * org.eclipse.linuxtools.lttng.control.ILTTngAnalysisResource#getParent()
 	 */
+	@Override
 	public E getParent() {
 		return fparent;
 	}
@@ -223,6 +229,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 * @see
 	 * org.eclipse.linuxtools.lttng.control.ILTTngAnalysisResource#hasChildren()
 	 */
+	@Override
 	public boolean hasChildren() {
 		if (fchildren.size() > 0) {
 			return true;
@@ -236,6 +243,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 * @see
 	 * org.eclipse.linuxtools.lttng.control.ILTTngAnalysisResource#getName()
 	 */
+	@Override
 	public String getName() {
 		return fname;
 	}
@@ -246,6 +254,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 * @see
 	 * org.eclipse.linuxtools.lttng.control.ILTTngAnalysisResource#getPath()
 	 */
+	@Override
 	public String getPath() {
 		return getPath(this, "");
 	}
@@ -278,6 +287,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 * 
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
+	@Override
 	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class clazz) {
 		if (clazz == ftype) {
@@ -291,6 +301,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.model.ILTTngTreeNode#getValue()
 	 */
+	@Override
 	public Object getValue() {
 		return fvalue;
 	}
@@ -300,6 +311,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.model.ILTTngTreeNode#getNextUniqueId()
 	 */
+	@Override
 	public synchronized Long getNextUniqueId() {
 		return idCount++;
 	}
@@ -311,6 +323,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 * org.eclipse.linuxtools.lttng.model.ILTTngTreeNode#getAttribute(java.lang
 	 * .String)
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T getAttribute(String key, Class<T> type) {
 		if (key != null) {
@@ -330,6 +343,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 * org.eclipse.linuxtools.lttng.model.ILTTngTreeNode#addAttribute(java.lang
 	 * .String, java.lang.Object)
 	 */
+	@Override
 	public boolean addAttribute(String key, Object value) {
 		// validate
 		if (key == null || value == null) {

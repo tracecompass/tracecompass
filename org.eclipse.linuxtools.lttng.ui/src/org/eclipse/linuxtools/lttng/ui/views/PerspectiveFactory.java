@@ -51,6 +51,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui.IPageLayout)
 	 */
+	@Override
 	public void createInitialLayout(IPageLayout layout) {
 
         layout.setEditorAreaVisible(false);

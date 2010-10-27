@@ -413,7 +413,8 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * @return -1 if given event happens before, 0 if equal, 1 if passed event happens after.
      */
-    public int compareTo(JniEvent rightEvent ){
+    @Override
+	public int compareTo(JniEvent rightEvent ){
     	
     	// Note : this = left hand operand
     	

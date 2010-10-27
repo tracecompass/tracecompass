@@ -37,10 +37,12 @@ public class TmfLocation<L> implements ITmfLocation<L> {
     	fLocation = other.fLocation;
 	}
 
+	@Override
 	public void setLocation(L location) {
 		fLocation = location;
 	}
 
+	@Override
 	public L getLocation() {
 		return fLocation;
 	}

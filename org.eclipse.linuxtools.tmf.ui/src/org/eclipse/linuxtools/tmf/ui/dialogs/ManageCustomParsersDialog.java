@@ -104,24 +104,30 @@ public class ManageCustomParsersDialog extends Dialog {
         txtButton.setText("Text");
         txtButton.setSelection(true);
         txtButton.addSelectionListener(new SelectionListener(){
-            public void widgetDefaultSelected(SelectionEvent e) {}
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 fillParserList();
             }});
         
         xmlButton = new Button(radioContainer, SWT.RADIO);
         xmlButton.setText("XML");
         xmlButton.addSelectionListener(new SelectionListener(){
-            public void widgetDefaultSelected(SelectionEvent e) {}
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 fillParserList();
             }});
         
         parserList = new List(listContainer, SWT.SINGLE | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         parserList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         parserList.addSelectionListener(new SelectionListener(){
-            public void widgetDefaultSelected(SelectionEvent e) {}
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 if (parserList.getSelectionCount() == 0) {
                     editButton.setEnabled(false);
                     deleteButton.setEnabled(false);
@@ -143,8 +149,10 @@ public class ManageCustomParsersDialog extends Dialog {
         newButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
         newButton.setText("New...");
         newButton.addSelectionListener(new SelectionListener(){
-            public void widgetDefaultSelected(SelectionEvent e) {}
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 WizardDialog dialog = null;
                 if (txtButton.getSelection()) {
                     dialog = new WizardDialog(getShell(), new CustomTxtParserWizard());
@@ -162,8 +170,10 @@ public class ManageCustomParsersDialog extends Dialog {
         editButton.setText("Edit...");
         editButton.setEnabled(false);
         editButton.addSelectionListener(new SelectionListener(){
-            public void widgetDefaultSelected(SelectionEvent e) {}
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 WizardDialog dialog = null;
                 if (txtButton.getSelection()) {
                     dialog = new WizardDialog(getShell(),
@@ -183,8 +193,10 @@ public class ManageCustomParsersDialog extends Dialog {
         deleteButton.setText("Delete");
         deleteButton.setEnabled(false);
         deleteButton.addSelectionListener(new SelectionListener(){
-            public void widgetDefaultSelected(SelectionEvent e) {}
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 boolean confirm = MessageDialog.openQuestion(
                         getShell(),
                         "Delete Custom Parser",
@@ -205,8 +217,10 @@ public class ManageCustomParsersDialog extends Dialog {
         importButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
         importButton.setText("Import...");
         importButton.addSelectionListener(new SelectionListener(){
-            public void widgetDefaultSelected(SelectionEvent e) {}
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
                 dialog.setText("Select custom parser file to import");
                 dialog.setFilterExtensions(new String[] {"*.xml", "*"});
@@ -232,8 +246,10 @@ public class ManageCustomParsersDialog extends Dialog {
         exportButton.setText("Export...");
         exportButton.setEnabled(false);
         exportButton.addSelectionListener(new SelectionListener(){
-            public void widgetDefaultSelected(SelectionEvent e) {}
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
                 dialog.setText("Select file to export the " + parserList.getSelection()[0] + " custom parser");
                 dialog.setFilterExtensions(new String[] {"*.xml", "*"});
@@ -256,8 +272,10 @@ public class ManageCustomParsersDialog extends Dialog {
         parseButton.setText("Parse...");
         parseButton.setEnabled(false);
         parseButton.addSelectionListener(new SelectionListener(){
-            public void widgetDefaultSelected(SelectionEvent e) {}
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
                 dialog.setText("Select log file to parse using the " + parserList.getSelection()[0] + " custom parser");
                 if (xmlButton.getSelection()) {

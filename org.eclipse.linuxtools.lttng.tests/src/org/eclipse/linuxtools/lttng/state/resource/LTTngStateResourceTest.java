@@ -96,26 +96,32 @@ public class LTTngStateResourceTest extends TestCase {
 	private ILttngStateContext getContext() {
 		return new ILttngStateContext() {
 
+			@Override
 			public TmfTimeRange getTraceTimeWindow() {
 				return null;
 			}
 
+			@Override
 			public ITmfTrace getTraceIdRef() {
 				return null;
 			}
 
+			@Override
 			public String getTraceId() {
 				return "Test Trace";
 			}
 
+			@Override
 			public int getNumberOfCpus() {
 				return 1;
 			}
 
+			@Override
 			public TmfTimeRange getExperimentTimeWindow() {
 				return null;
 			}
 
+			@Override
 			public String getExperimentName() {
 				return "Test Experiment";
 			}

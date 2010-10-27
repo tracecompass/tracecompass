@@ -27,6 +27,7 @@ public class DialogTraceLabelProvider extends LabelProvider implements ITableLab
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
 	 */
+	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
 		return null;
 	}
@@ -34,6 +35,7 @@ public class DialogTraceLabelProvider extends LabelProvider implements ITableLab
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
 	 */
+	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		if (element instanceof LTTngTraceNode) {
 			LTTngTraceNode entry = (LTTngTraceNode) element;

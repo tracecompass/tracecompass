@@ -55,6 +55,7 @@ public class TmfProjectNode extends TmfProjectTreeNode {
 	// TmfProjectTreeNode
 	// ------------------------------------------------------------------------
 
+	@Override
 	public String getName() {
 		return fProject.getName();
 	}

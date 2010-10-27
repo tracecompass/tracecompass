@@ -34,15 +34,18 @@ public class TmfEditorInput implements IEditorInput {
         fTrace = trace;
     }
     
-    public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
+    @Override
+	public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
         return null;
     }
 
-    public boolean exists() {
+    @Override
+	public boolean exists() {
         return fResource.exists();
     }
 
-    public ImageDescriptor getImageDescriptor() {
+    @Override
+	public ImageDescriptor getImageDescriptor() {
         if (fResource instanceof IFile) {
             IFile file = (IFile) fResource;
             IContentType contentType = IDE.getContentType(file);
@@ -52,15 +55,18 @@ public class TmfEditorInput implements IEditorInput {
         return null;
     }
 
-    public String getName() {
+    @Override
+	public String getName() {
         return fResource.getName();
     }
 
-    public IPersistableElement getPersistable() {
+    @Override
+	public IPersistableElement getPersistable() {
         return null;
     }
 
-    public String getToolTipText() {
+    @Override
+	public String getToolTipText() {
         return fResource.getFullPath().makeRelative().toString();
     }
 

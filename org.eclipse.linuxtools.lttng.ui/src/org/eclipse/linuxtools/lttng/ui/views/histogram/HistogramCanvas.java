@@ -407,6 +407,7 @@ class AsyncCanvasRedrawer {
 		if ((parentCanvas != null) && (!parentCanvas.isDisposed())) {
 			Display display = parentCanvas.getDisplay();
 			display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					if ((parentCanvas != null) && (!parentCanvas.isDisposed())) {
 						parentCanvas.redraw();
@@ -446,6 +447,7 @@ class AsyncCanvasRedrawer {
 		if((parentCanvas != null) && (!parentCanvas.isDisposed())) {
 			Display display = parentCanvas.getDisplay();
 			display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					if((parentCanvas != null) && (!parentCanvas.isDisposed())) {
 						parentCanvas.notifyParentUpdatedInformation();

@@ -41,11 +41,13 @@ public abstract class TmfMultiPageEditorPart extends MultiPageEditorPart impleme
     // ITmfComponent
     // ------------------------------------------------------------------------
 
-    public String getName() {
+    @Override
+	public String getName() {
         return fName;
     }
     
-    public void broadcast(TmfSignal signal) {
+    @Override
+	public void broadcast(TmfSignal signal) {
         TmfSignalManager.dispatchSignal(signal);
     }
 }

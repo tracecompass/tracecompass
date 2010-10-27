@@ -64,6 +64,7 @@ public class TimeRangeEvent extends TimeRangeComponent implements ITimeEvent {
 	 * org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent#getTime
 	 * ()
 	 */
+	@Override
 	public long getTime() {
 		// The value provided by this method is used to start drawing the
 		// time-range,
@@ -84,6 +85,7 @@ public class TimeRangeEvent extends TimeRangeComponent implements ITimeEvent {
 	 * org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent#getEntry
 	 * ()
 	 */
+	@Override
 	public ITmfTimeAnalysisEntry getEntry() {
 		return parent;
 	}
@@ -102,6 +104,7 @@ public class TimeRangeEvent extends TimeRangeComponent implements ITimeEvent {
 	 * @seeorg.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent#
 	 * getDuration()
 	 */
+	@Override
 	public long getDuration() {
 		long duration = -1;
 		long endT = (stopTime == null) ? parent.getStopTime() : stopTime;

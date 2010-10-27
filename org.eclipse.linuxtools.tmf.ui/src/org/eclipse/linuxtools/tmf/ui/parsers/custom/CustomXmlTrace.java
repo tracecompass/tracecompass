@@ -93,7 +93,8 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
         
     }
 
-    public ITmfTrace createTraceCopy() {
+    @Override
+	public ITmfTrace createTraceCopy() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -165,7 +166,8 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
 
             // The following allows xml parsing without access to the dtd
             EntityResolver resolver = new EntityResolver () {
-                public InputSource resolveEntity (String publicId, String systemId) {
+                @Override
+				public InputSource resolveEntity (String publicId, String systemId) {
                     String empty = "";
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
@@ -175,9 +177,12 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
 
             // The following catches xml parsing exceptions
             db.setErrorHandler(new ErrorHandler(){
-                public void error(SAXParseException saxparseexception) throws SAXException {}
-                public void warning(SAXParseException saxparseexception) throws SAXException {}
-                public void fatalError(SAXParseException saxparseexception) throws SAXException {
+                @Override
+				public void error(SAXParseException saxparseexception) throws SAXException {}
+                @Override
+				public void warning(SAXParseException saxparseexception) throws SAXException {}
+                @Override
+				public void fatalError(SAXParseException saxparseexception) throws SAXException {
                     throw saxparseexception;
                 }});
             

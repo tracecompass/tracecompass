@@ -364,6 +364,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
 	 * 
 	 * @param event  The focus event generated.
 	 */
+	@Override
 	public void focusGained(FocusEvent event) {
 		// Nothing to do yet
 	}
@@ -374,6 +375,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
 	 * 
 	 * @param event  The focus event generated.
 	 */
+	@Override
 	public void focusLost(FocusEvent event) {
 		handleNewStringValue();
 	}
@@ -385,6 +387,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
 	 * 
 	 * @param event  The KeyEvent generated when the key was pressed.
 	 */
+	@Override
 	public void keyPressed(KeyEvent event) {
 		switch (event.keyCode) {
 			// SWT.CR is "ENTER" Key
@@ -403,6 +406,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
 	 * 
 	 * @param event  The KeyEvent generated when the key was pressed.
 	 */
+	@Override
 	public void keyReleased(KeyEvent e) {
 		
 	}
@@ -442,6 +446,7 @@ class AsyncTimeTextGroupRedrawer {
 		
 		Display display =  parentTimeTextGroup.getParent().getDisplay();
 		display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (!parentTimeTextGroup.getParent().isDisposed()) {
 					parentTimeTextGroup.setValue(newTime);
@@ -464,6 +469,7 @@ class AsyncTimeTextGroupRedrawer {
 		final String tmpName = newGroupName;
 		Display display =  parentTimeTextGroup.getParent().getDisplay();
 		display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (!parentTimeTextGroup.getParent().isDisposed()) {
 					parentTimeTextGroup.setGroupName(tmpName);
@@ -484,6 +490,7 @@ class AsyncTimeTextGroupRedrawer {
 
 		Display display =  parentTimeTextGroup.getParent().getDisplay();
 		display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (!parentTimeTextGroup.getParent().isDisposed()) {
 					parentTimeTextGroup.getParent().redraw();

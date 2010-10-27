@@ -123,6 +123,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 			return getName();
 		}
 
+		@Override
 		@SuppressWarnings("rawtypes")
 		public Object getAdapter(Class key) {
 			return null;
@@ -161,12 +162,15 @@ public class TsfTraceAnalysisView extends ViewPart implements
 			ITreeContentProvider {
 		private TreeParent invisibleRoot;
 
+		@Override
 		public void inputChanged(Viewer v, Object oldInput, Object newInput) {
 		}
 
+		@Override
 		public void dispose() {
 		}
 
+		@Override
 		public Object[] getElements(Object parent) {
 			if (parent.equals(getViewSite())) {
 				if (invisibleRoot == null)
@@ -176,6 +180,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 			return getChildren(parent);
 		}
 
+		@Override
 		public Object getParent(Object child) {
 			if (child instanceof TreeObject) {
 				return ((TreeObject) child).getParent();
@@ -183,6 +188,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 			return null;
 		}
 
+		@Override
 		public Object[] getChildren(Object parent) {
 			if (parent instanceof TreeParent) {
 				return ((TreeParent) parent).getChildren();
@@ -190,6 +196,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 			return new Object[0];
 		}
 
+		@Override
 		public boolean hasChildren(Object parent) {
 			if (parent instanceof TreeParent)
 				return ((TreeParent) parent).hasChildren();
@@ -292,6 +299,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				TsfTraceAnalysisView.this.fillContextMenu(manager);
 			}
@@ -567,6 +575,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 	private void hookDoubleClickAction() {
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(DoubleClickEvent event) {
 				doubleClickAction.run();
 			}
@@ -586,6 +595,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 		viewer.getControl().setFocus();
 	}
 
+	@Override
 	public void tsfTmProcessSelEvent(TmfTimeSelectionEvent event) {
 		Object source = event.getSource();
 		if (source == null || !(source instanceof ITimeAnalysisViewer)) {
@@ -650,6 +660,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 	}
 
+	@Override
 	public void tsfTmProcessTimeScaleEvent(TmfTimeScaleSelectionEvent event) {
 		Object source = event.getSource();
 		if (source == null || !(source instanceof ITimeAnalysisViewer)) {

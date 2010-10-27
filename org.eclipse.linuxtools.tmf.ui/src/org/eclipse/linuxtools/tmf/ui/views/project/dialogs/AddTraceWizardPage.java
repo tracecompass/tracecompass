@@ -43,6 +43,7 @@ public class AddTraceWizardPage extends WizardPage {
 		fProject = project;
 	}
 
+	@Override
 	public void createControl(Composite parent) {
 		Composite container = new Composite(parent, SWT.NULL);
 		container.setLayout(new FormLayout());

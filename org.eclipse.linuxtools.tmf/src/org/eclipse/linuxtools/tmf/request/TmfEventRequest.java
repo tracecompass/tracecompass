@@ -88,7 +88,8 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
     /**
      * @return the requested time range
      */
-    public TmfTimeRange getRange() {
+    @Override
+	public TmfTimeRange getRange() {
         return fRange;
     }
 

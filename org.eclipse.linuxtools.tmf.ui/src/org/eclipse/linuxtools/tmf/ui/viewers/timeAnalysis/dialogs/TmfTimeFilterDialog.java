@@ -91,6 +91,7 @@ public class TmfTimeFilterDialog extends TitleAreaDialog {
 		viewer.setInput(new Object());
 
 		viewer.addCheckStateListener(new ICheckStateListener() {
+			@Override
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				Object o = event.getElement();
 				for (int i = threads.length - 1; i >= 0; i--) {
@@ -162,12 +163,15 @@ public class TmfTimeFilterDialog extends TitleAreaDialog {
 	}
 	
 	class ViewContentProvider implements IStructuredContentProvider {
+		@Override
 		public void dispose() {
 		}
 
+		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
+		@Override
 		public Object[] getElements(Object input) {
 			return threads;
 		}
@@ -180,10 +184,12 @@ public class TmfTimeFilterDialog extends TitleAreaDialog {
 			return null;
 		}
 
+		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
 			return null;
 		}
 
+		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			// TODO: AA: Provide Label Provider externally
 			ITmfTimeAnalysisEntry t = (ITmfTimeAnalysisEntry) element;

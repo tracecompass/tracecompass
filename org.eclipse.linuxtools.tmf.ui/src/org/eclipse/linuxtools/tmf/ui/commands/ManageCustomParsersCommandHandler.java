@@ -20,7 +20,8 @@ import org.eclipse.swt.widgets.Display;
 
 public class ManageCustomParsersCommandHandler extends AbstractHandler {
 
-    public Object execute(ExecutionEvent event) throws ExecutionException {
+    @Override
+	public Object execute(ExecutionEvent event) throws ExecutionException {
         ManageCustomParsersDialog dialog = new ManageCustomParsersDialog(Display.getDefault().getActiveShell());
         dialog.open();
         return null;

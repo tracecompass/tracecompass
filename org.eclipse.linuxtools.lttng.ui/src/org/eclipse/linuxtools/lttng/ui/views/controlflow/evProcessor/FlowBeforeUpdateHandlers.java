@@ -40,6 +40,7 @@ class FlowBeforeUpdateHandlers {
 		AbsFlowTRangeUpdate handler = new AbsFlowTRangeUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long cpu = trcEvent.getCpuId();
@@ -99,6 +100,7 @@ class FlowBeforeUpdateHandlers {
 		AbsFlowTRangeUpdate handler = new AbsFlowTRangeUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long pid_out = getAFieldLong(trcEvent, traceSt,
@@ -221,6 +223,7 @@ class FlowBeforeUpdateHandlers {
 		AbsFlowTRangeUpdate handler = new AbsFlowTRangeUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				// We need to process information.
@@ -283,6 +286,7 @@ class FlowBeforeUpdateHandlers {
 		AbsFlowTRangeUpdate handler = new AbsFlowTRangeUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 				// PID of the process to release
 				Long release_pid = getAFieldLong(trcEvent, traceSt,
@@ -334,6 +338,7 @@ class FlowBeforeUpdateHandlers {
 		AbsFlowTRangeUpdate handler = new AbsFlowTRangeUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				// What's below should replace the following call in C :

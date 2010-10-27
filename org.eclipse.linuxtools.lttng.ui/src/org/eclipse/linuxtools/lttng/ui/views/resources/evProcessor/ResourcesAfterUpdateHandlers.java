@@ -38,6 +38,7 @@ public class ResourcesAfterUpdateHandlers {
 	final ILttngEventProcessor getAfterSchedChangeHandler() {
 		AbsResourcesTRangeUpdate handler = new AbsResourcesTRangeUpdate() {
 
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				// TODO: After sched scheduler handler should implement an

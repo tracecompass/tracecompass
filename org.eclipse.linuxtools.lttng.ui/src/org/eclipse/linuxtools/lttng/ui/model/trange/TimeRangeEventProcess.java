@@ -195,6 +195,7 @@ public class TimeRangeEventProcess extends TimeRangeComposite implements
 	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
+	@Override
 	public int compareTo(TimeRangeEventProcess process) {
 		if (process != null) {
 			int result = 0;

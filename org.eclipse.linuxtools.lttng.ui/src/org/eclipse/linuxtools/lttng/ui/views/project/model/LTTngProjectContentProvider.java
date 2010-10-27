@@ -22,18 +22,22 @@ import org.eclipse.jface.viewers.Viewer;
  */
  public class LTTngProjectContentProvider implements ITreeContentProvider {
 
+	@Override
 	public Object[] getChildren(Object parentElement) {
 		return ((ILTTngProjectTreeNode) parentElement).getChildren().toArray();
 	}
 
+	@Override
 	public Object getParent(Object element) {
 		return ((ILTTngProjectTreeNode) element).getParent();
 	}
 
+	@Override
 	public boolean hasChildren(Object element) {
 		return ((ILTTngProjectTreeNode) element).hasChildren();
 	}
 
+	@Override
 	public Object[] getElements(Object inputElement) {
 		if (inputElement instanceof LTTngProjectRoot) {
 			return ((LTTngProjectRoot) inputElement).getChildren().toArray();
@@ -41,10 +45,12 @@ import org.eclipse.jface.viewers.Viewer;
         return null;
 	}
 
+	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
 	}
 
+	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		// TODO Auto-generated method stub
 	}

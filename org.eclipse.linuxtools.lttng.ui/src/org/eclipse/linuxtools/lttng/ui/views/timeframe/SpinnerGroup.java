@@ -97,7 +97,8 @@ public class SpinnerGroup {
         // Create and position the widgets
         seconds = new Spinner(group, SWT.BORDER);
         seconds.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent e) {
+            @Override
+			public void modifyText(ModifyEvent e) {
                 currentSeconds = seconds.getSelection();
                 refreshCurrentTime();
             }
@@ -110,7 +111,8 @@ public class SpinnerGroup {
 
         nanosec = new Spinner(group, SWT.BORDER);
         nanosec.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent e) {
+            @Override
+			public void modifyText(ModifyEvent e) {
                 currentNanosec = nanosec.getSelection();
                 // Correct for nanosec underflow
                 if (currentNanosec < 0) {
@@ -279,6 +281,7 @@ public class SpinnerGroup {
     	if (seconds.isDisposed()) return;
     	
         seconds.getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (!seconds.isDisposed() && !nanosec.isDisposed()) {
 		            // If we are on the start second, ensure that [currentNS >= startNS]

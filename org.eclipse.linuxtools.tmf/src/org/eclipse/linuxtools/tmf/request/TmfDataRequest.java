@@ -185,6 +185,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
 	/**
 	 * @return the request ID
 	 */
+	@Override
 	public int getRequestId() {
 		return fRequestId;
 	}
@@ -192,6 +193,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
 	/**
 	 * @return the index of the first event requested
 	 */
+	@Override
 	public int getIndex() {
 		return fIndex;
 	}
@@ -199,6 +201,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
 	/**
 	 * @return the index of the first event requested
 	 */
+	@Override
 	public ExecutionType getExecType() {
 		return fExecType;
 	}
@@ -206,49 +209,56 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     /**
      * @return the number of requested events (ALL_DATA = all)
      */
-    public int getNbRequested() {
+    @Override
+	public int getNbRequested() {
         return fNbRequested;
     }
 
     /**
      * @return the number of events read so far
      */
-    public synchronized int getNbRead() {
+    @Override
+	public synchronized int getNbRead() {
         return fNbRead;
     }
 
     /**
      * @return indicates if the request is completed
      */
-    public boolean isRunning() {
+    @Override
+	public boolean isRunning() {
         return fRequestRunning;
     }
 
     /**
      * @return indicates if the request is completed
      */
-    public boolean isCompleted() {
+    @Override
+	public boolean isCompleted() {
         return fRequestCompleted;
     }
 
     /**
      * @return indicates if the request is canceled
      */
-    public boolean isFailed() {
+    @Override
+	public boolean isFailed() {
         return fRequestFailed;
     }
 
     /**
      * @return indicates if the request is canceled
      */
-    public boolean isCancelled() {
+    @Override
+	public boolean isCancelled() {
         return fRequestCanceled;
     }
 
     /**
      * @return the requested data type
      */
-    public Class<T> getDataType() {
+    @Override
+	public Class<T> getDataType() {
         return fDataType;
     }
 
@@ -277,13 +287,15 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      *
      * @param events - an events
      */
-    public void handleData(T data) {
+    @Override
+	public void handleData(T data) {
         if (data != null) {
         	fNbRead++;
         }
     }
 
-    public void handleStarted() {
+    @Override
+	public void handleStarted() {
     }
 
     /**
@@ -296,7 +308,8 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * As a convenience, handleXXXX methods are provided. They are meant to be
      * overridden by the application if it needs to handle these conditions. 
      */
-    public void handleCompleted() {
+    @Override
+	public void handleCompleted() {
     	if (fRequestFailed) { 
             if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "failed");
     		handleFailure();
@@ -311,13 +324,16 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     	}
     }
 
-    public void handleSuccess() {
+    @Override
+	public void handleSuccess() {
     }
 
-    public void handleFailure() {
+    @Override
+	public void handleFailure() {
     }
 
-    public void handleCancel() {
+    @Override
+	public void handleCancel() {
     }
 
     /**
@@ -338,7 +354,8 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * 
      * @throws InterruptedException 
      */
-    public void waitForCompletion() throws InterruptedException {
+    @Override
+	public void waitForCompletion() throws InterruptedException {
 		while (!fRequestCompleted) {
 			completedLatch.await();
 		}
@@ -347,7 +364,8 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     /**
      * Called by the request processor upon starting to service the request.
      */
-    public void start() {
+    @Override
+	public void start() {
         if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "starting");
         synchronized(this) {
             fRequestRunning = true;
@@ -360,7 +378,8 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     /**
      * Called by the request processor upon completion.
      */
-    public void done() {
+    @Override
+	public void done() {
         if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "completing");
         synchronized(this) {
         	if (!fRequestCompleted) {
@@ -375,7 +394,8 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     /**
      * Called by the request processor upon failure.
      */
-    public synchronized void fail() {
+    @Override
+	public synchronized void fail() {
         fRequestFailed = true;
         done();
     }
@@ -383,7 +403,8 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     /**
      * Called by the request processor upon cancellation.
      */
-    public synchronized void cancel() {
+    @Override
+	public synchronized void cancel() {
 		fRequestCanceled = true;
 		done();
     }

@@ -44,6 +44,7 @@ public class TmfExperimentFolderNode extends TmfProjectTreeNode {
 	// TmfProjectTreeNode
 	// ------------------------------------------------------------------------
 
+	@Override
 	public String getName() {
 		return fExperimentFolder.getName();
 	}

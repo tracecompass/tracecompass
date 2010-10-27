@@ -88,10 +88,12 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.api.ITimeAnalysisWidget#display(org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.model.TmfTaTrace[])
      */
-    public void display(ITmfTimeAnalysisEntry[] traceArr) {
+    @Override
+	public void display(ITmfTimeAnalysisEntry[] traceArr) {
         modelUpdate(traceArr);
     }
 
+	@Override
 	public void display(ITmfTimeAnalysisEntry[] traceArr, long start, long end,
 			boolean updateTimeBounds) {
 		modelUpdate(traceArr, start, end, updateTimeBounds);
@@ -100,6 +102,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
     public void controlMoved(ControlEvent e) {
 	}
 
+	@Override
 	public void controlResized(ControlEvent e) {
 		resizeControls();
 	}
@@ -131,6 +134,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		}
 	}
 
+	@Override
 	public void itemUpdate(ITmfTimeAnalysisEntry parent, TimeEvent item) {
 		if (null != parent && null != item) {
 			_stateCtrl.refreshPartial(parent, item);
@@ -209,6 +213,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		_colors.dispose();
 	}
 
+	@Override
 	public void resizeControls() {
 		Rectangle r = _dataViewer.getClientArea();
 		if (r.isEmpty())
@@ -317,43 +322,53 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		filterOutNotification();
 	}
 
+	@Override
 	public void setFocus() {
 		if (null != _stateCtrl)
 			_stateCtrl.setFocus();
 	}
 
+	@Override
 	public boolean isInFocus() {
 		return _stateCtrl.isInFocus();
 	}
 
+	@Override
 	public ITmfTimeAnalysisEntry getSelectedTrace() {
 		return _stateCtrl.getSelectedTrace();
 	}
 
+	@Override
 	public ISelection getSelection() {
 		return _stateCtrl.getSelection();
 	}
 
+	@Override
 	public ISelection getSelectionTrace() {
 		return _stateCtrl.getSelectionTrace();
 	}
 
+	@Override
 	public long getTime0() {
 		return _time0;
 	}
 
+	@Override
 	public long getTime1() {
 		return _time1;
 	}
 
+	@Override
 	public long getMinTimeInterval() {
 		return _minTimeInterval;
 	}
 
+	@Override
 	public int getNameSpace() {
 		return _nameWidth;
 	}
 
+	@Override
 	public void setNameSpace(int width) {
 		_nameWidth = width;
 		width = _stateCtrl.getClientArea().width;
@@ -366,27 +381,33 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		_timeScaleCtrl.redraw();
 	}
 
+	@Override
 	public int getTimeSpace() {
 		int w = _stateCtrl.getClientArea().width;
 		return w - _nameWidth;
 	}
 
+	@Override
 	public long getSelectedTime() {
 		return _selectedTime;
 	}
 
+	@Override
 	public long getBeginTime() {
 		return _beginTime;
 	}
 
+	@Override
 	public long getEndTime() {
 		return _endTime;
 	}
 
+	@Override
 	public long getMaxTime() {
 		return _time1_;
 	}
 
+	@Override
 	public long getMinTime() {
 		return _time0_;
 	}
@@ -398,6 +419,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	 * org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.ITimeDataProvider
 	 * #setStartFinishTimeNotify(long, long)
 	 */
+	@Override
 	public void setStartFinishTimeNotify(long time0, long time1) {
 		setStartFinishTime(time0, time1);
 		notifyStartFinishTimeSelectionListeners(time0, time1);
@@ -407,7 +429,8 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.ITimeDataProvider#notifyStartFinishTime()
      */
-    public void notifyStartFinishTime() {
+    @Override
+	public void notifyStartFinishTime() {
         notifyStartFinishTimeSelectionListeners(_time0, _time1);
     }
 
@@ -418,6 +441,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	 * org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.ITimeDataProvider
 	 * #setStartFinishTime(long, long)
 	 */
+	@Override
 	public void setStartFinishTime(long time0, long time1) {
 		_time0 = time0;
         if (_time0 < _time0_)
@@ -437,11 +461,13 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		_timeScaleCtrl.redraw();
 	}
 
+	@Override
 	public void resetStartFinishTime() {
 		setStartFinishTimeNotify(_time0_, _time1_);
 		_timeRangeFixed = false;
 	}
 
+	@Override
 	public void setSelectedTimeInt(long time, boolean ensureVisible) {
 		// Trace.debug("currentTime:" + _selectedTime + " new time:" + time);
 		_selectedTime = time;
@@ -474,6 +500,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		_timeScaleCtrl.redraw();
 	}
 
+	@Override
 	public void widgetDefaultSelected(SelectionEvent e) {
 		// TODO: Opening call stack shall be replaced to a configurable view
 		// new OpenCallStackViewAction().openView(false);
@@ -482,32 +509,39 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		notifySelectionListeners(TmfTimeSelectionEvent.type.WIDGET_DEF_SEL);
 	}
 
+	@Override
 	public void widgetSelected(SelectionEvent e) {
 		// Replace by event notification
 		// updateModelSelection();
 		notifySelectionListeners(TmfTimeSelectionEvent.type.WIDGET_SEL);
 	}
 
+	@Override
 	public void selectNextEvent() {
 		_stateCtrl.selectNextEvent();
 	}
 
+	@Override
 	public void selectPrevEvent() {
 		_stateCtrl.selectPrevEvent();
 	}
 
+	@Override
 	public void selectNextTrace() {
 		_stateCtrl.selectNextTrace();
 	}
 
+	@Override
 	public void selectPrevTrace() {
 		_stateCtrl.selectPrevTrace();
 	}
 
+	@Override
 	public void groupTraces(boolean on) {
 		_stateCtrl.groupTraces(on);
 	}
 
+	@Override
 	public void filterTraces() {
 		if (_dataViewer == null || _dataViewer.isDisposed())
 			return;
@@ -519,6 +553,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		}
 	}
 
+	@Override
 	public void showLegend() {
 		if (_dataViewer == null || _dataViewer.isDisposed())
 			return;
@@ -570,10 +605,12 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		}
 	}
 
+	@Override
 	public void zoomIn() {
 		_stateCtrl.zoomIn();
 	}
 
+	@Override
 	public void zoomOut() {
 		_stateCtrl.zoomOut();
 	}
@@ -582,24 +619,29 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		return getViewTypeStr() + "." + string;
 	}
 
+	@Override
 	public void addWidgetSelectionListner(ITmfTimeSelectionListener listener) {
 		widgetSelectionListners.add(listener);
 	}
 
+	@Override
 	public void removeWidgetSelectionListner(ITmfTimeSelectionListener listener) {
 		widgetSelectionListners.removeElement(listener);
 	}
 
+	@Override
 	public void addWidgetTimeScaleSelectionListner(
 			ITmfTimeScaleSelectionListener listener) {
 		widgetTimeScaleSelectionListners.add(listener);
 	}
 
+	@Override
 	public void removeWidgetTimeScaleSelectionListner(
 			ITmfTimeScaleSelectionListener listener) {
 		widgetTimeScaleSelectionListners.removeElement(listener);
 	}
 
+	@Override
 	public void setSelectedTime(long time, boolean ensureVisible, Object source) {
 		if (_acceptSetSelAPICalls == false || this == source) {
 			return;
@@ -608,6 +650,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		setSelectedTimeInt(time, ensureVisible);
 	}
 
+	@Override
 	public void setSelectedEvent(ITimeEvent event, Object source) {
 		if (_acceptSetSelAPICalls == false || event == null || source == this) {
 			return;
@@ -620,6 +663,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		setSelectedTimeInt(event.getTime(), true);
 	}
 
+	@Override
 	public void setSelectedTraceTime(ITmfTimeAnalysisEntry trace, long time, Object source) {
 		if (_acceptSetSelAPICalls == false || trace == null || source == this) {
 			return;
@@ -632,6 +676,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		setSelectedTimeInt(time, true);
 	}
 
+	@Override
 	public void setSelectedTrace(ITmfTimeAnalysisEntry trace) {
 		if (trace == null) {
 			return;
@@ -647,6 +692,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	 * org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITimeAnalysisViewer
 	 * #setSelectVisTimeWindow(long, long, java.lang.Object)
 	 */
+	@Override
 	public void setSelectVisTimeWindow(long time0, long time1, Object source) {
 		if (_acceptSetSelAPICalls == false || source == this) {
 			return;
@@ -659,6 +705,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		updateExtSynchTimers();
 	}
 
+	@Override
 	public void setAcceptSelectionAPIcalls(boolean acceptCalls) {
 		_acceptSetSelAPICalls = acceptCalls;
 	}
@@ -720,18 +767,22 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		_time1_extSynch = _time1;
 	}
 
+	@Override
 	public void setTimeCalendarFormat(boolean toAbsoluteCaltime) {
 		calendarTimeFormat = toAbsoluteCaltime;
 	}
 
+	@Override
 	public boolean isCalendarFormat() {
 		return calendarTimeFormat;
 	}
 
+	@Override
 	public int getBorderWidth() {
 		return borderWidth;
 	}
 
+	@Override
 	public void setBorderWidth(int borderWidth) {
 		if (borderWidth > -1) {
             this.borderWidth = borderWidth;
@@ -740,10 +791,12 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		}
 	}
 
+	@Override
 	public int getHeaderHeight() {
 		return timeScaleHeight;
 	}
 
+	@Override
 	public void setHeaderHeight(int headerHeight) {
 		if (headerHeight > -1) {
 			this.timeScaleHeight = headerHeight;
@@ -751,6 +804,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		}
 	}
 
+	@Override
 	public int getItemHeight() {
 		if (_stateCtrl != null) {
 			return _stateCtrl.getItemHeight();
@@ -758,12 +812,14 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		return 0;
 	}
 
+	@Override
 	public void setItemHeight(int rowHeight) {
 		if (_stateCtrl != null) {
 			_stateCtrl.setItemHeight(rowHeight);
 		}
 	}
 
+	@Override
 	public boolean isVisibleVerticalScroll() {
 		if (_stateCtrl != null) {
 			_stateCtrl.isVisibleVerticalScroll();
@@ -771,12 +827,14 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		return false;
 	}
 
+	@Override
 	public void setVisibleVerticalScroll(boolean visibleVerticalScroll) {
 		if (_stateCtrl != null) {
 			_stateCtrl.setVisibleVerticalScroll(visibleVerticalScroll);
 		}
 	}
 
+	@Override
 	public void setNameWidthPref(int width) {
 		_nameWidthPref = width;
 		if (width == 0) {
@@ -784,14 +842,17 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		}
 	}
 
+	@Override
 	public int getNameWidthPref(int width) {
 		return _nameWidthPref;
 	}
 
+	@Override
 	public void addFilterSelectionListner(ITmfTimeFilterSelectionListener listener) {
 		widgetFilterSelectionListeners.add(listener);
 	}
 
+	@Override
 	public void removeFilterSelectionListner(
 			ITmfTimeFilterSelectionListener listener) {
 		widgetFilterSelectionListeners.remove(listener);
@@ -810,6 +871,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	 * 
 	 * @return
 	 */
+	@Override
 	public Control getControl() {
 		return _stateCtrl;
 	}
@@ -819,6 +881,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	 * 
 	 * @return
 	 */
+	@Override
 	public ISelectionProvider getSelectionProvider() {
 		return _stateCtrl;
 	}
@@ -830,6 +893,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	 * org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITimeAnalysisViewer
 	 * #waitCursor(boolean)
 	 */
+	@Override
 	public void waitCursor(boolean waitInd) {
 		_stateCtrl.waitCursor(waitInd);
 	}

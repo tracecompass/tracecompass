@@ -47,10 +47,12 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
 	// ITmfComponent
 	// ------------------------------------------------------------------------
 
+	@Override
 	public String getName() {
 		return fName;
 	}
 	
+	@Override
 	public void broadcast(TmfSignal signal) {
 		TmfSignalManager.dispatchSignal(signal);
 	}

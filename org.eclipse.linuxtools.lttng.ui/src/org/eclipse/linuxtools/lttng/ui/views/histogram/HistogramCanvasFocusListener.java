@@ -43,6 +43,7 @@ public class HistogramCanvasFocusListener implements FocusListener {
 	 * 
 	 * @param event  The focus event generated.
 	 */
+	@Override
 	public void focusGained(FocusEvent event) {
 		ourCanvas.redrawAsynchronously();
 	}
@@ -54,6 +55,7 @@ public class HistogramCanvasFocusListener implements FocusListener {
 	 * 
 	 * @param event  The focus event generated.
 	 */
+	@Override
 	public void focusLost(FocusEvent event) {
 		// Nothing to do yet
 	}

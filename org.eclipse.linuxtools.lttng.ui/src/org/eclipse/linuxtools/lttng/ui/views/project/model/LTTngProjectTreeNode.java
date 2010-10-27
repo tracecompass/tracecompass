@@ -43,24 +43,30 @@ public abstract class LTTngProjectTreeNode implements ILTTngProjectTreeNode {
 	// ILTTngProjectTreeNode
 	// ------------------------------------------------------------------------
 
+	@Override
 	public ILTTngProjectTreeNode getParent() {
 		return fParent;
 	}
 
+	@Override
 	public boolean hasChildren() {
 		return fChildren.size() > 0;
 	}
 
+	@Override
 	public List<ILTTngProjectTreeNode> getChildren() {
 		return fChildren;
 	}
 
+	@Override
 	public abstract void refreshChildren();
 
+	@Override
 	public void refresh() {
 		fParent.refresh();
 	}
 
+	@Override
 	public void removeChild(ILTTngProjectTreeNode child) {
         for (ILTTngProjectTreeNode node : fChildren) {
         	if (node == child) {
@@ -72,6 +78,7 @@ public abstract class LTTngProjectTreeNode implements ILTTngProjectTreeNode {
         }
 	}
 
+	@Override
 	public void removeChildren() {
         for (ILTTngProjectTreeNode node : fChildren) {
         		node.removeChildren();

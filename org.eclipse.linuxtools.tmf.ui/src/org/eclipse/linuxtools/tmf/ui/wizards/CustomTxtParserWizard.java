@@ -69,6 +69,7 @@ public class CustomTxtParserWizard extends Wizard implements INewWizard {
         addPage(outputPage);
     }
 
+	@Override
     public void init(IWorkbench workbench, IStructuredSelection selection) {
         this.selection = selection;
     }

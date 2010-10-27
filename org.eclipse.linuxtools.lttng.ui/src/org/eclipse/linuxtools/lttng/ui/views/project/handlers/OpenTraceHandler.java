@@ -33,11 +33,13 @@ public class OpenTraceHandler implements IHandler {
 	// Validation
 	// ------------------------------------------------------------------------
 
+	@Override
 	public boolean isEnabled() {
 		return (fTrace != null);
 	}
 
 	// Handled if we are in the ProjectView
+	@Override
 	public boolean isHandled() {
 		return true;
 	}
@@ -46,6 +48,7 @@ public class OpenTraceHandler implements IHandler {
 	// Execution
 	// ------------------------------------------------------------------------
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
@@ -56,6 +59,7 @@ public class OpenTraceHandler implements IHandler {
 		return null;
 	}
 
+	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
 	}
@@ -64,10 +68,12 @@ public class OpenTraceHandler implements IHandler {
 	// IHandlerListener
 	// ------------------------------------------------------------------------
 
+	@Override
 	public void addHandlerListener(IHandlerListener handlerListener) {
 		// TODO Auto-generated method stub
 	}
 
+	@Override
 	public void removeHandlerListener(IHandlerListener handlerListener) {
 		// TODO Auto-generated method stub
 	}

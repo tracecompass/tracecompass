@@ -45,6 +45,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
         fDefinition = definition;
     }
 
+	@Override
     public ITmfTrace createTraceCopy() {
         // TODO Auto-generated method stub
         return null;

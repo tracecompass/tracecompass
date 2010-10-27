@@ -150,8 +150,8 @@ public class LTTngTreeNodeTest extends TestCase {
 		int size = childrensOf20.length;
 		assertEquals(2, size);
 
-		LTTngTreeNode child30 = childrensOf20[0];
-		LTTngTreeNode child25 = childrensOf20[1];
+		LTTngTreeNode child25 = childrensOf20[0];
+		LTTngTreeNode child30 = childrensOf20[1];
 
 		assertNotNull(child25);
 		assertNotNull(child30);

@@ -153,6 +153,7 @@ public abstract class TimeRangeEventResource extends TimeRangeComposite
 	 *         "bigger".
 	 */
 	// @Override
+	@Override
 	public int compareTo(TimeRangeEventResource comparedResource) {
 		int returnedValue = 0;
 

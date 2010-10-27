@@ -264,6 +264,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             
             // The following allows xml parsing without access to the dtd
             EntityResolver resolver = new EntityResolver () {
+            	@Override
                 public InputSource resolveEntity (String publicId, String systemId) {
                     String empty = "";
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
@@ -274,8 +275,11 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
 
             // The following catches xml parsing exceptions
             db.setErrorHandler(new ErrorHandler(){
+            	@Override
                 public void error(SAXParseException saxparseexception) throws SAXException {}
+            	@Override
                 public void warning(SAXParseException saxparseexception) throws SAXException {}
+            	@Override
                 public void fatalError(SAXParseException saxparseexception) throws SAXException {
                     throw saxparseexception;
                 }});
@@ -397,6 +401,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
 
             // The following allows xml parsing without access to the dtd
             EntityResolver resolver = new EntityResolver () {
+            	@Override
                 public InputSource resolveEntity (String publicId, String systemId) {
                     String empty = "";
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
@@ -407,8 +412,11 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
 
             // The following catches xml parsing exceptions
             db.setErrorHandler(new ErrorHandler(){
+            	@Override
                 public void error(SAXParseException saxparseexception) throws SAXException {}
+            	@Override
                 public void warning(SAXParseException saxparseexception) throws SAXException {}
+            	@Override
                 public void fatalError(SAXParseException saxparseexception) throws SAXException {
                     throw saxparseexception;
                 }});
@@ -453,6 +461,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
 
             // The following allows xml parsing without access to the dtd
             EntityResolver resolver = new EntityResolver () {
+            	@Override
                 public InputSource resolveEntity (String publicId, String systemId) {
                     String empty = "";
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
@@ -463,8 +472,11 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
 
             // The following catches xml parsing exceptions
             db.setErrorHandler(new ErrorHandler(){
+            	@Override
                 public void error(SAXParseException saxparseexception) throws SAXException {}
+            	@Override
                 public void warning(SAXParseException saxparseexception) throws SAXException {}
+            	@Override
                 public void fatalError(SAXParseException saxparseexception) throws SAXException {
                     throw saxparseexception;
                 }});
@@ -567,6 +579,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
 
             // The following allows xml parsing without access to the dtd
             EntityResolver resolver = new EntityResolver () {
+            	@Override
                 public InputSource resolveEntity (String publicId, String systemId) {
                     String empty = "";
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
@@ -577,8 +590,11 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
 
             // The following catches xml parsing exceptions
             db.setErrorHandler(new ErrorHandler(){
+            	@Override
                 public void error(SAXParseException saxparseexception) throws SAXException {}
+            	@Override
                 public void warning(SAXParseException saxparseexception) throws SAXException {}
+            	@Override
                 public void fatalError(SAXParseException saxparseexception) throws SAXException {
                     throw saxparseexception;
                 }});

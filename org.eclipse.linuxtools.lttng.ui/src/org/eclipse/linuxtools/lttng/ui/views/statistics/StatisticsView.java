@@ -185,6 +185,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 									.getValue().nbEvents);
 						}
 					}, new ColumnPercentageProvider() {
+						@Override
 						public double getPercentage(StatisticsTreeNode node) {
 							StatisticsTreeNode parent = node;
 							do {
@@ -269,6 +270,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 		 * org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang
 		 * .Object)
 		 */
+		@Override
 		public Object[] getChildren(Object parentElement) {
 			return ((StatisticsTreeNode) parentElement).getChildren().toArray();
 		}
@@ -280,6 +282,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 		 * org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang
 		 * .Object)
 		 */
+		@Override
 		public Object getParent(Object element) {
 			return ((StatisticsTreeNode) element).getParent();
 		}
@@ -291,6 +294,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 		 * org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang
 		 * .Object)
 		 */
+		@Override
 		public boolean hasChildren(Object element) {
 			return ((StatisticsTreeNode) element).hasChildren();
 		}
@@ -302,6 +306,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 		 * org.eclipse.jface.viewers.IStructuredContentProvider#getElements(
 		 * java.lang.Object)
 		 */
+		@Override
 		public Object[] getElements(Object inputElement) {
 			return getChildren(inputElement);
 		}
@@ -311,6 +316,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 		 * 
 		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 		 */
+		@Override
 		public void dispose() {
 		}
 
@@ -322,6 +328,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 		 * .jface.viewers.Viewer, java.lang.Object, java.lang.Object)
 		 */
 		// @Override
+		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 	}
@@ -398,6 +405,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 		// Handler that will draw the bar charts.
 		treeViewer.getTree().addListener(SWT.EraseItem, new Listener() {
 			// @Override
+			@Override
 			public void handleEvent(Event event) {
 				if (columnDataList[event.index].percentageProvider != null) {
 					StatisticsTreeNode node = (StatisticsTreeNode) event.item
@@ -504,6 +512,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 
 		// Perform the updates on the UI thread
 		display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if ((treeViewer != null) && (!treeViewer.getTree().isDisposed())) {
 					Cursor cursor = null; /* indicates default */
@@ -523,6 +532,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 			((StatisticsTreeNode) input).reset();
 			treeViewer.getTree().getDisplay().asyncExec(new Runnable() {
 				// @Override
+				@Override
 				public void run() {
 					if (!treeViewer.getTree().isDisposed())
 						treeViewer.refresh();
@@ -538,6 +548,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 		
 		treeViewer.getTree().getDisplay().asyncExec(new Runnable() {
 			// @Override
+			@Override
 			public void run() {
 				if (!treeViewer.getTree().isDisposed())
 					treeViewer.refresh();

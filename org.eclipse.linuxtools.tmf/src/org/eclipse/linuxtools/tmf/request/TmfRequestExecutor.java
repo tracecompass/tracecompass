@@ -32,6 +32,7 @@ public class TmfRequestExecutor implements Executor {
 	private final ExecutorService fExecutor;
 	private final String fExecutorName;
 	private final PriorityBlockingQueue<TmfThread> fRequestQueue = new PriorityBlockingQueue<TmfThread>(100, new Comparator<TmfThread>() {
+		@Override
 		public int compare(TmfThread o1, TmfThread o2) {
 			if (o1.getExecType() == o2.getExecType())
 				return 0;
@@ -93,6 +94,7 @@ public class TmfRequestExecutor implements Executor {
 	/* (non-Javadoc)
 	 * @see java.util.concurrent.Executor#execute(java.lang.Runnable)
 	 */
+	@Override
 	public synchronized void execute(final Runnable requestThread) {
 		fRequestQueue.offer(new TmfThread(((TmfThread) requestThread).getExecType()) {
 			@Override

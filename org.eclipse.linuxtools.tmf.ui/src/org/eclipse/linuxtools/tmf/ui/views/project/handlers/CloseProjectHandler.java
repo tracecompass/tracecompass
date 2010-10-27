@@ -62,6 +62,7 @@ public class CloseProjectHandler extends AbstractHandler {
 	// Execution
 	// ------------------------------------------------------------------------
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		if (fProject != null) {

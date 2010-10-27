@@ -73,7 +73,8 @@ public class SelectParserHandler extends AbstractHandler {
     // Execution
     // ------------------------------------------------------------------------
 
-    @SuppressWarnings("unchecked")
+    @Override
+	@SuppressWarnings("unchecked")
 	public Object execute(ExecutionEvent event) throws ExecutionException {
         IResource resource = fTrace.getResource();
         if (fTrace.getParent() instanceof TmfExperimentNode) {

@@ -40,6 +40,7 @@ public class TmfTraceNode extends TmfProjectTreeNode {
 	// TmfProjectTreeNode
 	// ------------------------------------------------------------------------
 
+	@Override
 	public String getName() {
 		return fTrace.getName();
 	}

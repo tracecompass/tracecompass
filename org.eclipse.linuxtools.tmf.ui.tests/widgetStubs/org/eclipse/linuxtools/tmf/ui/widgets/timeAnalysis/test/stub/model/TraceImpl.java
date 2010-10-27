@@ -75,26 +75,32 @@ public class TraceImpl implements ITmfTimeAnalysisEntry {
 		this.stopTime = stopTime;
 	}
 
+	@Override
 	public String getGroupName() {
 		return groupName;
 	}
 
+	@Override
 	public int getId() {
 		return id;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
 
+	@Override
 	public long getStartTime() {
 		return startTime;
 	}
 
+	@Override
 	public long getStopTime() {
 		return stopTime;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public Vector<TimeEvent> getTraceEvents() {
 		return traceEvents;

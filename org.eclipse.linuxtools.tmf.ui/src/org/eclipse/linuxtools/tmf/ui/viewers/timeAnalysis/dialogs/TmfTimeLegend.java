@@ -193,6 +193,7 @@ public class TmfTimeLegend extends TitleAreaDialog {
 			this.colorIdx = colorIdx;
 			color = colors.getColor(colorIdx);
 			addListener(SWT.Paint, new Listener() {
+				@Override
 				public void handleEvent(Event event) {
 					draw(event.gc);
 				}
@@ -239,6 +240,7 @@ public class TmfTimeLegend extends TitleAreaDialog {
 
 			color = colors.getColor(colorIdx);
 			addListener(SWT.Paint, new Listener() {
+				@Override
 				public void handleEvent(Event event) {
 					draw(event.gc);
 				}
@@ -275,6 +277,7 @@ public class TmfTimeLegend extends TitleAreaDialog {
 
 			color = colors.getColor(colorIdx);
 			addListener(SWT.Paint, new Listener() {
+				@Override
 				public void handleEvent(Event event) {
 					draw(event.gc);
 				}

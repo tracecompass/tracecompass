@@ -221,7 +221,8 @@ public class TimeFrameView extends TmfView {
         fSlider.setLayoutData(gridData);
 
         fSlider.addListener(SWT.Selection, new Listener() {
-        	public void handleEvent(Event event) {
+        	@Override
+			public void handleEvent(Event event) {
 				int ratio = fSlider.getSelection();
 				TmfTimestamp span = fCurrentGroup.getSpan();
 				long value = span.getValue() * ratio / SLIDER_RANGE;
@@ -254,7 +255,8 @@ public class TimeFrameView extends TmfView {
         long current = fSlider.getSelection();
         if (position != current) {
         	fSlider.getDisplay().asyncExec(new Runnable() {
-        		public void run() {
+        		@Override
+				public void run() {
         			fSlider.setSelection((int) position);
         		}
         	});

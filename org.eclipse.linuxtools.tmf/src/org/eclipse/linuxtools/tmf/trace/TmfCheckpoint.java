@@ -117,7 +117,8 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint>, Cloneable {
     // Comparable
     // ------------------------------------------------------------------------
 
-    public int compareTo(TmfCheckpoint other) {
+    @Override
+	public int compareTo(TmfCheckpoint other) {
         return fTimestamp.compareTo(other.fTimestamp, false);
     }
 

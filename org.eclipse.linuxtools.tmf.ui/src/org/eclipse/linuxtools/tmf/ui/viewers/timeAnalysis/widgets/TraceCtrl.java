@@ -47,6 +47,7 @@ public abstract class TraceCtrl extends Canvas implements PaintListener {
 		super.dispose();
 	}
 
+	@Override
 	public void paintControl(PaintEvent e) {
 		if (e.widget != this)
 			return;

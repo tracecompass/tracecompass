@@ -16,16 +16,19 @@ public abstract class TimeEvent implements ITimeEvent {
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.tlf.widgets.timeAnalysis.model.TmTaEventI#getTrace()
 	 */
+	@Override
 	public abstract ITmfTimeAnalysisEntry getEntry();
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.tlf.widgets.timeAnalysis.model.TmTaEventI#getTime()
 	 */
+	@Override
 	public abstract long getTime();
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.tlf.widgets.timeAnalysis.model.TmTaEventI#getDuration()
 	 */
+	@Override
 	public long getDuration() {
 		return -1;
 	}

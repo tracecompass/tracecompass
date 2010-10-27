@@ -97,6 +97,7 @@ public class TmfVirtualTable extends Composite {
 
 		// Add the listeners
 		fTable.addMouseWheelListener(new MouseWheelListener() {
+			@Override
 			public void mouseScrolled(MouseEvent event) {
 				fTableTopEventRank -= event.count;
 				if (fTableTopEventRank < 0) {
@@ -144,9 +145,11 @@ public class TmfVirtualTable extends Composite {
 		});
 
         fTable.addKeyListener(new KeyListener() {
+			@Override
 			public void keyPressed(KeyEvent event) {
 				handleTableKeyEvent(event);
 			}
+			@Override
 			public void keyReleased(KeyEvent event) {
 			}
 		});
@@ -303,6 +306,7 @@ public class TmfVirtualTable extends Composite {
 		fSlider.setMaximum(0);
 
 		fSlider.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				switch (event.detail) {
 					case SWT.ARROW_DOWN:

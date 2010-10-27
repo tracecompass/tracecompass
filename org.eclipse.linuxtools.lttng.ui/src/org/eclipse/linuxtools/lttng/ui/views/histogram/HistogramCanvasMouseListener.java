@@ -49,6 +49,7 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 	 * 
 	 * @param event  The generated mouse event when the mouse moved.
 	 */
+	@Override
 	public void mouseMove(MouseEvent event) {
 		if ( parentCanvas.getHistogramContent() != null && isWindowMoving == true ) {
 
@@ -62,6 +63,7 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 	 * 
 	 * @param event  The generated mouse event when the mouse button was pressed.
 	 */
+	@Override
 	public void mouseDown(MouseEvent event) {
 		if ( parentCanvas.getHistogramContent() != null && event.button == 1) {
 			isWindowMoving = true;
@@ -77,6 +79,7 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 	 * 
 	 * @param event  The generated mouse event when the mouse button was released.
 	 */
+	@Override
 	public void mouseUp(MouseEvent event) {
 		if ( parentCanvas.getHistogramContent() != null && event.button == 1) {
 			isWindowMoving = false;
@@ -93,6 +96,7 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 	 * 
 	 * @param event  The generated mouse event when the mouse double-click was issued.
 	 */
+	@Override
 	public void mouseDoubleClick(MouseEvent event) {
 //		System.out.println("mouseDoubleClick");
 	}
@@ -104,6 +108,7 @@ public class HistogramCanvasMouseListener implements MouseMoveListener, MouseLis
 	 * 
 	 * @param event  The generated mouse event when the mouse scroll was spinned.
 	 */
+	@Override
 	public void mouseScrolled(MouseEvent event) {
 		
 		// Start a scrollListener if none exist yet and start its thread

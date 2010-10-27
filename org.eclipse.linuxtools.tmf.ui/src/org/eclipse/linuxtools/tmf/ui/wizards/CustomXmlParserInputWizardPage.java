@@ -140,6 +140,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         }
     }
 
+	@Override
     public void createControl(Composite parent) {
         container = new Composite(parent, SWT.NULL);
         container.setLayout(new GridLayout());
@@ -272,6 +273,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         inputText.setLayoutData(gd);
         inputText.setText(getSelectionText());
         inputText.addModifyListener(new ModifyListener(){
+        	@Override
             public void modifyText(ModifyEvent e) {
                 parseXmlInput(inputText.getText());
             }});
@@ -455,6 +457,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     
     private class InputElementTreeNodeContentProvider implements ITreeContentProvider {
 
+    	@Override
         public Object[] getElements(Object inputElement) {
             CustomXmlTraceDefinition def = (CustomXmlTraceDefinition) inputElement;
             if (def.rootInputElement != null) {
@@ -464,23 +467,28 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             }
         }
 
+    	@Override
         public Object[] getChildren(Object parentElement) {
             InputElement inputElement = (InputElement) parentElement;
             if (inputElement.childElements == null) return new InputElement[0];
             return inputElement.childElements.toArray();
         }
 
+    	@Override
         public boolean hasChildren(Object element) {
             InputElement inputElement = (InputElement) element;
             return (inputElement.childElements != null && inputElement.childElements.size() > 0);
         }
 
+    	@Override
         public void dispose() {
         }
 
+    	@Override
         public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         }
 
+    	@Override
         public Object getParent(Object element) {
             InputElement inputElement = (InputElement) element;
             return inputElement.parentElement;
@@ -502,6 +510,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     }
 
     private class InputElementTreeSelectionChangedListener implements ISelectionChangedListener {
+    	@Override
         public void selectionChanged(SelectionChangedEvent event) {
             if (selectedElement != null) {
                 selectedElement.dispose();
@@ -664,6 +673,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
             // The following allows xml parsing without access to the dtd
             EntityResolver resolver = new EntityResolver () {
+            	@Override
                 public InputSource resolveEntity (String publicId, String systemId) {
                     String empty = "";
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
@@ -674,8 +684,11 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
             // The following catches xml parsing exceptions
             db.setErrorHandler(new ErrorHandler(){
+            	@Override
                 public void error(SAXParseException saxparseexception) throws SAXException {}
+            	@Override
                 public void warning(SAXParseException saxparseexception) throws SAXException {}
+            	@Override
                 public void fatalError(SAXParseException saxparseexception) throws SAXException {
                     if (string.trim().length() != 0) {
                         errorText.setText(saxparseexception.getMessage());
@@ -749,6 +762,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         helpShell.setLayout(new FillLayout());
         helpBrowser = new Browser(helpShell, SWT.NONE);
         helpBrowser.addTitleListener(new TitleListener() {
+        	@Override
            public void changed(TitleEvent event) {
                helpShell.setText(event.title);
            }
@@ -761,16 +775,19 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
     private class UpdateListener implements ModifyListener, SelectionListener {
 
+    	@Override
         public void modifyText(ModifyEvent e) {
             validate();
             updatePreviews();
         }
 
+    	@Override
         public void widgetDefaultSelected(SelectionEvent e) {
             validate();
             updatePreviews();
         }
 
+    	@Override
         public void widgetSelected(SelectionEvent e) {
             validate();
             updatePreviews();
@@ -816,6 +833,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             gd.widthHint = 0;
             elementNameText.setLayoutData(gd);
             elementNameText.addModifyListener(new ModifyListener(){
+            	@Override
                 public void modifyText(ModifyEvent e) {
                     ElementNode.this.inputElement.elementName = elementNameText.getText().trim();
                     group.setText(getName(ElementNode.this.inputElement));
@@ -839,7 +857,9 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 logEntryButton.setText("Log Entry");
                 logEntryButton.setSelection(inputElement.logEntry);
                 logEntryButton.addSelectionListener(new SelectionListener(){
+                	@Override
                     public void widgetDefaultSelected(SelectionEvent e) {}
+                	@Override
                     public void widgetSelected(SelectionEvent e) {
                         InputElement parent = ElementNode.this.inputElement.parentElement;
                         while (parent != null) {
@@ -863,7 +883,9 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                                                 CustomXmlTraceDefinition.TAG_OTHER});
                 tagCombo.setVisibleItemCount(tagCombo.getItemCount());
                 tagCombo.addSelectionListener(new SelectionListener(){
+                	@Override
                     public void widgetDefaultSelected(SelectionEvent e) {}
+                	@Override
                     public void widgetSelected(SelectionEvent e) {
                         tagText.removeModifyListener(updateListener);
                         switch (tagCombo.getSelectionIndex()) {
@@ -1207,7 +1229,9 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                                             CustomXmlTraceDefinition.TAG_OTHER});
             tagCombo.select(2); //Other
             tagCombo.addSelectionListener(new SelectionListener(){
+            	@Override
                 public void widgetDefaultSelected(SelectionEvent e) {}
+            	@Override
                 public void widgetSelected(SelectionEvent e) {
                     tagText.removeModifyListener(updateListener);
                     switch (tagCombo.getSelectionIndex()) {

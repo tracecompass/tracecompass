@@ -24,10 +24,12 @@ import org.eclipse.swt.widgets.Composite;
 
 public class CustomParserProvider implements IParserProvider {
 
+	@Override
     public String getCategory() {
         return "Custom";
     }
 
+	@Override
     public ITmfTrace getTraceForParser(String parser, IResource resource) {
         try {
             String name = resource.getName();
@@ -48,14 +50,17 @@ public class CustomParserProvider implements IParserProvider {
         return null;
     }
 
+	@Override
     public ITmfTrace getTraceForContentType(String contentTypeId, IResource resource) {
         return null;
     }
 
-    public String getEditorIdForParser(String parser) {
+	@Override
+	public String getEditorIdForParser(String parser) {
         return null;
     }
 
+	@Override
     public Map<String, String> getParserMap() {
         Map<String, String> parserMap = new LinkedHashMap<String, String>();
         for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
@@ -67,6 +72,7 @@ public class CustomParserProvider implements IParserProvider {
         return parserMap;
     }
 
+	@Override
     public TmfEventsTable getEventsTable(ITmfTrace trace, Composite parent, int cacheSize) {
         if (trace instanceof CustomTxtTrace) {
             return new CustomEventsTable(((CustomTxtTrace) trace).getDefinition(), parent, cacheSize);

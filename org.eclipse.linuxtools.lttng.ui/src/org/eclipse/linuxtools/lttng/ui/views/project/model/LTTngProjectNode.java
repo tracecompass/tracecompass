@@ -55,6 +55,7 @@ public class LTTngProjectNode extends LTTngProjectTreeNode {
 	// LTTngProjectTreeNode
 	// ------------------------------------------------------------------------
 
+	@Override
 	public String getName() {
 		return fProject.getName();
 	}

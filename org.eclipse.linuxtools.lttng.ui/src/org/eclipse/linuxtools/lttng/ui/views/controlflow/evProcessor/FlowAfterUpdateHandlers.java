@@ -43,6 +43,7 @@ class FlowAfterUpdateHandlers {
 		AbsFlowTRangeUpdate handler = new AbsFlowTRangeUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 				
 				// get event time, cpu, trace_number, process, pid
@@ -124,6 +125,7 @@ class FlowAfterUpdateHandlers {
 	    AbsFlowTRangeUpdate handler = new AbsFlowTRangeUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {  
 			    
                 Long child_pid = getAFieldLong(trcEvent, traceSt, Fields.LTT_FIELD_CHILD_PID);
@@ -169,6 +171,7 @@ class FlowAfterUpdateHandlers {
 	    AbsFlowTRangeUpdate handler = new AbsFlowTRangeUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 			    
 			    LttngProcessState process = traceSt.getRunning_process().get(trcEvent.getCpuId());
@@ -217,6 +220,7 @@ class FlowAfterUpdateHandlers {
 	    AbsFlowTRangeUpdate handler = new AbsFlowTRangeUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 			    
 			    LttngProcessState process = traceSt.getRunning_process().get(trcEvent.getCpuId());
@@ -261,6 +265,7 @@ class FlowAfterUpdateHandlers {
 	    AbsFlowTRangeUpdate handler = new AbsFlowTRangeUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 			    
 			    LttngProcessState process = traceSt.getRunning_process().get(trcEvent.getCpuId());
@@ -321,6 +326,7 @@ class FlowAfterUpdateHandlers {
 	    AbsFlowTRangeUpdate handler = new AbsFlowTRangeUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 			    
 				int first_cpu;

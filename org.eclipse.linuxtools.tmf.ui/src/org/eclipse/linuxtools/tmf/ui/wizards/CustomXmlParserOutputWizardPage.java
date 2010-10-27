@@ -55,7 +55,8 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
         setPageComplete(false);
     }
 
-    public void createControl(Composite parent) {
+    @Override
+	public void createControl(Composite parent) {
         container = new Composite(parent, SWT.NULL);
         container.setLayout(new GridLayout());
 

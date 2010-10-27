@@ -200,7 +200,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
                                   	  );
     }
     
-    public LTTngTrace createTraceCopy() { 
+    @Override
+	public LTTngTrace createTraceCopy() { 
     	LTTngTrace returnedTrace = null;
     	
     	try {

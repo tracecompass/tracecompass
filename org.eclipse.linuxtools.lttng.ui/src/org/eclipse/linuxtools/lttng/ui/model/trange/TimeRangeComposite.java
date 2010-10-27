@@ -105,6 +105,7 @@ ITmfTimeAnalysisEntry {
 	 * @seeorg.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.
 	 * ITmfTimeAnalysisEntry#getGroupName()
 	 */
+	@Override
 	public String getGroupName() {
 		return groupName;
 	}
@@ -122,6 +123,7 @@ ITmfTimeAnalysisEntry {
 	 * @seeorg.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.
 	 * ITmfTimeAnalysisEntry#getId()
 	 */
+	@Override
 	public int getId() {
 		return id;
 	}
@@ -153,6 +155,7 @@ ITmfTimeAnalysisEntry {
 	 * @seeorg.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.
 	 * ITmfTimeAnalysisEntry#getTraceEvents()
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public Vector<TimeRangeComponent> getTraceEvents() {
 		return ChildEventLeafs;

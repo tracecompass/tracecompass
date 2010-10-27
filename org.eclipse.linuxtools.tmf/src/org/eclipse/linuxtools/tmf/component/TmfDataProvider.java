@@ -126,6 +126,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	// ITmfRequestHandler
 	// ------------------------------------------------------------------------
 
+	@Override
 	public void sendRequest(final ITmfDataRequest<T> request) {
 		synchronized(fLock) {
 			if (fSignalDepth > 0) {
@@ -141,6 +142,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	 * 
 	 * @param thread
 	 */
+	@Override
 	public void fireRequests() {
 		synchronized(fLock) {
 			for (TmfDataRequest<T> request : fPendingCoalescedRequests) {

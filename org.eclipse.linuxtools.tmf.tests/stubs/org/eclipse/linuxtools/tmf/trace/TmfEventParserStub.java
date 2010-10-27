@@ -60,7 +60,8 @@ public class TmfEventParserStub implements ITmfEventParser {
     // ------------------------------------------------------------------------
 
     static final String typePrefix = "Type-";
-    @SuppressWarnings("unchecked")
+    @Override
+	@SuppressWarnings("unchecked")
 	public TmfEvent parseNextEvent(ITmfTrace eventStream, TmfContext context) throws IOException {
 
         if (! (eventStream instanceof TmfTraceStub)) {

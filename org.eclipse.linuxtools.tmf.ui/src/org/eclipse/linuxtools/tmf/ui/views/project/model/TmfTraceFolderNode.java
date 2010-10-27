@@ -46,6 +46,7 @@ public class TmfTraceFolderNode extends TmfProjectTreeNode {
 	// TmfProjectTreeNode
 	// ------------------------------------------------------------------------
 
+	@Override
 	public String getName() {
 		return fTraceFolder.getName();
 	}

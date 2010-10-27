@@ -120,42 +120,48 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     /**
      * @return the trace path
      */
-    public String getPath() {
+    @Override
+	public String getPath() {
         return fPath;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.stream.ITmfEventStream#getNbEvents()
      */
-    public long getNbEvents() {
+    @Override
+	public long getNbEvents() {
         return fNbEvents;
     }
 
     /**
      * @return the size of the cache
      */
-    public int getCacheSize() {
+    @Override
+	public int getCacheSize() {
         return fIndexPageSize;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.stream.ITmfEventStream#getTimeRange()
      */
-    public TmfTimeRange getTimeRange() {
+    @Override
+	public TmfTimeRange getTimeRange() {
         return new TmfTimeRange(fStartTime, fEndTime);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#getStartTime()
      */
-    public TmfTimestamp getStartTime() {
+    @Override
+	public TmfTimestamp getStartTime() {
     	return fStartTime;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#getEndTime()
      */
-    public TmfTimestamp getEndTime() {
+    @Override
+	public TmfTimestamp getEndTime() {
     	return fEndTime;
     }
 
@@ -171,7 +177,8 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
      * @param timestamp
      * @return
      */
-    public long getRank(TmfTimestamp timestamp) {
+    @Override
+	public long getRank(TmfTimestamp timestamp) {
         TmfContext context = seekEvent(timestamp);
         return context.getRank();
     }
@@ -228,7 +235,8 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#seekEvent(org.eclipse.linuxtools.tmf.event.TmfTimestamp)
      */
-    public TmfContext seekEvent(TmfTimestamp timestamp) {
+    @Override
+	public TmfContext seekEvent(TmfTimestamp timestamp) {
 
     	if (timestamp == null) {
     		timestamp = TmfTimestamp.BigBang;
@@ -275,7 +283,8 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#seekEvent(int)
      */
-    public TmfContext seekEvent(long rank) {
+    @Override
+	public TmfContext seekEvent(long rank) {
 
         // Position the stream at the previous checkpoint
         int index = (int) rank / fIndexPageSize;
@@ -309,6 +318,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#getNextEvent(org.eclipse.linuxtools.tmf.trace.ITmfTrace.TraceContext)
 	 */
+	@Override
 	public synchronized TmfEvent getNextEvent(TmfContext context) {
 		// parseEvent() does not update the context
 		TmfEvent event = parseEvent(context);
@@ -354,9 +364,11 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     /**
      * To be implemented by the concrete class
      */
-    public abstract TmfContext seekLocation(ITmfLocation<?> location);
+    @Override
+	public abstract TmfContext seekLocation(ITmfLocation<?> location);
 	public abstract ITmfLocation<?> getCurrentLocation();
-    public abstract TmfEvent parseEvent(TmfContext context);
+    @Override
+	public abstract TmfEvent parseEvent(TmfContext context);
 
 	// ------------------------------------------------------------------------
 	// toString

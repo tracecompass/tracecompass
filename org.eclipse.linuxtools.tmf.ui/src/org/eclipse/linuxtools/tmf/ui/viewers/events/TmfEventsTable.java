@@ -128,7 +128,8 @@ public class TmfEventsTable extends TmfComponent {
         // Handle the table item requests 
         fTable.addListener(SWT.SetData, new Listener() {
 
-            @SuppressWarnings("unchecked")
+            @Override
+			@SuppressWarnings("unchecked")
 			public void handleEvent(Event event) {
 
                 final TableItem item = (TableItem) event.item;
@@ -249,7 +250,8 @@ public class TmfEventsTable extends TmfComponent {
         
         // Perform the updates on the UI thread
         fTable.getDisplay().syncExec(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 //fTable.setSelection(0);
                 fTable.removeAll();
                 fCacheStartIndex = fCacheEndIndex = 0; // Clear the cache
@@ -272,7 +274,8 @@ public class TmfEventsTable extends TmfComponent {
         if ((signal.getExperiment() != fTrace) || fTable.isDisposed()) return;
         // Perform the refresh on the UI thread
         fTable.getDisplay().asyncExec(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 if (!fTable.isDisposed() && fTrace != null) {
                     fTable.setItemCount((int) fTrace.getNbEvents());
                     fTable.refresh();
@@ -286,7 +289,8 @@ public class TmfEventsTable extends TmfComponent {
         if ((signal.getTrace() != fTrace ) || fTable.isDisposed()) return;
         // Perform the refresh on the UI thread
         fTable.getDisplay().asyncExec(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 if (!fTable.isDisposed() && fTrace != null) {
                     //int nbEvents = (int) fTrace.getNbEvents();
                     //fTable.setItemCount((nbEvents > 100) ? nbEvents : 100);
@@ -303,7 +307,8 @@ public class TmfEventsTable extends TmfComponent {
             // Perform the refresh on the UI thread
             fRefreshPending = true;
             fTable.getDisplay().asyncExec(new Runnable() {
-                public void run() {
+                @Override
+				public void run() {
                     fRefreshPending = false;
                     if (!fTable.isDisposed() && fTrace != null) {
                         fTable.setItemCount((int) fTrace.getNbEvents());
@@ -322,7 +327,8 @@ public class TmfEventsTable extends TmfComponent {
                     final int index = (int) fTrace.getRank(signal.getCurrentTime());
                     // Perform the updates on the UI thread
                     fTable.getDisplay().asyncExec(new Runnable() {
-                        public void run() {
+                        @Override
+						public void run() {
                         	// Return if table is disposed
                         	if (fTable.isDisposed()) return;
                         	

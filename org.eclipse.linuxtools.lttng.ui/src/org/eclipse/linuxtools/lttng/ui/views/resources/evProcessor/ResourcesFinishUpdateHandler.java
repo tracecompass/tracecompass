@@ -33,6 +33,7 @@ public class ResourcesFinishUpdateHandler extends
 		return null;
 	}
 
+	@Override
 	public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 		// The end of the last state is unknown since it's beyond the requested time range window. Create this last
 		// event to half page after the visible window but not beyond the end of trace

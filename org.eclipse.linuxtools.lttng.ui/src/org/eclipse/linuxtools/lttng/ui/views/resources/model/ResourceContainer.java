@@ -50,6 +50,7 @@ public class ResourceContainer implements ItemContainer<TimeRangeEventResource> 
 	 * (org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.
 	 * ITmfTimeAnalysisEntry)
 	 */
+	@Override
 	public void addItem(TimeRangeEventResource newItem) {
 		if (newItem != null) {
 		    resources.put( new ResourceKey(newItem),newItem);
@@ -62,13 +63,15 @@ public class ResourceContainer implements ItemContainer<TimeRangeEventResource> 
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.lttng.ui.views.resources.model.ItemContainer#getUniqueId()
 	 */
-    public Integer getUniqueId() {
+    @Override
+	public Integer getUniqueId() {
         return uniqueId++;
     }
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.lttng.ui.views.resources.model.ItemContainer#readItems()
 	 */
+	@Override
 	public TimeRangeEventResource[] readItems() {
 		return resources.values().toArray(
 				new TimeRangeEventResource[resources.size()]);
@@ -77,6 +80,7 @@ public class ResourceContainer implements ItemContainer<TimeRangeEventResource> 
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.lttng.ui.views.resources.model.ItemContainer#clearChildren()
 	 */
+	@Override
 	public void clearChildren() {
 	    TimeRangeEventResource newRes = null;
         Iterator<ResourceKey> iterator = resources.keySet().iterator();
@@ -90,6 +94,7 @@ public class ResourceContainer implements ItemContainer<TimeRangeEventResource> 
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.lttng.ui.views.resources.model.ItemContainer#clearItems()
 	 */
+	@Override
 	public void clearItems() {
 		resources.clear();
 	}
@@ -97,6 +102,7 @@ public class ResourceContainer implements ItemContainer<TimeRangeEventResource> 
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.lttng.ui.views.resources.model.ItemContainer#removeItems(java.lang.String)
 	 */
+	@Override
 	public void removeItems(String traceId) {
 	    ResourceKey newKey = null;
 

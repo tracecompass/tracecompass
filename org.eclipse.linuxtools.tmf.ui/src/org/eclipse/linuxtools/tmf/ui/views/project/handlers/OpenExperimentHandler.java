@@ -62,6 +62,7 @@ public class OpenExperimentHandler extends AbstractHandler {
 	// Execution
 	// ------------------------------------------------------------------------
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		// Set the selection to the project

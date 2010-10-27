@@ -68,6 +68,7 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> {
 //    	indexTrace(true);
     }
     
+	@Override
 	public ITmfTrace createTraceCopy() {
 		ITmfTrace returnedValue = null;
 		try {

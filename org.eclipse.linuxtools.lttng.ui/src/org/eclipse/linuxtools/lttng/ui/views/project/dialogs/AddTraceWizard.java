@@ -48,6 +48,7 @@ public class AddTraceWizard extends Wizard implements IImportWizard {
     /* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
 	 */
+	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
     	setWindowTitle("Adding traces to experiment");
 	}

@@ -109,6 +109,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     	fCheckpoints = oldTrace.fCheckpoints;
     }
     
+	@Override
 	public LTTngTextTrace createTraceCopy() {
 		
 		LTTngTextTrace returnedTrace = null;

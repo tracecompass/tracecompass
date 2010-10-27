@@ -51,6 +51,7 @@ public class TmfProjectRoot extends TmfProjectTreeNode {
 	// TmfProjectTreeNode
 	// ------------------------------------------------------------------------
 
+	@Override
 	public String getName() {
 		return null;
 	}

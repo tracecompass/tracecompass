@@ -31,6 +31,7 @@ public class StatsTracesetEndHandler extends AbstractStatsEventHandler {
 	 * (non-Javadoc)
 	 * @see org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor#process(org.eclipse.linuxtools.lttng.event.LttngEvent, org.eclipse.linuxtools.lttng.state.model.LttngTraceState)
 	 */
+	@Override
 	public boolean process(LttngEvent event, LttngTraceState traceState) {
 		StatisticsData tree = getStatisticsTree(traceState);
 		tree.endTraceset(event, traceState);

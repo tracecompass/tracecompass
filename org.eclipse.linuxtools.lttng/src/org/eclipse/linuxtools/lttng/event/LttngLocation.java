@@ -143,10 +143,12 @@ public class LttngLocation implements ITmfLocation<LttngTimestamp> {
 	// ITmfLocation
 	// ------------------------------------------------------------------------
 
+	@Override
 	public void setLocation(LttngTimestamp location) {
 		operationTime  = (LttngTimestamp)location;
 	}
 
+	@Override
 	public LttngTimestamp getLocation() {
 		return new LttngTimestamp ( operationTime );
 	}

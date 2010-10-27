@@ -131,6 +131,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 	 * #experimentSelected_prep
 	 * (org.eclipse.linuxtools.tmf.experiment.TmfExperiment)
 	 */
+	@Override
 	public void experimentSelected_prep(TmfExperiment<LttngEvent> experiment) {
 		LTTngTreeNode experimentNode = null;
 		if (experiment != null) {
@@ -188,6 +189,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 	 * experimentSelected(java.lang.Object,
 	 * org.eclipse.linuxtools.tmf.experiment.TmfExperiment)
 	 */
+	@Override
 	public void experimentSelected(Object source,
 			TmfExperiment<LttngEvent> experiment) {
 		// validate
@@ -213,6 +215,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 	 * experimentUpdated
 	 * (org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal, boolean)
 	 */
+	@Override
 	public void experimentUpdated(TmfExperimentUpdatedSignal signal, boolean wait) {
 		// NOTE: This represents the end of TMF indexing for a trace, however
 		// the node was already existing and the state system check points are
@@ -224,6 +227,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 	/**
 	 * @return the SelectedExperiment tree node
 	 */
+	@Override
 	public LTTngTreeNode getSelectedExperiment() {
 		return fSelectedExperiment;
 	}
@@ -231,6 +235,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.lttng.state.experiment.IStateExperimentManager#getExperimentTimeRange()
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public TmfTimeRange getExperimentTimeRange() {
 		TmfTimeRange timeRangeResult = null;
@@ -259,6 +264,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 	 * org.eclipse.linuxtools.lttng.state.experiment.IStateExperimentManager
 	 * #waitForComplete(boolean)
 	 */
+	@Override
 	public void waitForCompletion(boolean wait) {
 		fwaitForCompletion = wait;
 	}

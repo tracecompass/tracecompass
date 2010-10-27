@@ -46,6 +46,7 @@ public class ResourcesBeforeUpdateHandlers {
 		AbsResourcesTRangeUpdate handler = new AbsResourcesTRangeUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 				// Create a time range for the cpu.
 				globalProcessBeforeExecmode(trcEvent, traceSt);
@@ -69,6 +70,7 @@ public class ResourcesBeforeUpdateHandlers {
 		AbsResourcesTRangeUpdate handler = new AbsResourcesTRangeUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long irqId = null;
@@ -150,6 +152,7 @@ public class ResourcesBeforeUpdateHandlers {
 		AbsResourcesTRangeUpdate handler = new AbsResourcesTRangeUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long softIrqId = null;
@@ -238,6 +241,7 @@ public class ResourcesBeforeUpdateHandlers {
 		AbsResourcesTRangeUpdate handler = new AbsResourcesTRangeUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long trapId = null;
@@ -332,6 +336,7 @@ public class ResourcesBeforeUpdateHandlers {
 		AbsResourcesTRangeUpdate handler = new AbsResourcesTRangeUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 				Long major = getAFieldLong(trcEvent, traceSt,
 						Fields.LTT_FIELD_MAJOR);

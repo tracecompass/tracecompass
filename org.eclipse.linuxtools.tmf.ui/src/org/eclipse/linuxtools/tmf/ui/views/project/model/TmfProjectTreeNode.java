@@ -43,24 +43,30 @@ public abstract class TmfProjectTreeNode implements ITmfProjectTreeNode {
 	// ITmfProjectTreeNode
 	// ------------------------------------------------------------------------
 
+	@Override
 	public ITmfProjectTreeNode getParent() {
 		return fParent;
 	}
 
+	@Override
 	public boolean hasChildren() {
 		return fChildren.size() > 0;
 	}
 
+	@Override
 	public List<ITmfProjectTreeNode> getChildren() {
 		return fChildren;
 	}
 
+	@Override
 	public abstract void refreshChildren();
 
+	@Override
 	public void refresh() {
 		fParent.refresh();
 	}
 
+	@Override
 	public void removeChild(ITmfProjectTreeNode child) {
         for (ITmfProjectTreeNode node : fChildren) {
         	if (node == child) {
@@ -72,6 +78,7 @@ public abstract class TmfProjectTreeNode implements ITmfProjectTreeNode {
         }
 	}
 
+	@Override
 	public void removeChildren() {
         for (ITmfProjectTreeNode node : fChildren) {
         		node.removeChildren();

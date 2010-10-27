@@ -66,6 +66,7 @@ public class DeleteExperimentHandler extends AbstractHandler {
 	// Execution
 	// ------------------------------------------------------------------------
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		IFolder folder = fExperiment.getFolder();

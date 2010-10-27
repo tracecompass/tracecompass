@@ -44,6 +44,7 @@ public class HistogramCanvasKeyListener implements KeyListener
 	 * 
 	 * @param event  The KeyEvent generated when the key was pressed.
 	 */
+	@Override
 	public void keyPressed(KeyEvent event) {
 		switch (event.keyCode) {
 			case SWT.SHIFT:
@@ -67,6 +68,7 @@ public class HistogramCanvasKeyListener implements KeyListener
 	 * 
 	 * @param event  The KeyEvent generated when the key was pressed.
 	 */
+	@Override
 	public void keyReleased(KeyEvent event) {
 		switch (event.keyCode) {
 			case SWT.SHIFT:

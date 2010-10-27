@@ -154,6 +154,7 @@ public class TraceColorScheme {
 			this.syscol = syscol;
 		}
 
+		@Override
 		public Color get() {
 			return Utils.getSysColor(syscol);
 		}
@@ -170,6 +171,7 @@ public class TraceColorScheme {
 			this.b = b;
 		}
 
+		@Override
 		public Color get() {
 			return new Color(null, r, g, b);
 		}
@@ -195,6 +197,7 @@ public class TraceColorScheme {
 			this.w2 = 1;
 		}
 
+		@Override
 		public Color get() {
 			Color col1 = cp1.get();
 			Color col2 = cp2.get();

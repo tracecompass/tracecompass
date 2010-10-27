@@ -53,6 +53,7 @@ public class HistogramCanvasPaintListener implements PaintListener
 	 * 
 	 * @param event  The generated paint event when redraw is called.
 	 */
+	@Override
 	public void paintControl(PaintEvent event) {
 
 		if (childrenCanvas.getSize().x > 0 && childrenCanvas.getSize().y > 0) {

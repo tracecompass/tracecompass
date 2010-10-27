@@ -35,27 +35,32 @@ public abstract class AbsEventToHandlerResolver implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.lttng.state.evProcessor.IEventToHandlerResolver#getBeforeProcessor(java.lang.String)
 	 */
+	@Override
 	public abstract ILttngEventProcessor getBeforeProcessor(String eventType);
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.lttng.state.evProcessor.IEventToHandlerResolver#getAfterProcessor(java.lang.String)
 	 */
+	@Override
 	public abstract ILttngEventProcessor getAfterProcessor(String eventType);
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.lttng.state.evProcessor.IEventToHandlerResolver#getfinishProcessor()
 	 */
+	@Override
 	public abstract ILttngEventProcessor getfinishProcessor();
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.lttng.state.evProcessor.IEventToHandlerResolver#getStateUpdaterProcessor(java.lang.String)
 	 */
+	@Override
 	public abstract ILttngEventProcessor getStateUpdaterProcessor(
 			String eventType);
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor#process(org.eclipse.linuxtools.lttng.event.LttngEvent, org.eclipse.linuxtools.lttng.state.model.LttngTraceState)
 	 */
+	@Override
 	public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 		if (trcEvent instanceof LttngSyntheticEvent) {
 
@@ -122,6 +127,7 @@ public abstract class AbsEventToHandlerResolver implements
 	 * (org.eclipse.linuxtools.tmf.event.TmfEvent,
 	 * org.eclipse.linuxtools.lttng.state.model.LttngTraceState)
 	 */
+	@Override
 	public void process(TmfEvent tmfEvent, LttngTraceState traceSt) {
 		if (tmfEvent == null) {
 			return;
@@ -154,6 +160,7 @@ public abstract class AbsEventToHandlerResolver implements
 	 * @see org.eclipse.linuxtools.lttng.state.evProcessor.ITransEventProcessor#
 	 * getEventCount()
 	 */
+	@Override
 	public Long getBeforeEventCount() {
 		return fbeforeEventCount;
 	}
@@ -164,6 +171,7 @@ public abstract class AbsEventToHandlerResolver implements
 	 * @see org.eclipse.linuxtools.lttng.state.evProcessor.ITransEventProcessor#
 	 * getStateUpdateCount()
 	 */
+	@Override
 	public Long getStateUpdateCount() {
 		return fstateUpdateCount;
 	}
@@ -174,6 +182,7 @@ public abstract class AbsEventToHandlerResolver implements
 	 * @see org.eclipse.linuxtools.lttng.state.evProcessor.ITransEventProcessor#
 	 * getFilteredOutEventCount()
 	 */
+	@Override
 	public Long getFilteredOutEventCount() {
 		return filteredOutEventsCount;
 	}

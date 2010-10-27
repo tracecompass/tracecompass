@@ -67,6 +67,7 @@ public class SelectTracesHandler extends AbstractHandler {
 	// Execution
 	// ------------------------------------------------------------------------
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		// Open the trace addition wizard

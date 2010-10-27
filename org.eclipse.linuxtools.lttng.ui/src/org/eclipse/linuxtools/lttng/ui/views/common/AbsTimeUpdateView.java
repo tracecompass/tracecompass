@@ -97,6 +97,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	 * @seeorg.eclipse.linuxtools.lttng.state.IStateDataRequestListener#
 	 * processingStarted(org.eclipse.linuxtools.lttng.state.StateDataRequest)
 	 */
+	@Override
 	@TmfSignalHandler
 	public synchronized void processingStarted(RequestStartedSignal signal) {
 		LttngSyntEventRequest request = signal.getRequest();
@@ -129,6 +130,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	 * @seeorg.eclipse.linuxtools.lttng.state.IStateDataRequestListener#
 	 * processingCompleted(org.eclipse.linuxtools.lttng.state.StateDataRequest)
 	 */
+	@Override
 	@TmfSignalHandler
 	public void processingCompleted(RequestCompletedSignal signal) {
 		ILttngSyntEventRequest request = signal.getRequest();
@@ -485,6 +487,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 
 			// Perform the updates on the UI thread
 			display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					if ((tsfviewer != null) && (!tsfviewer.getControl().isDisposed())) {
 						tsfviewer.waitCursor(waitInd);
@@ -604,6 +607,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 					TraceDebug.debug("View: " + getName() + "\n\t\tRestoring the selected time to: " + selTime);
 					Display display = tsfviewer.getControl().getDisplay();
 					display.asyncExec(new Runnable() {
+						@Override
 						public void run() {
 							if ((tsfviewer != null) && (!tsfviewer.getControl().isDisposed())) {
 								tsfviewer.setSelectedTime(selTime, false, this);

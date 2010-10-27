@@ -69,7 +69,8 @@ public class CustomXmlParserWizard extends Wizard implements INewWizard {
         addPage(outputPage);
     }
 
-    public void init(IWorkbench workbench, IStructuredSelection selection) {
+    @Override
+	public void init(IWorkbench workbench, IStructuredSelection selection) {
         this.selection = selection;
     }
 

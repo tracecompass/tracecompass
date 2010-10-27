@@ -40,6 +40,7 @@ public class LTTngTraceNode extends LTTngProjectTreeNode {
 	// LTTngProjectTreeNode
 	// ------------------------------------------------------------------------
 
+	@Override
 	public String getName() {
 		return fTrace.getName();
 	}

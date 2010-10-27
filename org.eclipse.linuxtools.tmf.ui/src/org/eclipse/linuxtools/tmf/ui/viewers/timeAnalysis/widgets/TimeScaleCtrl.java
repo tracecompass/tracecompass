@@ -371,6 +371,7 @@ public class TimeScaleCtrl extends TraceCtrl implements MouseListener,
 		return numDigits;
 	}
 
+	@Override
 	public void mouseDown(MouseEvent e) {
 	    if (_dragState == 0 && null != _timeProvider) {
 	        if (1 == e.button) {
@@ -391,6 +392,7 @@ public class TimeScaleCtrl extends TraceCtrl implements MouseListener,
 	    }
 	}
 
+	@Override
 	public void mouseUp(MouseEvent e) {
 		if (e.button == 1 && _dragState == 1) {
 			setCapture(false);
@@ -424,6 +426,7 @@ public class TimeScaleCtrl extends TraceCtrl implements MouseListener,
 		}
 	}
 
+	@Override
 	public void mouseMove(MouseEvent e) {
 		if (_dragX0 < 0 || _dragState == 0) {
 			return;
@@ -450,6 +453,7 @@ public class TimeScaleCtrl extends TraceCtrl implements MouseListener,
 		}
 	}
 
+	@Override
 	public void mouseDoubleClick(MouseEvent e) {
 		if (null != _timeProvider) {
 			_timeProvider.resetStartFinishTime();

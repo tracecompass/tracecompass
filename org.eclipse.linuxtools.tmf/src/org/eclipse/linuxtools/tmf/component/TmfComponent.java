@@ -57,6 +57,7 @@ public abstract class TmfComponent implements ITmfComponent {
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.tmf.component.ITmfComponent#getName()
 	 */
+	@Override
 	public String getName() {
 		return fName;
 	}
@@ -64,6 +65,7 @@ public abstract class TmfComponent implements ITmfComponent {
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.tmf.component.ITmfComponent#dispose()
 	 */
+	@Override
 	public void dispose() {
 		TmfSignalManager.deregister(this);
 //		if (Tracer.isComponentTraced()) Tracer.traceComponent(this, "terminated");
@@ -72,6 +74,7 @@ public abstract class TmfComponent implements ITmfComponent {
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.tmf.component.ITmfComponent#broadcast(org.eclipse.linuxtools.tmf.signal.TmfSignal)
 	 */
+	@Override
 	public void broadcast(TmfSignal signal) {
 		TmfSignalManager.dispatchSignal(signal);
 	}

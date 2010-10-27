@@ -68,6 +68,7 @@ public class RefreshHandler extends AbstractHandler {
 	// Execution
 	// ------------------------------------------------------------------------
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
         IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
         try {

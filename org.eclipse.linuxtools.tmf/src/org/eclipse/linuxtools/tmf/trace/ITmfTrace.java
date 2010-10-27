@@ -33,6 +33,7 @@ public interface ITmfTrace extends ITmfComponent {
 	/**
 	 * @return the trace name 
 	 */
+	@Override
 	public String getName();
 
     /**

@@ -475,6 +475,7 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 
 		Display display = this.getDisplay();
 		display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if(!ParentHistogramCanvas.this.isDisposed())
 					notifyParentSelectionWindowChanged();

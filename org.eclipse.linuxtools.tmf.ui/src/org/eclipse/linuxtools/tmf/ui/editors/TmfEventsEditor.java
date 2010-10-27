@@ -99,7 +99,8 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     }
 
 //    @Override
-    public void propertyChanged(Object source, int propId) {
+    @Override
+	public void propertyChanged(Object source, int propId) {
         if (propId == IEditorPart.PROP_INPUT) {
             broadcast(new TmfTraceClosedSignal(this, fTrace));
             fResource = ((TmfEditorInput) getEditorInput()).getResource();
@@ -151,7 +152,8 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     }
     
 //    @Override
-    public ITmfTrace getTrace() {
+    @Override
+	public ITmfTrace getTrace() {
         return fTrace;
     }
 

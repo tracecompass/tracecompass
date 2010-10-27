@@ -40,6 +40,7 @@ public class DeleteProjectHandler implements IHandler {
 	// Validation
 	// ------------------------------------------------------------------------
 
+	@Override
 	public boolean isEnabled() {
 		
 		// Check if we are closing down
@@ -62,6 +63,7 @@ public class DeleteProjectHandler implements IHandler {
 	}
 
 	// Handled if we are in the ProjectView
+	@Override
 	public boolean isHandled() {
 		return true;
 	}
@@ -70,6 +72,7 @@ public class DeleteProjectHandler implements IHandler {
 	// Execution
 	// ------------------------------------------------------------------------
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		IProject project = fProject.getProject();
@@ -85,6 +88,7 @@ public class DeleteProjectHandler implements IHandler {
 		return null;
 	}
 
+	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
 	}
@@ -93,10 +97,12 @@ public class DeleteProjectHandler implements IHandler {
 	// IHandlerListener
 	// ------------------------------------------------------------------------
 
+	@Override
 	public void addHandlerListener(IHandlerListener handlerListener) {
 		// TODO Auto-generated method stub
 	}
 
+	@Override
 	public void removeHandlerListener(IHandlerListener handlerListener) {
 		// TODO Auto-generated method stub
 	}

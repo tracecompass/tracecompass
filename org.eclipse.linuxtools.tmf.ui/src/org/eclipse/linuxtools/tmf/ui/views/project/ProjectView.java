@@ -147,7 +147,8 @@ public class ProjectView extends TmfView {
 
     // Perform updates on the UI thread
     private Runnable fViewRefresher = new Runnable() {
-    	public void run() {
+    	@Override
+		public void run() {
     		if ((fViewer != null) && (!fViewer.getTree().isDisposed())) {
     			Object[] elements = fViewer.getExpandedElements();
     			fViewer.refresh();
@@ -191,7 +192,8 @@ public class ProjectView extends TmfView {
     public void init(IViewSite site) throws PartInitException {
         super.init(site);
         fResourceChangeListener = new IResourceChangeListener() {
-            public void resourceChanged(IResourceChangeEvent event) {
+            @Override
+			public void resourceChanged(IResourceChangeEvent event) {
                 if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
                     fProjectRoot.refreshChildren();
                     refresh();
@@ -200,7 +202,8 @@ public class ProjectView extends TmfView {
         };
         fWorkspace.addResourceChangeListener(fResourceChangeListener);
         fPreferenceChangeListener = new IPreferenceChangeListener() {
-            public void preferenceChange(PreferenceChangeEvent event) {
+            @Override
+			public void preferenceChange(PreferenceChangeEvent event) {
                 refresh();
             }
         };

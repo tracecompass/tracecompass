@@ -101,19 +101,23 @@ public class NewExperimentDialog extends SelectionStatusDialog {
 	protected void createLinkResourceGroup(Composite parent) {
 		linkedResourceGroup = new CreateLinkedResourceGroup(IResource.FOLDER,
 				new Listener() {
+					@Override
 					public void handleEvent(Event e) {
 						validateLinkedResource();
 						firstLinkCheck = false;
 					}
 				}, new CreateLinkedResourceGroup.IStringValue() {
+					@Override
 					public void setValue(String string) {
 						folderNameField.setText(string);
 					}
 
+					@Override
 					public String getValue() {
 						return folderNameField.getText();
 					}
 
+					@Override
 					public IResource getResource() {
 						// TODO Auto-generated method stub
 						return null;
@@ -160,6 +164,7 @@ public class NewExperimentDialog extends SelectionStatusDialog {
 		folderNameField.setLayoutData(data);
 		folderNameField.setFont(font);
 		folderNameField.addListener(SWT.Modify, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				validateLinkedResource();
 			}

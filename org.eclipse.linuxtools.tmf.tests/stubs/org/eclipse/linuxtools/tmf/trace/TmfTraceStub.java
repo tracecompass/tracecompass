@@ -95,7 +95,8 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     	return clone;
     }
  
-    public ITmfTrace createTraceCopy() {
+    @Override
+	public ITmfTrace createTraceCopy() {
 		ITmfTrace returnedValue = null;
 		returnedValue = clone();
 		return returnedValue;

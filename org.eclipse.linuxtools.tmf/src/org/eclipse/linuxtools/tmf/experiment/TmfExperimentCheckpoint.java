@@ -84,6 +84,7 @@ public class TmfExperimentCheckpoint implements Comparable<TmfExperimentCheckpoi
     // Comparable
     // ------------------------------------------------------------------------
 
+	@Override
 	public int compareTo(TmfExperimentCheckpoint other) {
 		return fTimestamp.compareTo(other.fTimestamp, false);
 	}

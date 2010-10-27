@@ -49,26 +49,31 @@ public abstract class TimeRangeComponent implements ITimeRangeComponent {
 	 * 
 	 * @param time
 	 */
+	@Override
 	public long getStartTime() {
 		return startTime.longValue();
 	}
 
+	@Override
 	public void setStartTime(long time) {
 		if (time > -1) {
 			startTime = time;
 		}
 	}
 
+	@Override
 	public long getStopTime() {
 		return stopTime.longValue();
 	}
 
+	@Override
 	public void setStopTime(long stopTime) {
 		if (stopTime > -1) {
 			this.stopTime = stopTime;
 		}
 	}
 
+	@Override
 	public ITimeRangeComponent getEventParent() {
 		return eventParent;
 	}
@@ -77,6 +82,7 @@ public abstract class TimeRangeComponent implements ITimeRangeComponent {
 		this.eventParent = eventParent;
 	}
 
+	@Override
 	public abstract String getName();
 
 	
@@ -87,6 +93,7 @@ public abstract class TimeRangeComponent implements ITimeRangeComponent {
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.lttng.ui.model.trange.ITimeRangeComponent#isVisible()
 	 */
+	@Override
 	public boolean isVisible() {
 		return visible;
 	}

@@ -52,6 +52,7 @@ public class FlowProcessContainer implements ItemContainer<TimeRangeEventProcess
 	 * 
 	 * @param newProcess   The process to add
 	 */
+	@Override
 	public void addItem(TimeRangeEventProcess newItem) {
 		if (newItem != null) {
 			allProcesses.put(new ProcessKey(newItem), newItem);
@@ -63,7 +64,8 @@ public class FlowProcessContainer implements ItemContainer<TimeRangeEventProcess
      * 
      * @return Integer
      */
-    public Integer getUniqueId() {
+    @Override
+	public Integer getUniqueId() {
         return uniqueId++;
     }
     
@@ -73,6 +75,7 @@ public class FlowProcessContainer implements ItemContainer<TimeRangeEventProcess
      * 
      * @return TimeRangeEventProcess[]
      */
+	@Override
 	public TimeRangeEventProcess[] readItems() {
 		
 	    // This allow us to return an Array of the correct type of the exact correct dimension, without looping
@@ -83,6 +86,7 @@ public class FlowProcessContainer implements ItemContainer<TimeRangeEventProcess
 	 * Clear the children information for processes e.g. just before refreshing
 	 * data with a new time range
 	 */
+	@Override
 	public void clearChildren() {
 	    TimeRangeEventProcess process = null;
         Iterator<ProcessKey> iterator = allProcesses.keySet().iterator();
@@ -96,7 +100,8 @@ public class FlowProcessContainer implements ItemContainer<TimeRangeEventProcess
 	/**
      * Clear all process items
      */
-    public void clearItems() {
+    @Override
+	public void clearItems() {
         allProcesses.clear();
     }
 	
@@ -106,6 +111,7 @@ public class FlowProcessContainer implements ItemContainer<TimeRangeEventProcess
      * 
      * @param traceId   The trace unique id (trace name?) on which we want to remove process
      */
+	@Override
 	public void removeItems(String traceId) {
 	    ProcessKey iterKey = null;
 

@@ -66,6 +66,7 @@ public class NewProjectHandler extends AbstractHandler {
 	// Execution
 	// ------------------------------------------------------------------------
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		// Fire the New Project Wizard

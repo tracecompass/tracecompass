@@ -134,6 +134,7 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
     // ITmfEventRequest
     // ------------------------------------------------------------------------
 
+	@Override
 	public TmfTimeRange getRange() {
 		return fRange;
 	}

@@ -134,6 +134,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         }
     }
 
+	@Override
     public void createControl(Composite parent) {
         container = new Composite(parent, SWT.NULL);
         container.setLayout(new GridLayout());
@@ -405,27 +406,33 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
     private class InputLineTreeNodeContentProvider implements ITreeContentProvider {
 
+    	@Override
         public Object[] getElements(Object inputElement) {
             return ((List<?>) inputElement).toArray();
         }
 
+    	@Override
         public Object[] getChildren(Object parentElement) {
             InputLine inputLine = (InputLine) parentElement;
             if (inputLine.childrenInputs == null) return new InputLine[0];
             return inputLine.childrenInputs.toArray();
         }
 
+    	@Override
         public boolean hasChildren(Object element) {
             InputLine inputLine = (InputLine) element;
             return (inputLine.childrenInputs != null && inputLine.childrenInputs.size() > 0);
         }
 
+    	@Override
         public void dispose() {
         }
 
+    	@Override
         public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         }
 
+    	@Override
         public Object getParent(Object element) {
             InputLine inputLine = (InputLine) element;
             return inputLine.parentInput;
@@ -451,6 +458,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
     }
 
     private class InputLineTreeSelectionChangedListener implements ISelectionChangedListener {
+    	@Override
         public void selectionChanged(SelectionChangedEvent event) {
             if (selectedLine != null) {
                 selectedLine.dispose();
@@ -859,6 +867,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         helpShell.setLayout(new FillLayout());
         helpBrowser = new Browser(helpShell, SWT.NONE);
         helpBrowser.addTitleListener(new TitleListener() {
+        	@Override
            public void changed(TitleEvent event) {
                helpShell.setText(event.title);
            }
@@ -910,16 +919,19 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
     private class UpdateListener implements ModifyListener, SelectionListener {
 
+    	@Override
         public void modifyText(ModifyEvent e) {
             validate();
             updatePreviews();
         }
 
+    	@Override
         public void widgetDefaultSelected(SelectionEvent e) {
             validate();
             updatePreviews();
         }
 
+    	@Override
         public void widgetSelected(SelectionEvent e) {
             validate();
             updatePreviews();
@@ -1008,7 +1020,9 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                     Cardinality.ONE.toString(),
                     "(?,?)"});
             cardinalityCombo.addSelectionListener(new SelectionListener(){
+            	@Override
                 public void widgetDefaultSelected(SelectionEvent e) {}
+            	@Override
                 public void widgetSelected(SelectionEvent e) {
                     switch (cardinalityCombo.getSelectionIndex()) {
                     case 4: //(?,?)
@@ -1088,6 +1102,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             }
             
             VerifyListener digitsListener = new VerifyListener() {
+            	@Override
                 public void verifyText(VerifyEvent e) {
                     if (e.text.equals(INFINITY_STRING)) {
                         e.doit = e.widget == cardinalityMaxText && e.start == 0 && e.end == ((Text) e.widget).getText().length();
@@ -1301,7 +1316,9 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                                             CustomTxtTraceDefinition.TAG_OTHER});
             tagCombo.select(1);
             tagCombo.addSelectionListener(new SelectionListener(){
+            	@Override
                 public void widgetDefaultSelected(SelectionEvent e) {}
+            	@Override
                 public void widgetSelected(SelectionEvent e) {
                     tagText.removeModifyListener(updateListener);
                     switch (tagCombo.getSelectionIndex()) {

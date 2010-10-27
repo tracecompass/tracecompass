@@ -126,6 +126,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.state.IStateManager#getEventLog()
 	 */
+	@Override
 	public ITmfTrace getTrace() {
 		return fTrace;
 	}
@@ -189,6 +190,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * restoreCheckPointByTimestamp
 	 * (org.eclipse.linuxtools.tmf.event.TmfTimestamp)
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public TmfTimestamp restoreCheckPointByTimestamp(TmfTimestamp eventTime) {
 		TmfTimeRange experimentRange = fExperiment.getTimeRange();
@@ -285,6 +287,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager#getStateModel
 	 * ()
 	 */
+	@Override
 	public LttngTraceState getStateModel() {
 		synchronized (fStateModel) {
 			return fStateModel;
@@ -297,6 +300,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * @see org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager#
 	 * getCheckPointStateModel()
 	 */
+	@Override
 	public LttngTraceState getCheckPointStateModel() {
 		synchronized (fStateModel) {
 			return fCheckPointStateModel;
@@ -390,6 +394,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * @see org.eclipse.linuxtools.lttng.state.resource.ILttngStateContext#
 	 * getNumberOfCpus()
 	 */
+	@Override
 	public int getNumberOfCpus() {
 		return fcpuNumber;
 	}
@@ -400,6 +405,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * @see org.eclipse.linuxtools.lttng.state.resource.ILttngStateContext#
 	 * getTraceTimeWindow()
 	 */
+	@Override
 	public TmfTimeRange getTraceTimeWindow() {
 		if (fTrace != null) {
 			return fTrace.getTimeRange();
@@ -415,6 +421,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * org.eclipse.linuxtools.lttng.state.resource.ILttngStateContext#getTraceId
 	 * ()
 	 */
+	@Override
 	public String getTraceId() {
 		if (fTrace != null) {
 			return fTrace.getName();
@@ -428,6 +435,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * @see org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager#
 	 * getExperimentTimeWindow()
 	 */
+	@Override
 	public TmfTimeRange getExperimentTimeWindow() {
 		if (fExperiment != null) {
 			return fExperiment.getTimeRange();
@@ -442,6 +450,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager#getExperimentName
 	 * ()
 	 */
+	@Override
 	public String getExperimentName() {
 		return fExperiment.getName();
 	}
@@ -453,6 +462,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * org.eclipse.linuxtools.lttng.state.resource.ILttngStateContext#getTraceIdRef
 	 * ()
 	 */
+	@Override
 	public ITmfTrace getTraceIdRef() {
 		return fTrace;
 	}
@@ -464,6 +474,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager#clearCheckPoints
 	 * ()
 	 */
+	@Override
 	public void clearCheckPoints() {
 		synchronized (checkPointsLock) {
 			stateCheckpointsList.clear();
@@ -485,6 +496,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager#handleEvent
 	 * (org.eclipse.linuxtools.lttng.event.LttngSyntheticEvent, java.lang.Long)
 	 */
+	@Override
 	public void handleEvent(LttngSyntheticEvent synEvent, Long eventCount) {
 		fStateUpdateProcessor.process(synEvent, fCheckPointStateModel);
 

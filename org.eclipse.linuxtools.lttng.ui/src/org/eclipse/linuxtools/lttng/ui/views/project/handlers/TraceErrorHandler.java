@@ -30,14 +30,17 @@ public class TraceErrorHandler implements IHandler {
 		messages = newMessages;
 	}
 	
+	@Override
 	public boolean isEnabled() {
 		return true;
 	}
 	
+	@Override
 	public boolean isHandled() {
 		return true;
 	}
 	
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbench workbench = PlatformUI.getWorkbench();
 		Shell shell = workbench.getActiveWorkbenchWindow().getShell();
@@ -48,12 +51,15 @@ public class TraceErrorHandler implements IHandler {
 		return null;
 	}
 
+	@Override
 	public void dispose() {
 	}
 	
+	@Override
 	public void addHandlerListener(IHandlerListener handlerListener) {
 	}
 
+	@Override
 	public void removeHandlerListener(IHandlerListener handlerListener) {
 	}
 

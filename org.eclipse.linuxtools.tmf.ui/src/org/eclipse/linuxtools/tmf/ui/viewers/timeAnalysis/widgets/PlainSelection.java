@@ -37,28 +37,34 @@ public class PlainSelection implements IStructuredSelection {
 			list.add(sel);
 	}
 
+	@Override
 	public Object getFirstElement() {
 		if (!list.isEmpty())
 			return list.get(0);
 		return null;
 	}
 
+	@Override
 	public Iterator<Object> iterator() {
 		return list.iterator();
 	}
 
+	@Override
 	public int size() {
 		return list.size();
 	}
 
+	@Override
 	public Object[] toArray() {
 		return list.toArray();
 	}
 
+	@Override
 	public List<Object> toList() {
 		return list;
 	}
 
+	@Override
 	public boolean isEmpty() {
 		return list.isEmpty();
 	}

@@ -75,6 +75,7 @@ public class NewExperimentHandler extends AbstractHandler {
 	// Execution
 	// ------------------------------------------------------------------------
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		// Open the experiment creation dialog

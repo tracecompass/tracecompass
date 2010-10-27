@@ -50,6 +50,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long cpu = trcEvent.getCpuId();
@@ -92,6 +93,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long cpu = trcEvent.getCpuId();
@@ -122,6 +124,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 				Long cpu = trcEvent.getCpuId();
 
@@ -181,6 +184,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long cpu = trcEvent.getCpuId();
@@ -216,6 +220,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long cpu = trcEvent.getCpuId();
@@ -267,6 +272,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long cpu = trcEvent.getCpuId();
@@ -303,6 +309,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long cpu = trcEvent.getCpuId();
@@ -340,6 +347,7 @@ class StateUpdateHandlers {
 			private Events eventType = Events.LTT_EVENT_SOFT_IRQ_RAISE;
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				// Long cpu = trcEvent.getCpuId();
@@ -389,6 +397,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				// obtrain cpu
@@ -450,6 +459,7 @@ class StateUpdateHandlers {
 			private Events eventType = Events.LTT_EVENT_LIST_INTERRUPT;
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 				String action = getAFieldString(trcEvent, traceSt,
 						Fields.LTT_FIELD_ACTION);
@@ -489,6 +499,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				// Get Fields
@@ -550,6 +561,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				// Get Fields
@@ -605,6 +617,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 				Long cpu = trcEvent.getCpuId();
 				Long funcptr = getAFieldLong(trcEvent, traceSt,
@@ -626,6 +639,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long funcptr = getAFieldLong(trcEvent, traceSt,
@@ -653,6 +667,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 				// obtain the syscall id
 				Long id = getAFieldLong(trcEvent, traceSt, Fields.LTT_FIELD_ID);
@@ -687,6 +702,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long ip = getAFieldLong(trcEvent, traceSt, Fields.LTT_FIELD_IP);
@@ -716,6 +732,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				// Get id
@@ -753,6 +770,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long cpu = trcEvent.getCpuId();
@@ -898,6 +916,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long cpu = trcEvent.getCpuId();
@@ -1026,6 +1045,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 				/*
 				 * We stamp a newly created process as kernel_thread. The thread
@@ -1077,6 +1097,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long pid;
@@ -1114,6 +1135,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long release_pid;
@@ -1190,6 +1212,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long cpu = trcEvent.getCpuId();
@@ -1237,6 +1260,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				String name;
@@ -1260,6 +1284,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				/* For all processes */
@@ -1377,6 +1402,7 @@ class StateUpdateHandlers {
 		AbsStateUpdate handler = new AbsStateUpdate() {
 
 			// @Override
+			@Override
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long parent_pid;

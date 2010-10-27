@@ -26,6 +26,7 @@ class StatsModeEndHandler extends AbstractStatsEventHandler {
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.lttng.state.evProcessor.IEventProcessing#process(org.eclipse.linuxtools.lttng.event.LttngEvent, org.eclipse.linuxtools.lttng.state.model.LttngTraceState)
 	 */
+	@Override
 	public boolean process(LttngEvent event, LttngTraceState traceState) {
 		StatisticsData tree = getStatisticsTree(traceState);
 		tree.increase(event, traceState, StatisticsData.Values.CPU_TIME | StatisticsData.Values.ELAPSED_TIME | StatisticsData.Values.CUMULATIVE_CPU_TIME);

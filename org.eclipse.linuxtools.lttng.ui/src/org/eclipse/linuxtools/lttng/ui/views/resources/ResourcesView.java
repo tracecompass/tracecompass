@@ -157,6 +157,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				ResourcesView.this.fillContextMenu(manager);
 			}
@@ -445,6 +446,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		
 		Display display = tsfviewer.getControl().getDisplay();
 		display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if ((tsfviewer != null) && (!tsfviewer.getControl().isDisposed())) {
 					tsfviewer.display(items, startBoundTime, endBoundTime, updateTimeBounds);
