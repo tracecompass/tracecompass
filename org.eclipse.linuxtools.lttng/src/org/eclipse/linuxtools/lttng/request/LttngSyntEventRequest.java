@@ -38,37 +38,63 @@ public class LttngSyntEventRequest extends TmfEventRequest<LttngSyntheticEvent>
 	private TmfTimeRange fExperimentTimeRange = null;
 	private Object fsource = null;
 	private final ITransEventProcessor fprocessor;
+	private String fExperimentName = null; 
+	
 
 	// ========================================================================
 	// Constructors
 	// =======================================================================
+    /**
+     * @param range
+     * @param offset
+     * @param nbEvents
+     * @param maxBlockSize
+     * @param listener
+     * @param experimentTimeRange
+     * @param processor
+     */
+    public LttngSyntEventRequest(TmfTimeRange range, long offset, int nbEvents,
+	            int maxBlockSize, IRequestStatusListener listener,
+	            TmfTimeRange experimentTimeRange, ITransEventProcessor processor) {
+	        
+	        this(range, offset, nbEvents, maxBlockSize, listener, experimentTimeRange, processor, "", ExecutionType.FOREGROUND);
+	    }
 	/**
 	 * @param range
 	 * @param offset
 	 * @param nbEvents
 	 * @param maxBlockSize
 	 * @param listener
+	 * @param experimentTimeRange
+	 * @param processor
+	 * @param experimentName 
 	 */
 	public LttngSyntEventRequest(TmfTimeRange range, long offset, int nbEvents,
 			int maxBlockSize, IRequestStatusListener listener,
-			TmfTimeRange experimentTimeRange, ITransEventProcessor processor) {
+			TmfTimeRange experimentTimeRange, ITransEventProcessor processor, String experimentName) {
 		
-		this(range, offset, nbEvents, maxBlockSize, listener, experimentTimeRange, processor, ExecutionType.FOREGROUND);
+		this(range, offset, nbEvents, maxBlockSize, listener, experimentTimeRange, processor, experimentName, ExecutionType.FOREGROUND);
 	}
 
-	/**
-	 * @param range
-	 * @param offset
-	 * @param nbEvents
-	 * @param maxBlockSize
-	 * @param listener
-	 */
+    /**
+     * @param range
+     * @param offset
+     * @param nbEvents
+     * @param maxBlockSize
+     * @param listener
+     * @param experimentTimeRange
+     * @param processor
+     * @param experimentName
+     * @param execType 
+     */
 	public LttngSyntEventRequest(TmfTimeRange range, long offset, int nbEvents,
 			int maxBlockSize, IRequestStatusListener listener,
-			TmfTimeRange experimentTimeRange, ITransEventProcessor processor, ExecutionType execType) {
+			TmfTimeRange experimentTimeRange, ITransEventProcessor processor, String experimentName,
+			ExecutionType execType) {
 		
 		super(LttngSyntheticEvent.class, range, nbEvents, maxBlockSize, execType);
 		fExperimentTimeRange = experimentTimeRange;
+		fExperimentName = new String(experimentName);
 		addListener(listener);
 
 		fprocessor = processor;
@@ -86,7 +112,7 @@ public class LttngSyntEventRequest extends TmfEventRequest<LttngSyntheticEvent>
 	/**
 	 * @param listener
 	 */
-	public void removeListner(IRequestStatusListener listener) {
+	public void removeListener(IRequestStatusListener listener) {
 		if (listener != null) {
 			listeners.remove(listener);
 		}
@@ -216,4 +242,10 @@ public class LttngSyntEventRequest extends TmfEventRequest<LttngSyntheticEvent>
 	public ITransEventProcessor getProcessor() {
 		return fprocessor;
 	}
+
+	@Override
+    public String getExperimentName() {
+	    return fExperimentName;
+	}
+	
 }

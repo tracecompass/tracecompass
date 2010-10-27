@@ -32,6 +32,7 @@ import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.linuxtools.lttng.control.LttngCoreProviderFactory;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.request.ILttngSyntEventRequest;
 import org.eclipse.linuxtools.lttng.state.evProcessor.ITransEventProcessor;
@@ -866,7 +867,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	 * .tmf.ui.viewers.timeAnalysis.TmfTimeScaleSelectionEvent)
 	 */
 	@Override
-	public synchronized void tsfTmProcessTimeScaleEvent(TmfTimeScaleSelectionEvent event) {
+	public void tsfTmProcessTimeScaleEvent(TmfTimeScaleSelectionEvent event) {
 		super.tsfTmProcessTimeScaleEvent(event);
 	}
 
@@ -1112,5 +1113,14 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	@Override
 	protected ItemContainer<?> getItemContainer() {
 		return FlowModelFactory.getProcContainer();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#getProviderId()
+	 */
+	@Override
+	protected int getProviderId() { 
+	    return LttngCoreProviderFactory.CONTROL_FLOW_LTTNG_SYTH_EVENT_PROVIDER; 
 	}
 }

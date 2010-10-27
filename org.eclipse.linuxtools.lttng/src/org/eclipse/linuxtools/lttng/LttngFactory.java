@@ -23,10 +23,11 @@ public class LttngFactory {
 		// Make sure the experiment component is ready to listen to experiment
 		// selections
 		StateManagerFactory.getExperimentManager();
-		// The Synthetic event provider must also be notified of selections, in
-		// order to keep the sychronization orders from TMF, this element is
+
+		// The Synthetic event providers must also be notified of selections, in
+		// order to keep the synchronization orders from TMF, this element is
 		// shared for all synthetic event requests
-		LttngCoreProviderFactory.getEventProvider();
+		LttngCoreProviderFactory.initialize();
 
 		// start debugging as per .options
 		TraceDebug.init();

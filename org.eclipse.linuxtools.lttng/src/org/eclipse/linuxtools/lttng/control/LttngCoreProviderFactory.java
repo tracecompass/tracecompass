@@ -11,7 +11,11 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.control;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.linuxtools.lttng.event.LttngSyntheticEvent;
+import org.eclipse.linuxtools.lttng.model.LTTngTreeNode;
 
 /**
  * @author alvaro
@@ -19,15 +23,46 @@ import org.eclipse.linuxtools.lttng.event.LttngSyntheticEvent;
  */
 public class LttngCoreProviderFactory {
 
-	private static LttngSyntheticEventProvider fSynEventProvider = null;
+    // List of provider IDs
+    public static final int STATISTICS_LTTNG_SYTH_EVENT_PROVIDER = 0;
+    public static final int CONTROL_FLOW_LTTNG_SYTH_EVENT_PROVIDER = 1;
+    public static final int RESOURCE_LTTNG_SYTH_EVENT_PROVIDER = 2;
+    
+    private static final Map<Integer, LttngSyntheticEventProvider> fSyntheticEventProviders = new HashMap<Integer, LttngSyntheticEventProvider>();
+    
+    /**
+     * Pre-creates all known LTTng providers.
+     */
+    public static void initialize() {
+        getEventProvider(STATISTICS_LTTNG_SYTH_EVENT_PROVIDER);
+        getEventProvider(CONTROL_FLOW_LTTNG_SYTH_EVENT_PROVIDER);
+        getEventProvider(RESOURCE_LTTNG_SYTH_EVENT_PROVIDER);
+    }
+    
+    /**
+     * Gets a SyntheticEventProvider for the given ID. It creates a new provider
+     * if necessary
+     *  
+     * @param providerId
+     * @return
+     */
+    public static LttngSyntheticEventProvider getEventProvider(int providerId) {
+        if (!fSyntheticEventProviders.containsKey(Integer.valueOf(providerId))) {
+            LttngSyntheticEventProvider synEventProvider = new LttngSyntheticEventProvider(LttngSyntheticEvent.class);
+            fSyntheticEventProviders.put(Integer.valueOf(providerId), synEventProvider);
+        }
+        return fSyntheticEventProviders.get(Integer.valueOf(providerId));
+    }
 
-	public static LttngSyntheticEventProvider getEventProvider() {
-		// create if necessary
-		if (fSynEventProvider == null) {
-			fSynEventProvider = new LttngSyntheticEventProvider(
-					LttngSyntheticEvent.class);
-		}
-
-		return fSynEventProvider;
-	}
+    /**
+     * Resets all LTTngSytheticEventProviders associated with the given
+     * Experiment
+     * 
+     * @param experimentNode
+     */
+    public static void reset(LTTngTreeNode experimentNode) {
+        for (LttngSyntheticEventProvider provider : fSyntheticEventProviders.values()) {
+            provider.reset(experimentNode);
+        }
+    }
 }

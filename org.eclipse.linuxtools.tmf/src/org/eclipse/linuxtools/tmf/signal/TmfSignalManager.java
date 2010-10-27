@@ -86,14 +86,14 @@ public class TmfSignalManager {
 	 * 
 	 * @param signal the signal to dispatch
 	 */
-	static int fSynchId = 0;
+	static int fSignalId = 0;
 	static public synchronized void dispatchSignal(TmfSignal signal) {
-		fSynchId++;
-		sendSignal(new TmfStartSynchSignal(fSynchId));
-		signal.setReference(fSynchId);
+		fSignalId++;
+		sendSignal(new TmfStartSynchSignal(fSignalId));
+		signal.setReference(fSignalId);
 		sendSignal(signal);
-		sendSignal(new TmfEndSynchSignal(fSynchId));
-//		Tracer.traceSignal(signal);
+		sendSignal(new TmfEndSynchSignal(fSignalId));
+///		Tracer.traceSignal(signal);
 	}
 
 	static private void sendSignal(TmfSignal signal) {

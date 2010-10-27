@@ -30,5 +30,6 @@ public interface ITmfDataProvider<T extends TmfData> {
 	 * @param request The request to process
 	 */
 	public void sendRequest(ITmfDataRequest<T> request);
-	public void fireRequests();
+	public void fireRequest();
+	public void notifyPendingRequest(boolean isIncrement);
 }

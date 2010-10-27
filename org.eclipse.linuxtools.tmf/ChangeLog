@@ -1,3 +1,13 @@
+2010-10-27  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/component/ITmfDataProvider.java: Augmented API for coalescing (notifyPendingRequest) 
+	* src/org/eclipse/linuxtools/tmf/component/TmfDataProvider.java: Request coalescing and cancelling 
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Augmented API 
+	* src/org/eclipse/linuxtools/tmf/request/TmfCoalescedDataRequest.java: Improved coalescing and cancelling
+	* src/org/eclipse/linuxtools/tmf/request/TmfCoalescedEventRequest.java: Ditto
+	* src/org/eclipse/linuxtools/tmf/request/TmfDataRequest.java: Ditto
+	* src/org/eclipse/linuxtools/tmf/signal/TmfSignalManager.java: Renaming of a field
+
 2010-10-15  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/tmf/event/TmfEvent.java: Implement cloning

@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Composite;
 public abstract class HistogramConstant {
 	// Constants relative to requests
 	public final static int MAX_EVENTS_PER_READ = 1;
-	public final static int REDRAW_EVERY_NB_EVENTS = 10000;
+	public final static int REDRAW_EVERY_NB_EVENTS = 20000;
 	public final static Boolean SKIP_EMPTY_INTERVALS_WHEN_CALCULATING_AVERAGE = true;
 	
 	

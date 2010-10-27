@@ -26,6 +26,8 @@ import org.eclipse.linuxtools.tmf.event.TmfSyntheticEventStub;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.signal.TmfEndSynchSignal;
+import org.eclipse.linuxtools.tmf.signal.TmfStartSynchSignal;
 import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
 
 /**
@@ -102,6 +104,7 @@ public class TmfEventProviderTest extends TestCase {
         		requestedEvents.add(event);
         	}
         };
+        
         provider.sendRequest(request);
         try {
 			request.waitForCompletion();
@@ -119,6 +122,114 @@ public class TmfEventProviderTest extends TestCase {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	public void testCancelRequests() {
+
+	    final int BLOCK_SIZE = 100;
+	    final int NB_EVENTS  = 1000;
+	    final int NUMBER_EVENTS_BEFORE_CANCEL_REQ1 = 10;
+	    final int NUMBER_EVENTS_BEFORE_CANCEL_REQ2 = 800;
+	    
+	    final Vector<TmfEvent> requestedEventsReq1 = new Vector<TmfEvent>();
+	    final Vector<TmfEvent> requestedEventsReq2 = new Vector<TmfEvent>();
+
+	    // Get the TmfSyntheticEventStub provider
+	    ITmfDataProvider<TmfEvent>[] eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfEventProviderStub.class);
+	    ITmfDataProvider<TmfEvent> provider = eventProviders[0];
+
+	    TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+	    
+	    // Create first request
+	    final TmfEventRequest<TmfEvent> request1 =
+	        new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+	        @Override
+	        public void handleData(TmfEvent event) {
+	            super.handleData(event);
+	            requestedEventsReq1.add(event);
+
+	            // cancel sub request
+	            if (getNbRead() == NUMBER_EVENTS_BEFORE_CANCEL_REQ1) {
+	                cancel();
+	            }
+	        }
+	    };
+
+	    // Synchronize requests
+	    ((TmfEventProviderStub) provider).startSynch(new TmfStartSynchSignal(0));
+	    
+	    // Additionally, notify provider for up-coming requests
+	    provider.notifyPendingRequest(true);
+	    
+	    // Call sendRequest, which will create a coalescing request, but it doesn't send request1 yet
+	    provider.sendRequest(request1);
+	    
+	    // Check if request1 is not running yet.
+	    assertFalse("isRunning", request1.isRunning());
+	    
+	    // Create second request
+	    final TmfEventRequest<TmfEvent> request2 =
+	        new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+	        @Override
+	        public void handleData(TmfEvent event) {
+	            super.handleData(event);
+                requestedEventsReq2.add(event);
+
+                // cancel sub request which will cancel also main request
+	            if (getNbRead() == NUMBER_EVENTS_BEFORE_CANCEL_REQ2) {
+	                cancel();
+	            }
+	        }
+	    };
+
+	    // Call sendRequest, which will create a coalescing request, but it doesn't send request2 yet
+        provider.sendRequest(request2);
+
+        // Check if request1/2 is not running yet.
+        assertFalse("isRunning",  request1.isRunning());
+        assertFalse("isRunning",  request2.isRunning());
+        
+        // Send end synch signal, however requests won't be sent 
+        ((TmfEventProviderStub) provider).endSynch(new TmfEndSynchSignal(0));
+
+        // Check if request1/2 is not running yet.
+        assertFalse("isRunning",  request1.isRunning());
+        assertFalse("isRunning",  request2.isRunning());
+
+        // Finally, trigger sending of requests 
+        provider.notifyPendingRequest(false);
+        
+	    try {
+	        
+	        // Wait till requests start
+	        request1.waitForStart();
+	        request2.waitForStart();
+
+	        // Check if request1/2 are running.
+	        assertTrue("isRunning",  request1.isRunning());
+	        assertTrue("isRunning",  request2.isRunning());
+
+	        request1.waitForCompletion();
+
+	        // Check if request2 is still running
+            assertTrue("isRunning",  request2.isRunning());
+
+	        // Verify result (request1)
+            assertEquals("nbEvents", NUMBER_EVENTS_BEFORE_CANCEL_REQ1, requestedEventsReq1.size());
+	        assertTrue("isCompleted",  request1.isCompleted());
+	        assertTrue("isCancelled",  request1.isCancelled());
+	        
+	        request2.waitForCompletion();
+	        
+  	        // Verify result (request2)
+	        assertEquals("nbEvents", NUMBER_EVENTS_BEFORE_CANCEL_REQ2, requestedEventsReq2.size());
+	        assertTrue("isCompleted",  request2.isCompleted());
+	        assertTrue("isCancelled",  request2.isCancelled());
+
+	    } catch (InterruptedException e) {
+	        fail();
+	    }
+	}
+	
 	@SuppressWarnings("unchecked")
 	private void getSyntheticData(final TmfTimeRange range, final int nbEvents, final int blockSize) throws InterruptedException {
 

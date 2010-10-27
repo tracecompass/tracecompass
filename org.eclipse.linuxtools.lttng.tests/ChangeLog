@@ -1,3 +1,7 @@
+2010-10-27  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/LttngTestPreparation.java (prepareExperimentContext): Event provider adjustment
+
 2010-10-15  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/tests/trace/LTTngExperimentTest.java (fStartTime): Fixed unit test for updated start time

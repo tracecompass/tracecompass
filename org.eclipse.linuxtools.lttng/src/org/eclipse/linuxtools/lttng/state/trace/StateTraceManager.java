@@ -65,7 +65,8 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	private LttngTraceState fCheckPointStateModel;
 
 	// locks
-	private Object checkPointsLock = new Object();
+	private Object fCheckPointsLock = new Object();
+	private Object fStateModelLock = new Object();
 
 
 	
@@ -147,8 +148,9 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	private void saveCheckPointIfNeeded(Long eventCounter, TmfTimestamp eventTime) {
 		// Save a checkpoint every LTTNG_STATE_SAVE_INTERVAL event
 		if ((eventCounter.longValue() % fcheckPointInterval) == 0) {
+
 			LttngTraceState stateCheckPoint;
-			synchronized (fCheckPointStateModel) {
+			synchronized (fCheckPointsLock) {
 				stateCheckPoint = fCheckPointStateModel.clone();
 			}
 
@@ -157,7 +159,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 					+ getTrace().getName() + "   >>>>> Thread: "
 					+ Thread.currentThread().getId());
 
-			synchronized (checkPointsLock) {
+			synchronized (fCheckPointsLock) {
 				// Save the checkpoint
 				stateCheckpointsList.put(eventCounter, stateCheckPoint);
 				// Save correlation between timestamp and checkpoint index
@@ -208,35 +210,37 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 			eventTime = fTrace.getStartTime();
 		}
 
-		Collections.sort(timestampCheckpointsList);
-		// Initiate the compare with a checkpoint containing the target time
-		// stamp to find
-		int index = Collections.binarySearch(timestampCheckpointsList, new TmfCheckpoint(eventTime,
-				new TmfLocation<Long>(0L)));
-		// adjust index to round down to earlier checkpoint when exact match
-		// not
-		// found
-		index = getPrevIndex(index);
+	    LttngTraceState traceState;
+		synchronized (fCheckPointsLock) {
+		    Collections.sort(timestampCheckpointsList);
+		    // Initiate the compare with a checkpoint containing the target time
+		    // stamp to find
+		    int index = Collections.binarySearch(timestampCheckpointsList, new TmfCheckpoint(eventTime,
+		            new TmfLocation<Long>(0L)));
+		    // adjust index to round down to earlier checkpoint when exact match
+		    // not
+		    // found
+		    index = getPrevIndex(index);
 
-		LttngTraceState traceState;
-		if (index == 0) {
-			// No checkpoint restore is needed, start with a brand new
-			// TraceState
-			traceState = StateModelFactory.getStateEntryInstance(this);
-		} else {
-			synchronized (checkPointsLock) {
-				// Useful CheckPoint found
-				TmfCheckpoint checkpoint = timestampCheckpointsList.get(index);
-				nearestTimeStamp = checkpoint.getTimestamp();
-				// get the location associated with the checkpoint
-				TmfLocation<Long> location = (TmfLocation<Long>) checkpoint.getLocation();
-				// reference a new copy of the checkpoint template
-				traceState = stateCheckpointsList.get(location.getLocation()).clone();
-			}
+		    if (index == 0) {
+		        // No checkpoint restore is needed, start with a brand new
+		        // TraceState
+		        traceState = StateModelFactory.getStateEntryInstance(this);
+		    } else {
+
+		        // Useful CheckPoint found
+		        TmfCheckpoint checkpoint = timestampCheckpointsList.get(index);
+		        nearestTimeStamp = checkpoint.getTimestamp();
+		        // get the location associated with the checkpoint
+		        TmfLocation<Long> location = (TmfLocation<Long>) checkpoint.getLocation();
+		        // reference a new copy of the checkpoint template
+		        traceState = stateCheckpointsList.get(location.getLocation()).clone();
+		    }
+
 		}
 
 		// Restore the stored traceState
-		synchronized (this) {
+		synchronized (fStateModelLock) {
 			fStateModel = traceState;
 		}
 
@@ -288,10 +292,12 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * ()
 	 */
 	@Override
-	public LttngTraceState getStateModel() {
-		synchronized (fStateModel) {
-			return fStateModel;
+    public LttngTraceState getStateModel() {
+	    LttngTraceState stateModel = null;
+		synchronized (fStateModelLock) {
+			stateModel = fStateModel;
 		}
+		return stateModel;
 	}
 
 	/*
@@ -301,10 +307,12 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * getCheckPointStateModel()
 	 */
 	@Override
-	public LttngTraceState getCheckPointStateModel() {
-		synchronized (fStateModel) {
-			return fCheckPointStateModel;
+    public LttngTraceState getCheckPointStateModel() {
+	    LttngTraceState checkPointStateModel = null;
+		synchronized (fCheckPointsLock) {
+		    checkPointStateModel = fCheckPointStateModel;
 		}
+		return checkPointStateModel;
 	}
 
 	/**
@@ -475,12 +483,13 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * ()
 	 */
 	@Override
-	public void clearCheckPoints() {
-		synchronized (checkPointsLock) {
+    public void clearCheckPoints() {
+		synchronized (fCheckPointsLock) {
 			stateCheckpointsList.clear();
 			timestampCheckpointsList.clear();
 
 			fCheckPointStateModel = StateModelFactory.getStateEntryInstance(this);
+
 			try {
 				fCheckPointStateModel.init(this);
 			} catch (LttngStateException e) {

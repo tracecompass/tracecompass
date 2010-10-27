@@ -13,6 +13,7 @@ package org.eclipse.linuxtools.lttng.ui.model.trange;
 
 
 import org.eclipse.linuxtools.lttng.state.StateStrings;
+import org.eclipse.linuxtools.lttng.state.model.LTTngCPUState;
 import org.eclipse.linuxtools.lttng.state.model.LttngIRQState;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.state.model.LttngTrapState;
@@ -234,9 +235,15 @@ public class TimeRangeResourceFactory {
 			@Override
 			public String getStateMode(LttngTraceState traceSt) {
 				// Get the resource state mode
-				String cpuStateMode = traceSt.getCpu_states().get(
-						getResourceId())
-						.peekFromCpuStack().getInName();
+			    LTTngCPUState cpuState = traceSt.getCpu_states().get(
+                        getResourceId());
+			    
+				String cpuStateMode = "";
+				if (cpuState != null) { 
+				    cpuStateMode = traceSt.getCpu_states().get(
+				            getResourceId())
+				            .peekFromCpuStack().getInName();
+				}
 
 				return cpuStateMode;
 			}

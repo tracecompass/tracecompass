@@ -69,6 +69,8 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	private int fSignalDepth = 0;
     private final Object fLock = new Object();
 
+    private int fRequestPendingCounter = 0;
+
 	// ------------------------------------------------------------------------
 	// Constructors
 	// ------------------------------------------------------------------------
@@ -143,13 +145,45 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	 * @param thread
 	 */
 	@Override
-	public void fireRequests() {
+    public void fireRequest() {
 		synchronized(fLock) {
-			for (TmfDataRequest<T> request : fPendingCoalescedRequests) {
-				dispatchRequest(request);
+			if (fRequestPendingCounter > 0) {
+				return;
 			}
-			fPendingCoalescedRequests.clear();
+			if (fPendingCoalescedRequests.size() > 0) {
+				for (TmfDataRequest<T> request : fPendingCoalescedRequests) {
+					dispatchRequest(request);
+				}
+				fPendingCoalescedRequests.clear();
+			}
 		}
+	}
+	
+	/**
+	 * Increments/decrements the pending requests counters and fires
+	 * the request if necessary (counter == 0). Used for coalescing
+	 * requests accross multiple TmfDataProvider.
+	 * 
+	 * @param isIncrement
+	 */
+    @Override
+    public void notifyPendingRequest(boolean isIncrement) {
+        synchronized(fLock) {
+            if (isIncrement) {
+                if (fSignalDepth > 0) {
+                    fRequestPendingCounter++;
+                }
+            } else {
+                if (fRequestPendingCounter > 0) {
+                    fRequestPendingCounter--;
+                }
+                
+                // fire request if all pending requests are received
+                if (fRequestPendingCounter == 0) {
+                    fireRequest();
+                }
+            }
+        }
 	}
 
 	// ------------------------------------------------------------------------
@@ -245,7 +279,13 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 							}
 						}
 					}
-					request.done();
+
+					if (request.isCancelled()) {
+						request.cancel();					    
+					}
+					else {
+						request.done();
+					}
 
 					if (Tracer.isRequestTraced()) Tracer.traceRequest(request, "completed");
 				}
@@ -303,7 +343,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
         synchronized (fLock) {
     		fSignalDepth--;
     		if (fSignalDepth == 0) {
-    			fireRequests();
+		  		fireRequest();
     		}
         }
 	}

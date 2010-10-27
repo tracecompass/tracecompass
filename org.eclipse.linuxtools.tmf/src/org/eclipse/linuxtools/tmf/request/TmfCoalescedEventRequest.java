@@ -117,14 +117,18 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
     		} else {
     			if (request instanceof TmfEventRequest<?>) {
     				TmfEventRequest<T> req = (TmfEventRequest<T>) request;
-    				TmfTimestamp ts = data.getTimestamp();
-    				if (req.getRange().contains(ts)) {
-    					req.handleData(data);
+       				if (!req.isCompleted()) {
+       					TmfTimestamp ts = data.getTimestamp();
+    					if (req.getRange().contains(ts)) {
+    						req.handleData(data);
+    					}
     				}
     			}
     			else {
     				TmfDataRequest<T> req = (TmfDataRequest<T>) request;
-    				req.handleData(data);
+    				if (!req.isCompleted()) {
+    					req.handleData(data);
+    				}
     			}
     		}
     	}

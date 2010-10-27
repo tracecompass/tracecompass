@@ -1,3 +1,8 @@
+2010-10-27  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/tests/component/TmfEventProviderTest.java: Augmented coalescing and cancelling tests 
+	* src/org/eclipse/linuxtools/tmf/tests/request/TmfCoalescedDataRequestTest.java: Ditto 
+
 2010-10-13  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/tmf/tests/event/TmfEventContentTest.java: Added unit test for setEvent() 

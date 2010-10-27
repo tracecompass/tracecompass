@@ -92,5 +92,7 @@ public interface ILttngSyntEventRequest extends ITmfDataRequest<LttngSyntheticEv
 	 * @return
 	 */
 	public abstract TmfTimeRange getRange();
+	
+	public abstract String getExperimentName();
 
 }

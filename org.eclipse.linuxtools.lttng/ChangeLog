@@ -1,3 +1,15 @@
+2010-10-27  Francois Chouinard  <fchouinard@gmail.com>
+
+	* Implement enhanced request coalescing across providers, request cancellation, multiple synth data providers and cleanup
+		* src/org/eclipse/linuxtools/lttng/control/LttngCoreProviderFactory.java
+		* src/org/eclipse/linuxtools/lttng/control/LttngSyntheticEventProvider.java: 
+		* src/org/eclipse/linuxtools/lttng/LttngFactory.java: 
+		* src/org/eclipse/linuxtools/lttng/request/ILttngSyntEventRequest.java: 
+		* src/org/eclipse/linuxtools/lttng/request/LttngSyntEventRequest.java: 
+		* src/org/eclipse/linuxtools/lttng/state/evProcessor/AbsEventToHandlerResolver.java: 
+		* src/org/eclipse/linuxtools/lttng/state/experiment/StateExperimentManager.java: 
+		* src/org/eclipse/linuxtools/lttng/state/trace/StateTraceManager.java 
+
 2010-10-15  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/event/LttngEvent.java: Implement cloning

@@ -16,6 +16,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.linuxtools.lttng.control.LttngCoreProviderFactory;
 import org.eclipse.linuxtools.lttng.request.ILttngSyntEventRequest;
 import org.eclipse.linuxtools.lttng.state.evProcessor.ITransEventProcessor;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
@@ -568,4 +569,13 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	protected ItemContainer<?> getItemContainer() {
 		return ResourceModelFactory.getResourceContainer();
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#getProviderId()
+	 */
+	@Override
+    protected int getProviderId() { 
+        return LttngCoreProviderFactory.RESOURCE_LTTNG_SYTH_EVENT_PROVIDER; 
+    }
 }

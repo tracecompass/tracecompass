@@ -20,7 +20,6 @@ package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
@@ -31,7 +30,6 @@ import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
@@ -555,7 +553,7 @@ public class HistogramView extends TmfView implements ControlListener {
     
     @TmfSignalHandler
 	public void synchToTimeRange(TmfRangeSynchSignal signal) {
-		if ( (signal != null) && (signal.getSource() != this) ) {
+        if ( (signal != null) ) {
 			if ( lastUsedExperiment != null ) {
 				long currentTime 		= signal.getCurrentTime().getValue();
 				long windowStart 		= signal.getCurrentRange().getStartTime().getValue();
@@ -669,10 +667,7 @@ public class HistogramView extends TmfView implements ControlListener {
 		TmfTimestamp startTime = TmfTimestamp.BigCrunch;
 		TmfTimestamp endTime   = TmfTimestamp.BigBang;
 		for (ITmfTrace trace : experiment.getTraces()) {
-			TmfContext context = trace.seekLocation(null);
-			context.setRank(0);
-			TmfEvent event = trace.getNextEvent(context);
-			TmfTimestamp traceStartTime = event.getTimestamp();
+          TmfTimestamp traceStartTime = trace.getStartTime();
 			if (traceStartTime.compareTo(startTime, true) < 0)
 				startTime = traceStartTime;
 			TmfTimestamp traceEndTime = trace.getEndTime();
@@ -906,7 +901,6 @@ public class HistogramView extends TmfView implements ControlListener {
 	    	long newSelectedWindowTime = ntgWindowCenterTime.getValue();
 	    	if ( newSelectedWindowTime != fullExperimentCanvas.getCurrentWindow().getTimestampOfCenterPosition() ) {
 	    		fullExperimentCanvas.setWindowCenterPosition(newSelectedWindowTime);	
-	    		windowChangedNotification();
 	    		// Send a broadcast to the framework about the window change
 	    		sendTmfRangeSynchSignalBroadcast();
 	    	}
@@ -917,7 +911,6 @@ public class HistogramView extends TmfView implements ControlListener {
 	    	long newSelectedWindowTimeRange = ntgWindowTimeSpan.getValue();
 	    	if ( newSelectedWindowTimeRange != fullExperimentCanvas.getCurrentWindow().getWindowTimeWidth() ) {
 	    		fullExperimentCanvas.resizeWindowByAbsoluteTime(newSelectedWindowTimeRange);
-	    		windowChangedNotification();
 	    		// Send a broadcast to the framework about the window change
 	    		sendTmfRangeSynchSignalBroadcast();
 	    	}

@@ -163,7 +163,7 @@ public abstract class LttngTestPreparation extends TestCase {
 		StateManagerFactory.setTraceCheckPointInterval(CHECK_POINT_INTERVAL);
 
 		// Lets wait for the request completion to analyse the results
-		LttngCoreProviderFactory.getEventProvider()
+		LttngCoreProviderFactory.getEventProvider(0)
 				.setWaitForRequest(waitForRequest);
 		return expManager;
 	}

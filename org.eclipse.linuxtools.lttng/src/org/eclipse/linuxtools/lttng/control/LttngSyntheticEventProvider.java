@@ -60,16 +60,19 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 	public static final int QUEUE_SIZE = 1; // lttng specific, one event at a time
 
 	private ITmfDataRequest<LttngSyntheticEvent> fmainRequest = null;
+    private LttngBaseEventRequest fSubRequest = null;
+
 	private final List<IStateTraceManager> fEventProviderRequests = new Vector<IStateTraceManager>();
 
 	private final LttngSyntheticEvent fStatusEvent;
-	private int fMainReqEventCount = 0;
 	volatile boolean startIndSent = false;
 	private LTTngTreeNode fExperiment = null;
 	private ITransEventProcessor fstateUpdateProcessor = StateEventToHandlerFactory.getInstance();
 	private boolean waitForRequest = false;
 	long dispatchTime = 0L;
 	private final Map<ITmfTrace, LttngTraceState> traceToTraceStateModel = new HashMap<ITmfTrace, LttngTraceState>();
+
+	private boolean fIsExperimentNotified = false;
 
 	// ========================================================================
 	// Constructor
@@ -126,13 +129,13 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 		}
 
 		fmainRequest = request;
+
 		// define event data handling
 		ITmfEventRequest<LttngSyntheticEvent> eventRequest = (ITmfEventRequest<LttngSyntheticEvent>) fmainRequest;
 		TmfTimeRange reqWindow = eventRequest.getRange();
 
 		TraceDebug.debug("Main Synthethic event request started on thread:  " + Thread.currentThread().getName());
 
-		boolean subRequestQueued = false;
 		TmfExperiment<LttngEvent> experiment = (TmfExperiment<LttngEvent>) fExperiment.getValue();
 		experiment.startSynch(new TmfStartSynchSignal(0));
 		
@@ -173,15 +176,14 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 			// Save which trace state model corresponds to current trace
 			traceToTraceStateModel.put(traceManager.getTrace(), traceManager.getStateModel());
 		}
-		
+
 		dispatchTime = reqWindow.getStartTime().getValue();
+
 		// Create a single request for all traces in the experiment, with coalesced time range.
-		final LttngBaseEventRequest subRequest = new LttngBaseEventRequest(adjustedRange, reqWindow.getStartTime(),
-				0, TmfEventRequest.ALL_DATA, BLOCK_SIZE, ITmfDataRequest.ExecutionType.FOREGROUND) {
+		fSubRequest = new LttngBaseEventRequest(adjustedRange, reqWindow.getStartTime(),
+				0, TmfEventRequest.ALL_DATA, BLOCK_SIZE, eventRequest.getExecType() /*ITmfDataRequest.ExecutionType.FOREGROUND*/) {
 
 			private LttngSyntheticEvent syntheticEvent = null;
-			private LttngSyntheticEvent syntheticAckIndicator = null;
-			long subEventCount = 0L;
 
 			/*
 			 * (non-Javadoc)
@@ -192,7 +194,15 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 			public void handleData(LttngEvent event) {
 				super.handleData(event);
 				if (event != null) {
-					handleIncomingData(event);
+				    synchronized (LttngSyntheticEventProvider.this) {
+				        // Check if request was canceled
+				        if ((fmainRequest == null) || (fmainRequest.isCompleted()) ) {
+				            TraceDebug.debug("fmainRequest was canceled. Ignoring event " + event);
+				            return;
+				        } 
+
+				        handleIncomingData(event);
+				    }
 				} else {
 					TraceDebug.debug("handle data received with no data");
 				}
@@ -201,13 +211,13 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 			/*
 			 * (non-Javadoc)
 			 * 
-			 * @see org.eclipse.linuxtools.tmf.request.TmfDataRequest#done()
+			 * @see org.eclipse.linuxtools.tmf.request.TmfDataRequest#handleCompleted()
 			 */
 			@Override
-			public void done() {
+	         public void handleCompleted() {
 				// mark this sub-request as completed
-				super.done();
-				handleProviderDone(/*getTraceModel()*/); // mcds
+                handleProviderDone(!isCancelled() && !isFailed());
+                super.handleCompleted();
 			}
 
 			/**
@@ -221,7 +231,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 				TmfTrace<LttngEvent> inTrace = e.getParentTrace();
 				LttngTraceState traceModel = traceToTraceStateModel.get(inTrace);
 				
-				// queue the new event data and an ACK
+				// queue the new event data
 				updateSynEvent(e);
 				
 				// If time at or above requested time, update application
@@ -229,7 +239,6 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 					// Before update
 					syntheticEvent.setSequenceInd(SequenceInd.BEFORE);
 					fmainRequest.handleData(syntheticEvent);
-					fmainRequest.handleData(syntheticAckIndicator);
 
 					// Update state locally
 					syntheticEvent.setSequenceInd(SequenceInd.UPDATE);
@@ -238,11 +247,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 					// After Update
 					syntheticEvent.setSequenceInd(SequenceInd.AFTER);
 					fmainRequest.handleData(syntheticEvent);
-					fmainRequest.handleData(syntheticAckIndicator);
 
-					// increment once per dispatch
-					incrementSynEvenCount();
-					subEventCount++;
 				} else {
 					// event time is between checkpoint adjusted time and
 					// requested time i.e. application does not expect the
@@ -264,8 +269,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 			 * @return
 			 */
 			private LttngSyntheticEvent updateSynEvent(LttngEvent e) {
-				if (syntheticEvent == null
-						|| syntheticEvent.getBaseEvent() != e) {
+				if ((syntheticEvent == null) || (syntheticEvent.getBaseEvent() != e)) {
 					syntheticEvent = new LttngSyntheticEvent(e);
 				}
 
@@ -288,21 +292,24 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 
 		// start request
 		TmfExperiment<LttngEvent> provider = (TmfExperiment<LttngEvent>) fExperiment.getValue();
-		provider.sendRequest(subRequest);
+		provider.sendRequest(fSubRequest);
 
-		// provider.sendRequest(subRequest, ExecutionType.LONG);
-		subRequestQueued = true;
+		// notify LTTngEvent provider that all requests were sent
+		synchronized (this) {
+		    TmfExperiment.getCurrentExperiment().notifyPendingRequest(false);
+		    fIsExperimentNotified = false;
+		}
 
 		experiment.endSynch(new TmfEndSynchSignal(0));
 
 		// Return a dummy context, not used for relay provider
-		return (subRequestQueued) ? new TmfContext() : null;
+		return new TmfContext();
 	}
 
 	/**
 	 * Notify listeners to prepare to receive data e.g. clean previous data etc.
 	 */
-	public void handleProviderStarted(LttngTraceState traceModel) {
+	public synchronized void handleProviderStarted(LttngTraceState traceModel) {
 		LttngSyntheticEvent startIndEvent = new LttngSyntheticEvent(fStatusEvent);
 		startIndEvent.setSequenceInd(SequenceInd.STARTREQ);
 
@@ -317,36 +324,28 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 	 * Notify listeners, no more events for the current request will be
 	 * distributed e.g. update view.
 	 */
-	public synchronized void handleProviderDone() {
+	public synchronized void handleProviderDone(boolean isSuccess) {
 		// Notify application. One notification per trace so the last state of each trace can be
 		// drawn
-		LttngTraceState traceModel;
-		Iterator<IStateTraceManager> iter = fEventProviderRequests.iterator();
-		while(iter.hasNext()) {
-			traceModel = iter.next().getStateModel();
+	    for (LttngTraceState traceModel : traceToTraceStateModel.values()) {
+	        // Take the trace model from traceToTraceStateModel list since it has a copy
+	        // of the state
+	        LttngSyntheticEvent finishEvent = new LttngSyntheticEvent(fStatusEvent);
+            finishEvent.setSequenceInd(SequenceInd.ENDREQ);
+            finishEvent.setTraceModel(traceModel);
 
-			LttngSyntheticEvent finishEvent = new LttngSyntheticEvent(fStatusEvent);
-			finishEvent.setSequenceInd(SequenceInd.ENDREQ);
-			finishEvent.setTraceModel(traceModel);
-
-			fmainRequest.handleData(finishEvent);
-			fmainRequest.done();
-		}
-		
-	}
-
-	/**
-	 * Increment the global event counter i.e. events from any sub requests
-	 */
-	private synchronized void incrementSynEvenCount() {
-		fMainReqEventCount++;
-	}
-
-	/**
-	 * @return
-	 */
-	public synchronized int getSynEvenCount() {
-		return fMainReqEventCount;
+            fmainRequest.handleData(finishEvent);
+	    }
+	    
+        if(isSuccess) {
+            // Finish main request
+            fmainRequest.done();
+        }
+        else {
+            // Cancel main request
+            fmainRequest.cancel();
+            
+        }
 	}
 
 	/**
@@ -355,10 +354,10 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 	 * @param experimentNode
 	 */
 	public synchronized void reset(LTTngTreeNode experimentNode) {
-		fmainRequest = null;
+
+	    conditionallyCancelRequests();
 
 		fEventProviderRequests.clear();
-		fMainReqEventCount = 0;
 		startIndSent = false;
 
 		// set of base event providers
@@ -400,6 +399,17 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 	 */
 	@Override
 	public void sendRequest(final ITmfDataRequest<LttngSyntheticEvent> request) {
+	    synchronized (this) {
+	        if (!fIsExperimentNotified) {
+	            @SuppressWarnings("unchecked")
+	            TmfExperiment<LttngSyntheticEvent> experiment = (TmfExperiment<LttngSyntheticEvent>) TmfExperiment.getCurrentExperiment();
+	            if (experiment != null) {
+	                experiment.notifyPendingRequest(true);
+	                fIsExperimentNotified = true;
+	            }
+	        }
+	    }
+
 		super.sendRequest(request);
 		if (waitForRequest) {
 			try {
@@ -435,4 +445,19 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 		return null;
 	}
 
+	/**
+	 * Cancels the ongoing requests for this data provider if necessary
+	 */
+	public synchronized void conditionallyCancelRequests() {
+	    if ((fSubRequest != null) && (!fSubRequest.isCompleted())) {
+	    	
+	    	TraceDebug.debug("Canceling synthethic event request!");
+
+	        // This will also cancel the fmainRequest
+	        fSubRequest.cancel();
+	        // Reset the request references
+	        fSubRequest = null;
+	        fmainRequest = null;
+	    }
+	}
 }

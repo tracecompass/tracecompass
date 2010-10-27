@@ -226,6 +226,11 @@ public class TimeTextGroup implements FocusListener, KeyListener {
     	lblNanosec.setParent(newParent);
     }
     
+    
+    public boolean isDisposed() {
+        return grpName.isDisposed();
+    }
+    
     /**
      * Getter for the time value of the control.<p>
      * 
@@ -442,13 +447,13 @@ class AsyncTimeTextGroupRedrawer {
 	 */
 	public void asynchronousSetValue(final long newTime) {
 		// Ignore setting of value if widget is disposed
-		if (parentTimeTextGroup.getParent().isDisposed()) return;
+		if (parentTimeTextGroup.isDisposed()) return;
 		
 		Display display =  parentTimeTextGroup.getParent().getDisplay();
 		display.asyncExec(new Runnable() {
 			@Override
-			public void run() {
-				if (!parentTimeTextGroup.getParent().isDisposed()) {
+            public void run() {
+				if (!parentTimeTextGroup.isDisposed()) {
 					parentTimeTextGroup.setValue(newTime);
 				}
 			}
@@ -464,14 +469,14 @@ class AsyncTimeTextGroupRedrawer {
 	 */
 	public void asynchronousSetGroupName(String newGroupName) {
 		// Ignore setting of name if widget is disposed
-		if (parentTimeTextGroup.getParent().isDisposed()) return;
+		if (parentTimeTextGroup.isDisposed()) return;
 
 		final String tmpName = newGroupName;
 		Display display =  parentTimeTextGroup.getParent().getDisplay();
 		display.asyncExec(new Runnable() {
 			@Override
-			public void run() {
-				if (!parentTimeTextGroup.getParent().isDisposed()) {
+            public void run() {
+				if (!parentTimeTextGroup.isDisposed()) {
 					parentTimeTextGroup.setGroupName(tmpName);
 				}
 			}
@@ -486,13 +491,13 @@ class AsyncTimeTextGroupRedrawer {
 	 */
 	public void asynchronousRedraw() {
 		// Ignore redraw if widget is disposed
-		if (parentTimeTextGroup.getParent().isDisposed()) return;
+		if (parentTimeTextGroup.isDisposed()) return;
 
 		Display display =  parentTimeTextGroup.getParent().getDisplay();
 		display.asyncExec(new Runnable() {
 			@Override
-			public void run() {
-				if (!parentTimeTextGroup.getParent().isDisposed()) {
+            public void run() {
+				if (!parentTimeTextGroup.isDisposed()) {
 					parentTimeTextGroup.getParent().redraw();
 				}
 			}

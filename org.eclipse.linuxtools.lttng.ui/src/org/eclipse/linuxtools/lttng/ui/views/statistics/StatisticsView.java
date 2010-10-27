@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.linuxtools.lttng.control.LttngCoreProviderFactory;
 import org.eclipse.linuxtools.lttng.request.ILttngSyntEventRequest;
 import org.eclipse.linuxtools.lttng.state.evProcessor.AbsEventToHandlerResolver;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
@@ -95,6 +96,8 @@ public class StatisticsView extends AbsTimeUpdateView {
 	private DecimalFormat decimalFormat = new DecimalFormat("0.#########");
 	private Cursor fwaitCursor = null;
 
+	private static final Long STATS_INPUT_CHANGED_REFRESH = 5000L;
+	
 	// Used to draw bar charts in columns.
 	private interface ColumnPercentageProvider {
 		public double getPercentage(StatisticsTreeNode node);
@@ -483,6 +486,15 @@ public class StatisticsView extends AbsTimeUpdateView {
 		treeViewer.getTree().setFocus();
 	}
 
+	
+	/*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#getInputChangedRefresh()
+     */
+    @Override
+    protected Long getInputChangedRefresh() {
+        return STATS_INPUT_CHANGED_REFRESH;
+    }
 
 	/**
 	 * @return
@@ -569,7 +581,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 		if (input != null && input instanceof StatisticsTreeNode) {
 			// The data from this experiment is invalid and shall be removed to
 			// refresh upon next selection
-			String name = ((StatisticsTreeNode) input).getKey();
+		    String name = request.getExperimentName();
 			StatisticsTreeRootFactory.removeStatTreeRoot(name);
 		}
 	}
@@ -672,5 +684,14 @@ public class StatisticsView extends AbsTimeUpdateView {
 	protected ItemContainer<?> getItemContainer() {
 		// Not applicable to statistics view
 		return null;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView#getProviderId()
+	 */
+	@Override
+	protected int getProviderId() { 
+	    return LttngCoreProviderFactory.STATISTICS_LTTNG_SYTH_EVENT_PROVIDER; 
 	}
 }

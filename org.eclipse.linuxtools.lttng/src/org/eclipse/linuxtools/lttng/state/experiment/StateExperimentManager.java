@@ -17,13 +17,13 @@ import java.util.Map;
 
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.control.LttngCoreProviderFactory;
-import org.eclipse.linuxtools.lttng.control.LttngSyntheticEventProvider;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.event.LttngSyntheticEvent;
 import org.eclipse.linuxtools.lttng.event.LttngSyntheticEvent.SequenceInd;
 import org.eclipse.linuxtools.lttng.model.LTTngTreeNode;
 import org.eclipse.linuxtools.lttng.signal.ILttExperimentSelectedListener;
 import org.eclipse.linuxtools.lttng.signal.StateExperimentListener;
+import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
@@ -52,8 +52,8 @@ public class StateExperimentManager extends LTTngTreeNode implements
 	 * Used to route incoming events to proper trace manager, during check point
 	 * building
 	 */
-	private final Map<ITmfTrace, IStateTraceManager> ftraceToManagerMap = new HashMap<ITmfTrace, IStateTraceManager>();
-	private final Map<ITmfTrace, Long> ftraceEventsReadMap = new HashMap<ITmfTrace, Long>();
+	private final Map<ITmfTrace, StateTraceHelper> ftraceToManagerMap = new HashMap<ITmfTrace, StateTraceHelper>();
+
 	private LttngSyntheticEvent syntheticEvent = null;
 	private ITmfEventRequest<LttngEvent> fStateCheckPointRequest = null;
 
@@ -173,9 +173,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			}
 
 			// Reset event provider to handle requests for the new experiment
-			LttngSyntheticEventProvider synEventProvider = LttngCoreProviderFactory
-					.getEventProvider();
-			synEventProvider.reset(experimentNode);
+			LttngCoreProviderFactory.reset(experimentNode);
 
 			// preserve the selected experiment
 			fSelectedExperiment = experimentNode;
@@ -286,9 +284,8 @@ public class StateExperimentManager extends LTTngTreeNode implements
 		LTTngTreeNode[] traceNodes = experimentNode.getChildren();
 		synchronized (this) {
 			ftraceToManagerMap.clear();
-			ftraceEventsReadMap.clear();
 		}
-		
+
 		ITmfTrace trace;
 		for (LTTngTreeNode traceStateManagerNode : traceNodes) {
 			IStateTraceManager traceManager;
@@ -306,11 +303,10 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			// build the trace to manager mapping for event dispatching
 			trace = traceManager.getTrace();
 			synchronized (this) {
-				ftraceToManagerMap.put(trace, traceManager);
-				ftraceEventsReadMap.put(trace, new Long(0));
+				ftraceToManagerMap.put(trace, new StateTraceHelper(traceManager));
 			}
 		}
-		
+
 		// if no trace mapping
 		if (ftraceToManagerMap.size() < 1) {
 			TraceDebug.debug("No traces associated to experiment " + experiment.getName());
@@ -337,22 +333,24 @@ public class StateExperimentManager extends LTTngTreeNode implements
 //					Tracer.trace("Chk: " + event.getTimestamp());
 					nbEventsHandled++;
 					ITmfTrace trace = event.getParentTrace();
-					IStateTraceManager traceManager = ftraceToManagerMap.get(trace);
-					long nbEvents = ftraceEventsReadMap.get(trace) + 1;
-					ftraceEventsReadMap.put(trace, nbEvents);
-					if (traceManager != null) {
+
+					StateTraceHelper helper = ftraceToManagerMap.get(trace);
+
+					if (helper != null) {
+						helper.incrementNumberRead();
+
 						// obtain synthetic event
-						LttngSyntheticEvent synEvent = updateSynEvent(event, traceManager);
+						LttngSyntheticEvent synEvent = updateSynEvent(event, helper.getTraceModel());
+
 						// update state system, and save check points as needed
-						traceManager.handleEvent(synEvent, nbEvents);
+						helper.getStateManager().handleEvent(synEvent, helper.getNumberRead());
 					} else {
-						TraceDebug
-								.debug("StateTraceManager not found for trace"
-										+ trace.getName());
+						TraceDebug.debug("StateTraceManager not found for trace"
+								+ trace.getName());
 					}
 				}
 			}
-		
+
 			/*
 			 * (non-Javadoc)
 			 * 
@@ -363,7 +361,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			public void handleFailure() {
 				printCompletedMessage();
 			}
-			
+
 			/*
 			 * (non-Javadoc)
 			 * 
@@ -374,7 +372,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			public void handleCancel() {
 				printCompletedMessage();
 			}
-		
+
 			/*
 			 * (non-Javadoc)
 			 * 
@@ -385,21 +383,20 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			public void handleSuccess() {
 				printCompletedMessage();
 			}
-		
+
 			/**
 			 * @param header
 			 */
 			private void printCompletedMessage() {
 				if (TraceDebug.isDEBUG()) {
-					TraceDebug.debug("Trace check point building completed, number of events handled: " + nbEventsHandled
-							+ "\n\t\t");
-					for (IStateTraceManager traceMgr : ftraceToManagerMap.values()) {
-						TraceDebug.debug(traceMgr.toString() + "\n\t\t");
+					TraceDebug.debug("Trace check point building completed, number of events handled: " + nbEventsHandled + "\n\t\t");
+					for (StateTraceHelper helper : ftraceToManagerMap.values()) {
+						TraceDebug.debug(helper.getStateManager().toString() + "\n\t\t");
 					}
 				}
 			}
 		};
-		
+
 		// Execute event data request
 		experiment.sendRequest(request);
 
@@ -414,17 +411,77 @@ public class StateExperimentManager extends LTTngTreeNode implements
 		return request;
 	}
 
-
-	private LttngSyntheticEvent updateSynEvent(LttngEvent e, IStateTraceManager stateTraceManager) {
+	private LttngSyntheticEvent updateSynEvent(LttngEvent e, LttngTraceState stateModel) {
 		if (syntheticEvent == null || syntheticEvent.getBaseEvent() != e) {
 			syntheticEvent = new LttngSyntheticEvent(e);
 		}
 
 		// Trace model needed by application handlers
-		syntheticEvent.setTraceModel(stateTraceManager.getStateModel());
+		syntheticEvent.setTraceModel(stateModel);
 		syntheticEvent.setSequenceInd(SequenceInd.UPDATE);
 
 		return syntheticEvent;
 	}
 
+	/**
+	 * Helper class that wraps the StateTraceManager, the current
+	 * LTTngTraceState and the number of read events
+	 * 
+	 * @author bHufmann
+	 * 
+	 */
+	private class StateTraceHelper {
+
+		IStateTraceManager stateTraceManager = null;
+		long numberEventsRead = 0;
+		LttngTraceState stateTraceModel = null;
+
+		/**
+		 * Constructor
+		 * 
+		 * @param stateManager
+		 *            The StateTraceManager the helper is for
+		 */
+		public StateTraceHelper(IStateTraceManager stateManager) {
+			this.stateTraceManager = stateManager;
+			// Get the TraceState at the beginning of the trace
+			this.stateTraceManager.restoreCheckPointByTimestamp(stateManager
+					.getTrace().getStartTime());
+			this.stateTraceModel = this.stateTraceManager.getStateModel();
+		}
+
+		/**
+		 * Returns the StateTraceManager
+		 * 
+		 * @return IStateTraceManager
+		 */
+		public IStateTraceManager getStateManager() {
+			return stateTraceManager;
+		}
+
+		/**
+		 * Returns the number of read events
+		 * 
+		 * @return long
+		 */
+		public long getNumberRead() {
+			return numberEventsRead;
+		}
+
+		/**
+		 * Increments the number of read events
+		 */
+		public void incrementNumberRead() {
+			++numberEventsRead;
+		}
+
+		/**
+		 * Returns the current LTTngTraceState
+		 * 
+		 * @return LttngTraceState
+		 */
+		public LttngTraceState getTraceModel() {
+			return stateTraceModel;
+		}
+	}
 }

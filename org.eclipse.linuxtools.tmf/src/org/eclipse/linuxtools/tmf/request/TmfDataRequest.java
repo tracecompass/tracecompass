@@ -226,7 +226,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * @return indicates if the request is completed
      */
     @Override
-	public boolean isRunning() {
+    public synchronized boolean isRunning() {
         return fRequestRunning;
     }
 
@@ -234,7 +234,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * @return indicates if the request is completed
      */
     @Override
-	public boolean isCompleted() {
+    public synchronized boolean isCompleted() {
         return fRequestCompleted;
     }
 
@@ -242,7 +242,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * @return indicates if the request is canceled
      */
     @Override
-	public boolean isFailed() {
+    public synchronized boolean isFailed() {
         return fRequestFailed;
     }
 
@@ -250,7 +250,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * @return indicates if the request is canceled
      */
     @Override
-	public boolean isCancelled() {
+    public synchronized boolean isCancelled() {
         return fRequestCanceled;
     }
 
@@ -395,8 +395,10 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * Called by the request processor upon failure.
      */
     @Override
-	public synchronized void fail() {
-        fRequestFailed = true;
+    public void fail() {
+        synchronized(this) {
+            fRequestFailed = true;
+        }
         done();
     }
 
@@ -404,8 +406,10 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * Called by the request processor upon cancellation.
      */
     @Override
-	public synchronized void cancel() {
-		fRequestCanceled = true;
+    public void cancel() {
+        synchronized(this) {
+            fRequestCanceled = true;
+        }
 		done();
     }
 

@@ -16,7 +16,6 @@ import java.util.Arrays;
 import org.eclipse.linuxtools.lttng.control.LttngCoreProviderFactory;
 import org.eclipse.linuxtools.lttng.control.LttngSyntheticEventProvider;
 import org.eclipse.linuxtools.lttng.event.LttngSyntheticEvent;
-import org.eclipse.linuxtools.lttng.event.LttngSyntheticEvent.SequenceInd;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.request.ILttngSyntEventRequest;
 import org.eclipse.linuxtools.lttng.request.IRequestStatusListener;
@@ -56,8 +55,7 @@ import org.eclipse.swt.widgets.Display;
  * @author alvaro
  * 
  */
-public abstract class AbsTimeUpdateView extends TmfView implements
-		IRequestStatusListener {
+public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatusListener {
 
 	// ========================================================================
 	// Data
@@ -71,7 +69,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	/**
 	 * Number of events before a GUI refresh
 	 */
-	private static final Long INPUT_CHANGED_REFRESH = 3000L;
+	protected static final Long INPUT_CHANGED_REFRESH = 20000L;
 	private static final long DEFAULT_OFFSET = 0L;
 	private static final int DEFAULT_CHUNK = 1;
 
@@ -80,7 +78,9 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 
 	private LttngSyntEventRequest fCurrentRequest = null;
 
-		// ========================================================================
+	protected LttngSyntheticEventProvider fProvider = LttngCoreProviderFactory.getEventProvider(getProviderId());
+	
+	// ========================================================================
 	// Constructor
 	// ========================================================================
 	public AbsTimeUpdateView(String viewID) {
@@ -91,6 +91,17 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	// ========================================================================
 	// Methods
 	// ========================================================================
+	
+	/**
+	 * Returns the number of events after which the relevant display will 
+	 * be refreshed
+	 * 
+	 * @return  
+	 */
+	protected Long getInputChangedRefresh() {
+	    return INPUT_CHANGED_REFRESH;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -262,25 +273,41 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	 * 
 	 * @param event
 	 */
-	protected synchronized void tsfTmProcessTimeScaleEvent(TmfTimeScaleSelectionEvent event) {
-		// source needed to keep track of source values
-		Object source = event.getSource();
+	protected void tsfTmProcessTimeScaleEvent(TmfTimeScaleSelectionEvent event) {
+        // source needed to keep track of source values
+        Object source = event.getSource();
 
-		if (source != null) {
-			// Update the parameter updater before carrying out a read request
-			ParamsUpdater paramUpdater = getParamsUpdater();
-			boolean newParams = paramUpdater.processTimeScaleEvent(event);
+        boolean newParams = false;
+        TmfTimeRange trange = null;
+        Long selectedTime = null;
 
-			if (newParams) {
-				// Read the updated time window
-				TmfTimeRange trange = paramUpdater.getTrange();
-				if (trange != null) {
+        // update all information and get relevant data
+	    synchronized (this) {
+	        if (source != null) {
+	            // Update the parameter updater before carrying out a read request
+	            ParamsUpdater paramUpdater = getParamsUpdater();
+	            newParams = paramUpdater.processTimeScaleEvent(event);
 
-					// Notify listener views. to perform data requests
-					// upon this notification
-					synchTimeRangeNotification(trange, paramUpdater.getSelectedTime(), source);
-				}
-			}
+	            if (newParams) {
+	                // Read the updated time window
+	                trange = paramUpdater.getTrange();
+	                if (trange != null) {
+	                    selectedTime = paramUpdater.getSelectedTime();
+	                }
+	            }
+	        }
+	    }
+
+	    // Check for selectedTime is sufficient since it is only set if
+	    // newParams is true and trange is not null
+		if (selectedTime != null) {
+		    // Notify listener views. to perform data requests
+            // upon this notification
+
+		    // Note that this has to be done outside the synchronized statement
+		    // because otherwise we could end-up in a deadlock if a ongoing 
+		    // request needs to be canceled.
+            synchTimeRangeNotification(trange, selectedTime, source);		    
 		}
 	}
 
@@ -350,14 +377,12 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 		}
 
 		// Cancel the currently executing request before starting a new one
-		if (fCurrentRequest != null && !fCurrentRequest.isCompleted()) {
-//			System.out.println("Cancelling request");
-//			fCurrentRequest.cancel();
-		}
-		
+		fProvider.conditionallyCancelRequests();
+
 		fCurrentRequest = new LttngSyntEventRequest(
 				requestTrange, DEFAULT_OFFSET, TmfDataRequest.ALL_DATA,
-				DEFAULT_CHUNK, this, experimentTRange, getEventProcessor(), execType) {
+				DEFAULT_CHUNK, this, experimentTRange, getEventProcessor(), 
+				TmfExperiment.getCurrentExperiment().getName(), execType) {
 	
 			Long fCount = getSynEventCount();
 			ITransEventProcessor processor = getProcessor();
@@ -386,30 +411,39 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 //					handleDataValidCount++;
 					LttngSyntheticEvent synEvent = (LttngSyntheticEvent) event;
 					// process event
-					SequenceInd indicator = synEvent.getSynType();
-					if (indicator == SequenceInd.BEFORE
-							|| indicator == SequenceInd.AFTER) {
-						processor.process(event, synEvent.getTraceModel());
-					} else if (indicator == SequenceInd.STARTREQ) {
-						handleRequestStarted();
-					} else if (indicator == SequenceInd.ENDREQ) {
-						processor.process(event, synEvent.getTraceModel());
-						// handleCompleted();
-					}
-	
-					if (indicator == SequenceInd.BEFORE) {
-						fCount++;
-						if (fCount != 0 && fCount % INPUT_CHANGED_REFRESH == 0) {
-							// send partial update
-							modelInputChanged(this, false);
-	
-							if (TraceDebug.isDEBUG()) {
-								frunningTimeStamp = event.getTimestamp();
-								TraceDebug.debug("handled: " + fCount + " sequence: " + synEvent.getSynType());
-							}
-	
-						}
-					}
+					switch (synEvent.getSynType()) {
+
+					    case STARTREQ: {
+					        handleRequestStarted();
+					        break;
+					    }
+
+					    case BEFORE: {
+					        processor.process(event, synEvent.getTraceModel());
+					        fCount++;
+					        if ((fCount != 0) && (fCount % getInputChangedRefresh() == 0)) {
+					            // send partial update
+					            modelInputChanged(this, false);
+  
+					            if (TraceDebug.isDEBUG()) {
+					                frunningTimeStamp = event.getTimestamp();
+					                TraceDebug.debug("handled: " + fCount + " sequence: " + synEvent.getSynType());
+					            }
+					        }
+					        break;
+					    }
+
+					    case AFTER:
+					        // fall-through
+					    case ENDREQ:{
+					        processor.process(event, synEvent.getTraceModel());
+					        break;
+					    }
+
+					    default:
+                          // nothing to do
+                          break;
+				    }
 				}
 			}
 	
@@ -443,12 +477,8 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 			}
 		};
 	
-		// obtain singleton core provider
-		LttngSyntheticEventProvider provider = LttngCoreProviderFactory
-				.getEventProvider();
-	
 		// send the request to TMF
-		fCurrentRequest.startRequestInd(provider);
+		fCurrentRequest.startRequestInd(fProvider);
 		fCurrentRequest.setclearDataInd(clearingData);
 		return true;
 	}
@@ -719,4 +749,11 @@ public abstract class AbsTimeUpdateView extends TmfView implements
 	 * @return
 	 */
 	protected abstract ItemContainer<?> getItemContainer();
+
+	/**
+	 * Returns LTTng Synthetic Provider ID used for current view
+	 * 
+	 * @return  
+	 */
+	protected abstract int getProviderId();
 }

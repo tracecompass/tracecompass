@@ -187,7 +187,8 @@ public class ProjectView extends TmfView {
                 traces[i] = trace;
         	}
             fSelectedExperiment = new LTTngExperiment<LttngEvent>(LttngEvent.class, expId, traces);
-
+            TmfExperiment.setCurrentExperiment(fSelectedExperiment);
+            
 			// Make sure the lttng-core, experiment selection context is ready
 			// for an event request from any view
 			StateManagerFactory.getExperimentManager().experimentSelected_prep(

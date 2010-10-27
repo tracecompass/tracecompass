@@ -109,15 +109,29 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
 		// the sub-requests handleData().
 		if (getClass() == TmfCoalescedDataRequest.class) {
 	    	for (ITmfDataRequest<T> request : fRequests) {
-	    		request.handleData(data);
+	    	    if (!request.isCompleted()) {
+	    	        request.handleData(data);
+	    	    }
 	    	}
 		}
     }
 
+    @Override
+    public void start() {
+        for (ITmfDataRequest<T> request : fRequests) {
+            if (!request.isCompleted()) {
+                request.start();
+            }
+        }
+        super.start();
+    }
+    
 	@Override
     public void done() {
     	for (ITmfDataRequest<T> request : fRequests) {
-    		request.done();
+    	    if (!request.isCompleted()) {
+    	        request.done();
+    	    }
     	}
     	super.done();
     }
@@ -133,11 +147,61 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
     @Override
     public void cancel() {
     	for (ITmfDataRequest<T> request : fRequests) {
-    		request.cancel();
+    	    if (!request.isCompleted()) {
+    	        request.cancel();
+    	    }
     	}
     	super.cancel();
     }
+    
+    @Override
+    public boolean isCompleted() {
+        // Firstly, check if coalescing request is completed
+        if (super.isCompleted()) {
+            return true;
+        }
 
+        // Secondly, check if all sub-requests are finished
+        if (fRequests.size() > 0) {
+            // If all sub requests are completed the coalesced request is 
+            // treated as completed, too.
+            for (ITmfDataRequest<T> request : fRequests) {
+                if (!request.isCompleted()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Coalescing request is not finished if there are no sub-requests
+        return false;
+    }
+
+    @Override
+    public boolean isCancelled() {
+        // Firstly, check if coalescing request is canceled
+        if (super.isCancelled()) {
+            return true;
+        }
+
+        // Secondly, check if all sub-requests are canceled
+        if (fRequests.size() > 0) {
+            // If all sub requests are canceled the coalesced request is 
+            // treated as completed, too.
+            for (ITmfDataRequest<T> request : fRequests) {
+                if (!request.isCancelled()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Coalescing request is not canceled if there are no sub-requests
+        return false;
+
+    }
+
+    
     // ------------------------------------------------------------------------
     // Object
     // ------------------------------------------------------------------------
@@ -165,5 +229,4 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
 		return "[TmfCoalescedDataRequest(" + getRequestId() + "," + getDataType().getSimpleName() 
 			+ "," + getIndex() + "," + getNbRequested() + ")]";
     }
-
 }

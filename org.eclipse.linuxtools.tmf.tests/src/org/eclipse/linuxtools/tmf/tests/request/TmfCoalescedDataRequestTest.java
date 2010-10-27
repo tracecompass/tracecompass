@@ -347,6 +347,55 @@ public class TmfCoalescedDataRequestTest extends TestCase {
 		assertTrue ("isCancelled", subRequest2.isCancelled());
 	}
 
+	
+	// ------------------------------------------------------------------------
+	// cancel sub-requests
+	// ------------------------------------------------------------------------
+
+    public void testCancelSubRequests() {
+
+	        final boolean[] crFlags = new boolean[4];
+	        TmfCoalescedDataRequest<TmfEvent> request = setupTestRequest(crFlags);
+	        TmfDataRequest<TmfEvent> subRequest1 = new TmfDataRequestStub<TmfEvent>(TmfEvent.class, 10, 100, 200);
+	        TmfDataRequest<TmfEvent> subRequest2 = new TmfDataRequestStub<TmfEvent>(TmfEvent.class, 10, 100, 200);
+	        request.addRequest(subRequest1);
+	        request.addRequest(subRequest2);
+
+	        subRequest1.cancel();
+
+	        // Validate the first coalesced request
+	        assertTrue ("isCompleted", subRequest1.isCompleted());
+	        assertFalse("isFailed",    subRequest1.isFailed());
+	        assertTrue ("isCancelled", subRequest1.isCancelled());
+
+	        // Validate the coalescing request
+	        assertFalse("isCompleted", request.isCompleted());
+	        assertFalse("isFailed",     request.isFailed());
+	        assertFalse("isCancelled", request.isCancelled());  
+
+	        // Cancel second sub-request
+	        subRequest2.cancel();
+
+	        // Validate the second coalesced request
+	        assertTrue ("isCompleted", subRequest2.isCompleted());
+	        assertFalse("isFailed",    subRequest2.isFailed());
+	        assertTrue ("isCancelled", subRequest2.isCancelled());
+
+	        // Validate the coalescing request
+	        assertTrue ("isCompleted", request.isCompleted());
+	        assertFalse("isFailed",    request.isFailed());
+	        assertTrue ("isCancelled", request.isCancelled());
+
+	        // Finalize coalescing request - 
+	        // Note: No need to check "request.isCancelled()" since it was verified above
+            request.cancel();
+
+	        assertTrue ("handleCompleted", crFlags[0]);
+	        assertFalse("handleSuccess",   crFlags[1]);
+	        assertFalse("handleFailure",   crFlags[2]);
+	        assertTrue ("handleCancel",   crFlags[3]);
+	    }
+
 	// ------------------------------------------------------------------------
 	// waitForCompletion
 	// ------------------------------------------------------------------------

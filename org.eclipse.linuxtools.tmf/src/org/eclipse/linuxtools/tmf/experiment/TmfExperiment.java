@@ -204,7 +204,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     // Accessors
     // ------------------------------------------------------------------------
 
-    private static void setCurrentExperiment(TmfExperiment<?> experiment) {
+    public static void setCurrentExperiment(TmfExperiment<?> experiment) {
     	fCurrentExperiment = experiment;
     }
 
@@ -794,10 +794,15 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 						public void handleCompleted() {
 //							System.out.println("Request completed at: " + timestamp[0]);
 							if (getNbRead() < CHUNK_SIZE[0]) {
-								eventRequest.done();
+							    if (isCancelled()) { 
+							        eventRequest.cancel();
+							    }
+							    else {
+							        eventRequest.done();
+							    }
 								isFinished[0] = Boolean.TRUE;
 								nbRead[0] += getNbRead();
-//								System.out.println("fNbRead=" + fNbRead + ", count=" + count +", total=" + nbRead[0]);
+//								System.out.println("fNbRead=" + getNbRead() + " total=" + nbRead[0]);
 							}
 							super.handleCompleted();
 						}

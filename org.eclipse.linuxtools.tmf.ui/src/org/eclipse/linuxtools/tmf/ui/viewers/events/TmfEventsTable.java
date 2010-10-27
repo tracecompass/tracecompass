@@ -14,14 +14,12 @@
 
 package org.eclipse.linuxtools.tmf.ui.viewers.events;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
@@ -320,34 +318,52 @@ public class TmfEventsTable extends TmfComponent {
     
     @TmfSignalHandler
     public void currentTimeUpdated(final TmfTimeSynchSignal signal) {
-        if (signal.getSource() != fTable && fTrace != null && !fTable.isDisposed()) {
-            Job job = new Job("seeking...") {
-                @Override
-                protected IStatus run(IProgressMonitor monitor) {
-                    final int index = (int) fTrace.getRank(signal.getCurrentTime());
-                    // Perform the updates on the UI thread
-                    fTable.getDisplay().asyncExec(new Runnable() {
-                        @Override
-						public void run() {
-                        	// Return if table is disposed
-                        	if (fTable.isDisposed()) return;
-                        	
-                            fTable.setSelection(index);
-                            // The timestamp might not correspond to an actual event
-                            // and the selection will point to the next experiment event.
-                            // But we would like to display both the event before and
-                            // after the selected timestamp.
-                            // This works fine by default except when the selected event
-                            // is the top displayed event. The following ensures that we
-                            // always see both events.
-                            if ((index > 0) && (index == fTable.getTopIndex())) {
-                                fTable.setTopIndex(index - 1);
-                            }
-                        }
-                    });
-                    return Status.OK_STATUS;
-                }};
-            job.schedule();
-        }
-    }
+    	if ((signal.getSource() != fTable) && (fTrace != null) && (!fTable.isDisposed())) {
+
+    		// Create a request for one event that will be queued after other ongoing requests. When this request is completed 
+    		// do the work to select the actual event with the timestamp specified in the signal. This procedure prevents 
+    		// the method fTrace.getRank() from interfering and delaying ongoing requests.
+    		final TmfDataRequest<TmfEvent> subRequest = new TmfDataRequest<TmfEvent>(TmfEvent.class, 0, 1, ExecutionType.FOREGROUND) {
+
+    			@Override
+    			public void handleData(TmfEvent event) {
+    				super.handleData(event);
+    			}
+
+    			@Override
+    			public void handleCompleted() {
+    				// Get the rank for the event selection in the table
+    				final int index = (int) fTrace.getRank(signal.getCurrentTime());
+
+    				fTable.getDisplay().asyncExec(new Runnable() {
+    					@Override
+                        public void run() {
+    						// Return if table is disposed
+    						if (fTable.isDisposed()) return;
+
+    						fTable.setSelection(index);
+    						// The timestamp might not correspond to an actual event
+    						// and the selection will point to the next experiment event.
+    						// But we would like to display both the event before and
+    						// after the selected timestamp.
+    						// This works fine by default except when the selected event
+    						// is the top displayed event. The following ensures that we
+    						// always see both events.
+    						if ((index > 0) && (index == fTable.getTopIndex())) {
+    							fTable.setTopIndex(index - 1);
+    						}
+    					}
+    				});
+    				super.handleCompleted();
+    			}
+    		};
+
+    		@SuppressWarnings("unchecked")
+            TmfExperiment<TmfEvent> experiment = (TmfExperiment<TmfEvent>)TmfExperiment.getCurrentExperiment();
+    		if (experiment != null) {
+    			experiment.sendRequest(subRequest);
+    		}
+    	}
+	}
+
 }
