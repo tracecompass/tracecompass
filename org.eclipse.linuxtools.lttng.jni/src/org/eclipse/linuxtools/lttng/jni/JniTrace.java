@@ -454,7 +454,8 @@ public abstract class JniTrace extends Jni_C_Common {
         
         // Otherwise, we need to make sure the timestamp of the event we got is not the same as the last "NextEvent" we requested 
         // NOTE : JniEvent.compareTo() compare by timestamp AND type, as 2 events of different type could have the same timestamp.
-        if ( tmpEvent.compareTo(currentEvent) == 0 ) {
+//        if( currentEvent != null ){
+        if (tmpEvent.equals(currentEvent)) {
             // Remove the event on top as it is the same currentEventTimestamp
             eventsHeap.poll();
             

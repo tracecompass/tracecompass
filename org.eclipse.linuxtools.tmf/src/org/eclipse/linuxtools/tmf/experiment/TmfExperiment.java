@@ -521,7 +521,8 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
 	        TmfContext traceContext = expContext.getContexts()[trace];
 	        TmfExperimentLocation expLocation = (TmfExperimentLocation) expContext.getLocation();
-	        expLocation.getLocation()[trace] = traceContext.getLocation().clone();
+//	        expLocation.getLocation()[trace] = traceContext.getLocation().clone();
+	        expLocation.getLocation()[trace] = traceContext.getLocation();
 
 //	        updateIndex(expContext, timestamp);
 

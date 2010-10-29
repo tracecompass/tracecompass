@@ -405,6 +405,14 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
         return parentTracefile;
     }
     
+	public boolean equals(JniEvent other) {
+		if (other != null) {
+			return (this.getEventTime().equals(other.getEventTime())
+				&&	this.parentTracefile.equals(other.parentTracefile));
+		}
+		return false;
+	}
+    
     /**
      * Compare fonction for JNIEvent.<p>
      * <p>
@@ -414,25 +422,24 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * @return -1 if given event happens before, 0 if equal, 1 if passed event happens after.
      */
     @Override
-	public int compareTo(JniEvent rightEvent ){
-    	
-    	// Note : this = left hand operand
-    	
-        // By default, we consider the current event to be older.
-        int eventComparaison = -1; 
-        
-        // Test against null before performing anything
-        if ( rightEvent != null ) {
-            // Compare the timestamp first
-            eventComparaison = this.getEventTime().compareTo( rightEvent.getEventTime() );
-            
-            // If timestamp is equal, compare the parent tracefile ("event type")
-            if ( (eventComparaison == 0) && ( !this.parentTracefile.equals(rightEvent.parentTracefile)) ) {
-                eventComparaison = 1;
-            }
-        }
-        return eventComparaison;
-    }
+	public int compareTo(JniEvent other) {
+
+		// By default, we consider the current event to be older.
+		int eventComparaison = -1;
+
+		// Test against null before performing anything
+		if (other != null) {
+			// Compare the timestamp first
+			eventComparaison = this.getEventTime().compareTo(other.getEventTime());
+
+			// If timestamp is equal, compare the parent trace file ("event type")
+			if ((eventComparaison == 0)
+					&& (!this.parentTracefile.equals(other.parentTracefile))) {
+				eventComparaison = 1;
+			}
+		}
+		return eventComparaison;
+	}
     
     /**
      * Print information for this event. 

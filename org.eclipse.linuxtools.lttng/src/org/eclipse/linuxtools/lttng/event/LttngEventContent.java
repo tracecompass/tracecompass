@@ -161,7 +161,8 @@ public class LttngEventContent extends TmfEventContent {
         	
 	        for ( int pos=0; pos<tmpType.getNbFields(); pos++ ) {
 	            String name = null;
-				JniEvent tmpEvent = ((LttngEvent)getEvent()).convertEventTmfToJni();
+	            LttngEvent lttngTmpEvent = (LttngEvent)getEvent(); //added for easier debugging
+				JniEvent tmpEvent = (lttngTmpEvent).convertEventTmfToJni();
 				
 				// tmpEvent == null probably mean there is a discrepancy between Eclipse and C library
 				// An error was probably printed in convertEventTmfToJni() already, but keep in mind this is SERIOUS

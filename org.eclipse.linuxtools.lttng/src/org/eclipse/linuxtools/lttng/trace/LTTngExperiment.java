@@ -120,16 +120,25 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
 			expContext.setLastTrace(TmfExperimentContext.NO_TRACE);
 		}
 
-		// Scan the candidate events and identify the "next" trace to read from 
+		// Scan the candidate events and identify the "next" trace to read from
+		TmfEvent eventArray[] =  expContext.getEvents();
+		if (eventArray == null) {
+			return null;
+		}
 		int trace = TmfExperimentContext.NO_TRACE;
 		TmfTimestamp timestamp = TmfTimestamp.BigCrunch;
-		for (int i = 0; i < expContext.getTraces().length; i++) {
-			TmfEvent event = expContext.getEvents()[i];
-			if (event != null && event.getTimestamp() != null) {
-				TmfTimestamp otherTS = event.getTimestamp();
-				if (otherTS.compareTo(timestamp, true) < 0) {
-					trace = i;
-					timestamp = otherTS;
+		if (eventArray.length == 1) {
+			timestamp = eventArray[0].getTimestamp();
+			trace = 0;
+		} else {
+			for (int i = 0; i < eventArray.length; i++) {
+				TmfEvent event = eventArray[i];
+				if (event != null && event.getTimestamp() != null) {
+					TmfTimestamp otherTS = event.getTimestamp();
+					if (otherTS.compareTo(timestamp, true) < 0) {
+						trace = i;
+						timestamp = otherTS;
+					}
 				}
 			}
 		}
@@ -141,7 +150,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
 
 	        TmfContext traceContext = expContext.getContexts()[trace];
 	        TmfExperimentLocation expLocation = (TmfExperimentLocation) expContext.getLocation();
-	        expLocation.getLocation()[trace] = traceContext.getLocation().clone();
+	        expLocation.getLocation()[trace] = traceContext.getLocation();
 
 	        updateIndex(expContext, timestamp);
 

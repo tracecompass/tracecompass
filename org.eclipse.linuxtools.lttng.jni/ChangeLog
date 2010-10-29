@@ -1,0 +1,6 @@
+2010-10-29  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/jni/common/JniTime.java (equals): Optimization 
+	* src/org/eclipse/linuxtools/lttng/jni/JniEvent.java (equals): Optimization
+	(compareTo): Optimization
+	* src/org/eclipse/linuxtools/lttng/jni/JniTrace.java (readNextEvent): Optimization 

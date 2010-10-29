@@ -181,7 +181,7 @@ public class ParentHistogramCanvasPaintListener extends HistogramCanvasPaintList
 						);
 
 				parentCanvas.setData("double-buffer-image", image);
-				isFinished = false;
+//				isFinished = false;
 			}
 			
 			// Initializes the graphics context of the image. 
@@ -192,10 +192,10 @@ public class ParentHistogramCanvasPaintListener extends HistogramCanvasPaintList
 					&& (parentCanvas.getHistogramContent().getReadyUpToPosition() != 0)	) {
 				
 				// Call the function that draw the bars
-				if (!isFinished) {
+//				if (!isFinished) {
 					drawHistogram(imageGC, image);
-					isFinished = HistogramCanvas.getHistogramView().getDataBackgroundFullRequest().isCompleted();
-				}
+//					isFinished = HistogramCanvas.getHistogramView().getDataBackgroundFullRequest().isCompleted();
+//				}
 
 				Image img = new Image (image.getDevice(), image, SWT.IMAGE_COPY);
 				GC imgGC = new GC(img);

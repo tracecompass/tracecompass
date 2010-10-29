@@ -1,3 +1,7 @@
+2010-10-29  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/ParentHistogramCanvasPaintListener.java (paintControl): Temporary refresh fix
+
 2010-10-27  Francois Chouinard  <fchouinard@gmail.com>
 
 	* Implement enhanced request coalescing across providers, request cancellation, multiple synth data providers and cleanup

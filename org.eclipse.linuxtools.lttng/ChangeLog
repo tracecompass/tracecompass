@@ -1,3 +1,9 @@
+2010-10-29  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/event/LttngEventContent.java (getFields): Cosmetic change
+	* src/org/eclipse/linuxtools/lttng/trace/LTTngExperiment.java (getNextEvent): Oprimization when only 1 trace 
+	* src/org/eclipse/linuxtools/lttng/trace/LTTngTrace.java: New hshing algorithm
+
 2010-10-27  Francois Chouinard  <fchouinard@gmail.com>
 
 	* Implement enhanced request coalescing across providers, request cancellation, multiple synth data providers and cleanup
