@@ -23,6 +23,11 @@ import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
+import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.signal.TmfTraceOpenedSignal;
+import org.eclipse.linuxtools.tmf.signal.TmfTraceUpdatedSignal;
 
 /**
  * <b><u>TmfTrace</u></b>
@@ -386,73 +391,132 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     // Indexing
     // ------------------------------------------------------------------------
 
-//	/*
-//	 * The purpose of the index is to keep the information needed to rapidly
-//	 * restore the traces contexts at regular intervals (every INDEX_PAGE_SIZE
-//	 * event).
-//	 */
-//
-//	@SuppressWarnings({ "unchecked", "unused" })
-//	private void indexTrace(boolean waitForCompletion) {
-//
-//		fCheckpoints.clear();
-//		
-//		ITmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity, TmfDataRequest.ALL_DATA, 1, ITmfDataRequest.ExecutionType.BACKGROUND) {
-//
-//			TmfTimestamp startTime =  null;
-//			TmfTimestamp lastTime  =  null;
-//
-//			@Override
-//			public void handleData() {
-//				TmfEvent[] events = getData();
-//				if (events.length > 0) {
-//					TmfTimestamp ts = events[0].getTimestamp();
-//					if (startTime == null) {
-//						startTime = new TmfTimestamp(ts);
-//						fStartTime = startTime;
-//					}
-//					lastTime = new TmfTimestamp(ts);
-//
-//					if ((fNbRead % DEFAULT_INDEX_PAGE_SIZE) == 0) {
-//						updateTraceData();
-//					}
-//				}
-//			}
-//
-//			@Override
-//			public void handleSuccess() {
-//				updateTraceData();
-//			}
-//
-//			private void updateTraceData() {
-//				if (fNbRead != 0) {
-//					fEndTime  = new TmfTimestamp(lastTime);
-//					fNbEvents = fNbRead;
-//					notifyListeners();
-//				}
-//			}
-//		};
-//
-//		sendRequest((ITmfDataRequest<T>) request);
-//		if (waitForCompletion)
-//			try {
-//				request.waitForCompletion();
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//	}
+	/*
+	 * The purpose of the index is to keep the information needed to rapidly
+	 * restore the traces contexts at regular intervals (every INDEX_PAGE_SIZE
+	 * event).
+	 */
+
+    @SuppressWarnings({ "unchecked" })
+    private void indexTrace(boolean waitForCompletion) {
+
+        fCheckpoints.clear();
+        ITmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity,
+                TmfDataRequest.ALL_DATA, 1, ITmfDataRequest.ExecutionType.BACKGROUND) {
+
+            TmfTimestamp startTime =  null;
+            TmfTimestamp lastTime  =  null;
+
+            @Override
+            public void handleData(TmfEvent event) {
+                super.handleData(event);
+                if (event != null) {
+                    TmfTimestamp ts = event.getTimestamp();
+                    if (startTime == null)
+                        startTime = new TmfTimestamp(ts);
+                    lastTime = new TmfTimestamp(ts);
+
+                    if ((getNbRead() % DEFAULT_INDEX_PAGE_SIZE) == 0) {
+                        updateTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void handleSuccess() {
+                updateTrace();
+            }
+
+            private void updateTrace() {
+                int nbRead = getNbRead();
+                if (nbRead != 0) {
+                    fStartTime = startTime;
+                    fEndTime = lastTime;
+                    fNbEvents  = nbRead;
+                    notifyListeners();
+                }
+            }
+        };
+
+        sendRequest((ITmfDataRequest<T>) request);
+        if (waitForCompletion)
+            try {
+                request.waitForCompletion();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+    }
+
+    @SuppressWarnings({ "unchecked", "unused" })
+	private void indexTraceOld(boolean waitForCompletion) {
+
+		fCheckpoints.clear();
+		
+		ITmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity, TmfDataRequest.ALL_DATA, 1, ITmfDataRequest.ExecutionType.BACKGROUND) {
+
+			TmfTimestamp startTime =  null;
+			TmfTimestamp lastTime  =  null;
+
+			@Override
+			public void handleData(TmfEvent event) {
+			    super.handleData(event);
+				if (event != null) {
+					TmfTimestamp ts = event.getTimestamp();
+					if (startTime == null) {
+						startTime = new TmfTimestamp(ts);
+						fStartTime = startTime;
+					}
+					lastTime = new TmfTimestamp(ts);
+
+					if ((getNbRead() % fIndexPageSize) == 0) {
+						updateTraceData();
+					}
+				}
+			}
+
+			@Override
+			public void handleSuccess() {
+				updateTraceData();
+			}
+
+			private void updateTraceData() {
+                int nbRead = getNbRead();
+				if (nbRead != 0) {
+					fEndTime  = new TmfTimestamp(lastTime);
+					fNbEvents = nbRead;
+					notifyListeners();
+				}
+			}
+		};
+
+		sendRequest((ITmfDataRequest<T>) request);
+		if (waitForCompletion)
+			try {
+				request.waitForCompletion();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+	}
 	
-//	protected void notifyListeners() {
-//    	broadcast(new TmfTraceUpdatedSignal(this, this, new TmfTimeRange(fStartTime, fEndTime)));
-//	}
+	protected void notifyListeners() {
+    	broadcast(new TmfTraceUpdatedSignal(this, this, new TmfTimeRange(fStartTime, fEndTime)));
+	}
+   
+	@TmfSignalHandler
+    public void handleTraceOpen(TmfTraceOpenedSignal signal) {
+        ITmfTrace trace = signal.getTrace();
+        if (trace == this) {
+            indexTrace(false);
+        }
+    }
    
 	// ------------------------------------------------------------------------
 	// TmfDataProvider
 	// ------------------------------------------------------------------------
 
-//	@Override
-//    protected void queueBackgroundRequest(final ITmfDataRequest<T> request, final int blockSize, final boolean adjust) {
-//		super.queueBackgroundRequest(request, fIndexPageSize, true);
-//    }
+	@Override
+    protected void queueBackgroundRequest(final ITmfDataRequest<T> request, final int blockSize, final boolean adjust) {
+		super.queueBackgroundRequest(request, fIndexPageSize, true);
+    }
 
 }

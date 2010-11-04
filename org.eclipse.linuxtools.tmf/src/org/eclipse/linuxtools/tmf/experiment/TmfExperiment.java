@@ -667,7 +667,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 						startTime = new TmfTimestamp(ts);
 					lastTime = new TmfTimestamp(ts);
 
-					if ((getNbRead() % DEFAULT_INDEX_PAGE_SIZE) == 0) {
+					if ((getNbRead() % fIndexPageSize) == 0) {
 						updateExperiment();
 					}
 				}

@@ -1,3 +1,8 @@
+2010-11-04  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Use the correct index page size 
+	* src/org/eclipse/linuxtools/tmf/trace/TmfTrace.java: Added indexTrace() and support code 
+
 2010-10-29  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java (getNextEvent): Removed an unnecessary clone() operation
