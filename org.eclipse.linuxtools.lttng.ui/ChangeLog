@@ -1,3 +1,7 @@
+2010-11-05  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/ui/views/controlflow/ControlFlowView.java: Made the call to updateScroll() asynchronous
+
 2010-11-04  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/ui/views/project/ProjectView.java: Create an ad hoc experiment when a trace is selected 

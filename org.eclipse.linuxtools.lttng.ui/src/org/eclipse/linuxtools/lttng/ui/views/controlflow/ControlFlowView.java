@@ -929,11 +929,16 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 						tsfviewer.resizeControls();
 
-						// Adjust the size of the vertical scroll bar to fit the
-						// contents
-						if (scrollFrame != null) {
-							updateScrolls(scrollFrame);
-						}
+						// Adjust asynchronously the size of the vertical scroll bar to fit the
+						// contents 
+                        tableViewer.getTable().getDisplay().asyncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                if ((scrollFrame != null) && (!scrollFrame.getDisplay().isDisposed())) {
+                                    updateScrolls(scrollFrame);
+                                }
+                            }
+                        });
 					}
 				}
 			});
