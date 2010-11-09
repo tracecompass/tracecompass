@@ -29,8 +29,8 @@ import org.eclipse.ui.internal.wizards.datatransfer.WizardFileSystemResourceImpo
 public class ImportTraceWizardPage extends WizardFileSystemResourceImportPage1 {
 	
 	private boolean isContainerSet = false;
-	private String  initialContainerString = "";
-	private String  selectedSourceDirectory = "";
+	private String  initialContainerString = ""; //$NON-NLS-1$
+	private String  selectedSourceDirectory = ""; //$NON-NLS-1$
 	
 	public ImportTraceWizardPage(IWorkbench workbench, IStructuredSelection selection) {
 		super(workbench, selection);
@@ -44,7 +44,7 @@ public class ImportTraceWizardPage extends WizardFileSystemResourceImportPage1 {
 	
 	
 	public String getTraceDirectory() {
-		String tmpPath = "";
+		String tmpPath = ""; //$NON-NLS-1$
 		if ( (getSourceDirectory() != null) && (getSourceDirectory().getName() != null) ) {
 			tmpPath = this.getSourceDirectory().getName().toString();
 		}
@@ -57,7 +57,7 @@ public class ImportTraceWizardPage extends WizardFileSystemResourceImportPage1 {
 	}
 	
 	public String getTracepath() {
-		String tmpPath = "";
+		String tmpPath = ""; //$NON-NLS-1$
 		if ( (getSourceDirectory() != null) && (getSourceDirectory().getPath() != null) ) {
 			tmpPath = this.getSourceDirectory().getPath().toString();
 		}

@@ -28,8 +28,8 @@ import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTraceDefinition.Output
 
 public class CustomEvent extends TmfEvent {
 
-    protected static final String TIMESTAMP_INPUT_FORMAT_KEY = "CE_TS_I_F";
-    protected static final String NO_MESSAGE = "";
+    protected static final String TIMESTAMP_INPUT_FORMAT_KEY = "CE_TS_I_F"; //$NON-NLS-1$
+    protected static final String NO_MESSAGE = ""; //$NON-NLS-1$
     public static final byte TIMESTAMP_SCALE = -3;
     
     protected CustomTraceDefinition fDefinition;

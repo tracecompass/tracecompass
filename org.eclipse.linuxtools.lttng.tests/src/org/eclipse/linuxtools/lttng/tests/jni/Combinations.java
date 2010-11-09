@@ -21,6 +21,7 @@ import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
  * @author alvaro
  * 
  */
+@SuppressWarnings("nls")
 public class Combinations extends TestCase {
 
 	private final static boolean printLttDebug = false;

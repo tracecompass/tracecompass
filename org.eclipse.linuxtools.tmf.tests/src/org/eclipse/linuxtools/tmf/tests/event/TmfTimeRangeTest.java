@@ -22,8 +22,8 @@ import junit.framework.TestCase;
  * <p>
  * Test suite for the TmfTimeRange class.
  */
+@SuppressWarnings("nls")
 public class TmfTimeRangeTest extends TestCase {
-
 
 	// ------------------------------------------------------------------------
 	// Housekeeping

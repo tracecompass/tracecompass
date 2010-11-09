@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysis
 import org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.test.stub.model.EventImpl;
 import org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.test.stub.model.TraceImpl;
 
-
+@SuppressWarnings("nls")
 public class TsfImplProvider extends TmfTimeAnalysisProvider {
 
 	// ========================================================================

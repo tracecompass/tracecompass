@@ -22,6 +22,7 @@ import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
         public void printMarkerFieldInformation()
 */
 
+@SuppressWarnings("nls")
 public class JniMarkerFieldTest extends TestCase
 {
 		private final static boolean printLttDebug = false;

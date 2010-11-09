@@ -113,6 +113,7 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
     }
 
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
 		return "[TmfEventRequest(" + getRequestId() + "," + getDataType().getSimpleName() 
 			+ "," + getRange() + "," + getNbRequested() + ")]";

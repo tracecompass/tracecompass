@@ -29,8 +29,8 @@ import org.eclipse.swt.widgets.Text;
 
 public class CustomTxtParserOutputWizardPage extends WizardPage {
 
-    private static final Image upImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/up_button.gif");
-    private static final Image downImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/down_button.gif");
+    private static final Image upImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/up_button.gif"); //$NON-NLS-1$
+    private static final Image downImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/down_button.gif"); //$NON-NLS-1$
     private CustomTxtParserWizard wizard;
     private CustomTxtTraceDefinition definition;
     ArrayList<Output> outputs = new ArrayList<Output>();
@@ -47,9 +47,9 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
     File tmpFile;
     
     protected CustomTxtParserOutputWizardPage(CustomTxtParserWizard wizard) {
-        super("CustomParserOutputWizardPage");
+        super("CustomParserOutputWizardPage"); //$NON-NLS-1$
         setTitle(wizard.inputPage.getTitle());
-        setDescription("Customize the output of the parser");
+        setDescription(Messages.CustomTxtParserOutputWizardPage_description);
         this.wizard = wizard;
         setPageComplete(false);
     }
@@ -197,7 +197,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
         definition.outputs = extractOutputs();
 
         try {
-            tmpFile = TmfUiPlugin.getDefault().getStateLocation().addTrailingSeparator().append("customwizard.tmp").toFile();
+            tmpFile = TmfUiPlugin.getDefault().getStateLocation().addTrailingSeparator().append("customwizard.tmp").toFile(); //$NON-NLS-1$
             FileWriter writer = new FileWriter(tmpFile);
             writer.write(wizard.inputPage.getInputText());
             writer.close();
@@ -248,7 +248,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
             this.name = name;
             
             enabledButton = new Button(parent, SWT.CHECK);
-            enabledButton.setToolTipText("Visible");
+            enabledButton.setToolTipText(Messages.CustomTxtParserOutputWizardPage_visible);
             enabledButton.setSelection(true);
             enabledButton.addSelectionListener(new SelectionAdapter() {
             	@Override
@@ -267,7 +267,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
 
             upButton = new Button(parent, SWT.PUSH);
             upButton.setImage(upImage);
-            upButton.setToolTipText("Move Before");
+            upButton.setToolTipText(Messages.CustomTxtParserOutputWizardPage_moveBefore);
             upButton.addSelectionListener(new SelectionAdapter() {
             	@Override
                 public void widgetSelected(SelectionEvent e) {
@@ -278,7 +278,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
             
             downButton = new Button(parent, SWT.PUSH);
             downButton.setImage(downImage);
-            downButton.setToolTipText("Move After");
+            downButton.setToolTipText(Messages.CustomTxtParserOutputWizardPage_moveAfter);
             downButton.addSelectionListener(new SelectionAdapter() {
             	@Override
                 public void widgetSelected(SelectionEvent e) {

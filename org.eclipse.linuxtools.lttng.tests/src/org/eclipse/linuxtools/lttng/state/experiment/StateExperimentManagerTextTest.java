@@ -21,6 +21,7 @@ import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
  * @author alvaro
  *
  */
+@SuppressWarnings("nls")
 public class StateExperimentManagerTextTest extends LttngTestPreparation {
 
 	/**

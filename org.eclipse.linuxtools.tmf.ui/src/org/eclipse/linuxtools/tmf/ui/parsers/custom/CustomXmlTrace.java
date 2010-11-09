@@ -65,13 +65,13 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
             return context;
         }
         try {
-            context.raFile = new RandomAccessFile(getPath(), "r");
+            context.raFile = new RandomAccessFile(getPath(), "r"); //$NON-NLS-1$
             if (location != null && location.getLocation() instanceof Long) {
                 context.raFile.seek((Long)location.getLocation());
             }
             
             String line;
-            String recordElementStart = "<" + fRecordInputElement.elementName;
+            String recordElementStart = "<" + fRecordInputElement.elementName; //$NON-NLS-1$
             long rawPos = context.raFile.getFilePointer();
             
             while ((line = context.raFile.readLine()) != null) {
@@ -133,14 +133,14 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
                 if (context.raFile.getFilePointer() != (Long)context.getLocation().getLocation() + 1) {
                     context.raFile.seek((Long)context.getLocation().getLocation() + 1); // +1 is for the <
                 }
-                StringBuffer elementBuffer = new StringBuffer("<");
+                StringBuffer elementBuffer = new StringBuffer("<"); //$NON-NLS-1$
                 readElement(elementBuffer, context.raFile);
                 Element element = parseElementBuffer(elementBuffer);
                 
                 event = extractEvent(element, fRecordInputElement);
                 
                 String line;
-                String recordElementStart = "<" + fRecordInputElement.elementName;
+                String recordElementStart = "<" + fRecordInputElement.elementName; //$NON-NLS-1$
                 long rawPos = context.raFile.getFilePointer();
                 
                 while ((line = context.raFile.readLine()) != null) {
@@ -168,7 +168,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
             EntityResolver resolver = new EntityResolver () {
                 @Override
 				public InputSource resolveEntity (String publicId, String systemId) {
-                    String empty = "";
+                    String empty = ""; //$NON-NLS-1$
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
                 }
@@ -215,7 +215,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
                     readElement(buffer, raFile);
                 } else if (c == '/' && numRead == 1) {
                     break; // found "</"
-                } else if (c == '-' && numRead == 3 && buffer.substring(buffer.length() - 3, buffer.length() - 1).equals("!-")) {
+                } else if (c == '-' && numRead == 3 && buffer.substring(buffer.length() - 3, buffer.length() - 1).equals("!-")) { //$NON-NLS-1$
                     readComment(buffer, raFile); // found "<!--"
                 } else if (i == '>') {
                     if (buffer.charAt(buffer.length() - 2) == '/') {
@@ -257,7 +257,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
                 numRead++;
                 char c = (char)i;
                 buffer.append(c);
-                if (c == '>' && numRead >= 2 && buffer.substring(buffer.length() - 3, buffer.length() - 1).equals("--")) {
+                if (c == '>' && numRead >= 2 && buffer.substring(buffer.length() - 3, buffer.length() - 1).equals("--")) { //$NON-NLS-1$
                     break; // found "-->"
                 }
             }
@@ -274,7 +274,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
             Node node = nodeList.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 if (separator == null) {
-                    separator = " | ";
+                    separator = " | "; //$NON-NLS-1$
                 } else {
                     buffer.append(separator);
                 }
@@ -282,12 +282,12 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
                 if (element.hasChildNodes() == false) {
                     buffer.append(element.getNodeName());
                 } else if (element.getChildNodes().getLength() == 1 && element.getFirstChild().getNodeType() == Node.TEXT_NODE) {
-                    buffer.append(element.getNodeName() + ":" + element.getFirstChild().getNodeValue().trim());
+                    buffer.append(element.getNodeName() + ":" + element.getFirstChild().getNodeValue().trim()); //$NON-NLS-1$
                 } else {
                     buffer.append(element.getNodeName());
-                    buffer.append(" [ ");
+                    buffer.append(" [ "); //$NON-NLS-1$
                     parseElement(element, buffer);
-                    buffer.append(" ]");
+                    buffer.append(" ]"); //$NON-NLS-1$
                 }
             } else if (node.getNodeType() == Node.TEXT_NODE) {
                 if (node.getNodeValue().trim().length() != 0) {
@@ -313,7 +313,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     }
     
     public CustomXmlEvent extractEvent(Element element, InputElement inputElement) {
-        CustomXmlEvent event = new CustomXmlEvent(fDefinition, TmfTimestamp.Zero, new TmfEventSource(""), new TmfEventType(fDefinition.definitionName, new String[0]), new TmfEventReference(""));
+        CustomXmlEvent event = new CustomXmlEvent(fDefinition, TmfTimestamp.Zero, new TmfEventSource(""), new TmfEventType(fDefinition.definitionName, new String[0]), new TmfEventReference("")); //$NON-NLS-1$ //$NON-NLS-2$
         parseElement(element, event, inputElement);
         return event;
     }

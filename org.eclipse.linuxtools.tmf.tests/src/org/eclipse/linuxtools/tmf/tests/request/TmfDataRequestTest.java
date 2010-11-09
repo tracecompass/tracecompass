@@ -23,6 +23,7 @@ import org.eclipse.linuxtools.tmf.request.TmfDataRequestStub;
  * <p>
  * Test suite for the TmfDataRequest class.
  */
+@SuppressWarnings("nls")
 public class TmfDataRequestTest extends TestCase {
 
 	// ------------------------------------------------------------------------

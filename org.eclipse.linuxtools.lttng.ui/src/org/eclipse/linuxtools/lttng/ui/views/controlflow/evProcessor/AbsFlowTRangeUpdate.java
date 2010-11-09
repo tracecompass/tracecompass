@@ -44,7 +44,7 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements ILt
 		// TimeRangeEventProcess localProcess = new TimeRangeEventProcess(id, name, startTime, stopTime, groupName, className)
 		TimeRangeEventProcess localProcess = new TimeRangeEventProcess(
 				procContainer.getUniqueId(), stateProcess.getName(),
-				traceStartTime, traceEndTime, "", stateProcess.getType()
+				traceStartTime, traceEndTime, "", stateProcess.getType() //$NON-NLS-1$
 						.getInName(), stateProcess.getCpu(), stateProcess
 						.getInsertion_time());
 		
@@ -60,7 +60,7 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements ILt
 		procContainer.addItem(localProcess);
 
 		if (TraceDebug.isCFV()) {
-			TraceDebug.traceCFV("addLocalProcess():" + localProcess);
+			TraceDebug.traceCFV("addLocalProcess():" + localProcess); //$NON-NLS-1$
 		}
 
 		return localProcess;
@@ -112,7 +112,10 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements ILt
 			ParamsUpdater params, String stateMode) {
 
 		if (TraceDebug.isCFV()) {
-			TraceDebug.traceCFV("makeDraw():[" + localProcess + ",candidate=[stime=" + startTime + ",etime=" + endTime + ",state=" + stateMode + "]]");
+			TraceDebug.traceCFV("makeDraw():[" + localProcess + //$NON-NLS-1$ 
+					",candidate=[stime=" + startTime +  //$NON-NLS-1$
+					",etime=" + endTime +  //$NON-NLS-1$
+					",state=" + stateMode + "]]"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Determine start and end times to establish duration

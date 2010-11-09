@@ -251,6 +251,7 @@ public class LttngEventContent extends TmfEventContent {
      * Note : this function parse all fields and so is very heavy to use.
      */
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
         LttngEventField[] allFields = getFields();
         

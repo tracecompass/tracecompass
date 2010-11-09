@@ -56,6 +56,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.DrillDownAdapter;
 import org.eclipse.ui.part.ViewPart;
 
+@SuppressWarnings("nls")
 public class TsfTraceAnalysisView extends ViewPart implements
 		ITmfTimeSelectionListener, ITmfTimeScaleSelectionListener {
 

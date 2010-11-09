@@ -53,7 +53,7 @@ import junit.framework.TestCase;
         public String toString() 
  */
 
-
+@SuppressWarnings("nls")
 public class JniTraceTest extends TestCase
 {
 		private final static boolean printLttDebug = false;

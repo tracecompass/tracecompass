@@ -30,8 +30,8 @@ import org.eclipse.ui.PlatformUI;
  */
 public class LTTngProjectLabelProvider implements ILabelProvider {
 
-	private final String fTraceIconFile      = "icons/garland16.png";
-//	private final String fExperimentIconFile = "icons/garland16.png";
+	private final String fTraceIconFile      = "icons/garland16.png"; //$NON-NLS-1$
+//	private final String fExperimentIconFile = "icons/garland16.png"; //$NON-NLS-1$
 
 	private final Image fOpenedProjectIcon;
 	private final Image fClosedProjectIcon;
@@ -105,7 +105,7 @@ public class LTTngProjectLabelProvider implements ILabelProvider {
 			node instanceof LTTngExperimentFolderNode ||
 			node instanceof LTTngExperimentNode)
 		{
-			label += " [" + node.getChildren().size() + "]";
+			label += " [" + node.getChildren().size() + "]";  //$NON-NLS-1$//$NON-NLS-2$
 		}
 		return label;
 	}

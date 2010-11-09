@@ -124,7 +124,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
      * @param other
      */
     public TmfExperiment(TmfExperiment<T> other) {
-    	super(other.getName() + "(clone)", other.fType);
+    	super(other.getName() + "(clone)", other.fType); //$NON-NLS-1$
     	
     	fEpoch         = other.fEpoch;
     	fIndexPageSize = other.fIndexPageSize;
@@ -609,6 +609,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
+    @SuppressWarnings("nls")
 	public String toString() {
 		return "[TmfExperiment (" + getName() + ")]";
 	}

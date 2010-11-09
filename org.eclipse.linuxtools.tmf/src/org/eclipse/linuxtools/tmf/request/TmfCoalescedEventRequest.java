@@ -169,6 +169,7 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
     }
 
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
 		return "[TmfCoalescedEventRequest(" + getRequestId() + "," + getDataType().getSimpleName() 
 			+ "," + getRange() + "," + getNbRequested() + ")]";

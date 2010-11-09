@@ -52,8 +52,8 @@ public class OpenTraceHandler implements IHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-		mb.setText("Open Trace");
-		mb.setMessage("Not implemented yet");
+		mb.setText("Open Trace"); //$NON-NLS-1$
+		mb.setMessage("Not implemented yet"); //$NON-NLS-1$
 		mb.open();
 
 		return null;

@@ -48,11 +48,11 @@ public class Utils {
 		SECONDS, MILLISEC, MICROSEC, NANOSEC
 	};
 
-	static private final SimpleDateFormat stimeformat = new SimpleDateFormat("HH:mm:ss");
-	static private final SimpleDateFormat sdateformat = new SimpleDateFormat("yyyy-MM-dd");
+	static private final SimpleDateFormat stimeformat = new SimpleDateFormat("HH:mm:ss"); //$NON-NLS-1$
+	static private final SimpleDateFormat sdateformat = new SimpleDateFormat("yyyy-MM-dd"); //$NON-NLS-1$
 	static {
-        stimeformat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        sdateformat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        stimeformat.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
+        sdateformat.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
 	}
 
 //	static private String _externalPlugin[] = { "org.eclipse.debug.ui",
@@ -184,7 +184,7 @@ public class Utils {
 		// str.append('0');
 		str.append(sec);
 		String ns = formatNs(v, res);
-		if (!ns.equals("")) {
+		if (!ns.equals("")) { //$NON-NLS-1$
 			str.append(':');
 			str.append(ns);
 		}
@@ -214,7 +214,7 @@ public class Utils {
 
 		// format time from nanoseconds to calendar time HH:MM:SS
 		String stime = stimeformat.format(new Date((long) (time * 1E-6)));
-		str.append(stime + " ");
+		str.append(stime + " "); //$NON-NLS-1$
 		// append the Milliseconds, MicroSeconds and NanoSeconds as specified in
 		// the Resolution
 		str.append(formatNs(time, res));
@@ -262,21 +262,21 @@ public class Utils {
 		long ns = time;
 		ns %= 1000000000;
 		if (ns < 10) {
-			temp.append("00000000");
+			temp.append("00000000"); //$NON-NLS-1$
 		} else if (ns < 100) {
-			temp.append("0000000");
+			temp.append("0000000"); //$NON-NLS-1$
 		} else if (ns < 1000) {
-			temp.append("000000");
+			temp.append("000000"); //$NON-NLS-1$
 		} else if (ns < 10000) {
-			temp.append("00000");
+			temp.append("00000"); //$NON-NLS-1$
 		} else if (ns < 100000) {
-			temp.append("0000");
+			temp.append("0000"); //$NON-NLS-1$
 		} else if (ns < 1000000) {
-			temp.append("000");
+			temp.append("000"); //$NON-NLS-1$
 		} else if (ns < 10000000) {
-			temp.append("00");
+			temp.append("00"); //$NON-NLS-1$
 		} else if (ns < 100000000) {
-			temp.append("0");
+			temp.append("0"); //$NON-NLS-1$
 		}
 		temp.append(ns);
 
@@ -287,12 +287,12 @@ public class Utils {
 		}
 		if (segments > 1) {
 			// append Micro secs
-			str.append(".");
+			str.append("."); //$NON-NLS-1$
 			str.append(temp.substring(3, 6));
 		}
 		if (segments > 2) {
 			// append Nano seconds
-			str.append(".");
+			str.append("."); //$NON-NLS-1$
 			str.append(temp.substring(6));
 		}
 
@@ -410,13 +410,13 @@ public class Utils {
 		if (pos >= 0) {
 			String ret = sig.substring(0, pos);
 			sig = sig.substring(pos);
-			sig = sig + " " + ret;
+			sig = sig + " " + ret; //$NON-NLS-1$
 		}
 		return sig;
 	}
 
 	static public String restoreMethodSignature(String sig) {
-		String ret = "";
+		String ret = ""; //$NON-NLS-1$
 		int pos = sig.indexOf('(');
 		if (pos >= 0) {
 			ret = sig.substring(0, pos);
@@ -426,15 +426,15 @@ public class Utils {
 		if (pos >= 0) {
 			sig = sig.substring(0, pos);
 		}
-		String args[] = sig.split(",");
-		sig = "(";
+		String args[] = sig.split(","); //$NON-NLS-1$
+		sig = "("; //$NON-NLS-1$
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i].trim();
 			if (arg.length() == 0 && args.length == 1)
 				break;
 			sig += getTypeSignature(arg);
 		}
-		sig += ")" + getTypeSignature(ret);
+		sig += ")" + getTypeSignature(ret); //$NON-NLS-1$
 		return sig;
 	}
 
@@ -447,29 +447,29 @@ public class Utils {
 		int pos = type.indexOf('[');
 		if (pos >= 0)
 			type = type.substring(0, pos);
-		String sig = "";
+		String sig = "";                //$NON-NLS-1$
 		for (int j = 0; j < dim; j++)
-			sig += "[";
-		if (type.equals("boolean"))
-			sig += "Z";
-		else if (type.equals("byte"))
-			sig += "B";
-		else if (type.equals("char"))
-			sig += "C";
-		else if (type.equals("short"))
-			sig += "S";
-		else if (type.equals("int"))
-			sig += "I";
-		else if (type.equals("long"))
-			sig += "J";
-		else if (type.equals("float"))
-			sig += "F";
-		else if (type.equals("double"))
-			sig += "D";
-		else if (type.equals("void"))
-			sig += "V";
+			sig += "[";                 //$NON-NLS-1$
+		if (type.equals("boolean"))     //$NON-NLS-1$
+			sig += "Z";                 //$NON-NLS-1$
+		else if (type.equals("byte"))   //$NON-NLS-1$
+			sig += "B";                 //$NON-NLS-1$
+		else if (type.equals("char"))   //$NON-NLS-1$
+			sig += "C";                 //$NON-NLS-1$
+		else if (type.equals("short"))  //$NON-NLS-1$
+			sig += "S";                 //$NON-NLS-1$
+		else if (type.equals("int"))    //$NON-NLS-1$
+			sig += "I";                 //$NON-NLS-1$
+		else if (type.equals("long"))   //$NON-NLS-1$
+			sig += "J";                 //$NON-NLS-1$
+		else if (type.equals("float"))  //$NON-NLS-1$
+			sig += "F";                 //$NON-NLS-1$
+		else if (type.equals("double")) //$NON-NLS-1$
+			sig += "D";                 //$NON-NLS-1$
+		else if (type.equals("void"))   //$NON-NLS-1$
+			sig += "V";                 //$NON-NLS-1$
 		else
-			sig += "L" + type.replace('.', '/') + ";";
+			sig += "L" + type.replace('.', '/') + ";"; //$NON-NLS-1$ //$NON-NLS-2$
 		return sig;
 	}
 

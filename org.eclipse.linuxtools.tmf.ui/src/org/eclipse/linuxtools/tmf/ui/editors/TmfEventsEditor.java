@@ -39,7 +39,7 @@ import org.eclipse.ui.ide.FileStoreEditorInput;
  */
 public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReusableEditor, IPropertyListener {
 
-    public static final String ID = "org.eclipse.linuxtools.tmf.ui.editors.events";
+    public static final String ID = "org.eclipse.linuxtools.tmf.ui.editors.events"; //$NON-NLS-1$
     
     private TmfEventsTable fEventsTable;
     private IResource fResource;
@@ -73,10 +73,10 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                 throw new PartInitException(e.getMessage());
             }
         } else {
-            throw new PartInitException("Invalid IEditorInput: " + input.getClass());
+            throw new PartInitException("Invalid IEditorInput: " + input.getClass()); //$NON-NLS-1$
         }
         if (fTrace == null) {
-            throw new PartInitException("Invalid IEditorInput: " + fResource.getName());
+            throw new PartInitException("Invalid IEditorInput: " + fResource.getName()); //$NON-NLS-1$
         }
         super.setSite(site);
         super.setInput(input);

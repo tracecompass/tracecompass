@@ -109,6 +109,7 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint>, Cloneable {
     }
  
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
     	return "[TmfCheckpoint(" + fTimestamp +  "," + fLocation + ")]";
     }

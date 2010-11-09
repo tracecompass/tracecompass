@@ -489,6 +489,7 @@ public class LttngProcessState implements Cloneable {
     }
 
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
     	String stateSt  = state.toString();
     	String eStackSt = execution_stack.toString();

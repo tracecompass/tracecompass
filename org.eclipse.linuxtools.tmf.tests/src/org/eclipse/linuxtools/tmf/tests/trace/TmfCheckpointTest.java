@@ -23,6 +23,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfLocation;
  * <p>
  * Test suite for the TmfCheckpoint class.
  */
+@SuppressWarnings("nls")
 public class TmfCheckpointTest extends TestCase {
 
 	// ------------------------------------------------------------------------

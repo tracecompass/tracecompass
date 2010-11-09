@@ -55,7 +55,7 @@ public class TmfRequestExecutor implements Executor {
 		fExecutor = executor;
 		String canonicalName = fExecutor.getClass().getCanonicalName();
 		fExecutorName = canonicalName.substring(canonicalName.lastIndexOf('.') + 1);
-		if (Tracer.isComponentTraced()) Tracer.trace(fExecutor + " created");
+		if (Tracer.isComponentTraced()) Tracer.trace(fExecutor + " created"); //$NON-NLS-1$
 	}
 
 	/**
@@ -84,7 +84,7 @@ public class TmfRequestExecutor implements Executor {
 	 */
 	public void stop() {
 		fExecutor.shutdown();
-		if (Tracer.isComponentTraced()) Tracer.trace(fExecutor + " terminated");
+		if (Tracer.isComponentTraced()) Tracer.trace(fExecutor + " terminated"); //$NON-NLS-1$
 	}
 	
 	// ------------------------------------------------------------------------
@@ -101,7 +101,7 @@ public class TmfRequestExecutor implements Executor {
 			public void run() {
 				try {
 					requestThread.run();
-				    if (Tracer.isRequestTraced()) Tracer.trace("[REQ] Request finished");
+				    if (Tracer.isRequestTraced()) Tracer.trace("[REQ] Request finished"); //$NON-NLS-1$
 				} finally {
 					scheduleNext();
 				}
@@ -127,6 +127,7 @@ public class TmfRequestExecutor implements Executor {
 	// ------------------------------------------------------------------------
 
 	@Override
+    @SuppressWarnings("nls")
 	public String toString() {
 		return "[TmfRequestExecutor(" + fExecutorName + ")]";
 	}

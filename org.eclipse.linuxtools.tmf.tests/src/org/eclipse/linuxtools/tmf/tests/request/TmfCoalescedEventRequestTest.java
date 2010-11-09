@@ -42,6 +42,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
  * <p>
  * Test suite for the TmfCoalescedEventRequest class.
  */
+@SuppressWarnings("nls")
 public class TmfCoalescedEventRequestTest extends TestCase {
 
 	// ------------------------------------------------------------------------

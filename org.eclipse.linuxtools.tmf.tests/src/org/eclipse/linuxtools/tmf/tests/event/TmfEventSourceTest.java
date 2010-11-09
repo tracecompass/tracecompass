@@ -21,6 +21,7 @@ import org.eclipse.linuxtools.tmf.event.TmfEventSource;
  * <p>
  * Test suite for the TmfEventSource class.
  */
+@SuppressWarnings("nls")
 public class TmfEventSourceTest extends TestCase {
 
 	// ------------------------------------------------------------------------

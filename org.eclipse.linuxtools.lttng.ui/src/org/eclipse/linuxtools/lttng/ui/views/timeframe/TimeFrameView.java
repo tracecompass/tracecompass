@@ -56,7 +56,7 @@ import org.eclipse.swt.widgets.Slider;
  */
 public class TimeFrameView extends TmfView {
 
-    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.timeframe";
+    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.timeframe"; //$NON-NLS-1$
 
     // ========================================================================
     // TimeFrameView
@@ -267,6 +267,7 @@ public class TimeFrameView extends TmfView {
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
+	@SuppressWarnings("nls")
 	public String toString() {
 		return "[TimeFrameView]";
 	}

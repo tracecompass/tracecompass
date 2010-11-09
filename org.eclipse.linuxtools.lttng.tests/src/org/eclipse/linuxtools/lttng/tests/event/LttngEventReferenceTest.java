@@ -26,6 +26,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfContext;
     public String toString()
  */
 
+@SuppressWarnings("nls")
 public class LttngEventReferenceTest extends TestCase {
     private final static String tracepath1="traceset/trace-15316events_nolost_newformat.txt";
     private final static boolean skipIndexing=true;

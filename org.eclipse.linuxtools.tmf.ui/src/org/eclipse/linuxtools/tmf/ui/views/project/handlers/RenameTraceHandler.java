@@ -45,8 +45,8 @@ public class RenameTraceHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-		mb.setText("Rename Trace");
-		mb.setMessage("Not implemented yet");
+		mb.setText("Rename Trace"); //$NON-NLS-1$
+		mb.setMessage("Not implemented yet"); //$NON-NLS-1$
 		mb.open();
 
 		return null;

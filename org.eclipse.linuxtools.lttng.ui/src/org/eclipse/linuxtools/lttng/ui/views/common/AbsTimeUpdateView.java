@@ -158,14 +158,14 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 			if (TraceDebug.isDEBUG()) {
 				TmfTimeRange trange = request.getRange();
 				if (request.isCancelled()) {
-					TraceDebug.debug("Request cancelled "
-							+ trange.getStartTime() + "-" + trange.getEndTime()
-							+ " Handled Events: " + request.getSynEventCount()
-							+ " " + request.toString(), 15);
+					TraceDebug.debug("Request cancelled " //$NON-NLS-1$
+							+ trange.getStartTime() + "-" + trange.getEndTime() //$NON-NLS-1$
+							+ " Handled Events: " + request.getSynEventCount() //$NON-NLS-1$
+							+ " " + request.toString(), 15); //$NON-NLS-1$
 				} else if (request.isFailed()) {
-					TraceDebug.debug("Request Failed " + trange.getStartTime()
-							+ "-" + trange.getEndTime() + " Handled Events: "
-							+ request.getSynEventCount() + " "
+					TraceDebug.debug("Request Failed " + trange.getStartTime() //$NON-NLS-1$
+							+ "-" + trange.getEndTime() + " Handled Events: " //$NON-NLS-1$ //$NON-NLS-2$
+							+ request.getSynEventCount() + " " //$NON-NLS-1$
 							+ request.toString());
 				}
 			}
@@ -209,7 +209,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 				TmfTimeRange trange = signal.getCurrentRange();
 				TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
 				if (experiment == null) {
-					TraceDebug.debug("Current selected experiment is null");
+					TraceDebug.debug("Current selected experiment is null"); //$NON-NLS-1$
 					return;
 				}
 
@@ -262,7 +262,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 			paramUpdater.setSelectedTime(selTimens);
 
 			if (TraceDebug.isDEBUG()) {
-				TraceDebug.debug("Selected Time: " + new LttngTimestamp(selTimens) + "\n\t\t" + getName());
+				TraceDebug.debug("Selected Time: " + new LttngTimestamp(selTimens) + "\n\t\t" + getName()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}
@@ -372,7 +372,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 			TmfTimeRange experimentTRange, boolean clearingData, ExecutionType execType) {
 		// Validate input
 		if (requestTrange == null || experimentTRange == null) {
-			TraceDebug.debug("Invalid input");
+			TraceDebug.debug("Invalid input"); //$NON-NLS-1$
 			return false;
 		}
 
@@ -427,7 +427,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
   
 					            if (TraceDebug.isDEBUG()) {
 					                frunningTimeStamp = event.getTimestamp();
-					                TraceDebug.debug("handled: " + fCount + " sequence: " + synEvent.getSynType());
+					                TraceDebug.debug("handled: " + fCount + " sequence: " + synEvent.getSynType()); //$NON-NLS-1$ //$NON-NLS-2$
 					            }
 					        }
 					        break;
@@ -470,8 +470,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 
 				if (TraceDebug.isDEBUG()) {
 					if (frunningTimeStamp != null) {
-						TraceDebug.debug("Last event time stamp: "
-								+ frunningTimeStamp.getValue());
+						TraceDebug.debug("Last event time stamp: " + frunningTimeStamp.getValue()); //$NON-NLS-1$
 					}
 				}
 			}
@@ -634,7 +633,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 			if ((paramUpdater != null) && (tsfviewer != null) && (!tsfviewer.getControl().isDisposed())) {
 				final Long selTime = paramUpdater.getSelectedTime();
 				if (selTime != null) {
-					TraceDebug.debug("View: " + getName() + "\n\t\tRestoring the selected time to: " + selTime);
+					TraceDebug.debug("View: " + getName() + "\n\t\tRestoring the selected time to: " + selTime); //$NON-NLS-1$ //$NON-NLS-2$
 					Display display = tsfviewer.getControl().getDisplay();
 					display.asyncExec(new Runnable() {
 						@Override
@@ -661,14 +660,14 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 					int dicardedNotVisible = paramUpdater.getEventsDiscardedNotVisible();
 
 					TmfTimeRange range = request.getRange();
-					StringBuilder sb = new StringBuilder("View: " + getName() + ", Events handled: " + count
-							+ ", Events loaded in view: " + eventCount + ", Number of events discarded: " + discarded
-							+ "\n\tNumber of events discarded with start time earlier than next good time: "
-							+ discardedOutofOrder + "\n\tDiscarded Not visible: " + dicardedNotVisible
-							+ "\n\tDiscarded out of view Range: " + discardedOutofViewRange);
+					StringBuilder sb = new StringBuilder("View: " + getName() + ", Events handled: " + count //$NON-NLS-1$ //$NON-NLS-2$
+							+ ", Events loaded in view: " + eventCount + ", Number of events discarded: " + discarded //$NON-NLS-1$ //$NON-NLS-2$
+							+ "\n\tNumber of events discarded with start time earlier than next good time: " //$NON-NLS-1$
+							+ discardedOutofOrder + "\n\tDiscarded Not visible: " + dicardedNotVisible //$NON-NLS-1$
+							+ "\n\tDiscarded out of view Range: " + discardedOutofViewRange); //$NON-NLS-1$
 
-					sb.append("\n\t\tRequested Time Range: " + range.getStartTime() + "-" + range.getEndTime());
-					sb.append("\n\t\tExperiment Time Range: " + experimentStartTime + "-" + experimentEndTime);
+					sb.append("\n\t\tRequested Time Range: " + range.getStartTime() + "-" + range.getEndTime()); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append("\n\t\tExperiment Time Range: " + experimentStartTime + "-" + experimentEndTime); //$NON-NLS-1$ //$NON-NLS-2$
 					TraceDebug.debug(sb.toString());
 				}
 			}

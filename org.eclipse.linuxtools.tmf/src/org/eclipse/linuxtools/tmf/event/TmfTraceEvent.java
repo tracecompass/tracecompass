@@ -140,6 +140,7 @@ public class TmfTraceEvent extends TmfEvent {
 
     // TODO: Proper format
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
 		return "[TmfTraceEvent(" + fSourcePath + "," + fFileName + "," + fLineNumber + ")]";
     }

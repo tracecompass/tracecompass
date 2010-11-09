@@ -97,7 +97,7 @@ public abstract class AbsEventToHandlerResolver implements
 				
 				case ENDREQ: {
 					processor = getfinishProcessor();
-					TraceDebug.debug("EndRequest satus received:");
+					TraceDebug.debug("EndRequest satus received:"); //$NON-NLS-1$
 					break;
 				}
 					
@@ -146,7 +146,7 @@ public abstract class AbsEventToHandlerResolver implements
 
 		if (!(tmfEvent instanceof LttngSyntheticEvent)) {
 			TraceDebug
-					.debug("The event received is not an instance of LttngSyntheticEvent and can not be processed");
+					.debug("The event received is not an instance of LttngSyntheticEvent and can not be processed"); //$NON-NLS-1$
 			return;
 		}
 

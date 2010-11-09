@@ -198,8 +198,8 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 					fType, request.getIndex(), request.getNbRequested(),request.getExecType());
 			coalescedRequest.addRequest(request);
 	        if (Tracer.isRequestTraced()) {
-	        	Tracer.traceRequest(request, "coalesced with " + coalescedRequest.getRequestId());
-		        Tracer.traceRequest(coalescedRequest,  "added " + request.getRequestId());
+	        	Tracer.traceRequest(request, "coalesced with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
+		        Tracer.traceRequest(coalescedRequest,  "added " + request.getRequestId()); //$NON-NLS-1$
 	        }
 			fPendingCoalescedRequests.add(coalescedRequest);
 		}
@@ -211,8 +211,8 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 				if (req.isCompatible(request)) {
 					req.addRequest(request);
 			        if (Tracer.isRequestTraced()) {
-				        Tracer.traceRequest(request, "coalesced with " + req.getRequestId());
-				        Tracer.traceRequest(req,  "added " + request.getRequestId());
+				        Tracer.traceRequest(request, "coalesced with " + req.getRequestId()); //$NON-NLS-1$
+				        Tracer.traceRequest(req,  "added " + request.getRequestId()); //$NON-NLS-1$
 			        }
 					return;
 				}
@@ -247,7 +247,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 			@Override
 			public void run() {
 
-				if (Tracer.isRequestTraced()) Tracer.traceRequest(request, "started");
+				if (Tracer.isRequestTraced()) Tracer.traceRequest(request, "started"); //$NON-NLS-1$
 
 				// Extract the generic information
 				request.start();
@@ -263,9 +263,9 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 
 				try {
 					// Get the ordered events
-					if (Tracer.isRequestTraced()) Tracer.trace("Request #" + request.getRequestId() + " is being serviced by " + provider.getName());
+					if (Tracer.isRequestTraced()) Tracer.trace("Request #" + request.getRequestId() + " is being serviced by " + provider.getName());  //$NON-NLS-1$//$NON-NLS-2$
 					T data = getNext(context);
-					if (Tracer.isRequestTraced()) Tracer.trace("Request #" + request.getRequestId() + " read first event");
+					if (Tracer.isRequestTraced()) Tracer.trace("Request #" + request.getRequestId() + " read first event"); //$NON-NLS-1$ //$NON-NLS-2$
 					while (data != null && !isCompleted(request, data, nbRead))
 					{
 						if (fLogData) Tracer.traceEvent(provider, request, data);
@@ -275,7 +275,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 						if (++nbRead < nbRequested) {
 							data = getNext(context);
 							if (Tracer.isRequestTraced() && (data == null || data.isNullRef())) {
-								Tracer.trace("Request #" + request.getRequestId() + " end of data");
+								Tracer.trace("Request #" + request.getRequestId() + " end of data");  //$NON-NLS-1$//$NON-NLS-2$
 							}
 						}
 					}
@@ -287,10 +287,10 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 						request.done();
 					}
 
-					if (Tracer.isRequestTraced()) Tracer.traceRequest(request, "completed");
+					if (Tracer.isRequestTraced()) Tracer.traceRequest(request, "completed"); //$NON-NLS-1$
 				}
 				catch (Exception e) {
-			        if (Tracer.isRequestTraced()) Tracer.traceRequest(request, "exception (failed)");
+			        if (Tracer.isRequestTraced()) Tracer.traceRequest(request, "exception (failed)"); //$NON-NLS-1$
 					request.fail();
 				}
 			}
@@ -298,7 +298,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 
 		fExecutor.execute(thread);
 
-        if (Tracer.isRequestTraced()) Tracer.traceRequest(request, "queued");
+        if (Tracer.isRequestTraced()) Tracer.traceRequest(request, "queued"); //$NON-NLS-1$
 	}
 
 	// By default, same behavior as a foreground request

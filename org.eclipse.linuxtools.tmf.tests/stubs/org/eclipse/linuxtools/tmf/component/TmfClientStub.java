@@ -19,6 +19,7 @@ import org.eclipse.linuxtools.tmf.event.TmfSyntheticEventStub;
  * <p>
  * TODO: Implement me. Please.
  */
+@SuppressWarnings("nls")
 public class TmfClientStub extends TmfComponent {
 
 	private TmfDataProvider<TmfSyntheticEventStub>[] fProviders;

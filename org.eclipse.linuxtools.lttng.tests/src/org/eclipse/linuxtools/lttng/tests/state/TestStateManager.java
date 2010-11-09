@@ -20,6 +20,7 @@ import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
  * @author alvaro
  * 
  */
+@SuppressWarnings("nls")
 public class TestStateManager extends TestCase {
 
 	/**

@@ -27,7 +27,7 @@ public abstract class TmfEditor extends EditorPart implements ITmfComponent {
 
     public TmfEditor() {
         super();
-        fName = "TmfEditor";
+        fName = "TmfEditor"; //$NON-NLS-1$
         TmfSignalManager.register(this);
     }
 

@@ -25,9 +25,9 @@ public abstract class CustomTraceDefinition {
     public static final int ACTION_APPEND = 1;
     public static final int ACTION_APPEND_WITH_SEPARATOR = 2;
 
-    public static final String TAG_TIMESTAMP = "Time Stamp";
-    public static final String TAG_MESSAGE = "Message";
-    public static final String TAG_OTHER = "Other";
+    public static final String TAG_TIMESTAMP = Messages.CustomTraceDefinition_timestampTag;
+    public static final String TAG_MESSAGE = Messages.CustomTraceDefinition_messageTag;
+    public static final String TAG_OTHER = Messages.CustomTraceDefinition_otherTag;
     
     public String definitionName;
     public List<OutputColumn> outputs;
@@ -50,7 +50,7 @@ public abstract class CustomTraceDefinition {
 
     public String formatTimeStamp(TmfTimestamp timestamp) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(timeStampOutputFormat);
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
         return simpleDateFormat.format(timestamp.getValue());
     }
     

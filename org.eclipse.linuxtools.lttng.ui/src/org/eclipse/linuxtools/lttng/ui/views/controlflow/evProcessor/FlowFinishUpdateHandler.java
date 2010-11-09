@@ -49,8 +49,7 @@ public class FlowFinishUpdateHandler extends AbsFlowTRangeUpdate
 			endOfEvent = endOfTrace;
 		}
 
-		TraceDebug.debug("Number of localProcesses: "
-				+ procContainer.readItems().length);
+		TraceDebug.debug("Number of localProcesses: " + procContainer.readItems().length); //$NON-NLS-1$
 		// to identify the process relevant to the traceState
 		String traceId = traceSt.getTraceId();
 		int numLocalFound = 0;
@@ -90,7 +89,7 @@ public class FlowFinishUpdateHandler extends AbsFlowTRangeUpdate
 						// not contain events related to this process
 						makeDraw(traceSt, nextGoodTime, endOfEvent, localProcess, params, stateMode);
 					} else {
-						TraceDebug.debug("previous event not instance of TimeRangeEvent?: "
+						TraceDebug.debug("previous event not instance of TimeRangeEvent?: " //$NON-NLS-1$
 								+ prevEvent.getClass().getSimpleName());
 					}
 				} else {
@@ -106,9 +105,9 @@ public class FlowFinishUpdateHandler extends AbsFlowTRangeUpdate
 			makeDraw(traceSt, endOfEvent, stateProcess, localProcess, params);
 		}
 
-		TraceDebug.debug("Print Last Event: NumLocalFound " + numLocalFound
-				+ "; NumLocalNotFound: " + numLocalNotFound
-				+ "; NumWithNoChildren: " + numWithNoChildren);
+		TraceDebug.debug("Print Last Event: NumLocalFound " + numLocalFound	 //$NON-NLS-1$
+				+ "; NumLocalNotFound: " + numLocalNotFound //$NON-NLS-1$
+				+ "; NumWithNoChildren: " + numWithNoChildren); //$NON-NLS-1$
 
 		return false;
 	}

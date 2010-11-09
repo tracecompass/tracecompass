@@ -39,7 +39,7 @@ public abstract class TmfTimeAnalysisProvider {
 		private String stateName;
 
 		StateColor() {
-			String undef = new String("Undefined");
+			String undef = new String("Undefined"); //$NON-NLS-1$
 			this.stateName = undef;
 		}
 
@@ -272,13 +272,13 @@ public abstract class TmfTimeAnalysisProvider {
 		String name = trace.getName();
 		String threadClass = getTraceClassName(trace);
 		if (threadClass != null && threadClass.length() > 0) {
-			name += " [" + threadClass + "]";
+			name += " [" + threadClass + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (inclState) {
 			List<TimeEvent> list = trace.getTraceEvents();
 			if (null != list && list.size() > 0) {
 				ITimeEvent event = (ITimeEvent) list.get(list.size() - 1);
-				name += " (" + getEventName(event, false, true) + ")";
+				name += " (" + getEventName(event, false, true) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		return name;
@@ -288,9 +288,9 @@ public abstract class TmfTimeAnalysisProvider {
 		String name = event.getEntry().getName();
 		String threadClass = getTraceClassName(event.getEntry());
 		if (threadClass != null && threadClass.length() > 0) {
-			name += " [" + threadClass + "]";
+			name += " [" + threadClass + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		name += " (" + getEventName(event, false, true) + ")";
+		name += " (" + getEventName(event, false, true) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		return name;
 	}
 

@@ -186,6 +186,7 @@ public class TmfEvent extends TmfData implements Cloneable {
     }
 
 	@Override
+    @SuppressWarnings("nls")
 	public String toString() {
 		return "[TmfEvent(" + fEffectiveTimestamp + "," + fSource + "," + fType + "," + fContent + ")]";
 	}

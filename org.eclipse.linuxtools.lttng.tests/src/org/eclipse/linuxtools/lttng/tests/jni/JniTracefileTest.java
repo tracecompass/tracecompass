@@ -52,6 +52,7 @@ import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
         public void printTracefileInformation()
 */
 
+@SuppressWarnings("nls")
 public class JniTracefileTest extends TestCase
 {
 		private final static boolean printLttDebug = false;

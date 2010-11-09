@@ -138,6 +138,7 @@ public class LttngTimestamp extends TmfTimestamp {
      * @return timestamp, as string
      */
     @Override
+    @SuppressWarnings("nls")
 	public String toString() {
 
         // If we are dealing with units of seconds (or higher),

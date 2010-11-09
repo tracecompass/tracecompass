@@ -16,6 +16,7 @@ import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 
+@SuppressWarnings("nls")
 public class LTTngSyntheticEventProviderTest extends LttngTestPreparation {
 	// ========================================================================
 	// Tests

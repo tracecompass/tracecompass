@@ -33,9 +33,9 @@ public class JniTraceFactory {
 	// Version string of the supported library version
 	// These will be used in the switch below to find the correct version
 	// ***
-	static final String TraceVersion_v2_3 = "2.3"; 
-	static final String TraceVersion_v2_5 = "2.5";
-	static final String TraceVersion_v2_6 = "2.6";
+	static final String TraceVersion_v2_3 = "2.3";  //$NON-NLS-1$
+	static final String TraceVersion_v2_5 = "2.5";  //$NON-NLS-1$
+	static final String TraceVersion_v2_6 = "2.6";  //$NON-NLS-1$
 	
 	/*
 	 * Default constructor is forbidden

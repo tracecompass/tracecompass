@@ -39,6 +39,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
  * <p>
  * TODO: Implement me. Please.
  */
+@SuppressWarnings("nls")
 public class TmfExperimentTest extends TestCase {
 
     private static final String DIRECTORY   = "testfiles";

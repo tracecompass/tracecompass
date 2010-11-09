@@ -47,17 +47,17 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 			long traceEndTime, String traceId, ResourceTypes type, Long resId,
 			long insertionTime) {
 
-		String resourceName = type.toString() + " " + resId.toString();
+		String resourceName = type.toString() + " " + resId.toString(); //$NON-NLS-1$
 		// Note : the "traceid" here is assigned to the "groupname" as we group
 		// by trace in the UI
 		TimeRangeEventResource localRessource = TimeRangeResourceFactory
 				.getInstance().createResource(resContainer.getUniqueId(),
 						traceStartTime, traceEndTime, resourceName, traceId,
-						"", type, resId, insertionTime);
+						"", type, resId, insertionTime); //$NON-NLS-1$
 		resContainer.addItem(localRessource);
 
 		if (TraceDebug.isRV()) {
-			TraceDebug.traceRV("addLocalResource():" + localRessource);
+			TraceDebug.traceRV("addLocalResource():" + localRessource); //$NON-NLS-1$
 		}
 
 		return localRessource;
@@ -196,7 +196,7 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 			String stateMode) {
 
 		if (TraceDebug.isRV()) {
-			TraceDebug.traceRV("makeDraw():[" + localResource + ",candidate=[stime=" + stime + ",etime=" + etime + ",state=" + stateMode + "]]");
+			TraceDebug.traceRV("makeDraw():[" + localResource + ",candidate=[stime=" + stime + ",etime=" + etime + ",state=" + stateMode + "]]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		}
 
 		// Check if the event is out of range

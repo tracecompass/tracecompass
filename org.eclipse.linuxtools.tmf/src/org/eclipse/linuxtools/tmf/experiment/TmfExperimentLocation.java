@@ -41,6 +41,7 @@ public class TmfExperimentLocation extends TmfLocation<ITmfLocation<?>[]> {
 	}
 
 	@Override
+    @SuppressWarnings("nls")
 	public String toString() {
 		StringBuilder result = new StringBuilder("[TmfExperimentLocation");
 		ITmfLocation<?>[] locations = (ITmfLocation<?>[]) getLocation();

@@ -28,6 +28,7 @@ import org.eclipse.linuxtools.lttng.tests.state.handlers.AbsStateUpdate;
  * @author alvaro
  * 
  */
+@SuppressWarnings("nls")
 class StateAfterUpdateHandlers {
 
 	final ILttngEventProcessor getSyscallEntryHandler() {

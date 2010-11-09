@@ -1039,10 +1039,10 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener,
 			while (size.x > width && name.length() > 1) {
 				cuts++;
 				name = name.substring(0, name.length() - 1);
-				size = gc.stringExtent(name + "...");
+				size = gc.stringExtent(name + "..."); //$NON-NLS-1$
 			}
 			if (cuts > 0)
-				name += "...";
+				name += "..."; //$NON-NLS-1$
 			elemWidth += MARGIN;
 		}
 		Utils.init(_rect1, rect);
@@ -2097,7 +2097,7 @@ class ItemData {
 
 	public void updateItems() {
 		List<Item> itemList = new ArrayList<Item>();
-		String name = "";
+		String name = ""; //$NON-NLS-1$
 
 		Iterator<GroupItem> it = _groupTable.values().iterator();
 		while (it.hasNext()) {
@@ -2224,8 +2224,7 @@ class ItemData {
 			if (null == group) {
 				group = new GroupItem(NLS.bind(Messages._TRACE_GROUP_LABEL,
 						groupName));
-				group._expanded = !groupName.equalsIgnoreCase("system")
-						&& !groupName.equalsIgnoreCase(undef);
+				group._expanded = !groupName.equalsIgnoreCase("system")	&& !groupName.equalsIgnoreCase(undef);
 				_groupTable.put(groupName, group);
 				groupList.add(group);
 			}

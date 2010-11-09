@@ -30,6 +30,7 @@ import org.eclipse.linuxtools.tmf.parser.ITmfEventParser;
  * <p>
  * TODO: Implement me. Please.
  */
+@SuppressWarnings("nls")
 public class TmfEventParserStub implements ITmfEventParser {
 
     // ------------------------------------------------------------------------

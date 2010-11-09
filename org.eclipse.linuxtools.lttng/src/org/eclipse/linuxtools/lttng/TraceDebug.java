@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 
+@SuppressWarnings("nls")
 public class TraceDebug {
 	static boolean DEBUG = false;
 	static boolean INFO = false;

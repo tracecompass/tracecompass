@@ -25,6 +25,7 @@ import org.eclipse.linuxtools.tmf.trace.ITmfContext;
  * <p>
  * Test suite for the TmfProviderManager class.
  */
+@SuppressWarnings("nls")
 public class TmfProviderManagerTest extends TestCase {
 
 	public TmfProviderManagerTest(String name) {

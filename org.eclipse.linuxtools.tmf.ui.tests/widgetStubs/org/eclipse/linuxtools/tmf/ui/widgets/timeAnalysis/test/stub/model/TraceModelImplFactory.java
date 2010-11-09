@@ -13,6 +13,7 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.test.stub.model;
 
 import java.util.Date;
 
+@SuppressWarnings("nls")
 public class TraceModelImplFactory {
 
 	// ========================================================================

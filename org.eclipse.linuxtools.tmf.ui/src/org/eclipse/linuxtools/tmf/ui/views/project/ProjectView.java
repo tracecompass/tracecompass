@@ -91,7 +91,7 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public class ProjectView extends TmfView {
 
-    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.project";
+    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.project"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Main data structures
@@ -128,8 +128,7 @@ public class ProjectView extends TmfView {
 	static public IFile createLink(URI uri) throws CoreException {
 		IFolder folder = getActiveProjectTracesFolder();
 		if (folder == null || !folder.exists()) {
-			throw new CoreException(new Status(Status.ERROR, TmfUiPlugin.PLUGIN_ID,
-					"No active project set"));
+			throw new CoreException(new Status(Status.ERROR, TmfUiPlugin.PLUGIN_ID, "No active project set"));
 		}
 		String path = uri.getPath();
 		// TODO: support duplicate file names
@@ -166,7 +165,7 @@ public class ProjectView extends TmfView {
     // ------------------------------------------------------------------------
 
 	public ProjectView() {
-		super("Projects");
+		super("Projects"); //$NON-NLS-1$
 		
 		fWorkspace = ResourcesPlugin.getWorkspace();
 		try {
@@ -296,6 +295,7 @@ public class ProjectView extends TmfView {
     // ------------------------------------------------------------------------
 
 	@Override
+	@SuppressWarnings("nls")
 	public String toString() {
 		return "[ProjectView]";
 	}
@@ -330,7 +330,7 @@ public class ProjectView extends TmfView {
                     IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
                     IHandlerService handlerService = (IHandlerService) win.getService(IHandlerService.class);
                     try {
-                        handlerService.executeCommand("org.eclipse.linuxtools.tmf.ui.command.project.trace.open", null);
+                        handlerService.executeCommand("org.eclipse.linuxtools.tmf.ui.command.project.trace.open", null); //$NON-NLS-1$
                     } catch (ExecutionException e) {
                         e.printStackTrace();
                     } catch (NotDefinedException e) {
@@ -394,7 +394,7 @@ public class ProjectView extends TmfView {
 
 	// Populated from the plug-in
     private void createContextMenu() {
-        MenuManager menuManager = new MenuManager("#PopupMenu");
+        MenuManager menuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
         menuManager.setRemoveAllWhenShown(true);
         Menu menu = menuManager.createContextMenu(fViewer.getControl());
         fViewer.getControl().setMenu(menu);

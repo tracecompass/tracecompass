@@ -75,6 +75,7 @@ public class TmfEventReference implements Cloneable {
     }
 
 	@Override
+    @SuppressWarnings("nls")
     public String toString() {
         return "[TmfEventReference(" + ((fReference != null) ? fReference.toString() : "null") + ")]";
     }

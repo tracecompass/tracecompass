@@ -19,6 +19,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
 
 
+@SuppressWarnings("nls")
 public class LttngTraceTest {
 
 	/**

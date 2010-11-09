@@ -26,6 +26,7 @@ import org.eclipse.linuxtools.tmf.parser.ITmfEventParser;
  * <p>
  * Dummy test trace. Use in conjunction with TmfEventParserStub.
  */
+@SuppressWarnings("nls")
 public class TmfTraceStub extends TmfTrace<TmfEvent> {
 
     // ------------------------------------------------------------------------

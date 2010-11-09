@@ -26,8 +26,8 @@ public abstract class JniMarkerField extends Jni_C_Common
     // Internal C pointer of the JniEvent used in LTT
     private Jni_C_Pointer_And_Library_Id thisMarkerFieldPtr = new Jni_C_Pointer_And_Library_Id();
 
-    private String field = "";
-    private String format = "";
+    private String field = ""; //$NON-NLS-1$
+    private String format = ""; //$NON-NLS-1$
     
     // Native access method
     protected native String ltt_getField(int libId, long markerFieldPtr);
@@ -127,7 +127,8 @@ public abstract class JniMarkerField extends Jni_C_Common
      * 
      * @return Attributes of the object concatenated in String
      */
-    @Override
+	@Override
+    @SuppressWarnings("nls")
     public String toString() {
         String returnData = "";
         returnData += "field                   : " + field + "\n";

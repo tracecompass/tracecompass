@@ -18,8 +18,8 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 
 public class TmfUiPreferenceInitializer extends AbstractPreferenceInitializer {
 
-    public static final String ACTIVE_PROJECT_PREFERENCE = "ACTIVE_PROJECT";
-    public static final String ACTIVE_PROJECT_DEFAULT = "";
+    public static final String ACTIVE_PROJECT_PREFERENCE = "ACTIVE_PROJECT"; //$NON-NLS-1$
+    public static final String ACTIVE_PROJECT_DEFAULT = ""; //$NON-NLS-1$
     
     public TmfUiPreferenceInitializer() {
         super();

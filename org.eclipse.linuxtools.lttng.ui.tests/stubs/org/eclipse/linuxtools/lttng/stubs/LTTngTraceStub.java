@@ -30,6 +30,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfTrace;
  * <p>
  * Dummy test trace. Use in conjunction with LTTngEventParserStub.
  */
+@SuppressWarnings("nls")
 public class LTTngTraceStub extends TmfTrace<LttngEvent> {
 
     // ========================================================================

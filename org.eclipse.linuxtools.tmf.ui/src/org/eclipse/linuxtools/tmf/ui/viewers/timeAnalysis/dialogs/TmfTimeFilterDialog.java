@@ -120,7 +120,7 @@ public class TmfTimeFilterDialog extends TitleAreaDialog {
 	private void createColumns(Table table) {
 		table.setHeaderVisible(true);
 
-		String headers[] = { "", Messages._TRACE_ID, Messages._TRACE_NAME };
+		String headers[] = { "", Messages._TRACE_ID, Messages._TRACE_NAME }; //$NON-NLS-1$
 		int width[] = { 20, 80, 400 };
 
 		for (int i = 0; i < headers.length; i++) {
@@ -199,7 +199,7 @@ public class TmfTimeFilterDialog extends TitleAreaDialog {
 			else if (columnIndex == 2)
 				return t.getName();
 			else
-				return "";
+				return ""; //$NON-NLS-1$
 		}
 	}
 

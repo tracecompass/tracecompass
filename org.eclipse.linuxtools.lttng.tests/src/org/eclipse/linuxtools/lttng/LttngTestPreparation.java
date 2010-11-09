@@ -25,6 +25,7 @@ import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 
+@SuppressWarnings("nls")
 public abstract class LttngTestPreparation extends TestCase {
 	// ========================================================================
 	// Data

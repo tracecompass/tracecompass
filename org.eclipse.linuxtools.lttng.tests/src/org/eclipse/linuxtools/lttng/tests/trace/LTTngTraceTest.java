@@ -31,6 +31,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfContext;
     public int getCpuNumber() {
  */
 
+@SuppressWarnings("nls")
 public class LTTngTraceTest extends TestCase {
 	
     private final static String tracepath1="traceset/trace-15316events_nolost_newformat";

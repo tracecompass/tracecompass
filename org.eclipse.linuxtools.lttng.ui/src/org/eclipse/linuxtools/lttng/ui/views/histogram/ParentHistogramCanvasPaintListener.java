@@ -163,11 +163,12 @@ public class ParentHistogramCanvasPaintListener extends HistogramCanvasPaintList
 	 * 
 	 * @param event  The generated paint event when redraw is called.
 	 */
+	private final String DATA_KEY = "double-buffer-image"; //$NON-NLS-1$
 	@Override
 	public void paintControl(PaintEvent event) {
 		
 		if (parentCanvas.getSize().x > 0 && parentCanvas.getSize().y > 0) {
-			Image image = (Image) parentCanvas.getData("double-buffer-image");
+			Image image = (Image) parentCanvas.getData(DATA_KEY);
 			
 			// Creates new image only absolutely necessary.
 			if (image == null
@@ -180,7 +181,7 @@ public class ParentHistogramCanvasPaintListener extends HistogramCanvasPaintList
 						parentCanvas.getClientArea().height
 						);
 
-				parentCanvas.setData("double-buffer-image", image);
+				parentCanvas.setData(DATA_KEY, image);
 //				isFinished = false;
 			}
 			

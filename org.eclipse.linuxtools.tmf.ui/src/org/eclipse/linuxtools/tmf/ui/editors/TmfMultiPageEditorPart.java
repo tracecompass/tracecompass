@@ -27,7 +27,7 @@ public abstract class TmfMultiPageEditorPart extends MultiPageEditorPart impleme
 
     public TmfMultiPageEditorPart() {
         super();
-        fName = "TmfMultiPageEditorPart";
+        fName = "TmfMultiPageEditorPart"; //$NON-NLS-1$
         TmfSignalManager.register(this);
     }
 

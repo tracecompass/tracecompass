@@ -318,7 +318,7 @@ public class NewExperimentDialog extends SelectionStatusDialog {
 			updateStatus(IStatus.ERROR, NLS.bind("Experiment already exists", name));
 			return false;
 		}
-		updateStatus(IStatus.OK, "");
+		updateStatus(IStatus.OK, ""); //$NON-NLS-1$
 		return true;
 	}
 

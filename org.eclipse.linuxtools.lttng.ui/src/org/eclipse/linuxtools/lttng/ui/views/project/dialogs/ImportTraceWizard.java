@@ -41,11 +41,12 @@ public class ImportTraceWizard extends Wizard implements IImportWizard {
 	/**
      * 
      */
+    private final String IMPORT_WIZARD = "LTTngTraceImportWizard"; //$NON-NLS-1$
     public ImportTraceWizard() {
         IDialogSettings workbenchSettings = WorkbenchPlugin.getDefault().getDialogSettings();
-        IDialogSettings section = workbenchSettings.getSection("LTTngTraceImportWizard");
+        IDialogSettings section = workbenchSettings.getSection(IMPORT_WIZARD);
         if (section == null) {
-			section = workbenchSettings.addNewSection("LTTngTraceImportWizard");
+			section = workbenchSettings.addNewSection(IMPORT_WIZARD);
 		}
         
         setDialogSettings(section);
@@ -76,7 +77,7 @@ public class ImportTraceWizard extends Wizard implements IImportWizard {
         }
         
         setWindowTitle(DataTransferMessages.DataTransfer_importTitle);
-        setDefaultPageImageDescriptor(IDEWorkbenchPlugin.getIDEImageDescriptor("wizban/importdir_wiz.png"));
+        setDefaultPageImageDescriptor(IDEWorkbenchPlugin.getIDEImageDescriptor("wizban/importdir_wiz.png")); //$NON-NLS-1$
         setNeedsProgressMonitor(true);
     }
 	

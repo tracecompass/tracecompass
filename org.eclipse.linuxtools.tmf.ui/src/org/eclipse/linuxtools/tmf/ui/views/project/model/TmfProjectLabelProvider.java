@@ -36,8 +36,8 @@ import org.eclipse.ui.PlatformUI;
  */
 public class TmfProjectLabelProvider implements ILabelProvider {
 
-	private final String fTraceIconFile      = "icons/events_view.gif";
-//	private final String fExperimentIconFile = "icons/garland16.png";
+	private final String fTraceIconFile      = "icons/events_view.gif"; //$NON-NLS-1$
+//	private final String fExperimentIconFile = "icons/garland16.png"; //$NON-NLS-1$
 
 	private final Image fOpenedProjectIcon;
 	private final Image fClosedProjectIcon;
@@ -138,7 +138,7 @@ public class TmfProjectLabelProvider implements ILabelProvider {
 			node instanceof TmfExperimentFolderNode ||
 			node instanceof TmfExperimentNode)
 		{
-			label += " [" + node.getChildren().size() + "]";
+			label += " [" + node.getChildren().size() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return label;
 	}

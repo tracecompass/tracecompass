@@ -59,7 +59,7 @@ import org.eclipse.ui.part.FileEditorInput;
 
 public class ManageCustomParsersDialog extends Dialog {
 
-    private static final Image image = TmfUiPlugin.getDefault().getImageFromPath("/icons/customparser_wizard.gif");
+    private static final Image image = TmfUiPlugin.getDefault().getImageFromPath("/icons/customparser_wizard.gif"); //$NON-NLS-1$
 
     Button txtButton;
     Button xmlButton;
@@ -112,7 +112,7 @@ public class ManageCustomParsersDialog extends Dialog {
             }});
         
         xmlButton = new Button(radioContainer, SWT.RADIO);
-        xmlButton.setText("XML");
+        xmlButton.setText("XML"); //$NON-NLS-1$
         xmlButton.addSelectionListener(new SelectionListener(){
             @Override
 			public void widgetDefaultSelected(SelectionEvent e) {}
@@ -223,7 +223,7 @@ public class ManageCustomParsersDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
                 FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
                 dialog.setText("Select custom parser file to import");
-                dialog.setFilterExtensions(new String[] {"*.xml", "*"});
+                dialog.setFilterExtensions(new String[] {"*.xml", "*"}); //$NON-NLS-1$ //$NON-NLS-2$
                 String path = dialog.open();
                 if (path != null) {
                     CustomTraceDefinition[] defs = null;
@@ -252,7 +252,7 @@ public class ManageCustomParsersDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
                 FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
                 dialog.setText("Select file to export the " + parserList.getSelection()[0] + " custom parser");
-                dialog.setFilterExtensions(new String[] {"*.xml", "*"});
+                dialog.setFilterExtensions(new String[] {"*.xml", "*"}); //$NON-NLS-1$ //$NON-NLS-2$
                 String path = dialog.open();
                 if (path != null) {
                     CustomTraceDefinition def = null;
@@ -279,7 +279,7 @@ public class ManageCustomParsersDialog extends Dialog {
                 FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
                 dialog.setText("Select log file to parse using the " + parserList.getSelection()[0] + " custom parser");
                 if (xmlButton.getSelection()) {
-                    dialog.setFilterExtensions(new String[] {"*.xml", "*"});
+                    dialog.setFilterExtensions(new String[] {"*.xml", "*"}); //$NON-NLS-1$ //$NON-NLS-2$
                 }
                 String path = dialog.open();
                 String parser = null;
@@ -287,10 +287,10 @@ public class ManageCustomParsersDialog extends Dialog {
                     CustomTraceDefinition def = null;
                     if (txtButton.getSelection()) {
                         def = CustomTxtTraceDefinition.load(parserList.getSelection()[0]);
-                        parser = CustomTxtTrace.class.getCanonicalName() + "." + def.definitionName;
+                        parser = CustomTxtTrace.class.getCanonicalName() + "." + def.definitionName; //$NON-NLS-1$
                     } else if (xmlButton.getSelection()) {
                         def = CustomXmlTraceDefinition.load(parserList.getSelection()[0]);
-                        parser = CustomXmlTrace.class.getCanonicalName() + "." + def.definitionName;
+                        parser = CustomXmlTrace.class.getCanonicalName() + "." + def.definitionName; //$NON-NLS-1$
                     }
                     if (def != null) {
                         try {

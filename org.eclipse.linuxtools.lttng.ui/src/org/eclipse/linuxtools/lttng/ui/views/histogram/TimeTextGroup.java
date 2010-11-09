@@ -40,7 +40,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
 	// 2010-06-10 Yuriy: Has been moved to header into HistogramView.java
 	protected static final String 	NANOSEC_LABEL = "sec";
 */	
-	private static final String	LONGEST_STRING_VALUE = "." + Long.MAX_VALUE;
+	private static final String	LONGEST_STRING_VALUE = "." + Long.MAX_VALUE; //$NON-NLS-1$
 	private static final int	MAX_CHAR_IN_TEXTBOX = LONGEST_STRING_VALUE.length();
     
     // The "small font" height used to display time will be "default font" minus this constant
@@ -68,7 +68,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
      * @param groupStyle		Style of the group.   Anything that suite a Text
      */
     public TimeTextGroup(HistogramView newParentView, Composite parent, int textStyle, int groupStyle) {
-    	this(newParentView, parent, textStyle, groupStyle, "", HistogramConstant.formatNanoSecondsTime(0L), false);
+    	this(newParentView, parent, textStyle, groupStyle, "", HistogramConstant.formatNanoSecondsTime(0L), false); //$NON-NLS-1$
     }
     
     /**
@@ -81,7 +81,7 @@ public class TimeTextGroup implements FocusListener, KeyListener {
      * @param isSpaceSaverNeeded Value that tell if we try to save some space in the control.
      */
     public TimeTextGroup(HistogramView newParentView, Composite parent, int textStyle, int groupStyle, boolean isSpaceSaverNeeded) {
-    	this(newParentView, parent, textStyle, groupStyle, "", HistogramConstant.formatNanoSecondsTime(0L), isSpaceSaverNeeded);
+    	this(newParentView, parent, textStyle, groupStyle, "", HistogramConstant.formatNanoSecondsTime(0L), isSpaceSaverNeeded); //$NON-NLS-1$
     }
     
     /**

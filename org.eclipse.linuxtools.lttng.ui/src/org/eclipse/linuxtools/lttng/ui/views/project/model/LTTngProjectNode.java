@@ -28,8 +28,8 @@ import org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature;
  */
 public class LTTngProjectNode extends LTTngProjectTreeNode {
 
-	public static final String TRACE_FOLDER_NAME = "Traces";
-	public static final String EXPER_FOLDER_NAME = "Experiments";
+	public static final String TRACE_FOLDER_NAME = "Traces"; //$NON-NLS-1$
+	public static final String EXPER_FOLDER_NAME = "Experiments"; //$NON-NLS-1$
 
 	private final IProject fProject;
 	private boolean fIsLTTngProject;

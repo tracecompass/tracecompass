@@ -18,6 +18,7 @@ import org.eclipse.linuxtools.lttng.jni.common.JniTime;
 import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
 
 
+@SuppressWarnings("nls")
 public class JniTraceTest {
     
     public static void main(String[] args) {

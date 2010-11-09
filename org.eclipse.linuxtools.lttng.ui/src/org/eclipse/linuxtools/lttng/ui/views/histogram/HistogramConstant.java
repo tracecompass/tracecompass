@@ -76,15 +76,15 @@ public abstract class HistogramConstant {
 		
 		// If our number has over 9 digits, just add a dot after the ninth digits
 		if ( returnedTime.length() > 9 ) {
-			returnedTime = returnedTime.substring(0, returnedTime.length() - 9 ) + "." + returnedTime.substring( returnedTime.length() - 9 );
+			returnedTime = returnedTime.substring(0, returnedTime.length() - 9 ) + "." + returnedTime.substring( returnedTime.length() - 9 ); //$NON-NLS-1$
 		}
 		// Otherwise, patch missing decimal with 0
 		else {
 			int curSize = returnedTime.length();
 			for (int l=0; (curSize+l)< 9; l++) {
-				returnedTime = "0" + returnedTime;
+				returnedTime = "0" + returnedTime; //$NON-NLS-1$
 			}
-			returnedTime = "0." + returnedTime;
+			returnedTime = "0." + returnedTime; //$NON-NLS-1$
 		}
 		
 		return returnedTime;
@@ -105,14 +105,14 @@ public abstract class HistogramConstant {
 		
 	    try {
 	    	// Avoid simple commat/dot mistake
-	        timeString = timeString.replace(",", ".");
+	        timeString = timeString.replace(",", "."); //$NON-NLS-1$ //$NON-NLS-2$
 	
 	        // If we have a dot, we have a decimal number to convert
-	        int dotPosition = timeString.indexOf(".");
+	        int dotPosition = timeString.indexOf("."); //$NON-NLS-1$
 	        
 	        // If the user begun the line with a dot, we add a zero
 	        if ( dotPosition == 0 ) {
-                timeString = "0" + timeString;
+                timeString = "0" + timeString; //$NON-NLS-1$
                 dotPosition = 1;
 	        }
 	        
@@ -124,7 +124,7 @@ public abstract class HistogramConstant {
                 if ( decimalNumber <= 9 ) {
                 	StringBuffer strBuffer = new StringBuffer(timeString);
                     for ( int nbDec=decimalNumber; nbDec<9; nbDec++) {
-                    	strBuffer.append("0");
+                    	strBuffer.append("0"); //$NON-NLS-1$
                     }
                     timeString = strBuffer.toString();
                 }
@@ -140,7 +140,7 @@ public abstract class HistogramConstant {
 	        returnedNumber = (long)(dblMaxTimerange * 1000000000.0);
 	    }
 	    catch (NumberFormatException e) {
-	        System.out.println("Warning : Could not convert string into nanoseconds (convertStringToLong)");
+	        System.out.println("Warning : Could not convert string into nanoseconds (convertStringToLong)"); //$NON-NLS-1$
 	    }
 	    
 	    return returnedNumber;

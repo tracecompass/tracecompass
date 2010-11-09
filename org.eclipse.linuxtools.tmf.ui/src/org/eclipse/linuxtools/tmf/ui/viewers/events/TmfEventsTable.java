@@ -94,7 +94,7 @@ public class TmfEventsTable extends TmfComponent {
     }
 
     public TmfEventsTable(Composite parent, int cacheSize, ColumnData[] columnData) {
-        super("TmfEventsTable");
+        super("TmfEventsTable"); //$NON-NLS-1$
         
         fCacheSize = cacheSize;
         fCache = new TmfEvent[fCacheSize];

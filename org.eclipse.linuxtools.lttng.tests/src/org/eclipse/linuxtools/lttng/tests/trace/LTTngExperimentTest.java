@@ -34,6 +34,7 @@ import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
  * <p>
  * TODO: Implement me. Please.
  */
+@SuppressWarnings("nls")
 public class LTTngExperimentTest extends TestCase {
 
     private static final String DIRECTORY   = "traceset";

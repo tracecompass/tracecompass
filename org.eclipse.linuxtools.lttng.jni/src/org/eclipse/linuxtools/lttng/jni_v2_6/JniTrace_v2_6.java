@@ -30,7 +30,7 @@ public class JniTrace_v2_6 extends JniTrace {
 	// This is the dynamic library name that is passed to the library loader (liblttvlibraryloader.so) to load.
 	// It needs to be a complete name, like "libXYZ.so", unlike java that would take "XYZ". It could also take a complete path.
 	//	The library need to be accessible, i.e. LD_LIBRARY_PATH need to be set correctly. 
-	private static final String LIBRARY_NAME = "liblttvtraceread-2.6.so";
+	private static final String LIBRARY_NAME = "liblttvtraceread-2.6.so"; //$NON-NLS-1$
 	
 	/*
 	 * Forbid access to the default constructor

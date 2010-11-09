@@ -173,6 +173,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
+    @SuppressWarnings("nls")
 	public String toString() {
 		return "[LTTngExperiment (" + getName() + ")]";
 	}

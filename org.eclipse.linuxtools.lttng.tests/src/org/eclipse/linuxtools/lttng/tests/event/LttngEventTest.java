@@ -40,6 +40,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfLocation;
 	public String toString()
  */
 
+@SuppressWarnings("nls")
 public class LttngEventTest extends TestCase {
     private final static String tracepath1="traceset/trace-15316events_nolost_newformat.txt";
     private final static boolean skipIndexing=true;

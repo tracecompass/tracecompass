@@ -26,11 +26,11 @@ public class EventsTable extends TmfEventsTable {
     // ------------------------------------------------------------------------
 
     // Table column names
-    static private final String TIMESTAMP_COLUMN = "Timestamp";
-    static private final String SOURCE_COLUMN    = "Source";
-    static private final String TYPE_COLUMN      = "Type";
-    static private final String REFERENCE_COLUMN = "Reference";
-    static private final String CONTENT_COLUMN   = "Content";
+    static private final String TIMESTAMP_COLUMN = Messages.EventsTable_timestampColumn;
+    static private final String SOURCE_COLUMN    = Messages.EventsTable_sourceColumn;
+    static private final String TYPE_COLUMN      = Messages.EventsTable_typeColumn;
+    static private final String REFERENCE_COLUMN = Messages.EventsTable_referenceColumn;
+    static private final String CONTENT_COLUMN   = Messages.EventsTable_contentColumn;
     static private final String[] COLUMN_NAMES =  new String[] {
         TIMESTAMP_COLUMN,
         SOURCE_COLUMN,

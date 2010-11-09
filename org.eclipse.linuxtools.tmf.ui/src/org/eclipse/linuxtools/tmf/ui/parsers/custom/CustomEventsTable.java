@@ -34,10 +34,10 @@ public class CustomEventsTable extends TmfEventsTable {
         createColumnHeaders();
     }
 
-    public static final String TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+    public static final String TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS"; //$NON-NLS-1$
     private static final SimpleDateFormat TIMESTAMP_SIMPLE_DATE_FORMAT = new SimpleDateFormat(TIMESTAMP_FORMAT); 
     static {
-        TIMESTAMP_SIMPLE_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
+        TIMESTAMP_SIMPLE_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
     }
 
     protected void createColumnHeaders() {

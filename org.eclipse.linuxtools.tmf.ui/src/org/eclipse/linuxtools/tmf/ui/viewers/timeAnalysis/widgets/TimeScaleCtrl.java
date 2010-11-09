@@ -55,7 +55,7 @@ public class TimeScaleCtrl extends TraceCtrl implements MouseListener,
     private static final double LOG10_3 = Math.log10(3);
     private static final double LOG10_5 = Math.log10(5);
     
-    private static final Calendar GREGORIAN_CALENDAR = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
+    private static final Calendar GREGORIAN_CALENDAR = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
     
 	private ITimeDataProvider _timeProvider;
 	private int _dragState = 0;
@@ -198,9 +198,9 @@ public class TimeScaleCtrl extends TraceCtrl implements MouseListener,
 		_rect0.x += 4;
 		_rect0.width -= 4;
 		if (_rect0.width > 0) {
-		    Utils.drawText(gc, Messages._Timescale + ":", _rect0, true);
+		    Utils.drawText(gc, Messages._Timescale + ":", _rect0, true); //$NON-NLS-1$
 		}
-		int messageWidth = gc.stringExtent(Messages._Timescale + ":").x + 4;
+		int messageWidth = gc.stringExtent(Messages._Timescale + ":").x + 4; //$NON-NLS-1$
 		Rectangle absHeaderRect = new Rectangle(_rect0.x + messageWidth, _rect0.y, _rect0.width - messageWidth, _rect0.height);
 		_rect0.x -= 4;
 		_rect0.width += 4;
@@ -464,30 +464,30 @@ public class TimeScaleCtrl extends TraceCtrl implements MouseListener,
 }
 
 abstract class TimeDraw {
-	static String S = ":";
-	static String S0 = ":0";
-	static String S00 = ":00";
-    protected static final SimpleDateFormat stimeformat = new SimpleDateFormat("HH:mm:ss");
-    protected static final SimpleDateFormat stimeformatheader = new SimpleDateFormat("yyyy MMM dd");
-    protected static final SimpleDateFormat sminformat = new SimpleDateFormat("HH:mm");
-    protected static final SimpleDateFormat sminformatheader = new SimpleDateFormat("yyyy MMM dd");
-    protected static final SimpleDateFormat shrsformat = new SimpleDateFormat("MMM dd HH:mm");
-    protected static final SimpleDateFormat shrsformatheader = new SimpleDateFormat("yyyy");
-    protected static final SimpleDateFormat sdayformat = new SimpleDateFormat("MMM dd");
-    protected static final SimpleDateFormat sdayformatheader = new SimpleDateFormat("yyyy");
-    protected static final SimpleDateFormat smonthformat = new SimpleDateFormat("yyyy MMM");
-    protected static final SimpleDateFormat syearformat = new SimpleDateFormat("yyyy");
+	static String S   = ":"  ; //$NON-NLS-1$
+	static String S0  = ":0" ; //$NON-NLS-1$
+	static String S00 = ":00"; //$NON-NLS-1$
+    protected static final SimpleDateFormat stimeformat = new SimpleDateFormat("HH:mm:ss");          //$NON-NLS-1$
+    protected static final SimpleDateFormat stimeformatheader = new SimpleDateFormat("yyyy MMM dd"); //$NON-NLS-1$
+    protected static final SimpleDateFormat sminformat = new SimpleDateFormat("HH:mm");              //$NON-NLS-1$
+    protected static final SimpleDateFormat sminformatheader = new SimpleDateFormat("yyyy MMM dd");  //$NON-NLS-1$
+    protected static final SimpleDateFormat shrsformat = new SimpleDateFormat("MMM dd HH:mm"); 	     //$NON-NLS-1$
+    protected static final SimpleDateFormat shrsformatheader = new SimpleDateFormat("yyyy");         //$NON-NLS-1$
+    protected static final SimpleDateFormat sdayformat = new SimpleDateFormat("MMM dd");             //$NON-NLS-1$
+    protected static final SimpleDateFormat sdayformatheader = new SimpleDateFormat("yyyy");         //$NON-NLS-1$
+    protected static final SimpleDateFormat smonthformat = new SimpleDateFormat("yyyy MMM");         //$NON-NLS-1$
+    protected static final SimpleDateFormat syearformat = new SimpleDateFormat("yyyy");              //$NON-NLS-1$
     static {
-        stimeformat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        stimeformatheader.setTimeZone(TimeZone.getTimeZone("GMT"));
-        sminformat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        sminformatheader.setTimeZone(TimeZone.getTimeZone("GMT"));
-        shrsformat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        shrsformatheader.setTimeZone(TimeZone.getTimeZone("GMT"));
-        sdayformat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        sdayformatheader.setTimeZone(TimeZone.getTimeZone("GMT"));
-        smonthformat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        syearformat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        stimeformat.setTimeZone(TimeZone.getTimeZone("GMT"));       //$NON-NLS-1$
+        stimeformatheader.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
+        sminformat.setTimeZone(TimeZone.getTimeZone("GMT"));        //$NON-NLS-1$
+        sminformatheader.setTimeZone(TimeZone.getTimeZone("GMT"));  //$NON-NLS-1$
+        shrsformat.setTimeZone(TimeZone.getTimeZone("GMT"));        //$NON-NLS-1$
+        shrsformatheader.setTimeZone(TimeZone.getTimeZone("GMT"));  //$NON-NLS-1$
+        sdayformat.setTimeZone(TimeZone.getTimeZone("GMT"));        //$NON-NLS-1$
+        sdayformatheader.setTimeZone(TimeZone.getTimeZone("GMT"));  //$NON-NLS-1$
+        smonthformat.setTimeZone(TimeZone.getTimeZone("GMT"));      //$NON-NLS-1$
+        syearformat.setTimeZone(TimeZone.getTimeZone("GMT"));       //$NON-NLS-1$
     }
 	
 	static String pad(long n) {
@@ -510,12 +510,12 @@ abstract class TimeDraw {
 }
 
 class TimeDrawSec extends TimeDraw {
-	static String _hint = "sec";
+	static String _hint = "sec"; //$NON-NLS-1$
 
 	@Override
 	public void draw(GC gc, long time, Rectangle rect) {
 		time /= 1000000000;
-		Utils.drawText(gc, time + "", rect, true);
+		Utils.drawText(gc, time + "", rect, true); //$NON-NLS-1$
 	}
 
 	@Override
@@ -525,7 +525,7 @@ class TimeDrawSec extends TimeDraw {
 }
 
 class TimeDrawMillisec extends TimeDraw {
-	static String _hint = "s:ms";
+	static String _hint = "s:ms"; //$NON-NLS-1$
 
 	@Override
 	public void draw(GC gc, long time, Rectangle rect) {
@@ -542,7 +542,7 @@ class TimeDrawMillisec extends TimeDraw {
 }
 
 class TimeDrawMicrosec extends TimeDraw {
-	static String _hint = "s:ms:mcs";
+	static String _hint = "s:ms:mcs"; //$NON-NLS-1$
 
 	@Override
 	public void draw(GC gc, long time, Rectangle rect) {
@@ -561,7 +561,7 @@ class TimeDrawMicrosec extends TimeDraw {
 }
 
 class TimeDrawNanosec extends TimeDraw {
-	static String _hint = "s:ms:mcs:ns";
+	static String _hint = "s:ms:mcs:ns"; //$NON-NLS-1$
 
 	@Override
 	public void draw(GC gc, long time, Rectangle rect) {
@@ -581,7 +581,7 @@ class TimeDrawNanosec extends TimeDraw {
 }
 
 class TimeDrawAbsYear extends TimeDraw {
-    static String _hint = "YYYY";
+    static String _hint = "YYYY"; //$NON-NLS-1$
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
@@ -596,7 +596,7 @@ class TimeDrawAbsYear extends TimeDraw {
 }
 
 class TimeDrawAbsMonth extends TimeDraw {
-    static String _hint = "YYYY Mmm";
+    static String _hint = "YYYY Mmm"; //$NON-NLS-1$
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
@@ -611,7 +611,7 @@ class TimeDrawAbsMonth extends TimeDraw {
 }
 
 class TimeDrawAbsDay extends TimeDraw {
-    static String _hint = "Mmm dd";
+    static String _hint = "Mmm dd"; //$NON-NLS-1$
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
@@ -636,7 +636,7 @@ class TimeDrawAbsDay extends TimeDraw {
 }
 
 class TimeDrawAbsHrs extends TimeDraw {
-    static String _hint = "Mmm dd HH:mm";
+    static String _hint = "Mmm dd HH:mm"; //$NON-NLS-1$
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
@@ -661,7 +661,7 @@ class TimeDrawAbsHrs extends TimeDraw {
 }
 
 class TimeDrawAbsMin extends TimeDraw {
-    static String _hint = "HH:mm";
+    static String _hint = "HH:mm"; //$NON-NLS-1$
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
@@ -687,7 +687,7 @@ class TimeDrawAbsMin extends TimeDraw {
 }
 
 class TimeDrawAbsSec extends TimeDraw {
-    static String _hint = "HH:mm:ss";
+    static String _hint = "HH:mm:ss"; //$NON-NLS-1$
 
     @Override
     public void draw(GC gc, long time, Rectangle rect) {
@@ -712,14 +712,14 @@ class TimeDrawAbsSec extends TimeDraw {
 }
 
 class TimeDrawAbsMillisec extends TimeDraw {
-	static String _hint = "HH:ss:ms";
+	static String _hint = "HH:ss:ms"; //$NON-NLS-1$
 
 	@Override
 	public void draw(GC gc, long time, Rectangle rect) {
 		String stime = stimeformat.format(new Date((long) (time / 1000000)));
 		String ns = Utils.formatNs(time, Resolution.MILLISEC);
 
-		Utils.drawText(gc, stime + " " + ns, rect, true);
+		Utils.drawText(gc, stime + " " + ns, rect, true); //$NON-NLS-1$
 	}
 
     @Override
@@ -739,13 +739,13 @@ class TimeDrawAbsMillisec extends TimeDraw {
 }
 
 class TimeDrawAbsMicroSec extends TimeDraw {
-	static String _hint = "HH:ss:ms:mcs";
+	static String _hint = "HH:ss:ms:mcs"; //$NON-NLS-1$
 
 	@Override
 	public void draw(GC gc, long time, Rectangle rect) {
 		String stime = stimeformat.format(new Date((long) (time / 1000000)));
 		String micr = Utils.formatNs(time, Resolution.MICROSEC);
-		Utils.drawText(gc, stime + " " + micr, rect, true);
+		Utils.drawText(gc, stime + " " + micr, rect, true); //$NON-NLS-1$
 	}
 
     @Override
@@ -765,13 +765,13 @@ class TimeDrawAbsMicroSec extends TimeDraw {
 }
 
 class TimeDrawAbsNanoSec extends TimeDraw {
-	static String _hint = "HH:ss:ms:mcs:ns";
+	static String _hint = "HH:ss:ms:mcs:ns"; //$NON-NLS-1$
 
 	@Override
 	public void draw(GC gc, long time, Rectangle rect) {
 		String stime = stimeformat.format(new Date((long) (time / 1000000)));
 		String ns = Utils.formatNs(time, Resolution.NANOSEC);
-		Utils.drawText(gc, stime + " " + ns, rect, true);
+		Utils.drawText(gc, stime + " " + ns, rect, true); //$NON-NLS-1$
 	}
 
     @Override

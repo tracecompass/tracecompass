@@ -40,6 +40,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
  * <p>
  * Test suite for the TmfTrace class.
  */
+@SuppressWarnings("nls")
 public class TmfTraceTest extends TestCase {
 
 	// ------------------------------------------------------------------------

@@ -149,6 +149,7 @@ public class TmfTimeRange {
     }
 
 	@Override
+    @SuppressWarnings("nls")
 	public String toString() {
 		return "[TmfTimeRange(" + fStartTime + ":" + fEndTime + ")]";
 	}

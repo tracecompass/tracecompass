@@ -69,14 +69,15 @@ public class TmfLocation<L> implements ITmfLocation<L> {
     }
 
 	@Override
+	@SuppressWarnings("nls")
 	public String toString() {
 	    if (fLocation == null)
 	        return "null";
 		return fLocation.toString();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
+	@SuppressWarnings({ "nls", "unchecked" })
 	public TmfLocation<L> clone() {
 		TmfLocation<L> clone = null;
 		try {

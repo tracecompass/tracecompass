@@ -45,28 +45,28 @@ import org.xml.sax.SAXParseException;
 
 public class CustomXmlTraceDefinition extends CustomTraceDefinition {
 
-    protected static final String CUSTOM_XML_TRACE_DEFINITIONS_FILE_NAME = "custom_xml_parsers.xml";
+    protected static final String CUSTOM_XML_TRACE_DEFINITIONS_FILE_NAME = "custom_xml_parsers.xml"; //$NON-NLS-1$
     protected static final String CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME =
         TmfUiPlugin.getDefault().getStateLocation().addTrailingSeparator().append(CUSTOM_XML_TRACE_DEFINITIONS_FILE_NAME).toString();
 
-    public static final String TAG_IGNORE = "Ignore";
+    public static final String TAG_IGNORE = Messages.CustomXmlTraceDefinition_ignoreTag;
 
-    private static final String CUSTOM_XML_TRACE_DEFINITION_ROOT_ELEMENT = "CustomXMLTraceDefinitionList";
-    private static final String DEFINITION_ELEMENT = "Definition";
-    private static final String NAME_ATTRIBUTE = "name";
-    private static final String LOG_ENTRY_ATTRIBUTE = "logentry";
-    private static final String TIME_STAMP_OUTPUT_FORMAT_ELEMENT = "TimeStampOutputFormat";
-    private static final String INPUT_ELEMENT_ELEMENT = "InputElement";
-    private static final String ATTRIBUTE_ELEMENT = "Attribute";
-    private static final String INPUT_DATA_ELEMENT = "InputData";
-    private static final String ACTION_ATTRIBUTE = "action";
-    private static final String FORMAT_ATTRIBUTE = "format";
-    private static final String OUTPUT_COLUMN_ELEMENT = "OutputColumn";
+    private static final String CUSTOM_XML_TRACE_DEFINITION_ROOT_ELEMENT = Messages.CustomXmlTraceDefinition_definitionRootElement;
+    private static final String DEFINITION_ELEMENT = Messages.CustomXmlTraceDefinition_definition;
+    private static final String NAME_ATTRIBUTE = Messages.CustomXmlTraceDefinition_name;
+    private static final String LOG_ENTRY_ATTRIBUTE = Messages.CustomXmlTraceDefinition_logEntry;
+    private static final String TIME_STAMP_OUTPUT_FORMAT_ELEMENT = Messages.CustomXmlTraceDefinition_timestampOutputFormat;
+    private static final String INPUT_ELEMENT_ELEMENT = Messages.CustomXmlTraceDefinition_inputElement;
+    private static final String ATTRIBUTE_ELEMENT = Messages.CustomXmlTraceDefinition_attribute;
+    private static final String INPUT_DATA_ELEMENT = Messages.CustomXmlTraceDefinition_inputData;
+    private static final String ACTION_ATTRIBUTE = Messages.CustomXmlTraceDefinition_action;
+    private static final String FORMAT_ATTRIBUTE = Messages.CustomXmlTraceDefinition_format;
+    private static final String OUTPUT_COLUMN_ELEMENT = Messages.CustomXmlTraceDefinition_outputColumn;
     
     public InputElement rootInputElement;
 
     public CustomXmlTraceDefinition() {
-        this("", null, new ArrayList<OutputColumn>(), "");
+        this("", null, new ArrayList<OutputColumn>(), ""); //$NON-NLS-1$ //$NON-NLS-2$
     };
 
     public CustomXmlTraceDefinition(String logtype, InputElement rootElement, List<OutputColumn> outputs, String timeStampOutputFormat) {
@@ -182,7 +182,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             EntityResolver resolver = new EntityResolver () {
                 @Override
 				public InputSource resolveEntity (String publicId, String systemId) {
-                    String empty = "";
+                    String empty = ""; //$NON-NLS-1$
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
                 }
@@ -245,7 +245,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             }
             
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
 
             //initialize StreamResult with File object to save to file
             StreamResult result = new StreamResult(new StringWriter());
@@ -326,7 +326,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             EntityResolver resolver = new EntityResolver () {
                 @Override
 				public InputSource resolveEntity (String publicId, String systemId) {
-                    String empty = "";
+                    String empty = ""; //$NON-NLS-1$
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
                 }
@@ -386,7 +386,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             EntityResolver resolver = new EntityResolver () {
                 @Override
 				public InputSource resolveEntity (String publicId, String systemId) {
-                    String empty = "";
+                    String empty = ""; //$NON-NLS-1$
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
                 }
@@ -512,7 +512,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             EntityResolver resolver = new EntityResolver () {
                 @Override
 				public InputSource resolveEntity (String publicId, String systemId) {
-                    String empty = "";
+                    String empty = ""; //$NON-NLS-1$
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
                 }
@@ -549,7 +549,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             }
             
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
 
             //initialize StreamResult with File object to save to file
             StreamResult result = new StreamResult(new StringWriter());

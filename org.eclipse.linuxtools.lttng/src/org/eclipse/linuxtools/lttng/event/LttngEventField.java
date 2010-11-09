@@ -56,6 +56,7 @@ public class LttngEventField extends TmfEventField {
 	}
 	
 	@Override
+    @SuppressWarnings("nls")
 	public String toString() {
 		Object value = getValue();
 	    return getId() + ":" + ((value != null) ? value.toString() : "null");

@@ -16,7 +16,7 @@ import java.util.Vector;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.TimeEvent;
 
-
+@SuppressWarnings("nls")
 public class TraceImpl implements ITmfTimeAnalysisEntry {
 	// ========================================================================
 	// Data

@@ -48,28 +48,28 @@ import org.xml.sax.SAXParseException;
 
 public class CustomTxtTraceDefinition extends CustomTraceDefinition {
 
-    protected static final String CUSTOM_TXT_TRACE_DEFINITIONS_FILE_NAME = "custom_txt_parsers.xml";
+    protected static final String CUSTOM_TXT_TRACE_DEFINITIONS_FILE_NAME = "custom_txt_parsers.xml"; //$NON-NLS-1$
     protected static final String CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME =
         TmfUiPlugin.getDefault().getStateLocation().addTrailingSeparator().append(CUSTOM_TXT_TRACE_DEFINITIONS_FILE_NAME).toString();
 
-    private static final String CUSTOM_TXT_TRACE_DEFINITION_ROOT_ELEMENT = "CustomTxtTraceDefinitionList";
-    private static final String DEFINITION_ELEMENT = "Definition";
-    private static final String NAME_ATTRIBUTE = "name";
-    private static final String TIME_STAMP_OUTPUT_FORMAT_ELEMENT = "TimeStampOutputFormat";
-    private static final String INPUT_LINE_ELEMENT = "InputLine";
-    private static final String CARDINALITY_ELEMENT = "Cardinality";
-    private static final String MIN_ATTRIBUTE = "min";
-    private static final String MAX_ATTRIBUTE = "max";
-    private static final String REGEX_ELEMENT = "RegEx";
-    private static final String INPUT_DATA_ELEMENT = "InputData";
-    private static final String ACTION_ATTRIBUTE = "action";
-    private static final String FORMAT_ATTRIBUTE = "format";
-    private static final String OUTPUT_COLUMN_ELEMENT = "OutputColumn";
+    private static final String CUSTOM_TXT_TRACE_DEFINITION_ROOT_ELEMENT = Messages.CustomTxtTraceDefinition_definitionRootElement;
+    private static final String DEFINITION_ELEMENT = Messages.CustomTxtTraceDefinition_definition;
+    private static final String NAME_ATTRIBUTE = Messages.CustomTxtTraceDefinition_name;
+    private static final String TIME_STAMP_OUTPUT_FORMAT_ELEMENT = Messages.CustomTxtTraceDefinition_timestampOutputFormat;
+    private static final String INPUT_LINE_ELEMENT = Messages.CustomTxtTraceDefinition_inputLine;
+    private static final String CARDINALITY_ELEMENT = Messages.CustomTxtTraceDefinition_cardinality;
+    private static final String MIN_ATTRIBUTE = Messages.CustomTxtTraceDefinition_min;
+    private static final String MAX_ATTRIBUTE = Messages.CustomTxtTraceDefinition_max;
+    private static final String REGEX_ELEMENT = Messages.CustomTxtTraceDefinition_regEx;
+    private static final String INPUT_DATA_ELEMENT = Messages.CustomTxtTraceDefinition_inputData;
+    private static final String ACTION_ATTRIBUTE = Messages.CustomTxtTraceDefinition_action;
+    private static final String FORMAT_ATTRIBUTE = Messages.CustomTxtTraceDefinition_format;
+    private static final String OUTPUT_COLUMN_ELEMENT = Messages.CustomTxtTraceDefinition_outputColumn;
     
     public List<InputLine> inputs;
 
     public CustomTxtTraceDefinition() {
-        this("", new ArrayList<InputLine>(0), new ArrayList<OutputColumn>(0), "");
+        this("", new ArrayList<InputLine>(0), new ArrayList<OutputColumn>(0), ""); //$NON-NLS-1$ //$NON-NLS-2$
     };
     
     public CustomTxtTraceDefinition(String logtype, List<InputLine> inputs, List<OutputColumn> outputs, String timeStampOutputFormat) {
@@ -199,7 +199,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
 
         @Override
         public String toString() {
-            return regex + " " + cardinality;
+            return regex + " " + cardinality; //$NON-NLS-1$
         }
         
     }
@@ -238,9 +238,9 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             this.max = max;
         }
 
-        @Override
+		@Override
         public String toString() {
-            return "(" + (min >= 0 ? min : "?") + "," + (max == INF ? "\u221E" : (max >= 0 ? max : "?")) + ")";
+            return "(" + (min >= 0 ? min : "?") + "," + (max == INF ? "\u221E" : (max >= 0 ? max : "?")) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
         }
 
         @Override
@@ -266,7 +266,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             EntityResolver resolver = new EntityResolver () {
             	@Override
                 public InputSource resolveEntity (String publicId, String systemId) {
-                    String empty = "";
+                    String empty = ""; //$NON-NLS-1$
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
                 }
@@ -331,7 +331,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             }
             
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
 
             //initialize StreamResult with File object to save to file
             StreamResult result = new StreamResult(new StringWriter());
@@ -403,7 +403,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             EntityResolver resolver = new EntityResolver () {
             	@Override
                 public InputSource resolveEntity (String publicId, String systemId) {
-                    String empty = "";
+                    String empty = ""; //$NON-NLS-1$
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
                 }
@@ -463,7 +463,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             EntityResolver resolver = new EntityResolver () {
             	@Override
                 public InputSource resolveEntity (String publicId, String systemId) {
-                    String empty = "";
+                    String empty = ""; //$NON-NLS-1$
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
                 }
@@ -581,7 +581,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             EntityResolver resolver = new EntityResolver () {
             	@Override
                 public InputSource resolveEntity (String publicId, String systemId) {
-                    String empty = "";
+                    String empty = ""; //$NON-NLS-1$
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
                 }
@@ -618,7 +618,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             }
             
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
 
             //initialize StreamResult with File object to save to file
             StreamResult result = new StreamResult(new StringWriter());

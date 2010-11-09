@@ -155,33 +155,33 @@ public class TmfTimeTipHandler {
 						// Add Date
 						addItem(Messages._TRACE_DATE, eventStartTime > -1 ?
 						        Utils.formatDate(eventStartTime)
-						        : "?");
+						        : "?"); //$NON-NLS-1$
 						if (eventDuration > 0) {
                             addItem(Messages._TRACE_START_TIME, eventStartTime > -1 ?
                                     Utils.formatTime(eventStartTime, TimeFormat.ABSOLUTE, res)
-                                    : "?");
+                                    : "?"); //$NON-NLS-1$
                             
                             addItem(Messages._TRACE_STOP_TIME, eventEndTime > -1 ?
                                     Utils.formatTime(eventEndTime, TimeFormat.ABSOLUTE, res)
-                                    : "?");
+                                    : "?"); //$NON-NLS-1$
 						} else {
                             addItem(Messages._TRACE_EVENT_TIME, eventStartTime > -1 ?
                                     Utils.formatTime(eventStartTime, TimeFormat.ABSOLUTE, res)
-                                    : "?");
+                                    : "?"); //$NON-NLS-1$
 						}
 					} else {
 						if (eventDuration > 0) {
 					        addItem(Messages._TRACE_START_TIME, eventStartTime > -1 ?
 					                Utils.formatTime(eventStartTime, TimeFormat.RELATIVE, res)
-					                : "?");
+					                : "?"); //$NON-NLS-1$
 					    
 					        addItem(Messages._TRACE_STOP_TIME, eventEndTime > -1 ?
 					                Utils.formatTime(eventEndTime, TimeFormat.RELATIVE, res)
-					                : "?");
+					                : "?"); //$NON-NLS-1$
 						} else {
                             addItem(Messages._TRACE_EVENT_TIME, eventStartTime > -1 ?
                                     Utils.formatTime(eventStartTime, TimeFormat.RELATIVE, res)
-                                    : "?");
+                                    : "?"); //$NON-NLS-1$
 						}
 					}
 
@@ -189,13 +189,12 @@ public class TmfTimeTipHandler {
 					    // Duration in relative format in any case
 					    addItem(Messages._DURATION, eventDuration > -1 ?
 					            Utils.formatTime(eventDuration, TimeFormat.RELATIVE, res)
-					            : "?");
+					            : "?"); //$NON-NLS-1$
 					}
 
 				} else if (item instanceof GroupItem) {
 					addItem(Messages._TRACE_GROUP_NAME, item.toString());
-					addItem(Messages._NUMBER_OF_TRACES, ""
-							+ ((GroupItem) item)._traces.size());
+					addItem(Messages._NUMBER_OF_TRACES, "" + ((GroupItem) item)._traces.size()); //$NON-NLS-1$
 				}
 			}
 

@@ -1,3 +1,27 @@
+2010-11-09  Francois Chouinard  <fchouinard@gmail.com>
+
+    Suppress warning for non-externalized strings
+	   * src/org/eclipse/linuxtools/lttng/event/LttngEvent.java (toString):
+	   * src/org/eclipse/linuxtools/lttng/event/LttngEventContent.java (toString): 
+	   * src/org/eclipse/linuxtools/lttng/event/LttngEventField.java (toString): 
+	   * src/org/eclipse/linuxtools/lttng/event/LttngEventType.java (toString): 
+	   * src/org/eclipse/linuxtools/lttng/event/LttngTimestamp.java (toString): 
+	   * src/org/eclipse/linuxtools/lttng/state/evProcessor/AbsEventToHandlerResolver.java (process): 
+	   * src/org/eclipse/linuxtools/lttng/state/evProcessor/state/AbsStateProcessing.java (getAFieldLong): 
+	       (getAFieldString): 
+	       (sendNoFieldFoundMsg): 
+	      * src/org/eclipse/linuxtools/lttng/state/evProcessor/state/AbsStateUpdate.java (pop_state): 
+	       (pop_function): 
+	   * src/org/eclipse/linuxtools/lttng/state/model/LttngExecutionState.java (toString): 
+	   * src/org/eclipse/linuxtools/lttng/state/model/LttngProcessState.java (toString): 
+	   * src/org/eclipse/linuxtools/lttng/state/model/LttngTraceState.java (toString): 
+	   * src/org/eclipse/linuxtools/lttng/state/model/LttngTrapState.java (toString): 
+	   * src/org/eclipse/linuxtools/lttng/state/trace/StateTraceManager.java (toString): 
+	   * src/org/eclipse/linuxtools/lttng/trace/LTTngExperiment.java (toString): 
+	   * src/org/eclipse/linuxtools/lttng/trace/LTTngTrace.java (toString): 
+	   * src/org/eclipse/linuxtools/lttng/trace/LTTngTraceVersion.java (toString): 
+	   * src/org/eclipse/linuxtools/lttng/TraceDebug.java: 
+
 2010-10-29  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/event/LttngEventContent.java (getFields): Cosmetic change

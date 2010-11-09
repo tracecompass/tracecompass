@@ -116,6 +116,7 @@ public class TmfEventField implements Cloneable {
     }
 
     @Override
+    @SuppressWarnings("nls")
 	public String toString() {
         return "[TmfEventField(" + fFieldId + ":" + fValue.toString() + ")]";
     }

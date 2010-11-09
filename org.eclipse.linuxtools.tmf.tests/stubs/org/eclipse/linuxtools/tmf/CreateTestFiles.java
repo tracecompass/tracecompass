@@ -32,6 +32,7 @@ import java.util.Random;
  * <li> The number of fields (0 .. NB_TYPES-1) depends on the event type.
  * </ul>
  */
+@SuppressWarnings("nls")
 public class CreateTestFiles {
 
     // ========================================================================

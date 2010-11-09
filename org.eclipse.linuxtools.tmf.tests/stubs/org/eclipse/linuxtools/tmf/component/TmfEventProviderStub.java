@@ -31,6 +31,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
  * <p>
  * TODO: Implement me. Please.
  */
+@SuppressWarnings("nls")
 public class TmfEventProviderStub extends TmfEventProvider<TmfEvent> {
 
     private static final String DIRECTORY   = "testfiles";

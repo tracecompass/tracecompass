@@ -33,6 +33,6 @@ public class TmfSignalTracer {
 
 	@TmfSignalHandler
 	public void traceSignal(TmfSignal signal) {
-		System.out.println(signal.getSource().toString() + ": " + signal.toString());
+		System.out.println(signal.getSource().toString() + ": " + signal.toString()); //$NON-NLS-1$
 	}
 }

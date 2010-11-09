@@ -53,11 +53,12 @@ public class HistogramCanvasPaintListener implements PaintListener
 	 * 
 	 * @param event  The generated paint event when redraw is called.
 	 */
+	private final String DATA_KEY = "double-buffer-image"; //$NON-NLS-1$
 	@Override
 	public void paintControl(PaintEvent event) {
 
 		if (childrenCanvas.getSize().x > 0 && childrenCanvas.getSize().y > 0) {
-			Image image = (Image) childrenCanvas.getData("double-buffer-image");
+			Image image = (Image) childrenCanvas.getData(DATA_KEY);
 			
 			// Creates new image only absolutely necessary.
 			if (image == null
@@ -70,7 +71,7 @@ public class HistogramCanvasPaintListener implements PaintListener
 						childrenCanvas.getBounds().height
 						);
 
-				childrenCanvas.setData("double-buffer-image", image);
+				childrenCanvas.setData(DATA_KEY, image);
 			}
 			
 			// Initializes the graphics context of the image. 

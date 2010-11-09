@@ -36,6 +36,7 @@ public abstract class Jni_C_Common extends Jni_C_Constant
      * 
      * @param msg   The string to print in C.
      */
+    @SuppressWarnings("nls")
     public void printC(int libId, String msg) {
         // Need to escape "%" for C printf 
         msg = msg.replaceAll("%", "%%");
@@ -49,6 +50,7 @@ public abstract class Jni_C_Common extends Jni_C_Constant
      * 
      * @param msg   The string to print in C.
      */
+    @SuppressWarnings("nls")
     public void printlnC(int libId, String msg) {
         printC(libId, msg + "\n");
     }

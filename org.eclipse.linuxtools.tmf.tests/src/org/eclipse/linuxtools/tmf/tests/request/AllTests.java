@@ -5,6 +5,7 @@ import junit.framework.TestSuite;
 
 import org.eclipse.linuxtools.tmf.TmfCorePlugin;
 
+@SuppressWarnings("nls")
 public class AllTests {
 
 	public static Test suite() {

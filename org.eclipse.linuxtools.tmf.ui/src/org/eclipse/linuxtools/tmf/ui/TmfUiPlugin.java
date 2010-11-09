@@ -29,7 +29,7 @@ public class TmfUiPlugin extends AbstractUIPlugin {
     // ========================================================================
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.linuxtools.tmf.ui";
+	public static final String PLUGIN_ID = "org.eclipse.linuxtools.tmf.ui"; //$NON-NLS-1$
 
 	// The shared instance
 	private static TmfUiPlugin plugin;

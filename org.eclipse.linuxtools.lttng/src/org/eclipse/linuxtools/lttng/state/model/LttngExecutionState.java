@@ -151,6 +151,7 @@ public class LttngExecutionState implements Cloneable {
 	}
 
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
 		return "[LttngExecutionState: " + "entry=" + entry_LttTime + ",change=" + change_LttTime + ",cum_cpu=" + cum_cpu_time_Timens +
 		",pstatus=" + proc_status + ",emode=" + exec_mode + ",esubmode=" + exec_submode +"]";

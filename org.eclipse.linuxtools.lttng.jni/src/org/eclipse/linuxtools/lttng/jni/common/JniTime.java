@@ -201,6 +201,7 @@ public class JniTime extends Jni_C_Constant implements Comparable<JniTime>
      * @return String Attributes of the object concatenated in String
      */
     @Override
+    @SuppressWarnings("nls")
 	public String toString() {
         String returnData = "";
 

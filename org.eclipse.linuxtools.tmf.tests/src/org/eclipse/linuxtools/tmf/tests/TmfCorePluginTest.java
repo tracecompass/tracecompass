@@ -21,6 +21,7 @@ import junit.framework.TestCase;
  * <p>
  * Test the TMF core plug-in activator
  */
+@SuppressWarnings("nls")
 public class TmfCorePluginTest extends TestCase {
 
 	// ------------------------------------------------------------------------

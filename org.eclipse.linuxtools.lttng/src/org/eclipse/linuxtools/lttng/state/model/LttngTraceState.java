@@ -568,6 +568,7 @@ class ProcessStateKey {
     
     
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
         if ( valueRef != null ) {
 			// return (valueRef.getPid().toString() + ":" +

@@ -28,8 +28,8 @@ import org.eclipse.linuxtools.tmf.ui.views.project.TmfProjectNature;
  */
 public class TmfProjectNode extends TmfProjectTreeNode {
 
-	public static final String TRACE_FOLDER_NAME = "Traces";
-	public static final String EXPER_FOLDER_NAME = "Experiments";
+	public static final String TRACE_FOLDER_NAME = "Traces"; //$NON-NLS-1$
+	public static final String EXPER_FOLDER_NAME = "Experiments"; //$NON-NLS-1$
 
 	private final IProject fProject;
 	private boolean fIsTmfProject;

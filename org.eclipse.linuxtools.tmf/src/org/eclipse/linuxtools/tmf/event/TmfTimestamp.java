@@ -170,7 +170,7 @@ public class TmfTimestamp implements Cloneable {
             int scaleDiff = Math.abs(fScale - newScale);
             // Let's try to be realistic...
             if (scaleDiff >= scalingFactors.length) {
-                throw new ArithmeticException("Scaling exception");
+                throw new ArithmeticException("Scaling exception"); //$NON-NLS-1$
             }
             // Adjust the timestamp
             long scalingFactor = scalingFactors[scaleDiff];
@@ -354,6 +354,7 @@ public class TmfTimestamp implements Cloneable {
     }
 
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
     	return "[TmfTimestamp(" + fValue + "," + fScale + "," + fPrecision + ")]";
     }

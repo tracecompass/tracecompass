@@ -225,6 +225,7 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
     }
 
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
 		return "[TmfCoalescedDataRequest(" + getRequestId() + "," + getDataType().getSimpleName() 
 			+ "," + getIndex() + "," + getNbRequested() + ")]";

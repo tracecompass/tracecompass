@@ -60,10 +60,10 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 
 		if (!process.getState().getExec_mode().equals(execMode)) {
 			// Different execution mode
-			TraceDebug.debug("Different Execution Mode type \n\tTime:"
-					+ eventTime.toString() + "\n\tprocess state has: \n\t"
+			TraceDebug.debug("Different Execution Mode type \n\tTime:" //$NON-NLS-1$
+					+ eventTime.toString() + "\n\tprocess state has: \n\t" //$NON-NLS-1$
 					+ process.getState().getExec_mode().toString()
-					+ "\n\twhen pop_int is:\n\t" + execMode.toString());
+					+ "\n\twhen pop_int is:\n\t" + execMode.toString()); //$NON-NLS-1$
 			return;
 		}
 
@@ -130,8 +130,8 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 		Long curr_function = process.getCurrent_function();
 
 		if (curr_function != null && !curr_function.equals(funcptr)) {
-			TraceDebug.debug("Different functions: " + funcptr + " current: "
-					+ curr_function + " time stamp: "
+			TraceDebug.debug("Different functions: " + funcptr + " current: " //$NON-NLS-1$ //$NON-NLS-2$
+					+ curr_function + " time stamp: " //$NON-NLS-1$
 					+ trcEvent.getTimestamp().toString());
 
 			// g_info("Different functions (%lu.%09lu): ignore it\n",

@@ -78,6 +78,7 @@ public class LttngEventType extends TmfEventType {
      * @return TypeId (channel/marker) of the object
      */
     @Override
+    @SuppressWarnings("nls")
 	public String toString() {
         // *** TODO ***
         // This is used as-it in the events view, so we won't change its format.

@@ -43,9 +43,9 @@ public class ImportTraceWizard extends Wizard implements IImportWizard {
      */
     public ImportTraceWizard() {
         IDialogSettings workbenchSettings = WorkbenchPlugin.getDefault().getDialogSettings();
-        IDialogSettings section = workbenchSettings.getSection("TmfTraceImportWizard");
+        IDialogSettings section = workbenchSettings.getSection("TmfTraceImportWizard"); //$NON-NLS-1$
         if (section == null) {
-			section = workbenchSettings.addNewSection("TmfTraceImportWizard");
+			section = workbenchSettings.addNewSection("TmfTraceImportWizard"); //$NON-NLS-1$
 		}
         setDialogSettings(section);
     }
@@ -75,7 +75,7 @@ public class ImportTraceWizard extends Wizard implements IImportWizard {
         }
 
         setWindowTitle(DataTransferMessages.DataTransfer_importTitle);
-        setDefaultPageImageDescriptor(IDEWorkbenchPlugin.getIDEImageDescriptor("wizban/importdir_wiz.png"));
+        setDefaultPageImageDescriptor(IDEWorkbenchPlugin.getIDEImageDescriptor("wizban/importdir_wiz.png")); //$NON-NLS-1$
         setNeedsProgressMonitor(true);
     }
 

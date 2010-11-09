@@ -50,7 +50,7 @@ public class NewProjectWizard extends BasicNewResourceWizard {
      * 
      */
     public NewProjectWizard() {
-        this("Tmf Project", "Create an Tmf Project");
+        this("Tmf Project", "Create a Tmf Project");
     }
 
     /**

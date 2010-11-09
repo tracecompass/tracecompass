@@ -67,7 +67,7 @@ import org.eclipse.ui.PlatformUI;
  * observer of the model.
  */
 public class StatisticsView extends AbsTimeUpdateView {
-	public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.statistics";
+	public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.statistics"; //$NON-NLS-1$
 	private TreeViewer treeViewer;
 
 	// Table column names
@@ -175,7 +175,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 							if (!folderLevels.contains(node.getKey())) {
 								return Long.toString(node.getValue().nbEvents);
 							} else {
-								return "";
+								return ""; //$NON-NLS-1$
 							}
 						}
 					}, new ViewerComparator() {
@@ -211,11 +211,11 @@ public class StatisticsView extends AbsTimeUpdateView {
 							StatisticsTreeNode node = (StatisticsTreeNode) element;
 
 							if (folderLevels.contains(node.getKey())) {
-								return "";
+								return ""; //$NON-NLS-1$
 							} else if (node.getParent() != null
 									&& levelsWithEmptyTime.contains(node
 											.getParent().getKey())) {
-								return "";
+								return ""; //$NON-NLS-1$
 							} else {
 								return decimalFormat
 										.format(node.getValue().cpuTime
@@ -229,11 +229,11 @@ public class StatisticsView extends AbsTimeUpdateView {
 						public String getText(Object element) {
 							StatisticsTreeNode node = (StatisticsTreeNode) element;
 							if (folderLevels.contains(node.getKey())) {
-								return "";
+								return ""; //$NON-NLS-1$
 							} else if (node.getParent() != null
 									&& levelsWithEmptyTime.contains(node
 											.getParent().getKey())) {
-								return "";
+								return ""; //$NON-NLS-1$
 							} else {
 								return decimalFormat
 										.format(node.getValue().cumulativeCpuTime
@@ -247,11 +247,11 @@ public class StatisticsView extends AbsTimeUpdateView {
 						public String getText(Object element) {
 							StatisticsTreeNode node = (StatisticsTreeNode) element;
 							if (folderLevels.contains(node.getKey())) {
-								return "";
+								return ""; //$NON-NLS-1$
 							} else if (node.getParent() != null
 									&& levelsWithEmptyTime.contains(node
 											.getParent().getKey())) {
-								return "";
+								return ""; //$NON-NLS-1$
 							} else {
 								return decimalFormat
 										.format(node.getValue().elapsedTime
@@ -340,8 +340,9 @@ public class StatisticsView extends AbsTimeUpdateView {
 		super(viewName);
 	}
 
+	private static final String STATISTICS_VIEW = "StatisticsView"; //$NON-NLS-1$
 	public StatisticsView() {
-		this("StatisticsView");
+		this(STATISTICS_VIEW);
 	}
 
 	/*
@@ -461,7 +462,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 		if (experiment != null) {
 			requestData(experiment);
 		} else {
-			TraceDebug.debug("No selected experiment information available");
+			TraceDebug.debug("No selected experiment information available"); //$NON-NLS-1$
 		}
 	}
 
@@ -649,7 +650,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 			// send the initial request, to start filling up model
 			dataRequest(experimentTRange, experimentTRange, true, ExecutionType.BACKGROUND);
 		} else {
-			TraceDebug.debug("No selected experiment information available");
+			TraceDebug.debug("No selected experiment information available"); //$NON-NLS-1$
 		}
 	}
 

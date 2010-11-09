@@ -519,6 +519,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
+    @SuppressWarnings("nls")
 	public String toString() {
 		StringBuilder sb = new StringBuilder(super.toString());
 		sb.append("\n\tTotal number of processes in the Shared State model: " + fStateModel.getProcesses().length

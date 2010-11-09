@@ -73,7 +73,7 @@ public class HistogramView extends TmfView implements ControlListener {
 	//			at run time. There should be a view of some kind of "menu" to allow the user to change them while executing.
 	//		Most of the pertinent values are in HistogramConstant.java or in this file.
 	
-    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.histogram";
+    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.histogram"; //$NON-NLS-1$
     
     // "Minimum" screen width size. On smaller screen, we will apply several space saving technique
     private static final int SCREEN_SMALL_IF_SMALLER_THAN = 1600;
@@ -141,13 +141,9 @@ public class HistogramView extends TmfView implements ControlListener {
 	private Text  txtWindowMinNbEvents = null;
     
 	// We move the time label to header from TimeTextGroup.java
-//	protected static final String NANOSEC_LABEL = "(sec)";
-//	private static final String WINDOW_TIMERANGE_LABEL_TEXT 	= "Window Timerange, " + NANOSEC_LABEL;
-//	private static final String WINDOW_CURRENT_TIME_LABEL_TEXT 	= "Cursor Centered on, " + NANOSEC_LABEL;
-//	private static final String EVENT_CURRENT_TIME_LABEL_TEXT 	= "Current Event Time, " + NANOSEC_LABEL;
-	private static final String WINDOW_TIMESPAN_LABEL_TEXT 	    = "Window Span (sec)";
-	private static final String WINDOW_CENTER_TIME_LABEL_TEXT 	= "Window Center (sec)";
-	private static final String CURRENT_EVENT_TIME_LABEL_TEXT 	= "Current Event (sec)";
+	private static final String WINDOW_TIMESPAN_LABEL_TEXT 	  = Messages.HistogramView_windowSpanLabel;
+	private static final String WINDOW_CENTER_TIME_LABEL_TEXT = Messages.HistogramView_windowCenterLabel;
+	private static final String CURRENT_EVENT_TIME_LABEL_TEXT = Messages.HistogramView_currentEventLabel;
 	private TimeTextGroup  ntgWindowTimeSpan = null;
 	private TimeTextGroup  ntgWindowCenterTime = null;
 	private TimeTextGroup  ntgCurrentEventTime = null;
@@ -316,7 +312,7 @@ public class HistogramView extends TmfView implements ControlListener {
 		txtWindowMaxNbEvents.setFont(smallFont);
 		txtWindowMaxNbEvents.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		txtWindowMaxNbEvents.setEditable(false);
-		txtWindowMaxNbEvents.setText("0");
+		txtWindowMaxNbEvents.setText("0"); //$NON-NLS-1$
 		txtWindowMaxNbEvents.setLayoutData(gridDataWindowMaxEvents);
 		
 		GridData gridDataWindowMinEvents = new GridData();
@@ -328,7 +324,7 @@ public class HistogramView extends TmfView implements ControlListener {
 		txtWindowMinNbEvents.setFont(smallFont);
 		txtWindowMinNbEvents.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		txtWindowMinNbEvents.setEditable(false);
-		txtWindowMinNbEvents.setText("0");
+		txtWindowMinNbEvents.setText("0"); //$NON-NLS-1$
 		txtWindowMinNbEvents.setLayoutData(gridDataWindowMinEvents);
 		
 		GridData gridDataWindowStart = new GridData();
@@ -338,7 +334,7 @@ public class HistogramView extends TmfView implements ControlListener {
 		txtWindowStartTime.setFont(smallFont);
 		txtWindowStartTime.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		txtWindowStartTime.setEditable(false);
-		txtWindowStartTime.setText("0.000000000");
+		txtWindowStartTime.setText("0.000000000");  //$NON-NLS-1$
 		txtWindowStartTime.setLayoutData(gridDataWindowStart);
 		
 		GridData gridDataWindowStop = new GridData();
@@ -348,7 +344,7 @@ public class HistogramView extends TmfView implements ControlListener {
 		txtWindowStopTime.setFont(smallFont);
 		txtWindowStopTime.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		txtWindowStopTime.setEditable(false);
-		txtWindowStopTime.setText("0.000000000");
+		txtWindowStopTime.setText("0.000000000"); //$NON-NLS-1$
 		txtWindowStopTime.setLayoutData(gridDataWindowStop);
 		
 
@@ -445,7 +441,7 @@ public class HistogramView extends TmfView implements ControlListener {
 		gridDataExperimentStart.verticalAlignment = SWT.BOTTOM;
 		txtExperimentStartTime = new Text(layoutExperimentHistogram, SWT.READ_ONLY);
 		txtExperimentStartTime.setFont(smallFont);
-		txtExperimentStartTime.setText("0.000000000");
+		txtExperimentStartTime.setText("0.000000000"); //$NON-NLS-1$
 		txtExperimentStartTime.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		txtExperimentStartTime.setEditable(false);
 		txtExperimentStartTime.setLayoutData(gridDataExperimentStart);
@@ -455,7 +451,7 @@ public class HistogramView extends TmfView implements ControlListener {
 		gridDataExperimentStop.verticalAlignment = SWT.BOTTOM;
 		txtExperimentStopTime = new Text(layoutExperimentHistogram, SWT.READ_ONLY);
 		txtExperimentStopTime.setFont(smallFont);
-		txtExperimentStopTime.setText("0.000000000");
+		txtExperimentStopTime.setText("0.000000000"); //$NON-NLS-1$
 		txtExperimentStopTime.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		txtExperimentStopTime.setEditable(false);
 		txtExperimentStopTime.setLayoutData(gridDataExperimentStop);
@@ -973,8 +969,8 @@ public class HistogramView extends TmfView implements ControlListener {
 		txtExperimentStopTime.setText( stopTime );
 		txtExperimentStartTime.getParent().layout();
 		
-		txtWindowMaxNbEvents.setText("" + 0);
-		txtWindowMinNbEvents.setText("" + 0);
+		txtWindowMaxNbEvents.setText("" + 0); //$NON-NLS-1$
+		txtWindowMinNbEvents.setText("" + 0); //$NON-NLS-1$
 		txtWindowStartTime.setText( HistogramConstant.formatNanoSecondsTime( 0L ) );
 		txtWindowStopTime.setText( HistogramConstant.formatNanoSecondsTime( 0L ) );
 		txtWindowStartTime.getParent().layout();

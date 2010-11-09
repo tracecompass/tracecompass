@@ -21,6 +21,7 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
  * <p>
  * Test suite for the TmfTimestamp class.
  */
+@SuppressWarnings("nls")
 public class TmfTimestampTest extends TestCase {
 
 	// ------------------------------------------------------------------------

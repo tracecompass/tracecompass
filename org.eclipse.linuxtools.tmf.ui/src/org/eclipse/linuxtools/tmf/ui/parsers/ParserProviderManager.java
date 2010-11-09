@@ -32,17 +32,17 @@ import org.eclipse.swt.widgets.Composite;
 
 public class ParserProviderManager {
 
-    public static final QualifiedName PARSER_PROPERTY = new QualifiedName(TmfUiPlugin.PLUGIN_ID, "PARSER");
+    public static final QualifiedName PARSER_PROPERTY = new QualifiedName(TmfUiPlugin.PLUGIN_ID, "PARSER"); //$NON-NLS-1$
 
     private static List<IParserProvider> fParserProviders = new ArrayList<IParserProvider>();
 
     public static void init() {
         IExtensionRegistry reg = Platform.getExtensionRegistry();
-        IConfigurationElement[] extensions = reg.getConfigurationElementsFor("org.eclipse.linuxtools.tmf.ui.parserProviders");
+        IConfigurationElement[] extensions = reg.getConfigurationElementsFor("org.eclipse.linuxtools.tmf.ui.parserProviders"); //$NON-NLS-1$
         for (int i = 0; i < extensions.length; i++) {
             IConfigurationElement element = extensions[i];
             try {
-                IParserProvider parserProvider = (IParserProvider) element.createExecutableExtension("class");
+                IParserProvider parserProvider = (IParserProvider) element.createExecutableExtension("class"); //$NON-NLS-1$
                 addParserProvider(parserProvider);
             } catch (CoreException e) {
                 e.printStackTrace();

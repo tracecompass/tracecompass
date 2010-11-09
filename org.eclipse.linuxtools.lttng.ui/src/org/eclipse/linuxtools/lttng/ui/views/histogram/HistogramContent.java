@@ -180,6 +180,7 @@ public class HistogramContent {
 	/**
 	 * Print all HistogramContent attributes, but the elements table.
 	 */
+    @SuppressWarnings("nls")
 	public void printContentInfo() {
 		System.out.println("startTime          : " + startTime);
 		System.out.println("endTime            : " + endTime );
@@ -194,6 +195,7 @@ public class HistogramContent {
 	/**
 	 * Print the data in the elements table.<p>
 	 */
+    @SuppressWarnings("nls")
 	public void printTable() {
 		for ( int x=0; x<elementTable.length; x++) {
 			System.out.println("X:" + x + " -> " + elementTable[x].intervalNbEvents + ":" + elementTable[x].intervalHeight + " (" + elementTable[x].firstIntervalTimestamp + ")");

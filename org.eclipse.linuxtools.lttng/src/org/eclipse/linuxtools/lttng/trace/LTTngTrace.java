@@ -1138,6 +1138,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 	 * @return String that identify this trace
 	 */
 	@Override
+    @SuppressWarnings("nls")
 	public String toString() {
 		String returnedData = "";
 

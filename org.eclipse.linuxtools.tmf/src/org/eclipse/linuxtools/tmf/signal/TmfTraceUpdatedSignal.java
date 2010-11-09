@@ -43,6 +43,7 @@ public class TmfTraceUpdatedSignal extends TmfSignal {
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
+    @SuppressWarnings("nls")
 	public String toString() {
 		return "[TmfTraceUpdatedSignal (" + fTrace.toString() + ", " + fTimeRange.toString() + ")]";
 	}

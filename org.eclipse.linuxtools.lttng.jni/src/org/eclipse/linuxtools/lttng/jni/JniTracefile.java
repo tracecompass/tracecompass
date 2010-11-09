@@ -428,6 +428,7 @@ public abstract class JniTracefile extends Jni_C_Common
      * @return Attributes of the object concatenated in String
      */
 	@Override
+    @SuppressWarnings("nls")
 	public String toString() {
         String returnData = "";
                 

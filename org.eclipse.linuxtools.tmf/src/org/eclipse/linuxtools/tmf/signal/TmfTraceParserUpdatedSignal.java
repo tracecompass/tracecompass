@@ -31,6 +31,7 @@ public class TmfTraceParserUpdatedSignal extends TmfSignal {
     }
 
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
         return "[TmfTraceParserUpdatedSignal (" + fTraceResource.getName() + ")]";
     }

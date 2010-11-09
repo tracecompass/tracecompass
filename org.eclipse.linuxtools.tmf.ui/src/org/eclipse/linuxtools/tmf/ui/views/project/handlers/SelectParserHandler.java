@@ -80,7 +80,7 @@ public class SelectParserHandler extends AbstractHandler {
         if (fTrace.getParent() instanceof TmfExperimentNode) {
             resource = fTrace.getProject().getTracesFolder().getTraceForLocation(resource.getLocation()).getResource();
         }
-        String parser = event.getParameter("org.eclipse.linuxtools.tmf.ui.commandparameter.project.trace.selectparser.parser");
+        String parser = event.getParameter("org.eclipse.linuxtools.tmf.ui.commandparameter.project.trace.selectparser.parser"); //$NON-NLS-1$
         try {
             resource.setPersistentProperty(ParserProviderManager.PARSER_PROPERTY, parser);
             fProjectView.broadcast(new TmfTraceParserUpdatedSignal(fProjectView, resource));

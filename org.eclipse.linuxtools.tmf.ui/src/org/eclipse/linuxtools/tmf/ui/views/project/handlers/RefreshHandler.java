@@ -75,7 +75,7 @@ public class RefreshHandler extends AbstractHandler {
             root.refreshLocal(IResource.DEPTH_INFINITE, null);
             fProjectRoot.refreshChildren();
         } catch (CoreException e) {
-            throw new ExecutionException("CoreException", e);
+            throw new ExecutionException("CoreException", e); //$NON-NLS-1$
         }
 
 		return null;

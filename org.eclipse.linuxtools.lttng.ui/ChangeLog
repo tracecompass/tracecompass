@@ -1,3 +1,90 @@
+2010-11-09  Francois Chouinard  <fchouinard@gmail.com>
+
+    Externalized Strings
+	   * src/org/eclipse/linuxtools/lttng/ui/views/events/Messages.java: New file.
+	   * src/org/eclipse/linuxtools/lttng/ui/views/events/messages.properties: New file.
+	   * src/org/eclipse/linuxtools/lttng/ui/views/histogram/Messages.java: New file.
+	   * src/org/eclipse/linuxtools/lttng/ui/views/histogram/messages.properties: New file.
+	   * src/org/eclipse/linuxtools/lttng/ui/views/project/dialogs/Messages.java: New file.
+	   * src/org/eclipse/linuxtools/lttng/ui/views/project/dialogs/messages.properties: New file.
+
+    Suppress warning for non-externalized strings
+	   * src/org/eclipse/linuxtools/lttng/ui/LTTngUiPlugin.java (PLUGIN_ID): 
+	   * src/org/eclipse/linuxtools/lttng/ui/TraceDebug.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/common/AbsTimeUpdateView.java (processingCompleted): 
+	       (synchToTimeRange): 
+	       (tsfTmProcessSelEvent): 
+	       (processDataRequest): 
+	       (.handleData): 
+	       (.handleCompleted): 
+	       (modelInputChanged): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/control/ControlView.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/controlflow/ControlFlowView.java (PROCESS_COLUMN): 
+	       (ViewContentProvider.inputChanged): 
+	       (ViewProcessFilter.select): 
+	       (createPartControl): 
+	       (makeActions): 
+	       (initialExperimentDataRequest): 
+	       (checkForSWTBugItemHeightAdjustement): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/controlflow/evProcessor/AbsFlowTRangeUpdate.java (addLocalProcess): 
+	       (makeDraw): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/controlflow/evProcessor/FlowFinishUpdateHandler.java (process): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/controlflow/messages.properties: 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/controlflow/model/FlowProcessContainer.java (toString): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/events/EventsTable.java (TIMESTAMP_COLUMN): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/events/EventsView.java (toString): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramCanvasPaintListener.java (DATA_KEY): 
+	       (paintControl): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramConstant.java (formatNanoSecondsTime): 
+	       (convertStringToNanoseconds): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramContent.java (printContentInfo): 
+	       (printTable): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramView.java (ID): 
+	       (WINDOW_TIMESPAN_LABEL_TEXT): 
+	       (createPartControl): 
+	       (resetControlsContent): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/histogram/ParentHistogramCanvasPaintListener.java (DATA_KEY): 
+	       (paintControl): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/histogram/TimeTextGroup.java (LONGEST_STRING_VALUE): 
+	       (TimeTextGroup): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/PerspectiveFactory.java (ID): 
+	       (createInitialLayout): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/project/dialogs/AddTraceWizard.java (init): 
+	       (addPages): 
+	       (performFinish): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/project/dialogs/AddTraceWizardPage.java (AddTraceWizardPage): 
+	       (createControl): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/project/dialogs/ImportTraceWizard.java (IMPORT_WIZARD): 
+	       (ImportTraceWizard): 
+	       (init): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/project/dialogs/ImportTraceWizardPage.java (getTraceDirectory): 
+	       (getTracepath): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/project/handlers/OpenTraceHandler.java (execute): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/project/handlers/RenameExperimentHandler.java (execute): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/project/handlers/RenameProjectHandler.java (execute): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/project/handlers/RenameTraceHandler.java (execute): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/project/LTTngProjectNature.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/project/model/LTTngProjectLabelProvider.java (fOpenedProjectIcon): 
+	       (getText): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/project/model/LTTngProjectNode.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/project/ProjectView.java (ProjectView): 
+	       (toString): 
+	       (createContextMenu): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/resources/evProcessor/AbsResourcesTRangeUpdate.java (addLocalResource): 
+	       (makeDraw): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/resources/model/ResourceContainer.java (equals): 
+	       (toString): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/resources/ResourcesView.java (ID): 
+	       (makeActions): 
+	       (initialExperimentDataRequest): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/statistics/model/StatisticsData.java (ROOT): 
+	       (getProcessName): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/statistics/StatisticsView.java (.getText): 
+	       (StatisticsView): 
+	       (createPartControl): 
+	       (requestData): 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/timeframe/TimeFrameView.java (toString): 
+
 2010-11-05  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/ui/views/controlflow/ControlFlowView.java: Made the call to updateScroll() asynchronous

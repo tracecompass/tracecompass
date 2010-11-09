@@ -25,8 +25,8 @@ public class TmfEventType implements Cloneable {
     // Constants
     // ------------------------------------------------------------------------
 
-	public static final String DEFAULT_TYPE_ID  = "TMF Default Type";
-	public static final String[] DEFAULT_LABELS = new String[] { "Content" };
+	public static final String DEFAULT_TYPE_ID  = "TMF Default Type"; //$NON-NLS-1$
+	public static final String[] DEFAULT_LABELS = new String[] { "Content" }; //$NON-NLS-1$
 	
     // ------------------------------------------------------------------------
     // Attributes
@@ -118,7 +118,7 @@ public class TmfEventType implements Cloneable {
 	public String getLabel(int i) throws TmfNoSuchFieldException {
 		if (i >= 0 && i < fNbFields)
 			return fFieldLabels[i];
-		throw new TmfNoSuchFieldException("Bad index (" + i + ")");
+		throw new TmfNoSuchFieldException("Bad index (" + i + ")");  //$NON-NLS-1$//$NON-NLS-2$
 	}
 
     // ------------------------------------------------------------------------
@@ -139,6 +139,7 @@ public class TmfEventType implements Cloneable {
     }
 
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
     	return "[TmfEventType:" + fTypeId + "]";
     }

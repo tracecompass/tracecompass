@@ -40,6 +40,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
  * <p>
  * TODO: Implement me. Please.
  */
+@SuppressWarnings("nls")
 public class TmfMultiTraceExperimentTest extends TestCase {
 
     private static final String DIRECTORY    = "testfiles";

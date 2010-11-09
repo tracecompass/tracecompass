@@ -34,6 +34,7 @@ public class TmfExperimentSelectedSignal<T extends TmfEvent> extends TmfSignal {
 	}
 
 	@Override
+    @SuppressWarnings("nls")
 	public String toString() {
 		return "[TmfExperimentSelectedSignal (" + fExperiment.getName() + ")]";
 	}

@@ -44,6 +44,7 @@ public abstract class Jni_C_Constant {
      * 
      * @return The Java hashed UID of the object (i.e. : NAME@HASH)
      */
+    @SuppressWarnings("nls")
     public String getReferenceToString() {
         return this.getClass().getName() + "@" + Integer.toHexString(this.hashCode());
     }

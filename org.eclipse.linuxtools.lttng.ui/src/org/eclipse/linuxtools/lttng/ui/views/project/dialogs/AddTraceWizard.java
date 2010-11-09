@@ -50,7 +50,7 @@ public class AddTraceWizard extends Wizard implements IImportWizard {
 	 */
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-    	setWindowTitle("Adding traces to experiment");
+    	setWindowTitle(Messages.AddTraceWizard_windowTitle);
 	}
 
     /* (non-Javadoc)
@@ -59,7 +59,7 @@ public class AddTraceWizard extends Wizard implements IImportWizard {
     @Override
 	public void addPages() {
         super.addPages();
-        fMainPage = new AddTraceWizardPage(fProject, "Some string");
+        fMainPage = new AddTraceWizardPage(fProject, "Some string"); //$NON-NLS-1$
         addPage(fMainPage);
     }
 
@@ -82,7 +82,7 @@ public class AddTraceWizard extends Wizard implements IImportWizard {
 					fExperiment.addTrace(folder);
 				}
 				else {
-					System.out.println("Problem");
+					System.out.println(Messages.AddTraceWizard_invalidTraceLocation);
 				}
 			} catch (CoreException e) {
 				e.printStackTrace();

@@ -22,6 +22,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfLocation;
  * <p>
  * Test suite for the TmfLocation class.
  */
+@SuppressWarnings("nls")
 public class TmfLocationTest extends TestCase {
 
 	// ------------------------------------------------------------------------

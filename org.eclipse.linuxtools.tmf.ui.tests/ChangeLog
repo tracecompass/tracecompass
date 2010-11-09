@@ -1,0 +1,8 @@
+2010-11-09  Francois Chouinard  <fchouinard@gmail.com>
+
+    Suppress warning for non-externalized strings
+	   * src/org/eclipse/linuxtools/tmf/ui/tests/TmfUITestPlugin.java: 
+	   * widgetStubs/org/eclipse/linuxtools/tmf/ui/widgets/timeAnalysis/test/stub/adaption/TsfImplProvider.java: 
+	   * widgetStubs/org/eclipse/linuxtools/tmf/ui/widgets/timeAnalysis/test/stub/model/TraceImpl.java: 
+	   * widgetStubs/org/eclipse/linuxtools/tmf/ui/widgets/timeAnalysis/test/stub/model/TraceModelImplFactory.java: 
+	   * widgetStubs/org/eclipse/linuxtools/tmf/ui/widgets/timeAnalysis/test/stub/views/TsfTraceAnalysisView.java: 

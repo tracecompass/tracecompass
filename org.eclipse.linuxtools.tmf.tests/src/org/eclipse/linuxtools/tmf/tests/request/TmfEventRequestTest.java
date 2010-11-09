@@ -26,6 +26,7 @@ import org.eclipse.linuxtools.tmf.request.TmfEventRequestStub;
  * <p>
  * Test suite for the TmfEventRequest class.
  */
+@SuppressWarnings("nls")
 public class TmfEventRequestTest extends TestCase {
 
 	// ------------------------------------------------------------------------

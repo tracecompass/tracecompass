@@ -9,6 +9,7 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
  * @author francois
  *
  */
+@SuppressWarnings("nls")
 public class LTTngTimestampStub extends TmfTimestamp {
 
     /**

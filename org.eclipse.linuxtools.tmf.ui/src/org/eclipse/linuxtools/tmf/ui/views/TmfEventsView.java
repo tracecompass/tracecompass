@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class TmfEventsView extends TmfView {
 
-    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.events";
+    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.events"; //$NON-NLS-1$
 
     private TmfExperiment<TmfEvent> fExperiment;
     private TmfEventsTable fEventsTable;
@@ -43,7 +43,7 @@ public class TmfEventsView extends TmfView {
 	// ------------------------------------------------------------------------
 
     public TmfEventsView(int cacheSize) {
-    	super("TmfEventsView");
+    	super("TmfEventsView"); //$NON-NLS-1$
     	fCacheSize = cacheSize;
     }
 
@@ -55,8 +55,8 @@ public class TmfEventsView extends TmfView {
     // ViewPart
 	// ------------------------------------------------------------------------
 
-    @SuppressWarnings("unchecked")
 	@Override
+    @SuppressWarnings("unchecked")
 	public void createPartControl(Composite parent) {
         fEventsTable = createEventsTable(parent, fCacheSize);
 
@@ -93,6 +93,7 @@ public class TmfEventsView extends TmfView {
      * @see java.lang.Object#toString()
      */
     @Override
+	@SuppressWarnings("nls")
 	public String toString() {
     	return "[TmfEventsView]";
     }
@@ -106,7 +107,7 @@ public class TmfEventsView extends TmfView {
     public void experimentSelected(TmfExperimentSelectedSignal<TmfEvent> signal) {
         // Update the trace reference
         fExperiment = (TmfExperiment<TmfEvent>) signal.getExperiment();
-        setPartName(fTitlePrefix + " - " + fExperiment.getName());
+        setPartName(fTitlePrefix + " - " + fExperiment.getName()); //$NON-NLS-1$
 
         if (fEventsTable != null) {
             fEventsTable.setTrace(fExperiment, false);

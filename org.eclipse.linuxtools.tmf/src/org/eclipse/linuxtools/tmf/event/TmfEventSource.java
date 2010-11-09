@@ -83,6 +83,7 @@ public class TmfEventSource implements Cloneable {
     }
 
 	@Override
+    @SuppressWarnings("nls")
     public String toString() {
         return "[TmfEventSource(" + ((fSourceId != null) ? fSourceId.toString() : "null") + ")]";
     }

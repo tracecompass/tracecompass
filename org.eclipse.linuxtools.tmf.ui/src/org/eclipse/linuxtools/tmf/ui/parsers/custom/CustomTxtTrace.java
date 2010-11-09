@@ -60,7 +60,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
             return context;
         }
         try {
-            RandomAccessFile raFile = new RandomAccessFile(getPath(), "r");
+            RandomAccessFile raFile = new RandomAccessFile(getPath(), "r"); //$NON-NLS-1$
             if (location != null && location.getLocation() instanceof Long) {
                 raFile.seek((Long)location.getLocation());
             }
@@ -258,7 +258,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     }
     
     public CustomTxtEvent parseFirstLine(CustomTxtTraceContext context) {
-        CustomTxtEvent event = new CustomTxtEvent(fDefinition, TmfTimestamp.Zero, new TmfEventSource(""), new TmfEventType(fDefinition.definitionName, new String[0]), new TmfEventReference(""));
+        CustomTxtEvent event = new CustomTxtEvent(fDefinition, TmfTimestamp.Zero, new TmfEventSource(""), new TmfEventType(fDefinition.definitionName, new String[0]), new TmfEventReference("")); //$NON-NLS-1$ //$NON-NLS-2$
         event.processGroups(context.inputLine, context.firstLineMatcher);
         return event;
     }

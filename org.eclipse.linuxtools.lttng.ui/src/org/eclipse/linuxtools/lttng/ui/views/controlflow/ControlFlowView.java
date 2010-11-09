@@ -91,20 +91,21 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		ITmfTimeSelectionListener, ITmfTimeScaleSelectionListener,
 		ITmfTimeFilterSelectionListener {
 
-    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.controlflow";
+    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.controlflow"; //$NON-NLS-1$
     
 	// ========================================================================
 	// Table data
 	// ========================================================================
-	private final String PROCESS_COLUMN = "Process";
-	private final String BRAND_COLUMN = "Brand";
-	private final String PID_COLUMN = "PID";
-	private final String TGID_COLUMN = "TGID";
-	private final String PPID_COLUMN = "PPID";
-	private final String CPU_COLUMN = "CPU";
-	private final String BIRTH_SEC_COLUMN = "Birth sec";
-	private final String BIRTH_NSEC_COLUMN = "Birth nsec";
-	private final String TRACE = "TRACE";
+
+    private final String PROCESS_COLUMN    = Messages.getString("ControlFlowView.processColumn"); //$NON-NLS-1$
+	private final String BRAND_COLUMN      = Messages.getString("ControlFlowView.brandColumn"); //$NON-NLS-1$
+	private final String PID_COLUMN        = Messages.getString("ControlFlowView.pidColumn"); //$NON-NLS-1$
+	private final String TGID_COLUMN       = Messages.getString("ControlFlowView.tgidColumn"); //$NON-NLS-1$
+	private final String PPID_COLUMN       = Messages.getString("ControlFlowView.ppidColumn"); //$NON-NLS-1$
+	private final String CPU_COLUMN        = Messages.getString("ControlFlowView.cpuColumn"); //$NON-NLS-1$
+	private final String BIRTH_SEC_COLUMN  = Messages.getString("ControlFlowView.birthSecColumn"); //$NON-NLS-1$
+	private final String BIRTH_NSEC_COLUMN = Messages.getString("ControlFlowView.birthNSecColumn"); //$NON-NLS-1$
+	private final String TRACE             = Messages.getString("ControlFlowView.TraceNameColumn"); //$NON-NLS-1$
 
 	private final String[] columnNames = new String[] { PROCESS_COLUMN, /* */
 	BRAND_COLUMN,/* */
@@ -167,9 +168,9 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		public void inputChanged(Viewer v, Object oldInput, Object newInput) {
 			this.elements = (ITmfTimeAnalysisEntry[]) newInput;
 			if (elements != null) {
-				TraceDebug.debug("Total number of processes provided to Control Flow view: " + elements.length);
+				TraceDebug.debug("Total number of processes provided to Control Flow view: " + elements.length); //$NON-NLS-1$
 			} else {
-				TraceDebug.debug("New input = null");
+				TraceDebug.debug("New input = null"); //$NON-NLS-1$
 			}
 		}
 
@@ -280,7 +281,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 					return false;
 				}
 			} else {
-				TraceDebug.debug("Unexpected type of filter element received: "
+				TraceDebug.debug("Unexpected type of filter element received: " //$NON-NLS-1$
 						+ element.toString());
 			}
 			// Compare element versus a list of filtered out
@@ -559,7 +560,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 			// initialize widget time boundaries and filtering parameters
 			ModelUpdateInit(experimentTRange, adjustedTimeRange, this);
 		} else {
-			TraceDebug.debug("No selected experiment information available");
+			TraceDebug.debug("No selected experiment information available"); //$NON-NLS-1$
 		}
 	}
 
@@ -647,8 +648,8 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 				.getString("ControlFlowView.Action.Reset.ToolTip")); //$NON-NLS-1$
 		resetScale.setImageDescriptor(AbstractUIPlugin
 				.imageDescriptorFromPlugin(Messages
-						.getString("ControlFlowView.tmf.UI"),
-						"icons/home_nav.gif"));
+						.getString("ControlFlowView.tmf.UI"), //$NON-NLS-1$
+						"icons/home_nav.gif")); //$NON-NLS-1$
 
 		// nextEvent
 		nextEvent = new Action() {
@@ -665,8 +666,8 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 				.getString("ControlFlowView.Action.NextEvent.Tooltip")); //$NON-NLS-1$
 		nextEvent.setImageDescriptor(AbstractUIPlugin
 				.imageDescriptorFromPlugin(Messages
-						.getString("ControlFlowView.tmf.UI"),
-						"icons/next_event.gif"));
+						.getString("ControlFlowView.tmf.UI"), //$NON-NLS-1$
+						"icons/next_event.gif")); //$NON-NLS-1$
 
 		// prevEvent
 		prevEvent = new Action() {
@@ -683,8 +684,8 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 				.getString("ControlFlowView.Action.PrevEvent.Tooltip")); //$NON-NLS-1$
 		prevEvent.setImageDescriptor(AbstractUIPlugin
 				.imageDescriptorFromPlugin(Messages
-						.getString("ControlFlowView.tmf.UI"),
-						"icons/prev_event.gif"));
+						.getString("ControlFlowView.tmf.UI"), //$NON-NLS-1$
+						"icons/prev_event.gif")); //$NON-NLS-1$
 
 		// nextTrace
 		nextTrace = new Action() {
@@ -701,8 +702,8 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 				.getString("ControlFlowView.Action.NextProcess.ToolTip")); //$NON-NLS-1$
 		nextTrace.setImageDescriptor(AbstractUIPlugin
 				.imageDescriptorFromPlugin(Messages
-						.getString("ControlFlowView.tmf.UI"),
-						"icons/next_item.gif"));
+						.getString("ControlFlowView.tmf.UI"), //$NON-NLS-1$
+						"icons/next_item.gif")); //$NON-NLS-1$
 
 		// prevTrace
 		prevTrace = new Action() {
@@ -719,8 +720,8 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 				.getString("ControlFlowView.Action.PreviousProcess.Tooltip")); //$NON-NLS-1$
 		prevTrace.setImageDescriptor(AbstractUIPlugin
 				.imageDescriptorFromPlugin(Messages
-						.getString("ControlFlowView.tmf.UI"),
-						"icons/prev_item.gif"));
+						.getString("ControlFlowView.tmf.UI"), //$NON-NLS-1$
+						"icons/prev_item.gif")); //$NON-NLS-1$
 
 		// showLegend
 		showLegend = new Action() {
@@ -750,8 +751,8 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 				.getString("ControlFlowView.Action.Filter.ToolTip")); //$NON-NLS-1$
 		filterTraces.setImageDescriptor(AbstractUIPlugin
 				.imageDescriptorFromPlugin(Messages
-						.getString("ControlFlowView.tmf.UI"),
-						"icons/filter_items.gif"));
+						.getString("ControlFlowView.tmf.UI"), //$NON-NLS-1$
+						"icons/filter_items.gif")); //$NON-NLS-1$
 
 		// zoomIn
 		zoomIn = new Action() {
@@ -766,8 +767,8 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		zoomIn.setToolTipText(Messages
 				.getString("ControlFlowView.Action.ZoomIn.Tooltip")); //$NON-NLS-1$
 		zoomIn.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
-				Messages.getString("ControlFlowView.tmf.UI"),
-				"icons/zoomin_nav.gif"));
+				Messages.getString("ControlFlowView.tmf.UI"), //$NON-NLS-1$
+				"icons/zoomin_nav.gif")); //$NON-NLS-1$
 
 		// zoomOut
 		zoomOut = new Action() {
@@ -782,8 +783,8 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		zoomOut.setToolTipText(Messages
 				.getString("ControlFlowView.Action.ZoomOut.tooltip")); //$NON-NLS-1$
 		zoomOut.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
-				Messages.getString("ControlFlowView.tmf.UI"),
-				"icons/zoomout_nav.gif"));
+				Messages.getString("ControlFlowView.tmf.UI"), //$NON-NLS-1$
+				"icons/zoomout_nav.gif")); //$NON-NLS-1$
 
 		// zoomFilter
 		zoomFilter = new Action() {
@@ -799,8 +800,8 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 				.getString("ControlFlowView.Action.ZoomFilter.tooltip")); //$NON-NLS-1$
 		zoomFilter.setImageDescriptor(AbstractUIPlugin
 				.imageDescriptorFromPlugin(Messages
-						.getString("ControlFlowView.tmf.UI"),
-						"icons/filter_items.gif"));
+						.getString("ControlFlowView.tmf.UI"), //$NON-NLS-1$
+						"icons/filter_items.gif")); //$NON-NLS-1$
 		zoomFilter.setChecked(false);
 
 		// PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_SYNCED);
@@ -1070,8 +1071,8 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 		dataRequest(initTimeWindow, experimentTRange, true, ExecutionType.FOREGROUND);
 		if (TraceDebug.isDEBUG()) {
-			TraceDebug.debug("Initialization request time range is: "
-					+ initTimeWindow.getStartTime().toString() + "-"
+			TraceDebug.debug("Initialization request time range is: " //$NON-NLS-1$
+					+ initTimeWindow.getStartTime().toString() + "-" //$NON-NLS-1$
 					+ initTimeWindow.getEndTime().toString());
 		}
 
@@ -1084,14 +1085,14 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	//
 	public int checkForSWTBugItemHeightAdjustement() {
 		int returnedAjustement = 0;
-		String desktopSessionName = System.getenv("DESKTOP_SESSION");
+		String desktopSessionName = System.getenv("DESKTOP_SESSION"); //$NON-NLS-1$
 		
 		// Gnome : most common case, no adjustement
-		if ( desktopSessionName.equals("gnome") ) {
+		if ( desktopSessionName.equals("gnome") ) { //$NON-NLS-1$
 			returnedAjustement = 0;
 		}
 		// Kde : ajustement of 2 is needed
-		else if ( desktopSessionName.equals("kde") ) {
+		else if ( desktopSessionName.equals("kde") ) { //$NON-NLS-1$
 			returnedAjustement = 2;
 		}
 		

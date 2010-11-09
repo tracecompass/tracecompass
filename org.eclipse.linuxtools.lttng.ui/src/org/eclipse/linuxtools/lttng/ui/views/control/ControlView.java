@@ -22,7 +22,7 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class ControlView extends ViewPart {
 
-    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.control";
+    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.control"; //$NON-NLS-1$
 
 	/**
 	 * 

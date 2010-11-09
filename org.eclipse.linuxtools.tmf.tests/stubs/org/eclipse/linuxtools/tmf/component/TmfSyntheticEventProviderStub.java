@@ -28,6 +28,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfContext;
  * <p>
  * TODO: Implement me. Please.
  */
+@SuppressWarnings("nls")
 public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSyntheticEventStub> {
 
     public static final int BLOCK_SIZE = 100;

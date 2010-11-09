@@ -32,7 +32,7 @@ import org.eclipse.ui.IPerspectiveFactory;
 public class PerspectiveFactory implements IPerspectiveFactory {
 
 	// Perspective ID
-    public static final String ID = "org.eclipse.linuxtools.lttng.ui.perspective";
+    public static final String ID = "org.eclipse.linuxtools.lttng.ui.perspective"; //$NON-NLS-1$
 	
     // LTTng views
     private static final String PROJECT_VIEW_ID      = ProjectView.ID;
@@ -61,26 +61,26 @@ public class PerspectiveFactory implements IPerspectiveFactory {
         addPerspectiveShortcuts(layout);
 
         // Create the top left folder
-        IFolderLayout topLeftFolder = layout.createFolder("topLeftFolder", IPageLayout.LEFT, 0.15f, IPageLayout.ID_EDITOR_AREA);
+        IFolderLayout topLeftFolder = layout.createFolder("topLeftFolder", IPageLayout.LEFT, 0.15f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
         topLeftFolder.addView(PROJECT_VIEW_ID);
         topLeftFolder.addView(CONTROL_VIEW_ID);
 
         // Create the bottom left folder
-        IFolderLayout bottomLeftFolder = layout.createFolder("bottomLeftFolder", IPageLayout.BOTTOM, 0.50f, "topLeftFolder");
+        IFolderLayout bottomLeftFolder = layout.createFolder("bottomLeftFolder", IPageLayout.BOTTOM, 0.50f, "topLeftFolder"); //$NON-NLS-1$ //$NON-NLS-2$
         bottomLeftFolder.addView(PROPERTIES_VIEW_ID);
    
         // Create the middle right folder
-        IFolderLayout topRightFolder = layout.createFolder("topRightFolder", IPageLayout.TOP, 0.50f, IPageLayout.ID_EDITOR_AREA);
+        IFolderLayout topRightFolder = layout.createFolder("topRightFolder", IPageLayout.TOP, 0.50f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
         topRightFolder.addView(CONTROL_FLOW_VIEW_ID);
         topRightFolder.addView(RESOURCES_VIEW_ID);
         topRightFolder.addView(STATISTICS_VIEW_ID);
 
         // Create the middle right folder
-        IFolderLayout middleRightFolder = layout.createFolder("middleRightFolder", IPageLayout.BOTTOM, 0.50f, "topRightFolder");
+        IFolderLayout middleRightFolder = layout.createFolder("middleRightFolder", IPageLayout.BOTTOM, 0.50f, "topRightFolder");  //$NON-NLS-1$//$NON-NLS-2$
         middleRightFolder.addView(EVENTS_VIEW_ID);
 
         // Create the bottom right folder
-        IFolderLayout bottomRightFolder = layout.createFolder("bottomRightFolder", IPageLayout.BOTTOM, 0.65f, "middleRightFolder");
+        IFolderLayout bottomRightFolder = layout.createFolder("bottomRightFolder", IPageLayout.BOTTOM, 0.65f, "middleRightFolder"); //$NON-NLS-1$ //$NON-NLS-2$
         bottomRightFolder.addView(TIME_FRAME_VIEW_ID);
         bottomRightFolder.addView(HISTOGRAM_VIEW_ID);
         bottomRightFolder.addView(PROBLEM_VIEW_ID);

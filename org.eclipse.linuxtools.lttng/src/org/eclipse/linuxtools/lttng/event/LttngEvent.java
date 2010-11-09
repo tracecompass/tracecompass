@@ -169,6 +169,7 @@ public class LttngEvent extends TmfEvent {
     }
     
     @Override
+    @SuppressWarnings("nls")
 	public String toString() {
     	StringBuffer result= new StringBuffer("[LttngEvent(");
     	result.append("Timestamp:" + getTimestamp().getValue());

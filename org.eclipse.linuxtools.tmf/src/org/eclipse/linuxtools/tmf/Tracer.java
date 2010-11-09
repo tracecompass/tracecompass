@@ -10,6 +10,7 @@ import org.eclipse.linuxtools.tmf.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.event.TmfData;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 
+@SuppressWarnings("nls")
 public class Tracer {
 
 	private static String pluginID = TmfCorePlugin.PLUGIN_ID;

@@ -26,7 +26,7 @@ public class CustomParserProvider implements IParserProvider {
 
 	@Override
     public String getCategory() {
-        return "Custom";
+        return "Custom"; //$NON-NLS-1$
     }
 
 	@Override
@@ -35,12 +35,12 @@ public class CustomParserProvider implements IParserProvider {
             String name = resource.getName();
             String path = resource.getLocation().toOSString();
             for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
-                if (parser.equals(CustomTxtTrace.class.getCanonicalName() + "." + def.definitionName)) {
+                if (parser.equals(CustomTxtTrace.class.getCanonicalName() + "." + def.definitionName)) { //$NON-NLS-1$
                     return new CustomTxtTrace(name, def, path, 100);
                 }
             }
             for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
-                if (parser.equals(CustomXmlTrace.class.getCanonicalName() + "." + def.definitionName)) {
+                if (parser.equals(CustomXmlTrace.class.getCanonicalName() + "." + def.definitionName)) { //$NON-NLS-1$
                     return new CustomXmlTrace(name, def, path, 100);
                 }
             }
@@ -64,10 +64,10 @@ public class CustomParserProvider implements IParserProvider {
     public Map<String, String> getParserMap() {
         Map<String, String> parserMap = new LinkedHashMap<String, String>();
         for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
-            parserMap.put(def.definitionName, CustomTxtTrace.class.getCanonicalName() + "." + def.definitionName);
+            parserMap.put(def.definitionName, CustomTxtTrace.class.getCanonicalName() + "." + def.definitionName); //$NON-NLS-1$
         }
         for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
-            parserMap.put(def.definitionName, CustomXmlTrace.class.getCanonicalName() + "." + def.definitionName);
+            parserMap.put(def.definitionName, CustomXmlTrace.class.getCanonicalName() + "." + def.definitionName); //$NON-NLS-1$
         }
         return parserMap;
     }

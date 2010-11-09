@@ -31,6 +31,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
  * <p>
  * TODO: Implement me. Please.
  */
+@SuppressWarnings("nls")
 public class TmfDataProviderStub extends TmfDataProvider<TmfData> {
 
     private static final String DIRECTORY   = "testfiles";

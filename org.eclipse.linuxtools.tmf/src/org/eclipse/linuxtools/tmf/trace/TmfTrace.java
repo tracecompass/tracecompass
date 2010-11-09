@@ -383,6 +383,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
+	@SuppressWarnings("nls")
 	public String toString() {
 		return "[TmfTrace (" + getName() + ")]";
 	}

@@ -43,6 +43,7 @@ public class TmfExperimentUpdatedSignal extends TmfSignal {
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
+    @SuppressWarnings("nls")
 	public String toString() {
 		return "[TmfExperimentUpdatedSignal (" + fExperiment.toString() /*+ ", " + fTrace.toString()*/ + ")]";
 	}

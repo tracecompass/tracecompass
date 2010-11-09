@@ -74,7 +74,7 @@ public abstract class StatisticsData {
 	/**
 	 * <h4>Identification of the root.</h4>
 	 */
-	public static final FixedArray<String> ROOT = new FixedArray<String>("root");
+	public static final FixedArray<String> ROOT = new FixedArray<String>("root"); //$NON-NLS-1$
 	/**
 	 * <h4>Function to merge many string with more efficacy.</h4>
 	 * @param strings Strings to merge.
@@ -171,10 +171,10 @@ public abstract class StatisticsData {
 			return "Unknown process";
 		if(process.getName() == null)
 			return mergeString("Unknown process - ", String.valueOf(process.getPid()));
-		if(process.getName().equals(""))
+		if(process.getName().equals("")) //$NON-NLS-1$
 			return process.getPid().toString();
 		else
-			return mergeString(process.getName(), " - ",String.valueOf(process.getPid()));
+			return mergeString(process.getName(), " - ",String.valueOf(process.getPid())); //$NON-NLS-1$
 	}
 	/**
 	 * <h4>Increase some values.</h4>

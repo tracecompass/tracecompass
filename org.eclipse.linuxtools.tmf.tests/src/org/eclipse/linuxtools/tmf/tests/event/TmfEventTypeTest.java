@@ -22,6 +22,7 @@ import org.eclipse.linuxtools.tmf.event.TmfNoSuchFieldException;
  * <p>
  * JUnit test suite for the TmfEventType class.
  */
+@SuppressWarnings("nls")
 public class TmfEventTypeTest extends TestCase {
 
     // ------------------------------------------------------------------------

@@ -19,6 +19,7 @@ import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 
+@SuppressWarnings("nls")
 public class TmfTraceTest extends TmfEventRequest<LttngEvent> {
     
     @SuppressWarnings("unchecked")

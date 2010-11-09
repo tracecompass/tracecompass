@@ -37,7 +37,7 @@ public abstract class AbsStateProcessing {
 		LttngEventField field = ((LttngEventContent) trcEvent.getContent()).getField(fieldname);
 		
 		if ( field == null ) {
-			TraceDebug.debug("***************** CONTENT : " + ((LttngEventContent) trcEvent.getContent()).toString());
+			TraceDebug.debug("***************** CONTENT : " + ((LttngEventContent) trcEvent.getContent()).toString()); //$NON-NLS-1$
 		}
 		else {
             Object fieldObj = field.getValue();
@@ -47,7 +47,7 @@ public abstract class AbsStateProcessing {
             } 
             else {
                 if (TraceDebug.isDEBUG()) {
-                    TraceDebug.debug("Unexpected field Type. Expected: Long, Received: "+ fieldObj.getClass().getSimpleName());
+                    TraceDebug.debug("Unexpected field Type. Expected: Long, Received: "+ fieldObj.getClass().getSimpleName()); //$NON-NLS-1$
                 }
             }
 		}
@@ -110,13 +110,13 @@ public abstract class AbsStateProcessing {
 	 */
 	protected String getAFieldString(LttngEvent trcEvent,
 			LttngTraceState traceSt, Fields expectedField) {
-		String fieldVal = "";
+		String fieldVal = ""; //$NON-NLS-1$
 		
 		String fieldname = expectedField.getInName();
         LttngEventField field = ((LttngEventContent) trcEvent.getContent()).getField(fieldname);
         
 		if ( field == null ) {
-			TraceDebug.debug("***************** CONTENT : " + ((LttngEventContent) trcEvent.getContent()).toString());
+			TraceDebug.debug("***************** CONTENT : " + ((LttngEventContent) trcEvent.getContent()).toString()); //$NON-NLS-1$
 		}
 		else {
 	        Object fieldObj = field.getValue();
@@ -126,7 +126,7 @@ public abstract class AbsStateProcessing {
 	        } 
 	        else {
 	            if (TraceDebug.isDEBUG()) {
-	                TraceDebug.debug("Unexpected field Type. Expected: String, Received: "+ fieldObj.getClass().getSimpleName());
+	                TraceDebug.debug("Unexpected field Type. Expected: String, Received: "+ fieldObj.getClass().getSimpleName()); //$NON-NLS-1$
 	            }
 	        }
 		}
@@ -192,6 +192,7 @@ public abstract class AbsStateProcessing {
 		return traceState.findProcessState(pid, cpu, traceState.getTraceId());
 	}
 
+	@SuppressWarnings("nls")
 	protected void sendNoFieldFoundMsg(TmfEventField[] fields,
 			String expectedFieldName) {
 		LttngEventField field;

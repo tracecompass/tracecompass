@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 
+@SuppressWarnings("nls")
 public class TraceDebug {
 	static boolean DEBUG = false;
 	static boolean INFO = false;
@@ -22,8 +23,7 @@ public class TraceDebug {
 
 	private static Plugin plugin = LTTngUiPlugin.getDefault();
 	private static String pluginID = LTTngUiPlugin.PLUGIN_ID;
-	private static SimpleDateFormat stimeformat = new SimpleDateFormat(
-			"HH:mm:ss:SSS");
+	private static SimpleDateFormat stimeformat = new SimpleDateFormat("HH:mm:ss:SSS");
 
 	// Note: files are created in $HOME
 	static private PrintWriter fCFVfile = null;

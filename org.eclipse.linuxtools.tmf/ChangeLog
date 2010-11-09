@@ -1,3 +1,55 @@
+2010-11-09  Francois Chouinard  <fchouinard@gmail.com>
+
+    Suppress warning for non-externalized strings
+	   * src/org/eclipse/linuxtools/tmf/component/TmfDataProvider.java (newCoalescedDataRequest): 
+	       (coalesceDataRequest): 
+	       (.run): 
+	       (queueRequest): 
+	   * src/org/eclipse/linuxtools/tmf/component/TmfEventProvider.java (newCoalescedDataRequest): 
+	   * src/org/eclipse/linuxtools/tmf/event/TmfEvent.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/event/TmfEventContent.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/event/TmfEventField.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/event/TmfEventReference.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/event/TmfEventSource.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/event/TmfEventType.java (DEFAULT_TYPE_ID): 
+	       (getLabel): 
+	       (toString): 
+	   * src/org/eclipse/linuxtools/tmf/event/TmfTimeRange.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/event/TmfTimestamp.java (synchronize): 
+	       (toString): 
+	   * src/org/eclipse/linuxtools/tmf/event/TmfTraceEvent.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java (TmfExperiment): 
+	       (toString): 
+	   * src/org/eclipse/linuxtools/tmf/experiment/TmfExperimentLocation.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/request/TmfCoalescedDataRequest.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/request/TmfCoalescedEventRequest.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/request/TmfDataRequest.java (TmfDataRequest): 
+	       (handleCompleted): 
+	       (start): 
+	       (done): 
+	       (toString): 
+	   * src/org/eclipse/linuxtools/tmf/request/TmfEventRequest.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/request/TmfRequestExecutor.java (TmfRequestExecutor): 
+	       (stop): 
+	       (.run): 
+	       (toString): 
+	   * src/org/eclipse/linuxtools/tmf/signal/TmfExperimentSelectedSignal.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/signal/TmfExperimentUpdatedSignal.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/signal/TmfSignalTracer.java (traceSignal): 
+	   * src/org/eclipse/linuxtools/tmf/signal/TmfTimeSynchSignal.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/signal/TmfTraceClosedSignal.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/signal/TmfTraceOpenedSignal.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/signal/TmfTraceParserUpdatedSignal.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/signal/TmfTraceSelectedSignal.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/signal/TmfTraceUpdatedSignal.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/TmfCorePlugin.java (PLUGIN_ID): 
+	   * src/org/eclipse/linuxtools/tmf/trace/TmfCheckpoint.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/trace/TmfContext.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/trace/TmfLocation.java (toString): 
+	       (clone): 
+	   * src/org/eclipse/linuxtools/tmf/trace/TmfTrace.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/Tracer.java: 
+
 2010-11-04  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Use the correct index page size 

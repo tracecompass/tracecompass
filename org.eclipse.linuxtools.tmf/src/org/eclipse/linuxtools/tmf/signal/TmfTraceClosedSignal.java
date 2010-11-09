@@ -31,6 +31,7 @@ public class TmfTraceClosedSignal extends TmfSignal {
     }
 
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
         return "[TmfTraceClosedSignal (" + fTrace.getName() + ")]";
     }

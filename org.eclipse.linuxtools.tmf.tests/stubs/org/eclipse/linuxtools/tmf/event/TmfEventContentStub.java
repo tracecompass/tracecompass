@@ -17,6 +17,7 @@ package org.eclipse.linuxtools.tmf.event;
  * <p>
  * TODO: Implement me. Please.
  */
+@SuppressWarnings("nls")
 public class TmfEventContentStub extends TmfEventContent {
 
 	public TmfEventContentStub(TmfEvent parent, Object content) {

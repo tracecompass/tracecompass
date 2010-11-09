@@ -36,6 +36,7 @@ public class TmfTimeSynchSignal extends TmfSignal {
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
+    @SuppressWarnings("nls")
 	public String toString() {
 		return "[TmfTimeSynchSignal (" + fCurrentTime.toString() + ")]";
 	}

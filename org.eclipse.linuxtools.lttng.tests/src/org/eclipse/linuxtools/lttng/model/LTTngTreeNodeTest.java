@@ -17,6 +17,7 @@ import junit.framework.TestCase;
  * @author alvaro
  *
  */
+@SuppressWarnings("nls")
 public class LTTngTreeNodeTest extends TestCase {
 	// =======================================================================
 	// Data

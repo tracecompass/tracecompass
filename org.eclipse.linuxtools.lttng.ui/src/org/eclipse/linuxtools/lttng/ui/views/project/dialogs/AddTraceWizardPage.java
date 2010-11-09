@@ -38,8 +38,8 @@ public class AddTraceWizardPage extends WizardPage {
 	
 	protected AddTraceWizardPage(LTTngProjectNode project, String pageName) {
 		super(pageName);
-		setTitle("Select traces");
-		setDescription("Select the traces to add to the experiment");
+		setTitle(Messages.AddTraceWizardPage_windowTitle);
+		setDescription(Messages.AddTraceWizardPage_description);
 		fProject = project;
 	}
 
@@ -64,7 +64,7 @@ public class AddTraceWizardPage extends WizardPage {
 
 		final TableColumn tableColumn = new TableColumn(table, SWT.NONE);
 		tableColumn.setWidth(200);
-		tableColumn.setText("Trace");
+		tableColumn.setText(Messages.AddTraceWizardPage_columnHeader);
 
         fCheckboxTableViewer.setInput(fProject.getTracesFolder());
 	}

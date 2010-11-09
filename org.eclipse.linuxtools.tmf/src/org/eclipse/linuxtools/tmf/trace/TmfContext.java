@@ -105,7 +105,8 @@ public class TmfContext implements ITmfContext, Cloneable {
     	return fLocation.equals(o.fLocation) && (fRank == o.fRank);
     }
  
-    @Override
+	@Override
+    @SuppressWarnings("nls")
     public String toString() {
     	return "[TmfContext(" + fLocation.toString() +  "," + fRank + ")]";
     }

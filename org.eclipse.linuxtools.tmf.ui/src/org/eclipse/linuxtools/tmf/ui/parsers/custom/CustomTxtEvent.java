@@ -68,14 +68,14 @@ public class CustomTxtEvent extends CustomEvent {
                 } else if (column.action == CustomTxtTraceDefinition.ACTION_APPEND_WITH_SEPARATOR) {
                     String s = fData.get(name);
                     if (s != null) {
-                        fData.put(name, s + " | " + value);
+                        fData.put(name, s + " | " + value); //$NON-NLS-1$
                     } else {
                         fData.put(name, value);
                     }
                     if (name.equals(CustomTxtTraceDefinition.TAG_TIMESTAMP)) {
                         String timeStampInputFormat = fData.get(TIMESTAMP_INPUT_FORMAT_KEY);
                         if (timeStampInputFormat != null) {
-                            fData.put(TIMESTAMP_INPUT_FORMAT_KEY, timeStampInputFormat + " | " + column.format);
+                            fData.put(TIMESTAMP_INPUT_FORMAT_KEY, timeStampInputFormat + " | " + column.format); //$NON-NLS-1$
                         } else {
                             fData.put(TIMESTAMP_INPUT_FORMAT_KEY, column.format);
                         }

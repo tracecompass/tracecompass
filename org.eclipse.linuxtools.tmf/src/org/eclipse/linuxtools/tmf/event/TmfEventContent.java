@@ -161,6 +161,7 @@ public class TmfEventContent implements Cloneable {
     }
 
     @Override
+    @SuppressWarnings("nls")
 	public String toString() {
     	Object[] fields = getFields();
     	StringBuilder result = new StringBuilder("[TmfEventContent(");

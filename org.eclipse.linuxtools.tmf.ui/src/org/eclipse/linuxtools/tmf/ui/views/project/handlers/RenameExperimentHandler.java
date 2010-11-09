@@ -45,8 +45,8 @@ public class RenameExperimentHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-		mb.setText("Rename Experiment");
-		mb.setMessage("Not implemented yet");
+		mb.setText("Rename Experiment"); //$NON-NLS-1$
+		mb.setMessage("Not implemented yet"); //$NON-NLS-1$
 		mb.open();
 
 		return null;

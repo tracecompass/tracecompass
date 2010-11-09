@@ -89,6 +89,7 @@ public class Jni_C_Pointer extends Jni_C_Constant {
      * @return Attributes of the object concatenated in String
      */
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
         String returnData = "0x";
 

@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class EventsView extends TmfEventsView {
 
-    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.events";
+    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.events"; //$NON-NLS-1$
 
     private static final int BUFFERED_EVENTS = 1000;
 
@@ -44,6 +44,7 @@ public class EventsView extends TmfEventsView {
      * @see java.lang.Object#toString()
      */
     @Override
+    @SuppressWarnings("nls")
 	public String toString() {
     	return "[EventsView]";
     }

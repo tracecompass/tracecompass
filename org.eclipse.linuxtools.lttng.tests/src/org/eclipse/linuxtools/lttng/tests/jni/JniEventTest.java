@@ -39,6 +39,7 @@ import org.eclipse.linuxtools.lttng.jni.common.JniTime;
 import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
 
+@SuppressWarnings("nls")
 public class JniEventTest extends TestCase
 {
 		private final static boolean printLttDebug = false;

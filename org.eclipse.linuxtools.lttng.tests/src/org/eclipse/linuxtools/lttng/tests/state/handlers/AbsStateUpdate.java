@@ -9,6 +9,7 @@ import org.eclipse.linuxtools.lttng.state.model.LttngExecutionState;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.tmf.event.TmfEventField;
 
+@SuppressWarnings("nls")
 public abstract class AbsStateUpdate implements ILttngEventProcessor {
 
 	// ========================================================================

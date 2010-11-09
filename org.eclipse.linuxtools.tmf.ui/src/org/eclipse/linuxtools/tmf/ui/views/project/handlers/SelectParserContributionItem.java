@@ -39,15 +39,16 @@ public class SelectParserContributionItem extends CompoundContributionItem {
             MenuManager subMenu = new MenuManager(providerEntry.getKey());
             for(Entry<String, String> entry : providerEntry.getValue().entrySet()) {
                 params = new HashMap<String, String>();
-                params.put("org.eclipse.linuxtools.tmf.ui.commandparameter.project.trace.selectparser.parser", entry.getValue());
+                params.put("org.eclipse.linuxtools.tmf.ui.commandparameter.project.trace.selectparser.parser", entry.getValue()); //$NON-NLS-1$
     
-                CommandContributionItemParameter param = new CommandContributionItemParameter(PlatformUI.getWorkbench().getActiveWorkbenchWindow(), "my.parameterid",
-                        "org.eclipse.linuxtools.tmf.ui.command.project.trace.selectparser",
+                CommandContributionItemParameter param = new CommandContributionItemParameter(PlatformUI.getWorkbench().getActiveWorkbenchWindow(),
+                		"my.parameterid", //$NON-NLS-1$
+                        "org.eclipse.linuxtools.tmf.ui.command.project.trace.selectparser", //$NON-NLS-1$
                         params,
                         null, // icon
                         null, // disabled icon
                         null, // hover icon
-                        entry.getKey().replaceAll("&", "&&"), // label
+                        entry.getKey().replaceAll("&", "&&"), // label  //$NON-NLS-1$//$NON-NLS-2$
                         null, // mnemonic
                         null, // tooltip
                         CommandContributionItem.STYLE_PUSH,

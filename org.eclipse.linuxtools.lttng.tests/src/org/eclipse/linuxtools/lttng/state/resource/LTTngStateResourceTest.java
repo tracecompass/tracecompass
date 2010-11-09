@@ -23,6 +23,7 @@ import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
  * @author alvaro
  * 
  */
+@SuppressWarnings("nls")
 public class LTTngStateResourceTest extends TestCase {
 	// =======================================================================
 	// Data

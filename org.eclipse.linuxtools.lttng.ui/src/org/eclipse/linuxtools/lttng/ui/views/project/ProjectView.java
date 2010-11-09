@@ -52,7 +52,7 @@ import org.eclipse.swt.widgets.Tree;
  */
 public class ProjectView extends TmfView {
 
-    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.project";
+    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.project"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Main data structures
@@ -91,7 +91,7 @@ public class ProjectView extends TmfView {
 
 	public ProjectView() {
 		
-		super("ProjectView");
+		super("ProjectView"); //$NON-NLS-1$
         fProjectRoot = new LTTngProjectRoot(this);
 
 		fWorkspace = ResourcesPlugin.getWorkspace();
@@ -142,6 +142,7 @@ public class ProjectView extends TmfView {
     // ------------------------------------------------------------------------
 
 	@Override
+	@SuppressWarnings("nls")
 	public String toString() {
 		return "[ProjectView]";
 	}
@@ -241,7 +242,7 @@ public class ProjectView extends TmfView {
 
 	// Populated from the plug-in
     private void createContextMenu() {
-        MenuManager menuManager = new MenuManager("#PopupMenu");
+        MenuManager menuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
         menuManager.setRemoveAllWhenShown(true);
         Menu menu = menuManager.createContextMenu(fViewer.getControl());
         fViewer.getControl().setMenu(menu);

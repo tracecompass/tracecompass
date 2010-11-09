@@ -26,6 +26,7 @@ import junit.framework.TestCase;
  * <p>
  * Test suite for the TmfTraceEvent class.
  */
+@SuppressWarnings("nls")
 public class TmfTraceEventTest extends TestCase {
 
 	// ------------------------------------------------------------------------

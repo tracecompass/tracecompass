@@ -229,6 +229,7 @@ public class JniTraceVersion {
 	
     
 	@Override
+    @SuppressWarnings("nls")
 	public String toString() {
 		return "JniTraceVersion [" + majorNumber + "." + minorNumber + "]";
 	}

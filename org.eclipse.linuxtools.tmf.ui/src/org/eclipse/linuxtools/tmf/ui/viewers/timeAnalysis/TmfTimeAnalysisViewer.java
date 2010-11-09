@@ -147,7 +147,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	}
 
 	protected String getViewTypeStr() {
-		return "viewoption.threads";
+		return "viewoption.threads"; //$NON-NLS-1$
 	}
 
 	int getMarginWidth(int idx) {
@@ -161,12 +161,12 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	void loadOptions() {
 		_minTimeInterval = 1;
 		_selectedTime = -1;
-		_nameWidth = Utils.loadIntOption(getPreferenceString("namewidth"),
+		_nameWidth = Utils.loadIntOption(getPreferenceString("namewidth"), //$NON-NLS-1$
 				_nameWidthPref, _minNameWidth, 1000);
 	}
 
 	void saveOptions() {
-		Utils.saveIntOption(getPreferenceString("namewidth"), _nameWidth);
+		Utils.saveIntOption(getPreferenceString("namewidth"), _nameWidth); //$NON-NLS-1$
 	}
 
 	protected Control createDataViewer(Composite parent,
@@ -616,7 +616,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	}
 
 	private String getPreferenceString(String string) {
-		return getViewTypeStr() + "." + string;
+		return getViewTypeStr() + "." + string; //$NON-NLS-1$
 	}
 
 	@Override

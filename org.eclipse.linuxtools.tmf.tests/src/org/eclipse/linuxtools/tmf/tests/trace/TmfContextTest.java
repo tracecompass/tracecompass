@@ -23,6 +23,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfLocation;
  * <p>
  * Test suite for the TmfContext class.
  */
+@SuppressWarnings("nls")
 public class TmfContextTest extends TestCase {
 
 	// ------------------------------------------------------------------------
