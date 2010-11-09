@@ -1,5 +1,7 @@
 2010-11-09  Francois Chouinard  <fchouinard@gmail.com>
 
+    * src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java (getNextEvent): Fix for NullPointerException
+
     Suppress warning for non-externalized strings
 	   * src/org/eclipse/linuxtools/tmf/component/TmfDataProvider.java (newCoalescedDataRequest): 
 	       (coalesceDataRequest): 

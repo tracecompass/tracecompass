@@ -1,5 +1,7 @@
 2010-11-09  Francois Chouinard  <fchouinard@gmail.com>
 
+    * src/org/eclipse/linuxtools/lttng/trace/LTTngExperiment.java (getNextEvent): Fix for NullPointerException
+
     Suppress warning for non-externalized strings
 	   * src/org/eclipse/linuxtools/lttng/event/LttngEvent.java (toString):
 	   * src/org/eclipse/linuxtools/lttng/event/LttngEventContent.java (toString): 
@@ -18,6 +20,8 @@
 	   * src/org/eclipse/linuxtools/lttng/state/model/LttngTrapState.java (toString): 
 	   * src/org/eclipse/linuxtools/lttng/state/trace/StateTraceManager.java (toString): 
 	   * src/org/eclipse/linuxtools/lttng/trace/LTTngExperiment.java (toString): 
+           (LTTngExperiment): 
+	       (getNextEvent): Fix for Bug329764
 	   * src/org/eclipse/linuxtools/lttng/trace/LTTngTrace.java (toString): 
 	   * src/org/eclipse/linuxtools/lttng/trace/LTTngTraceVersion.java (toString): 
 	   * src/org/eclipse/linuxtools/lttng/TraceDebug.java: 

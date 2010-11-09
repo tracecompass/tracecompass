@@ -70,7 +70,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
     }
     
     public LTTngExperiment(LTTngExperiment<T> other) {
-    	super(other.getName() + "(clone)", other.fType);
+    	super(other.getName() + "(clone)", other.fType); //$NON-NLS-1$
     	
     	fEpoch         = other.fEpoch;
     	fIndexPageSize = other.fIndexPageSize;
@@ -128,8 +128,10 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
 		int trace = TmfExperimentContext.NO_TRACE;
 		TmfTimestamp timestamp = TmfTimestamp.BigCrunch;
 		if (eventArray.length == 1) {
-			timestamp = eventArray[0].getTimestamp();
-			trace = 0;
+		    if (eventArray[0] != null) {
+		        timestamp = eventArray[0].getTimestamp();
+		        trace = 0;
+		    }
 		} else {
 			for (int i = 0; i < eventArray.length; i++) {
 				TmfEvent event = eventArray[i];

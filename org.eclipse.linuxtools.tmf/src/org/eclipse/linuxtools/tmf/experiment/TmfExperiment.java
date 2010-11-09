@@ -501,20 +501,30 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 		}
 
 		// Scan the candidate events and identify the "next" trace to read from 
+        TmfEvent eventArray[] =  expContext.getEvents();
+        if (eventArray == null) {
+            return null;
+        }
 		int trace = TmfExperimentContext.NO_TRACE;
 		TmfTimestamp timestamp = TmfTimestamp.BigCrunch;
-		for (int i = 0; i < expContext.getTraces().length; i++) {
-			TmfEvent event = expContext.getEvents()[i];
-			if (event != null && event.getTimestamp() != null) {
-				TmfTimestamp otherTS = event.getTimestamp();
-				if (otherTS.compareTo(timestamp, true) < 0) {
-					trace = i;
-					timestamp = otherTS;
-				}
-			}
+        if (eventArray.length == 1) {
+            if (eventArray[0] != null) {
+                timestamp = eventArray[0].getTimestamp();
+                trace = 0;
+            }
+        } else {
+            for (int i = 0; i < eventArray.length; i++) {
+                TmfEvent event = eventArray[i];
+                if (event != null && event.getTimestamp() != null) {
+                    TmfTimestamp otherTS = event.getTimestamp();
+                    if (otherTS.compareTo(timestamp, true) < 0) {
+                        trace = i;
+                        timestamp = otherTS;
+                    }
+                }
+            }
 		}
-
-		// Update the experiment context and set the "next" event
+        // Update the experiment context and set the "next" event
 		TmfEvent event = null;
 		if (trace != TmfExperimentContext.NO_TRACE) {
 	        updateIndex(expContext, timestamp);
