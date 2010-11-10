@@ -1,3 +1,4 @@
+package org.eclipse.linuxxtools.lttng.tests.headless;
 /*******************************************************************************
  * Copyright (c) 2009 Ericsson
  * 

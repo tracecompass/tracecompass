@@ -1,3 +1,9 @@
+2010-11-10  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxxtools/lttng/tests/headless/JniTraceTest.java: New file.
+	* src/org/eclipse/linuxxtools/lttng/tests/headless/LttngTraceTest.java: New file.
+	* src/org/eclipse/linuxxtools/lttng/tests/headless/TmfTraceTest.java: New file.
+
 2010-11-09  Francois Chouinard  <fchouinard@gmail.com>
 
     Suppress warning for non-externalized strings
