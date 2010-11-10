@@ -1,6 +1,0 @@
-2010-11-09  Francois Chouinard  <fchouinard@gmail.com>
-
-    Suppress warning for non-externalized strings
-	   * src/JniTraceTest.java: 
-	   * src/LttngTraceTest.java: 
-	   * src/TmfTraceTest.java: 
