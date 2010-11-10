@@ -46,7 +46,7 @@ public class ResourcesFinishUpdateHandler extends
 			endOfEvent = endOfTrace;
 		}
 		
-		TraceDebug.debug("Number of localResources: "
+		TraceDebug.debug("Number of localResources: " //$NON-NLS-1$
 				+ resContainer.readItems().length);
 
 		// for each existing resource

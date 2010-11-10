@@ -1,3 +1,24 @@
+2010-11-10  Francois Chouinard  <fchouinard@gmail.com>
+
+    Suppress warning for non-externalized strings
+	   * src/org/eclipse/linuxtools/lttng/ui/model/trange/TimeRangeComponent.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/model/trange/TimeRangeComposite.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/model/trange/TimeRangeEvent.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/model/trange/TimeRangeEventProcess.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/model/trange/TimeRangeEventResource.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/model/trange/TimeRangeResourceFactory.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/model/trange/TimeRangeViewerProvider.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/common/ParamsUpdater.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/controlflow/evProcessor/FlowAfterUpdateHandlers.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/controlflow/evProcessor/FlowBeforeUpdateHandlers.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/controlflow/model/FlowProcessContainer.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/project/dialogs/ImportTraceWizardPage.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/project/dialogs/NewExperimentDialog.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/project/dialogs/TraceErrorDialog.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/resources/evProcessor/ResourcesFinishUpdateHandler.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/resources/ResourcesView.java: 
+	   * src/org/eclipse/linuxtools/lttng/ui/views/timeframe/SpinnerGroup.java: 
+
 2010-11-09  Francois Chouinard  <fchouinard@gmail.com>
 
     Externalized Strings

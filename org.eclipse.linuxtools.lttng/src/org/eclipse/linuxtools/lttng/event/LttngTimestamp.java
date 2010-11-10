@@ -110,21 +110,21 @@ public class LttngTimestamp extends TmfTimestamp {
 		long ns = time;
 		ns %= 1000000000;
 		if (ns < 10) {
-			temp.append("00000000");
+			temp.append("00000000"); //$NON-NLS-1$
 		} else if (ns < 100) {
-			temp.append("0000000");
+			temp.append("0000000"); //$NON-NLS-1$
 		} else if (ns < 1000) {
-			temp.append("000000");
+			temp.append("000000"); //$NON-NLS-1$
 		} else if (ns < 10000) {
-			temp.append("00000");
+			temp.append("00000"); //$NON-NLS-1$
 		} else if (ns < 100000) {
-			temp.append("0000");
+			temp.append("0000"); //$NON-NLS-1$
 		} else if (ns < 1000000) {
-			temp.append("000");
+			temp.append("000"); //$NON-NLS-1$
 		} else if (ns < 10000000) {
-			temp.append("00");
+			temp.append("00"); //$NON-NLS-1$
 		} else if (ns < 100000000) {
-			temp.append("0");
+			temp.append("0"); //$NON-NLS-1$
 		}
 
 		temp.append(ns);

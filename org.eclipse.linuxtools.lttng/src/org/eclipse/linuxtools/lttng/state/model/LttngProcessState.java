@@ -167,7 +167,7 @@ public class LttngProcessState implements Cloneable {
             }
         }
         catch ( CloneNotSupportedException e ) {
-            System.out.println("Cloning failed with : " + e.getMessage() );
+            System.out.println("Cloning failed with : " + e.getMessage() ); //$NON-NLS-1$
         }
         
         return newState;
@@ -255,7 +255,7 @@ public class LttngProcessState implements Cloneable {
 	public void setCreation_time(Long creationTime) {
 		if ( (creationTime != null) && (pid != null) ) {
 			creation_time = creationTime;
-			StringBuilder sb = new StringBuilder(this.pid.toString() + "-"
+			StringBuilder sb = new StringBuilder(this.pid.toString() + "-" //$NON-NLS-1$
 					+ creationTime.toString());
 			this.pid_time = sb.toString();
 		}
@@ -444,7 +444,7 @@ public class LttngProcessState implements Cloneable {
 	
 	public Long popFromUserStack() {
        if (user_stack.size() <= 1) {
-            TraceDebug.debug("Removing last item from user stack is not allowed! (popFromUserStack)");
+            TraceDebug.debug("Removing last item from user stack is not allowed! (popFromUserStack)"); //$NON-NLS-1$
             return null;
         }
         else {
@@ -469,7 +469,7 @@ public class LttngProcessState implements Cloneable {
     
     public LttngExecutionState popFromExecutionStack() {
        if (execution_stack.size() <= 1) {
-    	   TraceDebug.debug("Removing last item from execution stack is not allowed! (popFromExecutionStack)");
+    	   TraceDebug.debug("Removing last item from execution stack is not allowed! (popFromExecutionStack)"); //$NON-NLS-1$
             return null;
         }
         else {

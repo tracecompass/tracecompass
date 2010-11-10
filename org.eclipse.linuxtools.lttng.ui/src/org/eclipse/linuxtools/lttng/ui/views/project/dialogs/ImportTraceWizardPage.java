@@ -86,7 +86,7 @@ public class ImportTraceWizardPage extends WizardFileSystemResourceImportPage1 {
 				try {
 					if ( isPathLttngTrace( getSourceDirectory().getAbsolutePath() ) == false ) {
 						returnedValue = false;
-						selectedSourceDirectory = "";
+						selectedSourceDirectory = ""; //$NON-NLS-1$
 						
 						String errMessage[] = { "Couldn't get LTTng version number for the path : " }; 
 						errMessage = extendErrorMessage(errMessage, getSourceDirectory().getAbsolutePath() );
@@ -102,17 +102,17 @@ public class ImportTraceWizardPage extends WizardFileSystemResourceImportPage1 {
 						if ( isContainerSet == false ) {
 							isContainerSet = true;
 							
-							if ( ! getDestination().toString().equals( getInitialContainerString() + "/" + getTraceDirectory() )  ) {
+							if ( ! getDestination().toString().equals( getInitialContainerString() + "/" + getTraceDirectory() )  ) { //$NON-NLS-1$
 								// *** HACK ***
 						    	// Force a sane destination to avoid imported files to end up in the root of the "Traces/" directory
-						    	setContainerFieldValue(getInitialContainerString() + "/" + getTraceDirectory());
+						    	setContainerFieldValue(getInitialContainerString() + "/" + getTraceDirectory()); //$NON-NLS-1$
 							}
 						}
 					}
 		    	}
 		    	catch (LttngException e) {
-		    		String[] errorMessages = e.toString().split("\n");
-		    		String exceptionMessage[] = { "Version check failed for the path : ", this.getTracepath(), "", "Returned error was :" }; 
+		    		String[] errorMessages = e.toString().split("\n"); //$NON-NLS-1$
+		    		String exceptionMessage[] = { "Version check failed for the path : ", this.getTracepath(), "", "Returned error was :" };   //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		    		
 		    		for ( int pos=0; pos<errorMessages.length; pos++) {
 		    			exceptionMessage = extendErrorMessage(exceptionMessage, errorMessages[pos]);

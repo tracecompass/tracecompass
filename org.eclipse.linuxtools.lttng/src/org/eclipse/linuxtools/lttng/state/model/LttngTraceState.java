@@ -67,7 +67,7 @@ public class LttngTraceState implements Cloneable {
 
 	// reference to input data provider
 	ILttngStateContext fContext = null;
-	String traceId = "";
+	String traceId = ""; //$NON-NLS-1$
 
 	// ========================================================================
 	// Constructor
@@ -200,7 +200,7 @@ public class LttngTraceState implements Cloneable {
 			}
 
 		} catch (CloneNotSupportedException e) {
-			System.out.println("Cloning failed with : " + e.getMessage());
+			System.out.println("Cloning failed with : " + e.getMessage()); //$NON-NLS-1$
 		}
 
 		return newState;
@@ -210,7 +210,7 @@ public class LttngTraceState implements Cloneable {
 			throws LttngStateException {
 		if (context == null) {
 			StringBuilder sb = new StringBuilder(
-					"The input provider reference must not be null");
+					"The input provider reference must not be null"); //$NON-NLS-1$
 			throw new LttngStateException(sb.toString());
 		}
 
@@ -279,7 +279,7 @@ public class LttngTraceState implements Cloneable {
 
 			process.setCpu(i);
 			// no associated user trace yet
-			process.setUserTrace("");
+			process.setUserTrace(""); //$NON-NLS-1$
 			// processes.put(i, process);
 			running_process.put(i, process);
 			// reset cpu states
@@ -524,7 +524,7 @@ class ProcessStateKey {
 		}
         else {
 			TraceDebug
-					.debug("ERROR : The received Key is not of the type ProcessStateKey! but "
+					.debug("ERROR : The received Key is not of the type ProcessStateKey! but " //$NON-NLS-1$
 							+ obj.getClass().toString());
 			return false;
         }

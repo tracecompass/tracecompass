@@ -50,7 +50,7 @@ public abstract class JniTrace extends Jni_C_Common {
     // This might be a problem about "unsigned long" as there is no equivalent
     // in java
     
-    private String tracepath = ""; // Path of the trace. Should be a directory (like : /tmp/traceX)
+    private String tracepath = ""; // Path of the trace. Should be a directory (like : /tmp/traceX) //$NON-NLS-1$
     private int    cpuNumber = 0;
     private long   archType = 0;
     private long   archVariant = 0;
@@ -248,8 +248,8 @@ public abstract class JniTrace extends Jni_C_Common {
     public void openTrace() throws JniException {
     	
         // Raise an exception if the tracepath is empty, otherwise open the trace
-        if (tracepath == "") {
-            throw new JniTraceException("Tracepath is not set. (openTrace)");
+        if (tracepath == "") { //$NON-NLS-1$
+            throw new JniTraceException("Tracepath is not set. (openTrace)"); //$NON-NLS-1$
         }
         
         // If the file is already opened, close it first
@@ -267,7 +267,7 @@ public abstract class JniTrace extends Jni_C_Common {
 	        
 	        if (newPtr == NULL) {
 	        	thisTracePtr = new Jni_C_Pointer_And_Library_Id();
-	            throw new JniOpenTraceFailedException("Error while opening trace. Is the tracepath correct? (openTrace)");
+	            throw new JniOpenTraceFailedException("Error while opening trace. Is the tracepath correct? (openTrace)"); //$NON-NLS-1$
 	        }
 	        
 	        // This is OUR pointer
@@ -278,8 +278,8 @@ public abstract class JniTrace extends Jni_C_Common {
         }
         else {
         	thisTracePtr = new Jni_C_Pointer_And_Library_Id();
-        	throw new JniTraceException("Failed to initialize library! Is the trace version supported?\n" +
-        			                    "Make sure you have the correct LTTv library compiled. (openTrace)");
+        	throw new JniTraceException("Failed to initialize library! Is the trace version supported?\n" + //$NON-NLS-1$
+        			                    "Make sure you have the correct LTTv library compiled. (openTrace)"); //$NON-NLS-1$
         }
     }
         
@@ -322,7 +322,7 @@ public abstract class JniTrace extends Jni_C_Common {
      */
     private void populateTraceInformation() throws JniException {
         if (thisTracePtr.getPointer() == NULL) {
-            throw new JniTraceException("Pointer is NULL, trace not opened/already closed? (populateTraceInformation)");
+            throw new JniTraceException("Pointer is NULL, trace not opened/already closed? (populateTraceInformation)"); //$NON-NLS-1$
         }
 
         // Populate from the LTT library
@@ -413,12 +413,12 @@ public abstract class JniTrace extends Jni_C_Common {
         }
         catch(JniTracefileWithoutEventException e) {
         	if ( printLttDebug == true ) {
-        		printlnC(thisTracePtr.getLibraryId(), "JniTracefile " + tracefileName + " has no event (addTracefileFromC). Ignoring.");
+        		printlnC(thisTracePtr.getLibraryId(), "JniTracefile " + tracefileName + " has no event (addTracefileFromC). Ignoring."); //$NON-NLS-1$ //$NON-NLS-2$
         	}
         }
         catch(Exception e) {
         	if ( printLttDebug == true ) {
-        		printlnC(thisTracePtr.getLibraryId(), "Failed to add tracefile " + tracefileName + " to tracefilesMap!(addTracefileFromC)\n\tException raised : " + e.toString() );
+        		printlnC(thisTracePtr.getLibraryId(), "Failed to add tracefile " + tracefileName + " to tracefilesMap!(addTracefileFromC)\n\tException raised : " + e.toString() ); //$NON-NLS-1$ //$NON-NLS-2$
         	}
         }
     }

@@ -1,3 +1,35 @@
+2010-11-10  Francois Chouinard  <fchouinard@gmail.com>
+
+    Suppress warning for non-externalized strings
+	   * src/org/eclipse/linuxtools/lttng/control/LttngSyntheticEventProvider.java: 
+	   * src/org/eclipse/linuxtools/lttng/event/LttngEvent.java: 
+	   * src/org/eclipse/linuxtools/lttng/event/LttngEventContent.java: 
+	   * src/org/eclipse/linuxtools/lttng/event/LttngEventReference.java: 
+	   * src/org/eclipse/linuxtools/lttng/event/LttngEventType.java: 
+	   * src/org/eclipse/linuxtools/lttng/event/LttngLocation.java: 
+	   * src/org/eclipse/linuxtools/lttng/event/LttngTimestamp.java: 
+	   * src/org/eclipse/linuxtools/lttng/LTTngCorePlugin.java: 
+	   * src/org/eclipse/linuxtools/lttng/model/LTTngTreeNodeGeneric.java: 
+	   * src/org/eclipse/linuxtools/lttng/request/LttngSyntEventRequest.java: 
+	   * src/org/eclipse/linuxtools/lttng/state/evProcessor/state/StateUpdateHandlers.java: 
+	   * src/org/eclipse/linuxtools/lttng/state/experiment/StateExperimentManager.java: 
+	   * src/org/eclipse/linuxtools/lttng/state/experiment/StateManagerFactory.java: 
+	   * src/org/eclipse/linuxtools/lttng/state/model/LttngBdevState.java: 
+	   * src/org/eclipse/linuxtools/lttng/state/model/LTTngCPUState.java: 
+	   * src/org/eclipse/linuxtools/lttng/state/model/LttngExecutionState.java: 
+	   * src/org/eclipse/linuxtools/lttng/state/model/LttngIRQState.java: 
+	   * src/org/eclipse/linuxtools/lttng/state/model/LttngProcessState.java: 
+	   * src/org/eclipse/linuxtools/lttng/state/model/LttngSoftIRQState.java: 
+	   * src/org/eclipse/linuxtools/lttng/state/model/LttngTraceState.java: 
+	   * src/org/eclipse/linuxtools/lttng/state/model/LttngTrapState.java: 
+	   * src/org/eclipse/linuxtools/lttng/state/resource/ILTTngStateResource.java: 
+	   * src/org/eclipse/linuxtools/lttng/state/resource/LTTngStateResource.java: 
+	   * src/org/eclipse/linuxtools/lttng/state/StateStrings.java: 
+	   * src/org/eclipse/linuxtools/lttng/state/trace/StateTraceManager.java: 
+	   * src/org/eclipse/linuxtools/lttng/trace/LTTngTextTrace.java: 
+	   * src/org/eclipse/linuxtools/lttng/trace/LTTngTrace.java: 
+	   * src/org/eclipse/linuxtools/lttng/trace/LTTngTraceVersion.java: 
+
 2010-11-09  Francois Chouinard  <fchouinard@gmail.com>
 
     * src/org/eclipse/linuxtools/lttng/trace/LTTngExperiment.java (getNextEvent): Fix for NullPointerException

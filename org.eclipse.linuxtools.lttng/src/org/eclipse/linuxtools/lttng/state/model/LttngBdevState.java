@@ -57,7 +57,7 @@ public class LttngBdevState implements Cloneable {
        BdevMode returnedMode = mode_stack.pop();
         
        if (mode_stack.size() < 1) {
-            TraceDebug.debug("Removing last item from mode stack is not allowed! (popFromModeStack)");
+            TraceDebug.debug("Removing last item from mode stack is not allowed! (popFromModeStack)"); //$NON-NLS-1$
             mode_stack.push(BdevMode.LTTV_BDEV_UNKNOWN);
        }
        
@@ -80,7 +80,7 @@ public class LttngBdevState implements Cloneable {
 	        newState.mode_stack = (Stack<BdevMode>)this.mode_stack.clone();
 	    }
 	    catch ( CloneNotSupportedException e ) {
-	        System.out.println("Cloning failed with : " + e.getMessage() );
+	        System.out.println("Cloning failed with : " + e.getMessage() ); //$NON-NLS-1$
 	    }
 	    
 	    return newState;

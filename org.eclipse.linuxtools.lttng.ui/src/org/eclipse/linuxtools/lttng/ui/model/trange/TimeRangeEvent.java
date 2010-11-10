@@ -30,7 +30,7 @@ public class TimeRangeEvent extends TimeRangeComponent implements ITimeEvent {
 	}
 
 	protected Type eventType = Type.UNKNOWN;
-	protected String stateMode = "";
+	protected String stateMode = ""; //$NON-NLS-1$
 
 	// =======================================================================
 	// Constructors

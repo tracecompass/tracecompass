@@ -131,7 +131,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
                 || (newMarkersMap == null) 
                 || (newMarkersMap.size() == 0)
                 || (newParentTracefile == null)) {
-            throw new JniEventException("Null or empty value passed to constructor, object is invalid! (JniEvent)");
+            throw new JniEventException("Null or empty value passed to constructor, object is invalid! (JniEvent)"); //$NON-NLS-1$
         }
         
         thisEventPtr = newEventPtr;
@@ -147,7 +147,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
         // In that case, throw JniNoSuchEventException to warn the tracefile.
         eventState = positionToFirstEvent();
         if (eventState != EOK)  {
-            throw new JniNoSuchEventException("Object not populated, unusable. There is probably no event of that type in the trace. (JniEvent)");
+            throw new JniNoSuchEventException("Object not populated, unusable. There is probably no event of that type in the trace. (JniEvent)"); //$NON-NLS-1$
         }
         else {
             populateEventInformation();
@@ -289,7 +289,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
         // It would be a good addition to have a way to detect where an event come
         // from, like "kernel" or "userspace"
         // 
-        return "Kernel Core";
+        return "Kernel Core"; //$NON-NLS-1$
     }
     
     /**

@@ -43,7 +43,7 @@ public class LttngEventType extends TmfEventType {
      * @param thisMarkerfieldsName  MarkerFields related to this marker	
      */
     public LttngEventType(String thisTracefileName, Long thisCpuId, String thisMarkerName, String[] thisMarkerfieldsName) {
-        super( thisTracefileName + "/" + thisCpuId + "/" + thisMarkerName, thisMarkerfieldsName);
+        super( thisTracefileName + "/" + thisCpuId + "/" + thisMarkerName, thisMarkerfieldsName); //$NON-NLS-1$ //$NON-NLS-2$
         
         tracefileName   = thisTracefileName;
         cpuId           = thisCpuId;

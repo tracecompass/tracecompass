@@ -45,7 +45,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     
     private  HashMap<String, LttngEventType> traceTypes       = null;
     
-    private  String tracepath = "";
+    private  String tracepath = ""; //$NON-NLS-1$
     private  FileReader fr = null;
     private  BufferedReader br = null;
     private  Long nbCharRead = 0L;
@@ -74,7 +74,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
         eventContent.setEvent(currentLttngEvent);
         
         if ( positionToFirstEvent() == false ) {
-        	throw new IOException("Fail to position to the beginning of the trace");
+        	throw new IOException("Fail to position to the beginning of the trace"); //$NON-NLS-1$
         }
         else {
         	fIndexPageSize = 1000;
@@ -118,7 +118,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     		returnedTrace = new LTTngTextTrace(this);
     	}
     	catch (Exception e) {
-    		System.out.println("ERROR : Could not create LTTngTextTrace copy (createTraceCopy).\nError is : " + e.getStackTrace());
+    		System.out.println("ERROR : Could not create LTTngTextTrace copy (createTraceCopy).\nError is : " + e.getStackTrace()); //$NON-NLS-1$
     	}
     	
     	return returnedTrace;
@@ -159,14 +159,14 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     			}
     		
 				if ( showDebug == true ) {
-					System.out.println("skipToPosition(Long skipPosition)");
-					System.out.println("\tSkipping to : " + skipPosition);
+					System.out.println("skipToPosition(Long skipPosition)"); //$NON-NLS-1$
+					System.out.println("\tSkipping to : " + skipPosition); //$NON-NLS-1$
 					System.out.println();
 				}
 				positionToFirstEvent();
 				long nbSkipped = br.skip(skipPosition);
 				if ( nbSkipped != skipPosition) {
-					throw new IOException("Too few characters skipped, positionning failed! (skipToPosition)");
+					throw new IOException("Too few characters skipped, positionning failed! (skipToPosition)"); //$NON-NLS-1$
 				}
 				
 				nbCharRead = skipPosition;
@@ -199,16 +199,16 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     	int tmpCurIndex = 0;
     	int tmpPrevIndex = 0;
     	
-    	String tracefile = "";
+    	String tracefile = ""; //$NON-NLS-1$
 		long tmpCpu = 0;
-		String marker = "";
+		String marker = ""; //$NON-NLS-1$
     	
 		long tmpSecond = 0;
 		long tmpNanosecond = 0;
 		
-		String parsedPayload = "";
-		String markerName = "";
-		Object payload = "";
+		String parsedPayload = ""; //$NON-NLS-1$
+		String markerName = ""; //$NON-NLS-1$
+		Object payload = ""; //$NON-NLS-1$
 		
 		HashMap<String, LttngEventField> fieldsMap = null;
 		
@@ -227,13 +227,13 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     			}
     			
 	    		// EventSource is always the same for now :
-	    		eventSource.setSourceId("Kernel Core");
+	    		eventSource.setSourceId("Kernel Core"); //$NON-NLS-1$
 	    		
 	    		
 	    		// Tracefile and marker are first in the file
 	    		// Sound like : 
 	    		//		kernel.syscall_entry:
-	    		tmpCurIndex = tmpContent.indexOf(".", tmpPrevIndex);
+	    		tmpCurIndex = tmpContent.indexOf(".", tmpPrevIndex); //$NON-NLS-1$
 	    		
 	    		// *** HACK ***
 	    		// Evil exit case here : the two last line of the text dump does not contain "."
@@ -241,7 +241,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 	    		// Conclusion : this is ugly but fast.
 	    		if ( tmpCurIndex < 0 ) {
 	    			if ( showDebug == true ) {
-	    				System.out.println("END OF FILE.");
+	    				System.out.println("END OF FILE."); //$NON-NLS-1$
 	    				System.out.println();
 	    			}
 	    			return null;
@@ -251,7 +251,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 	    		/*System.out.println(tracefile);*/
 	    		
 	    		tmpPrevIndex = tmpCurIndex;
-	    		tmpCurIndex = tmpContent.indexOf(":", tmpPrevIndex);
+	    		tmpCurIndex = tmpContent.indexOf(":", tmpPrevIndex); //$NON-NLS-1$
 	    		marker = tmpContent.substring(tmpPrevIndex+1, tmpCurIndex ).trim();
 	    		/*System.out.println(marker);*/
 	    		
@@ -259,12 +259,12 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 	    		// Sound like : 
 	    		//		952.162637168
 	    		tmpPrevIndex = tmpCurIndex+1;
-	    		tmpCurIndex = tmpContent.indexOf(".", tmpPrevIndex);
+	    		tmpCurIndex = tmpContent.indexOf(".", tmpPrevIndex); //$NON-NLS-1$
 	    		tmpSecond = Long.parseLong( tmpContent.substring(tmpPrevIndex, tmpCurIndex ).trim() );
 	    		/*System.out.println(tmpSecond);*/
 	    		
 	    		tmpPrevIndex = tmpCurIndex+1;
-	    		tmpCurIndex = tmpContent.indexOf(" ", tmpPrevIndex);
+	    		tmpCurIndex = tmpContent.indexOf(" ", tmpPrevIndex); //$NON-NLS-1$
 	    		tmpNanosecond = Long.parseLong( tmpContent.substring(tmpPrevIndex, tmpCurIndex ).trim() );
 	    		/*System.out.println(tmpNanosecond);*/
 	    		
@@ -276,14 +276,14 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 	    		// A long string enclosed by parenthesis and ending with a comma
 	    		// 		(/home/william/workspace/org.eclipse.linuxtools.lttng.tests/traceset/trace-618339events-1293lost-1cpu/kernel_0),
 	    		tmpPrevIndex = tmpCurIndex+1;
-	    		tmpCurIndex = tmpContent.indexOf("(", tmpPrevIndex);
+	    		tmpCurIndex = tmpContent.indexOf("(", tmpPrevIndex); //$NON-NLS-1$
 	    		tmpPrevIndex = tmpCurIndex+1;
-	    		tmpCurIndex = tmpContent.indexOf("),", tmpPrevIndex);
+	    		tmpCurIndex = tmpContent.indexOf("),", tmpPrevIndex); //$NON-NLS-1$
 	    		String fullTracePath = tmpContent.substring(tmpPrevIndex, tmpCurIndex ).trim();
 	    		/*System.out.println(fullTracePath);*/
 	    		
 	    		eventReference.setValue(fullTracePath);
-	    		String traceName = fullTracePath.substring(fullTracePath.lastIndexOf("/")+1).trim();
+	    		String traceName = fullTracePath.substring(fullTracePath.lastIndexOf("/")+1).trim(); //$NON-NLS-1$
 	    		/*System.out.println(traceName);*/
 	    		eventReference.setTracepath(traceName);
 	    		
@@ -294,31 +294,31 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 	    		
 	    		// 1st comma
 	    		tmpPrevIndex = tmpCurIndex+1;
-	    		tmpCurIndex = tmpContent.indexOf(",", tmpPrevIndex);
+	    		tmpCurIndex = tmpContent.indexOf(",", tmpPrevIndex); //$NON-NLS-1$
 	    		// 2nd comma
 	    		tmpPrevIndex = tmpCurIndex+1;
-	    		tmpCurIndex = tmpContent.indexOf(",", tmpPrevIndex);
+	    		tmpCurIndex = tmpContent.indexOf(",", tmpPrevIndex); //$NON-NLS-1$
 	    		// 3rd comma
 	    		tmpPrevIndex = tmpCurIndex+1;
-	    		tmpCurIndex = tmpContent.indexOf(",", tmpPrevIndex);
+	    		tmpCurIndex = tmpContent.indexOf(",", tmpPrevIndex); //$NON-NLS-1$
 	    		// 4th comma
 	    		tmpPrevIndex = tmpCurIndex+1;
-	    		tmpCurIndex = tmpContent.indexOf(",", tmpPrevIndex);
+	    		tmpCurIndex = tmpContent.indexOf(",", tmpPrevIndex); //$NON-NLS-1$
 	    		// 5th comma
 	    		tmpPrevIndex = tmpCurIndex+1;
-	    		tmpCurIndex = tmpContent.indexOf(",", tmpPrevIndex);
+	    		tmpCurIndex = tmpContent.indexOf(",", tmpPrevIndex); //$NON-NLS-1$
 	    		// 6th comma
 	    		tmpPrevIndex = tmpCurIndex+1;
-	    		tmpCurIndex = tmpContent.indexOf(",", tmpPrevIndex);
+	    		tmpCurIndex = tmpContent.indexOf(",", tmpPrevIndex); //$NON-NLS-1$
 	    		
 	    		// The next field is the CPU, in hexadecimal format
 	    		// Should be like : 
 	    		//		0x0,
 	    		tmpPrevIndex = tmpCurIndex+1;
-	    		tmpCurIndex = tmpContent.indexOf("0x", tmpPrevIndex);
+	    		tmpCurIndex = tmpContent.indexOf("0x", tmpPrevIndex); //$NON-NLS-1$
 	    		tmpPrevIndex = tmpCurIndex+2;
 	    		
-	    		tmpCurIndex = tmpContent.indexOf(",", tmpPrevIndex);
+	    		tmpCurIndex = tmpContent.indexOf(",", tmpPrevIndex); //$NON-NLS-1$
 	    		tmpCpu = Long.parseLong( tmpContent.substring(tmpPrevIndex, tmpCurIndex ).trim() );
 	    		
 	    		// Set the cpu number of trace if we found a "new" cpu
@@ -335,12 +335,12 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 	    		//
 	    		// NOTE : it seems some state system events do not respect this format as they have no payload. 
 	    		//		We will create empty payload then.
-	    		int tmpIndex = tmpContent.indexOf("{", tmpPrevIndex);
+	    		int tmpIndex = tmpContent.indexOf("{", tmpPrevIndex); //$NON-NLS-1$
 	    		if ( tmpIndex != -1 ) {
 		    		tmpPrevIndex = tmpCurIndex+1;
 		    		tmpCurIndex = tmpIndex;
 		    		tmpPrevIndex = tmpCurIndex+1;
-		    		tmpCurIndex = tmpContent.indexOf("}", tmpPrevIndex);
+		    		tmpCurIndex = tmpContent.indexOf("}", tmpPrevIndex); //$NON-NLS-1$
 		    		parsedPayload = tmpContent.substring(tmpPrevIndex, tmpCurIndex ).trim();
 		    		
 		    		// Now add each LttngField
@@ -352,15 +352,15 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 		    		fieldsMap = new HashMap<String, LttngEventField>(); 
 		    		
 		    		while ( isDone == false ) {
-		    			tmpIndexEqual = parsedPayload.indexOf("=", (int)tmpIndexBegin);
-		    			tmpIndexEnd = parsedPayload.indexOf(", ", (int)tmpIndexEqual);
+		    			tmpIndexEqual = parsedPayload.indexOf("=", (int)tmpIndexBegin); //$NON-NLS-1$
+		    			tmpIndexEnd = parsedPayload.indexOf(", ", (int)tmpIndexEqual); //$NON-NLS-1$
 		    			if ( tmpIndexEnd == -1 ) {
 		    				tmpIndexEnd = parsedPayload.length();
 		    				isDone = true;
 		    			}
 		    			
 		    			markerName = parsedPayload.substring((int)tmpIndexBegin, (int)tmpIndexEqual-1 ).trim();
-		    			payload = ((String)parsedPayload.substring((int)tmpIndexEqual+1, (int)tmpIndexEnd )).replace("\"", " ").trim();
+		    			payload = ((String)parsedPayload.substring((int)tmpIndexEqual+1, (int)tmpIndexEnd )).replace("\"", " ").trim(); //$NON-NLS-1$ //$NON-NLS-2$
 		    			
 		    			// Try to cast the payload into the correct type
 		    			try {
@@ -377,8 +377,8 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 	    		else {
 	    			fieldsMap = new HashMap<String, LttngEventField>(); 
 		    		
-	    			markerName = "";
-	    			payload = "";
+	    			markerName = ""; //$NON-NLS-1$
+	    			payload = ""; //$NON-NLS-1$
 	    			
 	    			LttngEventField tmpField = new LttngEventField(eventContent, markerName, payload);
 	    			fieldsMap.put(markerName, tmpField);
@@ -387,7 +387,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 	    		eventContent = new TextLttngEventContent(currentLttngEvent, fieldsMap);
 	    		
 	    		// We now have what we need for the type
-	    		String tmpTypeKey = tracefile + "/" + tmpCpu + "/" + marker;
+	    		String tmpTypeKey = tracefile + "/" + tmpCpu + "/" + marker; //$NON-NLS-1$ //$NON-NLS-2$
 	    		if ( traceTypes.get(tmpTypeKey) == null ) {
 	    			traceTypes.put(tmpTypeKey, new LttngEventType(tracefile, tmpCpu, marker, fieldsMap.keySet().toArray(new String[fieldsMap.size()] )) );
 	    		}
@@ -398,15 +398,15 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 	    		returnedEvent = currentLttngEvent;
     		}
     		else if ( showDebug == true ) {
-					System.out.println("NULL READING");
+					System.out.println("NULL READING"); //$NON-NLS-1$
 					System.out.println();
 					returnedEvent = null;
 			}
     	}
     	catch (Exception e) {
-    		System.out.println("Pos is :" + nbCharRead);
+    		System.out.println("Pos is :" + nbCharRead); //$NON-NLS-1$
     		if ( tmpContent != null ) {
-    			System.out.println("Erroneous content is :" + tmpContent);
+    			System.out.println("Erroneous content is :" + tmpContent); //$NON-NLS-1$
     		}
     		
     		tmpContent = null;
@@ -512,7 +512,7 @@ class TextLttngEventContent extends LttngEventContent {
 			returnedField = this.getField(label);
 		} 
 		catch (TmfNoSuchFieldException e) {
-			System.out.println("Invalid field position requested : " + position + ", ignoring (getField).");
+			System.out.println("Invalid field position requested : " + position + ", ignoring (getField)."); //$NON-NLS-1$ //$NON-NLS-2$
 		}
         
         return returnedField;

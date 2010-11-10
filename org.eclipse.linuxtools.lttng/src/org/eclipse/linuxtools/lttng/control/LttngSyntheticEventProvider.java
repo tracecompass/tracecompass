@@ -83,7 +83,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 	 * @param type
 	 */
 	LttngSyntheticEventProvider(Class<LttngSyntheticEvent> type) {
-		super("LttngSyntheticEventProvider", type, QUEUE_SIZE);
+		super("LttngSyntheticEventProvider", type, QUEUE_SIZE); //$NON-NLS-1$
 
 		// prepare empty instance status indicators and allow them to travel via
 		// the framework
@@ -108,12 +108,12 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 		// make sure we have the right type of request
 		if (!(request instanceof ITmfEventRequest<?>)) {
 			request.cancel();
-			TraceDebug.debug("Request is not an instance of ITmfEventRequest");
+			TraceDebug.debug("Request is not an instance of ITmfEventRequest"); //$NON-NLS-1$
 			return null;
 		}
 
 		if (fExperiment == null) {
-			TraceDebug.debug("Experiment is null");
+			TraceDebug.debug("Experiment is null"); //$NON-NLS-1$
 			request.cancel();
 			return null;
 		}
@@ -124,7 +124,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 		// At least one base provider shall be available
 		if (fEventProviderRequests.size() < 1) {
 			request.cancel();
-			TraceDebug.debug("No Base event providers available");
+			TraceDebug.debug("No Base event providers available"); //$NON-NLS-1$
 			return null;
 		}
 
@@ -134,7 +134,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 		ITmfEventRequest<LttngSyntheticEvent> eventRequest = (ITmfEventRequest<LttngSyntheticEvent>) fmainRequest;
 		TmfTimeRange reqWindow = eventRequest.getRange();
 
-		TraceDebug.debug("Main Synthethic event request started on thread:  " + Thread.currentThread().getName());
+		TraceDebug.debug("Main Synthethic event request started on thread:  " + Thread.currentThread().getName()); //$NON-NLS-1$
 
 		TmfExperiment<LttngEvent> experiment = (TmfExperiment<LttngEvent>) fExperiment.getValue();
 		experiment.startSynch(new TmfStartSynchSignal(0));
@@ -197,14 +197,14 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 				    synchronized (LttngSyntheticEventProvider.this) {
 				        // Check if request was canceled
 				        if ((fmainRequest == null) || (fmainRequest.isCompleted()) ) {
-				            TraceDebug.debug("fmainRequest was canceled. Ignoring event " + event);
+				            TraceDebug.debug("fmainRequest was canceled. Ignoring event " + event); //$NON-NLS-1$
 				            return;
 				        } 
 
 				        handleIncomingData(event);
 				    }
 				} else {
-					TraceDebug.debug("handle data received with no data");
+					TraceDebug.debug("handle data received with no data"); //$NON-NLS-1$
 				}
 			}
 
@@ -281,7 +281,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 
 				// send the start request indication once per request thread
 				if (!startIndSent) {
-					TraceDebug.debug("Thread started: " + Thread.currentThread().getName());
+					TraceDebug.debug("Thread started: " + Thread.currentThread().getName()); //$NON-NLS-1$
 					handleProviderStarted(traceModel);
 					startIndSent = true;
 				}
@@ -385,7 +385,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 			fExperiment = experiment;
 		} else {
 			TraceDebug
-					.debug("Experiment received is not instance of TmfExperiment: "
+					.debug("Experiment received is not instance of TmfExperiment: " //$NON-NLS-1$
 							+ experiment.getClass().getName());
 		}
 	}
@@ -451,7 +451,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 	public synchronized void conditionallyCancelRequests() {
 	    if ((fSubRequest != null) && (!fSubRequest.isCompleted())) {
 	    	
-	    	TraceDebug.debug("Canceling synthethic event request!");
+	    	TraceDebug.debug("Canceling synthethic event request!"); //$NON-NLS-1$
 
 	        // This will also cancel the fmainRequest
 	        fSubRequest.cancel();

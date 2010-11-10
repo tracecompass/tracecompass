@@ -175,7 +175,7 @@ public class LttngEventContent extends TmfEventContent {
 						fFieldsMap.put(name, tmpField);
 					}
 					catch (TmfNoSuchFieldException e) {
-						System.out.println("Invalid field position requested : " + pos + ", ignoring (getFields).");
+						System.out.println("Invalid field position requested : " + pos + ", ignoring (getFields).");  //$NON-NLS-1$//$NON-NLS-2$
 					}
 	            }
 	        }
@@ -200,7 +200,7 @@ public class LttngEventContent extends TmfEventContent {
 			returnedField = this.getField(label);
 		} 
 		catch (TmfNoSuchFieldException e) {
-			System.out.println("Invalid field position requested : " + position + ", ignoring (getField).");
+			System.out.println("Invalid field position requested : " + position + ", ignoring (getField).");  //$NON-NLS-1$//$NON-NLS-2$
 		}
         
         return returnedField;

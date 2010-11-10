@@ -70,7 +70,7 @@ class StateUpdateHandlers {
 				String submode = null;
 				if (syscall == null) {
 					TraceDebug
-							.debug("Syscall Field not found, traceVent time: "
+							.debug("Syscall Field not found, traceVent time: " //$NON-NLS-1$
 									+ trcEvent.getTimestamp());
 				} else {
 					submode = traceSt.getSyscall_names().get(syscall);
@@ -132,7 +132,7 @@ class StateUpdateHandlers {
 						Fields.LTT_FIELD_TRAP_ID);
 				if (trap == null) {
 					TraceDebug
-							.debug("Trap field could not be found, event time: "
+							.debug("Trap field could not be found, event time: " //$NON-NLS-1$
 									+ trcEvent.getTimestamp());
 					return true;
 				}
@@ -229,7 +229,7 @@ class StateUpdateHandlers {
 						Fields.LTT_FIELD_IRQ_ID);
 				if (irq == null || traceSt.getIrq_states().get(irq) == null) {
 					if (irq != null) {
-						TraceDebug.debug("Invalid irq (" + irq + "), ts = " + trcEvent.getOriginalTimestamp());
+						TraceDebug.debug("Invalid irq (" + irq + "), ts = " + trcEvent.getOriginalTimestamp()); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 					return true;
 				}
@@ -357,8 +357,8 @@ class StateUpdateHandlers {
 						Fields.LTT_FIELD_SOFT_IRQ_ID);
 
 				if (softirq == null) {
-					TraceDebug.debug("Soft_irq_id not found in "
-							+ eventType.getInName() + " time: "
+					TraceDebug.debug("Soft_irq_id not found in " //$NON-NLS-1$
+							+ eventType.getInName() + " time: " //$NON-NLS-1$
 							+ trcEvent.getTimestamp());
 					return true;
 				}
@@ -379,7 +379,7 @@ class StateUpdateHandlers {
 					irqState.setPending(1L);
 				} else {
 					TraceDebug
-							.debug("unexpected soft irq id value: " + softirq);
+							.debug("unexpected soft irq id value: " + softirq); //$NON-NLS-1$
 				}
 
 				return false;
@@ -408,7 +408,7 @@ class StateUpdateHandlers {
 						Fields.LTT_FIELD_SOFT_IRQ_ID);
 
 				if (softirq == null) {
-					TraceDebug.debug("Soft IRQ ID not found, eventTime: "
+					TraceDebug.debug("Soft IRQ ID not found, eventTime: " //$NON-NLS-1$
 							+ trcEvent.getTimestamp());
 					return true;
 				}
@@ -417,7 +417,7 @@ class StateUpdateHandlers {
 				Map<Long, String> softIrqNames = traceSt.getSoft_irq_names();
 				String submode = softIrqNames.get(softirq);
 				if (submode == null) {
-					submode = "softirq " + softirq;
+					submode = "softirq " + softirq; //$NON-NLS-1$
 					softIrqNames.put(softirq, submode);
 				}
 
@@ -429,7 +429,7 @@ class StateUpdateHandlers {
 					irqState.incrementRunning();
 				} else {
 					TraceDebug
-							.debug("unexpected soft irq id value: " + softirq);
+							.debug("unexpected soft irq id value: " + softirq); //$NON-NLS-1$
 				}
 
 				/* update cpu state */
@@ -467,15 +467,15 @@ class StateUpdateHandlers {
 						Fields.LTT_FIELD_IRQ_ID);
 
 				if (action == null) {
-					TraceDebug.debug("Field Action not found in event "
-							+ eventType.getInName() + " time: "
+					TraceDebug.debug("Field Action not found in event " //$NON-NLS-1$
+							+ eventType.getInName() + " time: " //$NON-NLS-1$
 							+ trcEvent.getTimestamp());
 					return true;
 				}
 
 				if (irq == null) {
-					TraceDebug.debug("Field irq_id not found in event "
-							+ eventType.getInName() + " time: "
+					TraceDebug.debug("Field irq_id not found in event " //$NON-NLS-1$
+							+ eventType.getInName() + " time: " //$NON-NLS-1$
 							+ trcEvent.getTimestamp());
 					return true;
 				}
@@ -515,11 +515,11 @@ class StateUpdateHandlers {
 
 				if (devcode == null) {
 					TraceDebug
-							.debug("incorrect calcualtion of bdevcode input( major: "
+							.debug("incorrect calcualtion of bdevcode input( major: " //$NON-NLS-1$
 									+ major
-									+ " minor: "
+									+ " minor: " //$NON-NLS-1$
 									+ minor
-									+ " operation: " + operation);
+									+ " operation: " + operation); //$NON-NLS-1$
 					return true;
 				}
 
@@ -577,11 +577,11 @@ class StateUpdateHandlers {
 
 				if (devcode == null) {
 					TraceDebug
-							.debug("incorrect calcualtion of bdevcode input( major: "
+							.debug("incorrect calcualtion of bdevcode input( major: " //$NON-NLS-1$
 									+ major
-									+ " minor: "
+									+ " minor: " //$NON-NLS-1$
 									+ minor
-									+ " operation: " + operation);
+									+ " operation: " + operation); //$NON-NLS-1$
 					return true;
 				}
 
@@ -972,9 +972,9 @@ class StateUpdateHandlers {
 
 				if (process.getPid().equals(child_pid)) {
 					TraceDebug
-							.debug("Unexpected, process pid equal to child pid: "
+							.debug("Unexpected, process pid equal to child pid: " //$NON-NLS-1$
 									+ child_pid
-									+ " Event Time: "
+									+ " Event Time: " //$NON-NLS-1$
 									+ trcEvent.getTimestamp());
 				}
 
@@ -996,15 +996,15 @@ class StateUpdateHandlers {
 					 * 
 					 * Simply put a correct parent.
 					 */
-					StringBuilder sb = new StringBuilder("Process " + child_pid);
-					sb.append(" has been created at ["
-							+ child_process.getCreation_time() + "] ");
-					sb.append("and inserted at ["
-							+ child_process.getInsertion_time() + "] ");
-					sb.append("before \nfork on cpu " + cpu + " Event time: ["
-							+ trcEvent + "]\n.");
+					StringBuilder sb = new StringBuilder("Process " + child_pid); //$NON-NLS-1$
+					sb.append(" has been created at [" //$NON-NLS-1$
+							+ child_process.getCreation_time() + "] "); //$NON-NLS-1$
+					sb.append("and inserted at [" //$NON-NLS-1$
+							+ child_process.getInsertion_time() + "] "); //$NON-NLS-1$
+					sb.append("before \nfork on cpu " + cpu + " Event time: [" //$NON-NLS-1$ //$NON-NLS-2$
+							+ trcEvent + "]\n."); //$NON-NLS-1$
 					sb
-							.append("Probably an unsynchronized TSD problem on the traced machine.");
+							.append("Probably an unsynchronized TSD problem on the traced machine."); //$NON-NLS-1$
 					TraceDebug.debug(sb.toString());
 
 					// g_assert(0); /* This is a problematic case : the process
@@ -1017,7 +1017,7 @@ class StateUpdateHandlers {
 
 				if (!child_process.getName().equals(
 						ProcessStatus.LTTV_STATE_UNNAMED.getInName())) {
-					TraceDebug.debug("Unexpected child process status: "
+					TraceDebug.debug("Unexpected child process status: " //$NON-NLS-1$
 							+ child_process.getName());
 				}
 
@@ -1147,7 +1147,7 @@ class StateUpdateHandlers {
 				// s->parent.target_pid = release_pid;
 
 				if ((release_pid != null) && (release_pid.longValue() == 0L)) {
-					TraceDebug.debug("Unexpected release_pid: 0, Event time: "
+					TraceDebug.debug("Unexpected release_pid: 0, Event time: " //$NON-NLS-1$
 							+ trcEvent.getTimestamp());
 				}
 
@@ -1466,7 +1466,7 @@ class StateUpdateHandlers {
 									.setType(ProcessType.LTTV_STATE_KERNEL_THREAD);
 						} else {
 							StringBuilder sb = new StringBuilder(
-									"Unexpected, null process read from the TraceState list of processes, event time: "
+									"Unexpected, null process read from the TraceState list of processes, event time: " //$NON-NLS-1$
 											+ trcEvent.getTimestamp());
 							TraceDebug.debug(sb.toString());
 						}

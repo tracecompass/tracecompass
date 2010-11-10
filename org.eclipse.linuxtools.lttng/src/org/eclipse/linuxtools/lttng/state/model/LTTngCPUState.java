@@ -62,7 +62,7 @@ public class LTTngCPUState implements Cloneable {
 			newState.softirq_stack = (Stack<Long>) this.softirq_stack.clone();
 			newState.trap_stack = (Stack<Long>) this.trap_stack.clone();
 		} catch (CloneNotSupportedException e) {
-			System.out.println("Cloning failed with : " + e.getMessage());
+			System.out.println("Cloning failed with : " + e.getMessage()); //$NON-NLS-1$
 		}
 
 		return newState;

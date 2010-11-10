@@ -1,3 +1,10 @@
+2010-11-10  Francois Chouinard  <fchouinard@gmail.com>
+
+    Suppress warning for non-externalized strings
+	   * src/org/eclipse/linuxtools/tmf/ui/viewers/timeAnalysis/widgets/TmfTimeStatesCtrl.java: 
+	   * src/org/eclipse/linuxtools/tmf/ui/views/project/dialogs/NewExperimentDialog.java: 
+	   * src/org/eclipse/linuxtools/tmf/ui/views/project/ProjectView.java: 
+
 2010-11-09  Francois Chouinard  <fchouinard@gmail.com>
 
     Externalized strings

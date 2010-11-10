@@ -127,7 +127,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 			Long id = child.getId();
 			if (id != null) {
 				if (fchildren.containsKey(id) && fchildren.get(id) != child) {
-					TraceDebug.debug("Replaced child " + id + " for: " + child);
+					TraceDebug.debug("Replaced child " + id + " for: " + child);  //$NON-NLS-1$//$NON-NLS-2$
 				}
 				fchildren.put(id, child);
 				fchildrenByName.put(child.getName(), child);
@@ -256,7 +256,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 */
 	@Override
 	public String getPath() {
-		return getPath(this, "");
+		return getPath(this, ""); //$NON-NLS-1$
 	}
 
 	/**
@@ -275,7 +275,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 				return ipath;
 			} else {
 				E parent = child.getParent();
-				path = getPath(parent, "/" + child.getName() + ipath);
+				path = getPath(parent, "/" + child.getName() + ipath); //$NON-NLS-1$
 			}
 		}
 

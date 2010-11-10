@@ -109,7 +109,7 @@ public class TimeRangeResourceFactory {
 			public String getStateMode(LttngTraceState traceSt) {
 				LttngIRQState irqState = traceSt.getIrq_states().get(
 						getResourceId());
-				String statemode = "";
+				String statemode = ""; //$NON-NLS-1$
 				if (irqState != null) {
 					statemode = irqState.peekFromIrqStack().getInName();
 				}
@@ -133,7 +133,7 @@ public class TimeRangeResourceFactory {
 			@Override
 			public String getStateMode(LttngTraceState traceSt) {
 				// Determine the trap state.
-				String trapStateMode = "";
+				String trapStateMode = ""; //$NON-NLS-1$
 				LttngTrapState ts = traceSt.getTrap_states().get(getResourceId());
 				
 				// *** Note : 
@@ -238,7 +238,7 @@ public class TimeRangeResourceFactory {
 			    LTTngCPUState cpuState = traceSt.getCpu_states().get(
                         getResourceId());
 			    
-				String cpuStateMode = "";
+				String cpuStateMode = ""; //$NON-NLS-1$
 				if (cpuState != null) { 
 				    cpuStateMode = traceSt.getCpu_states().get(
 				            getResourceId())

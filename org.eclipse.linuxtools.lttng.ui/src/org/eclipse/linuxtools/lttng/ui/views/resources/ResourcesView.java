@@ -150,7 +150,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 			// initialize widget time boundaries and filtering parameters
 			ModelUpdateInit(experimentTRange, adjustedTimeRange, this);
 		} else {
-			TraceDebug.debug("No selected experiment information available");
+			TraceDebug.debug("No selected experiment information available"); //$NON-NLS-1$
 		}
 	}
 

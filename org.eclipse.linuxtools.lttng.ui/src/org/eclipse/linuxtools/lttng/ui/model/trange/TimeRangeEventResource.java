@@ -135,6 +135,7 @@ public abstract class TimeRangeEventResource extends TimeRangeComposite
 //	}
 
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
 		return "[TimeRangeEventResource: " + super.toString() +
 		",type=" + type + ",resourceId=" + resourceId + "]";

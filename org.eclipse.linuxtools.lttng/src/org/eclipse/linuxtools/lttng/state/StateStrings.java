@@ -22,13 +22,15 @@ import java.util.HashSet;
  * @author alvaro
  * 
  */
+
+@SuppressWarnings("nls")
 public class StateStrings {
 
 	// ========================================================================
 	// Table data
 	// =======================================================================
 	private static StateStrings instance = null;
-	public static final String LTTV_STATE_UNBRANDED = "";
+    public static final String LTTV_STATE_UNBRANDED = "";
 	private final HashMap<String, Events> eventStrMap = new HashMap<String, Events>();
 	private final HashMap<String, Events> stateTransEventMap = new HashMap<String, Events>();
 	private final String[] syscall_names = new String[256];;

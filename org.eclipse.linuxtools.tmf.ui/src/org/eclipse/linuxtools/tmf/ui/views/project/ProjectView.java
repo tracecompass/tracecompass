@@ -128,7 +128,7 @@ public class ProjectView extends TmfView {
 	static public IFile createLink(URI uri) throws CoreException {
 		IFolder folder = getActiveProjectTracesFolder();
 		if (folder == null || !folder.exists()) {
-			throw new CoreException(new Status(Status.ERROR, TmfUiPlugin.PLUGIN_ID, "No active project set"));
+			throw new CoreException(new Status(Status.ERROR, TmfUiPlugin.PLUGIN_ID, "No active project set")); //$NON-NLS-1$
 		}
 		String path = uri.getPath();
 		// TODO: support duplicate file names

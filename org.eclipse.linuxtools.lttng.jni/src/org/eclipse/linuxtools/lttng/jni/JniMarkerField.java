@@ -82,7 +82,7 @@ public abstract class JniMarkerField extends Jni_C_Common
     private void populateMarkerFieldInformation() throws JniException {
         if (thisMarkerFieldPtr.getPointer() == NULL) {
             throw new JniMarkerFieldException(
-                    "Pointer is NULL, trace closed? (populateMarkerInformation)");
+                    "Pointer is NULL, trace closed? (populateMarkerInformation)"); //$NON-NLS-1$
         } else {
             field = ltt_getField(thisMarkerFieldPtr.getLibraryId(), thisMarkerFieldPtr.getPointer());
             format = ltt_getFormat(thisMarkerFieldPtr.getLibraryId(), thisMarkerFieldPtr.getPointer());

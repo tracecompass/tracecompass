@@ -48,8 +48,8 @@ ITmfTimeAnalysisEntry {
 	protected final Vector<TimeRangeComponent> ChildEventComposites = new Vector<TimeRangeComponent>();
 	protected Integer id = 0;
 	protected String name;
-	protected String groupName = "";
-	protected String className = "";
+	protected String groupName = ""; //$NON-NLS-1$
+	protected String className = ""; //$NON-NLS-1$
 	protected CompositeType contType = CompositeType.UNKNOWN;
 	protected Long next_good_time = -1L;
 	/*Time of first event which trigger the creation of this local resource */
@@ -207,6 +207,7 @@ ITmfTimeAnalysisEntry {
 	}
 
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
 		return "[TimeRangeComposite:" + super.toString() +
 		",id=" + id + ",name=" + name + ",group=" + groupName + ",class=" + className +

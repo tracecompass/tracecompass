@@ -85,8 +85,8 @@ public class ParamsUpdater {
 	 * @param selTime
 	 */
 	public void setSelectedTime(long selTime) {
-		TraceDebug.debug("Selected time changed from: \n\t" + selectedTime
-				+ " to: \n\t" + selTime);
+		TraceDebug.debug("Selected time changed from: \n\t" + selectedTime //$NON-NLS-1$
+				+ " to: \n\t" + selTime); //$NON-NLS-1$
 		selectedTime = selTime;
 	}
 
@@ -152,16 +152,16 @@ public class ParamsUpdater {
 			// update succeeded
 			updated = true;
 
-			TraceDebug.debug("Configuration updated to: StartTime: " /* */
+			TraceDebug.debug("Configuration updated to: StartTime: " /* */ //$NON-NLS-1$
 					+ fTimeStart /* */
-					+ "-" /* */
+					+ "-" /* */ //$NON-NLS-1$
 					+ fTimeEnd /* */
-					+ " width: " /* */
-					+ width + " k: " + pixelsPerNs); /* */
+					+ " width: " /* */ //$NON-NLS-1$
+					+ width + " k: " + pixelsPerNs); /* */ //$NON-NLS-1$
 		} else {
 			TraceDebug
-					.debug("End time is not greater than start time, start time: "
-							+ time0 + " end time: " + time1);
+					.debug("End time is not greater than start time, start time: " //$NON-NLS-1$
+							+ time0 + " end time: " + time1); //$NON-NLS-1$
 		}
 
 		return updated;
@@ -187,7 +187,7 @@ public class ParamsUpdater {
 	public int getWidth() {
 		if (width == 0) {
 			TraceDebug
-					.debug("Unexpected width value of 0 pixels, returning default");
+					.debug("Unexpected width value of 0 pixels, returning default"); //$NON-NLS-1$
 			return DEFAULT_WIDTH;
 		}
 

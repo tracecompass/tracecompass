@@ -46,7 +46,7 @@ public class LttngIRQState implements Cloneable {
             newState.mode_stack = (Stack<StateStrings.IRQMode>)this.mode_stack.clone();
         }
         catch ( CloneNotSupportedException e ) {
-            System.out.println("Cloning failed with : " + e.getMessage() );
+            System.out.println("Cloning failed with : " + e.getMessage() ); //$NON-NLS-1$
         }
         
         return newState;

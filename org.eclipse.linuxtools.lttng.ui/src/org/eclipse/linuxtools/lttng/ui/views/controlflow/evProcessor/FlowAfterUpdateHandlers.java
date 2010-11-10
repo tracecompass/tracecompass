@@ -54,7 +54,7 @@ class FlowAfterUpdateHandlers {
 				Long pid_in = getAFieldLong(trcEvent, traceSt, Fields.LTT_FIELD_NEXT_PID);
 				
 				if ( !(pid_in.equals(process_in.getPid())) ) {
-				    TraceDebug.debug("pid_in != PID!  (getSchedChangeHandler)");
+				    TraceDebug.debug("pid_in != PID!  (getSchedChangeHandler)"); //$NON-NLS-1$
                 }
 				
 				//hashed_process_data = processlist_get_process_data(process_list,pid_out,process->cpu,&birth,trace_num);
@@ -68,7 +68,7 @@ class FlowAfterUpdateHandlers {
 					}
 					else {
 						TraceDebug
-								.debug("pid_in is not 0 or pid_in == PPID!  (getSchedChangeHandler)");
+								.debug("pid_in is not 0 or pid_in == PPID!  (getSchedChangeHandler)"); //$NON-NLS-1$
 					}
 				}
 
@@ -140,7 +140,7 @@ class FlowAfterUpdateHandlers {
                             localProcess = addLocalProcess(process_child, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
 			            }
 			            else {
-			                TraceDebug.debug("localProcess is null with child_pid not 0 or child_pid equals PPID (getProcessForkHandler)");
+			                TraceDebug.debug("localProcess is null with child_pid not 0 or child_pid equals PPID (getProcessForkHandler)"); //$NON-NLS-1$
 			            }
 					} else {
 						// If we found the process, the Ppid and the Tgid might
@@ -150,7 +150,7 @@ class FlowAfterUpdateHandlers {
 			        }
 			    }
 			    else {
-			        TraceDebug.debug("process_child is null! (getProcessForkHandler)");
+			        TraceDebug.debug("process_child is null! (getProcessForkHandler)"); //$NON-NLS-1$
 			    }
 	              
 				return false;
@@ -193,12 +193,12 @@ class FlowAfterUpdateHandlers {
 		                    localProcess = addLocalProcess(process, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
 			            }
 			            else {
-			                TraceDebug.debug("process pid is not 0 or pid equals ppid! (getProcessExitHandler)");
+			                TraceDebug.debug("process pid is not 0 or pid equals ppid! (getProcessExitHandler)"); //$NON-NLS-1$
 			            }
 					}
 			    }
 			    else {
-			        TraceDebug.debug("process is null! (getProcessExitHandler)");
+			        TraceDebug.debug("process is null! (getProcessExitHandler)"); //$NON-NLS-1$
 			    }			    
 			    
 				return false;
@@ -235,7 +235,7 @@ class FlowAfterUpdateHandlers {
                             localProcess = addLocalProcess(process, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
                         }
                         else {
-                            TraceDebug.debug("process pid is not 0 or pid equals ppid! (getProcessExecHandler)");
+                            TraceDebug.debug("process pid is not 0 or pid equals ppid! (getProcessExecHandler)"); //$NON-NLS-1$
                         }
                     }
                     else {
@@ -244,7 +244,7 @@ class FlowAfterUpdateHandlers {
                     }
                 }
                 else {
-                    TraceDebug.debug("process is null! (getProcessExecHandler)");
+                    TraceDebug.debug("process is null! (getProcessExecHandler)"); //$NON-NLS-1$
                 }
                 
 				return false;
@@ -285,7 +285,7 @@ class FlowAfterUpdateHandlers {
                             localProcess = addLocalProcess(process, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
                         }
                         else {
-                            TraceDebug.debug("process pid is not 0 or pid equals ppid! (GetThreadBrandHandler)");
+                            TraceDebug.debug("process pid is not 0 or pid equals ppid! (GetThreadBrandHandler)"); //$NON-NLS-1$
                         }
                     }
                     else {
@@ -295,7 +295,7 @@ class FlowAfterUpdateHandlers {
                     }
                 }
                 else {
-                    TraceDebug.debug("process is null! (GetThreadBrandHandler)");
+                    TraceDebug.debug("process is null! (GetThreadBrandHandler)"); //$NON-NLS-1$
                 }
                 
                 return false;
@@ -357,7 +357,7 @@ class FlowAfterUpdateHandlers {
                                     localProcess = addLocalProcess(process_in, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
                                 }
                                 else {
-                                    TraceDebug.debug("process pid is not 0 or pid equals ppid! (getEnumProcessStateHandler)");
+                                    TraceDebug.debug("process pid is not 0 or pid equals ppid! (getEnumProcessStateHandler)"); //$NON-NLS-1$
                                 }
     			            }
 
@@ -368,12 +368,12 @@ class FlowAfterUpdateHandlers {
 							localProcess.setTgid(process_in.getTgid());
     			        }
     			        else {
-    			            TraceDebug.debug("process_in is null! This should never happen. (getEnumProcessStateHandler)");
+    			            TraceDebug.debug("process_in is null! This should never happen. (getEnumProcessStateHandler)"); //$NON-NLS-1$
     			        }
     			    }
 			    }
 			    else {
-			        TraceDebug.debug("pid_in is null! This should never happen, really... (getEnumProcessStateHandler)");
+			        TraceDebug.debug("pid_in is null! This should never happen, really... (getEnumProcessStateHandler)"); //$NON-NLS-1$
 			    }
 			    
 				return false;

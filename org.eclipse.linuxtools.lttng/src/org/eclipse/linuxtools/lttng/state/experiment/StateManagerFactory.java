@@ -113,7 +113,7 @@ public class StateManagerFactory {
 				rexperiment.removeChild(childToremove);
 			}
 		} else {
-			TraceDebug.debug("Invalid arguments to remove manager for trace: "
+			TraceDebug.debug("Invalid arguments to remove manager for trace: " //$NON-NLS-1$
 					+ rtrace.getName());
 		}
 	}
@@ -124,7 +124,7 @@ public class StateManagerFactory {
 	private static void initCheck() {
 		if (experimentManager == null) {
 			Long id = 0L; // unique id
-			String name = "StateExperimentManager"; // name
+			String name = "StateExperimentManager"; // name //$NON-NLS-1$
 			experimentManager = new StateExperimentManager(id, name);
 		}
 	}

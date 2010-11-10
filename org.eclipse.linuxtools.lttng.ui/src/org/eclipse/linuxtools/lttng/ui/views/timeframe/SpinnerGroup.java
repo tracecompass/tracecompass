@@ -43,8 +43,8 @@ public class SpinnerGroup {
     private static final byte NS_SCALING_FACTOR = -9;
 
     // Labels
-    private static final String SECONDS_LABEL = "sec";
-    private static final String NANOSEC_LABEL = "ns";
+    private static final String SECONDS_LABEL = "sec"; //$NON-NLS-1$
+    private static final String NANOSEC_LABEL = "ns"; //$NON-NLS-1$
 
     // Widgets
     private Group group;

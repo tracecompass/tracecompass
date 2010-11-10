@@ -99,6 +99,7 @@ public abstract class TimeRangeComponent implements ITimeRangeComponent {
 	}
 
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
 		return "[TimeRangeComponent:" + "startTime=" + startTime + ",stopTime=" + stopTime +
 		",parent=" + (eventParent != null ? eventParent.id : "null") + "]";

@@ -63,7 +63,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 	// =======================================================================
 	public StateExperimentManager(Long id, String name) {
 		super(id, null, name, null);
-		fexperimentListener = new StateExperimentListener("Experiment Manager", this);
+		fexperimentListener = new StateExperimentListener("Experiment Manager", this); //$NON-NLS-1$
 	}
 
 
@@ -192,7 +192,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			TmfExperiment<LttngEvent> experiment) {
 		// validate
 		if (experiment == null) { 
-			TraceDebug.debug("Received expriment is null");
+			TraceDebug.debug("Received expriment is null"); //$NON-NLS-1$
 			return;
 		}
 
@@ -270,13 +270,13 @@ public class StateExperimentManager extends LTTngTreeNode implements
 	private ITmfEventRequest<LttngEvent> buildCheckPoints(TmfExperiment<LttngEvent> experiment) {
 		// validate
 		if (experiment == null) {
-			TraceDebug.debug("Received expriment is null");
+			TraceDebug.debug("Received expriment is null"); //$NON-NLS-1$
 			return null;
 		}
 		
 		LTTngTreeNode experimentNode = getChildByName(experiment.getName());
 		if (experimentNode == null) {
-			TraceDebug.debug("Expriment Node " + experiment.getName() + " does not exist");
+			TraceDebug.debug("Expriment Node " + experiment.getName() + " does not exist"); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
 		
@@ -309,7 +309,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 
 		// if no trace mapping
 		if (ftraceToManagerMap.size() < 1) {
-			TraceDebug.debug("No traces associated to experiment " + experiment.getName());
+			TraceDebug.debug("No traces associated to experiment " + experiment.getName()); //$NON-NLS-1$
 			return null;
 		}
 		
@@ -345,7 +345,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 						// update state system, and save check points as needed
 						helper.getStateManager().handleEvent(synEvent, helper.getNumberRead());
 					} else {
-						TraceDebug.debug("StateTraceManager not found for trace"
+						TraceDebug.debug("StateTraceManager not found for trace" //$NON-NLS-1$
 								+ trace.getName());
 					}
 				}
@@ -389,9 +389,9 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			 */
 			private void printCompletedMessage() {
 				if (TraceDebug.isDEBUG()) {
-					TraceDebug.debug("Trace check point building completed, number of events handled: " + nbEventsHandled + "\n\t\t");
+					TraceDebug.debug("Trace check point building completed, number of events handled: " + nbEventsHandled + "\n\t\t"); //$NON-NLS-1$ //$NON-NLS-2$
 					for (StateTraceHelper helper : ftraceToManagerMap.values()) {
-						TraceDebug.debug(helper.getStateManager().toString() + "\n\t\t");
+						TraceDebug.debug(helper.getStateManager().toString() + "\n\t\t"); //$NON-NLS-1$
 					}
 				}
 			}

@@ -84,7 +84,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 		super(id, parent, name, trace);
 
 		if (trace == null) {
-			throw new LttngStateException("No TmfTrace object available!");
+			throw new LttngStateException("No TmfTrace object available!"); //$NON-NLS-1$
 		}
 
 		fTrace = trace;
@@ -154,9 +154,9 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 				stateCheckPoint = fCheckPointStateModel.clone();
 			}
 
-			TraceDebug.debug("Check point created here: " + eventCounter
-					+ " -> " + eventTime.toString() + "************"
-					+ getTrace().getName() + "   >>>>> Thread: "
+			TraceDebug.debug("Check point created here: " + eventCounter //$NON-NLS-1$
+					+ " -> " + eventTime.toString() + "************" //$NON-NLS-1$ //$NON-NLS-2$
+					+ getTrace().getName() + "   >>>>> Thread: " //$NON-NLS-1$
 					+ Thread.currentThread().getId());
 
 			synchronized (fCheckPointsLock) {
@@ -348,7 +348,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 
 			super(range, offset, nbEvents, maxBlockSize, listener, experimentTimeRange, processor);
 			fprocessor = processor;
-			TraceDebug.debug("Instance created for range: " + range.toString());
+			TraceDebug.debug("Instance created for range: " + range.toString()); //$NON-NLS-1$
 			fCount = 0L;
 		}
 
@@ -376,7 +376,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 
 					if (TraceDebug.isDEBUG()) {
 						if (fCount % 1000 == 0) {
-							TraceDebug.debug("handled: " + fCount + " sequence: " + synEvent.getSynType());
+							TraceDebug.debug("handled: " + fCount + " sequence: " + synEvent.getSynType()); //$NON-NLS-1$ //$NON-NLS-2$
 						}
 					}
 				}

@@ -798,7 +798,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 								nbRead[0] += getNbRead();
 							}
 							if (getNbRead() > CHUNK_SIZE[0]) {
-								System.out.println("ERROR - Read too many events");
+								System.out.println("ERROR - Read too many events"); //$NON-NLS-1$
 							}
 						}
 

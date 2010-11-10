@@ -163,7 +163,7 @@ public class LttngEvent extends TmfEvent {
             tmpEvent = jniEventReference;
         }
         else {
-            System.out.println("convertEventTmfToJni() failed: Unsynced Timestamp > TMF:" + getTimestamp().getValue() + " <--> JNI:" + jniEventReference.getParentTracefile().getParentTrace().getCurrentEventTimestamp().getTime());
+            System.out.println("convertEventTmfToJni() failed: Unsynced Timestamp > TMF:" + getTimestamp().getValue() + " <--> JNI:" + jniEventReference.getParentTracefile().getParentTrace().getCurrentEventTimestamp().getTime());  //$NON-NLS-1$//$NON-NLS-2$
         }
         return tmpEvent;
     }

@@ -77,7 +77,7 @@ public class LTTngStateResource extends
 		if (stateMode != null) {
 			fstateMode = stateMode;
 		} else {
-			TraceDebug.debug("Received input is null !");
+			TraceDebug.debug("Received input is null !"); //$NON-NLS-1$
 		}
 	}
 

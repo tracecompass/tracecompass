@@ -43,8 +43,8 @@ public abstract class JniMarker extends Jni_C_Common
     // Internal C pointer of the JniEvent used in LTT
     private Jni_C_Pointer_And_Library_Id thisMarkerPtr = new Jni_C_Pointer_And_Library_Id();
 
-    private String name = "";
-    private String formatOverview = "";
+    private String name = ""; //$NON-NLS-1$
+    private String formatOverview = ""; //$NON-NLS-1$
     
     // These two contains hold references to the same MarkerField object
     //  The ArrayList can be used to efficiently find a field by its position
@@ -111,7 +111,7 @@ public abstract class JniMarker extends Jni_C_Common
      */
     private void populateMarkerInformation() throws JniException {
         if (thisMarkerPtr.getPointer() == NULL) {
-            throw new JniMarkerException("Pointer is NULL, trace closed? (populateMarkerInformatOverviewion)");
+            throw new JniMarkerException("Pointer is NULL, trace closed? (populateMarkerInformatOverviewion)"); //$NON-NLS-1$
         } else {
             name = ltt_getName(thisMarkerPtr.getLibraryId(), thisMarkerPtr.getPointer());
             formatOverview = ltt_getFormatOverview(thisMarkerPtr.getLibraryId(),  thisMarkerPtr.getPointer());
@@ -139,7 +139,7 @@ public abstract class JniMarker extends Jni_C_Common
             markerFieldsHashMap.put(markerFieldName, newMarkerField);
             
         } catch (JniException e) {
-            printlnC(thisMarkerPtr.getLibraryId(), "Failed to add marker field " + markerFieldName + " to marker fields list!(addMarkerFieldFromC)\n\tException raised : " + e.toString() );
+            printlnC(thisMarkerPtr.getLibraryId(), "Failed to add marker field " + markerFieldName + " to marker fields list!(addMarkerFieldFromC)\n\tException raised : " + e.toString() ); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 

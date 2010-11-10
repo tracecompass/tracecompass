@@ -72,16 +72,16 @@ public class JniTraceFactory {
 				return new JniTrace_v2_3(path, show_debug);
 			}
 			else {
-				String errMsg = "\nERROR : Unrecognized/unsupported trace version." +
-								"\nLibrary reported a trace version " + traceVersion.getVersionAsString() + "." + 
-								"\nMake sure you installed the Lttv library that support this version (look for liblttvtraceread-" + traceVersion.getVersionAsString() + ".so).\n"; 
+				String errMsg = "\nERROR : Unrecognized/unsupported trace version." + //$NON-NLS-1$
+								"\nLibrary reported a trace version " + traceVersion.getVersionAsString() + "." +  //$NON-NLS-1$ //$NON-NLS-2$
+								"\nMake sure you installed the Lttv library that support this version (look for liblttvtraceread-" + traceVersion.getVersionAsString() + ".so).\n";  //$NON-NLS-1$ //$NON-NLS-2$
 				throw new JniException(errMsg);
 			}
 		}
 		catch (JniTraceVersionException e) {
-			String errMsg = "\nERROR : Call to JniTraceVersion() failed." +
-							"\nThis usually means that the library (liblttvtraceread_loader.so) could not be found." +
-							"\nMake sure the LTTv library is installed and that your LD_LIBRARY_PATH is set correctly (see help for more details)\n.";
+			String errMsg = "\nERROR : Call to JniTraceVersion() failed." + //$NON-NLS-1$
+							"\nThis usually means that the library (liblttvtraceread_loader.so) could not be found." + //$NON-NLS-1$
+							"\nMake sure the LTTv library is installed and that your LD_LIBRARY_PATH is set correctly (see help for more details)\n."; //$NON-NLS-1$
 			
 			throw new JniException(errMsg);
 		}

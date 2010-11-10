@@ -101,7 +101,7 @@ public class TimeRangeViewerProvider extends TmfTimeAnalysisProvider {
 	@Override
 	public String getStateName(StateColor color) {
 		//Override to multiple instances of the widget, the same color can have multiple meanings
-		return "Not mapped";
+		return "Not mapped"; //$NON-NLS-1$
 	}
 
 	@Override
@@ -118,7 +118,7 @@ public class TimeRangeViewerProvider extends TmfTimeAnalysisProvider {
 			if (eventStart < fviewParameters.getStartTime()) {
 				toolTipEventMsgs.put("Start Time:", "Actual Event Start Time is undefined" + extraInfo);
 				// avoid repeated details
-				extraInfo = "";
+				extraInfo = ""; //$NON-NLS-1$
 			}
 
 			long eventEnd = revent.getTime() + revent.getDuration();
@@ -146,14 +146,14 @@ public class TimeRangeViewerProvider extends TmfTimeAnalysisProvider {
 		}
 		
 		if (name == null) {
-			return "Unknown";
+			return "Unknown"; //$NON-NLS-1$
 		}
 		return name;
 	}
 
 	@Override
 	public String getTraceClassName(ITmfTimeAnalysisEntry trace) {
-		String name = "";
+		String name = ""; //$NON-NLS-1$
 		if (trace instanceof TimeRangeComposite) {
 			TimeRangeComposite dTrace = (TimeRangeComposite) trace;
 			name = dTrace.getClassName();

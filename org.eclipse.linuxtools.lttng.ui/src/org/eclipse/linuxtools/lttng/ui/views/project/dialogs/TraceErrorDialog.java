@@ -83,7 +83,7 @@ public class TraceErrorDialog extends SelectionStatusDialog {
 		
 		// The actual messages
 		GC graphicContext = new GC(parent);
-		String longuestLine = "";
+		String longuestLine = ""; //$NON-NLS-1$
 		int msgSize = 0;
 		
 		// *** Font and FontData are nowhere near elegant to use.

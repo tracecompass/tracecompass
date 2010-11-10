@@ -34,7 +34,7 @@ public class JniTraceVersion {
 	private int minorNumber = 0;
 	
 	// To store the given tracepath
-	private String tracepath = "";
+	private String tracepath = ""; //$NON-NLS-1$
 	
 	// Was the trace read already?
 	private boolean wasTraceRead = false;
@@ -107,8 +107,8 @@ public class JniTraceVersion {
 	public void readVersionFromTrace(String newTracepath) throws JniTraceVersionException {
 		
 		// Verify that the tracepath isn't obliviously wrong (null or empty)
-		if ( (newTracepath == null) || (newTracepath.equals("") ) ) {
-			throw new JniTraceVersionException("ERROR : Tracepath is null or empty! (readVersionNumber)");
+		if ( (newTracepath == null) || (newTracepath.equals("") ) ) { //$NON-NLS-1$
+			throw new JniTraceVersionException("ERROR : Tracepath is null or empty! (readVersionNumber)"); //$NON-NLS-1$
 		}
 		else {
 			// Otherwise set the path in case it was changed
@@ -118,7 +118,7 @@ public class JniTraceVersion {
 		try {
 			// Load the C library here. 
 			// If LD_LIBRARY_PATH is not set correctly this will raise a java.lang.UnsatisfiedLinkError
-			System.loadLibrary("lttvtraceread_loader");
+			System.loadLibrary("lttvtraceread_loader"); //$NON-NLS-1$
 			
 			// Assuming the C library loaded correctly, call the JNI here.
 			ltt_getTraceVersion(tracepath);
@@ -128,12 +128,12 @@ public class JniTraceVersion {
 		}
 		// The library was unable to load -> Lttv not installed or bad version of it? 
 		catch (java.lang.UnsatisfiedLinkError e) {
-			throw new JniTraceVersionException("\nERROR : Could not get trace version. Is the library missing?" +
-											   "\nMake sure your \"LD_LIBRARY_PATH\" is setted correctly (readVersionNumber)\n");
+			throw new JniTraceVersionException("\nERROR : Could not get trace version. Is the library missing?" + //$NON-NLS-1$
+											   "\nMake sure your \"LD_LIBRARY_PATH\" is setted correctly (readVersionNumber)\n"); //$NON-NLS-1$
 		}
 		// Something else failed -> Possibly a bad tracepath was given 
 		catch (Exception e) {
-			throw new JniTraceVersionException("\nERROR : Call to ltt_getTraceVersion failed. (readVersionNumber)\n");
+			throw new JniTraceVersionException("\nERROR : Call to ltt_getTraceVersion failed. (readVersionNumber)\n"); //$NON-NLS-1$
 		}
 	}
 	
@@ -190,7 +190,7 @@ public class JniTraceVersion {
 			readVersionNumberNofail();
 		}
 		
-		return majorNumber + "." + minorNumber;
+		return majorNumber + "." + minorNumber; //$NON-NLS-1$
 	}
 	
 	/**

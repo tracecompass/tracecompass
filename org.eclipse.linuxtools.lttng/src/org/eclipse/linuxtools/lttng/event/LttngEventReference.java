@@ -21,7 +21,7 @@ import org.eclipse.linuxtools.tmf.event.*;
  */
 public class LttngEventReference extends TmfEventReference {
     
-    private String tracename = ""; 
+    private String tracename = "";  //$NON-NLS-1$
     
     /**
      * Constructor with parameters.<p>
@@ -29,7 +29,7 @@ public class LttngEventReference extends TmfEventReference {
      * @param newTraceName      Trace name 
      */
     public LttngEventReference(String newTraceName) {
-        super("");
+        super(""); //$NON-NLS-1$
         tracename = newTraceName;
     }
     

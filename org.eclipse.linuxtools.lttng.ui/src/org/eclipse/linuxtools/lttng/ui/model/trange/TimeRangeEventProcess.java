@@ -21,10 +21,10 @@ public class TimeRangeEventProcess extends TimeRangeComposite implements
 	private Long tgid = 0L;
 	private Long ppid = 0L;
 	private Long creationTime = 0L;
-	private String traceID = "";
-	private String processType = "User"; // Kernel or user thread
+	private String traceID = ""; //$NON-NLS-1$
+	private String processType = "User"; // Kernel or user thread //$NON-NLS-1$
 	private Long cpu = 0L;
-	private String brand = "";
+	private String brand = ""; //$NON-NLS-1$
 
 	// ========================================================================
 	// Constructor
@@ -134,7 +134,7 @@ public class TimeRangeEventProcess extends TimeRangeComposite implements
 		if (traceID != null) {
 			this.traceID = traceID;
 		} else {
-			this.traceID = "";
+			this.traceID = ""; //$NON-NLS-1$
 		}
 	}
 
@@ -186,7 +186,7 @@ public class TimeRangeEventProcess extends TimeRangeComposite implements
         if (brand != null) {
             this.brand = brand;
         } else {
-            brand = "";
+            brand = ""; //$NON-NLS-1$
         }
     }
 	
@@ -222,6 +222,7 @@ public class TimeRangeEventProcess extends TimeRangeComposite implements
 	}
 	
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
 		return "[TimeRangeEventProcess:" + super.toString() +
 		",pid=" + pid + ",tgid=" + tgid + ",ppid=" + ppid + ",ctime=" + creationTime +

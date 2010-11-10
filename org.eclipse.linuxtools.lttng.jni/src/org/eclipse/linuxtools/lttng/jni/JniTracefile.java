@@ -52,8 +52,8 @@ public abstract class JniTracefile extends Jni_C_Common
     // Note that all type have been scaled up as there is no "unsigned" in java
     // This might be a problem about "unsigned long" as there is no equivalent in java
     private boolean isCpuOnline = false;
-    private String  tracefilePath = "";
-    private String  tracefileName = "";
+    private String  tracefilePath = ""; //$NON-NLS-1$
+    private String  tracefileName = ""; //$NON-NLS-1$
     private long    cpuNumber = 0;
     private long    tid = 0;
     private long    pgid = 0;
@@ -184,7 +184,7 @@ public abstract class JniTracefile extends Jni_C_Common
             populateTracefileInformation();
         } 
         catch (JniNoSuchEventException e) {
-            throw new JniTracefileWithoutEventException("JniEvent constructor reported that no event of this type are usable. (Jni_Tracefile)");
+            throw new JniTracefileWithoutEventException("JniEvent constructor reported that no event of this type are usable. (Jni_Tracefile)"); //$NON-NLS-1$
         }
     }        
 
@@ -223,7 +223,7 @@ public abstract class JniTracefile extends Jni_C_Common
      */
     private void populateTracefileInformation() throws JniException {
         if (thisTracefilePtr.getPointer() == NULL) {
-            throw new JniTracefileException("Pointer is NULL, trace closed? (populateTracefileInformation)");
+            throw new JniTracefileException("Pointer is NULL, trace closed? (populateTracefileInformation)"); //$NON-NLS-1$
         }
 
         isCpuOnline = ltt_getIsCpuOnline(thisTracefilePtr.getLibraryId(), thisTracefilePtr.getPointer());
@@ -276,7 +276,7 @@ public abstract class JniTracefile extends Jni_C_Common
 
             tracefileMarkersMap.put(markerId, newMarker);
         } catch (Exception e) {
-            printlnC(thisTracefilePtr.getLibraryId(), "Failed to add marker to tracefileMarkersMap!(addMarkersFromC)\n\tException raised : " + e.toString());
+            printlnC(thisTracefilePtr.getLibraryId(), "Failed to add marker to tracefileMarkersMap!(addMarkersFromC)\n\tException raised : " + e.toString()); //$NON-NLS-1$
         }
     }
     

@@ -58,7 +58,7 @@ public class LttngLocation implements ITmfLocation<LttngTimestamp> {
 			newLocation.operationTime  = new LttngTimestamp( this.operationTime );
 		} 
 		catch (CloneNotSupportedException e) {
-			System.out.println("Cloning failed with : " + e.getMessage());
+			System.out.println("Cloning failed with : " + e.getMessage()); //$NON-NLS-1$
 		}
 
 		return newLocation;

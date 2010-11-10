@@ -76,7 +76,7 @@ class FlowBeforeUpdateHandlers {
 							stateProcess, localProcess, params);
 				} else {
 					TraceDebug
-							.debug("Running state process is null! (getStateModesHandler)");
+							.debug("Running state process is null! (getStateModesHandler)"); //$NON-NLS-1$
 				}
 
 				return false;
@@ -201,7 +201,7 @@ class FlowBeforeUpdateHandlers {
 					}
 				} else {
 					TraceDebug
-							.debug("Running process is null! (getBeforeSchedChangeHandler)");
+							.debug("Running process is null! (getBeforeSchedChangeHandler)"); //$NON-NLS-1$
 				}
 
 				return false;
@@ -262,7 +262,7 @@ class FlowBeforeUpdateHandlers {
 
 				} else {
 					TraceDebug
-							.debug("Running process is null! (getProcessExitHandler)");
+							.debug("Running process is null! (getProcessExitHandler)"); //$NON-NLS-1$
 				}
 
 				return false;
@@ -317,7 +317,7 @@ class FlowBeforeUpdateHandlers {
 					}
 				} else {
 					TraceDebug
-							.debug("Release_pid is null! (getProcessFreeHandler)");
+							.debug("Release_pid is null! (getProcessFreeHandler)"); //$NON-NLS-1$
 				}
 
 				return false;

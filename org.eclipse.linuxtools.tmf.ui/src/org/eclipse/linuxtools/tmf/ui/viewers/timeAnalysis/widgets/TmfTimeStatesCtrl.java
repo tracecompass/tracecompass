@@ -2224,7 +2224,7 @@ class ItemData {
 			if (null == group) {
 				group = new GroupItem(NLS.bind(Messages._TRACE_GROUP_LABEL,
 						groupName));
-				group._expanded = !groupName.equalsIgnoreCase("system")	&& !groupName.equalsIgnoreCase(undef);
+				group._expanded = !groupName.equalsIgnoreCase("system")	&& !groupName.equalsIgnoreCase(undef); //$NON-NLS-1$
 				_groupTable.put(groupName, group);
 				groupList.add(group);
 			}

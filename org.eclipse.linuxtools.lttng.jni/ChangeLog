@@ -1,3 +1,14 @@
+2010-11-10  Francois Chouinard  <fchouinard@gmail.com>
+
+    Suppress warning for non-externalized strings
+	   * src/org/eclipse/linuxtools/lttng/jni/factory/JniTraceFactory.java: 
+	   * src/org/eclipse/linuxtools/lttng/jni/factory/JniTraceVersion.java: 
+	   * src/org/eclipse/linuxtools/lttng/jni/JniEvent.java: 
+	   * src/org/eclipse/linuxtools/lttng/jni/JniMarker.java: 
+	   * src/org/eclipse/linuxtools/lttng/jni/JniMarkerField.java: 
+	   * src/org/eclipse/linuxtools/lttng/jni/JniTrace.java: 
+	   * src/org/eclipse/linuxtools/lttng/jni/JniTracefile.java: 
+
 2010-11-09  Francois Chouinard  <fchouinard@gmail.com>
 
     Suppress warning for non-externalized strings

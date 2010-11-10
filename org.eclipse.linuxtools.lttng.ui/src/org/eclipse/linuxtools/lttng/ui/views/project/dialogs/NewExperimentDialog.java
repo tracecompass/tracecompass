@@ -304,8 +304,8 @@ public class NewExperimentDialog extends SelectionStatusDialog {
 		IWorkspace workspace = container.getWorkspace();
 		IStatus nameStatus = workspace.validateName(name, IResource.FOLDER);
 
-		if ("".equals(name)) {
-			updateStatus(IStatus.ERROR, "Experiment name is empty");
+		if ("".equals(name)) { //$NON-NLS-1$
+			updateStatus(IStatus.ERROR, "Experiment name is empty"); //$NON-NLS-1$
 			return false;
 		}
 		if (nameStatus.isOK() == false) {
@@ -315,10 +315,10 @@ public class NewExperimentDialog extends SelectionStatusDialog {
 		IPath path = new Path(name);
 		if (container.getFolder(path).exists()
 				|| container.getFile(path).exists()) {
-			updateStatus(IStatus.ERROR, NLS.bind("Experiment already exists", name));
+			updateStatus(IStatus.ERROR, NLS.bind("Experiment already exists", name)); //$NON-NLS-1$
 			return false;
 		}
-		updateStatus(IStatus.OK, "");
+		updateStatus(IStatus.OK, ""); //$NON-NLS-1$
 		return true;
 	}
 

@@ -231,7 +231,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     		returnedTrace = new LTTngTrace(this);
     	}
     	catch (Exception e) {
-    		System.out.println("ERROR : Could not create LTTngTrace copy (createTraceCopy).\nError is : " + e.getStackTrace());
+    		System.out.println("ERROR : Could not create LTTngTrace copy (createTraceCopy).\nError is : " + e.getStackTrace()); //$NON-NLS-1$
     	}
     	
     	return returnedTrace;
@@ -443,7 +443,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 
 		if (PrintDebug) {
 			System.out
-					.println("seekLocation(location) location -> " + location);
+					.println("seekLocation(location) location -> " + location); //$NON-NLS-1$
 		}
 
 		// If the location in context is null, create a new one
@@ -502,7 +502,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 
 		if (PrintDebug) {
 			System.out
-					.println("seekEvent(timestamp) timestamp -> " + timestamp);
+					.println("seekEvent(timestamp) timestamp -> " + timestamp); //$NON-NLS-1$
 		}
 
 		// Call JNI to seek
@@ -542,7 +542,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 	public synchronized TmfContext seekEvent(long position) {
 
 		if (PrintDebug) {
-			System.out.println("seekEvent(position) position -> " + position);
+			System.out.println("seekEvent(position) position -> " + position); //$NON-NLS-1$
 		}
 
 		TmfTimestamp timestamp = null;
@@ -625,7 +625,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 
 		if (PrintDebug) {
 			System.out
-					.println("getNextEvent(context) context.getLocation() -> "
+					.println("getNextEvent(context) context.getLocation() -> " //$NON-NLS-1$
 							+ context.getLocation());
 		}
 
@@ -668,11 +668,11 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 					.getOperationTimeValue()) {
 				if (PrintDebug) {
 					System.out
-							.println("\t\tSeeking in getNextEvent. [ LastTime : "
+							.println("\t\tSeeking in getNextEvent. [ LastTime : " //$NON-NLS-1$
 									+ previousLocation.getOperationTimeValue()
-									+ " CurrentTime"
+									+ " CurrentTime" //$NON-NLS-1$
 									+ curLocation.getOperationTimeValue()
-									+ " ]");
+									+ " ]"); //$NON-NLS-1$
 				}
 				seekEvent(curLocation.getOperationTime());
 			}
@@ -797,7 +797,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 	public synchronized LttngEvent parseEvent(TmfContext context) {
 
 		if (PrintDebug) {
-			System.out.println("parseEvent(context) context.getLocation() -> "
+			System.out.println("parseEvent(context) context.getLocation() -> " //$NON-NLS-1$
 					+ context.getLocation());
 		}
 
@@ -844,11 +844,11 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 					.getOperationTimeValue()) {
 				if (PrintDebug) {
 					System.out
-							.println("\t\tSeeking in getNextEvent. [ LastTime : "
+							.println("\t\tSeeking in getNextEvent. [ LastTime : " //$NON-NLS-1$
 									+ previousLocation.getOperationTimeValue()
-									+ " CurrentTime"
+									+ " CurrentTime" //$NON-NLS-1$
 									+ curLocation.getOperationTimeValue()
-									+ " ]");
+									+ " ]"); //$NON-NLS-1$
 				}
 				seekEvent(curLocation.getOperationTime());
 			}
@@ -1120,14 +1120,14 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 	 * This is intended for debug purpose only.
 	 */
 	public void printCheckpointsVector() {
-		System.out.println("StartTime : "
+		System.out.println("StartTime : " //$NON-NLS-1$
 				+ getTimeRange().getStartTime().getValue());
-		System.out.println("EndTime   : "
+		System.out.println("EndTime   : " //$NON-NLS-1$
 				+ getTimeRange().getEndTime().getValue());
 
 		for (int pos = 0; pos < fCheckpoints.size(); pos++) {
-			System.out.print(pos + ": " + "\t");
-			System.out.print(fCheckpoints.get(pos).getTimestamp() + "\t");
+			System.out.print(pos + ": " + "\t"); //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.print(fCheckpoints.get(pos).getTimestamp() + "\t"); //$NON-NLS-1$
 			System.out.println(fCheckpoints.get(pos).getLocation());
 		}
 	}
