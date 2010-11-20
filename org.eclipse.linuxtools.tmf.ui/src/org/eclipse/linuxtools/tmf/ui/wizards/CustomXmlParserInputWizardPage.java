@@ -1402,14 +1402,14 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         StringBuffer errors = new StringBuffer();
 
         if (definition.definitionName.length() == 0) {
-            errors.append(Messages.CustomXmlParserInputWizardPage_62);
+            errors.append(Messages.CustomXmlParserInputWizardPage_emptyLogTypeError);
             logtypeText.setBackground(COLOR_LIGHT_RED);
         } else {
             logtypeText.setBackground(COLOR_TEXT_BACKGROUND);
             for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
                 if (definition.definitionName.equals(def.definitionName)) {
                     if (editDefinitionName == null || ! editDefinitionName.equals(definition.definitionName)) {
-                        errors.append(Messages.CustomXmlParserInputWizardPage_63);
+                        errors.append(Messages.CustomXmlParserInputWizardPage_duplicatelogTypeError);
                         logtypeText.setBackground(COLOR_LIGHT_RED);
                         break;
                     }
@@ -1418,7 +1418,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         }
         
         if (definition.rootInputElement == null) {
-            errors.append(Messages.CustomXmlParserInputWizardPage_64);
+            errors.append(Messages.CustomXmlParserInputWizardPage_noDocumentError);
         }
         
         if (definition.rootInputElement != null) {
@@ -1431,28 +1431,28 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             if ((definition.rootInputElement.attributes != null && definition.rootInputElement.attributes.size() != 0) ||
                     (definition.rootInputElement.childElements != null && definition.rootInputElement.childElements.size() != 0) || errors.length() == 0) {
                 if (!logEntryFound) {
-                    errors.append(Messages.CustomXmlParserInputWizardPage_65);
+                    errors.append(Messages.CustomXmlParserInputWizardPage_missingLogEntryError);
                 }
 
                 if (timeStampFound) {
                     if (timeStampOutputFormatText.getText().trim().length() == 0) {
-                        errors.append(Messages.CustomXmlParserInputWizardPage_66);
+                        errors.append(Messages.CustomXmlParserInputWizardPage_missingTimestampFmtError);
                         timeStampOutputFormatText.setBackground(COLOR_LIGHT_RED);
                     } else {
                         try {
                             new SimpleDateFormat(timeStampOutputFormatText.getText().trim());
                             timeStampOutputFormatText.setBackground(COLOR_TEXT_BACKGROUND);
                         } catch (IllegalArgumentException e) {
-                            errors.append(Messages.CustomXmlParserInputWizardPage_67);
+                            errors.append(Messages.CustomXmlParserInputWizardPage_invalidTimestampFmtError);
                             timeStampOutputFormatText.setBackground(COLOR_LIGHT_RED);
                         }
                     }
                 } else {
-                    timeStampPreviewText.setText(Messages.CustomXmlParserInputWizardPage_68);
+                    timeStampPreviewText.setText(Messages.CustomXmlParserInputWizardPage_notimestamporAttributeError);
                 }
             }
         } else {
-            timeStampPreviewText.setText(Messages.CustomXmlParserInputWizardPage_69);
+            timeStampPreviewText.setText(Messages.CustomXmlParserInputWizardPage_notimestamporAttributeError);
         }
     
         if (errors.length() == 0) {
@@ -1470,7 +1470,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         if (selectedElement != null && selectedElement.inputElement.equals(inputElement)) elementNode = selectedElement;
         if (inputElement == definition.rootInputElement) {
             if (inputElement.elementName.length() == 0) {
-                errors.append(Messages.CustomXmlParserInputWizardPage_70);
+                errors.append(Messages.CustomXmlParserInputWizardPage_missingDocumentElementError);
                 if (elementNode != null) elementNode.elementNameText.setBackground(COLOR_LIGHT_RED);
             } else {
                 if (elementNode != null) elementNode.elementNameText.setBackground(COLOR_TEXT_BACKGROUND);
@@ -1484,19 +1484,21 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             if (inputElement.inputName.equals(CustomXmlTraceDefinition.TAG_TIMESTAMP)) {
                 timeStampFound = true;
                 if (inputElement.inputFormat.length() == 0) {
-                    errors.append(Messages.CustomXmlParserInputWizardPage_71 + getName(inputElement) + "). "); //$NON-NLS-1$
+                    errors.append(Messages.CustomXmlParserInputWizardPage_timestampFormatPrompt + 
+                            " (" + Messages.CustomXmlParserInputWizardPage_timestampElementPrompt + " " + getName(inputElement) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     if (elementNode != null) elementNode.tagText.setBackground(COLOR_LIGHT_RED);
                 } else {
                     try {
                         new SimpleDateFormat(inputElement.inputFormat);
                         if (elementNode != null) elementNode.tagText.setBackground(COLOR_TEXT_BACKGROUND);
                     } catch (IllegalArgumentException e) {
-                        errors.append(Messages.CustomXmlParserInputWizardPage_73 + getName(inputElement) + "). "); //$NON-NLS-1$
+                        errors.append(Messages.CustomXmlParserInputWizardPage_invalidTimestampFmtError + 
+                                " (" + Messages.CustomXmlParserInputWizardPage_timestampElementPrompt + " " + getName(inputElement) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                         if (elementNode != null) elementNode.tagText.setBackground(COLOR_LIGHT_RED);
                     }
                 }
             } else if (inputElement.inputName.length() == 0) {
-                errors.append(Messages.CustomXmlParserInputWizardPage_75);
+                errors.append(Messages.CustomXmlParserInputWizardPage_missingInputElementNameError);
                 if (elementNode != null) elementNode.tagText.setBackground(COLOR_LIGHT_RED);
             } else {
                 if (elementNode != null) elementNode.tagText.setBackground(COLOR_TEXT_BACKGROUND);
@@ -1521,28 +1523,33 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     }
                 }
                 if (attribute.attributeName.length() == 0) {
-                    errors.append(Messages.CustomXmlParserInputWizardPage_76 + getName(inputElement) + ": ?). "); //$NON-NLS-1$
+                    errors.append(Messages.CustomXmlParserInputWizardPage_missingAttribute + 
+                            " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(inputElement) + ": ?). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     if (elementNode != null) elementNode.attributes.get(i).attributeNameText.setBackground(COLOR_LIGHT_RED);
                 } else if (duplicate) {
-                    errors.append(Messages.CustomXmlParserInputWizardPage_78 + getName(attribute, inputElement) +"). "); //$NON-NLS-1$
+                    errors.append(Messages.CustomXmlParserInputWizardPage_duplicateAttributeError +
+                            " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(attribute, inputElement) +"). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     if (elementNode != null) elementNode.attributes.get(i).attributeNameText.setBackground(COLOR_LIGHT_RED);
                 }
                 if (attribute.inputName.equals(CustomXmlTraceDefinition.TAG_TIMESTAMP)) {
                     timeStampFound = true;
                     if (attribute.inputFormat.length() == 0) {
-                        errors.append(Messages.CustomXmlParserInputWizardPage_80 + getName(attribute, inputElement) +"). "); //$NON-NLS-1$
+                        errors.append(Messages.CustomXmlParserInputWizardPage_missingTimestampInFmtError +
+                                " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(attribute, inputElement) +"). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                         if (elementNode != null) elementNode.attributes.get(i).tagText.setBackground(COLOR_LIGHT_RED);
                     } else {
                         try {
                             new SimpleDateFormat(attribute.inputFormat);
                             if (elementNode != null) elementNode.attributes.get(i).tagText.setBackground(COLOR_TEXT_BACKGROUND);
                         } catch (IllegalArgumentException e) {
-                            errors.append(Messages.CustomXmlParserInputWizardPage_82 + getName(attribute, inputElement) +"). "); //$NON-NLS-1$
+                            errors.append(Messages.CustomXmlParserInputWizardPage_invalidTimestampInFmtError + 
+                                    " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(attribute, inputElement) +"). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                             if (elementNode != null) elementNode.attributes.get(i).tagText.setBackground(COLOR_LIGHT_RED);
                         }
                     }
                 } else if (attribute.inputName.length() == 0) {
-                    errors.append(Messages.CustomXmlParserInputWizardPage_84 + getName(attribute, inputElement) +"). "); //$NON-NLS-1$
+                    errors.append(Messages.CustomXmlParserInputWizardPage_missingDataGroupNameError + 
+                            " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(attribute, inputElement) +"). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     if (elementNode != null) elementNode.attributes.get(i).tagText.setBackground(COLOR_LIGHT_RED);
                 } else {
                     if (elementNode != null) elementNode.attributes.get(i).tagText.setBackground(COLOR_TEXT_BACKGROUND);
@@ -1560,7 +1567,8 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 ElementNode childElementNode = null;
                 if (selectedElement != null && selectedElement.inputElement.equals(child)) childElementNode = selectedElement;
                 if (child.elementName.length() == 0) {
-                    errors.append(Messages.CustomXmlParserInputWizardPage_86 + getName(child) + "). "); //$NON-NLS-1$
+                    errors.append(Messages.CustomXmlParserInputWizardPage_missingElementNameError + 
+                            " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(child) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     if (childElementNode != null) childElementNode.elementNameText.setBackground(COLOR_LIGHT_RED);
                 } else {
                     boolean duplicate = false;
@@ -1574,7 +1582,8 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                         }
                     }
                     if (duplicate) {
-                        errors.append(Messages.CustomXmlParserInputWizardPage_88 + getName(child) + "). "); //$NON-NLS-1$
+                        errors.append(Messages.CustomXmlParserInputWizardPage_duplicateElementNameError + 
+                                " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(child) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                         if (childElementNode != null) childElementNode.elementNameText.setBackground(COLOR_LIGHT_RED);
                     }
                 }

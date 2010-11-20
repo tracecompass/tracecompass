@@ -51,7 +51,7 @@ public class AddTraceWizard extends Wizard implements IImportWizard {
 	 */
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-    	setWindowTitle(Messages.AddTraceWizard_windowTitle);
+    	setWindowTitle(Messages.AddTraceWizard_WindowTitle);
 	}
 
     /* (non-Javadoc)
@@ -84,7 +84,7 @@ public class AddTraceWizard extends Wizard implements IImportWizard {
 			            folder.createLink(location, IResource.REPLACE, null);
 			        }
 			        else {
-			            System.out.println(Messages.AddTraceWizard_invalidTraceLocation);
+			            System.out.println("Invalid Trace Location"); //$NON-NLS-1$
 			        }
 			    } else {
                     IFile file = experimentFolder.getFile(trace.getName());
@@ -92,7 +92,7 @@ public class AddTraceWizard extends Wizard implements IImportWizard {
                         file.createLink(location, IResource.REPLACE, null);
                     }
                     else {
-                        System.out.println(Messages.AddTraceWizard_invalidTraceLocation);
+                        System.out.println("Invalid Trace Location"); //$NON-NLS-1$
                     }
 			    }
 			} catch (CoreException e) {

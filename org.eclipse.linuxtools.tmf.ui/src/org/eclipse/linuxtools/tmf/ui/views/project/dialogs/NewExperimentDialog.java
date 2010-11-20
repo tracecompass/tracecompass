@@ -46,7 +46,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.dialogs.SelectionStatusDialog;
-import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.dialogs.CreateLinkedResourceGroup;
 
@@ -72,7 +71,7 @@ public class NewExperimentDialog extends SelectionStatusDialog {
 	public NewExperimentDialog(Shell parentShell, TmfExperimentFolderNode experimentFolder) {
 		super(parentShell);
 		this.container = experimentFolder.getFolder();
-		setTitle("Tmf Experiment");
+		setTitle(""); //$NON-NLS-1$
 		setStatusLineAboveButtons(true);
 	}
 
@@ -155,7 +154,7 @@ public class NewExperimentDialog extends SelectionStatusDialog {
 		// new folder label
 		Label folderLabel = new Label(folderGroup, SWT.NONE);
 		folderLabel.setFont(font);
-		folderLabel.setText("Experiment name: ");
+		folderLabel.setText(org.eclipse.linuxtools.tmf.ui.views.project.dialogs.IDEWorkbenchMessages.NewExperimentDialog_ExperimentName + ": "); //$NON-NLS-1$
 
 		// new folder name entry field
 		folderNameField = new Text(folderGroup, SWT.BORDER);
@@ -202,7 +201,7 @@ public class NewExperimentDialog extends SelectionStatusDialog {
 			@Override
 			public void execute(IProgressMonitor monitor) throws CoreException {
 				try {
-					monitor.beginTask(IDEWorkbenchMessages.NewFolderDialog_progress, 2000);
+					monitor.beginTask("", 2000); //$NON-NLS-1$
 					if (monitor.isCanceled()) {
 						throw new OperationCanceledException();
 					}
@@ -225,17 +224,13 @@ public class NewExperimentDialog extends SelectionStatusDialog {
 			return null;
 		} catch (InvocationTargetException exception) {
 			if (exception.getTargetException() instanceof CoreException) {
-				ErrorDialog.openError(getShell(),
-						IDEWorkbenchMessages.NewFolderDialog_errorTitle, null, // no special message
+				ErrorDialog.openError(getShell(), "", null, // no special message //$NON-NLS-1$
 						((CoreException) exception.getTargetException()).getStatus());
 			} else {
 				// CoreExceptions are handled above, but unexpected runtime exceptions and errors may still occur.
-				IDEWorkbenchPlugin.log(getClass(),
-						"createNewExperiment", exception.getTargetException());
-				MessageDialog.openError(getShell(),
-						IDEWorkbenchMessages.NewFolderDialog_errorTitle,
-						NLS.bind(IDEWorkbenchMessages.NewFolderDialog_internalError,
-							exception.getTargetException().getMessage()));
+				IDEWorkbenchPlugin.log(getClass(), "", exception.getTargetException()); //$NON-NLS-1$
+				MessageDialog.openError(getShell(), "", //$NON-NLS-1$
+						NLS.bind("", exception.getTargetException().getMessage())); //$NON-NLS-1$
 			}
 			return null;
 		}

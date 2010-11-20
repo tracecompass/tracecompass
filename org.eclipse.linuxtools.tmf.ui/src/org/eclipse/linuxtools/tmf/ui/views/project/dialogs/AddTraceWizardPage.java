@@ -38,8 +38,8 @@ public class AddTraceWizardPage extends WizardPage {
 	
 	protected AddTraceWizardPage(TmfProjectNode project, String pageName) {
 		super(pageName);
-		setTitle(Messages.AddTraceWizardPage_windowTitle);
-		setDescription(Messages.AddTraceWizardPage_description);
+		setTitle(Messages.AddTraceWizardPage_WindowTitle);
+		setDescription(Messages.AddTraceWizardPage_Description);
 		fProject = project;
 	}
 
@@ -64,7 +64,7 @@ public class AddTraceWizardPage extends WizardPage {
 
 		final TableColumn tableColumn = new TableColumn(table, SWT.NONE);
 		tableColumn.setWidth(200);
-		tableColumn.setText(Messages.AddTraceWizardPage_columnHeader);
+		tableColumn.setText(Messages.AddTraceWizardPage_TraceColumnHeader);
 
         fCheckboxTableViewer.setInput(fProject.getTracesFolder());
 	}

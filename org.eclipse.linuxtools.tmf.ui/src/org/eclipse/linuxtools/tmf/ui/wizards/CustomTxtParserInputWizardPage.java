@@ -771,9 +771,9 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 dateFormat = new SimpleDateFormat(timestampOutputFormatText.getText().trim());
                 timestampPreviewText.setText(dateFormat.format(date));
             } catch (ParseException e) {
-                timestampPreviewText.setText(Messages.CustomTxtParserInputWizardPage_20 + firstEntryTimeStamp + Messages.CustomTxtParserInputWizardPage_21 + firstEntryTimeStampInputFormat + Messages.CustomTxtParserInputWizardPage_22);
+                timestampPreviewText.setText("*parse exception* [" + firstEntryTimeStamp + "] <> [" + firstEntryTimeStampInputFormat + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             } catch (IllegalArgumentException e) {
-                timestampPreviewText.setText(Messages.CustomTxtParserInputWizardPage_23);
+                timestampPreviewText.setText("*parse exception* [Illegal Argument]"); //$NON-NLS-1$
             }
 
         }
@@ -885,15 +885,15 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         int line1start = 0;
         String line1 = Messages.CustomTxtParserInputWizardPage_nonMatchingLine;
         int line2start = line1start + line1.length();
-        String line2 = Messages.CustomTxtParserInputWizardPage_matchingLineRoot+CG+" "+UCG+" "+UT+" \n";  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        String line2 = Messages.CustomTxtParserInputWizardPage_matchingLineRoot + CG + " " + UCG + " " + UT + " \n";  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         int line3start = line2start + line2.length();
-        String line3 = Messages.CustomTxtParserInputWizardPage_matchingOtherLine+CG+" "+UCG+" "+UT+" \n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        String line3 = Messages.CustomTxtParserInputWizardPage_matchingOtherLine + CG + " " + UCG + " " + UT + " \n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         int line4start = line3start + line3.length();
-        String line4 = Messages.CustomTxtParserInputWizardPage_matchingOtherLine+CG+" "+UCG+" "+UT+" \n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        String line4 = Messages.CustomTxtParserInputWizardPage_matchingOtherLine + CG + " " + UCG + " " + UT + " \n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         int line5start = line4start + line4.length();
         String line5 = Messages.CustomTxtParserInputWizardPage_nonMatchingLine;
         int line6start = line5start + line5.length();
-        String line6 = Messages.CustomTxtParserInputWizardPage_44+CG+" "+UCG+" "+UT+" \n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
+        String line6 = Messages.CustomTxtParserInputWizardPage_matchingRootLine + CG + " " + UCG + " " + UT + " \n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
  
         final Shell legendShell = new Shell(getShell(), SWT.DIALOG_TRIM);
         legendShell.setLayout(new FillLayout());

@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.CoreException;
  */
 public class TmfProjectNature implements IProjectNature {
 
-	public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.project.TmfProjectNature"; //$NON-NLS-1$
+	public static final String ID = "org.eclipse.linuxtools.tmf.project.nature"; //$NON-NLS-1$
 
 	private IProject fProject;
 	

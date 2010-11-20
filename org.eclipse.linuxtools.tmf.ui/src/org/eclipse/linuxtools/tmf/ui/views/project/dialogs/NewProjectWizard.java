@@ -50,7 +50,7 @@ public class NewProjectWizard extends BasicNewResourceWizard {
      * 
      */
     public NewProjectWizard() {
-        this("Tmf Project", "Create a Tmf Project");
+        this(Messages.NewProjectWizard_DialogHeader, Messages.NewProjectWizard_DialogMessage);
     }
 
     /**
@@ -72,7 +72,7 @@ public class NewProjectWizard extends BasicNewResourceWizard {
      */
     @Override
     public void addPages() {
-        fMainPage= new NewProjectMainWizardPage("Tmf Project");
+        fMainPage= new NewProjectMainWizardPage(Messages.NewProjectWizard_DialogHeader);
         fMainPage.setTitle(fTtitle);
         fMainPage.setDescription(fDescription);
         addPage(fMainPage);

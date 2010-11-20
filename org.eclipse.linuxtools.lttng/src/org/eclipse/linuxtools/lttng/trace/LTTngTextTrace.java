@@ -462,13 +462,13 @@ class TextLttngEvent extends LttngEvent {
 	
 	@Override
 	public JniEvent convertEventTmfToJni() {
-		System.out.println("WARNING : Cannot use convertEventTmfToJni() on a trace in text format.");
+		System.out.println("WARNING : Cannot use convertEventTmfToJni() on a trace in text format."); //$NON-NLS-1$
 		return null;
 	}
 	
 	@Override
 	public void updateJniEventReference(JniEvent newJniEventReference) {
-		System.out.println("WARNING : Cannot use updateJniEventReference on a trace in text format. Using null.");
+		System.out.println("WARNING : Cannot use updateJniEventReference on a trace in text format. Using null."); //$NON-NLS-1$
     }
 }
 

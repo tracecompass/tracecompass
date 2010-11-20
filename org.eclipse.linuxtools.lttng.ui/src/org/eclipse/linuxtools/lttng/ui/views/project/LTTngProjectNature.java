@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.CoreException;
  */
 public class LTTngProjectNature implements IProjectNature {
 
-	public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature"; //$NON-NLS-1$
+	public static final String ID = "org.eclipse.linuxtools.lttng.project.nature"; //$NON-NLS-1$
 
 	private IProject fProject;
 	

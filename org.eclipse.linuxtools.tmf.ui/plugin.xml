@@ -6,7 +6,7 @@
          point="org.eclipse.ui.views">
       <category
             id="org.eclipse.linuxtools.tmf.ui.views.category"
-            name="TMF">
+            name="%views.category.name">
       </category>
       <view
             allowMultiple="false"
@@ -14,7 +14,7 @@
             class="org.eclipse.linuxtools.tmf.ui.views.project.ProjectView"
             icon="icons/project_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.project"
-            name="Projects"
+            name="%project.view.name"
             restorable="true">
       </view>
       <view
@@ -23,7 +23,7 @@
             class="org.eclipse.linuxtools.tmf.ui.views.TmfEventsView"
             icon="icons/events_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.events"
-            name="Events"
+            name="%events.view.name"
             restorable="true">
       </view>
    </extension>
@@ -34,28 +34,27 @@
             default="false"
             icon="icons/events_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.editors.events"
-            name="Events">
+            name="%events.editor.name">
          <contentTypeBinding
                contentTypeId="org.eclipse.linuxtools.tmf.ui.content-type.trace">
          </contentTypeBinding>
       </editor>
    </extension>
    <extension
-         id="org.eclipse.linuxtools.tmf.wizards.new"
-         name="%extension.name.2"
          point="org.eclipse.ui.newWizards">
       <category
             id="org.eclipse.linuxtools.tmf.ui.wizards.new"
-            name="TMF">
+            name="%wizard.category.name">
       </category>
       <wizard
             category="org.eclipse.linuxtools.tmf.ui.wizards.new"
             class="org.eclipse.linuxtools.tmf.ui.views.project.dialogs.NewProjectWizard"
             id="org.eclipse.linuxtools.tmf.ui.views.ui.wizards.newProject"
-            name="TMF Project"
+            name="%project.new.wizard.name"
             project="true">
          <description>
-            %wizard.description.0
+            %project.new.wizard.description
+            
          </description>
       </wizard>
       <wizard
@@ -63,19 +62,18 @@
             class="org.eclipse.linuxtools.tmf.ui.wizards.CustomTxtParserWizard"
             icon="icons/customparser_wizard.gif"
             id="org.eclipse.linuxtools.tmf.ui.wizards.custom.text"
-            name="Custom Text Parser">
+            name="%project.new.wizard.custom.text.parser">
       </wizard>
       <wizard
             category="org.eclipse.linuxtools.tmf.ui.wizards.new"
             class="org.eclipse.linuxtools.tmf.ui.wizards.CustomXmlParserWizard"
             icon="icons/customparser_wizard.gif"
             id="org.eclipse.linuxtools.tmf.ui.wizards.custom.xml"
-            name="Custom XML Parser">
+            name="%project.new.wizard.custom.xml.parser">
       </wizard>
    </extension>
    <extension
-         id="org.eclipse.linuxtools.tmf.ui.views.project.TmfProjectNature"
-         name="TMF Project Nature"
+         id="org.eclipse.linuxtools.tmf.project.nature"
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
@@ -84,159 +82,170 @@
       </runtime>
    </extension>
    <extension
-         id="org.eclipse.linuxtools.tmf.ui.actionSets"
-         name="TMF Action Sets"
          point="org.eclipse.ui.actionSets">
       <actionSet
-            description="TMF Action Set"
+            description="%action.set.description"
             id="org.eclipse.linuxtools.tmf.ui.actionSet"
-            label="TMF Action Set"
+            label="%action.set.label"
             visible="true">
       </actionSet>
    </extension>
    <extension
-         id="org.eclipse.linuxtools.tmf.ui.commands"
-         name="TMF Commands"
          point="org.eclipse.ui.commands">
       <category
-            description="TMF Project Commands"
+            description="%commands.project.category.description"
             id="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            name="TMF Project Commands">
+            name="%commands.project.category.name">
       </category>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="Create an TMF Project"
+            description="%commands.project.new.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.new"
-            name="New Project">
+            name="%commands.project.new">
       </command>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="Open an TMF Project"
+            description="%commands.project.open.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.open"
-            name="Open Project">
+            name="%commands.project.open">
       </command>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="Close an TMF Project"
+            description="%commands.project.close.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.close"
-            name="Close Project">
+            name="%commands.project.close">
       </command>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="Rename an TMF Project"
+            description="%commands.project.rename.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.rename"
-            name="Rename Project">
+            name="%commands.project.rename">
       </command>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="Delete an TMF Project"
+            description="%commands.project.delete.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.delete"
-            name="Delete Project">
+            name="%commands.project.delete">
       </command>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="Import an TMF Trace"
+            description="%commands.project.refresh.description"
+            id="org.eclipse.linuxtools.tmf.ui.command.project.refresh"
+            name="%commands.project.refresh">
+      </command>
+      <category
+            description="%commands.trace.category.description"
+            id="org.eclipse.linuxtools.tmf.ui.commands.trace.category"
+            name="%commands.trace.category.name">
+      </category>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.trace.category"
+            description="%commands.trace.import.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.trace.import"
-            name="Import Trace">
+            name="%commands.trace.import">
       </command>
       <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="Open an TMF Trace"
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.trace.category"
+            description="%commands.trace.open.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.trace.open"
-            name="Open Trace">
+            name="%commands.trace.open">
       </command>
       <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="Select the Parser for a TMF Trace"
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.trace.category"
+            description="%commands.trace.rename.description"
+            id="org.eclipse.linuxtools.tmf.ui.command.project.trace.rename"
+            name="%commands.trace.rename">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.trace.category"
+            description="%commands.trace.selectparser.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.trace.selectparser"
-            name="Select Parser">
+            name="%commands.trace.selectparser">
          <commandParameter
                id="org.eclipse.linuxtools.tmf.ui.commandparameter.project.trace.selectparser.parser"
-               name="Parser"
+               name="%commands.trace.selectparser.parser"
                optional="false">
          </commandParameter>
       </command>
       <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="Rename an TMF Trace"
-            id="org.eclipse.linuxtools.tmf.ui.command.project.trace.rename"
-            name="Rename Trace">
-      </command>
-      <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="Delete an TMF Trace"
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.trace.category"
+            description="%commands.trace.delete.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.trace.delete"
-            name="Delete Trace">
+            name="%commands.trace.delete">
       </command>
+      <category
+            description="%commands.experiment.category.description"
+            id="org.eclipse.linuxtools.tmf.ui.commands.experiment.category"
+            name="%commands.experiment.category.name">
+      </category>
       <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="Create an TMF Experiment"
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.experiment.category"
+            description="%commands.experiment.new.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.experiment.new"
-            name="New Experiment">
+            name="%commands.experiment.new">
       </command>
       <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="Select TMF Traces"
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.experiment.category"
+            description="%commands.experiment.selecttraces.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.experiment.select"
-            name="Select Traces">
+            name="%commands.experiment.selecttraces">
       </command>
       <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="Open an TMF Experiment"
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.experiment.category"
+            description="%commands.experiment.open.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.experiment.open"
-            name="Open Experiment">
+            name="%commands.experiment.open">
       </command>
       <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="Rename an TMF Experiment"
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.experiment.category"
+            description="%commands.experiment.rename.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.experiment.rename"
-            name="Rename Experiment">
+            name="%commands.experiment.rename">
       </command>
       <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="Delete an TMF Experiment"
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.experiment.category"
+            description="%commands.experiment.delete.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.experiment.delete"
-            name="Delete Experiment">
+            name="%commands.experiment.delete">
       </command>
+      <category
+            description="%commands.parser.category.description"
+            id="org.eclipse.linuxtools.tmf.ui.commands.parser.category"
+            name="%commands.parser.category.name">
+      </category>
       <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="Refresh View"
-            id="org.eclipse.linuxtools.tmf.ui.command.project.refresh"
-            name="Refresh View">
-      </command>
-      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.parser.category"
+            description="%commands.parser.manage.description"
             id="org.eclipse.linuxtools.tmf.ui.command.managecustomparsers"
-            name="Manage Custom Parsers">
+            name="%commands.parser.manage">
       </command>
    </extension>
    <extension
-         id="org.eclipse.linuxtools.tmf.ui.menus"
-         name="TMF Menus"
          point="org.eclipse.ui.menus">
       <menuContribution
             locationURI="popup:org.eclipse.linuxtools.tmf.ui.views.project?after=additions">
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.command.project.new"
                id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.new"
-               label="New Project"
+               label="%commands.project.new"
                style="push">
          </command>
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.command.project.open"
                id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.open"
-               label="Open Project"
+               label="%commands.project.open"
                style="push">
          </command>
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.command.project.close"
                id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.close"
-               label="Close Project"
+               label="%commands.project.close"
                style="push">
          </command>
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.command.project.delete"
                id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.delete"
-               label="Delete Project"
+               label="%commands.project.delete"
                style="push">
          </command>
          <separator
@@ -246,25 +255,25 @@
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.new"
                id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.experiment.new"
-               label="New Experiment"
+               label="%commands.experiment.new"
                style="push">
          </command>
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.select"
                id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.experiment.select"
-               label="Select Traces"
+               label="%commands.experiment.selecttraces"
                style="push">
          </command>
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.open"
                id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.experiment.open"
-               label="Open Experiment"
+               label="%commands.experiment.open"
                style="push">
          </command>
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.delete"
                id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.experiment.delete"
-               label="Delete Experiment"
+               label="%commands.experiment.delete"
                style="push">
          </command>
          <separator
@@ -274,18 +283,18 @@
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.import"
                id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.trace.import"
-               label="Import Traces"
+               label="%commands.trace.import"
                style="push">
          </command>
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.open"
                id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.trace.open"
-               label="Open Trace"
+               label="%commands.trace.open"
                style="push">
          </command>
          <menu
                id="org.eclipse.linuxtools.tmf.ui.menu.project.trace.selectparser"
-               label="Select Parser">
+               label="%commands.trace.selectparser">
             <dynamic
                   class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.SelectParserContributionItem"
                   id="org.eclipse.linuxtools.tmf.ui.command.project.trace.selectparser.dynamic">
@@ -294,7 +303,7 @@
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.delete"
                id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.trace.delete"
-               label="Delete Trace"
+               label="%commands.trace.delete"
                style="push">
          </command>
          <separator
@@ -304,7 +313,7 @@
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.command.project.refresh"
                id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.refresh"
-               label="Refresh View"
+               label="%commands.project.refresh"
                style="push">
          </command>
       </menuContribution>
@@ -318,8 +327,6 @@
       </menuContribution>
    </extension>
    <extension
-         id="org.eclipse.linuxtools.tmf.ui.handlers"
-         name="TMF Command Handlers"
          point="org.eclipse.ui.handlers">
       <handler
             class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.NewProjectHandler"
@@ -401,7 +408,7 @@
       <content-type
             file-extensions="log"
             id="org.eclipse.linuxtools.tmf.ui.content-type.trace"
-            name="TMF Trace"
+            name="%contenttype.trace"
             priority="normal">
       </content-type>
    </extension>

@@ -53,17 +53,12 @@ public class TmfEventsTable extends TmfComponent {
     protected boolean fPackDone = false;
 
     // Table column names
-    static private final String TIMESTAMP_COLUMN = "Timestamp";
-    static private final String SOURCE_COLUMN    = "Source";
-    static private final String TYPE_COLUMN      = "Type";
-    static private final String REFERENCE_COLUMN = "File";
-    static private final String CONTENT_COLUMN   = "Content";
     static private final String[] COLUMN_NAMES =  new String[] {
-        TIMESTAMP_COLUMN,
-        SOURCE_COLUMN,
-        TYPE_COLUMN,
-        REFERENCE_COLUMN,
-        CONTENT_COLUMN
+        Messages.TmfEventsTable_TimestampColumnHeader,
+        Messages.TmfEventsTable_SourceColumnHeader,
+        Messages.TmfEventsTable_TypeColumnHeader,
+        Messages.TmfEventsTable_ReferenceColumnHeader,
+        Messages.TmfEventsTable_ContentColumnHeader
     };
 
     static private ColumnData[] COLUMN_DATA = new ColumnData[] {
