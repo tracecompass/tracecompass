@@ -1,3 +1,8 @@
+2010-11-22  Francois Chouinard  <fchouinard@gmail.com>
+
+	* plugin.xml: Fixed the LTTng project nature ID
+	* src/org/eclipse/linuxtools/lttng/ui/views/project/LTTngProjectNature.java: Ditto. 
+
 2010-11-10  Francois Chouinard  <fchouinard@gmail.com>
 
     Suppress warning for non-externalized strings

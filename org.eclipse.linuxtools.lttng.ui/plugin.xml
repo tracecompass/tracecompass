@@ -113,7 +113,7 @@
       </wizard>
    </extension>
    <extension
-         id="org.eclipse.linuxtools.lttng.project.nature"
+         id="org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature"
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
