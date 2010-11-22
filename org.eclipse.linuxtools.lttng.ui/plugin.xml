@@ -92,7 +92,6 @@
       </view>
    </extension>
    <extension
-         id="org.eclipse.linuxtools.lttng.wizards.new"
          point="org.eclipse.ui.newWizards">
       <category
             id="org.eclipse.linuxtools.lttng.ui.wizards.new"
