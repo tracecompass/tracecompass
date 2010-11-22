@@ -50,7 +50,7 @@ public class NewProjectWizard extends BasicNewResourceWizard {
      * 
      */
     public NewProjectWizard() {
-        this("LTTng Project", "Create an LTTng Project");
+        this(Messages.NewProjectWizard_Title, Messages.NewProjectWizard_Description);
     }
 
     /**
@@ -72,7 +72,7 @@ public class NewProjectWizard extends BasicNewResourceWizard {
      */
     @Override
     public void addPages() {
-        fMainPage= new NewProjectMainWizardPage("LTTng Project");
+        fMainPage= new NewProjectMainWizardPage(Messages.NewProjectWizard_Title);
         fMainPage.setTitle(fTtitle);
         fMainPage.setDescription(fDescription);
         addPage(fMainPage);

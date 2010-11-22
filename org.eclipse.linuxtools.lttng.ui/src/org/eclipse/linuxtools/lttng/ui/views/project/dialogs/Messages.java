@@ -9,6 +9,13 @@ public class Messages extends NLS {
 	public static String AddTraceWizardPage_columnHeader;
 	public static String AddTraceWizardPage_description;
 	public static String AddTraceWizardPage_windowTitle;
+	public static String ImportTraceWizardPage_BadTraceVersion;
+	public static String ImportTraceWizardPage_BadTraceVersionMsg1;
+	public static String ImportTraceWizardPage_BadTraceVersionMsg2;
+	public static String NewProjectWizard_Description;
+	public static String NewProjectWizard_Title;
+	public static String TraceErrorDialog_DalogTitle;
+	public static String TraceErrorDialog_DialogMsgLabel;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

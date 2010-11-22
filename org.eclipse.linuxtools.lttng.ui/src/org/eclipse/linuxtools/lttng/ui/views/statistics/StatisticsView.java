@@ -71,29 +71,28 @@ public class StatisticsView extends AbsTimeUpdateView {
 	private TreeViewer treeViewer;
 
 	// Table column names
-	private final String LEVEL_COLUMN = "Level";
-	private final String EVENTS_COUNT_COLUMN = "Number of Events";
-	private final String CPU_TIME_COLUMN = "CPU Time";
-	private final String CUMULATIVE_CPU_TIME_COLUMN = "Cumulative CPU Time";
-	private final String ELAPSED_TIME_COLUMN = "Elapsed Time";
+	private final String LEVEL_COLUMN = Messages.StatisticsView_LevelColumn;
+	private final String EVENTS_COUNT_COLUMN = Messages.StatisticsView_NbEventsColumn;
+	private final String CPU_TIME_COLUMN = Messages.StatisticsView_CPUTimeColumn;
+	private final String CUMULATIVE_CPU_TIME_COLUMN = Messages.StatisticsView_CumCPUTimeColumn;
+	private final String ELAPSED_TIME_COLUMN = Messages.StatisticsView_ElapsedTimeColumn;
 
 	// Table column tooltips
-	private final String LEVEL_COLUMN_TIP = "Level at which statistics apply.";
-	private final String EVENTS_COUNT_COLUMN_TIP = "Total amount of events that are tied to given resource.";
-	private final String CPU_TIME_COLUMN_TIP = "Total amount of time the CPU was used excluding wait times(I/O, etc.) at that level.";
-	private final String CUMULATIVE_CPU_TIME_COLUMN_TIP = "Total amount of time between the first and last event excluding wait times in a level.";
-	private final String ELAPSED_TIME_COLUMN_TIP = "Total amount of time the CPU was used including wait times(I/O, etc.) at that level.";
+	private final String LEVEL_COLUMN_TIP = Messages.StatisticsView_LevelColumnTip;
+	private final String EVENTS_COUNT_COLUMN_TIP = Messages.StatisticsView_NbEventsTip;
+	private final String CPU_TIME_COLUMN_TIP = Messages.StatisticsView_CPUTimeTip;
+	private final String CUMULATIVE_CPU_TIME_COLUMN_TIP = Messages.StatisticsView_CumCPUTimeTip;
+	private final String ELAPSED_TIME_COLUMN_TIP = Messages.StatisticsView_ElapsedTimeTip;
 
 	// Level for which statistics should not be displayed.
-	private Set<String> folderLevels = new HashSet<String>(Arrays
-			.asList(new String[] { "Event Types", "Modes", "Submodes", "CPUs",
-					"Processes", "Functions" }));
+	private Set<String> folderLevels = new HashSet<String>(Arrays.asList(
+		new String[] { "Event Types", "Modes", "Submodes", "CPUs", "Processes", "Functions" })); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
 	// Levels for which sub-levels should not contain time-related statistics.
-	private Set<String> levelsWithEmptyTime = new HashSet<String>(Arrays
-			.asList(new String[] { "Event Types" }));
+	private Set<String> levelsWithEmptyTime = new HashSet<String>(Arrays.asList(
+		new String[] { "Event Types" })); //$NON-NLS-1$
 
-	private DecimalFormat decimalFormat = new DecimalFormat("0.#########");
+	private DecimalFormat decimalFormat = new DecimalFormat("0.#########"); //$NON-NLS-1$
 	private Cursor fwaitCursor = null;
 
 	private static final Long STATS_INPUT_CHANGED_REFRESH = 5000L;
