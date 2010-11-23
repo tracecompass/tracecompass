@@ -1,3 +1,10 @@
+2010-11-23  Francois Chouinard  <fchouinard@gmail.com> Added support for Stats tracing (in java) - no bug
+
+	* .options: Added the SV tracing option
+	* src/org/eclipse/linuxtools/lttng/ui/TraceDebug.java: Handling of the SV trace file
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/model/StatisticsTreeNode.java: Comparable + getContent() for improved tracing
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/StatisticsView.java: SV tracing points 
+
 2010-11-22  Francois Chouinard  <fchouinard@gmail.com>
 
 	* plugin.xml: Fixed the LTTng project nature ID

@@ -20,7 +20,7 @@ import java.util.Collection;
  * 
  * <p>It works like file systems. Each node is identified by a key. A path is an array ({@link FixedArray}) of String. The elements of the array represent the path from the root to this node.</p>
  */
-public class StatisticsTreeNode {
+public class StatisticsTreeNode implements Comparable<StatisticsTreeNode> {
 	/**
 	 * <h4>Value of the node.</h4>
 	 */
@@ -102,6 +102,7 @@ public class StatisticsTreeNode {
 	public boolean hasChildren() {
 		return !fNodes.getChildren(fPath).isEmpty();
 	}
+
 	/**
 	 * <h4>Start from creation time i.e. keep key and parent but new statistics and no children.</h4>
 	 */
@@ -109,4 +110,23 @@ public class StatisticsTreeNode {
 		fValue = new Statistics();
 		fNodes.reset(fPath);
 	}
+	
+    /**
+     * <h4>Returns node content as string (full path is not included).</h4>
+     * @return Node content as string.
+     */
+	public String getContent() {
+	        return getKey() + ": [nbEvents=" + fValue.nbEvents + //$NON-NLS-1$
+	                        ", cpuTime=" + fValue.cpuTime + //$NON-NLS-1$
+	                        ", cumulativeCpuTime=" + fValue.cumulativeCpuTime + //$NON-NLS-1$
+	                        ", elapsedTime=" + fValue.elapsedTime + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/**
+	 * <h4>For sorting purposes (sorting by node name).</h4>
+	 */
+	@Override
+    public int compareTo(StatisticsTreeNode o) {
+        return getKey().compareTo(o.getKey());
+    }
 }

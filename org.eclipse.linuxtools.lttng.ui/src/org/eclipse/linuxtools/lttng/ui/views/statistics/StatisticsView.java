@@ -15,7 +15,10 @@ package org.eclipse.linuxtools.lttng.ui.views.statistics;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -557,6 +560,17 @@ public class StatisticsView extends AbsTimeUpdateView {
 	public void modelInputChanged(ILttngSyntEventRequest request, boolean complete) {
 		// Ignore update if disposed
 		if (treeViewer.getTree().isDisposed()) return;
+
+		if(TraceDebug.isSV() && complete) {
+		    // print results
+
+		    TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
+		    if(experiment != null) {
+		        StatisticsTreeNode node = StatisticsTreeRootFactory.getStatTreeRoot(experiment.getName());
+		        printRecursively(node);
+
+		        }
+		}
 		
 		treeViewer.getTree().getDisplay().asyncExec(new Runnable() {
 			// @Override
@@ -567,6 +581,24 @@ public class StatisticsView extends AbsTimeUpdateView {
 			}
 		});
 		}
+	private static int level = 0;
+	private void printRecursively(StatisticsTreeNode node) {
+	    String tab = ""; //$NON-NLS-1$
+	    for (int i = 0; i < level; i++) {
+            tab += "\t"; //$NON-NLS-1$
+        }
+	    level++;
+        TraceDebug.traceSV(tab + node.getContent());
+        if (node.hasChildren()) {
+            LinkedList<StatisticsTreeNode> childreen = (LinkedList<StatisticsTreeNode>)node.getChildren();
+            Collections.sort(childreen);
+            for (Iterator<StatisticsTreeNode> iterator = childreen.iterator(); iterator.hasNext();) {
+                StatisticsTreeNode statisticsTreeNode = (StatisticsTreeNode) iterator.next();
+                printRecursively(statisticsTreeNode);
+            }
+        }
+        level--;
+    }
 
 	/*
 	 * (non-Javadoc)

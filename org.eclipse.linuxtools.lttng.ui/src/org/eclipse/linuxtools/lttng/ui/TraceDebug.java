@@ -20,6 +20,7 @@ public class TraceDebug {
 
 	static boolean CFV = false;
 	static boolean RV = false;
+	static boolean SV = false;
 
 	private static Plugin plugin = LTTngUiPlugin.getDefault();
 	private static String pluginID = LTTngUiPlugin.PLUGIN_ID;
@@ -28,6 +29,8 @@ public class TraceDebug {
 	// Note: files are created in $HOME
 	static private PrintWriter fCFVfile = null;
 	static private PrintWriter fRVfile  = null;
+	static private PrintWriter fSVfile  = null;
+	
 
 	public static void init() {
 		// Update Trace configuration options
@@ -70,6 +73,18 @@ public class TraceDebug {
 				}
 			}
 		}
+		
+	    String svTrace = Platform.getDebugOption(pluginID + "/sv");
+	        if (svTrace != null) {
+	            SV = (new Boolean(svTrace)).booleanValue();
+	            if (SV) {
+	                try {
+	                    fSVfile = new PrintWriter(new FileWriter("SVTrace.txt"));
+	                } catch (IOException e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	        }
 	}
 
 	public static void stop() {
@@ -81,6 +96,11 @@ public class TraceDebug {
 		if (fRVfile != null) {
 			fRVfile.close();
 			fRVfile = null;
+		}
+		
+		if (fSVfile != null) {
+		    fSVfile.close();
+		    fSVfile = null;
 		}
 	}
 
@@ -96,6 +116,13 @@ public class TraceDebug {
 			fRVfile.println(trace);
 			fRVfile.flush();
 		}
+	}
+
+	public static void traceSV(String trace) {
+	    if (SV && fSVfile != null) {
+	        fSVfile.println(trace);
+	        fSVfile.flush();
+	    }
 	}
 
 	public static void info(String message) {
@@ -197,4 +224,8 @@ public class TraceDebug {
 	public static boolean isRV() {
 		return RV;
 	}
+	
+	public static boolean isSV() {
+        return SV;
+    }
 }
