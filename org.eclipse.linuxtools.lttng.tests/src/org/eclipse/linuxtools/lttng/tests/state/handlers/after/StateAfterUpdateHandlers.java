@@ -42,8 +42,7 @@ class StateAfterUpdateHandlers {
 				Long cpu = trcEvent.getCpuId();
 
 				// No syscall_entry update for initialization process
-				LttngProcessState process = traceSt.getRunning_process().get(
-						cpu);
+				LttngProcessState process = traceSt.getRunning_process().get(cpu);
 
 				if (pid != process.getPid()) {
 					TraceDebug
@@ -92,8 +91,7 @@ class StateAfterUpdateHandlers {
 
 				// TraceDebug.debug("Syscall Exit After event called");
 				Long cpu = trcEvent.getCpuId();
-				LttngProcessState process = traceSt.getRunning_process().get(
-						cpu);
+				LttngProcessState process = traceSt.getRunning_process().get(cpu);
 
 				/* There can be no system call from PID 0 : unknown state */
 				if (process.getPid() == 0L) {

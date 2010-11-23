@@ -69,7 +69,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	/**
 	 * Number of events before a GUI refresh
 	 */
-	protected static final Long INPUT_CHANGED_REFRESH = 20000L;
+	protected static final Long INPUT_CHANGED_REFRESH = 75000L;
 	private static final long DEFAULT_OFFSET = 0L;
 	private static final int DEFAULT_CHUNK = 1;
 

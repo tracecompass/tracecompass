@@ -12,10 +12,7 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.statistics.model;
 
-import java.lang.reflect.Array;
-import java.util.AbstractList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.RandomAccess;
 
 /**
@@ -29,34 +26,19 @@ import java.util.RandomAccess;
  *
  * @param <T> Type of the array content.
  */
-public final class FixedArray<T> extends AbstractList<T> implements RandomAccess {
+public final class FixedArray implements RandomAccess {
 	/**
 	 * Replace {@link java.util.Arrays#copyOf(Object[], int)} that do not exist in java 5.
-	 * @param <E> Content of the array.
 	 * @param array Original array to copy from.
 	 * @param newLength Length of the copy to be returned.
 	 * @return A new array consisting of the elements specified.
 	 */
-	@SuppressWarnings("unchecked")
-	private static <E> E[] copyOf(final E[] array, int newLength) {
-		E[] result = (E[])Array.newInstance(array.getClass().getComponentType(), newLength); // Is it useful to use newInstance?
+	private static int[] copyOf(final int[] array, int newLength) {
+		int[] result = new int[newLength]; // Is it useful to use newInstance?
 		System.arraycopy(array, 0, result, 0, Math.min(array.length, newLength));
 		return result;
 	}
-	/**
-	 * Replace {@link java.util.Arrays#copyOf(Object[], int, Class)} that do not exist in java 5.
-	 * @param <E> Content of the array.
-	 * @param array Original array to copy from.
-	 * @param newLength Length of the copy to be returned.
-	 * @param newType Type of the array to be returned.
-	 * @return A new array consisting of the elements specified.
-	 */
-	@SuppressWarnings("unchecked")
-	private static <E, U> E[] copyOf(final U[] array, int newLength, Class<? extends E[]> newType) {
-		E[] result = (E[])Array.newInstance(newType.getComponentType(), newLength);
-		System.arraycopy(array, 0, result, 0, Math.min(array.length, newLength));
-		return result;
-	}
+
 	/**
 	 * Replace {@link java.util.Arrays#copyOfRange(Object[], int, int)} that do not exist in java 5.
 	 * @param <E> Content of the array.
@@ -65,21 +47,21 @@ public final class FixedArray<T> extends AbstractList<T> implements RandomAccess
 	 * @param end Ending position of the range.
 	 * @return A new array consisting of the elements specified.
 	 */
-	@SuppressWarnings("unchecked")
-	private static <E> E[] copyOfRange(final E[] array, int start, int end) {
-		E[] result = (E[])Array.newInstance(array.getClass().getComponentType(), end - start);
+	private static int[] copyOfRange(final int[] array, int start, int end) {
+		int[] result = new int[end - start];
 		System.arraycopy(array, start, result, 0, end - start);
 		return result;
 	}
 	/**
 	 * The array.
 	 */
-	private final T[] fArray;
+	private final int[] fArray;
+	
 	/**
 	 * Constructor.
 	 * @param array Array to use. WILL NOT BE COPIED.
 	 */
-	public FixedArray(final T... array) {
+	public FixedArray(final int... array) {
 		fArray = array;
 	}
 	/**
@@ -87,8 +69,8 @@ public final class FixedArray<T> extends AbstractList<T> implements RandomAccess
 	 * @param value The FixedArray to append.
 	 * @return A new FixedArray with the elements of the two FixedArray.
 	 */
-	public FixedArray<T> append(final FixedArray<T> value) {
-		FixedArray<T> result = new FixedArray<T>(copyOf(fArray, fArray.length + value.size()));
+	public FixedArray append(final FixedArray value) {
+		FixedArray result = new FixedArray(copyOf(fArray, fArray.length + value.size()));
 		System.arraycopy(value.fArray, 0, result.fArray, fArray.length, value.fArray.length);
 		return result;
 	}
@@ -97,13 +79,13 @@ public final class FixedArray<T> extends AbstractList<T> implements RandomAccess
 	 * @param values The FixedArrays to append.
 	 * @return A new FixedArray with the element of all the FixedArray.
 	 */
-	public FixedArray<T> append(final FixedArray<T>... values) {
+	public FixedArray append(final FixedArray... values) {
 		int newLength = 0;
-		for(FixedArray<T> value : values)
+		for(FixedArray value : values)
 			newLength += value.size();
-		FixedArray<T> result = new FixedArray<T>(copyOf(fArray, fArray.length + newLength));
+		FixedArray result = new FixedArray(copyOf(fArray, fArray.length + newLength));
 		newLength = fArray.length;
-		for(FixedArray<T> value : values)
+		for(FixedArray value : values)
 		{
 			System.arraycopy(value.fArray, 0, result.fArray, newLength, value.fArray.length);
 			newLength += value.fArray.length;
@@ -115,9 +97,9 @@ public final class FixedArray<T> extends AbstractList<T> implements RandomAccess
 	 * @param value Element to append.
 	 * @return A new FixedArray with the element appended.
 	 */
-	public FixedArray<T> append(final T value) {
-		FixedArray<T> result = new FixedArray<T>(copyOf(fArray, fArray.length + 1));
-		result.set(fArray.length, value);
+	public FixedArray append(final int value) {
+		FixedArray result = new FixedArray(copyOf(fArray, fArray.length + 1));
+		result.fArray[fArray.length] = value;
 		return result;
 	}
 	/**
@@ -125,10 +107,10 @@ public final class FixedArray<T> extends AbstractList<T> implements RandomAccess
 	 * @param values Elements array to append.
 	 * @return A new FixedArray with the elements appended.
 	 */
-	public FixedArray<T> append(final T... values) {
-		FixedArray<T> result = new FixedArray<T>(copyOf(fArray, fArray.length + values.length));
+	public FixedArray append(final int... values) {
+		FixedArray result = new FixedArray(copyOf(fArray, fArray.length + values.length));
 		for(int i = 0; i < values.length; ++i)
-			result.set(fArray.length + i, values[i]);
+			result.fArray[fArray.length + i] =  values[i];
 		return result;
 	}
 	/*
@@ -136,31 +118,23 @@ public final class FixedArray<T> extends AbstractList<T> implements RandomAccess
 	 * @see java.lang.Object#clone()
 	 */
 	@Override
-	public Object clone()
-	{
-		return new FixedArray<T>(copyOf(fArray, fArray.length));
+	public Object clone() {
+		return new FixedArray(copyOf(fArray, fArray.length));
 	}
 	/*
 	 * (non-Javadoc)
-	 * @see java.util.AbstractList#equals(java.lang.Object)
+	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
 	public boolean equals(Object o) {
-		if(o instanceof FixedArray<?>)
-			return Arrays.equals(fArray, ((FixedArray<?>)o).fArray);
-		if(!(o instanceof List))
-			return false;
-		for(int i = 0; i < fArray.length; ++i)
-			if(!fArray[i].equals((List<?>)o))
-				return false;
-		return true;
+		return Arrays.equals(fArray, ((FixedArray)o).fArray);
 	}
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.AbstractList#get(int)
+	/**
+	 * Gets value of given index.
+	 * @param index 
+	 * @return Value of given index
 	 */
-	@Override
-	public T get(int index) {
+	public int get(int index) {
 		return fArray[index];
 	}
 	/**
@@ -168,32 +142,36 @@ public final class FixedArray<T> extends AbstractList<T> implements RandomAccess
 	 * @return The array reference.
 	 * @see #toArray FixedArray.toArray() to get a copy of the array.
 	 */
-	public T[] getArray() {
+	public int[] getArray() {
 		return fArray;
 	}
 	/*
 	 * (non-Javadoc)
-	 * @see java.util.AbstractList#hashCode()
+	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
 	public int hashCode() {
-		return Arrays.hashCode(fArray);
+		int hash = 1;
+		for (int i = 0; i < fArray.length; ++i) {
+			hash = hash ^ fArray[i];
+		}
+		return hash;
 	}
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.AbstractList#set(int, java.lang.Object)
+	/**
+	 * Sets value at given index.
+	 * @param index
+	 * @param value
+	 * @return returns old value.
 	 */
-	@Override
-	public T set(int index, T element) {
-		T temp = fArray[index];
-		fArray[index] = element;
+	public int set(int index, int value) {
+		int temp = fArray[index];
+		fArray[index] = value;
 		return temp;
 	}
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.AbstractCollection#size()
+	/**
+	 * Gets the size of the array.
+	 * @return Size of the array.
 	 */
-	@Override
 	public int size() {
 		return fArray.length;
 	}
@@ -202,8 +180,8 @@ public final class FixedArray<T> extends AbstractList<T> implements RandomAccess
 	 * @param start Starting position of the new array.
 	 * @return A new array covering the elements specified.
 	 */
-	public FixedArray<T> subArray(int start) {
-		return new FixedArray<T>(copyOfRange(fArray, start, fArray.length - 1));
+	public FixedArray subArray(int start) {
+		return new FixedArray(copyOfRange(fArray, start, fArray.length - 1));
 	}
 	/**
 	 * Get a array covering only a part of the array.
@@ -211,36 +189,12 @@ public final class FixedArray<T> extends AbstractList<T> implements RandomAccess
 	 * @param length Number of element to include in the new array.
 	 * @return A new array covering the elements specified.
 	 */
-	public FixedArray<T> subArray(int start, int length) {
-		return new FixedArray<T>(copyOfRange(fArray, start, length + start));
+	public FixedArray subArray(int start, int length) {
+		return new FixedArray(copyOfRange(fArray, start, length + start));
 	}
 	/*
 	 * (non-Javadoc)
-	 * @see java.util.AbstractCollection#toArray()
-	 */
-	@Override
-	public T[] toArray()
-	{
-		return copyOf(fArray, fArray.length);
-	}
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.AbstractCollection#toArray(T[])
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public <E> E[] toArray(E[] array)
-	{
-		if(array.length < fArray.length)
-			return copyOf(fArray, fArray.length,(Class<? extends E[]>)array.getClass());
-		System.arraycopy(fArray, 0, array, 0, fArray.length);
-		if(array.length > fArray.length)
-			array[fArray.length] = null;
-		return array;
-	}
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.AbstractCollection#toString()
+	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {

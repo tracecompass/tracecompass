@@ -84,7 +84,7 @@ public class LttngEventTypeTest extends TestCase {
         
         // Default construction with good arguments
         try {
-            tmpEventType = new LttngEventType("test", 0L, "test",  new String[1]);
+            tmpEventType = new LttngEventType("test", 0L, "test",  0, new String[1]);
         }
         catch( Exception e) { 
             fail("Construction failed!");
@@ -92,7 +92,7 @@ public class LttngEventTypeTest extends TestCase {
         
         // Copy constructor
         try {
-            tmpEventType = new LttngEventType("test", 0L, "test", new String[1]);
+            tmpEventType = new LttngEventType("test", 0L, "test", 0, new String[1]);
             tmpEventType2 = new LttngEventType(tmpEventType);
         }
         catch( Exception e) { 

@@ -42,8 +42,7 @@ class StateBeforeUpdateHandlers {
 				Long cpu = trcEvent.getCpuId();
 
 				// No syscall_entry update for initialization process
-				LttngProcessState process = traceSt.getRunning_process().get(
-						cpu);
+				LttngProcessState process = traceSt.getRunning_process().get(cpu);
 
 				pid = process.getPid();
 				if (pid == 0L) {
@@ -88,8 +87,7 @@ class StateBeforeUpdateHandlers {
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long cpu = trcEvent.getCpuId();
-				LttngProcessState process = traceSt.getRunning_process().get(
-						cpu);
+				LttngProcessState process = traceSt.getRunning_process().get(cpu);
 
 				/* There can be no system call from PID 0 : unknown state */
 				pid = process.getPid();

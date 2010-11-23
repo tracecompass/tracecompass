@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.linuxtools.lttng.LttngConstants;
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.tmf.event.TmfData;
 
@@ -313,7 +314,11 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 */
 	@Override
 	public synchronized Long getNextUniqueId() {
-		return idCount++;
+	    ++idCount;
+	    if (idCount > LttngConstants.MAX_NUMBER_OF_TRACES_ID) {
+	        idCount = 0L;
+	    }
+		return idCount | LttngConstants.STATS_TRACE_NAME_ID;
 	}
 
 	/*

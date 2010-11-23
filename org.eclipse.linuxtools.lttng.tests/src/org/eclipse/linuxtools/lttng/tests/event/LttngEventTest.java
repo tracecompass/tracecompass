@@ -111,7 +111,7 @@ public class LttngEventTest extends TestCase {
                 testEvent 	= null;
                 testTime	= new LttngTimestamp(0L);
                 testSource 	= new TmfEventSource("test");
-                testType   	= new LttngEventType("test", 0L, "test", testMarkerFields);
+                testType   	= new LttngEventType("test", 0L, "test", 0, testMarkerFields);
                 testContent	= new LttngEventContent(testEvent);
                 testReference = new LttngEventReference("test", "test");
         }
@@ -180,7 +180,7 @@ public class LttngEventTest extends TestCase {
         JniEvent			testJniEvent 	= null;
 		
         String[] testMarkerFields = new String[1];
-        testType   	= new LttngEventType("test", 0L, "test", testMarkerFields);
+        testType   	= new LttngEventType("test", 0L, "test", 0, testMarkerFields);
         testContent	= new LttngEventContent(testEvent);
         
     	try {

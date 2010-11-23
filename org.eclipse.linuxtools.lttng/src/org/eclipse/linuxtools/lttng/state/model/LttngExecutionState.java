@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.state.model;
 
+import org.eclipse.linuxtools.lttng.LttngConstants;
 import org.eclipse.linuxtools.lttng.state.StateStrings;
 
 /**
@@ -22,14 +23,18 @@ public class LttngExecutionState implements Cloneable {
 	// ========================================================================
 	// Data
 	// =======================================================================
-	private Long entry_LttTime = null;
+
+    private Long entry_LttTime = null;
 	private Long change_LttTime = null;
 	private Long cum_cpu_time_Timens = null;
 	
 	private StateStrings.ProcessStatus proc_status = StateStrings.ProcessStatus.LTTV_STATE_UNNAMED;
 	private StateStrings.ExecutionMode exec_mode = StateStrings.ExecutionMode.LTTV_STATE_MODE_UNKNOWN;
 	private String exec_submode = StateStrings.ExecutionSubMode.LTTV_STATE_SUBMODE_UNKNOWN.getInName();
-	
+    // Note: For statistics performance improvement a integer representation of the submode is used 
+    // as well as a bit mask is applied! 
+	private int exec_submode_id = Integer.valueOf(StateStrings.ExecutionSubMode.LTTV_STATE_SUBMODE_UNKNOWN.ordinal() | LttngConstants.STATS_NONE_ID);
+
     @Override
 	public LttngExecutionState clone() {
 	    LttngExecutionState newState = null;
@@ -43,6 +48,7 @@ public class LttngExecutionState implements Cloneable {
             //  but we should ALWAYS use "new" or "clone()" on "non basic" type
             newState.cum_cpu_time_Timens = this.cum_cpu_time_Timens;
             newState.exec_submode = this.exec_submode;
+            newState.exec_submode_id = this.exec_submode_id;
             
             // ProcessStatus and ExecutionMode are enum, and so shouldn't be a problem to use their reference
             newState.proc_status = this.proc_status;
@@ -146,10 +152,26 @@ public class LttngExecutionState implements Cloneable {
 	 * @param execSubmode
 	 *            the exec_submode to set
 	 */
-	public void setExec_submode(String execSubmode) {
-		exec_submode = execSubmode;
-	}
+    public void setExec_submode(String execSubmode) {
+        exec_submode = execSubmode;
+    }
+	
+    /**
+     * @return the exec_submode
+     */
+    public int getExec_submode_id() {
+        return exec_submode_id;
+    }
 
+    /**
+     * @param execSubmode
+     *            the exec_submode id to set
+     */
+    public void setExec_submode_id(int execSubmodeId) {
+        exec_submode_id = execSubmodeId;
+    }
+
+    
     @Override
     @SuppressWarnings("nls")
     public String toString() {

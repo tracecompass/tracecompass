@@ -48,7 +48,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	private static final int DEFAULT_CHUNK = 1;
 
 	// configurable check point interval
-	private static final long LTTNG_CHECK_POINT_INTERVAL = 15000L;
+	private static final long LTTNG_CHECK_POINT_INTERVAL = 50000L;
 	private long fcheckPointInterval = LTTNG_CHECK_POINT_INTERVAL;
 
 	private TmfExperiment<LttngEvent> fExperiment = null;
@@ -536,6 +536,15 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 		}
 
 		return sb.toString();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.linuxtools.lttng.state.resource.ILttngStateContext#getIdentifier()
+	 */
+	@Override
+	public long getIdentifier() {
+	    return getId().longValue();
 	}
 
 }

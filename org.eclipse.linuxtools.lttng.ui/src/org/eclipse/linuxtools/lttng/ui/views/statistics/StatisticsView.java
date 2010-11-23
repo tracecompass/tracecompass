@@ -28,13 +28,16 @@ import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.linuxtools.lttng.control.LttngCoreProviderFactory;
+import org.eclipse.linuxtools.lttng.model.LTTngTreeNode;
 import org.eclipse.linuxtools.lttng.request.ILttngSyntEventRequest;
 import org.eclipse.linuxtools.lttng.state.evProcessor.AbsEventToHandlerResolver;
+import org.eclipse.linuxtools.lttng.state.experiment.StateManagerFactory;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.lttng.ui.model.trange.ItemContainer;
 import org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView;
 import org.eclipse.linuxtools.lttng.ui.views.common.ParamsUpdater;
 import org.eclipse.linuxtools.lttng.ui.views.statistics.evProcessor.StatsTimeCountHandlerFactory;
+import org.eclipse.linuxtools.lttng.ui.views.statistics.model.KernelStatisticsData;
 import org.eclipse.linuxtools.lttng.ui.views.statistics.model.StatisticsTreeNode;
 import org.eclipse.linuxtools.lttng.ui.views.statistics.model.StatisticsTreeRootFactory;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
@@ -88,14 +91,20 @@ public class StatisticsView extends AbsTimeUpdateView {
 	private final String ELAPSED_TIME_COLUMN_TIP = Messages.StatisticsView_ElapsedTimeTip;
 
 	// Level for which statistics should not be displayed.
-	private Set<String> folderLevels = new HashSet<String>(Arrays.asList(
-		new String[] { "Event Types", "Modes", "Submodes", "CPUs", "Processes", "Functions" })); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+    private Set<Integer> folderLevels = new HashSet<Integer>(Arrays
+	            .asList(new Integer[] { KernelStatisticsData.HEADER_CPUS_INT, 
+	                                    KernelStatisticsData.HEADER_EVENT_TYPES_INT, 
+	                                    KernelStatisticsData.HEADER_FUNCTIONS_INT, 
+	                                    KernelStatisticsData.HEADER_MODES_INT, 
+	                                    KernelStatisticsData.HEADER_PROCESSES_INT, 
+	                                    KernelStatisticsData.HEADER_SUBMODES_INT }));
 
 	// Levels for which sub-levels should not contain time-related statistics.
-	private Set<String> levelsWithEmptyTime = new HashSet<String>(Arrays.asList(
-		new String[] { "Event Types" })); //$NON-NLS-1$
+	private Set<Integer> levelsWithEmptyTime = new HashSet<Integer>(Arrays
+	            .asList(new Integer[] { KernelStatisticsData.HEADER_EVENT_TYPES_INT }));
 
 	private DecimalFormat decimalFormat = new DecimalFormat("0.#########"); //$NON-NLS-1$
+
 	private Cursor fwaitCursor = null;
 
 	private static final Long STATS_INPUT_CHANGED_REFRESH = 5000L;
@@ -144,7 +153,12 @@ public class StatisticsView extends AbsTimeUpdateView {
 					new ColumnLabelProvider() {
 						@Override
 						public String getText(Object element) {
-							return ((StatisticsTreeNode) element).getKey();
+						    StatisticsTreeNode node = (StatisticsTreeNode) element;
+                            if (folderLevels.contains(node.getKey())) {
+                                return (KernelStatisticsData.getCategoryFromId(node.getKey().intValue()));
+                            } else {
+                                return node.getName();
+                            }
 						}
 
 						@Override
@@ -165,8 +179,9 @@ public class StatisticsView extends AbsTimeUpdateView {
 						public int compare(Viewer viewer, Object e1, Object e2) {
 							StatisticsTreeNode n1 = (StatisticsTreeNode) e1;
 							StatisticsTreeNode n2 = (StatisticsTreeNode) e2;
-
-							return n1.getKey().compareTo(n2.getKey());
+							
+//							return n1.getKey().compareTo(n2.getKey());
+							return n1.compareTo(n2);
 						}
 					}, null),
 			new ColumnData(EVENTS_COUNT_COLUMN, 125, SWT.LEFT,
@@ -560,7 +575,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 	public void modelInputChanged(ILttngSyntEventRequest request, boolean complete) {
 		// Ignore update if disposed
 		if (treeViewer.getTree().isDisposed()) return;
-
+		
 		if(TraceDebug.isSV() && complete) {
 		    // print results
 
@@ -569,7 +584,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 		        StatisticsTreeNode node = StatisticsTreeRootFactory.getStatTreeRoot(experiment.getName());
 		        printRecursively(node);
 
-		        }
+		    }
 		}
 		
 		treeViewer.getTree().getDisplay().asyncExec(new Runnable() {
@@ -581,17 +596,19 @@ public class StatisticsView extends AbsTimeUpdateView {
 			}
 		});
 		}
+
 	private static int level = 0;
-	private void printRecursively(StatisticsTreeNode node) {
-	    String tab = ""; //$NON-NLS-1$
-	    for (int i = 0; i < level; i++) {
+    private void printRecursively(StatisticsTreeNode node) {
+        String tab = ""; //$NON-NLS-1$
+        for (int i = 0; i < level; i++) {
             tab += "\t"; //$NON-NLS-1$
         }
-	    level++;
+        level++;
         TraceDebug.traceSV(tab + node.getContent());
         if (node.hasChildren()) {
             LinkedList<StatisticsTreeNode> childreen = (LinkedList<StatisticsTreeNode>)node.getChildren();
             Collections.sort(childreen);
+
             for (Iterator<StatisticsTreeNode> iterator = childreen.iterator(); iterator.hasNext();) {
                 StatisticsTreeNode statisticsTreeNode = (StatisticsTreeNode) iterator.next();
                 printRecursively(statisticsTreeNode);
@@ -632,7 +649,9 @@ public class StatisticsView extends AbsTimeUpdateView {
 				StatisticsTreeNode experimentTreeNode = StatisticsTreeRootFactory.getStatTreeRoot(experimentName);
 
 				ITmfTrace[] traces = experiment.getTraces();
-
+				
+				LTTngTreeNode expNode = StateManagerFactory.getExperimentManager().getSelectedExperiment();
+				
 				// check if there is partial data loaded in the experiment
 				int numTraces = experiment.getTraces().length;
 				int numNodeTraces = experimentTreeNode.getNbChildren();
@@ -643,7 +662,8 @@ public class StatisticsView extends AbsTimeUpdateView {
 					// previously selected
 					for (int i = 0; i < numTraces; i++) {
 						String traceName = traces[i].getName();
-						if (!experimentTreeNode.containsChild(traceName)) {
+						LTTngTreeNode child = expNode.getChildByName(traceName);
+						if ((child == null) || (!experimentTreeNode.containsChild(child.getId().intValue()))) {
 							 same = false;
 							 break;
 						}

@@ -29,7 +29,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfContext;
  */
 public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implements ITmfTrace {
 
-	private static final int DEFAULT_INDEX_PAGE_SIZE = 5000;
+	private static final int DEFAULT_INDEX_PAGE_SIZE = 50000;
 
 	// ------------------------------------------------------------------------
     // Constructors

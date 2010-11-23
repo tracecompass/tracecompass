@@ -59,7 +59,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	final protected boolean  fLogData;
 	final protected boolean  fLogError;
 
-	public static final int DEFAULT_BLOCK_SIZE = 5000;
+	public static final int DEFAULT_BLOCK_SIZE = 50000;
 	public static final int DEFAULT_QUEUE_SIZE = 1000;
 
 	protected final int fQueueSize;

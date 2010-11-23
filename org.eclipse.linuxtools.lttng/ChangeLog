@@ -1,3 +1,21 @@
+2010-11-23  Francois Chouinard  <fchouinard@gmail.com> Providing int IDs for the Stats HashMaps
+
+	* src/org/eclipse/linuxtools/lttng/LttngConstants.java:
+	* src/org/eclipse/linuxtools/lttng/event/LttngEvent.java: 
+	* src/org/eclipse/linuxtools/lttng/event/LttngEventType.java: 
+	* src/org/eclipse/linuxtools/lttng/model/LTTngTreeNodeGeneric.java: 
+	* src/org/eclipse/linuxtools/lttng/state/evProcessor/state/AbsStateUpdate.java: 
+	* src/org/eclipse/linuxtools/lttng/state/evProcessor/state/StateUpdateHandlers.java:
+	* src/org/eclipse/linuxtools/lttng/state/model/LttngExecutionState.java:
+	* src/org/eclipse/linuxtools/lttng/state/model/LttngProcessState.java: 
+	* src/org/eclipse/linuxtools/lttng/state/model/LttngTraceState.java: 
+	* src/org/eclipse/linuxtools/lttng/state/resource/ILttngStateContext.java: 
+	* src/org/eclipse/linuxtools/lttng/trace/LTTngTextTrace.java: 
+
+    * src/org/eclipse/linuxtools/lttng/state/trace/StateTraceManager.java: Adjusted buffering between checkpoints
+    * src/org/eclipse/linuxtools/lttng/trace/LTTngExperiment.java: Ditto
+	* src/org/eclipse/linuxtools/lttng/trace/LTTngTrace.java: Ditto
+
 2010-11-19  Francois Chouinard  <fchouinard@gmail.com>
 
 	* build.properties: Cosmetic spacing

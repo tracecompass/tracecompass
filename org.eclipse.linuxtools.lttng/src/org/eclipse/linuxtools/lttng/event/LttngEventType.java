@@ -26,6 +26,7 @@ public class LttngEventType extends TmfEventType {
     private String tracefileName    = null;
     private Long   cpuId            = null;
     private String markerName       = null;
+    private int markerId            = -1;
     
     /**
      * Default Constructor.<p>
@@ -42,12 +43,13 @@ public class LttngEventType extends TmfEventType {
      * @param thisMarkerName 		Marker name in LTT
      * @param thisMarkerfieldsName  MarkerFields related to this marker	
      */
-    public LttngEventType(String thisTracefileName, Long thisCpuId, String thisMarkerName, String[] thisMarkerfieldsName) {
+    public LttngEventType(String thisTracefileName, Long thisCpuId, String thisMarkerName, int thisMarkerId, String[] thisMarkerfieldsName) {
         super( thisTracefileName + "/" + thisCpuId + "/" + thisMarkerName, thisMarkerfieldsName); //$NON-NLS-1$ //$NON-NLS-2$
         
         tracefileName   = thisTracefileName;
         cpuId           = thisCpuId;
         markerName      = thisMarkerName;
+        markerId        = thisMarkerId;
     }
 
     /**
@@ -56,7 +58,7 @@ public class LttngEventType extends TmfEventType {
      * @param oldType   Type we want to copy from
      */
     public LttngEventType(LttngEventType oldType) {
-        this(oldType.tracefileName, oldType.cpuId, oldType.markerName, oldType.getLabels());
+        this(oldType.tracefileName, oldType.cpuId, oldType.markerName, oldType.markerId, oldType.getLabels());
     }
     
     
@@ -70,6 +72,10 @@ public class LttngEventType extends TmfEventType {
     
     public String getMarkerName() {
         return markerName;
+    }
+    
+    public int getMarkerId() {
+        return markerId;
     }
     
     /**
@@ -92,6 +98,7 @@ public class LttngEventType extends TmfEventType {
 		clone.tracefileName = new String(tracefileName);
 		clone.cpuId         = new Long(cpuId);
 		clone.markerName    = new String(markerName);
+		clone.markerId      = markerId;
     	return clone;
     }
 

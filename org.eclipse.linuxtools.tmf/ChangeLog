@@ -1,3 +1,8 @@
+2010-11-23  Francois Chouinard  <fchouinard@gmail.com> 
+
+	* src/org/eclipse/linuxtools/tmf/component/TmfDataProvider.java: Adjusted background request block size
+	* src/org/eclipse/linuxtools/tmf/trace/TmfTrace.java: Adjusted buffering between checkpoints
+
 2010-11-10  Francois Chouinard  <fchouinard@gmail.com>
 
     Suppress warning for non-externalized strings

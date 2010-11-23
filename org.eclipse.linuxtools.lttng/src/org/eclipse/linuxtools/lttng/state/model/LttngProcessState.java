@@ -13,6 +13,7 @@ package org.eclipse.linuxtools.lttng.state.model;
 
 import java.util.Stack;
 
+import org.eclipse.linuxtools.lttng.LttngConstants;
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.state.StateStrings;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ExecutionMode;
@@ -88,6 +89,10 @@ public class LttngProcessState implements Cloneable {
 		LttngExecutionState es = new LttngExecutionState();
 		es.setExec_mode(ExecutionMode.LTTV_STATE_USER_MODE);
 		es.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE.getInName());
+        // Note: For statistics performance improvement a integer representation of the submode is used 
+        // as well as a bit mask is applied! 
+		es.setExec_submode_id(StateStrings.ExecutionSubMode.LTTV_STATE_SUBMODE_NONE.ordinal() | 
+		        LttngConstants.STATS_NONE_ID);
 		es.setEntry_Time(this.insertion_time);
 		es.setChange_Time(this.insertion_time);
 		es.setCum_cpu_time(0L);
@@ -97,9 +102,11 @@ public class LttngProcessState implements Cloneable {
 		//This second entry is needed when processes are created via a Fork event.
 		es = new LttngExecutionState();
 		es.setExec_mode(ExecutionMode.LTTV_STATE_SYSCALL);
-		es
-				.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE
-						.getInName());
+		es.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE.getInName());
+        // Note: For statistics performance improvement a integer representation of the submode is used 
+        // as well as a bit mask is applied! 
+		es.setExec_submode_id(StateStrings.ExecutionSubMode.LTTV_STATE_SUBMODE_NONE.ordinal() | 
+		        LttngConstants.STATS_NONE_ID);
 		es.setEntry_Time(this.insertion_time);
 		es.setChange_Time(this.insertion_time);
 		es.setCum_cpu_time(0L);

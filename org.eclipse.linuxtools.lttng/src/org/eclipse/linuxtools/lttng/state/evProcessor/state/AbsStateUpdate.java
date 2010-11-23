@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.state.evProcessor.state;
 
-
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.state.StateStrings;
@@ -39,12 +38,13 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 	// push and pop from stack
 	// =======================================================================
 	protected void push_state(Long cpu, StateStrings.ExecutionMode execMode,
-			String submode, TmfTimestamp eventTime, LttngTraceState traceSt) {
+	        String submode, int subModeId, TmfTimestamp eventTime, LttngTraceState traceSt) {
 
 		LttngProcessState process = traceSt.getRunning_process().get(cpu);
 		LttngExecutionState exe_state = new LttngExecutionState();
 		exe_state.setExec_mode(execMode);
 		exe_state.setExec_submode(submode);
+		exe_state.setExec_submode_id(subModeId);
 		exe_state.setEntry_Time(eventTime.getValue());
 		exe_state.setChange_Time(eventTime.getValue());
 		exe_state.setCum_cpu_time(0L);

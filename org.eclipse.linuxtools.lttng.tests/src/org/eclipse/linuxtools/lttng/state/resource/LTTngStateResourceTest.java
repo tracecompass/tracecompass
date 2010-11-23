@@ -126,6 +126,11 @@ public class LTTngStateResourceTest extends TestCase {
 			public String getExperimentName() {
 				return "Test Experiment";
 			}
+			
+			@Override
+            public long getIdentifier() {
+                return 0;
+            }
 		};
 	}
 

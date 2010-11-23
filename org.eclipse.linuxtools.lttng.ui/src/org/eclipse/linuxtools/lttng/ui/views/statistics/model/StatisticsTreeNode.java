@@ -28,29 +28,45 @@ public class StatisticsTreeNode implements Comparable<StatisticsTreeNode> {
 	/**
 	 * <h4>Path of the node.</h4>
 	 */
-	private FixedArray<String> fPath;
+	private FixedArray fPath;
 	/**
 	 * <h4>Corresponding StatisticsData.</h4>
 	 */
 	private StatisticsData fNodes;
 	/**
+     * <h4>Name of the node.</h4>
+     */
+	private String fName = ""; //$NON-NLS-1$
+	/**
 	 * <h4>Constructor.</h4>
 	 * @param path Path to the node.
 	 * @param nodes Corresponding StatisticsData.
 	 */
-	public StatisticsTreeNode(final FixedArray<String> path, StatisticsData nodes) {
-		fPath = path;
-		fNodes = nodes;
-		fValue = new Statistics();
+	public StatisticsTreeNode(final FixedArray path, StatisticsData nodes) {
+		this(path, nodes, ""); //$NON-NLS-1$
 	}
+	
+	/**
+     * <h4>Constructor.</h4>
+     * @param path Path to the node.
+     * @param nodes Corresponding StatisticsData.
+     * @param name The name associated with this node.
+     */
+	public StatisticsTreeNode(final FixedArray path, StatisticsData nodes, String name) {
+	        fPath = path;
+	        fNodes = nodes;
+	        fName = name;
+	        fValue = new Statistics();
+	    }
+
 	/**
 	 * <h4>Test if a node contain the specified child.</h4>
 	 * @param key Name of the child.
 	 * @return true: if child with given key is present, false: if no child exists with given key name
 	 */
-	public boolean containsChild(String key) {
-		if(StatisticsData.ROOT.equals(fPath))
-			return fNodes.get(new FixedArray<String>(key)) != null;
+	public boolean containsChild(Integer key) {
+		if(StatisticsData.ROOT == fPath)
+			return fNodes.get(new FixedArray(key)) != null;
 		return (fNodes.get(fPath.append(key)) != null);
 	}
 	/**
@@ -64,7 +80,7 @@ public class StatisticsTreeNode implements Comparable<StatisticsTreeNode> {
 	 * <h4>Get the key for this node.</h4>
 	 * @return Key associated with this node.
 	 */
-	public String getKey() {
+	public Integer getKey() {
 		return fPath.get(fPath.size() - 1);
 	}
 	/**
@@ -85,7 +101,7 @@ public class StatisticsTreeNode implements Comparable<StatisticsTreeNode> {
 	 * <h4>Get the path of the node.</h4>
 	 * @return The path of the node.
 	 */
-	public FixedArray<String> getPath() {
+	public FixedArray getPath() {
 		return fPath;
 	}
 	/**
@@ -110,23 +126,37 @@ public class StatisticsTreeNode implements Comparable<StatisticsTreeNode> {
 		fValue = new Statistics();
 		fNodes.reset(fPath);
 	}
-	
-    /**
-     * <h4>Returns node content as string (full path is not included).</h4>
-     * @return Node content as string.
+
+	/**
+     * <h4>Set the name of this node.</h4>
      */
-	public String getContent() {
-	        return getKey() + ": [nbEvents=" + fValue.nbEvents + //$NON-NLS-1$
-	                        ", cpuTime=" + fValue.cpuTime + //$NON-NLS-1$
-	                        ", cumulativeCpuTime=" + fValue.cumulativeCpuTime + //$NON-NLS-1$
-	                        ", elapsedTime=" + fValue.elapsedTime + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+	public void setName (String name) {
+	    fName = name;
+	}
+	/**
+     * <h4>Get the name of this node.</h4>
+     * @return Name associated with this node.
+     */
+	public String getName() {
+	    return fName;
 	}
 
 	/**
-	 * <h4>For sorting purposes (sorting by node name).</h4>
-	 */
-	@Override
+     * <h4>Returns node content as string (full path is not included).</h4>
+     * @return Node content as string.
+     */
+    public String getContent() {
+	    return fName + ": [nbEvents=" + fValue.nbEvents +  //$NON-NLS-1$
+	                    ", cpuTime=" + fValue.cpuTime + //$NON-NLS-1$
+	    		        ", cumulativeCpuTime=" + fValue.cumulativeCpuTime + //$NON-NLS-1$
+	    		        ", elapsedTime=" + fValue.elapsedTime + "]"; //$NON-NLS-1$ //$NON-NLS-2$ 
+	}
+
+    /**
+     * <h4>For sorting purposes (sorting by node name).</h4>
+     */
+    @Override
     public int compareTo(StatisticsTreeNode o) {
-        return getKey().compareTo(o.getKey());
+        return fName.compareTo(o.fName);
     }
 }

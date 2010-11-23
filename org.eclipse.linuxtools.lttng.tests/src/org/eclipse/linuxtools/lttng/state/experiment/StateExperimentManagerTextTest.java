@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.state.experiment;
 
+import org.eclipse.linuxtools.lttng.LttngConstants;
 import org.eclipse.linuxtools.lttng.LttngTestPreparation;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.model.LTTngTreeNode;
@@ -80,7 +81,7 @@ public class StateExperimentManagerTextTest extends LttngTestPreparation {
 		// access to the context tree
 		LTTngTreeNode experimentNode = expManager.getSelectedExperiment();
 		StateTraceManager traceManager = (StateTraceManager) experimentNode
-				.getChildById(0L);
+				.getChildById(1L | LttngConstants.STATS_TRACE_NAME_ID);
 
 		// validate
 		int numProcesses = traceManager.getCheckPointStateModel().getProcesses().length;

@@ -935,7 +935,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
                         tableViewer.getTable().getDisplay().asyncExec(new Runnable() {
                             @Override
                             public void run() {
-                                if ((scrollFrame != null) && (!scrollFrame.getDisplay().isDisposed())) {
+                                if ((scrollFrame != null) && (!scrollFrame.isDisposed())) {
                                     updateScrolls(scrollFrame);
                                 }
                             }

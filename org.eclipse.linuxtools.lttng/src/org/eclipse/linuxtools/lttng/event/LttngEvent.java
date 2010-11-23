@@ -110,6 +110,15 @@ public class LttngEvent extends TmfEvent {
         return ( (LttngEventType)this.getType() ).getMarkerName();
     }
     
+    /**
+     * Marker id of this event.<p>
+     * 
+     * @return Marker id
+     */
+    public int getMarkerId() {
+        return ( (LttngEventType)this.getType() ).getMarkerId();
+    }
+    
     @Override
     public LttngEventContent getContent() {
         return (LttngEventContent)fContent;

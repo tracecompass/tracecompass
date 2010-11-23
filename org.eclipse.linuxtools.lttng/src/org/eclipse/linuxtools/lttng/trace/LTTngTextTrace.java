@@ -389,7 +389,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
 	    		// We now have what we need for the type
 	    		String tmpTypeKey = tracefile + "/" + tmpCpu + "/" + marker; //$NON-NLS-1$ //$NON-NLS-2$
 	    		if ( traceTypes.get(tmpTypeKey) == null ) {
-	    			traceTypes.put(tmpTypeKey, new LttngEventType(tracefile, tmpCpu, marker, fieldsMap.keySet().toArray(new String[fieldsMap.size()] )) );
+	    		    traceTypes.put(tmpTypeKey, new LttngEventType(tracefile, tmpCpu, marker, 0, fieldsMap.keySet().toArray(new String[fieldsMap.size()] )) );
 	    		}
 	    		
 	    		currentLttngEvent.setContent(eventContent);

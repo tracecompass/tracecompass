@@ -61,7 +61,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 
 	private final static boolean SHOW_LTT_DEBUG_DEFAULT = false;
 	private final static boolean IS_PARSING_NEEDED_DEFAULT = !UniqueEvent;
-	private final static int CHECKPOINT_PAGE_SIZE = 1000;
+	private final static int CHECKPOINT_PAGE_SIZE = 50000;
 
 	// Reference to our JNI trace
 	private JniTrace currentJniTrace = null;
@@ -301,6 +301,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 		// First, obtain an iterator on TRACEFILES of owned by the TRACE
 		Iterator<String> tracefileItr = trace.getTracefilesMap().keySet()
 				.iterator();
+
 		while (tracefileItr.hasNext()) {
 			newTracefileKey = tracefileItr.next();
 			newTracefile = trace.getTracefilesMap().get(newTracefileKey);
@@ -321,9 +322,10 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 						.toArray(
 								new String[newMarker.getMarkerFieldsHashMap()
 										.size()]);
+ 
 				tmpType = new LttngEventType(newTracefile.getTracefileName(),
-						newTracefile.getCpuNumber(), newMarker.getName(),
-						markerFieldsLabels);
+						newTracefile.getCpuNumber(), newMarker.getName(), 
+						newMarkerKey.intValue(), markerFieldsLabels);
 
 				// Add the type to the map/vector
 				addEventTypeToMap(tmpType);

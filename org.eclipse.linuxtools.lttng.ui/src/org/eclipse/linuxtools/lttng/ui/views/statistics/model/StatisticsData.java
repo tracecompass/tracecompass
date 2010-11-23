@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.state.model.LttngProcessState;
 import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 
 /**
@@ -36,52 +35,52 @@ public abstract class StatisticsData {
      * </p>
      */
     public static class Values {
-	/**
-	 * <h4>Indicate the cpu time</h4>
-	 * <p>
-	 * The actual time the cpu as passed in this state making calculations.
-	 * </p>
-	 */
-	public static final int CPU_TIME = 1;
-	/**
-	 * <h4>Indicate the cumulative cpu time</h4>
-	 * <p>
-	 * Include the time the cpu as passed in this state and substate.
-	 * </p>
-	 * <p>
-	 * Example:
-	 * <ul>
-	 * <li>PID:1, Mode:USER_MODE</li>
-	 * <ul>
-	 * <li>PID:1, Mode:SYSCALL</li>
-	 * </ul>
-	 * <li>PID:2, Mode:USER_MODE</li>
-	 * </ul>
-	 * </p>
-	 * <p>
-	 * In this example, the cumulative cpu time for "PID:1, Mode:USER_MODE"
-	 * would be equal to its cpu time plus the cpu time of
-	 * "PID:1, Mode:SYSCALL".
-	 * </p>
-	 * TODO Validate values. Not tested in LTTv. TODO Validate description.
-	 */
-	public static final int CUMULATIVE_CPU_TIME = 2;
-	/**
-	 * <h4>Elapsed time</h4>
-	 * <p>
-	 * Description...
-	 * </p>
-	 * TODO Give a correct description.
-	 */
-	public static final int ELAPSED_TIME = 4;
-	/**
-	 * <h4>State cumulative cpu time</h4>
-	 * <p>
-	 * Description...
-	 * </p>
-	 * TODO Give a correct description.
-	 */
-	public static final int STATE_CUMULATIVE_CPU_TIME = 8;
+        /**
+         * <h4>Indicate the cpu time</h4>
+         * <p>
+         * The actual time the cpu as passed in this state making calculations.
+         * </p>
+         */
+        public static final int CPU_TIME = 1;
+        /**
+         * <h4>Indicate the cumulative cpu time</h4>
+         * <p>
+         * Include the time the cpu as passed in this state and substate.
+         * </p>
+         * <p>
+         * Example:
+         * <ul>
+         * <li>PID:1, Mode:USER_MODE</li>
+         * <ul>
+         * <li>PID:1, Mode:SYSCALL</li>
+         * </ul>
+         * <li>PID:2, Mode:USER_MODE</li>
+         * </ul>
+         * </p>
+         * <p>
+         * In this example, the cumulative cpu time for "PID:1, Mode:USER_MODE"
+         * would be equal to its cpu time plus the cpu time of
+         * "PID:1, Mode:SYSCALL".
+         * </p>
+         * TODO Validate values. Not tested in LTTv. TODO Validate description.
+         */
+        public static final int CUMULATIVE_CPU_TIME = 2;
+        /**
+         * <h4>Elapsed time</h4>
+         * <p>
+         * Description...
+         * </p>
+         * TODO Give a correct description.
+         */
+        public static final int ELAPSED_TIME = 4;
+        /**
+         * <h4>State cumulative cpu time</h4>
+         * <p>
+         * Description...
+         * </p>
+         * TODO Give a correct description.
+         */
+        public static final int STATE_CUMULATIVE_CPU_TIME = 8;
     }
 
     /**
@@ -91,7 +90,7 @@ public abstract class StatisticsData {
     /**
      * <h4>Identification of the root.</h4>
      */
-    public static final FixedArray<String> ROOT = new FixedArray<String>("root"); //$NON-NLS-1$
+    public static final FixedArray ROOT = new FixedArray(-1);
 
     /**
      * <h4>Function to merge many string with more efficacy.</h4>
@@ -101,10 +100,10 @@ public abstract class StatisticsData {
      * @return A new string containing all the strings.
      */
     protected synchronized static String mergeString(String... strings) {
-	fBuilder.setLength(0);
-	for (String s : strings)
-	    fBuilder.append(s);
-	return fBuilder.toString();
+        fBuilder.setLength(0);
+        for (String s : strings)
+            fBuilder.append(s);
+        return fBuilder.toString();
     }
 
     /**
@@ -116,18 +115,18 @@ public abstract class StatisticsData {
      * HashSet are always faster than TreeSet.
      * </p>
      */
-    private Map<String, Set<String>> fKeys;
+    private Map<Integer, Set<Integer>> fKeys;
     /**
      * <h4>The nodes in the tree.</f4>
      */
-    private HashMap<FixedArray<String>, StatisticsTreeNode> fNodes;
+    private HashMap<FixedArray, StatisticsTreeNode> fNodes;
 
     /**
      * <h4>Constructor.</h4>
      */
     public StatisticsData() {
-	fNodes = new HashMap<FixedArray<String>, StatisticsTreeNode>();
-	fKeys = new HashMap<String, Set<String>>();
+        fNodes = new HashMap<FixedArray, StatisticsTreeNode>();
+        fKeys = new HashMap<Integer, Set<Integer>>();
     }
 
     /**
@@ -150,8 +149,21 @@ public abstract class StatisticsData {
      *            Path to the node.
      * @return The node or null.
      */
-    public StatisticsTreeNode get(final FixedArray<String> path) {
-	return fNodes.get(path);
+    public StatisticsTreeNode get(final FixedArray path) {
+        return fNodes.get(path);
+    }
+
+    /**
+     * <h4>Put a node.</h4>
+     * 
+     * @param path
+     *            Path to the node.
+     * @param node
+     *            Node to put.
+     * @return node if replaced.
+     */
+    public StatisticsTreeNode put(final FixedArray path, StatisticsTreeNode node) {
+        return fNodes.put(path, node);
     }
 
     /**
@@ -161,15 +173,15 @@ public abstract class StatisticsData {
      *            Path to the node.
      * @return Collection containing the children.
      */
-    public abstract Collection<StatisticsTreeNode> getChildren(final FixedArray<String> path);
+    public abstract Collection<StatisticsTreeNode> getChildren(final FixedArray path);
 
     /**
      * <h4>Get the map of existing elements of path classified by parent.</h4>
      * 
      * @return The map.
      */
-    protected Map<String, Set<String>> getKeys() {
-	return fKeys;
+    protected Map<Integer, Set<Integer>> getKeys() {
+        return fKeys;
     }
 
     /**
@@ -179,14 +191,14 @@ public abstract class StatisticsData {
      *            Path to the node.
      * @return The node.
      */
-    public StatisticsTreeNode getOrCreate(final FixedArray<String> path) {
-	StatisticsTreeNode current = fNodes.get(path);
-	if (current == null) {
-	    registerName(path);
-	    current = new StatisticsTreeNode(path, this);
-	    fNodes.put(path, current);
-	}
-	return current;
+    public StatisticsTreeNode getOrCreate(final FixedArray path) {
+        StatisticsTreeNode current = fNodes.get(path);
+        if (current == null) {
+            registerName(path);
+            current = new StatisticsTreeNode(path, this);
+            fNodes.put(path, current);
+        }
+        return current;
     }
 
     /**
@@ -196,34 +208,15 @@ public abstract class StatisticsData {
      *            Path to the node.
      * @return Parent node or null.
      */
-    public StatisticsTreeNode getParent(final FixedArray<String> path) {
-	if (path.size() == 1) {
-	    if (path.equals(ROOT))
-		return null;
-	    else
-		return get(ROOT);
-	}
-	// TODO Get or GetOrCreate?
-	return get(path.subArray(0, path.size() - 1));
-    }
-
-    /**
-     * <h4>Get the name of a process.</h4>
-     * 
-     * @param process
-     *            The process.
-     * @return The name of the process. //TODO Adding the creation time of the
-     *         process may be needed to differentiate two process.
-     */
-    protected String getProcessName(LttngProcessState process) {
-	if (process.getPid() == -1)
-	    return Messages.StatisticsData_UnknowProcess;
-	if (process.getName() == null)
-	    return mergeString(Messages.StatisticsData_UnknowProcess + " - ", String.valueOf(process.getPid())); //$NON-NLS-1$
-	if (process.getName().equals("")) //$NON-NLS-1$
-	    return process.getPid().toString();
-	else
-	    return mergeString(process.getName(), " - ", String.valueOf(process.getPid())); //$NON-NLS-1$
+    public StatisticsTreeNode getParent(final FixedArray path) {
+        if (path.size() == 1) {
+            if (path.equals(ROOT))
+                return null;
+            else
+                return get(ROOT);
+        }
+        // TODO Get or GetOrCreate?
+        return get(path.subArray(0, path.size() - 1));
     }
 
     /**
@@ -266,7 +259,7 @@ public abstract class StatisticsData {
      * @param path
      *            Path of the new node.
      */
-    protected abstract void registerName(final FixedArray<String> path);
+    protected abstract void registerName(final FixedArray path);
 
     /**
      * <h4>Reset a node.</h4>
@@ -277,11 +270,11 @@ public abstract class StatisticsData {
      * @param path
      *            Path to the node.
      */
-    public void reset(final FixedArray<String> path) {
-	for (StatisticsTreeNode node : getChildren(path)) {
-	    reset(node.getPath());
-	    fNodes.remove(node.getPath());
-	}
+    public void reset(final FixedArray path) {
+        for (StatisticsTreeNode node : getChildren(path)) {
+            reset(node.getPath());
+            fNodes.remove(node.getPath());
+        }
     }
 
     /**

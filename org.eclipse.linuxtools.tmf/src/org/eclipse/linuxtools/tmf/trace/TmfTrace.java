@@ -57,7 +57,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 
     // The default number of events to cache
 	// TODO: Make the DEFAULT_CACHE_SIZE a preference
-    public static final int DEFAULT_INDEX_PAGE_SIZE = 1000;
+    public static final int DEFAULT_INDEX_PAGE_SIZE = 50000;
 
     // ------------------------------------------------------------------------
     // Attributes

@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.lttng.state.evProcessor.state;
 
 import java.util.Map;
 
+import org.eclipse.linuxtools.lttng.LttngConstants;
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.state.StateStrings;
@@ -68,21 +69,25 @@ class StateUpdateHandlers {
 						Fields.LTT_FIELD_SYSCALL_ID);
 
 				String submode = null;
+				int submodeId = 0;
 				if (syscall == null) {
 					TraceDebug
 							.debug("Syscall Field not found, traceVent time: " //$NON-NLS-1$
 									+ trcEvent.getTimestamp());
 				} else {
 					submode = traceSt.getSyscall_names().get(syscall);
+					// Note: For statistics performance improvement only the integer value of syscall is used 
+					// as well as a bit mask is applied! 
+					submodeId = syscall.intValue() | LttngConstants.STATS_SYS_CALL_NAME_ID;
 				}
 
 				if (submode == null) {
-					submode = ExecutionSubMode.LTTV_STATE_SUBMODE_UNKNOWN
-							.getInName();
+					submode = ExecutionSubMode.LTTV_STATE_SUBMODE_UNKNOWN.getInName();
+					submodeId = ExecutionSubMode.LTTV_STATE_SUBMODE_UNKNOWN.ordinal() | LttngConstants.STATS_NONE_ID; 
 				}
 
 				push_state(cpu, StateStrings.ExecutionMode.LTTV_STATE_SYSCALL,
-						submode, trcEvent.getTimestamp(), traceSt);
+						submode, submodeId, trcEvent.getTimestamp(), traceSt);
 				return false;
 			}
 		};
@@ -139,15 +144,19 @@ class StateUpdateHandlers {
 
 				// ready the trap submode name
 				String submode = traceSt.getTrap_names().get(trap);
+				// Note: For statistics performance improvement only the integer value of trap is used 
+                // as well as a bit mask is applied! 
+
+				int submodeId = trap.intValue() | LttngConstants.STATS_TRAP_NAME_ID; 
 
 				if (submode == null) {
-					submode = ExecutionSubMode.LTTV_STATE_SUBMODE_UNKNOWN
-							.getInName();
+					submode = ExecutionSubMode.LTTV_STATE_SUBMODE_UNKNOWN.getInName();
+					submodeId = ExecutionSubMode.LTTV_STATE_SUBMODE_UNKNOWN.ordinal() | LttngConstants.STATS_NONE_ID;
 				}
 
 				/* update process state */
 				push_state(cpu, StateStrings.ExecutionMode.LTTV_STATE_TRAP,
-						submode, trcEvent.getTimestamp(), traceSt);
+						submode, submodeId, trcEvent.getTimestamp(), traceSt);
 
 				/* update cpu status */
 				LTTngCPUState cpust = traceSt.getCpu_states().get(cpu);
@@ -236,17 +245,20 @@ class StateUpdateHandlers {
 
 				String submode;
 				submode = traceSt.getIrq_names().get(irq);
-
+                // Note: For statistics performance improvement only the integer value of irq is used 
+                // as well as a bit mask is applied! 
+				int submodeId = irq.intValue() | LttngConstants.STATS_IRQ_NAME_ID;
+                
 				if (submode == null) {
-					submode = ExecutionSubMode.LTTV_STATE_SUBMODE_UNKNOWN
-							.getInName();
+					submode = ExecutionSubMode.LTTV_STATE_SUBMODE_UNKNOWN.getInName();
+					submodeId = ExecutionSubMode.LTTV_STATE_SUBMODE_UNKNOWN.ordinal() | LttngConstants.STATS_NONE_ID;
 				}
 
 				/*
 				 * Do something with the info about being in user or system mode
 				 * when int?
 				 */
-				push_state(cpu, ExecutionMode.LTTV_STATE_IRQ, submode, trcEvent
+				push_state(cpu, ExecutionMode.LTTV_STATE_IRQ, submode, submodeId, trcEvent
 						.getTimestamp(), traceSt);
 
 				/* update cpu state */
@@ -421,6 +433,10 @@ class StateUpdateHandlers {
 					softIrqNames.put(softirq, submode);
 				}
 
+                // Note: For statistics performance improvement only the integer value of softirq is used 
+                // as well as a bit mask is applied! 
+				int submodeId = softirq.intValue() | LttngConstants.STATS_SOFT_IRQ_NAME_ID;
+
 				/* update softirq status */
 				LttngSoftIRQState irqState = traceSt.getSoft_irq_states().get(
 						softirq);
@@ -438,7 +454,7 @@ class StateUpdateHandlers {
 				cpu_push_mode(cpu_state, CpuMode.LTTV_CPU_SOFT_IRQ);
 
 				/* update process execution mode state stack */
-				push_state(cpu, ExecutionMode.LTTV_STATE_SOFT_IRQ, submode,
+				push_state(cpu, ExecutionMode.LTTV_STATE_SOFT_IRQ, submode, submodeId,
 						trcEvent.getTimestamp(), traceSt);
 
 				return false;
@@ -1326,9 +1342,10 @@ class StateUpdateHandlers {
 
 					if (es.getExec_mode() == ExecutionMode.LTTV_STATE_MODE_UNKNOWN) {
 						es.setExec_mode(ExecutionMode.LTTV_STATE_SYSCALL);
-						es
-								.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE
-										.getInName());
+						es.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE.getInName());
+                        // Note: For statistics performance improvement a integer representation of the submode is used 
+                        // as well as a bit mask is applied! 
+						es.setExec_submode_id(StateStrings.ExecutionSubMode.LTTV_STATE_SUBMODE_NONE.ordinal() | LttngConstants.STATS_NONE_ID);
 						es.setEntry_Time(timestamp.getValue());
 						es.setChange_Time(timestamp.getValue());
 						es.setCum_cpu_time(0L);
@@ -1340,9 +1357,10 @@ class StateUpdateHandlers {
 					es = process.getFirstElementFromExecutionStack();
 					if (es.getExec_mode() == ExecutionMode.LTTV_STATE_MODE_UNKNOWN) {
 						es.setExec_mode(ExecutionMode.LTTV_STATE_USER_MODE);
-						es
-								.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE
-										.getInName());
+						es.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE.getInName());
+                        // Note: For statistics performance improvement a integer representation of the submode is used 
+                        // as well as a bit mask is applied! 
+						es.setExec_submode_id(StateStrings.ExecutionSubMode.LTTV_STATE_SUBMODE_NONE.ordinal() | LttngConstants.STATS_NONE_ID);
 						es.setEntry_Time(timestamp.getValue());
 						es.setChange_Time(timestamp.getValue());
 						es.setCum_cpu_time(0L);
@@ -1368,9 +1386,10 @@ class StateUpdateHandlers {
 
 							// initialize values
 							es.setExec_mode(ExecutionMode.LTTV_STATE_SYSCALL);
-							es
-									.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE
-											.getInName());
+							es.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE.getInName());
+	                        // Note: For statistics performance improvement a integer representation of the submode is used 
+	                        // as well as a bit mask is applied! 
+							es.setExec_submode_id(StateStrings.ExecutionSubMode.LTTV_STATE_SUBMODE_NONE.ordinal() | LttngConstants.STATS_NONE_ID);
 							es.setEntry_Time(timestamp.getValue());
 							es.setChange_Time(timestamp.getValue());
 							es.setCum_cpu_time(0L);
@@ -1515,9 +1534,12 @@ class StateUpdateHandlers {
 						es = process.getState();
 						es.setExec_mode(ExecutionMode.LTTV_STATE_MODE_UNKNOWN);
 						es.setProc_status(ProcessStatus.LTTV_STATE_UNNAMED);
-						es
-								.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_UNKNOWN
+						es.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_UNKNOWN
 										.getInName());
+                        // Note: For statistics performance improvement a integer representation of the submode is used 
+                        // as well as a bit mask is applied! 
+						es.setExec_submode_id(StateStrings.ExecutionSubMode.LTTV_STATE_SUBMODE_UNKNOWN.ordinal() | LttngConstants.STATS_NONE_ID);
+						
 						// #if 0
 						// /* UNKNOWN STATE */
 						// {

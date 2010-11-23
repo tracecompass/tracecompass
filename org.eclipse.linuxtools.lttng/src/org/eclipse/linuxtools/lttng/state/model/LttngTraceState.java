@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.eclipse.linuxtools.lttng.LttngConstants;
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.state.LttngStateException;
 import org.eclipse.linuxtools.lttng.state.StateStrings;
@@ -270,8 +271,10 @@ public class LttngTraceState implements Cloneable {
 			LttngExecutionState es = process.getFirstElementFromExecutionStack();
 			process.setState(es);
 			es.setExec_mode(ExecutionMode.LTTV_STATE_MODE_UNKNOWN);
-			es.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE
-					.getInName());
+			es.setExec_submode(ExecutionSubMode.LTTV_STATE_SUBMODE_NONE.getInName());
+            // Note: For statistics performance improvement a integer representation of the submode is used 
+            // as well as a bit mask is applied! 
+			es.setExec_submode_id(StateStrings.ExecutionSubMode.LTTV_STATE_SUBMODE_NONE.ordinal() | LttngConstants.STATS_NONE_ID);
 			es.setProc_status(ProcessStatus.LTTV_STATE_UNNAMED);
 
 			// Reduce from default to only one execution state in the stack
@@ -463,22 +466,22 @@ public class LttngTraceState implements Cloneable {
         
         return foundProcess;
     }
-	
-	
 }
 
-class ProcessStateKey {
-    private LttngProcessState valueRef = null;
+final class ProcessStateKey {
+
+    private long pid;
+    private long cpuId;
+    private String traceId;
     
-    private Long    pid = null;
-    private Long    cpuId = null;
-    private String  traceId = null;
     
     @SuppressWarnings("unused")
     private ProcessStateKey() { }
     
     public ProcessStateKey(LttngProcessState newRef) {
-        valueRef = newRef;
+        pid = newRef.getPid().longValue();
+        cpuId = newRef.getCpu().longValue();
+        traceId = newRef.getTrace_id();
     }
     
     public ProcessStateKey(Long newPid, Long newCpuId, String newTraceId) {
@@ -496,31 +499,18 @@ class ProcessStateKey {
         if ( obj instanceof ProcessStateKey ) {
         	ProcessStateKey procKey = (ProcessStateKey) obj;
         	
-			if (valueRef != null) {
-				if (!(procKey.getPid().equals(valueRef.getPid()))) {
-					return false;
-				}
-				
-				if (!procKey.getTraceId().equals(valueRef.getTrace_id())) {
-					return false;
-				}
+        	if (procKey.pid != this.pid) {
+        	    return false;
+        	}
 
-				if (((procKey.getPid().longValue() == 0L) && !(procKey.getCpuId().equals(valueRef.getCpu())))) {
-					isSame = false;
-				}
-			} else {
-				if (!(procKey.getPid().equals(this.pid))) {
-					return false;
-				}
+        	if (!(procKey.traceId.equals(this.traceId))) {
+        	    return false;
+        	}
 
-				if (!(procKey.getTraceId().equals(this.traceId))) {
-					return false;
-				}
+        	if (((procKey.pid == 0L) && (procKey.cpuId != this.cpuId))) {
+        	    return false;
+        	}
 
-				if (((procKey.getPid().longValue() == 0L) && !(procKey.getCpuId().equals(this.cpuId)))) {
-					return false;
-				}
-			}
 		}
         else {
 			TraceDebug
@@ -532,53 +522,15 @@ class ProcessStateKey {
         return isSame;
     }
     
-    // *** WARNING : Everything in there work because the check "valueRef != null" is the same for ALL getter
-    // Do NOT change this check without checking.
-    public Long getPid() {
-    	if ( valueRef != null ) {
-            return valueRef.getPid();
-        }
-        else {
-            return pid;
-        }
-    }
-
-    public Long getCpuId() {
-        if ( valueRef != null ) {
-            return valueRef.getCpu();
-        }
-        else {
-            return cpuId;
-        }
-    }
-    
-    public String getTraceId() {
-        if ( valueRef != null ) {
-            return valueRef.getTrace_id();
-        }
-        else {
-            return traceId;
-        }
-    }
-    
     @Override
     public int hashCode() {
-    	return this.toString().hashCode();
+        return (1 ^ (int)(pid ^ (pid >>> 32)) ^ traceId.hashCode());
     }
     
     
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        if ( valueRef != null ) {
-			// return (valueRef.getPid().toString() + ":" +
-			// valueRef.getCpu().toString() + ":" +
-			// valueRef.getTrace_id().toString() );
-			return (valueRef.getPid().toString() + ":" + valueRef.getTrace_id().toString());
-        } 
-        
-		// return (pid.toString() + ":" + cpuId.toString() + ":" +
-		// traceId.toString());
-		return (pid.toString() + ":" + traceId.toString());
+        return (String.valueOf(pid) + ":" + traceId);
     }
 }
