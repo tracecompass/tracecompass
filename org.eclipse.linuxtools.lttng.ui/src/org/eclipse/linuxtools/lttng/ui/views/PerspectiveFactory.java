@@ -19,7 +19,6 @@ import org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramView;
 import org.eclipse.linuxtools.lttng.ui.views.project.ProjectView;
 import org.eclipse.linuxtools.lttng.ui.views.resources.ResourcesView;
 import org.eclipse.linuxtools.lttng.ui.views.statistics.StatisticsView;
-import org.eclipse.linuxtools.lttng.ui.views.timeframe.TimeFrameView;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
@@ -38,7 +37,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
     private static final String PROJECT_VIEW_ID      = ProjectView.ID;
     private static final String CONTROL_VIEW_ID      = ControlView.ID;
     private static final String EVENTS_VIEW_ID       = EventsView.ID;
-    private static final String TIME_FRAME_VIEW_ID   = TimeFrameView.ID;
+//    private static final String TIME_FRAME_VIEW_ID   = TimeFrameView.ID;
     private static final String CONTROL_FLOW_VIEW_ID = ControlFlowView.ID;
     private static final String RESOURCES_VIEW_ID    = ResourcesView.ID;
     private static final String STATISTICS_VIEW_ID   = StatisticsView.ID;
@@ -80,8 +79,8 @@ public class PerspectiveFactory implements IPerspectiveFactory {
         middleRightFolder.addView(EVENTS_VIEW_ID);
 
         // Create the bottom right folder
-        IFolderLayout bottomRightFolder = layout.createFolder("bottomRightFolder", IPageLayout.BOTTOM, 0.65f, "middleRightFolder"); //$NON-NLS-1$ //$NON-NLS-2$
-        bottomRightFolder.addView(TIME_FRAME_VIEW_ID);
+        IFolderLayout bottomRightFolder = layout.createFolder("bottomRightFolder", IPageLayout.BOTTOM, 0.50f, "middleRightFolder"); //$NON-NLS-1$ //$NON-NLS-2$
+//        bottomRightFolder.addView(TIME_FRAME_VIEW_ID);
         bottomRightFolder.addView(HISTOGRAM_VIEW_ID);
         bottomRightFolder.addView(PROBLEM_VIEW_ID);
 

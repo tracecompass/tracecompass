@@ -1,3 +1,7 @@
+2010-11-25  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/ui/views/PerspectiveFactory.java: Removed TimeFrame View and the default LTTng perspective
+
 2010-11-23  Francois Chouinard  <fchouinard@gmail.com> Added support for Stats tracing (in java) - no bug
 
 	* .options: Added the SV tracing option
