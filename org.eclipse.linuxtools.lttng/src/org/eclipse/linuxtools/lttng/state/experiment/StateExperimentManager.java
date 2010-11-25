@@ -133,14 +133,19 @@ public class StateExperimentManager extends LTTngTreeNode implements
 	 */
 	@Override
 	public void experimentSelected_prep(TmfExperiment<LttngEvent> experiment) {
+	    
+	    if (fSelectedExperiment != null) {
+	        clearExperimentNode(fSelectedExperiment);
+	        fSelectedExperiment = null;
+	    }
+
 		LTTngTreeNode experimentNode = null;
 		if (experiment != null) {
 			experimentNode = getChildByName(experiment.getName());
 			// keep experiment if already loaded with the same value
 			if (experimentNode != null
 					&& experimentNode.getValue() != experiment) {
-				// rebuild the experiment nodes from scratch
-				removeChild(experimentNode);
+			    clearExperimentNode(experimentNode);
 				experimentNode = null;
 			}
 
@@ -179,6 +184,28 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			fSelectedExperiment = experimentNode;
 		}
 	}
+
+
+    private void clearExperimentNode(LTTngTreeNode experimentNode) {
+        // Remove checkpoints
+        LTTngTreeNode[] traceNodes = experimentNode.getChildren();
+        
+        for (LTTngTreeNode traceStateManagerNode : traceNodes) {
+            IStateTraceManager traceManager = null;
+            try {
+                traceManager = (IStateTraceManager) traceStateManagerNode;
+                // Clear all previously created check points as preparation to
+                // re-build
+                traceManager.clearCheckPoints();
+                experimentNode.removeChild(traceStateManagerNode);
+            } catch (ClassCastException e) {
+                // Nothing to do 
+            }
+
+            // rebuild the experiment nodes from scratch
+            removeChild(experimentNode);
+        }
+    }
 
 	/*
 	 * (non-Javadoc)

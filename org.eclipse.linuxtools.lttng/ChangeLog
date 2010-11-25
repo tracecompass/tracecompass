@@ -1,3 +1,7 @@
+2010-11-25  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/state/experiment/StateExperimentManager.java: Clear the checkpoint data when a new experiment is selected
+
 2010-11-23  Francois Chouinard  <fchouinard@gmail.com> Providing int IDs for the Stats HashMaps
 
 	* src/org/eclipse/linuxtools/lttng/LttngConstants.java:
