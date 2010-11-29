@@ -1,0 +1,188 @@
+<?xml version='1.0' encoding='utf-8' ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<title>LTTng Plug-in User Guide - Getting Started</title>
+		<link type="text/css" rel="stylesheet" href="../../../book.css"/>
+	</head>
+	<body>
+		<table class="navigation" style="width: 100%;" border="0" summary="navigation">
+			<tr>
+				<th style="width: 100%" align="center" colspan="3">Getting Started</th>
+			</tr>
+			<tr>
+				<td style="width: 20%" align="left">
+					<a href="User-Guide.html" title="LTTng Plug-in User Guide">
+						<img alt="Previous" border="0" src="../../../images/prev.gif"/>
+					</a>
+				</td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right">
+					<a href="User-Interface.html" title="User Interface">
+						<img alt="Next" border="0" src="../../../images/next.gif"/>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 20%" align="left" valign="top">LTTng Plug-in User Guide</td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right" valign="top">User Interface</td>
+			</tr>
+		</table><hr/>
+		<h1 id="Getting_Started">Getting Started</h1>
+		<p>The LTTng plug-in for Eclipse is used to visualize and analyze kernel traces produced by the LTTng tracer. Controlling the recording and fetching of an LTTng trace from Eclipse is currently a work in progress therefore, 
+			<i>currently the plug-in can only be used to visualize existing LTTng traces</i>. To record your own trace, you will need to install the LTTng kernel patches and the LTTv application (refer to the LTTng  
+			<a href="http://lttng.org">site</a> for more information on how to record and fetch traces).
+		</p>
+		<p>If not already installed, you can download and install the LTTng plug-ins from the Eclipse update site (search for LTTng under Linux Tools). </p>
+		<p>The rest of this section provides instructions on how to complete the LTTng for Eclipse installation and verify that it is correct.</p>
+		<ul>
+			<li>
+				<a href="Getting-Started.html#Installing_the_LTTng_parsing_library">Installing the LTTng parsing library</a>
+			</li>
+			<li>
+				<a href="Getting-Started.html#Downloading_Sample_Traces">Downloading Sample Traces</a>
+			</li>
+			<li>
+				<a href="Getting-Started.html#Installation_Verification">Installation Verification</a>
+			</li>
+		</ul>
+		<h2 id="Installing_the_LTTng_parsing_library">Installing the LTTng parsing library</h2>
+		<p>The LTTng plug-in for Eclipse requires the installation of a third-party library, 
+			<i>liblttngtrace</i>, that is used to parse the binary LTTng traces. For the first Eclipse release, it was decided not to re-implemented that library in Java but to simply integrate it using JNI. As a consequence, 
+			<i>you need to download, compile and install the parsing library</i>.
+		</p>
+		<p>This trace parsing library is not delivered as part of Eclipse (licensing stuff) and has to be downloaded from the LTTng site, compiled and then installed on your Linux system.</p>
+		<p>Currently, the Eclipse plug-in supports the following version of the LTTng trace format: 2.3, 2.5 and 2.6. Depending on which trace version(s) you wish to analyze, you will need to download the appropriate snapshot from the corresponding git repository (pick the "snapshot" link next to the latest commit):</p>
+		<p>
+			<a href="http://git.dorsal.polymtl.ca/?p=liblttngtrace.git;a=shortlog;h=refs/heads/traceformat-2.3">Trace format 2.3</a>
+			<br/>
+
+			<a href="http://git.dorsal.polymtl.ca/?p=liblttngtrace.git;a=shortlog;h=refs/heads/traceformat-2.5">Trace format 2.5</a>
+			<br/>
+
+			<a href="http://git.dorsal.polymtl.ca/?p=liblttngtrace.git;a=shortlog;h=refs/heads/traceformat-2.6">Trace format 2.6</a>
+			<br/>
+		</p>
+		<p>Build and install the snapshot(s) you downloaded. If you wish to install more than one version of the library, you will have to build them in 
+			<i>format version sequence</i> (e.g. build 2.6 
+			<i>last</i>). For a plain library installation (in /usr/local/lib), you can execute the following commands for each version you wish to install:
+		</p>
+		<pre>
+$ cd liblttngtrace-2.n
+$ ./autogen.sh --with-jni-interface --without-lttv &amp;&amp; make
+# make install
+</pre>
+		<p>You will end up with something like this (the 
+			<i>loader</i> acts as a factory to pre-analyze the trace and load the correct parser library):
+		</p>
+		<pre>
+$ ls -l1 /usr/local/lib
+total 1048
+-rwxr-xr-x. 1 root root 210300 2010-06-07 11:24 liblttvtraceread-2.5.so
+-rwxr-xr-x. 1 root root 211052 2010-06-07 11:25 liblttvtraceread-2.6.so
+-rw-r--r--. 1 root root 316040 2010-06-07 11:25 liblttvtraceread.a
+-rwxr-xr-x. 1 root root   1175 2010-06-07 11:25 liblttvtraceread.la
+-rwxr-xr-x. 1 root root  93963 2010-06-07 11:24 liblttvtraceread_loader-2.5.so
+-rwxr-xr-x. 1 root root  93963 2010-06-07 11:25 liblttvtraceread_loader-2.6.so
+-rw-r--r--. 1 root root 125442 2010-06-07 11:25 liblttvtraceread_loader.a
+-rwxr-xr-x. 1 root root   1224 2010-06-07 11:25 liblttvtraceread_loader.la
+lrwxrwxrwx. 1 root root     30 2010-06-07 11:25 liblttvtraceread_loader.so -&gt; liblttvtraceread_loader-2.6.so
+lrwxrwxrwx. 1 root root     23 2010-06-07 11:25 liblttvtraceread.so -&gt; liblttvtraceread-2.6.so
+</pre>
+		<p>A number of configuration options are available to fine tune the library builds:</p>
+		<pre>
+$ ./configure -- help
+Usage: ./configure [OPTION]... [VAR=VALUE]...
+
+To assign environment variables (e.g., CC, CFLAGS...), specify them as
+VAR=VALUE.  See below for descriptions of some of the useful variables.
+
+Defaults for the options are specified in brackets.
+
+Configuration:
+  -h, --help              display this help and exit
+      --help=short        display options specific to this package
+      --help=recursive    display the short help of all the included packages
+  -V, --version           display version information and exit
+  -q, --quiet, --silent   do not print `checking ...' messages
+...
+  &lt;more options&gt;
+</pre>
+		<p>Finally, you have to set your LD_LIBRARY_PATH environment variable so Eclipse can find the parsing libraries. Otherwise, you have to specify the path when you start Eclipse:</p>
+		<pre>
+$ LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH" ./eclipse
+</pre>
+		<h2 id="Downloading_Sample_Traces">Downloading Sample Traces</h2>
+		<p>To verify that your installation is functional, you can download sample traces from the Eclipse repository. The following LTTng traces are provided as samples.</p>
+		<p>Each trace as its own characteristics and complexity. The size given refers to the size of the trace once "untarred", the actual tar size should be ~10 times smaller.</p>
+		<ul>
+			<li>
+				<a href="http://dev.eclipse.org/viewsvn/index.cgi/lttng/trunk/org.eclipse.linuxtools.lttng.tests/traceset/trace-15316events_nolost_newformat.tar.gz?root=Technology_LINUXTOOLS&amp;view=log">trace-15316 (456K)</a> Very small trace (format 2.5 - 15316 events) made from a single LTTng marker. Recorded with a VirtualBox system with 1 processor.
+			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="http://dev.eclipse.org/viewsvn/index.cgi/lttng/trunk/org.eclipse.linuxtools.lttng.tests/traceset/trace-15471events_nolost_newformat.txt?root=Technology_LINUXTOOLS&amp;view=log">trace-15471 (460K)</a> Very small trace (format 2.5 - 15471 events) made from a single LTTng marker. Recorded with a VirtualBox system with 1 processor.
+			</li>
+		</ul>
+		<p>(More sample traces to come)</p>
+		<h2 id="Installation_Verification">Installation Verification</h2>
+		<p>Here are the quick steps to verify that your installation is functional. If needed, refer to the 
+			<a href="User-Interface.html#User_Interface">User Interface</a> section for clarifications.
+		</p>
+		<ul>
+			<li>Start Eclipse</li>
+			<li>Open the LTTng perspective</li>
+			<li>Create an LTTng project
+				<ul>
+					<li>Right-click in the Project view and select "New Project"</li>
+					<li>Enter the name of your project (e.g. "MyLTTngProject")</li>
+					<li>The project will be created. It will contain 2 empty folders: "Traces" and "Experiments"</li>
+				</ul>
+			</li>
+			<li>Import a sample trace
+				<ul>
+					<li>Right-click on the newly created project and select "Import Trace"</li>
+					<li>Navigate to the sample LTTng trace that you want to visualize</li>
+					<li>Note: you have to drill down into the trace directory to import the trace correctly (yes, we know that the Import function needs to be re-written...)</li>
+					<li>The newly imported trace should appear under the Traces folder</li>
+				</ul>
+			</li>
+			<li>Visualize the trace
+				<ul>
+					<li>Expand the Traces folder</li>
+					<li>Double-click on the trace</li>
+					<li>The trace should load and the views be populated</li>
+				</ul>
+			</li>
+		</ul>
+		<p>Refer to 
+			<a href="User-Interface.html#User_Interface">User Interface</a> for detailed description of the views and their usage.
+		</p><hr/>
+		<table class="navigation" style="width: 100%;" border="0" summary="navigation">
+			<tr>
+				<td style="width: 20%" align="left">
+					<a href="User-Guide.html" title="LTTng Plug-in User Guide">
+						<img alt="Previous" border="0" src="../../../images/prev.gif"/>
+					</a>
+				</td>
+				<td style="width: 60%" align="center">
+					<a href="User-Guide.html" title="LTTng Plug-in User Guide">
+						<img alt="LTTng Plug-in User Guide" border="0" src="../../../images/home.gif"/>
+					</a>
+				</td>
+				<td style="width: 20%" align="right">
+					<a href="User-Interface.html" title="User Interface">
+						<img alt="Next" border="0" src="../../../images/next.gif"/>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 20%" align="left" valign="top">LTTng Plug-in User Guide</td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right" valign="top">User Interface</td>
+			</tr>
+		</table>
+	</body>
+</html>

@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='utf-8' ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<title>LTTng Plug-in User Guide - Limitations</title>
+		<link type="text/css" rel="stylesheet" href="../../../book.css"/>
+	</head>
+	<body>
+		<table class="navigation" style="width: 100%;" border="0" summary="navigation">
+			<tr>
+				<th style="width: 100%" align="center" colspan="3">Limitations</th>
+			</tr>
+			<tr>
+				<td style="width: 20%" align="left">
+					<a href="User-Interface.html" title="User Interface">
+						<img alt="Previous" border="0" src="../../../images/prev.gif"/>
+					</a>
+				</td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right">
+					<a href="References.html" title="References">
+						<img alt="Next" border="0" src="../../../images/next.gif"/>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 20%" align="left" valign="top">User Interface</td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right" valign="top">References</td>
+			</tr>
+		</table><hr/>
+		<h1 id="Limitations">Limitations</h1>
+		<p>The current implementation is under heavy development and some important features are still missing. Here is a list of the known bugs and missing features that are being worked on.</p>
+		<p>
+			<b>Performance</b>
+		</p>
+		<p>The current version takes 3-5 more time to fully parse a trace than the finely optimized C version (LTTv). Things are event worse when the Statistics View is open. However, once a trace/experiment is selected, the user has immediate feedback and can start navigating and visualizing the trace while the parsing takes place in the background.</p>
+		<p>
+			<b>No tracer control</b>
+		</p>
+		<p>The LTTng tracer control (
+			<i>start</i>/''suspend''/''resume''/''stop'' tracing) is not integrated yet. Also, transferring an LTTng trace from a remote target is not supported yet.
+		</p>
+		<p>
+			<b>64-bits and non-x86 host architectures</b>
+		</p>
+		<p>The parser libraries have not been extensively tested for 64-bits and not tested at all on non-x86 architectures. The code is believed to work on a broad range of architectures but this cannot be certified for now.</p>
+		<p>
+			<b>Searches and Filters</b>
+		</p>
+		<p>There is currently no way to filter events following some criteria or to dynamically sort the different fields.</p><hr/>
+		<table class="navigation" style="width: 100%;" border="0" summary="navigation">
+			<tr>
+				<td style="width: 20%" align="left">
+					<a href="User-Interface.html" title="User Interface">
+						<img alt="Previous" border="0" src="../../../images/prev.gif"/>
+					</a>
+				</td>
+				<td style="width: 60%" align="center">
+					<a href="User-Guide.html" title="LTTng Plug-in User Guide">
+						<img alt="LTTng Plug-in User Guide" border="0" src="../../../images/home.gif"/>
+					</a>
+				</td>
+				<td style="width: 20%" align="right">
+					<a href="References.html" title="References">
+						<img alt="Next" border="0" src="../../../images/next.gif"/>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 20%" align="left" valign="top">User Interface</td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right" valign="top">References</td>
+			</tr>
+		</table>
+	</body>
+</html>

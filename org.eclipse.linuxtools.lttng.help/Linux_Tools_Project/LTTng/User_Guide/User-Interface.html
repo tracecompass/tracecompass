@@ -1,0 +1,341 @@
+<?xml version='1.0' encoding='utf-8' ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<title>LTTng Plug-in User Guide - User Interface</title>
+		<link type="text/css" rel="stylesheet" href="../../../book.css"/>
+	</head>
+	<body>
+		<table class="navigation" style="width: 100%;" border="0" summary="navigation">
+			<tr>
+				<th style="width: 100%" align="center" colspan="3">User Interface</th>
+			</tr>
+			<tr>
+				<td style="width: 20%" align="left">
+					<a href="Getting-Started.html" title="Getting Started">
+						<img alt="Previous" border="0" src="../../../images/prev.gif"/>
+					</a>
+				</td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right">
+					<a href="Limitations.html" title="Limitations">
+						<img alt="Next" border="0" src="../../../images/next.gif"/>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 20%" align="left" valign="top">Getting Started</td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right" valign="top">Limitations</td>
+			</tr>
+		</table><hr/>
+		<h1 id="User_Interface">User Interface</h1>
+		<p>This section describes the LTTng perspective and its specific views.</p>
+		<h2 id="LTTng_Perspective">LTTng Perspective</h2>
+		<p>The LTTng perspective groups the LTTng specific views, namely:</p>
+		<ul>
+			<li>
+				<a href="User-Interface.html#Project_View">Project_View</a>
+			</li>
+			<li>
+				<a href="User-Interface.html#Events_View">Events_View</a>
+			</li>
+			<li>
+				<a href="User-Interface.html#Histogram_View">Histogram_View</a>
+			</li>
+			<li>
+				<a href="User-Interface.html#Control_Flow_View">Control_Flow_View</a>
+			</li>
+			<li>
+				<a href="User-Interface.html#Resources_View">Resources_View</a>
+			</li>
+			<li>
+				<a href="User-Interface.html#Statistics_View">Statistics_View</a>
+			</li>
+		</ul>
+		<p>The views are synchronized i.e. selecting an event, a timestamp, a time range, etc will update the other views accordingly.</p>
+		<p>
+			<img border="0" src="images/LTTngPerspective.png"/>
+		</p>
+		<p>The perspective can be opened from the Eclipse Open Perspective dialog (Window &gt; Open Perspective... &gt; Other).</p>
+		<p>
+			<img border="0" src="images/LTTngPerspectiveOpen.png"/>
+		</p>
+		<h2 id="Project_View">Project View</h2>
+		<p>The project view displays the LTTng projects of the current workspace.</p>
+		<p>Two folders are always present: Traces and Experiments. </p>
+		<p>
+			<img border="0" src="images/ProjectView.png"/>
+		</p>
+		<p>A new LTTng project can be created using the LTTng Project dialog (File &gt; New &gt; Project... or the context menu)</p>
+		<p>
+			<img border="0" src="images/LTTngProjectNewWizard.png"/>
+		</p>
+		<p>
+			<img border="0" src="images/LTTngProjectNewDialog.png"/>
+		</p>
+		<p>The Traces folder holds the set of traces available for experiments. Traces are imported in the LTTng project using an import wizard triggered by a context menu.</p>
+		<p>Note: An LTTng trace is actually a composite of multiple channel traces grouped under a folder. It is the folder that has to be imported. </p>
+		<p>
+			<img border="0" src="images/LTTngTraceImportDialog.png"/>
+		</p>
+		<p>The Experiment folder holds the set of experiments of the project. Experiments are created from the Experiment context menu and are configured from the experiment's context menu.</p>
+		<p>
+			<img border="0" src="images/LTTngTraceSelectDialog.png"/>
+		</p>
+		<h2 id="Events_View">Events View</h2>
+		<p>The Events View shows the basic trace data in chronological order in a tabular format.</p>
+		<p>The header displays the current trace (or experiment) name. The table displays the following fields:</p>
+		<ul>
+			<li>
+				<b>Timestamp</b>: the event timestamp
+			</li>
+			<li>
+				<b>Source</b>: the component that generated the event
+			</li>
+			<li>
+				<b>Type</b>: the event type
+			</li>
+			<li>
+				<b>Reference</b>: the trace that holds the event (e.g. experiments typically hold multiple traces)
+			</li>
+			<li>
+				<b>Content</b>: the raw event content 
+			</li>
+		</ul>
+		<p>
+			<img border="0" src="images/EventsView.png"/>
+		</p>
+		<p>The highlighted event is the 
+			<i>current event</i> and is synchronized with the other views. If you select another event, the other views will be synchronized accordingly.
+		</p>
+		<h2 id="Histogram_View">Histogram View</h2>
+		<p>The Histogram View displays the trace events distribution with respect to time.</p>
+		<p>
+			<img border="0" src="images/HistogramView.png"/>
+		</p>
+		<p>The large histogram, at the bottom, shows the event distribution over the whole trace. The timetamps (sec.nanosec) correspond to the first and the last event in the trace. The selected area corresponds to the current time range window. When clicking in that viewer, the mouse wheel can be used to zoom in/out and update the time range window.</p>
+		<p>The smaller histogram, on the top right of the view, is a zoom of the current time range window. It also has timestamps on the bottom that correspond to the time range. The scale of the histogram (i.e. the number of events) is displayed on the right.</p>
+		<p>On the top left, there are three elements of data:</p>
+		<ul>
+			<li>
+				<b>Current Event (sec)</b>: Displays the timestamp of the currently selected event
+			</li>
+			<li>
+				<b>Window Span (sec)</b>: Displays the current time range window size
+			</li>
+			<li>
+				<b>Window Center (sec)</b>: Displays the timestamp at the cursor
+			</li>
+		</ul>
+		<h2 id="Control_Flow_View">Control Flow View</h2>
+		<p>The Control Flow View is applicable to kernel trace data. It displays the list processes in tabular format, sorted by PID, as well as their state transitions over time in a Gantt chart format.</p>
+		<p>
+			<img border="0" src="images/ControlFlowView.png"/>
+		</p>
+		<p>The tool bar options from left to right are:</p>
+		<ul>
+			<li>
+				<b>Home</b>: reset the time window to the whole trace range.
+			</li>
+			<li>
+				<b>Next Event</b>: sets the current event to the next event of the selected process.
+			</li>
+			<li>
+				<b>Previous Event</b>: sets the current event to the previous event of the selected process.
+			</li>
+			<li>
+				<b>Next Process</b>: sets the selected process to the next down in the list.
+			</li>
+			<li>
+				<b>Previous Process</b>: sets the selected process to the next up in the list.
+			</li>
+			<li>
+				<b>Zoom In</b>: zooms in the trace (i.e. shortens the current time window) at the current location. This can also be accomplished by using the mouse wheel in the graphical part.
+			</li>
+			<li>
+				<b>Zoom Out</b>: zooms out the trace (i.e. widens the current time window) at the current location. This can also be accomplished by using the mouse wheel in the graphical part.
+			</li>
+			<li>
+				<b>Filter</b>: display only the processes that have a state transition in the current window.
+			</li>
+		</ul>
+		<p>The process table displays the following fields:</p>
+		<ul>
+			<li>
+				<b>Process</b>: the process name if know (
+				<i>UNNAMED</i> otherwise)
+			</li>
+			<li>
+				<b>Brand</b>:
+			</li>
+			<li>
+				<b>PID</b>: the process ID
+			</li>
+			<li>
+				<b>TGID</b>:
+			</li>
+			<li>
+				<b>PPID</b>: the parent PID
+			</li>
+			<li>
+				<b>CPU</b>: the CPU/core the process is running on
+			</li>
+			<li>
+				<b>Birth sec/nsec</b>: the birth time of the process (
+				<i>0</i> if unknown) - seconds and nanoseconds
+			</li>
+			<li>
+				<b>TRACE</b>: the name of the trace that holds this process
+			</li>
+		</ul>
+		<p>The graphical part shows the state of the corresponding process 
+			<i>a la Gantt</i>: the color represents the process state and the length of the bar represents the time span during which the process was in that state. The header corresponds to a time axis. 
+			Note that depending on the scale or zooming factor, some pixels might represent more (in fact many, many more) than just one state.
+		</p>
+		<p>Here's a list of possible colors and their corresponding process state:</p>
+		<p>
+			<img border="0" src="images/LTTngControlFlowColorLegend.png"/>
+		</p>
+		<ul>
+			<li>
+				<b>MODE_UNKNOWN</b> - Process state is unknown: there is not enough information in the trace to determine the state. This usually occurs for processes already alive when tracing started and the system is unable to infer the original state from the following trace events.
+			</li>
+			<li>
+				<b>USER_MODE</b> - Running in user mode: the process is executing user source code or library calls (in user space).
+			</li>
+			<li>
+				<b>SYSCALL</b> - Running in system call: the process is doing a system call to the kernel and the running mode switched from process limited rights to super user mode.
+			</li>
+			<li>
+				<b>IRQ</b> - Servicing an IRQ: the currently running process is interrupted by an IRQ. As the IRQ does not change the currently running process (on some architectures it uses the same stack as the process), the IRQ state is shown in the state of the process. IRQ can be nested: a higher priority interrupt can interrupt a lower priority interrupt.
+			</li>
+			<li>
+				<b>TRAP</b> - Running in a trap: the kernel is running a trap that services a fault. The most frequent trap is the memory page fault trap, called every time a page is missing from physical memory.
+			</li>
+			<li>
+				<b>WAIT</b> - Waiting on I/O: the process is waiting for an I/O operation to complete before it can continue its execution.
+			</li>
+			<li>
+				<b>UNNAMED</b> - Mode unnamed: see 
+				<b>MODE_UNKNOWN</b>
+			</li>
+			<li>
+				<b>WAIT_FORK</b> - Waiting for fork: the process has just been created by its parent and is waiting for first scheduling.
+			</li>
+			<li>
+				<b>WAIT_CPU</b> - Waiting for CPU: the process is ready to run but waiting to get the CPU (a schedule in event).
+			</li>
+			<li>
+				<b>EXIT</b> - Process has exited: the process has exited, but still has the control of the CPU. It may happend if it has some tasks to do in the exit system call.
+			</li>
+			<li>
+				<b>ZOMBIE</b> - Zombie process: the process in in zombie state. This state happens when a process exits and then waits for the parent to wait for it (wait() or waitpid()).
+			</li>
+			<li>
+				<b>SOFTIRQ</b> - Running a soft IRQ handler: a SoftIRQ is normally triggered by an interrupt that whishes to have some work done very soon, but not "now". Doing the long part of a computation in a softirq that will be run just after the IRQ handler exits permits to do work while interrupts are enabled, without increasing the system latency.
+			</li>
+		</ul>
+		<h3 id="Mouse_Control">Mouse Control</h3>
+		<ul>
+			<li>Mouse Wheel
+				<ul>
+					<li>Forward - Zoom In.</li>
+					<li>Backward - Zoom Out.</li>
+				</ul>
+			</li>
+		</ul>
+		<ul>
+			<li>Mouse Drag
+				<ul>
+					<li>States Area - Moves the time window in the direction of the drag keeping current scale.</li>
+					<li>Time Scale Area - Changes the time scale to the time range from the start to the end of the drag action.</li>
+				</ul>
+			</li>
+		</ul>
+		<ul>
+			<li>Mouse Hover
+				<ul>
+					<li>Hovering the mouse selection over a state will trigger a tooltip display with additional information, including the start and end times as well as the name of the state associated to the color.</li>
+				</ul>
+			</li>
+		</ul>
+		<p>
+			<img border="0" src="images/LTTngProcessStateInfo.png"/>
+		</p>
+		<h2 id="Resources_View">Resources View</h2>
+		<p>The Resources View is applicable to kernel trace data. It displays the list system resources in tree format, grouped by trace, as well as their state transitions over time in a Gantt chart format.</p>
+		<p>
+			<img border="0" src="images/ResourcesView.png"/>
+		</p>
+		<p>The tool bar options from left to right are:</p>
+		<ul>
+			<li>
+				<b>Home</b>: reset the time window to the whole trace range.
+			</li>
+			<li>
+				<b>Next Event</b>: sets the current event to the next event of the selected process.
+			</li>
+			<li>
+				<b>Previous Event</b>: sets the current event to the previous event of the selected process.
+			</li>
+			<li>
+				<b>Next Process</b>: sets the selected process to the next down in the list.
+			</li>
+			<li>
+				<b>Previous Process</b>: sets the selected process to the next up in the list.
+			</li>
+			<li>
+				<b>Zoom In</b>: zooms in the trace (i.e. shortens the current time window) at the current location. This can also be accomplished by using the mouse wheel in the graphical part.
+			</li>
+			<li>
+				<b>Zoom Out</b>: zooms out the trace (i.e. widens the current time window) at the current location. This can also be accomplished by using the mouse wheel in the graphical part.
+			</li>
+			<li>
+				<b>Filter</b>: display only the processes that have a state transition in the current window.
+			</li>
+		</ul>
+		<p>The resource tree displays the system resources whose state transitions were collected in the trace.</p>
+		<p>The graphical part shows the state of the corresponding resources 
+			<i>a la Gantt</i>: the color represents the resource state and the length of the bar represents the time span during which the resource was in that state. The header corresponds to a time axis. 
+			Note that depending on the scale or zooming factor, some pixels might represent more (in fact many, many more) than just one state.
+		</p>
+		<p>Here's a list of possible colors and their corresponding process state:</p>
+		<p>
+			<img border="0" src="images/LTTngResourcesColorLegend.png"/>
+		</p>
+		<h3 id="Mouse_Control_2">Mouse Control</h3>
+		<p>See 
+			<a href="User-Interface.html#Control_Flow_View">Control_Flow_View</a>
+		</p>
+		<h2 id="Statistics_View">Statistics View</h2>
+		<p>The Statistics View displays the various event counters that are collected when analyzing a trace. The data is organized per trace.</p>
+		<p>
+			<img border="0" src="images/StatisticsView.png"/>
+		</p><hr/>
+		<table class="navigation" style="width: 100%;" border="0" summary="navigation">
+			<tr>
+				<td style="width: 20%" align="left">
+					<a href="Getting-Started.html" title="Getting Started">
+						<img alt="Previous" border="0" src="../../../images/prev.gif"/>
+					</a>
+				</td>
+				<td style="width: 60%" align="center">
+					<a href="User-Guide.html" title="LTTng Plug-in User Guide">
+						<img alt="LTTng Plug-in User Guide" border="0" src="../../../images/home.gif"/>
+					</a>
+				</td>
+				<td style="width: 20%" align="right">
+					<a href="Limitations.html" title="Limitations">
+						<img alt="Next" border="0" src="../../../images/next.gif"/>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 20%" align="left" valign="top">Getting Started</td>
+				<td style="width: 60%" align="center"></td>
+				<td style="width: 20%" align="right" valign="top">Limitations</td>
+			</tr>
+		</table>
+	</body>
+</html>

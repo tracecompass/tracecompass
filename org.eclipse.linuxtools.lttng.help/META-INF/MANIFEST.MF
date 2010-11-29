@@ -4,4 +4,6 @@ Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.linuxtools.lttng.help; singleton:=true
 Bundle-Version: 0.3.0.qualifier
 Bundle-Vendor: %Bundle-Vendor
+Require-Bundle: org.eclipse.help
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Localization: plugin
