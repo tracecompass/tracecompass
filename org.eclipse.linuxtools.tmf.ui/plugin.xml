@@ -12,7 +12,7 @@
             allowMultiple="false"
             category="org.eclipse.linuxtools.tmf.ui.views.category"
             class="org.eclipse.linuxtools.tmf.ui.views.project.ProjectView"
-            icon="icons/project_view.gif"
+            icon="icons/eview16/project_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.project"
             name="%project.view.name"
             restorable="true">
@@ -21,7 +21,7 @@
             allowMultiple="false"
             category="org.eclipse.linuxtools.tmf.ui.views.category"
             class="org.eclipse.linuxtools.tmf.ui.views.TmfEventsView"
-            icon="icons/events_view.gif"
+            icon="icons/eview16/events_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.events"
             name="%events.view.name"
             restorable="true">
@@ -32,7 +32,7 @@
       <editor
             class="org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor"
             default="false"
-            icon="icons/events_view.gif"
+            icon="icons/eview16/events_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.editors.events"
             name="%events.editor.name">
          <contentTypeBinding
@@ -60,14 +60,14 @@
       <wizard
             category="org.eclipse.linuxtools.tmf.ui.wizards.new"
             class="org.eclipse.linuxtools.tmf.ui.wizards.CustomTxtParserWizard"
-            icon="icons/customparser_wizard.gif"
+            icon="icons/etool16/customparser_wizard.gif"
             id="org.eclipse.linuxtools.tmf.ui.wizards.custom.text"
             name="%project.new.wizard.custom.text.parser">
       </wizard>
       <wizard
             category="org.eclipse.linuxtools.tmf.ui.wizards.new"
             class="org.eclipse.linuxtools.tmf.ui.wizards.CustomXmlParserWizard"
-            icon="icons/customparser_wizard.gif"
+            icon="icons/etool16/customparser_wizard.gif"
             id="org.eclipse.linuxtools.tmf.ui.wizards.custom.xml"
             name="%project.new.wizard.custom.xml.parser">
       </wizard>
