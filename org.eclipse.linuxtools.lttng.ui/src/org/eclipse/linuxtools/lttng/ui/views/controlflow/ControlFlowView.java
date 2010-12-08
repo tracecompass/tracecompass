@@ -649,7 +649,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		resetScale.setImageDescriptor(AbstractUIPlugin
 				.imageDescriptorFromPlugin(Messages
 						.getString("ControlFlowView.tmf.UI"), //$NON-NLS-1$
-						"icons/home_nav.gif")); //$NON-NLS-1$
+						"icons/elcl16/home_nav.gif")); //$NON-NLS-1$
 
 		// nextEvent
 		nextEvent = new Action() {
@@ -667,7 +667,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		nextEvent.setImageDescriptor(AbstractUIPlugin
 				.imageDescriptorFromPlugin(Messages
 						.getString("ControlFlowView.tmf.UI"), //$NON-NLS-1$
-						"icons/next_event.gif")); //$NON-NLS-1$
+						"icons/elcl16/next_event.gif")); //$NON-NLS-1$
 
 		// prevEvent
 		prevEvent = new Action() {
@@ -685,7 +685,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		prevEvent.setImageDescriptor(AbstractUIPlugin
 				.imageDescriptorFromPlugin(Messages
 						.getString("ControlFlowView.tmf.UI"), //$NON-NLS-1$
-						"icons/prev_event.gif")); //$NON-NLS-1$
+						"icons/elcl16/prev_event.gif")); //$NON-NLS-1$
 
 		// nextTrace
 		nextTrace = new Action() {
@@ -703,7 +703,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		nextTrace.setImageDescriptor(AbstractUIPlugin
 				.imageDescriptorFromPlugin(Messages
 						.getString("ControlFlowView.tmf.UI"), //$NON-NLS-1$
-						"icons/next_item.gif")); //$NON-NLS-1$
+						"icons/elcl16/next_item.gif")); //$NON-NLS-1$
 
 		// prevTrace
 		prevTrace = new Action() {
@@ -721,7 +721,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		prevTrace.setImageDescriptor(AbstractUIPlugin
 				.imageDescriptorFromPlugin(Messages
 						.getString("ControlFlowView.tmf.UI"), //$NON-NLS-1$
-						"icons/prev_item.gif")); //$NON-NLS-1$
+						"icons/elcl16/prev_item.gif")); //$NON-NLS-1$
 
 		// showLegend
 		showLegend = new Action() {
@@ -752,7 +752,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		filterTraces.setImageDescriptor(AbstractUIPlugin
 				.imageDescriptorFromPlugin(Messages
 						.getString("ControlFlowView.tmf.UI"), //$NON-NLS-1$
-						"icons/filter_items.gif")); //$NON-NLS-1$
+						"icons/elcl16/filter_items.gif")); //$NON-NLS-1$
 
 		// zoomIn
 		zoomIn = new Action() {
@@ -768,7 +768,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 				.getString("ControlFlowView.Action.ZoomIn.Tooltip")); //$NON-NLS-1$
 		zoomIn.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
 				Messages.getString("ControlFlowView.tmf.UI"), //$NON-NLS-1$
-				"icons/zoomin_nav.gif")); //$NON-NLS-1$
+				"icons/elcl16/zoomin_nav.gif")); //$NON-NLS-1$
 
 		// zoomOut
 		zoomOut = new Action() {
@@ -784,7 +784,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 				.getString("ControlFlowView.Action.ZoomOut.tooltip")); //$NON-NLS-1$
 		zoomOut.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
 				Messages.getString("ControlFlowView.tmf.UI"), //$NON-NLS-1$
-				"icons/zoomout_nav.gif")); //$NON-NLS-1$
+				"icons/elcl16/zoomout_nav.gif")); //$NON-NLS-1$
 
 		// zoomFilter
 		zoomFilter = new Action() {
@@ -801,7 +801,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		zoomFilter.setImageDescriptor(AbstractUIPlugin
 				.imageDescriptorFromPlugin(Messages
 						.getString("ControlFlowView.tmf.UI"), //$NON-NLS-1$
-						"icons/filter_items.gif")); //$NON-NLS-1$
+						"icons/elcl16/filter_items.gif")); //$NON-NLS-1$
 		zoomFilter.setChecked(false);
 
 		// PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_SYNCED);

@@ -1,3 +1,8 @@
+2010-12-08  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/ui/views/controlflow/ControlFlowView.java: Fix the icon path
+	* src/org/eclipse/linuxtools/lttng/ui/views/resources/ResourcesView.java: Fix the icon path
+
 2010-11-25  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/ui/views/PerspectiveFactory.java: Removed TimeFrame View and the default LTTng perspective

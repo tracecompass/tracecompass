@@ -238,7 +238,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		resetScale.setText(Messages.getString("ResourcesView.Action.Reset")); //$NON-NLS-1$
 		resetScale.setToolTipText(Messages.getString("ResourcesView.Action.Reset.ToolTip")); //$NON-NLS-1$
 		resetScale.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
-				Messages.getString("ResourcesView.tmf.UI"),	"icons/home_nav.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+				Messages.getString("ResourcesView.tmf.UI"),	"icons/elcl16/home_nav.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// action5
 		nextEvent = new Action() {
@@ -252,7 +252,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		nextEvent.setText(Messages.getString("ResourcesView.Action.NextEvent")); //$NON-NLS-1$
 		nextEvent.setToolTipText(Messages.getString("ResourcesView.Action.NextEvent.Tooltip")); //$NON-NLS-1$
 		nextEvent.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
-				Messages.getString("ResourcesView.tmf.UI"),	"icons/next_event.gif"));  //$NON-NLS-1$//$NON-NLS-2$
+				Messages.getString("ResourcesView.tmf.UI"),	"icons/elcl16/next_event.gif"));  //$NON-NLS-1$//$NON-NLS-2$
 
 		// action6
 		prevEvent = new Action() {
@@ -266,7 +266,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		prevEvent.setText(Messages.getString("ResourcesView.Action.PrevEvent")); //$NON-NLS-1$
 		prevEvent.setToolTipText(Messages.getString("ResourcesView.Action.PrevEvent.Tooltip")); //$NON-NLS-1$
 		prevEvent.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
-				Messages.getString("ResourcesView.tmf.UI"),	"icons/prev_event.gif")); //$NON-NLS-1$//$NON-NLS-2$
+				Messages.getString("ResourcesView.tmf.UI"),	"icons/elcl16/prev_event.gif")); //$NON-NLS-1$//$NON-NLS-2$
 
 		// action7
 		nextTrace = new Action() {
@@ -280,7 +280,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		nextTrace.setText(Messages.getString("ResourcesView.Action.NextResource")); //$NON-NLS-1$
 		nextTrace.setToolTipText(Messages.getString("ResourcesView.Action.NextResource.ToolTip")); //$NON-NLS-1$
 		nextTrace.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
-				Messages.getString("ResourcesView.tmf.UI"),	"icons/next_item.gif")); //$NON-NLS-1$//$NON-NLS-2$
+				Messages.getString("ResourcesView.tmf.UI"),	"icons/elcl16/next_item.gif")); //$NON-NLS-1$//$NON-NLS-2$
 
 		// action8
 		prevTrace = new Action() {
@@ -294,7 +294,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		prevTrace.setText(Messages.getString("ResourcesView.Action.PreviousResource")); //$NON-NLS-1$
 		prevTrace.setToolTipText(Messages.getString("ResourcesView.Action.PreviousResource.Tooltip")); //$NON-NLS-1$
 		prevTrace.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
-				Messages.getString("ResourcesView.tmf.UI"),	"icons/prev_item.gif"));  //$NON-NLS-1$//$NON-NLS-2$
+				Messages.getString("ResourcesView.tmf.UI"),	"icons/elcl16/prev_item.gif"));  //$NON-NLS-1$//$NON-NLS-2$
 
 		// action9
 		showLegend = new Action() {
@@ -320,7 +320,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		filterTraces.setText(Messages.getString("ResourcesView.Action.Filter")); //$NON-NLS-1$
 		filterTraces.setToolTipText(Messages.getString("ResourcesView.Action.Filter.ToolTip")); //$NON-NLS-1$
 		filterTraces.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
-				Messages.getString("ResourcesView.tmf.UI"),	"icons/filter_items.gif"));  //$NON-NLS-1$//$NON-NLS-2$
+				Messages.getString("ResourcesView.tmf.UI"),	"icons/elcl16/filter_items.gif"));  //$NON-NLS-1$//$NON-NLS-2$
 
 		// action10
 		zoomIn = new Action() {
@@ -334,7 +334,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		zoomIn.setText(Messages.getString("ResourcesView.Action.ZoomIn")); //$NON-NLS-1$
 		zoomIn.setToolTipText(Messages.getString("ResourcesView.Action.ZoomIn.Tooltip")); //$NON-NLS-1$
 		zoomIn.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
-				Messages.getString("ResourcesView.tmf.UI"), "icons/zoomin_nav.gif"));  //$NON-NLS-1$//$NON-NLS-2$
+				Messages.getString("ResourcesView.tmf.UI"), "icons/elcl16/zoomin_nav.gif"));  //$NON-NLS-1$//$NON-NLS-2$
 
 		// action10
 		zoomOut = new Action() {
@@ -348,7 +348,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		zoomOut.setText(Messages.getString("ResourcesView.Action.ZoomOut")); //$NON-NLS-1$
 		zoomOut.setToolTipText(Messages.getString("ResourcesView.Action.ZoomOut.tooltip")); //$NON-NLS-1$
 		zoomOut.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
-				Messages.getString("ResourcesView.tmf.UI"),	"icons/zoomout_nav.gif"));  //$NON-NLS-1$//$NON-NLS-2$
+				Messages.getString("ResourcesView.tmf.UI"),	"icons/elcl16/zoomout_nav.gif"));  //$NON-NLS-1$//$NON-NLS-2$
 
 		// zoomFilter
 		zoomFilter = new Action() {
@@ -362,7 +362,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		zoomFilter.setText(Messages.getString("ResourcesView.Action.ZoomFilter")); //$NON-NLS-1$
 		zoomFilter.setToolTipText(Messages.getString("ResourcesView.Action.ZoomFilter.tooltip")); //$NON-NLS-1$
 		zoomFilter.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
-				Messages.getString("ResourcesView.tmf.UI"), "icons/filter_items.gif"));  //$NON-NLS-1$//$NON-NLS-2$
+				Messages.getString("ResourcesView.tmf.UI"), "icons/elcl16/filter_items.gif"));  //$NON-NLS-1$//$NON-NLS-2$
 		zoomFilter.setChecked(false);
 
 		// PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_SYNCED);
