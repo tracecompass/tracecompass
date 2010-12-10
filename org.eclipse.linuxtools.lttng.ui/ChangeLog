@@ -1,3 +1,7 @@
+2010-12-10  Bernd Hufmann  <bhufmann@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/model/FixedArray.java (hashCode): Better hashing algorithm
+
 2010-12-08  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/ui/views/controlflow/ControlFlowView.java: Fix the icon path

@@ -151,11 +151,7 @@ public final class FixedArray implements RandomAccess {
 	 */
 	@Override
 	public int hashCode() {
-		int hash = 1;
-		for (int i = 0; i < fArray.length; ++i) {
-			hash = hash ^ fArray[i];
-		}
-		return hash;
+	    return Arrays.hashCode(fArray);
 	}
 	/**
 	 * Sets value at given index.
