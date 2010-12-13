@@ -282,14 +282,25 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     // ------------------------------------------------------------------------
     // TmfProvider
     // ------------------------------------------------------------------------
-
 	@Override
 	public ITmfContext armRequest(ITmfDataRequest<T> request) {
 //		Tracer.trace("Ctx: Arming request - start");
 		TmfTimestamp timestamp = (request instanceof ITmfEventRequest<?>) ?
 			((ITmfEventRequest<T>) request).getRange().getStartTime() : null;
-		TmfExperimentContext context = (timestamp != null) ? 
-			seekEvent(timestamp) : seekEvent(request.getIndex());
+
+		TmfExperimentContext context = null;    
+		if (timestamp != null) {
+			// seek by timestamp
+			context = seekEvent(timestamp);
+		} else {
+            // Seek by rank		    
+			if ((fExperimentContext != null) && fExperimentContext.getRank() == request.getIndex()) {
+				// We are already at the right context -> no need to seek 
+				context = fExperimentContext;
+			} else {
+				context = seekEvent(request.getIndex());
+			}
+		}
 //		Tracer.trace("Ctx: Arming request - done");
 		return context;
 	}

@@ -1,3 +1,7 @@
+2010-12-13  Bernd Hufmann  <bhufmann@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/LttngConstants.java: Added file header.
+
 2010-11-25  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/state/experiment/StateExperimentManager.java: Clear the checkpoint data when a new experiment is selected

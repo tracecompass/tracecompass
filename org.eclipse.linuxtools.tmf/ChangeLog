@@ -1,3 +1,7 @@
+2010-12-13  Bernd Hufmann  <bhufmann@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java (armRequest): For data requests, seek only if necessary   
+
 2010-11-23  Francois Chouinard  <fchouinard@gmail.com> 
 
 	* src/org/eclipse/linuxtools/tmf/component/TmfDataProvider.java: Adjusted background request block size

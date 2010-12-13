@@ -881,12 +881,12 @@ public class KernelStatisticsData extends StatisticsData {
     }
 
     /**
-     * Helper class that provides for keys for HashMaps depending on an integer
+     <h4>Helper class that provides keys for HashMaps depending on an integer 
      * - string -pair. It provides better performance than using a string as key
-     * only. However, for optimal performance the integer values should mostly
-     * unique.
+     * only. However, for optimal performance the integer values should be mostly
+     * unique.</h4>
      * 
-     * @author eedbhu
+     * @author bhufmann
      * 
      */
     private class KeyHelper implements Cloneable {

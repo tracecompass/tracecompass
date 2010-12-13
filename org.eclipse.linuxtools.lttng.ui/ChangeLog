@@ -1,3 +1,7 @@
+2010-12-13  Bernd Hufmann  <bhufmann@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/model/KernelStatisticsData.java (KeyHelper): Updated comment
+
 2010-12-10  Bernd Hufmann  <bhufmann@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/model/FixedArray.java (hashCode): Better hashing algorithm
