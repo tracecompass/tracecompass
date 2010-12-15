@@ -1,3 +1,8 @@
+2010-12-15  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/ui/viewers/events/TmfEventsTable.java: 
+	* src/org/eclipse/linuxtools/tmf/ui/widgets/TmfVirtualTable.java: 
+
 2010-11-25  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/tmf/ui/viewers/timeAnalysis/widgets/TmfTimeStatesCtrl.java (drawItemDataBurst): Fixed the threading issue on the shared vector

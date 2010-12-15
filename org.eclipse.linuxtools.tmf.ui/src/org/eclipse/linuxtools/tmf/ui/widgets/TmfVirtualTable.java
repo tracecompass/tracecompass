@@ -276,25 +276,32 @@ public class TmfVirtualTable extends Composite {
 				setDataItem(i, fTableItems[i]);
 			}
 		}
-
-		fSlider.setSelection(fSelectedEventRank);
-		fTable.setSelection(fSelectedRow);
-		fTable.showSelection();
-		fSelectedItems[0] = fTable.getSelection()[0];
-
-        TmfTimestamp ts = (TmfTimestamp) fSelectedItems[0].getData();
-        TmfSignalManager.dispatchSignal(new TmfTimeSynchSignal(this, ts));
-	}
-
-	private void setDataItem(int index, TableItem item) {
-		if( index != -1) {
-			Event event = new Event();
-			event.item  = item;
-			event.index = index + fTableTopEventRank;
-			event.doit  = true;
-			notifyListeners(SWT.SetData, event);
+		else {
+	      notifyUpdatedSelection();
 		}
 	}
+
+    private void setDataItem(int index, TableItem item) {
+        if( index != -1) {
+            Event event = new Event();
+            event.item  = item;
+            event.index = index + fTableTopEventRank;
+            event.doit  = true;
+            notifyListeners(SWT.SetData, event);
+        }
+    }
+
+    public void notifyUpdatedSelection() {
+        fSlider.setSelection(fSelectedEventRank);
+        fTable.setSelection(fSelectedRow);
+        fTable.showSelection();
+        TableItem[] tableSelection = fTable.getSelection();
+        if (tableSelection.length > 0 && tableSelection[0] != null) {
+            fSelectedItems[0] = tableSelection[0];
+            TmfTimestamp ts = (TmfTimestamp) fSelectedItems[0].getData();
+            TmfSignalManager.dispatchSignal(new TmfTimeSynchSignal(this, ts));
+        }
+    }
 
 	// ------------------------------------------------------------------------
 	// Slider handling
@@ -437,6 +444,7 @@ public class TmfVirtualTable extends Composite {
 	
 	public void refresh() {
 		refreshTable();
+		notifyUpdatedSelection();
 	}
 
 	public void setColumnHeaders(ColumnData columnData[]) {

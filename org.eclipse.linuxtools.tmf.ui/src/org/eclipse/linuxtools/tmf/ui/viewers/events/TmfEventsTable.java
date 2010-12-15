@@ -14,6 +14,10 @@
 
 package org.eclipse.linuxtools.tmf.ui.viewers.events;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
@@ -27,6 +31,7 @@ import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.widgets.ColumnData;
 import org.eclipse.linuxtools.tmf.ui.widgets.TmfVirtualTable;
 import org.eclipse.swt.SWT;
@@ -122,13 +127,12 @@ public class TmfEventsTable extends TmfComponent {
         fTable.addListener(SWT.SetData, new Listener() {
 
             @Override
-			@SuppressWarnings("unchecked")
 			public void handleEvent(Event event) {
 
                 final TableItem item = (TableItem) event.item;
                 final int index = fTable.indexOf(item);
 
-                // Note: this works because handleEvent() is called once for each row, in sequence  
+                // If available, return the cached data  
                 if ((index >= fCacheStartIndex) && (index < fCacheEndIndex)) {
                     int i = index - fCacheStartIndex;
                     item.setText(extractItemFields(fCache[i]));
@@ -136,36 +140,8 @@ public class TmfEventsTable extends TmfComponent {
                     return;
                 }
 
-                fCacheStartIndex = index;
-                fCacheEndIndex = index;
-
-                TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(TmfEvent.class, index, fCacheSize) {
-                	private int count = 0;
-
-                	@Override
-                    public void handleData(TmfEvent event) {
-                		super.handleData(event);
-                        if (event != null) {
-                            fCache[count++] = event.clone();
-                            fCacheEndIndex++;
-                        }
-                    }
-
-                };
-
-                ((ITmfDataProvider<TmfEvent>) fTrace).sendRequest(request);
-                try {
-                    request.waitForCompletion();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                
-                if (fCache[0] != null && fCacheStartIndex == index) {
-                    item.setText(extractItemFields(fCache[0]));
-                    item.setData(new TmfTimestamp(fCache[0].getTimestamp()));
-                    packColumns();
-                }
-                
+                // Else, fill the cache asynchronously (and off the UI thread)
+                populateCache(index);
             }
         });
 
@@ -361,4 +337,89 @@ public class TmfEventsTable extends TmfComponent {
     	}
 	}
 
+    // ------------------------------------------------------------------------
+    // Event cache population
+    // ------------------------------------------------------------------------
+    
+    // The event fetching job
+    private Job job;
+
+    private synchronized void populateCache(final int index) {
+
+        /* Check if the current job will fetch the requested event:
+         * 1. The job must exist
+         * 2. It must be running (i.e. not completed)
+         * 3. The requested index must be within the cache range
+         * 
+         * If the job meets these conditions, we simply exit.
+         * Otherwise, we create a new job but we might have to cancel
+         * an existing job for an obsolete range.
+         */
+        if (job != null) {
+            if (job.getState() != Job.NONE) {
+                if (index >= fCacheStartIndex && index < (fCacheStartIndex + fCacheSize)) {
+                    return;
+                }
+                // The new index is out of the requested range
+                // Kill the job and start a new one
+                job.cancel();
+            }
+        }
+        
+        fCacheStartIndex = index;
+        fCacheEndIndex   = index;
+
+        job = new Job("Fetching Events") { //$NON-NLS-1$
+            @Override
+            @SuppressWarnings("unchecked")
+            protected IStatus run(final IProgressMonitor monitor) {
+
+                TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(TmfEvent.class, index, fCacheSize) {
+                    private int count = 0;
+                    @Override
+                    public void handleData(TmfEvent event) {
+                        // If the job is canceled, cancel the request so waitForCompletion() will unlock
+                        if (monitor.isCanceled()) {
+                            cancel();
+                            return;
+                        }
+                        super.handleData(event);
+                        if (event != null) {
+                            fCache[count++] = event.clone();
+                            fCacheEndIndex++;   // TODO: Need to protect this??
+                        }
+                    }
+                };
+
+                ((ITmfDataProvider<TmfEvent>) fTrace).sendRequest(request);
+                try {
+                    request.waitForCompletion();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                // Event cache is now updated. Perform update on the UI thread
+                if (!fTable.isDisposed() && !monitor.isCanceled()) {
+                    fTable.getDisplay().asyncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!fTable.isDisposed()) {
+                                fTable.refresh();
+                            }
+                        }
+                    });
+                }
+                
+                // Flag the UI thread that the cache is ready
+                if (monitor.isCanceled()) {
+                    return new Status(IStatus.CANCEL, TmfUiPlugin.PLUGIN_ID, "Canceled"); //$NON-NLS-1$
+                }
+                else {
+                    return new Status(IStatus.OK, TmfUiPlugin.PLUGIN_ID, "Completed"); //$NON-NLS-1$
+                }
+            }
+        };
+        job.setPriority(Job.SHORT);
+        job.schedule();
+    }
 }
