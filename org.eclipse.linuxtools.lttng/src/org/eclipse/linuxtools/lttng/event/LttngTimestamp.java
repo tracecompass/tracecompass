@@ -141,23 +141,15 @@ public class LttngTimestamp extends TmfTimestamp {
     @SuppressWarnings("nls")
 	public String toString() {
 
-        // If we are dealing with units of seconds (or higher),
-        // use the plain formatter
-        if (fScale >= 0) {
-            Double value = fValue * Math.pow(10, fScale);
-            return value.toString();
+        StringBuilder sb = new StringBuilder(String.valueOf(fValue));
+
+        // Prepend the correct number of "0" so we can insert a "." at the right location
+        int nbZeroes = (-fScale) - sb.length() + 1;  
+        for (int i = 0; i < nbZeroes; i++) {
+            sb.insert(i, "0");
         }
-
-        // Define a format string
-        String format = String.format("%%1d.%%0%dd", -fScale);
-
-        // And format the timestamp value
-        double scale = Math.pow(10, fScale);
-        long seconds = (long) (fValue * scale);
-        long fracts  = fValue - (long) ((double) seconds / scale); 
-        String result = String.format(format, seconds, fracts);
-
-        return result;
+        sb.insert(sb.length() + fScale, ".");
+        return sb.toString();
     }
 
     @Override

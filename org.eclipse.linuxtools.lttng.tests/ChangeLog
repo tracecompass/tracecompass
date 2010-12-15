@@ -1,3 +1,7 @@
+2010-12-15  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/tests/event/LttngTimestampTest.java: Added a proper test for toString()
+
 2010-11-23  Francois Chouinard  <fchouinard@gmail.com>  Adjusted tests to new API
 
 	* src/org/eclipse/linuxtools/lttng/state/experiment/StateExperimentManagerTextTest.java: 

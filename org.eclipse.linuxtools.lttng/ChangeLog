@@ -1,3 +1,7 @@
+2010-12-15  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/event/LttngTimestamp.java: Fixed a rounding error 
+
 2010-12-13  Bernd Hufmann  <bhufmann@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/LttngConstants.java: Added file header.
