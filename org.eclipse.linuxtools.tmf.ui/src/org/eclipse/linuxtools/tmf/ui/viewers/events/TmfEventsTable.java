@@ -343,7 +343,6 @@ public class TmfEventsTable extends TmfComponent {
     
     // The event fetching job
     private Job job;
-
     private synchronized void populateCache(final int index) {
 
         /* Check if the current job will fetch the requested event:
@@ -405,6 +404,7 @@ public class TmfEventsTable extends TmfComponent {
                         public void run() {
                             if (!fTable.isDisposed()) {
                                 fTable.refresh();
+                                fTable.notifyUpdatedSelection();
                             }
                         }
                     });

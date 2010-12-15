@@ -1,3 +1,8 @@
+2010-12-15  Bernd Hufmann  <bhufmann@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/ui/viewers/events/TmfEventsTable.java (populateCache): Added call to notifyUpdatedSelection 
+	* src/org/eclipse/linuxtools/tmf/ui/widgets/TmfVirtualTable.java: Optimize table refresh
+
 2010-12-15  Francois Chouinard  <fchouinard@gmail.com>
 
 	* src/org/eclipse/linuxtools/tmf/ui/viewers/events/TmfEventsTable.java: 

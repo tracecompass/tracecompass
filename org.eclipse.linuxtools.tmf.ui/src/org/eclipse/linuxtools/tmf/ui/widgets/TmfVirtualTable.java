@@ -278,6 +278,7 @@ public class TmfVirtualTable extends Composite {
 		}
 		else {
 	      notifyUpdatedSelection();
+//	      fTable.showSelection();
 		}
 	}
 
@@ -290,11 +291,10 @@ public class TmfVirtualTable extends Composite {
             notifyListeners(SWT.SetData, event);
         }
     }
-
+    
     public void notifyUpdatedSelection() {
-        fSlider.setSelection(fSelectedEventRank);
-        fTable.setSelection(fSelectedRow);
-        fTable.showSelection();
+        fSlider.setSelection(fTableTopEventRank + fSelectedRow);
+        setSelectedRowVisibility();
         TableItem[] tableSelection = fTable.getSelection();
         if (tableSelection.length > 0 && tableSelection[0] != null) {
             fSelectedItems[0] = tableSelection[0];
@@ -444,7 +444,6 @@ public class TmfVirtualTable extends Composite {
 	
 	public void refresh() {
 		refreshTable();
-		notifyUpdatedSelection();
 	}
 
 	public void setColumnHeaders(ColumnData columnData[]) {
@@ -466,18 +465,22 @@ public class TmfVirtualTable extends Composite {
 	}
 	
 	private void refreshTable() {
-		int lastRowOffset = fTableTopEventRank + fTableRows - 1;
+		setSelectedRowVisibility();
+
+		for (int i = 0; i < fTableRows; i++) {
+			setDataItem(i, fTableItems[i]);
+		}
+	}
+
+    private void setSelectedRowVisibility() {
+        int lastRowOffset = fTableTopEventRank + fTableRows - 1;
 		if ((fSelectedEventRank >= fTableTopEventRank) && (fSelectedEventRank <= lastRowOffset)) {
 			fSelectedRow = fSelectedEventRank - fTableTopEventRank;
 			fTable.setSelection(fSelectedRow);
 		} else {
 			fTable.deselect(fSelectedRow);
 		}
-
-		for (int i = 0; i < fTableRows; i++) {
-			setDataItem(i, fTableItems[i]);
-		}
-	}
+    }
 
 	public void setSelection(int i) {
 		if (fTableItems != null) {
