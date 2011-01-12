@@ -538,7 +538,8 @@ public class HistogramView extends TmfView implements ControlListener {
             
             // If the given event is outside the selection window, recenter the window
             if ( isGivenTimestampInSelectedWindow( currentEventTime ) == false) {
-            	fullExperimentCanvas.setWindowCenterPosition( fullExperimentCanvas.getHistogramContent().getClosestXPositionFromTimestamp(currentEventTime) );
+                fullExperimentCanvas.setWindowCenterPosition(currentEventTime);
+
             	// Notify control that the window changed
             	windowChangedNotification();
             	// Send a broadcast to the framework about the window change
@@ -830,8 +831,16 @@ public class HistogramView extends TmfView implements ControlListener {
     	
     	// Notify other views in the framework
         if (currentEventTime != newCurrentEventTime) {
-        	currentEventTime = newCurrentEventTime;
-        	
+            currentEventTime = newCurrentEventTime;
+            
+            if ( currentEventTime < fullExperimentCanvas.getHistogramContent().getStartTime() ) {
+                currentEventTime = fullExperimentCanvas.getHistogramContent().getStartTime();
+            }
+            
+            if ( currentEventTime > fullExperimentCanvas.getHistogramContent().getEndTime() ) {
+                currentEventTime = fullExperimentCanvas.getHistogramContent().getEndTime();
+            }
+            
         	// Update the UI control
         	updateSelectedEventTime();
         }

@@ -496,11 +496,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		int headerHeight = table.getHeaderHeight();
 		table.getVerticalBar().setVisible(false);
 
-		tsfviewer = TmfViewerFactory.createViewer(sash,
- new TimeRangeViewerProvider(getParamsUpdater()));
-
-		tsfviewer.addWidgetSelectionListner(this);
-		tsfviewer.addWidgetTimeScaleSelectionListner(this);
+		tsfviewer = TmfViewerFactory.createViewer(sash, new TimeRangeViewerProvider(getParamsUpdater()));
 
 		// Traces shall not be grouped to allow synchronisation
 		tsfviewer.groupTraces(false);

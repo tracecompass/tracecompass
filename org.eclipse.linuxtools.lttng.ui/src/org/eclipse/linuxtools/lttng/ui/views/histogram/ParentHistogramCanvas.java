@@ -311,7 +311,7 @@ public class ParentHistogramCanvas extends HistogramCanvas {
 				timestampOfRight = timestampOfCenterPosition + currentWindow.getWindowTimeWidth() / 2;
 				windowXPositionRight = histogramContent.getClosestXPositionFromTimestamp(timestampOfRight);
 				
-				if ( windowXPositionRight > histogramContent.getEndTime() ) {
+				if ( timestampOfRight > histogramContent.getEndTime() ) {
 
 					timestampOfRight = histogramContent.getEndTime();
 					timestampOfCenter = timestampOfRight - currentWindow.getWindowTimeWidth() / 2;

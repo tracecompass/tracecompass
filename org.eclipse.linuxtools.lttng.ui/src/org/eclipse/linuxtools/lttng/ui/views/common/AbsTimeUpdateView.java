@@ -189,6 +189,13 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 				long selectedTime = signal.getCurrentTime().getValue();
 				if (tsfviewer != null) {
 					tsfviewer.setSelectedTime(selectedTime, true, source);
+
+					ParamsUpdater paramUpdater = getParamsUpdater();
+				    Long savedSelTime = paramUpdater.getSelectedTime();
+				    if ((savedSelTime == null) || (savedSelTime != selectedTime)) {
+			            // Update the parameter updater to save the selected time
+			            paramUpdater.setSelectedTime(selectedTime);   
+			        }
 				}
 			}
 		}

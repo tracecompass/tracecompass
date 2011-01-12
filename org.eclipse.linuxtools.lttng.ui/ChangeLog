@@ -1,3 +1,11 @@
+2011-01-12  Bernd Hufmann  <bhufmann@gmail.com> Fix or Bug 333486
+
+	* src/org/eclipse/linuxtools/lttng/ui/views/common/AbsTimeUpdateView.java (synchToTime): Added missing update of ParamsUpdater 
+	* src/org/eclipse/linuxtools/lttng/ui/views/controlflow/ControlFlowView.java (createPartControl): Removed duplicate "add listeners"-calls
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/HistogramView.java (currentTimeUpdated): Changed setting of center position
+	(currentEventChangeNotification): Added time range validation
+	* src/org/eclipse/linuxtools/lttng/ui/views/histogram/ParentHistogramCanvas.java (setWindowCenterPosition): Fixed time range validation
+
 2010-12-13  Bernd Hufmann  <bhufmann@gmail.com>
 
 	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/model/KernelStatisticsData.java (KeyHelper): Updated comment
