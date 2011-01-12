@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.eclipse.linuxtools.lttng.LttngConstants;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
+import org.eclipse.linuxtools.lttng.state.StateStrings.Events;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ExecutionMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.ProcessStatus;
 import org.eclipse.linuxtools.lttng.state.model.LttngProcessState;
@@ -64,7 +65,7 @@ public class KernelStatisticsData extends StatisticsData {
     /**
      * <h4>Class to generate unique IDs for processes.</h4>
      */
-    private KeyProvider fPidKeys = new KeyProvider(LttngConstants.STATS_PROCESS_ID);
+    private ProcessKeyProvider fPidKeys = new ProcessKeyProvider(LttngConstants.STATS_PROCESS_ID);
 
     /**
      * <h4>Class to generate unique Ids for event types.</h4>
@@ -307,7 +308,7 @@ public class KernelStatisticsData extends StatisticsData {
         Long cpu = event.getCpuId();
         int cpus = cpu.intValue() | LttngConstants.STATS_CPU_ID;
         LttngProcessState process = traceState.getRunning_process().get(cpu);
-        int processName = fPidKeys.getUniqueId(process.getPid().intValue(), process.getName());
+        int processName = fPidKeys.getUniqueId(process.getPid().intValue(), process.getCpu().intValue(), process.getCreation_time());
         int mode = process.getState().getExec_mode().ordinal() | LttngConstants.STATS_MODE_ID;
         int submode = fSubModeKeys.getUniqueId(process.getState().getExec_submode_id(), process.getState().getExec_submode());
         int function = process.getCurrent_function().intValue() | LttngConstants.STATS_FUNCTION_ID;
@@ -422,7 +423,7 @@ public class KernelStatisticsData extends StatisticsData {
         Long cpu = event.getCpuId();
         int cpus = cpu.intValue() | LttngConstants.STATS_CPU_ID;
         LttngProcessState process = traceState.getRunning_process().get(cpu);
-        int processName = fPidKeys.getUniqueId(process.getPid().intValue(), process.getName());
+        int processName = fPidKeys.getUniqueId(process.getPid().intValue(), process.getCpu().intValue(), process.getCreation_time());
         int mode = process.getState().getExec_mode().ordinal() | LttngConstants.STATS_MODE_ID;
         int submode = fSubModeKeys.getUniqueId(process.getState().getExec_submode_id(), process.getState().getExec_submode());
         int function = process.getCurrent_function().intValue() | LttngConstants.STATS_FUNCTION_ID;
@@ -695,6 +696,14 @@ public class KernelStatisticsData extends StatisticsData {
             current = new StatisticsTreeNode(newPath, this, name);
             put(newPath, current);
         }
+        else {
+            // Special case: Update name if event is of type "exec". This is necessary because the 
+            // process name can change at this point (See Bug333114))
+            if ((index == 3) && !isType && Events.LTT_EVENT_EXEC.getInName().equals(event.getMarkerName())) {
+                String name = getOtherStatsName(event, traceState, index);
+                current.setName(name);
+            }
+        }
         return current;
     }
 
@@ -812,7 +821,7 @@ public class KernelStatisticsData extends StatisticsData {
     /**
      * <h4>Provides unique keys for String - Integer pairs.</h4>
      * 
-     * @author eedbhu
+     * @author bhufmann
      * 
      */
     final private class KeyProvider {
@@ -857,13 +866,6 @@ public class KernelStatisticsData extends StatisticsData {
          *            Integer value of the data the key is for
          * @param name
          *            Name of the data the key is for
-         * @param helper
-         *            Helper class instance for the data the key is for
-         * @param map
-         *            The map the keys are tracked
-         * @param bitMask
-         *            The bit mask to apply for the key
-         * 
          * @return Unique id
          */
         public int getUniqueId(int value, String name) {
@@ -958,6 +960,157 @@ public class KernelStatisticsData extends StatisticsData {
          */
         public void setValue(int value) {
             this.fValue = value;
+        }
+    }
+
+    /**
+     * <h4>Provides unique keys for given process information. For optimal performance the integer 
+     * PIDs need to be mostly unique</h4>
+     * 
+     * @author bhufmann
+     * 
+     */
+    final private class ProcessKeyProvider {
+        /**
+         * <h4>Instance counter for unique ID generation.</h4>
+         */
+        private int fCount = 0;
+
+        /**
+         * <h4>Attributes to generate unique IDs for processes.</h4>
+         */
+        private HashMap<ProcessKey, Integer> fKeyMap = new HashMap<ProcessKey, Integer>(65535);
+        private ProcessKey fHelper = new ProcessKey();
+
+        /**
+         * <h4>Bit mask to apply for the key.</h4>
+         */
+        private int fBitMask = 0;
+
+        /**
+         * Constructor
+         * 
+         * @param bitMask
+         *            <h4>Bit mask to apply for the key.</h4>
+         */
+        public ProcessKeyProvider(int bitMask) {
+            fBitMask = bitMask;
+        }
+
+        /**
+         * <h4>Creates unique id for the given input data.</h4>
+         * 
+         * @param value
+         *            Integer value of the data the key is for
+         * @param cpuId
+         *            The cpuId for the processKey Helper
+         * @param creationTime
+         *            The creation Time for the processKey Helper
+         * @return Unique id
+         */
+        public int getUniqueId(int value, int cpuId, long creationTime) {
+            fHelper.setPid(value);
+            fHelper.setCpuId(cpuId);
+            fHelper.setCreationTime(creationTime);
+
+            Integer returnKey = fKeyMap.get(fHelper);
+            if (returnKey == null) {
+                returnKey = Integer.valueOf((++fCount) | fBitMask);
+                ProcessKey newHelper = fHelper.clone();
+                fKeyMap.put(newHelper, returnKey);
+            }
+            return returnKey.intValue();
+        }
+    }
+    
+    /**
+    <h4>Helper class that provides keys for HashMaps depending on process information.</h4>
+    * 
+    * @author bhufmann
+    * 
+    */
+    final class ProcessKey implements Cloneable {
+        private int fPid = 0;
+        private int fCpuId = 0;
+        private long fCreationTime = 0;
+
+        /**
+         * <h4>Set the PID of the key.</h4>
+         * 
+         * @param pid
+         */
+        public void setPid(int pid) {
+            this.fPid = pid;
+        }
+        
+        /**
+         * <h4>Set the cpuTime of the process key.</h4>
+         * 
+         * @param cpuTime
+         *            The name to set.
+         */
+        public void setCpuId(int cpuId) {
+            this.fCpuId = cpuId;
+        }
+
+        /**
+         * <h4>Set the creationTime of the process key.</h4>
+         * 
+         * @param creationTime
+         *            The name to set.
+         */
+        public void setCreationTime(long creationTime) {
+            this.fCreationTime = creationTime;
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see java.lang.Object#equals(java.lang.Object)
+         */
+        @Override
+        public boolean equals(Object obj) {
+            ProcessKey procKey = (ProcessKey) obj;
+
+            if (procKey.fPid != this.fPid) {
+                return false;
+            }
+
+            if (procKey.fCreationTime != this.fCreationTime) {
+                return false;
+            }
+            
+            // use the cpu value to validate pid 0
+            if (((procKey.fPid == 0L) && (procKey.fCpuId != this.fCpuId))) {
+                return false;
+            }
+            return true;
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see java.lang.Object#hashCode()
+         */
+        @Override
+        public int hashCode() {
+            return this.fPid;
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see java.lang.Object#clone()
+         */
+        @Override
+        public ProcessKey clone() {
+            ProcessKey clone = null;
+            try {
+                clone = (ProcessKey) super.clone();
+                clone.fPid = fPid;
+                clone.fCpuId = fCpuId;
+                clone.fCreationTime = fCreationTime;
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+            return clone;
         }
     }
 }
