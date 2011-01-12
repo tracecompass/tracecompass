@@ -276,10 +276,8 @@ public class TmfVirtualTable extends Composite {
 				setDataItem(i, fTableItems[i]);
 			}
 		}
-		else {
-	      notifyUpdatedSelection();
-//	      fTable.showSelection();
-		}
+		// Notify about changed selection
+		notifyUpdatedSelection();
 	}
 
     private void setDataItem(int index, TableItem item) {
@@ -291,14 +289,29 @@ public class TmfVirtualTable extends Composite {
             notifyListeners(SWT.SetData, event);
         }
     }
-    
+
+    /**
+     * Updates the selection in the table and broadcasts a signal to notify all signal
+     * handlers about the updated selection.
+     */ 
     public void notifyUpdatedSelection() {
+    	notifyUpdatedSelection(null);
+    }
+
+    /**
+     * Updates the selection in the table and broadcasts a signal to notify all signal
+     * handlers about the updated selection. 
+     * 
+     * @param broadcastTimestamp - timestamp to broadcast if other than from the table selection.
+     *                             use null to broadcast selected time
+     */
+    public void notifyUpdatedSelection(TmfTimestamp broadcastTimestamp) {
         fSlider.setSelection(fTableTopEventRank + fSelectedRow);
         setSelectedRowVisibility();
         TableItem[] tableSelection = fTable.getSelection();
         if (tableSelection.length > 0 && tableSelection[0] != null) {
             fSelectedItems[0] = tableSelection[0];
-            TmfTimestamp ts = (TmfTimestamp) fSelectedItems[0].getData();
+            TmfTimestamp ts = (broadcastTimestamp != null) ? broadcastTimestamp : (TmfTimestamp) fSelectedItems[0].getData();
             TmfSignalManager.dispatchSignal(new TmfTimeSynchSignal(this, ts));
         }
     }
@@ -489,7 +502,16 @@ public class TmfVirtualTable extends Composite {
 			fSlider.setSelection(i);
 
 			fSelectedEventRank = i;
-			fTableTopEventRank = i - (fTableRows / 2);
+
+			// Check if enough events are available to display selected event
+			// in the middle of table
+			if (i < (fTableItemCount - fTableRows/2)) {
+				fTableTopEventRank = i - (fTableRows / 2);
+			} else {
+				fTableTopEventRank = fTableItemCount - fTableRows;
+			}
+
+			// Sanity check
 			if (fTableTopEventRank < 0) {
 				fTableTopEventRank = 0;
 			}

@@ -303,8 +303,19 @@ public class TmfEventsTable extends TmfComponent {
 
     			@Override
     			public void handleCompleted() {
+
+    				// Verify if event is within the trace range
+    				final TmfTimestamp timestamp[] = new TmfTimestamp[1];
+    				timestamp[0] = signal.getCurrentTime();
+    				if (timestamp[0].compareTo(fTrace.getStartTime(), true) == -1) {
+    					timestamp[0] = fTrace.getStartTime();
+    				}
+    				if (timestamp[0].compareTo(fTrace.getEndTime(), true) == 1) {
+    					timestamp[0] = fTrace.getEndTime();
+    				}
+
     				// Get the rank for the event selection in the table
-    				final int index = (int) fTrace.getRank(signal.getCurrentTime());
+    				final int index = (int) fTrace.getRank(timestamp[0]);
 
     				fTable.getDisplay().asyncExec(new Runnable() {
     					@Override
@@ -313,6 +324,15 @@ public class TmfEventsTable extends TmfComponent {
     						if (fTable.isDisposed()) return;
 
     						fTable.setSelection(index);
+
+    						// If index is in cache, then notify about updated selection. 
+    						// Otherwise it's done after fetching the relevant events from the trace
+    						if ((index >= fCacheStartIndex) && (index < fCacheEndIndex)) {
+    							// Use the timestamp in signal to broadcast to avoid moving the selection
+    							// at the source of the signal
+    							fTable.notifyUpdatedSelection(timestamp[0]);
+    						}
+
     						// The timestamp might not correspond to an actual event
     						// and the selection will point to the next experiment event.
     						// But we would like to display both the event before and

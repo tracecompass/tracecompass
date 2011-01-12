@@ -1,3 +1,11 @@
+2011-01-12  Bernd Hufmann  <bhufmann@gmail.com> Fix for Bug 333606
+
+	* src/org/eclipse/linuxtools/tmf/ui/viewers/events/TmfEventsTable.java (.handleCompleted): Added time range verification
+	(..run): Added conditional notification call  
+	* src/org/eclipse/linuxtools/tmf/ui/widgets/TmfVirtualTable.java (handleTableKeyEvent): Added unconditional notification call 
+	(notifyUpdatedSelection): Added parameter to method call 
+	(setSelection): Change setting of members if selection is at the end of the trace
+
 2010-12-15  Bernd Hufmann  <bhufmann@gmail.com>
 
 	* src/org/eclipse/linuxtools/tmf/ui/viewers/events/TmfEventsTable.java (populateCache): Added call to notifyUpdatedSelection 
