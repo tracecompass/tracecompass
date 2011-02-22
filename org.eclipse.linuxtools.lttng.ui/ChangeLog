@@ -1,3 +1,7 @@
+2011-02-22  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/ui/views/controlflow/ControlFlowView.java: Fix for Bug337859 (check for NPE) 
+
 2011-01-12  Bernd Hufmann  <bhufmann@gmail.com> Fix for Bug 333114
 
 	* src/org/eclipse/linuxtools/lttng/ui/views/statistics/model/KernelStatisticsData.java: Update statistic handling for processes that change name at event of type "exec" and after fork 

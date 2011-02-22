@@ -492,7 +492,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 		int borderWidth = table.getBorderWidth();
 
-		int itemHeight = table.getItemHeight() + checkForSWTBugItemHeightAdjustement();
+		int itemHeight = table.getItemHeight() + getTableItemHeightAdjustement();
 		int headerHeight = table.getHeaderHeight();
 		table.getVerticalBar().setVisible(false);
 
@@ -1075,24 +1075,25 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		return initTimeWindow;
 	}
 	
-	// *** HACK ***
-	//
-	//
-	//
-	public int checkForSWTBugItemHeightAdjustement() {
-		int returnedAjustement = 0;
-		String desktopSessionName = System.getenv("DESKTOP_SESSION"); //$NON-NLS-1$
-		
-		// Gnome : most common case, no adjustement
-		if ( desktopSessionName.equals("gnome") ) { //$NON-NLS-1$
-			returnedAjustement = 0;
+	/*
+	 * SWT doesn't seem to report correctly the table item height, at least in
+	 * the case of KDE.
+	 * 
+	 * This method provides an adjustment term according to the desktop session.
+	 * 
+	 * @return Height adjustment 
+	 */
+	private int getTableItemHeightAdjustement() {
+		int ajustement = 0;
+		String desktopSession = System.getenv("DESKTOP_SESSION"); //$NON-NLS-1$
+
+		if (desktopSession != null) {
+	        if (desktopSession.equals("kde")) { //$NON-NLS-1$
+	            ajustement = 2;
+	        }
 		}
-		// Kde : ajustement of 2 is needed
-		else if ( desktopSessionName.equals("kde") ) { //$NON-NLS-1$
-			returnedAjustement = 2;
-		}
-		
-		return returnedAjustement;
+
+		return ajustement;
 	}
 
 	/*
