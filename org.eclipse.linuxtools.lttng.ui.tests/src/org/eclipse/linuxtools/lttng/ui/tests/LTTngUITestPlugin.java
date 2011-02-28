@@ -21,7 +21,7 @@ import org.osgi.framework.BundleContext;
 public class LTTngUITestPlugin extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.linuxtools.lttng.ui.tests";
+	public static final String PLUGIN_ID = "org.eclipse.linuxtools.lttng.ui.tests"; //$NON-NLS-1$
 
 	// The shared instance
 	private static LTTngUITestPlugin plugin;
