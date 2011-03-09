@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright (C) 2011, Red Hat, Inc.
+
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <prerequisites>
+    <maven>3.0</maven>
+  </prerequisites>
+
+  <parent>
+    <groupId>org.eclipse.linuxtools</groupId>
+    <artifactId>linuxtools-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.eclipse.linuxtools.lttng</groupId>
+  <artifactId>linuxtools-lttng-parent</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>Eclipse Linux Tools LTTng Parent</name>
+
+  <licenses>
+    <license>
+      <name>Eclipse Public License v1.0</name>
+      <comments>
+       All rights reserved.
+
+       This program and the accompanying materials are made
+       available under the terms of the Eclipse Public License v1.0
+       which accompanies this distribution, and is available at
+       http://www.eclipse.org/legal/epl-v10.htm
+      </comments>
+    </license>
+  </licenses>
+
+  <modules>
+    <module>org.eclipse.linuxtools.lttng</module>
+    <module>org.eclipse.linuxtools.lttng-feature</module>
+    <module>org.eclipse.linuxtools.lttng.help</module>
+    <module>org.eclipse.linuxtools.lttng.jni</module>
+    <module>org.eclipse.linuxtools.lttng.test-feature</module>
+    <module>org.eclipse.linuxtools.lttng.tests</module>
+    <module>org.eclipse.linuxtools.lttng.ui</module>
+    <module>org.eclipse.linuxtools.lttng.ui.tests</module>
+    <module>org.eclipse.linuxtools.tmf</module>
+    <!--<module>org.eclipse.linuxtools.tmf.doc</module>-->
+    <module>org.eclipse.linuxtools.tmf-feature</module>
+    <module>org.eclipse.linuxtools.tmf.test-feature</module>
+    <module>org.eclipse.linuxtools.tmf.tests</module>
+    <module>org.eclipse.linuxtools.tmf.ui</module>
+    <module>org.eclipse.linuxtools.tmf.ui.tests</module>
+  </modules>
+
+</project>
