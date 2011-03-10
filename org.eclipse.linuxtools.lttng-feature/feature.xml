@@ -4,6 +4,8 @@
       label="%featureName"
       version="0.3.0.qualifier"
       provider-name="%featureProvider"
+      ws="*"
+      arch="*"
       os="linux">
 
    <description>
@@ -39,6 +41,8 @@
    <plugin
          id="org.eclipse.linuxtools.lttng"
          os="linux"
+         ws="*"
+         arch="*"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -46,6 +50,8 @@
 
    <plugin
          id="org.eclipse.linuxtools.lttng.ui"
+         ws="*"
+         arch="*"
          os="linux"
          download-size="0"
          install-size="0"
