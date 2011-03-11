@@ -15,6 +15,10 @@ package org.eclipse.linuxtools.tmf.experiment;
 import java.util.Collections;
 import java.util.Vector;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.component.TmfEventProvider;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
@@ -665,7 +669,23 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 //	}
 
 	@SuppressWarnings("unchecked")
-	private void indexExperiment(boolean waitForCompletion) {
+	protected void indexExperiment(boolean waitForCompletion) {
+		
+		final Job job = new Job("Indexing " + getName() + "...") { //$NON-NLS-1$ //$NON-NLS-2$
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				while (!monitor.isCanceled()) {
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						return Status.OK_STATUS;
+					}
+				}
+				monitor.done();
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule();
 
 		fCheckpoints.clear();
 		
@@ -707,6 +727,12 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 //				System.out.println(getName() + ": nbEvents=" + fNbEvents + " (" + (average / 1000) + "." + (average % 1000) + " us/evt)");
 				super.handleSuccess();
 			}
+
+            @Override
+            public void handleCompleted() {
+                job.cancel();
+	            super.handleCompleted();
+            }
 
 			private void updateExperiment() {
 				int nbRead = getNbRead();

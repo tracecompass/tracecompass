@@ -17,6 +17,10 @@ import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.Vector;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.component.TmfEventProvider;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
@@ -89,7 +93,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
      * @throws FileNotFoundException
      */
     protected TmfTrace(String name, Class<T> type, String path) throws FileNotFoundException {
-    	this(name, type, path, DEFAULT_INDEX_PAGE_SIZE);
+    	this(name, type, path, DEFAULT_INDEX_PAGE_SIZE, true);
     }
 
     /**
@@ -98,12 +102,34 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
      * @throws FileNotFoundException
      */
     protected TmfTrace(String name, Class<T> type, String path, int cacheSize) throws FileNotFoundException {
+    	this(name, type, path, cacheSize, true);
+    }
+
+    /**
+     * @param path
+     * @param indexTrace
+     * @throws FileNotFoundException
+     */
+    protected TmfTrace(String name, Class<T> type, String path, boolean indexTrace) throws FileNotFoundException {
+    	this(name, type, path, DEFAULT_INDEX_PAGE_SIZE, indexTrace);
+    }
+
+    /**
+     * @param path
+     * @param cacheSize
+     * @param indexTrace
+     * @throws FileNotFoundException
+     */
+    protected TmfTrace(String name, Class<T> type, String path, int cacheSize, boolean indexTrace) throws FileNotFoundException {
     	super(name, type);
     	int sep = path.lastIndexOf(File.separator);
     	String simpleName = (sep >= 0) ? path.substring(sep + 1) : path;
     	setName(simpleName);
     	fPath = path;
         fIndexPageSize = (cacheSize > 0) ? cacheSize : DEFAULT_INDEX_PAGE_SIZE;
+//        if (indexTrace) {
+//        	indexTrace(false);
+//        }
     }
 
     /* (non-Javadoc)
@@ -402,7 +428,23 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     @SuppressWarnings({ "unchecked" })
     private void indexTrace(boolean waitForCompletion) {
 
-        fCheckpoints.clear();
+    	final Job job = new Job("Indexing " + getName() + "...") { //$NON-NLS-1$ //$NON-NLS-2$
+    		@Override
+    		protected IStatus run(IProgressMonitor monitor) {
+    			while (!monitor.isCanceled()) {
+    				try {
+    					Thread.sleep(100);
+    				} catch (InterruptedException e) {
+    					return Status.OK_STATUS;
+    				}
+    			}
+    			monitor.done();
+    			return Status.OK_STATUS;
+    		}
+    	};
+    	job.schedule();
+
+    	fCheckpoints.clear();
         ITmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity,
                 TmfDataRequest.ALL_DATA, 1, ITmfDataRequest.ExecutionType.BACKGROUND) {
 
@@ -427,6 +469,12 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
             @Override
             public void handleSuccess() {
                 updateTrace();
+            }
+
+            @Override
+            public void handleCompleted() {
+            	job.cancel();
+            	super.handleCompleted();
             }
 
             private void updateTrace() {

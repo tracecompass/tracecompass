@@ -144,7 +144,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 	 */
 	public LTTngTrace(String path, boolean waitForCompletion,
 			boolean bypassIndexing) throws Exception {
-		super(path, LttngEvent.class, path, CHECKPOINT_PAGE_SIZE);
+		super(path, LttngEvent.class, path, CHECKPOINT_PAGE_SIZE, false);
 		try {
 			currentJniTrace = JniTraceFactory.getJniTrace(path,
 					SHOW_LTT_DEBUG_DEFAULT);
