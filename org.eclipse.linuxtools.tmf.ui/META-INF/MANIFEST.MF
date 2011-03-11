@@ -15,6 +15,7 @@ Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.linuxtools.tmf.ui,
  org.eclipse.linuxtools.tmf.ui.editors,
  org.eclipse.linuxtools.tmf.ui.parsers,
+ org.eclipse.linuxtools.tmf.ui.signal,
  org.eclipse.linuxtools.tmf.ui.viewers,
  org.eclipse.linuxtools.tmf.ui.viewers.events,
  org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis,

@@ -30,8 +30,6 @@ import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
-import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
-import org.eclipse.linuxtools.tmf.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfTraceUpdatedSignal;
 
 /**
@@ -500,14 +498,6 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 	protected void notifyListeners() {
     	broadcast(new TmfTraceUpdatedSignal(this, this, new TmfTimeRange(fStartTime, fEndTime)));
 	}
-   
-	@TmfSignalHandler
-    public void handleTraceOpen(TmfTraceOpenedSignal signal) {
-        ITmfTrace trace = signal.getTrace();
-        if (trace == this) {
-            indexTrace(false);
-        }
-    }
    
 	// ------------------------------------------------------------------------
 	// TmfDataProvider

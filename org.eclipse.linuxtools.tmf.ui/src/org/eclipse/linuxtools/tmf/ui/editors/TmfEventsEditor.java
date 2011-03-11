@@ -16,12 +16,11 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
-import org.eclipse.linuxtools.tmf.signal.TmfTraceClosedSignal;
-import org.eclipse.linuxtools.tmf.signal.TmfTraceOpenedSignal;
-import org.eclipse.linuxtools.tmf.signal.TmfTraceParserUpdatedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.parsers.ParserProviderManager;
+import org.eclipse.linuxtools.tmf.ui.signal.TmfTraceClosedSignal;
+import org.eclipse.linuxtools.tmf.ui.signal.TmfTraceParserUpdatedSignal;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.linuxtools.tmf.ui.views.project.ProjectView;
 import org.eclipse.swt.widgets.Composite;
@@ -109,7 +108,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             if (fTrace != null) {
                 fEventsTable = createEventsTable(fParent, fTrace.getCacheSize());
                 fEventsTable.setTrace(fTrace, true);
-                broadcast(new TmfTraceOpenedSignal(this, fTrace));
+// FIXME: broadcast(new TmfTraceOpenedSignal(this, fTrace));
             } else {
                 fEventsTable = new TmfEventsTable(fParent, 0);
             }
@@ -124,7 +123,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         if (fTrace != null) {
             fEventsTable = createEventsTable(parent, fTrace.getCacheSize());
             fEventsTable.setTrace(fTrace, true);
-            broadcast(new TmfTraceOpenedSignal(this, fTrace));
+// FIXME: broadcast(new TmfTraceOpenedSignal(this, fTrace));
         } else {
             fEventsTable = new TmfEventsTable(parent, 0);
         }
@@ -178,7 +177,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             if (fTrace != null) {
                 fEventsTable = createEventsTable(fParent, fTrace.getCacheSize());
                 fEventsTable.setTrace(fTrace, true);
-                broadcast(new TmfTraceOpenedSignal(this, fTrace));
+// FIXME:broadcast(new TmfTraceOpenedSignal(this, fTrace, fResource, fEventsTable));
             } else {
                 fEventsTable = new TmfEventsTable(fParent, 0);
             }
