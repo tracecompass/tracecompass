@@ -93,7 +93,7 @@ public class TmfEventSource implements Cloneable {
 		TmfEventSource clone = null;
 		try {
 			clone = (TmfEventSource) super.clone();
-			clone.fSourceId = null;
+			clone.fSourceId = fSourceId;
 		}
 		catch (CloneNotSupportedException e) {
 			e.printStackTrace();

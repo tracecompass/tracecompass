@@ -179,8 +179,8 @@ public class TmfEventContent implements Cloneable {
 		try {
 			clone = (TmfEventContent) super.clone();
 			clone.fParentEvent = fParentEvent;
-			clone.fRawContent = null;
-			clone.fFields = null;
+			clone.fRawContent = fRawContent;
+			clone.fFields = fFields;
 		}
 		catch (CloneNotSupportedException e) {
 			e.printStackTrace();
