@@ -856,4 +856,8 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 		thread.start();
 	}
 
+//	@Override
+//    protected void queueBackgroundRequest(final ITmfDataRequest<T> request, final int blockSize, final boolean adjust) {
+//		super.queueBackgroundRequest(request, fIndexPageSize, true);
+//    }
 }
