@@ -101,7 +101,7 @@ public class TmfEventsTable extends TmfComponent {
         fCache = new TmfEvent[fCacheSize];
         
         // Create a virtual table
-        final int style = SWT.SINGLE | SWT.FULL_SELECTION | SWT.BORDER;
+        final int style = SWT.H_SCROLL | SWT.V_SCROLL | SWT.SINGLE | SWT.FULL_SELECTION;
         fTable = new TmfVirtualTable(parent, style);
 
         // Set the table layout
@@ -335,7 +335,7 @@ public class TmfEventsTable extends TmfComponent {
     						if ((index >= fCacheStartIndex) && (index < fCacheEndIndex)) {
     							// Use the timestamp in signal to broadcast to avoid moving the selection
     							// at the source of the signal
-    							fTable.notifyUpdatedSelection(timestamp[0]);
+// FIXME:   							fTable.notifyUpdatedSelection(timestamp[0]);
     						}
 
     						// The timestamp might not correspond to an actual event
@@ -429,7 +429,7 @@ public class TmfEventsTable extends TmfComponent {
                         public void run() {
                             if (!fTable.isDisposed()) {
                                 fTable.refresh();
-                                fTable.notifyUpdatedSelection();
+// FIXME:                               fTable.notifyUpdatedSelection();
                             }
                         }
                     });
