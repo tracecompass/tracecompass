@@ -12,16 +12,17 @@
 
 package org.eclipse.linuxtools.tmf.ui.parsers.custom;
 
-import java.io.RandomAccessFile;
 import java.util.regex.Matcher;
 
+import org.eclipse.linuxtools.tmf.io.BufferedRandomAccessFile;
 import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTraceDefinition.InputLine;
 
 public class CustomTxtTraceContext extends TmfContext {
-    public RandomAccessFile raFile;
+    public BufferedRandomAccessFile raFile;
     public Matcher firstLineMatcher;
+    public String firstLine;
     public long nextLineLocation;
     public InputLine inputLine;
 

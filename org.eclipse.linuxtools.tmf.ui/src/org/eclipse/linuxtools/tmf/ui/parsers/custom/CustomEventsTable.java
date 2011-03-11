@@ -12,10 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.ui.parsers.custom;
 
-import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTraceDefinition.OutputColumn;
@@ -29,15 +27,9 @@ public class CustomEventsTable extends TmfEventsTable {
     private CustomTraceDefinition fDefinition;
     
     public CustomEventsTable(CustomTraceDefinition definition, Composite parent, int cacheSize) {
-        super(parent, cacheSize);
+        super(parent, cacheSize, new ColumnData[0]);
         fDefinition = definition;
         createColumnHeaders();
-    }
-
-    public static final String TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS"; //$NON-NLS-1$
-    private static final SimpleDateFormat TIMESTAMP_SIMPLE_DATE_FORMAT = new SimpleDateFormat(TIMESTAMP_FORMAT); 
-    static {
-        TIMESTAMP_SIMPLE_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
     }
 
     protected void createColumnHeaders() {
@@ -50,16 +42,6 @@ public class CustomEventsTable extends TmfEventsTable {
 		}
     	setColumnHeaders((ColumnData[]) columnData.toArray(new ColumnData[0]));
     }
-
-//    @Override
-//    public void createColumnHeaders(final Table table) {
-//        if (fDefinition == null) return; // ignore when called by the super constructor
-//        for (OutputColumn outputColumn : fDefinition.outputs) {
-//            TableColumn column = new TableColumn(table, SWT.LEFT);
-//            column.setText(outputColumn.name);
-//            column.pack();
-//        }
-//    }
 
     @Override
     public String[] extractItemFields(TmfEvent event) {

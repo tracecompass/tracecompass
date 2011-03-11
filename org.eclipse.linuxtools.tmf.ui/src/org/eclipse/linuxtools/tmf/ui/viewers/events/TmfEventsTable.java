@@ -162,6 +162,10 @@ public class TmfEventsTable extends TmfComponent {
         return fTable;
     }
     
+	public void setLayoutData(Object layoutData) {
+//	FIXME: fComposite.setLayoutData(layoutData);
+	}
+
     /**
      * @param table
      * 

@@ -30,8 +30,8 @@ import org.eclipse.swt.widgets.Text;
 
 public class CustomTxtParserOutputWizardPage extends WizardPage {
 
-    private static final Image upImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/up_button.gif"); //$NON-NLS-1$
-    private static final Image downImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/down_button.gif"); //$NON-NLS-1$
+    private static final Image upImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/up_button.gif"); //$NON-NLS-1$
+    private static final Image downImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/down_button.gif"); //$NON-NLS-1$
     private CustomTxtParserWizard wizard;
     private CustomTxtTraceDefinition definition;
     ArrayList<Output> outputs = new ArrayList<Output>();
@@ -85,6 +85,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
         tableLayout.marginWidth = 0;
         tableContainer.setLayout(tableLayout);
         previewTable = new CustomEventsTable(new CustomTxtTraceDefinition(), tableContainer, 0);
+        previewTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         
         if (wizard.definition != null) {
             loadDefinition(wizard.definition);
@@ -206,6 +207,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
             ITmfTrace trace = new CustomTxtTrace(tmpFile.getName(), definition, tmpFile.getAbsolutePath(), MAX_NUM_ENTRIES);
             previewTable.dispose();
             previewTable = new CustomEventsTable(definition, tableContainer, MAX_NUM_ENTRIES);
+            previewTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
             previewTable.setTrace(trace, true);
             previewTable.getTable().setItemCount(MAX_NUM_ENTRIES); // Trigger parsing
         } catch (FileNotFoundException e) {

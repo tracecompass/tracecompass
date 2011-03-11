@@ -37,6 +37,9 @@ public class CustomTxtEvent extends CustomEvent {
     }
 
     public void processGroups(InputLine input, Matcher matcher) {
+    	if (input.columns == null) {
+    		return;
+    	}
         for (int i = 0; i < input.columns.size(); i++) {
             InputData column = input.columns.get(i);
             if (i < matcher.groupCount() && matcher.group(i + 1) != null) {

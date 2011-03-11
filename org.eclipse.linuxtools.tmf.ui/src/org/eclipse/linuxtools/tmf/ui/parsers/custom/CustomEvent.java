@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.event.TmfEventReference;
 import org.eclipse.linuxtools.tmf.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.event.TmfEventType;
@@ -66,12 +65,6 @@ public class CustomEvent extends TmfEvent {
         return super.getOriginalTimestamp();
     }
 
-    @Override
-    public TmfEventContent getContent() {
-        if (fData != null) processData();
-        return super.getContent();
-    }
-
     public String[] extractItemFields() {
         if (fData != null) processData();
         return fColumnData;
@@ -101,11 +94,9 @@ public class CustomEvent extends TmfEvent {
                 SimpleDateFormat dateFormat = new SimpleDateFormat(fDefinition.timeStampOutputFormat);
                 fColumnData[i++] = dateFormat.format(date);
             } else {
-                fColumnData[i++] = value;
+                fColumnData[i++] = (value != null ? value : ""); //$NON-NLS-1$
             }
         }
-        String message = fData.get(CustomTraceDefinition.TAG_MESSAGE);;
-        setContent(new TmfEventContent(this, message));
         fData = null;
     }
 }

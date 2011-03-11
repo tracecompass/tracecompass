@@ -60,7 +60,7 @@ import org.eclipse.ui.part.FileEditorInput;
 
 public class ManageCustomParsersDialog extends Dialog {
 
-    private static final Image image = TmfUiPlugin.getDefault().getImageFromPath("/icons/customparser_wizard.gif"); //$NON-NLS-1$
+    private static final Image image = TmfUiPlugin.getDefault().getImageFromPath("/icons/etool16/customparser_wizard.gif"); //$NON-NLS-1$
 
     Button txtButton;
     Button xmlButton;

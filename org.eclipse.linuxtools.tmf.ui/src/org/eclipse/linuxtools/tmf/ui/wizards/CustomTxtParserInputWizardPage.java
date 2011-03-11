@@ -72,14 +72,14 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
     private static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS"; //$NON-NLS-1$
     private static final String SIMPLE_DATE_FORMAT_URL = "http://java.sun.com/javase/6/docs/api/java/text/SimpleDateFormat.html#skip-navbar_top"; //$NON-NLS-1$
     private static final String PATTERN_URL = "http://java.sun.com/javase/6/docs/api/java/util/regex/Pattern.html#sum"; //$NON-NLS-1$
-    private static final Image lineImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/line_icon.gif"); //$NON-NLS-1$
-    private static final Image addImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/add_button.gif"); //$NON-NLS-1$
-    private static final Image addNextImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/addnext_button.gif"); //$NON-NLS-1$
-    private static final Image addChildImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/addchild_button.gif"); //$NON-NLS-1$
-    private static final Image deleteImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/delete_button.gif"); //$NON-NLS-1$
-    private static final Image moveUpImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/moveup_button.gif"); //$NON-NLS-1$
-    private static final Image moveDownImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/movedown_button.gif"); //$NON-NLS-1$
-    private static final Image helpImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/help_button.gif"); //$NON-NLS-1$
+    private static final Image lineImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/line_icon.gif"); //$NON-NLS-1$
+    private static final Image addImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
+    private static final Image addNextImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/addnext_button.gif"); //$NON-NLS-1$
+    private static final Image addChildImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/addchild_button.gif"); //$NON-NLS-1$
+    private static final Image deleteImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/delete_button.gif"); //$NON-NLS-1$
+    private static final Image moveUpImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/moveup_button.gif"); //$NON-NLS-1$
+    private static final Image moveDownImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/movedown_button.gif"); //$NON-NLS-1$
+    private static final Image helpImage = TmfUiPlugin.getDefault().getImageFromPath("/icons/elcl16/help_button.gif"); //$NON-NLS-1$
     private static final Color COLOR_BLACK = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
     private static final Color COLOR_LIGHT_GREEN = new Color(Display.getDefault(), 192, 255, 192);
     private static final Color COLOR_GREEN = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
@@ -105,16 +105,12 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
     private TreeViewer treeViewer;
     private Composite treeContainer;
     private Composite lineContainer;
-    @SuppressWarnings("unused")
-	private Group addLineGroup;
     private StyledText inputText;
     private Font fixedFont;
     private UpdateListener updateListener;
     private Browser helpBrowser;
 
     // variables used recursively through line traversal
-    @SuppressWarnings("unused")
-	private String timeStampValue;
     private String timeStampFormat;
     private boolean timestampFound;
     
@@ -154,7 +150,6 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         
         logtypeText = new Text(headerComposite, SWT.BORDER | SWT.SINGLE);
         logtypeText.setLayoutData(new GridData(120, SWT.DEFAULT));
-        logtypeText.addModifyListener(updateListener);
         
         Label timestampFormatLabel = new Label(headerComposite, SWT.NULL);
         timestampFormatLabel.setText(Messages.CustomTxtParserInputWizardPage_timestampFormat);
@@ -162,7 +157,6 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         timestampOutputFormatText = new Text(headerComposite, SWT.BORDER | SWT.SINGLE);
         timestampOutputFormatText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         timestampOutputFormatText.setText(DEFAULT_TIMESTAMP_FORMAT);
-        timestampOutputFormatText.addModifyListener(updateListener);
 
         Button dateFormatHelpButton = new Button(headerComposite, SWT.PUSH);
         dateFormatHelpButton.setImage(helpImage);
@@ -345,6 +339,9 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         loadDefinition(definition);
         treeViewer.expandAll();
         lineContainer.layout();
+        
+        logtypeText.addModifyListener(updateListener);
+        timestampOutputFormatText.addModifyListener(updateListener);
         
         lineScrolledComposite.setMinSize(lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, lineContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y-1);
 
@@ -548,10 +545,6 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         container.layout();
     }
 
-//    private void removeAddLineButton() {
-//        addLineGroup.dispose();
-//    }
-    
     private String getSelectionText() {
         if (this.selection instanceof IStructuredSelection) {
             Object selection = ((IStructuredSelection)this.selection).getFirstElement();
