@@ -14,8 +14,8 @@ package org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.dialogs;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.linuxtools.tmf.ui.internal.Messages;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.Messages;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider.StateColor;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.TraceColorScheme;
 import org.eclipse.swt.SWT;
@@ -86,8 +86,8 @@ public class TmfTimeLegend extends TitleAreaDialog {
 		createThreadStatesGroup(composite);
 		// createThreadInteractionsGroup(composite);
 
-		setMessage(Messages._LEGEND);
-		setTitle(Messages.TRACE_STATES_TITLE);
+		setMessage(Messages.TmfTimeLegend_LEGEND);
+		setTitle(Messages.TmfTimeLegend_TRACE_STATES_TITLE);
 		setDialogHelpAvailable(false);
 		setHelpAvailable(false);
 
@@ -98,7 +98,7 @@ public class TmfTimeLegend extends TitleAreaDialog {
 
 	private void createThreadStatesGroup(Composite composite) {
 		Group gs = new Group(composite, SWT.NONE);
-		gs.setText(Messages._TRACE_STATES);
+		gs.setText(Messages.TmfTimeLegend_TRACE_STATES);
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		gs.setLayoutData(gd);
 
@@ -174,7 +174,7 @@ public class TmfTimeLegend extends TitleAreaDialog {
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
-		shell.setText(Messages._WINDOW_TITLE);
+		shell.setText(Messages.TmfTimeLegend_WINDOW_TITLE);
 	}
 
 	@Override

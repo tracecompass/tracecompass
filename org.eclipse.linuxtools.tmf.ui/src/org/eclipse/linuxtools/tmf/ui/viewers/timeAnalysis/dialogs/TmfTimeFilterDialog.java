@@ -23,7 +23,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.Messages;
+import org.eclipse.linuxtools.tmf.ui.internal.Messages;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -106,8 +106,8 @@ public class TmfTimeFilterDialog extends TitleAreaDialog {
 				viewer.setChecked(threads[i], filter[i]);
 		}
 
-		setMessage(Messages._TRACE_FILTER_DESC);
-		setTitle(Messages._TRACE_FILTER);
+		setMessage(Messages.TmfTimeFilterDialog_TRACE_FILTER_DESC);
+		setTitle(Messages.TmfTimeFilterDialog_TRACE_FILTER);
 		setDialogHelpAvailable(false);
 		setHelpAvailable(false);
 
@@ -120,7 +120,7 @@ public class TmfTimeFilterDialog extends TitleAreaDialog {
 	private void createColumns(Table table) {
 		table.setHeaderVisible(true);
 
-		String headers[] = { "", Messages._TRACE_ID, Messages._TRACE_NAME }; //$NON-NLS-1$
+		String headers[] = { "", Messages.TmfTimeFilterDialog_TRACE_ID, Messages.TmfTimeFilterDialog_TRACE_NAME }; //$NON-NLS-1$
 		int width[] = { 20, 80, 400 };
 
 		for (int i = 0; i < headers.length; i++) {
@@ -134,7 +134,7 @@ public class TmfTimeFilterDialog extends TitleAreaDialog {
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
-		shell.setText(Messages._EDIT_PROFILING_OPTIONS);
+		shell.setText(Messages.TmfTimeFilterDialog_EDIT_PROFILING_OPTIONS);
 	}
 
 	public boolean[] getFilter() {

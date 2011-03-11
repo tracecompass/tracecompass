@@ -25,7 +25,7 @@ import java.util.Vector;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.Messages;
+import org.eclipse.linuxtools.tmf.ui.internal.Messages;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
@@ -2163,7 +2163,7 @@ class ItemData {
     public void refreshData() {
         clearGroups();
         filteredOut.clear();
-        String undef = Messages._UNDEFINED_GROUP;
+        String undef = Messages.TmfTimeStatesCtrl_UNDEFINED_GROUP;
         List<GroupItem> groupList = new ArrayList<GroupItem>();
         for (int i = 0; i < _traces.length; i++) {
             ITmfTimeAnalysisEntry trace = (ITmfTimeAnalysisEntry) _traces[i];
@@ -2178,7 +2178,7 @@ class ItemData {
 
             GroupItem group = _groupTable.get(groupName);
             if (null == group) {
-                group = new GroupItem(NLS.bind(Messages._TRACE_GROUP_LABEL, groupName));
+                group = new GroupItem(NLS.bind(Messages.TmfTimeStatesCtrl_TRACE_GROUP_LABEL, groupName));
                 group._expanded = !groupName.equalsIgnoreCase("system") && !groupName.equalsIgnoreCase(undef); //$NON-NLS-1$
                 _groupTable.put(groupName, group);
                 groupList.add(group);

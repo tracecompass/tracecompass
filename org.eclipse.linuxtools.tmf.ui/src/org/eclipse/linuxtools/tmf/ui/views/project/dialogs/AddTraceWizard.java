@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.linuxtools.tmf.ui.internal.Messages;
 import org.eclipse.linuxtools.tmf.ui.views.project.model.TmfExperimentNode;
 import org.eclipse.linuxtools.tmf.ui.views.project.model.TmfProjectNode;
 import org.eclipse.linuxtools.tmf.ui.views.project.model.TmfTraceNode;

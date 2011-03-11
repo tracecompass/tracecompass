@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.ui.internal.Messages;
 
 
 public abstract class CustomTraceDefinition {

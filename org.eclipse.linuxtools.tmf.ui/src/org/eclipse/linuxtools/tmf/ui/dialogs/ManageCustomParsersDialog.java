@@ -26,6 +26,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
+import org.eclipse.linuxtools.tmf.ui.internal.Messages;
 import org.eclipse.linuxtools.tmf.ui.parsers.ParserProviderManager;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTraceDefinition;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTrace;

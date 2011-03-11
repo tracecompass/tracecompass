@@ -32,6 +32,7 @@ import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.tmf.ui.internal.Messages;
 import org.eclipse.linuxtools.tmf.ui.widgets.ColumnData;
 import org.eclipse.linuxtools.tmf.ui.widgets.TmfVirtualTable;
 import org.eclipse.swt.SWT;

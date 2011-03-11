@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.tmf.ui.internal.Messages;
 import org.eclipse.linuxtools.tmf.ui.views.project.TmfProjectNature;
 import org.eclipse.linuxtools.tmf.ui.views.project.model.TmfProjectNode;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;

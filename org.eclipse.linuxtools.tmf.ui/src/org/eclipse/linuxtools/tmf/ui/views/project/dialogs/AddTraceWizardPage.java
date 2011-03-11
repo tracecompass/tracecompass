@@ -16,6 +16,7 @@ import java.util.Vector;
 
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.linuxtools.tmf.ui.internal.Messages;
 import org.eclipse.linuxtools.tmf.ui.views.project.model.TmfProjectNode;
 import org.eclipse.linuxtools.tmf.ui.views.project.model.TmfTraceNode;
 import org.eclipse.swt.SWT;

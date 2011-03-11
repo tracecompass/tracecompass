@@ -17,9 +17,9 @@ package org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.Messages;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider;
+import org.eclipse.linuxtools.tmf.ui.internal.Messages;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITimeAnalysisViewer.TimeFormat;
+import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.Utils.Resolution;
@@ -112,13 +112,17 @@ public class TmfTimeTipHandler {
 					ITimeEvent nextEvent = Utils.findEvent(thrd, threadStates
 							.hitTimeTest(pt.x, pt.y), 1);
 					// thread name
-					addItem(Messages._TRACE_NAME, thrd.getName());
+					addItem(Messages.TmfTimeTipHandler_TRACE_NAME, thrd.getName());
 					// class name
-					addItem(Messages._TRACE_CLASS_NAME, _utilImp
-							.getTraceClassName(thrd));
+					String traceClass = _utilImp.getTraceClassName(thrd);
+					if (traceClass != null) {
+						addItem(Messages.TmfTimeTipHandler_TRACE_CLASS_NAME, traceClass);
+					}
 					// thread state
-					addItem(Messages._TRACE_STATE, _utilImp
-							.getEventName(threadEvent));
+					String state = _utilImp.getEventName(threadEvent);
+					if (state != null) {
+						addItem(Messages.TmfTimeTipHandler_TRACE_STATE, state);
+					}
 
 					// This block receives a
 					// list of <String, String> values to be added to the tip
@@ -153,33 +157,33 @@ public class TmfTimeTipHandler {
 //						format = TimeFormat.ABSOLUTE; // Absolute format
 //														// (calendar)
 						// Add Date
-						addItem(Messages._TRACE_DATE, eventStartTime > -1 ?
+						addItem(Messages.TmfTimeTipHandler_TRACE_DATE, eventStartTime > -1 ?
 						        Utils.formatDate(eventStartTime)
 						        : "?"); //$NON-NLS-1$
 						if (eventDuration > 0) {
-                            addItem(Messages._TRACE_START_TIME, eventStartTime > -1 ?
+                            addItem(Messages.TmfTimeTipHandler_TRACE_START_TIME, eventStartTime > -1 ?
                                     Utils.formatTime(eventStartTime, TimeFormat.ABSOLUTE, res)
                                     : "?"); //$NON-NLS-1$
                             
-                            addItem(Messages._TRACE_STOP_TIME, eventEndTime > -1 ?
+                            addItem(Messages.TmfTimeTipHandler_TRACE_STOP_TIME, eventEndTime > -1 ?
                                     Utils.formatTime(eventEndTime, TimeFormat.ABSOLUTE, res)
                                     : "?"); //$NON-NLS-1$
 						} else {
-                            addItem(Messages._TRACE_EVENT_TIME, eventStartTime > -1 ?
+                            addItem(Messages.TmfTimeTipHandler_TRACE_EVENT_TIME, eventStartTime > -1 ?
                                     Utils.formatTime(eventStartTime, TimeFormat.ABSOLUTE, res)
                                     : "?"); //$NON-NLS-1$
 						}
 					} else {
 						if (eventDuration > 0) {
-					        addItem(Messages._TRACE_START_TIME, eventStartTime > -1 ?
+					        addItem(Messages.TmfTimeTipHandler_TRACE_START_TIME, eventStartTime > -1 ?
 					                Utils.formatTime(eventStartTime, TimeFormat.RELATIVE, res)
 					                : "?"); //$NON-NLS-1$
 					    
-					        addItem(Messages._TRACE_STOP_TIME, eventEndTime > -1 ?
+					        addItem(Messages.TmfTimeTipHandler_TRACE_STOP_TIME, eventEndTime > -1 ?
 					                Utils.formatTime(eventEndTime, TimeFormat.RELATIVE, res)
 					                : "?"); //$NON-NLS-1$
 						} else {
-                            addItem(Messages._TRACE_EVENT_TIME, eventStartTime > -1 ?
+                            addItem(Messages.TmfTimeTipHandler_TRACE_EVENT_TIME, eventStartTime > -1 ?
                                     Utils.formatTime(eventStartTime, TimeFormat.RELATIVE, res)
                                     : "?"); //$NON-NLS-1$
 						}
@@ -187,14 +191,14 @@ public class TmfTimeTipHandler {
 
 					if (eventDuration > 0) {
 					    // Duration in relative format in any case
-					    addItem(Messages._DURATION, eventDuration > -1 ?
+					    addItem(Messages.TmfTimeTipHandler_DURATION, eventDuration > -1 ?
 					            Utils.formatTime(eventDuration, TimeFormat.RELATIVE, res)
 					            : "?"); //$NON-NLS-1$
 					}
 
 				} else if (item instanceof GroupItem) {
-					addItem(Messages._TRACE_GROUP_NAME, item.toString());
-					addItem(Messages._NUMBER_OF_TRACES, "" + ((GroupItem) item)._traces.size()); //$NON-NLS-1$
+					addItem(Messages.TmfTimeTipHandler_TRACE_GROUP_NAME, item.toString());
+					addItem(Messages.TmfTimeTipHandler_NUMBER_OF_TRACES, "" + ((GroupItem) item)._traces.size()); //$NON-NLS-1$
 				}
 			}
 
