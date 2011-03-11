@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.linuxtools.tmf.Tracer;
+
 /**
  * <b><u>TmfSignalHandler</u></b>
  * <p>
@@ -93,10 +95,11 @@ public class TmfSignalManager {
 		signal.setReference(fSignalId);
 		sendSignal(signal);
 		sendSignal(new TmfEndSynchSignal(fSignalId));
-///		Tracer.traceSignal(signal);
 	}
 
 	static private void sendSignal(TmfSignal signal) {
+
+		if (Tracer.isSignalTraced()) Tracer.traceSignal(signal, "(start)"); //$NON-NLS-1$
 
 		// Build the list of listener methods that are registered for this signal
 		Class<?> signalClass = signal.getClass();
@@ -119,6 +122,12 @@ public class TmfSignalManager {
 			for (Method method : entry.getValue()) {
 				try {
 					method.invoke(entry.getKey(), new Object[] { signal });
+					if (Tracer.isSignalTraced()) {
+						Object key = entry.getKey();
+						String hash = String.format("%1$08X", entry.getKey().hashCode()); //$NON-NLS-1$
+						String target = "[" + hash + "] " + key.getClass().getSimpleName() + ":" + method.getName();   //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+						Tracer.traceSignal(signal, target);						
+					}
 				} catch (IllegalArgumentException e) {
 					// TODO Auto-generated catch block
 				} catch (IllegalAccessException e) {
@@ -128,6 +137,8 @@ public class TmfSignalManager {
 				}
 			}
 		}
-	}
+
+		if (Tracer.isSignalTraced()) Tracer.traceSignal(signal, "(end)"); //$NON-NLS-1$
+}
 
 }

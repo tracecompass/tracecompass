@@ -705,6 +705,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 //				long average = (indexingEnd - indexingStart) / fNbEvents;
 //				System.out.println(getName() + ": start=" + startTime + ", end=" + lastTime + ", elapsed=" + (indexingEnd * 1.0 - indexingStart) / 1000000000);
 //				System.out.println(getName() + ": nbEvents=" + fNbEvents + " (" + (average / 1000) + "." + (average % 1000) + " us/evt)");
+				super.handleSuccess();
 			}
 
 			private void updateExperiment() {

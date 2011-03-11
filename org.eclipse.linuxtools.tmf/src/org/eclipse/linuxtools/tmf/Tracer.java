@@ -9,6 +9,7 @@ import org.eclipse.linuxtools.tmf.component.ITmfComponent;
 import org.eclipse.linuxtools.tmf.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.event.TmfData;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.signal.TmfSignal;
 
 @SuppressWarnings("nls")
 public class Tracer {
@@ -115,6 +116,10 @@ public class Tracer {
 		return REQUEST;
 	}
 	
+	public static boolean isSignalTraced() {
+		return SIGNAL;
+	}
+	
 	public static boolean isEventTraced() {
 		return EVENT;
 	}
@@ -125,7 +130,7 @@ public class Tracer {
 		StringBuilder message = new StringBuilder("[");
 		message.append(currentTime / 1000);
 		message.append(".");
-		message.append(currentTime % 1000);
+		message.append(String.format("%1$03d", currentTime % 1000));
 		message.append("] ");
 		message.append(msg);
 //		System.out.println(message);
@@ -147,10 +152,16 @@ public class Tracer {
 	}
 
 	public static void traceRequest(ITmfDataRequest<?> request, String msg) {
-		String message = ("[REQ] Thread=" + Thread.currentThread().getId() + " Req=" + request.getRequestId() + 
-				(request.getExecType() == ITmfDataRequest.ExecutionType.BACKGROUND ? "(BG)" : "(FG)") +
-				", Type=" + request.getClass().getName() + 
-				", DataType=" + request.getDataType().getSimpleName() + " " + msg);
+		String message = ("[REQ] Req=" + request.getRequestId() + 
+		(request.getExecType() == ITmfDataRequest.ExecutionType.BACKGROUND ? " (BG)" : " (FG)") +
+		" Thread=" + Thread.currentThread().getId() + 
+		" Type=" + request.getClass().getName() + 
+		" DataType=" + request.getDataType().getSimpleName() + " " + msg);
+		trace(message);
+	}
+
+	public static void traceSignal(TmfSignal signal, String msg) {
+		String message = ("[SIG] Type=" + signal.getClass().getSimpleName() + " Target=" + msg);
 		trace(message);
 	}
 

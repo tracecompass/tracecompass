@@ -101,7 +101,6 @@ public class TmfRequestExecutor implements Executor {
 			public void run() {
 				try {
 					requestThread.run();
-				    if (Tracer.isRequestTraced()) Tracer.trace("[REQ] Request finished"); //$NON-NLS-1$
 				} finally {
 					scheduleNext();
 				}

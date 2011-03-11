@@ -272,6 +272,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      * 
      * @param data Data value to set.
      */
+
     /**
      * Handle a block of incoming data. This method is called every time
      * a block of data becomes available.
@@ -296,6 +297,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
 
     @Override
 	public void handleStarted() {
+        if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "started"); //$NON-NLS-1$
     }
 
     /**
@@ -311,29 +313,30 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     @Override
 	public void handleCompleted() {
     	if (fRequestFailed) { 
-            if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "failed"); //$NON-NLS-1$
     		handleFailure();
     	}
     	else if (fRequestCanceled) {
-            if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "cancelled"); //$NON-NLS-1$
     		handleCancel();
     	}
     	else {
-            if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "succeeded"); //$NON-NLS-1$
 			handleSuccess();
     	}
+        if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "completed"); //$NON-NLS-1$
     }
 
     @Override
 	public void handleSuccess() {
+        if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "succeeded"); //$NON-NLS-1$
     }
 
     @Override
 	public void handleFailure() {
+        if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "failed"); //$NON-NLS-1$
     }
 
     @Override
 	public void handleCancel() {
+        if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "cancelled"); //$NON-NLS-1$
     }
 
     /**
@@ -366,13 +369,11 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      */
     @Override
 	public void start() {
-        if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "starting"); //$NON-NLS-1$
         synchronized(this) {
             fRequestRunning = true;
         }
         handleStarted();
         startedLatch.countDown();
-        if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "started"); //$NON-NLS-1$
     }
 
     /**
@@ -380,7 +381,6 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
      */
     @Override
 	public void done() {
-        if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "completing"); //$NON-NLS-1$
         synchronized(this) {
         	if (!fRequestCompleted) {
             	fRequestRunning   = false;

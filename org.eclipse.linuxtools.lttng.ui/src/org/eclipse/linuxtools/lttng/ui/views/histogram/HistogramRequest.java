@@ -204,6 +204,7 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
     @Override
     public void handleCancel() {
     	redrawAsyncronously();
+		super.handleCancel();
     }
 	
     /**

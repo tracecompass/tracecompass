@@ -387,6 +387,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			@Override
 			public void handleFailure() {
 				printCompletedMessage();
+				super.handleFailure();
 			}
 
 			/*
@@ -398,6 +399,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			@Override
 			public void handleCancel() {
 				printCompletedMessage();
+				super.handleCancel();
 			}
 
 			/*
@@ -409,6 +411,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 			@Override
 			public void handleSuccess() {
 				printCompletedMessage();
+				super.handleSuccess();
 			}
 
 			/**

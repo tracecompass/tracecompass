@@ -72,8 +72,7 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
      * @param blockSize Size of the largest blocks expected
      */
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize) {
-    	super(dataType, 0, nbRequested, blockSize, ExecutionType.FOREGROUND);
-    	fRange = range;
+    	this(dataType, range, nbRequested, blockSize, ExecutionType.FOREGROUND);
     }
 
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize, ExecutionType execType) {
