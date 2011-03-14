@@ -192,7 +192,19 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     	return tmpTraceContext;
     }
     
-     private LttngEvent parseMyNextEvent(TmfContext context) {
+    @Override
+    public TmfContext seekLocation(double ratio) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public double getLocationRatio(ITmfLocation<?> location) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    private LttngEvent parseMyNextEvent(TmfContext context) {
     	
     	// All parsing variables declared here so to be able to print them into the catch if needed
     	String tmpContent = null;

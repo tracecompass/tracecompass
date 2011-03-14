@@ -115,6 +115,18 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> {
         return context;
     }
 
+    @Override
+    public TmfContext seekLocation(double ratio) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public double getLocationRatio(ITmfLocation<?> location) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.eventlog.ITmfStreamLocator#getCurrentLocation()
      */

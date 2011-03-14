@@ -11,12 +11,15 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.model.trange;
 
+import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
+import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
+
 
 /**
  * @author alvaro
  * 
  */
-public abstract class TimeRangeComponent implements ITimeRangeComponent {
+public abstract class TimeRangeComponent implements ITimeRangeComponent, ITimeEvent {
 
 	// ========================================================================
 	// Data
@@ -96,6 +99,21 @@ public abstract class TimeRangeComponent implements ITimeRangeComponent {
 	@Override
 	public boolean isVisible() {
 		return visible;
+	}
+
+	@Override
+	public ITmfTimeAnalysisEntry getEntry() {
+		return eventParent;
+	}
+
+	@Override
+	public long getTime() {
+		return startTime;
+	}
+
+	@Override
+	public long getDuration() {
+		return stopTime - startTime;
 	}
 
     @Override

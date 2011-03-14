@@ -61,6 +61,48 @@ public class CustomParserProvider implements IParserProvider {
     }
 
 	@Override
+    public Map<String, String> getEventTypeMapForParser(String parser) {
+        for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
+            if (parser.equals(CustomTxtTrace.class.getCanonicalName() + "." + def.definitionName)) { //$NON-NLS-1$
+                Map<String, String> eventTypeMap = new LinkedHashMap<String, String>();
+                eventTypeMap.put(def.definitionName, CustomTxtEventType.class.getCanonicalName() + "." + def.definitionName); //$NON-NLS-1$
+                return eventTypeMap;
+            }
+        }
+        for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
+            if (parser.equals(CustomXmlTrace.class.getCanonicalName() + "." + def.definitionName)) { //$NON-NLS-1$
+                Map<String, String> eventTypeMap = new LinkedHashMap<String, String>();
+                eventTypeMap.put(def.definitionName, CustomXmlEventType.class.getCanonicalName() + "." + def.definitionName); //$NON-NLS-1$
+                return eventTypeMap;
+            }
+        }
+		return null;
+	}
+
+	@Override
+    public String[] getFieldLabelsForEventType(String eventType) {
+        for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
+            if (eventType.equals(CustomTxtEventType.class.getCanonicalName() + "." + def.definitionName)) { //$NON-NLS-1$
+                String[] labels = new String[def.outputs.size()];
+                for (int i = 0; i < labels.length; i++) {
+                    labels[i] = def.outputs.get(i).name;
+                }
+                return labels;
+            }
+        }
+        for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
+            if (eventType.equals(CustomXmlEventType.class.getCanonicalName() + "." + def.definitionName)) { //$NON-NLS-1$
+                String[] labels = new String[def.outputs.size()];
+                for (int i = 0; i < labels.length; i++) {
+                    labels[i] = def.outputs.get(i).name;
+                }
+                return labels;
+            }
+        }
+        return null;
+	}
+
+	@Override
     public Map<String, String> getParserMap() {
         Map<String, String> parserMap = new LinkedHashMap<String, String>();
         for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {

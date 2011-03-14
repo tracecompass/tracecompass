@@ -43,6 +43,15 @@
             name="%colors.view.name"
             restorable="true">
       </view> 
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.linuxtools.tmf.ui.views.filter.FilterView"
+            icon="icons/eview16/filters_view.gif"
+            id="org.eclipse.linuxtools.tmf.ui.views.filter"
+            name="%filters.view.name"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.editors">

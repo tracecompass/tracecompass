@@ -604,6 +604,18 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 		return new TmfContext(curLocation);
 	}
 
+	@Override
+	public TmfContext seekLocation(double ratio) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public double getLocationRatio(ITmfLocation<?> location) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 	/**
 	 * Return the event in the trace according to the given context. Read it if
 	 * necessary.

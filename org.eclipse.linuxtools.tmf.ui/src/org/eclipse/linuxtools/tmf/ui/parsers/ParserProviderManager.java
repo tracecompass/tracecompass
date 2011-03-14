@@ -123,6 +123,26 @@ public class ParserProviderManager {
         return parserMap;
     }
 
+    public static Map<String, String> getEventTypeMapForParser(String parser) {
+        for (IParserProvider parserProvider : fParserProviders) {
+        	Map<String, String> map = parserProvider.getEventTypeMapForParser(parser);
+        	if (map != null) {
+        		return map;
+        	}
+        }
+        return new LinkedHashMap<String, String>(0);
+    }
+    
+    public static String[] getFieldLabelsForEventType(String eventType) {
+        for (IParserProvider parserProvider : fParserProviders) {
+        	String[] fieldLabels = parserProvider.getFieldLabelsForEventType(eventType);
+        	if (fieldLabels != null) {
+        		return fieldLabels;
+        	}
+        }
+        return new String[0];
+    }
+
     public static TmfEventsTable getEventsTable(ITmfTrace trace, Composite parent, int cacheSize) {
         for (IParserProvider parserProvider : fParserProviders) {
             if (parserProvider != null) {
