@@ -84,7 +84,7 @@ public class TraceModelImplFactory {
 
 			event = new EventImpl(eventTime, trace, getEventType(i%16));
 			event.setDuration(duration);
-			trace.getTraceEvents().add(event);
+			trace.addTraceEvent(event);
 		}
 	}
 
@@ -99,7 +99,7 @@ public class TraceModelImplFactory {
 //			duration = i  + (long) ((i % 4));
 			event = new EventImpl(eventTime, trace, getEventType(i));
 			event.setDuration(duration);
-			trace.getTraceEvents().add(event);
+			trace.addTraceEvent(event);
 		}
 	}
 

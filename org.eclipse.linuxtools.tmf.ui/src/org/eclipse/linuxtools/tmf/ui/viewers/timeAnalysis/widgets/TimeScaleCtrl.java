@@ -104,6 +104,9 @@ public class TimeScaleCtrl extends TraceCtrl implements MouseListener,
                 unit = MIN_IN_NS;
             } else if (minDelta > 20 * SEC_IN_NS) {
                 unit = 30 * SEC_IN_NS;
+            } else if (minDelta <= 1) {
+                _timeDelta = 1;
+                return;
             }
         }
         double log = Math.log10((double) minDelta / unit);

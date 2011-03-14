@@ -12,12 +12,10 @@
 
 package org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis;
 
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.TimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.TraceColorScheme;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
@@ -274,6 +272,8 @@ public abstract class TmfTimeAnalysisProvider {
 		if (threadClass != null && threadClass.length() > 0) {
 			name += " [" + threadClass + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
+		/*
+		 * Check if this is still necessary!
 		if (inclState) {
 			List<TimeEvent> list = trace.getTraceEvents();
 			if (null != list && list.size() > 0) {
@@ -281,6 +281,7 @@ public abstract class TmfTimeAnalysisProvider {
 				name += " (" + getEventName(event, false, true) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
+		*/
 		return name;
 	}
 

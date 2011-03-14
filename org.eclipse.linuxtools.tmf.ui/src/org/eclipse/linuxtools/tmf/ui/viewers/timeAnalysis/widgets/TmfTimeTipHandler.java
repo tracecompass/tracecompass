@@ -107,10 +107,8 @@ public class TmfTimeTipHandler {
 					Item item) {
 				if (item instanceof TraceItem) {
 					ITmfTimeAnalysisEntry thrd = ((TraceItem) item)._trace;
-					ITimeEvent threadEvent = Utils.findEvent(thrd, threadStates
-							.hitTimeTest(pt.x, pt.y), 2);
-					ITimeEvent nextEvent = Utils.findEvent(thrd, threadStates
-							.hitTimeTest(pt.x, pt.y), 1);
+					ITimeEvent threadEvent = Utils.findEvent(thrd, threadStates.hitTimeTest(pt.x), 2);
+					ITimeEvent nextEvent = Utils.findEvent(thrd, threadStates.hitTimeTest(pt.x), 1);
 					// thread name
 					addItem(Messages.TmfTimeTipHandler_TRACE_NAME, thrd.getName());
 					// class name
@@ -127,12 +125,12 @@ public class TmfTimeTipHandler {
 					// This block receives a
 					// list of <String, String> values to be added to the tip
 					// table
-					Map<String, String> eventAddOns = _utilImp
-							.getEventHoverToolTipInfo(threadEvent);
-					for (Iterator<String> iter = eventAddOns.keySet()
-							.iterator(); iter.hasNext();) {
-						String message = (String) iter.next();
-						addItem(message, eventAddOns.get(message));
+					Map<String, String> eventAddOns = _utilImp.getEventHoverToolTipInfo(threadEvent);
+					if (eventAddOns != null) {
+						for (Iterator<String> iter = eventAddOns.keySet().iterator(); iter.hasNext();) {
+							String message = (String) iter.next();
+							addItem(message, eventAddOns.get(message));
+						}
 					}
 
 					long eventStartTime = -1;

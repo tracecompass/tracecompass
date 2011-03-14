@@ -17,7 +17,6 @@
 package org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.jface.viewers.ISelection;
@@ -110,7 +109,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	// called from the display order in the API
 	public void modelUpdate(ITmfTimeAnalysisEntry[] traces) {
 		if (null != _stateCtrl) {
-			loadOptions();
+			//loadOptions();
 			updateInternalData(traces);
 			_stateCtrl.redraw();
 			_timeScaleCtrl.redraw();
@@ -121,7 +120,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	public void modelUpdate(ITmfTimeAnalysisEntry[] traces, long start,
 			long end, boolean updateTimeBounds) {
 		if (null != _stateCtrl) {
-			loadOptions();
+			//loadOptions();
 			updateInternalData(traces, start, end);
 			if (updateTimeBounds) {
 				_timeRangeFixed = true;
@@ -230,7 +229,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	void setTimeRange(Object traces[]) {
 		_endTime = 0;
 		_beginTime = -1;
-		ITimeEvent event;
+//		ITimeEvent event;
 		for (int i = 0; i < traces.length; i++) {
 			ITmfTimeAnalysisEntry entry = (ITmfTimeAnalysisEntry) traces[i];
 			if (entry.getStopTime() >= entry.getStartTime() && entry.getStopTime() > 0) {
@@ -241,6 +240,8 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 			        _endTime = entry.getStopTime();
 			    }
 			}
+			/*
+			 * This is not needed if entry startTime and stopTime are properly set!
 			List<TimeEvent> list = entry.getTraceEvents();
 			int len = list.size();
 			if (len > 0) {
@@ -254,6 +255,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 					_endTime = eventEndTime;
 				}
 			}
+			*/
 		}
 
 		if (_beginTime < 0)
@@ -475,6 +477,8 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 			_selectedTime = _endTime;
 		if (_selectedTime < _beginTime)
 			_selectedTime = _beginTime;
+		long time0 = _time0;
+		long time1 = _time1;
 		if (ensureVisible) {
 			double timeSpace = (_time1 - _time0) * .02;
 			double timeMid = (_time1 - _time0) * .1;
@@ -498,6 +502,9 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		_stateCtrl.adjustScrolls();
 		_stateCtrl.redraw();
 		_timeScaleCtrl.redraw();
+		if (time0 != _time0 || time1 != _time1) {
+			notifyStartFinishTimeSelectionListeners(_time0, _time1);
+		}
 	}
 
 	@Override
@@ -819,6 +826,13 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		}
 	}
 
+    @Override
+    public void setMinimumItemWidth(int width) {
+        if (_stateCtrl != null) {
+            _stateCtrl.setMinimumItemWidth(width);
+        }
+    }
+    
 	@Override
 	public boolean isVisibleVerticalScroll() {
 		if (_stateCtrl != null) {

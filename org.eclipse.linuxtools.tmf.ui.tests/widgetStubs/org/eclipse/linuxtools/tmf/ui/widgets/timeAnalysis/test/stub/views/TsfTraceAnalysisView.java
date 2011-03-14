@@ -35,10 +35,10 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.linuxtools.tmf.ui.viewers.TmfViewerFactory;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITimeAnalysisViewer;
+import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITmfTimeScaleSelectionListener;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITmfTimeSelectionListener;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeScaleSelectionEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeSelectionEvent;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITmfTimeScaleSelectionListener;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
 import org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.test.stub.adaption.TsfImplProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.test.stub.model.EventImpl;
@@ -596,7 +596,8 @@ public class TsfTraceAnalysisView extends ViewPart implements
 		viewer.getControl().setFocus();
 	}
 
-	@Override
+	@SuppressWarnings("deprecation")
+    @Override
 	public void tsfTmProcessSelEvent(TmfTimeSelectionEvent event) {
 		Object source = event.getSource();
 		if (source == null || !(source instanceof ITimeAnalysisViewer)) {

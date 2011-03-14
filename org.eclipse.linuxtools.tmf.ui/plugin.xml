@@ -26,6 +26,14 @@
             name="%events.view.name"
             restorable="true">
       </view>
+      <view
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.linuxtools.tmf.ui.views.timechart.TimeChartView"
+            icon="icons/eview16/timechart_view.gif"
+            id="org.eclipse.linuxtools.tmf.ui.views.timechart"
+            name="%timechart.view.name"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
@@ -406,7 +414,6 @@
    <extension
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
-            file-extensions="log"
             id="org.eclipse.linuxtools.tmf.ui.content-type.trace"
             name="%contenttype.trace"
             priority="normal">

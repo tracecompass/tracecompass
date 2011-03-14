@@ -64,6 +64,10 @@ import org.eclipse.swt.widgets.ScrollBar;
  */
 public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyListener, MouseMoveListener, MouseListener, MouseWheelListener, ControlListener, SelectionListener, MouseTrackListener, TraverseListener, ISelectionProvider {
 
+    private static final int DRAG_NONE = 0;
+    private static final int DRAG_TRACE_ITEM = 1;
+    private static final int DRAG_GROUP_ITEM = 2;
+    private static final int DRAG_SPLIT_LINE = 3;
     public static final boolean DEFAULT_DRAW_THREAD_JOIN = true;
     public static final boolean DEFAULT_DRAW_THREAD_WAIT = true;
     public static final boolean DEFAULT_DRAW_THREAD_RELEASE = true;
@@ -78,8 +82,9 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
     private boolean _mouseHover = false;
     private int _itemHeightDefault = 19;
     private int _itemHeight = _itemHeightDefault;
+    private int _minimumItemWidth = 0;
     private int _topItem = 0;
-    private int _dragState = 0;
+    private int _dragState = DRAG_NONE;
     private int _hitIdx = 0;
     private int _dragX0 = 0;
     private int _dragX = 0;
@@ -132,14 +137,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
         if (scrollHor != null) {
             scrollHor.addSelectionListener(this);
         }
-        mouseScrollFilterListener = new Listener() {
-            // This filter is used to prevent scrolling of the view when the
-            // mouse wheel is used to zoom
-            @Override
-            public void handleEvent(Event event) {
-                event.doit = false;
-            }
-        };
 
         _dragCursor3 = new Cursor(super.getDisplay(), SWT.CURSOR_SIZEWE);
         _WaitCursor = new Cursor(super.getDisplay(), SWT.CURSOR_WAIT);
@@ -451,7 +448,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
         if (zoomIn) {
             newInterval = Math.max(Math.round((double) interval * 0.8), _timeProvider.getMinTimeInterval());
         } else {
-            newInterval = Math.round((double) interval * 1.25);
+            newInterval = (long) Math.ceil((double) interval * 1.25);
         }
         long center = time0 + Math.round(((double) (xPos - nameSpace) / timeSpace * interval));
         long newTime0 = center - Math.round((double) newInterval * (center - time0) / interval);
@@ -621,7 +618,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
         return idx >= 0 ? (Item) _data._items[idx] : null;
     }
 
-    long hitTimeTest(int x, int y) {
+    long hitTimeTest(int x) {
         if (null == _timeProvider)
             return -1;
         long hitTime = -1;
@@ -644,25 +641,32 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
     }
 
     void selectItem(int idx, boolean addSelection) {
+        boolean changed = false;
         if (addSelection) {
             if (idx >= 0 && idx < _data._items.length) {
                 Item item = (Item) _data._items[idx];
+                changed = (item._selected == false);
                 item._selected = true;
             }
         } else {
             for (int i = 0; i < _data._items.length; i++) {
                 Item item = (Item) _data._items[i];
+                if (i == idx && item._selected == false) {
+                    changed = true;
+                }
                 item._selected = i == idx;
             }
         }
-        boolean changed = ensureVisibleItem(idx, true);
-        if (!changed)
+        changed |= ensureVisibleItem(idx, true);
+        if (changed)
             redraw();
     }
 
     public void selectItem(ITmfTimeAnalysisEntry trace, boolean addSelection) {
         Integer idx = _data.findTraceItemIndex(trace);
-        selectItem(idx, addSelection);
+        if (idx != null) {
+            selectItem(idx, addSelection);
+        }
     }
 
     public int countPerPage() {
@@ -946,11 +950,17 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
         if (drawTracesInteraction)
             drawTraceInteractions(bound, e.gc);
 
+        // draw empty name space background
+        if (_itemHeight * items.length < bound.height) {
+            gc.setBackground(_colors.getBkColor(false, false, true));
+            drawBackground(gc, bound.x, _itemHeight * items.length, nameWidth, bound.height - _itemHeight * items.length);
+        }
+
         // draw drag line, no line if name space is 0.
-        if (3 == _dragState) {
+        if (DRAG_SPLIT_LINE == _dragState) {
             gc.setForeground(_colors.getColor(TraceColorScheme.BLACK));
             gc.drawLine(bound.x + nameWidth, bound.y, bound.x + nameWidth, bound.y + bound.height - 1);
-        } else if (0 == _dragState && _mouseHover && _timeProvider.getNameSpace() > 0) {
+        } else if (DRAG_NONE == _dragState && _mouseHover && _timeProvider.getNameSpace() > 0) {
             gc.setForeground(_colors.getColor(TraceColorScheme.RED));
             gc.drawLine(bound.x + nameWidth, bound.y, bound.x + nameWidth, bound.y + bound.height - 1);
         }
@@ -1066,12 +1076,10 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
             ITmfTimeAnalysisEntry trace = ((TraceItem) item)._trace;
 
             int x0 = rect.x;
-            List<TimeEvent> list = trace.getTraceEvents();
-            // Iterator it = list.iterator();
-            int count = list.size();
+            Iterator<ITimeEvent> iterator = trace.getTraceEventsIterator();
             ITimeEvent lastEvent = null;
-            if (count > 0) {
-                ITimeEvent currEvent = list.get(0);
+            if (iterator.hasNext()) {
+                ITimeEvent currEvent = iterator.next();
                 ITimeEvent nextEvent = null;
                 long currEventTime = currEvent.getTime();
                 long nextEventTime = currEventTime;
@@ -1083,14 +1091,14 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
                 // reduce rect
                 _rect1.y += 3;
                 _rect1.height -= 6;
-                fillSpace(rect, gc, selected, _rect1.x, x0, xEnd);
+                fillSpace(rect, gc, selected);
 
                 // draw event states
                 while (x0 <= xEnd && null != currEvent) {
                     boolean stopped = false;// currEvent instanceof
                     // TsfTmTraceDeadEvent;
-                    if (idx < count) {
-                        nextEvent = list.get(idx);
+                    if (iterator.hasNext()) {
+                        nextEvent = iterator.next();
                         nextEventTime = nextEvent.getTime();
                         idx++;
                     } else if (stopped) {
@@ -1133,22 +1141,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
                 gc.drawLine(_rect1.x, midy, _rect1.x + _rect1.width, midy);
                 gc.setLineWidth(lw);
             }
-
-            // draw focus ares
-            Utils.init(_rect1, rect);
-            gc.setForeground(_colors.getBkColor(selected, _isInFocus, false));
-            int y = _rect1.y;
-            gc.drawLine(_rect1.x, y, _rect1.x + _rect1.width, y);
-            y++;
-            gc.drawLine(_rect1.x, y, _rect1.x + _rect1.width, y);
-            y++;
-            gc.drawLine(_rect1.x, y, _rect1.x + _rect1.width, y);
-            y = _rect1.y + _rect1.height - 1;
-            gc.drawLine(_rect1.x, y, _rect1.x + _rect1.width, y);
-            y--;
-            gc.drawLine(_rect1.x, y, _rect1.x + _rect1.width, y);
-            y--;
-            gc.drawLine(_rect1.x, y, _rect1.x + _rect1.width, y);
         }
 
         // draw selected time
@@ -1205,13 +1197,11 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
             ITmfTimeAnalysisEntry trace = ((TraceItem) item)._trace;
 
             double x0 = rect.x;
-            List<TimeEvent> list = trace.getTraceEvents();
-            // Iterator it = list.iterator();
-            int count = list.size();
+            Iterator<ITimeEvent> iterator = trace.getTraceEventsIterator();
             ITimeEvent lastEvent = null;
             // Trace.debug("count is: " + count);
-            if (count > 0) {
-                ITimeEvent currEvent = list.get(0);
+            if (iterator.hasNext()) {
+                ITimeEvent currEvent = iterator.next();
                 ITimeEvent nextEvent = null;
                 long currEventTime = currEvent.getTime();
                 long nextEventTime = currEventTime;
@@ -1222,20 +1212,20 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
                 double xEnd = rect.x + (double) ((time1 - time0) * pixelsPerNanoSec);
                 double x1 = -1;
                 int idx = 1;
-                double xNext = 0;
+                //double xNext = 0;
 
                 // Drawing rectangle is smaller than reserved space
                 _rect1.y += 3;
                 _rect1.height -= 6;
 
                 // Clean up to empty line to draw on top
-                fillSpace(rect, gc, selected, _rect1.x, xEnd, xEnd);
+                fillSpace(rect, gc, selected);
                 // draw event states
                 while (x0 <= xEnd && null != currEvent) {
                     boolean stopped = false;// currEvent instanceof
                     // TsfTmTraceDeadEvent;
-                    if (idx < count) {
-                        nextEvent = list.get(idx);
+                    if (iterator.hasNext()) {
+                        nextEvent = iterator.next();
                         nextEventTime = nextEvent.getTime();
                         idx++;
                     } else if (stopped) {
@@ -1265,10 +1255,10 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
                         // with space until next event
                         _rect1.x += _rect1.width;
                         x0 = x1;
-                        xNext = rect.x + (double) ((nextEventTime - time0) * pixelsPerNanoSec);
+                        //xNext = rect.x + (double) ((nextEventTime - time0) * pixelsPerNanoSec);
                     }
                     // Fill space till next event
-                    fillSpace(rect, gc, selected, x0, xNext, xEnd);
+                    fillSpace(rect, gc, selected);
 
                     lastEvent = currEvent;
                     currEvent = nextEvent;
@@ -1299,22 +1289,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
                 gc.drawLine(_rect1.x, midy, _rect1.x + _rect1.width, midy);
                 gc.setLineWidth(lw);
             }
-
-            // draw focus area
-            Utils.init(_rect1, rect);
-            gc.setForeground(_colors.getBkColor(selected, _isInFocus, false));
-            int y = _rect1.y;
-            gc.drawLine(_rect1.x, y, _rect1.x + _rect1.width, y);
-            y++;
-            gc.drawLine(_rect1.x, y, _rect1.x + _rect1.width, y);
-            y++;
-            gc.drawLine(_rect1.x, y, _rect1.x + _rect1.width, y);
-            y = _rect1.y + _rect1.height - 1;
-            gc.drawLine(_rect1.x, y, _rect1.x + _rect1.width, y);
-            y--;
-            gc.drawLine(_rect1.x, y, _rect1.x + _rect1.width, y);
-            y--;
-            gc.drawLine(_rect1.x, y, _rect1.x + _rect1.width, y);
         }
 
         // draw selected time
@@ -1370,10 +1344,8 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
             ITmfTimeAnalysisEntry trace = ((TraceItem) item)._trace;
 
             double x0 = rect.x;
-            @SuppressWarnings("unchecked")
-            List<TimeEvent> list = (List<TimeEvent>) trace.getTraceEvents().clone();
-            // Iterator it = list.iterator();
-            int count = list.size();
+            long maxDuration = (_timeProvider.getTimeSpace() == 0) ? Long.MAX_VALUE : 1 * (_timeProvider.getTime1() - _timeProvider.getTime0()) / _timeProvider.getTimeSpace();
+            Iterator<ITimeEvent> iterator = trace.getTraceEventsIterator(_timeProvider.getTime0(), _timeProvider.getTime1(), maxDuration);
             // ITimeEvent lastEvent = null;
             // if (Trace.isDEBUG()) {
             // Trace.debug("\n\t\t\tTrace: " + trace.getName()
@@ -1386,9 +1358,9 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
 
             // Clean up to empty line to draw on top
             int xEnd = rect.x + rect.width;
-            fillSpace(rect, gc, selected, _rect1.x, xEnd, xEnd);
-            if (count > 0) {
-                ITimeEvent currEvent = list.get(0);
+            fillSpace(rect, gc, selected);
+            if (iterator.hasNext()) {
+                ITimeEvent currEvent = iterator.next();
                 ITimeEvent nextEvent = null;
                 long currEventTime = currEvent.getTime();
                 long currEventDuration = currEvent.getDuration();
@@ -1408,8 +1380,8 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
                     // refresh current event duration as the loop moves
                     currEventDuration = currEvent.getDuration();
                     // TsfTmTraceDeadEvent;
-                    if (idx < count) {
-                        nextEvent = list.get(idx);
+                    if (iterator.hasNext()) {
+                        nextEvent = iterator.next();
                         nextEventTime = nextEvent.getTime();
                         idx++;
                     } else if (stopped) {
@@ -1448,11 +1420,11 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
                     if (x1 >= rect.x && x0 <= xEnd) {
                         if (currEventDuration != 0) {
                             x0 = (double) (x0 >= rect.x ? x0 : rect.x);
-                            _rect1.width = (int) ((x1 <= xEnd ? x1 : xEnd) - x0);
+                            _rect1.width = (int) Math.ceil(x1 <= xEnd ? x1 : xEnd) - (int) x0;
                         } else {
-                            _rect1.width = 2; // make punctual events 2 pixels
-                                              // wide
+                            _rect1.width = 1;
                         }
+                        _rect1.width = Math.max(_minimumItemWidth, _rect1.width);
                         _rect1.x = (int) x0;
                         boolean timeSelected = currEventTime <= selectedTime && selectedTime < nextEventTime;
                         utilImpl.drawState(_colors, currEvent, _rect1, gc, selected, false, timeSelected);
@@ -1480,22 +1452,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
                     // + K + " = " + x0);
                 }
             }
-
-            // draw focus area
-            Utils.init(_rect1, rect);
-            gc.setForeground(_colors.getBkColor(selected, _isInFocus, false));
-            int y = _rect1.y;
-            gc.drawLine(_rect1.x, y, _rect1.x + _rect1.width, y);
-            y++;
-            gc.drawLine(_rect1.x, y, _rect1.x + _rect1.width, y);
-            y++;
-            gc.drawLine(_rect1.x, y, _rect1.x + _rect1.width, y);
-            y = _rect1.y + _rect1.height - 1;
-            gc.drawLine(_rect1.x, y, _rect1.x + _rect1.width, y);
-            y--;
-            gc.drawLine(_rect1.x, y, _rect1.x + _rect1.width, y);
-            y--;
-            gc.drawLine(_rect1.x, y, _rect1.x + _rect1.width, y);
         }
 
         // draw selected time
@@ -1509,27 +1465,13 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
         }
     }
 
-    private void fillSpace(Rectangle rect, GC gc, boolean selected, double x0, double x1, double xEnd) {
-        // fill space before first event
-        if (x0 >= rect.x && x0 < xEnd) {
-            // _rect1.width = (int) ((x1 <= xEnd ? x1 : xEnd) - x0);
-            // Trace.debug("Drawing Space: " + _rect1.x + "," + _rect1.y + ","
-            // + _rect1.height + ", " + _rect1.width + "--> "
-            // + ((int) _rect1.x + (int) _rect1.width));
-
-            // if (_rect1.width < 0) {
-            // Trace.debug("Incorrect width:" + _rect1.width);
-            // }
-            gc.setBackground(_colors.getBkColor(selected, _isInFocus, false));
-            gc.fillRectangle(_rect1);
-            // draw middle line
-            gc.setForeground(_colors.getColor(TraceColorScheme.MID_LINE));
-            int midy = _rect1.y + _rect1.height / 2;
-            gc.drawLine(_rect1.x, midy, _rect1.x + _rect1.width, midy);
-        } else {
-            // Trace.debug("No space added since, x0 is out of range " + x0
-            // + " rect.x: " + rect.x + " xEnd: " + xEnd);
-        }
+    private void fillSpace(Rectangle rect, GC gc, boolean selected) {
+        gc.setBackground(_colors.getBkColor(selected, _isInFocus, false));
+        gc.fillRectangle(rect);
+        // draw middle line
+        gc.setForeground(_colors.getColor(TraceColorScheme.MID_LINE));
+        int midy = rect.y + rect.height / 2;
+        gc.drawLine(rect.x, midy, rect.x + rect.width, midy);
     }
 
     @Override
@@ -1601,18 +1543,31 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
     public void focusGained(FocusEvent e) {
         _isInFocus = true;
         redraw();
-        getDisplay().addFilter(SWT.MouseWheel, mouseScrollFilterListener);
+        if (mouseScrollFilterListener == null) {
+            mouseScrollFilterListener = new Listener() {
+                // This filter is used to prevent scrolling of the view when the
+                // mouse wheel is used to zoom
+                @Override
+                public void handleEvent(Event event) {
+                    event.doit = false;
+                }
+            };
+            getDisplay().addFilter(SWT.MouseWheel, mouseScrollFilterListener);
+        }
     }
 
     @Override
     public void focusLost(FocusEvent e) {
         _isInFocus = false;
-        if (0 != _dragState) {
+        if (DRAG_NONE != _dragState) {
             setCapture(false);
-            _dragState = 0;
+            _dragState = DRAG_NONE;
         }
         redraw();
-        getDisplay().removeFilter(SWT.MouseWheel, mouseScrollFilterListener);
+        if (mouseScrollFilterListener != null) {
+            getDisplay().removeFilter(SWT.MouseWheel, mouseScrollFilterListener);
+            mouseScrollFilterListener = null;
+        }
     }
 
     public boolean isInFocus() {
@@ -1624,7 +1579,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
         if (null == _timeProvider)
             return;
         Point size = getCtrlSize();
-        if (1 == _dragState) {
+        if (DRAG_TRACE_ITEM == _dragState) {
             int nameWidth = _timeProvider.getNameSpace();
             int x = e.x - nameWidth;
             if (x > 0 && size.x > nameWidth && _dragX != x) {
@@ -1642,10 +1597,10 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
                 }
                 _timeProvider.setStartFinishTime(time0, time1);
             }
-        } else if (3 == _dragState) {
+        } else if (DRAG_SPLIT_LINE == _dragState) {
             _dragX = e.x;
             _timeProvider.setNameSpace(_hitIdx + _dragX - _dragX0);
-        } else if (0 == _dragState) {
+        } else if (DRAG_NONE == _dragState) {
             boolean mouseHover = hitSplitTest(e.x, e.y) > 0;
             if (_mouseHover != mouseHover)
                 redraw();
@@ -1734,7 +1689,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
             if (namewidth != 0) {
                 idx = hitSplitTest(e.x, e.y);
                 if (idx > 0) {
-                    _dragState = 3;
+                    _dragState = DRAG_SPLIT_LINE;
                     _dragX = _dragX0 = e.x;
                     _hitIdx = _timeProvider.getNameSpace();
                     ;
@@ -1748,42 +1703,51 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
             idx = hitTest(e.x, e.y);
             if (idx >= 0) {
                 if (_data._items[idx] instanceof TraceItem) {
-                    long hitTime = hitTimeTest(e.x, e.y);
+                    long hitTime = hitTimeTest(e.x);
                     if (hitTime >= 0) {
-                        _timeProvider.setSelectedTimeInt(hitTime, false);
+                        // _timeProvider.setSelectedTimeInt(hitTime, false);
                         setCapture(true);
-                        _dragState = 1;
+                        _dragState = DRAG_TRACE_ITEM;
                         _dragX = _dragX0 = e.x - _timeProvider.getNameSpace();
+                        _hitIdx = idx;
                         _time0bak = _timeProvider.getTime0();
                         _time1bak = _timeProvider.getTime1();
+                        return;
                     }
                 } else if (_data._items[idx] instanceof GroupItem) {
-                    _hitIdx = idx;
-                    _dragState = 2;
+                    _dragX0 = e.x;
+                    _dragState = DRAG_GROUP_ITEM;
                 }
                 selectItem(idx, false);
                 fireSelectionChanged();
             } else {
                 selectItem(idx, false); // clear selection
+                redraw();
             }
         }
     }
 
     @Override
     public void mouseUp(MouseEvent e) {
-        if (0 != _dragState) {
+        if (DRAG_NONE != _dragState) {
             setCapture(false);
-            if (1 == _dragState) {
+            if (DRAG_TRACE_ITEM == _dragState) {
                 // Notify time provider to check the need for listener
                 // notification
                 _timeProvider.notifyStartFinishTime();
-            } else if (2 == _dragState) {
-                if (hitTest(e.x, e.y) == _hitIdx)
+                if (_dragX == _dragX0) { // click without drag
+                    long time = hitTimeTest(e.x);
+                    _timeProvider.setSelectedTimeInt(time, false);
+                    selectItem(_hitIdx, false);
+                    fireSelectionChanged();
+                }
+            } else if (DRAG_GROUP_ITEM == _dragState) {
+                if (e.x == _dragX0) // click without drag
                     toggle(_hitIdx);
-            } else if (3 == _dragState) {
+            } else if (DRAG_SPLIT_LINE == _dragState) {
                 redraw();
             }
-            _dragState = 0;
+            _dragState = DRAG_NONE;
         }
     }
 
@@ -1849,7 +1813,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
 
     @Override
     public void mouseScrolled(MouseEvent e) {
-        if (!_isInFocus)
+        if (!_isInFocus || _dragState != DRAG_NONE)
             return;
         if (e.count > 0) {
             zoom(true);
@@ -1893,6 +1857,10 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
 
     public void setItemHeight(int rowHeight) {
         this._itemHeight = rowHeight;
+    }
+
+    public void setMinimumItemWidth(int width) {
+        this._minimumItemWidth = width;
     }
 
     public Vector<ITmfTimeAnalysisEntry> getFilteredOut() {
@@ -2033,21 +2001,17 @@ class ItemData {
         if (trace == null)
             return null;
 
-        int traceId = trace.getId();
-
-        Integer idx = null;
         for (int i = 0; i < _items.length; i++) {
-            idx = i;
             Object item = _items[i];
             if (item instanceof TraceItem) {
                 TraceItem ti = (TraceItem) item;
-                if (ti._trace.getId() == traceId) {
-                    break;
+                if (ti._trace == trace) {
+                    return i;
                 }
             }
         }
 
-        return idx;
+        return null;
     }
 
     public void updateItems() {
@@ -2109,7 +2073,7 @@ class ItemData {
      */
     public void refreshPartial(ITmfTimeAnalysisEntry parent, TimeEvent childItem) {
         // Find the Trace item within the current list
-        TraceItem item = findTraceItem(parent);
+//        TraceItem item = findTraceItem(parent);
 
         // This method is not used (yet) so this code can be commented out for
         // now
@@ -2142,6 +2106,8 @@ class ItemData {
         // item = findTraceItem(parent);
         // }
 
+        /*
+         * Check if this is still needed!
         ITmfTimeAnalysisEntry localTraceItem = item._trace;
         // Local trace found
         Vector<TimeEvent> children = localTraceItem.getTraceEvents();
@@ -2157,6 +2123,7 @@ class ItemData {
         }
         // Add the new item
         children.add(childItem);
+        */
 
     }
 

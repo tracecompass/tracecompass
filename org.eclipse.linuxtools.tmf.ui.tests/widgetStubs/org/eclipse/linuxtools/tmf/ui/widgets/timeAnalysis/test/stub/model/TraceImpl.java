@@ -11,10 +11,11 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.test.stub.model;
 
+import java.util.Iterator;
 import java.util.Vector;
 
+import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.TimeEvent;
 
 @SuppressWarnings("nls")
 public class TraceImpl implements ITmfTimeAnalysisEntry {
@@ -27,7 +28,7 @@ public class TraceImpl implements ITmfTimeAnalysisEntry {
 	private long stopTime = 1;
 	private String groupName = "defaultGroupName";
 	private String className = "defaultClassName";
-	private Vector<TimeEvent> traceEvents = new Vector<TimeEvent>();
+	private Vector<ITimeEvent> traceEvents = new Vector<ITimeEvent>();
 	
 	// ========================================================================
 	// Constructor
@@ -101,9 +102,23 @@ public class TraceImpl implements ITmfTimeAnalysisEntry {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public Vector<TimeEvent> getTraceEvents() {
+	@Deprecated public Vector<ITimeEvent> getTraceEvents() {
 		return traceEvents;
 	}
+	
+    @Override
+    public Iterator<ITimeEvent> getTraceEventsIterator() {
+        return traceEvents.iterator();
+    }
+
+    @Override
+    public Iterator<ITimeEvent> getTraceEventsIterator(long startTime, long stopTime, long maxDuration) {
+        return traceEvents.iterator();
+    }
+
+    @Override
+    public void addTraceEvent(ITimeEvent event) {
+        traceEvents.add(event);
+    }
 
 }

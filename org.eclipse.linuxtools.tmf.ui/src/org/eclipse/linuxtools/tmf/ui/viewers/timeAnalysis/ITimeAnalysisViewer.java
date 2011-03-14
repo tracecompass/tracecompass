@@ -126,6 +126,8 @@ public interface ITimeAnalysisViewer extends ITmfViewer {
 
 	public void setItemHeight(int rowHeight);
 
+    public void setMinimumItemWidth(int width);
+
 	public void resizeControls();
 
 	public void setSelectedTrace(ITmfTimeAnalysisEntry trace);

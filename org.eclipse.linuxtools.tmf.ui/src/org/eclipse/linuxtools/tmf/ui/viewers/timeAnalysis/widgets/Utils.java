@@ -18,14 +18,11 @@ package org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.TimeZone;
-import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITimeAnalysisViewer.TimeFormat;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.TimeEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
@@ -323,11 +320,12 @@ public class Utils {
 	static ITimeEvent getFirstEvent(ITmfTimeAnalysisEntry thread) {
 		if (null == thread)
 			return null;
-		Vector<TimeEvent> list =   thread.getTraceEvents();
-		ITimeEvent event = null;
-		if (!list.isEmpty())
-			event = (ITimeEvent) list.get(0);
-		return event;
+		Iterator<ITimeEvent> iterator = thread.getTraceEventsIterator();
+		if (iterator.hasNext()) {
+		    return iterator.next();
+		} else {
+		    return null;
+		}
 	}
 
 	/**
@@ -343,14 +341,13 @@ public class Utils {
     static ITimeEvent findEvent(ITmfTimeAnalysisEntry thread, long time, int n) {
         if (null == thread)
             return null;
-        List<TimeEvent> list = thread.getTraceEvents();
-        Iterator<TimeEvent> it = list.iterator();
+        Iterator<ITimeEvent> iterator = thread.getTraceEventsIterator();
         ITimeEvent nextEvent = null;
         ITimeEvent currEvent = null;
         ITimeEvent prevEvent = null;
 
-        while (it.hasNext()) {
-            nextEvent = (ITimeEvent) it.next();
+        while (iterator.hasNext()) {
+            nextEvent = (ITimeEvent) iterator.next();
             long nextStartTime = nextEvent.getTime();
             
             if (nextStartTime > time) {
