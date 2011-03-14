@@ -166,13 +166,14 @@ ITmfTimeAnalysisEntry {
 	@Override
 	@SuppressWarnings("unchecked")
 	public Iterator<TimeRangeComponent> getTraceEventsIterator() {
-		return ChildEventLeafs.iterator();
+		Vector<TimeRangeComponent> clone = (Vector<TimeRangeComponent>) ChildEventLeafs.clone();
+		return clone.iterator();
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public Iterator<TimeRangeComponent> getTraceEventsIterator(long startTime, long stopTime, long visibleDuration) {
-		return ChildEventLeafs.iterator();
+		return getTraceEventsIterator();
 	}
 
 	@Override
