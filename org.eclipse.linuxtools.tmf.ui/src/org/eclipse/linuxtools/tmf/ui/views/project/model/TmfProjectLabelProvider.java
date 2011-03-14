@@ -36,7 +36,7 @@ import org.eclipse.ui.PlatformUI;
  */
 public class TmfProjectLabelProvider implements ILabelProvider {
 
-	private final String fTraceIconFile      = "icons/events_view.gif"; //$NON-NLS-1$
+	private final String fTraceIconFile      = "icons/eview16/events_view.gif"; //$NON-NLS-1$
 //	private final String fExperimentIconFile = "icons/garland16.png"; //$NON-NLS-1$
 
 	private final Image fOpenedProjectIcon;
@@ -56,7 +56,7 @@ public class TmfProjectLabelProvider implements ILabelProvider {
 		fFolderIcon  = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
 
 		fTraceIcon = loadIcon(fTraceIconFile);
-		fUnknownTraceIcon = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_LCL_LINKTO_HELP);
+		fUnknownTraceIcon = TmfUiPlugin.getDefault().getImageFromPath("icons/elcl16/unknown_parser.gif"); //$NON-NLS-1$
 		fExperimentIcon = fFolderIcon; // loadIcon(fExperimentIconFile);
 	}
 

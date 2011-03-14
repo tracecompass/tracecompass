@@ -81,6 +81,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.ResourceTransfer;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -245,8 +246,6 @@ public class ProjectView extends TmfView {
                 IFolder targetFolder = ((TmfProjectNode) node).getTracesFolder().getFolder();
                 if (data instanceof String[]) {
                     // FileTransfer
-                    System.out.println("Drop:" + ((String[])data)[0]); //$NON-NLS-1$
-                    System.out.println("Folder:" + targetFolder); //$NON-NLS-1$
                     for (String path : (String[]) data) {
                         File sourceFile = new File(path);
                         if (sourceFile.isFile()) {
@@ -264,8 +263,6 @@ public class ProjectView extends TmfView {
                     }
                 } else if (data instanceof IResource[]) {
                     // ResourceTransfer
-                    System.out.println("Drop:" + ((IResource[])data)[0].getName()); //$NON-NLS-1$
-                    System.out.println("Folder:" + targetFolder); //$NON-NLS-1$
                     for (IResource resource : (IResource[]) data) {
                         if (resource instanceof IFile) {
                             IFile file = targetFolder.getFile(resource.getName());
@@ -368,6 +365,9 @@ public class ProjectView extends TmfView {
     		            IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
     		  
     		            String editorId = ParserProviderManager.getEditorId(resource);
+    		            if (resource instanceof IFile) {
+    		            	IDE.setDefaultEditor((IFile) resource, editorId);
+    		            }
     		            IEditorPart editor = activePage.findEditor(editorInput);
     		            if (editor != null && editor instanceof IReusableEditor) {
     		                activePage.reuseEditor((IReusableEditor)editor, editorInput);

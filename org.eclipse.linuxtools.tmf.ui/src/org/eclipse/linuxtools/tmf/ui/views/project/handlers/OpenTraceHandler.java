@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.tmf.ui.views.project.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -32,6 +33,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 
 /**
  * <b><u>OpenTraceHandler</u></b>
@@ -92,6 +94,9 @@ public class OpenTraceHandler extends AbstractHandler {
             IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
   
             String editorId = ParserProviderManager.getEditorId(resource);
+            if (resource instanceof IFile) {
+            	IDE.setDefaultEditor((IFile) resource, editorId);
+            }
             IEditorPart editor = activePage.findEditor(editorInput);
             if (editor != null && editor instanceof IReusableEditor) {
                 activePage.reuseEditor((IReusableEditor)editor, editorInput);
