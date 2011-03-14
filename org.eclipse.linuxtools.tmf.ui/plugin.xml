@@ -422,6 +422,18 @@
             class="org.eclipse.linuxtools.tmf.ui.commands.ManageCustomParsersCommandHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.managecustomparsers">
       </handler>
+      <handler
+            class="org.eclipse.linuxtools.tmf.ui.editors.handlers.AddBookmarkHandler"
+            commandId="org.eclipse.ui.edit.addBookmark">
+         <activeWhen>
+            <with
+                  variable="activeEditor">
+               <instanceof
+                     value="org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor">
+               </instanceof>
+            </with>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

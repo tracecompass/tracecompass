@@ -164,11 +164,13 @@ ITmfTimeAnalysisEntry {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Iterator<TimeRangeComponent> getTraceEventsIterator() {
 		return ChildEventLeafs.iterator();
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Iterator<TimeRangeComponent> getTraceEventsIterator(long startTime, long stopTime, long visibleDuration) {
 		return ChildEventLeafs.iterator();
 	}

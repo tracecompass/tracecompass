@@ -12,7 +12,13 @@
 
 package org.eclipse.linuxtools.tmf.ui.editors;
 
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
@@ -20,10 +26,12 @@ import org.eclipse.linuxtools.tmf.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.parsers.ParserProviderManager;
 import org.eclipse.linuxtools.tmf.ui.signal.TmfTraceClosedSignal;
+import org.eclipse.linuxtools.tmf.ui.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.ui.signal.TmfTraceParserUpdatedSignal;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.linuxtools.tmf.ui.views.project.ProjectView;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
@@ -32,11 +40,12 @@ import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IReusableEditor;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.FileStoreEditorInput;
+import org.eclipse.ui.ide.IGotoMarker;
 
 /**
  * <b><u>TmfEventsEditor</u></b>
  */
-public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReusableEditor, IPropertyListener {
+public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReusableEditor, IPropertyListener, IResourceChangeListener {
 
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.editors.events"; //$NON-NLS-1$
     
@@ -97,7 +106,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         firePropertyChange(IEditorPart.PROP_INPUT);
     }
 
-//    @Override
     @Override
 	public void propertyChanged(Object source, int propId) {
         if (propId == IEditorPart.PROP_INPUT) {
@@ -108,7 +116,8 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             if (fTrace != null) {
                 fEventsTable = createEventsTable(fParent, fTrace.getCacheSize());
                 fEventsTable.setTrace(fTrace, true);
-// FIXME: broadcast(new TmfTraceOpenedSignal(this, fTrace));
+                fEventsTable.refreshBookmarks(fResource);
+                broadcast(new TmfTraceOpenedSignal(this, fTrace, fResource, fEventsTable));
             } else {
                 fEventsTable = new TmfEventsTable(fParent, 0);
             }
@@ -123,16 +132,19 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         if (fTrace != null) {
             fEventsTable = createEventsTable(parent, fTrace.getCacheSize());
             fEventsTable.setTrace(fTrace, true);
-// FIXME: broadcast(new TmfTraceOpenedSignal(this, fTrace));
+            fEventsTable.refreshBookmarks(fResource);
+            broadcast(new TmfTraceOpenedSignal(this, fTrace, fResource, fEventsTable));
         } else {
             fEventsTable = new TmfEventsTable(parent, 0);
         }
         addPropertyListener(this);
+        ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
     }
 
     @Override
     public void dispose() {
-        removePropertyListener(this);
+    	ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
+    	removePropertyListener(this);
         if (fTrace != null) {
             broadcast(new TmfTraceClosedSignal(this, fTrace));
         }
@@ -150,10 +162,14 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         return eventsTable;
     }
     
-//    @Override
     @Override
 	public ITmfTrace getTrace() {
         return fTrace;
+    }
+
+    @Override
+    public IResource getResource() {
+    	return fResource;
     }
 
     @Override
@@ -163,6 +179,39 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             broadcast(new TmfTraceSelectedSignal(this, fTrace));
         }
     }
+
+    @Override
+    @SuppressWarnings("rawtypes")
+    public Object getAdapter(Class adapter) {
+    	if (IGotoMarker.class.equals(adapter)) {
+    		return fEventsTable;
+    	}
+    	return super.getAdapter(adapter);
+    }
+
+    @Override
+    public void resourceChanged(IResourceChangeEvent event) {
+    	for (IMarkerDelta delta : event.findMarkerDeltas(IMarker.BOOKMARK, false)) {
+    		if (delta.getResource().equals(fResource) && delta.getKind() == IResourceDelta.REMOVED) {
+    			final IMarker bookmark = delta.getMarker();
+    			Display.getDefault().asyncExec(new Runnable() {
+    				@Override
+    				public void run() {
+    					fEventsTable.removeBookmark(bookmark);
+    				}
+    			});
+    		}
+    	}
+    }
+     
+    // ------------------------------------------------------------------------
+    // Global commands
+    // ------------------------------------------------------------------------
+
+    public void addBookmark() {
+    	fEventsTable.addBookmark(fResource);
+    }
+    
 
     // ------------------------------------------------------------------------
     // Signal handlers
@@ -177,7 +226,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             if (fTrace != null) {
                 fEventsTable = createEventsTable(fParent, fTrace.getCacheSize());
                 fEventsTable.setTrace(fTrace, true);
-// FIXME:broadcast(new TmfTraceOpenedSignal(this, fTrace, fResource, fEventsTable));
+                broadcast(new TmfTraceOpenedSignal(this, fTrace, fResource, fEventsTable));
             } else {
                 fEventsTable = new TmfEventsTable(fParent, 0);
             }
