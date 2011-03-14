@@ -161,6 +161,16 @@ public class TmfEvent extends TmfData implements Cloneable {
 		fContent = content;
 	}
 
+	/**
+	 * @return the event raw text
+	 */
+	public String getRawText() {
+		if (fContent != null && fContent.getContent() != null) {
+			return fContent.getContent().toString();
+		}
+		return ""; //$NON-NLS-1$
+	}
+
 	// ------------------------------------------------------------------------
     // Object
     // ------------------------------------------------------------------------

@@ -396,9 +396,14 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
      */
     @Override
 	public abstract TmfContext seekLocation(ITmfLocation<?> location);
+	@Override
 	public abstract ITmfLocation<?> getCurrentLocation();
     @Override
 	public abstract TmfEvent parseEvent(TmfContext context);
+    @Override
+    public abstract TmfContext seekLocation(double ratio);
+    @Override
+    public abstract double getLocationRatio(ITmfLocation<?> location);
 
 	// ------------------------------------------------------------------------
 	// toString

@@ -95,6 +95,38 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     }
 
     @Override
+    public TmfContext seekLocation(double ratio) {
+        try {
+            BufferedRandomAccessFile raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
+            ITmfLocation<?> location = new TmfLocation<Long>(new Long((long) (ratio * raFile.length())));
+            TmfContext context = seekLocation(location);
+            context.setRank(ITmfContext.UNKNOWN_RANK);
+            return context;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
+        }
+    }
+
+    @Override
+    public double getLocationRatio(ITmfLocation<?> location) {
+        try {
+            if (location.getLocation() instanceof Long) {
+            	BufferedRandomAccessFile raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
+                return (double) ((Long) location.getLocation()) / raFile.length();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
     public ITmfLocation<?> getCurrentLocation() {
         // TODO Auto-generated method stub
         return null;

@@ -140,6 +140,32 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
 		return null;
     }
 
+
+	@Override
+    public TmfContext seekLocation(double ratio) {
+        try {
+            ITmfLocation<?> location = new TmfLocation<Long>(new Long((long) (ratio * fTrace.length())));
+            TmfContext context = seekLocation(location);
+            context.setRank(ITmfContext.UNKNOWN_RANK);
+            return context;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public double getLocationRatio(ITmfLocation<?> location) {
+        try {
+            if (location.getLocation() instanceof Long) {
+                return (double) ((Long) location.getLocation()) / fTrace.length();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     @Override
 	public TmfLocation<Long> getCurrentLocation() {
         try {

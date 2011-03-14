@@ -465,6 +465,28 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 		return context;
 	}
 
+    @Override
+    public TmfContext seekLocation(double ratio) {
+        TmfContext context = seekEvent((long) (ratio * getNbEvents()));
+        return context;
+    }
+
+	@Override
+    public double getLocationRatio(ITmfLocation<?> location) {
+	    if (location instanceof TmfExperimentLocation) {
+	        return (double) seekLocation(location).getRank() / getNbEvents();
+	    }
+        return 0;
+    }
+
+	@Override
+	public ITmfLocation<?> getCurrentLocation() {
+		if (fExperimentContext != null) {
+			return fExperimentContext.getLocation();
+		}
+		return null;
+	}
+
 	/**
 	 * Scan the next events from all traces and return the next one
 	 * in chronological order.
