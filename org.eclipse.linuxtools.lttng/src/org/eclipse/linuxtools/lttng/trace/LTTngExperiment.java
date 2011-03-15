@@ -105,7 +105,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
 
 		if (!context.equals(fExperimentContext)) {
 //    		Tracer.trace("Ctx: Restoring context");
-			seekLocation(context.getLocation());
+			fExperimentContext = seekLocation(context.getLocation());
 		}
 		
 		TmfExperimentContext expContext = (TmfExperimentContext) context;
@@ -160,6 +160,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
 			expContext.setLastTrace(trace);
 			expContext.updateRank(1);
 			event = expContext.getEvents()[trace];
+			fExperimentContext = expContext;
 		}
 
 //		if (event != null) {

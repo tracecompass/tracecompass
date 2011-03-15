@@ -522,7 +522,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
 		if (!context.equals(fExperimentContext)) {
 //    		Tracer.trace("Ctx: Restoring context");
-			seekLocation(context.getLocation());
+			fExperimentContext = seekLocation(context.getLocation());
 		}
 		
 		TmfExperimentContext expContext = (TmfExperimentContext) context;
@@ -577,6 +577,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 			expContext.setLastTrace(trace);
 			expContext.updateRank(1);
 			event = expContext.getEvents()[trace];
+			fExperimentContext = expContext;
 		}
 
 //		if (event != null) {
@@ -598,7 +599,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 			if (fCheckpoints.size() == position) {
 				ITmfLocation<?> location = context.getLocation().clone();
 				fCheckpoints.add(new TmfCheckpoint(timestamp.clone(), location));
-//				System.out.println(this + "[" + (fCheckpoints.size() - 1) + "] " + timestamp + ", " + location.toString());
+				System.out.println(this + "[" + (fCheckpoints.size() - 1) + "] " + timestamp + ", " + location.toString());
 			}
 		}
 	}
