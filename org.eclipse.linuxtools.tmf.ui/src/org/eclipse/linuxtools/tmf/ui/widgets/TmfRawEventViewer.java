@@ -255,7 +255,10 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 			} else {
 				fSlider.setThumb(SLIDER_MAX);
 			}
-		    if (fLines.size() == 0) {
+
+			if (!isVisible()) return;
+		    
+			if (fLines.size() == 0) {
 		        setTopRank(0);
 		    } else if (fLines.size() < fNumVisibleLines) {
 		        fBottomContext = null;

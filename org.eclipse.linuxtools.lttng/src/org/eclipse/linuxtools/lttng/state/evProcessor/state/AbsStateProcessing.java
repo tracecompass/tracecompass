@@ -34,7 +34,7 @@ public abstract class AbsStateProcessing {
 		Long fieldVal = 0L;
 		
         String fieldname = expectedField.getInName();
-		LttngEventField field = ((LttngEventContent) trcEvent.getContent()).getField(fieldname);
+		LttngEventField field = (LttngEventField) ((LttngEventContent) trcEvent.getContent()).getField(fieldname);
 		
 		if ( field == null ) {
 			TraceDebug.debug("***************** CONTENT : " + ((LttngEventContent) trcEvent.getContent()).toString()); //$NON-NLS-1$
@@ -113,7 +113,7 @@ public abstract class AbsStateProcessing {
 		String fieldVal = ""; //$NON-NLS-1$
 		
 		String fieldname = expectedField.getInName();
-        LttngEventField field = ((LttngEventContent) trcEvent.getContent()).getField(fieldname);
+        LttngEventField field = (LttngEventField) ((LttngEventContent) trcEvent.getContent()).getField(fieldname);
         
 		if ( field == null ) {
 			TraceDebug.debug("***************** CONTENT : " + ((LttngEventContent) trcEvent.getContent()).toString()); //$NON-NLS-1$

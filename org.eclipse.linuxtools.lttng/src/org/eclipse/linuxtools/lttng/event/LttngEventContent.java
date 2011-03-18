@@ -197,7 +197,7 @@ public class LttngEventContent extends TmfEventContent {
 		try {
 			label = fParentEvent.getType().getLabel(position);
 			
-			returnedField = this.getField(label);
+			returnedField = (LttngEventField) this.getField(label);
 		} 
 		catch (TmfNoSuchFieldException e) {
 			System.out.println("Invalid field position requested : " + position + ", ignoring (getField).");  //$NON-NLS-1$//$NON-NLS-2$
@@ -214,7 +214,21 @@ public class LttngEventContent extends TmfEventContent {
      * @see @see org.eclipse.linuxtools.lttng.event.LttngEventField
      */
     @Override
-    public synchronized LttngEventField getField(String name) {
+    public synchronized Object getField(String name) {
+    	
+    	// Check for generic table header fields
+    	if (name.equals(FIELD_ID_TIMESTAMP)) {
+    		return new Long(fParentEvent.getTimestamp().getValue()).toString();       
+    	} else if (name.equals(FIELD_ID_SOURCE)) {
+    		return fParentEvent.getSource().getSourceId().toString();
+    	} else if (name.equals(FIELD_ID_TYPE)) {
+    		return fParentEvent.getType().getTypeId().toString();
+    	} else if (name.equals(FIELD_ID_REFERENCE)) {
+    		return fParentEvent.getReference().getReference().toString();
+    	} else if (name.equals(FIELD_ID_CONTENT)) {
+    		return fParentEvent.getContent().toString();
+    	}
+
     	// *** VERIFY ***
         // Should we check if the field exists in LttngType before parsing? 
         // It could avoid calling parse for non-existent fields but would waste some cpu cycle on check?

@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.lttng.ui.views.events;
 
 import org.eclipse.linuxtools.lttng.event.LttngEventContent;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.linuxtools.tmf.ui.widgets.ColumnData;
 import org.eclipse.swt.SWT;
@@ -53,6 +54,11 @@ public class EventsTable extends TmfEventsTable {
 
     public EventsTable(Composite parent, int cacheSize) {
         super(parent, cacheSize, COLUMN_DATA);
+        fTable.getColumns()[0].setData(Key.FIELD_ID, TmfEventContent.FIELD_ID_TIMESTAMP);
+        fTable.getColumns()[1].setData(Key.FIELD_ID, TmfEventContent.FIELD_ID_SOURCE);
+        fTable.getColumns()[2].setData(Key.FIELD_ID, TmfEventContent.FIELD_ID_TYPE);
+        fTable.getColumns()[3].setData(Key.FIELD_ID, TmfEventContent.FIELD_ID_REFERENCE);
+        fTable.getColumns()[4].setData(Key.FIELD_ID, TmfEventContent.FIELD_ID_CONTENT);
     }
 
     /**

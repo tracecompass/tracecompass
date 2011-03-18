@@ -504,7 +504,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             		if (imageBounds.contains(point)) {
             			// Right-click on left margin 
                 		Long rank = (Long) item.getData(Key.RANK);
-                		if (rank != null) {
+                		if (rank != null && fBookmarksResource != null) {
                 			if (fBookmarksMap.containsKey(rank)) {
                                 tablePopupMenu.add(new ToggleBookmarkAction(Messages.TmfEventsTable_RemoveBookmarkActionText, rank));
                 			} else {
@@ -1021,7 +1021,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 				fFilterCheckCount++;
 				if (filter.matches(event)) {
 					synchronized (fFilteredEventCache) {
-						fFilteredEventCache.add(new FilteredEvent(event, rank));
+						fFilteredEventCache.add(new FilteredEvent(event.clone(), rank));
 						fFilterMatchCount++;
 					}
 					display.asyncExec(new Runnable() {
