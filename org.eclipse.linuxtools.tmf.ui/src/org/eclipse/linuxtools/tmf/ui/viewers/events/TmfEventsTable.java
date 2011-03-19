@@ -61,7 +61,6 @@ import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.internal.Messages;
 import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSetting;
@@ -985,85 +984,75 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
     
     protected class FilterThread extends Thread {
-		private volatile boolean interrupted = false;
-		private final ITmfFilterTreeNode filter;
+    	private final ITmfFilterTreeNode filter;
+    	private TmfDataRequest<TmfEvent> request;
+    	private long lastRefreshTime;
 
-		public FilterThread(ITmfFilterTreeNode filter) {
-			super("Filter Thread"); //$NON-NLS-1$
-			this.filter = filter;
-		}
-		
-		@Override
-		public void run() {
-			final Display display = Display.getDefault();
-			long lastRefreshTime = System.currentTimeMillis();
-			TmfContext context = fTrace.seekLocation(null);
-			context.setRank(0);
-			long rank = 0;
-			/*
-			TmfContext context;
-			long rank;
-			synchronized (fFilteredEventCache) {
-				if (fFilterCheckCount == 0) {
-					rank = 0;
-					context = fTrace.seekLocation(null);
-					context.setRank(0);
-				} else {
-					// Get the event following the last checked event
-					rank = fFilterCheckCount;
-					context = fTrace.seekEvent(rank);
-				}
-			}
-			*/
-			
-			TmfEvent event = fTrace.getNextEvent(context);
-			while (!interrupted && event != null) {
-				fFilterCheckCount++;
-				if (filter.matches(event)) {
-					synchronized (fFilteredEventCache) {
-						fFilteredEventCache.add(new FilteredEvent(event.clone(), rank));
-						fFilterMatchCount++;
-					}
-					display.asyncExec(new Runnable() {
-						@Override
-                        public void run() {
-							if (interrupted) return;
-							if (fTable.isDisposed()) return;
-							fTable.setItemCount(fFilteredEventCache.size() + 3); // +1 for header row, +2 for top and bottom filter status rows
-						}
-					});
-				}
-				if (fFilterCheckCount % 100 == 0) {
-					long currentTime = System.currentTimeMillis();
-					if (currentTime - lastRefreshTime > 1000) {
-						lastRefreshTime = currentTime;
-						display.asyncExec(new Runnable() {
-							@Override
-                            public void run() {
-								if (interrupted) return;
-								if (fTable.isDisposed()) return;
-								fTable.refresh();
-							}
-						});
-					}
-				}
-				rank = context.getRank();
-				event = fTrace.getNextEvent(context);
-			}
-			display.asyncExec(new Runnable() {
-				@Override
-                public void run() {
-					if (fTable.isDisposed()) return;
-					fTable.refresh();
-				}
-			});
-		}
-		
-		public void cancel() {
-			interrupted = true;
-		}
+    	public FilterThread(ITmfFilterTreeNode filter) {
+    		super("Filter Thread"); //$NON-NLS-1$
+    		this.filter = filter;
+    	}
+
+    	@SuppressWarnings("unchecked")
+    	@Override
+    	public void run() {
+    		final Display display = Display.getDefault();
+    		lastRefreshTime = System.currentTimeMillis();
+
+    		request = new TmfDataRequest<TmfEvent>(TmfEvent.class, 0, Integer.MAX_VALUE, ExecutionType.BACKGROUND) {
+    			@Override
+    			public void handleData(TmfEvent event) {
+    				super.handleData(event);
+    				fFilterCheckCount++;
+    				if (filter.matches(event)) {
+    					synchronized (fFilteredEventCache) {
+    						fFilteredEventCache.add(new FilteredEvent(event.clone(), getNbRead() - 1));
+    						fFilterMatchCount++;
+    					}
+    					display.asyncExec(new Runnable() {
+    						@Override
+    						public void run() {
+    							if (request.isCancelled()) return;
+    							if (fTable.isDisposed()) return;
+    							fTable.setItemCount(fFilteredEventCache.size() + 3); // +1 for header row, +2 for top and bottom filter status rows
+    						}
+    					});
+    				}
+    				if (fFilterCheckCount % 100 == 0) {
+    					long currentTime = System.currentTimeMillis();
+    					if (currentTime - lastRefreshTime > 1000) {
+    						lastRefreshTime = currentTime;
+    						display.asyncExec(new Runnable() {
+    							@Override
+    							public void run() {
+    								if (request.isCancelled()) return;
+    								if (fTable.isDisposed()) return;
+    								fTable.refresh();
+    							}
+    						});
+    					}
+    				}
+    			}
+    		};
+    		((ITmfDataProvider<TmfEvent>) fTrace).sendRequest(request);
+    		try {
+    			request.waitForCompletion();
+    		} catch (InterruptedException e) {
+    		}
+    		display.asyncExec(new Runnable() {
+    			@Override
+    			public void run() {
+    				if (fTable.isDisposed()) return;
+    				fTable.refresh();
+    			}
+    		});
+    	}
+
+    	public void cancel() {
+    		request.cancel();
+    	}
     }
-    
+
     protected void searchNext() {
 		synchronized (fSearchSyncObj) {
 			if (fSearchThread != null) {
@@ -1127,71 +1116,91 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
     
     protected class SearchThread extends Job {
-		protected ITmfFilterTreeNode filter;
-		protected long startRank;
-		protected int direction;
+    	protected ITmfFilterTreeNode filter;
+    	protected long startRank;
+    	protected int direction;
+    	protected long rank = -1;
+    	protected TmfDataRequest<TmfEvent> request;
 
-		public SearchThread(ITmfFilterTreeNode filter, int startIndex, int direction) {
-			super(Messages.TmfEventsTable_SearchingJobName);
-			this.filter = filter;
-			this.startRank = startIndex;
-			this.direction = direction;
-		}
-		
-		@Override
-		protected IStatus run(final IProgressMonitor monitor) {
-			final Display display = Display.getDefault();
-			if (startRank < 0) {
-				startRank = fTrace.getNbEvents() - 1;
-			} else if (startRank > fTrace.getNbEvents() - 1) {
-				startRank = 0;
-			}
-			TmfContext context = fTrace.seekEvent(startRank);
-			long rank = context.getRank();
-			TmfEvent event = fTrace.getNextEvent(context);
-			while (!monitor.isCanceled() && event != null) {
-				if (filter.matches(event)) {
-					break;
-				}
-				if (direction == Direction.FORWARD) {
-					rank = context.getRank();
-					if (rank == startRank) {
-						return Status.OK_STATUS;
-					}
-					event = fTrace.getNextEvent(context);
-					if (event == null) {
-						if (startRank == 0) {
-							return Status.OK_STATUS;
-						}
-						context = fTrace.seekLocation(null);
-						context.setRank(0);
-						rank = 0;
-						event = fTrace.getNextEvent(context);
-					}
-				} else {
-					rank--;
-					if (rank < 0) rank = fTrace.getNbEvents() - 1;
-					context = fTrace.seekEvent(rank);
-					event = fTrace.getNextEvent(context);
-				}
-			}
-			final int selection = (int) rank + 1; // +1 for header row
-			
-			display.asyncExec(new Runnable() {
-				@Override
-                public void run() {
-					if (monitor.isCanceled()) return;
-					if (fTable.isDisposed()) return;
-					fTable.setSelection(selection);
-					synchronized (fSearchSyncObj) {
-						fSearchThread = null;
-					}
-				}
-			});
-			return Status.OK_STATUS;
-		}
+    	public SearchThread(ITmfFilterTreeNode filter, int startIndex, int direction) {
+    		super(Messages.TmfEventsTable_SearchingJobName);
+    		this.filter = filter;
+    		this.startRank = startIndex;
+    		this.direction = direction;
+    	}
+
+    	@SuppressWarnings("unchecked")
+    	@Override
+    	protected IStatus run(final IProgressMonitor monitor) {
+    		final Display display = Display.getDefault();
+    		if (startRank < 0) {
+    			startRank = fTrace.getNbEvents() - 1;
+    		} else if (startRank > fTrace.getNbEvents() - 1) {
+    			startRank = 0;
+    		}
+    		int startIndex = (int) startRank;
+    		int nbRequested = (direction == Direction.FORWARD ? Integer.MAX_VALUE : 1);
+    		while (!monitor.isCanceled() && rank == -1) {
+    			request = new TmfDataRequest<TmfEvent>(TmfEvent.class, startIndex, nbRequested) {
+    				@Override
+    				public void handleData(TmfEvent event) {
+    					super.handleData(event);
+    					if (filter.matches(event)) {
+    						rank = startRank + getNbRead() - 1;
+    						done();
+    					}
+    				}
+    			};
+    			((ITmfDataProvider<TmfEvent>) fTrace).sendRequest(request);
+    			try {
+    				request.waitForCompletion();
+    				if (request.isCancelled()) {
+    					return Status.OK_STATUS;
+    				}
+    			} catch (InterruptedException e) {
+    				return Status.OK_STATUS;
+    			}
+    			if (rank == -1) {
+    				if (direction == Direction.FORWARD) {
+    					if (startIndex == 0) {
+    						return Status.OK_STATUS;
+    					} else {
+    						nbRequested = startIndex;
+    						startIndex = 0;
+    					}
+    				} else {
+    					startIndex--;
+    					if (startIndex < 0) {
+    						startIndex = (int) fTrace.getNbEvents() - 1;
+    					}
+    					if (startIndex == startRank) {
+    						return Status.OK_STATUS;
+    					}
+    				}
+    			}
+    		}
+    		final int selection = (int) rank + 1; // +1 for header row
+
+    		display.asyncExec(new Runnable() {
+    			@Override
+    			public void run() {
+    				if (monitor.isCanceled()) return;
+    				if (fTable.isDisposed()) return;
+    				fTable.setSelection(selection);
+    				synchronized (fSearchSyncObj) {
+    					fSearchThread = null;
+    				}
+    			}
+    		});
+    		return Status.OK_STATUS;
+    	}
+
+    	@Override
+    	protected void canceling() {
+    		request.cancel();
+    	}
     }
-		
+
     protected class SearchFilteredThread extends SearchThread {
 
 		public SearchFilteredThread(ITmfFilterTreeNode filter, int startIndex, int direction) {
@@ -1403,7 +1412,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                                 fTable.refresh();
                                 packColumns();
                             }
-                            fTrace.seekEvent(fSelectedRank);
+//                            fTrace.seekEvent(fSelectedRank);
                         }
                     });
                 }
