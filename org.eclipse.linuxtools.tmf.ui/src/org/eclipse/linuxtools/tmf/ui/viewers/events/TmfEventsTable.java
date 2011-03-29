@@ -55,7 +55,6 @@ import org.eclipse.linuxtools.tmf.filter.model.TmfFilterNode;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal;
-import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfTraceUpdatedSignal;
@@ -1328,10 +1327,17 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             @Override
 			public void run() {
                 fTable.removeAll();
+                // Clear filters if present
                 fTable.setData(Key.FILTER_OBJ, null);
                 fTable.setData(Key.FILTER_TXT, null);
                 fTable.setData(Key.SEARCH_OBJ, null);
                 fTable.setData(Key.SEARCH_TXT, null);
+                for (TableColumn column : fTable.getColumns()) {
+                	column.setData(Key.FILTER_OBJ, null);
+                	column.setData(Key.FILTER_TXT, null);
+                	column.setData(Key.SEARCH_OBJ, null);
+                	column.setData(Key.SEARCH_TXT, null);
+                }
                 fCacheStartIndex = fCacheEndIndex = 0; // Clear the cache
                 if (fTrace != null) {
                     if (!fTable.isDisposed() && fTrace != null) {
@@ -1567,7 +1573,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             @Override
 			public void run() {
                 if (!fTable.isDisposed() && fTrace != null) {
-//                	System.out.println("TmfEventsTable.experimentUpdated() - nbEvents = " + fTrace.getNbEvents());
                 	if (fTable.getData(Key.FILTER_OBJ) == null) {
                 		fTable.setItemCount((int) fTrace.getNbEvents() + 1); // +1 for header row
                 	}
@@ -1606,23 +1611,23 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         });
     }
 
-    private boolean fRefreshPending = false;
-    @TmfSignalHandler
-    public synchronized void rangeSynched(TmfRangeSynchSignal signal) {
-        if (!fRefreshPending && !fTable.isDisposed()) {
-            // Perform the refresh on the UI thread
-            fRefreshPending = true;
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-				public void run() {
-                    fRefreshPending = false;
-                    if (!fTable.isDisposed() && fTrace != null) {
-                        fTable.setItemCount((int) fTrace.getNbEvents() + 1); // +1 for header row
-                    }
-                }
-            });
-        }
-    }
+//    private boolean fRefreshPending = false;
+//    @TmfSignalHandler
+//    public synchronized void rangeSynched(TmfRangeSynchSignal signal) {
+//        if (!fRefreshPending && !fTable.isDisposed()) {
+//            // Perform the refresh on the UI thread
+//            fRefreshPending = true;
+//            Display.getDefault().asyncExec(new Runnable() {
+//                @Override
+//				public void run() {
+//                    fRefreshPending = false;
+//                    if (!fTable.isDisposed() && fTrace != null) {
+//                        fTable.setItemCount((int) fTrace.getNbEvents() + 1); // +1 for header row
+//                    }
+//                }
+//            });
+//        }
+//    }
     
     @SuppressWarnings("unchecked")
     @TmfSignalHandler
