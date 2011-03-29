@@ -125,9 +125,9 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     	setName(simpleName);
     	fPath = path;
         fIndexPageSize = (cacheSize > 0) ? cacheSize : DEFAULT_INDEX_PAGE_SIZE;
-//        if (indexTrace) {
-//        	indexTrace(false);
-//        }
+        if (indexTrace) {
+        	indexTrace(false);
+        }
     }
 
     /* (non-Javadoc)

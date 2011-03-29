@@ -1146,6 +1146,12 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 		}
 	}
 
+	@Override
+	public void dispose() {
+		currentJniTrace.closeTrace();
+		super.dispose();
+	}
+
 	/**
 	 * Return a String identifying this trace.
 	 * 
