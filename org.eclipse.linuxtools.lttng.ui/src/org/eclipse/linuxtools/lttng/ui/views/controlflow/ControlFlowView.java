@@ -6,7 +6,9 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  * 
- * Contributors: Alvaro Sanchez-Leon - Initial implementation
+ * Contributors:
+ *   Alvaro Sanchez-Leon - Initial implementation
+ *   Michel Dagenais (michel.dagenais@polymtl.ca) - Reference C implementation, used with permission
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.controlflow;
 

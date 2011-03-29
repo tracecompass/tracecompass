@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
+ * 	 Michel Dagenais (michel.dagenais@polymtl.ca) - Reference C implementation, used with permission
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.state.evProcessor.state;
 

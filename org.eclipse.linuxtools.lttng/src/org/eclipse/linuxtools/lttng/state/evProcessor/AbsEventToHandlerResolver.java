@@ -7,7 +7,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
+ *   Alvaro Sanchez-Leon (alvsan09@ail.com) - Initial API and implementation
+ * 	 Michel Dagenais (michel.dagenais@polymtl.ca) - Reference C implementation, used with permission
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng.state.evProcessor;
