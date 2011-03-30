@@ -13,6 +13,7 @@ package org.eclipse.linuxtools.lttng.ui.model.trange;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.linuxtools.lttng.state.StateStrings.BdevMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.CpuMode;
@@ -23,6 +24,7 @@ import org.eclipse.linuxtools.lttng.state.StateStrings.SoftIRQMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.TrapMode;
 import org.eclipse.linuxtools.lttng.ui.views.common.ParamsUpdater;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider;
+import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider.StateColor;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
 
@@ -32,12 +34,12 @@ public class TimeRangeViewerProvider extends TmfTimeAnalysisProvider {
     // Data
     // ------------------------------------------------------------------------
 
-    Map<String, StateColor> procStateToColor = new HashMap<String, StateColor>(16);
-    Map<String, StateColor> bdevStateToColor = new HashMap<String, StateColor>(4);
-    Map<String, StateColor> softIrqStateToColor = new HashMap<String, StateColor>(4);
-    Map<String, StateColor> trapStateToColor = new HashMap<String, StateColor>(4);
-    Map<String, StateColor> irqStateToColor = new HashMap<String, StateColor>(4);
-    Map<String, StateColor> cpuStateToColor = new HashMap<String, StateColor>(8);
+    protected Map<String, StateColor> procStateToColor = new HashMap<String, StateColor>(16);
+    protected Map<String, StateColor> bdevStateToColor = new HashMap<String, StateColor>(4);
+    protected Map<String, StateColor> softIrqStateToColor = new HashMap<String, StateColor>(4);
+    protected Map<String, StateColor> trapStateToColor = new HashMap<String, StateColor>(4);
+    protected Map<String, StateColor> irqStateToColor = new HashMap<String, StateColor>(4);
+    protected Map<String, StateColor> cpuStateToColor = new HashMap<String, StateColor>(8);
 
     private final ParamsUpdater fviewParameters;
 
@@ -191,20 +193,20 @@ public class TimeRangeViewerProvider extends TmfTimeAnalysisProvider {
 
     private void fillTrapStateToColor() {
 	trapStateToColor.put(TrapMode.LTTV_TRAP_UNKNOWN.getInName(), StateColor.BLACK);
-	trapStateToColor.put(TrapMode.LTTV_TRAP_IDLE.getInName(), StateColor.BLACK);
+	trapStateToColor.put(TrapMode.LTTV_TRAP_IDLE.getInName(), StateColor.GRAY);
 	trapStateToColor.put(TrapMode.LTTV_TRAP_BUSY.getInName(), StateColor.GOLD);
     }
 
     private void fillSoftIRQStateToColor() {
 	softIrqStateToColor.put(SoftIRQMode.LTTV_SOFT_IRQ_UNKNOWN.getInName(), StateColor.BLACK);
-	softIrqStateToColor.put(SoftIRQMode.LTTV_SOFT_IRQ_IDLE.getInName(), StateColor.BLACK);
+	softIrqStateToColor.put(SoftIRQMode.LTTV_SOFT_IRQ_IDLE.getInName(), StateColor.GRAY);
 	softIrqStateToColor.put(SoftIRQMode.LTTV_SOFT_IRQ_PENDING.getInName(), StateColor.PINK1);
 	softIrqStateToColor.put(SoftIRQMode.LTTV_SOFT_IRQ_BUSY.getInName(), StateColor.PURPLE1);
     }
 
     private void fillBdevStateToColor() {
 	softIrqStateToColor.put(BdevMode.LTTV_BDEV_UNKNOWN.getInName(), StateColor.BLACK);
-	softIrqStateToColor.put(BdevMode.LTTV_BDEV_IDLE.getInName(), StateColor.BLACK);
+	softIrqStateToColor.put(BdevMode.LTTV_BDEV_IDLE.getInName(), StateColor.GRAY);
 	softIrqStateToColor.put(BdevMode.LTTV_BDEV_BUSY_READING.getInName(), StateColor.DARK_BLUE);
 	softIrqStateToColor.put(BdevMode.LTTV_BDEV_BUSY_WRITING.getInName(), StateColor.RED);
     }
@@ -227,4 +229,14 @@ public class TimeRangeViewerProvider extends TmfTimeAnalysisProvider {
 	procStateToColor.put(ExecutionMode.LTTV_STATE_IRQ.getInName(), StateColor.ORANGE);
 	procStateToColor.put(ExecutionMode.LTTV_STATE_SOFT_IRQ.getInName(), StateColor.PINK1);
     }
+    
+    protected String findObject(StateColor Value, Map<String, StateColor> map) {
+		Set<String> keys = map.keySet();
+		for (String key : keys) {
+			if (map.get(key).equals(Value)) {
+				return key;
+			}
+		}
+		return "Not Found";
+	}
 }

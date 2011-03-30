@@ -91,7 +91,7 @@ public class TmfTimeLegend extends TitleAreaDialog {
 		setDialogHelpAvailable(false);
 		setHelpAvailable(false);
 
-		// setTitleImage(org.eclipse.hyades.trace.internal.ui.PDPluginImages.DESC_IMG_UI_WZ_EDITPROFSET.createImage());
+		//setTitleImage(org.eclipse.hyades.trace.internal.ui.PDPluginImages.DESC_IMG_UI_WZ_EDITPROFSET.createImage());
 
 		return composite;
 	}
@@ -108,23 +108,28 @@ public class TmfTimeLegend extends TitleAreaDialog {
 		layout.marginBottom = 10;
 		gs.setLayout(layout);
 
-		for (int i = 0; i < 7; i++) {
-			Bar bar = new Bar(gs, i);
-			gd = new GridData();
-			gd.widthHint = 40;
-			gd.heightHint = 20;
-			gd.verticalIndent = 8;
-			bar.setLayoutData(gd);
-
-			Label name = new Label(gs, SWT.NONE);
+		// Go through all the defined colors and only add the ones you need. 
+		// This will not handle several colors assigned to a color, we have 
+		// 16 mil colors, and should not pick two to mean the same thing. 
+		for (int i = 0; i <  TraceColorScheme.getStateColors().length; i++) {
 			//Get the color enum related to the index
 			StateColor stateColor = TraceColorScheme.getStateColors()[i];
 			//Get the given name, provided by the interface to the application
-			name.setText(ifUtil.getStateName(stateColor));
-			gd = new GridData();
-			gd.horizontalIndent = 10;
-			gd.verticalIndent = 8;
-			name.setLayoutData(gd);
+			String stateName = ifUtil.getStateName(stateColor);
+			if( stateName != "Not mapped" ) {
+				Bar bar = new Bar(gs, i);
+				gd = new GridData();
+				gd.widthHint = 40;
+				gd.heightHint = 20;
+				gd.verticalIndent = 8;
+				bar.setLayoutData(gd);
+				Label name = new Label(gs, SWT.NONE);
+				name.setText(stateName);
+				gd = new GridData();
+				gd.horizontalIndent = 10;
+				gd.verticalIndent = 8;
+				name.setLayoutData(gd);
+			}
 		}
 	}
 
@@ -204,26 +209,6 @@ public class TmfTimeLegend extends TitleAreaDialog {
 			Rectangle r = getClientArea();
 			gc.setBackground(color);
 			gc.fillRectangle(r);
-
-			int my = r.height / 2;
-
-			if (TraceColorScheme.GOLD_STATE == colorIdx
-					|| TraceColorScheme.ORANGE_STATE == colorIdx) {
-				int s = gc.getLineStyle();
-				int w = gc.getLineWidth();
-				gc.setLineStyle(SWT.LINE_DOT);
-				gc.setLineWidth(2);
-				gc.drawLine(0, my, r.width - 1, my);
-				gc.setLineStyle(s);
-				gc.setLineWidth(w);
-			} else if (TraceColorScheme.RED_STATE == colorIdx
-					|| TraceColorScheme.GRAY_STATE == colorIdx) {
-				int w = gc.getLineWidth();
-				gc.setLineWidth(2);
-				gc.drawLine(0, my, r.width - 1, my);
-				gc.setLineWidth(w);
-			}
-
 			gc.setForeground(colors.getColor(TraceColorScheme.BLACK));
 			gc.drawRectangle(0, 0, r.width - 1, r.height - 1);
 		}

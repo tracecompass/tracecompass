@@ -23,11 +23,11 @@ import org.eclipse.linuxtools.lttng.request.ILttngSyntEventRequest;
 import org.eclipse.linuxtools.lttng.state.evProcessor.ITransEventProcessor;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.lttng.ui.model.trange.ItemContainer;
-import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeViewerProvider;
 import org.eclipse.linuxtools.lttng.ui.views.common.AbsTimeUpdateView;
 import org.eclipse.linuxtools.lttng.ui.views.common.ParamsUpdater;
 import org.eclipse.linuxtools.lttng.ui.views.resources.evProcessor.ResourcesEventToHandlerFactory;
 import org.eclipse.linuxtools.lttng.ui.views.resources.model.ResourceModelFactory;
+import org.eclipse.linuxtools.lttng.ui.views.resources.model.ResourcesTimeRangeViewerProvider;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
@@ -107,7 +107,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 		top = new Composite(parent, SWT.BORDER);
 
 		top.setLayout(new FillLayout());
-		tsfviewer = TmfViewerFactory.createViewer(top, new TimeRangeViewerProvider(getParamsUpdater()));
+		tsfviewer = TmfViewerFactory.createViewer(top, new ResourcesTimeRangeViewerProvider(getParamsUpdater()));
 
 		tsfviewer.addWidgetSelectionListner(this);
 		tsfviewer.addWidgetTimeScaleSelectionListner(this);
@@ -180,7 +180,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 
 	private void fillLocalPullDown(IMenuManager manager) {
 		manager.add(new Separator());
-		// manager.add(showLegend);
+		manager.add(showLegend);
 		manager.add(new Separator());
 		manager.add(resetScale);
 		manager.add(nextEvent);
@@ -195,7 +195,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
-		// manager.add(showLegend);
+		manager.add(showLegend);
 		manager.add(new Separator());
 		manager.add(resetScale);
 		manager.add(nextEvent);
@@ -212,7 +212,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
-		// manager.add(showLegend);
+		manager.add(showLegend);
 		manager.add(new Separator());
 		manager.add(resetScale);
 		manager.add(nextEvent);
