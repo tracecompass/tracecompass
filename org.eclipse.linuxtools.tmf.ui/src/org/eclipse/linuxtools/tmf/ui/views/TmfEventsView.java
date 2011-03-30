@@ -15,8 +15,10 @@ package org.eclipse.linuxtools.tmf.ui.views;
 
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.signal.TmfExperimentDisposedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.swt.widgets.Composite;
 
@@ -106,12 +108,31 @@ public class TmfEventsView extends TmfView {
     @TmfSignalHandler
     public void experimentSelected(TmfExperimentSelectedSignal<TmfEvent> signal) {
         // Update the trace reference
-        fExperiment = (TmfExperiment<TmfEvent>) signal.getExperiment();
-        setPartName(fTitlePrefix + " - " + fExperiment.getName()); //$NON-NLS-1$
-
-        if (fEventsTable != null) {
-            fEventsTable.setTrace(fExperiment, false);
+        TmfExperiment<TmfEvent> exp = (TmfExperiment<TmfEvent>) signal.getExperiment();
+        if (!exp.equals(fExperiment)) {
+        	fExperiment = exp;
+            setPartName(fTitlePrefix + " - " + fExperiment.getName()); //$NON-NLS-1$
+            if (fEventsTable != null) {
+            	fEventsTable.setTrace(fExperiment, false);
+            }
         }
     }
+
+	@SuppressWarnings("unchecked")
+	@TmfSignalHandler
+	public void experimentDisposed(TmfExperimentDisposedSignal<TmfEvent> signal) {
+		// Clear the trace reference
+		TmfExperiment<TmfEvent> experiment = (TmfExperiment<TmfEvent>) signal.getExperiment();
+		if (experiment.equals(fExperiment)) {
+			fEventsTable.setTrace(null, false);
+		}
+
+		TmfUiPlugin.getDefault().getWorkbench().getWorkbenchWindows()[0].getShell().getDisplay().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				setPartName(fTitlePrefix);
+			}
+		});
+	}
 
 }

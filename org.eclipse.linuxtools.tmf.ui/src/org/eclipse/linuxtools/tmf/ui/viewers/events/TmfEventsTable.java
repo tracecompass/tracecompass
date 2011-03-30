@@ -1418,7 +1418,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                                 fTable.refresh();
                                 packColumns();
                             }
-//                            fTrace.seekEvent(fSelectedRank);
+                            populateCompleted();
                         }
                     });
                 }
@@ -1435,7 +1435,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         job.setPriority(Job.SHORT);
         job.schedule();
     }
-    
+
+    protected void populateCompleted() {
+    	// Nothing by default;
+    }
+
     // ------------------------------------------------------------------------
     // Bookmark handling
     // ------------------------------------------------------------------------

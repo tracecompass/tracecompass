@@ -28,6 +28,7 @@ import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.signal.TmfExperimentDisposedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
@@ -154,6 +155,10 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
      */
     @Override
 	public synchronized void dispose() {
+
+    	TmfExperimentDisposedSignal<T> signal = new TmfExperimentDisposedSignal<T>(this, this);
+    	broadcast(signal);
+
     	if (fTraces != null) {
     		for (ITmfTrace trace : fTraces) {
     			trace.dispose();
