@@ -44,6 +44,9 @@
 				<a href="Getting-Started.html#Downloading_Sample_Traces">Downloading Sample Traces</a>
 			</li>
 			<li>
+				<a href="Getting-Started.html#Installation_of_the_LTTng_Agent">Installation of the LTTng Agent</a>
+			</li>
+			<li>
 				<a href="Getting-Started.html#Installation_Verification">Installation Verification</a>
 			</li>
 		</ul>
@@ -127,6 +130,17 @@ $ LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH" ./eclipse
 			</li>
 		</ul>
 		<p>(More sample traces to come)</p>
+		<h2 id="Installation_of_the_LTTng_Agent">Installation of the LTTng Agent</h2>
+		<p>To be able to connect remotely to a host for controlling LTTng traces, an LTTng agent has to be running on the remote system. </p>
+		<p>To download the source code from the relevant git repository, use 
+			<b>git clone git://git.dorsal.polymtl.ca/git/lttng-agent.git</b> from a Linux command shell. Then go to directory 
+			<b>lttng-agent/manual</b> in the cloned git repository and type 
+			<b>make</b>. This will generate the 
+			<b>LTTng Agent Manual</b> in HTML format. Please follow the instructions in this manual for the manual installation of the agent. 
+		</p>
+		<p>To install an agent on Ubuntu using a PPA package follow the instruction of the web site 
+			<a href="https://launchpad.net/~lttng/+archive/ppa">LTTng PPA</a>. However, this version won't always include the latest bugfixes. To get the latest version, the user should download the source code, compile and install the agent manually.
+		</p>
 		<h2 id="Installation_Verification">Installation Verification</h2>
 		<p>Here are the quick steps to verify that your installation is functional. If needed, refer to the 
 			<a href="User-Interface.html#User_Interface">User Interface</a> section for clarifications.

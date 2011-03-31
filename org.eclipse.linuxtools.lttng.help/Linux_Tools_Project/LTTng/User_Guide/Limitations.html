@@ -34,13 +34,13 @@
 		<p>
 			<b>Performance</b>
 		</p>
-		<p>The current version takes 3-5 more time to fully parse a trace than the finely optimized C version (LTTv). Things are event worse when the Statistics View is open. However, once a trace/experiment is selected, the user has immediate feedback and can start navigating and visualizing the trace while the parsing takes place in the background.</p>
+		<p>The current version takes 3-5 more time to fully parse a trace than the finely optimized C version (LTTv). However, once a trace/experiment is selected, the user has immediate feedback and can start navigating and visualizing the trace while the parsing takes place in the background.</p>
 		<p>
-			<b>No tracer control</b>
+			<b>Tracer control limitations</b>
 		</p>
-		<p>The LTTng tracer control (
-			<i>start</i>/''suspend''/''resume''/''stop'' tracing) is not integrated yet. Also, transferring an LTTng trace from a remote target is not supported yet.
-		</p>
+		<p>Due to errors in the LTTng remote agent, controlling of user space traces is currently not possible.</p>
+		<p>The LTTng agent doesn't allow to retrieve the trace state, i.e. whether a trace is started or stopped. Therefore, when reconnecting with Eclipse, the LTTng control is not able to display the correct state. Currently, the trace is considered as started.</p>
+		<p>For kernel traces, it's currently not possible to configure the channels. This will be added in the next release. </p>
 		<p>
 			<b>64-bits and non-x86 host architectures</b>
 		</p>

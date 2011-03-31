@@ -8,20 +8,38 @@
 		<topic href="Linux_Tools_Project/LTTng/User_Guide/Getting-Started.html" label="Getting Started">
 			<topic href="Linux_Tools_Project/LTTng/User_Guide/Getting-Started.html#Installing_the_LTTng_parsing_library" label="Installing the LTTng parsing library"></topic>
 			<topic href="Linux_Tools_Project/LTTng/User_Guide/Getting-Started.html#Downloading_Sample_Traces" label="Downloading Sample Traces"></topic>
+			<topic href="Linux_Tools_Project/LTTng/User_Guide/Getting-Started.html#Installation_of_the_LTTng_Agent" label="Installation of the LTTng Agent"></topic>
 			<topic href="Linux_Tools_Project/LTTng/User_Guide/Getting-Started.html#Installation_Verification" label="Installation Verification"></topic>
 		</topic>
 		<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html" label="User Interface">
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#LTTng_Perspective" label="LTTng Perspective"></topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Project_View" label="Project View"></topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Events_View" label="Events View"></topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Histogram_View" label="Histogram View"></topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Control_Flow_View" label="Control Flow View">
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Mouse_Control" label="Mouse Control"></topic>
+			<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#LTTng_Perspective" label="LTTng Perspective">
+				<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Project_View" label="Project View"></topic>
+				<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Events_View" label="Events View"></topic>
+				<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Histogram_View" label="Histogram View"></topic>
+				<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Control_Flow_View" label="Control Flow View">
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Mouse_Control" label="Mouse Control"></topic>
+				</topic>
+				<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Resources_View" label="Resources View">
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Mouse_Control_2" label="Mouse Control"></topic>
+				</topic>
+				<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Statistics_View" label="Statistics View"></topic>
 			</topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Resources_View" label="Resources View">
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Mouse_Control_2" label="Mouse Control"></topic>
+			<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#LTTng_Trace_Control" label="LTTng Trace Control">
+				<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Remote_Systems_View" label="Remote Systems View"></topic>
+				<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Create_a_Remote_Connection" label="Create a Remote Connection">
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#General" label="General"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Connect_to_Remote_Host" label="Connect to Remote Host"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Configure_Kernel_Markers" label="Configure Kernel Markers"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Create_a_New_Kernel_Trace" label="Create a New Kernel Trace"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Configure_a_Trace" label="Configure a Trace"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Start_a_Trace" label="Start a Trace"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Pause_a_Trace" label="Pause a Trace"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Stop_a_Trace" label="Stop a Trace"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Import_a_Trace_in_the__LTTng_Perspective" label="Import a Trace in the  LTTng Perspective"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Delete_a_Trace" label="Delete a Trace"></topic>
+				</topic>
+				<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Property_View" label="Property View"></topic>
 			</topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Statistics_View" label="Statistics View"></topic>
 		</topic>
 		<topic href="Linux_Tools_Project/LTTng/User_Guide/Limitations.html" label="Limitations"></topic>
 		<topic href="Linux_Tools_Project/LTTng/User_Guide/References.html" label="References"></topic>
