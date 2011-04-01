@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.trace;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.Vector;
@@ -119,11 +120,11 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
      */
     protected TmfTrace(String name, Class<T> type, String path, int cacheSize, boolean indexTrace) throws FileNotFoundException {
     	super(name, type);
-//    	if (path != null) {
-//    		int sep = path.lastIndexOf(File.separator);
-//    		String simpleName = (sep >= 0) ? path.substring(sep + 1) : path;
-//    		setName(simpleName);
-//    	}
+    	if (path != null) {
+    		int sep = path.lastIndexOf(File.separator);
+    		String simpleName = (sep >= 0) ? path.substring(sep + 1) : path;
+    		setName(simpleName);
+    	}
     	fPath = path;
         fIndexPageSize = (cacheSize > 0) ? cacheSize : DEFAULT_INDEX_PAGE_SIZE;
         if (indexTrace) {
