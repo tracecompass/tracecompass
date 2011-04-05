@@ -451,7 +451,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 
     	fCheckpoints.clear();
         ITmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity,
-                TmfDataRequest.ALL_DATA, 1, ITmfDataRequest.ExecutionType.BACKGROUND) {
+                TmfDataRequest.ALL_DATA, fIndexPageSize, ITmfDataRequest.ExecutionType.BACKGROUND) {
 
             TmfTimestamp startTime =  null;
             TmfTimestamp lastTime  =  null;

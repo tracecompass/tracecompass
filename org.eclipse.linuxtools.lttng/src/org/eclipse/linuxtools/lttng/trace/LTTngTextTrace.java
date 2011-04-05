@@ -55,7 +55,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     private  boolean showDebug = false;
     
     public LTTngTextTrace(String path) throws Exception {
-    	this(path, false);
+    	this(path, true); // false);
     }
     
     public LTTngTextTrace(String path, boolean skipIndexing) throws Exception {

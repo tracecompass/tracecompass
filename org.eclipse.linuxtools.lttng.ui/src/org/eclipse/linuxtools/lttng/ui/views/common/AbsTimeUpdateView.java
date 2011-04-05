@@ -13,6 +13,7 @@ package org.eclipse.linuxtools.lttng.ui.views.common;
 
 import java.util.Arrays;
 
+import org.eclipse.linuxtools.lttng.LttngConstants;
 import org.eclipse.linuxtools.lttng.control.LttngCoreProviderFactory;
 import org.eclipse.linuxtools.lttng.control.LttngSyntheticEventProvider;
 import org.eclipse.linuxtools.lttng.event.LttngSyntheticEvent;
@@ -71,7 +72,6 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	 */
 	protected static final Long INPUT_CHANGED_REFRESH = 75000L;
 	private static final long DEFAULT_OFFSET = 0L;
-	private static final int DEFAULT_CHUNK = 1;
 
 	protected boolean synch = true; // time synchronization, used to be an option
 	protected ITimeAnalysisViewer tsfviewer = null;
@@ -388,7 +388,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 
 		fCurrentRequest = new LttngSyntEventRequest(
 				requestTrange, DEFAULT_OFFSET, TmfDataRequest.ALL_DATA,
-				DEFAULT_CHUNK, this, experimentTRange, getEventProcessor(), 
+				LttngConstants.DEFAULT_BLOCK_SIZE, this, experimentTRange, getEventProcessor(), 
 				TmfExperiment.getCurrentExperiment().getName(), execType) {
 	
 			Long fCount = getSynEventCount();

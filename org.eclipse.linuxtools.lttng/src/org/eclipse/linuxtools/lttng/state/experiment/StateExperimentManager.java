@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.lttng.state.experiment;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.linuxtools.lttng.LttngConstants;
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.control.LttngCoreProviderFactory;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
@@ -343,7 +344,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
 		// Prepare event data request to build state model
 		ITmfEventRequest<LttngEvent> request = new TmfEventRequest<LttngEvent>(
 				LttngEvent.class, TmfTimeRange.Eternity,
-				TmfDataRequest.ALL_DATA, 1, ITmfDataRequest.ExecutionType.BACKGROUND) {
+				TmfDataRequest.ALL_DATA, LttngConstants.DEFAULT_BLOCK_SIZE, ITmfDataRequest.ExecutionType.BACKGROUND) {
 		
 			long nbEventsHandled = 0;
 			

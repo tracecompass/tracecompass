@@ -213,10 +213,10 @@ public class TmfCoalescedDataRequestTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testToString() {
-        String expected1 = "[TmfCoalescedDataRequest(0,TmfEvent,10,100)]";
-        String expected2 = "[TmfCoalescedDataRequest(1,TmfEvent,20,100)]";
-        String expected3 = "[TmfCoalescedDataRequest(2,TmfEvent,20,200)]";
-        String expected4 = "[TmfCoalescedDataRequest(3,TmfEvent,20,200)]";
+        String expected1 = "[TmfCoalescedDataRequest(0,TmfEvent,10,100,200)]";
+        String expected2 = "[TmfCoalescedDataRequest(1,TmfEvent,20,100,200)]";
+        String expected3 = "[TmfCoalescedDataRequest(2,TmfEvent,20,200,200)]";
+        String expected4 = "[TmfCoalescedDataRequest(3,TmfEvent,20,200,300)]";
 
         assertEquals("toString", expected1, fRequest1.toString());
         assertEquals("toString", expected2, fRequest2.toString());

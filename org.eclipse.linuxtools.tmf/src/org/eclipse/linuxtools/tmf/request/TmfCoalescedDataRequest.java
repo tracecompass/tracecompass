@@ -228,6 +228,6 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
     @SuppressWarnings("nls")
     public String toString() {
 		return "[TmfCoalescedDataRequest(" + getRequestId() + "," + getDataType().getSimpleName() 
-			+ "," + getIndex() + "," + getNbRequested() + ")]";
+			+ "," + getIndex() + "," + getNbRequested() + "," + getBlockSize() + ")]";
     }
 }

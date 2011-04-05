@@ -229,10 +229,10 @@ public class TmfEventRequestTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testToString() {
-        String expected1 = "[TmfEventRequest(0,TmfEvent," + range1 + ",100)]";
-        String expected2 = "[TmfEventRequest(1,TmfEvent," + range2 + ",100)]";
-        String expected3 = "[TmfEventRequest(2,TmfEvent," + range2 + ",200)]";
-        String expected4 = "[TmfEventRequest(3,TmfEvent," + range2 + ",200)]";
+        String expected1 = "[TmfEventRequest(0,TmfEvent," + range1 + ",100,200)]";
+        String expected2 = "[TmfEventRequest(1,TmfEvent," + range2 + ",100,200)]";
+        String expected3 = "[TmfEventRequest(2,TmfEvent," + range2 + ",200,200)]";
+        String expected4 = "[TmfEventRequest(3,TmfEvent," + range2 + ",200,300)]";
 
         assertEquals("toString", expected1, fRequest1.toString());
         assertEquals("toString", expected2, fRequest2.toString());

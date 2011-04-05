@@ -115,7 +115,7 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
     @SuppressWarnings("nls")
     public String toString() {
 		return "[TmfEventRequest(" + getRequestId() + "," + getDataType().getSimpleName() 
-			+ "," + getRange() + "," + getNbRequested() + ")]";
+			+ "," + getRange() + "," + getNbRequested() + "," + getBlockSize() + ")]";
     }
 
 }

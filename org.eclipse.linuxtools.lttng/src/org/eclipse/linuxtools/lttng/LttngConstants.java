@@ -81,4 +81,8 @@ public class LttngConstants {
      */
     public static final int STATS_CATEGORY_ID = 0xC << STATS_ID_SHIFT;
 
+    /**
+     * <h4>Background requests block size </h4>
+     */
+    public static final int DEFAULT_BLOCK_SIZE = 50000;
 }

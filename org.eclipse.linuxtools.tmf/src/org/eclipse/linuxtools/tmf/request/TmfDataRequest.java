@@ -92,6 +92,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     private final int      		fRequestId;  	// A unique request ID
     private final int      		fIndex;      	// The index (rank) of the requested event
     private final int      		fNbRequested;	// The number of requested events (ALL_DATA for all)
+    private final int			fBlockSize;		// The block size (for BG requests)
     private       int      		fNbRead;        // The number of reads so far
 
     private CountDownLatch startedLatch   = new CountDownLatch(1);
@@ -165,6 +166,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     	fDataType    = dataType;
     	fIndex       = index;
     	fNbRequested = nbRequested;
+    	fBlockSize   = blockSize;
     	fExecType    = execType;
     	fNbRead      = 0;
         if (Tracer.isRequestTraced()) Tracer.traceRequest(this, "created"); //$NON-NLS-1$
@@ -212,6 +214,14 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     @Override
 	public int getNbRequested() {
         return fNbRequested;
+    }
+
+    /**
+     * @return the block size (for BG requests)
+     */
+    @Override
+	public int getBlockSize() {
+        return fBlockSize;
     }
 
     /**
@@ -438,6 +448,6 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     @SuppressWarnings("nls")
     public String toString() {
 		return "[TmfDataRequest(" + fRequestId + "," + fDataType.getSimpleName() + 
-			"," + fIndex + "," + fNbRequested + ")]";
+			"," + fIndex + "," + fNbRequested + "," + getBlockSize() + ")]";
     }
 }

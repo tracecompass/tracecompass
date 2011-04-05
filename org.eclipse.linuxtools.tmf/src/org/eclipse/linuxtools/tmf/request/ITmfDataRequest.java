@@ -57,6 +57,11 @@ public interface ITmfDataRequest<T extends TmfData> {
     public int getNbRequested();
 
     /**
+     * @return the block size (for BG requests)
+     */
+    public int getBlockSize();
+
+    /**
      * @return the number of events read so far
      */
     public int getNbRead();

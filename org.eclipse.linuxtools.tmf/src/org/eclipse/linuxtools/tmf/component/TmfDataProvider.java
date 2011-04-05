@@ -195,7 +195,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 	protected void newCoalescedDataRequest(ITmfDataRequest<T> request) {
 		synchronized(fLock) {
 			TmfCoalescedDataRequest<T> coalescedRequest = new TmfCoalescedDataRequest<T>(
-					fType, request.getIndex(), request.getNbRequested(),request.getExecType());
+					fType, request.getIndex(), request.getNbRequested(), request.getBlockSize(), request.getExecType());
 			coalescedRequest.addRequest(request);
 	        if (Tracer.isRequestTraced()) {
 		        Tracer.traceRequest(request, "coalesced with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
@@ -227,7 +227,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 		if (request.getExecType() == ExecutionType.FOREGROUND)
 			queueRequest(request);
 		else
-			queueBackgroundRequest(request, DEFAULT_BLOCK_SIZE, true);
+			queueBackgroundRequest(request, request.getBlockSize(), true);
 	}
 
 	protected void queueRequest(final ITmfDataRequest<T> request) {

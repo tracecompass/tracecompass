@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
+import org.eclipse.linuxtools.lttng.LttngConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
@@ -22,8 +23,9 @@ import org.eclipse.swt.widgets.Composite;
  * <p>
  */
 public abstract class HistogramConstant {
+
 	// Constants relative to requests
-	public final static int MAX_EVENTS_PER_READ = 1;
+//	public final static int MAX_EVENTS_PER_READ = LttngConstants.DEFAULT_BLOCK_SIZE;
 	public final static int REDRAW_EVERY_NB_EVENTS = 20000;
 	public final static Boolean SKIP_EMPTY_INTERVALS_WHEN_CALCULATING_AVERAGE = true;
 	
