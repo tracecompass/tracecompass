@@ -43,6 +43,19 @@
       </comments>
     </license>
   </licenses>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptors>
+            <descriptor>../src.xml</descriptor>
+          </descriptors>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
   <modules>
     <module>org.eclipse.linuxtools.lttng</module>
