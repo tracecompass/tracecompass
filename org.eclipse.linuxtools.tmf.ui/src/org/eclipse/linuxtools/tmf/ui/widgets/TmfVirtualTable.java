@@ -638,6 +638,9 @@ public class TmfVirtualTable extends Composite {
 
 	public int getSelectionIndex() {
 		int index = fTable.getSelectionIndex();
+		if (index == -1) {
+			return fSelectedEventRank;
+		}
 		if (index < fFrozenRowCount) {
 			return index;
 		} else {

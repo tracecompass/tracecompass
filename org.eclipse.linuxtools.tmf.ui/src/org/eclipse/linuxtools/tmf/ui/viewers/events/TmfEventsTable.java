@@ -46,6 +46,7 @@ import org.eclipse.linuxtools.tmf.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfEventContent;
+import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.filter.ITmfFilter;
 import org.eclipse.linuxtools.tmf.filter.model.ITmfFilterTreeNode;
@@ -54,6 +55,7 @@ import org.eclipse.linuxtools.tmf.filter.model.TmfFilterMatchesNode;
 import org.eclipse.linuxtools.tmf.filter.model.TmfFilterNode;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
@@ -62,6 +64,7 @@ import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.internal.Messages;
+import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsCache.CachedEvent;
 import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSetting;
 import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSettingsManager;
 import org.eclipse.linuxtools.tmf.ui.views.colors.IColorSettingsListener;
@@ -147,7 +150,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     protected long fSelectedRank = 0;
     
     // Filter data
-    protected ArrayList<FilteredEvent> fFilteredEventCache = new ArrayList<FilteredEvent>();
     protected long fFilterMatchCount;
     protected long fFilterCheckCount;
     protected FilterThread fFilterThread;
@@ -184,24 +186,13 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         new ColumnData(COLUMN_NAMES[4], 100, SWT.LEFT)
     };
 
-    private class FilteredEvent {
-    	TmfEvent event;
-    	long rank;
-
-    	public FilteredEvent (TmfEvent event, long rank) {
-    		this.event = event;
-    		this.rank = rank;
-    	}
-    }
-    
-    // ------------------------------------------------------------------------
     // Event cache
-    // ------------------------------------------------------------------------
+    private final TmfEventsCache fCache;
+    private boolean fCacheUpdateBusy = false;
+    private boolean fCacheUpdatePending = false;
+    private boolean fCacheUpdateCompleted = false;
+    private Object fCacheUpdateSyncObj = new Object();
 
-    private final int  fCacheSize;
-    private TmfEvent[] fCache;
-    private int fCacheStartIndex = 0;
-    private int fCacheEndIndex   = 0;
 
     private boolean fDisposeOnClose;
 
@@ -277,8 +268,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             }
         });
 
-        fCacheSize = Math.max(cacheSize, Display.getDefault().getBounds().height / fTable.getItemHeight());
-        fCache = new TmfEvent[fCacheSize];
+        cacheSize = Math.max(cacheSize, Display.getDefault().getBounds().height / fTable.getItemHeight());
+        fCache = new TmfEventsCache(cacheSize, this);
 
         // Handle the table item requests 
         fTable.addListener(SWT.SetData, new Listener() {
@@ -287,53 +278,28 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 			public void handleEvent(Event event) {
 
                 final TableItem item = (TableItem) event.item;
-                final int index = event.index - 1; // -1 for the header row
+                int index = event.index - 1; // -1 for the header row
 
-                if (index == -1) {
-                    String txtKey = null;
-                    if (fHeaderState == HeaderState.SEARCH) {
-                        item.setImage(SEARCH_IMAGE);
-                        txtKey = Key.SEARCH_TXT;
-                    } else if (fHeaderState == HeaderState.FILTER) {
-                        item.setImage(FILTER_IMAGE);
-                        txtKey = Key.FILTER_TXT;
-                    }
-                    item.setForeground(fGrayColor);
-                    for (int i = 0; i < fTable.getColumns().length; i++) {
-                        TableColumn column = fTable.getColumns()[i];
-                        String filter = (String) column.getData(txtKey);
-                        if (filter == null) {
-                            if (fHeaderState == HeaderState.SEARCH) {
-                                item.setText(i, SEARCH_HINT);
-                            } else if (fHeaderState == HeaderState.FILTER) {
-                                item.setText(i, FILTER_HINT);
-                            }
-                            item.setForeground(i, fGrayColor);
-                            item.setFont(i, fTable.getFont());
-                        } else {
-                            item.setText(i, filter);
-                            item.setForeground(i, fGreenColor);
-                            item.setFont(i, fBoldFont);
-                        }
-                    }
+                if (event.index == 0) {
+                	setHeaderRowItemData(item);
                     return;
                 }
 
-                // If available, return the cached data  
-                if ((index >= fCacheStartIndex) && (index < fCacheEndIndex)) {
-                    int i = index - fCacheStartIndex;
-                    setItemData(item, fCache[i], index);
-                    return;
-                }
-
-                // If filter is applied, use the filtered event cache
                 if (fTable.getData(Key.FILTER_OBJ) != null) {
-                	setFilteredItemData(item, index);
-                	return;
+                	if (event.index == 1 || event.index == fTable.getItemCount() - 1) {
+                		setFilterStatusRowItemData(item);
+                		return;
+                	}
+                	index = index - 1; // -1 for top filter status row
                 }
-
+                
+                CachedEvent cachedEvent = fCache.getEvent(index);
+                if (cachedEvent != null) {
+                    setItemData(item, cachedEvent.event, cachedEvent.rank);
+                    return;
+                }
+                
                 // Else, fill the cache asynchronously (and off the UI thread)
-                populateCache(index);
                 event.doit = false;
             }
         });
@@ -376,7 +342,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     long rank = (Long) e.data;
                     int index = (int) rank;
                     if (fTable.getData(Key.FILTER_OBJ) != null) {
-                    	index = getFilteredEventIndex(rank) + 1; // +1 for top filter status row
+                    	index = fCache.getFilteredEventIndex(rank) + 1; // +1 for top filter status row
                     }
                     fTable.setSelection(index + 1); // +1 for header row
                     fSelectedRank = rank;
@@ -532,13 +498,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     		subMenu.add(new Action(filter.getFilterName()) {
                     			@Override
                     			public void run() {
-                					synchronized (fFilteredEventCache) {
-                						fFilteredEventCache.clear();
-                						fFilterMatchCount = 0;
-                						fFilterCheckCount = 0;
-                					}
-                					fCacheStartIndex = 0;
-                					fCacheEndIndex = 0;
+                    				stopFilterThread();
+            						fFilterMatchCount = 0;
+            						fFilterCheckCount = 0;
+                					fCache.applyFilter(filter);
             						fTable.clearAll();
             						fTable.setData(Key.FILTER_OBJ, filter);
             						fTable.setItemCount(3); // +1 for header row, +2 for top and bottom filter status rows
@@ -657,43 +620,53 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 			item.setImage((Image) null);
     	}
     }
+
+    protected void setHeaderRowItemData(TableItem item) {
+        String txtKey = null;
+        if (fHeaderState == HeaderState.SEARCH) {
+            item.setImage(SEARCH_IMAGE);
+            txtKey = Key.SEARCH_TXT;
+        } else if (fHeaderState == HeaderState.FILTER) {
+            item.setImage(FILTER_IMAGE);
+            txtKey = Key.FILTER_TXT;
+        }
+        item.setForeground(fGrayColor);
+        for (int i = 0; i < fTable.getColumns().length; i++) {
+            TableColumn column = fTable.getColumns()[i];
+            String filter = (String) column.getData(txtKey);
+            if (filter == null) {
+                if (fHeaderState == HeaderState.SEARCH) {
+                    item.setText(i, SEARCH_HINT);
+                } else if (fHeaderState == HeaderState.FILTER) {
+                    item.setText(i, FILTER_HINT);
+                }
+                item.setForeground(i, fGrayColor);
+                item.setFont(i, fTable.getFont());
+            } else {
+                item.setText(i, filter);
+                item.setForeground(i, fGreenColor);
+                item.setFont(i, fBoldFont);
+            }
+        }
+    }
     
-    protected void setFilteredItemData(final TableItem item, int index) {
-    	synchronized (fFilteredEventCache) {
-			if (index > 0 && --index < fFilteredEventCache.size()) { // top and bottom rows are filter status rows
-				FilteredEvent filteredEvent = fFilteredEventCache.get(index);
-				setItemData(item, filteredEvent.event, filteredEvent.rank);
-				return;
-			}
-			for (int i = 0; i < fTable.getColumns().length; i++) {
-	    		if (i == 0) {
-	    			if (fFilterCheckCount == fTrace.getNbEvents()) {
-	    				item.setImage(FILTER_IMAGE);
-	    			} else {
-	    				item.setImage(STOP_IMAGE);
-	    			}
-	    			item.setText(0, fFilterMatchCount + "/" + fFilterCheckCount); //$NON-NLS-1$
-	    		} else {
-	    			item.setText(i, ""); //$NON-NLS-1$
-	    		}
-	    	}
+    protected void setFilterStatusRowItemData(TableItem item) {
+		for (int i = 0; i < fTable.getColumns().length; i++) {
+    		if (i == 0) {
+    			if (fFilterCheckCount == fTrace.getNbEvents()) {
+    				item.setImage(FILTER_IMAGE);
+    			} else {
+    				item.setImage(STOP_IMAGE);
+    			}
+    			item.setText(0, fFilterMatchCount + "/" + fFilterCheckCount); //$NON-NLS-1$
+    		} else {
+    			item.setText(i, ""); //$NON-NLS-1$
+    		}
     	}
     	item.setData(Key.TIMESTAMP, null);
     	item.setData(Key.RANK, null);
     	item.setForeground(null);
     	item.setBackground(null);
-    }
-    
-    protected int getFilteredEventIndex(long rank) {
-    	synchronized (fFilteredEventCache) {
-	        for (int i = 0; i < fFilteredEventCache.size(); i++) {
-	        	FilteredEvent filteredEvent = fFilteredEventCache.get(i);
-	        	if (filteredEvent.rank >= rank) {
-	        		return i;
-	        	}
-	        }
-    	}
-    	return fFilteredEventCache.size();
     }
     
     protected void createHeaderEditor() {
@@ -854,13 +827,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 						fireSearchApplied(null);
 					}
 				} else if (fHeaderState == HeaderState.FILTER) {
-					synchronized (fFilteredEventCache) {
-						fFilteredEventCache.clear();
-						fFilterMatchCount = 0;
-						fFilterCheckCount = 0;
-					}
-					fCacheStartIndex = 0;
-					fCacheEndIndex = 0;
+					stopFilterThread();
+					fFilterMatchCount = 0;
+					fFilterCheckCount = 0;
 					TmfFilterAndNode filter = new TmfFilterAndNode(null);
 					for (TableColumn column : fTable.getColumns()) {
 						Object filterObj = column.getData(Key.FILTER_OBJ);
@@ -869,12 +838,14 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 						}
 					}
 					if (filter.getChildrenCount() > 0) {
+						fCache.applyFilter(filter);
 						fTable.clearAll();
 						fTable.setData(Key.FILTER_OBJ, filter);
 						fTable.setItemCount(3); // +1 for header row, +2 for top and bottom filter status rows
 						startFilterThread();
 						fireFilterApplied(filter);
 					} else {
+						fCache.clearFilter();
 						stopFilterThread();
 						fTable.clearAll();
 						fTable.setData(Key.FILTER_OBJ, null);
@@ -955,13 +926,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 		if (fTable.getData(Key.FILTER_OBJ) == null) {
 			return;
 		}
-		long selectedRank = -1;
-		synchronized (fFilteredEventCache) {
-			int selectedIndex = fTable.getSelectionIndex() - 2; // -1 for header row, -1 for top filter status row
-			if (selectedIndex >= 0 && selectedIndex < fFilteredEventCache.size()) {
-				selectedRank = fFilteredEventCache.get(selectedIndex).rank;
-			}
-		}
+		fCache.clearFilter();
 		fTable.clearAll();
 		for (TableColumn column : fTable.getColumns()) {
 			column.setData(Key.FILTER_OBJ, null);
@@ -969,13 +934,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 		}
 		fTable.setData(Key.FILTER_OBJ, null);
         fTable.setItemCount((int) fTrace.getNbEvents() + 1); // +1 for header row
-		synchronized (fFilteredEventCache) {
-			fFilteredEventCache.clear();
-			fFilterMatchCount = 0;
-			fFilterCheckCount = 0;
-		}
-		if (selectedRank >= 0) {
-			fTable.setSelection((int) selectedRank + 1); // +1 for header row
+		fFilterMatchCount = 0;
+		fFilterCheckCount = 0;
+		if (fSelectedRank >= 0) {
+			fTable.setSelection((int) fSelectedRank + 1); // +1 for header row
 		} else {
 			fTable.setSelection(0);
 		}
@@ -984,8 +946,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     
     protected class FilterThread extends Thread {
     	private final ITmfFilterTreeNode filter;
-    	private TmfDataRequest<TmfEvent> request;
-    	private long lastRefreshTime;
+    	private TmfEventRequest<TmfEvent> request;
+        private boolean refreshBusy = false;
+        private boolean refreshPending = false;
+        private Object syncObj = new Object();
 
     	public FilterThread(ITmfFilterTreeNode filter) {
     		super("Filter Thread"); //$NON-NLS-1$
@@ -995,42 +959,21 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     	@SuppressWarnings("unchecked")
     	@Override
     	public void run() {
-    		final Display display = Display.getDefault();
-    		lastRefreshTime = System.currentTimeMillis();
-
-    		request = new TmfDataRequest<TmfEvent>(TmfEvent.class, 0, Integer.MAX_VALUE, ExecutionType.BACKGROUND) {
+    		request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity, TmfDataRequest.ALL_DATA, fTrace.getCacheSize(), ExecutionType.BACKGROUND) {
     			@Override
     			public void handleData(TmfEvent event) {
     				super.handleData(event);
-    				fFilterCheckCount++;
+					if (request.isCancelled()) return;
     				if (filter.matches(event)) {
-    					synchronized (fFilteredEventCache) {
-    						fFilteredEventCache.add(new FilteredEvent(event.clone(), getNbRead() - 1));
-    						fFilterMatchCount++;
-    					}
-    					display.asyncExec(new Runnable() {
-    						@Override
-    						public void run() {
-    							if (request.isCancelled()) return;
-    							if (fTable.isDisposed()) return;
-    							fTable.setItemCount(fFilteredEventCache.size() + 3); // +1 for header row, +2 for top and bottom filter status rows
-    						}
-    					});
+    					long rank = fFilterCheckCount;
+    					int index = (int) fFilterMatchCount;
+						fFilterMatchCount++;
+						fCache.storeEvent(event.clone(), rank, index);
+						refreshTable();
+    				} else if (fFilterCheckCount % 100 == 0) {
+    					refreshTable();
     				}
-    				if (fFilterCheckCount % 100 == 0) {
-    					long currentTime = System.currentTimeMillis();
-    					if (currentTime - lastRefreshTime > 1000) {
-    						lastRefreshTime = currentTime;
-    						display.asyncExec(new Runnable() {
-    							@Override
-    							public void run() {
-    								if (request.isCancelled()) return;
-    								if (fTable.isDisposed()) return;
-    								fTable.refresh();
-    							}
-    						});
-    					}
-    				}
+    				fFilterCheckCount++;
     			}
     		};
     		((ITmfDataProvider<TmfEvent>) fTrace).sendRequest(request);
@@ -1038,13 +981,34 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     			request.waitForCompletion();
     		} catch (InterruptedException e) {
     		}
-    		display.asyncExec(new Runnable() {
-    			@Override
-    			public void run() {
-    				if (fTable.isDisposed()) return;
-    				fTable.refresh();
-    			}
-    		});
+    		refreshTable();
+    	}
+    	
+    	public void refreshTable() {
+	        synchronized (syncObj) {
+	        	if (refreshBusy) {
+	        		refreshPending = true;
+	        		return;
+	        	} else {
+	        		refreshBusy = true;
+	        	}
+	        }
+	        Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (request.isCancelled()) return;
+					if (fTable.isDisposed()) return;
+					fTable.setItemCount((int) fFilterMatchCount + 3); // +1 for header row, +2 for top and bottom filter status rows
+					fTable.refresh();
+	                synchronized (syncObj) {
+	                	refreshBusy = false;
+	                	if (refreshPending) {
+	                		refreshPending = false;
+	                		refreshTable();
+	                	}
+	                }
+				}
+			});
     	}
 
     	public void cancel() {
@@ -1057,8 +1021,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 			if (fSearchThread != null) {
 				return;
 			}
-	    	final ITmfFilterTreeNode filter = (ITmfFilterTreeNode) fTable.getData(Key.SEARCH_OBJ);
-	    	if (filter == null) {
+	    	final ITmfFilterTreeNode searchFilter = (ITmfFilterTreeNode) fTable.getData(Key.SEARCH_OBJ);
+	    	if (searchFilter == null) {
 	    		return;
 	    	}
 	    	int selectionIndex = fTable.getSelectionIndex();
@@ -1069,11 +1033,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 				// header row is selected, start at top event
 				startIndex = Math.max(0, fTable.getTopIndex() - 1); // -1 for header row
 			}
-			if (fTable.getData(Key.FILTER_OBJ) != null) {
-				fSearchThread = new SearchFilteredThread(filter, Math.max(0, startIndex - 1), Direction.FORWARD); // -1 for top filter status row
-			} else {
-				fSearchThread = new SearchThread(filter, startIndex, Direction.FORWARD);
+			final ITmfFilterTreeNode eventFilter = (ITmfFilterTreeNode) fTable.getData(Key.FILTER_OBJ);
+			if (eventFilter != null) {
+				startIndex = Math.max(0, startIndex - 1); // -1 for top filter status row
 			}
+			fSearchThread = new SearchThread(searchFilter, eventFilter, startIndex, fSelectedRank, Direction.FORWARD);
 			fSearchThread.schedule();
 		}
     }
@@ -1083,8 +1047,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 			if (fSearchThread != null) {
 				return;
 			}
-	    	final ITmfFilterTreeNode filter = (ITmfFilterTreeNode) fTable.getData(Key.SEARCH_OBJ);
-	    	if (filter == null) {
+	    	final ITmfFilterTreeNode searchFilter = (ITmfFilterTreeNode) fTable.getData(Key.SEARCH_OBJ);
+	    	if (searchFilter == null) {
 	    		return;
 	    	}
 	    	int selectionIndex = fTable.getSelectionIndex();
@@ -1095,11 +1059,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 				// header row is selected, start at precedent of top event
 				startIndex = fTable.getTopIndex() - 2; // -1 for header row, -1 for previous event
 			}
-			if (fTable.getData(Key.FILTER_OBJ) != null) {
-				fSearchThread = new SearchFilteredThread(filter, startIndex - 1, Direction.BACKWARD); // -1 for top filter status row
-			} else {
-				fSearchThread = new SearchThread(filter, startIndex, Direction.BACKWARD);
+			final ITmfFilterTreeNode eventFilter = (ITmfFilterTreeNode) fTable.getData(Key.FILTER_OBJ);
+			if (eventFilter != null) {
+				startIndex = startIndex - 1; // -1 for top filter status row
 			}
+			fSearchThread = new SearchThread(searchFilter, eventFilter, startIndex, fSelectedRank, Direction.BACKWARD);
 			fSearchThread.schedule();
 		}
     }
@@ -1115,16 +1079,20 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
     
     protected class SearchThread extends Job {
-    	protected ITmfFilterTreeNode filter;
-    	protected long startRank;
+    	protected ITmfFilterTreeNode searchFilter;
+    	protected ITmfFilterTreeNode eventFilter;
+    	protected int startIndex;
     	protected int direction;
-    	protected long rank = -1;
+    	protected long rank;
+    	protected long foundRank = -1;
     	protected TmfDataRequest<TmfEvent> request;
 
-    	public SearchThread(ITmfFilterTreeNode filter, int startIndex, int direction) {
+    	public SearchThread(ITmfFilterTreeNode searchFilter, ITmfFilterTreeNode eventFilter, int startIndex, long currentRank, int direction) {
     		super(Messages.TmfEventsTable_SearchingJobName);
-    		this.filter = filter;
-    		this.startRank = startIndex;
+    		this.searchFilter = searchFilter;
+    		this.eventFilter = eventFilter;
+    		this.startIndex = startIndex;
+    		this.rank = currentRank;
     		this.direction = direction;
     	}
 
@@ -1132,22 +1100,62 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     	@Override
     	protected IStatus run(final IProgressMonitor monitor) {
     		final Display display = Display.getDefault();
-    		if (startRank < 0) {
-    			startRank = fTrace.getNbEvents() - 1;
-    		} else if (startRank > fTrace.getNbEvents() - 1) {
-    			startRank = 0;
+    		if (startIndex < 0) {
+    			rank = (int) fTrace.getNbEvents() - 1;
+    		} else if (startIndex >= fTable.getItemCount() - (eventFilter == null ? 1 : 3)) { // -1 for header row, -2 for top and bottom filter status rows
+    			rank = 0;
+    		} else {
+        		int idx = startIndex;
+        		while (foundRank == -1) {
+        			CachedEvent event = fCache.peekEvent(idx);
+        			if (event == null) {
+        				break;
+        			}
+        			rank = event.rank;
+        			if (searchFilter.matches(event.event) && (eventFilter == null || eventFilter.matches(event.event))) {
+        				foundRank = event.rank;
+        				break;
+        			}
+        			if (direction == Direction.FORWARD) {
+        				idx++;
+        			} else {
+        				idx--;
+        			}
+        		}
+        		if (foundRank == -1) {
+        			if (direction == Direction.FORWARD) {
+        				rank++;
+        				if (rank > fTrace.getNbEvents() - 1) {
+        	    			rank = 0;
+        				}
+        			} else {
+        				rank--;
+        				if (rank < 0) {
+        	    			rank = (int) fTrace.getNbEvents() - 1;
+        				}
+        			}
+        		}
     		}
-    		int startIndex = (int) startRank;
-    		int nbRequested = (direction == Direction.FORWARD ? Integer.MAX_VALUE : 1);
-    		while (!monitor.isCanceled() && rank == -1) {
-    			request = new TmfDataRequest<TmfEvent>(TmfEvent.class, startIndex, nbRequested) {
+    		int startRank = (int) rank;
+    		boolean wrapped = false;
+    		while (!monitor.isCanceled() && foundRank == -1) {
+    			int nbRequested = (direction == Direction.FORWARD ? Integer.MAX_VALUE : Math.min((int) rank + 1, fTrace.getCacheSize()));
+    			if (direction == Direction.BACKWARD) {
+    				rank = Math.max(0, rank - fTrace.getCacheSize() + 1);
+    			}
+    			request = new TmfDataRequest<TmfEvent>(TmfEvent.class, (int) rank, nbRequested) {
+    				long currentRank = rank;
     				@Override
     				public void handleData(TmfEvent event) {
     					super.handleData(event);
-    					if (filter.matches(event)) {
-    						rank = startRank + getNbRead() - 1;
-    						done();
+    					if (searchFilter.matches(event) && (eventFilter == null || eventFilter.matches(event))) {
+    						foundRank = currentRank;
+    						if (direction == Direction.FORWARD) {
+        						done();
+        						return;
+    						}
     					}
+    					currentRank++;
     				}
     			};
     			((ITmfDataProvider<TmfEvent>) fTrace).sendRequest(request);
@@ -1157,28 +1165,43 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     					return Status.OK_STATUS;
     				}
     			} catch (InterruptedException e) {
+    				synchronized (fSearchSyncObj) {
+    					fSearchThread = null;
+    				}
     				return Status.OK_STATUS;
     			}
-    			if (rank == -1) {
+    			if (foundRank == -1) {
     				if (direction == Direction.FORWARD) {
-    					if (startIndex == 0) {
+    					if (rank == 0) {
+    	    				synchronized (fSearchSyncObj) {
+    	    					fSearchThread = null;
+    	    				}
     						return Status.OK_STATUS;
     					} else {
-    						nbRequested = startIndex;
-    						startIndex = 0;
+    						nbRequested = (int) rank;
+    						rank = 0;
+    						wrapped = true;
     					}
     				} else {
-    					startIndex--;
-    					if (startIndex < 0) {
-    						startIndex = (int) fTrace.getNbEvents() - 1;
+    					rank--;
+    					if (rank < 0) {
+    						rank = (int) fTrace.getNbEvents() - 1;
+    						wrapped = true;
     					}
-    					if (startIndex == startRank) {
+    					if (rank <= startRank && wrapped) {
+    	    				synchronized (fSearchSyncObj) {
+    	    					fSearchThread = null;
+    	    				}
     						return Status.OK_STATUS;
     					}
     				}
     			}
     		}
-    		final int selection = (int) rank + 1; // +1 for header row
+    		int index = (int) foundRank;
+    		if (eventFilter != null) {
+    			index = fCache.getFilteredEventIndex(foundRank);
+    		}
+    		final int selection = (int) index + 1 + (eventFilter != null ? +1 : 0); // +1 for header row, +1 for top filter status row
 
     		display.asyncExec(new Runnable() {
     			@Override
@@ -1186,6 +1209,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     				if (monitor.isCanceled()) return;
     				if (fTable.isDisposed()) return;
     				fTable.setSelection(selection);
+    				fSelectedRank = foundRank;
     				synchronized (fSearchSyncObj) {
     					fSearchThread = null;
     				}
@@ -1197,75 +1221,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     	@Override
     	protected void canceling() {
     		request.cancel();
+			synchronized (fSearchSyncObj) {
+				fSearchThread = null;
+			}
     	}
     }
 
-    protected class SearchFilteredThread extends SearchThread {
-
-		public SearchFilteredThread(ITmfFilterTreeNode filter, int startIndex, int direction) {
-			super(filter, startIndex, direction);
-		}
-    	
-		@Override
-		protected IStatus run(final IProgressMonitor monitor) {
-			final Display display = Display.getDefault();
-			if (fFilteredEventCache.size() == 0) {
-				return Status.OK_STATUS;
-			}
-			if (startRank < 0) {
-				startRank = fFilteredEventCache.size() - 1;
-			}
-			int index = (int) startRank;
-			if (direction == Direction.FORWARD) {
-    			if (index >= fFilteredEventCache.size()) {
-    				index = 0;
-    			}
-			} else {
-				if (index < 0) {
-					index = fFilteredEventCache.size() - 1;
-				}
-			}
-			TmfEvent event = null;
-			while (!monitor.isCanceled()) {
-				event = fFilteredEventCache.get(index).event;
-				if (filter.matches(event)) {
-					break;
-				}
-				if (direction == Direction.FORWARD) {
-    				index++;
-    				if (index == startRank) {
-    					return Status.OK_STATUS;
-    				}
-    				if (index >= fFilteredEventCache.size()) {
-    					index = 0;
-    				}
-				} else {
-    				index--;
-    				if (index == startRank) {
-    					return Status.OK_STATUS;
-    				}
-    				if (index < 0) {
-    					index = fFilteredEventCache.size() - 1;
-    				}
-				}
-			}
-			final int selection = (int) index + 2; // +1 for header row, +1 for top filter status row
-			
-			display.asyncExec(new Runnable() {
-				@Override
-                public void run() {
-					if (monitor.isCanceled()) return;
-					if (fTable.isDisposed()) return;
-					fTable.setSelection(selection);
-					synchronized (fSearchSyncObj) {
-						fSearchThread = null;
-					}
-				}
-			});
-			return Status.OK_STATUS;
-		}
-    }
-    
     protected void createResources() {
     	fGrayColor = fResourceManager.createColor(ColorUtil.blend(fTable.getBackground().getRGB(), fTable.getForeground().getRGB()));
     	fGreenColor = fTable.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN);
@@ -1338,7 +1299,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 	column.setData(Key.SEARCH_OBJ, null);
                 	column.setData(Key.SEARCH_TXT, null);
                 }
-                fCacheStartIndex = fCacheEndIndex = 0; // Clear the cache
+                fCache.setTrace(fTrace); // Clear the cache
                 if (fTrace != null) {
                     if (!fTable.isDisposed() && fTrace != null) {
                         fTable.setItemCount((int) fTrace.getNbEvents() + 1); // +1 for header row
@@ -1350,92 +1311,43 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
 
     // ------------------------------------------------------------------------
-    // Event cache population
+    // Event cache
     // ------------------------------------------------------------------------
-    
-    // The event fetching job
-    private Job job;
-    private synchronized void populateCache(final int index) {
 
-        /* Check if the current job will fetch the requested event:
-         * 1. The job must exist
-         * 2. It must be running (i.e. not completed)
-         * 3. The requested index must be within the cache range
-         * 
-         * If the job meets these conditions, we simply exit.
-         * Otherwise, we create a new job but we might have to cancel
-         * an existing job for an obsolete range.
-         */
-        if (job != null) {
-            if (job.getState() != Job.NONE) {
-                if (index >= fCacheStartIndex && index < (fCacheStartIndex + fCacheSize)) {
-                    return;
-                }
-                // The new index is out of the requested range
-                // Kill the job and start a new one
-                job.cancel();
-            }
+    public void cacheUpdated(final boolean completed) {
+        synchronized (fCacheUpdateSyncObj) {
+        	if (fCacheUpdateBusy) {
+        		fCacheUpdatePending = true;
+        		fCacheUpdateCompleted = completed;
+        		return;
+        	} else {
+        		fCacheUpdateBusy = true;
+        	}
         }
-        
-        fCacheStartIndex = index;
-        fCacheEndIndex   = index;
-
-        job = new Job("Fetching Events") { //$NON-NLS-1$
-            @Override
-            @SuppressWarnings("unchecked")
-            protected IStatus run(final IProgressMonitor monitor) {
-
-                TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(TmfEvent.class, index, fCacheSize) {
-                    private int count = 0;
-                    @Override
-                    public void handleData(TmfEvent event) {
-                        // If the job is canceled, cancel the request so waitForCompletion() will unlock
-                        if (monitor.isCanceled()) {
-                            cancel();
-                            return;
-                        }
-                        super.handleData(event);
-                        if (event != null) {
-                            fCache[count++] = event.clone();
-                            fCacheEndIndex++;   // TODO: Need to protect this??
-                        }
+    	// Event cache is now updated. Perform update on the UI thread
+        if (!fTable.isDisposed()) {
+            fTable.getDisplay().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    if (!fTable.isDisposed()) {
+                        fTable.refresh();
+                        packColumns();
                     }
-                };
-
-                ((ITmfDataProvider<TmfEvent>) fTrace).sendRequest(request);
-                try {
-                    request.waitForCompletion();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    if (completed) {
+                    	populateCompleted();
+                    }
+	                synchronized (fCacheUpdateSyncObj) {
+	                	fCacheUpdateBusy = false;
+	                	if (fCacheUpdatePending) {
+	                		fCacheUpdatePending = false;
+	                		cacheUpdated(fCacheUpdateCompleted);
+	                	}
+	                }
                 }
-
-                // Event cache is now updated. Perform update on the UI thread
-                if (!fTable.isDisposed() && !monitor.isCanceled()) {
-                    fTable.getDisplay().asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!fTable.isDisposed()) {
-                                fTable.refresh();
-                                packColumns();
-                            }
-                            populateCompleted();
-                        }
-                    });
-                }
-                
-                // Flag the UI thread that the cache is ready
-                if (monitor.isCanceled()) {
-                	return Status.CANCEL_STATUS;
-                } else {
-                    return Status.OK_STATUS;
-                }
-            }
-        };
-        //job.setSystem(true);
-        job.setPriority(Job.SHORT);
-        job.schedule();
+            });
+        }
     }
-
+    
     protected void populateCompleted() {
     	// Nothing by default;
     }
@@ -1533,7 +1445,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         if (rank != -1) {
         	int index = (int) rank;
         	if (fTable.getData(Key.FILTER_OBJ) != null) {
-            	index = getFilteredEventIndex(rank) + 1; //+1 for top filter status row
+            	index = fCache.getFilteredEventIndex(rank) + 1; //+1 for top filter status row
         	} else if (rank >= fTable.getItemCount()) {
         		fPendingGotoRank = rank;
         	}
@@ -1674,7 +1586,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             int index = (int) rank;
                             if (fTable.isDisposed()) return;
                             if (fTable.getData(Key.FILTER_OBJ) != null) {
-                            	index = getFilteredEventIndex(rank) + 1; //+1 for top filter status row
+                            	index = fCache.getFilteredEventIndex(rank) + 1; //+1 for top filter status row
                             }
                             fTable.setSelection(index + 1); // +1 for header row
                             fRawViewer.selectAndReveal(rank);

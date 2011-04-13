@@ -73,6 +73,9 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
     private ArrayList<DecorateThread> fDecorateThreads;
     private long fStartTime = 0;
     private long fStopTime = Long.MAX_VALUE;
+    private boolean fRefreshBusy = false;
+    private boolean fRefreshPending = false;
+    private Object fSyncObj = new Object();
 
     public TimeChartView() {
         super("Time Chart"); //$NON-NLS-1$
@@ -205,16 +208,30 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
         if (fComposite == null) {
             return;
         }
+        synchronized (fSyncObj) {
+        	if (fRefreshBusy) {
+        		fRefreshPending = true;
+        		return;
+        	} else {
+        		fRefreshBusy = true;
+        	}
+        }
         final boolean reset = resetTimeIntervals;
         // Perform the refresh on the UI thread
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                if (!fComposite.isDisposed()) {
-                    fViewer.display(fTimeAnalysisEntries.toArray(new TimeChartAnalysisEntry[0]));
-                    if (reset) {
-                        fViewer.resetStartFinishTime();
-                    }
+                if (fComposite.isDisposed()) return;
+                fViewer.display(fTimeAnalysisEntries.toArray(new TimeChartAnalysisEntry[0]));
+                if (reset) {
+                    fViewer.resetStartFinishTime();
+                }
+                synchronized (fSyncObj) {
+                	fRefreshBusy = false;
+                	if (fRefreshPending) {
+                		fRefreshPending = false;
+                		refreshViewer(reset);
+                	}
                 }
             }
         });
