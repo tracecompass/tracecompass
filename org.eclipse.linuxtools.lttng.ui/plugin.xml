@@ -6,7 +6,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="org.eclipse.linuxtools.lttng.ui.views.PerspectiveFactory"
-            icon="icons/garland16.png"
+            icon="icons/obj16/garland16.png"
             id="org.eclipse.linuxtools.lttng.ui.perspective"
             name="%perspective.category.name">
       </perspective>
@@ -22,7 +22,7 @@
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng.ui.views.category"
             class="org.eclipse.linuxtools.lttng.ui.views.project.ProjectView"
-            icon="icons/project_view.gif"
+            icon="icons/eview16/project_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.project"
             name="%project.view.name"
             restorable="true">
@@ -31,7 +31,7 @@
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng.ui.views.category"
             class="org.eclipse.linuxtools.lttng.ui.views.control.ControlView"
-            icon="icons/control_view.gif"
+            icon="icons/eview16/control_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.control"
             name="%control.view.name"
             restorable="true">
@@ -40,7 +40,7 @@
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng.ui.views.category"
             class="org.eclipse.linuxtools.lttng.ui.views.events.EventsView"
-            icon="icons/events_view.gif"
+            icon="icons/eview16/events_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.events"
             name="%events.view.name"
             restorable="true">
@@ -49,7 +49,7 @@
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng.ui.views.category"
             class="org.eclipse.linuxtools.lttng.ui.views.timeframe.TimeFrameView"
-            icon="icons/time_frame_view.gif"
+            icon="icons/eview16/time_frame_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.timeframe"
             name="%timeframe.view.name"
             restorable="true">
@@ -58,7 +58,7 @@
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng.ui.views.category"
             class="org.eclipse.linuxtools.lttng.ui.views.controlflow.ControlFlowView"
-            icon="icons/control_flow_view.gif"
+            icon="icons/eview16/control_flow_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.controlflow"
             name="%controlflow.view.name"
             restorable="true">
@@ -67,7 +67,7 @@
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng.ui.views.category"
             class="org.eclipse.linuxtools.lttng.ui.views.resources.ResourcesView"
-            icon="icons/resources_view.gif"
+            icon="icons/eview16/resources_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.resources"
             name="%resources.view.name"
             restorable="true">
@@ -76,7 +76,7 @@
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng.ui.views.category"
             class="org.eclipse.linuxtools.lttng.ui.views.statistics.StatisticsView"
-            icon="icons/statistics_view.gif"
+            icon="icons/eview16/statistics_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.statistics"
             name="%statistics.view.name"
             restorable="true">
@@ -85,7 +85,7 @@
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng.ui.views.category"
             class="org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramView"
-            icon="icons/histogram.gif"
+            icon="icons/eview16/histogram.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.histogram"
             name="%histogram.view.name"
             restorable="true">
@@ -100,9 +100,9 @@
       <wizard
             category="org.eclipse.linuxtools.lttng.ui.wizards.new"
             class="org.eclipse.linuxtools.lttng.ui.views.project.dialogs.NewProjectWizard"
-            descriptionImage="icons/garland16.png"
+            descriptionImage="icons/obj16/garland16.png"
             finalPerspective="org.eclipse.linuxtools.lttng.ui.perspective"
-            icon="icons/garland16.png"
+            icon="icons/obj16/garland16.png"
             id="org.eclipse.linuxtools.lttng.ui.views.ui.wizards.newProject"
             name="%project.new.wizard.name"
             project="true">
@@ -245,7 +245,7 @@
             locationURI="popup:org.eclipse.linuxtools.lttng.ui.views.project?after=additions">
          <command
                commandId="org.eclipse.linuxtools.lttng.ui.command.project.new"
-               icon="icons/garland16.png"
+               icon="icons/obj16/garland16.png"
                id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.new"
                label="%commands.project.new"
                style="push">
@@ -411,6 +411,304 @@
             class="org.eclipse.linuxtools.lttng.ui.views.project.handlers.RefreshHandler"
             commandId="org.eclipse.linuxtools.lttng.ui.command.project.refresh">
       </handler>
+   </extension>
+
+    <!-- ======================================= -->
+    <!-- SubSystem Configuration                 -->
+    <!-- ======================================= -->
+    <extension point="org.eclipse.rse.core.subsystemConfigurations">
+        <configuration
+              category="users"
+              class="org.eclipse.linuxtools.lttng.ui.tracecontrol.subsystems.TraceSubSystemConfiguration"
+              description="%lttng.rse.subsystem.config.description"
+              icon="icons/obj16/garland16.gif"
+              iconlive="icons/obj16/garland16-live.gif"
+              id="org.eclipse.linuxtools.lttng.ui.tracecontrol.subsystems.TraceSubSystemConfiguration"
+              name="%lttng.rse.subsystem.config.name"
+              systemTypeIds="org.eclipse.tm.tcf.rse.systemType"
+              vendor="%Bundle-Vendor">
+        </configuration>
+   </extension>
+
+   <!-- ======================================= -->
+   <!-- SubSystem Type Description              -->
+   <!-- ======================================= -->
+    <extension
+          point="org.eclipse.rse.core.systemTypes">
+       <systemType
+             description="%lttng.rse.subsystem.type.description"
+             icon="icons/obj16/systemlttng.gif"
+             iconLive="icons/obj16/systemlttng-live.gif"
+             id="org.eclipse.linuxtools.lttng.ui.tracecontrol.systemType"
+             label="%lttng.rse.subsystem.type.name"
+             name="org.eclipse.linuxtools.lttng.ui.tracecontrol.systemType"
+             subsystemConfigurationIds="org.eclipse.linuxtools.lttng.ui.tracecontrol.subsystems.TraceSubSystemConfiguration;org.eclipse.tm.tcf.rse.Processes;org.eclipse.tm.tcf.rse.Shells;org.eclipse.tm.tcf.rse.Files;org.eclipse.tm.tcf.rse.Terminals">
+       </systemType>
+    </extension>
+     
+   <!-- ======================================= -->
+   <!-- Remote Object Popup Menu Actions        -->
+   <!-- ======================================= -->
+   <extension point="org.eclipse.ui.popupMenus">
+       <objectContribution
+             id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.deletetrace"
+             objectClass="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+          <action
+                class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.DeleteTrace"
+                enablesFor="*"
+                icon="icons/elcl16/delete_trace.gif"
+                id="actions.trace.delete"
+                label="%action.delete.label"
+                menubarPath="additions"
+                tooltip="%action.delete.tooltip">
+             <enablement>
+                <and>
+                   <objectClass
+                         name="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+                   </objectClass>
+                   <objectState
+                         name="canDelete"
+                         value="yes">
+                   </objectState>
+                </and>
+             </enablement>
+          </action>
+       </objectContribution>
+       <objectContribution
+             adaptable="false"
+             id="org.eclipse.linuxtools.lttng.ui.tracecontrol.importtrace"
+             objectClass="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+          <action
+                class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.ImportToProject"
+                enablesFor="*"
+                icon="icons/elcl16/import_trace.gif"
+                id="org.eclipse.linuxtools.lttng.ui.tracecontrol.action1"
+                label="%action.import.label"
+                menubarPath="additions"
+                tooltip="%action.import.tooltip">
+             <enablement>
+                <and>
+                   <objectClass
+                         name="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+                   </objectClass>
+                   <objectState
+                         name="canImport"
+                         value="yes">
+                   </objectState>
+                </and>
+             </enablement>
+          </action>
+       </objectContribution>
+      <objectContribution
+               id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.createnewtrace"
+               objectClass="org.eclipse.linuxtools.lttng.tracecontrol.model.TargetResource">
+            <action
+                   label="%action.newtrace.label"
+                   tooltip="%action.newtrace.tooltip"
+                   icon="icons/elcl16/new_trace.gif"
+                   class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.CreateNewTrace"
+                   menubarPath="additions"
+                   enablesFor="1"
+                   id="actions.trace.new">
+            <enablement>
+             <and>
+              <objectClass name="org.eclipse.linuxtools.lttng.tracecontrol.model.TargetResource"/> 
+              <objectState name="canCreateNewTrace" value="yes"/> 
+             </and>
+            </enablement> 
+           </action>
+       </objectContribution>
+       <objectContribution
+               objectClass="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource"
+               id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.configuretrace">
+           <action
+                   label="%action.configuretrace.label"
+                   tooltip="%action.configuretrace.tooltip"
+                   icon="icons/elcl16/configure_trace.gif"
+                   class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.ConfigureTrace"
+                   menubarPath="additions"
+                   enablesFor="1"
+                   id="actions.trace.configure">
+            <enablement>
+             <and>
+              <objectClass name="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource"/> 
+              <objectState name="canConfigure" value="yes"/> 
+             </and>
+            </enablement> 
+           </action>
+       </objectContribution>
+       <objectContribution
+             id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.stoptrace"
+             objectClass="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+          <action
+                class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.StopTrace"
+                enablesFor="*"
+                icon="icons/elcl16/stop_trace.gif"
+                id="actions.trace.stop"
+                label="%action.stop.label"
+                menubarPath="additions"
+                tooltip="%action.stop.tooltip">
+             <enablement>
+                <and>
+                   <objectClass
+                         name="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+                   </objectClass>
+                   <objectState
+                         name="canStop"
+                         value="yes">
+                   </objectState>
+                </and>
+             </enablement>
+          </action>
+       </objectContribution>
+       <objectContribution
+             id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.pausetrace"
+             objectClass="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+          <action
+                class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.PauseTrace"
+                enablesFor="*"
+                icon="icons/elcl16/pause_trace.gif"
+                id="actions.trace.pause"
+                label="%action.pause.label"
+                menubarPath="additions"
+                tooltip="%action.puase.tooltip">
+             <enablement>
+                <and>
+                   <objectClass
+                         name="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+                   </objectClass>
+                   <objectState
+                         name="canPause"
+                         value="yes">
+                   </objectState>
+                </and>
+             </enablement>
+          </action>
+       </objectContribution>
+       <objectContribution
+               objectClass="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource"
+               id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.starttrace">
+           <action
+                 class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.StartTrace"
+                 enablesFor="*"
+                 icon="icons/elcl16/start_trace.gif"
+                 id="actions.trace.start"
+                 label="%action.start.label"
+                 menubarPath="additions"
+                 tooltip="%action.start.tooltip">
+            <enablement>
+             <and>
+              <objectClass name="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource"/> 
+              <objectState name="canStart" value="yes"/> 
+             </and>
+            </enablement> 
+           </action>
+       </objectContribution>
+       
+       <objectContribution
+               objectClass="org.eclipse.linuxtools.lttng.tracecontrol.model.TargetResource"
+               id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.configuremarkers">
+           <action
+                   label="%action.configuremarkers.label"
+                   tooltip="%action.configuremarkers.tooltip"
+                   icon="icons/elcl16/configure_markers.gif"
+                   class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.ConfigureMarkers"
+                   menubarPath="additions"
+                   enablesFor="1"
+                   id="actions.markers.configure">
+           </action>
+       </objectContribution>
+
+    </extension>
+    
+   <!-- ======================================= -->
+   <!-- Remote System View Contributions        -->
+   <!-- ======================================= -->
+   <extension
+         point="org.eclipse.ui.viewActions">
+         
+         
+      <viewContribution
+            id="org.eclipse.linuxtools.lttng.ui.tracecontrol.viewContribution.stop"
+            targetID="org.eclipse.rse.ui.view.systemView">
+         <action
+               class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.StopTrace"
+               enablesFor="*"
+               icon="icons/elcl16/stop_trace.gif"
+               id="actions.trace.stop"
+               label="%action.stop.label"
+               menubarPath="additions"
+               style="push"
+               toolbarPath="additions"
+               tooltip="%action.stop.tooltip">
+            <enablement>
+               <and>
+                  <objectClass
+                        name="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+                  </objectClass>
+                  <objectState
+                        name="canStop"
+                        value="yes">
+                  </objectState>
+               </and>
+            </enablement>
+         </action>
+      </viewContribution>
+      
+      <viewContribution
+            id="org.eclipse.linuxtools.lttng.ui.tracecontrol.viewContribution.pause"
+            targetID="org.eclipse.rse.ui.view.systemView">
+         <action
+               class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.PauseTrace"
+               enablesFor="*"
+               icon="icons/elcl16/pause_trace.gif"
+               id="actions.trace.pause"
+               label="%action.pause.label"
+               menubarPath="additions"
+               style="push"
+               toolbarPath="additions"
+               tooltip="%action.pause.tooltip">
+             <enablement>
+                <and>
+                   <objectClass
+                         name="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+                   </objectClass>
+                   <objectState
+                         name="canPause"
+                         value="yes">
+                   </objectState>
+                </and>
+             </enablement>
+         </action>
+      </viewContribution>
+      
+      <viewContribution
+            id="org.eclipse.linuxtools.lttng.ui.tracecontrol.viewContribution.start"
+            targetID="org.eclipse.rse.ui.view.systemView">
+         <action
+               class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.StartTrace"
+               enablesFor="*"
+               icon="icons/elcl16/start_trace.gif"
+               id="actions.trace.start"
+               label="%action.start.label"
+               menubarPath="additions"
+               style="push"
+               toolbarPath="additions"
+               tooltip="%action.start.tooltip">
+            <enablement>
+               <and>
+                  <objectClass
+                        name="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+                  </objectClass>
+                  <objectState
+                        name="canStart"
+                        value="yes">
+                  </objectState>
+               </and>
+            </enablement>
+         </action>
+      </viewContribution>
+     
    </extension>
 
 </plugin>

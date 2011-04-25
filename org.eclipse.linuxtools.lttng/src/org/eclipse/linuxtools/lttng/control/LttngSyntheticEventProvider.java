@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import org.eclipse.linuxtools.lttng.LttngConstants;
 import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.event.LttngEventType;

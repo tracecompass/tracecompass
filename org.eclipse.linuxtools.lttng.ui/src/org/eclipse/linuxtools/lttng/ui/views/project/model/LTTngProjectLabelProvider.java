@@ -30,8 +30,8 @@ import org.eclipse.ui.PlatformUI;
  */
 public class LTTngProjectLabelProvider implements ILabelProvider {
 
-	private final String fTraceIconFile      = "icons/garland16.png"; //$NON-NLS-1$
-//	private final String fExperimentIconFile = "icons/garland16.png"; //$NON-NLS-1$
+	private final String fTraceIconFile      = "icons/obj16/garland16.png"; //$NON-NLS-1$
+//	private final String fExperimentIconFile = "icons/obj16/garland16.png"; //$NON-NLS-1$
 
 	private final Image fOpenedProjectIcon;
 	private final Image fClosedProjectIcon;

@@ -24,7 +24,6 @@ import org.eclipse.linuxtools.lttng.state.StateStrings.SoftIRQMode;
 import org.eclipse.linuxtools.lttng.state.StateStrings.TrapMode;
 import org.eclipse.linuxtools.lttng.ui.views.common.ParamsUpdater;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider.StateColor;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
 
@@ -237,6 +236,6 @@ public class TimeRangeViewerProvider extends TmfTimeAnalysisProvider {
 				return key;
 			}
 		}
-		return "Not Found";
+		return "Not Found"; //$NON-NLS-1$
 	}
 }

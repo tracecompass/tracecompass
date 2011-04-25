@@ -18,6 +18,7 @@ package org.eclipse.linuxtools.lttng;
  * Declaration of LTTng specific constants.
  * <p>
  */
+@SuppressWarnings("nls")
 public class LttngConstants {
 
     /**
@@ -80,9 +81,130 @@ public class LttngConstants {
      * <h4>Statistic node identifier for the event types. </h4>
      */
     public static final int STATS_CATEGORY_ID = 0xC << STATS_ID_SHIFT;
-
     /**
      * <h4>Background requests block size </h4>
      */
     public static final int DEFAULT_BLOCK_SIZE = 50000;
+
+    /*
+     * LTTng Trace Control Constants
+     */
+    
+    /**
+     * <h4>Kernel Provider name.</h4>
+     */
+    public static final String Lttng_Provider_Kernel = "kernel";
+    /**
+     * <h4>UST provider name.</h4> 
+     */
+    public static final String Lttng_Provider_Ust = "ust";
+    /**
+     * <h4>LTTng trace control command name.</h4> 
+     */
+    public static final String Lttng_Control_Command = "ltt_control";
+    /**
+     * <h4>LTTng trace control command to get providers.</h4> 
+     */
+    public static final String Lttng_Control_GetProviders = "getProviders";
+    /**
+     * <h4>LTTng trace control command to get targets.</h4> 
+     */
+    public static final String Lttng_Control_GetTargets = "getTargets";
+    /**
+     * <h4>LTTng trace control command to get markers.</h4> 
+     */
+    public static final String Lttng_Control_GetMarkers = "getMarkers";
+    /**
+     * <h4>LTTng trace control command to get traces.</h4> 
+     */
+    public static final String Lttng_Control_GetTraces = "getTraces";
+    /**
+     * <h4>LTTng trace control command to get active traces.</h4> 
+     */
+    public static final String Lttng_Control_GetActiveTraces = "getActiveTraces";
+    /**
+     * <h4>LTTng trace control command to get information about a active trace.</h4> 
+     */
+    public static final String Lttng_Control_GetActiveTraceInfo = "getActiveTraceInfo";
+    /**
+     * <h4>LTTng trace control command get all available channels.</h4> 
+     */
+    public static final String Lttng_Control_GetChannels = "getChannels";
+    /**
+     * <h4>LTTng trace control command to setup a trace.</h4> 
+     */
+    public static final String Lttng_Control_SetupTrace = "setupTrace";
+    /**
+     * <h4>LTTng trace control command to set the trace transport.</h4> 
+     */
+    public static final String Lttng_Control_SetupTraceTransport = "setTraceTransport";
+    /**
+     * <h4>LTTng trace control command to get information about a marker.</h4> 
+     */
+    public static final String Lttng_Control_GetMarkerInfo = "getMarkerInfo";
+    /**
+     * <h4>LTTng trace control command to enable/disable a marker.</h4> 
+     */
+    public static final String Lttng_Control_SetMarkerEnable = "setMarkerEnable";
+    /**
+     * <h4>LTTng trace control command to enable/disable a channel.</h4> 
+     */
+    public static final String Lttng_Control_SetChannelEnable = "setChannelEnable";
+    /**
+     * <h4>LTTng trace control command to enable/disable channel buffer overwrite.</h4> 
+     */
+    public static final String Lttng_Control_SetChannelOverwrite = "setChannelOverwrite";
+    /**
+     * <h4>LTTng trace control command to the channel timer.</h4> 
+     */
+    public static final String Lttng_Control_SetChannelTimer = "setChannelTimer";
+    /**
+     * <h4>LTTng trace control command to set the number of sub-buffers of a channel.</h4> 
+     */
+    public static final String Lttng_Control_SetChannelSubbufNum = "setChannelSubbufNum";
+    /**
+     * <h4>LTTng trace control command to set the sub-buffer size of a channel.</h4> 
+     */
+    public static final String Lttng_Control_SetChannelSubbufSize = "setChannelSubbufSize";
+    /**
+     * <h4>LTTng trace control command to allocate trace resources.</h4> 
+     */
+    public static final String Lttng_Control_AllocTrace = "allocTrace";
+    /**
+     * <h4>LTTng trace control command to configure a trace local trace.</h4> 
+     */
+    public static final String Lttng_Control_WriteTraceLocal = "writeTraceLocal";
+    /**
+     * <h4>LTTng trace control command to configure a network trace</h4> 
+     */
+    public static final String Lttng_Control_WriteTraceNetwork = "writeTraceNetwork";
+    /**
+     * <h4>LTTng trace control command to start tracing.</h4> 
+     */
+    public static final String Lttng_Control_StartTrace = "startTrace";
+    /**
+     * <h4>LTTng trace control command to pause tracing.</h4> 
+     */
+    public static final String Lttng_Control_PauseTrace = "pauseTrace";
+    /**
+     * <h4>LTTng trace control command to destroy a trace (i.e. deallocate trace resource)</h4> 
+     */
+    public static final String Lttng_Control_DestroyTrace = "destroyTrace";
+    /**
+     * <h4>Separator in command replies.</h4> 
+     */
+    public static final String Lttng_Control_Separator = ",";
+    /**
+     * <h4>Separator</h4> 
+     */
+    public static final String Lttng_Control_GetActiveTraceInfoSeparator = "=";
+    /**
+     * <h4>Action property indicating a enabled action.</h4> 
+     */
+    public static final String Rse_Resource_Action_Enabled = "yes";
+
+    /**
+     * <h4>Action property indicating a disabled action.</h4> 
+     */
+    public static final String Rse_Resource_Action_Disabled = "no";
 }
