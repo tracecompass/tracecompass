@@ -109,7 +109,7 @@ public class KernelTraceChannelConfigurationPage extends WizardPage implements I
      * @param channels The current channels information
      * @param state The trace state
      */
-	protected KernelTraceChannelConfigurationPage(TraceChannels channels, TraceState state) {
+    protected KernelTraceChannelConfigurationPage(TraceChannels channels, TraceState state) {
         super("TraceChannelConfigurationPage"); //$NON-NLS-1$
         fChannels = channels;
         fTraceState = state;
@@ -120,10 +120,10 @@ public class KernelTraceChannelConfigurationPage extends WizardPage implements I
     // Operations
     // ------------------------------------------------------------------------
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
-	 */
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
+     */
     @Override
     public void createControl(Composite parent) {
         container = new Composite(parent, SWT.NULL);
@@ -455,6 +455,10 @@ public class KernelTraceChannelConfigurationPage extends WizardPage implements I
             
             @Override
             public void menuAboutToShow(IMenuManager manager) {
+                
+                if ((fTraceState != TraceState.CREATED)  && (fTraceState != TraceState.CONFIGURED)) {
+                    return;
+                }
                 manager.add(enableAllAction);
                 manager.add(disableAllAction);
                 manager.add(setOverrideAllAction);
