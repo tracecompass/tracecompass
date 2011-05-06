@@ -371,8 +371,11 @@ public class TraceConfigurationPage extends WizardPage {
         if(fOldTraceConfig != null) {
             fPathText.setText(fOldTraceConfig.getTracePath());
             fIsLocal = fOldTraceConfig.isNetworkTrace();
+            fLocalButton.setSelection(fIsLocal);
+            fRemoteButton.setSelection(!fIsLocal);
             fBrowseButton.setEnabled(true);
             fIsAppend = fOldTraceConfig.getIsAppend();
+            fIsAppendButton.setSelection(fIsAppend);
             fNumChannelText.setText(String.valueOf(fOldTraceConfig.getNumChannel()));
 
             fFlightRecorderButton.setSelection(fOldTraceConfig.getMode() == TraceConfig.FLIGHT_RECORDER_MODE);

@@ -31,7 +31,7 @@
 					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Connect_to_Remote_Host" label="Connect to Remote Host"></topic>
 					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Configure_Kernel_Markers" label="Configure Kernel Markers"></topic>
 					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Create_a_New_Kernel_Trace" label="Create a New Kernel Trace"></topic>
-					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Configure_a_Trace" label="Configure a Trace"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Configure_a_Trace_and_Trace_Channels" label="Configure a Trace and Trace Channels"></topic>
 					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Start_a_Trace" label="Start a Trace"></topic>
 					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Pause_a_Trace" label="Pause a Trace"></topic>
 					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Stop_a_Trace" label="Stop a Trace"></topic>

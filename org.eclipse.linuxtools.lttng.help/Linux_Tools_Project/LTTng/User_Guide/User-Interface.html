@@ -477,16 +477,66 @@
 		<p>
 			<img border="0" src="images/LTTngRemoteSystemConfiguredTrace.png"/>
 		</p>
-		<h4 id="Configure_a_Trace">Configure a Trace</h4>
-		<p>Some of the trace parameters can be changed if the trace hadn't been previously started. A new trace can be created by selecting the relevant kernel trace, clicking the right mouse button and selecting the "Configure Trace" menu item of the context sensitive menu. </p>
+		<h4 id="Configure_a_Trace_and_Trace_Channels">Configure a Trace and Trace Channels</h4>
+		<p>Some of the trace parameters can be changed if the trace has not been previously started. A trace can be configured by selecting the relevant kernel trace, clicking the right mouse button and selecting the "Configure Trace" menu item of the context sensitive menu. </p>
 		<p>
 			<img border="0" src="images/LTTngConfigureTraceAction.png"/>
 		</p>
-		<p>A new dialog box will show for the configuration of the relevant parameter. For explanation of the parameters see 
+		<p>A new dialog box with a wizard page will show for the configuration of the relevant parameter. For explanation of the parameters see 
 			<a href="User-Interface.html#Create_a_New_Kernel_Trace">Create_a_New_Kernel_Trace</a>
 		</p>
 		<p>
-			<img border="0" src="images/LTTngConfigureTraceDialog.png"/>
+			<img border="0" src="images/LTTngConfigureTraceDialog_New.png"/>
+		</p>
+		<p>After entering valid parameters the 
+			<b>Next</b> and 
+			<b>Finish</b> buttons will be active. To finalize the configuration of the trace select the 
+			<b>Finish</b> button. To configure channel parameters select the 
+			<b>Next</b> button. A new wizard page will show for the configuration of channel parameters. For provider 
+			<b>kernel</b> the following display will show:  
+		</p>
+		<p>
+			<img border="0" src="images/LTTngConfigureChannelsKernelDialog.png"/>
+		</p>
+		<p>All channels can be configured at once by clicking the right mouse button in the table and selecting one of the menu items of the context sensitive menu.</p>
+		<p>
+			<img border="0" src="images/LTTngConfigureChannelsActions.png"/>
+		</p>
+		<p>For provider 
+			<b>ust</b> only the channel parameter 
+			<b>Channel Timer</b> can be configured and the following display will show after selecting the 
+			<b>Next</b> button of the 
+			<b>Trace configuration</b> page.
+		</p>
+		<p>
+			<img border="0" src="images/LTTngConfigureChannelsUstDialog.png"/>
+		</p>
+		<p>Please note that channel parameters cannot be retrieved from the LTTng agent. Therefore they cannot be displayed in the table unless they have been previously configured through Eclipse. However, this information will be lost after closing Eclipse. A question mark will indicate that the relevant value is not known and it will be ignored after selecting the 
+			<b>Finish</b> button.
+		</p>
+		<ul>
+			<li>
+				<b>Name</b> column: holds the name of the channel. 
+			</li>
+			<li>
+				<b>Enabled</b> column: a checkbox indicates whether the channel is enabled or not.
+			</li>
+			<li>
+				<b>Buffer Override</b> column: a checkbox indicates whether channel buffer overwrite is enabled or not. 
+			</li>
+			<li>
+				<b>Number of Sub Buffers</b> column: holds the number of sub-buffers of the channel. 
+			</li>
+			<li>
+				<b>Sub Buffer size</b> column: holds the size of the sub-buffer of the channel (in bytes). 
+			</li>
+			<li>
+				<b>Channel Timer</b> column: holds the channel timer value (in milliseconds) for periodically flushing all collected data for the channel, whether the sub-buffers are full or not. The provider 
+				<b>ust</b> only supports a single timer for all channels, traces and targets it is monitoring.
+			</li>
+		</ul>
+		<p>Please note that the 
+			<b>Configure Trace</b> item of the context sensitive menu of a trace can be used to display the trace and channel parameters at any time. However, they can only be changed if the trace has not been previously started.
 		</p>
 		<h4 id="Start_a_Trace">Start a Trace</h4>
 		<p>A configured or paused trace can be started by selecting the kernel trace, clicking the right mouse button and selecting the 
