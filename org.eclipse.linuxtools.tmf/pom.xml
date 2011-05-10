@@ -35,8 +35,8 @@
     </resources>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.tycho</groupId>
-        <artifactId>maven-osgi-source-plugin</artifactId>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-source-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
