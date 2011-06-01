@@ -106,12 +106,59 @@
 				<b>Content</b>: the raw event content 
 			</li>
 		</ul>
+		<p>The first row of the table is the header row a.k.a. the Search and Filter row.</p>
 		<p>
 			<img border="0" src="images/EventsView.png"/>
 		</p>
 		<p>The highlighted event is the 
 			<i>current event</i> and is synchronized with the other views. If you select another event, the other views will be synchronized accordingly.
 		</p>
+		<h4 id="Searching_and_Filtering">Searching and Filtering</h4>
+		<p>Searching and filtering of events in the table can be performed by entering matching conditions in one or multiple columns in the header row (the first row below the column header).</p>
+		<p>To toggle between searching and filtering, click on the 'search' (
+			<img border="0" src="images/TmfEventSearch.gif"/>) or 'filter' (
+			<img border="0" src="images/TmfEventFilter.gif"/>) icon in the header row's left margin, or right-click on the header row and select 
+			<b>Show Filter Bar</b> or 
+			<b>Show Search Bar</b> in the context menu.
+		</p>
+		<p>To apply a matching condition to a specific column, click on the column's header row cell, type in a 
+			<a href="http://download.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regular expression</a> and press the 
+			<b>ENTER</b> key. You can also enter a simple text string and it will be automatically be replaced with a 'contains' regular expression.
+		</p>
+		<p>When matching conditions are applied to two or more columns, all conditions must be met for the event to match (i.e. 'and' behavior).</p>
+		<p>To clear all matching conditions in the header row, press the 
+			<b>DEL</b> key.
+		</p>
+		<h5 id="Searching">Searching</h5>
+		<p>When a searching condition is applied to the header row, the table will select the next matching event starting from the top currently displayed event. Wrapping will occur if there is no match until the end of the trace.</p>
+		<p>All matching events will have a 'search match' icon in their left margin. Non-matching events will be dimmed.</p>
+		<p>
+			<img border="0" src="images/TmfEvents-Search.png"/>
+		</p>
+		<p>Pressing the 
+			<b>ENTER</b> key will search and select the next matching event. Pressing the 
+			<b>SHIFT-ENTER</b> key will search and select the previous matching event. Wrapping will occur in both directions.
+		</p>
+		<p>Press 
+			<b>ESC</b> to cancel an ongoing search.
+		</p>
+		<p>Press 
+			<b>DEL</b> to clear the header row and reset all events to normal.
+		</p>
+		<h5 id="Filtering">Filtering</h5>
+		<p>When a filtering condition is entered in the head row, the table will clear all events and fill itself with matching events as they are found from the beginning of the trace.</p>
+		<p>A status row will be displayed before and after the matching events, dynamically showing how many matching events were found and how many events were processed so far. Once the filtering is completed, the status row icon in the left margin will change from a 'stop' to a 'filter' icon.</p>
+		<p>
+			<img border="0" src="images/TmfEvents-Filter.png"/>
+		</p>
+		<p>Press 
+			<b>ESC</b> to stop an ongoing filtering. In this case the status row icon will remain as a 'stop' icon to indicate that not all events were processed.
+		</p>
+		<p>Press 
+			<b>DEL</b> or right-click on the table and select 
+			<b>Clear Filters</b> from the context menu to clear the header row and remove the filtering. All trace events will be now shown in the table. Note that the currently selected event will remain selected even after the filter is removed.
+		</p>
+		<p>You can also search on the subset of filtered events by toggling the header row to the Search Bar while a filter is applied. Searching and filtering conditions are independent of each other.</p>
 		<h3 id="Histogram_View">Histogram View</h3>
 		<p>The Histogram View displays the trace events distribution with respect to time.</p>
 		<p>

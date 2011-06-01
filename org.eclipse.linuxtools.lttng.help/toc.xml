@@ -14,7 +14,12 @@
 		<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html" label="User Interface">
 			<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#LTTng_Perspective" label="LTTng Perspective">
 				<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Project_View" label="Project View"></topic>
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Events_View" label="Events View"></topic>
+				<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Events_View" label="Events View">
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Searching_and_Filtering" label="Searching and Filtering">
+						<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Searching" label="Searching"></topic>
+						<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Filtering" label="Filtering"></topic>
+					</topic>
+				</topic>
 				<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Histogram_View" label="Histogram View"></topic>
 				<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Control_Flow_View" label="Control Flow View">
 					<topic href="Linux_Tools_Project/LTTng/User_Guide/User-Interface.html#Mouse_Control" label="Mouse Control"></topic>

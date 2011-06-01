@@ -10,7 +10,7 @@
     <property name="ug.title" value="LTTng Plug-in User Guide" />
 
 	<!-- Replace dir with the dir you have eclipse installed into.-->
-	<property name="eclipse.dir" value="/home/francois/Eclipse/Helios" />
+	<property name="eclipse.dir" value="/home/francois/Eclipse/Indigo" />
 	<property name="temp.dir" value="/home/francois/tmp" />
 
     <path id="wikitext.tasks.classpath">
