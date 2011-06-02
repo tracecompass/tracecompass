@@ -9,13 +9,14 @@
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.linuxtools.lttng.state.experiment;
+package org.eclipse.linuxtools.lttng.tests.state.experiment;
 
 import org.eclipse.linuxtools.lttng.LttngConstants;
-import org.eclipse.linuxtools.lttng.LttngTestPreparation;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.model.LTTngTreeNode;
+import org.eclipse.linuxtools.lttng.state.experiment.IStateExperimentManager;
 import org.eclipse.linuxtools.lttng.state.trace.StateTraceManager;
+import org.eclipse.linuxtools.lttng.tests.LttngTestPreparation;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 
 /**

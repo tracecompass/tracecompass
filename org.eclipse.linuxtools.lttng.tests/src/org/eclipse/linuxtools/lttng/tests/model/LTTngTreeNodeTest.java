@@ -9,7 +9,9 @@
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.linuxtools.lttng.model;
+package org.eclipse.linuxtools.lttng.tests.model;
+
+import org.eclipse.linuxtools.lttng.model.LTTngTreeNode;
 
 import junit.framework.TestCase;
 

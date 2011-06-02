@@ -5,7 +5,7 @@ import junit.framework.TestSuite;
 import org.eclipse.linuxtools.lttng.tests.trace.LTTngTextTraceTest;;
 
 @SuppressWarnings("nls")
-public final class AllLttngTests extends TestCase  {
+public final class AllLTTngEventTests extends TestCase  {
     public static TestSuite suite() {
         TestSuite suite = new TestSuite("Testing LTTng (trace in text format)");
         
