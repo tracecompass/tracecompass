@@ -138,6 +138,10 @@ public class LttngTimestampTest extends TestCase {
         assertEquals("toString()", expectedTS2, ts2.toString());
         assertEquals("toString()", expectedTS3, ts3.toString());
         assertEquals("toString()", expectedTS4, ts4.toString());
+        
+        LttngTimestamp ts5 = new LttngTimestamp(2234567890L);
+        LttngTimestamp delta = ts4.getDelta(ts5);
+        String expectedDelta = "-1.000000000";
+        assertEquals("toString()", expectedDelta, delta.toString());
     }
-
 }

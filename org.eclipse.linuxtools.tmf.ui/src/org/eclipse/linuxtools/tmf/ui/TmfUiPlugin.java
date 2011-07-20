@@ -12,7 +12,11 @@
 
 package org.eclipse.linuxtools.tmf.ui;
 
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.linuxtools.tmf.ui.TmfUiTracer;
 import org.eclipse.linuxtools.tmf.ui.parsers.ParserProviderManager;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.LoadersManager;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -69,6 +73,7 @@ public class TmfUiPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		TmfUiTracer.init();
 		ParserProviderManager.init();
 	}
 
@@ -78,13 +83,41 @@ public class TmfUiPlugin extends AbstractUIPlugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
+	    TmfUiTracer.stop();
 		plugin = null;
 		super.stop(context);
 	}
 
-    public Image getImageFromPath(String path)
-    {
-        return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path).createImage();
+    public Image getImageFromPath(String path){
+        return getImageDescripterFromPath(path).createImage();
+    }
+    
+    public ImageDescriptor getImageDescripterFromPath(String path){
+        return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+    }
+    
+    public Image getImageFromImageRegistry(String path) {
+        Image icon = getImageRegistry().get(path);
+        if (icon == null) {
+            icon = getImageDescripterFromPath(path).createImage();
+            plugin.getImageRegistry().put(path, icon);
+        }
+        return icon;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.plugin.AbstractUIPlugin#initializeImageRegistry(org.eclipse.jface.resource.ImageRegistry)
+     */
+    @Override
+    protected void initializeImageRegistry(ImageRegistry reg) {
+        reg.put(ITmfImageConstants.IMG_UI_ZOOM, getImageFromPath(ITmfImageConstants.IMG_UI_ZOOM));
+        reg.put(ITmfImageConstants.IMG_UI_ZOOM_IN, getImageFromPath(ITmfImageConstants.IMG_UI_ZOOM_IN));
+        reg.put(ITmfImageConstants.IMG_UI_ZOOM_OUT, getImageFromPath(ITmfImageConstants.IMG_UI_ZOOM_OUT));
+        reg.put(ITmfImageConstants.IMG_UI_SEQ_DIAGRAM_OBJ, getImageFromPath(ITmfImageConstants.IMG_UI_SEQ_DIAGRAM_OBJ));
+        reg.put(ITmfImageConstants.IMG_UI_ARROW_COLLAPSE_OBJ, getImageFromPath(ITmfImageConstants.IMG_UI_ARROW_COLLAPSE_OBJ));
+        reg.put(ITmfImageConstants.IMG_UI_ARROW_UP_OBJ, getImageFromPath(ITmfImageConstants.IMG_UI_ARROW_UP_OBJ));
+    }
+    
+    
 }

@@ -2,6 +2,8 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="org.eclipse.linuxtools.tmf.ui.parserProviders" name="Parser Providers" schema="schema/org.eclipse.linuxtools.tmf.ui.parserprovider.exsd"/>
+   <extension-point id="org.eclipse.linuxtools.tmf.ui.uml2SDLoader" name="TMF UML 2 Sequence Diagram Loader" schema="schema/org.eclipse.linuxtools.tmf.ui.uml2SDLoader.exsd"/>
+
    <extension
          point="org.eclipse.ui.views">
       <category
@@ -50,6 +52,14 @@
             icon="icons/eview16/filters_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.filter"
             name="%filters.view.name"
+            restorable="true">
+      </view>
+      <view
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView"
+            icon="icons/eview16/sequencediagram_view.gif"
+            id="org.eclipse.linuxtools.tmf.ui.tmfUml2SDSyncView"
+            name="%uml2sd.view.name"
             restorable="true">
       </view>
    </extension>
@@ -245,6 +255,97 @@
             id="org.eclipse.linuxtools.tmf.ui.command.managecustomparsers"
             name="%commands.parser.manage">
       </command>
+      <category
+            description="%commands.uml2sd.category.name"
+            id="org.eclipse.linuxtools.tmf.ui.views.uml2sd.category"    
+            name="%commands.uml2sd.category.name">
+      </category>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.category"
+            description="%commands.uml2sd.goto.description"
+            id="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.GoToMessage"
+            name="%commands.uml2sd.goto">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.category"
+            description="%commands.uml2sd.showend.description"
+            id="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ShowNodeEnd"
+            name="%commands.uml2sd.showend">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.category"
+            description="%commands.uml2sd.showstart.description"
+            id="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ShowNodeStart"
+            name="%commands.uml2sd.showstart">
+      </command>      
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.category"
+            description="%commands.uml2sd.scrollup.description"
+            id="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.MoveSDUp"
+            name="%commands.uml2sd.scrollup">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.category"
+            description="%commands.uml2sd.scrolldown.description"
+            id="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.MoveSDDown"
+            name="%commands.uml2sd.scrolldown">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.category"
+            description="%commands.uml2sd.scrollleft.description"
+            id="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.MoveSDLeft"
+            name="%commands.uml2sd.scrollleft">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.category"
+            description="%commands.uml2sd.scrollright.description"
+            id="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.MoveSDRight"
+            name="%commands.uml2sd.scrollright">
+      </command>
+   </extension>
+   <extension point="org.eclipse.ui.bindings">
+      <key
+            sequence="ALT+R"
+            contextId="org.eclipse.linuxtools.tmf.ui.view.uml2sd.context"
+            commandId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.GoToMessage"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>   
+      <key
+            sequence="SHIFT+ALT+END"
+            contextId="org.eclipse.linuxtools.tmf.ui.view.uml2sd.context"
+            commandId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ShowNodeEnd"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>   
+      <key
+            sequence="SHIFT+ALT+HOME"
+            contextId="org.eclipse.linuxtools.tmf.ui.view.uml2sd.context"
+            commandId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ShowNodeStart"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>    
+      <key
+            sequence="SHIFT+ALT+ARROW_UP"
+            contextId="org.eclipse.linuxtools.tmf.ui.view.uml2sd.context"
+            commandId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.MoveSDUp"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>  
+      <key
+            sequence="SHIFT+ALT+ARROW_DOWN"
+            contextId="org.eclipse.linuxtools.tmf.ui.view.uml2sd.context"
+            commandId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.MoveSDDown"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+      <key
+            sequence="SHIFT+ALT+ARROW_LEFT"
+            contextId="org.eclipse.linuxtools.tmf.ui.view.uml2sd.context"
+            commandId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.MoveSDLeft"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+      <key
+            sequence="SHIFT+ALT+ARROW_RIGHT"
+            contextId="org.eclipse.linuxtools.tmf.ui.view.uml2sd.context"
+            commandId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.MoveSDRight"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>                           
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -454,6 +555,37 @@
       <parserProvider
             class="org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomParserProvider">
       </parserProvider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="org.eclipse.linuxtools.tmf.ui.view.uml2sd.context"
+            name="%contexts.uml2sd">
+      </context>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.eclipse.linuxtools.tmf.ui.preferences.TmfTracingPreferencePage"
+            id="org.eclipse.linuxtools.tmf.ui.TmfTracingPreferences"
+            name="%preference.page.trace.name">
+      </page>
+      <page
+            category="org.eclipse.linuxtools.tmf.ui.TmfTracingPreferences"
+            class="org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewerPage"
+            id="org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewerPage"
+            name="%preference.page.uml2sd.name">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.ui.uml2SDLoader">
+      <uml2SDLoader
+            class="org.eclipse.linuxtools.tmf.ui.views.uml2sd.impl.TmfUml2SDSyncLoader"
+            default="true"
+            id="org.eclipse.linuxtools.tmf.ui.views.uml2sd.impl.TmfUml2SDSyncLoader"
+            name="TMF UML2SD Loader"
+            view="org.eclipse.linuxtools.tmf.ui.tmfUml2SDSyncView">
+      </uml2SDLoader>
    </extension>
 
 </plugin>

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.linuxtools.tmf
-Bundle-Version: 0.3.1.qualifier
+Bundle-Version: 0.3.2.qualifier
 Bundle-Activator: org.eclipse.linuxtools.tmf.TmfCorePlugin
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
@@ -20,5 +20,6 @@ Export-Package: org.eclipse.linuxtools.tmf,
  org.eclipse.linuxtools.tmf.parser,
  org.eclipse.linuxtools.tmf.request,
  org.eclipse.linuxtools.tmf.signal,
- org.eclipse.linuxtools.tmf.trace
+ org.eclipse.linuxtools.tmf.trace,
+ org.eclipse.linuxtools.tmf.uml2sd
 Bundle-Localization: plugin

@@ -10,6 +10,50 @@
 			id="org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.test.stub.views.TmfTaTimeAnalysis"
 			name="TMF Time Analysis View" restorable="true">
 		</view>
+  <view
+        category="org.eclipse.linuxtools.tmf.ui.stubs"
+        class="org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView"
+        id="org.eclipse.linuxtools.tmf.ui.tests.testSDView1Loader"
+        name="TestSDView1Loader"
+        restorable="true">
+  </view>
+  <view
+        category="org.eclipse.linuxtools.tmf.ui.stubs"
+        class="org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView"
+        id="org.eclipse.linuxtools.tmf.ui.tests.testSDView2Loaders"
+        name="TestSDView2Loaders"
+        restorable="true">
+  </view>
 	</extension>
+ <extension
+       point="org.eclipse.linuxtools.tmf.ui.uml2SDLoader">
+    <uml2SDLoader
+          class="org.eclipse.linuxtools.tmf.ui.tests.uml2sd.load.TestLoaders"
+          default="true"
+          id="org.eclipse.linuxtools.tmf.ui.tests.uml2SDLoader1"
+          name="Test Loader "
+          view="org.eclipse.linuxtools.tmf.ui.tests.testSDView1Loader">
+    </uml2SDLoader>
+ </extension>
+ <extension
+       point="org.eclipse.linuxtools.tmf.ui.uml2SDLoader">
+    <uml2SDLoader
+          class="org.eclipse.linuxtools.tmf.ui.tests.uml2sd.load.TestLoaders"
+          default="true"
+          id="org.eclipse.linuxtools.tmf.ui.tests.uml2SDLoader2"
+          name="Test Loader2"
+          view="org.eclipse.linuxtools.tmf.ui.tests.testSDView2Loaders">
+    </uml2SDLoader>
+ </extension>
+ <extension
+       point="org.eclipse.linuxtools.tmf.ui.uml2SDLoader">
+    <uml2SDLoader
+          class="org.eclipse.linuxtools.tmf.ui.views.uml2sd.impl.TmfUml2SDSyncLoader"
+          default="true"
+          id="org.eclipse.linuxtools.tmf.ui.tests.uml2SDLoader3"
+          name="Test Tmf UML2SD Loader"
+          view="org.eclipse.linuxtools.tmf.ui.tests.testSDView2Loaders">
+    </uml2SDLoader>
+ </extension>
 
 </plugin>

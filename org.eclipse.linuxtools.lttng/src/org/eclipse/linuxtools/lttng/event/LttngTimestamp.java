@@ -141,7 +141,12 @@ public class LttngTimestamp extends TmfTimestamp {
     @SuppressWarnings("nls")
 	public String toString() {
 
-        StringBuilder sb = new StringBuilder(String.valueOf(fValue));
+        long value = fValue;
+        if (fValue < 0) {
+            value = -fValue; 
+        }
+        
+        StringBuilder sb = new StringBuilder(String.valueOf(value));
 
         // Prepend the correct number of "0" so we can insert a "." at the right location
         int nbZeroes = (-fScale) - sb.length() + 1;  
@@ -149,6 +154,12 @@ public class LttngTimestamp extends TmfTimestamp {
             sb.insert(i, "0");
         }
         sb.insert(sb.length() + fScale, ".");
+        
+        // Prepend "-" if negative
+        if (fValue < 0) {
+            sb.insert(0, "-");
+        }
+        
         return sb.toString();
     }
 
@@ -157,4 +168,16 @@ public class LttngTimestamp extends TmfTimestamp {
     	return (LttngTimestamp) super.clone();
     }
 
+    /**
+     * Compute the delta between two timestamps (adjusted to scale of current timestamp).
+     * 
+     * @param reference the reference timestamp to synchronize with
+     * @return the delta timestamp 
+     * @throws ArithmeticException
+     */
+    @Override
+    public LttngTimestamp getDelta(TmfTimestamp other) throws ArithmeticException {
+        TmfTimestamp delta = super.getDelta(other);
+        return new LttngTimestamp(delta); 
+    }
 }

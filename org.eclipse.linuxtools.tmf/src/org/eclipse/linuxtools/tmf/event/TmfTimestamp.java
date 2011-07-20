@@ -257,6 +257,23 @@ public class TmfTimestamp implements Cloneable {
     }
 
     /**
+     * Compute the delta between two timestamps (adjusted to scale of current timestamp).
+     * 
+     * @param reference the reference timestamp to synchronize with
+     * @return the delta timestamp 
+     * @throws ArithmeticException
+     */
+    public TmfTimestamp getDelta(TmfTimestamp other) throws ArithmeticException {
+        TmfTimestamp newSecond = other;
+        if ((fScale != other.fScale) || (fPrecision != other.fPrecision)) {
+            newSecond = other.synchronize(0, fScale);
+        }
+        return new TmfTimestamp(fValue - newSecond.fValue,
+                                fScale, 
+                                newSecond.fPrecision > fPrecision ? newSecond.fPrecision : fPrecision);
+    }
+
+    /**
      * Compare with another timestamp
      * 
      * @param other the other timestamp

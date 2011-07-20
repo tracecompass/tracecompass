@@ -418,4 +418,78 @@ public class TmfTimestampTest extends TestCase {
 		assertEquals("CompareTo", -1, ts4.compareTo(TmfTimestamp.BigCrunch, false));
 	}
 
+    // ------------------------------------------------------------------------
+    // getDelta
+    // ------------------------------------------------------------------------
+	
+	public void testDelta() throws Exception {
+	    // Delta for same scale and precision (delta > 0)
+	    TmfTimestamp ts0 = new TmfTimestamp(10, (byte)9);
+	    TmfTimestamp ts1 = new TmfTimestamp(5,  (byte)9);
+	    TmfTimestamp exp = new TmfTimestamp(5,  (byte)9);
+	    
+	    TmfTimestamp delta = ts0.getDelta(ts1);
+	    assertEquals("getDelta", 0, delta.compareTo(exp, false));
+	    
+	    // Delta for same scale and precision (delta < 0)
+	    ts0 = new TmfTimestamp(5,  (byte)9);
+	    ts1 = new TmfTimestamp(10, (byte)9);
+	    exp = new TmfTimestamp(-5, (byte)9);
+
+	    delta = ts0.getDelta(ts1);
+	    assertEquals("getDelta", 0, delta.compareTo(exp, false));
+	    
+	    // Delta for different scale and same precision (delta > 0)
+        ts0 = new TmfTimestamp(5,  (byte)9);
+        ts1 = new TmfTimestamp(10, (byte)8);
+        exp = new TmfTimestamp(4,  (byte)9);
+
+        delta = ts0.getDelta(ts1);
+        assertEquals("getDelta", 0, delta.compareTo(exp, false));
+
+        // Delta for different scale and same precision (delta > 0)
+        ts0 = new TmfTimestamp(5,  (byte)9);
+        ts1 = new TmfTimestamp(10, (byte)7);
+        exp = new TmfTimestamp(5,  (byte)9);
+
+        delta = ts0.getDelta(ts1);
+        assertEquals("getDelta", 0, delta.compareTo(exp, false));
+
+        // Delta for different scale and same precision
+        ts0 = new TmfTimestamp(10, (byte)9);
+        ts1 = new TmfTimestamp(5,  (byte)8);
+        exp = new TmfTimestamp(10, (byte)9);
+
+        delta = ts0.getDelta(ts1);
+        assertEquals("getDelta", 0, delta.compareTo(exp, false));
+
+        // Delta for same scale and different precision
+        ts0 = new TmfTimestamp(10, (byte)9,1);
+        ts1 = new TmfTimestamp(5,  (byte)9, 2);
+        exp = new TmfTimestamp(5,  (byte)9, 2);
+
+        delta = ts0.getDelta(ts1);
+        assertEquals("getDelta", 0, delta.compareTo(exp, true));
+        assertEquals("precision", 2, delta.getPrecision());
+        
+        // Delta for same scale and different precision
+        ts0 = new TmfTimestamp(5,  (byte)9, 2);
+        ts1 = new TmfTimestamp(10, (byte)9, 1);
+        exp = new TmfTimestamp(-5, (byte)9, 2);
+
+        delta = ts0.getDelta(ts1);
+        assertEquals("getDelta", 0, delta.compareTo(exp, true));
+        assertEquals("precision", 2, delta.getPrecision());
+
+        // Delta for different scale and different precision
+        ts0 = new TmfTimestamp(5,  (byte)9, 2);
+        ts1 = new TmfTimestamp(10, (byte)8, 1);
+        exp = new TmfTimestamp(4,  (byte)9, 2);
+        assertEquals("precision", 2, delta.getPrecision());
+        assertEquals("precision", 2, delta.getPrecision());
+
+        delta = ts0.getDelta(ts1);
+        assertEquals("getDelta", 0, delta.compareTo(exp, true));
+        assertEquals("precision", 2, delta.getPrecision());
+	}
 }

@@ -74,44 +74,44 @@ public class TmfEventParserStub implements ITmfEventParser {
        	String name = eventStream.getName();
        	name = name.substring(name.lastIndexOf('/') + 1);
 
-        synchronized(stream) {
-        	long location = 0;
-        	if (context != null)
-        		location = ((TmfLocation<Long>) (context.getLocation())).getLocation();
-        	stream.seek(location);
+       	// no need to use synchronized since it's already cover by the calling method
+       	
+       	long location = 0;
+       	if (context != null)
+       	    location = ((TmfLocation<Long>) (context.getLocation())).getLocation();
+       	stream.seek(location);
 
-        	try {
-        		long ts        = stream.readLong();
-        		String source  = stream.readUTF();
-        		String type    = stream.readUTF();
-        		@SuppressWarnings("unused")
-        		int reference  = stream.readInt();
-        		int typeIndex  = Integer.parseInt(type.substring(typePrefix.length()));
-        		String[] fields = new String[typeIndex];
-        		for (int i = 0; i < typeIndex; i++) {
-        			fields[i] = stream.readUTF();
-        		}
+       	try {
+       	    long ts        = stream.readLong();
+       	    String source  = stream.readUTF();
+       	    String type    = stream.readUTF();
+       	    @SuppressWarnings("unused")
+       	    int reference  = stream.readInt();
+       	    int typeIndex  = Integer.parseInt(type.substring(typePrefix.length()));
+       	    String[] fields = new String[typeIndex];
+       	    for (int i = 0; i < typeIndex; i++) {
+       	        fields[i] = stream.readUTF();
+       	    }
 
-        		String content = "[";
-        		if (typeIndex > 0) {
-        			content += fields[0];
-        		}
-        		for (int i = 1; i < typeIndex; i++) {
-        			content += ", " + fields[i];
-        		}
-        		content += "]";
+       	    String content = "[";
+       	    if (typeIndex > 0) {
+       	        content += fields[0];
+       	    }
+       	    for (int i = 1; i < typeIndex; i++) {
+       	        content += ", " + fields[i];
+       	    }
+       	    content += "]";
 
-        		TmfEvent event = new TmfEvent(
-        				new TmfTimestamp(ts, (byte) -3, 0),     // millisecs
-        				new TmfEventSource(source),
-        				fTypes[typeIndex],
-        				new TmfEventReference(name));
-				TmfEventContent cnt = new TmfEventContent(event, content);
-				event.setContent(cnt);
-				return event;
-        	} catch (EOFException e) {
-        	}
-        }
+       	    TmfEvent event = new TmfEvent(
+       	            new TmfTimestamp(ts, (byte) -3, 0),     // millisecs
+       	            new TmfEventSource(source),
+       	            fTypes[typeIndex],
+       	            new TmfEventReference(name));
+       	    TmfEventContent cnt = new TmfEventContent(event, content);
+       	    event.setContent(cnt);
+       	    return event;
+       	} catch (EOFException e) {
+       	}
         return null;
     }
 

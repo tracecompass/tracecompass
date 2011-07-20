@@ -1,0 +1,193 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.linuxtools.tmf.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.eclipse.linuxtools.tmf.ui" id="uml2SDLoader" name="TMF UML2 Sequence Diagram Extensions"/>
+      </appinfo>
+      <documentation>
+         This extension point aims to list and connect any UML2 Sequence Diagram loader.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="1" maxOccurs="unbounded">
+            <element ref="uml2SDLoader"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A fully qualified identifier of the target extension point.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  An optional identifier of the extension instance.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  An optional name of the extension instance.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="uml2SDLoader">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A unique identifier for this &lt;code&gt;uml2SDLoader&lt;/code&gt;. This is not mandatory as long as the id attribute cannot be retrieved by the provider plugin. The class attribute is the one on which the underlying algorythm relies.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  An name of the extension instance.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The implementation of this UML2 SD viewer loader. The class must implement  &lt;code&gt;org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader&lt;/code&gt;.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="view" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The view ID of the view that this loader aims to populate.
+Either &lt;code&gt;org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView&lt;/code&gt; itself or a extension of &lt;code&gt;org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView&lt;/code&gt;.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="default" type="boolean">
+            <annotation>
+               <documentation>
+                  Set to true to make this loader the default one for the view; in case of several default loaders, first one coming from extensions list is taken.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         Since 0.4.0 (based on UML2SD of org.eclipse.tptp.common.ui)
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;
+For an example implemetation of the loader class see:
+&lt;pre&gt; 
+plug-in: org.eclipse.linuxtools.tmf.ui
+package: org.eclipse.linuxtools.tmf.ui.views.uml2sd.impl
+class: TmfUml2SDSyncLoader
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+The following is an example of the extension point:
+&lt;pre&gt;
+&lt;extension
+    point=&quot;org.eclipse.linuxtools.tmf.ui.uml2SDLoader&quot;&gt;
+    &lt;uml2SDLoader
+        class=&quot;org.eclipse.linuxtools.tmf.ui.views.uml2sd.impl.TmfUml2SDSyncLoader&quot;
+        default=&quot;true&quot;
+        id=&quot;org.eclipse.linuxtools.tmf.ui.views.uml2sd.impl.TmfUml2SDSyncLoader&quot;
+        name=&quot;Component Interactions&quot;
+        view=&quot;org.eclipse.linuxtools.ust.examples.ui.componentinteraction&quot;&gt;
+    &lt;/uml2SDLoader&gt;
+&lt;/extension&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+&lt;p&gt;
+The following is an example of the extension point for the required sequence diagram view:
+&lt;pre&gt;
+&lt;extension
+    point=&quot;org.eclipse.ui.views&quot;&gt;
+    &lt;view
+        category=&quot;org.eclipse.linuxtools.ust.examples.ui.sequenceDiagrams&quot;
+        class =&quot;org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView&quot;
+        id=&quot;org.eclipse.linuxtools.ust.examples.ui.componentinteraction&quot;
+        name=&quot;Sequence Diagram&quot;
+        restorable=&quot;true&quot;&gt;
+    &lt;/view&gt; 
+&lt;/extension&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+The following example command handler shows how to specify which loader to use while opening the sequence diagram view. This is not necessary if there is only one loader for a given sequence diagram view associated and this loader has the attribute &quot;default&quot; set to &quot;true&quot;.
+&lt;pre&gt;
+public class OpenSDView extends AbstractHandler {
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        try {
+            IWorkbenchPage persp = TmfUiPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
+            SDView view = (SDView) persp.showView(&quot;org.eclipse.linuxtools.ust.examples.ui.componentinteraction&quot;);
+            LoadersManager.getLoadersManager().createLoader(&quot;org.eclipse.linuxtools.tmf.ui.views.uml2sd.impl.TmfUml2SDSyncLoader&quot;, view);
+        } catch (PartInitException e) {
+            throw new ExecutionException(&quot;PartInitException caught: &quot;, e);
+        }
+        return null;
+ }
+}
+&lt;/pre&gt;
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;
+For this extension point a sequence diagram view has to be defined as well. The sequence diagram view class implementation is provided by the plug-in org.eclipse.linuxtools.tmf.ui (org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView) and can be used as is or can also be sub-classed. 
+&lt;/p&gt;
+&lt;p&gt;
+With this extension point, a loader class is associated with a sequence diagram view. Multiple loaders can be associated to a single sequence diagram view. However, additional means have to be implemented to specify which loader should be used when opening the view. For example, an eclipse action or command could be used for that (see example section). This additional code is not necessary if there is only one loader for a given sequence diagram view associated and this loader has the attribute &quot;default&quot; set to &quot;true&quot;.
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2005, 2008, 2011 IBM Corporation, Ericsson and others
+ 
+All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at &lt;a 
+href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+      </documentation>
+   </annotation>
+
+</schema>

@@ -30,6 +30,10 @@ public abstract class TmfComponent implements ITmfComponent {
 	// Constructor
 	// ------------------------------------------------------------------------
 
+	public TmfComponent() {
+	    this(""); //$NON-NLS-1$
+	}
+	
 	public TmfComponent(String name) {
 		fName = name;
 //		if (Tracer.isComponentTraced()) Tracer.traceComponent(this, "created");

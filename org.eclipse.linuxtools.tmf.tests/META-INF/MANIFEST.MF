@@ -11,3 +11,4 @@ Require-Bundle: org.junit;bundle-version="3.8.2",
 Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.linuxtools.tmf.tests.TmfCoreTestPlugin
+Export-Package: org.eclipse.linuxtools.tmf.trace;x-friends:="org.eclipse.linuxtools.tmf.ui.tests"

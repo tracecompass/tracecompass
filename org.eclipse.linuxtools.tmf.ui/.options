@@ -1,0 +1,7 @@
+org.eclipse.linuxtools.tmf.ui/error=false
+org.eclipse.linuxtools.tmf.ui/warning=false
+org.eclipse.linuxtools.tmf.ui/info=false
+
+org.eclipse.linuxtools.tmf.ui/index=false
+org.eclipse.linuxtools.tmf.ui/display=false
+org.eclipse.linuxtools.tmf.ui/sorting=false
