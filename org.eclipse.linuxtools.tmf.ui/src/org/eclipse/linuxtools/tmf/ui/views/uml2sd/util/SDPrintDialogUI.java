@@ -128,8 +128,6 @@ public class SDPrintDialogUI {
 
     int test = 3;
 
-    public static int r = 0;
-
     // bug 195026
     protected WizardPage parentWizardPage = null;
     protected SDPrintDialog parentDialog = null;
@@ -450,9 +448,7 @@ public class SDPrintDialogUI {
 
         @Override
         public void resizeContents(int _w, int _h) {
-            // if (r<2)
             super.resizeContents(_w, _h);
-            r++;
         }
 
     }
@@ -894,7 +890,7 @@ public class SDPrintDialogUI {
                     stepY = ((float) ph / z1 / z2);
                 }
             }
-        } finally {
+        } catch (NumberFormatException e) {
             stepX = stepY = nbPages = 0;
             zoomFactor = 0;
         }
@@ -907,7 +903,7 @@ public class SDPrintDialogUI {
     }
 
     public int[] getPageList() {
-        return pagesList;
+        return Arrays.copyOf(pagesList, pagesList.length);
     }
 
     public void addToPagesList(int num) {
@@ -935,14 +931,14 @@ public class SDPrintDialogUI {
     public int getNbRow() {
         if (!setHPagesNumber.isDisposed()) {
             int cw = (int) (overviewCanvas.getContentsWidth() / overviewCanvas.zoomValue);
-            if (stepX == 0)
-                return 1;
-            int row = (int) (cw / stepX);
-            if (setHPagesNumber.getSelection())
-                row = Math.round((float) cw / stepX);
-            else if ((cw % stepX != 0))
-                row++;
-
+            int row = 1;
+            if (stepX != 0) {
+                row = (int) (cw / stepX);
+                if (setHPagesNumber.getSelection())
+                    row = Math.round((float) cw / stepX);
+                else if ((cw % stepX != 0))
+                    row++;
+            }
             nbRows = row;
         }
         return nbRows;
@@ -951,13 +947,14 @@ public class SDPrintDialogUI {
     public int getNbLines() {
         if (!setVPagesNumber.isDisposed()) {
             int ch = (int) (overviewCanvas.getContentsHeight() / overviewCanvas.zoomValue);
-            if (stepY == 0)
-                return 1;
-            int line = (int) (ch / stepY);
-            if (setVPagesNumber.getSelection())
-                line = Math.round((float) ch / stepY);
-            else if (ch % stepY != 0)
-                line++;
+            int line = 1;
+            if (stepY != 0) {
+                line = (int) (ch / stepY);
+                if (setVPagesNumber.getSelection())
+                    line = Math.round((float) ch / stepY);
+                else if (ch % stepY != 0)
+                    line++;
+            }
             nbLines = line;
         }
         return nbLines;

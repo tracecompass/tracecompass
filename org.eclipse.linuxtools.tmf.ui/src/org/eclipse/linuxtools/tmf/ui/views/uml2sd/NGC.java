@@ -47,8 +47,8 @@ public class NGC implements IGC {
     protected int xx;
     protected boolean drawWithFocus = false;
 
-    protected static int vscreen_bounds = 0;
-
+    private static int vscreen_bounds = 0;
+    
     public NGC(SDWidget scrollView, GC gc) {
         context = gc;
         view = scrollView;
@@ -685,4 +685,13 @@ public class NGC implements IGC {
     public void setDrawTextWithFocusStyle(boolean focus) {
         drawWithFocus = focus;
     }
+    
+    protected static int getVscreenBounds() {
+        return vscreen_bounds;
+    }
+
+    protected static void setVscreenBounds(int vBounds) {
+        vscreen_bounds = vBounds;
+    }
+
 }

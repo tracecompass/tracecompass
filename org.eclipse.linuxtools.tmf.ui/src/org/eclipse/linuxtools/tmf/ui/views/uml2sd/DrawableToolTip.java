@@ -49,10 +49,11 @@ public class DrawableToolTip implements PaintListener {
     protected TmfTimeRange minMaxRange;
     protected TmfTimestamp currentValue;
 
-    protected static int H_MARGIN = 10;
-    protected static int V_MARGIN = 10;
-    protected static int TEXT_SCALE_MARGIN = 20;
-    protected static int SCALE_LENGTH = 100;
+    private static int H_MARGIN = 10;
+    private static int V_MARGIN = 10;
+
+    private static int TEXT_SCALE_MARGIN = 20;
+    private static int SCALE_LENGTH = 100;
 
     protected String msg;
 
@@ -177,4 +178,37 @@ public class DrawableToolTip implements PaintListener {
         for (int i = 0; i < col.length; i++)
             col[i].dispose();
     }
+    
+    protected static int getHorizontalMargin() {
+        return H_MARGIN;
+    }
+
+    protected static void setHorizontalMargin(int margin) {
+        H_MARGIN = margin;
+    }
+
+    protected static int getVerticalMargin() {
+        return V_MARGIN;
+    }
+
+    protected static void setVerticalMargin(int margin) {
+        V_MARGIN = margin;
+    }
+
+    protected static int getTestScaleMargin() {
+        return TEXT_SCALE_MARGIN;
+    }
+
+    protected static void setTestScaleMargin(int testScaleMargin) {
+        TEXT_SCALE_MARGIN = testScaleMargin;
+    }
+
+    protected static int getScaleLength() {
+        return SCALE_LENGTH;
+    }
+
+    protected static void setScaleLength(int scaleLength) {
+        SCALE_LENGTH = scaleLength;
+    }
+
 }

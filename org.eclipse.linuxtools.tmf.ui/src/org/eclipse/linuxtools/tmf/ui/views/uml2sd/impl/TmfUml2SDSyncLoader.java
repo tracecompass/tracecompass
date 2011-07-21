@@ -1239,7 +1239,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
             super.handleData(event);
 
             if ((fMonitor!= null) && fMonitor.isCanceled()) {
-                cancel();
+                super.cancel();
                 return;
             }
 

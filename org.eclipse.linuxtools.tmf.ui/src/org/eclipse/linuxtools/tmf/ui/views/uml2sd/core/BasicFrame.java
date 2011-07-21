@@ -76,7 +76,7 @@ public class BasicFrame extends GraphNode {
     protected int visibleAreaWidth;
     protected int visibleAreaHeight;
 
-    protected static ISDPreferences userPref = null;
+    static ISDPreferences userPref = null;
 
     protected int forceEventOccurrenceSpacing = -1;
 

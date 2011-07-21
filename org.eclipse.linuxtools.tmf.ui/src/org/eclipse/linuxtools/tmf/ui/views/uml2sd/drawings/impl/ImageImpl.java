@@ -12,6 +12,7 @@
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.impl;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -33,26 +34,14 @@ public class ImageImpl implements IImage {
     public ImageImpl(Image img_) {
         img = img_;
     }
-
-    protected static URL BASIC_URL = null;
-    static {
-        // URL to get images from plug-ins
-        // perhaps we can found better code to load images ...
-        // but at this time I know this:
-        try {
-            BASIC_URL = new URL("platform", "localhost", "plugin");//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        } catch (Exception E) {
-            System.err.println(E);
-        }
-    }
-
+    
     public Image getResourceImage(String _name) {
         try {
-            // FIXME: bhufmann: don't use org.eclipse.linuxtools.tmf.ui
+            URL BASIC_URL = new URL("platform", "localhost", "plugin");//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             URL url = new URL(BASIC_URL, "plugin/org.eclipse.linuxtools.tmf.ui/icons/" + _name);//$NON-NLS-1$
             ImageDescriptor img = ImageDescriptor.createFromURL(url);
             return img.createImage();
-        } catch (Exception E) {
+        } catch (MalformedURLException E) {
             System.err.println(E);
         }
         return null;

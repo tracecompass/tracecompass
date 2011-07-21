@@ -46,8 +46,8 @@ public class Zoom extends Action {
     protected boolean fLastZoomOut = false;
     protected boolean fLastZoom = true;
 
-    protected static Cursor fZoomInCursor = null;
-    protected static Cursor fZoomOutCursor = null;
+    private static Cursor fZoomInCursor;
+    private static Cursor fZoomOutCursor;
 
     public static enum ZoomType {
         ZOOM_NONE, ZOOM_IN, ZOOM_OUT, ZOOM_RESET

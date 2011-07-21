@@ -42,7 +42,7 @@ public class LoadersManager {
     public static final String LOADER_PREFIX = LOADER_TAG + "."; //$NON-NLS-1$
 
     // The instance
-    protected static LoadersManager loadersManager;
+    private static LoadersManager loadersManager;
 
     // Maps for caching information
     protected HashMap<String, IUml2SDLoader> fViewLoaderMap = new HashMap<String, IUml2SDLoader>();

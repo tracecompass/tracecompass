@@ -12,6 +12,7 @@
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences;
 
+import java.util.Arrays;
 import java.util.Hashtable;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -43,22 +44,22 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
     public static final String FORE_COLOR_POSTFIX = "_FORE_COLOR";//$NON-NLS-1$
     public static final String TEXT_COLOR_POSTFIX = "_TEXT_COLOR";//$NON-NLS-1$
 
-    public static final String[] fontList = { PREF_LIFELINE, PREF_EXEC, PREF_SYNC_MESS, PREF_SYNC_MESS_RET, PREF_ASYNC_MESS, PREF_ASYNC_MESS_RET, PREF_FRAME, PREF_LIFELINE_HEADER, PREF_FRAME_NAME };
+    private static final String[] fontList = { PREF_LIFELINE, PREF_EXEC, PREF_SYNC_MESS, PREF_SYNC_MESS_RET, PREF_ASYNC_MESS, PREF_ASYNC_MESS_RET, PREF_FRAME, PREF_LIFELINE_HEADER, PREF_FRAME_NAME };
 
-    public static final String[] fontList2 = { SDMessages._88, SDMessages._89, SDMessages._90, SDMessages._91, SDMessages._92, SDMessages._93, SDMessages._94, SDMessages._95, SDMessages._96 };
+    private static final String[] fontList2 = { SDMessages._88, SDMessages._89, SDMessages._90, SDMessages._91, SDMessages._92, SDMessages._93, SDMessages._94, SDMessages._95, SDMessages._96 };
 
-    public static final String[] prefBackColorList = { PREF_LIFELINE, PREF_EXEC, PREF_FRAME, PREF_LIFELINE_HEADER, PREF_FRAME_NAME };
+    private static final String[] prefBackColorList = { PREF_LIFELINE, PREF_EXEC, PREF_FRAME, PREF_LIFELINE_HEADER, PREF_FRAME_NAME };
 
-    public static final String[] prefForeColorList = { PREF_LIFELINE, PREF_EXEC, PREF_SYNC_MESS, PREF_SYNC_MESS_RET, PREF_ASYNC_MESS, PREF_ASYNC_MESS_RET, PREF_FRAME, PREF_LIFELINE_HEADER, PREF_FRAME_NAME };
+    private static final String[] prefForeColorList = { PREF_LIFELINE, PREF_EXEC, PREF_SYNC_MESS, PREF_SYNC_MESS_RET, PREF_ASYNC_MESS, PREF_ASYNC_MESS_RET, PREF_FRAME, PREF_LIFELINE_HEADER, PREF_FRAME_NAME };
 
-    public static final String[] prefTextColorList = { PREF_LIFELINE, PREF_SYNC_MESS, PREF_SYNC_MESS_RET, PREF_ASYNC_MESS, PREF_ASYNC_MESS_RET, PREF_LIFELINE_HEADER, PREF_FRAME_NAME };
+    private static final String[] prefTextColorList = { PREF_LIFELINE, PREF_SYNC_MESS, PREF_SYNC_MESS_RET, PREF_ASYNC_MESS, PREF_ASYNC_MESS_RET, PREF_LIFELINE_HEADER, PREF_FRAME_NAME };
 
     protected Hashtable<String, IFont> fontPref;
     protected Hashtable<String, IColor> foreColorPref;
     protected Hashtable<String, IColor> backColorPref;
     protected Hashtable<String, IColor> textColorPref;
 
-    protected static SDViewPref handle = null;
+    private static SDViewPref handle = null;
     protected IPreferenceStore prefStore = null;
     protected IColor timeCompressionSelectionColor = null;
 
@@ -379,5 +380,40 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
 
     public void setNoFocusSelection(boolean v) {
         noFocusSelection = v;
+    }
+
+    /**
+     * @return static font list
+     */
+    public static String[] getFontList() {
+        return Arrays.copyOf(fontList, fontList.length);
+    }
+    
+    /**
+     * @return 2nd static font list
+     */
+    public static String[] getFontList2() {
+        return Arrays.copyOf(fontList2, fontList2.length);
+    }
+    
+    /**
+     * @return preference background color list
+     */
+    public static String[] getPrefBackColorList() {
+        return Arrays.copyOf(prefBackColorList, prefBackColorList.length);
+    }
+    
+    /**
+     * @return preference foreground color list
+     */
+    public static String[] getPrefForeColorList() {
+        return Arrays.copyOf(prefForeColorList, prefForeColorList.length);
+    }
+    
+    /**
+     * @return preference text color list color list
+     */
+    public static String[] getPrefTextColorList() {
+        return Arrays.copyOf(prefTextColorList, prefTextColorList.length);
     }
 }

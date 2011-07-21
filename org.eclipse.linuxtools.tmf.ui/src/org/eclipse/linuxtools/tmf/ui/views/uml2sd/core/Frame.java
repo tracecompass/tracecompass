@@ -521,7 +521,7 @@ public class Frame extends BasicFrame {
      * @param categories the lifeline categories array
      */
     public void setLifelineCategories(LifelineCategories[] categories) {
-        lifelineCategories = categories;
+        lifelineCategories = Arrays.copyOf(categories, categories.length);
     }
 
     /**
@@ -530,7 +530,7 @@ public class Frame extends BasicFrame {
      * @return the lifeline categories array or null if not set
      */
     public LifelineCategories[] getLifelineCategories() {
-        return lifelineCategories;
+        return  Arrays.copyOf(lifelineCategories, lifelineCategories.length); 
     }
 
     /**
