@@ -13,7 +13,7 @@
 package org.eclipse.linuxtools.lttng.ui.views.project.dialogs;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.linuxtools.lttng.LttngException;
+import org.eclipse.linuxtools.lttng.exceptions.LttngException;
 import org.eclipse.linuxtools.lttng.trace.LTTngTraceVersion;
 import org.eclipse.linuxtools.lttng.ui.views.project.handlers.TraceErrorHandler;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectNode;

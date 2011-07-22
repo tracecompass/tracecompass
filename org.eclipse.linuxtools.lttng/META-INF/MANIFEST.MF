@@ -15,6 +15,7 @@ Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.linuxtools.lttng,
  org.eclipse.linuxtools.lttng.control,
  org.eclipse.linuxtools.lttng.event,
+ org.eclipse.linuxtools.lttng.exceptions,
  org.eclipse.linuxtools.lttng.model,
  org.eclipse.linuxtools.lttng.request,
  org.eclipse.linuxtools.lttng.signal,

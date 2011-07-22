@@ -1,4 +1,4 @@
-package org.eclipse.linuxtools.lttng;
+package org.eclipse.linuxtools.lttng.exceptions;
 
 /**
  * <b><u>LttngException</u></b>
