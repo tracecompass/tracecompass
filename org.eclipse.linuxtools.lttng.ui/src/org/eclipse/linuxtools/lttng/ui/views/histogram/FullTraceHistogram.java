@@ -67,10 +67,13 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
     // Operations
     // ------------------------------------------------------------------------
 
+    public void setFullRange(long startTime, long endTime) {
+        fZoom.setFullRange(startTime, endTime);
+    }
+
     public void setTimeRange(long startTime, long duration) {
         fRangeStartTime = startTime;
         fRangeDuration = duration;
-        fZoom.setFullRange(getStartTime(), getEndTime());
         fZoom.setNewRange(fRangeStartTime, fRangeDuration);
         refresh();
     }

@@ -101,9 +101,10 @@ public class HistogramView extends TmfView {
         super(ID);
     }
 
+    @Override
     public void dispose() {
-    	fFullTraceHistogram.dispose();
-    	fTimeRangeHistogram.dispose();
+        fFullTraceHistogram.dispose();
+        fTimeRangeHistogram.dispose();
     }
 
     // ------------------------------------------------------------------------
@@ -275,7 +276,7 @@ public class HistogramView extends TmfView {
             // Build the new time range; keep the current time
             TmfTimeRange timeRange = new TmfTimeRange(new TmfTimestamp(startTime, TIME_SCALE), new TmfTimestamp(endTime, TIME_SCALE));
             TmfTimestamp currentTime = new TmfTimestamp(fCurrentTimestamp, TIME_SCALE);
-            
+
             fTimeSpanControl.setValue(endTime - startTime);
 
             // Send the FW signal
@@ -286,24 +287,24 @@ public class HistogramView extends TmfView {
 
     public synchronized void updateTimeRange(long newDuration) {
         if (fCurrentExperiment != null) {
-        	long delta = newDuration - fWindowSpan;
-        	long newStartTime = fWindowStartTime + delta / 2;
-        	setNewRange(newStartTime, newDuration);
+            long delta = newDuration - fWindowSpan;
+            long newStartTime = fWindowStartTime + delta / 2;
+            setNewRange(newStartTime, newDuration);
         }
     }
 
     private void setNewRange(long startTime, long duration) {
         if (startTime < fExperimentStartTime)
-        	startTime = fExperimentStartTime;
+            startTime = fExperimentStartTime;
 
         long endTime = startTime + duration;
         if (endTime > fExperimentEndTime) {
-        	endTime = fExperimentEndTime;
-        	if (endTime - duration > fExperimentStartTime)
-        		startTime = endTime - duration;
-        	else {
-        		startTime = fExperimentStartTime;
-        	}
+            endTime = fExperimentEndTime;
+            if (endTime - duration > fExperimentStartTime)
+                startTime = endTime - duration;
+            else {
+                startTime = fExperimentStartTime;
+            }
         }
         updateTimeRange(startTime, endTime);
     }
@@ -380,16 +381,17 @@ public class HistogramView extends TmfView {
         fTimeRangeHistogram.setTimeRange(fExperimentStartTime, INITIAL_WINDOW_SPAN);
         fTimeRangeHistogram.setCurrentEvent(fExperimentStartTime);
 
+        fFullTraceHistogram.setFullRange(fExperimentStartTime, fExperimentEndTime);
         fFullTraceHistogram.setTimeRange(fExperimentStartTime, INITIAL_WINDOW_SPAN);
         fFullTraceHistogram.setCurrentEvent(fExperimentStartTime);
 
         fWindowStartTime = fExperimentStartTime;
         fWindowSpan = INITIAL_WINDOW_SPAN;
         fWindowEndTime = fWindowStartTime + fWindowSpan;
-        
+
         fCurrentEventTimeControl.setValue(fExperimentStartTime);
         fTimeSpanControl.setValue(fWindowSpan);
-        
+
         sendTimeRangeRequest(fExperimentStartTime, fExperimentStartTime + fWindowSpan);
         sendFullRangeRequest();
     }
