@@ -11,7 +11,7 @@ package org.eclipse.linuxtools.lttng.trace;
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
-import org.eclipse.linuxtools.lttng.LttngException;
+import org.eclipse.linuxtools.lttng.exceptions.LttngException;
 import org.eclipse.linuxtools.lttng.jni.exception.JniTraceVersionException;
 import org.eclipse.linuxtools.lttng.jni.factory.JniTraceVersion;
 
