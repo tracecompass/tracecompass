@@ -89,7 +89,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     private static final Color COLOR_TEXT_BACKGROUND = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
     private static final Color COLOR_WIDGET_BACKGROUND = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 
-    private ISelection selection;
+    private final ISelection selection;
     private CustomXmlTraceDefinition definition;
     private String editDefinitionName;
     private String defaultDescription;
@@ -141,29 +141,29 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         }
     }
 
-	@Override
+    @Override
     public void createControl(Composite parent) {
         container = new Composite(parent, SWT.NULL);
         container.setLayout(new GridLayout());
 
         updateListener = new UpdateListener();
-        
+
         Composite headerComposite = new Composite(container, SWT.FILL);
         GridLayout headerLayout = new GridLayout(5, false);
         headerLayout.marginHeight = 0;
         headerLayout.marginWidth = 0;
         headerComposite.setLayout(headerLayout);
         headerComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-        
+
         Label logtypeLabel = new Label(headerComposite, SWT.NULL);
         logtypeLabel.setText(Messages.CustomXmlParserInputWizardPage_logType);
-        
+
         logtypeText = new Text(headerComposite, SWT.BORDER | SWT.SINGLE);
         logtypeText.setLayoutData(new GridData(120, SWT.DEFAULT));
-        
+
         Label timeStampFormatLabel = new Label(headerComposite, SWT.NULL);
         timeStampFormatLabel.setText(Messages.CustomXmlParserInputWizardPage_timestampFormat);
-        
+
         timeStampOutputFormatText = new Text(headerComposite, SWT.BORDER | SWT.SINGLE);
         timeStampOutputFormatText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         timeStampOutputFormatText.setText(DEFAULT_TIMESTAMP_FORMAT);
@@ -172,22 +172,22 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         dateFormatHelpButton.setImage(helpImage);
         dateFormatHelpButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_dateFormatHelp);
         dateFormatHelpButton.addSelectionListener(new SelectionAdapter() {
-        	@Override
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 openHelpShell(SIMPLE_DATE_FORMAT_URL);
             }
         });
-        
+
         Label timeStampPreviewLabel = new Label(headerComposite, SWT.NULL);
         timeStampPreviewLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 3, 1));
         timeStampPreviewLabel.setText(Messages.CustomXmlParserInputWizardPage_preview);
-        
+
         timeStampPreviewText = new Text(headerComposite, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
         timeStampPreviewText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
         timeStampPreviewText.setText("*no time stamp element or attribute*"); //$NON-NLS-1$
 
         createButtonBar();
-        
+
         SashForm vSash = new SashForm(container, SWT.VERTICAL);
         vSash.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         vSash.setBackground(vSash.getDisplay().getSystemColor(SWT.COLOR_GRAY));
@@ -202,15 +202,16 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         treeScrolledComposite.setContent(treeContainer);
         treeScrolledComposite.setExpandHorizontal(true);
         treeScrolledComposite.setExpandVertical(true);
-        
+
         treeViewer = new TreeViewer(treeContainer, SWT.SINGLE | SWT.BORDER);
         treeViewer.setContentProvider(new InputElementTreeNodeContentProvider());
         treeViewer.setLabelProvider(new InputElementTreeLabelProvider());
         treeViewer.addSelectionChangedListener(new InputElementTreeSelectionChangedListener());
         treeContainer.layout();
-        
-        treeScrolledComposite.setMinSize(treeContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, treeContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-        
+
+        treeScrolledComposite
+                .setMinSize(treeContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, treeContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+
         elementScrolledComposite = new ScrolledComposite(hSash, SWT.V_SCROLL);
         elementScrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         elementContainer = new Composite(elementScrolledComposite, SWT.NONE);
@@ -228,14 +229,15 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         loadDefinition(definition);
         treeViewer.expandAll();
         elementContainer.layout();
-        
+
         logtypeText.addModifyListener(updateListener);
         timeStampOutputFormatText.addModifyListener(updateListener);
-        
-        elementScrolledComposite.setMinSize(elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y-1);
-        
-        hSash.setWeights(new int[] {1, 2});
-        
+
+        elementScrolledComposite.setMinSize(elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x,
+                elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y - 1);
+
+        hSash.setWeights(new int[] { 1, 2 });
+
         if (definition.rootInputElement == null) {
             removeButton.setEnabled(false);
             addChildButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_addDocumentElement);
@@ -245,7 +247,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         } else { // root is selected
             addNextButton.setEnabled(false);
         }
-        
+
         Composite sashBottom = new Composite(vSash, SWT.NONE);
         GridLayout sashBottomLayout = new GridLayout(2, false);
         sashBottomLayout.marginHeight = 0;
@@ -259,7 +261,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         errorText.setBackground(COLOR_WIDGET_BACKGROUND);
         errorText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         errorText.setVisible(false);
-        
+
         inputText = new StyledText(sashBottom, SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
         if (fixedFont == null) {
             if (System.getProperty("os.name").contains("Windows")) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -274,15 +276,16 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         gd.widthHint = 800;
         inputText.setLayoutData(gd);
         inputText.setText(getSelectionText());
-        inputText.addModifyListener(new ModifyListener(){
-        	@Override
+        inputText.addModifyListener(new ModifyListener() {
+            @Override
             public void modifyText(ModifyEvent e) {
                 parseXmlInput(inputText.getText());
-            }});
+            }
+        });
         inputText.addModifyListener(updateListener);
 
-        vSash.setWeights(new int[] {hSash.computeSize(SWT.DEFAULT, SWT.DEFAULT).y, sashBottom.computeSize(SWT.DEFAULT, SWT.DEFAULT).y});
-        
+        vSash.setWeights(new int[] { hSash.computeSize(SWT.DEFAULT, SWT.DEFAULT).y, sashBottom.computeSize(SWT.DEFAULT, SWT.DEFAULT).y });
+
         setControl(container);
     }
 
@@ -292,14 +295,15 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         buttonBarLayout.marginHeight = 0;
         buttonBarLayout.marginWidth = 0;
         buttonBar.setLayout(buttonBarLayout);
-        
+
         removeButton = new Button(buttonBar, SWT.PUSH);
         removeButton.setImage(deleteImage);
         removeButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_removeElement);
         removeButton.addSelectionListener(new SelectionAdapter() {
-        	@Override
+            @Override
             public void widgetSelected(SelectionEvent e) {
-                if (treeViewer.getSelection().isEmpty() || selectedElement == null) return;
+                if (treeViewer.getSelection().isEmpty() || selectedElement == null)
+                    return;
                 removeElement();
                 InputElement inputElement = (InputElement) ((IStructuredSelection) treeViewer.getSelection()).getFirstElement();
                 if (inputElement == definition.rootInputElement) {
@@ -322,12 +326,12 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 moveDownButton.setEnabled(false);
             }
         });
-        
+
         addChildButton = new Button(buttonBar, SWT.PUSH);
         addChildButton.setImage(addChildImage);
         addChildButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_addChildElement);
         addChildButton.addSelectionListener(new SelectionAdapter() {
-        	@Override
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 InputElement inputElement = new InputElement("", false, CustomXmlTraceDefinition.TAG_IGNORE, 0, "", null); //$NON-NLS-1$ //$NON-NLS-2$
                 if (definition.rootInputElement == null) {
@@ -344,12 +348,12 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 treeViewer.setSelection(new StructuredSelection(inputElement), true);
             }
         });
-        
+
         addNextButton = new Button(buttonBar, SWT.PUSH);
         addNextButton.setImage(addNextImage);
         addNextButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_addNextElement);
         addNextButton.addSelectionListener(new SelectionAdapter() {
-        	@Override
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 InputElement inputElement = new InputElement("", false, CustomXmlTraceDefinition.TAG_IGNORE, 0, "", null); //$NON-NLS-1$ //$NON-NLS-2$
                 if (definition.rootInputElement == null) {
@@ -370,12 +374,12 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 treeViewer.setSelection(new StructuredSelection(inputElement), true);
             }
         });
-        
+
         feelingLuckyButton = new Button(buttonBar, SWT.PUSH);
         feelingLuckyButton.setImage(addManyImage);
         feelingLuckyButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_feelingLucky);
         feelingLuckyButton.addSelectionListener(new SelectionAdapter() {
-        	@Override
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 InputElement inputElement = null;
                 if (definition.rootInputElement == null) {
@@ -383,6 +387,8 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                         inputElement = new InputElement(getChildNameSuggestion(null), false, CustomXmlTraceDefinition.TAG_IGNORE, 0, "", null); //$NON-NLS-1$
                         definition.rootInputElement = inputElement;
                         feelingLucky(inputElement);
+                    } else {
+                        return;
                     }
                 } else if (treeViewer.getSelection().isEmpty()) {
                     return;
@@ -395,14 +401,15 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 treeViewer.expandToLevel(inputElement, TreeViewer.ALL_LEVELS);
             }
         });
-        
+
         moveUpButton = new Button(buttonBar, SWT.PUSH);
         moveUpButton.setImage(moveUpImage);
         moveUpButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_moveUp);
         moveUpButton.addSelectionListener(new SelectionAdapter() {
-        	@Override
+            @Override
             public void widgetSelected(SelectionEvent e) {
-                if (treeViewer.getSelection().isEmpty()) return;
+                if (treeViewer.getSelection().isEmpty())
+                    return;
                 InputElement inputElement = (InputElement) ((IStructuredSelection) treeViewer.getSelection()).getFirstElement();
                 if (inputElement == definition.rootInputElement) {
                     return;
@@ -414,14 +421,15 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 updatePreviews();
             }
         });
-        
+
         moveDownButton = new Button(buttonBar, SWT.PUSH);
         moveDownButton.setImage(moveDownImage);
         moveDownButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_moveDown);
         moveDownButton.addSelectionListener(new SelectionAdapter() {
-        	@Override
+            @Override
             public void widgetSelected(SelectionEvent e) {
-                if (treeViewer.getSelection().isEmpty()) return;
+                if (treeViewer.getSelection().isEmpty())
+                    return;
                 InputElement inputElement = (InputElement) ((IStructuredSelection) treeViewer.getSelection()).getFirstElement();
                 if (inputElement == definition.rootInputElement) {
                     return;
@@ -456,47 +464,48 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             }
         }
     }
-    
+
     private class InputElementTreeNodeContentProvider implements ITreeContentProvider {
 
-    	@Override
+        @Override
         public Object[] getElements(Object inputElement) {
             CustomXmlTraceDefinition def = (CustomXmlTraceDefinition) inputElement;
             if (def.rootInputElement != null) {
-                return new Object[] {def.rootInputElement};
+                return new Object[] { def.rootInputElement };
             } else {
                 return new Object[0];
             }
         }
 
-    	@Override
+        @Override
         public Object[] getChildren(Object parentElement) {
             InputElement inputElement = (InputElement) parentElement;
-            if (inputElement.childElements == null) return new InputElement[0];
+            if (inputElement.childElements == null)
+                return new InputElement[0];
             return inputElement.childElements.toArray();
         }
 
-    	@Override
+        @Override
         public boolean hasChildren(Object element) {
             InputElement inputElement = (InputElement) element;
             return (inputElement.childElements != null && inputElement.childElements.size() > 0);
         }
 
-    	@Override
+        @Override
         public void dispose() {
         }
 
-    	@Override
+        @Override
         public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         }
 
-    	@Override
+        @Override
         public Object getParent(Object element) {
             InputElement inputElement = (InputElement) element;
             return inputElement.parentElement;
         }
     }
-    
+
     private class InputElementTreeLabelProvider extends ColumnLabelProvider {
 
         @Override
@@ -512,7 +521,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     }
 
     private class InputElementTreeSelectionChangedListener implements ISelectionChangedListener {
-    	@Override
+        @Override
         public void selectionChanged(SelectionChangedEvent event) {
             if (selectedElement != null) {
                 selectedElement.dispose();
@@ -522,7 +531,8 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 InputElement inputElement = (InputElement) selection.getFirstElement();
                 selectedElement = new ElementNode(elementContainer, inputElement);
                 elementContainer.layout();
-                elementScrolledComposite.setMinSize(elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y-1);
+                elementScrolledComposite.setMinSize(elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x,
+                        elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y - 1);
                 container.layout();
                 validate();
                 updatePreviews();
@@ -550,8 +560,10 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             }
         }
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.jface.dialogs.DialogPage#dispose()
      */
     @Override
@@ -567,12 +579,12 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         logtypeText.setText(def.definitionName);
         timeStampOutputFormatText.setText(def.timeStampOutputFormat);
         treeViewer.setInput(def);
-        
+
         if (def.rootInputElement != null) {
             treeViewer.setSelection(new StructuredSelection(def.rootInputElement));
         }
     }
-    
+
     private String getName(InputElement inputElement) {
         String name = (inputElement.elementName.trim().length() == 0) ? "?" : inputElement.elementName.trim(); //$NON-NLS-1$
         if (inputElement.parentElement == null) {
@@ -586,7 +598,9 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         return getName(inputElement) + " : " + name; //$NON-NLS-1$
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.jface.dialogs.DialogPage#setVisible(boolean)
      */
     @Override
@@ -601,7 +615,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     public List<String> getInputNames() {
         return getInputNames(definition.rootInputElement);
     }
-    
+
     public List<String> getInputNames(InputElement inputElement) {
         List<String> inputs = new ArrayList<String>();
         if (inputElement.inputName != null && !inputElement.inputName.equals(CustomXmlTraceDefinition.TAG_IGNORE)) {
@@ -629,21 +643,22 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         }
         return inputs;
     }
-    
+
     private void removeElement() {
         selectedElement.dispose();
         selectedElement = null;
         elementContainer.layout();
-        elementScrolledComposite.setMinSize(elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y-1);
+        elementScrolledComposite.setMinSize(elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x,
+                elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y - 1);
         container.layout();
     }
 
     private String getSelectionText() {
         InputStream inputStream = null;
         if (this.selection instanceof IStructuredSelection) {
-            Object selection = ((IStructuredSelection)this.selection).getFirstElement();
+            Object selection = ((IStructuredSelection) this.selection).getFirstElement();
             if (selection instanceof IFile) {
-                IFile file = (IFile)selection;
+                IFile file = (IFile) selection;
                 try {
                     inputStream = file.getContents();
                 } catch (CoreException e) {
@@ -667,16 +682,16 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         }
         return ""; //$NON-NLS-1$
     }
-    
+
     private void parseXmlInput(final String string) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
-            EntityResolver resolver = new EntityResolver () {
-            	@Override
-                public InputSource resolveEntity (String publicId, String systemId) {
+            EntityResolver resolver = new EntityResolver() {
+                @Override
+                public InputSource resolveEntity(String publicId, String systemId) {
                     String empty = ""; //$NON-NLS-1$
                     ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
                     return new InputSource(bais);
@@ -685,12 +700,16 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             db.setEntityResolver(resolver);
 
             // The following catches xml parsing exceptions
-            db.setErrorHandler(new ErrorHandler(){
-            	@Override
-                public void error(SAXParseException saxparseexception) throws SAXException {}
-            	@Override
-                public void warning(SAXParseException saxparseexception) throws SAXException {}
-            	@Override
+            db.setErrorHandler(new ErrorHandler() {
+                @Override
+                public void error(SAXParseException saxparseexception) throws SAXException {
+                }
+
+                @Override
+                public void warning(SAXParseException saxparseexception) throws SAXException {
+                }
+
+                @Override
                 public void fatalError(SAXParseException saxparseexception) throws SAXException {
                     if (string.trim().length() != 0) {
                         errorText.setText(saxparseexception.getMessage());
@@ -698,8 +717,9 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                         errorText.setVisible(true);
                     }
                     throw saxparseexception;
-                }});
-            
+                }
+            });
+
             errorText.setVisible(false);
             Document doc = null;
             doc = db.parse(new ByteArrayInputStream(string.getBytes()));
@@ -728,12 +748,12 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         if (selectedElement == null) {
             return;
         }
-        
+
         timeStampValue = null;
         timeStampFormat = null;
         logEntriesCount = 0;
         logEntryFound = false;
-        
+
         selectedElement.updatePreview();
 
         if (timeStampValue != null && timeStampFormat != null) {
@@ -764,12 +784,12 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         helpShell.setLayout(new FillLayout());
         helpBrowser = new Browser(helpShell, SWT.NONE);
         helpBrowser.addTitleListener(new TitleListener() {
-        	@Override
-           public void changed(TitleEvent event) {
-               helpShell.setText(event.title);
-           }
+            @Override
+            public void changed(TitleEvent event) {
+                helpShell.setText(event.title);
+            }
         });
-        helpBrowser.setBounds(0,0,600,400);
+        helpBrowser.setBounds(0, 0, 600, 400);
         helpShell.pack();
         helpShell.open();
         helpBrowser.setUrl(url);
@@ -777,26 +797,26 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
     private class UpdateListener implements ModifyListener, SelectionListener {
 
-    	@Override
+        @Override
         public void modifyText(ModifyEvent e) {
             validate();
             updatePreviews();
         }
 
-    	@Override
+        @Override
         public void widgetDefaultSelected(SelectionEvent e) {
             validate();
             updatePreviews();
         }
 
-    	@Override
+        @Override
         public void widgetSelected(SelectionEvent e) {
             validate();
             updatePreviews();
         }
 
     }
-    
+
     private class ElementNode {
         final InputElement inputElement;
         final Group group;
@@ -815,31 +835,32 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         Composite addAttributeComposite;
         Button addAttributeButton;
         Label addAttributeLabel;
-        
+
         public ElementNode(Composite parent, InputElement inputElement) {
             this.inputElement = inputElement;
-            
+
             group = new Group(parent, SWT.NONE);
             GridLayout gl = new GridLayout(2, false);
             gl.marginHeight = 0;
             group.setLayout(gl);
             group.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
             group.setText(getName(inputElement));
-            
+
             Label label = new Label(group, SWT.NULL);
             label.setText(Messages.CustomXmlParserInputWizardPage_elementName);
             label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-            
+
             elementNameText = new Text(group, SWT.BORDER | SWT.SINGLE);
             GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
             gd.widthHint = 0;
             elementNameText.setLayoutData(gd);
-            elementNameText.addModifyListener(new ModifyListener(){
-            	@Override
+            elementNameText.addModifyListener(new ModifyListener() {
+                @Override
                 public void modifyText(ModifyEvent e) {
                     ElementNode.this.inputElement.elementName = elementNameText.getText().trim();
                     group.setText(getName(ElementNode.this.inputElement));
-                }});
+                }
+            });
             elementNameText.setText(inputElement.elementName);
             elementNameText.addModifyListener(updateListener);
 
@@ -847,96 +868,101 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 previewLabel = new Label(group, SWT.NULL);
                 previewLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
                 previewLabel.setText(Messages.CustomXmlParserInputWizardPage_preview);
-                
+
                 previewText = new Text(group, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
                 gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
                 gd.widthHint = 0;
                 previewText.setLayoutData(gd);
                 previewText.setText(Messages.CustomXmlParserInputWizardPage_noMatchingElement);
                 previewText.setBackground(COLOR_WIDGET_BACKGROUND);
-                
+
                 logEntryButton = new Button(group, SWT.CHECK);
                 logEntryButton.setText(Messages.CustomXmlParserInputWizardPage_logEntry);
                 logEntryButton.setSelection(inputElement.logEntry);
-                logEntryButton.addSelectionListener(new SelectionListener(){
-                	@Override
-                    public void widgetDefaultSelected(SelectionEvent e) {}
-                	@Override
+                logEntryButton.addSelectionListener(new SelectionListener() {
+                    @Override
+                    public void widgetDefaultSelected(SelectionEvent e) {
+                    }
+
+                    @Override
                     public void widgetSelected(SelectionEvent e) {
                         InputElement parent = ElementNode.this.inputElement.parentElement;
                         while (parent != null) {
                             parent.logEntry = false;
                             parent = parent.parentElement;
                         }
-                    }});
+                    }
+                });
                 logEntryButton.addSelectionListener(updateListener);
-    
+
                 tagComposite = new Composite(group, SWT.FILL);
                 GridLayout tagLayout = new GridLayout(4, false);
                 tagLayout.marginWidth = 0;
                 tagLayout.marginHeight = 0;
                 tagComposite.setLayout(tagLayout);
                 tagComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-                
+
                 tagCombo = new Combo(tagComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
-                tagCombo.setItems(new String[] {CustomXmlTraceDefinition.TAG_IGNORE,
-                                                CustomXmlTraceDefinition.TAG_TIMESTAMP,
-                                                CustomXmlTraceDefinition.TAG_MESSAGE,
-                                                CustomXmlTraceDefinition.TAG_OTHER});
+                tagCombo.setItems(new String[] { CustomXmlTraceDefinition.TAG_IGNORE, CustomXmlTraceDefinition.TAG_TIMESTAMP,
+                        CustomXmlTraceDefinition.TAG_MESSAGE, CustomXmlTraceDefinition.TAG_OTHER });
                 tagCombo.setVisibleItemCount(tagCombo.getItemCount());
-                tagCombo.addSelectionListener(new SelectionListener(){
-                	@Override
-                    public void widgetDefaultSelected(SelectionEvent e) {}
-                	@Override
+                tagCombo.addSelectionListener(new SelectionListener() {
+                    @Override
+                    public void widgetDefaultSelected(SelectionEvent e) {
+                    }
+
+                    @Override
                     public void widgetSelected(SelectionEvent e) {
                         tagText.removeModifyListener(updateListener);
                         switch (tagCombo.getSelectionIndex()) {
-                        case 0: //Ignore
-                            tagLabel.setVisible(false);
-                            tagText.setVisible(false);
-                            actionCombo.setVisible(false);
-                            break;
-                        case 1: //Time Stamp
-                            tagLabel.setText(Messages.CustomXmlParserInputWizardPage_format);
-                            tagLabel.setVisible(true);
-                            tagText.setVisible(true);
-                            tagText.addModifyListener(updateListener);
-                            actionCombo.setVisible(true);
-                            break;
-                        case 2: //Message
-                            tagLabel.setVisible(false);
-                            tagText.setVisible(false);
-                            actionCombo.setVisible(true);
-                            break;
-                        case 3: //Other
-                            tagLabel.setText(Messages.CustomXmlParserInputWizardPage_tagName);
-                            tagLabel.setVisible(true);
-                            if (tagText.getText().trim().length() == 0) {
-                                tagText.setText(elementNameText.getText().trim());
-                            }
-                            tagText.setVisible(true);
-                            tagText.addModifyListener(updateListener);
-                            actionCombo.setVisible(true);
-                            break;
+                            case 0: // Ignore
+                                tagLabel.setVisible(false);
+                                tagText.setVisible(false);
+                                actionCombo.setVisible(false);
+                                break;
+                            case 1: // Time Stamp
+                                tagLabel.setText(Messages.CustomXmlParserInputWizardPage_format);
+                                tagLabel.setVisible(true);
+                                tagText.setVisible(true);
+                                tagText.addModifyListener(updateListener);
+                                actionCombo.setVisible(true);
+                                break;
+                            case 2: // Message
+                                tagLabel.setVisible(false);
+                                tagText.setVisible(false);
+                                actionCombo.setVisible(true);
+                                break;
+                            case 3: // Other
+                                tagLabel.setText(Messages.CustomXmlParserInputWizardPage_tagName);
+                                tagLabel.setVisible(true);
+                                if (tagText.getText().trim().length() == 0) {
+                                    tagText.setText(elementNameText.getText().trim());
+                                }
+                                tagText.setVisible(true);
+                                tagText.addModifyListener(updateListener);
+                                actionCombo.setVisible(true);
+                                break;
                         }
                         tagComposite.layout();
                         validate();
                         updatePreviews();
-                    }});
-                
+                    }
+                });
+
                 tagLabel = new Label(tagComposite, SWT.NULL);
                 tagLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-                
+
                 tagText = new Text(tagComposite, SWT.BORDER | SWT.SINGLE);
                 gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
                 gd.widthHint = 0;
                 tagText.setLayoutData(gd);
-                
+
                 actionCombo = new Combo(tagComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
-                actionCombo.setItems(new String[] {Messages.CustomXmlParserInputWizardPage_set, Messages.CustomXmlParserInputWizardPage_append, Messages.CustomXmlParserInputWizardPage_appendWith});
+                actionCombo.setItems(new String[] { Messages.CustomXmlParserInputWizardPage_set, Messages.CustomXmlParserInputWizardPage_append,
+                        Messages.CustomXmlParserInputWizardPage_appendWith });
                 actionCombo.select(inputElement.inputAction);
                 actionCombo.addSelectionListener(updateListener);
-                
+
                 if (inputElement.inputName.equals(CustomXmlTraceDefinition.TAG_IGNORE)) {
                     tagCombo.select(0);
                     tagLabel.setVisible(false);
@@ -961,17 +987,18 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
             if (inputElement.attributes != null) {
                 for (InputAttribute inputAttribute : inputElement.attributes) {
-                    Attribute attribute = new Attribute(group, this, inputAttribute, attributes.size()+1);
+                    Attribute attribute = new Attribute(group, this, inputAttribute, attributes.size() + 1);
                     attributes.add(attribute);
                 }
             }
-            
+
             createAddButton();
         }
-        
+
         private void updatePreview() {
             Element element = getPreviewElement(inputElement);
-            if (inputElement.parentElement != null) { // no preview text for document element
+            if (inputElement.parentElement != null) { // no preview text for
+                                                      // document element
                 previewText.setText(Messages.CustomXmlParserInputWizardPage_noMatchingElement);
                 if (element != null) {
                     previewText.setText(CustomXmlTrace.parseElement(element, new StringBuffer()).toString());
@@ -980,7 +1007,8 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                             logEntryFound = true;
                             logEntriesCount++;
                         } else {
-                            logEntryButton.setSelection(false); // remove nested log entry
+                            logEntryButton.setSelection(false); // remove nested
+                                                                // log entry
                         }
                     }
                     if (tagCombo.getText().equals(CustomXmlTraceDefinition.TAG_TIMESTAMP) && logEntriesCount <= 1) {
@@ -1054,33 +1082,34 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
         private void createAddButton() {
             fillerLabel = new Label(group, SWT.NONE);
-            
+
             addAttributeComposite = new Composite(group, SWT.NONE);
             addAttributeComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
             GridLayout addAttributeLayout = new GridLayout(2, false);
             addAttributeLayout.marginHeight = 0;
             addAttributeLayout.marginWidth = 0;
             addAttributeComposite.setLayout(addAttributeLayout);
-            
+
             addAttributeButton = new Button(addAttributeComposite, SWT.PUSH);
             addAttributeButton.setImage(addImage);
             addAttributeButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_addAttribute);
             addAttributeButton.addSelectionListener(new SelectionAdapter() {
-            	@Override
+                @Override
                 public void widgetSelected(SelectionEvent e) {
                     removeAddButton();
                     String attributeName = getAttributeNameSuggestion(inputElement);
                     InputAttribute inputAttribute = new InputAttribute(attributeName, attributeName, 0, ""); //$NON-NLS-1$
-                    attributes.add(new Attribute(group, ElementNode.this, inputAttribute, attributes.size()+1));
+                    attributes.add(new Attribute(group, ElementNode.this, inputAttribute, attributes.size() + 1));
                     createAddButton();
                     elementContainer.layout();
-                    elementScrolledComposite.setMinSize(elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y-1);
+                    elementScrolledComposite.setMinSize(elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x,
+                            elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y - 1);
                     group.getParent().layout();
                     validate();
                     updatePreviews();
                 }
             });
-            
+
             addAttributeLabel = new Label(addAttributeComposite, SWT.NULL);
             addAttributeLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
             addAttributeLabel.setText(Messages.CustomXmlParserInputWizardPage_newAttibute);
@@ -1090,19 +1119,20 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             fillerLabel.dispose();
             addAttributeComposite.dispose();
         }
-        
+
         private void removeAttribute(int attributeNumber) {
             if (--attributeNumber < attributes.size()) {
                 attributes.remove(attributeNumber).dispose();
                 for (int i = attributeNumber; i < attributes.size(); i++) {
-                    attributes.get(i).setAttributeNumber(i+1);
+                    attributes.get(i).setAttributeNumber(i + 1);
                 }
                 elementContainer.layout();
-                elementScrolledComposite.setMinSize(elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y-1);
+                elementScrolledComposite.setMinSize(elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x,
+                        elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y - 1);
                 group.getParent().layout();
             }
         }
-        
+
         private void dispose() {
             group.dispose();
         }
@@ -1143,7 +1173,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     private class Attribute {
         ElementNode element;
         int attributeNumber;
-        
+
         // children of parent (must be disposed)
         Composite labelComposite;
         Composite attributeComposite;
@@ -1152,45 +1182,45 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
         // children of labelComposite
         Label attributeLabel;
-        
+
         // children of attributeComposite
         Text attributeNameText;
         Text previewText;
-        
+
         // children of tagComposite
         Combo tagCombo;
         Label tagLabel;
         Text tagText;
         Combo actionCombo;
-        
+
         public Attribute(Composite parent, ElementNode element, InputAttribute inputAttribute, int attributeNumber) {
             this.element = element;
             this.attributeNumber = attributeNumber;
-            
+
             labelComposite = new Composite(parent, SWT.FILL);
             GridLayout labelLayout = new GridLayout(2, false);
             labelLayout.marginWidth = 0;
             labelLayout.marginHeight = 0;
             labelComposite.setLayout(labelLayout);
             labelComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-            
+
             Button deleteButton = new Button(labelComposite, SWT.PUSH);
             deleteButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
             deleteButton.setImage(deleteImage);
             deleteButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_removeAttribute);
             deleteButton.addSelectionListener(new SelectionAdapter() {
-            	@Override
+                @Override
                 public void widgetSelected(SelectionEvent e) {
                     Attribute.this.element.removeAttribute(Attribute.this.attributeNumber);
                     validate();
                     updatePreviews();
                 }
             });
-            
+
             attributeLabel = new Label(labelComposite, SWT.NULL);
             attributeLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
             attributeLabel.setText(Messages.CustomXmlParserInputWizardPage_attibute);
-            
+
             attributeComposite = new Composite(parent, SWT.FILL);
             GridLayout attributeLayout = new GridLayout(4, false);
             attributeLayout.marginWidth = 0;
@@ -1200,15 +1230,15 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
             Label nameLabel = new Label(attributeComposite, SWT.NONE);
             nameLabel.setText(Messages.CustomXmlParserInputWizardPage_name);
-            
+
             attributeNameText = new Text(attributeComposite, SWT.BORDER | SWT.SINGLE);
             attributeNameText.setLayoutData(new GridData(120, SWT.DEFAULT));
             attributeNameText.setText(inputAttribute.attributeName);
             attributeNameText.addModifyListener(updateListener);
-            
+
             Label previewLabel = new Label(attributeComposite, SWT.NONE);
             previewLabel.setText(Messages.CustomXmlParserInputWizardPage_preview);
-            
+
             previewText = new Text(attributeComposite, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
             GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
             gd.widthHint = 0;
@@ -1217,65 +1247,68 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             previewText.setBackground(COLOR_WIDGET_BACKGROUND);
 
             filler = new Label(parent, SWT.NULL);
-            
+
             tagComposite = new Composite(parent, SWT.FILL);
             GridLayout tagLayout = new GridLayout(4, false);
             tagLayout.marginWidth = 0;
             tagLayout.marginHeight = 0;
             tagComposite.setLayout(tagLayout);
             tagComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-            
+
             tagCombo = new Combo(tagComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
-            tagCombo.setItems(new String[] {CustomXmlTraceDefinition.TAG_TIMESTAMP,
-                                            CustomXmlTraceDefinition.TAG_MESSAGE,
-                                            CustomXmlTraceDefinition.TAG_OTHER});
-            tagCombo.select(2); //Other
-            tagCombo.addSelectionListener(new SelectionListener(){
-            	@Override
-                public void widgetDefaultSelected(SelectionEvent e) {}
-            	@Override
+            tagCombo.setItems(new String[] { CustomXmlTraceDefinition.TAG_TIMESTAMP, CustomXmlTraceDefinition.TAG_MESSAGE,
+                    CustomXmlTraceDefinition.TAG_OTHER });
+            tagCombo.select(2); // Other
+            tagCombo.addSelectionListener(new SelectionListener() {
+                @Override
+                public void widgetDefaultSelected(SelectionEvent e) {
+                }
+
+                @Override
                 public void widgetSelected(SelectionEvent e) {
                     tagText.removeModifyListener(updateListener);
                     switch (tagCombo.getSelectionIndex()) {
-                    case 0: //Time Stamp
-                        tagLabel.setText(Messages.CustomXmlParserInputWizardPage_format);
-                        tagLabel.setVisible(true);
-                        tagText.setVisible(true);
-                        tagText.addModifyListener(updateListener);
-                        break;
-                    case 1: //Message
-                        tagLabel.setVisible(false);
-                        tagText.setVisible(false);
-                        break;
-                    case 2: //Other
-                        tagLabel.setText(Messages.CustomXmlParserInputWizardPage_tagName);
-                        tagLabel.setVisible(true);
-                        if (tagText.getText().trim().length() == 0) {
-                            tagText.setText(attributeNameText.getText().trim());
-                        }
-                        tagText.setVisible(true);
-                        tagText.addModifyListener(updateListener);
-                        break;
+                        case 0: // Time Stamp
+                            tagLabel.setText(Messages.CustomXmlParserInputWizardPage_format);
+                            tagLabel.setVisible(true);
+                            tagText.setVisible(true);
+                            tagText.addModifyListener(updateListener);
+                            break;
+                        case 1: // Message
+                            tagLabel.setVisible(false);
+                            tagText.setVisible(false);
+                            break;
+                        case 2: // Other
+                            tagLabel.setText(Messages.CustomXmlParserInputWizardPage_tagName);
+                            tagLabel.setVisible(true);
+                            if (tagText.getText().trim().length() == 0) {
+                                tagText.setText(attributeNameText.getText().trim());
+                            }
+                            tagText.setVisible(true);
+                            tagText.addModifyListener(updateListener);
+                            break;
                     }
                     tagComposite.layout();
                     validate();
                     updatePreviews();
-                }});
-            
+                }
+            });
+
             tagLabel = new Label(tagComposite, SWT.NULL);
             tagLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-            
+
             tagText = new Text(tagComposite, SWT.BORDER | SWT.SINGLE);
             gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
             gd.widthHint = 0;
             tagText.setLayoutData(gd);
             tagText.setText(attributeNameText.getText());
-            
+
             actionCombo = new Combo(tagComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
-            actionCombo.setItems(new String[] {Messages.CustomXmlParserInputWizardPage_set, Messages.CustomXmlParserInputWizardPage_append, Messages.CustomXmlParserInputWizardPage_appendWith});
+            actionCombo.setItems(new String[] { Messages.CustomXmlParserInputWizardPage_set, Messages.CustomXmlParserInputWizardPage_append,
+                    Messages.CustomXmlParserInputWizardPage_appendWith });
             actionCombo.select(inputAttribute.inputAction);
             actionCombo.addSelectionListener(updateListener);
-            
+
             if (inputAttribute.inputName.equals(CustomXmlTraceDefinition.TAG_TIMESTAMP)) {
                 tagCombo.select(0);
                 tagLabel.setText(Messages.CustomXmlParserInputWizardPage_format);
@@ -1292,14 +1325,14 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 tagText.addModifyListener(updateListener);
             }
         }
-        
+
         private void dispose() {
             labelComposite.dispose();
             attributeComposite.dispose();
             filler.dispose();
             tagComposite.dispose();
         }
-        
+
         private void setAttributeNumber(int attributeNumber) {
             this.attributeNumber = attributeNumber;
             labelComposite.layout();
@@ -1323,7 +1356,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 for (int j = 0; j < childList.getLength(); j++) {
                     Node child = childList.item(j);
                     if (child instanceof Element && child.getNodeName().equals(elementNames.get(i))) {
-                        element = (Element)child;
+                        element = (Element) child;
                         break;
                     }
                 }
@@ -1337,7 +1370,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         }
         return null;
     }
-    
+
     private String getChildNameSuggestion(InputElement inputElement) {
         if (inputElement == null) {
             if (documentElement != null) {
@@ -1368,7 +1401,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         }
         return ""; //$NON-NLS-1$
     }
-    
+
     private String getAttributeNameSuggestion(InputElement inputElement) {
         Element element = getPreviewElement(inputElement);
         if (element != null) {
@@ -1395,12 +1428,12 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     private void validate() {
         definition.definitionName = logtypeText.getText().trim();
         definition.timeStampOutputFormat = timeStampOutputFormatText.getText().trim();
-        
+
         if (selectedElement != null) {
             selectedElement.extractInputs();
             treeViewer.refresh();
         }
-        
+
         StringBuffer errors = new StringBuffer();
 
         if (definition.definitionName.length() == 0) {
@@ -1410,7 +1443,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             logtypeText.setBackground(COLOR_TEXT_BACKGROUND);
             for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
                 if (definition.definitionName.equals(def.definitionName)) {
-                    if (editDefinitionName == null || ! editDefinitionName.equals(definition.definitionName)) {
+                    if (editDefinitionName == null || !editDefinitionName.equals(definition.definitionName)) {
                         errors.append(Messages.CustomXmlParserInputWizardPage_duplicatelogTypeError);
                         logtypeText.setBackground(COLOR_LIGHT_RED);
                         break;
@@ -1418,20 +1451,21 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 }
             }
         }
-        
+
         if (definition.rootInputElement == null) {
             errors.append(Messages.CustomXmlParserInputWizardPage_noDocumentError);
         }
-        
+
         if (definition.rootInputElement != null) {
             logEntryFound = false;
             logEntryNestedCount = 0;
             timeStampFound = false;
-            
+
             errors.append(validateElement(definition.rootInputElement));
 
-            if ((definition.rootInputElement.attributes != null && definition.rootInputElement.attributes.size() != 0) ||
-                    (definition.rootInputElement.childElements != null && definition.rootInputElement.childElements.size() != 0) || errors.length() == 0) {
+            if ((definition.rootInputElement.attributes != null && definition.rootInputElement.attributes.size() != 0)
+                    || (definition.rootInputElement.childElements != null && definition.rootInputElement.childElements.size() != 0)
+                    || errors.length() == 0) {
                 if (!logEntryFound) {
                     errors.append(Messages.CustomXmlParserInputWizardPage_missingLogEntryError);
                 }
@@ -1456,7 +1490,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         } else {
             timeStampPreviewText.setText(Messages.CustomXmlParserInputWizardPage_notimestamporAttributeError);
         }
-    
+
         if (errors.length() == 0) {
             setDescription(defaultDescription);
             setPageComplete(true);
@@ -1465,17 +1499,20 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             setPageComplete(false);
         }
     }
-    
+
     public StringBuffer validateElement(InputElement inputElement) {
         StringBuffer errors = new StringBuffer();
         ElementNode elementNode = null;
-        if (selectedElement != null && selectedElement.inputElement.equals(inputElement)) elementNode = selectedElement;
+        if (selectedElement != null && selectedElement.inputElement.equals(inputElement))
+            elementNode = selectedElement;
         if (inputElement == definition.rootInputElement) {
             if (inputElement.elementName.length() == 0) {
                 errors.append(Messages.CustomXmlParserInputWizardPage_missingDocumentElementError);
-                if (elementNode != null) elementNode.elementNameText.setBackground(COLOR_LIGHT_RED);
+                if (elementNode != null)
+                    elementNode.elementNameText.setBackground(COLOR_LIGHT_RED);
             } else {
-                if (elementNode != null) elementNode.elementNameText.setBackground(COLOR_TEXT_BACKGROUND);
+                if (elementNode != null)
+                    elementNode.elementNameText.setBackground(COLOR_TEXT_BACKGROUND);
             }
         }
         if (inputElement != definition.rootInputElement) {
@@ -1486,24 +1523,29 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             if (inputElement.inputName.equals(CustomXmlTraceDefinition.TAG_TIMESTAMP)) {
                 timeStampFound = true;
                 if (inputElement.inputFormat.length() == 0) {
-                    errors.append(Messages.CustomXmlParserInputWizardPage_timestampFormatPrompt + 
-                            " (" + Messages.CustomXmlParserInputWizardPage_timestampElementPrompt + " " + getName(inputElement) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    if (elementNode != null) elementNode.tagText.setBackground(COLOR_LIGHT_RED);
+                    errors.append(Messages.CustomXmlParserInputWizardPage_timestampFormatPrompt
+                            + " (" + Messages.CustomXmlParserInputWizardPage_timestampElementPrompt + " " + getName(inputElement) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    if (elementNode != null)
+                        elementNode.tagText.setBackground(COLOR_LIGHT_RED);
                 } else {
                     try {
                         new SimpleDateFormat(inputElement.inputFormat);
-                        if (elementNode != null) elementNode.tagText.setBackground(COLOR_TEXT_BACKGROUND);
+                        if (elementNode != null)
+                            elementNode.tagText.setBackground(COLOR_TEXT_BACKGROUND);
                     } catch (IllegalArgumentException e) {
-                        errors.append(Messages.CustomXmlParserInputWizardPage_invalidTimestampFmtError + 
-                                " (" + Messages.CustomXmlParserInputWizardPage_timestampElementPrompt + " " + getName(inputElement) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                        if (elementNode != null) elementNode.tagText.setBackground(COLOR_LIGHT_RED);
+                        errors.append(Messages.CustomXmlParserInputWizardPage_invalidTimestampFmtError
+                                + " (" + Messages.CustomXmlParserInputWizardPage_timestampElementPrompt + " " + getName(inputElement) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        if (elementNode != null)
+                            elementNode.tagText.setBackground(COLOR_LIGHT_RED);
                     }
                 }
             } else if (inputElement.inputName.length() == 0) {
                 errors.append(Messages.CustomXmlParserInputWizardPage_missingInputElementNameError);
-                if (elementNode != null) elementNode.tagText.setBackground(COLOR_LIGHT_RED);
+                if (elementNode != null)
+                    elementNode.tagText.setBackground(COLOR_LIGHT_RED);
             } else {
-                if (elementNode != null) elementNode.tagText.setBackground(COLOR_TEXT_BACKGROUND);
+                if (elementNode != null)
+                    elementNode.tagText.setBackground(COLOR_TEXT_BACKGROUND);
             }
         }
         if (inputElement.attributes != null) {
@@ -1525,53 +1567,64 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     }
                 }
                 if (attribute.attributeName.length() == 0) {
-                    errors.append(Messages.CustomXmlParserInputWizardPage_missingAttribute + 
-                            " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(inputElement) + ": ?). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    if (elementNode != null) elementNode.attributes.get(i).attributeNameText.setBackground(COLOR_LIGHT_RED);
+                    errors.append(Messages.CustomXmlParserInputWizardPage_missingAttribute
+                            + " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(inputElement) + ": ?). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    if (elementNode != null)
+                        elementNode.attributes.get(i).attributeNameText.setBackground(COLOR_LIGHT_RED);
                 } else if (duplicate) {
-                    errors.append(Messages.CustomXmlParserInputWizardPage_duplicateAttributeError +
-                            " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(attribute, inputElement) +"). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    if (elementNode != null) elementNode.attributes.get(i).attributeNameText.setBackground(COLOR_LIGHT_RED);
+                    errors.append(Messages.CustomXmlParserInputWizardPage_duplicateAttributeError
+                            + " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(attribute, inputElement) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    if (elementNode != null)
+                        elementNode.attributes.get(i).attributeNameText.setBackground(COLOR_LIGHT_RED);
                 }
                 if (attribute.inputName.equals(CustomXmlTraceDefinition.TAG_TIMESTAMP)) {
                     timeStampFound = true;
                     if (attribute.inputFormat.length() == 0) {
-                        errors.append(Messages.CustomXmlParserInputWizardPage_missingTimestampInFmtError +
-                                " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(attribute, inputElement) +"). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                        if (elementNode != null) elementNode.attributes.get(i).tagText.setBackground(COLOR_LIGHT_RED);
+                        errors.append(Messages.CustomXmlParserInputWizardPage_missingTimestampInFmtError
+                                + " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(attribute, inputElement) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        if (elementNode != null)
+                            elementNode.attributes.get(i).tagText.setBackground(COLOR_LIGHT_RED);
                     } else {
                         try {
                             new SimpleDateFormat(attribute.inputFormat);
-                            if (elementNode != null) elementNode.attributes.get(i).tagText.setBackground(COLOR_TEXT_BACKGROUND);
+                            if (elementNode != null)
+                                elementNode.attributes.get(i).tagText.setBackground(COLOR_TEXT_BACKGROUND);
                         } catch (IllegalArgumentException e) {
-                            errors.append(Messages.CustomXmlParserInputWizardPage_invalidTimestampInFmtError + 
-                                    " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(attribute, inputElement) +"). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                            if (elementNode != null) elementNode.attributes.get(i).tagText.setBackground(COLOR_LIGHT_RED);
+                            errors.append(Messages.CustomXmlParserInputWizardPage_invalidTimestampInFmtError
+                                    + " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(attribute, inputElement) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                            if (elementNode != null)
+                                elementNode.attributes.get(i).tagText.setBackground(COLOR_LIGHT_RED);
                         }
                     }
                 } else if (attribute.inputName.length() == 0) {
-                    errors.append(Messages.CustomXmlParserInputWizardPage_missingDataGroupNameError + 
-                            " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(attribute, inputElement) +"). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    if (elementNode != null) elementNode.attributes.get(i).tagText.setBackground(COLOR_LIGHT_RED);
+                    errors.append(Messages.CustomXmlParserInputWizardPage_missingDataGroupNameError
+                            + " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(attribute, inputElement) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    if (elementNode != null)
+                        elementNode.attributes.get(i).tagText.setBackground(COLOR_LIGHT_RED);
                 } else {
-                    if (elementNode != null) elementNode.attributes.get(i).tagText.setBackground(COLOR_TEXT_BACKGROUND);
+                    if (elementNode != null)
+                        elementNode.attributes.get(i).tagText.setBackground(COLOR_TEXT_BACKGROUND);
                 }
             }
         }
         if (inputElement.childElements != null) {
             for (InputElement child : inputElement.childElements) {
                 ElementNode childElementNode = null;
-                if (selectedElement != null && selectedElement.inputElement.equals(child)) childElementNode = selectedElement;
-                if (childElementNode != null) childElementNode.elementNameText.setBackground(COLOR_TEXT_BACKGROUND);
+                if (selectedElement != null && selectedElement.inputElement.equals(child))
+                    childElementNode = selectedElement;
+                if (childElementNode != null)
+                    childElementNode.elementNameText.setBackground(COLOR_TEXT_BACKGROUND);
             }
             for (int i = 0; i < inputElement.childElements.size(); i++) {
                 InputElement child = inputElement.childElements.get(i);
                 ElementNode childElementNode = null;
-                if (selectedElement != null && selectedElement.inputElement.equals(child)) childElementNode = selectedElement;
+                if (selectedElement != null && selectedElement.inputElement.equals(child))
+                    childElementNode = selectedElement;
                 if (child.elementName.length() == 0) {
-                    errors.append(Messages.CustomXmlParserInputWizardPage_missingElementNameError + 
-                            " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(child) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    if (childElementNode != null) childElementNode.elementNameText.setBackground(COLOR_LIGHT_RED);
+                    errors.append(Messages.CustomXmlParserInputWizardPage_missingElementNameError
+                            + " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(child) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    if (childElementNode != null)
+                        childElementNode.elementNameText.setBackground(COLOR_LIGHT_RED);
                 } else {
                     boolean duplicate = false;
                     for (int j = i + 1; j < inputElement.childElements.size(); j++) {
@@ -1579,17 +1632,20 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                         if (otherChild.elementName.equals(child.elementName)) {
                             duplicate = true;
                             ElementNode otherChildElementNode = null;
-                            if (selectedElement != null && selectedElement.inputElement.equals(otherChild)) otherChildElementNode = selectedElement;
-                            if (otherChildElementNode != null) otherChildElementNode.elementNameText.setBackground(COLOR_LIGHT_RED);
+                            if (selectedElement != null && selectedElement.inputElement.equals(otherChild))
+                                otherChildElementNode = selectedElement;
+                            if (otherChildElementNode != null)
+                                otherChildElementNode.elementNameText.setBackground(COLOR_LIGHT_RED);
                         }
                     }
                     if (duplicate) {
-                        errors.append(Messages.CustomXmlParserInputWizardPage_duplicateElementNameError + 
-                                " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(child) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                        if (childElementNode != null) childElementNode.elementNameText.setBackground(COLOR_LIGHT_RED);
+                        errors.append(Messages.CustomXmlParserInputWizardPage_duplicateElementNameError
+                                + " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(child) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        if (childElementNode != null)
+                            childElementNode.elementNameText.setBackground(COLOR_LIGHT_RED);
                     }
                 }
-                
+
                 errors.append(validateElement(child));
             }
         }
@@ -1598,7 +1654,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         }
         return errors;
     }
-    
+
     public CustomXmlTraceDefinition getDefinition() {
         return definition;
     }
