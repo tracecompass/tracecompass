@@ -93,7 +93,7 @@ Either &lt;code&gt;org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView&lt;/code&gt
          <meta.section type="since"/>
       </appinfo>
       <documentation>
-         Since 0.4.0 (based on UML2SD of org.eclipse.tptp.common.ui)
+         Since 0.3.2 (based on UML2SD of org.eclipse.tptp.common.ui)
       </documentation>
    </annotation>
 
@@ -103,7 +103,7 @@ Either &lt;code&gt;org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView&lt;/code&gt
       </appinfo>
       <documentation>
          &lt;p&gt;
-For an example implemetation of the loader class see:
+For an example implementation of the loader class see:
 &lt;pre&gt; 
 plug-in: org.eclipse.linuxtools.tmf.ui
 package: org.eclipse.linuxtools.tmf.ui.views.uml2sd.impl

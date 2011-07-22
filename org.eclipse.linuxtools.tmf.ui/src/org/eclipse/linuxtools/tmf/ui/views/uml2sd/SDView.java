@@ -50,7 +50,6 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.Zoom;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.Zoom.ZoomType;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.IExtendedFilterProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.IExtendedFindProvider;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.IPropertySheetPage;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDAdvancedPagingProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDCollapseProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDExtendedActionBarProvider;
@@ -74,6 +73,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.views.properties.IPropertySheetPage;
 
 /**
  * @author sveyrier

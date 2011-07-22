@@ -12,6 +12,8 @@
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider;
 
+import org.eclipse.ui.views.properties.IPropertySheetPage;
+
 /**
  * Contract for loaders that want to provide information in the properties view
  */
