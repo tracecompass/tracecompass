@@ -9,10 +9,10 @@
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.linuxtools.lttng.control;
+package org.eclipse.linuxtools.lttng.tests.control;
 
-import org.eclipse.linuxtools.lttng.LttngTestPreparation;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
+import org.eclipse.linuxtools.lttng.tests.LttngTestPreparation;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 

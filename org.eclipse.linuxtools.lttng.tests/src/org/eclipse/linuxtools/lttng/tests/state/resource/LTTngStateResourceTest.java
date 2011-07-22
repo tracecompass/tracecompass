@@ -9,10 +9,12 @@
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.linuxtools.lttng.state.resource;
+package org.eclipse.linuxtools.lttng.tests.state.resource;
 
 import junit.framework.TestCase;
 
+import org.eclipse.linuxtools.lttng.state.resource.ILttngStateContext;
+import org.eclipse.linuxtools.lttng.state.resource.LTTngStateResource;
 import org.eclipse.linuxtools.lttng.state.resource.ILTTngStateResource.GlobalStateMode;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;

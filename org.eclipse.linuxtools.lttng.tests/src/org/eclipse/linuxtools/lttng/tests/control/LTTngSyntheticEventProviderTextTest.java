@@ -9,11 +9,11 @@
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.linuxtools.lttng.control;
+package org.eclipse.linuxtools.lttng.tests.control;
 
 
 
-import org.eclipse.linuxtools.lttng.LttngTestPreparation;
+import org.eclipse.linuxtools.lttng.tests.LttngTestPreparation;
 
 public class LTTngSyntheticEventProviderTextTest extends LttngTestPreparation {
 

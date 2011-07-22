@@ -1,4 +1,4 @@
-package org.eclipse.linuxtools.lttng;
+package org.eclipse.linuxtools.lttng.tests;
 
 import java.io.File;
 import java.net.URL;
@@ -7,6 +7,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.linuxtools.lttng.TraceDebug;
 import org.eclipse.linuxtools.lttng.control.LttngCoreProviderFactory;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.event.LttngSyntheticEvent;
@@ -14,7 +15,6 @@ import org.eclipse.linuxtools.lttng.event.LttngSyntheticEvent.SequenceInd;
 import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.state.experiment.IStateExperimentManager;
 import org.eclipse.linuxtools.lttng.state.experiment.StateManagerFactory;
-import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
