@@ -269,6 +269,7 @@ public class ColorsView extends TmfView {
 			if (fSelectedRow != null) {
 				int index = fColorSettings.indexOf(fSelectedRow.getColorSetting());
 				fColorSettings.remove(index);
+				fSelectedRow.fColorSetting.dispose();
 				fSelectedRow.dispose();
 				if (index < fColorSettings.size()) {
 					fSelectedRow = (ColorSettingRow) fListComposite.getChildren()[index];
@@ -341,6 +342,7 @@ public class ColorsView extends TmfView {
 	        			if (overwrite) {
 		        			for (Control control : fListComposite.getChildren()) {
 		        				if (control instanceof ColorSettingRow) {
+		        					((ColorSettingRow) control).fColorSetting.dispose();
 		        					control.dispose();
 		        				}
 		        			}

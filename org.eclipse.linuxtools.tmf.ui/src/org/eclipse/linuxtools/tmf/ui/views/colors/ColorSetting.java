@@ -19,6 +19,11 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.themes.ColorUtil;
 
+/**
+ * Application code must explicitly invoke the ColorSetting.dispose() method to release the operating system
+ * resources managed by each instance when those instances are no longer required. 
+ */
+
 public class ColorSetting {
 
 	private RGB fForegroundRGB;
@@ -30,6 +35,9 @@ public class ColorSetting {
 	private int fTickColorIndex;
 	private ITmfFilterTreeNode fFilter;
 	
+	/**
+	 * You must dispose the color setting when it is no longer required.
+	 */
 	public ColorSetting(RGB foreground, RGB background, int tickColorIndex, ITmfFilterTreeNode filter) {
 		fForegroundRGB = foreground;
 		fBackgroundRGB = background;
@@ -42,6 +50,16 @@ public class ColorSetting {
 				fForegroundRGB, fBackgroundRGB));
 		fDimmedBackgroundColor = new Color(display, ColorUtil.blend(
 				fBackgroundRGB, display.getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB()));
+	}
+	
+	/**
+	 * Dispose the color setting resources
+	 */
+	public void dispose() {
+		fForegroundColor.dispose();
+		fBackgroundColor.dispose();
+		fDimmedForegroundColor.dispose();
+		fDimmedBackgroundColor.dispose();
 	}
 	
 	/**

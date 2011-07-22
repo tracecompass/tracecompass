@@ -112,9 +112,9 @@ public class ColorSettingsXML {
 		SAXParserFactory parserFactory = SAXParserFactory.newInstance(); 
         parserFactory.setNamespaceAware(true); 
 
+        ColorSettingsContentHandler handler = new ColorSettingsContentHandler();
 		try {
 			XMLReader saxReader = parserFactory.newSAXParser().getXMLReader();
-			ColorSettingsContentHandler handler = new ColorSettingsContentHandler();
 	        saxReader.setContentHandler(handler);
 	        saxReader.parse(pathName);
 	        return handler.colorSettings.toArray(new ColorSetting[0]);
@@ -124,6 +124,10 @@ public class ColorSettingsXML {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		// In case of error, dispose the partial list of color settings
+		for (ColorSetting colorSetting : handler.colorSettings) {
+			colorSetting.dispose();
 		}
 		return new ColorSetting[0];
 	}
