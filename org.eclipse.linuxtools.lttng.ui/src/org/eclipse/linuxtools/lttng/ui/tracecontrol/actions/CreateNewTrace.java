@@ -59,9 +59,7 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
     // Attributes
     // ------------------------------------------------------------------------
     
-    private TargetResource fSelectedTarget;
     private List<TargetResource> fSelectedFiles;
-    private String fTraceName;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -105,68 +103,64 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
     @Override
     public void run(IAction action) {
         Shell shell = getShell();
-        fSelectedTarget = getFirstSelectedTarget();
-        TraceSubSystem subSystem = (TraceSubSystem)fSelectedTarget.getSubSystem();
-        NewTraceDialog dialog = new NewTraceDialog(shell, subSystem, fSelectedTarget);
+        final TargetResource targetResource = getFirstSelectedTarget();
+        TraceSubSystem subSystem = (TraceSubSystem)targetResource.getSubSystem();
+        NewTraceDialog dialog = new NewTraceDialog(shell, subSystem, targetResource);
         
         final TraceConfig traceConfig = dialog.open();
 
-        if (traceConfig != null) {
+        if (traceConfig == null) {
+            return;
+        }
+
+        try {
+            final ILttControllerService service = subSystem.getControllerService();
+
+            TraceResource trace = new TraceResource(targetResource.getSubSystem(), service);
+            trace.setName(traceConfig.getTraceName());
+            trace.setParent(targetResource);
+            trace.setTraceConfig(traceConfig);
             
-            fTraceName = traceConfig.getTraceName();
-
-            try {
-                final ILttControllerService service = subSystem.getControllerService();
-
-                if (fSelectedTarget.isUst()) {
-                	boolean ok = setupUstLocation(service, fSelectedTarget, traceConfig);
-                	if (!ok) {
-                		return;
-                	}
+            if (targetResource.isUst()) {
+                boolean ok = setupUstLocation(service, targetResource, traceConfig);
+                if (!ok) {
+                    return;
                 }
-                
-                // Create future task
-                @SuppressWarnings("unused")
-                Boolean success = new TCFTask<Boolean>() {
-                    @Override
-                    public void run() {
+            }
+            
+            trace.setupTrace();
 
-                        // Setup trace  using Lttng controller service proxy
-                        service.setupTrace(fSelectedTarget.getParent().getName(), fSelectedTarget.getName(), traceConfig.getTraceName(), new ILttControllerService.DoneSetupTrace() {
-                            
-                            @Override
-                            public void doneSetupTrace(IToken token, Exception error, Object str) {
-                                if (error != null) {
-                                    // Notify with error
-                                    error(error);
-                                    return;
-                                }
+            if (!targetResource.isUst()) {
 
-                                // Notify about success
-                                done(Boolean.valueOf(true));
-                            }
-                        });
-                    }}.get(TraceControlConstants.DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
+                // Enable all channels by default
+                trace.setChannelEnable(TraceControlConstants.Lttng_Control_AllChannels, true);
 
-                    // Enable all channels by default
-                    setChannelEnable(service, fSelectedTarget, traceConfig, TraceControlConstants.Lttng_Control_AllChannels, true);
+                // Set overwrite mode for all channels according to user selection (true for flight recorder, false for normal)
+                trace.setChannelOverwrite(TraceControlConstants.Lttng_Control_AllChannels, traceConfig.getMode() == TraceConfig.FLIGHT_RECORDER_MODE);
 
-            } catch (Exception e) {
-                SystemMessageException sysExp;
-                if (e instanceof SystemMessageException) {
-                    sysExp = (SystemMessageException)e;
-                } else {
-                    sysExp = new SystemMessageException(LTTngUiPlugin.getDefault().getMessage(e));    
-                }
-                SystemBasePlugin.logError(Messages.Lttng_Control_ErrorNewTrace + " (" +  //$NON-NLS-1$
-                        Messages.Lttng_Resource_Trace + ": "  + traceConfig.getTraceName() + ")", sysExp); //$NON-NLS-1$ //$NON-NLS-2$
+                // Set channel timer for all channels
+                final long period = 5000; 
+                trace.setChannelTimer(TraceControlConstants.Lttng_Control_AllChannels, period);
 
-                return;
+                // Set subbuffer size for all channels
+                final long subbufSize = 16384; 
+                trace.setChannelSubbufSize(TraceControlConstants.Lttng_Control_AllChannels, subbufSize);
+
+                // Set number of subbuffers for all channels
+                final long subbufNum = 2;
+                trace.setChannelSubbufNum(TraceControlConstants.Lttng_Control_AllChannels, subbufNum);
             }
 
-            TraceResource trace = new TraceResource(fSelectedTarget.getSubSystem());
-            trace.setName(fTraceName);
-            trace.setParent(fSelectedTarget);
+            if (traceConfig.isNetworkTrace()) {
+
+                File newDir = new File(traceConfig.getTracePath());
+                if (!newDir.exists()) {
+                    boolean created = newDir.mkdirs();
+                    if (!created) {
+                        throw new Exception(Messages.Lttng_Control_ErrorCreateTracePath + ": " + traceConfig.getTracePath()); //$NON-NLS-1$
+                    }
+                }
+            }
             
             if (trace.isUst()) {
                 // in UST the tracing is started after setupTrace!!
@@ -176,12 +170,24 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
                 trace.setTraceState(TraceState.CONFIGURED);
             }
             
-            trace.setTraceConfig(traceConfig);
-            fSelectedTarget.addTrace(trace);
+            targetResource.addTrace(trace);
 
             ISystemRegistry registry = SystemStartHere.getSystemRegistry();
-            registry.fireRemoteResourceChangeEvent(ISystemRemoteChangeEvents.SYSTEM_REMOTE_RESOURCE_CREATED, trace, fSelectedTarget, subSystem, null);
+            registry.fireRemoteResourceChangeEvent(ISystemRemoteChangeEvents.SYSTEM_REMOTE_RESOURCE_CREATED, trace, targetResource, subSystem, null);
+                
+        } catch (Exception e) {
+            SystemMessageException sysExp;
+            if (e instanceof SystemMessageException) {
+                sysExp = (SystemMessageException)e;
+            } else {
+                sysExp = new SystemMessageException(LTTngUiPlugin.getDefault().getMessage(e));    
+            }
+            SystemBasePlugin.logError(Messages.Lttng_Control_ErrorNewTrace + " (" +  //$NON-NLS-1$
+                    Messages.Lttng_Resource_Trace + ": "  + traceConfig.getTraceName() + ")", sysExp); //$NON-NLS-1$ //$NON-NLS-2$
+
+            return;
         }
+
     }
 
     /*
@@ -243,13 +249,13 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
      */ 
     private boolean setupUstLocation(final ILttControllerService service, final TargetResource targetResource, final TraceConfig traceConfig) throws Exception {
         if (traceConfig.isNetworkTrace()) {
-        	File localDir = new File(traceConfig.getTracePath());
-        	if (!localDir.exists()) {
-	            boolean success = localDir.mkdirs();
-	            if (!success) {
-	            	return false;
-	            }
-        	}
+            File localDir = new File(traceConfig.getTracePath());
+            if (!localDir.exists()) {
+                boolean success = localDir.mkdirs();
+                if (!success) {
+                    return false;
+                }
+            }
 
             // Create future task
             boolean ok = new TCFTask<Boolean>() {
@@ -314,35 +320,4 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
         }
     }
 
-    /*
-     * Enable or disable a channel on the remote system. 
-     */
-    private void setChannelEnable(final ILttControllerService service, final TargetResource targetResource, final TraceConfig traceConfig, final String channelName, final boolean enabled) throws Exception{
-            // Create future task
-           new TCFTask<Boolean>() {
-                @Override
-                public void run() {
-
-                    // Set marker enable using Lttng controller service proxy
-                    service.setChannelEnable(targetResource.getParent().getName(),
-                            targetResource.getName(), 
-                            traceConfig.getTraceName(), 
-                            channelName, 
-                            enabled,  
-                            new ILttControllerService.DoneSetChannelEnable() {
-
-                        @Override
-                        public void doneSetChannelEnable(IToken token, Exception error, Object str) {
-                            if (error != null) {
-                                // Notify with error
-                                error(error);
-                                return;
-                            }
-
-                            // Notify about success
-                            done(Boolean.valueOf(true));
-                        }
-                    });
-                }}.get(TraceControlConstants.DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
-    }
 }

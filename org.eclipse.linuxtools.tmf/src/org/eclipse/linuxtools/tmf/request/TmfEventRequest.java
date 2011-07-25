@@ -36,22 +36,22 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
      * @param range
      */
     public TmfEventRequest(Class<T> dataType) {
-        this(dataType, TmfTimeRange.Eternity, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
+        this(dataType, TmfTimeRange.Eternity, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
     public TmfEventRequest(Class<T> dataType, ExecutionType execType) {
-        this(dataType, TmfTimeRange.Eternity, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
+        this(dataType, TmfTimeRange.Eternity, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
     }
 
     /**
      * @param range
      */
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range) {
-        this(dataType, range, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
+        this(dataType, range, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range, ExecutionType execType) {
-        this(dataType, range, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
+        this(dataType, range, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
     }
 
     /**
@@ -59,11 +59,11 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
      * @param nbRequested
      */
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested) {
-        this(dataType, range, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
+        this(dataType, range, 0, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
     
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, ExecutionType execType) {
-        this(dataType, range, nbRequested, DEFAULT_BLOCK_SIZE, execType);
+        this(dataType, range, 0, nbRequested, DEFAULT_BLOCK_SIZE, execType);
     }
     
     /**
@@ -72,11 +72,15 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
      * @param blockSize Size of the largest blocks expected
      */
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize) {
-    	this(dataType, range, nbRequested, blockSize, ExecutionType.FOREGROUND);
+    	this(dataType, range, 0, nbRequested, blockSize, ExecutionType.FOREGROUND);
     }
 
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize, ExecutionType execType) {
-    	super(dataType, 0, nbRequested, blockSize, execType);
+    	this(dataType, range, 0, nbRequested, blockSize, execType);
+    }
+
+    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int index, int nbRequested, int blockSize, ExecutionType execType) {
+    	super(dataType, index, nbRequested, blockSize, execType);
     	fRange = range;
     }
 
@@ -90,6 +94,20 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
     @Override
 	public TmfTimeRange getRange() {
         return fRange;
+    }
+
+    // ------------------------------------------------------------------------
+    // Setters
+    // ------------------------------------------------------------------------
+
+    /**
+     * this method is called by the event provider to set the index corresponding
+     * to the time range start time once it is known
+     * @param index the start time index
+     */
+    @Override
+	public void setStartIndex(int index) {
+    	setIndex(index);
     }
 
     // ------------------------------------------------------------------------
@@ -115,7 +133,7 @@ public abstract class TmfEventRequest<T extends TmfEvent> extends TmfDataRequest
     @SuppressWarnings("nls")
     public String toString() {
 		return "[TmfEventRequest(" + getRequestId() + "," + getDataType().getSimpleName() 
-			+ "," + getRange() + "," + getNbRequested() + "," + getBlockSize() + ")]";
+			+ "," + getRange() + "," + getIndex() + "," + getNbRequested() + "," + getBlockSize() + ")]";
     }
 
 }

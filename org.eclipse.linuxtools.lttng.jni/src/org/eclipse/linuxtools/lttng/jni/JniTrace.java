@@ -86,6 +86,7 @@ public abstract class JniTrace extends Jni_C_Common {
     
     // Open/close native functions
     protected native long ltt_openTrace(int libId, String pathname, boolean printDebug);
+    protected native long ltt_openTraceLive(int libId, String pathname, boolean printDebug);
     protected native void ltt_closeTrace(int libId, long tracePtr);
 
     // Native access functions
@@ -101,6 +102,9 @@ public abstract class JniTrace extends Jni_C_Common {
     protected native long   ltt_getStartFreq(int libId, long tracePtr);
     protected native long   ltt_getStartTimestampCurrentCounter(int libId, long tracePtr);
     protected native long   ltt_getStartMonotonic(int libId, long tracePtr);
+    
+    // Native function to update trace file and file size information
+    protected native int ltt_updateTrace(int libId, long tracePtr);
     
     // Native function to fill out startTime
     protected native void ltt_feedStartTime(int libId, long tracePtr, JniTime startTime);
@@ -263,7 +267,12 @@ public abstract class JniTrace extends Jni_C_Common {
         if ( newLibraryId != -1 ) {
 	        // Call the LTT to open the trace
         	// Note that the libraryId is not yet and the pointer
-	        long newPtr = ltt_openTrace(newLibraryId, tracepath, printLttDebug);
+        	long newPtr;
+        	if (isLiveTraceSupported()) {
+        		newPtr = ltt_openTraceLive(newLibraryId, tracepath, printLttDebug);
+        	} else {
+        		newPtr = ltt_openTrace(newLibraryId, tracepath, printLttDebug);
+        	}
 	        
 	        if (newPtr == NULL) {
 	        	thisTracePtr = new Jni_C_Pointer_And_Library_Id();
@@ -707,6 +716,20 @@ public abstract class JniTrace extends Jni_C_Common {
         return startMonotonic;
     }
 
+    /**
+     * Update trace file and file size information.<p>
+     * 
+     * If the trace has any new events, fetch the new end time.
+     */
+    public void updateTrace() {
+        if (thisTracePtr.getPointer() != NULL && isLiveTraceSupported()) {
+            int numUpdated = ltt_updateTrace(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
+            if (numUpdated > 0) {
+                ltt_feedTracefileTimeRange(thisTracePtr.getLibraryId(), thisTracePtr.getPointer(), new JniTime(), endTime);
+            }
+        }
+    }
+    
     public JniTime getStartTime() {
         return startTime;
     }
@@ -759,6 +782,16 @@ public abstract class JniTrace extends Jni_C_Common {
     public Jni_C_Pointer_And_Library_Id getTracePtr() {
         return thisTracePtr;
     }        
+
+    /**
+     * Indicate whether a trace can be opened in live mode.
+     * Override if live mode is supported
+     * 
+     * @return true if the trace version supports live
+     */
+    public boolean isLiveTraceSupported() {
+    	return false;
+    }
     
     /**
      * Return boolean value saying if the debug is enabled in LTT or not.<p>

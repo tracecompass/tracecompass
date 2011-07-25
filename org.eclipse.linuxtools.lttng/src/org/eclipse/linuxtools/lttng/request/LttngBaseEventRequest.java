@@ -55,7 +55,7 @@ public abstract class LttngBaseEventRequest extends TmfEventRequest<LttngEvent> 
 	 */
 	public LttngBaseEventRequest(TmfTimeRange range, TmfTimestamp dispatchTime, long offset, int nbEvents,
 			int maxBlockSize, ITmfDataRequest.ExecutionType execType) {
-		super(LttngEvent.class, range, nbEvents, maxBlockSize, execType);		
+		super(LttngEvent.class, range, (int) offset, nbEvents, maxBlockSize, execType);		
 		fDispatchTime = dispatchTime;
 	}
 

@@ -55,16 +55,15 @@ public class TraceConfigurationPage extends WizardPage {
     private String fTracePath;
     private int fMode;
     private int fNumChannel;
-    private Boolean fIsAppend;
-    private Boolean fIsLocal = false;
+    private boolean fIsAppend;
+    private boolean fIsNetwork;
     private Text fNameText;
     private Text fTransportText;
     private Text fPathText;
-    private Text fNumChannelText;
-    private Button fLocalButton;
-    private Button fRemoteButton;
+    private Text fNumLttdThreadsText;
+    private Button fHostButton;
+    private Button fTargetButton;
     private Button fIsAppendButton;
-    private Button fNoneButton;
     private Button fFlightRecorderButton;
     private Button fNormalButton;
     private Display fDisplay;
@@ -139,7 +138,6 @@ public class TraceConfigurationPage extends WizardPage {
         griddata.verticalIndent = 20;
         griddata.horizontalSpan = 3;
         fNameText.setLayoutData(griddata);
-        fNameText.setSize(500, 50);
         fNameText.setText(fTraceResource.getName());
         fNameText.setEnabled(false);
 
@@ -154,7 +152,6 @@ public class TraceConfigurationPage extends WizardPage {
         griddata.grabExcessHorizontalSpace = true;
         griddata.horizontalSpan = 3;
         fTransportText.setLayoutData(griddata);
-        fTransportText.setSize(500, 50);
         fTransportText.setText(TraceControlConstants.Lttng_Trace_Transport_Relay);
         fTransportText.setEnabled(false); // relay is the only allowed value
         if (fOldTraceConfig != null) {
@@ -173,25 +170,24 @@ public class TraceConfigurationPage extends WizardPage {
         composite21.setLayoutData(griddata);
         GridLayout compositeLayout21 = new GridLayout(4, false);
         composite21.setLayout(compositeLayout21);
-        fRemoteButton = new Button(composite21, SWT.RADIO);
-        fRemoteButton.setText(Messages.ConfigureTraceDialog_Remote);
-        fRemoteButton.setSelection(true);
-        fLocalButton = new Button(composite21, SWT.RADIO);
-        fLocalButton.setText(Messages.ConfigureTraceDialog_Local);
+        fTargetButton = new Button(composite21, SWT.RADIO);
+        fTargetButton.setText(Messages.ConfigureTraceDialog_Target);
+        fTargetButton.setSelection(true);
+        fIsNetwork = false;
+        fHostButton = new Button(composite21, SWT.RADIO);
+        fHostButton.setText(Messages.ConfigureTraceDialog_Host);
         griddata = new GridData();
         griddata.horizontalSpan = 3;
-        fLocalButton.setLayoutData(griddata);
-        fIsLocal = false;
-        fLocalButton.addListener(SWT.Selection, new Listener() {
+        fHostButton.setLayoutData(griddata);
+        fHostButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event e) {
-                if (fLocalButton.getSelection()) {
-                    fIsLocal = true;
+                if (fHostButton.getSelection()) {
                     fBrowseButton.setEnabled(true);
                 } else {
-                    fIsLocal = false;
                     fBrowseButton.setEnabled(false);
                 }
+                fIsNetwork = fHostButton.getSelection();
                 validatePathName(fPathText.getText());
                 validate();
             }
@@ -265,34 +261,34 @@ public class TraceConfigurationPage extends WizardPage {
         griddata.minimumWidth = 500;
         composite2.setLayoutData(griddata);
 
-        Label numChannelLabel = new Label(composite2, SWT.NULL);
-        numChannelLabel.setText(Messages.ConfigureTraceDialog_Num_Channels + ":"); //$NON-NLS-1$);
+        Label numLttdThreadsLabel = new Label(composite2, SWT.NULL);
+        numLttdThreadsLabel.setText(Messages.ConfigureTraceDialog_Num_Lttd_Threads + ":"); //$NON-NLS-1$);
         griddata = new GridData();
         griddata.verticalIndent = 10;
-        numChannelLabel.setLayoutData(griddata);
+        numLttdThreadsLabel.setLayoutData(griddata);
 
-        fNumChannelText = new Text(composite2, SWT.SINGLE | SWT.BORDER);
+        fNumLttdThreadsText = new Text(composite2, SWT.SINGLE | SWT.BORDER);
         griddata = new GridData();
         griddata.horizontalAlignment = SWT.BEGINNING;
         griddata.verticalIndent = 10;
         griddata.widthHint = 50;
         griddata.minimumWidth = 50;
-        fNumChannelText.setLayoutData(griddata);
+        fNumLttdThreadsText.setLayoutData(griddata);
         if (fTraceResource.isUst()) {
-            fNumChannelText.setText("1"); //$NON-NLS-1$
-            fNumChannelText.setEnabled(false);
+            fNumLttdThreadsText.setText("1"); //$NON-NLS-1$
+            fNumLttdThreadsText.setEnabled(false);
         } else {
-            fNumChannelText.setText("2"); //$NON-NLS-1$
+            fNumLttdThreadsText.setText("2"); //$NON-NLS-1$
         }
 
-        fNumChannelText.addVerifyListener(new VerifyListener() {
+        fNumLttdThreadsText.addVerifyListener(new VerifyListener() {
             @Override
             public void verifyText(VerifyEvent e) {
                 e.doit = e.text.matches("[0-9]*"); //$NON-NLS-1$
             }
         });
 
-        fNumChannelText.addListener(SWT.Modify, new Listener() {
+        fNumLttdThreadsText.addListener(SWT.Modify, new Listener() {
             @Override
             public void handleEvent(Event event) {
                 validate();
@@ -306,16 +302,11 @@ public class TraceConfigurationPage extends WizardPage {
         griddata.horizontalSpan = 4;
         griddata.verticalIndent = 10;
         fIsAppendButton.setLayoutData(griddata);
-        fIsAppend = Boolean.valueOf(false);
+        fIsAppend = false;
         fIsAppendButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event e) {
-                if (fIsAppendButton.getSelection()) {
-                    fIsAppend = true;
-                }
-                else {
-                    fIsAppend = false;
-                }
+                fIsAppend = fIsAppendButton.getSelection();
             }
         });
         if (fTraceResource.isUst()) {
@@ -328,23 +319,21 @@ public class TraceConfigurationPage extends WizardPage {
         griddata.horizontalSpan = 4;
         griddata.verticalIndent = 10;
         composite22.setLayoutData(griddata);
-        GridLayout compositeLayout22 = new GridLayout(3, false);
+        GridLayout compositeLayout22 = new GridLayout(2, false);
         composite22.setLayout(compositeLayout22);
-        fNoneButton = new Button(composite22, SWT.RADIO);
-        fNoneButton.setText(Messages.ConfigureTraceDialog_Mode_None);
-        fNoneButton.setSelection(true);
-        fFlightRecorderButton = new Button(composite22, SWT.RADIO);
-        fFlightRecorderButton.setText(Messages.ConfigureTraceDialog_Mode_Flight_Recorder);
         fNormalButton = new Button(composite22, SWT.RADIO);
         fNormalButton.setText(Messages.ConfigureTraceDialog_Mode_Normal);
-        fMode = 0;
-        fNoneButton.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(Event e) {
-                if (fNoneButton.getSelection()) {
-                    fMode = TraceConfig.NONE_MODE;
-                }
-            }
+        fFlightRecorderButton = new Button(composite22, SWT.RADIO);
+        fFlightRecorderButton.setText(Messages.ConfigureTraceDialog_Mode_Flight_Recorder);
+        fMode = TraceConfig.NORMAL_MODE;
+        fNormalButton.setSelection(true);
+        fNormalButton.addListener(SWT.Selection, new Listener() {
+        	@Override
+        	public void handleEvent(Event e) {
+        		if (fNormalButton.getSelection()) {
+        			fMode = TraceConfig.NORMAL_MODE;
+        		}
+        	}
         });
         fFlightRecorderButton.addListener(SWT.Selection, new Listener() {
             @Override
@@ -354,46 +343,34 @@ public class TraceConfigurationPage extends WizardPage {
                 }
             }
         });
-        fNormalButton.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(Event e) {
-                if (fNormalButton.getSelection()) {
-                    fMode = TraceConfig.NORMAL_MODE;
-                }
-            }
-        });
         if (fTraceResource.isUst()) {
-            fNoneButton.setEnabled(false);
             fFlightRecorderButton.setEnabled(false);
             fNormalButton.setEnabled(false);
         }
 
         if(fOldTraceConfig != null) {
             fPathText.setText(fOldTraceConfig.getTracePath());
-            fIsLocal = fOldTraceConfig.isNetworkTrace();
-            fLocalButton.setSelection(fIsLocal);
-            fRemoteButton.setSelection(!fIsLocal);
+            fTargetButton.setSelection(!fOldTraceConfig.isNetworkTrace());
+            fHostButton.setSelection(fOldTraceConfig.isNetworkTrace());
+            fIsNetwork = fOldTraceConfig.isNetworkTrace();
             fBrowseButton.setEnabled(true);
+            fNumLttdThreadsText.setText(String.valueOf(fOldTraceConfig.getNumChannel()));
+            fIsAppendButton.setSelection(fOldTraceConfig.getIsAppend());
             fIsAppend = fOldTraceConfig.getIsAppend();
-            fIsAppendButton.setSelection(fIsAppend);
-            fNumChannelText.setText(String.valueOf(fOldTraceConfig.getNumChannel()));
-
             fFlightRecorderButton.setSelection(fOldTraceConfig.getMode() == TraceConfig.FLIGHT_RECORDER_MODE);
             fNormalButton.setSelection(fOldTraceConfig.getMode() == TraceConfig.NORMAL_MODE);
-            fNoneButton.setSelection(fOldTraceConfig.getMode() == TraceConfig.NONE_MODE);
         }
 
         // Depending on the state disable fields, it's only informational then
         if ((fTraceResource.getTraceState() == TraceState.STARTED) || (fTraceResource.getTraceState() == TraceState.PAUSED)) {
             fPathText.setEnabled(false);
             fBrowseButton.setEnabled(false);
-            fRemoteButton.setEnabled(false);
-            fLocalButton.setEnabled(false);
+            fTargetButton.setEnabled(false);
+            fHostButton.setEnabled(false);
             fIsAppendButton.setEnabled(false);
-            fNumChannelText.setEnabled(false);
+            fNumLttdThreadsText.setEnabled(false);
             fFlightRecorderButton.setEnabled(false);
             fNormalButton.setEnabled(false);
-            fNoneButton.setEnabled(false);
         }
 
         validate();
@@ -511,7 +488,7 @@ public class TraceConfigurationPage extends WizardPage {
                     }
                 }
             }
-            if (fIsLocal) {
+            if (fHostButton.getSelection()) {
                 File file = new File(path);
                 if (file.isFile()) {
                     fTracePathError = Messages.ConfigureTraceDialog_Error_File_Exists;
@@ -539,7 +516,7 @@ public class TraceConfigurationPage extends WizardPage {
      */
     private void validate() {
         if ((fNameText.getText() == null) || (fTransportText.getText() == null) || (fTransportText.getText().length() == 0) || (fNameText.getText().length() == 0)
-                || (fNumChannelText.getText().length() == 0) || (fNumChannelText.getText().length() == 0)) {
+                || (fNumLttdThreadsText.getText().length() == 0) || (fNumLttdThreadsText.getText().length() == 0)) {
             setPageComplete(false);
             return;
         }
@@ -554,7 +531,7 @@ public class TraceConfigurationPage extends WizardPage {
         fTraceName = fNameText.getText();
         fTraceTransport = fTransportText.getText();
         fTracePath = fPathText.getText();
-        fNumChannel = Integer.parseInt(fNumChannelText.getText());
+        fNumChannel = Integer.parseInt(fNumLttdThreadsText.getText());
         
         if (fTraceNameError.length() == 0) {
             setErrorMessage(null);
@@ -575,7 +552,7 @@ public class TraceConfigurationPage extends WizardPage {
         newTraceConfig.setTraceName(fTraceName);
         newTraceConfig.setTraceTransport(fTraceTransport);
         newTraceConfig.setTracePath(fTracePath);
-        newTraceConfig.setNetworkTrace(fIsLocal);
+        newTraceConfig.setNetworkTrace(fIsNetwork);
         newTraceConfig.setIsAppend(fIsAppend);
         newTraceConfig.setMode(fMode);
         newTraceConfig.setNumChannel(fNumChannel);
@@ -590,6 +567,6 @@ public class TraceConfigurationPage extends WizardPage {
      * @return isLocalTrace
      */
     public boolean isLocalTrace() {
-        return fIsLocal;
+        return fHostButton.getSelection();
     }
 }

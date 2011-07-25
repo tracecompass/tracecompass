@@ -194,9 +194,9 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public TmfTimestamp restoreCheckPointByTimestamp(TmfTimestamp eventTime) {
+	public TmfCheckpoint restoreCheckPointByTimestamp(TmfTimestamp eventTime) {
 		TmfTimeRange experimentRange = fExperiment.getTimeRange();
-		TmfTimestamp nearestTimeStamp = fTrace.getStartTime();
+		TmfCheckpoint checkpoint = new TmfCheckpoint(fTrace.getStartTime(), new TmfLocation<Long>(0L));
 
 		// The GUI can have time limits higher than this log, since GUI can
 		// handle multiple logs
@@ -229,8 +229,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 		    } else {
 
 		        // Useful CheckPoint found
-		        TmfCheckpoint checkpoint = timestampCheckpointsList.get(index);
-		        nearestTimeStamp = checkpoint.getTimestamp();
+		        checkpoint = timestampCheckpointsList.get(index);
 		        // get the location associated with the checkpoint
 		        TmfLocation<Long> location = (TmfLocation<Long>) checkpoint.getLocation();
 		        // reference a new copy of the checkpoint template
@@ -244,7 +243,49 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 			fStateModel = traceState;
 		}
 
-		return nearestTimeStamp;
+		return checkpoint;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.linuxtools.lttng.state.trace.IStateTraceManager#restoreCheckPointByIndex(long)
+	 */
+	@Override
+	public TmfCheckpoint restoreCheckPointByIndex(long eventIndex) {
+		TmfCheckpoint checkpoint = new TmfCheckpoint(fTrace.getStartTime(), new TmfLocation<Long>(0L));
+
+	    LttngTraceState traceState;
+		synchronized (fCheckPointsLock) {
+		    Collections.sort(timestampCheckpointsList);
+		    // Initiate the compare with a checkpoint containing the target time
+		    // stamp to find
+		    int index = Collections.binarySearch(timestampCheckpointsList, new TmfCheckpoint(null,
+		            new TmfLocation<Long>(eventIndex)));
+		    // adjust index to round down to earlier checkpoint when exact match not found
+		    index = getPrevIndex(index);
+
+		    if (index == 0) {
+		        // No checkpoint restore is needed, start with a brand new
+		        // TraceState
+		        traceState = StateModelFactory.getStateEntryInstance(this);
+		    } else {
+
+		        // Useful CheckPoint found
+		        checkpoint = timestampCheckpointsList.get(index);
+		        // get the location associated with the checkpoint
+		        @SuppressWarnings("unchecked")
+				TmfLocation<Long> location = (TmfLocation<Long>) checkpoint.getLocation();
+		        // reference a new copy of the checkpoint template
+		        traceState = stateCheckpointsList.get(location.getLocation()).clone();
+		    }
+
+		}
+
+		// Restore the stored traceState
+		synchronized (fStateModelLock) {
+			fStateModel = traceState;
+		}
+
+		return checkpoint;
 	}
 
 	/**

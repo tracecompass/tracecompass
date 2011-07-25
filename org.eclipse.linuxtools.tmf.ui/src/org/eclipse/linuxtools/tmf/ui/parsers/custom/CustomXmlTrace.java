@@ -100,8 +100,14 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     @Override
     public TmfContext seekLocation(double ratio) {
         try {
-            RandomAccessFile raFile = new RandomAccessFile(getPath(), "r"); //$NON-NLS-1$
-            ITmfLocation<?> location = new TmfLocation<Long>(new Long((long) (ratio * raFile.length())));
+            BufferedRandomAccessFile raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
+            long pos = (long) (ratio * raFile.length());
+            while (pos > 0) {
+                raFile.seek(pos - 1);
+                if (raFile.read() == '\n') break;
+                pos--;
+            }
+            ITmfLocation<?> location = new TmfLocation<Long>(new Long(pos));
             TmfContext context = seekLocation(location);
             context.setRank(ITmfContext.UNKNOWN_RANK);
             return context;
@@ -137,7 +143,8 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     
     @Override
     public ITmfLocation<?> getCurrentLocation() {
-        return new TmfLocation<Object>(null);
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override

@@ -15,19 +15,26 @@ package org.eclipse.linuxtools.lttng.ui.tracecontrol.dialogs;
 
 import java.io.File;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.linuxtools.lttng.tracecontrol.model.TargetResource;
 import org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource;
 import org.eclipse.linuxtools.lttng.tracecontrol.model.config.TraceConfig;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
-import org.eclipse.linuxtools.lttng.ui.tracecontrol.TraceControlConstants;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.Messages;
+import org.eclipse.linuxtools.lttng.ui.tracecontrol.TraceControlConstants;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.subsystems.TraceSubSystem;
+import org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.rse.ui.SystemBasePlugin;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.DirectoryDialog;
@@ -61,12 +68,11 @@ public class NewTraceDialog extends Dialog {
     private Text fNameText;
     private Text fTransportText;
     private Text fPathText;
-    private Text fNumChannelText;
+    private Text fNumLttdThreadsText;
     private Button fFinishButton;
-    private Button fLocalButton;
-    private Button fRemoteButton;
+    private Button fHostButton;
+    private Button fTargetButton;
     private Button fIsAppendButton;
-    private Button fNoneButton;
     private Button fFlightRecorderButton;
     private Button fNormalButton;
     private Boolean fFinishButtonClicked;
@@ -78,6 +84,9 @@ public class NewTraceDialog extends Dialog {
     
     private TraceSubSystem fSubSystem;
     private TargetResource fTargetResource;
+    
+    private IProject fProject;
+    private static IProject defaultProject;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -110,9 +119,7 @@ public class NewTraceDialog extends Dialog {
         final Shell shell = new Shell(parent, SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL);
         shell.setText(Messages.NewTraceDialog_Title);
 
-        shell.setLayout(new GridLayout(3, false));
-        shell.setSize(520, 400);
-        shell.setMinimumSize(520, 400);
+        shell.setLayout(new GridLayout());
         shell.setImage(LTTngUiPlugin.getDefault().getImage(LTTngUiPlugin.ICON_ID_NEW_TRACE));
 
         GridData griddata = new GridData();
@@ -122,7 +129,7 @@ public class NewTraceDialog extends Dialog {
 
         griddata = new GridData();
         Composite composite1 = new Composite(shell, SWT.NONE);
-        GridLayout compositeLayout1 = new GridLayout(4, false);
+        GridLayout compositeLayout1 = new GridLayout(2, false);
         composite1.setSize(520, 300);
         composite1.setLayout(compositeLayout1);
         griddata.horizontalSpan = 3;
@@ -146,7 +153,6 @@ public class NewTraceDialog extends Dialog {
         griddata.horizontalAlignment = SWT.FILL;
         griddata.grabExcessHorizontalSpace = true;
         griddata.verticalIndent = 20;
-        griddata.horizontalSpan = 3;
         fNameText.setLayoutData(griddata);
         fNameText.setSize(500, 50);
 
@@ -159,7 +165,6 @@ public class NewTraceDialog extends Dialog {
         griddata = new GridData();
         griddata.horizontalAlignment = SWT.FILL;
         griddata.grabExcessHorizontalSpace = true;
-        griddata.horizontalSpan = 3;
         fTransportText.setLayoutData(griddata);
         fTransportText.setSize(500, 50);
         fTransportText.setText(TraceControlConstants.Lttng_Trace_Transport_Relay);
@@ -170,26 +175,26 @@ public class NewTraceDialog extends Dialog {
         composite21.setSize(300, 300);
         composite21.setText(Messages.ConfigureTraceDialog_Trace_Location);
         griddata.horizontalAlignment = SWT.FILL;
-        griddata.horizontalSpan = 4;
+        griddata.horizontalSpan = 2;
         griddata.verticalIndent = 10;
         griddata.widthHint = 300;
         griddata.minimumWidth = 300;
         composite21.setLayoutData(griddata);
         GridLayout compositeLayout21 = new GridLayout(4, false);
         composite21.setLayout(compositeLayout21);
-        fRemoteButton = new Button(composite21, SWT.RADIO);
-        fRemoteButton.setText(Messages.ConfigureTraceDialog_Remote);
-        fRemoteButton.setSelection(true);
-        fLocalButton = new Button(composite21, SWT.RADIO);
-        fLocalButton.setText(Messages.ConfigureTraceDialog_Local);
+        fTargetButton = new Button(composite21, SWT.RADIO);
+        fTargetButton.setText(Messages.ConfigureTraceDialog_Target);
+        fTargetButton.setSelection(true);
+        fHostButton = new Button(composite21, SWT.RADIO);
+        fHostButton.setText(Messages.ConfigureTraceDialog_Host);
         griddata = new GridData();
         griddata.horizontalSpan = 3;
-        fLocalButton.setLayoutData(griddata);
+        fHostButton.setLayoutData(griddata);
         fIsLocal = false;
-        fLocalButton.addListener(SWT.Selection, new Listener() {
+        fHostButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event e) {
-                if (fLocalButton.getSelection()) {
+                if (fHostButton.getSelection()) {
                     fIsLocal = true;
                     fBrowseButton.setEnabled(true);
                 } else {
@@ -260,36 +265,66 @@ public class NewTraceDialog extends Dialog {
             }
         });
 
+        Composite projectComposite = new Composite(composite1, SWT.NONE);
+        projectComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+        GridLayout gl = new GridLayout(2, false);
+        gl.marginWidth = 0;
+        gl.marginHeight = 10;
+        projectComposite.setLayout(gl);
+
+        Label projectLabel = new Label(projectComposite, SWT.NONE);
+        projectLabel.setText(Messages.NewTraceDialog_Tracing_Project + ":"); //$NON-NLS-1$);
+
+        final Combo projectCombo = new Combo(projectComposite, SWT.READ_ONLY);
+        projectCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+        for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+            try {
+                if (project.isOpen() && project.hasNature(LTTngProjectNature.ID)) {
+                    projectCombo.add(project.getName());
+                    projectCombo.setData(project.getName(), project);
+                    if (fProject == null  || project.equals(defaultProject)) {
+                        projectCombo.select(projectCombo.getItemCount() - 1);
+                        fProject = project;
+                    }
+                }
+            } catch (CoreException e) {
+                SystemBasePlugin.logError("NewTraceDialog", e); //$NON-NLS-1$
+            }
+        }
+        projectCombo.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                fProject = (IProject) projectCombo.getData(projectCombo.getText());
+            }
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }});
+
         griddata = new GridData();
         Composite composite2 = new Composite(composite1, SWT.NONE);
         GridLayout compositeLayout2 = new GridLayout(2, false);
+        compositeLayout2.marginWidth = 0;
         composite2.setLayout(compositeLayout2);
-        griddata.horizontalSpan = 4;
-        griddata.widthHint = 500;
-        griddata.minimumWidth = 500;
+        griddata.horizontalSpan = 2;
         composite2.setLayoutData(griddata);
 
-        Label numChannelLabel = new Label(composite2, SWT.NULL);
-        numChannelLabel.setText(Messages.ConfigureTraceDialog_Num_Channels + ":"); //$NON-NLS-1$);
-        griddata = new GridData();
-        griddata.verticalIndent = 10;
-        numChannelLabel.setLayoutData(griddata);
+        Label numLttdThreadsLabel = new Label(composite2, SWT.NULL);
+        numLttdThreadsLabel.setText(Messages.ConfigureTraceDialog_Num_Lttd_Threads + ":"); //$NON-NLS-1$);
 
-        fNumChannelText = new Text(composite2, SWT.SINGLE | SWT.BORDER);
+        fNumLttdThreadsText = new Text(composite2, SWT.SINGLE | SWT.BORDER);
         griddata = new GridData();
         griddata.horizontalAlignment = SWT.BEGINNING;
-        griddata.verticalIndent = 10;
         griddata.widthHint = 50;
         griddata.minimumWidth = 50;
-        fNumChannelText.setLayoutData(griddata);
+        fNumLttdThreadsText.setLayoutData(griddata);
         if (fTargetResource.isUst()) {
-        	fNumChannelText.setText("1"); //$NON-NLS-1$
-        	fNumChannelText.setEnabled(false);
+        	fNumLttdThreadsText.setText("1"); //$NON-NLS-1$
+        	fNumLttdThreadsText.setEnabled(false);
         } else {
-        	fNumChannelText.setText("2"); //$NON-NLS-1$
+        	fNumLttdThreadsText.setText("2"); //$NON-NLS-1$
         }
 
-        fNumChannelText.addListener(SWT.Verify, new Listener() {
+        fNumLttdThreadsText.addListener(SWT.Verify, new Listener() {
             @Override
             public void handleEvent(Event e) {
                 String string = e.text;
@@ -304,7 +339,7 @@ public class NewTraceDialog extends Dialog {
             }
         });
 
-        fNumChannelText.addListener(SWT.Modify, new Listener() {
+        fNumLttdThreadsText.addListener(SWT.Modify, new Listener() {
             @Override
             public void handleEvent(Event event) {
             	validate();
@@ -315,7 +350,7 @@ public class NewTraceDialog extends Dialog {
         fIsAppendButton.setText(Messages.ConfigureTraceDialog_Append);
         griddata = new GridData();
         griddata.horizontalAlignment = SWT.BEGINNING;
-        griddata.horizontalSpan = 4;
+        griddata.horizontalSpan = 2;
         griddata.verticalIndent = 10;
         fIsAppendButton.setLayoutData(griddata);
         fIsAppend = Boolean.valueOf(false);
@@ -337,35 +372,17 @@ public class NewTraceDialog extends Dialog {
         griddata = new GridData();
         Group composite22 = new Group(composite1, SWT.SHADOW_OUT);
         composite22.setText(Messages.ConfigureTraceDialog_Trace_Mode);
-        griddata.horizontalSpan = 4;
+        griddata.horizontalSpan = 2;
         griddata.verticalIndent = 10;
         composite22.setLayoutData(griddata);
-        GridLayout compositeLayout22 = new GridLayout(3, false);
+        GridLayout compositeLayout22 = new GridLayout(2, false);
         composite22.setLayout(compositeLayout22);
-        fNoneButton = new Button(composite22, SWT.RADIO);
-        fNoneButton.setText(Messages.ConfigureTraceDialog_Mode_None);
-        fNoneButton.setSelection(true);
-        fFlightRecorderButton = new Button(composite22, SWT.RADIO);
-        fFlightRecorderButton.setText(Messages.ConfigureTraceDialog_Mode_Flight_Recorder);
         fNormalButton = new Button(composite22, SWT.RADIO);
         fNormalButton.setText(Messages.ConfigureTraceDialog_Mode_Normal);
-        fMode = 0;
-        fNoneButton.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(Event e) {
-                if (fNoneButton.getSelection()) {
-                    fMode = TraceConfig.NONE_MODE;
-                }
-            }
-        });
-        fFlightRecorderButton.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(Event e) {
-                if (fFlightRecorderButton.getSelection()) {
-                    fMode = TraceConfig.FLIGHT_RECORDER_MODE;
-                }
-            }
-        });
+        fFlightRecorderButton = new Button(composite22, SWT.RADIO);
+        fFlightRecorderButton.setText(Messages.ConfigureTraceDialog_Mode_Flight_Recorder);
+        fMode = TraceConfig.NORMAL_MODE;
+        fNormalButton.setSelection(true);
         fNormalButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event e) {
@@ -374,8 +391,15 @@ public class NewTraceDialog extends Dialog {
                 }
             }
         });
+        fFlightRecorderButton.addListener(SWT.Selection, new Listener() {
+        	@Override
+        	public void handleEvent(Event e) {
+        		if (fFlightRecorderButton.getSelection()) {
+        			fMode = TraceConfig.FLIGHT_RECORDER_MODE;
+        		}
+        	}
+        });
         if (fTargetResource.isUst()) {
-        	fNoneButton.setEnabled(false);
         	fFlightRecorderButton.setEnabled(false);
         	fNormalButton.setEnabled(false);
         }
@@ -391,25 +415,21 @@ public class NewTraceDialog extends Dialog {
         Label shadow_sep_h = new Label(shell, SWT.SEPARATOR | SWT.SHADOW_OUT | SWT.HORIZONTAL);
         griddata = new GridData();
         griddata.horizontalAlignment = SWT.FILL;
-        griddata.horizontalSpan = 4;
         griddata.grabExcessHorizontalSpace = true;
         griddata.verticalIndent = 20;
         shadow_sep_h.setLayoutData(griddata);
 
-        Button cancelButton = new Button(shell, SWT.PUSH);
-        cancelButton.setText(Messages.ConfigureTraceDialog_Cancel);
-        griddata = new GridData();
-        griddata.grabExcessHorizontalSpace = false;
-        griddata.widthHint = 100;
-        griddata.horizontalIndent = 290;
-        cancelButton.setLayoutData(griddata);
+        Composite buttonComposite = new Composite(shell, SWT.NONE);
+        buttonComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+        buttonComposite.setLayout(new GridLayout(2, false));
 
-        fFinishButton = new Button(shell, SWT.PUSH);
+        Button cancelButton = new Button(buttonComposite, SWT.PUSH);
+        cancelButton.setText(Messages.ConfigureTraceDialog_Cancel);
+        cancelButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false));
+
+        fFinishButton = new Button(buttonComposite, SWT.PUSH);
         fFinishButton.setText(Messages.ConfigureTraceDialog_Finish);
-        griddata = new GridData();
-        griddata.grabExcessHorizontalSpace = false;
-        griddata.widthHint = 100;
-        fFinishButton.setLayoutData(griddata);
+        fFinishButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
         fFinishButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event event) {
@@ -457,6 +477,8 @@ public class NewTraceDialog extends Dialog {
         result.setIsAppend(fIsAppend);
         result.setMode(fMode);
         result.setNumChannel(fNumChannel);
+        result.setProject(fProject);
+        defaultProject = fProject;
         return result;
     }
 
@@ -570,23 +592,39 @@ public class NewTraceDialog extends Dialog {
      * It validates all input values.
      */
     private void validate() {
-        if ((fNameText.getText() == null) || (fTransportText.getText() == null) || (fTransportText.getText().length() == 0) || (fNameText.getText().length() == 0)
-                || (fNumChannelText.getText().length() == 0) || (fNumChannelText.getText().length() == 0)) {
-            fFinishButton.setEnabled(false);
-            return;
-        }
-    	if (fPathText.getText().length() == 0) {
-            fFinishButton.setEnabled(false);
-            return;
-    	}
         if ((fTracePathError.length() > 0) || (fTraceNameError.length() > 0)) {
             fFinishButton.setEnabled(false);
             return;
         }
+        if ((fNameText.getText() == null) || (fNameText.getText().length() == 0)) {
+            fErrorLabel.setText(Messages.NewTraceDialog_Error_No_Name);
+            fFinishButton.setEnabled(false);
+            return;
+        }
+        if ((fTransportText.getText() == null) || (fTransportText.getText().length() == 0)) {
+            fFinishButton.setEnabled(false);
+            return;
+        }
+        if (fPathText.getText().length() == 0) {
+            fErrorLabel.setText(Messages.NewTraceDialog_Error_No_Path);
+            fFinishButton.setEnabled(false);
+            return;
+        }
+        if (fProject == null) {
+            fErrorLabel.setText(Messages.NewTraceDialog_Error_No_Project);
+            fFinishButton.setEnabled(false);
+            return;
+        }
+        if ((fNumLttdThreadsText.getText().length() == 0) || (fNumLttdThreadsText.getText().length() == 0)) {
+            fErrorLabel.setText(Messages.NewTraceDialog_Error_No_NumLttdThreads);
+            fFinishButton.setEnabled(false);
+            return;
+        }
+        fErrorLabel.setText(""); //$NON-NLS-1$
         fTraceName = fNameText.getText();
         fTraceTransport = fTransportText.getText();
         fTracePath = fPathText.getText();
-        fNumChannel = Integer.parseInt(fNumChannelText.getText());
+        fNumChannel = Integer.parseInt(fNumLttdThreadsText.getText());
         fFinishButton.setEnabled(true);
     }
 

@@ -13,7 +13,7 @@ package org.eclipse.linuxtools.lttng.signal;
 
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
-import org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal;
+import org.eclipse.linuxtools.tmf.signal.TmfExperimentRangeUpdatedSignal;
 
 /**
  * @author alvaro
@@ -31,9 +31,7 @@ public interface ILttExperimentSelectedListener {
 
 	/**
 	 * @param signal
-	 * @param waitForComplete
-	 *            if true: wait for the request to complete before returning
 	 */
-	public void experimentUpdated(TmfExperimentUpdatedSignal signal, boolean waitForComplete);
+	public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal);
 	
 }

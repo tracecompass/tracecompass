@@ -5,6 +5,7 @@ import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.trace.TmfCheckpoint;
 
 public interface IStateTraceManager {
 //	/**
@@ -40,11 +41,22 @@ public interface IStateTraceManager {
 	 * @param eventTime
 	 *            The timestamp of the event to restore to
 	 * 
-	 * @return TmfTimestamp indicates the nearest time used to restore the
+	 * @return TmfCheckpoint indicates the nearest checkpoint used to restore the
 	 *         state, null sent if input is invalid
 	 */
-	public abstract TmfTimestamp restoreCheckPointByTimestamp(
+	public abstract TmfCheckpoint restoreCheckPointByTimestamp(
 			TmfTimestamp eventTime);
+
+	/**
+	 * Restore to the closest checkpoint from index
+	 * 
+	 * @param eventIndex
+	 *            The index of the event to restore to
+	 * 
+	 * @return TmfCheckpoint indicates the nearest checkpoint used to restore the
+	 *         state, null sent if input is invalid
+	 */
+	public abstract TmfCheckpoint restoreCheckPointByIndex(long eventIndex);
 
 	/**
 	 * @return

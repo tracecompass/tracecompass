@@ -15,6 +15,7 @@ import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.tmf.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 
@@ -40,5 +41,11 @@ public class StateExperimentListener extends TmfComponent {
 
 		// notify handler
 		fhandler.experimentSelected(signal.getSource(), experiment);
+	}
+
+	@TmfSignalHandler
+	public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
+		// notify handler
+		fhandler.experimentRangeUpdated(signal);
 	}
 }

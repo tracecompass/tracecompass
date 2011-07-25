@@ -69,7 +69,7 @@ public class TmfExperimentContext extends TmfContext {
 			}
 		}
 		
-		setLocation(new TmfExperimentLocation(locations, ranks));
+		setLocation(new TmfExperimentLocation(new TmfLocationArray(locations), ranks));
 		setRank(rank);
 		lastTraceRead = NO_TRACE;
 	}

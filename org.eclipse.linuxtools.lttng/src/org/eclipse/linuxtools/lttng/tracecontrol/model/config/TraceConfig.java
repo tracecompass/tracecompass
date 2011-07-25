@@ -13,7 +13,8 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.tracecontrol.model.config;
 
-import org.eclipse.linuxtools.lttng.tracecontrol.model.config.TraceChannels;
+import org.eclipse.core.resources.IProject;
+
 
 /**
  * <b><u>TraceChannel</u></b>
@@ -26,9 +27,8 @@ public class TraceConfig {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    public static final int NONE_MODE = 0;
+	public static final int NORMAL_MODE = 0;
 	public static final int FLIGHT_RECORDER_MODE = 1;
-	public static final int NORMAL_MODE = 2;
 	
 	public static final String InvalidTracePath = "network"; //$NON-NLS-1$
 	
@@ -44,6 +44,7 @@ public class TraceConfig {
     private int fMode = 0;
     private int fNumChannel = 0;
     private TraceChannels fChannels = null;
+    private IProject fProject = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -212,4 +213,23 @@ public class TraceConfig {
         fChannels = new TraceChannels();
         fChannels.putAll(channels);
     }
+    
+    /**
+     * Gets the trace project.
+     * 
+     * @return project
+     */
+    public IProject getProject() {
+        return fProject;
+    }
+    
+    /**
+     * Sets the trace project.
+     * 
+     * @param project
+     */
+    public void setProject(IProject project) {
+        fProject = project;
+    }
+    
 }

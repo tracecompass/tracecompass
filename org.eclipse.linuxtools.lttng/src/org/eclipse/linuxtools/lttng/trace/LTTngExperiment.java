@@ -12,11 +12,20 @@
 
 package org.eclipse.linuxtools.lttng.trace;
 
+import org.eclipse.linuxtools.lttng.event.LttngEvent;
+import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
+import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperimentContext;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperimentLocation;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
+import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.signal.TmfExperimentRangeUpdatedSignal;
+import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfContext;
@@ -29,9 +38,9 @@ import org.eclipse.linuxtools.tmf.trace.TmfContext;
  */
 public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implements ITmfTrace {
 
-	private static final int DEFAULT_INDEX_PAGE_SIZE = 50000;
+    private static final int DEFAULT_INDEX_PAGE_SIZE = 50000;
 
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
@@ -44,11 +53,11 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
      */
     public LTTngExperiment(Class<T> type, String id, ITmfTrace[] traces, TmfTimestamp epoch, int indexPageSize) {
         this(type, id, traces, TmfTimestamp.Zero, indexPageSize, false);
-	}
+    }
 
     public LTTngExperiment(Class<T> type, String id, ITmfTrace[] traces, TmfTimestamp epoch, int indexPageSize, boolean preIndexExperiment) {
-    	super(type, id, traces, epoch, indexPageSize, preIndexExperiment);
-	}
+        super(type, id, traces, epoch, indexPageSize, preIndexExperiment);
+    }
 
     /**
      * @param type
@@ -68,100 +77,100 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
     public LTTngExperiment(Class<T> type, String id, ITmfTrace[] traces, int indexPageSize) {
         this(type, id, traces, TmfTimestamp.Zero, indexPageSize);
     }
-    
+
     public LTTngExperiment(LTTngExperiment<T> other) {
-    	super(other.getName() + "(clone)", other.fType); //$NON-NLS-1$
-    	
-    	fEpoch         = other.fEpoch;
-    	fIndexPageSize = other.fIndexPageSize;
-    	
-    	fTraces = new ITmfTrace[other.fTraces.length];
-    	for (int trace = 0; trace < other.fTraces.length; trace++) {
-    		fTraces[trace] = other.fTraces[trace].createTraceCopy();
-    	}
-    	
-    	fNbEvents  = other.fNbEvents;
-    	fTimeRange = other.fTimeRange;
+        super(other.getName() + "(clone)", other.fType); //$NON-NLS-1$
+
+        fEpoch = other.fEpoch;
+        fIndexPageSize = other.fIndexPageSize;
+
+        fTraces = new ITmfTrace[other.fTraces.length];
+        for (int trace = 0; trace < other.fTraces.length; trace++) {
+            fTraces[trace] = other.fTraces[trace].createTraceCopy();
+        }
+
+        fNbEvents = other.fNbEvents;
+        fTimeRange = other.fTimeRange;
     }
-    
-	@Override
-	public LTTngExperiment<T> createTraceCopy() {
-		LTTngExperiment<T> experiment = new LTTngExperiment<T>(this);
-		TmfSignalManager.deregister(experiment);
-		return experiment;
-	}
-    
-	// ------------------------------------------------------------------------
+
+    @Override
+    public LTTngExperiment<T> createTraceCopy() {
+        LTTngExperiment<T> experiment = new LTTngExperiment<T>(this);
+        TmfSignalManager.deregister(experiment);
+        return experiment;
+    }
+
+    // ------------------------------------------------------------------------
     // ITmfTrace trace positioning
     // ------------------------------------------------------------------------
 
-	@Override
-	public synchronized TmfEvent getNextEvent(TmfContext context) {
+    @Override
+    public synchronized TmfEvent getNextEvent(TmfContext context) {
 
-		// Validate the context
-		if (!(context instanceof TmfExperimentContext)) {
-			return null;	// Throw an exception?
-		}
+        // Validate the context
+        if (!(context instanceof TmfExperimentContext)) {
+            return null; // Throw an exception?
+        }
 
-		if (!context.equals(fExperimentContext)) {
+        if (!context.equals(fExperimentContext)) {
 //    		Tracer.trace("Ctx: Restoring context");
-			fExperimentContext = seekLocation(context.getLocation());
-		}
-		
-		TmfExperimentContext expContext = (TmfExperimentContext) context;
+            fExperimentContext = seekLocation(context.getLocation());
+        }
+
+        TmfExperimentContext expContext = (TmfExperimentContext) context;
 
 //		dumpContext(expContext, true);
 
-		// If an event was consumed previously, get the next one from that trace
-		int lastTrace = expContext.getLastTrace();
-		if (lastTrace != TmfExperimentContext.NO_TRACE) {
-		    TmfContext traceContext = expContext.getContexts()[lastTrace];
-			expContext.getEvents()[lastTrace] = expContext.getTraces()[lastTrace].getNextEvent(traceContext);
-			expContext.setLastTrace(TmfExperimentContext.NO_TRACE);
-		}
+        // If an event was consumed previously, get the next one from that trace
+        int lastTrace = expContext.getLastTrace();
+        if (lastTrace != TmfExperimentContext.NO_TRACE) {
+            TmfContext traceContext = expContext.getContexts()[lastTrace];
+            expContext.getEvents()[lastTrace] = expContext.getTraces()[lastTrace].getNextEvent(traceContext);
+            expContext.setLastTrace(TmfExperimentContext.NO_TRACE);
+        }
 
-		// Scan the candidate events and identify the "next" trace to read from
-		TmfEvent eventArray[] =  expContext.getEvents();
-		if (eventArray == null) {
-			return null;
-		}
-		int trace = TmfExperimentContext.NO_TRACE;
-		TmfTimestamp timestamp = TmfTimestamp.BigCrunch;
-		if (eventArray.length == 1) {
-		    if (eventArray[0] != null) {
-		        timestamp = eventArray[0].getTimestamp();
-		        trace = 0;
-		    }
-		} else {
-			for (int i = 0; i < eventArray.length; i++) {
-				TmfEvent event = eventArray[i];
-				if (event != null && event.getTimestamp() != null) {
-					TmfTimestamp otherTS = event.getTimestamp();
-					if (otherTS.compareTo(timestamp, true) < 0) {
-						trace = i;
-						timestamp = otherTS;
-					}
-				}
-			}
-		}
+        // Scan the candidate events and identify the "next" trace to read from
+        TmfEvent eventArray[] = expContext.getEvents();
+        if (eventArray == null) {
+            return null;
+        }
+        int trace = TmfExperimentContext.NO_TRACE;
+        TmfTimestamp timestamp = TmfTimestamp.BigCrunch;
+        if (eventArray.length == 1) {
+            if (eventArray[0] != null) {
+                timestamp = eventArray[0].getTimestamp();
+                trace = 0;
+            }
+        } else {
+            for (int i = 0; i < eventArray.length; i++) {
+                TmfEvent event = eventArray[i];
+                if (event != null && event.getTimestamp() != null) {
+                    TmfTimestamp otherTS = event.getTimestamp();
+                    if (otherTS.compareTo(timestamp, true) < 0) {
+                        trace = i;
+                        timestamp = otherTS;
+                    }
+                }
+            }
+        }
 
-		// Update the experiment context and set the "next" event
-		TmfEvent event = null;
-		if (trace != TmfExperimentContext.NO_TRACE) {
+        // Update the experiment context and set the "next" event
+        TmfEvent event = null;
+        if (trace != TmfExperimentContext.NO_TRACE) {
 //	        updateIndex(expContext, timestamp);
 
-	        TmfContext traceContext = expContext.getContexts()[trace];
-	        TmfExperimentLocation expLocation = (TmfExperimentLocation) expContext.getLocation();
-	        expLocation.getLocation()[trace] = traceContext.getLocation();
+            TmfContext traceContext = expContext.getContexts()[trace];
+            TmfExperimentLocation expLocation = (TmfExperimentLocation) expContext.getLocation();
+            expLocation.getLocation().locations[trace] = traceContext.getLocation();
 
-	        updateIndex(expContext, timestamp);
+            updateIndex(expContext, timestamp);
 
-	        expLocation.getRanks()[trace] = traceContext.getRank();
-			expContext.setLastTrace(trace);
-			expContext.updateRank(1);
-			event = expContext.getEvents()[trace];
-			fExperimentContext = expContext;
-		}
+            expLocation.getRanks()[trace] = traceContext.getRank();
+            expContext.setLastTrace(trace);
+            expContext.updateRank(1);
+            event = expContext.getEvents()[trace];
+            fExperimentContext = expContext;
+        }
 
 //		if (event != null) {
 //    		Tracer.trace("Exp: " + (expContext.getRank() - 1) + ": " + event.getTimestamp().toString());
@@ -169,16 +178,107 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
 //    		Tracer.trace("Ctx: Event returned= " + event.getTimestamp().toString());
 //		}
 
-		return event;
-	}
+        return event;
+    }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
+    @SuppressWarnings("unchecked")
+    @Override
+    protected void indexExperiment(final boolean waitForCompletion) {
+        if (waitForCompletion) {
+            TmfExperimentRangeUpdatedSignal signal = new TmfExperimentRangeUpdatedSignal(LTTngExperiment.this, LTTngExperiment.this,
+                    TmfTimeRange.Eternity);
+            broadcast(signal);
+            while (isIndexingBusy()) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            ;
+            return;
+        }
+        for (ITmfTrace trace : fTraces) {
+            if (trace instanceof LTTngTrace) {
+                JniTrace jniTrace = ((LTTngTrace) trace).getCurrentJniTrace();
+                if (jniTrace != null && !jniTrace.isLiveTraceSupported()) {
+                    updateTimeRange();
+                    TmfExperimentRangeUpdatedSignal signal = new TmfExperimentRangeUpdatedSignal(LTTngExperiment.this, LTTngExperiment.this,
+                            getTimeRange());
+                    broadcast(signal);
+                    return;
+                }
+            }
+        }
+        final Thread thread = new Thread("Streaming Monitor for " + getName()) { //$NON-NLS-1$
+            LttngTimestamp safeTimestamp = null;
+            TmfTimeRange timeRange = null;
+
+            @Override
+            public void run() {
+                while (!fExecutor.isShutdown()) {
+                    final TmfEventRequest<LttngEvent> request = new TmfEventRequest<LttngEvent>(LttngEvent.class, TmfTimeRange.Eternity, 0,
+                            ExecutionType.FOREGROUND) {
+                        @Override
+                        public void handleCompleted() {
+                            super.handleCompleted();
+                            if (isIndexingBusy()) {
+                                timeRange = null;
+                                return;
+                            }
+                            long startTime = Long.MAX_VALUE;
+                            long endTime = Long.MIN_VALUE;
+                            for (ITmfTrace trace : getTraces()) {
+                                if (trace instanceof LTTngTrace) {
+                                    LTTngTrace lttngTrace = (LTTngTrace) trace;
+                                    JniTrace jniTrace = lttngTrace.getCurrentJniTrace();
+                                    jniTrace.updateTrace();
+                                    startTime = Math.min(startTime, jniTrace.getStartTime().getTime());
+                                    endTime = Math.max(endTime, jniTrace.getEndTime().getTime());
+                                }
+                            }
+                            LttngTimestamp startTimestamp = new LttngTimestamp(startTime);
+                            LttngTimestamp endTimestamp = new LttngTimestamp(endTime);
+                            if (safeTimestamp != null && safeTimestamp.compareTo(getTimeRange().getEndTime(), false) > 0) {
+                                timeRange = new TmfTimeRange(startTimestamp, safeTimestamp);
+                            } else {
+                                timeRange = null;
+                            }
+                            safeTimestamp = endTimestamp;
+                        }
+                    };
+                    try {
+                        sendRequest((ITmfDataRequest<T>) request);
+                        request.waitForCompletion();
+                        if (timeRange != null) {
+                            TmfExperimentRangeUpdatedSignal signal = new TmfExperimentRangeUpdatedSignal(LTTngExperiment.this, LTTngExperiment.this,
+                                    timeRange);
+                            broadcast(signal);
+                        }
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        thread.start();
+    }
+
+    @TmfSignalHandler
+    public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
+        indexExperiment(false, (int) fNbEvents, signal.getRange());
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
     @SuppressWarnings("nls")
-	public String toString() {
-		return "[LTTngExperiment (" + getName() + ")]";
-	}
+    public String toString() {
+        return "[LTTngExperiment (" + getName() + ")]";
+    }
 
 }

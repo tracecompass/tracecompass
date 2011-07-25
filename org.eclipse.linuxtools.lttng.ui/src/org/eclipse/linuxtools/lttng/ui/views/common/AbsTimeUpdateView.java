@@ -71,7 +71,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	 * Number of events before a GUI refresh
 	 */
 	protected static final Long INPUT_CHANGED_REFRESH = 75000L;
-	private static final long DEFAULT_OFFSET = 0L;
+	private static final long DEFAULT_OFFSET = 0;
 
 	protected boolean synch = true; // time synchronization, used to be an option
 	protected ITimeAnalysisViewer tsfviewer = null;
@@ -221,7 +221,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 				}
 
 				// Clearing of process data is configurable
-				dataRequest(trange, experiment.getTimeRange(), clearingData, ExecutionType.FOREGROUND);
+				eventRequest(trange, experiment.getTimeRange(), clearingData, ExecutionType.FOREGROUND);
 			}
 		}
 	}
@@ -336,13 +336,30 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	/**
 	 * @param zoomedTRange
 	 * @param experimentTRange
+	 * @param clearingData
 	 * @param execType 
 	 */
-	public void dataRequest(TmfTimeRange zoomedTRange,
-			TmfTimeRange experimentTRange, boolean clearingData, ExecutionType execType) {
+	public void eventRequest(TmfTimeRange zoomedTRange, TmfTimeRange experimentTRange, boolean clearingData, ExecutionType execType) {
 
 		// timeRange is the Experiment time range
-		 boolean sent = processDataRequest(zoomedTRange, experimentTRange, clearingData, execType);
+		boolean sent = processDataRequest(zoomedTRange, experimentTRange, DEFAULT_OFFSET, TmfDataRequest.ALL_DATA, clearingData, execType);
+
+		if (sent) {
+			waitCursor(true);
+		}
+	}
+
+	/**
+	 * @param offset
+	 * @param nbRequested
+	 * @param startTime
+	 * @param clearingData
+	 * @param execType 
+	 */
+	public void eventRequest(long offset, TmfTimeRange range, boolean clearingData, ExecutionType execType) {
+
+		// timeRange is the Experiment time range
+		boolean sent = processDataRequest(range, null, offset, TmfDataRequest.ALL_DATA, clearingData, execType);
 
 		if (sent) {
 			waitCursor(true);
@@ -376,18 +393,17 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	 * @return
 	 */
 	private boolean processDataRequest(TmfTimeRange requestTrange,
-			TmfTimeRange experimentTRange, boolean clearingData, ExecutionType execType) {
+			TmfTimeRange experimentTRange, long offset, int nbRequested, boolean clearingData, ExecutionType execType) {
 		// Validate input
-		if (requestTrange == null || experimentTRange == null) {
+		if (requestTrange == null) {
 			TraceDebug.debug("Invalid input"); //$NON-NLS-1$
 			return false;
 		}
 
 		// Cancel the currently executing request before starting a new one
 		fProvider.conditionallyCancelRequests();
-
 		fCurrentRequest = new LttngSyntEventRequest(
-				requestTrange, DEFAULT_OFFSET, TmfDataRequest.ALL_DATA,
+				requestTrange, offset, nbRequested,
 				LttngConstants.DEFAULT_BLOCK_SIZE, this, experimentTRange, getEventProcessor(), 
 				TmfExperiment.getCurrentExperiment().getName(), execType) {
 	
@@ -613,6 +629,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	 * @param complete
 	 *            true: yes, false: partial update
 	 */
+	@SuppressWarnings("deprecation")
 	protected void modelInputChanged(ILttngSyntEventRequest request, boolean complete) {
 		long experimentStartTime = -1;
 		long experimentEndTime = -1;

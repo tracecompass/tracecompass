@@ -293,9 +293,67 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 
 	}
 
-	// By default, same behavior as a foreground request
-	protected void queueBackgroundRequest(final ITmfDataRequest<T> request, final int blockSize, boolean indexing) {
-		queueRequest(request);
+	protected void queueBackgroundRequest(final ITmfDataRequest<T> request, final int blockSize, final boolean indexing) {
+
+		Thread thread = new Thread() {
+			@Override
+			public void run() {
+				request.start();
+
+				final Integer[] CHUNK_SIZE = new Integer[1];
+				CHUNK_SIZE[0] = Math.min(request.getNbRequested(), blockSize + ((indexing) ? 1 : 0));
+				
+				final Integer[] nbRead = new Integer[1];
+				nbRead[0] = 0;
+
+				final Boolean[] isFinished = new Boolean[1];
+				isFinished[0] = Boolean.FALSE;
+
+				while (!isFinished[0]) {
+
+					TmfDataRequest<T> subRequest= new TmfDataRequest<T>(request.getDataType(), request.getIndex() + nbRead[0], CHUNK_SIZE[0], blockSize, ExecutionType.BACKGROUND)
+					{
+						@Override
+						public void handleData(T data) {
+							super.handleData(data);
+							request.handleData(data);
+							if (getNbRead() > CHUNK_SIZE[0]) {
+								System.out.println("ERROR - Read too many events"); //$NON-NLS-1$
+							}
+						}
+
+						@Override
+						public void handleCompleted() {
+							nbRead[0] += getNbRead();
+							if (nbRead[0] >= request.getNbRequested() || (getNbRead() < CHUNK_SIZE[0])) {
+							    if (isCancelled()) { 
+							        request.cancel();
+							    }
+							    else {
+							        request.done();
+							    }
+								isFinished[0] = Boolean.TRUE;
+							}
+							super.handleCompleted();
+						}
+					};
+
+					if (!isFinished[0]) {
+						queueRequest(subRequest);
+
+						try {
+							subRequest.waitForCompletion();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+
+						CHUNK_SIZE[0] = Math.min(request.getNbRequested() - nbRead[0], blockSize);
+					}
+				}
+			}
+		};
+
+		thread.start();
 	}
 
 	/**

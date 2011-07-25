@@ -116,11 +116,11 @@ public class Messages extends NLS {
     public static String ConfigureTraceDialog_Cancel;
     public static String ConfigureTraceDialog_Finish;
     public static String ConfigureTraceDialog_Mode_Flight_Recorder;
-    public static String ConfigureTraceDialog_Local;
-    public static String ConfigureTraceDialog_Remote;
+    public static String ConfigureTraceDialog_Host;
+    public static String ConfigureTraceDialog_Target;
     public static String ConfigureTraceDialog_Mode_None;
     public static String ConfigureTraceDialog_Mode_Normal;
-    public static String ConfigureTraceDialog_Num_Channels;
+    public static String ConfigureTraceDialog_Num_Lttd_Threads;
     public static String ConfigureTraceDialog_Error_Invalid_Folder;
     public static String ConfigureTraceDialog_Error_Invalid_Path;
     public static String ConfigureTraceDialog_Error_Multiple_Seps;
@@ -134,6 +134,11 @@ public class Messages extends NLS {
     
     public static String NewTraceDialog_Title;
     public static String NewTraceDialog_TraceName;
+    public static String NewTraceDialog_Tracing_Project;
+    public static String NewTraceDialog_Error_No_Name;
+    public static String NewTraceDialog_Error_No_Path;
+    public static String NewTraceDialog_Error_No_NumLttdThreads;
+    public static String NewTraceDialog_Error_No_Project;
     public static String NewTraceDialog_Error_Already_Exists;
     public static String NewTraceDialog_Error_Invalid_First_Char;
     public static String NewTraceDialog_Error_Invalid_Name;

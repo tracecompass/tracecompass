@@ -38,6 +38,7 @@ public class FlowFinishUpdateHandler extends AbsFlowTRangeUpdate
 		return null;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 		// The end of the last state is unknown since it's beyond the requested time range window. Create this last

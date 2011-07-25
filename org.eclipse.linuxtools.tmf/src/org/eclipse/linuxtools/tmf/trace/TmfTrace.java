@@ -26,7 +26,6 @@ import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
-import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
@@ -238,8 +237,13 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 
 	@Override
 	public ITmfContext armRequest(ITmfDataRequest<T> request) {
-		if (request instanceof ITmfEventRequest<?>) {
-			return seekEvent(((ITmfEventRequest<T>) request).getRange().getStartTime());
+		if (request instanceof ITmfEventRequest<?> &&
+				!TmfTimestamp.BigBang.equals(((ITmfEventRequest<T>) request).getRange().getStartTime()) &&
+				request.getIndex() == 0) {
+			ITmfContext context = seekEvent(((ITmfEventRequest<T>) request).getRange().getStartTime());
+			((ITmfEventRequest<T>) request).setStartIndex((int) context.getRank());
+			return context;
+			
 		}
 		return seekEvent(request.getIndex());
 	}
@@ -431,7 +435,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 	 */
 
     @SuppressWarnings({ "unchecked" })
-    private void indexTrace(boolean waitForCompletion) {
+    protected void indexTrace(boolean waitForCompletion) {
 
     	final Job job = new Job("Indexing " + getName() + "...") { //$NON-NLS-1$ //$NON-NLS-2$
     		@Override
@@ -505,103 +509,4 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 	protected void notifyListeners() {
     	broadcast(new TmfTraceUpdatedSignal(this, this, new TmfTimeRange(fStartTime, fEndTime)));
 	}
-   
-	// ------------------------------------------------------------------------
-	// TmfDataProvider
-	// ------------------------------------------------------------------------
-
-	@Override
-	protected void queueBackgroundRequest(final ITmfDataRequest<T> request, final int blockSize, final boolean indexing) {
-
-		// TODO: Handle the data requests also...
-		if (!(request instanceof ITmfEventRequest<?>)) {
-			super.queueRequest(request);
-			return;
-		}
-		final ITmfEventRequest<T> eventRequest = (ITmfEventRequest<T>) request;
-
-		Thread thread = new Thread() {
-			@Override
-			public void run() {
-				
-//				final long requestStart = System.nanoTime();
-
-				final Integer[] CHUNK_SIZE = new Integer[1];
-				CHUNK_SIZE[0] = blockSize + ((indexing) ? 1 : 0);
-				
-				final Integer[] nbRead = new Integer[1];
-				nbRead[0] = 0;
-
-//				final TmfTimestamp[] timestamp = new TmfTimestamp[1];
-//				timestamp[0] = new TmfTimestamp(eventRequest.getRange().getStartTime());
-//				final TmfTimestamp endTS = eventRequest.getRange().getEndTime();
-
-				final Boolean[] isFinished = new Boolean[1];
-				isFinished[0] = Boolean.FALSE;
-
-				while (!isFinished[0]) {
-
-//					TmfEventRequest<T> subRequest = new TmfEventRequest<T>(eventRequest.getDataType(), new TmfTimeRange(timestamp[0], endTS), CHUNK_SIZE[0], eventRequest.getBlockize(), ExecutionType.BACKGROUND)
-//					TmfDataRequest<T> subRequest = new TmfDataRequest<T>(eventRequest.getDataType(), nbRead[0], CHUNK_SIZE[0], eventRequest.getBlockize(), ExecutionType.BACKGROUND)
-					TmfDataRequest<T> subRequest = new TmfDataRequest<T>(eventRequest.getDataType(), nbRead[0], CHUNK_SIZE[0], ExecutionType.BACKGROUND)
-					{
-						@Override
-						public void handleData(T data) {
-							super.handleData(data);
-							eventRequest.handleData(data);
-							if (getNbRead() == CHUNK_SIZE[0]) {
-								nbRead[0] += getNbRead();
-							}
-							if (getNbRead() > CHUNK_SIZE[0]) {
-								System.out.println("ERROR - Read too many events"); //$NON-NLS-1$
-							}
-						}
-
-						@Override
-						public void handleCompleted() {
-//							System.out.println("Request completed at: " + timestamp[0]);
-							if (getNbRead() < CHUNK_SIZE[0]) {
-							    if (isCancelled()) { 
-							        eventRequest.cancel();
-							    }
-							    else {
-							        eventRequest.done();
-							    }
-								isFinished[0] = Boolean.TRUE;
-								nbRead[0] += getNbRead();
-//								System.out.println("fNbRead=" + getNbRead() + " total=" + nbRead[0]);
-							}
-							super.handleCompleted();
-						}
-					};
-
-					if (!isFinished[0]) {
-						queueRequest(subRequest);
-
-						try {
-							subRequest.waitForCompletion();
-//							System.out.println("Finished at " + timestamp[0]);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-
-//						TmfTimestamp newTS = new TmfTimestamp(timestamp[0].getValue() + 1, timestamp[0].getScale(), timestamp[0].getPrecision());
-//						timestamp[0] = newTS;
-						CHUNK_SIZE[0] = blockSize;
-//						System.out.println("New timestamp: " + timestamp[0]);
-					}
-				}
-//				final long requestEnded = System.nanoTime();
-//				System.out.println("Background request completed. Elapsed= " + (requestEnded * 1.0 - requestStart) / 1000000000);
-			}
-		};
-
-		thread.start();
-	}
-
-//	@Override
-//    protected void queueBackgroundRequest(final ITmfDataRequest<T> request, final int blockSize, final boolean adjust) {
-//		super.queueBackgroundRequest(request, fIndexPageSize, true);
-//    }
-
 }

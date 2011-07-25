@@ -41,7 +41,7 @@ package org.eclipse.linuxtools.tmf.event;
  * Notice that the adjusted timestamp value could be negative e.g. for events
  * that occurred before t0 wrt the reference clock.
  */
-public class TmfTimestamp implements Cloneable {
+public class TmfTimestamp implements Cloneable, Comparable<TmfTimestamp> {
 
 	// ------------------------------------------------------------------------
     // Attributes
@@ -388,5 +388,10 @@ public class TmfTimestamp implements Cloneable {
 		}
 		return clone;
     }
+
+	@Override
+	public int compareTo(TmfTimestamp o) {
+		return compareTo(o, false);
+	}
 
 }

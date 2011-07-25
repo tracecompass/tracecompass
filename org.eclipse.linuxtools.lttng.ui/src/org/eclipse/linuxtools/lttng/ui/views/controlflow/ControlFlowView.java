@@ -50,6 +50,7 @@ import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
+import org.eclipse.linuxtools.tmf.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
@@ -140,6 +141,8 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 	private ViewProcessFilter tableFilter = null;
 	private ScrolledComposite scrollFrame = null;
+	
+	private TmfTimeRange initTimeRange = TmfTimeRange.Null;
 
 	// private static SimpleDateFormat stimeformat = new SimpleDateFormat(
 	// "yy/MM/dd HH:mm:ss");
@@ -551,12 +554,14 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		if (experiment != null) {
 			TmfTimeRange experimentTRange = experiment.getTimeRange();
 
-			// send request and received the adjusted time used
-			TmfTimeRange adjustedTimeRange = initialExperimentDataRequest(this,
-					experimentTRange);
-
-			// initialize widget time boundaries and filtering parameters
-			ModelUpdateInit(experimentTRange, adjustedTimeRange, this);
+			if (experimentTRange != TmfTimeRange.Null) {
+				// send request and received the adjusted time used
+				TmfTimeRange adjustedTimeRange = initialExperimentDataRequest(this,
+						experimentTRange);
+	
+				// initialize widget time boundaries and filtering parameters
+				ModelUpdateInit(experimentTRange, adjustedTimeRange, this);
+			}
 		} else {
 			TraceDebug.debug("No selected experiment information available"); //$NON-NLS-1$
 		}
@@ -1045,13 +1050,31 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 			TmfTimeRange experimentTRange = signal.getExperiment()
 					.getTimeRange();
 
-			// prepare time intervals in widget
-			ModelUpdateInit(experimentTRange, experimentTRange, signal
-					.getSource());
+			initTimeRange = TmfTimeRange.Null;
+			if (experimentTRange != TmfTimeRange.Null) {
+				// prepare time intervals in widget
+				ModelUpdateInit(experimentTRange, experimentTRange, signal
+						.getSource());
+	
+				// request initial data
+				initialExperimentDataRequest(signal
+						.getSource(), experimentTRange);
+			}
+		}
+	}
 
-			// request initial data
-			initialExperimentDataRequest(signal
-					.getSource(), experimentTRange);
+	@TmfSignalHandler
+	public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
+		if (initTimeRange == TmfTimeRange.Null && signal.getExperiment().equals(TmfExperiment.getCurrentExperiment())) {
+			TmfTimeRange experimentTRange = signal.getRange();
+
+			if (experimentTRange != TmfTimeRange.Null) {
+				// prepare time intervals in widget
+				ModelUpdateInit(experimentTRange, experimentTRange, signal.getSource());
+
+				// request initial data
+				initialExperimentDataRequest(signal.getSource(), experimentTRange);
+			}
 		}
 	}
 
@@ -1067,13 +1090,14 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		// user to select the interesting area based on the perspective
 		TmfTimeRange initTimeWindow = getInitTRange(experimentTRange);
 
-		dataRequest(initTimeWindow, experimentTRange, true, ExecutionType.FOREGROUND);
+		eventRequest(initTimeWindow, experimentTRange, true, ExecutionType.FOREGROUND);
 		if (TraceDebug.isDEBUG()) {
 			TraceDebug.debug("Initialization request time range is: " //$NON-NLS-1$
 					+ initTimeWindow.getStartTime().toString() + "-" //$NON-NLS-1$
 					+ initTimeWindow.getEndTime().toString());
 		}
 
+		initTimeRange = initTimeWindow;
 		return initTimeWindow;
 	}
 	

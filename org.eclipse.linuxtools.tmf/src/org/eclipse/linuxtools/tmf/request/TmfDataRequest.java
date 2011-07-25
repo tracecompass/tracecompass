@@ -90,7 +90,7 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     private final Class<T>      fDataType;
     private final ExecutionType fExecType;
     private final int      		fRequestId;  	// A unique request ID
-    private final int      		fIndex;      	// The index (rank) of the requested event
+    private       int      		fIndex;      	// The index (rank) of the requested event
     private final int      		fNbRequested;	// The number of requested events (ALL_DATA for all)
     private final int			fBlockSize;		// The block size (for BG requests)
     private       int      		fNbRead;        // The number of reads so far
@@ -273,6 +273,18 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
     }
 
     // ------------------------------------------------------------------------
+    // Setters
+    // ------------------------------------------------------------------------
+
+    /**
+     * this method is called by the event provider to set the index corresponding to the time range start time
+     * @param index the start time index
+     */
+	protected void setIndex(int index) {
+        fIndex = index;
+    }
+
+    // ------------------------------------------------------------------------
     // Operators
     // ------------------------------------------------------------------------
 
@@ -395,6 +407,8 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
         	if (!fRequestCompleted) {
             	fRequestRunning   = false;
                 fRequestCompleted = true;
+            } else {
+                return;
             }
         }
 		handleCompleted();

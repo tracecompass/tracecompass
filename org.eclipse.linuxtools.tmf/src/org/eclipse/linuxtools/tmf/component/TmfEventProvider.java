@@ -16,8 +16,10 @@ import org.eclipse.linuxtools.tmf.Tracer;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.request.TmfCoalescedEventRequest;
+import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 
 /**
  * <b><u>TmfEventProvider</u></b>
@@ -54,7 +56,7 @@ public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvid
 			ITmfEventRequest<T> eventRequest = (ITmfEventRequest<T>) request;
 			TmfCoalescedEventRequest<T> coalescedRequest = 
 				new TmfCoalescedEventRequest<T>(
-						fType, eventRequest.getRange(), eventRequest.getNbRequested(), eventRequest.getBlockSize(), 
+						fType, eventRequest.getRange(), eventRequest.getIndex(), eventRequest.getNbRequested(), eventRequest.getBlockSize(), 
 						eventRequest.getExecType());
 			coalescedRequest.addRequest(eventRequest);
 	        if (Tracer.isRequestTraced()) {
@@ -67,4 +69,77 @@ public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvid
 		}
 	}
 
+	@Override
+	protected void queueBackgroundRequest(final ITmfDataRequest<T> request, final int blockSize, final boolean indexing) {
+
+		if (! (request instanceof ITmfEventRequest)) {
+			super.queueBackgroundRequest(request, blockSize, indexing);
+			return;
+		}
+
+		Thread thread = new Thread() {
+			@Override
+			public void run() {
+				request.start();
+
+				final Integer[] CHUNK_SIZE = new Integer[1];
+				CHUNK_SIZE[0] = Math.min(request.getNbRequested(), blockSize + ((indexing) ? 1 : 0));
+				
+				final Integer[] nbRead = new Integer[1];
+				nbRead[0] = 0;
+
+				final Boolean[] isFinished = new Boolean[1];
+				isFinished[0] = Boolean.FALSE;
+
+				int startIndex = request.getIndex();
+				
+				while (!isFinished[0]) {
+
+					TmfEventRequest<T> subRequest= new TmfEventRequest<T>(request.getDataType(), ((ITmfEventRequest<?>) request).getRange(), startIndex + nbRead[0], CHUNK_SIZE[0], blockSize, ExecutionType.BACKGROUND)
+					{
+						@Override
+						public void handleData(T data) {
+							super.handleData(data);
+							request.handleData(data);
+							if (this.getNbRead() > CHUNK_SIZE[0]) {
+								System.out.println("ERROR - Read too many events"); //$NON-NLS-1$
+							}
+						}
+
+						@Override
+						public void handleCompleted() {
+							nbRead[0] += this.getNbRead();
+							if (nbRead[0] >= request.getNbRequested() || (this.getNbRead() < CHUNK_SIZE[0])) {
+								if (isCancelled()) { 
+									request.cancel();
+								}
+								else {
+									request.done();
+								}
+								isFinished[0] = Boolean.TRUE;
+							}
+							super.handleCompleted();
+						}
+					};
+
+					if (!isFinished[0]) {
+						queueRequest(subRequest);
+
+						try {
+							subRequest.waitForCompletion();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+
+						if (startIndex == 0 && nbRead[0] == CHUNK_SIZE[0]) { // do this only once if the event request index is unknown
+							startIndex = subRequest.getIndex(); // update the start index with the index of the first subrequest's
+						}                                       // start time event which was set during the arm request
+						CHUNK_SIZE[0] = Math.min(request.getNbRequested() - nbRead[0], blockSize);
+					}
+				}
+			}
+		};
+
+		thread.start();
+	}
 }

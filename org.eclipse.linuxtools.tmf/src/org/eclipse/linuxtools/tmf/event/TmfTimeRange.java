@@ -24,6 +24,7 @@ public class TmfTimeRange {
 	// ------------------------------------------------------------------------
 
 	public static final TmfTimeRange Eternity = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+	public static final TmfTimeRange Null = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigBang);
 	
 	// ------------------------------------------------------------------------
     // Attributes

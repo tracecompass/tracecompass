@@ -473,31 +473,38 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	public void setSelectedTimeInt(long time, boolean ensureVisible) {
 		// Trace.debug("currentTime:" + _selectedTime + " new time:" + time);
 		_selectedTime = time;
-		if (_selectedTime > _endTime)
-			_selectedTime = _endTime;
-		if (_selectedTime < _beginTime)
-			_selectedTime = _beginTime;
+		if (_selectedTime > _endTime) {
+			_endTime = _selectedTime;
+			_time1_ = _selectedTime;
+		}
+		if (_selectedTime < _beginTime) {
+			_beginTime = _selectedTime;
+			_time0_ = _selectedTime;
+		}
 		long time0 = _time0;
 		long time1 = _time1;
 		if (ensureVisible) {
 			double timeSpace = (_time1 - _time0) * .02;
 			double timeMid = (_time1 - _time0) * .1;
 			if (_selectedTime < _time0 + timeSpace) {
-				double dt = _time0 - _selectedTime + timeMid;
+				long dt = (long) (_time0 - _selectedTime + timeMid);
 				_time0 -= dt;
 				_time1 -= dt;
 			} else if (_selectedTime > _time1 - timeSpace) {
-				double dt = _selectedTime - _time1 + timeMid;
+				long dt = (long) (_selectedTime - _time1 + timeMid);
 				_time0 += dt;
 				_time1 += dt;
 			}
 			if (_time0 < _time0_) {
-				_time1 += _time0_ - _time0;
+				_time1 = Math.min(_time1_, _time1 + (_time0_ - _time0));
 				_time0 = _time0_;
 			} else if (_time1 > _time1_) {
-				_time0 -= _time1 - _time1_;
+				_time0 = Math.max(_time0_, _time0 - (_time1 - _time1_));
 				_time1 = _time1_;
 			}
+		}
+		if (_time1 - _time0 < _minTimeInterval) {
+			_time1 = _time0 + _minTimeInterval;
 		}
 		_stateCtrl.adjustScrolls();
 		_stateCtrl.redraw();

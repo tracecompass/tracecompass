@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.experiment;
 
-import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.trace.TmfLocation;
 
 /**
@@ -20,11 +19,11 @@ import org.eclipse.linuxtools.tmf.trace.TmfLocation;
  * <p>
  * The experiment location is the set of its traces' locations.
  */
-public class TmfExperimentLocation extends TmfLocation<ITmfLocation<?>[]> {
+public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> {
 
     private long[] fRanks;
 
-	public TmfExperimentLocation(ITmfLocation<?>[] locations, long[] ranks) {
+	public TmfExperimentLocation(TmfLocationArray locations, long[] ranks) {
 		super(locations);
 		fRanks = ranks;
 	}
@@ -32,11 +31,8 @@ public class TmfExperimentLocation extends TmfLocation<ITmfLocation<?>[]> {
 	@Override
 	public TmfExperimentLocation clone() {
 		super.clone();	// To keep FindBugs happy
-		ITmfLocation<?>[] locations = (ITmfLocation<?>[]) getLocation();
-		ITmfLocation<?>[] clones = new ITmfLocation[locations.length];
-		for (int i = 0; i < locations.length; i++) {
-			clones[i] = locations[i].clone();
-		}
+		TmfLocationArray array = (TmfLocationArray) getLocation();
+		TmfLocationArray clones = array.clone();
 		return new TmfExperimentLocation(clones, fRanks.clone());
 	}
 
@@ -44,9 +40,9 @@ public class TmfExperimentLocation extends TmfLocation<ITmfLocation<?>[]> {
     @SuppressWarnings("nls")
 	public String toString() {
 		StringBuilder result = new StringBuilder("[TmfExperimentLocation");
-		ITmfLocation<?>[] locations = (ITmfLocation<?>[]) getLocation();
-		for (int i = 0; i < locations.length; i++) {
-			result.append("[" + locations[i].toString() + "," + fRanks[i] + "]");
+		TmfLocationArray array = (TmfLocationArray) getLocation();
+		for (int i = 0; i < array.locations.length; i++) {
+			result.append("[" + array.locations[i].toString() + "," + fRanks[i] + "]");
 		}
 		result.append("]");
 		return result.toString();

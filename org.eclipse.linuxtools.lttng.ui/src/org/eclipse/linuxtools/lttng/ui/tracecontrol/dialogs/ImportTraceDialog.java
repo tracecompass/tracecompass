@@ -18,8 +18,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource;
+import org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource.TraceState;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.Messages;
+import org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature;
 import org.eclipse.rse.ui.SystemBasePlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -42,8 +44,6 @@ import org.eclipse.swt.widgets.Text;
  */
 public class ImportTraceDialog extends Dialog {
 
-	public static final String LTTngProjectNatureID = "org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature"; //$NON-NLS-1$
-	
 	// ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -99,7 +99,7 @@ public class ImportTraceDialog extends Dialog {
 
         for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
         	try {
-				if (project.hasNature(LTTngProjectNatureID)) {
+				if (project.isOpen() && project.hasNature(LTTngProjectNature.ID)) {
 		            TableItem item = new TableItem(fTable, SWT.LEFT);
 		            item.setText(0, project.getName());
 		            item.setData(project);
@@ -130,6 +130,12 @@ public class ImportTraceDialog extends Dialog {
         if (fTrace.getTraceConfig().isNetworkTrace()) {
         	fLinkOnlyButton = new Button(composite, SWT.CHECK);
         	fLinkOnlyButton.setText(Messages.ImportTraceDialog_LinkOnly);
+        	fLinkOnlyButton.setSelection(true);
+        	fLinkOnly = true;
+        	if (fTrace.getTraceState() != TraceState.STOPPED) {
+        		// if the trace is not stopped, link is the only allowed option
+        		fLinkOnlyButton.setEnabled(false);
+        	}
         }
         
 		return composite;

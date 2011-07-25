@@ -83,7 +83,7 @@ public class TmfLocationTest extends TestCase {
 
 	public void testTmfLocationCopy2() throws Exception {
 		try {
-			new TmfLocation<Object>(null);
+			new TmfLocation<Long>((TmfLocation<Long>) null);
 			fail("null copy");
 		}
 		catch (IllegalArgumentException e) {
@@ -199,7 +199,7 @@ public class TmfLocationTest extends TestCase {
 		}
 	}
 
-	public class MyCloneableClass implements Cloneable {
+	public class MyCloneableClass implements Cloneable, Comparable<MyCloneableClass> {
 		private String fName;
 		public MyCloneableClass(String name) {
 			fName = name;
@@ -218,6 +218,10 @@ public class TmfLocationTest extends TestCase {
 			}
 			return clone;
 		}
+		@Override
+		public int compareTo(MyCloneableClass o) {
+			return 0;
+		}
 	}
 
 	public void testCloneCloneable() {
@@ -233,7 +237,7 @@ public class TmfLocationTest extends TestCase {
 		}
 	}
 
-	public class MyUnCloneableClass {
+	public class MyUnCloneableClass implements Comparable<MyUnCloneableClass> {
 		private String fName;
 		public MyUnCloneableClass(String name) {
 			fName = name;
@@ -245,6 +249,10 @@ public class TmfLocationTest extends TestCase {
 		@Override
 		public Object clone() throws CloneNotSupportedException {
 			throw new CloneNotSupportedException();
+		}
+		@Override
+		public int compareTo(MyUnCloneableClass o) {
+			return 0;
 		}
 	}
 

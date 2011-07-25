@@ -82,6 +82,11 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
     	fRange = range;
     }
 
+    public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, int index, int nbRequested, int blockSize, ExecutionType execType) {
+    	super(dataType, index, nbRequested, blockSize, execType);
+    	fRange = range;
+    }
+
     // ------------------------------------------------------------------------
     // Management
     // ------------------------------------------------------------------------
@@ -90,6 +95,7 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
 	public boolean isCompatible(ITmfDataRequest<T> request) {
 		if (request instanceof ITmfEventRequest<?>) {
 			boolean ok = getNbRequested() == request.getNbRequested();
+			ok &= getIndex() == request.getIndex();
 			ok &= getExecType() == request.getExecType();
 			if (ok) {
 				TmfTimestamp startTime = ((ITmfEventRequest<T>) request).getRange().getStartTime();
@@ -143,6 +149,11 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
 		return fRange;
 	}
 	
+	@Override
+	public void setStartIndex(int index) {
+		setIndex(index);
+	}
+	
     // ------------------------------------------------------------------------
     // Object
     // ------------------------------------------------------------------------
@@ -172,7 +183,7 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
     @SuppressWarnings("nls")
     public String toString() {
 		return "[TmfCoalescedEventRequest(" + getRequestId() + "," + getDataType().getSimpleName() 
-			+ "," + getRange() + "," + getNbRequested() + "," + getBlockSize() + ")]";
+			+ "," + getRange() + "," + getIndex() + "," + getNbRequested() + "," + getBlockSize() + ")]";
     }
 
 }

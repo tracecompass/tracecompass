@@ -30,30 +30,6 @@ public class CustomXmlParserWizard extends Wizard implements INewWizard {
             CustomXmlTraceDefinition.delete(definition.definitionName);
         }
         def.save();
-        /*
-        if (this.selection instanceof IStructuredSelection) {
-            Object selection = ((IStructuredSelection)this.selection).getFirstElement();
-            if (selection instanceof IFile) {
-                IFile file = (IFile)selection;
-                IEditorInput editorInput = new FileEditorInput(file);
-                IWorkbench wb = PlatformUI.getWorkbench();
-                IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
-        
-                IEditorPart editor = activePage.findEditor(editorInput);
-                if (editor != null && editor instanceof GenericTableEditor) {
-                    activePage.reuseEditor((IReusableEditor)editor, editorInput);
-                    activePage.activate(editor);
-                } else {
-                    try {
-                        editor = activePage.openEditor(editorInput, GenericTableEditor.ID);
-                    } catch (PartInitException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-        */
         return true;
     }
 

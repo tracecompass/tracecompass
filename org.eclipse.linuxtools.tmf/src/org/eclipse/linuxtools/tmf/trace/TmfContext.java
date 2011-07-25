@@ -22,19 +22,19 @@ package org.eclipse.linuxtools.tmf.trace;
  */
 public class TmfContext implements ITmfContext, Cloneable {
 
-	private ITmfLocation<?> fLocation;
+	private ITmfLocation<? extends Comparable<?>> fLocation;
 	private long fRank;
 	
 	// ------------------------------------------------------------------------
 	// Constructors
 	// ------------------------------------------------------------------------
 
-	public TmfContext(ITmfLocation<?> loc, long rank) {
+	public TmfContext(ITmfLocation<? extends Comparable<?>> loc, long rank) {
 		fLocation = loc;
 		fRank = rank;
 	}
 
-	public TmfContext(ITmfLocation<?> location) {
+	public TmfContext(ITmfLocation<? extends Comparable<?>> location) {
 		this(location, UNKNOWN_RANK);
 	}
 
@@ -51,12 +51,12 @@ public class TmfContext implements ITmfContext, Cloneable {
 	// ------------------------------------------------------------------------
 
 	@Override
-	public void setLocation(ITmfLocation<?> location) {
+	public void setLocation(ITmfLocation<? extends Comparable<?>> location) {
 		fLocation = location;
 	}
 
 	@Override
-	public ITmfLocation<?> getLocation() {
+	public ITmfLocation<? extends Comparable<?>> getLocation() {
 		return fLocation;
 	}
 

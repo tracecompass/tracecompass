@@ -192,6 +192,7 @@ public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 	 * @param stateMode
 	 * @return
 	 */
+	@SuppressWarnings("deprecation")
 	protected boolean makeDraw(LttngTraceState traceSt, long stime, long etime,
 			TimeRangeEventResource localResource, ParamsUpdater params,
 			String stateMode) {

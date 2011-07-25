@@ -124,7 +124,7 @@ public class ImportToProject implements IObjectActionDelegate, IWorkbenchWindowA
             	String traceName = dialog.getTraceName();
             	if (trace.getTraceConfig().isNetworkTrace()) {
             		if (dialog.getLinkOnly()) {
-            			linkTrace(trace, project, traceName);
+            			linkTrace(getShell(), trace, project, traceName);
             		} else {
             			copyTrace(trace, project, traceName);
             		}
@@ -246,10 +246,10 @@ public class ImportToProject implements IObjectActionDelegate, IWorkbenchWindowA
     /*
      * Method to create a symbolic link to a trace residing on the local host. 
      */
-	private void linkTrace(TraceResource trace, IProject project, String traceName) {
+	public static void linkTrace(Shell shell, TraceResource trace, IProject project, String traceName) {
 		IFolder traceFolder = project.getFolder(TRACE_FOLDER_NAME);
 		if (!traceFolder.exists()) {
-			MessageDialog.openWarning(getShell(),
+			MessageDialog.openWarning(shell,
 					Messages.ImportToProject_ImportFailed,
 					Messages.ImportToProject_NoProjectTraceFolder);
 			return;
@@ -257,7 +257,7 @@ public class ImportToProject implements IObjectActionDelegate, IWorkbenchWindowA
 		
 		IFolder folder = traceFolder.getFolder(traceName);
 		if (folder.exists()) {
-			MessageDialog.openWarning(getShell(),
+			MessageDialog.openWarning(shell,
 					Messages.ImportToProject_ImportFailed,
 					Messages.ImportToProject_AlreadyExists);
 			return;
@@ -268,7 +268,7 @@ public class ImportToProject implements IObjectActionDelegate, IWorkbenchWindowA
 		try {
 			folder.createLink(sourceFolder.toURI(), IResource.REPLACE, null);
 		} catch (CoreException e) {
-			MessageDialog.openWarning(getShell(),
+			MessageDialog.openWarning(shell,
 					Messages.ImportToProject_ImportFailed,
 					e.getMessage());
 		}

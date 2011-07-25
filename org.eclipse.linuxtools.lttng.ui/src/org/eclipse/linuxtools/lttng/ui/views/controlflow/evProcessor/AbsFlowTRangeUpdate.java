@@ -109,6 +109,7 @@ public abstract class AbsFlowTRangeUpdate extends AbsTRangeUpdate implements ILt
 	 * @param stateMode
 	 * @return
 	 */
+	@SuppressWarnings("deprecation")
 	protected boolean makeDraw(LttngTraceState traceSt, long startTime,
 			long endTime, TimeRangeEventProcess localProcess,
 			ParamsUpdater params, String stateMode) {

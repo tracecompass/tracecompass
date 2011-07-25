@@ -334,6 +334,8 @@ public class TraceResourceAdapter extends AbstractSystemViewAdapter implements I
             else if (name.equals("canImport") && value.equals("yes")) {
                 if (trace.getTraceState() == TraceState.STOPPED) {
                     return true;
+                } else if (trace.getTraceState() != TraceState.CREATED && trace.getTraceConfig().isNetworkTrace()) {
+                	return true;
                 }
             }
         }

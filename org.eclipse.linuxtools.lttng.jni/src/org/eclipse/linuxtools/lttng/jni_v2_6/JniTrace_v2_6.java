@@ -83,4 +83,18 @@ public class JniTrace_v2_6 extends JniTrace {
 	public JniTracefile allocateNewJniTracefile(Jni_C_Pointer_And_Library_Id newPtr, JniTrace newParentTrace) throws JniException {
     	return new JniTracefile_v2_6(newPtr, newParentTrace);
     }
+
+
+    /**
+     * Indicate whether a trace can be opened in live mode.
+     * Override if live mode is supported
+     * 
+     * @return true if the trace version supports live
+     */
+	@Override
+	public boolean isLiveTraceSupported() {
+		return true;
+	}
+    
+    
 }

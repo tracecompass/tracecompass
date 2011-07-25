@@ -98,7 +98,13 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     public TmfContext seekLocation(double ratio) {
         try {
             BufferedRandomAccessFile raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
-            ITmfLocation<?> location = new TmfLocation<Long>(new Long((long) (ratio * raFile.length())));
+            long pos = (long) (ratio * raFile.length());
+            while (pos > 0) {
+                raFile.seek(pos - 1);
+                if (raFile.read() == '\n') break;
+                pos--;
+            }
+            ITmfLocation<?> location = new TmfLocation<Long>(new Long(pos));
             TmfContext context = seekLocation(location);
             context.setRank(ITmfContext.UNKNOWN_RANK);
             return context;

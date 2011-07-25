@@ -23,10 +23,11 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource;
 import org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource.TraceState;
+import org.eclipse.linuxtools.lttng.tracecontrol.model.config.TraceConfig;
 import org.eclipse.linuxtools.lttng.tracecontrol.service.ILttControllerService;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
-import org.eclipse.linuxtools.lttng.ui.tracecontrol.TraceControlConstants;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.Messages;
+import org.eclipse.linuxtools.lttng.ui.tracecontrol.TraceControlConstants;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.subsystems.TraceSubSystem;
 import org.eclipse.rse.core.events.ISystemRemoteChangeEvents;
 import org.eclipse.rse.core.model.ISystemRegistry;
@@ -91,7 +92,12 @@ public class StopTrace implements IObjectActionDelegate, IWorkbenchWindowActionD
 
             try {
                 final ILttControllerService service = subSystem.getControllerService();
-
+                
+                TraceConfig traceConfig = trace.getTraceConfig();
+                if (traceConfig != null && traceConfig.getMode() == TraceConfig.FLIGHT_RECORDER_MODE) {
+                	setupLocation(service, trace, traceConfig);
+                }
+                
                 // Create future task
                 @SuppressWarnings("unused")
                 Boolean success = new TCFTask<Boolean>() {
@@ -188,4 +194,86 @@ public class StopTrace implements IObjectActionDelegate, IWorkbenchWindowActionD
     @Override
     public void init(IViewPart view) {
     }
+    
+    /*
+     * Setup the trace location. Only flight recorder channels are written when trace is stopped.
+     */
+    private void setupLocation(final ILttControllerService service, final TraceResource trace, final TraceConfig traceConfig) throws Exception {
+    	boolean success = false;
+    	
+        if (traceConfig.isNetworkTrace()) {
+
+            // Create future task
+            success = new TCFTask<Boolean>() {
+                @Override
+                public void run() {
+
+                    // Setup trace transport using Lttng controller service proxy
+                    service.writeTraceNetwork(trace.getParent().getParent().getName(), 
+                            trace.getParent().getName(), 
+                            traceConfig.getTraceName(), 
+                            traceConfig.getNumChannel(), 
+                            traceConfig.getIsAppend(), 
+                            true, // write only flight recorder channels 
+                            false, 
+                            new ILttControllerService.DoneWriteTraceNetwork() {
+
+                        @Override
+                        public void doneWriteTraceNetwork(IToken token, Exception error, Object str) {
+                            if (error != null) {
+                                // Notify with error
+                                error(error);
+                                return;
+                            }
+
+                            // Notify about success
+                            done(Boolean.valueOf(true));
+                        }
+                    });
+                }}.get(TraceControlConstants.DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
+            
+        } else {
+            
+            // Create future task
+            success = new TCFTask<Boolean>() {
+                @Override
+                public void run() {
+
+                    // Setup trace transport using Lttng controller service proxy
+                    service.writeTraceLocal(trace.getParent().getParent().getName(), 
+                            trace.getParent().getName(), 
+                            traceConfig.getTraceName(), 
+                            traceConfig.getTracePath(), 
+                            traceConfig.getNumChannel(),
+                            traceConfig.getIsAppend(), 
+                            true, // write only flight recorder channels 
+                            false, 
+                            new ILttControllerService.DoneWriteTraceLocal() {
+
+                        @Override
+                        public void doneWriteTraceLocal(IToken token, Exception error, Object str) {
+                            if (error != null) {
+                                // Notify with error
+                                error(error);
+                                return;
+                            }
+
+                            // Notify about success
+                            done(Boolean.valueOf(true));
+                        }
+                    });
+                }}.get(TraceControlConstants.DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
+        }
+        
+        if (success) {
+            //FIXME: wait 2 seconds to allow time for channels to be written before destroying the trace
+            try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+        }
+    }
+
+
 }

@@ -28,6 +28,7 @@ import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.linuxtools.lttng.control.LttngCoreProviderFactory;
+import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.model.LTTngTreeNode;
 import org.eclipse.linuxtools.lttng.request.ILttngSyntEventRequest;
 import org.eclipse.linuxtools.lttng.state.evProcessor.AbsEventToHandlerResolver;
@@ -44,6 +45,7 @@ import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
+import org.eclipse.linuxtools.tmf.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
@@ -113,6 +115,11 @@ public class StatisticsView extends AbsTimeUpdateView {
 	private interface ColumnPercentageProvider {
 		public double getPercentage(StatisticsTreeNode node);
 	}
+
+    private boolean fStatisticsUpdateBusy = false;
+    private boolean fStatisticsUpdatePending = false;
+    private TmfTimeRange fStatisticsUpdateRange = null;
+    private final Object fStatisticsUpdateSyncObj = new Object();
 
 	/**
 	 * Contains all the information necessary to build a column of the table.
@@ -477,7 +484,11 @@ public class StatisticsView extends AbsTimeUpdateView {
 		// Read current data if any available
 		TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
 		if (experiment != null) {
-			requestData(experiment);
+			
+			@SuppressWarnings({ "rawtypes", "unchecked" })
+			TmfExperimentSelectedSignal<?> signal = new TmfExperimentSelectedSignal(this, experiment);
+			experimentSelected(signal);
+			
 		} else {
 			TraceDebug.debug("No selected experiment information available"); //$NON-NLS-1$
 		}
@@ -559,7 +570,9 @@ public class StatisticsView extends AbsTimeUpdateView {
 	public void ModelUpdatePrep(TmfTimeRange timeRange, boolean clearAllData) {
 		Object input = treeViewer.getInput();
 		if ((input != null) && (input instanceof StatisticsTreeNode) && (!treeViewer.getTree().isDisposed())) {
-			((StatisticsTreeNode) input).reset();
+			if (clearAllData) {
+				((StatisticsTreeNode) input).reset();
+			}
 			treeViewer.getTree().getDisplay().asyncExec(new Runnable() {
 				// @Override
 				@Override
@@ -595,7 +608,18 @@ public class StatisticsView extends AbsTimeUpdateView {
 					treeViewer.refresh();
 			}
 		});
+		
+		if (complete) {
+			synchronized (fStatisticsUpdateSyncObj) {
+				fStatisticsUpdateBusy = false;
+				if (fStatisticsUpdatePending) {
+					fStatisticsUpdatePending = false;
+					requestData(TmfExperiment.getCurrentExperiment(), fStatisticsUpdateRange, false);
+				}
+			}
 		}
+
+	}
 
 	private static int level = 0;
     private void printRecursively(StatisticsTreeNode node) {
@@ -672,21 +696,15 @@ public class StatisticsView extends AbsTimeUpdateView {
 					if (same) {
 						// no need to reload data, all traces are already loaded
 						treeViewer.setInput(experimentTreeNode);
+						synchronized (fStatisticsUpdateSyncObj) {
+							fStatisticsUpdateBusy = false;
+							fStatisticsUpdatePending = false;
+						}
 						return;
 					}
 				}
 			}
 
-			// if the data is not available or has changed, reload it
-			requestData(experiment);
-		}
-	}
-
-	/**
-	 * @param experiment
-	 */
-	private void requestData(TmfExperiment<?> experiment) {
-		if (experiment != null) {
 			StatisticsTreeNode treeModelRoot = StatisticsTreeRootFactory.getStatTreeRoot(experiment.getName());
 
 			// if the model has contents, clear to start over
@@ -696,10 +714,55 @@ public class StatisticsView extends AbsTimeUpdateView {
 
 			// set input to a clean data model
 			treeViewer.setInput(treeModelRoot);
-			TmfTimeRange experimentTRange = experiment.getTimeRange();
+
+			synchronized (fStatisticsUpdateSyncObj) {
+				fStatisticsUpdateBusy = false;
+				fStatisticsUpdatePending = false;
+			}
+
+			// if the data is not available or has changed, reload it
+			requestData(experiment, experiment.getTimeRange(), true);
+		}
+	}
+
+	/**
+	 * @param signal
+	 */
+	@SuppressWarnings("unchecked")
+	@TmfSignalHandler
+	public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
+		TmfExperiment<LttngEvent> experiment = (TmfExperiment<LttngEvent>) signal.getExperiment();
+		// validate
+		if (! experiment.equals(TmfExperiment.getCurrentExperiment())) {
+			return;
+		}
+
+		requestData(experiment, signal.getRange(), false);
+	}
+
+	/**
+	 * @param experiment
+	 */
+	private void requestData(TmfExperiment<?> experiment, TmfTimeRange range, boolean clearingData) {
+		if (experiment != null) {
+			synchronized (fStatisticsUpdateSyncObj) {
+				if (fStatisticsUpdateBusy) {
+					fStatisticsUpdatePending = true;
+					fStatisticsUpdateRange = range;
+					return;
+				} else {
+					fStatisticsUpdateBusy = true;
+				}
+			}
+
+			int index = 0;
+			for (StatisticsTreeNode node : ((StatisticsTreeNode) treeViewer.getInput()).getChildren()) {
+				index += (int) node.getValue().nbEvents;
+			}
 
 			// send the initial request, to start filling up model
-			dataRequest(experimentTRange, experimentTRange, true, ExecutionType.BACKGROUND);
+			//eventRequest(fStatisticsUpdateIndex, nbRequested, fStatisticsUpdateStartTime, clearingData, ExecutionType.BACKGROUND);
+			eventRequest(index, range, clearingData, ExecutionType.BACKGROUND);
 		} else {
 			TraceDebug.debug("No selected experiment information available"); //$NON-NLS-1$
 		}

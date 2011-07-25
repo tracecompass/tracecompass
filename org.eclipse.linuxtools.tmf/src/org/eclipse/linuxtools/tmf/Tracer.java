@@ -9,6 +9,7 @@ import org.eclipse.linuxtools.tmf.component.ITmfComponent;
 import org.eclipse.linuxtools.tmf.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.event.TmfData;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.signal.TmfSignal;
 
 @SuppressWarnings("nls")
@@ -156,6 +157,9 @@ public class Tracer {
 		(request.getExecType() == ITmfDataRequest.ExecutionType.BACKGROUND ? " (BG)" : " (FG)") +
 		" Thread=" + Thread.currentThread().getId() + 
 		" Type=" + request.getClass().getName() + 
+		" Index=" + request.getIndex() + 
+		" NbReq=" + request.getNbRequested() +
+		(request instanceof ITmfEventRequest ? " Range=" + ((ITmfEventRequest<?>)request).getRange() : "") +
 		" DataType=" + request.getDataType().getSimpleName() + " " + msg);
 		trace(message);
 	}

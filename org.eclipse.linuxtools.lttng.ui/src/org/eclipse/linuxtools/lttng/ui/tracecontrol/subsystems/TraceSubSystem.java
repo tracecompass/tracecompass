@@ -425,7 +425,7 @@ public class TraceSubSystem extends SubSystem implements ICommunicationsListener
                             // Create trace list
                             TraceResource[] traces = new TraceResource[str.length];
                             for (int i = 0; i < str.length; i++) {
-                                TraceResource trace = new TraceResource(TraceSubSystem.this);
+                                TraceResource trace = new TraceResource(TraceSubSystem.this, service);
                                 trace.setName(str[i]);
                                 trace.setParent(target);
                                 trace.setTraceState(TraceState.CREATED);
@@ -520,9 +520,6 @@ public class TraceSubSystem extends SubSystem implements ICommunicationsListener
                                         }
                                         else if (str[1].equals("true")) { //$NON-NLS-1$
                                             config.setMode(TraceConfig.NORMAL_MODE);
-                                        }
-                                        else {
-                                            config.setMode(TraceConfig.NONE_MODE);
                                         }
 
                                         if (str[5].equals(TraceConfig.InvalidTracePath)) {

@@ -92,7 +92,7 @@ public class LttngSyntEventRequest extends TmfEventRequest<LttngSyntheticEvent>
 			TmfTimeRange experimentTimeRange, ITransEventProcessor processor, String experimentName,
 			ExecutionType execType) {
 		
-		super(LttngSyntheticEvent.class, range, nbEvents, maxBlockSize, execType);
+		super(LttngSyntheticEvent.class, range, (int) offset, nbEvents, maxBlockSize, execType);
 		fExperimentTimeRange = experimentTimeRange;
 		fExperimentName = new String(experimentName);
 		addListener(listener);

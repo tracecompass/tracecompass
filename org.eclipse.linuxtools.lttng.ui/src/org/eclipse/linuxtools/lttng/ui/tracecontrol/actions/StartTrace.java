@@ -28,8 +28,8 @@ import org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource.TraceState;
 import org.eclipse.linuxtools.lttng.tracecontrol.model.config.TraceConfig;
 import org.eclipse.linuxtools.lttng.tracecontrol.service.ILttControllerService;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
-import org.eclipse.linuxtools.lttng.ui.tracecontrol.TraceControlConstants;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.Messages;
+import org.eclipse.linuxtools.lttng.ui.tracecontrol.TraceControlConstants;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.dialogs.SelectTracePathDialog;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.subsystems.TraceSubSystem;
 import org.eclipse.rse.core.events.ISystemRemoteChangeEvents;
@@ -100,7 +100,7 @@ public class StartTrace implements IObjectActionDelegate, IWorkbenchWindowAction
                     if (trace.getTraceState() == TraceState.CONFIGURED) {
                         setTraceTransport(service, trace, traceConfig);
                         allocTrace(service, trace, traceConfig);
-                        setupLocation(service, trace, traceConfig);
+                    	setupLocation(service, trace, traceConfig);
                     }
                     // for network traces and if trace path is not available, open a dialog box for the user to specify the trace path
                     else if (traceConfig.isNetworkTrace() && (TraceConfig.InvalidTracePath.equals(traceConfig.getTracePath()))) {
@@ -252,7 +252,7 @@ public class StartTrace implements IObjectActionDelegate, IWorkbenchWindowAction
     }
 
     /*
-     * Setup the trace location.  
+     * Setup the trace location. Only normal channels are written while trace is started.  
      */
     private void setupLocation(final ILttControllerService service, final TraceResource trace, final TraceConfig traceConfig) throws Exception {
         if (traceConfig.isNetworkTrace()) {
@@ -263,6 +263,10 @@ public class StartTrace implements IObjectActionDelegate, IWorkbenchWindowAction
                 if (!created) {
                     throw new Exception(Messages.Lttng_Control_ErrorCreateTracePath + ": " + traceConfig.getTracePath()); //$NON-NLS-1$
                 }
+            }
+            
+            if (traceConfig.getProject() != null) {
+                ImportToProject.linkTrace(getShell(), trace, traceConfig.getProject(), traceConfig.getTraceName());
             }
             
             // Create future task
@@ -276,8 +280,8 @@ public class StartTrace implements IObjectActionDelegate, IWorkbenchWindowAction
                             traceConfig.getTraceName(), 
                             traceConfig.getNumChannel(), 
                             traceConfig.getIsAppend(), 
-                            traceConfig.getMode() == TraceConfig.FLIGHT_RECORDER_MODE, 
-                            traceConfig.getMode() == TraceConfig.NORMAL_MODE, 
+                            false, 
+                            true, // write only normal channels 
                             new ILttControllerService.DoneWriteTraceNetwork() {
 
                         @Override
@@ -308,8 +312,8 @@ public class StartTrace implements IObjectActionDelegate, IWorkbenchWindowAction
                             traceConfig.getTracePath(), 
                             traceConfig.getNumChannel(),
                             traceConfig.getIsAppend(), 
-                            traceConfig.getMode() == TraceConfig.FLIGHT_RECORDER_MODE, 
-                            traceConfig.getMode() == TraceConfig.NORMAL_MODE, 
+                            false, 
+                            true, // write only normal channels 
                             new ILttControllerService.DoneWriteTraceLocal() {
 
                         @Override

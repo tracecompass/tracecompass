@@ -38,11 +38,12 @@ import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
-import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.signal.TmfEndSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfStartSynchSignal;
 import org.eclipse.linuxtools.tmf.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.trace.TmfCheckpoint;
 import org.eclipse.linuxtools.tmf.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
 
@@ -55,7 +56,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 	// ========================================================================
 	// Data
 	// ========================================================================
-	public static final int BLOCK_SIZE = 1;
+	public static final int BLOCK_SIZE = 50000;
 	public static final int NB_EVENTS  = 1;
 	public static final int QUEUE_SIZE = 1; // lttng specific, one event at a time
 
@@ -70,6 +71,8 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 	private ITransEventProcessor fstateUpdateProcessor = StateEventToHandlerFactory.getInstance();
 	private boolean waitForRequest = false;
 	long dispatchTime = 0L;
+	long dispatchIndex = 0L;
+	long eventIndex;
 	private final Map<ITmfTrace, LttngTraceState> traceToTraceStateModel = new HashMap<ITmfTrace, LttngTraceState>();
 
 	private boolean fIsExperimentNotified = false;
@@ -140,6 +143,8 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 		experiment.startSynch(new TmfStartSynchSignal(0));
 		
 		TmfTimeRange adjustedRange = reqWindow;
+		long adjustedIndex = eventRequest.getIndex();
+		int nbRequested = eventRequest.getNbRequested();
 				
 		// Figure-out if we need to increase the range of the request:  if some
 		// checkpoints are before the beginning of the range, increase the 
@@ -152,16 +157,20 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 		while(iter.hasNext()) {
 			traceManager = iter.next();
 			// restore trace state system to nearest check point
-			TmfTimestamp checkPoint = traceManager
-					.restoreCheckPointByTimestamp(reqWindow.getStartTime());
+			TmfCheckpoint checkPoint = null;
+			if (eventRequest.getIndex() > 0) {
+				checkPoint = traceManager.restoreCheckPointByIndex(eventRequest.getIndex());
+			} else {
+				checkPoint = traceManager.restoreCheckPointByTimestamp(reqWindow.getStartTime());
+			}
 
 			// validate that the checkpoint restored is within requested bounds
 			// (not outside the current trace's range or after the end of requested range)
 			TmfTimeRange traceRange = traceManager.getTrace().getTimeRange();
-			if ((checkPoint != null) && !(
-					checkPoint.getValue() >= traceRange.getStartTime().getValue() &&
-					checkPoint.getValue() <= traceRange.getEndTime().getValue() && 
-					checkPoint.getValue() < reqWindow.getEndTime().getValue())
+			if ((checkPoint == null) ||
+					checkPoint.getTimestamp().getValue() < traceRange.getStartTime().getValue() ||
+					checkPoint.getTimestamp().getValue() > traceRange.getEndTime().getValue() ||
+					checkPoint.getTimestamp().getValue() >= reqWindow.getEndTime().getValue()
 					) {
 				// checkpoint is out of trace bounds; no need to adjust request for this
 				// trace
@@ -169,8 +178,12 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 			else {
 				// use checkpoint time as new startTime for request if it's earlier than
 				// current startTime
-				if (checkPoint != null && adjustedRange.getStartTime().getValue() > checkPoint.getValue()) {
-					adjustedRange = new TmfTimeRange(checkPoint, reqWindow.getEndTime());
+				if (adjustedRange.getStartTime().getValue() > checkPoint.getTimestamp().getValue() || adjustedIndex > (Long) checkPoint.getLocation().getLocation()) {
+					adjustedRange = new TmfTimeRange(checkPoint.getTimestamp(), reqWindow.getEndTime());
+					adjustedIndex = (Long) checkPoint.getLocation().getLocation();
+					if (nbRequested < TmfDataRequest.ALL_DATA) {
+						nbRequested += (eventRequest.getIndex() - adjustedIndex);
+					}
 				}	
 			}		
 			// Save which trace state model corresponds to current trace
@@ -178,10 +191,12 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 		}
 
 		dispatchTime = reqWindow.getStartTime().getValue();
+		dispatchIndex = eventRequest.getIndex();
+		eventIndex = adjustedIndex;
 
 		// Create a single request for all traces in the experiment, with coalesced time range.
 		fSubRequest = new LttngBaseEventRequest(adjustedRange, reqWindow.getStartTime(),
-				0, TmfEventRequest.ALL_DATA, BLOCK_SIZE, eventRequest.getExecType() /*ITmfDataRequest.ExecutionType.FOREGROUND*/) {
+				adjustedIndex, nbRequested, BLOCK_SIZE, eventRequest.getExecType() /*ITmfDataRequest.ExecutionType.FOREGROUND*/) {
 
 			private LttngSyntheticEvent syntheticEvent = null;
 
@@ -235,7 +250,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 				updateSynEvent(e);
 				
 				// If time at or above requested time, update application
-				if (eventTime >= dispatchTime) {
+				if (eventTime >= dispatchTime && eventIndex >= dispatchIndex) {
 					// Before update
 					syntheticEvent.setSequenceInd(SequenceInd.BEFORE);
 					fmainRequest.handleData(syntheticEvent);
@@ -256,6 +271,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 					syntheticEvent.setSequenceInd(SequenceInd.UPDATE);
 					fstateUpdateProcessor.process(syntheticEvent, traceModel);
 				}
+				eventIndex++;
 			}
 
 			/**
@@ -459,5 +475,11 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 	        fSubRequest = null;
 	        fmainRequest = null;
 	    }
+	}
+
+	@Override
+	protected void queueBackgroundRequest(ITmfDataRequest<LttngSyntheticEvent> request, int blockSize, boolean indexing) {
+		// do not split background synthetic requests
+		queueRequest(request);
 	}
 }

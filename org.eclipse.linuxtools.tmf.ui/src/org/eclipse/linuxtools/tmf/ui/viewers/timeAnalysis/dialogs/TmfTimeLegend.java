@@ -116,7 +116,7 @@ public class TmfTimeLegend extends TitleAreaDialog {
 			StateColor stateColor = TraceColorScheme.getStateColors()[i];
 			//Get the given name, provided by the interface to the application
 			String stateName = ifUtil.getStateName(stateColor);
-			if( stateName != "Not mapped" ) {
+			if( stateName != "Not mapped" ) { //$NON-NLS-1$
 				Bar bar = new Bar(gs, i);
 				gd = new GridData();
 				gd.widthHint = 40;
@@ -189,13 +189,11 @@ public class TmfTimeLegend extends TitleAreaDialog {
 	}
 
 	class Bar extends Canvas {
-		private int colorIdx;
 		private Color color;
 
 		public Bar(Composite parent, int colorIdx) {
 			super(parent, SWT.NONE);
 
-			this.colorIdx = colorIdx;
 			color = colors.getColor(colorIdx);
 			addListener(SWT.Paint, new Listener() {
 				@Override

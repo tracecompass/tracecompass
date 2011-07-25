@@ -15,14 +15,15 @@ package org.eclipse.linuxtools.lttng.tracecontrol.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.linuxtools.lttng.tracecontrol.Messages;
 import org.eclipse.linuxtools.lttng.tracecontrol.model.config.TraceConfig;
-//import org.eclipse.linuxtools.lttng.ui.tracecontrol.Messages;
-import org.eclipse.linuxtools.lttng.tracecontrol.model.TargetResource;
-import org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource;
+import org.eclipse.linuxtools.lttng.tracecontrol.service.ILttControllerService;
 import org.eclipse.rse.core.subsystems.AbstractResource;
 import org.eclipse.rse.core.subsystems.ISubSystem;
+import org.eclipse.tm.tcf.protocol.IToken;
+import org.eclipse.tm.tcf.util.TCFTask;
 
 /**
  * <b><u>ProviderResource</u></b>
@@ -42,6 +43,8 @@ public class TraceResource extends AbstractResource implements Comparable<TraceR
     public static final String Ltt_Trace_Property_NetworkTrace = "isNetwork"; //$NON-NLS-1$
     public static final String Ltt_Trace_Property_TraceTransport = "transport"; //$NON-NLS-1$
     
+    public static final int DEFAULT_TCF_TASK_TIMEOUT = 10;
+
     private static final Map<String, PropertyInfo> fPropertyInfo = new HashMap<String, PropertyInfo>();
     
     static {
@@ -77,6 +80,7 @@ public class TraceResource extends AbstractResource implements Comparable<TraceR
     private TargetResource fParent;
     private TraceState fTraceState;
     private TraceConfig fTraceConfig;
+    private ILttControllerService fService;
     
     // ------------------------------------------------------------------------
     // Constructors
@@ -84,8 +88,9 @@ public class TraceResource extends AbstractResource implements Comparable<TraceR
     /**
      * Constructor for TraceResource when given fParent subsystem.
      */
-    public TraceResource(ISubSystem parentSubSystem) {
+    public TraceResource(ISubSystem parentSubSystem, ILttControllerService service) {
         super(parentSubSystem);
+        fService = service;
     }
     
     // ------------------------------------------------------------------------
@@ -297,4 +302,196 @@ public class TraceResource extends AbstractResource implements Comparable<TraceR
     public String toString() {
         return "[TraceResource (" + fName + ")]";
     }
+
+    /*
+     * Setup trace on the remote system. 
+     */
+    public void setupTrace() throws Exception {
+        // Create future task
+        new TCFTask<Boolean>() {
+            @Override
+            public void run() {
+
+                // Setup trace using Lttng controller service proxy
+                fService.setupTrace(fParent.getParent().getName(),
+                        fParent.getName(), 
+                        fName, 
+                        new ILttControllerService.DoneSetupTrace() {
+
+                    @Override
+                    public void doneSetupTrace(IToken token, Exception error, Object str) {
+                        if (error != null) {
+                            // Notify with error
+                            error(error);
+                            return;
+                        }
+
+                        // Notify about success
+                        done(Boolean.valueOf(true));
+                    }
+                });
+            }}.get(DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
+    }
+
+    /*
+     * Enable or disable a channel on the remote system. 
+     */
+    public void setChannelEnable(final String channelName, final boolean enabled) throws Exception {
+        // Create future task
+        new TCFTask<Boolean>() {
+            @Override
+            public void run() {
+
+                // Set marker enable using Lttng controller service proxy
+                fService.setChannelEnable(fParent.getParent().getName(),
+                        fParent.getName(), 
+                        fName, 
+                        channelName, 
+                        enabled,  
+                        new ILttControllerService.DoneSetChannelEnable() {
+
+                    @Override
+                    public void doneSetChannelEnable(IToken token, Exception error, Object str) {
+                        if (error != null) {
+                            // Notify with error
+                            error(error);
+                            return;
+                        }
+
+                        // Notify about success
+                        done(Boolean.valueOf(true));
+                    }
+                });
+            }}.get(DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
+    }
+
+    /*
+     * Set channel overwrite on the remote system. 
+     */
+    public void setChannelOverwrite(final String channelName, final boolean overwrite) throws Exception {
+        // Create future task
+       new TCFTask<Boolean>() {
+            @Override
+            public void run() {
+
+                // Set marker overwrite using Lttng controller service proxy
+                fService.setChannelOverwrite(fParent.getParent().getName(),
+                        fParent.getName(), 
+                        fName, 
+                        channelName, 
+                        overwrite,  
+                        new ILttControllerService.DoneSetChannelOverwrite() {
+
+                    @Override
+                    public void doneSetChannelOverwrite(IToken token, Exception error, Object str) {
+                        if (error != null) {
+                            // Notify with error
+                            error(error);
+                            return;
+                        }
+
+                        // Notify about success
+                        done(Boolean.valueOf(true));
+                    }
+                });
+            }}.get(DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
+    }
+
+    /*
+     * Set channel timer on the remote system. 
+     */
+    public void setChannelTimer(final String channelName, final long timer) throws Exception {
+        // Create future task
+       new TCFTask<Boolean>() {
+            @Override
+            public void run() {
+
+                // Set marker switch_timer using Lttng controller service proxy
+                fService.setChannelTimer(fParent.getParent().getName(),
+                        fParent.getName(), 
+                        fName, 
+                        channelName, 
+                        timer,  
+                        new ILttControllerService.DoneSetChannelTimer() {
+
+                    @Override
+                    public void doneSetChannelTimer(IToken token, Exception error, Object str) {
+                        if (error != null) {
+                            // Notify with error
+                            error(error);
+                            return;
+                        }
+
+                        // Notify about success
+                        done(Boolean.valueOf(true));
+                    }
+                });
+            }}.get(DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
+    }
+
+    /*
+     * Setup the size of the sub-buffer on the remote system.
+     */
+    public void setChannelSubbufNum(final String channelName, final long subbufNum) throws Exception {
+        // Create future task
+        new TCFTask<Boolean>() {
+            @Override
+            public void run() {
+
+                // Set marker enable using Lttng controller service proxy
+                fService.setChannelSubbufNum(fParent.getParent().getName(),
+                        fParent.getName(),
+                        fName,
+                        channelName,
+                        subbufNum,
+                        new ILttControllerService.DoneSetChannelSubbufNum() {
+
+                    @Override
+                    public void doneSetChannelSubbufNum(IToken token, Exception error, Object str) {
+                        if (error != null) {
+                            // Notify with error
+                            error(error);
+                            return;
+                        }
+
+                        // Notify about success
+                        done(Boolean.valueOf(true));
+                    }
+                });
+            }}.get(DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
+    }
+
+    /*
+     * Setup the size of the sub-buffer on the remote system.
+     */
+    public void setChannelSubbufSize(final String channelName, final long subbufSize) throws Exception {
+        // Create future task
+        new TCFTask<Boolean>() {
+            @Override
+            public void run() {
+
+                // Set marker enable using Lttng controller service proxy
+                fService.setChannelSubbufSize(fParent.getParent().getName(),
+                        fParent.getName(), 
+                        fName, 
+                        channelName, 
+                        subbufSize,  
+                        new ILttControllerService.DoneSetChannelSubbufSize() {
+
+                    @Override
+                    public void doneSetChannelSubbufSize(IToken token, Exception error, Object str) {
+                        if (error != null) {
+                            // Notify with error
+                            error(error);
+                            return;
+                        }
+
+                        // Notify about success
+                        done(Boolean.valueOf(true));
+                    }
+                });
+            }}.get(DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
+    }
+
+
 }

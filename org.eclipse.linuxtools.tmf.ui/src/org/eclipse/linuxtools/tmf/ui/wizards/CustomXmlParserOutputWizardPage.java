@@ -210,7 +210,6 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
             previewTable = new CustomEventsTable(definition, tableContainer, MAX_NUM_ENTRIES);
             previewTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
             previewTable.setTrace(trace, true);
-            previewTable.getTable().setItemCount(MAX_NUM_ENTRIES); // Trigger parsing
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

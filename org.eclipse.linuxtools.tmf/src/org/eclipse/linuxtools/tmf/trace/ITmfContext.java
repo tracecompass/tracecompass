@@ -23,7 +23,8 @@ public interface ITmfContext {
     public long INITIAL_RANK = -1L;
 
 	public void setLocation(ITmfLocation<?> location);
-	public ITmfLocation<?> getLocation();
+	@SuppressWarnings("rawtypes")
+	public ITmfLocation<? extends Comparable> getLocation();
 
 	public void setRank(long rank);
 	public long getRank();

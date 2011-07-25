@@ -19,7 +19,8 @@ import java.lang.reflect.Method;
  * <p>
  * A generic implementation of ITmfLocation
  */
-public class TmfLocation<L> implements ITmfLocation<L> {
+@SuppressWarnings("rawtypes")
+public class TmfLocation<L extends Comparable> implements ITmfLocation<L> {
 
 	private L fLocation;
 	
