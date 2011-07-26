@@ -37,8 +37,10 @@ public class JniTrace_v2_6 extends JniTrace {
 	 */
 	protected JniTrace_v2_6() {
 		super();
+		// Set live trace supported for 2.6 to true by default.
+		// Will be set to false if open live trace fails. 
+		setLiveTraceSupported(true);
     }
-    
 	
 	public JniTrace_v2_6(String newpath) throws JniException {
 		super(newpath);
@@ -83,18 +85,4 @@ public class JniTrace_v2_6 extends JniTrace {
 	public JniTracefile allocateNewJniTracefile(Jni_C_Pointer_And_Library_Id newPtr, JniTrace newParentTrace) throws JniException {
     	return new JniTracefile_v2_6(newPtr, newParentTrace);
     }
-
-
-    /**
-     * Indicate whether a trace can be opened in live mode.
-     * Override if live mode is supported
-     * 
-     * @return true if the trace version supports live
-     */
-	@Override
-	public boolean isLiveTraceSupported() {
-		return true;
-	}
-    
-    
 }

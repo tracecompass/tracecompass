@@ -77,6 +77,9 @@ public abstract class JniTrace extends Jni_C_Common {
     // Should we print debug in the C library or not?
     private boolean printLttDebug = DEFAULT_LTT_DEBUG;
     
+    // flag determine if live trace is supported or not
+    private boolean isLiveTraceSupported = false;
+    
     
     // This need to be called prior to any operation
     protected native int ltt_initializeHandle(String libname);
@@ -268,8 +271,16 @@ public abstract class JniTrace extends Jni_C_Common {
 	        // Call the LTT to open the trace
         	// Note that the libraryId is not yet and the pointer
         	long newPtr;
+        	
         	if (isLiveTraceSupported()) {
-        		newPtr = ltt_openTraceLive(newLibraryId, tracepath, printLttDebug);
+        	    try {
+        	        newPtr = ltt_openTraceLive(newLibraryId, tracepath, printLttDebug);
+        	    } catch (UnsatisfiedLinkError e) {
+        	        // JNI library doesn't support live trace read. Set flag for live trace support to false and
+        	        // open trace in offline mode.
+        	        setLiveTraceSupported(false);
+        	        newPtr = ltt_openTrace(newLibraryId, tracepath, printLttDebug);
+        	    }
         	} else {
         		newPtr = ltt_openTrace(newLibraryId, tracepath, printLttDebug);
         	}
@@ -785,12 +796,20 @@ public abstract class JniTrace extends Jni_C_Common {
 
     /**
      * Indicate whether a trace can be opened in live mode.
-     * Override if live mode is supported
      * 
      * @return true if the trace version supports live
      */
     public boolean isLiveTraceSupported() {
-    	return false;
+        return isLiveTraceSupported;
+    }
+    
+    /**
+     * Sets whether a trace can be opened in live mode.
+     * 
+     * @param isSupported
+     */
+    protected void setLiveTraceSupported(boolean isSupported) {
+        isLiveTraceSupported = isSupported;
     }
     
     /**
