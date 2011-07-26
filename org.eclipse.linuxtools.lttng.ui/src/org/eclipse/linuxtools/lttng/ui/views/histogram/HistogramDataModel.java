@@ -16,7 +16,6 @@ import java.util.Arrays;
 
 import org.eclipse.linuxtools.lttng.exceptions.EventOutOfSequenceException;
 import org.eclipse.linuxtools.lttng.ui.LTTngUILogger;
-import org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramScaledData;
 
 /**
  * <b><u>HistogramDataModel</u></b>
@@ -50,8 +49,7 @@ import org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramScaledData;
  * TODO: Add filter support for more refined event counting (e.g. by trace,
  * event type, etc.)
  * <p>
- * TODO: Cut-off eccentric values?
- * TODO: Support for going back in time?
+ * TODO: Cut-off eccentric values? TODO: Support for going back in time?
  */
 public class HistogramDataModel {
 
@@ -219,6 +217,7 @@ public class HistogramDataModel {
         HistogramScaledData result = new HistogramScaledData(width, height);
 
         // Scale horizontally
+        result.fMaxValue = 0;
         int bucketsPerBar = fLastBucket / width + 1;
         result.fBucketDuration = bucketsPerBar * fBucketDuration;
         for (int i = 0; i < width; i++) {

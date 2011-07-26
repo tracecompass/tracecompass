@@ -28,8 +28,8 @@ import org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource.TraceState;
 import org.eclipse.linuxtools.lttng.tracecontrol.model.config.TraceConfig;
 import org.eclipse.linuxtools.lttng.tracecontrol.service.ILttControllerService;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
-import org.eclipse.linuxtools.lttng.ui.tracecontrol.TraceControlConstants;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.Messages;
+import org.eclipse.linuxtools.lttng.ui.tracecontrol.TraceControlConstants;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.dialogs.NewTraceDialog;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.subsystems.TraceSubSystem;
 import org.eclipse.rse.core.events.ISystemRemoteChangeEvents;
@@ -58,8 +58,8 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    
-    private List<TargetResource> fSelectedFiles;
+
+    private final List<TargetResource> fSelectedFiles;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -69,7 +69,7 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
      * Constructor for CreateNewTrace.
      */
     public CreateNewTrace() {
-        fSelectedFiles= new ArrayList<TargetResource>();
+        fSelectedFiles = new ArrayList<TargetResource>();
     }
 
     // ------------------------------------------------------------------------
@@ -78,7 +78,10 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction, org.eclipse.ui.IWorkbenchPart)
+     * 
+     * @see
+     * org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.
+     * action.IAction, org.eclipse.ui.IWorkbenchPart)
      */
     @Override
     public void setActivePart(IAction action, IWorkbenchPart targetPart) {
@@ -91,22 +94,23 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
      */
     protected TargetResource getFirstSelectedTarget() {
         if (fSelectedFiles.size() > 0) {
-            return (TargetResource) fSelectedFiles.get(0);
+            return fSelectedFiles.get(0);
         }
         return null;
     }
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
      */
     @Override
     public void run(IAction action) {
         Shell shell = getShell();
         final TargetResource targetResource = getFirstSelectedTarget();
-        TraceSubSystem subSystem = (TraceSubSystem)targetResource.getSubSystem();
+        TraceSubSystem subSystem = (TraceSubSystem) targetResource.getSubSystem();
         NewTraceDialog dialog = new NewTraceDialog(shell, subSystem, targetResource);
-        
+
         final TraceConfig traceConfig = dialog.open();
 
         if (traceConfig == null) {
@@ -120,14 +124,14 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
             trace.setName(traceConfig.getTraceName());
             trace.setParent(targetResource);
             trace.setTraceConfig(traceConfig);
-            
+
             if (targetResource.isUst()) {
                 boolean ok = setupUstLocation(service, targetResource, traceConfig);
                 if (!ok) {
                     return;
                 }
             }
-            
+
             trace.setupTrace();
 
             if (!targetResource.isUst()) {
@@ -135,15 +139,16 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
                 // Enable all channels by default
                 trace.setChannelEnable(TraceControlConstants.Lttng_Control_AllChannels, true);
 
-                // Set overwrite mode for all channels according to user selection (true for flight recorder, false for normal)
+                // Set overwrite mode for all channels according to user
+                // selection (true for flight recorder, false for normal)
                 trace.setChannelOverwrite(TraceControlConstants.Lttng_Control_AllChannels, traceConfig.getMode() == TraceConfig.FLIGHT_RECORDER_MODE);
 
                 // Set channel timer for all channels
-                final long period = 5000; 
+                final long period = 1000;
                 trace.setChannelTimer(TraceControlConstants.Lttng_Control_AllChannels, period);
 
                 // Set subbuffer size for all channels
-                final long subbufSize = 16384; 
+                final long subbufSize = 16384;
                 trace.setChannelSubbufSize(TraceControlConstants.Lttng_Control_AllChannels, subbufSize);
 
                 // Set number of subbuffers for all channels
@@ -161,29 +166,28 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
                     }
                 }
             }
-            
+
             if (trace.isUst()) {
                 // in UST the tracing is started after setupTrace!!
                 trace.setTraceState(TraceState.STARTED);
-            }
-            else {
+            } else {
                 trace.setTraceState(TraceState.CONFIGURED);
             }
-            
+
             targetResource.addTrace(trace);
 
             ISystemRegistry registry = SystemStartHere.getSystemRegistry();
             registry.fireRemoteResourceChangeEvent(ISystemRemoteChangeEvents.SYSTEM_REMOTE_RESOURCE_CREATED, trace, targetResource, subSystem, null);
-                
+
         } catch (Exception e) {
             SystemMessageException sysExp;
             if (e instanceof SystemMessageException) {
-                sysExp = (SystemMessageException)e;
+                sysExp = (SystemMessageException) e;
             } else {
-                sysExp = new SystemMessageException(LTTngUiPlugin.getDefault().getMessage(e));    
+                sysExp = new SystemMessageException(LTTngUiPlugin.getDefault().getMessage(e));
             }
-            SystemBasePlugin.logError(Messages.Lttng_Control_ErrorNewTrace + " (" +  //$NON-NLS-1$
-                    Messages.Lttng_Resource_Trace + ": "  + traceConfig.getTraceName() + ")", sysExp); //$NON-NLS-1$ //$NON-NLS-2$
+            SystemBasePlugin.logError(Messages.Lttng_Control_ErrorNewTrace + " (" + //$NON-NLS-1$
+                    Messages.Lttng_Resource_Trace + ": " + traceConfig.getTraceName() + ")", sysExp); //$NON-NLS-1$ //$NON-NLS-2$
 
             return;
         }
@@ -192,7 +196,10 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
+     * 
+     * @see
+     * org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action
+     * .IAction, org.eclipse.jface.viewers.ISelection)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -204,7 +211,7 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
             while (theSet.hasNext()) {
                 Object obj = theSet.next();
                 if (obj instanceof TargetResource) {
-                    fSelectedFiles.add((TargetResource)obj);
+                    fSelectedFiles.add((TargetResource) obj);
                 }
             }
         }
@@ -218,10 +225,12 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
     protected Shell getShell() {
         return SystemBasePlugin.getActiveWorkbenchShell();
     }
-    
+
     /*
      * (non-Javadoc)
-     * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
+     * 
+     * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.
+     * IWorkbenchWindow)
      */
     @Override
     public void init(IWorkbenchWindow window) {
@@ -230,6 +239,7 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
      */
     @Override
@@ -238,16 +248,18 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.eclipse.ui.IViewActionDelegate#init(org.eclipse.ui.IViewPart)
      */
     @Override
     public void init(IViewPart view) {
     }
-    
+
     /*
      * Setup the trace location for UST.
-     */ 
-    private boolean setupUstLocation(final ILttControllerService service, final TargetResource targetResource, final TraceConfig traceConfig) throws Exception {
+     */
+    private boolean setupUstLocation(final ILttControllerService service, final TargetResource targetResource, final TraceConfig traceConfig)
+            throws Exception {
         if (traceConfig.isNetworkTrace()) {
             File localDir = new File(traceConfig.getTracePath());
             if (!localDir.exists()) {
@@ -263,28 +275,24 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
                 public void run() {
 
                     // Setup trace location using Lttng controller service proxy
-                    service.writeTraceNetwork(targetResource.getParent().getName(),
-                            targetResource.getName(),
-                            traceConfig.getTraceName(), 
-                            traceConfig.getNumChannel(), 
-                            traceConfig.getIsAppend(), 
-                            traceConfig.getMode() == TraceConfig.FLIGHT_RECORDER_MODE, 
-                            traceConfig.getMode() == TraceConfig.NORMAL_MODE, 
-                            new ILttControllerService.DoneWriteTraceNetwork() {
+                    service.writeTraceNetwork(targetResource.getParent().getName(), targetResource.getName(), traceConfig.getTraceName(),
+                            traceConfig.getNumChannel(), traceConfig.getIsAppend(), traceConfig.getMode() == TraceConfig.FLIGHT_RECORDER_MODE,
+                            traceConfig.getMode() == TraceConfig.NORMAL_MODE, new ILttControllerService.DoneWriteTraceNetwork() {
 
-                        @Override
-                        public void doneWriteTraceNetwork(IToken token, Exception error, Object str) {
-                            if (error != null) {
-                                // Notify with error
-                                error(error);
-                                return;
-                            }
+                                @Override
+                                public void doneWriteTraceNetwork(IToken token, Exception error, Object str) {
+                                    if (error != null) {
+                                        // Notify with error
+                                        error(error);
+                                        return;
+                                    }
 
-                            // Notify about success
-                            done(true);
-                        }
-                    });
-                }}.get(TraceControlConstants.DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
+                                    // Notify about success
+                                    done(true);
+                                }
+                            });
+                }
+            }.get(TraceControlConstants.DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
             return ok;
         } else {
             // Create future task
@@ -293,29 +301,25 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
                 public void run() {
 
                     // Setup trace location using Lttng controller service proxy
-                    service.writeTraceLocal(targetResource.getParent().getName(),
-                            targetResource.getName(),
-                            traceConfig.getTraceName(), 
-                            traceConfig.getTracePath(), 
-                            traceConfig.getNumChannel(),
-                            traceConfig.getIsAppend(), 
-                            traceConfig.getMode() == TraceConfig.NORMAL_MODE, 
-                            traceConfig.getMode() == TraceConfig.FLIGHT_RECORDER_MODE, 
+                    service.writeTraceLocal(targetResource.getParent().getName(), targetResource.getName(), traceConfig.getTraceName(),
+                            traceConfig.getTracePath(), traceConfig.getNumChannel(), traceConfig.getIsAppend(),
+                            traceConfig.getMode() == TraceConfig.NORMAL_MODE, traceConfig.getMode() == TraceConfig.FLIGHT_RECORDER_MODE,
                             new ILttControllerService.DoneWriteTraceLocal() {
 
-                        @Override
-                        public void doneWriteTraceLocal(IToken token, Exception error, Object str) {
-                            if (error != null) {
-                                // Notify with error
-                                error(error);
-                                return;
-                            }
+                                @Override
+                                public void doneWriteTraceLocal(IToken token, Exception error, Object str) {
+                                    if (error != null) {
+                                        // Notify with error
+                                        error(error);
+                                        return;
+                                    }
 
-                            // Notify about success
-                            done(true);
-                        }
-                    });
-                }}.get(TraceControlConstants.DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
+                                    // Notify about success
+                                    done(true);
+                                }
+                            });
+                }
+            }.get(TraceControlConstants.DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
             return ok;
         }
     }

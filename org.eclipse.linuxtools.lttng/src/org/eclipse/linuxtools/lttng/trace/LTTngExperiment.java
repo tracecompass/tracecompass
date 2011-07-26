@@ -233,7 +233,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
                                     LTTngTrace lttngTrace = (LTTngTrace) trace;
                                     JniTrace jniTrace = lttngTrace.getCurrentJniTrace();
                                     jniTrace.updateTrace();
-                                    startTime = Math.min(startTime, jniTrace.getStartTime().getTime());
+                                    startTime = Math.min(startTime, lttngTrace.getStartTime().getValue());
                                     endTime = Math.max(endTime, jniTrace.getEndTime().getTime());
                                 }
                             }
@@ -250,12 +250,12 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
                     try {
                         sendRequest((ITmfDataRequest<T>) request);
                         request.waitForCompletion();
-                        if (timeRange != null) {
+                        if (timeRange != null && timeRange != TmfTimeRange.Null) {
                             TmfExperimentRangeUpdatedSignal signal = new TmfExperimentRangeUpdatedSignal(LTTngExperiment.this, LTTngExperiment.this,
                                     timeRange);
                             broadcast(signal);
                         }
-                        Thread.sleep(5000);
+                        Thread.sleep(2000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

@@ -61,7 +61,8 @@ public class TimeRangeHistogram extends Histogram {
     }
 
     public void setFullRange(long startTime, long endTime) {
-        fZoom.setFullRange(startTime, endTime);
+        long currentFirstEvent = getStartTime();
+        fZoom.setFullRange((currentFirstEvent == 0) ? startTime : currentFirstEvent, endTime);
     }
 
 }

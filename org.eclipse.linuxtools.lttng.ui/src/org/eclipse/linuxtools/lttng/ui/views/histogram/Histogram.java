@@ -273,7 +273,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         fDataModel.countEvent(timestamp);
         if (fDataModel.getNbEvents() % REFRESH_FREQUENCY == 0) {
             refresh();
-            refresh();
+            refresh(); // This is intentional. Exercise left to the reader :-)
         }
     }
 
@@ -283,7 +283,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      * @param timestamp
      */
     public void setCurrentEvent(long timestamp) {
-        fCurrentEventTime = timestamp;
+        fCurrentEventTime = (timestamp > 0) ? timestamp : 0;
         fDataModel.setCurrentEvent(timestamp);
         refresh();
     }
@@ -381,16 +381,11 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                         int canvasHeight = fCanvas.getBounds().height;
                         fDataModel.setCurrentEvent(fCurrentEventTime);
                         fScaledData = fDataModel.scaleTo(canvasWidth, canvasHeight);
-                        // If there's no data, just get out
-                        if (fScaledData.fData[0] == 0)
-                            return;
-                        // Display histogram and update X-,Y-axis labels
                         fCanvas.redraw();
+                        // Display histogram and update X-,Y-axis labels
                         fTimeRangeStartText.setText(HistogramUtils.nanosecondsToString(fDataModel.getStartTime()));
                         fTimeRangeEndText.setText(HistogramUtils.nanosecondsToString(fDataModel.getEndTime()));
-                        if (fDataModel.getStartTime() > 0) {
-                            fMaxNbEventsText.setText(Long.toString(fScaledData.fMaxValue));
-                        }
+                        fMaxNbEventsText.setText(Long.toString(fScaledData.fMaxValue));
                         // The Y-axis area might need to be re-sized
                         fMaxNbEventsText.getParent().layout();
                     }
@@ -536,7 +531,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     @Override
     public void mouseHover(MouseEvent event) {
-        if (fDataModel.getNbEvents() > 0 && fScaledData.fLastBucket >= event.x) {
+        if (fDataModel.getNbEvents() > 0 && fScaledData != null && fScaledData.fLastBucket >= event.x) {
             String tooltip = formatToolTipLabel(event.x);
             fCanvas.setToolTipText(tooltip);
         }
@@ -545,7 +540,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     private String formatToolTipLabel(int index) {
         long startTime = fDataModel.getStartTime() + fScaledData.fCurrentBucket * fScaledData.fBucketDuration;
         long endTime = startTime + fScaledData.fBucketDuration;
-        int nbEvents = fScaledData.fData[index];
+        int nbEvents = (index >= 0) ? fScaledData.fData[index] : 0;
 
         StringBuffer buffer = new StringBuffer();
         buffer.append("Range = ["); //$NON-NLS-1$

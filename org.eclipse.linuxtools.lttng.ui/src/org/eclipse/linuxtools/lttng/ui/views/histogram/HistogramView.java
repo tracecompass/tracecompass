@@ -21,12 +21,12 @@ import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
+import org.eclipse.linuxtools.tmf.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
-import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -258,7 +258,7 @@ public class HistogramView extends TmfView {
     public void updateCurrentEventTime(long newTime) {
         if (fCurrentExperiment != null) {
             TmfTimeRange timeRange = new TmfTimeRange(new TmfTimestamp(newTime, TIME_SCALE), TmfTimestamp.BigCrunch);
-            HistogramRequest request = new HistogramRequest(fTimeRangeHistogram, timeRange, 1, ExecutionType.FOREGROUND) {
+            HistogramRequest request = new HistogramRequest(fTimeRangeHistogram, timeRange, 0, 1, ExecutionType.FOREGROUND) {
                 @Override
                 public void handleData(LttngEvent event) {
                     if (event != null) {
@@ -322,21 +322,34 @@ public class HistogramView extends TmfView {
     }
 
     private void loadExperiment() {
-        fExperimentStartTime = fCurrentExperiment.getStartTime().getValue();
-        fExperimentEndTime = fCurrentExperiment.getEndTime().getValue();
-        fCurrentTimestamp = fExperimentStartTime;
         initializeHistograms();
         fParent.redraw();
     }
 
-//    @TmfSignalHandler
-//    @SuppressWarnings("unchecked")
-//    public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
-//        fCurrentExperiment = (TmfExperiment<LttngEvent>) signal.getExperiment();
-//        fFullRangeHistogramCanvas.redraw();
-//        fTimespanHistogramCanvas.redraw();
-//        createCanvasAndRequests();
-//    }
+    @TmfSignalHandler
+    @SuppressWarnings("unchecked")
+    public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
+
+        fCurrentExperiment = (TmfExperiment<LttngEvent>) signal.getExperiment();
+        boolean drawTimeRangeHistogram = fExperimentStartTime == 0;
+        TmfTimeRange fullRange = signal.getRange();
+
+        fExperimentStartTime = fullRange.getStartTime().getValue();
+        fExperimentEndTime = fullRange.getEndTime().getValue();
+
+        fFullTraceHistogram.setFullRange(fExperimentStartTime, fExperimentEndTime);
+        fTimeRangeHistogram.setFullRange(fExperimentStartTime, fExperimentEndTime);
+
+        if (drawTimeRangeHistogram) {
+            fCurrentTimestamp = fExperimentStartTime;
+            fCurrentEventTimeControl.setValue(fCurrentTimestamp);
+            fFullTraceHistogram.setTimeRange(fExperimentStartTime, INITIAL_WINDOW_SPAN);
+            fTimeRangeHistogram.setTimeRange(fExperimentStartTime, INITIAL_WINDOW_SPAN);
+            sendTimeRangeRequest(fExperimentStartTime, fExperimentStartTime + INITIAL_WINDOW_SPAN);
+        }
+
+        sendFullRangeRequest(fullRange);
+    }
 
     @TmfSignalHandler
     public void currentTimeUpdated(TmfTimeSynchSignal signal) {
@@ -376,11 +389,14 @@ public class HistogramView extends TmfView {
     // ------------------------------------------------------------------------
 
     private void initializeHistograms() {
-        updateExperimentTimeRange(fCurrentExperiment);
+        TmfTimeRange fullRange = updateExperimentTimeRange(fCurrentExperiment);
+
+        fTimeRangeHistogram.clear();
         fTimeRangeHistogram.setFullRange(fExperimentStartTime, fExperimentEndTime);
         fTimeRangeHistogram.setTimeRange(fExperimentStartTime, INITIAL_WINDOW_SPAN);
         fTimeRangeHistogram.setCurrentEvent(fExperimentStartTime);
 
+        fFullTraceHistogram.clear();
         fFullTraceHistogram.setFullRange(fExperimentStartTime, fExperimentEndTime);
         fFullTraceHistogram.setTimeRange(fExperimentStartTime, INITIAL_WINDOW_SPAN);
         fFullTraceHistogram.setCurrentEvent(fExperimentStartTime);
@@ -393,7 +409,21 @@ public class HistogramView extends TmfView {
         fTimeSpanControl.setValue(fWindowSpan);
 
         sendTimeRangeRequest(fExperimentStartTime, fExperimentStartTime + fWindowSpan);
-        sendFullRangeRequest();
+        sendFullRangeRequest(fullRange);
+    }
+
+    private TmfTimeRange updateExperimentTimeRange(TmfExperiment<LttngEvent> experiment) {
+        fExperimentStartTime = 0;
+        fExperimentEndTime = 0;
+        fCurrentTimestamp = 0;
+
+        TmfTimeRange timeRange = fCurrentExperiment.getTimeRange();
+        if (timeRange != TmfTimeRange.Null) {
+            fExperimentStartTime = timeRange.getStartTime().getValue();
+            fExperimentEndTime = timeRange.getEndTime().getValue();
+            fCurrentTimestamp = fExperimentStartTime;
+        }
+        return timeRange;
     }
 
     private void sendTimeRangeRequest(long startTime, long endTime) {
@@ -410,31 +440,13 @@ public class HistogramView extends TmfView {
         fCurrentExperiment.sendRequest(fTimeRangeRequest);
     }
 
-    private void sendFullRangeRequest() {
+    private void sendFullRangeRequest(TmfTimeRange fullRange) {
         if (fFullTraceRequest != null && !fFullTraceRequest.isCompleted()) {
             fFullTraceRequest.cancel();
         }
-        fFullTraceHistogram.clear();
-        TmfTimeRange timeRange = updateExperimentTimeRange(fCurrentExperiment);
-        fFullTraceRequest = new HistogramRequest(fFullTraceHistogram, timeRange, ExecutionType.BACKGROUND);
+        fFullTraceRequest = new HistogramRequest(fFullTraceHistogram, fullRange, (int) fFullTraceHistogram.fDataModel.getNbEvents(),
+                ExecutionType.BACKGROUND);
         fCurrentExperiment.sendRequest(fFullTraceRequest);
-    }
-
-    private TmfTimeRange updateExperimentTimeRange(TmfExperiment<LttngEvent> experiment) {
-        TmfTimestamp startTime = TmfTimestamp.BigCrunch;
-        TmfTimestamp endTime = TmfTimestamp.BigBang;
-        for (ITmfTrace trace : experiment.getTraces()) {
-            TmfTimestamp traceStartTime = trace.getStartTime();
-            if (traceStartTime.compareTo(startTime, true) < 0)
-                startTime = traceStartTime;
-            TmfTimestamp traceEndTime = trace.getEndTime();
-            if (traceEndTime.compareTo(endTime, true) > 0)
-                endTime = traceEndTime;
-        }
-        fExperimentStartTime = startTime.getValue();
-        fExperimentEndTime = endTime.getValue();
-
-        return new TmfTimeRange(startTime, endTime);
     }
 
 }

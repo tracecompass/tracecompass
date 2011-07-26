@@ -36,13 +36,17 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
     // Constructor
     // ------------------------------------------------------------------------
 
-    public HistogramRequest(Histogram histogram, TmfTimeRange range, int nbEvents, ITmfDataRequest.ExecutionType execType) {
-        super(LttngEvent.class, range, nbEvents, LttngConstants.DEFAULT_BLOCK_SIZE, execType);
+    public HistogramRequest(Histogram histogram, TmfTimeRange range, int rank, int nbEvents, ITmfDataRequest.ExecutionType execType) {
+        super(LttngEvent.class, range, rank, nbEvents, LttngConstants.DEFAULT_BLOCK_SIZE, execType);
         fHistogram = histogram;
     }
 
     public HistogramRequest(Histogram histogram, TmfTimeRange range, ITmfDataRequest.ExecutionType execType) {
-        this(histogram, range, ALL_DATA, execType);
+        this(histogram, range, 0, ALL_DATA, execType);
+    }
+
+    public HistogramRequest(Histogram histogram, TmfTimeRange range, int rank, ITmfDataRequest.ExecutionType execType) {
+        this(histogram, range, rank, ALL_DATA, execType);
     }
 
     // ------------------------------------------------------------------------
