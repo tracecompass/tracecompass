@@ -804,10 +804,12 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
             private void updateExperiment() {
                 int nbRead = getNbRead();
+                if (startTime != null) {
+                    fTimeRange = new TmfTimeRange(startTime, new TmfTimestamp(lastTime));
+                }
                 if (nbRead != 0) {
 //					updateTimeRange();
 //					updateNbEvents();
-                    fTimeRange = new TmfTimeRange(startTime, new TmfTimestamp(lastTime));
                     fNbEvents = initialNbEvents + nbRead;
                     notifyListeners();
                 }

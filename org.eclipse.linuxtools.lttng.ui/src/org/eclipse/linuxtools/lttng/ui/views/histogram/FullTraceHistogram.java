@@ -149,7 +149,7 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
         Image rangeRectangleImage = new Image(image.getDevice(), image, SWT.IMAGE_COPY);
         GC rangeWindowGC = new GC(rangeRectangleImage);
 
-        if (fRangeStartTime != 0) {
+        if (fScaledData != null && fRangeStartTime != 0) {
             drawTimeRangeWindow(rangeWindowGC, rangeRectangleImage);
         }
 

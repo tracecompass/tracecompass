@@ -103,8 +103,15 @@ public class HistogramView extends TmfView {
 
     @Override
     public void dispose() {
+        if (fTimeRangeRequest != null && !fTimeRangeRequest.isCompleted()) {
+            fTimeRangeRequest.cancel();
+        }
+        if (fFullTraceRequest != null && !fFullTraceRequest.isCompleted()) {
+            fFullTraceRequest.cancel();
+        }
         fFullTraceHistogram.dispose();
         fTimeRangeHistogram.dispose();
+        super.dispose();
     }
 
     // ------------------------------------------------------------------------
