@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- For PDE build, remove "ws" and "arch" -->
 <feature
       id="org.eclipse.linuxtools.lttng"
       label="%featureName"
-      version="0.3.1.qualifier"
+      version="0.3.2.qualifier"
       provider-name="%featureProvider"
+      os="linux"
       ws="*"
-      arch="*"
-      os="linux">
+      arch="*">
 
    <description>
       %description
@@ -38,6 +40,7 @@
       <import plugin="org.eclipse.help"/>
    </requires>
 
+<!-- For PDE build, remove "ws" and "arch" -->
    <plugin
          id="org.eclipse.linuxtools.lttng"
          os="linux"
@@ -48,11 +51,12 @@
          version="0.0.0"
          unpack="false"/>
 
+<!-- For PDE build, remove "ws" and "arch" -->
    <plugin
          id="org.eclipse.linuxtools.lttng.ui"
+         os="linux"
          ws="*"
          arch="*"
-         os="linux"
          download-size="0"
          install-size="0"
          version="0.0.0"
