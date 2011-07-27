@@ -18,7 +18,7 @@
   </parent>
 
   <artifactId>org.eclipse.linuxtools.tmf.test-feature</artifactId>
-  <version>0.3.0-SNAPSHOT</version>
+  <version>0.3.2-SNAPSHOT</version>
   <packaging>eclipse-feature</packaging>
 
   <name>Linux Tools TMF Tests (LTTng) Feature</name>
