@@ -587,6 +587,11 @@ public class TraceSubSystem extends SubSystem implements ICommunicationsListener
                             PauseTrace pauseAction = new PauseTrace();
                             pauseAction.setSelectedTraces(new ArrayList<TraceResource>(Arrays.asList(traces)));
                             pauseAction.run(null);
+                            try {
+                                Thread.sleep(2000); // allow time for target to pause traces before disconnecting the channel
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
                 }

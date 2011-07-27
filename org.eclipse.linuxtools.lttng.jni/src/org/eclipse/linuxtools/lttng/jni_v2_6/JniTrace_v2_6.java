@@ -37,9 +37,6 @@ public class JniTrace_v2_6 extends JniTrace {
 	 */
 	protected JniTrace_v2_6() {
 		super();
-		// Set live trace supported for 2.6 to true by default.
-		// Will be set to false if open live trace fails. 
-		setLiveTraceSupported(true);
     }
 	
 	public JniTrace_v2_6(String newpath) throws JniException {
@@ -52,7 +49,7 @@ public class JniTrace_v2_6 extends JniTrace {
     
     public JniTrace_v2_6(JniTrace_v2_6 oldTrace) {
     	super(oldTrace);
-    }        
+    }
     
     public JniTrace_v2_6(Jni_C_Pointer_And_Library_Id newPtr, boolean newPrintDebug) throws JniException {
     	super(newPtr, newPrintDebug);
