@@ -160,13 +160,11 @@
 		</p>
 		<p>You can also search on the subset of filtered events by toggling the header row to the Search Bar while a filter is applied. Searching and filtering conditions are independent of each other.</p>
 		<h3 id="Histogram_View">Histogram View</h3>
-		<p>The Histogram View displays the trace events distribution with respect to time.</p>
+		<p>The Histogram View displays the trace events distribution with respect to time. When streaming a trace, this view is dynamically updated as the events are received.</p>
 		<p>
 			<img border="0" src="images/HistogramView.png"/>
 		</p>
-		<p>The large histogram, at the bottom, shows the event distribution over the whole trace. The timetamps (sec.nanosec) correspond to the first and the last event in the trace. The selected area corresponds to the current time range window. When clicking in that viewer, the mouse wheel can be used to zoom in/out and update the time range window.</p>
-		<p>The smaller histogram, on the top right of the view, is a zoom of the current time range window. It also has timestamps on the bottom that correspond to the time range. The scale of the histogram (i.e. the number of events) is displayed on the right.</p>
-		<p>On the top left, there are three elements of data:</p>
+		<p>On the top left, there are two data controls:</p>
 		<ul>
 			<li>
 				<b>Current Event (sec)</b>: Displays the timestamp of the currently selected event
@@ -174,8 +172,26 @@
 			<li>
 				<b>Window Span (sec)</b>: Displays the current time range window size
 			</li>
+		</ul>
+		<p>Both control can be used to modify their respective value. After validation, the other controls and views will be synchronized and updated accordingly.</p>
+		<p>The large histogram, at the bottom, shows the event distribution over the whole trace or set of traces. It also has a smaller semi-transparent window, with a cross-hair, that shows the currently selected time range window. The time range window can be zoomed in/out by using the mouse wheel. It can also be selected by the mouse and dragged to another region of the trace.</p>
+		<p>The smaller histogram, on top right, corresponds to the currently selected time range window, a sub-range of the event set. Its size can also be zoomed in/out using the mouse wheel.</p>
+		<p>The x-axis of each histogram corresponds to the events timestamps. The timestamp of the first and the last event of the respective ranges is displayed. The y-axis of each histogram shows the minimum/maximum number of events in the corresponding histogram bars.</p>
+		<p>The dashed vertical magenta bar, on the right, shows the position of the last event. The dashed vertical red bar shows the relative position of the currently selected event. The current event can be changed by clicking on the histogram.</p>
+		<p>Hovering the mouse over an histogram bar pops up an information window that displays the start/end time of the corresponding bar as well as the number of events it represents.</p>
+		<p>In each histogram, the following keys are handled:</p>
+		<ul>
 			<li>
-				<b>Window Center (sec)</b>: Displays the timestamp at the cursor
+				<b>Left</b>: Moves the current event to the previous non-empty bar
+			</li>
+			<li>
+				<b>Right</b>: Moves the current event to the next non-empty bar
+			</li>
+			<li>
+				<b>Home</b>: Displays the current event to the first histogram bar
+			</li>
+			<li>
+				<b>End</b>: Displays the current event to the last non-empty histogram bar
 			</li>
 		</ul>
 		<h3 id="Control_Flow_View">Control Flow View</h3>
@@ -492,10 +508,10 @@
 				<b>Trace Location</b>:  
 				<ul>
 					<li>
-						<b>Remote</b>: means that the trace is stored on the remote system where the trace is collected. 
+						<b>Target</b>: means that the trace is stored on the remote system where the trace is collected. 
 					</li>
 					<li>
-						<b>Local</b>: means that the trace is transfered to the local host where the eclipse application is running. 
+						<b>Host</b>: means that the trace is transfered to the local host where the eclipse application is running. 
 					</li>
 					<li>
 						<b>Trace path</b>: holds the path where the trace shall be stored. The 
@@ -504,21 +520,25 @@
 					</li>
 				</ul>
 			</li>
+		</ul>
+		<ul>
 			<li>
-				<b>NUM_CHANNELS</b>: defines the number of threads to be used during tracing.
+				<b>Tracing project</b>: defines the LTTng Tracing project where a streaming (host) trace will be added at trace start.
+			</li>
+			<li>
+				<b>Number of lttd threads</b>: defines the number of threads to be used by the ltt daemon during tracing.
 			</li>
 			<li>
 				<b>Append</b>: can be used to append the new trace to an existing trace.
 			</li>
 			<li>
 				<b>Trace mode</b>: can be either 
-				<b>None</b>, 
-				<b>Flight Recorder</b> or 
-				<b>Normal</b>.
+				<b>Normal</b> or 
+				<b>Flight Recorder</b>. In normal mode, the subbuffers are constantly written while the trace is started. In flight recorder mode, only the latest subbuffers are written when the trace is stopped. 
 			</li>
 		</ul>
-		<p>If all input are valid the 
-			<b>Finsh</b> button will be active and can be use to create the trace. The LTTng trace control will setup the trace using the connection to the remote agent.
+		<p>If all inputs are valid the 
+			<b>Finish</b> button will be active and can be used to create the trace. The LTTng trace control will setup the trace using the connection to the remote agent.
 		</p>
 		<p>After creating a new trace, the Remote Systems view will be updated. When selecting the newly created trace in the tree, the buttons to start, stop and configure the trace will be enabled.</p>
 		<p>
@@ -533,7 +553,7 @@
 			<a href="User-Interface.html#Create_a_New_Kernel_Trace">Create_a_New_Kernel_Trace</a>
 		</p>
 		<p>
-			<img border="0" src="images/LTTngConfigureTraceDialog_New.png"/>
+			<img border="0" src="images/LTTngConfigureTraceDialog.png"/>
 		</p>
 		<p>After entering valid parameters the 
 			<b>Next</b> and 
@@ -587,7 +607,7 @@
 		</p>
 		<h4 id="Start_a_Trace">Start a Trace</h4>
 		<p>A configured or paused trace can be started by selecting the kernel trace, clicking the right mouse button and selecting the 
-			<b>Start</b> menu item of the context sensitive menu. Alternatively, the start button in the toolbar can be used to start the trace.
+			<b>Start</b> menu item of the context sensitive menu. Alternatively, the start button in the toolbar can be used to start the trace. If the trace location is host (streaming trace), it will be automatically added to the tracing project that was selected at trace creation.
 		</p>
 		<p>
 			<img border="0" src="images/LTTngStartTraceAction.png"/>
@@ -606,36 +626,35 @@
 		<p>
 			<img border="0" src="images/LTTngStopTraceAction.png"/>
 		</p>
-		<h4 id="Import_a_Trace_in_the__LTTng_Perspective">Import a Trace in the  LTTng Perspective</h4>
-		<p>A stopped trace can be imported to the LTTng Perspective for viewing by selecting the relevant trace, clicking the right mouse button and selecting the 
+		<h4 id="Import_a_Trace_in_the_LTTng_Perspective">Import a Trace in the LTTng Perspective</h4>
+		<p>A streaming or stopped trace can be imported to the LTTng Perspective for viewing by selecting the relevant trace, clicking the right mouse button and selecting the 
 			<b>Import To Project</b> menu item of the context sensitive menu. A new dialog box will show to select the LTTng Project. 
 		</p>
 		<p>
 			<img border="0" src="images/LTTngImportTraceAction.png"/>
 		</p>
-		<p>For local trace path:</p>
+		<p>For local trace path (streamed to the host):</p>
 		<p>
 			<img border="0" src="images/LTTngImportLocalTrace.png"/>
 		</p>
-		<p>For remote trace path:</p>
+		<p>For remote trace path (stored on the target):</p>
 		<p>
 			<img border="0" src="images/LTTngImportRemoteTrace.png"/>
 		</p>
 		<ul>
 			<li>
-				<b>Import to project</b>: All in the workspace existing LTTng Projects are displayed in a table and the user has to select the destination. If no projects are available the use has to create a new project first (see 
+				<b>Import to project</b>: All existing LTTng tracing projects in the workspace are displayed in a table and the user has to select the destination. If no projects are available the user has to create a new project first (see 
 				<a href="User-Interface.html#Project_View">Project_View</a>)
 			</li>
 			<li>
 				<b>Trace name</b>: specifies the name that the imported trace shall have in the LTTng project. 
 			</li>
 			<li>
-				<b>Link only</b>: For local trace path the user has the option to create a symbolic link to the trace path or to copy the trace into the LTTng project. 
+				<b>Link only</b>: For a trace streamed to the host the user has the option to create a symbolic link to the trace path or, if the trace is stopped, to copy the trace into the LTTng project. 
 			</li>
 		</ul>
 		<p>After pressing button 
-			<b>Import</b> the trace will be stored in the selected project. For 
-			<b>Remote</b> it will be downloaded from the remote system.
+			<b>Import</b> the trace will be stored in the selected project. For a trace stored on the target, it will be downloaded from the remote system.
 		</p>
 		<h4 id="Delete_a_Trace">Delete a Trace</h4>
 		<p>A stopped trace can be deleted by selecting the relevant trace, clicking the right mouse button and selecting the 
