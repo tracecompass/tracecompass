@@ -19,16 +19,21 @@ package org.eclipse.linuxtools.tmf.trace;
  */
 public interface ITmfContext {
 
-	public long UNKNOWN_RANK = -2L;
+    public long UNKNOWN_RANK = -2L;
     public long INITIAL_RANK = -1L;
 
-	public void setLocation(ITmfLocation<?> location);
-	@SuppressWarnings("rawtypes")
-	public ITmfLocation<? extends Comparable> getLocation();
+    public void dispose();
 
-	public void setRank(long rank);
-	public long getRank();
-	public void updateRank(int rank);
+    public void setLocation(ITmfLocation<?> location);
 
-	public boolean isValidRank();
+    @SuppressWarnings("rawtypes")
+    public ITmfLocation<? extends Comparable> getLocation();
+
+    public void setRank(long rank);
+
+    public long getRank();
+
+    public void updateRank(int rank);
+
+    public boolean isValidRank();
 }

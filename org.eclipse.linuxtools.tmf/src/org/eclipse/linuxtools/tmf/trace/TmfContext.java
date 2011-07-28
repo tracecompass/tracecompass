@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.trace;
 
-
 /**
  * <b><u>TmfContext</u></b>
  * <p>
@@ -22,105 +21,110 @@ package org.eclipse.linuxtools.tmf.trace;
  */
 public class TmfContext implements ITmfContext, Cloneable {
 
-	private ITmfLocation<? extends Comparable<?>> fLocation;
-	private long fRank;
-	
-	// ------------------------------------------------------------------------
-	// Constructors
-	// ------------------------------------------------------------------------
+    private ITmfLocation<? extends Comparable<?>> fLocation;
+    private long fRank;
 
-	public TmfContext(ITmfLocation<? extends Comparable<?>> loc, long rank) {
-		fLocation = loc;
-		fRank = rank;
-	}
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
 
-	public TmfContext(ITmfLocation<? extends Comparable<?>> location) {
-		this(location, UNKNOWN_RANK);
-	}
+    public TmfContext(ITmfLocation<? extends Comparable<?>> loc, long rank) {
+        fLocation = loc;
+        fRank = rank;
+    }
 
-	public TmfContext(TmfContext other) {
-		this(other.fLocation, other.fRank);
-	}
+    public TmfContext(ITmfLocation<? extends Comparable<?>> location) {
+        this(location, UNKNOWN_RANK);
+    }
 
-	public TmfContext() {
-		this(null, UNKNOWN_RANK);
-	}
+    public TmfContext(TmfContext other) {
+        this(other.fLocation, other.fRank);
+    }
 
-	// ------------------------------------------------------------------------
-	// ITmfContext
-	// ------------------------------------------------------------------------
+    public TmfContext() {
+        this(null, UNKNOWN_RANK);
+    }
 
-	@Override
-	public void setLocation(ITmfLocation<? extends Comparable<?>> location) {
-		fLocation = location;
-	}
+    // ------------------------------------------------------------------------
+    // ITmfContext
+    // ------------------------------------------------------------------------
 
-	@Override
-	public ITmfLocation<? extends Comparable<?>> getLocation() {
-		return fLocation;
-	}
+    @Override
+    public void dispose() {
+        // override if necessary
+    }
 
-	@Override
-	public void setRank(long rank) {
-		fRank = rank;
-	}
+    @Override
+    public void setLocation(ITmfLocation<? extends Comparable<?>> location) {
+        fLocation = location;
+    }
 
-	@Override
-	public long getRank() {
-		return fRank;
-	}
+    @Override
+    public ITmfLocation<? extends Comparable<?>> getLocation() {
+        return fLocation;
+    }
 
-	@Override
-	public void updateRank(int delta) {
-		if (isValidRank())
-			fRank += delta;
-	}
+    @Override
+    public void setRank(long rank) {
+        fRank = rank;
+    }
 
-	@Override
-	public boolean isValidRank() {
-		return fRank != UNKNOWN_RANK;
-	}
+    @Override
+    public long getRank() {
+        return fRank;
+    }
 
-	// ------------------------------------------------------------------------
-	// Object
-	// ------------------------------------------------------------------------
+    @Override
+    public void updateRank(int delta) {
+        if (isValidRank())
+            fRank += delta;
+    }
+
+    @Override
+    public boolean isValidRank() {
+        return fRank != UNKNOWN_RANK;
+    }
+
+    // ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
 
     @Override
     public int hashCode() {
-		int result = 17;
-		result = 37 * result + fLocation.hashCode();
-		result = 37 * result + (int) (fRank ^ (fRank >>> 32));
-    	return result;
+        int result = 17;
+        result = 37 * result + fLocation.hashCode();
+        result = 37 * result + (int) (fRank ^ (fRank >>> 32));
+        return result;
     }
- 
+
     @Override
     public boolean equals(Object other) {
-    	if (other == this) {
-    		return true;
-    	}
-    	if (!(other instanceof TmfContext)) {
-    		return false;
-    	}
-    	TmfContext o = (TmfContext) other;
-    	return fLocation.equals(o.fLocation) && (fRank == o.fRank);
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof TmfContext)) {
+            return false;
+        }
+        TmfContext o = (TmfContext) other;
+        return fLocation.equals(o.fLocation) && (fRank == o.fRank);
     }
- 
-	@Override
+
+    @Override
     @SuppressWarnings("nls")
     public String toString() {
-    	return "[TmfContext(" + fLocation.toString() +  "," + fRank + ")]";
+        return "[TmfContext(" + fLocation.toString() + "," + fRank + ")]";
     }
- 
-	@Override
-	public TmfContext clone() {
-		TmfContext clone = null;
-		try {
-			clone = (TmfContext) super.clone();
-			clone.fLocation = fLocation.clone();
-			clone.fRank = fRank;
-		} catch (CloneNotSupportedException e) {
-		}
-		return clone;
-	}
+
+    @Override
+    public TmfContext clone() {
+        TmfContext clone = null;
+        try {
+            clone = (TmfContext) super.clone();
+            clone.fLocation = fLocation.clone();
+            clone.fRank = fRank;
+        } catch (CloneNotSupportedException e) {
+        }
+        return clone;
+    }
 
 }

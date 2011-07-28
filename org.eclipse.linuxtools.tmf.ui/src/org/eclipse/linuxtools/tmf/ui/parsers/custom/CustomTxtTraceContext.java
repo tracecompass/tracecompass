@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.ui.parsers.custom;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 
 import org.eclipse.linuxtools.tmf.io.BufferedRandomAccessFile;
@@ -29,4 +30,16 @@ public class CustomTxtTraceContext extends TmfContext {
     public CustomTxtTraceContext(ITmfLocation<?> location, long rank) {
         super(location, rank);
     }
+
+    @Override
+    public void dispose() {
+        if (raFile != null) {
+            try {
+                raFile.close();
+            } catch (IOException e) {
+            }
+        }
+        super.dispose();
+    }
+
 }
