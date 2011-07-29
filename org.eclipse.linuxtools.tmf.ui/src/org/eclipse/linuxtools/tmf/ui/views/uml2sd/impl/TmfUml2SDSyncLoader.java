@@ -327,7 +327,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                 fInitialWindow = delta.getValue();
 
                 fIsSelect = false;
-                fCurrentTime = signal.getCurrentTime();
+                fCurrentTime = newTimeRange.getStartTime();
 
                 moveToMessage();
             }

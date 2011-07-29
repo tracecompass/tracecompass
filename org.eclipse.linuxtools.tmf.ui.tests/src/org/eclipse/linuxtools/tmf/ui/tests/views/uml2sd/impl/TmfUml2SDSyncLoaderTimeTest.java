@@ -74,9 +74,9 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
     final static private Uml2SDTestTimestamp TC_008_END_TIME_VALUE   = new Uml2SDTestTimestamp(9789164833324L);
 
     // Test case 009 expected values
-    final static private Uml2SDTestTimestamp TC_009_TIME_VALUE       = new Uml2SDTestTimestamp(9789773782043L);
-    final static private int                 TC_009_PAGE_VALUE       = 2;
-    final static private Uml2SDTestTimestamp TC_009_START_TIME_VALUE = new Uml2SDTestTimestamp(9789689220871L);
+    final static private Uml2SDTestTimestamp TC_009_TIME_VALUE       = new Uml2SDTestTimestamp(9789689220871L);
+    final static private int                 TC_009_PAGE_VALUE       = 1;
+    final static private Uml2SDTestTimestamp TC_009_START_TIME_VALUE = TC_009_TIME_VALUE;
     final static private Uml2SDTestTimestamp TC_009_END_TIME_VALUE   = new Uml2SDTestTimestamp(9789773881426L);
     
     private Uml2SDTestFacility fFacility;
@@ -237,7 +237,7 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
         * Test Case: 008
         * Description: Verify time range signal (start, end time and current time are in same  page)  
         * Verified Methods: loader.synchToTimeRange(), loader.moveToMessage(), loader.moveToMessageInPage()
-        * Expected result: Move to correct page, set focus on current time, but no selection of message.
+        * Expected result: Move to correct page(=page of start time of range), set focus on start time of range, but no selection of message.
         */
         // 9788.642228395 (page 0) -> 9789.164833324 (page 0) with selected time 9788.642228395 (page 0)
         fFacility.getLoader().firstPage();
@@ -255,9 +255,9 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
         
         /*
          * Test Case: 009
-         * Description: Verify time range signal (start and end time are across 2 pages, current time is on 2nd page)  
+         * Description: Verify time range signal (start and end time are across 2 pages)  
          * Verified Methods: loader.synchToTimeRange(), loader.moveToMessage(), loader.moveToPage()
-         * Expected result: Move to correct page (page of current time), set focus on current time, but no selection of message.
+         * Expected result: Move to correct page (=page of start time of range), set focus on start time of range, but no selection of message.
          */
         range = new TmfTimeRange(TC_009_START_TIME_VALUE, TC_009_END_TIME_VALUE);
         fFacility.getTrace().broadcast(new TmfRangeSynchSignal(this, range, TC_009_TIME_VALUE));
