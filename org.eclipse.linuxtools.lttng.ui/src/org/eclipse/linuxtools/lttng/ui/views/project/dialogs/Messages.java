@@ -9,6 +9,8 @@ public class Messages extends NLS {
 	public static String AddTraceWizardPage_columnHeader;
 	public static String AddTraceWizardPage_description;
 	public static String AddTraceWizardPage_windowTitle;
+	public static String ImportTrace_ErrorTitle;
+	public static String ImportTrace_InvalidProject;
 	public static String ImportTraceWizardPage_BadTraceVersion;
 	public static String ImportTraceWizardPage_BadTraceVersionMsg1;
 	public static String ImportTraceWizardPage_BadTraceVersionMsg2;
@@ -24,6 +26,8 @@ public class Messages extends NLS {
 	public static String TraceLibraryPathWizardPage_TraceLoaderLibrary_notExists;
 	public static String TraceLibraryPathWizardPage_Title;
 	public static String TraceLibraryPathWizardPage_Description;
+	public static String TraceLibraryPathWizard_Message;
+	public static String TraceLibraryPathProperty_Message;
 	public static String SelectTrace_ErrorTitle;
 	public static String TraceLibraryPath_Note;
 	public static String TraceLibraryPath_Message;

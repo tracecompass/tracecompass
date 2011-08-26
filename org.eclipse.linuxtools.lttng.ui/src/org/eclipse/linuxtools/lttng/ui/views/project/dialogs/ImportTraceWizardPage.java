@@ -13,7 +13,9 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.project.dialogs;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.linuxtools.lttng.exceptions.LttngException;
 import org.eclipse.linuxtools.lttng.trace.LTTngTraceVersion;
@@ -39,9 +41,12 @@ public class ImportTraceWizardPage extends WizardFileSystemResourceImportPage1 {
     public ImportTraceWizardPage(IWorkbench workbench, IStructuredSelection selection) {
 	super(workbench, selection);
 
-	LTTngProjectNode folder = (LTTngProjectNode) selection.getFirstElement();
-	project = folder.getProject();
-	String path = folder.getTracesFolder().getFolder().getFullPath().toOSString();
+	project = (IProject) selection.getFirstElement();
+	IFolder folder = project.getFolder(LTTngProjectNode.TRACE_FOLDER_NAME);
+	if (folder == null) {
+        MessageDialog.openError(getShell(), Messages.ImportTrace_ErrorTitle, Messages.ImportTrace_InvalidProject);
+	}
+	String path = folder.getFullPath().toOSString();
 
 	initialContainerString = path;
 	setContainerFieldValue(path);

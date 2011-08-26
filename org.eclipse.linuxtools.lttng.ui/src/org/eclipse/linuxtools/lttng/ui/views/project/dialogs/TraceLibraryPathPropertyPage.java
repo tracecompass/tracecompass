@@ -80,6 +80,17 @@ public class TraceLibraryPathPropertyPage extends PropertyPage {
             }
 
         });
+
+        Label noLabel = new Label(client, SWT.NONE);
+        noLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false, false));
+
+        Label descTextLabel = new Label(client, SWT.WRAP);
+        descTextLabel.setText(Messages.TraceLibraryPathProperty_Message);
+        GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        gd.widthHint = 400;
+        gd.horizontalSpan = 2;
+        descTextLabel.setLayoutData(gd);
+
         Label noteBoldLabel = new Label(client, SWT.BOLD);
         noteBoldLabel.setText(Messages.TraceLibraryPath_Note);
         noteBoldLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false,
@@ -92,7 +103,7 @@ public class TraceLibraryPathPropertyPage extends PropertyPage {
 
         Label noteTextLabel = new Label(client, SWT.WRAP);
         noteTextLabel.setText(Messages.TraceLibraryPath_Message);
-        GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
         gd.widthHint = 400;
         gd.horizontalSpan = 2;
         noteTextLabel.setLayoutData(gd);

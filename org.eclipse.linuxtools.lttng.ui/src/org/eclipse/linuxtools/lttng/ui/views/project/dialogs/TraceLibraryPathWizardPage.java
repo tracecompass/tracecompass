@@ -50,8 +50,7 @@ public class TraceLibraryPathWizardPage extends WizardPage {
         Label label = new Label(client, SWT.NONE);
         label.setText(Messages.TraceLibraryPath_label);
         traceLibraryPath = new Text(client, SWT.BORDER);
-        traceLibraryPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-                false));
+        traceLibraryPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         traceLibraryPath.addModifyListener(new ModifyListener() {
 
             @Override
@@ -62,8 +61,7 @@ public class TraceLibraryPathWizardPage extends WizardPage {
 
         });
         browsePathButton = new Button(client, SWT.PUSH);
-        browsePathButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, false,
-                false));
+        browsePathButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
         browsePathButton.setText(Messages.TraceLibraryPath_browseBtn);
         browsePathButton.addSelectionListener(new SelectionAdapter() {
 
@@ -79,10 +77,19 @@ public class TraceLibraryPathWizardPage extends WizardPage {
 
         });
 
+        Label noLabel = new Label(client, SWT.NONE);
+        noLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false, false));
+
+        Label descTextLabel = new Label(client, SWT.WRAP);
+        descTextLabel.setText(Messages.TraceLibraryPathWizard_Message);
+        GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        gd.widthHint = 400;
+        gd.horizontalSpan = 2;
+        descTextLabel.setLayoutData(gd);
+
         Label noteBoldLabel = new Label(client, SWT.BOLD);
         noteBoldLabel.setText(Messages.TraceLibraryPath_Note);
-        noteBoldLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false,
-                false));
+        noteBoldLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false, false));
         Font font = noteBoldLabel.getFont();
         if (font.getFontData().length > 0)
             noteBoldLabel.setFont(new Font(client.getDisplay(), font
@@ -91,7 +98,7 @@ public class TraceLibraryPathWizardPage extends WizardPage {
 
         Label noteTextLabel = new Label(client, SWT.WRAP);
         noteTextLabel.setText(Messages.TraceLibraryPath_Message);
-        GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
         gd.widthHint = 400;
         gd.horizontalSpan = 2;
         noteTextLabel.setLayoutData(gd);

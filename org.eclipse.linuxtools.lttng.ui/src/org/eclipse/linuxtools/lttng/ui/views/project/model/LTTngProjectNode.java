@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009, 2010, 2011 Ericsson, MontaVista Software
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Yufen Kuo (ykuo@mvista.com) - bug 354541: implement IAdaptable Project->Properties action is enabled when project is selected.
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng.ui.views.project.model;
@@ -19,6 +20,8 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature;
 
 /**
@@ -26,7 +29,7 @@ import org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature;
  * <p>
  * TODO: Implement me. Please.
  */
-public class LTTngProjectNode extends LTTngProjectTreeNode {
+public class LTTngProjectNode extends LTTngProjectTreeNode implements IAdaptable {
 
 	public static final String TRACE_FOLDER_NAME = "Traces"; //$NON-NLS-1$
 	public static final String EXPER_FOLDER_NAME = "Experiments"; //$NON-NLS-1$
@@ -197,5 +200,17 @@ public class LTTngProjectNode extends LTTngProjectTreeNode {
 	public LTTngExperimentFolderNode getExperimentsFolder() {
 		return fExperimentsFolder;
 	}
+
+    /**
+     * Returns the adapter
+     */
+    @SuppressWarnings("rawtypes")
+    public Object getAdapter(Class adapter) {
+        if (adapter == IResource.class) {
+            return getProject();
+        }
+        // Defer to the platform
+        return Platform.getAdapterManager().getAdapter(this, adapter);
+    }
 
 }
