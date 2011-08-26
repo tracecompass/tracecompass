@@ -22,6 +22,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -79,6 +80,23 @@ public class TraceLibraryPathPropertyPage extends PropertyPage {
             }
 
         });
+        Label noteBoldLabel = new Label(client, SWT.BOLD);
+        noteBoldLabel.setText(Messages.TraceLibraryPath_Note);
+        noteBoldLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false,
+                false));
+        Font font = noteBoldLabel.getFont();
+        if (font.getFontData().length > 0)
+            noteBoldLabel.setFont(new Font(client.getDisplay(), font
+                    .getFontData()[0].getName(), font.getFontData()[0]
+                    .getHeight(), SWT.BOLD));
+
+        Label noteTextLabel = new Label(client, SWT.WRAP);
+        noteTextLabel.setText(Messages.TraceLibraryPath_Message);
+        GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        gd.widthHint = 400;
+        gd.horizontalSpan = 2;
+        noteTextLabel.setLayoutData(gd);
+                
         performDefaults();
         return client;
     }
