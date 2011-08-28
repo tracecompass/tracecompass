@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2011 Ericsson, MontaVista Software
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
+ *   Yufen Kuo       (ykuo@mvista.com) - add support to allow user specify trace library path
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng.trace;
@@ -92,7 +93,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 	HashMap<Integer, LttngEventType> traceTypes = null;
 	// This vector will be used to quickly find a marker name from a position
 	Vector<Integer> traceTypeNames = null;
-
+    private String traceLibPath;
 	/**
 	 * Default Constructor.
 	 * <p>
@@ -105,7 +106,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 	 */
 	public LTTngTrace(String path) throws Exception {
 		// Call with "wait for completion" true and "skip indexing" false
-		this(path, true, false);
+		this(path, null, true, false);
 	}
 
 	/**
@@ -122,7 +123,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 	 */
 	public LTTngTrace(String path, boolean waitForCompletion) throws Exception {
 		// Call with "skip indexing" false
-		this(path, waitForCompletion, false);
+		this(path, null, waitForCompletion, false);
 	}
 
 	/**
@@ -132,6 +133,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 	 * 
 	 * @param path
 	 *            Path to a <b>directory</b> that contain an LTTng trace.
+	 * @param traceLibPath
+     *            Path to a <b>directory</b> that contains LTTng trace libraries.
 	 * @param waitForCompletion
 	 *            Should we wait for indexign to complete before moving on.
 	 * @param bypassIndexing
@@ -142,16 +145,17 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 	 *                (most likely LTTngTraceException or FileNotFoundException)
 	 * 
 	 */
-	public LTTngTrace(String path, boolean waitForCompletion,
+	public LTTngTrace(String path, String traceLibPath, boolean waitForCompletion,
 			boolean bypassIndexing) throws Exception {
 		super(path, LttngEvent.class, path, CHECKPOINT_PAGE_SIZE, false);
 		try {
-			currentJniTrace = JniTraceFactory.getJniTrace(path,
+			currentJniTrace = JniTraceFactory.getJniTrace(path, traceLibPath,
 					SHOW_LTT_DEBUG_DEFAULT);
 		} catch (Exception e) {
 			throw new LTTngTraceException(e.getMessage());
 		}
 
+		this.traceLibPath = traceLibPath;
 		// Export all the event types from the JNI side
 		traceTypes = new HashMap<Integer, LttngEventType>();
 		traceTypeNames = new Vector<Integer>();
@@ -199,7 +203,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 	 * Copy constructor is forbidden for LttngEvenmStream
 	 */
 	public LTTngTrace(LTTngTrace oldTrace) throws Exception {
-		this(oldTrace.getPath(), false, true);
+		this(oldTrace.getPath(),oldTrace.getTraceLibPath(), false, true);
 
 		// *** VERIFY ***
 		// Is this safe?
@@ -243,7 +247,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     	try {
     		clone = (LTTngTrace) super.clone();
        		try {
-				clone.currentJniTrace = JniTraceFactory.getJniTrace(getPath(), SHOW_LTT_DEBUG_DEFAULT);
+				clone.currentJniTrace = JniTraceFactory.getJniTrace(getPath(),getTraceLibPath(), SHOW_LTT_DEBUG_DEFAULT);
 			} catch (JniException e) {
 				// e.printStackTrace();
 			}
@@ -280,6 +284,10 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 		}
 
 		return clone;
+	}
+
+	public String getTraceLibPath() {
+		return traceLibPath;
 	}
 
 	/*

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2011 Ericsson, MontaVista Software
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Yufen Kuo       (ykuo@mvista.com) - add support to allow user specify trace library path
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng.ui.views.project.dialogs;
@@ -25,6 +26,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
+import org.eclipse.linuxtools.lttng.ui.TraceHelper;
 import org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectNode;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
@@ -45,6 +47,7 @@ public class NewProjectWizard extends BasicNewResourceWizard {
     protected IConfigurationElement fConfigElement;
 
     protected IProject fProject;
+	private TraceLibraryPathWizardPage traceLibraryPathPage;
 
     /**
      * 
@@ -76,6 +79,11 @@ public class NewProjectWizard extends BasicNewResourceWizard {
         fMainPage.setTitle(fTtitle);
         fMainPage.setDescription(fDescription);
         addPage(fMainPage);
+        traceLibraryPathPage = new TraceLibraryPathWizardPage(Messages.NewProjectWizard_Title);
+        traceLibraryPathPage.setTitle(Messages.TraceLibraryPathWizardPage_Title);
+        traceLibraryPathPage.setDescription(Messages.TraceLibraryPathWizardPage_Description);
+        addPage(traceLibraryPathPage);
+        
     }
 
     /* (non-Javadoc)
@@ -94,6 +102,10 @@ public class NewProjectWizard extends BasicNewResourceWizard {
         fProjectName = fMainPage.getProjectName();
         fProjectLocation = fMainPage.useDefaults() ? null : fMainPage.getLocationURI();
         fProject = createProject(fProjectName, fProjectLocation, new NullProgressMonitor());
+        String traceLibraryPath = traceLibraryPathPage.getPath();
+        if (traceLibraryPath != null){
+        	return TraceHelper.setProjectPreference(fProject, "traceLibraryPath", traceLibraryPath);
+        }
         return true;
     }
 

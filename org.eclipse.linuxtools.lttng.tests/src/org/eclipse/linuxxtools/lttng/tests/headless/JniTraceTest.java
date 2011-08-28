@@ -43,7 +43,7 @@ public class JniTraceTest {
         try {
         	// Get the trace from the Factory... 
         	//	This assume the path is correct and that the correct version of the lib is installed
-            tmptrace = JniTraceFactory.getJniTrace(TRACE_PATH, false);
+            tmptrace = JniTraceFactory.getJniTrace(TRACE_PATH, null, false);
         	
             // Seek beginning
             tmptrace.seekToTime(new JniTime(0L));

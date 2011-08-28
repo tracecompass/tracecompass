@@ -55,7 +55,7 @@ public class LttngTraceTest {
 			if ( USE_TEXT_TRACE ) {
 				tmptrace = new LTTngTextTrace(TRACE_PATH, true);
 			} else {
-				tmptrace = new LTTngTrace(TRACE_PATH, true, true);
+				tmptrace = new LTTngTrace(TRACE_PATH, null, true, true);
 			}
 			
 			LttngTimestamp tmpTime = new LttngTimestamp(0L);

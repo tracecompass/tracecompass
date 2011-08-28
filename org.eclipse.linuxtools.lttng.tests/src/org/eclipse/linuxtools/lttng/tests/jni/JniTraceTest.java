@@ -96,7 +96,7 @@ public class JniTraceTest extends TestCase
                 
                 // This trace should be valid
                 try {
-                        tmpTrace = JniTraceFactory.getJniTrace(tracepath1, printLttDebug);
+                        tmpTrace = JniTraceFactory.getJniTrace(tracepath1, null, printLttDebug);
                         //tmpTrace.seekToTime(new JniTime(0L));
                 }
                 catch( JniException e) { }
@@ -112,7 +112,7 @@ public class JniTraceTest extends TestCase
                 
                 // Test constructor with argument on a wrong tracepath
                 try {
-                        testTrace1 = JniTraceFactory.getJniTrace(wrongTracePath, printLttDebug);
+                        testTrace1 = JniTraceFactory.getJniTrace(wrongTracePath, null, printLttDebug);
                         fail("Construction with wrong tracepath should fail!");
                 }
                 catch( JniException e) { 
@@ -120,7 +120,7 @@ public class JniTraceTest extends TestCase
                 
                 // Test constructor with argument on a correct tracepath
                 try {
-                        testTrace1 = JniTraceFactory.getJniTrace(tracepath1, printLttDebug);
+                        testTrace1 = JniTraceFactory.getJniTrace(tracepath1, null, printLttDebug);
                 }
                 catch( JniException e) {
                         fail("Construction with correct tracepath failed!");

@@ -42,7 +42,7 @@ public class JniMarkerTest extends TestCase
                 // This trace should be valid
                 // We will read the second event to have something interesting to test on
                 try {
-                        tmpEvent = JniTraceFactory.getJniTrace(tracepath, printLttDebug).requestEventByName(eventName);
+                        tmpEvent = JniTraceFactory.getJniTrace(tracepath, null, printLttDebug).requestEventByName(eventName);
                         tmpEvent.readNextEvent();
                         
                         tmpMarker = tmpEvent.requestEventMarker();
@@ -63,7 +63,7 @@ public class JniMarkerTest extends TestCase
                 
                 // This event should be valid and will be used in test
                 try {
-                        tmpEvent = JniTraceFactory.getJniTrace(tracepath, printLttDebug).requestEventByName(eventName);
+                        tmpEvent = JniTraceFactory.getJniTrace(tracepath, null, printLttDebug).requestEventByName(eventName);
                 }
                 catch( JniException e) { }
                 

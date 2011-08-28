@@ -1,6 +1,6 @@
 package org.eclipse.linuxtools.lttng.jni_v2_6;
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2011 Ericsson, MontaVista Software
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,8 +9,11 @@ package org.eclipse.linuxtools.lttng.jni_v2_6;
  * 
  * Contributors:
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
+ *   Yufen Kuo       (ykuo@mvista.com) - add support to allow user specify trace library path
  *******************************************************************************/
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.lttng.jni.JniTracefile;
 import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id;
@@ -65,7 +68,13 @@ public class JniTrace_v2_6 extends JniTrace {
      */
     @Override
 	public int initializeLibrary() {
-    	return ltt_initializeHandle(LIBRARY_NAME);
+        if (getTraceLibPath() == null)
+            return ltt_initializeHandle(LIBRARY_NAME);
+        else{
+            IPath path = new Path(getTraceLibPath());
+            IPath traceLib = path.append(LIBRARY_NAME);
+            return ltt_initializeHandle(traceLib.toOSString());
+        }
     }
     
     

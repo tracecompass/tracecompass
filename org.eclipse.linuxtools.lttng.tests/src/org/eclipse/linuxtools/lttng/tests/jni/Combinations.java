@@ -100,7 +100,7 @@ public class Combinations extends TestCase {
 		JniEvent tmpEvent = null;
 		// This trace should be valid
 		try {
-			tmpEvent = JniTraceFactory.getJniTrace(tracepath, printLttDebug).requestEventByName(eventName);
+			tmpEvent = JniTraceFactory.getJniTrace(tracepath, null, printLttDebug).requestEventByName(eventName);
 		} catch (JniException e) {
 		}
 
@@ -121,7 +121,7 @@ public class Combinations extends TestCase {
 		JniTrace trace = null;
 		JniEvent event = null;
 		try {
-			trace = JniTraceFactory.getJniTrace(tracepath, printLttDebug);
+			trace = JniTraceFactory.getJniTrace(tracepath, null, printLttDebug);
 		} catch (JniException e) {
 			e.printStackTrace();
 		}

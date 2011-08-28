@@ -1,7 +1,7 @@
 package org.eclipse.linuxtools.lttng.jni;
 
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2011 Ericsson, MontaVista Software
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,6 +10,7 @@ package org.eclipse.linuxtools.lttng.jni;
  * 
  * Contributors:
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
+ *   Yufen Kuo       (ykuo@mvista.com) - add support to allow user specify trace library path
  *******************************************************************************/
 
 import java.util.HashMap;
@@ -84,6 +85,9 @@ public abstract class JniTrace extends Jni_C_Common {
     // flag determine if live trace is supported or not
     // will be set to false in constructor if opening in live mode fails
     private boolean isLiveTraceSupported = true;
+    
+    // If traceLibPath is specified, it will be used to construct the complete path of the traceread library
+    private String traceLibPath;
 
     // This need to be called prior to any operation
     protected native int ltt_initializeHandle(String libname);
@@ -177,8 +181,6 @@ public abstract class JniTrace extends Jni_C_Common {
         tracepath = newpath;
         thisTracePtr = new Jni_C_Pointer_And_Library_Id();
         printLttDebug = newPrintDebug;
-
-        openTrace(newpath);
     }
 
     /**
@@ -991,5 +993,21 @@ public abstract class JniTrace extends Jni_C_Common {
      * @see org.eclipse.linuxtools.lttng.jni.JniTrace
      */
     public abstract JniTracefile allocateNewJniTracefile(Jni_C_Pointer_And_Library_Id newPtr, JniTrace newParentTrace) throws JniException;
+
+    /**
+     * Function set trace library path
+     * @param traceLibPath      Path to a <b>directory</b> that contain LTTng trace libraries
+     */
+    public void setTraceLibPath(String traceLibPath) {
+        this.traceLibPath = traceLibPath;
+    }
+
+    /**
+     * Function to get trace library path
+     * @return      Path to a <b>directory</b> that contain LTTng trace libraries
+     */
+    public String getTraceLibPath() {
+        return traceLibPath;
+    }
 
 }

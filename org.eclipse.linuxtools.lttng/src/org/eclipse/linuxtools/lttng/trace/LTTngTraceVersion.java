@@ -1,6 +1,6 @@
 package org.eclipse.linuxtools.lttng.trace;
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2011 Ericsson, MontaVista Software
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@ package org.eclipse.linuxtools.lttng.trace;
  * 
  * Contributors:
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
+ *   Yufen Kuo       (ykuo@mvista.com) - add support to allow user specify trace library path
  *******************************************************************************/
 
 import org.eclipse.linuxtools.lttng.exceptions.LttngException;
@@ -25,6 +26,8 @@ import org.eclipse.linuxtools.lttng.jni.factory.JniTraceVersion;
 public class LTTngTraceVersion {
 	
 	private String tracepath = null;
+	private String traceLibPath = null;
+	
 	private JniTraceVersion traceVersion = new JniTraceVersion();
 	
 	/*
@@ -39,14 +42,14 @@ public class LTTngTraceVersion {
 	 * Default constructor, takes a tracepath as parameter. 
 	 * 
 	 * @param newPath			(Valid) path to a LTTng trace <b>directory</b>. 
-	 * 
+	 * @param newLibPath		(Valid) path to a LTTng trace library<b>directory</b>. 
 	 * @throws LttngException	Throwed if something go wrong (bad tracepath or the C library could not be loaded).
 	 */
-	public LTTngTraceVersion(String newPath) throws LttngException {
+	public LTTngTraceVersion(String newPath, String newLibPath) throws LttngException {
 		tracepath = newPath;
-		
+		traceLibPath = newLibPath;
 		// Fill the new traceversion object
-		fillJniTraceVersion(tracepath);
+		fillJniTraceVersion(tracepath, newLibPath);
 	}
 	
 	/*
@@ -54,14 +57,15 @@ public class LTTngTraceVersion {
 	 * This need to be done each time the tracepath is changed.  
 	 * 
 	 * @param newTracepath		(Valid) path to a LTTng trace <b>directory</b>. 
+	 * @param newTraceLibPath	(Valid) path to a LTTng trace library<b>directory</b>. 
 	 * 
 	 * @throws LttngException	If something go wrong (bad tracepath or the C library could not be loaded).
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.jni.factory.JniTraceVersion
 	 */
-	private void fillJniTraceVersion(String newTracepath) throws LttngException {
+	private void fillJniTraceVersion(String newTracepath, String newTraceLibPath) throws LttngException {
 		try {
-			traceVersion.readVersionFromTrace(newTracepath);
+			traceVersion.readVersionFromTrace(newTracepath, newTraceLibPath);
 		}
 		catch (JniTraceVersionException e) {
 			throw new LttngException( e.toString() );
@@ -136,11 +140,13 @@ public class LTTngTraceVersion {
 	 * Errors will be catched but a warning will be printed if something go wrong.
 	 * 
 	 * @param newTracepath	The new tracepath to set.
+	 * @param newLibPath    The new trace library path to set.
 	 */
-	public void setTracepath(String newTracepath) {
+	public void setTracepath(String newTracepath, String newLibPath) {
 		try {
-			fillJniTraceVersion(newTracepath);
+			fillJniTraceVersion(newTracepath, newLibPath);
 			tracepath = newTracepath;
+			traceLibPath = newLibPath;
 		}
 		catch (LttngException e) {
 			System.out.println("Could not get the trace version from the given path." + //$NON-NLS-1$
@@ -153,5 +159,7 @@ public class LTTngTraceVersion {
 	public String toString() {
 		return "LTTngTraceVersion : [" + getTraceFloatVersion() + "]";
 	}
-	
+	public String getTraceLibPath() {
+		return traceLibPath;
+	}
 }

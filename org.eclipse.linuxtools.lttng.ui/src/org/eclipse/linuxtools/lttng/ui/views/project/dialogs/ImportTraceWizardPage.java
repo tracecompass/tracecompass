@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009, 2011 Ericsson, MontaVista Software
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,13 +8,16 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Yufen Kuo       (ykuo@mvista.com) - add support to allow user specify trace library path
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng.ui.views.project.dialogs;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.linuxtools.lttng.exceptions.LttngException;
 import org.eclipse.linuxtools.lttng.trace.LTTngTraceVersion;
+import org.eclipse.linuxtools.lttng.ui.TraceHelper;
 import org.eclipse.linuxtools.lttng.ui.views.project.handlers.TraceErrorHandler;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectNode;
 import org.eclipse.ui.IWorkbench;
@@ -31,11 +34,13 @@ public class ImportTraceWizardPage extends WizardFileSystemResourceImportPage1 {
     private boolean isContainerSet = false;
     private String initialContainerString = ""; //$NON-NLS-1$
     private String selectedSourceDirectory = ""; //$NON-NLS-1$
+    private IProject project;
 
     public ImportTraceWizardPage(IWorkbench workbench, IStructuredSelection selection) {
 	super(workbench, selection);
 
 	LTTngProjectNode folder = (LTTngProjectNode) selection.getFirstElement();
+	project = folder.getProject();
 	String path = folder.getTracesFolder().getFolder().getFullPath().toOSString();
 
 	initialContainerString = path;
@@ -130,9 +135,9 @@ public class ImportTraceWizardPage extends WizardFileSystemResourceImportPage1 {
     public boolean isPathLttngTrace(String path) throws LttngException {
 
 	boolean returnedValue = true;
-
+    String traceLibPath = TraceHelper.getTraceLibDirFromProject(project);
 	// Ask for a LttngTraceVersion for the given path
-	LTTngTraceVersion traceVersion = new LTTngTraceVersion(path);
+	LTTngTraceVersion traceVersion = new LTTngTraceVersion(path, traceLibPath);
 
 	// If this is not a valid LTTng trace
 	if (traceVersion.isValidLttngTrace() == false) {

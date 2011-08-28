@@ -83,7 +83,7 @@ public class JniEventTest extends TestCase
                 
                 // This trace should be valid
                 try {
-                        tmpEvent = JniTraceFactory.getJniTrace(tracepath, printLttDebug).requestEventByName(eventName);
+                        tmpEvent = JniTraceFactory.getJniTrace(tracepath, null, printLttDebug).requestEventByName(eventName);
                 }
                 catch( JniException e) { }
                 
@@ -101,7 +101,7 @@ public class JniEventTest extends TestCase
                 
                 // This trace should be valid and will be used in test
                 try {
-                        testTracefile = JniTraceFactory.getJniTrace(tracepath, printLttDebug).requestTracefileByName(eventName);
+                        testTracefile = JniTraceFactory.getJniTrace(tracepath, null, printLttDebug).requestTracefileByName(eventName);
                 }
                 catch( JniException e) { }
                 

@@ -1,6 +1,6 @@
 package org.eclipse.linuxtools.lttng.jni.factory;
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2011 Ericsson, MontaVista Software
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,7 +9,10 @@ package org.eclipse.linuxtools.lttng.jni.factory;
  * 
  * Contributors:
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
+ *   Yufen Kuo       (ykuo@mvista.com) - add support to allow user specify trace library path
  *******************************************************************************/
+
+import java.io.File;
 
 import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.exception.JniTraceVersionException;
@@ -26,6 +29,8 @@ import org.eclipse.linuxtools.lttng.jni.exception.JniTraceVersionException;
  */
 public class JniTraceVersion {
 	
+	private static final String LTTVTRACEREAD_LOADER_LIBNAME = "lttvtraceread_loader";
+
 	// Native access functions
 	protected native void ltt_getTraceVersion(String tracepath);
 	
@@ -35,6 +40,8 @@ public class JniTraceVersion {
 	
 	// To store the given tracepath
 	private String tracepath = ""; //$NON-NLS-1$
+	// To store the given trace lib path
+	private String traceLibPath = ""; //$NON-NLS-1$
 	
 	// Was the trace read already?
 	private boolean wasTraceRead = false;
@@ -54,12 +61,13 @@ public class JniTraceVersion {
      * This constructor read the version number from the trace, so it might throw.
      * 
      * @param newTracepath 		The <b>directory</b> of the trace to read.
+     * @param traceLibPath 		The <b>directory</b> of the trace libraries.
      * 
      * @exception JniException	If the library can not be loaded,if the path is wrong or if something go wrong during the read.
      */
-	public JniTraceVersion(String newTracepath) throws JniTraceVersionException {
+	public JniTraceVersion(String newTracepath, String traceLibPath) throws JniTraceVersionException {
 		// Read the version number from the trace 
-		readVersionFromTrace(newTracepath);
+		readVersionFromTrace(newTracepath, traceLibPath);
 	}
 	
 	/**
@@ -80,7 +88,7 @@ public class JniTraceVersion {
 	 */
 	private void readVersionNumberNofail() {
 		try {
-			readVersionFromTrace(tracepath);
+			readVersionFromTrace(tracepath, traceLibPath);
 		}
 		catch(JniTraceVersionException e) { 
 			// Yes, we do ignore exception.
@@ -94,7 +102,7 @@ public class JniTraceVersion {
 	 * 
 	 */
 	public void readVersionNumber() throws JniTraceVersionException {
-		readVersionFromTrace(tracepath);
+		readVersionFromTrace(tracepath, traceLibPath);
 	}
 	
 	/**
@@ -104,7 +112,7 @@ public class JniTraceVersion {
 	 * This function throw if the library can not be loaded,if the path is wrong or if something go wrong during the read.
 	 * 
 	 */
-	public void readVersionFromTrace(String newTracepath) throws JniTraceVersionException {
+	public void readVersionFromTrace(String newTracepath, String newTraceLibPath) throws JniTraceVersionException {
 		
 		// Verify that the tracepath isn't obliviously wrong (null or empty)
 		if ( (newTracepath == null) || (newTracepath.equals("") ) ) { //$NON-NLS-1$
@@ -114,15 +122,20 @@ public class JniTraceVersion {
 			// Otherwise set the path in case it was changed
 			tracepath = newTracepath;
 		}
+		traceLibPath = newTraceLibPath;
 		
 		try {
-			// Load the C library here. 
-			// If LD_LIBRARY_PATH is not set correctly this will raise a java.lang.UnsatisfiedLinkError
-			System.loadLibrary("lttvtraceread_loader"); //$NON-NLS-1$
-			
+			if (newTraceLibPath == null || newTraceLibPath.isEmpty()) {
+				// Load the C library here.
+				// If LD_LIBRARY_PATH is not set correctly this will raise a java.lang.UnsatisfiedLinkError
+				System.loadLibrary(LTTVTRACEREAD_LOADER_LIBNAME); //$NON-NLS-1$
+			} else {
+				File loaderLib = new File(newTraceLibPath, System.mapLibraryName(LTTVTRACEREAD_LOADER_LIBNAME));
+                System.load(loaderLib.getCanonicalPath());
+			}
 			// Assuming the C library loaded correctly, call the JNI here.
 			ltt_getTraceVersion(tracepath);
-			
+
 			// We can now assume that the trace was read
 			wasTraceRead = true;
 		}

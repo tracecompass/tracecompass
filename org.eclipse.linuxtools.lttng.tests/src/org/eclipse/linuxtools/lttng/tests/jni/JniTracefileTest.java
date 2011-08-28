@@ -78,7 +78,7 @@ public class JniTracefileTest extends TestCase
                 
                 // This trace should be valid
                 try {
-                        tmpTracefile = JniTraceFactory.getJniTrace(tracepath1, printLttDebug).requestTracefileByName(tracefileName1);
+                        tmpTracefile = JniTraceFactory.getJniTrace(tracepath1, null, printLttDebug).requestTracefileByName(tracefileName1);
                         
                 }
                 catch( JniException e) { }
@@ -96,7 +96,7 @@ public class JniTracefileTest extends TestCase
                 
                 // This trace should be valid and will be used in test
                 try {
-                        testTrace = JniTraceFactory.getJniTrace(tracepath1, printLttDebug);
+                        testTrace = JniTraceFactory.getJniTrace(tracepath1, null, printLttDebug);
                 }
                 catch( JniException e) { }
                 

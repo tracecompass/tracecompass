@@ -173,6 +173,12 @@
             id="org.eclipse.linuxtools.lttng.ui.command.project.refresh"
             name="%commands.project.refresh">
       </command>
+       <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.project.category"
+            description="%commands.project.property.description"
+            id="org.eclipse.linuxtools.lttng.ui.command.project.property"
+            name="%commands.project.property">
+      </command>
       <category
             description="%commands.trace.category.description"
             id="org.eclipse.linuxtools.lttng.ui.commands.trace.category"
@@ -346,6 +352,12 @@
                label="%commands.project.refresh"
                style="push">
          </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.project.property"
+               id="org.eclipse.linuxtools.lttng.ui.menu.popup.project.property"
+               label="%commands.project.property"
+               style="push">
+         </command>
       </menuContribution>
    </extension>
    <extension
@@ -410,6 +422,10 @@
       <handler
             class="org.eclipse.linuxtools.lttng.ui.views.project.handlers.RefreshHandler"
             commandId="org.eclipse.linuxtools.lttng.ui.command.project.refresh">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.project.handlers.ProjectPropertyHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.project.property">
       </handler>
    </extension>
 
@@ -709,6 +725,20 @@
          </action>
       </viewContribution>
      
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="org.eclipse.linuxtools.lttng.ui.views.project.dialogs.TraceLibraryPathPropertyPage"
+            id="org.eclipse.linuxtools.lttng.ui.propertyPage.libPath"
+            name="%project.propertyPage.tracelibPath">
+         <filter name="nature"
+                value="org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature" />
+            <enabledWhen>
+                <adapt type="org.eclipse.core.resources.IProject">
+                </adapt>
+            </enabledWhen>
+      </page>
    </extension>
 
 </plugin>

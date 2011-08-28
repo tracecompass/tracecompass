@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009, 2011 Ericsson, Montavista Software
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,12 +8,14 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Yufen Kuo       (ykuo@mvista.com) - add support to allow user specify trace library path
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng.ui.views.project;
 
 import java.io.FileNotFoundException;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -28,6 +30,7 @@ import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.state.experiment.StateManagerFactory;
 import org.eclipse.linuxtools.lttng.trace.LTTngExperiment;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
+import org.eclipse.linuxtools.lttng.ui.TraceHelper;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.ILTTngProjectTreeNode;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentNode;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectContentProvider;
@@ -179,7 +182,9 @@ public class ProjectView extends TmfView {
             ITmfTrace[] traces = new ITmfTrace[1];
             IResource res = traceNode.getFolder();
             String location = res.getLocation().toOSString();
-            ITmfTrace trace = new LTTngTrace(location, waitForCompletion);
+            IProject project = traceNode.getProject().getProject();
+            String traceLibPath = TraceHelper.getTraceLibDirFromProject(project);
+            ITmfTrace trace = new LTTngTrace(location, traceLibPath, waitForCompletion, false);
             traces[0] = trace;
             fSelectedExperiment = new LTTngExperiment<LttngEvent>(LttngEvent.class, traceNode.getName(), traces);
             TmfExperiment.setCurrentExperiment(fSelectedExperiment);
@@ -216,7 +221,9 @@ public class ProjectView extends TmfView {
         	for (int i = 0; i < nbTraces; i++) {
         		IResource res = traceEntries[i].getFolder();
         		String location = res.getLocation().toOSString();
-        		ITmfTrace trace = new LTTngTrace(location, waitForCompletion);
+        		IProject project = res.getProject().getProject();
+                String traceLibPath = TraceHelper.getTraceLibDirFromProject(project);
+        		ITmfTrace trace = new LTTngTrace(location, traceLibPath, waitForCompletion, false);
                 traces[i] = trace;
         	}
             fSelectedExperiment = new LTTngExperiment<LttngEvent>(LttngEvent.class, expId, traces);
