@@ -332,8 +332,10 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
                         public void handleCompleted() {
                             nbRead[0] += getNbRead();
                             if (nbRead[0] >= request.getNbRequested() || (getNbRead() < CHUNK_SIZE[0])) {
-                                if (isCancelled()) {
+                                if (this.isCancelled()) {
                                     request.cancel();
+                                } else if (this.isFailed()) {
+                                  request.fail();  
                                 } else {
                                     request.done();
                                 }

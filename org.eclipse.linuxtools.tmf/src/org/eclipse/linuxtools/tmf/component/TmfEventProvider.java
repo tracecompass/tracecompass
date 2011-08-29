@@ -110,10 +110,11 @@ public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvid
 						public void handleCompleted() {
 							nbRead[0] += this.getNbRead();
 							if (nbRead[0] >= request.getNbRequested() || (this.getNbRead() < CHUNK_SIZE[0])) {
-								if (isCancelled()) { 
+								if (this.isCancelled()) { 
 									request.cancel();
-								}
-								else {
+								} else if (this.isFailed()) {
+								    request.fail();  
+								} else {
 									request.done();
 								}
 								isFinished[0] = Boolean.TRUE;

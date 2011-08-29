@@ -491,12 +491,15 @@ public abstract class JniTrace extends Jni_C_Common {
      * Note : If the events were read before, the top event and the event
      * currently loaded (currentEvent) are most likely the same.
      * 
-     * @return The top event in the stack or null if no event is available.
+     * @@return The top event in the stack or null if no event is available or if the heap is null.
      * 
      * @see org.eclipse.linuxtools.lttng.jni.JniEvent
      */
     public JniEvent findNextEvent() {
-        return eventsHeap.peek();
+        if (eventsHeap != null) {
+            return eventsHeap.peek();
+        }
+        return null;
     }
 
     /**
@@ -510,7 +513,7 @@ public abstract class JniTrace extends Jni_C_Common {
      */
     public JniEvent readNextEvent() {
         // Get the "next" event on the top of the heap but DO NOT remove it
-        JniEvent tmpEvent = eventsHeap.peek();
+        JniEvent tmpEvent = findNextEvent();
 
         // If the event is null, it was the last one in the trace we can leave
         // the function
@@ -537,7 +540,7 @@ public abstract class JniTrace extends Jni_C_Common {
             }
 
             // Pick the top event again
-            tmpEvent = eventsHeap.peek();
+            tmpEvent = findNextEvent();
 
             // Save the event we just read as the "current event"
             currentEvent = tmpEvent;

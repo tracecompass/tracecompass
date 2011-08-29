@@ -1155,7 +1155,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 	}
 
 	@Override
-	public void dispose() {
+	public synchronized void dispose() {
 		currentJniTrace.closeTrace();
 		super.dispose();
 	}

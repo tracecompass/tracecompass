@@ -26,11 +26,13 @@ import org.eclipse.linuxtools.lttng.request.RequestStartedSignal;
 import org.eclipse.linuxtools.lttng.state.evProcessor.ITransEventProcessor;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.lttng.ui.model.trange.ItemContainer;
+import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.signal.TmfExperimentDisposedSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
@@ -102,6 +104,15 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	    return INPUT_CHANGED_REFRESH;
 	}
 
+   /**
+     * Cancel the ongoing request if another experiment is being selected
+     * @param experimentDisposedSignal
+     */
+    @TmfSignalHandler
+    public void experimentDisposed(TmfExperimentDisposedSignal<? extends TmfEvent> experimentDisposedSignal) {
+        fProvider.conditionallyCancelRequests();
+    }
+	
 	/*
 	 * (non-Javadoc)
 	 * 
