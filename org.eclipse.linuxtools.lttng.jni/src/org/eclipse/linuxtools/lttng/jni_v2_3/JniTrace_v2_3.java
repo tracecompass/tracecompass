@@ -10,10 +10,9 @@ package org.eclipse.linuxtools.lttng.jni_v2_3;
  * Contributors:
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
  *   Yufen Kuo       (ykuo@mvista.com) - add support to allow user specify trace library path
+ *   Yufen Kuo       (ykuo@mvista.com) - bug 340341: handle gracefully when native library failed to initialize
  *******************************************************************************/
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.lttng.jni.JniTracefile;
 import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id;
@@ -58,27 +57,20 @@ public class JniTrace_v2_3 extends JniTrace {
     
     public JniTrace_v2_3(Jni_C_Pointer_And_Library_Id newPtr, boolean newPrintDebug) throws JniException {
     	super(newPtr, newPrintDebug);
-    }
-    
-    
+    }   
+
     /**
-     * Initialize the C library.<p>
+     * Get the trace library name
+     * <p>
      * 
-     * Call the library loader with the .so we wish to load.
+     * Get the version specific native trace library name
      * 
-     * @return 	The library id if sucessful, -1 if something went wrong
+     * @return The native trace library name
      */
     @Override
-	public int initializeLibrary() {
-        if (getTraceLibPath() == null)
-            return ltt_initializeHandle(LIBRARY_NAME);
-        else{
-            IPath path = new Path(getTraceLibPath());
-            IPath traceLib = path.append(LIBRARY_NAME);
-            return ltt_initializeHandle(traceLib.toOSString());
-        }
+    public String getTraceLibName() {
+        return LIBRARY_NAME;
     }
-    
     
     /**
      * Allocate (call constructor for) a new JniTracefile.<p>
@@ -93,4 +85,5 @@ public class JniTrace_v2_3 extends JniTrace {
 	public JniTracefile allocateNewJniTracefile(Jni_C_Pointer_And_Library_Id newPtr, JniTrace newParentTrace) throws JniException {
     	return new JniTracefile_v2_3(newPtr, newParentTrace);
     }
+
 }

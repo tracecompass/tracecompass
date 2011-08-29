@@ -9,6 +9,7 @@
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Yufen Kuo       (ykuo@mvista.com) - add support to allow user specify trace library path
+ *   Yufen Kuo       (ykuo@mvista.com) - bug 340341: handle gracefully when native library failed to initialize
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng.ui.views.project;
@@ -22,6 +23,7 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -31,6 +33,7 @@ import org.eclipse.linuxtools.lttng.state.experiment.StateManagerFactory;
 import org.eclipse.linuxtools.lttng.trace.LTTngExperiment;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.lttng.ui.TraceHelper;
+import org.eclipse.linuxtools.lttng.ui.views.project.dialogs.Messages;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.ILTTngProjectTreeNode;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentNode;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectContentProvider;
@@ -198,7 +201,7 @@ public class ProjectView extends TmfView {
         } catch (FileNotFoundException e) {
             return;
         } catch (Exception e) {
-            e.printStackTrace();
+            MessageDialog.openError(getViewSite().getShell(), Messages.SelectTrace_ErrorTitle, e.getMessage());
         }
     }
 

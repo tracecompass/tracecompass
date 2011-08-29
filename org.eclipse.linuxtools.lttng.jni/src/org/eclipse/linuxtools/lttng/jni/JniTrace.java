@@ -11,12 +11,15 @@ package org.eclipse.linuxtools.lttng.jni;
  * Contributors:
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
  *   Yufen Kuo       (ykuo@mvista.com) - add support to allow user specify trace library path
+ *   Yufen Kuo       (ykuo@mvista.com) - bug 340341: handle gracefully when native library failed to initialize
  *******************************************************************************/
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.lttng.jni.common.JniTime;
 import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id;
 import org.eclipse.linuxtools.lttng.jni.exception.JniException;
@@ -323,9 +326,13 @@ public abstract class JniTrace extends Jni_C_Common {
             // Populate the trace with LTT information
             populateTraceInformation();
         } else {
-            thisTracePtr = new Jni_C_Pointer_And_Library_Id();
-            throw new JniTraceException("Failed to initialize library! Is the trace version supported?\n" + //$NON-NLS-1$
-                    "Make sure you have the correct LTTv library compiled. (openTrace)"); //$NON-NLS-1$
+        	thisTracePtr = new Jni_C_Pointer_And_Library_Id();
+            throw new JniTraceException("Failed to initialize the parsing library:\n\t" + getTraceLibFullPath() //$NON-NLS-1$
+                    + "\n\nIs the C library supporting that trace format properly installed?\n\n" //$NON-NLS-1$
+                    +  "Make sure that:\n" //$NON-NLS-1$
+                    +  "\t- The correct parsing library is installed\n" //$NON-NLS-1$
+                    +  "\t- The library is accessible (LD_LIBRARY_PATH or LTTng project properties)\n" //$NON-NLS-1$
+                    +  "\nRefer to the LTTng User Guide for more information"); //$NON-NLS-1$
         }
     }
 
@@ -940,7 +947,7 @@ public abstract class JniTrace extends Jni_C_Common {
         returnData += "endTime                              : " + endTime.getReferenceToString() + "\n";
         returnData += "   seconds                           : " + endTime.getSeconds() + "\n";
         returnData += "   nanoSeconds                       : " + endTime.getNanoSeconds() + "\n";
-        returnData += "tracefilesMap                        : " + tracefilesMap.keySet() + "\n"; // Hack
+        returnData += "tracefilesMap                        : " + tracefilesMap.keySet() + "\n";// Hack
                                                                                                  // to
                                                                                                  // avoid
                                                                                                  // ending
@@ -956,20 +963,12 @@ public abstract class JniTrace extends Jni_C_Common {
     // You MUST override those in your version specific implementation
 
     /**
-     * Function place holder to load the correct C library.
-     * <p>
+     * Function place holder to get the C library name.<p>
      * <br>
-     * Can be as simple as calling ltt_initializeHandle(LIBRARY_NAME) with the
-     * correct .so instead of LIBRARY_NAME.<br>
-     * You may also want to perform some check or some additionnal validations.<br>
-     * <br>
-     * <b>!! Override this with you version specific implementation.</b><br>
-     * 
-     * @return integer that is the library id, or -1 if the load was
-     *         unsuccessful
+     * @return      LTTng native trace library name
      */
-    public abstract int initializeLibrary();
-
+    public abstract String getTraceLibName();
+    
     /**
      * Function place holder to allocate a new JniTracefile.
      * <p>
@@ -1008,6 +1007,36 @@ public abstract class JniTrace extends Jni_C_Common {
      */
     public String getTraceLibPath() {
         return traceLibPath;
+    }
+    /**
+     * Initialize the C library.
+     * <p>
+     * 
+     * Call the library loader with the .so we wish to load.
+     * 
+     * @return The library id if successful, -1 if something went wrong
+     */
+    public int initializeLibrary() {
+        return ltt_initializeHandle(getTraceLibFullPath());
+    }
+
+    /**
+     * Get the full trace library path.
+     * <p>
+     * 
+     * Construct the full trace library path if traceLibPath is specified,
+     * otherwise just the library name
+     * 
+     * @return The full trace library path
+     */
+    public String getTraceLibFullPath() {
+        if (getTraceLibPath() == null)
+            return getTraceLibName();
+        else {
+            IPath path = new Path(getTraceLibPath());
+            IPath traceLib = path.append(getTraceLibName());
+            return traceLib.toOSString();
+        }
     }
 
 }
