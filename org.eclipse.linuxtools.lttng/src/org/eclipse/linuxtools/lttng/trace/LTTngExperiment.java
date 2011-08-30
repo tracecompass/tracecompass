@@ -250,7 +250,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
                     try {
                         sendRequest((ITmfDataRequest<T>) request);
                         request.waitForCompletion();
-                        if (timeRange != null && timeRange != TmfTimeRange.Null) {
+                        if (timeRange != null && !timeRange.equals(TmfTimeRange.Null)) {
                             TmfExperimentRangeUpdatedSignal signal = new TmfExperimentRangeUpdatedSignal(LTTngExperiment.this, LTTngExperiment.this,
                                     timeRange);
                             broadcast(signal);
