@@ -571,59 +571,55 @@ public class KernelStatisticsData extends StatisticsData {
     public void increase(LttngEvent event, LttngTraceState traceState, int values) {
         FixedArray[] paths = getNormalPaths(event, traceState);
         Long cpu = event.getCpuId();
-        LttngProcessState process = traceState.getRunning_process().get(cpu);
+		LttngProcessState process = traceState.getRunning_process().get(cpu);
 
-        for (int j = 0; j < paths.length; ++j) {
-            StatisticsTreeNode node = getOrCreate(paths[j], event, traceState, j, false);
+        // Updating the cumulative CPU time
+        if ((values & Values.STATE_CUMULATIVE_CPU_TIME) != 0) {
+            if (process.getState().getProc_status().equals(ProcessStatus.LTTV_STATE_RUN) && !process.getState().getExec_mode().equals(ExecutionMode.LTTV_STATE_MODE_UNKNOWN)) {
+                long cumulativeCpuTime = process.getState().getCum_cpu_time();
+                long delta = event.getTimestamp().getValue() - process.getState().getChange_LttTime();
+                process.getState().setCum_cpu_time(cumulativeCpuTime + delta);
+            }
+        }
+        if ((values & Values.CUMULATIVE_CPU_TIME) != 0) {
+            if (!process.getState().getExec_mode().equals(ExecutionMode.LTTV_STATE_MODE_UNKNOWN)) {
+                long cumulativeCpuTime = process.getState().getCum_cpu_time();
+                long delta = event.getTimestamp().getValue() - process.getState().getEntry_LttTime();
+                long newCumulativeCpuTime = cumulativeCpuTime + delta;
+                process.getState().setCum_cpu_time(newCumulativeCpuTime);
+            } else if (process.getState().getProc_status().equals(ProcessStatus.LTTV_STATE_RUN) && !process.getState().getExec_mode().equals(ExecutionMode.LTTV_STATE_MODE_UNKNOWN)) {
+                long cumulativeCpuTime = process.getState().getCum_cpu_time();
+                long delta = event.getTimestamp().getValue() - process.getState().getChange_LttTime();
+                long newCumulativeCpuTime = cumulativeCpuTime + delta;
+                process.getState().setCum_cpu_time(newCumulativeCpuTime);
+            }
+        }
+
+		for (int j = 0; j < paths.length; ++j) {
+			StatisticsTreeNode node = getOrCreate(paths[j], event, traceState, j, false);
 
             if ((values & Values.CPU_TIME) != 0) {
                 // TODO Uncomment if the event after process_exit need to be
                 // count.
                 if ((process.getState().getProc_status().equals(ProcessStatus.LTTV_STATE_RUN) /*
-                                                                                               * ||
-                                                                                               * process
-                                                                                               * .
-                                                                                               * getState
-                                                                                               * (
-                                                                                               * )
-                                                                                               * .
+                                                                                               * || process.getState().
                                                                                                * getProc_status
-                                                                                               * (
-                                                                                               * )
-                                                                                               * .
-                                                                                               * equals
-                                                                                               * (
-                                                                                               * ProcessStatus
-                                                                                               * .
-                                                                                               * LTTV_STATE_EXIT
-                                                                                               * )
+                                                                                               * ().equals(ProcessStatus
+                                                                                               * .LTTV_STATE_EXIT)
                                                                                                */) && !process.getState().getExec_mode().equals(ExecutionMode.LTTV_STATE_MODE_UNKNOWN)) {
                     node.getValue().cpuTime += event.getTimestamp().getValue() - process.getState().getChange_LttTime();
                 }
             }
             if ((values & Values.CUMULATIVE_CPU_TIME) != 0) {
                 if (!process.getState().getExec_mode().equals(ExecutionMode.LTTV_STATE_MODE_UNKNOWN)) {
-                    long cumulativeCpuTime = process.getState().getCum_cpu_time();
-                    long delta = event.getTimestamp().getValue() - process.getState().getEntry_LttTime();
-                    process.getState().setCum_cpu_time(cumulativeCpuTime + delta);
                     node.getValue().cumulativeCpuTime += process.getState().getCum_cpu_time();
                 } else if (process.getState().getProc_status().equals(ProcessStatus.LTTV_STATE_RUN) && !process.getState().getExec_mode().equals(ExecutionMode.LTTV_STATE_MODE_UNKNOWN)) {
-                    long cumulativeCpuTime = process.getState().getCum_cpu_time();
-                    long delta = event.getTimestamp().getValue() - process.getState().getChange_LttTime();
-                    process.getState().setCum_cpu_time(cumulativeCpuTime + delta);
-                    node.getValue().cumulativeCpuTime += process.getState().getCum_cpu_time();
+                     node.getValue().cumulativeCpuTime += process.getState().getCum_cpu_time();
                 }
             }
             if ((values & Values.ELAPSED_TIME) != 0) {
                 if (!process.getState().getExec_mode().equals(ExecutionMode.LTTV_STATE_MODE_UNKNOWN)) {
                     node.getValue().elapsedTime += event.getTimestamp().getValue() - process.getState().getEntry_LttTime();
-                }
-            }
-            if ((values & Values.STATE_CUMULATIVE_CPU_TIME) != 0) {
-                if (process.getState().getProc_status().equals(ProcessStatus.LTTV_STATE_RUN) && !process.getState().getExec_mode().equals(ExecutionMode.LTTV_STATE_MODE_UNKNOWN)) {
-                    long cumulativeCpuTime = process.getState().getCum_cpu_time();
-                    long delta = event.getTimestamp().getValue() - process.getState().getChange_LttTime();
-                    process.getState().setCum_cpu_time(cumulativeCpuTime + delta);
                 }
             }
         }
