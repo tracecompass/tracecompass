@@ -284,7 +284,7 @@ public class TimeScaleCtrl extends TraceCtrl implements MouseListener,
 				if (x + _rect0.width <= rect.x + rect.width)
 					timeDraw.draw(gc, time, _rect0);
 			}
-			if (pixelsPerNanoSec == 0 || time > Long.MAX_VALUE - _timeDelta) {
+			if (pixelsPerNanoSec == 0 || time > Long.MAX_VALUE - _timeDelta || _timeDelta == 0) {
 			    break;
 			}
 			time += _timeDelta;
