@@ -27,18 +27,23 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * <b><u>TmfVirtualTable</u></b>
@@ -73,6 +78,8 @@ public class TmfVirtualTable extends Composite {
 	private Slider fSlider;
 
 	private int fLinuxItemHeight = 0;            // Calculated item height for Linux workaround
+	private TooltipProvider tooltipProvider = null;
+	private IDoubleClickListener doubleClickListener = null;
 	
 	// ------------------------------------------------------------------------
 	// Constructor
@@ -146,7 +153,88 @@ public class TmfVirtualTable extends Composite {
 				}
 			}
 		});
+		// Implement a "fake" tooltip
+		final String TOOLTIP_DATA_KEY = "_TABLEITEM";
+		final Listener labelListener = new Listener () {
+			public void handleEvent (Event event) {
+				Label label = (Label)event.widget;
+				Shell shell = label.getShell ();
+				switch (event.type) {
+				case SWT.MouseDown:
+					Event e = new Event ();
+					e.item = (TableItem) label.getData (TOOLTIP_DATA_KEY);
+					// Assuming table is single select, set the selection as if
+					// the mouse down event went through to the table
+					fTable.setSelection (new TableItem [] {(TableItem) e.item});
+					fTable.notifyListeners (SWT.Selection, e);
+					shell.dispose ();
+					fTable.setFocus();
+					break;
+				case SWT.MouseExit:
+				case SWT.MouseWheel:
+					shell.dispose ();
+					break;
+				}
+			}
+		};
 
+		Listener tableListener = new Listener () {
+			Shell tip = null;
+			Label label = null;
+			public void handleEvent (Event event) {
+				switch (event.type) {
+				case SWT.Dispose:
+				case SWT.KeyDown:
+				case SWT.MouseMove: {
+					if (tip == null) break;
+					tip.dispose ();
+					tip = null;
+					label = null;
+					break;
+				}
+				case SWT.MouseHover: {
+					TableItem item = fTable.getItem (new Point(event.x, event.y));
+					if (item != null) {
+						for(int i=0;i<fTable.getColumnCount();i++){
+							Rectangle bounds = item.getBounds(i);
+							if (bounds.contains(event.x,event.y)){
+								if (tip != null  && !tip.isDisposed()) tip.dispose();
+								if (tooltipProvider == null) {
+									return;
+								} else {
+									String tooltipText = tooltipProvider.getTooltip(i, item.getData());
+									if (tooltipText == null) return;
+									tip = new Shell(fTable.getShell(), SWT.ON_TOP | SWT.NO_FOCUS | SWT.TOOL);
+									tip.setBackground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+									FillLayout layout = new FillLayout();
+									layout.marginWidth = 2;
+									tip.setLayout(layout);
+									label = new Label(tip, SWT.WRAP);
+									label.setForeground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
+									label.setBackground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+									label.setData(TOOLTIP_DATA_KEY, item);
+									label.setText(tooltipText);
+
+									label.addListener(SWT.MouseExit, labelListener);
+									label.addListener(SWT.MouseDown, labelListener);
+									label.addListener(SWT.MouseWheel, labelListener);
+									Point size = tip.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+									Point pt = fTable.toDisplay(bounds.x, bounds.y);
+									tip.setBounds(pt.x, pt.y, size.x, size.y);
+									tip.setVisible(true);
+								}
+								break;
+							}
+						}
+					}
+				}
+				}
+			}
+		};
+		fTable.addListener(SWT.Dispose, tableListener);
+		fTable.addListener(SWT.KeyDown, tableListener);
+		fTable.addListener(SWT.MouseMove, tableListener);
+		fTable.addListener(SWT.MouseHover, tableListener);
 		addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(ControlEvent event) {
@@ -186,6 +274,26 @@ public class TmfVirtualTable extends Composite {
 			public void keyReleased(KeyEvent event) {
 			}
 		});
+
+        fTable.addListener(
+        		SWT.MouseDoubleClick, new Listener() {
+        			@Override
+        			public void handleEvent(Event event) {
+        				if (doubleClickListener != null) {
+        					TableItem item = fTable.getItem (new Point (event.x, event.y));
+        					if (item != null) {
+        						for(int i=0;i<fTable.getColumnCount();i++){
+        							Rectangle bounds = item.getBounds(i);
+        							if (bounds.contains(event.x,event.y)){
+        								doubleClickListener.handleDoubleClick(TmfVirtualTable.this, item, i);
+        								break;
+        							}
+        						}
+        					}
+        				}
+        			}
+        		}
+        );
 	}
 
 	/**
@@ -665,4 +773,33 @@ public class TmfVirtualTable extends Composite {
 		}
 		return null;
 	}
+
+	/**
+	 * @return the tooltipProvider
+	 */
+	public TooltipProvider getTooltipProvider() {
+		return tooltipProvider;
+	}
+
+	/**
+	 * @param tooltipProvider the tooltipProvider to set
+	 */
+	public void setTooltipProvider(TooltipProvider tooltipProvider) {
+		this.tooltipProvider = tooltipProvider;
+	}
+
+	/**
+	 * @return the doubleClickListener
+	 */
+	public IDoubleClickListener getDoubleClickListener() {
+		return doubleClickListener;
+	}
+
+	/**
+	 * @param doubleClickListener the doubleClickListener to set
+	 */
+	public void setDoubleClickListener(IDoubleClickListener doubleClickListener) {
+		this.doubleClickListener = doubleClickListener;
+	}
+	
 }
