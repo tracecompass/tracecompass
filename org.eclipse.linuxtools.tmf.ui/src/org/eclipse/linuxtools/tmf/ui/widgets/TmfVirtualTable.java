@@ -10,6 +10,7 @@
  *   Matthew Khouzam - Initial API and implementation
  *   Francois Chouinard - Refactoring, slider support, bug fixing 
  *   Patrick Tasse - Improvements and bug fixing
+ *   Xavier Raynaud - Improvements
  ******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.widgets;
