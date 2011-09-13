@@ -9,6 +9,7 @@
  * Contributors:
  *   Alvaro Sanchez-Leon - Initial implementation
  *   Michel Dagenais (michel.dagenais@polymtl.ca) - Reference C implementation, used with permission
+ *   Bernd Hufmann - Bug fixes
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.controlflow;
 
@@ -967,13 +968,9 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	 */
 	private synchronized void resizeTableColumns(Table table) {
 		if (table != null) {
-			Composite parent = table.getParent();
-			int tableWidthSum = parent.getBorderWidth();
-
 			TableColumn[] columns = table.getColumns();
 			for (TableColumn column : columns) {
 				column.pack();
-				tableWidthSum += column.getWidth();
 			}
 		}
 	}
