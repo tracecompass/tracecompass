@@ -55,6 +55,7 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.widgets.FilterListDia
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader;
 import org.eclipse.linuxtools.tmf.uml2sd.ITmfSyncSequenceDiagramEvent;
 import org.eclipse.linuxtools.tmf.uml2sd.TmfSyncSequenceDiagramEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
@@ -894,33 +895,48 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     protected void moveToMessageInPage() {
         fLock.lock();
         try {
-            TmfSyncMessage prevMessage = null;
-            TmfSyncMessage syncMessage = null;
-            boolean isExactTime = false;
-            for (int i = 0; i < fFrame.syncMessageCount(); i++) {
-                if (fFrame.getSyncMessage(i) instanceof TmfSyncMessage) {
-                    syncMessage = (TmfSyncMessage) fFrame.getSyncMessage(i);
-                    if (syncMessage.getStartTime().compareTo(fCurrentTime, false) == 0) {
-                        isExactTime = true;
-                        break;
-                    }
-                    else if (syncMessage.getStartTime().compareTo(fCurrentTime, false) > 0) {
-                        if (prevMessage != null) {
-                            syncMessage = prevMessage;
-                            break;
-                        }
-                    }
-                    prevMessage = syncMessage;
-                }
-            }
-            if (fIsSelect && isExactTime) {
-                fView.getSDWidget().moveTo(syncMessage);
-            }
-            else {
-                fView.getSDWidget().ensureVisible(syncMessage);
-                fView.getSDWidget().clearSelection();
-                fView.getSDWidget().redraw();
-            }
+        	if (!fView.getSDWidget().isDisposed()) {
+        		// Check for GUI thread
+        		if(Display.getCurrent() != null) {
+        			// Already in GUI thread - execute directly
+        			TmfSyncMessage prevMessage = null;
+        			TmfSyncMessage syncMessage = null;
+        			boolean isExactTime = false;
+        			for (int i = 0; i < fFrame.syncMessageCount(); i++) {
+        				if (fFrame.getSyncMessage(i) instanceof TmfSyncMessage) {
+        					syncMessage = (TmfSyncMessage) fFrame.getSyncMessage(i);
+        					if (syncMessage.getStartTime().compareTo(fCurrentTime, false) == 0) {
+        						isExactTime = true;
+        						break;
+        					}
+        					else if (syncMessage.getStartTime().compareTo(fCurrentTime, false) > 0) {
+        						if (prevMessage != null) {
+        							syncMessage = prevMessage;
+        							break;
+        						}
+        					}
+        					prevMessage = syncMessage;
+        				}
+        			}
+        			if (fIsSelect && isExactTime) {
+        				fView.getSDWidget().moveTo(syncMessage);
+        			}
+        			else {
+        				fView.getSDWidget().ensureVisible(syncMessage);
+        				fView.getSDWidget().clearSelection();
+        				fView.getSDWidget().redraw();
+        			}
+        		}
+        		else {
+        			// Not in GUI thread - queue action in GUI thread. 
+        			fView.getSDWidget().getDisplay().asyncExec(new Runnable() {
+        				@Override
+        				public void run() {
+        					moveToMessageInPage();
+        				}
+        			});
+        		}
+        	}
         }
         finally {
             fLock.unlock();

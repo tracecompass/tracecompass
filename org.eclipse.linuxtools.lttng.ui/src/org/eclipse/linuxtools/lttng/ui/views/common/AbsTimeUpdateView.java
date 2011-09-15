@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
+ *   Bernd Hufmann - Bug fixes
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.common;
 
@@ -196,17 +197,39 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 		if (synch) {
 			Object source = signal.getSource();
 			if (signal != null && source != null && source != this) {
-				// Internal value is expected in nano seconds.
-				long selectedTime = signal.getCurrentTime().getValue();
-				if (tsfviewer != null) {
-					tsfviewer.setSelectedTime(selectedTime, true, source);
 
-					ParamsUpdater paramUpdater = getParamsUpdater();
-				    Long savedSelTime = paramUpdater.getSelectedTime();
-				    if ((savedSelTime == null) || (savedSelTime != selectedTime)) {
-			            // Update the parameter updater to save the selected time
-			            paramUpdater.setSelectedTime(selectedTime);   
-			        }
+				if ((tsfviewer != null) && (!tsfviewer.getControl().isDisposed())) {
+
+					// Check for GUI thread
+					if (Display.getCurrent() != null) {
+						// GUI thread - execute update right away.
+						
+						// Internal value is expected in nano seconds.
+						long selectedTime = signal.getCurrentTime().getValue();
+						if (tsfviewer != null) {
+							tsfviewer.setSelectedTime(selectedTime, true, source);
+
+							ParamsUpdater paramUpdater = getParamsUpdater();
+						    Long savedSelTime = paramUpdater.getSelectedTime();
+						    if ((savedSelTime == null) || (savedSelTime != selectedTime)) {
+					            // Update the parameter updater to save the selected time
+					            paramUpdater.setSelectedTime(selectedTime);   
+					        }
+						}
+					} else {
+						// Perform the updates on the UI thread
+						
+						// We need to clone the timestamp in the signal so that it won't be overwritten duo to multipe thread access 
+						final TmfTimeSynchSignal savedSignal = new TmfTimeSynchSignal(signal.getSource(), signal.getCurrentTime().clone());
+						tsfviewer.getControl().getDisplay().asyncExec(new Runnable() {
+							@Override
+							public void run() {
+								if ((tsfviewer != null) && (!tsfviewer.getControl().isDisposed())) {
+									synchToTime(savedSignal);
+								}
+							}
+						});
+					}
 				}
 			}
 		}
