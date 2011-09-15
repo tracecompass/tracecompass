@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *   Alvaro Sanchez-Leon (alvsan09@gmail.com) - Initial API and implementation
+ *   Daniel U. Thibault (daniel.thibault@drdc-rddc.gc.ca) - 2011-06-21 Fixes
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.state;
 
@@ -16,11 +17,10 @@ import java.util.HashSet;
 
 /**
  * Singleton
- * Establishes relationships of state related strings, since the strings and
+ * Establishes relationships of state-related strings. Since the strings and
  * relations are fixed, the elements are final i.e. just for reading.
  * 
  * @author alvaro
- * 
  */
 
 @SuppressWarnings("nls")
@@ -29,11 +29,11 @@ public class StateStrings {
 	// ========================================================================
 	// Table data
 	// =======================================================================
-	private static StateStrings instance = null;
     public static final String LTTV_STATE_UNBRANDED = "";
+	private static StateStrings instance = null;
 	private final HashMap<String, Events> eventStrMap = new HashMap<String, Events>();
 	private final HashMap<String, Events> stateTransEventMap = new HashMap<String, Events>();
-	private final String[] syscall_names = new String[256];;
+	private final String[] syscall_names = new String[256];
 	private final String[] trap_names = new String[256];
 	private final String[] irq_names = new String[256];
 	private final String[] soft_irq_names = new String[32];
@@ -66,11 +66,10 @@ public class StateStrings {
 		for (int i = 0; i < 32; i++) {
 			soft_irq_names[i] = "softirq " + i;
 		}
-
 	}
 
 	public static StateStrings getInstance() {
-		// Singleton to provide string constant
+		// Create singleton instance if not already done
 		if (instance == null) {
 			instance = new StateStrings();
 		}
@@ -78,22 +77,31 @@ public class StateStrings {
 	}
 
 	public enum Channels {
-		LTT_CHANNEL_FD_STATE("fd_state"), /* */
-		LTT_CHANNEL_GLOBAL_STATE("global_state"), /* */
-		LTT_CHANNEL_IRQ_STATE("irq_state"), /* */
-		LTT_CHANNEL_MODULE_STATE("module_state"), /* */
-		LTT_CHANNEL_NETIF_STATE("netif_state"), /* */
-		LTT_CHANNEL_SOFTIRQ_STATE("softirq_state"), /* */
-		LTT_CHANNEL_SWAP_STATE("swap_state"), /* */
-		LTT_CHANNEL_SYSCALL_STATE("syscall_state"), /* */
-		LTT_CHANNEL_TASK_STATE("task_state"), /* */
-		LTT_CHANNEL_VM_STATE("vm_state"), /* */
-		LTT_CHANNEL_KPROBE_STATE("kprobe_state"), /* */
-		LTT_CHANNEL_FS("fs"), /* */
-		LTT_CHANNEL_KERNEL("kernel"), /* */
-		LTT_CHANNEL_MM("mm"), /* */
-		LTT_CHANNEL_USERSPACE("userspace"), /* */
-		LTT_CHANNEL_BLOCK("block");
+		LTT_CHANNEL_FD_STATE("fd_state"),           /* file descriptor state events */
+		LTT_CHANNEL_GLOBAL_STATE("global_state"),   /* system state dump events */
+		LTT_CHANNEL_IRQ_STATE("irq_state"),         /* interrupt request (IRQ) events */
+		LTT_CHANNEL_MODULE_STATE("module_state"),   /* modules state events (list of modules) */
+		LTT_CHANNEL_NETIF_STATE("netif_state"),     /* network interface events */
+		LTT_CHANNEL_SOFTIRQ_STATE("softirq_state"), /* soft IRQs state events (soft IRQ vector table) */
+		LTT_CHANNEL_SWAP_STATE("swap_state"),       /* swap state events */
+		LTT_CHANNEL_SYSCALL_STATE("syscall_state"), /* system calls state events (system call table) */
+		LTT_CHANNEL_TASK_STATE("task_state"),       /* process state events */
+		LTT_CHANNEL_VM_STATE("vm_state"),           /* virtual memory events (virtual memory table) */
+		LTT_CHANNEL_KPROBE_STATE("kprobe_state"),   /* kprobe events (kprobe table) */
+		LTT_CHANNEL_FS("fs"),                       /* file system events */
+		LTT_CHANNEL_KERNEL("kernel"),               /* kernel events */
+		LTT_CHANNEL_MM("mm"),                       /* memory management events */
+		LTT_CHANNEL_USERSPACE("userspace"),         /* user space tracing events */
+		LTT_CHANNEL_BLOCK("block");                 /* block devices events */
+                /* remaining channels: */
+/*              LTT_CHANNEL_DEFAULT("default"),             /* null (i.e. no default) */
+/*              LTT_CHANNEL_INPUT("input"),                 /* LTT control command inputs */
+/*              LTT_CHANNEL_IPC("ipc"),	                    /* Inter Process Communication (IPC) events */
+/*              LTT_CHANNEL_JBD2("jbd2"),                   /* Journaling Block Device (JBD) events (JBD2 fork for ext4 file system) */
+/*              LTT_CHANNEL_METADATA("metadata"),           /* trace meta data */
+/*              LTT_CHANNEL_NET("net"),                     /* networking events */
+/*              LTT_CHANNEL_PM("pm"),                       /* power management events */
+/*              LTT_CHANNEL_RCU("rcu"),                     /* Read-Copy-Update (RCU) events */
 
 		private final String inName;
 
@@ -102,11 +110,11 @@ public class StateStrings {
 		}
 
 		public String getInName() {
-			return inName;
+			return this.inName;
 		}
-	};
 
-	//
+		}
+
 	public enum Events {
 		LTT_EVENT_SYSCALL_ENTRY("syscall_entry"), /* */
 		LTT_EVENT_SYSCALL_EXIT("syscall_exit"), /* */
@@ -143,7 +151,9 @@ public class StateStrings {
 		private final String inName;
 		private final HashSet<Fields> children = new HashSet<Fields>();
 		private Channels parent = null;
-		// Expected to cause a state transition default flag
+		// Default value for the "expected to cause a state transition?" flag
+		// Although most events do cause a state transition, the default is kept
+		// false to make this important property explicit in the static initializer
 		private boolean stateTransition = false;
 
 		static {
@@ -175,116 +185,104 @@ public class StateStrings {
 		}
 
 		private static void associate() {
-			// SYSCALL, can receive ip, syscall_id
+			// SYSCALL_ENTRY can receive ip (?), syscall_id
 			LTT_EVENT_SYSCALL_ENTRY.setParent(Channels.LTT_CHANNEL_KERNEL);
-			LTT_EVENT_SYSCALL_ENTRY.getChildren().add(
-					Fields.LTT_FIELD_SYSCALL_ID);
 			LTT_EVENT_SYSCALL_ENTRY.stateTransition = true;
+			LTT_EVENT_SYSCALL_ENTRY.getChildren().add(Fields.LTT_FIELD_SYSCALL_ID);
 
+			//SYSCALL_EXIT
 			LTT_EVENT_SYSCALL_EXIT.setParent(Channels.LTT_CHANNEL_KERNEL);
 			LTT_EVENT_SYSCALL_EXIT.stateTransition = true;
 
-			// TRAP
+			// TRAP_ENTRY
 			LTT_EVENT_TRAP_ENTRY.setParent(Channels.LTT_CHANNEL_KERNEL);
 			LTT_EVENT_TRAP_ENTRY.getChildren().add(Fields.LTT_FIELD_TRAP_ID);
 			LTT_EVENT_TRAP_ENTRY.stateTransition = true;
 
+			// TRAP_EXIT
 			LTT_EVENT_TRAP_EXIT.setParent(Channels.LTT_CHANNEL_KERNEL);
 			LTT_EVENT_TRAP_EXIT.stateTransition = true;
 
-			// PAGE_FAULT
+			// PAGE_FAULT_ENTRY
 			LTT_EVENT_PAGE_FAULT_ENTRY.setParent(Channels.LTT_CHANNEL_KERNEL);
-			LTT_EVENT_PAGE_FAULT_ENTRY.getChildren().add(
-					Fields.LTT_FIELD_TRAP_ID);
+			LTT_EVENT_PAGE_FAULT_ENTRY.getChildren().add(Fields.LTT_FIELD_TRAP_ID);
 			LTT_EVENT_PAGE_FAULT_ENTRY.stateTransition = true;
 
+			// PAGE_FAULT_EXIT
 			LTT_EVENT_PAGE_FAULT_EXIT.setParent(Channels.LTT_CHANNEL_KERNEL);
 			LTT_EVENT_PAGE_FAULT_EXIT.stateTransition = true;
 
-			// PAGE_FAULT_NOSEM
-			LTT_EVENT_PAGE_FAULT_NOSEM_ENTRY
-					.setParent(Channels.LTT_CHANNEL_KERNEL);
-			LTT_EVENT_PAGE_FAULT_NOSEM_ENTRY.getChildren().add(
-					Fields.LTT_FIELD_TRAP_ID);
+			// PAGE_FAULT_NOSEM_ENTRY
+			LTT_EVENT_PAGE_FAULT_NOSEM_ENTRY.setParent(Channels.LTT_CHANNEL_KERNEL);
+			LTT_EVENT_PAGE_FAULT_NOSEM_ENTRY.getChildren().add(Fields.LTT_FIELD_TRAP_ID);
 			LTT_EVENT_PAGE_FAULT_NOSEM_ENTRY.stateTransition = true;
 
-			LTT_EVENT_PAGE_FAULT_NOSEM_EXIT.getChildren().add(
-					Fields.LTT_FIELD_TRAP_ID);
+			// PAGE_FAULT_NOSEM_EXIT
+			LTT_EVENT_PAGE_FAULT_NOSEM_EXIT.setParent(Channels.LTT_CHANNEL_KERNEL);
+			LTT_EVENT_PAGE_FAULT_NOSEM_EXIT.getChildren().add(Fields.LTT_FIELD_TRAP_ID);
 			LTT_EVENT_PAGE_FAULT_NOSEM_EXIT.stateTransition = true;
 
-			// IRQ it also receives fields kernel_mode, ip and handler
+			// IRQ_ENTRY also receives fields kernel_mode, ip and handler (??)
 			LTT_EVENT_IRQ_ENTRY.setParent(Channels.LTT_CHANNEL_KERNEL);
 			LTT_EVENT_IRQ_ENTRY.getChildren().add(Fields.LTT_FIELD_IRQ_ID);
 			LTT_EVENT_IRQ_ENTRY.stateTransition = true;
 
+			// IRQ_EXIT
 			LTT_EVENT_IRQ_EXIT.setParent(Channels.LTT_CHANNEL_KERNEL);
 			LTT_EVENT_IRQ_EXIT.stateTransition = true;
 
-			// SOFT IRQ RAISE
+			// SOFT_IRQ_RAISE
 			LTT_EVENT_SOFT_IRQ_RAISE.setParent(Channels.LTT_CHANNEL_KERNEL);
-			LTT_EVENT_SOFT_IRQ_RAISE.getChildren().add(
-					Fields.LTT_FIELD_SOFT_IRQ_ID);
+			LTT_EVENT_SOFT_IRQ_RAISE.getChildren().add(Fields.LTT_FIELD_SOFT_IRQ_ID);
 			LTT_EVENT_SOFT_IRQ_RAISE.stateTransition = true;
 
-			// SOFT IRQ ENTRY
+			// SOFT_IRQ_ENTRY
 			LTT_EVENT_SOFT_IRQ_ENTRY.setParent(Channels.LTT_CHANNEL_KERNEL);
-			LTT_EVENT_SOFT_IRQ_ENTRY.getChildren().add(
-					Fields.LTT_FIELD_SOFT_IRQ_ID);
+			LTT_EVENT_SOFT_IRQ_ENTRY.getChildren().add(Fields.LTT_FIELD_SOFT_IRQ_ID);
 			LTT_EVENT_SOFT_IRQ_ENTRY.stateTransition = true;
 
+			// SOFT_IRQ_EXIT
 			LTT_EVENT_SOFT_IRQ_EXIT.setParent(Channels.LTT_CHANNEL_KERNEL);
 			LTT_EVENT_SOFT_IRQ_EXIT.stateTransition = true;
 
-			// SCHED SCHEDULE
+			// SCHED_SCHEDULE
 			LTT_EVENT_SCHED_SCHEDULE.setParent(Channels.LTT_CHANNEL_KERNEL);
-			LTT_EVENT_SCHED_SCHEDULE.getChildren().add(
-					Fields.LTT_FIELD_PREV_PID);
-			LTT_EVENT_SCHED_SCHEDULE.getChildren().add(
-					Fields.LTT_FIELD_NEXT_PID);
-			LTT_EVENT_SCHED_SCHEDULE.getChildren().add(
-					Fields.LTT_FIELD_PREV_STATE);
+			LTT_EVENT_SCHED_SCHEDULE.getChildren().add(Fields.LTT_FIELD_PREV_PID);
+			LTT_EVENT_SCHED_SCHEDULE.getChildren().add(Fields.LTT_FIELD_NEXT_PID);
+			LTT_EVENT_SCHED_SCHEDULE.getChildren().add(Fields.LTT_FIELD_PREV_STATE);
 			LTT_EVENT_SCHED_SCHEDULE.stateTransition = true;
 
-			// PROCESS FORK
+			// PROCESS_FORK
 			LTT_EVENT_PROCESS_FORK.setParent(Channels.LTT_CHANNEL_KERNEL);
-			LTT_EVENT_PROCESS_FORK.getChildren().add(
-					Fields.LTT_FIELD_PARENT_PID);
-			LTT_EVENT_PROCESS_FORK.getChildren()
-					.add(Fields.LTT_FIELD_CHILD_PID);
-			LTT_EVENT_PROCESS_FORK.getChildren().add(
-					Fields.LTT_FIELD_CHILD_TGID);
+			LTT_EVENT_PROCESS_FORK.getChildren().add(Fields.LTT_FIELD_PARENT_PID);
+			LTT_EVENT_PROCESS_FORK.getChildren().add(Fields.LTT_FIELD_CHILD_PID);
+			LTT_EVENT_PROCESS_FORK.getChildren().add(Fields.LTT_FIELD_CHILD_TGID);
 			LTT_EVENT_PROCESS_FORK.stateTransition = true;
 
-			// KTHREAD
+			// KTHREAD_CREATE
 			LTT_EVENT_KTHREAD_CREATE.setParent(Channels.LTT_CHANNEL_KERNEL);
 			LTT_EVENT_KTHREAD_CREATE.getChildren().add(Fields.LTT_FIELD_PID);
 			LTT_EVENT_KTHREAD_CREATE.stateTransition = true;
 
-			// PROCES EXIT
+			// PROCESS_EXIT
 			LTT_EVENT_PROCESS_EXIT.setParent(Channels.LTT_CHANNEL_KERNEL);
 			LTT_EVENT_PROCESS_EXIT.getChildren().add(Fields.LTT_FIELD_PID);
 			LTT_EVENT_PROCESS_EXIT.stateTransition = true;
 
-			// PROCESS FREE
+			// PROCESS_FREE
 			LTT_EVENT_PROCESS_FREE.setParent(Channels.LTT_CHANNEL_KERNEL);
 			LTT_EVENT_PROCESS_FREE.getChildren().add(Fields.LTT_FIELD_PID);
 			LTT_EVENT_PROCESS_FREE.stateTransition = true;
 
-			// EVENT EXEC
+			// EVENT_EXEC
 			LTT_EVENT_EXEC.setParent(Channels.LTT_CHANNEL_FS);
 			LTT_EVENT_EXEC.getChildren().add(Fields.LTT_FIELD_FILENAME);
 			LTT_EVENT_EXEC.stateTransition = true;
 
-			// THREAD BRAND
-			LTT_EVENT_THREAD_BRAND.setParent(Channels.LTT_CHANNEL_USERSPACE);
-			LTT_EVENT_THREAD_BRAND.getChildren().add(Fields.LTT_FIELD_NAME);
-			LTT_EVENT_THREAD_BRAND.stateTransition = true;
-
-			// EVENT PROCESS STATE
+			// EVENT_PROCESS_STATE
 			LTT_EVENT_PROCESS_STATE.setParent(Channels.LTT_CHANNEL_TASK_STATE);
 			LTT_EVENT_PROCESS_STATE.getChildren().add(Fields.LTT_FIELD_PID);
-			LTT_EVENT_PROCESS_STATE.getChildren().add(
-					Fields.LTT_FIELD_PARENT_PID);
+			LTT_EVENT_PROCESS_STATE.getChildren().add(Fields.LTT_FIELD_PARENT_PID);
 			LTT_EVENT_PROCESS_STATE.getChildren().add(Fields.LTT_FIELD_NAME);
 			LTT_EVENT_PROCESS_STATE.getChildren().add(Fields.LTT_FIELD_TYPE);
 			LTT_EVENT_PROCESS_STATE.getChildren().add(Fields.LTT_FIELD_MODE);
@@ -293,82 +291,75 @@ public class StateStrings {
 			LTT_EVENT_PROCESS_STATE.getChildren().add(Fields.LTT_FIELD_TGID);
 			LTT_EVENT_PROCESS_STATE.stateTransition = true;
 
-			// EVENT STATEDUMP END
-			LTT_EVENT_STATEDUMP_END
-					.setParent(Channels.LTT_CHANNEL_GLOBAL_STATE);
+			// STATEDUMP_END
+			LTT_EVENT_STATEDUMP_END.setParent(Channels.LTT_CHANNEL_GLOBAL_STATE);
 			LTT_EVENT_STATEDUMP_END.stateTransition = true;
 
-			// LTT_EVENT_LIST_INTERRUPT
-			LTT_EVENT_LIST_INTERRUPT.setParent(Channels.LTT_CHANNEL_IRQ_STATE);
-			LTT_EVENT_LIST_INTERRUPT.getChildren().add(Fields.LTT_FIELD_ACTION);
-			LTT_EVENT_LIST_INTERRUPT.getChildren().add(Fields.LTT_FIELD_IRQ_ID);
-			LTT_EVENT_LIST_INTERRUPT.stateTransition = true;
+			// FUNCTION_ENTRY
+			LTT_EVENT_FUNCTION_ENTRY.setParent(Channels.LTT_CHANNEL_USERSPACE);
+			LTT_EVENT_FUNCTION_ENTRY.getChildren().add(Fields.LTT_FIELD_THIS_FN);
+			LTT_EVENT_FUNCTION_ENTRY.getChildren().add(Fields.LTT_FIELD_CALL_SITE);
+ 			LTT_EVENT_FUNCTION_ENTRY.stateTransition = true;
 
-			// LTT_EVENT_REQUEST_ISSUE
+			// FUNCTION_EXIT
+			LTT_EVENT_FUNCTION_EXIT.setParent(Channels.LTT_CHANNEL_USERSPACE);
+			LTT_EVENT_FUNCTION_EXIT.getChildren().add(Fields.LTT_FIELD_THIS_FN);
+			LTT_EVENT_FUNCTION_EXIT.getChildren().add(Fields.LTT_FIELD_CALL_SITE);
+ 			LTT_EVENT_FUNCTION_EXIT.stateTransition = true;
+
+			// THREAD_BRAND
+			LTT_EVENT_THREAD_BRAND.setParent(Channels.LTT_CHANNEL_USERSPACE);
+			LTT_EVENT_THREAD_BRAND.getChildren().add(Fields.LTT_FIELD_NAME);
+ 			LTT_EVENT_THREAD_BRAND.stateTransition = true;
+
+			// REQUEST_ISSUE
 			LTT_EVENT_REQUEST_ISSUE.setParent(Channels.LTT_CHANNEL_BLOCK);
 			LTT_EVENT_REQUEST_ISSUE.getChildren().add(Fields.LTT_FIELD_MAJOR);
 			LTT_EVENT_REQUEST_ISSUE.getChildren().add(Fields.LTT_FIELD_MINOR);
 			LTT_EVENT_REQUEST_ISSUE.getChildren().add(Fields.LTT_FIELD_OPERATION);			
-			LTT_EVENT_REQUEST_ISSUE.getChildren().add(
-					Fields.LTT_FIELD_OPERATION);
 			LTT_EVENT_REQUEST_ISSUE.stateTransition = true;
 
-			// LTT_EVENT_REQUEST_COMPLETE
+			// REQUEST_COMPLETE
 			LTT_EVENT_REQUEST_COMPLETE.setParent(Channels.LTT_CHANNEL_BLOCK);
-			LTT_EVENT_REQUEST_COMPLETE.getChildren()
-					.add(Fields.LTT_FIELD_MAJOR);
-			LTT_EVENT_REQUEST_COMPLETE.getChildren()
-					.add(Fields.LTT_FIELD_MINOR);
-			LTT_EVENT_REQUEST_COMPLETE.getChildren().add(
-					Fields.LTT_FIELD_OPERATION);
+			LTT_EVENT_REQUEST_COMPLETE.getChildren().add(Fields.LTT_FIELD_MAJOR);
+			LTT_EVENT_REQUEST_COMPLETE.getChildren().add(Fields.LTT_FIELD_MINOR);
+			LTT_EVENT_REQUEST_COMPLETE.getChildren().add(Fields.LTT_FIELD_OPERATION);
 			LTT_EVENT_REQUEST_COMPLETE.stateTransition = true;
 
-			// LTT_EVENT_FUNCTION_ENTRY
-			LTT_EVENT_FUNCTION_ENTRY.setParent(Channels.LTT_CHANNEL_USERSPACE);
-			LTT_EVENT_FUNCTION_ENTRY.getChildren()
-					.add(Fields.LTT_FIELD_THIS_FN);
-			LTT_EVENT_FUNCTION_ENTRY.getChildren().add(
-					Fields.LTT_FIELD_CALL_SITE);
-			LTT_EVENT_FUNCTION_ENTRY.stateTransition = true;
+			// LIST_INTERRUPT
+			LTT_EVENT_LIST_INTERRUPT.setParent(Channels.LTT_CHANNEL_IRQ_STATE);
+			LTT_EVENT_LIST_INTERRUPT.getChildren().add(Fields.LTT_FIELD_ACTION);
+			LTT_EVENT_LIST_INTERRUPT.getChildren().add(Fields.LTT_FIELD_IRQ_ID);
+ 			LTT_EVENT_LIST_INTERRUPT.stateTransition = true;
 
-			// LTT_EVENT_FUNCTION_EXIT
-			LTT_EVENT_FUNCTION_EXIT.setParent(Channels.LTT_CHANNEL_USERSPACE);
-			LTT_EVENT_FUNCTION_EXIT.getChildren().add(Fields.LTT_FIELD_THIS_FN);
-			LTT_EVENT_FUNCTION_EXIT.getChildren().add(
-					Fields.LTT_FIELD_CALL_SITE);
-			LTT_EVENT_FUNCTION_EXIT.stateTransition = true;
-
-			// LTT_EVENT_FUNCTION_EXIT
-			LTT_EVENT_FUNCTION_EXIT.setParent(Channels.LTT_CHANNEL_USERSPACE);
-			LTT_EVENT_FUNCTION_EXIT.getChildren().add(Fields.LTT_FIELD_THIS_FN);
-			LTT_EVENT_FUNCTION_EXIT.getChildren().add(
-					Fields.LTT_FIELD_CALL_SITE);
-			LTT_EVENT_FUNCTION_EXIT.stateTransition = true;
-
-			// LTT_EVENT_SYS_CALL_TABLE
-			LTT_EVENT_SYS_CALL_TABLE
-					.setParent(Channels.LTT_CHANNEL_SYSCALL_STATE);
+			// SYS_CALL_TABLE
+			LTT_EVENT_SYS_CALL_TABLE.setParent(Channels.LTT_CHANNEL_SYSCALL_STATE);
 			LTT_EVENT_SYS_CALL_TABLE.getChildren().add(Fields.LTT_FIELD_ID);
-			LTT_EVENT_SYS_CALL_TABLE.getChildren()
-					.add(Fields.LTT_FIELD_ADDRESS);
+			LTT_EVENT_SYS_CALL_TABLE.getChildren().add(Fields.LTT_FIELD_ADDRESS);
 			LTT_EVENT_SYS_CALL_TABLE.getChildren().add(Fields.LTT_FIELD_SYMBOL);
 			LTT_EVENT_SYS_CALL_TABLE.stateTransition = true;
 
-			// LTT_EVENT_SYS_CALL_TABLE
-			LTT_EVENT_KPROBE_TABLE.setParent(Channels.LTT_CHANNEL_KPROBE_STATE);
-			LTT_EVENT_KPROBE_TABLE.getChildren().add(Fields.LTT_FIELD_IP);
-			LTT_EVENT_KPROBE_TABLE.getChildren().add(Fields.LTT_FIELD_SYMBOL);
-			LTT_EVENT_KPROBE_TABLE.stateTransition = true;
-
-			// LTT_EVENT_SOFTIRQ_VEC
+			// SOFTIRQ_VEC
 			LTT_EVENT_SOFTIRQ_VEC.setParent(Channels.LTT_CHANNEL_SOFTIRQ_STATE);
 			LTT_EVENT_SOFTIRQ_VEC.getChildren().add(Fields.LTT_FIELD_ID);
 			LTT_EVENT_SOFTIRQ_VEC.getChildren().add(Fields.LTT_FIELD_ADDRESS);
 			LTT_EVENT_SOFTIRQ_VEC.getChildren().add(Fields.LTT_FIELD_SYMBOL);
 			LTT_EVENT_SOFTIRQ_VEC.stateTransition = true;
+
+			// KPROBE_TABLE
+			LTT_EVENT_KPROBE_TABLE.setParent(Channels.LTT_CHANNEL_KPROBE_STATE);
+			LTT_EVENT_KPROBE_TABLE.getChildren().add(Fields.LTT_FIELD_IP);
+			LTT_EVENT_KPROBE_TABLE.getChildren().add(Fields.LTT_FIELD_SYMBOL);
+ 			LTT_EVENT_KPROBE_TABLE.stateTransition = true;
+
+			// KPROBE
+			LTT_EVENT_KPROBE.setParent(Channels.LTT_CHANNEL_KERNEL);
+			LTT_EVENT_KPROBE.getChildren().add(Fields.LTT_FIELD_IP);
+//			LTT_EVENT_KPROBE.getChildren().add(Fields.LTT_FIELD_SYMBOL);
+ 			LTT_EVENT_KPROBE.stateTransition = true;
 		}
 
-	};
+	}
 
 	public enum Fields {
 		LTT_FIELD_SYSCALL_ID("syscall_id"), /* */
@@ -409,7 +400,8 @@ public class StateStrings {
 		public String getInName() {
 			return this.inName;
 		}
-	};
+
+	}
 
 	public enum CpuMode {
 		LTTV_CPU_UNKNOWN("unknown"), /* */
@@ -419,7 +411,7 @@ public class StateStrings {
 		LTTV_CPU_SOFT_IRQ("softirq"), /* */
 		LTTV_CPU_TRAP("trap"); /* */
 
-		String inName;
+		private final String inName;
 
 		private CpuMode(String name) {
 			this.inName = name;
@@ -436,7 +428,7 @@ public class StateStrings {
 		LTTV_IRQ_IDLE("idle"), /* */
 		LTTV_IRQ_BUSY("busy"); /* */
 
-		String inName;
+		private final String inName;
 
 		private IRQMode(String name) {
 			this.inName = name;
@@ -454,7 +446,7 @@ public class StateStrings {
 		LTTV_SOFT_IRQ_PENDING("pending"), /* */
 		LTTV_SOFT_IRQ_BUSY("busy"); /* */
 
-		String inName;
+		private final String inName;
 
 		private SoftIRQMode(String name) {
 			this.inName = name;
@@ -472,7 +464,7 @@ public class StateStrings {
 		LTTV_BDEV_BUSY_READING("busy_reading"), /* */
 		LTTV_BDEV_BUSY_WRITING("busy_writing"); /* */
 
-		String inName;
+		private final String inName;
 
 		private BdevMode(String name) {
 			this.inName = name;
@@ -489,7 +481,7 @@ public class StateStrings {
 		LTTV_TRAP_IDLE("idle"), /* */
 		LTTV_TRAP_BUSY("busy"); /* */
 
-		String inName;
+		private final String inName;
 
 		private TrapMode(String name) {
 			this.inName = name;
@@ -500,11 +492,12 @@ public class StateStrings {
 		}
 
 	}
+
 	public enum ProcessType {
 		LTTV_STATE_USER_THREAD("USER_THREAD"), /* */
 		LTTV_STATE_KERNEL_THREAD("KERNEL_THREAD"); /* */
 
-		String inName;
+		private final String inName;
 
 		private ProcessType(String name) {
 			this.inName = name;
@@ -517,7 +510,8 @@ public class StateStrings {
 	}
 
 	public enum ProcessStatus {
-		LTTV_STATE_UNNAMED("UNNAMED"), LTTV_STATE_WAIT_FORK("WAIT_FORK"), /* */
+		LTTV_STATE_UNNAMED("UNNAMED"),     /* */
+                LTTV_STATE_WAIT_FORK("WAIT_FORK"), /* */
 		LTTV_STATE_WAIT_CPU("WAIT_CPU"), /* */
 		LTTV_STATE_EXIT("EXIT"), /* */
 		LTTV_STATE_ZOMBIE("ZOMBIE"), /* */
@@ -525,7 +519,7 @@ public class StateStrings {
 		LTTV_STATE_RUN("RUN"), /* */
 		LTTV_STATE_DEAD("DEAD"); /* */
 
-		String inName;
+		private final String inName;
 
 		private ProcessStatus(String name) {
 			this.inName = name;
@@ -541,7 +535,7 @@ public class StateStrings {
 		LTTV_STATE_SUBMODE_UNKNOWN("UNKNOWN"), /* */
 		LTTV_STATE_SUBMODE_NONE("NONE"); /* */
 
-		String inName;
+		private final String inName;
 
 		private ExecutionSubMode(String name) {
 			this.inName = name;
@@ -561,7 +555,7 @@ public class StateStrings {
 		LTTV_STATE_IRQ("IRQ"), /* */
 		LTTV_STATE_SOFT_IRQ("SOFTIRQ"); /* */
 
-		String inName;
+		private final String inName;
 
 		private ExecutionMode(String name) {
 			this.inName = name;
@@ -591,7 +585,7 @@ public class StateStrings {
 		LTTV_STATE_RESOURCE_TRAPS("trap resource states"), /* */
 		LTTV_STATE_RESOURCE_BLKDEVS("blkdevs resource states"); /* */
 
-		String inName;
+		private final String inName;
 
 		private GenStates(String name) {
 			this.inName = name;
@@ -606,8 +600,9 @@ public class StateStrings {
 	// ========================================================================
 	// Methods
 	// =======================================================================
+
 	/**
-	 * Return the string to any known event
+	 * Return the map from event name strings to Events instances
 	 * 
 	 * @return the eventstrmap
 	 */
@@ -616,7 +611,8 @@ public class StateStrings {
 	}
 
 	/**
-	 * Return the string to state transition events map
+	 * Return the map from state transition event name strings to Events instances
+	 * State transition events are the subset of events that have the attribute stateTransition == True.
 	 * 
 	 * @return the stateTransEventMap
 	 */
@@ -625,28 +621,28 @@ public class StateStrings {
 	}
 
 	/**
-	 * @return the mapping from int to system call names
+	 * @return the mapping from int (0..255) to system call names
 	 */
 	public String[] getSyscallNames() {
 		return syscall_names;
 	}
 
 	/**
-	 * @return the mapping from int to trap names
+	 * @return the mapping from int (0..255) to trap names
 	 */
 	public String[] getTrapNames() {
 		return trap_names;
 	}
 
 	/**
-	 * @return the mapping from int to irq names
+	 * @return the mapping from int (0..255) to IRQ names
 	 */
 	public String[] getIrqNames() {
 		return irq_names;
 	}
 
 	/**
-	 * @return the mapping from int to softirq name
+	 * @return the mapping from int (0..31) to soft IRQ names
 	 */
 	public String[] getSoftIrqNames() {
 		return soft_irq_names;
