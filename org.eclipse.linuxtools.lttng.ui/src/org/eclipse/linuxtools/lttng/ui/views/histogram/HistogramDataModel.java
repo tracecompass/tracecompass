@@ -211,7 +211,8 @@ public class HistogramDataModel {
      */
     public HistogramScaledData scaleTo(int width, int height) {
         // Basic validation
-        assert width > 0 && height > 0;
+        if (width <= 0 ||  height <= 0)
+            throw new AssertionError("Invalid histogram dimensions (" + width + "x" + height + ")");
 
         // The result structure
         HistogramScaledData result = new HistogramScaledData(width, height);

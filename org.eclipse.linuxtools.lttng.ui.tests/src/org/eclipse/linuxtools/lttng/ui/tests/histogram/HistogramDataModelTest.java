@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.lttng.ui.tests.histogram;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramDataModel;
 import org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramScaledData;
@@ -236,6 +237,29 @@ public class HistogramDataModelTest {
      * {@link org.eclipse.linuxtools.tmf.HistogramDataModel.views.histogram.TmfHistogramDataModel#scaleTo(int,int)}
      * .
      */
+    @Test
+    public void testScaleTo_0() {
+        HistogramDataModel model = new HistogramDataModel(10);
+        try {
+            model.scaleTo(10, 0);
+        }
+        catch (AssertionError e1) {
+            try {
+                model.scaleTo(0, 10);
+            }
+            catch (AssertionError e2) {
+                try {
+                    model.scaleTo(0, 0);
+                }
+                catch (AssertionError e3) {
+                    return;
+                }
+            }
+        }
+
+        fail("Uncaught assertion error");
+    }
+
     @Test
     public void testScaleTo_1() {
         final int nbBuckets = 10;

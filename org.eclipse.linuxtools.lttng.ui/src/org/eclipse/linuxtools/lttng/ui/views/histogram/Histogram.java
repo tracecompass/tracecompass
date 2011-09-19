@@ -379,6 +379,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                         // Retrieve and normalize the data
                         int canvasWidth = fCanvas.getBounds().width;
                         int canvasHeight = fCanvas.getBounds().height;
+                        if (canvasWidth <= 0 || canvasHeight <= 0)
+                            return;
                         fDataModel.setCurrentEvent(fCurrentEventTime);
                         fScaledData = fDataModel.scaleTo(canvasWidth, canvasHeight);
                         fCanvas.redraw();
