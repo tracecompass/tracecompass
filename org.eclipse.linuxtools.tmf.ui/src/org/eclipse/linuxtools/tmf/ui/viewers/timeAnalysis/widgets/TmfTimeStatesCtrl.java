@@ -1086,7 +1086,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
                 x0 = rect.x + (int) ((currEventTime - time0) * pixelsPerNanoSec);
                 int xEnd = rect.x + (int) ((time1 - time0) * pixelsPerNanoSec);
                 int x1 = -1;
-                int idx = 1;
 
                 // reduce rect
                 _rect1.y += 3;
@@ -1100,7 +1099,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
                     if (iterator.hasNext()) {
                         nextEvent = iterator.next();
                         nextEventTime = nextEvent.getTime();
-                        idx++;
                     } else if (stopped) {
                         nextEvent = null;
                         nextEventTime = time1;
@@ -1211,7 +1209,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
                 // xEnd - Points to the end of the events rectangle
                 double xEnd = rect.x + (double) ((time1 - time0) * pixelsPerNanoSec);
                 double x1 = -1;
-                int idx = 1;
                 //double xNext = 0;
 
                 // Drawing rectangle is smaller than reserved space
@@ -1227,7 +1224,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
                     if (iterator.hasNext()) {
                         nextEvent = iterator.next();
                         nextEventTime = nextEvent.getTime();
-                        idx++;
                     } else if (stopped) {
                         nextEvent = null;
                         nextEventTime = time1;
@@ -1371,7 +1367,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
                 x0 = rect.x + step;
                 // xEnd - Points to the end of the events rectangle
                 double x1 = -1;
-                int idx = 1;
                 double xNext = 0;
 
                 // draw event states
@@ -1383,7 +1378,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
                     if (iterator.hasNext()) {
                         nextEvent = iterator.next();
                         nextEventTime = nextEvent.getTime();
-                        idx++;
                     } else if (stopped) {
                         nextEvent = null;
                         nextEventTime = time1;
@@ -1420,7 +1414,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
                     if (x1 >= rect.x && x0 <= xEnd) {
                         if (currEventDuration != 0) {
                             x0 = (double) (x0 >= rect.x ? x0 : rect.x);
-                            _rect1.width = (int) Math.ceil(x1 <= xEnd ? x1 : xEnd) - (int) x0;
+                            _rect1.width = (int) ((x1 <= xEnd ? x1 : xEnd) - x0);
                         } else {
                             _rect1.width = 1;
                         }
