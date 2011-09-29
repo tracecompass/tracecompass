@@ -44,6 +44,48 @@
     </license>
   </licenses>
   
+<profiles>
+  <profile>
+    <id>jcoverage</id>
+      <properties>
+      <!-- Properties to enable jacoco code coverage analysis -->
+      <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
+      <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+      <sonar.jacoco.reportPath>../target/jacoco.exec</sonar.jacoco.reportPath>
+    </properties>
+
+    <build>
+      <plugins>
+        <!-- Enabling use of jacoco -->
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.5.3.201107060350</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+              <configuration>
+                <!-- Where to put jacoco coverage report -->
+                <destFile>${sonar.jacoco.reportPath}</destFile>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </build>
+  </profile>
+
+  <profile>
+    <id>lttngTests</id>
+      <modules>
+        <module>org.eclipse.linuxtools.lttng.tests</module>
+      </modules>
+  </profile>
+
+</profiles>
+
   <build>
     <plugins>
       <plugin>
@@ -54,6 +96,13 @@
           </descriptors>
         </configuration>
       </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>sonar-maven-plugin</artifactId>
+        <version>2.0-beta-2</version>
+      </plugin>
+
     </plugins>
   </build>
 
@@ -63,7 +112,6 @@
     <module>org.eclipse.linuxtools.lttng.help</module>
     <module>org.eclipse.linuxtools.lttng.jni</module>
     <module>org.eclipse.linuxtools.lttng.test-feature</module>
-    <module>org.eclipse.linuxtools.lttng.tests</module>
     <module>org.eclipse.linuxtools.lttng.ui</module>
     <module>org.eclipse.linuxtools.lttng.ui.tests</module>
     <module>org.eclipse.linuxtools.tmf</module>

@@ -13,6 +13,8 @@
 package org.eclipse.linuxtools.lttng.tests;
 
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.linuxtools.tmf.Tracer;
+import org.osgi.framework.BundleContext;
 
 /**
  * <b><u>TmfCoreTestPlugin</u></b>
@@ -52,5 +54,17 @@ public class LTTngCoreTestPlugin extends Plugin {
      */
     public static LTTngCoreTestPlugin getPlugin() {
         return plugin;
+    }
+    
+    @Override
+    public void start(BundleContext context) throws Exception {
+        super.start(context);
+        plugin = this;
+    }
+
+    @Override
+    public void stop(BundleContext context) throws Exception {
+        plugin = null;
+        super.stop(context);
     }
 }

@@ -19,7 +19,7 @@
 
   <artifactId>org.eclipse.linuxtools.lttng.ui.tests</artifactId>
   <version>0.3.2-SNAPSHOT</version>
-  <packaging>eclipse-plugin</packaging>
+  <packaging>eclipse-test-plugin</packaging>
 
   <name>Linux Tools LTTng UI Tests Plug-in</name>
 
@@ -33,10 +33,18 @@
         </excludes>
       </resource>
     </resources>
-    <plugins>
+     <plugins>
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-source-plugin</artifactId>
+        <artifactId>tycho-surefire-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <configuration>
+          <testSuite>org.eclipse.linuxtools.lttng.ui.tests</testSuite>
+          <testClass>org.eclipse.linuxtools.lttng.ui.tests.AllLTTngUITests</testClass>
+          <useUIHarness>true</useUIHarness>
+          <useUIThread>true</useUIThread>
+          <product>org.eclipse.sdk.ide</product>
+        </configuration>
       </plugin>
     </plugins>
   </build>

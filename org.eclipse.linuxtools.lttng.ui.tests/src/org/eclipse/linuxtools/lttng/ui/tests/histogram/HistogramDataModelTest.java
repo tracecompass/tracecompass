@@ -8,25 +8,22 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Bernd Hufmann - Adapt to junit.framework.TestCase
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng.ui.tests.histogram;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import junit.framework.TestCase;
 
 import org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramDataModel;
 import org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramScaledData;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * <b><u>HistogramDataModelTest</u></b>
  * <p>
  * Unit tests for the HistogramDataModel class.
  */
-public class HistogramDataModelTest {
+public class HistogramDataModelTest extends TestCase {
 
     // ------------------------------------------------------------------------
     // Test data
@@ -35,12 +32,12 @@ public class HistogramDataModelTest {
     // ------------------------------------------------------------------------
     // Housekeeping
     // ------------------------------------------------------------------------
-
-    @Before
+    
+    @Override
     public void setUp() throws Exception {
     }
 
-    @After
+    @Override
     public void tearDown() throws Exception {
     }
 
@@ -53,7 +50,6 @@ public class HistogramDataModelTest {
      * {@link org.eclipse.linuxtools.tmf.HistogramDataModel.views.histogram.TmfHistogramDataModel#HistogramDataModel()}
      * .
      */
-    @Test
     public void testHistogramDataModel() {
         HistogramDataModel model = new HistogramDataModel();
         assertTrue(model.getNbBuckets() == HistogramDataModel.DEFAULT_NUMBER_OF_BUCKETS);
@@ -69,7 +65,6 @@ public class HistogramDataModelTest {
      * {@link org.eclipse.linuxtools.tmf.HistogramDataModel.views.histogram.TmfHistogramDataModel#HistogramDataModel(int)}
      * .
      */
-    @Test
     public void testHistogramDataModelInt() {
         final int nbBuckets = 5 * 1000;
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
@@ -86,7 +81,6 @@ public class HistogramDataModelTest {
      * {@link org.eclipse.linuxtools.tmf.HistogramDataModel.views.histogram.TmfHistogramDataModel#countEvent(long)}
      * .
      */
-    @Test
     public void testClear() {
         final int nbBuckets = 100;
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
@@ -105,7 +99,6 @@ public class HistogramDataModelTest {
      * {@link org.eclipse.linuxtools.tmf.HistogramDataModel.views.histogram.TmfHistogramDataModel#countEvent(long)}
      * .
      */
-    @Test
     public void testCountEvent_0() {
         final int nbBuckets = 100;
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
@@ -119,7 +112,6 @@ public class HistogramDataModelTest {
         assertTrue(model.getTimeLimit() == nbBuckets);
     }
 
-    @Test
     public void testCountEvent_1() {
         final int nbBuckets = 100;
         final int maxHeight = 10;
@@ -139,7 +131,6 @@ public class HistogramDataModelTest {
         assertTrue(model.getTimeLimit() == nbBuckets);
     }
 
-    @Test
     public void testCountEvent_2() {
         final int nbBuckets = 100;
         final int maxHeight = 10;
@@ -161,7 +152,6 @@ public class HistogramDataModelTest {
         assertTrue(model.getTimeLimit() == nbBuckets + 1);
     }
 
-    @Test
     public void testCountEvent_3() {
         final int nbBuckets = 100;
         final int maxHeight = 10;
@@ -184,7 +174,6 @@ public class HistogramDataModelTest {
         assertTrue(model.getTimeLimit() == nbBuckets);
     }
 
-    @Test
     public void testCountEvent_4() {
         final int nbBuckets = 100;
         final int maxHeight = 10;
@@ -208,7 +197,6 @@ public class HistogramDataModelTest {
         assertTrue(model.getTimeLimit() == nbBuckets);
     }
 
-    @Test
     public void testCountEvent_5() {
         final int nbBuckets = 100;
         final int startTime = 25;
@@ -237,7 +225,6 @@ public class HistogramDataModelTest {
      * {@link org.eclipse.linuxtools.tmf.HistogramDataModel.views.histogram.TmfHistogramDataModel#scaleTo(int,int)}
      * .
      */
-    @Test
     public void testScaleTo_0() {
         HistogramDataModel model = new HistogramDataModel(10);
         try {
@@ -257,10 +244,9 @@ public class HistogramDataModelTest {
             }
         }
 
-        fail("Uncaught assertion error");
+        fail("Uncaught assertion error"); //$NON-NLS-1$
     }
 
-    @Test
     public void testScaleTo_1() {
         final int nbBuckets = 10;
         final int maxHeight = 10;
@@ -285,7 +271,6 @@ public class HistogramDataModelTest {
         assertTrue(model.getTimeLimit() == nbBuckets);
     }
 
-    @Test
     public void testScaleTo_2() {
         final int nbBuckets = 10;
         final int maxHeight = 10;
@@ -310,7 +295,6 @@ public class HistogramDataModelTest {
         assertTrue(model.getTimeLimit() == nbBuckets);
     }
 
-    @Test
     public void testScaleTo_3() {
         final int nbBuckets = 10;
         final int maxHeight = 10;
@@ -335,7 +319,6 @@ public class HistogramDataModelTest {
         assertTrue(model.getTimeLimit() == 2 * nbBuckets);
     }
 
-    @Test
     public void testScaleTo_4() {
         final int nbBuckets = 10;
         final int maxHeight = 10;
@@ -360,7 +343,6 @@ public class HistogramDataModelTest {
         assertTrue(model.getTimeLimit() == 4 * nbBuckets);
     }
 
-    @Test
     public void testScaleTo_5() {
         final int nbBuckets = 100;
         final int maxHeight = 20;
@@ -385,7 +367,6 @@ public class HistogramDataModelTest {
         assertTrue(model.getTimeLimit() == 2 * nbBuckets);
     }
 
-    @Test
     public void testScaleTo_6() {
         final int nbBuckets = 100;
         final int maxHeight = 24;

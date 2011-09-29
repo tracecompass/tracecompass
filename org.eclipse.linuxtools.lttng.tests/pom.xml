@@ -19,7 +19,7 @@
 
   <artifactId>org.eclipse.linuxtools.lttng.tests</artifactId>
   <version>0.3.2-SNAPSHOT</version>
-  <packaging>eclipse-plugin</packaging>
+  <packaging>eclipse-test-plugin</packaging>
 
   <name>Linux Tools LTTng Tests Plug-in</name>
 
@@ -34,10 +34,41 @@
       </resource>
     </resources>
     <plugins>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-source-plugin</artifactId>
-      </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.2</version>
+            <executions>
+                <execution>
+                    <id>prepare</id>
+                    <phase>validate</phase>
+                    <configuration>
+                    <tasks>
+                        <echo message="prepare phase" />
+                        <gunzip src="traceset/trace-15471events_nolost_newformat.tar.gz" dest="traceset/" />
+                        <untar src="traceset/trace-15471events_nolost_newformat.tar" dest="traceset/" />
+                        <gunzip src="traceset/trace-15316events_nolost_newformat.tar.gz" dest="traceset/" />
+                        <untar src="traceset/trace-15316events_nolost_newformat.tar" dest="traceset/" />
+                    </tasks>
+                    </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
+            <groupId>org.eclipse.tycho</groupId>
+            <artifactId>tycho-surefire-plugin</artifactId>
+            <version>${tycho-version}</version>
+            <configuration>
+                <testSuite>org.eclipse.linuxtools.lttng.tests</testSuite>
+                <testClass>org.eclipse.linuxtools.lttng.tests.AllLTTngCoreTests</testClass>
+                <useUIHarness>false</useUIHarness>
+                <useUIThread>false</useUIThread>
+                <product>org.eclipse.sdk.ide</product>
+            </configuration>
+        </plugin>
     </plugins>
   </build>
 
