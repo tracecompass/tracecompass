@@ -38,6 +38,7 @@ import org.eclipse.linuxtools.lttng.ui.views.project.model.ILTTngProjectTreeNode
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentNode;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectContentProvider;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectLabelProvider;
+import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectNode;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectRoot;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngTraceNode;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
@@ -185,7 +186,8 @@ public class ProjectView extends TmfView {
             ITmfTrace[] traces = new ITmfTrace[1];
             IResource res = traceNode.getFolder();
             String location = res.getLocation().toOSString();
-            IProject project = traceNode.getProject().getProject();
+            LTTngProjectNode projectNode = traceNode.getProject();
+            IProject project = projectNode.getProject();
             String traceLibPath = TraceHelper.getTraceLibDirFromProject(project);
             ITmfTrace trace = new LTTngTrace(location, traceLibPath, waitForCompletion, false);
             traces[0] = trace;

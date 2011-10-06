@@ -57,7 +57,16 @@ public class LTTngTraceNode extends LTTngProjectTreeNode {
 	 * @return
 	 */
 	public LTTngProjectNode getProject() {
-		return (LTTngProjectNode) getParent().getParent();
+	    ILTTngProjectTreeNode projectNode = null;
+	    ILTTngProjectTreeNode parent = getParent();
+	    if (parent instanceof LTTngTraceFolderNode) {
+	        projectNode = parent.getParent();
+	    }
+	    else if (parent instanceof LTTngExperimentNode) {
+            projectNode = parent.getParent().getParent();
+	    }
+
+		return (LTTngProjectNode) projectNode;
 	}
 
 	/**
