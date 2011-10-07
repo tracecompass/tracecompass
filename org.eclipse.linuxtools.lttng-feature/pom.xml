@@ -21,6 +21,6 @@
   <version>0.3.2-SNAPSHOT</version>
   <packaging>eclipse-feature</packaging>
 
-  <name>Linux Tracing Toolkit Integration (LTTng) (Incubation)</name>
+  <name>Linux Tools LTTng (Linux Tracing Toolkit)</name>
 
 </project>

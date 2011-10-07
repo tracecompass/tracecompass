@@ -21,7 +21,7 @@
   <version>0.3.2-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 
-  <name>Linux Tools TMF (LTTng) Plug-in</name>
+  <name>Linux Tools LTTng TMF Core Plug-in</name>
 
  <build>
      <!-- workaround for https://issues.sonatype.org/browse/TYCHO-168 -->

@@ -23,7 +23,7 @@
   <version>0.3.2-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
-  <name>Linux Tools TMF Tests (LTTng) Plug-in</name>
+  <name>Linux Tools LTTng TMF Core Unit Test Suite</name>
 
  <build>
      <!-- workaround for https://issues.sonatype.org/browse/TYCHO-168 -->

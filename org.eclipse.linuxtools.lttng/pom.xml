@@ -21,7 +21,7 @@
   <version>0.3.2-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 
-  <name>LTTng - Linux Tracing Toolkit (Incubation)</name>
+  <name>Linux Tools LTTng Core Plug-in</name>
 
  <build>
      <!-- workaround for https://issues.sonatype.org/browse/TYCHO-168 -->
