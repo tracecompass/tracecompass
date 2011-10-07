@@ -23,4 +23,5 @@
 
   <name>Linux Tools LTTng Help Plug-in</name>
 
+  <groupId>org.eclipse.linuxtools.lttng</groupId>
 </project>

@@ -72,4 +72,5 @@
     </plugins>
   </build>
 
+ <groupId>org.eclipse.linuxtools.lttng</groupId>
 </project>

@@ -41,4 +41,5 @@
     </plugins>
   </build>
 
+ <groupId>org.eclipse.linuxtools.tmf</groupId>
 </project>

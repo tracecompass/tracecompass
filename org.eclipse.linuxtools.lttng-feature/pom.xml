@@ -23,4 +23,5 @@
 
   <name>Linux Tools LTTng (Linux Tracing Toolkit)</name>
 
+  <groupId>org.eclipse.linuxtools.lttng</groupId>
 </project>

@@ -23,4 +23,5 @@
 
   <name>Linux Tools LTTng TMF (Tracing and Monitoring Framework)</name>
 
+  <groupId>org.eclipse.linuxtools.tmf</groupId>
 </project>
