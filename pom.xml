@@ -107,20 +107,19 @@
   </build>
 
   <modules>
-    <module>org.eclipse.linuxtools.lttng</module>
-    <module>org.eclipse.linuxtools.lttng-feature</module>
-    <module>org.eclipse.linuxtools.lttng.help</module>
-    <module>org.eclipse.linuxtools.lttng.jni</module>
-    <module>org.eclipse.linuxtools.lttng.test-feature</module>
-    <module>org.eclipse.linuxtools.lttng.ui</module>
-    <module>org.eclipse.linuxtools.lttng.ui.tests</module>
-    <module>org.eclipse.linuxtools.tmf</module>
-    <!--<module>org.eclipse.linuxtools.tmf.doc</module>-->
     <module>org.eclipse.linuxtools.tmf-feature</module>
-    <module>org.eclipse.linuxtools.tmf.test-feature</module>
+    <module>org.eclipse.linuxtools.tmf</module>
     <module>org.eclipse.linuxtools.tmf.tests</module>
     <module>org.eclipse.linuxtools.tmf.ui</module>
     <module>org.eclipse.linuxtools.tmf.ui.tests</module>
+    <!--<module>org.eclipse.linuxtools.tmf.doc</module>-->
+    <module>org.eclipse.linuxtools.lttng-feature</module>
+    <module>org.eclipse.linuxtools.lttng</module>
+    <!--<module>org.eclipse.linuxtools.lttng.tests</module>-->
+    <module>org.eclipse.linuxtools.lttng.help</module>
+    <module>org.eclipse.linuxtools.lttng.jni</module>
+    <module>org.eclipse.linuxtools.lttng.ui</module>
+    <module>org.eclipse.linuxtools.lttng.ui.tests</module>
   </modules>
 
 </project>

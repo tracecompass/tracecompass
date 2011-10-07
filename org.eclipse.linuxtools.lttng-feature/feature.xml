@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!-- For PDE build, remove "ws" and "arch" -->
 <feature
       id="org.eclipse.linuxtools.lttng"
@@ -28,21 +27,26 @@
          name="Tracing and Monitoring Framework (TMF) (Incubation)"/>
 
    <requires>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.linuxtools.tmf" version="0.3.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.linuxtools.lttng.jni" version="0.3.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.ui.ide"/>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.core.filesystem"/>
-      <import plugin="org.eclipse.linuxtools.tmf.ui" version="0.3.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.linuxtools.lttng" version="0.3.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.help"/>
+      <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.tmf.core" version="0.3.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.rse.core" version="3.2.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.tm.tcf.core" version="0.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources" version="3.7.100" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.ide" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.filesystem" version="1.3.100" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.tmf.ui" version="0.3.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.lttng.core" version="0.3.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.rse.services" version="3.2.100" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.rse.subsystems.files.core" version="3.2.100" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.rse.ui" version="3.2.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.tm.tcf.rse" version="0.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.help" version="3.5.100" match="greaterOrEqual"/>
    </requires>
 
-<!-- For PDE build, remove "ws" and "arch" -->
    <plugin
-         id="org.eclipse.linuxtools.lttng"
+         id="org.eclipse.linuxtools.lttng.core"
          os="linux"
          ws="*"
          arch="*"
@@ -51,7 +55,6 @@
          version="0.0.0"
          unpack="false"/>
 
-<!-- For PDE build, remove "ws" and "arch" -->
    <plugin
          id="org.eclipse.linuxtools.lttng.ui"
          os="linux"

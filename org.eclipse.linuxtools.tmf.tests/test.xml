@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <project name="testsuite" default="run" basedir=".">
-	<property name="classname" value="org.eclipse.linuxtools.tmf.ui.tests" />
+	<property name="classname" value="org.eclipse.linuxtools.tmf.core.tests" />
 	<property name="tmf-event-test-suite-classname"   value="org.eclipse.linuxtools.tmf.tests.event.AllTests" />
 	<property name="tmf-request-test-suite-classname" value="org.eclipse.linuxtools.tmf.tests.request.AllTests" />
 	<property name="tmf-trace-test-suite-classname"   value="org.eclipse.linuxtools.tmf.tests.trace.AllTests" />

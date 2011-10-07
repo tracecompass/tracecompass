@@ -21,12 +21,12 @@
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources" version="3.7.100" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.linuxtools.tmf" version="0.3.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.tmf.core" version="0.3.2" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.ide" version="3.7.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
-         id="org.eclipse.linuxtools.tmf"
+         id="org.eclipse.linuxtools.tmf.core"
          download-size="0"
          install-size="0"
          version="0.0.0"

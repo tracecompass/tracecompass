@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <project name="testsuite" default="run" basedir=".">
-	<property name="classname" value="org.eclipse.linuxtools.lttng.tests" />
+	<property name="classname" value="org.eclipse.linuxtools.lttng.core.tests" />
 	<property name="lttng-event-test-suite-classname" value="org.eclipse.linuxtools.lttng.tests.event.AllLttngTests" />
 	<property name="lttng-jni-test-suite-classname" value="org.eclipse.linuxtools.lttng.tests.jni.AllJniTests" />
 	<property name="plugin-name" value="org.eclipse.linuxtools.lttng.tests" />
