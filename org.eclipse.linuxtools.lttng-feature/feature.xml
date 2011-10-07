@@ -21,6 +21,10 @@
       %license
    </license>
 
+   <url>
+      <update label="Linux Tools Update Site" url="http://download.eclipse.org/technology/linuxtools/update"/>
+   </url>
+
    <includes
          id="org.eclipse.linuxtools.tmf"
          version="0.0.0"

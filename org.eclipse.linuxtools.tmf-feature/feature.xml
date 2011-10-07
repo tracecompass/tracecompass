@@ -17,6 +17,10 @@
       %license
    </license>
 
+   <url>
+      <update label="Linux Tools Update Site" url="http://download.eclipse.org/technology/linuxtools/update"/>
+   </url>
+
    <requires>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
