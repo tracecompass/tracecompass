@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.event;
 
+import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
+
 /**
  * <b><u>TmfEvent</u></b>
  * <p>
@@ -41,6 +43,8 @@ public class TmfEvent extends TmfData implements Cloneable {
     // Attributes
     // ------------------------------------------------------------------------
 
+	protected ITmfTrace         fParentTrace;
+	protected long              fEventRank;
 	protected TmfTimestamp      fEffectiveTimestamp;
 	protected TmfTimestamp      fOriginalTimestamp;
 	protected TmfEventSource    fSource;
@@ -55,6 +59,25 @@ public class TmfEvent extends TmfData implements Cloneable {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * @param originalTS the original timestamp
+     * @param effectiveTS the effective timestamp
+     * @param source the event source (generator)
+     * @param type the event type
+     * @param reference a free-form reference field
+     */
+    public TmfEvent(ITmfTrace trace, long rank, TmfTimestamp originalTS, TmfTimestamp effectiveTS,
+            TmfEventSource source, TmfEventType type, TmfEventReference reference)
+    {
+        fParentTrace        = trace;
+        fEventRank          = rank;
+        fOriginalTimestamp  = originalTS;
+        fEffectiveTimestamp = effectiveTS;
+        fSource             = source;
+        fType               = type;
+        fReference          = reference;
+    }
+
 	/**
 	 * @param originalTS the original timestamp
 	 * @param effectiveTS the effective timestamp
@@ -65,11 +88,7 @@ public class TmfEvent extends TmfData implements Cloneable {
 	public TmfEvent(TmfTimestamp originalTS, TmfTimestamp effectiveTS,
 			TmfEventSource source, TmfEventType type, TmfEventReference reference)
 	{
-		fOriginalTimestamp  = originalTS;
-		fEffectiveTimestamp = effectiveTS;
-		fSource             = source;
-		fType               = type;
-		fReference          = reference;
+        this(null, -1, originalTS, effectiveTS, source, type, reference);
 	}
 
 	/**
@@ -81,7 +100,7 @@ public class TmfEvent extends TmfData implements Cloneable {
 	public TmfEvent(TmfTimestamp timestamp, TmfEventSource source,
 			TmfEventType type, TmfEventReference reference)
 	{
-		this(timestamp, timestamp, source, type, reference);
+		this(null, -1, timestamp, timestamp, source, type, reference);
 	}
 
 	/**
@@ -92,6 +111,8 @@ public class TmfEvent extends TmfData implements Cloneable {
 	public TmfEvent(TmfEvent other) {
     	if (other == null)
     		throw new IllegalArgumentException();
+        fParentTrace        = other.fParentTrace;
+        fEventRank          = other.fEventRank;
 		fOriginalTimestamp  = new TmfTimestamp(other.fOriginalTimestamp);
 		fEffectiveTimestamp = new TmfTimestamp(other.fEffectiveTimestamp);
 		fSource    			= new TmfEventSource(other.fSource);
@@ -111,6 +132,20 @@ public class TmfEvent extends TmfData implements Cloneable {
 	// ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
+
+    /**
+     * @return the parent trace
+     */
+    public ITmfTrace getParentTrace() {
+        return fParentTrace;
+    }
+
+    /**
+     * @return the event rank
+     */
+    public long getEventRank() {
+        return fEventRank;
+    }
 
 	/**
 	 * @return the effective event timestamp
@@ -206,6 +241,8 @@ public class TmfEvent extends TmfData implements Cloneable {
 		TmfEvent clone = null;
 		try {
 			clone = (TmfEvent) super.clone();
+			clone.fParentTrace        = fParentTrace;
+			clone.fEventRank          = fEventRank;
 			clone.fOriginalTimestamp  = fOriginalTimestamp.clone();
 			clone.fEffectiveTimestamp = fEffectiveTimestamp.clone();
 			clone.fSource             = fSource.clone();

@@ -18,8 +18,8 @@ public class LttngEvent extends TmfEvent {
     // Reference to the JNI JniEvent. Should only be used INTERNALLY
     private JniEvent jniEventReference = null;
     
-    // Reference to the parent trace that own this event
-    private TmfTrace<LttngEvent> parentTrace = null;
+//    // Reference to the parent trace that own this event
+//    private TmfTrace<LttngEvent> parentTrace = null;
     
     /**
      * Constructor with parameters.<p>
@@ -51,9 +51,10 @@ public class LttngEvent extends TmfEvent {
      * 
      * @param oldEvent		Event we want to copy from.
      */
+    @SuppressWarnings("unchecked")
     public LttngEvent(LttngEvent oldEvent) {
         this(	
-        		oldEvent.getParentTrace(),
+        		(TmfTrace<LttngEvent>) oldEvent.getParentTrace(),
         		(LttngTimestamp)oldEvent.getTimestamp(), 
         		(TmfEventSource)oldEvent.getSource(), 
         		(LttngEventType)oldEvent.getType(), 
@@ -63,23 +64,13 @@ public class LttngEvent extends TmfEvent {
         	);
     }
     
-    
-    /**
-     * Return the parent trace associated with this event
-     * 
-     * @return Parent trace
-     */
-    public TmfTrace<LttngEvent> getParentTrace() {
-		return parentTrace;
-	}
-    
     /**
      * Set a new parent trace for this event
      * 
      * @param parentTrace	The new parent
      */
     public void setParentTrace(TmfTrace<LttngEvent> parentTrace) {
-		this.parentTrace = parentTrace;
+		fParentTrace = parentTrace;
 	}
     
     
@@ -194,7 +185,6 @@ public class LttngEvent extends TmfEvent {
 	public LttngEvent clone() {
     	LttngEvent clone = (LttngEvent) super.clone();
     	clone.getContent().setEvent(clone);
-		clone.parentTrace = parentTrace;
 		clone.jniEventReference = jniEventReference;
     	return clone;
     }

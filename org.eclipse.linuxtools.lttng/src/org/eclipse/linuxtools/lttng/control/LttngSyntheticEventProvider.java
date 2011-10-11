@@ -45,7 +45,6 @@ import org.eclipse.linuxtools.tmf.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfCheckpoint;
 import org.eclipse.linuxtools.tmf.trace.TmfContext;
-import org.eclipse.linuxtools.tmf.trace.TmfTrace;
 
 /**
  * @author alvaro
@@ -243,7 +242,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 			private void handleIncomingData(LttngEvent e) {
 				long eventTime = e.getTimestamp().getValue();
 
-				TmfTrace<LttngEvent> inTrace = e.getParentTrace();
+				ITmfTrace inTrace = e.getParentTrace();
 				LttngTraceState traceModel = traceToTraceStateModel.get(inTrace);
 				
 				// queue the new event data
@@ -289,7 +288,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 					syntheticEvent = new LttngSyntheticEvent(e);
 				}
 
-				TmfTrace<LttngEvent> inTrace = e.getParentTrace();
+				ITmfTrace inTrace = e.getParentTrace();
 				LttngTraceState traceModel = traceToTraceStateModel.get(inTrace);
 				
 				// Trace model needed by application handlers

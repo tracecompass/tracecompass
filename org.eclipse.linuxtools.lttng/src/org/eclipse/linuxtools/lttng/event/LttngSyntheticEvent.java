@@ -125,12 +125,13 @@ public class LttngSyntheticEvent extends LttngEvent {
 	 * 
 	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#getParentTrace()
 	 */
-	@Override
+	@SuppressWarnings("unchecked")
+    @Override
    public TmfTrace<LttngEvent> getParentTrace() {
 		if (baseEvent != null) {
-			return baseEvent.getParentTrace();
+			return (TmfTrace<LttngEvent>) baseEvent.getParentTrace();
 		} else {
-			return super.getParentTrace();
+			return (TmfTrace<LttngEvent>) super.getParentTrace();
 		}
 	}
 
