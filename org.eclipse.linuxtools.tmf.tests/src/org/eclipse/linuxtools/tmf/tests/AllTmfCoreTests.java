@@ -32,8 +32,8 @@ public class AllTmfCoreTests {
 		suite.addTest(org.eclipse.linuxtools.tmf.tests.trace.AllTests.suite());
 		suite.addTest(org.eclipse.linuxtools.tmf.tests.experiment.AllTests.suite());
 		suite.addTest(org.eclipse.linuxtools.tmf.tests.uml2sd.AllTests.suite());
+		suite.addTest(org.eclipse.linuxtools.tmf.tests.util.AllTests.suite());
 		//$JUnit-END$
 		return suite;
 	}
-
 }

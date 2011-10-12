@@ -62,6 +62,15 @@
             name="%uml2sd.view.name"
             restorable="true">
       </view>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.linuxtools.tmf.ui.views.statistics.TmfStatisticsView"
+            icon="icons/eview16/statistics_view.gif"
+            id="org.eclipse.linuxtools.tmf.ui.views.statistics"
+            name="%statistics.view.name"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.editors">

@@ -21,5 +21,6 @@ Export-Package: org.eclipse.linuxtools.tmf,
  org.eclipse.linuxtools.tmf.request,
  org.eclipse.linuxtools.tmf.signal,
  org.eclipse.linuxtools.tmf.trace,
- org.eclipse.linuxtools.tmf.uml2sd
+ org.eclipse.linuxtools.tmf.uml2sd,
+ org.eclipse.linuxtools.tmf.util
 Bundle-Localization: plugin
