@@ -36,8 +36,7 @@ import org.eclipse.swt.widgets.Composite;
 /**
  * <b><u>HistogramView</u></b>
  * <p>
- * The purpose of this view is to provide graphical time distribution statistics
- * about the experiment/trace events.
+ * The purpose of this view is to provide graphical time distribution statistics about the experiment/trace events.
  * <p>
  * The view is composed of two histograms and two controls:
  * <ul>
@@ -168,16 +167,16 @@ public class HistogramView extends TmfView {
         gridData = new GridData();
         gridData.horizontalAlignment = SWT.CENTER;
         gridData.verticalAlignment = SWT.CENTER;
-        fCurrentEventTimeControl = new HistogramCurrentTimeControl(this, controlsComposite, SWT.BORDER, SWT.BORDER, currentEventLabel,
-                HistogramUtils.nanosecondsToString(0L));
+        fCurrentEventTimeControl = new HistogramCurrentTimeControl(this, controlsComposite, SWT.BORDER, SWT.BORDER,
+                currentEventLabel, HistogramUtils.nanosecondsToString(0L));
         fCurrentEventTimeControl.setLayoutData(gridData);
 
         // Window span time control
         gridData = new GridData();
         gridData.horizontalAlignment = SWT.CENTER;
         gridData.verticalAlignment = SWT.CENTER;
-        fTimeSpanControl = new HistogramTimeRangeControl(this, controlsComposite, SWT.BORDER, SWT.BORDER, windowSpanLabel,
-                HistogramUtils.nanosecondsToString(0L));
+        fTimeSpanControl = new HistogramTimeRangeControl(this, controlsComposite, SWT.BORDER, SWT.BORDER,
+                windowSpanLabel, HistogramUtils.nanosecondsToString(0L));
         fTimeSpanControl.setLayoutData(gridData);
 
         // --------------------------------------------------------------------
@@ -255,7 +254,8 @@ public class HistogramView extends TmfView {
     // ------------------------------------------------------------------------
 
     public TmfTimeRange getTimeRange() {
-        return new TmfTimeRange(new TmfTimestamp(fWindowStartTime, TIME_SCALE), new TmfTimestamp(fWindowEndTime, TIME_SCALE));
+        return new TmfTimeRange(new TmfTimestamp(fWindowStartTime, TIME_SCALE), new TmfTimestamp(fWindowEndTime,
+                TIME_SCALE));
     }
 
     // ------------------------------------------------------------------------
@@ -265,7 +265,8 @@ public class HistogramView extends TmfView {
     public void updateCurrentEventTime(long newTime) {
         if (fCurrentExperiment != null) {
             TmfTimeRange timeRange = new TmfTimeRange(new TmfTimestamp(newTime, TIME_SCALE), TmfTimestamp.BigCrunch);
-            HistogramRequest request = new HistogramRequest(fTimeRangeHistogram, timeRange, 0, 1, ExecutionType.FOREGROUND) {
+            HistogramRequest request = new HistogramRequest(fTimeRangeHistogram, timeRange, 0, 1,
+                    ExecutionType.FOREGROUND) {
                 @Override
                 public void handleData(LttngEvent event) {
                     if (event != null) {
@@ -281,7 +282,8 @@ public class HistogramView extends TmfView {
     public void updateTimeRange(long startTime, long endTime) {
         if (fCurrentExperiment != null) {
             // Build the new time range; keep the current time
-            TmfTimeRange timeRange = new TmfTimeRange(new TmfTimestamp(startTime, TIME_SCALE), new TmfTimestamp(endTime, TIME_SCALE));
+            TmfTimeRange timeRange = new TmfTimeRange(new TmfTimestamp(startTime, TIME_SCALE), new TmfTimestamp(
+                    endTime, TIME_SCALE));
             TmfTimestamp currentTime = new TmfTimestamp(fCurrentTimestamp, TIME_SCALE);
 
             fTimeSpanControl.setValue(endTime - startTime);
@@ -451,8 +453,8 @@ public class HistogramView extends TmfView {
         if (fFullTraceRequest != null && !fFullTraceRequest.isCompleted()) {
             fFullTraceRequest.cancel();
         }
-        fFullTraceRequest = new HistogramRequest(fFullTraceHistogram, fullRange, (int) fFullTraceHistogram.fDataModel.getNbEvents(),
-                ExecutionType.BACKGROUND);
+        fFullTraceRequest = new HistogramRequest(fFullTraceHistogram, fullRange,
+                (int) fFullTraceHistogram.fDataModel.getNbEvents(), ExecutionType.BACKGROUND);
         fCurrentExperiment.sendRequest(fFullTraceRequest);
     }
 

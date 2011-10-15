@@ -17,8 +17,8 @@ import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 
 public interface ITmfEventsFilterListener {
 
-	public void filterApplied(ITmfFilter filter, ITmfTrace trace);
+	public void filterApplied(ITmfFilter filter, ITmfTrace<?> trace);
 	
-	public void searchApplied(ITmfFilter filter, ITmfTrace trace);
+	public void searchApplied(ITmfFilter filter, ITmfTrace<?> trace);
 	
 }

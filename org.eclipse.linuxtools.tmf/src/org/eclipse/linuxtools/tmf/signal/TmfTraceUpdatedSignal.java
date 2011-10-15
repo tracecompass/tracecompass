@@ -22,16 +22,16 @@ import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
  */
 public class TmfTraceUpdatedSignal extends TmfSignal {
 
-	private final ITmfTrace fTrace;
+	private final ITmfTrace<?> fTrace;
 	private final TmfTimeRange fTimeRange;
 	
-	public TmfTraceUpdatedSignal(Object source, ITmfTrace trace, TmfTimeRange range) {
+	public TmfTraceUpdatedSignal(Object source, ITmfTrace<?> trace, TmfTimeRange range) {
 		super(source);
 		fTrace = trace;
 		fTimeRange = range;
 	}
 
-	public ITmfTrace getTrace() {
+	public ITmfTrace<?> getTrace() {
 		return fTrace;
 	}
 

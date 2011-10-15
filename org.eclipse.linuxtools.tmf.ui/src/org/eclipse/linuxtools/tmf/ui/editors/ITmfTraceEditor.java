@@ -17,6 +17,6 @@ import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 
 public interface ITmfTraceEditor {
 
-    public ITmfTrace getTrace();
+    public ITmfTrace<?> getTrace();
     public IResource getResource();
 }

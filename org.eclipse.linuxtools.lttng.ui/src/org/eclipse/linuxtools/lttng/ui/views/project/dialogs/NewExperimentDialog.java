@@ -55,6 +55,7 @@ import org.eclipse.ui.internal.ide.dialogs.CreateLinkedResourceGroup;
  * 
  * This is stripped down version of NewFolderDialog.
  */
+@Deprecated
 @SuppressWarnings("restriction")
 public class NewExperimentDialog extends SelectionStatusDialog {
 

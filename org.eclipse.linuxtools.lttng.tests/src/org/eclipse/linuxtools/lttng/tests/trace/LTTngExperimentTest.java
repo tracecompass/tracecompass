@@ -21,10 +21,10 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.trace.LTTngExperiment;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
@@ -46,14 +46,15 @@ public class LTTngExperimentTest extends TestCase {
     private static final TmfTimestamp  fStartTime = new TmfTimestamp(13589759412128L, (byte) -9);
     private static final TmfTimestamp  fEndTime   = new TmfTimestamp(13589907059242L, (byte) -9);
 
-    private static ITmfTrace[] fTraces;
-    private static LTTngExperiment<TmfEvent> fExperiment;
+    private static ITmfTrace<LttngEvent>[] fTraces;
+    private static LTTngExperiment<LttngEvent> fExperiment;
 
     // ------------------------------------------------------------------------
     // Housekeeping
     // ------------------------------------------------------------------------
 
-    private synchronized static ITmfTrace[] setupTrace(String path) {
+    @SuppressWarnings("unchecked")
+    private synchronized static ITmfTrace<LttngEvent>[] setupTrace(String path) {
     	if (fTraces == null) {
     		fTraces = new ITmfTrace[1];
     		try {
@@ -74,7 +75,7 @@ public class LTTngExperimentTest extends TestCase {
 
     private synchronized static void setupExperiment() {
     	if (fExperiment == null) {
-    		fExperiment = new LTTngExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, fTraces, TmfTimestamp.Zero, 1000, true);
+    		fExperiment = new LTTngExperiment<LttngEvent>(LttngEvent.class, EXPERIMENT, fTraces, TmfTimestamp.Zero, 1000, true);
     	}
     }
 

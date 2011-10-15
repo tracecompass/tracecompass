@@ -32,30 +32,32 @@ import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.signal.TmfExperimentRangeUpdatedSignal;
+import org.eclipse.linuxtools.tmf.signal.TmfExperimentSelectedSignal;
+import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 
 /**
  * @author alvaro
  * 
  */
-public class StateExperimentManager extends LTTngTreeNode implements
-		ILttExperimentSelectedListener, IStateExperimentManager {
-	
-	// ========================================================================
-	// Data
-	// =======================================================================
-	private LTTngTreeNode fSelectedExperiment = null; // one selected experiment
-														// supported
-	private final StateExperimentListener fexperimentListener;
-	private boolean fwaitForCompletion = false;
-	/**
-	 * Used to route incoming events to proper trace manager, during check point
-	 * building
-	 */
-	private final Map<ITmfTrace, StateTraceHelper> ftraceToManagerMap = new HashMap<ITmfTrace, StateTraceHelper>();
+public class StateExperimentManager extends LTTngTreeNode implements ILttExperimentSelectedListener,
+        IStateExperimentManager {
 
-	private LttngSyntheticEvent syntheticEvent = null;
-	private ITmfDataRequest<LttngEvent> fStateCheckPointRequest = null;
+    // ========================================================================
+    // Data
+    // =======================================================================
+    private LTTngTreeNode fSelectedExperiment = null; // one selected experiment
+                                                      // supported
+    private final StateExperimentListener fexperimentListener;
+    private boolean fwaitForCompletion = false;
+    /**
+     * Used to route incoming events to proper trace manager, during check point building
+     */
+    private final Map<ITmfTrace, StateTraceHelper> ftraceToManagerMap = new HashMap<ITmfTrace, StateTraceHelper>();
+
+    private LttngSyntheticEvent syntheticEvent = null;
+    private ITmfDataRequest<LttngEvent> fStateCheckPointRequest = null;
     private boolean fCheckPointUpdateBusy = false;
     private boolean fCheckPointUpdatePending = false;
     private int fCheckPointUpdateIndex = 0;
@@ -63,19 +65,24 @@ public class StateExperimentManager extends LTTngTreeNode implements
     private long fCheckPointNbEventsHandled = 0;
     private final Object fCheckPointUpdateSyncObj = new Object();
 
+    // ========================================================================
+    // Constructors
+    // =======================================================================
+    public StateExperimentManager(Long id, String name) {
+        super(id, null, name, null);
+        fexperimentListener = new StateExperimentListener("Experiment Manager", this); //$NON-NLS-1$
+        TmfSignalManager.register(this);
+    }
 
-	// ========================================================================
-	// Constructors
-	// =======================================================================
-	public StateExperimentManager(Long id, String name) {
-		super(id, null, name, null);
-		fexperimentListener = new StateExperimentListener("Experiment Manager", this); //$NON-NLS-1$
-	}
+    @TmfSignalHandler
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void experimentSelected(TmfExperimentSelectedSignal signal) {
+        experimentSelected_prep(signal.getExperiment());
+    }
 
-
-	// ========================================================================
-	// Methods
-	// =======================================================================
+    // ========================================================================
+    // Methods
+    // =======================================================================
 
 //	/* (non-Javadoc)
 //	 * @see org.eclipse.linuxtools.lttng.state.experiment.IStateExperimentManager#readExperimentTimeWindow(org.eclipse.linuxtools.tmf.event.TmfTimeRange, java.lang.String, org.eclipse.linuxtools.lttng.state.IStateDataRequestListener)
@@ -126,76 +133,68 @@ public class StateExperimentManager extends LTTngTreeNode implements
 //			TraceDebug.debug("No selected experiment available");
 //		}
 //	}
-	
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.linuxtools.lttng.state.experiment.IStateExperimentManager #experimentSelected_prep
+     * (org.eclipse.linuxtools.tmf.experiment.TmfExperiment)
+     */
+    @Override
+    public void experimentSelected_prep(TmfExperiment<LttngEvent> experiment) {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.linuxtools.lttng.state.experiment.IStateExperimentManager
-	 * #experimentSelected_prep
-	 * (org.eclipse.linuxtools.tmf.experiment.TmfExperiment)
-	 */
-	@Override
-	public void experimentSelected_prep(TmfExperiment<LttngEvent> experiment) {
-	    
-	    if (fSelectedExperiment != null) {
-	        clearExperimentNode(fSelectedExperiment);
-	        fSelectedExperiment = null;
-	    }
+        if (fSelectedExperiment != null) {
+            clearExperimentNode(fSelectedExperiment);
+            fSelectedExperiment = null;
+        }
 
-		LTTngTreeNode experimentNode = null;
-		if (experiment != null) {
-			experimentNode = getChildByName(experiment.getName());
-			// keep experiment if already loaded with the same value
-			if (experimentNode != null
-					&& experimentNode.getValue() != experiment) {
-			    clearExperimentNode(experimentNode);
-				experimentNode = null;
-			}
+        LTTngTreeNode experimentNode = null;
+        if (experiment != null) {
+            experimentNode = getChildByName(experiment.getName());
+            // keep experiment if already loaded with the same value
+            if (experimentNode != null && experimentNode.getValue() != experiment) {
+                clearExperimentNode(experimentNode);
+                experimentNode = null;
+            }
 
-			// Make sure all traces involved have a corresponding state manager
-			// and
-			// state system to request its initial data
-			if (experimentNode == null) {
-				// Create the new experiment tree node
-				experimentNode = new LTTngTreeNode(getNextUniqueId(), this,
-						experiment.getName(), experiment);
-				// add the new experiment to this children list
-				addChild(experimentNode);
-			}
-			
-			// Make sure the traces exists in the tree
-			ITmfTrace[] rtraces = experiment.getTraces();
-			String traceName;
-			LTTngTreeNode traceStateManagerNode;
-			// StateStacksHandler
-			for (ITmfTrace rtrace : rtraces) {
-				traceName = rtrace.getName();
-				traceStateManagerNode = experimentNode.getChildByName(traceName);
-				// Node does not exist for this experiment, so needs to be
-				// created
-				if (traceStateManagerNode == null) {
-					traceStateManagerNode = StateManagerFactory.getManager(
-							rtrace, experimentNode);
-					experimentNode.addChild(traceStateManagerNode);
-				}
-			}
+            // Make sure all traces involved have a corresponding state manager
+            // and
+            // state system to request its initial data
+            if (experimentNode == null) {
+                // Create the new experiment tree node
+                experimentNode = new LTTngTreeNode(getNextUniqueId(), this, experiment.getName(), experiment);
+                // add the new experiment to this children list
+                addChild(experimentNode);
+            }
 
-			// Reset event provider to handle requests for the new experiment
-			LttngCoreProviderFactory.reset(experimentNode);
+            // Make sure the traces exists in the tree
+            ITmfTrace[] rtraces = experiment.getTraces();
+            String traceName;
+            LTTngTreeNode traceStateManagerNode;
+            // StateStacksHandler
+            for (ITmfTrace rtrace : rtraces) {
+                traceName = rtrace.getName();
+                traceStateManagerNode = experimentNode.getChildByName(traceName);
+                // Node does not exist for this experiment, so needs to be
+                // created
+                if (traceStateManagerNode == null) {
+                    traceStateManagerNode = StateManagerFactory.getManager(rtrace, experimentNode);
+                    experimentNode.addChild(traceStateManagerNode);
+                }
+            }
 
-			// preserve the selected experiment
-			fSelectedExperiment = experimentNode;
-		}
-	}
+            // Reset event provider to handle requests for the new experiment
+            LttngCoreProviderFactory.reset(experimentNode);
 
+            // preserve the selected experiment
+            fSelectedExperiment = experimentNode;
+        }
+    }
 
     private void clearExperimentNode(LTTngTreeNode experimentNode) {
         // Remove checkpoints
         LTTngTreeNode[] traceNodes = experimentNode.getChildren();
-        
+
         for (LTTngTreeNode traceStateManagerNode : traceNodes) {
             IStateTraceManager traceManager = null;
             try {
@@ -205,7 +204,7 @@ public class StateExperimentManager extends LTTngTreeNode implements
                 traceManager.clearCheckPoints();
                 experimentNode.removeChild(traceStateManagerNode);
             } catch (ClassCastException e) {
-                // Nothing to do 
+                // Nothing to do
             }
 
             // rebuild the experiment nodes from scratch
@@ -213,353 +212,346 @@ public class StateExperimentManager extends LTTngTreeNode implements
         }
     }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.linuxtools.lttng.signal.ILttExperimentSelectedListener#
-	 * experimentSelected(java.lang.Object,
-	 * org.eclipse.linuxtools.tmf.experiment.TmfExperiment)
-	 */
-	@Override
-	public void experimentSelected(Object source,
-			TmfExperiment<LttngEvent> experiment) {
-		// validate
-		if (experiment == null) { 
-			TraceDebug.debug("Received experiment is null"); //$NON-NLS-1$
-			return;
-		}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.linuxtools.lttng.signal.ILttExperimentSelectedListener# experimentSelected(java.lang.Object,
+     * org.eclipse.linuxtools.tmf.experiment.TmfExperiment)
+     */
+    @Override
+    public void experimentSelected(Object source, TmfExperiment<LttngEvent> experiment) {
+        // validate
+        if (experiment == null) {
+            TraceDebug.debug("Received experiment is null"); //$NON-NLS-1$
+            return;
+        }
 
-		// If previous request is ongoing, cancel it before requesting a new
-		// one.
-		if (fStateCheckPointRequest != null && !fStateCheckPointRequest.isCompleted()) {
-			fStateCheckPointRequest.cancel();
-		}
+        // If previous request is ongoing, cancel it before requesting a new
+        // one.
+        if (fStateCheckPointRequest != null && !fStateCheckPointRequest.isCompleted()) {
+            fStateCheckPointRequest.cancel();
+        }
 
-		synchronized (fCheckPointUpdateSyncObj) {
-			fCheckPointUpdateBusy = true;
-			fCheckPointUpdatePending = false;
-			fCheckPointUpdateIndex = 0;
-		}
+        synchronized (fCheckPointUpdateSyncObj) {
+            fCheckPointUpdateBusy = true;
+            fCheckPointUpdatePending = false;
+            fCheckPointUpdateIndex = 0;
+        }
 
-		// trigger data request to build the state system check points
-		fStateCheckPointRequest = buildCheckPoints(experiment, experiment.getTimeRange(), true);
+        // trigger data request to build the state system check points
+        fStateCheckPointRequest = buildCheckPoints(experiment, experiment.getTimeRange(), true);
 
-		if (fStateCheckPointRequest == null) {
-			synchronized (fCheckPointUpdateSyncObj) {
-				fCheckPointUpdateBusy = false;
-			}
-		}
-	}
+        if (fStateCheckPointRequest == null) {
+            synchronized (fCheckPointUpdateSyncObj) {
+                fCheckPointUpdateBusy = false;
+            }
+        }
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.linuxtools.lttng.signal.ILttExperimentSelectedListener#
-	 * experimentUpdated
-	 * (org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal, boolean)
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
-		TmfExperiment<LttngEvent> experiment = (TmfExperiment<LttngEvent>) signal.getExperiment();
-		// validate
-		if (experiment != fSelectedExperiment.getValue()) {
-			return;
-		}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.linuxtools.lttng.signal.ILttExperimentSelectedListener# experimentUpdated
+     * (org.eclipse.linuxtools.tmf.signal.TmfExperimentUpdatedSignal, boolean)
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
+        TmfExperiment<LttngEvent> experiment = (TmfExperiment<LttngEvent>) signal.getExperiment();
+        // validate
+        if (experiment != fSelectedExperiment.getValue()) {
+            return;
+        }
 
-		synchronized (fCheckPointUpdateSyncObj) {
-			if (fCheckPointUpdateBusy) {
-				fCheckPointUpdatePending = true;
-				fCheckPointUpdateRange = signal.getRange();
-				return;
-			} else {
-				fCheckPointUpdateBusy = true;
-			}
-		}
+        synchronized (fCheckPointUpdateSyncObj) {
+            if (fCheckPointUpdateBusy) {
+                fCheckPointUpdatePending = true;
+                fCheckPointUpdateRange = signal.getRange();
+                return;
+            } else {
+                fCheckPointUpdateBusy = true;
+            }
+        }
 
-		// If previous request is ongoing, cancel it before requesting a new
-		// one.
-		if (fStateCheckPointRequest != null && !fStateCheckPointRequest.isCompleted()) {
-			fStateCheckPointRequest.cancel();
-		}
+        // If previous request is ongoing, cancel it before requesting a new
+        // one.
+        if (fStateCheckPointRequest != null && !fStateCheckPointRequest.isCompleted()) {
+            fStateCheckPointRequest.cancel();
+        }
 
-		// trigger data request to build the state system check points
-		fStateCheckPointRequest = buildCheckPoints(experiment, signal.getRange(), false);
-		
-		if (fStateCheckPointRequest == null) {
-	        synchronized (fCheckPointUpdateSyncObj) {
-	    		fCheckPointUpdateBusy = false;
-	        }
-		}
-	}
+        // trigger data request to build the state system check points
+        fStateCheckPointRequest = buildCheckPoints(experiment, signal.getRange(), false);
 
+        if (fStateCheckPointRequest == null) {
+            synchronized (fCheckPointUpdateSyncObj) {
+                fCheckPointUpdateBusy = false;
+            }
+        }
+    }
 
-	/**
-	 * @return the SelectedExperiment tree node
-	 */
-	@Override
-	public LTTngTreeNode getSelectedExperiment() {
-		return fSelectedExperiment;
-	}
+    /**
+     * @return the SelectedExperiment tree node
+     */
+    @Override
+    public LTTngTreeNode getSelectedExperiment() {
+        return fSelectedExperiment;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.lttng.state.experiment.IStateExperimentManager#getExperimentTimeRange()
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public TmfTimeRange getExperimentTimeRange() {
-		TmfTimeRange timeRangeResult = null;
-		if (fSelectedExperiment != null) {
-			timeRangeResult = ((TmfExperiment<LttngEvent>) fSelectedExperiment
-					.getValue()).getTimeRange();
-		}
-		return timeRangeResult;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.linuxtools.lttng.state.experiment.IStateExperimentManager#getExperimentTimeRange()
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public TmfTimeRange getExperimentTimeRange() {
+        TmfTimeRange timeRangeResult = null;
+        if (fSelectedExperiment != null) {
+            timeRangeResult = ((TmfExperiment<LttngEvent>) fSelectedExperiment.getValue()).getTimeRange();
+        }
+        return timeRangeResult;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#finalize()
-	 */
-	@Override
-	protected void finalize() {
-		fexperimentListener.dispose();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#finalize()
+     */
+    @Override
+    protected void finalize() {
+        fexperimentListener.dispose();
+    }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.linuxtools.lttng.state.experiment.IStateExperimentManager #waitForComplete(boolean)
+     */
+    @Override
+    public void waitForCompletion(boolean wait) {
+        fwaitForCompletion = wait;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.linuxtools.lttng.state.experiment.IStateExperimentManager
-	 * #waitForComplete(boolean)
-	 */
-	@Override
-	public void waitForCompletion(boolean wait) {
-		fwaitForCompletion = wait;
-	}
+    private ITmfDataRequest<LttngEvent> buildCheckPoints(final TmfExperiment<LttngEvent> experiment,
+            final TmfTimeRange range, boolean initial) {
+        // validate
+        if (experiment == null) {
+            TraceDebug.debug("Received experiment is null"); //$NON-NLS-1$
+            return null;
+        }
 
-	private ITmfDataRequest<LttngEvent> buildCheckPoints(final TmfExperiment<LttngEvent> experiment, final TmfTimeRange range, boolean initial) {
-		// validate
-		if (experiment == null) {
-			TraceDebug.debug("Received experiment is null"); //$NON-NLS-1$
-			return null;
-		}
-		
-		LTTngTreeNode experimentNode = getChildByName(experiment.getName());
-		if (experimentNode == null) {
-			TraceDebug.debug("Experiment Node " + experiment.getName() + " does not exist"); //$NON-NLS-1$ //$NON-NLS-2$
-			return null;
-		}
-		
-		final boolean waitForCompletion = fwaitForCompletion;
-		
-		// get the trace manager nodes associated to the experiment
-		LTTngTreeNode[] traceNodes = experimentNode.getChildren();
-		
-		if (initial) {
-			synchronized (this) {
-				ftraceToManagerMap.clear();
-			}
+        LTTngTreeNode experimentNode = getChildByName(experiment.getName());
+        if (experimentNode == null) {
+            TraceDebug.debug("Experiment Node " + experiment.getName() + " does not exist"); //$NON-NLS-1$ //$NON-NLS-2$
+            return null;
+        }
 
-			ITmfTrace trace;
-			for (LTTngTreeNode traceStateManagerNode : traceNodes) {
-				IStateTraceManager traceManager;
-				try {
-					traceManager = (IStateTraceManager) traceStateManagerNode;
-				} catch (ClassCastException e) {
-					System.out.println(e.getStackTrace().toString());
-					return null;
-				}
-			
-				// Clear all previously created check points as preparation to
-				// re-build
-				traceManager.clearCheckPoints();
-			
-				// build the trace to manager mapping for event dispatching
-				trace = traceManager.getTrace();
-				synchronized (this) {
-					ftraceToManagerMap.put(trace, new StateTraceHelper(traceManager));
-				}
-			}
-		}
+        final boolean waitForCompletion = fwaitForCompletion;
 
-		// if no trace mapping
-		if (ftraceToManagerMap.size() < 1) {
-			TraceDebug.debug("No traces associated to experiment " + experiment.getName()); //$NON-NLS-1$
-			return null;
-		}
-		
-		fCheckPointNbEventsHandled = 0;
-		
-		// Prepare event data request to build state model
-		ITmfEventRequest<LttngEvent> request = new TmfEventRequest<LttngEvent>(
-				LttngEvent.class, range, fCheckPointUpdateIndex,
-				TmfEventRequest.ALL_DATA, LttngConstants.DEFAULT_BLOCK_SIZE, ITmfDataRequest.ExecutionType.BACKGROUND) {
-		
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.linuxtools.tmf.request.TmfDataRequest#handleData()
-			 */
-			@Override
-			public void handleData(LttngEvent event) {
-				super.handleData(event);
-				if (event != null) {
+        // get the trace manager nodes associated to the experiment
+        LTTngTreeNode[] traceNodes = experimentNode.getChildren();
+
+        if (initial) {
+            synchronized (this) {
+                ftraceToManagerMap.clear();
+            }
+
+            ITmfTrace trace;
+            for (LTTngTreeNode traceStateManagerNode : traceNodes) {
+                IStateTraceManager traceManager;
+                try {
+                    traceManager = (IStateTraceManager) traceStateManagerNode;
+                } catch (ClassCastException e) {
+                    System.out.println(e.getStackTrace().toString());
+                    return null;
+                }
+
+                // Clear all previously created check points as preparation to
+                // re-build
+                traceManager.clearCheckPoints();
+
+                // build the trace to manager mapping for event dispatching
+                trace = traceManager.getTrace();
+                synchronized (this) {
+                    ftraceToManagerMap.put(trace, new StateTraceHelper(traceManager));
+                }
+            }
+        }
+
+        // if no trace mapping
+        if (ftraceToManagerMap.size() < 1) {
+            TraceDebug.debug("No traces associated to experiment " + experiment.getName()); //$NON-NLS-1$
+            return null;
+        }
+
+        fCheckPointNbEventsHandled = 0;
+
+        // Prepare event data request to build state model
+        ITmfEventRequest<LttngEvent> request = new TmfEventRequest<LttngEvent>(LttngEvent.class, range,
+                fCheckPointUpdateIndex, TmfEventRequest.ALL_DATA, LttngConstants.DEFAULT_BLOCK_SIZE,
+                ITmfDataRequest.ExecutionType.BACKGROUND) {
+
+            /*
+             * (non-Javadoc)
+             * 
+             * @see org.eclipse.linuxtools.tmf.request.TmfDataRequest#handleData()
+             */
+            @Override
+            public void handleData(LttngEvent event) {
+                super.handleData(event);
+                if (event != null) {
 //					Tracer.trace("Chk: " + event.getTimestamp());
-					fCheckPointNbEventsHandled++;
-					ITmfTrace trace = event.getParentTrace();
+                    fCheckPointNbEventsHandled++;
+                    ITmfTrace trace = event.getParentTrace();
 
-					StateTraceHelper helper = ftraceToManagerMap.get(trace);
+                    StateTraceHelper helper = ftraceToManagerMap.get(trace);
 
-					if (helper != null) {
-						helper.incrementNumberRead();
+                    if (helper != null) {
+                        helper.incrementNumberRead();
 
-						// obtain synthetic event
-						LttngSyntheticEvent synEvent = updateSynEvent(event, helper.getTraceModel());
+                        // obtain synthetic event
+                        LttngSyntheticEvent synEvent = updateSynEvent(event, helper.getTraceModel());
 
-						// update state system, and save check points as needed
-						helper.getStateManager().handleEvent(synEvent, helper.getNumberRead());
-					} else {
-						TraceDebug.debug("StateTraceManager not found for trace" //$NON-NLS-1$
-								+ trace.getName());
-					}
-				}
-			}
+                        // update state system, and save check points as needed
+                        helper.getStateManager().handleEvent(synEvent, helper.getNumberRead());
+                    } else {
+                        TraceDebug.debug("StateTraceManager not found for trace" //$NON-NLS-1$
+                                + trace.getName());
+                    }
+                }
+            }
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.linuxtools.tmf.request.TmfDataRequest#handleCompleted()
-			 */
-			@Override
-			public void handleCompleted() {
-				super.handleCompleted();
-				printCompletedMessage();
-				
-				if (!waitForCompletion) {
-					synchronized (fCheckPointUpdateSyncObj) {
-						fCheckPointUpdateBusy = false;
-						fCheckPointUpdateIndex += fCheckPointNbEventsHandled;
-						if (fCheckPointUpdatePending) {
-							fCheckPointUpdatePending = false;
-							fCheckPointUpdateBusy = true;
-							buildCheckPoints(experiment, fCheckPointUpdateRange, false);
-						}
-					}
-				}
-			}
+            /*
+             * (non-Javadoc)
+             * 
+             * @see org.eclipse.linuxtools.tmf.request.TmfDataRequest#handleCompleted()
+             */
+            @Override
+            public void handleCompleted() {
+                super.handleCompleted();
+                printCompletedMessage();
 
-			/*
-			/**
-			 * @param header
-			 */
-			private void printCompletedMessage() {
-				if (TraceDebug.isDEBUG()) {
-					TraceDebug.debug("Trace check point building completed, number of events handled: " + fCheckPointNbEventsHandled + "\n\t\t"); //$NON-NLS-1$ //$NON-NLS-2$
-					for (StateTraceHelper helper : ftraceToManagerMap.values()) {
-						TraceDebug.debug(helper.getStateManager().toString() + "\n\t\t"); //$NON-NLS-1$
-					}
-				}
-			}
-		};
+                if (!waitForCompletion) {
+                    synchronized (fCheckPointUpdateSyncObj) {
+                        fCheckPointUpdateBusy = false;
+                        fCheckPointUpdateIndex += fCheckPointNbEventsHandled;
+                        if (fCheckPointUpdatePending) {
+                            fCheckPointUpdatePending = false;
+                            fCheckPointUpdateBusy = true;
+                            buildCheckPoints(experiment, fCheckPointUpdateRange, false);
+                        }
+                    }
+                }
+            }
 
-		// Execute event data request
-		experiment.sendRequest(request);
+            /*
+             * /**
+             * 
+             * @param header
+             */
+            private void printCompletedMessage() {
+                if (TraceDebug.isDEBUG()) {
+                    TraceDebug
+                            .debug("Trace check point building completed, number of events handled: " + fCheckPointNbEventsHandled + "\n\t\t"); //$NON-NLS-1$ //$NON-NLS-2$
+                    for (StateTraceHelper helper : ftraceToManagerMap.values()) {
+                        TraceDebug.debug(helper.getStateManager().toString() + "\n\t\t"); //$NON-NLS-1$
+                    }
+                }
+            }
+        };
 
-		if (waitForCompletion) {
-			try {
-				request.waitForCompletion();
-				synchronized (fCheckPointUpdateSyncObj) {
-					fCheckPointUpdateBusy = false;
-					fCheckPointUpdateIndex += fCheckPointNbEventsHandled;
-					if (fCheckPointUpdatePending) {
-						fCheckPointUpdatePending = false;
-						fCheckPointUpdateBusy = true;
-						buildCheckPoints(experiment, fCheckPointUpdateRange, false);
-					}
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+        // Execute event data request
+        experiment.sendRequest(request);
 
-		return request;
-	}
+        if (waitForCompletion) {
+            try {
+                request.waitForCompletion();
+                synchronized (fCheckPointUpdateSyncObj) {
+                    fCheckPointUpdateBusy = false;
+                    fCheckPointUpdateIndex += fCheckPointNbEventsHandled;
+                    if (fCheckPointUpdatePending) {
+                        fCheckPointUpdatePending = false;
+                        fCheckPointUpdateBusy = true;
+                        buildCheckPoints(experiment, fCheckPointUpdateRange, false);
+                    }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
-	private LttngSyntheticEvent updateSynEvent(LttngEvent e, LttngTraceState stateModel) {
-		if (syntheticEvent == null || syntheticEvent.getBaseEvent() != e) {
-			syntheticEvent = new LttngSyntheticEvent(e);
-		}
+        return request;
+    }
 
-		// Trace model needed by application handlers
-		syntheticEvent.setTraceModel(stateModel);
-		syntheticEvent.setSequenceInd(SequenceInd.UPDATE);
+    private LttngSyntheticEvent updateSynEvent(LttngEvent e, LttngTraceState stateModel) {
+        if (syntheticEvent == null || syntheticEvent.getBaseEvent() != e) {
+            syntheticEvent = new LttngSyntheticEvent(e);
+        }
 
-		return syntheticEvent;
-	}
+        // Trace model needed by application handlers
+        syntheticEvent.setTraceModel(stateModel);
+        syntheticEvent.setSequenceInd(SequenceInd.UPDATE);
 
-	/**
-	 * Helper class that wraps the StateTraceManager, the current
-	 * LTTngTraceState and the number of read events
-	 * 
-	 * @author bHufmann
-	 * 
-	 */
-	private class StateTraceHelper {
+        return syntheticEvent;
+    }
 
-		IStateTraceManager stateTraceManager = null;
-		long numberEventsRead = 0;
-		LttngTraceState stateTraceModel = null;
+    /**
+     * Helper class that wraps the StateTraceManager, the current LTTngTraceState and the number of read events
+     * 
+     * @author bHufmann
+     * 
+     */
+    private class StateTraceHelper {
 
-		/**
-		 * Constructor
-		 * 
-		 * @param stateManager
-		 *            The StateTraceManager the helper is for
-		 */
-		public StateTraceHelper(IStateTraceManager stateManager) {
-			this.stateTraceManager = stateManager;
-			// Get the TraceState at the beginning of the trace
-			this.stateTraceManager.restoreCheckPointByTimestamp(stateManager
-					.getTrace().getStartTime());
-			this.stateTraceModel = this.stateTraceManager.getStateModel();
-		}
+        IStateTraceManager stateTraceManager = null;
+        long numberEventsRead = 0;
+        LttngTraceState stateTraceModel = null;
 
-		/**
-		 * Returns the StateTraceManager
-		 * 
-		 * @return IStateTraceManager
-		 */
-		public IStateTraceManager getStateManager() {
-			return stateTraceManager;
-		}
+        /**
+         * Constructor
+         * 
+         * @param stateManager
+         *            The StateTraceManager the helper is for
+         */
+        public StateTraceHelper(IStateTraceManager stateManager) {
+            this.stateTraceManager = stateManager;
+            // Get the TraceState at the beginning of the trace
+            this.stateTraceManager.restoreCheckPointByTimestamp(stateManager.getTrace().getStartTime());
+            this.stateTraceModel = this.stateTraceManager.getStateModel();
+        }
 
-		/**
-		 * Returns the number of read events
-		 * 
-		 * @return long
-		 */
-		public long getNumberRead() {
-			return numberEventsRead;
-		}
+        /**
+         * Returns the StateTraceManager
+         * 
+         * @return IStateTraceManager
+         */
+        public IStateTraceManager getStateManager() {
+            return stateTraceManager;
+        }
 
-		/**
-		 * Increments the number of read events
-		 */
-		public void incrementNumberRead() {
-			++numberEventsRead;
-		}
+        /**
+         * Returns the number of read events
+         * 
+         * @return long
+         */
+        public long getNumberRead() {
+            return numberEventsRead;
+        }
 
-		/**
-		 * Returns the current LTTngTraceState
-		 * 
-		 * @return LttngTraceState
-		 */
-		public LttngTraceState getTraceModel() {
-			return stateTraceModel;
-		}
-	}
+        /**
+         * Increments the number of read events
+         */
+        public void incrementNumberRead() {
+            ++numberEventsRead;
+        }
+
+        /**
+         * Returns the current LTTngTraceState
+         * 
+         * @return LttngTraceState
+         */
+        public LttngTraceState getTraceModel() {
+            return stateTraceModel;
+        }
+    }
 }

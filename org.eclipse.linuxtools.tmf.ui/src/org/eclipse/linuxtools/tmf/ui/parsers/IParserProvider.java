@@ -35,7 +35,7 @@ public interface IParserProvider {
 	 * @param resource the resource
 	 * @return a trace instance or null if the parser id is not handled by this parser provider
 	 */
-    public ITmfTrace getTraceForParser(String parser, IResource resource);
+    public ITmfTrace<?> getTraceForParser(String parser, IResource resource);
     
 	/**
 	 * Return a trace instance for a resource given a content type id
@@ -44,7 +44,7 @@ public interface IParserProvider {
 	 * @param resource the resource
 	 * @return a trace instance or null if the content type id is not handled by this parser provider
 	 */
-    public ITmfTrace getTraceForContentType(String contentTypeId, IResource resource);
+    public ITmfTrace<?> getTraceForContentType(String contentTypeId, IResource resource);
     
 	/**
 	 * Return the parser map for this parser provider
@@ -90,6 +90,6 @@ public interface IParserProvider {
 	 * @param cacheSize the desired cache size for the table
 	 * @return an events table instance or null if the trace is not handled by this parser provider
 	 */
-    public TmfEventsTable getEventsTable(ITmfTrace trace, Composite parent, int cacheSize);
+    public TmfEventsTable getEventsTable(ITmfTrace<?> trace, Composite parent, int cacheSize);
 
 }

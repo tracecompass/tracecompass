@@ -28,13 +28,12 @@ import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.tmf.event.TmfNoSuchFieldException;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
-import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.trace.TmfCheckpoint;
 import org.eclipse.linuxtools.tmf.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.trace.TmfLocation;
 import org.eclipse.linuxtools.tmf.trace.TmfTrace;
 
-public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
+public class LTTngTextTrace extends TmfTrace<LttngEvent> {
 	private LttngTimestamp                  eventTimestamp   = null;
     private LttngEventSource                eventSource      = null;
     private LttngEventType                  eventType        = null;
@@ -110,7 +109,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfTrace {
     }
     
 	@Override
-	public LTTngTextTrace createTraceCopy() {
+	public LTTngTextTrace copy() {
 		
 		LTTngTextTrace returnedTrace = null;
     	

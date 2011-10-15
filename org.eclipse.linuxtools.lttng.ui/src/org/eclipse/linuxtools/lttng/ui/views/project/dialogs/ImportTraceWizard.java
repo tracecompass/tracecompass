@@ -30,6 +30,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
  * 
  * TODO: Implement me. Please.
  */
+@Deprecated
 @SuppressWarnings("restriction")
 public class ImportTraceWizard extends Wizard implements IImportWizard {
 

@@ -48,7 +48,8 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     }
 
 	@Override
-    public ITmfTrace createTraceCopy() {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public ITmfTrace copy() {
         // TODO Auto-generated method stub
         return null;
     }

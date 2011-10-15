@@ -28,11 +28,10 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.linuxtools.lttng.TraceHelper;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.state.experiment.StateManagerFactory;
 import org.eclipse.linuxtools.lttng.trace.LTTngExperiment;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
-import org.eclipse.linuxtools.lttng.ui.TraceHelper;
 import org.eclipse.linuxtools.lttng.ui.views.project.dialogs.Messages;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.ILTTngProjectTreeNode;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngExperimentNode;
@@ -78,61 +77,61 @@ public class ProjectView extends TmfView {
 
     // Perform updates on the UI thread
     private Runnable fViewRefresher = new Runnable() {
-    	@Override
-		public void run() {
-    		if ((fViewer != null) && (!fViewer.getTree().isDisposed())) {
-    			Object[] elements = fViewer.getExpandedElements();
-    			fViewer.refresh();
-    			fViewer.setExpandedElements(elements);
-    		}
-    	}
+        @Override
+        public void run() {
+            if ((fViewer != null) && (!fViewer.getTree().isDisposed())) {
+                Object[] elements = fViewer.getExpandedElements();
+                fViewer.refresh();
+                fViewer.setExpandedElements(elements);
+            }
+        }
     };
 
     public LTTngProjectRoot getRoot() {
-    	return fProjectRoot;
+        return fProjectRoot;
     }
-   
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
 
-	public ProjectView() {
-		
-		super("ProjectView"); //$NON-NLS-1$
+    public ProjectView() {
+
+        super("ProjectView"); //$NON-NLS-1$
         fProjectRoot = new LTTngProjectRoot(this);
 
-		fWorkspace = ResourcesPlugin.getWorkspace();
-		fResourceChangeListener = new IResourceChangeListener() {
+        fWorkspace = ResourcesPlugin.getWorkspace();
+        fResourceChangeListener = new IResourceChangeListener() {
             @Override
-			public void resourceChanged(IResourceChangeEvent event) {
+            public void resourceChanged(IResourceChangeEvent event) {
                 if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
-                	fProjectRoot.refreshChildren();
-                	refresh();
+                    fProjectRoot.refreshChildren();
+                    refresh();
                 }
-            }            
+            }
         };
         fWorkspace.addResourceChangeListener(fResourceChangeListener);
-	}
-
-	public void refresh() {
-       	Tree tree = fViewer.getTree();
-       	if (tree != null && !tree.isDisposed())
-       		tree.getDisplay().asyncExec(fViewRefresher);
-	}
-
-	public void setSelection(ILTTngProjectTreeNode node) {
-		fViewer.setSelection(new StructuredSelection(node), true);
-	}
-
-    @Override
-	public void dispose() {
-    	fWorkspace.removeResourceChangeListener(fResourceChangeListener);
     }
 
-	@Override
-	public void createPartControl(Composite parent) {
+    public void refresh() {
+        Tree tree = fViewer.getTree();
+        if (tree != null && !tree.isDisposed())
+            tree.getDisplay().asyncExec(fViewRefresher);
+    }
 
-		fViewer = new TreeViewer(parent, SWT.SINGLE);
+    public void setSelection(ILTTngProjectTreeNode node) {
+        fViewer.setSelection(new StructuredSelection(node), true);
+    }
+
+    @Override
+    public void dispose() {
+        fWorkspace.removeResourceChangeListener(fResourceChangeListener);
+    }
+
+    @Override
+    public void createPartControl(Composite parent) {
+
+        fViewer = new TreeViewer(parent, SWT.SINGLE);
         fViewer.setContentProvider(new LTTngProjectContentProvider());
         fViewer.setSorter(new ViewerSorter());
         fViewer.setLabelProvider(new LTTngProjectLabelProvider());
@@ -142,17 +141,17 @@ public class ProjectView extends TmfView {
         hookMouse();
 
         createContextMenu();
-	}
+    }
 
     // ------------------------------------------------------------------------
     // ViewPart
     // ------------------------------------------------------------------------
 
-	@Override
-	@SuppressWarnings("nls")
-	public String toString() {
-		return "[ProjectView]";
-	}
+    @Override
+    @SuppressWarnings("nls")
+    public String toString() {
+        return "[ProjectView]";
+    }
 
     // ------------------------------------------------------------------------
     // hookMouse
@@ -160,13 +159,13 @@ public class ProjectView extends TmfView {
 
     private void hookMouse() {
         fViewer.getTree().addMouseListener(new MouseAdapter() {
-        	@Override
-			public void mouseDoubleClick(MouseEvent event) {
+            @Override
+            public void mouseDoubleClick(MouseEvent event) {
                 TreeSelection selection = (TreeSelection) fViewer.getSelection();
                 Object element = selection.getFirstElement();
                 if (element instanceof LTTngExperimentNode) {
-                	LTTngExperimentNode experiment = (LTTngExperimentNode) element;
-                	selectExperiment(experiment);                
+                    LTTngExperimentNode experiment = (LTTngExperimentNode) element;
+                    selectExperiment(experiment);
                 } else {
                     if (element instanceof LTTngTraceNode) {
                         LTTngTraceNode trace = (LTTngTraceNode) element;
@@ -193,11 +192,11 @@ public class ProjectView extends TmfView {
             traces[0] = trace;
             fSelectedExperiment = new LTTngExperiment<LttngEvent>(LttngEvent.class, traceNode.getName(), traces);
             TmfExperiment.setCurrentExperiment(fSelectedExperiment);
-            
+
             // Make sure the lttng-core, experiment selection context is ready
             // for an event request from any view
-            StateManagerFactory.getExperimentManager().experimentSelected_prep(
-                    (TmfExperiment<LttngEvent>) fSelectedExperiment);
+//            StateManagerFactory.getExperimentManager().experimentSelected_prep(
+//                    (TmfExperiment<LttngEvent>) fSelectedExperiment);
 
             broadcast(new TmfExperimentSelectedSignal<LttngEvent>(this, fSelectedExperiment));
         } catch (FileNotFoundException e) {
@@ -207,37 +206,37 @@ public class ProjectView extends TmfView {
         }
     }
 
-	private boolean waitForCompletion = true;
+    private boolean waitForCompletion = true;
 
-	/**
-	 * @param experiment
-	 */
-	public void selectExperiment(LTTngExperimentNode experiment) {
-    	String expId = experiment.getName();
+    /**
+     * @param experiment
+     */
+    public void selectExperiment(LTTngExperimentNode experiment) {
+        String expId = experiment.getName();
         if (fSelectedExperiment != null) {
 //        	System.out.println(fSelectedExperiment.getName() + ": nbEvents=" + fSelectedExperiment.getNbEvents() + 
 //        			", nbReads=" + ((LTTngTrace) fSelectedExperiment.getTraces()[0]).nbEventsRead);
-        	fSelectedExperiment.dispose();
+            fSelectedExperiment.dispose();
         }
         try {
-        	LTTngTraceNode[] traceEntries = experiment.getTraces();
-        	int nbTraces = traceEntries.length;
-        	ITmfTrace[] traces = new ITmfTrace[nbTraces];
-        	for (int i = 0; i < nbTraces; i++) {
-        		IResource res = traceEntries[i].getFolder();
-        		String location = res.getLocation().toOSString();
-        		IProject project = res.getProject().getProject();
+            LTTngTraceNode[] traceEntries = experiment.getTraces();
+            int nbTraces = traceEntries.length;
+            ITmfTrace[] traces = new ITmfTrace[nbTraces];
+            for (int i = 0; i < nbTraces; i++) {
+                IResource res = traceEntries[i].getFolder();
+                String location = res.getLocation().toOSString();
+                IProject project = res.getProject().getProject();
                 String traceLibPath = TraceHelper.getTraceLibDirFromProject(project);
-        		ITmfTrace trace = new LTTngTrace(location, traceLibPath, waitForCompletion, false);
+                ITmfTrace trace = new LTTngTrace(location, traceLibPath, waitForCompletion, false);
                 traces[i] = trace;
-        	}
+            }
             fSelectedExperiment = new LTTngExperiment<LttngEvent>(LttngEvent.class, expId, traces);
             TmfExperiment.setCurrentExperiment(fSelectedExperiment);
-            
-			// Make sure the lttng-core, experiment selection context is ready
-			// for an event request from any view
-			StateManagerFactory.getExperimentManager().experimentSelected_prep(
-					(TmfExperiment<LttngEvent>) fSelectedExperiment);
+
+            // Make sure the lttng-core, experiment selection context is ready
+            // for an event request from any view
+//			StateManagerFactory.getExperimentManager().experimentSelected_prep(
+//					(TmfExperiment<LttngEvent>) fSelectedExperiment);
 
 //			System.out.println(System.currentTimeMillis() + ": Experiment selected");
             broadcast(new TmfExperimentSelectedSignal<LttngEvent>(this, fSelectedExperiment));
@@ -252,7 +251,7 @@ public class ProjectView extends TmfView {
     // createContextMenu
     // ------------------------------------------------------------------------
 
-	// Populated from the plug-in
+    // Populated from the plug-in
     private void createContextMenu() {
         MenuManager menuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
         menuManager.setRemoveAllWhenShown(true);
@@ -260,5 +259,5 @@ public class ProjectView extends TmfView {
         fViewer.getControl().setMenu(menu);
         getSite().registerContextMenu(menuManager, fViewer);
     }
-			
+
 }

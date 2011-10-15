@@ -105,7 +105,7 @@ public class LTTngStateResourceTest extends TestCase {
 			}
 
 			@Override
-			public ITmfTrace getTraceIdRef() {
+			public ITmfTrace<?> getTraceIdRef() {
 				return null;
 			}
 

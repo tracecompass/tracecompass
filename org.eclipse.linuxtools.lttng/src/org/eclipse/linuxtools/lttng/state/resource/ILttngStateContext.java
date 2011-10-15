@@ -66,7 +66,7 @@ public interface ILttngStateContext {
 	 * 
 	 * @return
 	 */
-	public ITmfTrace getTraceIdRef();
+	public ITmfTrace<?> getTraceIdRef();
 
 	/**
 	 *  Returns Trace Identifier

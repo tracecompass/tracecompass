@@ -28,46 +28,50 @@ import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
  */
 public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvider<T> {
 
-	public TmfEventProvider(String name, Class<T> type) {
-		super(name, type);
-	}
+    public TmfEventProvider() {
+    }
 
-	public TmfEventProvider(String name, Class<T> type, int queueSize) {
-		super(name, type, queueSize);
-	}
-	
-	public TmfEventProvider(TmfEventProvider<T> oldProvider) {
-		super(oldProvider);
-	}
-	
-	@Override
-	public boolean isCompleted(ITmfDataRequest<T> request, T data, int nbRead) {
-		boolean requestCompleted = super.isCompleted(request, data, nbRead);
-		if (!requestCompleted && request instanceof ITmfEventRequest<?> && !data.isNullRef()) {
-			TmfTimestamp endTime = ((ITmfEventRequest<?>) request).getRange().getEndTime();
-			return data.getTimestamp().compareTo(endTime, false) > 0;
-		}
-		return requestCompleted;
-	}
+    public void init(String name, Class<T> eventType) {
+        super.init(name, eventType);
+    }
 
-	@Override
-	protected synchronized void newCoalescedDataRequest(ITmfDataRequest<T> request) {
-		if (request instanceof ITmfEventRequest<?>) {
-			ITmfEventRequest<T> eventRequest = (ITmfEventRequest<T>) request;
-			TmfCoalescedEventRequest<T> coalescedRequest = 
-				new TmfCoalescedEventRequest<T>(
-						fType, eventRequest.getRange(), eventRequest.getIndex(), eventRequest.getNbRequested(), eventRequest.getBlockSize(), 
-						eventRequest.getExecType());
-			coalescedRequest.addRequest(eventRequest);
-	        if (Tracer.isRequestTraced()) {
-		        Tracer.traceRequest(request, "coalesced with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
-	        }
-			fPendingCoalescedRequests.add(coalescedRequest);
-		}
-		else {
-			super.newCoalescedDataRequest(request);
-		}
-	}
+    public TmfEventProvider(String name, Class<T> type) {
+        super(name, type);
+    }
+
+    public TmfEventProvider(String name, Class<T> type, int queueSize) {
+        super(name, type, queueSize);
+    }
+
+    public TmfEventProvider(TmfEventProvider<T> oldProvider) {
+        super(oldProvider);
+    }
+
+    @Override
+    public boolean isCompleted(ITmfDataRequest<T> request, T data, int nbRead) {
+        boolean requestCompleted = super.isCompleted(request, data, nbRead);
+        if (!requestCompleted && request instanceof ITmfEventRequest<?> && !data.isNullRef()) {
+            TmfTimestamp endTime = ((ITmfEventRequest<?>) request).getRange().getEndTime();
+            return data.getTimestamp().compareTo(endTime, false) > 0;
+        }
+        return requestCompleted;
+    }
+
+    @Override
+    protected synchronized void newCoalescedDataRequest(ITmfDataRequest<T> request) {
+        if (request instanceof ITmfEventRequest<?>) {
+            ITmfEventRequest<T> eventRequest = (ITmfEventRequest<T>) request;
+            TmfCoalescedEventRequest<T> coalescedRequest = new TmfCoalescedEventRequest<T>(fType, eventRequest.getRange(),
+                    eventRequest.getNbRequested(), eventRequest.getBlockSize(), eventRequest.getExecType());
+            coalescedRequest.addRequest(eventRequest);
+            if (Tracer.isRequestTraced()) {
+                Tracer.traceRequest(request, "coalesced with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
+            }
+            fPendingCoalescedRequests.add(coalescedRequest);
+        } else {
+            super.newCoalescedDataRequest(request);
+        }
+    }
 
 	@Override
 	protected void queueBackgroundRequest(final ITmfDataRequest<T> request, final int blockSize, final boolean indexing) {

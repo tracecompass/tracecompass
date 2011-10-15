@@ -34,11 +34,11 @@ import org.eclipse.linuxtools.tmf.trace.ITmfContext;
  * <p>
  * The TmfProvider<T> is a provider for a data of type <T>.
  * <p>
- * This abstract class implements the housekeeking methods to register/
- * deregister the event provider and to handle generically the event requests.
+ * This abstract class implements the housekeeking methods to register/ deregister the event provider and to handle
+ * generically the event requests.
  * <p>
- * The concrete class can either re-implement processRequest() entirely or just
- * implement the hooks (initializeContext() and getNext()).
+ * The concrete class can either re-implement processRequest() entirely or just implement the hooks (initializeContext()
+ * and getNext()).
  * <p>
  * TODO: Add support for providing multiple data types.
  */
@@ -48,23 +48,20 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
     // Constants
     // ------------------------------------------------------------------------
 
-//	private static final ITmfDataRequest.ExecutionType SHORT = ITmfDataRequest.ExecutionType.SHORT;
-//	private static final ITmfDataRequest.ExecutionType LONG  = ITmfDataRequest.ExecutionType.LONG;
-
     // ------------------------------------------------------------------------
-    //
+    // Attributes
     // ------------------------------------------------------------------------
 
-    final protected Class<T> fType;
-    final protected boolean fLogData;
-    final protected boolean fLogError;
+    protected Class<T> fType;
+    protected boolean fLogData;
+    protected boolean fLogError;
 
     public static final int DEFAULT_BLOCK_SIZE = 50000;
     public static final int DEFAULT_QUEUE_SIZE = 1000;
 
-    protected final int fQueueSize;
-    protected final BlockingQueue<T> fDataQueue;
-    protected final TmfRequestExecutor fExecutor;
+    protected int fQueueSize;
+    protected BlockingQueue<T> fDataQueue;
+    protected TmfRequestExecutor fExecutor;
 
     private int fSignalDepth = 0;
     private final Object fLock = new Object();
@@ -74,6 +71,27 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+
+    public TmfDataProvider() {
+        fQueueSize = DEFAULT_QUEUE_SIZE;
+        fDataQueue = new LinkedBlockingQueue<T>(fQueueSize);
+        fExecutor = new TmfRequestExecutor();
+    }
+
+    public void init(String name, Class<T> dataType) {
+        super.init(name);
+        fType = dataType;
+        fQueueSize = DEFAULT_QUEUE_SIZE;
+        fDataQueue = (fQueueSize > 1) ? new LinkedBlockingQueue<T>(fQueueSize) : new SynchronousQueue<T>();
+
+        fExecutor = new TmfRequestExecutor();
+        fSignalDepth = 0;
+
+        fLogData = Tracer.isEventTraced();
+        fLogError = Tracer.isErrorTraced();
+
+        TmfProviderManager.register(fType, this);
+    }
 
     public TmfDataProvider(String name, Class<T> type) {
         this(name, type, DEFAULT_QUEUE_SIZE);
@@ -92,7 +110,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
         fLogError = Tracer.isErrorTraced();
 
         TmfProviderManager.register(fType, this);
-//		if (Tracer.isComponentTraced()) Tracer.traceComponent(this, "started");
+        // if (Tracer.isComponentTraced()) Tracer.traceComponent(this, "started");
     }
 
     public TmfDataProvider(TmfDataProvider<T> other) {
@@ -113,7 +131,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
         TmfProviderManager.deregister(fType, this);
         fExecutor.stop();
         super.dispose();
-//		if (Tracer.isComponentTraced()) Tracer.traceComponent(this, "stopped");
+        // if (Tracer.isComponentTraced()) Tracer.traceComponent(this, "stopped");
     }
 
     public int getQueueSize() {
@@ -160,9 +178,8 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
     }
 
     /**
-     * Increments/decrements the pending requests counters and fires the request
-     * if necessary (counter == 0). Used for coalescing requests accross
-     * multiple TmfDataProvider.
+     * Increments/decrements the pending requests counters and fires the request if necessary (counter == 0). Used for
+     * coalescing requests accross multiple TmfDataProvider.
      * 
      * @param isIncrement
      */
@@ -194,8 +211,8 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 
     protected void newCoalescedDataRequest(ITmfDataRequest<T> request) {
         synchronized (fLock) {
-            TmfCoalescedDataRequest<T> coalescedRequest = new TmfCoalescedDataRequest<T>(fType, request.getIndex(), request.getNbRequested(),
-                    request.getBlockSize(), request.getExecType());
+            TmfCoalescedDataRequest<T> coalescedRequest = new TmfCoalescedDataRequest<T>(fType, request.getIndex(),
+                    request.getNbRequested(), request.getBlockSize(), request.getExecType());
             coalescedRequest.addRequest(request);
             if (Tracer.isRequestTraced()) {
                 Tracer.traceRequest(request, "coalesced with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
@@ -317,8 +334,8 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 
                 while (!isFinished[0]) {
 
-                    TmfDataRequest<T> subRequest = new TmfDataRequest<T>(request.getDataType(), request.getIndex() + nbRead[0], CHUNK_SIZE[0],
-                            blockSize, ExecutionType.BACKGROUND) {
+                    TmfDataRequest<T> subRequest = new TmfDataRequest<T>(request.getDataType(), request.getIndex()
+                            + nbRead[0], CHUNK_SIZE[0], blockSize, ExecutionType.BACKGROUND) {
                         @Override
                         public void handleData(T data) {
                             super.handleData(data);
@@ -335,7 +352,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
                                 if (this.isCancelled()) {
                                     request.cancel();
                                 } else if (this.isFailed()) {
-                                  request.fail();  
+                                    request.fail();
                                 } else {
                                     request.done();
                                 }
@@ -364,12 +381,10 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
     }
 
     /**
-     * Initialize the provider based on the request. The context is provider
-     * specific and will be updated by getNext().
+     * Initialize the provider based on the request. The context is provider specific and will be updated by getNext().
      * 
      * @param request
-     * @return an application specific context; null if request can't be
-     *         serviced
+     * @return an application specific context; null if request can't be serviced
      */
     public abstract ITmfContext armRequest(ITmfDataRequest<T> request);
 

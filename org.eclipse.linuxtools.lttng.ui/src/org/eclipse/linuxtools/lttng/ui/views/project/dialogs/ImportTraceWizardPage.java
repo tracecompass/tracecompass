@@ -17,9 +17,9 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.linuxtools.lttng.TraceHelper;
 import org.eclipse.linuxtools.lttng.exceptions.LttngException;
 import org.eclipse.linuxtools.lttng.trace.LTTngTraceVersion;
-import org.eclipse.linuxtools.lttng.ui.TraceHelper;
 import org.eclipse.linuxtools.lttng.ui.views.project.handlers.TraceErrorHandler;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectNode;
 import org.eclipse.ui.IWorkbench;
@@ -30,6 +30,7 @@ import org.eclipse.ui.internal.wizards.datatransfer.WizardFileSystemResourceImpo
  * <p>
  * TODO: Implement me. Please.
  */
+@Deprecated
 @SuppressWarnings("restriction")
 public class ImportTraceWizardPage extends WizardFileSystemResourceImportPage1 {
 

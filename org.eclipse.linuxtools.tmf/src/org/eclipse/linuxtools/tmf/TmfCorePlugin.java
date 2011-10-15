@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009, 2010, 2011 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -29,6 +29,7 @@ public class TmfCorePlugin extends Plugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.eclipse.linuxtools.tmf"; //$NON-NLS-1$
+	public static final String TMF_TRACE_TYPE_ID = "org.eclipse.linuxtools.tmf.tracetype"; //$NON-NLS-1$
 
 	// The shared instance
 	private static TmfCorePlugin fPlugin;
@@ -37,9 +38,6 @@ public class TmfCorePlugin extends Plugin {
     // Constructors
 	// ------------------------------------------------------------------------
 
-	/**
-	 * The constructor
-	 */
 	public TmfCorePlugin() {
 		setDefault(this);
 	}
@@ -48,22 +46,16 @@ public class TmfCorePlugin extends Plugin {
     // Accessors
 	// ------------------------------------------------------------------------
 
-    /**
-     * @return the shared instance
-     */
     public static TmfCorePlugin getDefault() {
         return fPlugin;
     }
 
-	/**
-	 * @param plugin the shared instance
-	 */
 	private static void setDefault(TmfCorePlugin plugin) {
 		fPlugin = plugin;
 	}
 
 	// ------------------------------------------------------------------------
-    // Operations
+    // Plugin
 	// ------------------------------------------------------------------------
 
 	@Override

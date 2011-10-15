@@ -21,6 +21,7 @@ import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngTraceFolderNode;
  * <p>
  * TODO: Implement me. Please.
  */
+@Deprecated
 public class DialogTraceContentProvider implements IStructuredContentProvider {
 
 	/* (non-Javadoc)

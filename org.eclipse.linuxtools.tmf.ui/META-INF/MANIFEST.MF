@@ -5,16 +5,21 @@ Bundle-SymbolicName: org.eclipse.linuxtools.tmf.ui;singleton:=true
 Bundle-Version: 0.3.2.qualifier
 Bundle-Activator: org.eclipse.linuxtools.tmf.ui.TmfUiPlugin
 Bundle-Vendor: %Bundle-Vendor
-Require-Bundle: org.eclipse.ui,
+Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
+ org.eclipse.ui.ide;bundle-version="3.7.0",
+ org.eclipse.core.resources;bundle-version="3.7.100",
+ org.eclipse.core.filesystem;bundle-version="1.3.100",
  org.eclipse.core.runtime;bundle-version="3.7.0",
  org.eclipse.linuxtools.tmf.core;bundle-version="0.3.2",
- org.eclipse.core.resources;bundle-version="3.7.100",
- org.eclipse.ui.ide;bundle-version="3.7.0"
+ org.eclipse.ui.navigator;bundle-version="3.5.100",
+ org.eclipse.ui.navigator.resources;bundle-version="3.4.300",
+ org.eclipse.core.expressions
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.linuxtools.tmf.ui,
  org.eclipse.linuxtools.tmf.ui.editors,
  org.eclipse.linuxtools.tmf.ui.parsers,
+ org.eclipse.linuxtools.tmf.ui.project.model,
  org.eclipse.linuxtools.tmf.ui.signal,
  org.eclipse.linuxtools.tmf.ui.viewers,
  org.eclipse.linuxtools.tmf.ui.viewers.events,
@@ -24,8 +29,8 @@ Export-Package: org.eclipse.linuxtools.tmf.ui,
  org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets,
  org.eclipse.linuxtools.tmf.ui.views,
  org.eclipse.linuxtools.tmf.ui.views.colors,
+ org.eclipse.linuxtools.tmf.ui.views.events,
  org.eclipse.linuxtools.tmf.ui.views.filter,
- org.eclipse.linuxtools.tmf.ui.views.project,
  org.eclipse.linuxtools.tmf.ui.views.statistics,
  org.eclipse.linuxtools.tmf.ui.views.statistics.model,
  org.eclipse.linuxtools.tmf.ui.views.timechart,

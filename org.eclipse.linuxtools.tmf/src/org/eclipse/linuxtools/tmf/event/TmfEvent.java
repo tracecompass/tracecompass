@@ -37,8 +37,8 @@ public class TmfEvent extends TmfData implements Cloneable {
     // Constants
     // ------------------------------------------------------------------------
 
-	public static final TmfEvent NullEvent = new TmfEvent();
-	
+    public static final TmfEvent NullEvent = new TmfEvent();
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -51,9 +51,9 @@ public class TmfEvent extends TmfData implements Cloneable {
 	protected TmfEventType      fType;
 	protected TmfEventReference fReference;
 
-	// Content requires a reference to the parent event so it is initialized
-	// using setContent()
-	protected TmfEventContent   fContent;
+    // Content requires a reference to the parent event so it is initialized
+    // using setContent()
+    protected TmfEventContent fContent;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -121,15 +121,15 @@ public class TmfEvent extends TmfData implements Cloneable {
 		fReference			= new TmfEventReference(other.fReference);
 	}
 
-	private TmfEvent() {
-	}
+    public TmfEvent() {
+    }
 
-	@Override
-	public boolean isNullRef() {
-		return this == NullEvent;
-	}
+    @Override
+    public boolean isNullRef() {
+        return this == NullEvent;
+    }
 
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
 
@@ -147,94 +147,92 @@ public class TmfEvent extends TmfData implements Cloneable {
         return fEventRank;
     }
 
-	/**
-	 * @return the effective event timestamp
-	 */
-	public TmfTimestamp getTimestamp() {
-		return fEffectiveTimestamp;
-	}
+    /**
+     * @return the effective event timestamp
+     */
+    public TmfTimestamp getTimestamp() {
+        return fEffectiveTimestamp;
+    }
 
-	/**
-	 * @return the original event timestamp
-	 */
-	public TmfTimestamp getOriginalTimestamp() {
-		return fOriginalTimestamp;
-	}
+    /**
+     * @return the original event timestamp
+     */
+    public TmfTimestamp getOriginalTimestamp() {
+        return fOriginalTimestamp;
+    }
 
-	/**
-	 * @return the event source
-	 */
-	public TmfEventSource getSource() {
-		return fSource;
-	}
+    /**
+     * @return the event source
+     */
+    public TmfEventSource getSource() {
+        return fSource;
+    }
 
-	/**
-	 * @return the event type
-	 */
-	public TmfEventType getType() {
-		return fType;
-	}
+    /**
+     * @return the event type
+     */
+    public TmfEventType getType() {
+        return fType;
+    }
 
-	/**
-	 * @return the event content
-	 */
-	public TmfEventContent getContent() {
-		return fContent;
-	}
+    /**
+     * @return the event content
+     */
+    public TmfEventContent getContent() {
+        return fContent;
+    }
 
-	/**
-	 * @return the event reference
-	 */
-	public TmfEventReference getReference() {
-		return fReference;
-	}
+    /**
+     * @return the event reference
+     */
+    public TmfEventReference getReference() {
+        return fReference;
+    }
 
-	/**
-	 * @param content the new event content
-	 */
-	public void setContent(TmfEventContent content) {
-		fContent = content;
-	}
+    /**
+     * @param content
+     *            the new event content
+     */
+    public void setContent(TmfEventContent content) {
+        fContent = content;
+    }
 
-	/**
-	 * @return the event raw text
-	 */
-	public String getRawText() {
-		if (fContent != null && fContent.getContent() != null) {
-			return fContent.getContent().toString();
-		}
-		return ""; //$NON-NLS-1$
-	}
+    /**
+     * @return the event raw text
+     */
+    public String getRawText() {
+        if (fContent != null && fContent.getContent() != null) {
+            return fContent.getContent().toString();
+        }
+        return ""; //$NON-NLS-1$
+    }
 
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Object
     // ------------------------------------------------------------------------
 
-	@Override
+    @Override
     public int hashCode() {
-		int result = 17;
-		result = 37 * result + fSource.hashCode();
-		result = 37 * result + fType.hashCode();
-		result = 37 * result + fEffectiveTimestamp.hashCode();
+        int result = 17;
+        result = 37 * result + fSource.hashCode();
+        result = 37 * result + fType.hashCode();
+        result = 37 * result + fEffectiveTimestamp.hashCode();
         return result;
     }
 
     @Override
     public boolean equals(Object other) {
         if (!(other instanceof TmfEvent))
-        	return false;
+            return false;
         TmfEvent o = (TmfEvent) other;
-        return fEffectiveTimestamp.equals(o.fEffectiveTimestamp) &&
-               fSource.equals(o.fSource) &&
-               fType.equals(o.fType) &&
-               fContent.equals(o.fContent);
+        return fEffectiveTimestamp.equals(o.fEffectiveTimestamp) && fSource.equals(o.fSource) && fType.equals(o.fType) && fContent.equals(o.fContent);
     }
 
-	@Override
+    @Override
     @SuppressWarnings("nls")
-	public String toString() {
-		return "[TmfEvent(" + fEffectiveTimestamp + "," + fSource + "," + fType + "," + fContent + ")]";
-	}
+    public String toString() {
+        return "[TmfEvent(" + fEffectiveTimestamp + "," + fSource + "," + fType + "," + fContent + ")]";
+    }
 
 	@Override
 	public TmfEvent clone() {
@@ -254,7 +252,7 @@ public class TmfEvent extends TmfData implements Cloneable {
 			e.printStackTrace();
 		}
 
-		return clone;
-	}
+        return clone;
+    }
 
 }

@@ -30,21 +30,23 @@ public abstract class TmfComponent implements ITmfComponent {
 	// Constructor
 	// ------------------------------------------------------------------------
 
-	public TmfComponent() {
+    public TmfComponent() {
 	    this(""); //$NON-NLS-1$
-	}
-	
+    }
+
+    public void init(String name) {
+        fName = name;
+        TmfSignalManager.register(this);
+    }
+
 	public TmfComponent(String name) {
 		fName = name;
-//		if (Tracer.isComponentTraced()) Tracer.traceComponent(this, "created");
 		TmfSignalManager.register(this);
 	}
 	
 	public TmfComponent(TmfComponent oldComponent) {
-        this.fName = oldComponent.fName;
-
-        // Should we register? Probably not but I'm not quite sure what this does
-        //register();
+        fName = oldComponent.fName;
+        TmfSignalManager.register(this);
 	}
 	
 	/* (non-Javadoc)

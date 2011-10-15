@@ -22,7 +22,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature;
+import org.eclipse.linuxtools.lttng.LTTngProjectNature;
 
 /**
  * <b><u>LTTngProjectNode</u></b>

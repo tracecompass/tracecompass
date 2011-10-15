@@ -12,11 +12,9 @@
 
 package org.eclipse.linuxtools.lttng.ui.views;
 
-import org.eclipse.linuxtools.lttng.ui.views.control.ControlView;
 import org.eclipse.linuxtools.lttng.ui.views.controlflow.ControlFlowView;
 import org.eclipse.linuxtools.lttng.ui.views.events.EventsView;
 import org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramView;
-import org.eclipse.linuxtools.lttng.ui.views.project.ProjectView;
 import org.eclipse.linuxtools.lttng.ui.views.resources.ResourcesView;
 import org.eclipse.linuxtools.lttng.ui.views.statistics.StatisticsView;
 import org.eclipse.ui.IFolderLayout;
@@ -30,28 +28,27 @@ import org.eclipse.ui.IPerspectiveFactory;
  */
 public class PerspectiveFactory implements IPerspectiveFactory {
 
-	// Perspective ID
+    // Perspective ID
     public static final String ID = "org.eclipse.linuxtools.lttng.ui.perspective"; //$NON-NLS-1$
-	
+
     // LTTng views
-    private static final String PROJECT_VIEW_ID      = ProjectView.ID;
-    private static final String CONTROL_VIEW_ID      = ControlView.ID;
-    private static final String EVENTS_VIEW_ID       = EventsView.ID;
-//    private static final String TIME_FRAME_VIEW_ID   = TimeFrameView.ID;
+    private static final String EVENTS_VIEW_ID = EventsView.ID;
     private static final String CONTROL_FLOW_VIEW_ID = ControlFlowView.ID;
-    private static final String RESOURCES_VIEW_ID    = ResourcesView.ID;
-    private static final String STATISTICS_VIEW_ID   = StatisticsView.ID;
-    private static final String HISTOGRAM_VIEW_ID    = HistogramView.ID;
+    private static final String RESOURCES_VIEW_ID = ResourcesView.ID;
+    private static final String STATISTICS_VIEW_ID = StatisticsView.ID;
+    private static final String HISTOGRAM_VIEW_ID = HistogramView.ID;
 
     // Standard Eclipse views
-    private static final String PROPERTIES_VIEW_ID   = IPageLayout.ID_PROP_SHEET;
-    private static final String PROBLEM_VIEW_ID      = IPageLayout.ID_PROBLEM_VIEW;
+    private static final String PROJECT_VIEW_ID = IPageLayout.ID_PROJECT_EXPLORER;
+    private static final String PROPERTIES_VIEW_ID = IPageLayout.ID_PROP_SHEET;
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui.IPageLayout)
-	 */
-	@Override
-	public void createInitialLayout(IPageLayout layout) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui.IPageLayout)
+     */
+    @Override
+    public void createInitialLayout(IPageLayout layout) {
 
         layout.setEditorAreaVisible(false);
 
@@ -60,31 +57,32 @@ public class PerspectiveFactory implements IPerspectiveFactory {
         addPerspectiveShortcuts(layout);
 
         // Create the top left folder
-        IFolderLayout topLeftFolder = layout.createFolder("topLeftFolder", IPageLayout.LEFT, 0.15f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
+        IFolderLayout topLeftFolder = layout.createFolder(
+                "topLeftFolder", IPageLayout.LEFT, 0.15f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
         topLeftFolder.addView(PROJECT_VIEW_ID);
-        topLeftFolder.addView(CONTROL_VIEW_ID);
 
-        // Create the bottom left folder
-        IFolderLayout bottomLeftFolder = layout.createFolder("bottomLeftFolder", IPageLayout.BOTTOM, 0.50f, "topLeftFolder"); //$NON-NLS-1$ //$NON-NLS-2$
-        bottomLeftFolder.addView(PROPERTIES_VIEW_ID);
-   
+//        // Create the bottom left folder
+//        IFolderLayout bottomLeftFolder = layout.createFolder(
+//                "bottomLeftFolder", IPageLayout.BOTTOM, 0.50f, "topLeftFolder"); //$NON-NLS-1$ //$NON-NLS-2$
+
         // Create the middle right folder
-        IFolderLayout topRightFolder = layout.createFolder("topRightFolder", IPageLayout.TOP, 0.50f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
+        IFolderLayout topRightFolder = layout.createFolder(
+                "topRightFolder", IPageLayout.TOP, 0.30f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
         topRightFolder.addView(CONTROL_FLOW_VIEW_ID);
         topRightFolder.addView(RESOURCES_VIEW_ID);
         topRightFolder.addView(STATISTICS_VIEW_ID);
 
         // Create the middle right folder
-        IFolderLayout middleRightFolder = layout.createFolder("middleRightFolder", IPageLayout.BOTTOM, 0.50f, "topRightFolder");  //$NON-NLS-1$//$NON-NLS-2$
+        IFolderLayout middleRightFolder = layout.createFolder(
+                "middleRightFolder", IPageLayout.BOTTOM, 0.40f, "topRightFolder"); //$NON-NLS-1$//$NON-NLS-2$
         middleRightFolder.addView(EVENTS_VIEW_ID);
 
         // Create the bottom right folder
-        IFolderLayout bottomRightFolder = layout.createFolder("bottomRightFolder", IPageLayout.BOTTOM, 0.50f, "middleRightFolder"); //$NON-NLS-1$ //$NON-NLS-2$
-//        bottomRightFolder.addView(TIME_FRAME_VIEW_ID);
+        IFolderLayout bottomRightFolder = layout.createFolder(
+                "bottomRightFolder", IPageLayout.BOTTOM, 0.50f, "middleRightFolder"); //$NON-NLS-1$ //$NON-NLS-2$
         bottomRightFolder.addView(HISTOGRAM_VIEW_ID);
-        bottomRightFolder.addView(PROBLEM_VIEW_ID);
-
-	}
+        bottomRightFolder.addView(PROPERTIES_VIEW_ID);
+    }
 
     /**
      * Add fast views to the perspective

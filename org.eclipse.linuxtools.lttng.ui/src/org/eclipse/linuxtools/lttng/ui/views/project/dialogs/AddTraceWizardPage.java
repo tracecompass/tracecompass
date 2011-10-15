@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.TableColumn;
  * <p>
  * TODO: Implement me. Please.
  */
+@Deprecated
 public class AddTraceWizardPage extends WizardPage {
 
 	private LTTngProjectNode fProject;

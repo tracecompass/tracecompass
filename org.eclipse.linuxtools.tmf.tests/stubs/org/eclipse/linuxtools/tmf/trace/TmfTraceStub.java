@@ -115,7 +115,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     }
  
     @Override
-	public ITmfTrace createTraceCopy() {
+	public ITmfTrace copy() {
 		ITmfTrace returnedValue = null;
 		returnedValue = clone();
 		return returnedValue;
@@ -135,7 +135,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public TmfContext seekLocation(ITmfLocation<?> location) {
+	public TmfContext seekLocation(ITmfLocation location) {
 	    fLock.lock();
         try {
             if (fTrace != null) {
@@ -183,7 +183,8 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     }
 
     @Override
-    public double getLocationRatio(ITmfLocation<?> location) {
+    @SuppressWarnings("rawtypes")
+    public double getLocationRatio(ITmfLocation location) {
         fLock.lock();
         try {
             if (fTrace != null) {

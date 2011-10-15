@@ -31,6 +31,7 @@ import org.eclipse.ui.IWorkbench;
  * <p>
  * TODO: Implement me. Please.
  */
+@Deprecated
 public class AddTraceWizard extends Wizard implements IImportWizard {
 
     private LTTngProjectNode fProject;

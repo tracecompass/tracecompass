@@ -20,33 +20,38 @@ import org.eclipse.ui.part.ViewPart;
  * <p>
  * TODO: Implement me. Please.
  */
+@Deprecated
 public class ControlView extends ViewPart {
 
     public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.control"; //$NON-NLS-1$
 
-	/**
+    /**
 	 * 
 	 */
-	public ControlView() {
-		// TODO Auto-generated constructor stub
-	}
+    public ControlView() {
+        // TODO Auto-generated constructor stub
+    }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
-	@Override
-	public void createPartControl(Composite parent) {
-		// TODO Auto-generated method stub
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+     */
+    @Override
+    public void createPartControl(Composite parent) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
-	@Override
-	public void setFocus() {
-		// TODO Auto-generated method stub
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+     */
+    @Override
+    public void setFocus() {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
 }

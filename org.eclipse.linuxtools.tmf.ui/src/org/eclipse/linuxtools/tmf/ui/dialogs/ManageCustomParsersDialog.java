@@ -13,18 +13,27 @@
 package org.eclipse.linuxtools.tmf.ui.dialogs;
 
 import java.io.File;
+import java.net.URI;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.tmf.ui.TmfUiPreferenceInitializer;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.linuxtools.tmf.ui.internal.Messages;
 import org.eclipse.linuxtools.tmf.ui.parsers.ParserProviderManager;
@@ -33,9 +42,9 @@ import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomXmlTraceDefinition;
-import org.eclipse.linuxtools.tmf.ui.views.project.ProjectView;
-import org.eclipse.linuxtools.tmf.ui.wizards.CustomTxtParserWizard;
-import org.eclipse.linuxtools.tmf.ui.wizards.CustomXmlParserWizard;
+import org.eclipse.linuxtools.tmf.ui.parsers.wizards.CustomTxtParserWizard;
+import org.eclipse.linuxtools.tmf.ui.parsers.wizards.CustomXmlParserWizard;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -299,7 +308,7 @@ public class ManageCustomParsersDialog extends Dialog {
                             IPath location = Path.fromOSString(path);
                             IFile file = workspace.getRoot().getFileForLocation(location);
                             if (file == null) {
-                                file = ProjectView.createLink(new File(location.toPortableString()).toURI());
+                                file = createLink(new File(location.toPortableString()).toURI());
                             }
                             file.setPersistentProperty(ParserProviderManager.PARSER_PROPERTY, parser);
                             IEditorInput editorInput = new FileEditorInput(file);
@@ -326,6 +335,50 @@ public class ManageCustomParsersDialog extends Dialog {
         getShell().setMinimumSize(300, 275);
         return composite;
     }
+
+	// /////////////////////////////////////////////////////////////////////////////
+	// FIXME: Duplicated in TmfEventsEditor
+	// From the legacy ProjectView
+	// /////////////////////////////////////////////////////////////////////////////
+
+	// ------------------------------------------------------------------------
+	// Static methods
+	// ------------------------------------------------------------------------
+
+	static public IFolder getActiveProjectTracesFolder() {
+		IEclipsePreferences node = new InstanceScope()
+				.getNode(TmfUiPlugin.PLUGIN_ID);
+		String activeProjectName = node.get(
+				TmfUiPreferenceInitializer.ACTIVE_PROJECT_PREFERENCE,
+				TmfUiPreferenceInitializer.ACTIVE_PROJECT_DEFAULT);
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		IProject[] projects = root.getProjects();
+		for (IProject project : projects) {
+			if (project.isAccessible()
+					&& project.getName().equals(activeProjectName)) {
+				return project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
+			}
+		}
+		return null;
+	}
+
+	static public IFile createLink(URI uri) throws CoreException {
+		IFolder folder = getActiveProjectTracesFolder();
+		if (folder == null || !folder.exists()) {
+			throw new CoreException(new Status(Status.ERROR,
+					TmfUiPlugin.PLUGIN_ID, "No active project set")); //$NON-NLS-1$
+		}
+		String path = uri.getPath();
+		// TODO: support duplicate file names
+		IFile file = folder.getFile(path.substring(path
+				.lastIndexOf(Path.SEPARATOR)));
+		if (!file.exists()) {
+			file.createLink(uri, IResource.NONE, null);
+		}
+		return file;
+	}
+
+	// /////////////////////////////////////////////////////////////////////////////
 
     /* (non-Javadoc)
      * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)

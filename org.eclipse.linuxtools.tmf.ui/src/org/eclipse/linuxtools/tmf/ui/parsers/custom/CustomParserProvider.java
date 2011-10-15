@@ -30,7 +30,7 @@ public class CustomParserProvider implements IParserProvider {
     }
 
 	@Override
-    public ITmfTrace getTraceForParser(String parser, IResource resource) {
+    public ITmfTrace<?> getTraceForParser(String parser, IResource resource) {
         try {
             String name = resource.getName();
             String path = resource.getLocation().toOSString();
@@ -51,7 +51,7 @@ public class CustomParserProvider implements IParserProvider {
     }
 
 	@Override
-    public ITmfTrace getTraceForContentType(String contentTypeId, IResource resource) {
+    public ITmfTrace<?> getTraceForContentType(String contentTypeId, IResource resource) {
         return null;
     }
 
@@ -115,7 +115,7 @@ public class CustomParserProvider implements IParserProvider {
     }
 
 	@Override
-    public TmfEventsTable getEventsTable(ITmfTrace trace, Composite parent, int cacheSize) {
+    public TmfEventsTable getEventsTable(ITmfTrace<?> trace, Composite parent, int cacheSize) {
         if (trace instanceof CustomTxtTrace) {
             return new CustomEventsTable(((CustomTxtTrace) trace).getDefinition(), parent, cacheSize);
         } else if (trace instanceof CustomXmlTrace) {

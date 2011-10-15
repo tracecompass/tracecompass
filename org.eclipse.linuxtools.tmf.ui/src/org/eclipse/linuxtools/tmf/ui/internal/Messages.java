@@ -110,13 +110,6 @@ public class Messages extends NLS {
 	public static String ColorsView_TickButtonText;
 	public static String TickColorDialog_TickColorDialogTitle;
 
-	public static String AddTraceWizard_WindowTitle;
-	public static String AddTraceWizardPage_TraceColumnHeader;
-	public static String AddTraceWizardPage_WindowTitle;
-	public static String AddTraceWizardPage_Description;
-	public static String NewProjectWizard_DialogHeader;
-	public static String NewProjectWizard_DialogMessage;
-
 	public static String CustomTxtParserInputWizardPage_addChildLine;
 	public static String CustomTxtParserInputWizardPage_addGroup;
 	public static String CustomTxtParserInputWizardPage_addNextLine;

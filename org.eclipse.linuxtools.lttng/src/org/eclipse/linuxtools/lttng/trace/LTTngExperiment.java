@@ -36,7 +36,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfContext;
  * Temporary class to resolve a basic incompatibility between TMF and LTTng.
  * <p>
  */
-public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implements ITmfTrace {
+public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> {
 
     private static final int DEFAULT_INDEX_PAGE_SIZE = 50000;
 
@@ -51,11 +51,11 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
      * @param epoch
      * @param indexPageSize
      */
-    public LTTngExperiment(Class<T> type, String id, ITmfTrace[] traces, TmfTimestamp epoch, int indexPageSize) {
+    public LTTngExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, TmfTimestamp epoch, int indexPageSize) {
         this(type, id, traces, TmfTimestamp.Zero, indexPageSize, false);
     }
 
-    public LTTngExperiment(Class<T> type, String id, ITmfTrace[] traces, TmfTimestamp epoch, int indexPageSize, boolean preIndexExperiment) {
+    public LTTngExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, TmfTimestamp epoch, int indexPageSize, boolean preIndexExperiment) {
         super(type, id, traces, epoch, indexPageSize, preIndexExperiment);
     }
 
@@ -64,7 +64,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
      * @param id
      * @param traces
      */
-    public LTTngExperiment(Class<T> type, String id, ITmfTrace[] traces) {
+    public LTTngExperiment(Class<T> type, String id, ITmfTrace<T>[] traces) {
         this(type, id, traces, TmfTimestamp.Zero, DEFAULT_INDEX_PAGE_SIZE);
     }
 
@@ -74,10 +74,11 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
      * @param traces
      * @param indexPageSize
      */
-    public LTTngExperiment(Class<T> type, String id, ITmfTrace[] traces, int indexPageSize) {
+    public LTTngExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, int indexPageSize) {
         this(type, id, traces, TmfTimestamp.Zero, indexPageSize);
     }
 
+    @SuppressWarnings("unchecked")
     public LTTngExperiment(LTTngExperiment<T> other) {
         super(other.getName() + "(clone)", other.fType); //$NON-NLS-1$
 
@@ -86,7 +87,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
 
         fTraces = new ITmfTrace[other.fTraces.length];
         for (int trace = 0; trace < other.fTraces.length; trace++) {
-            fTraces[trace] = other.fTraces[trace].createTraceCopy();
+    		fTraces[trace] = other.fTraces[trace].copy();
         }
 
         fNbEvents = other.fNbEvents;
@@ -94,7 +95,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> implem
     }
 
     @Override
-    public LTTngExperiment<T> createTraceCopy() {
+	public LTTngExperiment<T> copy() {
         LTTngExperiment<T> experiment = new LTTngExperiment<T>(this);
         TmfSignalManager.deregister(experiment);
         return experiment;

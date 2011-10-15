@@ -25,9 +25,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.linuxtools.lttng.LTTngProjectNature;
+import org.eclipse.linuxtools.lttng.TraceHelper;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
-import org.eclipse.linuxtools.lttng.ui.TraceHelper;
-import org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectNode;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 

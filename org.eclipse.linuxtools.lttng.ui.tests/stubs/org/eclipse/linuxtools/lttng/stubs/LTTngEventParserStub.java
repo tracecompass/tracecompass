@@ -27,7 +27,7 @@ import org.eclipse.linuxtools.tmf.trace.TmfContext;
 public class LTTngEventParserStub implements ITmfEventParser {
 
 	@Override
-	public TmfEvent parseNextEvent(ITmfTrace stream, TmfContext context)
+	public TmfEvent parseNextEvent(ITmfTrace<?> stream, TmfContext context)
 			throws IOException {
 		// TODO Auto-generated method stub
 		return null;

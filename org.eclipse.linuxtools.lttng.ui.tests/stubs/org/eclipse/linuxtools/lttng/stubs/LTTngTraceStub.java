@@ -70,8 +70,8 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> {
     }
     
 	@Override
-	public ITmfTrace createTraceCopy() {
-		ITmfTrace returnedValue = null;
+	public ITmfTrace<LttngEvent> copy() {
+		ITmfTrace<LttngEvent> returnedValue = null;
 		try {
 			returnedValue = new LTTngTraceStub(this.getName());
 		}

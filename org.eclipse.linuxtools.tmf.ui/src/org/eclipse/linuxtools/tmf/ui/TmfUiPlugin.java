@@ -14,9 +14,8 @@ package org.eclipse.linuxtools.tmf.ui;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.linuxtools.tmf.ui.TmfUiTracer;
 import org.eclipse.linuxtools.tmf.ui.parsers.ParserProviderManager;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.LoadersManager;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -24,13 +23,13 @@ import org.osgi.framework.BundleContext;
 /**
  * <b><u>TmfUiPlugin</u></b>
  * <p>
- * The activator class controls the plug-in life cycle
+ * The activator class controls the plug-in life cycle.
  */
 public class TmfUiPlugin extends AbstractUIPlugin {
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Attributes
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.eclipse.linuxtools.tmf.ui"; //$NON-NLS-1$
@@ -38,55 +37,44 @@ public class TmfUiPlugin extends AbstractUIPlugin {
 	// The shared instance
 	private static TmfUiPlugin plugin;
 	
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Constructors
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
-	/**
-	 * The constructor
-	 */
 	public TmfUiPlugin() {
 	}
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Accessors
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
-	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
-	 */
 	public static TmfUiPlugin getDefault() {
 		return plugin;
 	}
 
-    // ========================================================================
-    // Operators
-    // ========================================================================
+    // ------------------------------------------------------------------------
+    // AbstractUIPlugin
+    // ------------------------------------------------------------------------
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 		TmfUiTracer.init();
 		ParserProviderManager.init();
+		TmfTraceElement.init();
 	}
 
-    /*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
 	    TmfUiTracer.stop();
 		plugin = null;
 		super.stop(context);
 	}
+
+    // ------------------------------------------------------------------------
+    // Operations
+    // ------------------------------------------------------------------------
 
     public Image getImageFromPath(String path){
         return getImageDescripterFromPath(path).createImage();

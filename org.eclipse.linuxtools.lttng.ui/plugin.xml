@@ -112,11 +112,11 @@
       </wizard>
    </extension>
    <extension
-         id="org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature"
+         id="org.eclipse.linuxtools.lttng.LTTngProjectNature"
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature">
+               class="org.eclipse.linuxtools.lttng.LTTngProjectNature">
          </run>
       </runtime>
    </extension>
@@ -733,12 +733,28 @@
             id="org.eclipse.linuxtools.lttng.ui.propertyPage.libPath"
             name="%project.propertyPage.tracelibPath">
          <filter name="nature"
-                value="org.eclipse.linuxtools.lttng.ui.views.project.LTTngProjectNature" />
+                value="org.eclipse.linuxtools.lttng.LTTngProjectNature" />
             <enabledWhen>
                 <adapt type="org.eclipse.core.resources.IProject">
                 </adapt>
             </enabledWhen>
       </page>
+   </extension>
+
+   <extension
+         point="org.eclipse.linuxtools.tmf.tracetype">
+      <category
+            id="org.eclipse.linuxtools.lttng.ui.category.lttng"
+            name="%tracetype.category.lttng">
+      </category>
+      <type
+            category="org.eclipse.linuxtools.lttng.ui.category.lttng"
+            event_type="org.eclipse.linuxtools.lttng.event.LttngEvent"
+            icon="icons/obj16/garland16.gif"
+            id="org.eclipse.linuxtools.lttng.tracetype.kernel"
+            name="%tracetype.type.kernel"
+            trace_type="org.eclipse.linuxtools.lttng.trace.LTTngTrace">
+      </type>
    </extension>
 
 </plugin>

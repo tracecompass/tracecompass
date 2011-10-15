@@ -136,7 +136,8 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     }
 
     @Override
-	public ITmfTrace createTraceCopy() {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public ITmfTrace copy() {
         // TODO Auto-generated method stub
         return null;
     }

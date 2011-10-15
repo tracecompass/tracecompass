@@ -13,7 +13,7 @@
 package org.eclipse.linuxtools.lttng.ui.views.events;
 
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
-import org.eclipse.linuxtools.tmf.ui.views.TmfEventsView;
+import org.eclipse.linuxtools.tmf.ui.views.events.TmfEventsView;
 import org.eclipse.swt.widgets.Composite;
 
 /**

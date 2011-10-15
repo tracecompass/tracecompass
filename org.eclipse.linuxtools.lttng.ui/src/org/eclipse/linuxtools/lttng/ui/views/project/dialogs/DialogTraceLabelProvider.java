@@ -22,6 +22,7 @@ import org.eclipse.swt.graphics.Image;
  * <p>
  * TODO: Implement me. Please.
  */
+@Deprecated
 public class DialogTraceLabelProvider extends LabelProvider implements ITableLabelProvider {
 
 	/* (non-Javadoc)

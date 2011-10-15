@@ -4,6 +4,15 @@
    <extension-point id="org.eclipse.linuxtools.tmf.ui.parserProviders" name="Parser Providers" schema="schema/org.eclipse.linuxtools.tmf.ui.parserprovider.exsd"/>
    <extension-point id="org.eclipse.linuxtools.tmf.ui.uml2SDLoader" name="TMF UML 2 Sequence Diagram Loader" schema="schema/org.eclipse.linuxtools.tmf.ui.uml2SDLoader.exsd"/>
 
+    <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.eclipse.linuxtools.tmf.ui.views.TracingPerspectiveFactory"
+            icon="icons/eview16/tracing_pers.gif"
+            id="org.eclipse.linuxtools.tmf.ui.perspective"
+            name="%perspective.category.name">
+      </perspective>
+   </extension>
    <extension
          point="org.eclipse.ui.views">
       <category
@@ -13,16 +22,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.linuxtools.tmf.ui.views.project.ProjectView"
-            icon="icons/eview16/project_view.gif"
-            id="org.eclipse.linuxtools.tmf.ui.views.project"
-            name="%project.view.name"
-            restorable="true">
-      </view>
-      <view
-            allowMultiple="false"
-            category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.linuxtools.tmf.ui.views.TmfEventsView"
+            class="org.eclipse.linuxtools.tmf.ui.views.events.TmfEventsView"
             icon="icons/eview16/events_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.events"
             name="%events.view.name"
@@ -93,7 +93,8 @@
       </category>
       <wizard
             category="org.eclipse.linuxtools.tmf.ui.wizards.new"
-            class="org.eclipse.linuxtools.tmf.ui.views.project.dialogs.NewProjectWizard"
+            class="org.eclipse.linuxtools.tmf.ui.project.wizards.NewProjectWizard"
+            icon="icons/elcl16/new_tracing_prj.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.ui.wizards.newProject"
             name="%project.new.wizard.name"
             project="true">
@@ -104,17 +105,31 @@
       </wizard>
       <wizard
             category="org.eclipse.linuxtools.tmf.ui.wizards.new"
-            class="org.eclipse.linuxtools.tmf.ui.wizards.CustomTxtParserWizard"
+            class="org.eclipse.linuxtools.tmf.ui.parsers.wizards.CustomTxtParserWizard"
             icon="icons/etool16/customparser_wizard.gif"
             id="org.eclipse.linuxtools.tmf.ui.wizards.custom.text"
             name="%project.new.wizard.custom.text.parser">
       </wizard>
       <wizard
             category="org.eclipse.linuxtools.tmf.ui.wizards.new"
-            class="org.eclipse.linuxtools.tmf.ui.wizards.CustomXmlParserWizard"
+            class="org.eclipse.linuxtools.tmf.ui.parsers.wizards.CustomXmlParserWizard"
             icon="icons/etool16/customparser_wizard.gif"
             id="org.eclipse.linuxtools.tmf.ui.wizards.custom.xml"
             name="%project.new.wizard.custom.xml.parser">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.importWizards">
+      <category
+            id="org.eclipse.linuxtools.tmf.import.category"
+            name="%wizard.category.name">
+      </category>
+      <wizard
+            category="org.eclipse.linuxtools.tmf.import.category"
+            class="org.eclipse.linuxtools.tmf.ui.project.wizards.ImportTraceWizard"
+            icon="icons/etool16/import.gif"
+            id="org.eclipse.linuxtools.tmf.ui.trace.import.wizard"
+            name="%project.import.wizard.name">
       </wizard>
    </extension>
    <extension
@@ -122,61 +137,542 @@
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="org.eclipse.linuxtools.tmf.ui.views.project.TmfProjectNature">
+               class="org.eclipse.linuxtools.tmf.TmfProjectNature">
          </run>
       </runtime>
    </extension>
    <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            description="%action.set.description"
-            id="org.eclipse.linuxtools.tmf.ui.actionSet"
-            label="%action.set.label"
-            visible="true">
-      </actionSet>
+         point="org.eclipse.ui.ide.projectNatureImages">
+      <image
+            icon="icons/ovr16/trace_nature_ovr.gif"
+            id="org.eclipse.linuxtools.tmf.ui.nature.image"
+            natureId="org.eclipse.linuxtools.tmf.project.nature">
+      </image>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            activeByDefault="true"
+            contentProvider="org.eclipse.linuxtools.tmf.ui.project.model.TmfNavigatorContentProvider"
+            icon="icons/eview16/tracing_pers.gif"
+            id="org.eclipse.linuxtools.tmf.ui.navigator.content"
+            labelProvider="org.eclipse.linuxtools.tmf.ui.project.model.TmfNavigatorLabelProvider"
+            name="%navigatorContent.name"
+            priority="normal">
+         <enablement>
+            <and>
+               <instanceof
+                     value="org.eclipse.core.resources.IProject">
+               </instanceof>
+               <test
+                     property="org.eclipse.core.resources.projectNature"
+                     value="org.eclipse.linuxtools.tmf.project.nature">
+               </test>
+            </and>
+         </enablement>
+         <triggerPoints>
+            <or>
+               <instanceof
+                     value="org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement">
+               </instanceof>
+            </or>
+         </triggerPoints>
+         <possibleChildren>
+            <or>
+               <instanceof
+                     value="org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement">
+               </instanceof>
+            </or></possibleChildren>
+         <override
+               policy="InvokeAlwaysRegardlessOfSuppressedExt"
+               suppressedExtensionId="org.eclipse.ui.navigator.resourceContent">
+         </override>
+      </navigatorContent>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding
+            viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+         <includes>
+            <contentExtension
+                  pattern="org.eclipse.linuxtools.tmf.ui.navigator.content">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.filters.*">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+   </extension>
+   <extension
+         point="org.eclipse.ui.decorators">
+      <decorator
+            icon="icons/ovr16/trace_folder_ovr.png"
+            id="org.eclipse.linuxtools.tmf.ui.trace_folder.decorator"
+            label="Trace Folder"
+            lightweight="true"
+            location="TOP_RIGHT"
+            state="true">
+         <enablement>
+            <objectClass
+                  name="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+            </objectClass>
+         </enablement>
+      </decorator>
+      <decorator
+            icon="icons/ovr16/experiment_folder_ovr.png"
+            id="org.eclipse.linuxtools.tmf.ui.experiment_folder.decorator"
+            label="Trace Experiment Folder"
+            lightweight="true"
+            location="TOP_RIGHT"
+            state="true">
+         <enablement>
+            <objectClass
+                  name="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder">
+            </objectClass>
+         </enablement>
+      </decorator>
+      <decorator
+            icon="icons/ovr16/link_ovr.gif"
+            id="org.eclipse.linuxtools.tmf.ui.linked_trace.decorator"
+            label="Linked Trace"
+            lightweight="true"
+            location="BOTTOM_RIGHT"
+            state="true">
+         <enablement>
+            <and>
+               <objectClass
+                     name="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+               </objectClass>
+               <objectState
+                     name="isLinked"
+                     value="true">
+               </objectState>
+            </and>
+         </enablement>
+      </decorator>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.navigator.ProjectExplorer">
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.managecustomparsers"
+               id="org.eclipse.linuxtools.tmf.ui.menu.managecustomparsers"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.import"
+               disabledIcon="icons/dtool16/import.gif"
+               icon="icons/etool16/import.gif"
+               label="%commands.trace_folder.import"
+               mnemonic="%commands.trace_folder.import.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                        </instanceof>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <separator
+               name="org.eclipse.linuxtools.tmf.ui.separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.refresh"
+               disabledIcon="icons/dlcl16/refresh.gif"
+               icon="icons/elcl16/refresh.gif"
+               label="%commands.trace_folder.refresh"
+               mnemonic="%commands.trace_folder.refresh.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="true"
+                        operator="and">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                        </instanceof>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.open"
+               disabledIcon="icons/dlcl16/open.gif"
+               icon="icons/elcl16/open.gif"
+               label="%commands.trace.open"
+               mnemonic="%commands.trace.open.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                        </instanceof></and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.copy"
+               disabledIcon="IMG_TOOL_COPY_DISABLED"
+               icon="IMG_TOOL_COPY"
+               label="%commands.trace.copy"
+               mnemonic="%commands.trace.copy.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                        </instanceof></and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.rename"
+               disabledIcon="icons/dlcl16/rename.gif"
+               icon="icons/elcl16/rename.gif"
+               label="%commands.trace.rename"
+               mnemonic="%commands.trace.rename.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                        </instanceof>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.delete"
+               disabledIcon="IMG_ETOOL_DELETE_DISABLED"
+               icon="IMG_ETOOL_DELETE"
+               label="%commands.trace.delete"
+               mnemonic="%commands.trace.delete.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                        </instanceof>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <separator
+               name="org.eclipse.linuxtools.tmf.ui.separator2"
+               visible="true">
+         </separator>
+         <menu
+               label="%commands.trace.select_trace_type"
+               mnemonic="%commands.trace.select_trace_type.mnemonic">
+            <dynamic
+                  class="org.eclipse.linuxtools.tmf.ui.project.handlers.SelectTraceTypeContributionItem"
+                  id="org.eclipse.linuxtools.tmf.ui.command.project.trace.select_trace_type.dynamic">
+            </dynamic>
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                        </instanceof>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </menu>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment_folder.new"
+               disabledIcon="icons/dtool16/new.gif"
+               icon="icons/etool16/new.gif"
+               label="%commands.experiment_folder.new"
+               mnemonic="%commands.experiment_folder.new.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder">
+                        </instanceof>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <separator
+               name="org.eclipse.linuxtools.tmf.ui.separator3"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment_folder.refresh"
+               disabledIcon="icons/dlcl16/refresh.gif"
+               icon="icons/elcl16/refresh.gif"
+               label="%commands.experiment_folder.refresh"
+               mnemonic="%commands.experiment_folder.refresh.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="true"
+                        operator="and">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder">
+                        </instanceof>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.select"
+               icon="IMG_OBJ_ADD"
+               label="%commands.experiment.selecttraces"
+               mnemonic="%commands.experiment.selecttraces.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                        </instanceof>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <separator
+               name="org.eclipse.linuxtools.tmf.ui.separator4"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.open"
+               icon="icons/elcl16/open.gif"
+               label="%commands.experiment.open"
+               mnemonic="%commands.experiment.open.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                        </instanceof>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.copy"
+               disabledIcon="IMG_TOOL_COPY_DISABLED"
+               icon="IMG_TOOL_COPY"
+               label="%commands.experiment.copy"
+               mnemonic="%commands.experiment.copy.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                        </instanceof>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.rename"
+               icon="icons/elcl16/rename.gif"
+               label="%commands.experiment.rename"
+               mnemonic="%commands.experiment.rename.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                        </instanceof>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.delete"
+               disabledIcon="IMG_ETOOL_DELETE_DISABLED"
+               icon="IMG_ETOOL_DELETE"
+               label="%commands.experiment.delete"
+               mnemonic="%commands.experiment.delete.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                        </instanceof>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <separator
+               name="org.eclipse.linuxtools.tmf.ui.separator5"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.refresh"
+               disabledIcon="icons/dlcl16/refresh.gif"
+               icon="icons/elcl16/refresh.gif"
+               label="%commands.experiment.refresh"
+               mnemonic="%commands.experiment.refresh.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="true"
+                        operator="and">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                        </instanceof>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
       <category
-            description="%commands.project.category.description"
-            id="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            name="%commands.project.category.name">
+            description="%commands.trace_folder.category.description"
+            id="org.eclipse.linuxtools.tmf.ui.commands.trace_folder.category"
+            name="%commands.trace_folder.category.name">
       </category>
       <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="%commands.project.new.description"
-            id="org.eclipse.linuxtools.tmf.ui.command.project.new"
-            name="%commands.project.new">
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.trace_folder.category"
+            description="%commands.trace_folder.import.description"
+            id="org.eclipse.linuxtools.tmf.ui.command.project.trace.import"
+            name="%commands.trace_folder.import">
       </command>
       <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="%commands.project.open.description"
-            id="org.eclipse.linuxtools.tmf.ui.command.project.open"
-            name="%commands.project.open">
-      </command>
-      <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="%commands.project.close.description"
-            id="org.eclipse.linuxtools.tmf.ui.command.project.close"
-            name="%commands.project.close">
-      </command>
-      <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="%commands.project.rename.description"
-            id="org.eclipse.linuxtools.tmf.ui.command.project.rename"
-            name="%commands.project.rename">
-      </command>
-      <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="%commands.project.delete.description"
-            id="org.eclipse.linuxtools.tmf.ui.command.project.delete"
-            name="%commands.project.delete">
-      </command>
-      <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.project.category"
-            description="%commands.project.refresh.description"
-            id="org.eclipse.linuxtools.tmf.ui.command.project.refresh"
-            name="%commands.project.refresh">
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.trace_folder.category"
+            description="%commands.trace_folder.refresh.description"
+            id="org.eclipse.linuxtools.tmf.ui.command.project.trace.refresh"
+            name="%commands.trace_folder.refresh">
       </command>
       <category
             description="%commands.trace.category.description"
@@ -185,15 +681,15 @@
       </category>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.trace.category"
-            description="%commands.trace.import.description"
-            id="org.eclipse.linuxtools.tmf.ui.command.project.trace.import"
-            name="%commands.trace.import">
-      </command>
-      <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.trace.category"
             description="%commands.trace.open.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.trace.open"
             name="%commands.trace.open">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.trace.category"
+            description="%commands.trace.copy.description"
+            id="org.eclipse.linuxtools.tmf.ui.command.project.trace.copy"
+            name="%commands.trace.copy">
       </command>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.trace.category"
@@ -201,14 +697,41 @@
             id="org.eclipse.linuxtools.tmf.ui.command.project.trace.rename"
             name="%commands.trace.rename">
       </command>
+      <category
+            description="%commands.experiment_folder.category.description"
+            id="org.eclipse.linuxtools.tmf.ui.commands.experiment_folder.category"
+            name="%commands.experiment_folder.category.name">
+      </category>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.experiment_folder.category"
+            description="%commands.experiment_folder.new.description"
+            id="org.eclipse.linuxtools.tmf.ui.command.project.experiment_folder.new"
+            name="%commands.experiment_folder.new">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.experiment_folder.category"
+            description="%commands.experiment_folder.refresh.description"
+            id="org.eclipse.linuxtools.tmf.ui.command.project.experiment_folder.refresh"
+            name="%commands.experiment_folder.refresh">
+      </command>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.trace.category"
-            description="%commands.trace.selectparser.description"
-            id="org.eclipse.linuxtools.tmf.ui.command.project.trace.selectparser"
-            name="%commands.trace.selectparser">
+            description="%commands.trace.select_trace_type.description"
+            id="org.eclipse.linuxtools.tmf.ui.command.project.trace.select_trace_type"
+            name="%commands.trace.select_trace_type">
          <commandParameter
-               id="org.eclipse.linuxtools.tmf.ui.commandparameter.project.trace.selectparser.parser"
-               name="%commands.trace.selectparser.parser"
+               id="org.eclipse.linuxtools.tmf.ui.commandparameter.project.trace.select_trace_type.bundle"
+               name="%commands.trace.select_trace_type.bundle"
+               optional="false">
+         </commandParameter>
+         <commandParameter
+               id="org.eclipse.linuxtools.tmf.ui.commandparameter.project.trace.select_trace_type.type"
+               name="%commands.trace.select_trace_type.type"
+               optional="false">
+         </commandParameter>
+         <commandParameter
+               id="org.eclipse.linuxtools.tmf.ui.commandparameter.project.trace.select_trace_type.icon"
+               name="%commands.trace.select_trace_type.icon"
                optional="false">
          </commandParameter>
       </command>
@@ -225,12 +748,6 @@
       </category>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.experiment.category"
-            description="%commands.experiment.new.description"
-            id="org.eclipse.linuxtools.tmf.ui.command.project.experiment.new"
-            name="%commands.experiment.new">
-      </command>
-      <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.experiment.category"
             description="%commands.experiment.selecttraces.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.experiment.select"
             name="%commands.experiment.selecttraces">
@@ -240,6 +757,12 @@
             description="%commands.experiment.open.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.experiment.open"
             name="%commands.experiment.open">
+      </command>
+       <command
+             categoryId="org.eclipse.linuxtools.tmf.ui.commands.experiment.category"
+            description="%commands.experiment.copy.description"
+            id="org.eclipse.linuxtools.tmf.ui.command.project.experiment.copy"
+            name="%commands.experiment.copy">
       </command>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.experiment.category"
@@ -252,6 +775,12 @@
             description="%commands.experiment.delete.description"
             id="org.eclipse.linuxtools.tmf.ui.command.project.experiment.delete"
             name="%commands.experiment.delete">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.experiment.category"
+            description="%commands.experiment.refresh.description"
+            id="org.eclipse.linuxtools.tmf.ui.command.project.experiment.refresh"
+            name="%commands.experiment.refresh">
       </command>
       <category
             description="%commands.parser.category.description"
@@ -357,176 +886,66 @@
       </key>                           
    </extension>
    <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="popup:org.eclipse.linuxtools.tmf.ui.views.project?after=additions">
-         <command
-               commandId="org.eclipse.linuxtools.tmf.ui.command.project.new"
-               id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.new"
-               label="%commands.project.new"
-               style="push">
-         </command>
-         <command
-               commandId="org.eclipse.linuxtools.tmf.ui.command.project.open"
-               id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.open"
-               label="%commands.project.open"
-               style="push">
-         </command>
-         <command
-               commandId="org.eclipse.linuxtools.tmf.ui.command.project.close"
-               id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.close"
-               label="%commands.project.close"
-               style="push">
-         </command>
-         <command
-               commandId="org.eclipse.linuxtools.tmf.ui.command.project.delete"
-               id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.delete"
-               label="%commands.project.delete"
-               style="push">
-         </command>
-         <separator
-               name="org.eclipse.linuxtools.tmf.ui.menu.popup.project.separator1"
-               visible="true">
-         </separator>
-         <command
-               commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.new"
-               id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.experiment.new"
-               label="%commands.experiment.new"
-               style="push">
-         </command>
-         <command
-               commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.select"
-               id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.experiment.select"
-               label="%commands.experiment.selecttraces"
-               style="push">
-         </command>
-         <command
-               commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.open"
-               id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.experiment.open"
-               label="%commands.experiment.open"
-               style="push">
-         </command>
-         <command
-               commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.delete"
-               id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.experiment.delete"
-               label="%commands.experiment.delete"
-               style="push">
-         </command>
-         <separator
-               name="org.eclipse.linuxtools.tmf.ui.menu.popup.project.separator2"
-               visible="true">
-         </separator>
-         <command
-               commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.import"
-               id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.trace.import"
-               label="%commands.trace.import"
-               style="push">
-         </command>
-         <command
-               commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.open"
-               id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.trace.open"
-               label="%commands.trace.open"
-               style="push">
-         </command>
-         <menu
-               id="org.eclipse.linuxtools.tmf.ui.menu.project.trace.selectparser"
-               label="%commands.trace.selectparser">
-            <dynamic
-                  class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.SelectParserContributionItem"
-                  id="org.eclipse.linuxtools.tmf.ui.command.project.trace.selectparser.dynamic">
-            </dynamic>
-         </menu>
-         <command
-               commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.delete"
-               id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.trace.delete"
-               label="%commands.trace.delete"
-               style="push">
-         </command>
-         <separator
-               name="org.eclipse.linuxtools.tmf.ui.menu.popup.project.separator3"
-               visible="true">
-         </separator>
-         <command
-               commandId="org.eclipse.linuxtools.tmf.ui.command.project.refresh"
-               id="org.eclipse.linuxtools.tmf.ui.menu.popup.project.refresh"
-               label="%commands.project.refresh"
-               style="push">
-         </command>
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:org.eclipse.linuxtools.tmf.ui.views.project">
-         <command
-               commandId="org.eclipse.linuxtools.tmf.ui.command.managecustomparsers"
-               id="org.eclipse.linuxtools.tmf.ui.menu.managecustomparsers"
-               style="push">
-         </command>
-      </menuContribution>
-   </extension>
-   <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.NewProjectHandler"
-            commandId="org.eclipse.linuxtools.tmf.ui.command.project.new">
-      </handler>
-      <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.OpenProjectHandler"
-            commandId="org.eclipse.linuxtools.tmf.ui.command.project.open">
-      </handler>
-      <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.CloseProjectHandler"
-            commandId="org.eclipse.linuxtools.tmf.ui.command.project.close">
-      </handler>
-      <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.RenameProjectHandler"
-            commandId="org.eclipse.linuxtools.tmf.ui.command.project.rename">
-      </handler>
-      <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.DeleteProjectHandler"
-            commandId="org.eclipse.linuxtools.tmf.ui.command.project.delete">
-      </handler>
-      <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.ImportTraceHandler"
+            class="org.eclipse.linuxtools.tmf.ui.project.handlers.ImportTraceHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.import">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.OpenTraceHandler"
+            class="org.eclipse.linuxtools.tmf.ui.project.handlers.RefreshHandler"
+            commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.refresh">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.tmf.ui.project.handlers.OpenTraceHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.open">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.RenameTraceHandler"
+            class="org.eclipse.linuxtools.tmf.ui.project.handlers.CopyTraceHandler"
+            commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.copy">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.tmf.ui.project.handlers.RenameTraceHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.rename">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.DeleteTraceHandler"
+            class="org.eclipse.linuxtools.tmf.ui.project.handlers.DeleteTraceHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.delete">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.NewExperimentHandler"
-            commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.new">
+            class="org.eclipse.linuxtools.tmf.ui.project.handlers.SelectTraceTypeHandler"
+            commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.select_trace_type">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.SelectTracesHandler"
+            class="org.eclipse.linuxtools.tmf.ui.project.handlers.NewExperimentHandler"
+            commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment_folder.new">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.tmf.ui.project.handlers.RefreshHandler"
+            commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment_folder.refresh">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.tmf.ui.project.handlers.SelectTracesHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.select">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.OpenExperimentHandler"
+            class="org.eclipse.linuxtools.tmf.ui.project.handlers.OpenExperimentHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.open">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.RenameExperimentHandler"
+            class="org.eclipse.linuxtools.tmf.ui.project.handlers.CopyExperimentHandler"
+            commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.copy">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.tmf.ui.project.handlers.RenameExperimentHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.rename">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.DeleteExperimentHandler"
+            class="org.eclipse.linuxtools.tmf.ui.project.handlers.DeleteExperimentHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.delete">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.RefreshHandler"
-            commandId="org.eclipse.linuxtools.tmf.ui.command.project.refresh">
-      </handler>
-      <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.project.handlers.SelectParserHandler"
-            commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.selectparser">
+            class="org.eclipse.linuxtools.tmf.ui.project.handlers.RefreshHandler"
+            commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.refresh">
       </handler>
       <handler
             class="org.eclipse.linuxtools.tmf.ui.commands.ManageCustomParsersCommandHandler"
@@ -595,6 +1014,16 @@
             name="TMF UML2SD Loader"
             view="org.eclipse.linuxtools.tmf.ui.tmfUml2SDSyncView">
       </uml2SDLoader>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.linuxtools.tmf.ui.project.handlers.PropertyTester"
+            id="org.eclipse.linuxtools.tmf.ui.propertyTester.isInTraceFolder"
+            namespace="org.eclipse.linuxtools.tmf.ui.propertyTester"
+            properties="isInTraceFolder"
+            type="org.eclipse.jface.viewers.ISelection">
+      </propertyTester>
    </extension>
 
 </plugin>
