@@ -161,6 +161,7 @@ public class SelectTraceTypeHandler extends AbstractHandler {
                 }
             }
         }
+
         return true;
     }
 

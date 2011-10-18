@@ -115,9 +115,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
     // Target import directory ('Traces' folder)
     private IFolder fTargetFolder;
 
-    // Selected trace attributes
-    private final Map<String, IConfigurationElement> fTraceAttributes = new HashMap<String, IConfigurationElement>();
-
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -465,8 +462,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
         return selectFiles(sourceDirectory, FileSystemStructureProvider.INSTANCE);
     }
 
-    private FileSystemElement selectFiles(final Object rootFileSystemObject,
-            final IImportStructureProvider structureProvider) {
+    private FileSystemElement selectFiles(final Object rootFileSystemObject, final IImportStructureProvider structureProvider) {
         final FileSystemElement[] results = new FileSystemElement[1];
         BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
             @Override
@@ -535,12 +531,31 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
         });
     }
 
+    // The mapping of available trace type IDs to their corresponding configuration element
+    private Map<String, IConfigurationElement> fTraceTypeAttributes = new HashMap<String, IConfigurationElement>();
+    private Map<String, IConfigurationElement> fTraceCategories = new HashMap<String, IConfigurationElement>();
+    private final Map<String, IConfigurationElement> fTraceAttributes = new HashMap<String, IConfigurationElement>();
+
     private String[] getAvailableTraceTypes() {
-        List<String> traceTypes = new ArrayList<String>();
-        IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(
-                TmfCorePlugin.TMF_TRACE_TYPE_ID);
+
+        // Populate the Categories and Trace Types
+        IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(TmfCorePlugin.TMF_TRACE_TYPE_ID);
         for (IConfigurationElement ce : config) {
-            String traceTypeName = ce.getAttribute("name"); //$NON-NLS-1$
+            String attribute = ce.getName();
+            if (attribute.equals(TmfTraceElement.TYPE)) {
+                String traceTypeId = ce.getAttribute(TmfTraceElement.ID);
+                fTraceTypeAttributes.put(traceTypeId, ce);
+            } else if (attribute.equals(TmfTraceElement.CATEGORY)) {
+                String categoryId = ce.getAttribute(TmfTraceElement.ID);
+                fTraceCategories.put(categoryId, ce);
+            }
+        }
+
+        // Generate the list of Category:TraceType to populate the ComboBox
+        List<String> traceTypes = new ArrayList<String>();
+        for (String typeId : fTraceTypeAttributes.keySet()) {
+            IConfigurationElement ce = fTraceTypeAttributes.get(typeId);
+            String traceTypeName = getCategory(ce) + " : " + ce.getAttribute(TmfTraceElement.NAME); //$NON-NLS-1$
             fTraceAttributes.put(traceTypeName, ce);
             traceTypes.add(traceTypeName);
         }
@@ -552,6 +567,17 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
         String[] result = new String[traceTypes.size()];
         result = traceTypes.toArray(result);
         return result;
+    }
+
+    private String getCategory(IConfigurationElement ce) {
+        String categoryId = ce.getAttribute(TmfTraceElement.CATEGORY);
+        if (categoryId != null) {
+            IConfigurationElement category = fTraceCategories.get(categoryId);
+            if (category != null && !category.equals("")) { //$NON-NLS-1$
+                return category.getAttribute(TmfTraceElement.NAME);
+            }
+        }
+        return "[no category]"; //$NON-NLS-1$
     }
 
     // ------------------------------------------------------------------------
@@ -614,8 +640,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
 
         IContainer container = getSpecifiedContainer();
         if (container != null && container.isVirtual()) {
-            if (Platform.getPreferencesService().getBoolean(TmfUiPlugin.PLUGIN_ID,
-                    ResourcesPlugin.PREF_DISABLE_LINKING, false, null)) {
+            if (Platform.getPreferencesService().getBoolean(TmfUiPlugin.PLUGIN_ID, ResourcesPlugin.PREF_DISABLE_LINKING, false, null)) {
                 setMessage(null);
                 setErrorMessage(Messages.ImportTraceWizard_CannotImportFilesUnderAVirtualFolder);
                 return false;
@@ -741,12 +766,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
                         if (resource != null) {
                             try {
                                 // Set the trace properties for this resource
-                                resource.setPersistentProperty(TmfTraceElement.TRACEBUNDLE, ce.getContributor()
-                                        .getName());
-                                resource.setPersistentProperty(TmfTraceElement.TRACETYPE,
-                                        ce.getAttribute(TmfTraceElement.ID));
-                                resource.setPersistentProperty(TmfTraceElement.TRACEICON,
-                                        ce.getAttribute(TmfTraceElement.ICON));
+                                resource.setPersistentProperty(TmfTraceElement.TRACEBUNDLE, ce.getContributor().getName());
+                                resource.setPersistentProperty(TmfTraceElement.TRACETYPE, ce.getAttribute(TmfTraceElement.ID));
+                                resource.setPersistentProperty(TmfTraceElement.TRACEICON, ce.getAttribute(TmfTraceElement.ICON));
                             } catch (CoreException e) {
                                 e.printStackTrace();
                             }
@@ -799,8 +821,8 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
 
             // Perform the import operation for this subset
             FileSystemStructureProvider fileSystemStructureProvider = FileSystemStructureProvider.INSTANCE;
-            ImportOperation operation = new ImportOperation(getContainerFullPath(), parentFolder,
-                    fileSystemStructureProvider, this, subList);
+            ImportOperation operation = new ImportOperation(getContainerFullPath(), parentFolder, fileSystemStructureProvider, this,
+                    subList);
             operation.setContext(getShell());
             ok = executeImportOperation(operation);
         }
