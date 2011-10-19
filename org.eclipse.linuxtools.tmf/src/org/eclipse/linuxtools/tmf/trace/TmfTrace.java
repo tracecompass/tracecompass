@@ -66,6 +66,9 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     // The trace path
     private String fPath;
 
+    // The trace name
+    private String fName;
+
     // The cache page size AND checkpoints interval
     protected int fIndexPageSize = DEFAULT_INDEX_PAGE_SIZE;
 
@@ -84,6 +87,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     // ------------------------------------------------------------------------
 
     public TmfTrace() {
+        super();
     }
 
     @Override
@@ -103,16 +107,16 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 
     @Override
     public void initTrace(String path, Class<T> eventType, int cacheSize, boolean indexTrace) throws FileNotFoundException {
-        String simpleName = ""; //$NON-NLS-1$
         fPath = path;
-        if (path != null) {
-            int sep = path.lastIndexOf(File.separator);
-            simpleName = (sep >= 0) ? path.substring(sep + 1) : path;
+        if (fName == null) {
+            fName = ""; //$NON-NLS-1$
+            if (path != null) {
+                int sep = path.lastIndexOf(File.separator);
+                fName = (sep >= 0) ? path.substring(sep + 1) : path;
+            }
         }
-        super.init(simpleName, eventType);
-
+        super.init(fName, eventType);
         fIndexPageSize = (cacheSize > 0) ? cacheSize : DEFAULT_INDEX_PAGE_SIZE;
-
         if (indexTrace)
             indexTrace(false);
     }
@@ -156,22 +160,11 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
      * @throws FileNotFoundException
      */
     protected TmfTrace(String name, Class<T> type, String path, int cacheSize, boolean indexTrace) throws FileNotFoundException {
-        super(name, type);
-        if (path != null) {
-            int sep = path.lastIndexOf(File.separator);
-            String simpleName = (sep >= 0) ? path.substring(sep + 1) : path;
-            setName(simpleName);
-        }
-        fPath = path;
-        fIndexPageSize = (cacheSize > 0) ? cacheSize : DEFAULT_INDEX_PAGE_SIZE;
-        if (indexTrace) {
-            indexTrace(false);
-        }
+        super();
+        fName = name;
+        initTrace(path, type, cacheSize, indexTrace);
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#clone()
-     */
     @SuppressWarnings("unchecked")
     @Override
     public TmfTrace<T> clone() throws CloneNotSupportedException {

@@ -24,6 +24,10 @@ import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
  */
 public abstract class TmfComponent implements ITmfComponent {
 
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+
 	private String fName;
 	
 	// ------------------------------------------------------------------------
@@ -40,18 +44,17 @@ public abstract class TmfComponent implements ITmfComponent {
     }
 
 	public TmfComponent(String name) {
-		fName = name;
-		TmfSignalManager.register(this);
+		init(name);
 	}
 	
-	public TmfComponent(TmfComponent oldComponent) {
-        fName = oldComponent.fName;
-        TmfSignalManager.register(this);
+	public TmfComponent(TmfComponent other) {
+        init(other.fName);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.tmf.component.ITmfComponent#getName()
-	 */
+    // ------------------------------------------------------------------------
+    // Accessors
+    // ------------------------------------------------------------------------
+
 	protected void setName(String name) {
 		fName = name;
 	}
@@ -60,26 +63,17 @@ public abstract class TmfComponent implements ITmfComponent {
 	// ITmfComponent
 	// ------------------------------------------------------------------------
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.tmf.component.ITmfComponent#getName()
-	 */
 	@Override
 	public String getName() {
 		return fName;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.tmf.component.ITmfComponent#dispose()
-	 */
 	@Override
 	public void dispose() {
 		TmfSignalManager.deregister(this);
 //		if (Tracer.isComponentTraced()) Tracer.traceComponent(this, "terminated");
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.tmf.component.ITmfComponent#broadcast(org.eclipse.linuxtools.tmf.signal.TmfSignal)
-	 */
 	@Override
 	public void broadcast(TmfSignal signal) {
 		TmfSignalManager.dispatchSignal(signal);

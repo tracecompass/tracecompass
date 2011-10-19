@@ -127,8 +127,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         traceTypeNames = new Vector<Integer>();
         initialiseEventTypes(currentJniTrace);
 
-        // *** VERIFY ***
-        // Verify that all those "default constructor" are safe to use
+        // Build the re-used event structure
         eventTimestamp = new LttngTimestamp();
         eventSource = new LttngEventSource();
         this.eventType = new LttngEventType();
@@ -144,15 +143,6 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 
         // Set the currentEvent to the eventContent
         eventContent.setEvent(currentLttngEvent);
-
-        // // Bypass indexing if asked
-        // if ( bypassIndexing == false ) {
-        // indexTrace(true);
-        // }
-        // else {
-        // Even if we don't have any index, set ONE checkpoint
-        // fCheckpoints.add(new TmfCheckpoint(new LttngTimestamp(0L) , new
-        // LttngLocation() ) );
 
         // Set the time range of the trace
         TmfContext context = seekLocation(null);
@@ -215,74 +205,63 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     public LTTngTrace(String path, String traceLibPath, boolean waitForCompletion, boolean bypassIndexing)
             throws Exception {
         super(path, LttngEvent.class, path, CHECKPOINT_PAGE_SIZE, false);
-        try {
-            currentJniTrace = JniTraceFactory.getJniTrace(path, traceLibPath, SHOW_LTT_DEBUG_DEFAULT);
-        } catch (Exception e) {
-            throw new FileNotFoundException(e.getMessage());
-        }
-
+        initTrace(path, LttngEvent.class, !bypassIndexing);
         this.traceLibPath = traceLibPath;
-        // Export all the event types from the JNI side
-        traceTypes = new HashMap<Integer, LttngEventType>();
-        traceTypeNames = new Vector<Integer>();
-        initialiseEventTypes(currentJniTrace);
 
-        // *** VERIFY ***
-        // Verify that all those "default constructor" are safe to use
-        eventTimestamp = new LttngTimestamp();
-        eventSource = new LttngEventSource();
-        eventType = new LttngEventType();
-        eventContent = new LttngEventContent(currentLttngEvent);
-        eventReference = new LttngEventReference(this.getName());
-
-        // Create the skeleton event
-        currentLttngEvent = new LttngEvent(this, eventTimestamp, eventSource, eventType, eventContent, eventReference,
-                null);
-
-        // Create a new current location
-        previousLocation = new LttngLocation();
-
-        // Set the currentEvent to the eventContent
-        eventContent.setEvent(currentLttngEvent);
-
-        // // Bypass indexing if asked
-        // if ( bypassIndexing == false ) {
-        // indexTrace(true);
-        // }
-        // else {
-        // Even if we don't have any index, set ONE checkpoint
-        // fCheckpoints.add(new TmfCheckpoint(new LttngTimestamp(0L) , new
-        // LttngLocation() ) );
-
-        // Set the time range of the trace
-        TmfContext context = seekLocation(null);
-        LttngEvent event = getNextEvent(context);
-        LttngTimestamp startTime = new LttngTimestamp(event.getTimestamp());
-        LttngTimestamp endTime = new LttngTimestamp(currentJniTrace.getEndTime().getTime());
-
-        setTimeRange(new TmfTimeRange(startTime, endTime));
+//        try {
+//            currentJniTrace = JniTraceFactory.getJniTrace(path, traceLibPath, SHOW_LTT_DEBUG_DEFAULT);
+//        } catch (Exception e) {
+//            throw new FileNotFoundException(e.getMessage());
+//        }
+//
+//        // Export all the event types from the JNI side
+//        traceTypes = new HashMap<Integer, LttngEventType>();
+//        traceTypeNames = new Vector<Integer>();
+//        initialiseEventTypes(currentJniTrace);
+//
+//        // *** VERIFY ***
+//        // Verify that all those "default constructor" are safe to use
+//        eventTimestamp = new LttngTimestamp();
+//        eventSource = new LttngEventSource();
+//        eventType = new LttngEventType();
+//        eventContent = new LttngEventContent(currentLttngEvent);
+//        eventReference = new LttngEventReference(this.getName());
+//
+//        // Create the skeleton event
+//        currentLttngEvent = new LttngEvent(this, eventTimestamp, eventSource, eventType, eventContent, eventReference,
+//                null);
+//
+//        // Create a new current location
+//        previousLocation = new LttngLocation();
+//
+//        // Set the currentEvent to the eventContent
+//        eventContent.setEvent(currentLttngEvent);
+//
+//        // // Bypass indexing if asked
+//        // if ( bypassIndexing == false ) {
+//        // indexTrace(true);
+//        // }
+//        // else {
+//        // Even if we don't have any index, set ONE checkpoint
+//        // fCheckpoints.add(new TmfCheckpoint(new LttngTimestamp(0L) , new
+//        // LttngLocation() ) );
+//
+//        // Set the time range of the trace
+//        TmfContext context = seekLocation(null);
+//        LttngEvent event = getNextEvent(context);
+//        LttngTimestamp startTime = new LttngTimestamp(event.getTimestamp());
+//        LttngTimestamp endTime = new LttngTimestamp(currentJniTrace.getEndTime().getTime());
+//
+//        setTimeRange(new TmfTimeRange(startTime, endTime));
     }
 
     /*
      * Copy constructor is forbidden for LttngEvenmStream
      */
-    public LTTngTrace(LTTngTrace oldTrace) throws Exception {
-        this(oldTrace.getPath(), oldTrace.getTraceLibPath(), false, true);
-
-        // *** VERIFY ***
-        // Is this safe?
-        this.fCheckpoints = oldTrace.fCheckpoints;
-
-        /*
-         * // This would only work if the index is already done this.fCheckpoints = new Vector<TmfCheckpoint>(
-         * oldTrace.fCheckpoints.size() ); for (int x = 0; x<oldTrace.fCheckpoints.size(); x++){ TmfCheckpoint
-         * tmpCheckPoint = oldTrace.fCheckpoints.get(x); this.fCheckpoints.add( new
-         * TmfCheckpoint(tmpCheckPoint.getTimestamp(), tmpCheckPoint.getLocation()) ); }
-         */
-
-        // Set the start time of the trace
-        setTimeRange(new TmfTimeRange(new LttngTimestamp(oldTrace.getStartTime()), new LttngTimestamp(
-                oldTrace.getEndTime())));
+    public LTTngTrace(LTTngTrace other) throws Exception {
+        this(other.getPath(), other.getTraceLibPath(), false, true);
+        this.fCheckpoints = other.fCheckpoints;
+        setTimeRange(new TmfTimeRange(new LttngTimestamp(other.getStartTime()), new LttngTimestamp(other.getEndTime())));
     }
 
     @Override

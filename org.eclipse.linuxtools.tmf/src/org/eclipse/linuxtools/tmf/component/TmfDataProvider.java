@@ -48,6 +48,9 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
     // Constants
     // ------------------------------------------------------------------------
 
+    public static final int DEFAULT_BLOCK_SIZE = 50000;
+    public static final int DEFAULT_QUEUE_SIZE = 1000;
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -56,10 +59,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
     protected boolean fLogData;
     protected boolean fLogError;
 
-    public static final int DEFAULT_BLOCK_SIZE = 50000;
-    public static final int DEFAULT_QUEUE_SIZE = 1000;
-
-    protected int fQueueSize;
+    protected int fQueueSize = DEFAULT_QUEUE_SIZE;
     protected BlockingQueue<T> fDataQueue;
     protected TmfRequestExecutor fExecutor;
 
@@ -73,6 +73,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
     // ------------------------------------------------------------------------
 
     public TmfDataProvider() {
+        super();
         fQueueSize = DEFAULT_QUEUE_SIZE;
         fDataQueue = new LinkedBlockingQueue<T>(fQueueSize);
         fExecutor = new TmfRequestExecutor();
@@ -81,7 +82,6 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
     public void init(String name, Class<T> dataType) {
         super.init(name);
         fType = dataType;
-        fQueueSize = DEFAULT_QUEUE_SIZE;
         fDataQueue = (fQueueSize > 1) ? new LinkedBlockingQueue<T>(fQueueSize) : new SynchronousQueue<T>();
 
         fExecutor = new TmfRequestExecutor();
@@ -91,39 +91,21 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
         fLogError = Tracer.isErrorTraced();
 
         TmfProviderManager.register(fType, this);
+    }
+
+    protected TmfDataProvider(String name, Class<T> type, int queueSize) {
+        this();
+        fQueueSize = queueSize;
+        init(name, type);
+    }
+
+    public TmfDataProvider(TmfDataProvider<T> other) {
+        this();
+        init(other.getName(), other.fType);
     }
 
     public TmfDataProvider(String name, Class<T> type) {
         this(name, type, DEFAULT_QUEUE_SIZE);
-    }
-
-    protected TmfDataProvider(String name, Class<T> type, int queueSize) {
-        super(name);
-        fType = type;
-        fQueueSize = queueSize;
-        fDataQueue = (fQueueSize > 1) ? new LinkedBlockingQueue<T>(fQueueSize) : new SynchronousQueue<T>();
-
-        fExecutor = new TmfRequestExecutor();
-        fSignalDepth = 0;
-
-        fLogData = Tracer.isEventTraced();
-        fLogError = Tracer.isErrorTraced();
-
-        TmfProviderManager.register(fType, this);
-        // if (Tracer.isComponentTraced()) Tracer.traceComponent(this, "started");
-    }
-
-    public TmfDataProvider(TmfDataProvider<T> other) {
-        super(other);
-        fType = other.fType;
-        fQueueSize = other.fQueueSize;
-        fDataQueue = (fQueueSize > 1) ? new LinkedBlockingQueue<T>(fQueueSize) : new SynchronousQueue<T>();
-
-        fExecutor = new TmfRequestExecutor();
-        fSignalDepth = 0;
-
-        fLogData = Tracer.isEventTraced();
-        fLogError = Tracer.isErrorTraced();
     }
 
     @Override
@@ -133,6 +115,10 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
         super.dispose();
         // if (Tracer.isComponentTraced()) Tracer.traceComponent(this, "stopped");
     }
+
+    // ------------------------------------------------------------------------
+    // Accessors
+    // ------------------------------------------------------------------------
 
     public int getQueueSize() {
         return fQueueSize;

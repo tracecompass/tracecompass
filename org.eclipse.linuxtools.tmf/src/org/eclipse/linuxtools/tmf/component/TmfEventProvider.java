@@ -24,11 +24,15 @@ import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 /**
  * <b><u>TmfEventProvider</u></b>
  * <p>
- * Implement me. Please.
  */
 public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvider<T> {
 
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
+
     public TmfEventProvider() {
+        super();
     }
 
     public void init(String name, Class<T> eventType) {
@@ -43,9 +47,13 @@ public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvid
         super(name, type, queueSize);
     }
 
-    public TmfEventProvider(TmfEventProvider<T> oldProvider) {
-        super(oldProvider);
+    public TmfEventProvider(TmfEventProvider<T> other) {
+        super(other);
     }
+
+    // ------------------------------------------------------------------------
+    // TmfDataProvider
+    // ------------------------------------------------------------------------
 
     @Override
     public boolean isCompleted(ITmfDataRequest<T> request, T data, int nbRead) {
