@@ -110,8 +110,7 @@ public class OpenExperimentHandler extends AbstractHandler {
         }
 
         // Create the experiment and signal
-        TmfExperiment experiment = new TmfExperiment(traces[0].getClass(), "Experiment", traces, //$NON-NLS-1$
-                traces[0].getCacheSize());
+        TmfExperiment experiment = new TmfExperiment(traces[0].getClass(), fExperiment.getName(), traces, traces[0].getCacheSize());
         TmfExperiment.setCurrentExperiment(experiment);
         TmfSignalManager.dispatchSignal(new TmfExperimentSelectedSignal(this, experiment));
 

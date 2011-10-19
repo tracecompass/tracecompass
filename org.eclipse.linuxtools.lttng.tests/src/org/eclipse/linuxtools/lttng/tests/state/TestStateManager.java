@@ -32,7 +32,7 @@ public class TestStateManager extends TestCase {
 		
 		LTTngTrace testStream = null;
 		try {
-			testStream = new LTTngTrace(logName);
+			testStream = new LTTngTrace(logName, false);
 		} catch (Exception e) {
 //			e.printStackTrace();
 		}

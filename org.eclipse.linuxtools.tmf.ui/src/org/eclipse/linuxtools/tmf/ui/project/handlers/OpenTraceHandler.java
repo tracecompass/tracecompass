@@ -139,8 +139,7 @@ public class OpenTraceHandler extends AbstractHandler {
 
         } else {
             ITmfTrace[] traces = new ITmfTrace[] { trace };
-            TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), fTrace.getName(), traces,
-                    trace.getCacheSize());
+            TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), fTrace.getName(), traces, trace.getCacheSize());
             TmfExperiment.setCurrentExperiment(experiment);
             TmfSignalManager.dispatchSignal(new TmfExperimentSelectedSignal(this, experiment));
         }

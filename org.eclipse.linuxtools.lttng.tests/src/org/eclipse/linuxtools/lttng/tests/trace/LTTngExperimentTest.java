@@ -23,10 +23,10 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.tests.LTTngCoreTestPlugin;
-import org.eclipse.linuxtools.lttng.trace.LTTngExperiment;
 import org.eclipse.linuxtools.lttng.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 
 /**
@@ -47,7 +47,7 @@ public class LTTngExperimentTest extends TestCase {
     private static final TmfTimestamp  fEndTime   = new TmfTimestamp(13589907059242L, (byte) -9);
 
     private static ITmfTrace<LttngEvent>[] fTraces;
-    private static LTTngExperiment<LttngEvent> fExperiment;
+    private static TmfExperiment<LttngEvent> fExperiment;
 
     // ------------------------------------------------------------------------
     // Housekeeping
@@ -60,7 +60,7 @@ public class LTTngExperimentTest extends TestCase {
     		try {
 				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(path), null);
 				File testfile = new File(FileLocator.toFileURL(location).toURI());
-				LTTngTrace trace = new LTTngTrace(testfile.getPath());
+				LTTngTrace trace = new LTTngTrace(testfile.getPath(), false);
     			fTraces[0] = trace;
     		} catch (URISyntaxException e) {
     			e.printStackTrace();
@@ -75,7 +75,7 @@ public class LTTngExperimentTest extends TestCase {
 
     private synchronized static void setupExperiment() {
     	if (fExperiment == null) {
-    		fExperiment = new LTTngExperiment<LttngEvent>(LttngEvent.class, EXPERIMENT, fTraces, TmfTimestamp.Zero, 1000, true);
+    		fExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class, EXPERIMENT, fTraces, TmfTimestamp.Zero, 1000, true);
     	}
     }
 

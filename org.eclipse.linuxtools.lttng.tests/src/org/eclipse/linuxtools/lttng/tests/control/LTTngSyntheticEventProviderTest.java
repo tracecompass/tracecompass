@@ -11,7 +11,10 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.tests.control;
 
+import org.eclipse.linuxtools.lttng.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.tests.LttngTestPreparation;
+import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
 
 @SuppressWarnings("nls")
 public class LTTngSyntheticEventProviderTest extends LttngTestPreparation {
@@ -20,26 +23,25 @@ public class LTTngSyntheticEventProviderTest extends LttngTestPreparation {
 	// ========================================================================
 
 	public void testPlainDataRequest() {
-        System.out.println("testPlainDataRequest: test removed");
-//		// prepare
-//		init();
-//		TmfExperiment<LttngEvent> experiment = prepareExperimentToTest();
-//		TmfEventRequest<LttngEvent> request = prepareEventRequest(
-//				LttngEvent.class, 0, 31);
-//
-//		// execute
-//		experiment.sendRequest(request);
-//		try {
-//			request.waitForCompletion();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//
-//		// finish
-//		assertEquals("Unexpected eventCount", 15316, feventCount);
-//		boolean expected = true;
-//		assertEquals("Events received out of expected order", expected,
-//				validSequence);
+		// prepare
+		init();
+		TmfExperiment<LttngEvent> experiment = prepareExperimentToTest();
+		TmfEventRequest<LttngEvent> request = prepareEventRequest(
+				LttngEvent.class, 0, 31);
+
+		// execute
+		experiment.sendRequest(request);
+		try {
+			request.waitForCompletion();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		// finish
+		assertEquals("Unexpected eventCount", 15316, feventCount);
+		boolean expected = true;
+		assertEquals("Events received out of expected order", expected,
+				validSequence);
 	}
 
 	public void testSyntheticEventRequest() {

@@ -71,7 +71,7 @@ public class LTTngTraceTest extends TestCase {
 			try {
 				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(tracepath1), null);
 				File testfile = new File(FileLocator.toFileURL(location).toURI());
-				LTTngTrace tmpStream = new LTTngTrace(testfile.getPath());
+				LTTngTrace tmpStream = new LTTngTrace(testfile.getPath(), false);
 				testStream = tmpStream;
 			} 
 			catch (Exception e) {
@@ -109,6 +109,7 @@ public class LTTngTraceTest extends TestCase {
         catch( Exception e) {
                 fail("Construction with correct tracepath failed!");
         }
+        System.out.println("Test completed");
 	}
 	
 	public void testGetNextEvent() {
