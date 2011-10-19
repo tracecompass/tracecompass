@@ -20,12 +20,12 @@ import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
  *
  * TODO: Implement me. Please.
  */
-public class NewProjectMainWizardPage extends WizardNewProjectCreationPage {
+public class NewLTTngProjectMainWizardPage extends WizardNewProjectCreationPage {
 
     /**
      * @param pageName
      */
-    public NewProjectMainWizardPage(String pageName) {
+    public NewLTTngProjectMainWizardPage(String pageName) {
         super(pageName);
     }
 

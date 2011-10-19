@@ -93,7 +93,7 @@
       </category>
       <wizard
             category="org.eclipse.linuxtools.tmf.ui.wizards.new"
-            class="org.eclipse.linuxtools.tmf.ui.project.wizards.NewProjectWizard"
+            class="org.eclipse.linuxtools.tmf.ui.project.wizards.NewTmfProjectWizard"
             icon="icons/elcl16/new_tracing_prj.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.ui.wizards.newProject"
             name="%project.new.wizard.name"

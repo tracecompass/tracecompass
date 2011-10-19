@@ -20,7 +20,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.linuxtools.lttng.ui.views.project.ProjectView;
-import org.eclipse.linuxtools.lttng.ui.views.project.dialogs.NewProjectWizard;
+import org.eclipse.linuxtools.lttng.ui.views.project.dialogs.NewLTTngProjectWizard;
 import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectRoot;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPart;
@@ -73,7 +73,7 @@ public class NewProjectHandler implements IHandler {
 
 		// Fire the New Project Wizard
 		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-		NewProjectWizard wizard = new NewProjectWizard();
+		NewLTTngProjectWizard wizard = new NewLTTngProjectWizard();
 		WizardDialog dialog = new WizardDialog(shell, wizard);
 		dialog.open();
 

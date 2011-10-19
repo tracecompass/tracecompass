@@ -6,7 +6,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="org.eclipse.linuxtools.lttng.ui.views.PerspectiveFactory"
-            icon="icons/obj16/garland16.png"
+            icon="icons/obj16/tux.png"
             id="org.eclipse.linuxtools.lttng.ui.perspective"
             name="%perspective.category.name">
       </perspective>
@@ -99,7 +99,7 @@
       </category>
       <wizard
             category="org.eclipse.linuxtools.lttng.ui.wizards.new"
-            class="org.eclipse.linuxtools.lttng.ui.views.project.dialogs.NewProjectWizard"
+            class="org.eclipse.linuxtools.lttng.ui.views.project.dialogs.NewLTTngProjectWizard"
             descriptionImage="icons/obj16/garland16.png"
             finalPerspective="org.eclipse.linuxtools.lttng.ui.perspective"
             icon="icons/obj16/garland16.png"
@@ -750,7 +750,7 @@
       <type
             category="org.eclipse.linuxtools.lttng.ui.category.lttng"
             event_type="org.eclipse.linuxtools.lttng.event.LttngEvent"
-            icon="icons/obj16/garland16.gif"
+            icon="icons/obj16/tux2.png"
             id="org.eclipse.linuxtools.lttng.tracetype.kernel"
             name="%tracetype.type.kernel"
             trace_type="org.eclipse.linuxtools.lttng.trace.LTTngTrace">

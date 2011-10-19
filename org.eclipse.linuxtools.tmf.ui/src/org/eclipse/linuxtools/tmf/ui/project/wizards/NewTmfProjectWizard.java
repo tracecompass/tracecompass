@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2011 Ericsson, MontaVista Software
+ * Copyright (c) 2009, 2011 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,10 +8,9 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
- *   Yufen Kuo       (ykuo@mvista.com) - add support to allow user specify trace library path
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.ui.views.project.dialogs;
+package org.eclipse.linuxtools.tmf.ui.project.wizards;
 
 import java.net.URI;
 
@@ -23,46 +22,46 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.linuxtools.lttng.LTTngProjectNature;
-import org.eclipse.linuxtools.lttng.TraceHelper;
-import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
-import org.eclipse.linuxtools.lttng.ui.views.project.model.LTTngProjectNode;
+import org.eclipse.linuxtools.tmf.TmfProjectNature;
+import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
+import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 /**
- * <b><u>NewProjectWizard</u></b>
+ * <b><u>NewTmfProjectWizard</u></b>
  * <p>
- * TODO: Implement me. Please.
  */
-public class NewProjectWizard extends BasicNewResourceWizard {
+public class NewTmfProjectWizard extends BasicNewResourceWizard implements IExecutableExtension {
 
-    private String fTtitle;
-    private String fDescription;
+    private final String fTtitle;
+    private final String fDescription;
 
-    protected NewProjectMainWizardPage fMainPage;
+    protected NewTmfProjectMainWizardPage fMainPage;
     protected String fProjectName;
     protected URI fProjectLocation;
     protected IConfigurationElement fConfigElement;
 
     protected IProject fProject;
-	private TraceLibraryPathWizardPage traceLibraryPathPage;
 
     /**
      * 
      */
-    public NewProjectWizard() {
-        this(Messages.NewProjectWizard_Title, Messages.NewProjectWizard_Description);
+    public NewTmfProjectWizard() {
+        this(Messages.NewProjectWizard_DialogHeader, Messages.NewProjectWizard_DialogMessage);
     }
 
     /**
      * @param title
      * @param desc
      */
-    public NewProjectWizard(String title, String desc) {
+    public NewTmfProjectWizard(String title, String desc) {
         super();
-        setDialogSettings(LTTngUiPlugin.getDefault().getDialogSettings());
+        setDialogSettings(TmfUiPlugin.getDefault().getDialogSettings());
         setNeedsProgressMonitor(true);
         setForcePreviousAndNextButtons(true);
         setWindowTitle(title);
@@ -70,23 +69,22 @@ public class NewProjectWizard extends BasicNewResourceWizard {
         fDescription = desc;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.jface.wizard.Wizard#addPages()
      */
     @Override
     public void addPages() {
-        fMainPage= new NewProjectMainWizardPage(Messages.NewProjectWizard_Title);
+        fMainPage = new NewTmfProjectMainWizardPage(Messages.NewProjectWizard_DialogHeader);
         fMainPage.setTitle(fTtitle);
         fMainPage.setDescription(fDescription);
         addPage(fMainPage);
-        traceLibraryPathPage = new TraceLibraryPathWizardPage(Messages.NewProjectWizard_Title);
-        traceLibraryPathPage.setTitle(Messages.TraceLibraryPathWizardPage_Title);
-        traceLibraryPathPage.setDescription(Messages.TraceLibraryPathWizardPage_Description);
-        addPage(traceLibraryPathPage);
-        
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.jface.wizard.Wizard#performCancel()
      */
     @Override
@@ -94,7 +92,9 @@ public class NewProjectWizard extends BasicNewResourceWizard {
         return true;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.jface.wizard.Wizard#performFinish()
      */
     @Override
@@ -102,17 +102,10 @@ public class NewProjectWizard extends BasicNewResourceWizard {
         fProjectName = fMainPage.getProjectName();
         fProjectLocation = fMainPage.useDefaults() ? null : fMainPage.getLocationURI();
         fProject = createProject(fProjectName, fProjectLocation, new NullProgressMonitor());
-        String traceLibraryPath = traceLibraryPathPage.getPath();
-        if (traceLibraryPath != null){
-        	return TraceHelper.setProjectPreference(fProject, "traceLibraryPath", traceLibraryPath);
-        }
+        BasicNewProjectResourceWizard.updatePerspective(fConfigElement);
         return true;
     }
 
-    public IProject getProject() {
-    	return fProject;
-    }
- 
     /**
      * @param projectName
      * @param projectLocation
@@ -137,23 +130,31 @@ public class NewProjectWizard extends BasicNewResourceWizard {
                 project.open(monitor);
 
             IProjectDescription description = project.getDescription();
-            description.setNatureIds(new String[] { LTTngProjectNature.ID } );
+            description.setNatureIds(new String[] { TmfProjectNature.ID });
             project.setDescription(description, null);
 
-            IFolder folder = project.getFolder(LTTngProjectNode.TRACE_FOLDER_NAME);
+            IFolder folder = project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
             if (!folder.exists())
                 folder.create(true, true, null);
 
-            folder = project.getFolder(LTTngProjectNode.EXPER_FOLDER_NAME);
+            folder = project.getFolder(TmfExperimentFolder.EXPER_FOLDER_NAME);
             if (!folder.exists())
                 folder.create(true, true, null);
 
             return project;
-        }
-        catch (CoreException e) {
+        } catch (CoreException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    // ------------------------------------------------------------------------
+    // IExecutableExtension
+    // ------------------------------------------------------------------------
+
+    @Override
+    public void setInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException {
+        fConfigElement = config;
     }
 
 }
