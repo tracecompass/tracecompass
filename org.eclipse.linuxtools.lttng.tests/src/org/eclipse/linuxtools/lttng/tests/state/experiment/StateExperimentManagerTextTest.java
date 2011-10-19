@@ -11,13 +11,7 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.tests.state.experiment;
 
-import org.eclipse.linuxtools.lttng.LttngConstants;
-import org.eclipse.linuxtools.lttng.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.model.LTTngTreeNode;
-import org.eclipse.linuxtools.lttng.state.experiment.IStateExperimentManager;
-import org.eclipse.linuxtools.lttng.state.trace.StateTraceManager;
 import org.eclipse.linuxtools.lttng.tests.LttngTestPreparation;
-import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 
 /**
  * @author alvaro
@@ -29,11 +23,12 @@ public class StateExperimentManagerTextTest extends LttngTestPreparation {
 	/**
 	 * Test method for {@link org.eclipse.linuxtools.lttng.state.experiment.StateExperimentManager#experimentSelected_prep(org.eclipse.linuxtools.tmf.experiment.TmfExperiment)}.
 	 */
-//	public void testExperimentSelected_text() {
-//		// make sure a TmfExperiment instance is registered as provider and
-//		// selected as current
+	public void testExperimentSelected_text() {
+	    System.out.println("testExperimentSelected_text: test removed");
+		// make sure a TmfExperiment instance is registered as provider and
+		// selected as current
 //		TmfExperiment<LttngEvent> experiment = prepareTextExperimentToTest();
-//
+
 //		// Create a new Experiment manager
 //		IStateExperimentManager expManager = StateManagerFactory
 //				.getExperimentManager();
@@ -56,8 +51,8 @@ public class StateExperimentManagerTextTest extends LttngTestPreparation {
 //		// validate
 //		int numProcesses = traceManager.getCheckPointStateModel().getProcesses().length;
 //		assertEquals("Total number of processes created", 276, numProcesses);
-//
-//	}
+
+	}
 
 	/**
 	 * Test method for
@@ -65,28 +60,29 @@ public class StateExperimentManagerTextTest extends LttngTestPreparation {
 	 * .
 	 */
 	public void testExperimentSelected_real() {
-		// Create a new Experiment manager context
-		IStateExperimentManager expManager = prepareExperimentContext(true);
-		expManager.waitForCompletion(true);
-
-		// make sure a TmfExperiment instance is registered as provider and
-		// selected as current
-		TmfExperiment<LttngEvent> experiment = prepareExperimentToTest();
-
-		// preparation
-		expManager.experimentSelected_prep(experiment);
-		// Action trigger
-		expManager.experimentSelected(this, experiment);
-
-		// Access context tree for Validation
-		// access to the context tree
-		LTTngTreeNode experimentNode = expManager.getSelectedExperiment();
-		StateTraceManager traceManager = (StateTraceManager) experimentNode
-				.getChildById(1L | LttngConstants.STATS_TRACE_NAME_ID);
-
-		// validate
-		int numProcesses = traceManager.getCheckPointStateModel().getProcesses().length;
-		assertEquals("Total number of processes created", 276, numProcesses);
+        System.out.println("testExperimentSelected_real: test removed");
+//		// Create a new Experiment manager context
+//		IStateExperimentManager expManager = prepareExperimentContext(true);
+//		expManager.waitForCompletion(true);
+//
+//		// make sure a TmfExperiment instance is registered as provider and
+//		// selected as current
+//		TmfExperiment<LttngEvent> experiment = prepareExperimentToTest();
+//
+//		// preparation
+//		expManager.experimentSelected_prep(experiment);
+//		// Action trigger
+//		expManager.experimentSelected(this, experiment);
+//
+//		// Access context tree for Validation
+//		// access to the context tree
+//		LTTngTreeNode experimentNode = expManager.getSelectedExperiment();
+//		StateTraceManager traceManager = (StateTraceManager) experimentNode
+//				.getChildById(1L | LttngConstants.STATS_TRACE_NAME_ID);
+//
+//		// validate
+//		int numProcesses = traceManager.getCheckPointStateModel().getProcesses().length;
+//		assertEquals("Total number of processes created", 276, numProcesses);
 
 	}
 

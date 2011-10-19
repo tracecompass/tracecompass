@@ -28,13 +28,13 @@ public class TestStateManager extends TestCase {
 	 * for package state.experiment
 	 */
 	public void testSetTraceSelection() {
-		String logName = "traceset/trace1";
+		String logName = "traceset/trace-15316events_nolost_newformat";
 		
 		LTTngTrace testStream = null;
 		try {
 			testStream = new LTTngTrace(logName);
 		} catch (Exception e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 
 		if (testStream != null) {

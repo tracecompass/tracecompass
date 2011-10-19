@@ -70,8 +70,9 @@ public abstract class LttngTestPreparation extends TestCase {
 			int nbTraces = 1;
 
 			// Define traces in experiment
-			ITmfTrace[] traces = new ITmfTrace[nbTraces];
-			ITmfTrace trace = prepareStreamToTest();
+			@SuppressWarnings("unchecked")
+            ITmfTrace<LttngEvent>[] traces = new ITmfTrace[nbTraces];
+			ITmfTrace<LttngEvent> trace = prepareStreamToTest();
 			traces[0] = trace;
 
 			// create experiment and associate traces
@@ -97,8 +98,9 @@ public abstract class LttngTestPreparation extends TestCase {
 			int nbTraces = 1;
 
 			// Define traces in experiment
-			ITmfTrace[] traces = new ITmfTrace[nbTraces];
-			ITmfTrace trace = prepareTextStreamToTest();
+            @SuppressWarnings("unchecked")
+            ITmfTrace<LttngEvent>[] traces = new ITmfTrace[nbTraces];
+			ITmfTrace<LttngEvent> trace = prepareTextStreamToTest();
 			traces[0] = trace;
 
 			// create experiment and associate traces
@@ -121,7 +123,7 @@ public abstract class LttngTestPreparation extends TestCase {
 				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(ftracepath_T1),
 						null);
 				File testfile = new File(FileLocator.toFileURL(location).toURI());
-				LTTngTrace tmpStream = new LTTngTrace(testfile.getPath());
+				LTTngTrace tmpStream = new LTTngTrace(testfile.getPath(), false);
 				frealStream = tmpStream;
 			} catch (Exception e) {
 				System.out.println("ERROR : Could not open " + ftracepath_T1);
