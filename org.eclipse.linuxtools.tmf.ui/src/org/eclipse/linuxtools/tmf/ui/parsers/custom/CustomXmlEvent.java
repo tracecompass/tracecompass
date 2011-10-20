@@ -17,15 +17,21 @@ import org.eclipse.linuxtools.tmf.event.TmfEventReference;
 import org.eclipse.linuxtools.tmf.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 
 public class CustomXmlEvent extends CustomEvent {
+
+    public CustomXmlEvent(CustomXmlTraceDefinition definition) {
+        super(definition);
+        fType = new CustomXmlEventType(definition);
+    }
 
     public CustomXmlEvent(CustomXmlTraceDefinition definition, TmfEvent other) {
         super(definition, other);
     }
 
-    public CustomXmlEvent(CustomXmlTraceDefinition definition, TmfTimestamp timestamp, TmfEventSource source, TmfEventType type, TmfEventReference reference) {
-        super(definition, timestamp, source, type, reference);
+    public CustomXmlEvent(CustomXmlTraceDefinition definition, ITmfTrace<?> parentTrace, TmfTimestamp timestamp, TmfEventSource source, TmfEventType type, TmfEventReference reference) {
+        super(definition, parentTrace, timestamp, source, type, reference);
     }
 
     public CustomXmlEvent(CustomXmlTraceDefinition definition, TmfTimestamp originalTS, TmfTimestamp effectiveTS, TmfEventSource source, TmfEventType type, TmfEventReference reference) {

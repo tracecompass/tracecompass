@@ -23,6 +23,17 @@ import org.eclipse.linuxtools.tmf.event.*;
  */
 public class LttngEventType extends TmfEventType {
     
+    private static final String DEFAULT_TYPE_ID = "Kernel Trace"; //$NON-NLS-1$
+    // These should match the column names in LTTng Events Table
+    public static final String TIMESTAMP_LABEL = "Timestamp"; //$NON-NLS-1$
+    public static final String TRACE_LABEL = "Trace"; //$NON-NLS-1$
+    public static final String MARKER_LABEL = "Marker"; //$NON-NLS-1$
+    public static final String CONTENT_LABEL = "Content"; //$NON-NLS-1$
+    private static final String[] DEFAULT_LABELS = {
+        TIMESTAMP_LABEL, TRACE_LABEL, MARKER_LABEL, CONTENT_LABEL
+    };
+    public static final LttngEventType DEFAULT_EVENT_TYPE = new LttngEventType(DEFAULT_TYPE_ID, DEFAULT_LABELS);
+    
     private String tracefileName    = null;
     private Long   cpuId            = null;
     private String markerName       = null;
@@ -34,6 +45,14 @@ public class LttngEventType extends TmfEventType {
      */
     public LttngEventType() {
         super();
+    }
+    
+    /**
+     * Default Constructor.<p>
+     * 
+     */
+    public LttngEventType(String typeId, String[] labels) {
+        super(typeId, labels);
     }
     
     /**

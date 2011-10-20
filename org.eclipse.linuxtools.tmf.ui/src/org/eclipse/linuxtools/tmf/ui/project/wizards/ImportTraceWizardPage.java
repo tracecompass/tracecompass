@@ -43,12 +43,16 @@ import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.linuxtools.tmf.TmfCorePlugin;
 import org.eclipse.linuxtools.tmf.TmfProjectNature;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTrace;
+import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTraceDefinition;
+import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomXmlTrace;
+import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
+import org.eclipse.linuxtools.tmf.util.TmfTraceType;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.FocusEvent;
@@ -98,6 +102,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
     // ------------------------------------------------------------------------
 
     static private final String IMPORT_WIZARD_PAGE = "ImportTraceWizardPage"; //$NON-NLS-1$
+    private static final String CUSTOM_TXT_CATEGORY = "Custom Text"; //$NON-NLS-1$
+    private static final String CUSTOM_XML_CATEGORY = "Custom XML"; //$NON-NLS-1$
+    private static final String DEFAULT_TRACE_ICON_PATH = "icons/elcl16/trace.gif"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -539,14 +546,14 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
     private String[] getAvailableTraceTypes() {
 
         // Populate the Categories and Trace Types
-        IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(TmfCorePlugin.TMF_TRACE_TYPE_ID);
+        IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(TmfTraceType.TMF_TRACE_TYPE_ID);
         for (IConfigurationElement ce : config) {
-            String attribute = ce.getName();
-            if (attribute.equals(TmfTraceElement.TYPE)) {
-                String traceTypeId = ce.getAttribute(TmfTraceElement.ID);
+            String elementName = ce.getName();
+            if (elementName.equals(TmfTraceType.TYPE_ELEM)) {
+                String traceTypeId = ce.getAttribute(TmfTraceType.ID_ATTR);
                 fTraceTypeAttributes.put(traceTypeId, ce);
-            } else if (attribute.equals(TmfTraceElement.CATEGORY)) {
-                String categoryId = ce.getAttribute(TmfTraceElement.ID);
+            } else if (elementName.equals(TmfTraceType.CATEGORY_ELEM)) {
+                String categoryId = ce.getAttribute(TmfTraceType.ID_ATTR);
                 fTraceCategories.put(categoryId, ce);
             }
         }
@@ -555,26 +562,32 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
         List<String> traceTypes = new ArrayList<String>();
         for (String typeId : fTraceTypeAttributes.keySet()) {
             IConfigurationElement ce = fTraceTypeAttributes.get(typeId);
-            String traceTypeName = getCategory(ce) + " : " + ce.getAttribute(TmfTraceElement.NAME); //$NON-NLS-1$
+            String traceTypeName = getCategory(ce) + " : " + ce.getAttribute(TmfTraceType.NAME_ATTR); //$NON-NLS-1$
             fTraceAttributes.put(traceTypeName, ce);
             traceTypes.add(traceTypeName);
         }
         Collections.sort(traceTypes);
 
-        // TODO: Add Custom Parsers
+        // add the custom trace types
+        for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
+            String traceTypeName = CUSTOM_TXT_CATEGORY + " : " + def.definitionName; //$NON-NLS-1$
+            traceTypes.add(traceTypeName);
+        }
+        for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
+            String traceTypeName = CUSTOM_XML_CATEGORY + " : " + def.definitionName; //$NON-NLS-1$
+            traceTypes.add(traceTypeName);
+        }
 
         // Format result
-        String[] result = new String[traceTypes.size()];
-        result = traceTypes.toArray(result);
-        return result;
+        return traceTypes.toArray(new String[0]);
     }
 
     private String getCategory(IConfigurationElement ce) {
-        String categoryId = ce.getAttribute(TmfTraceElement.CATEGORY);
+        String categoryId = ce.getAttribute(TmfTraceType.CATEGORY_ATTR);
         if (categoryId != null) {
             IConfigurationElement category = fTraceCategories.get(categoryId);
             if (category != null && !category.equals("")) { //$NON-NLS-1$
-                return category.getAttribute(TmfTraceElement.NAME);
+                return category.getAttribute(TmfTraceType.NAME_ATTR);
             }
         }
         return "[no category]"; //$NON-NLS-1$
@@ -654,13 +667,15 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
 
         // Perform trace validation
         String traceTypeName = fTraceTypes.getText();
-        if (traceTypeName != null && !"".equals(traceTypeName)) { //$NON-NLS-1$
+        if (traceTypeName != null && !"".equals(traceTypeName) && //$NON-NLS-1$
+            !traceTypeName.startsWith(CUSTOM_TXT_CATEGORY) && !traceTypeName.startsWith(CUSTOM_XML_CATEGORY)) {
+
             List<File> traces = isolateTraces();
             for (File trace : traces) {
-                IConfigurationElement ce = fTraceAttributes.get(traceTypeName);
                 ITmfTrace<?> tmfTrace = null;
                 try {
-                    tmfTrace = (ITmfTrace<?>) ce.createExecutableExtension(TmfTraceElement.TRACE_TYPE);
+                    IConfigurationElement ce = fTraceAttributes.get(traceTypeName);
+                    tmfTrace = (ITmfTrace<?>) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
                     if (!tmfTrace.validate(fProject, trace.getAbsolutePath())) {
                         setMessage(null);
                         setErrorMessage(Messages.ImportTraceWizard_TraceValidationFailed);
@@ -749,9 +764,42 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
 
         if (fileSystemObjects.size() > 0) {
             boolean ok = importResources(sourceDirPath, fileSystemObjects);
+            String traceBundle = null;
+            String traceTypeId = null;
+            String traceIcon = null;
             String traceType = fTraceTypes.getText();
-            IConfigurationElement ce = fTraceAttributes.get(traceType);
-            if (ok && !traceType.equals("") && ce != null) { //$NON-NLS-1$
+            if (traceType.startsWith(CUSTOM_TXT_CATEGORY)) {
+                ok = false;
+                for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
+                    if (traceType.equals(CUSTOM_TXT_CATEGORY + " : " + def.definitionName)) { //$NON-NLS-1$
+                        ok = true;
+                        traceBundle = TmfUiPlugin.getDefault().getBundle().getSymbolicName();
+                        traceTypeId = CustomTxtTrace.class.getCanonicalName() + ":" + def.definitionName; //$NON-NLS-1$
+                        traceIcon = DEFAULT_TRACE_ICON_PATH;
+                        break;
+                    }
+                }
+            } else if (traceType.startsWith(CUSTOM_XML_CATEGORY)) {
+                for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
+                    if (traceType.equals(CUSTOM_XML_CATEGORY + " : " + def.definitionName)) { //$NON-NLS-1$
+                        ok = true;
+                        traceBundle = TmfUiPlugin.getDefault().getBundle().getSymbolicName();
+                        traceTypeId = CustomXmlTrace.class.getCanonicalName() + ":" + def.definitionName; //$NON-NLS-1$
+                        traceIcon = DEFAULT_TRACE_ICON_PATH;
+                        break;
+                    }
+                }
+            } else {
+                IConfigurationElement ce = fTraceAttributes.get(traceType);
+                if (ce != null) {
+                    traceBundle = ce.getContributor().getName();
+                    traceTypeId = ce.getAttribute(TmfTraceType.ID_ATTR);
+                    traceIcon = ce.getAttribute(TmfTraceType.ICON_ATTR);
+                } else {
+                    ok = false;
+                }
+            }
+            if (ok && !traceType.equals("")) { //$NON-NLS-1$
                 // Tag the selected traces with their type
                 List<String> files = new ArrayList<String>(fileSystemObjects.keySet());
                 Collections.sort(files);
@@ -766,9 +814,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
                         if (resource != null) {
                             try {
                                 // Set the trace properties for this resource
-                                resource.setPersistentProperty(TmfTraceElement.TRACEBUNDLE, ce.getContributor().getName());
-                                resource.setPersistentProperty(TmfTraceElement.TRACETYPE, ce.getAttribute(TmfTraceElement.ID));
-                                resource.setPersistentProperty(TmfTraceElement.TRACEICON, ce.getAttribute(TmfTraceElement.ICON));
+                                resource.setPersistentProperty(TmfTraceElement.TRACEBUNDLE, traceBundle);
+                                resource.setPersistentProperty(TmfTraceElement.TRACETYPE, traceTypeId);
+                                resource.setPersistentProperty(TmfTraceElement.TRACEICON, traceIcon);
                             } catch (CoreException e) {
                                 e.printStackTrace();
                             }

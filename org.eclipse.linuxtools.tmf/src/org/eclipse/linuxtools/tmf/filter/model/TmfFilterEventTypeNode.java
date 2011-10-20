@@ -52,19 +52,32 @@ public class TmfFilterEventTypeNode extends TmfFilterTreeNode {
 		this.fName = name;
 	}
 
-	@Override
-	public boolean matches(TmfEvent event) {
-		if (event.getType().getTypeId().equals(fName)) {
-			// There should be at most one child
-			for (ITmfFilterTreeNode node : getChildren()) {
-				if (! node.matches(event)) {
-					return false;
-				}
-			}
-			return true;
-		}
-		return false;
-	}
+    @Override
+    public boolean matches(TmfEvent event) {
+        boolean match = false;
+        if (fType.contains(":")) { //$NON-NLS-1$
+            // special case for custom parsers
+            if (fType.startsWith(event.getClass().getCanonicalName())) {
+                if (fType.endsWith(event.getType().getTypeId())) {
+                    match = true;
+                }
+            }
+        } else {
+            if (event.getClass().getCanonicalName().equals(fType)) {
+                match = true;
+            }
+        }
+        if (match) {
+            // There should be at most one child
+            for (ITmfFilterTreeNode node : getChildren()) {
+                if (! node.matches(event)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
 
 	@Override
 	public List<String> getValidChildren() {

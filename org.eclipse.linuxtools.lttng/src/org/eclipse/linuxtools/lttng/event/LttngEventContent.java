@@ -215,19 +215,19 @@ public class LttngEventContent extends TmfEventContent {
      */
     @Override
     public synchronized Object getField(String name) {
-    	
-    	// Check for generic table header fields
-    	if (name.equals(FIELD_ID_TIMESTAMP)) {
-    		return new Long(fParentEvent.getTimestamp().getValue()).toString();       
-    	} else if (name.equals(FIELD_ID_SOURCE)) {
-    		return fParentEvent.getSource().getSourceId().toString();
-    	} else if (name.equals(FIELD_ID_TYPE)) {
-    		return fParentEvent.getType().getTypeId().toString();
-    	} else if (name.equals(FIELD_ID_REFERENCE)) {
-    		return fParentEvent.getReference().getReference().toString();
-    	} else if (name.equals(FIELD_ID_CONTENT)) {
-    		return fParentEvent.getContent().toString();
-    	}
+
+        // Check for generic table header fields
+        if (name.equals(LttngEventType.CONTENT_LABEL) || name.equals(FIELD_ID_CONTENT)) {
+            return fParentEvent.getContent().toString();
+        } else if (name.equals(LttngEventType.MARKER_LABEL) || name.equals(FIELD_ID_TYPE)) {
+            return fParentEvent.getType().getTypeId().toString();
+        } else if (name.equals(LttngEventType.TRACE_LABEL) || name.equals(FIELD_ID_REFERENCE)) {
+            return fParentEvent.getReference().getReference().toString();
+        } else if (name.equals(LttngEventType.TIMESTAMP_LABEL) || name.equals(FIELD_ID_TIMESTAMP)) {
+            return new Long(fParentEvent.getTimestamp().getValue()).toString();
+        } else if (name.equals(FIELD_ID_SOURCE)) {
+            return fParentEvent.getSource().getSourceId().toString();
+        }
 
     	// *** VERIFY ***
         // Should we check if the field exists in LttngType before parsing? 

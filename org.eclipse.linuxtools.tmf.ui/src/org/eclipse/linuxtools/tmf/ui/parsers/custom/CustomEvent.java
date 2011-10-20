@@ -23,6 +23,7 @@ import org.eclipse.linuxtools.tmf.event.TmfEventReference;
 import org.eclipse.linuxtools.tmf.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTraceDefinition.OutputColumn;
 
 public class CustomEvent extends TmfEvent {
@@ -35,14 +36,19 @@ public class CustomEvent extends TmfEvent {
     protected Map<String, String> fData;
     private String[] fColumnData;
 
+    public CustomEvent(CustomTraceDefinition definition) {
+        fDefinition = definition;
+        fData = new HashMap<String, String>();
+    }
+
     public CustomEvent(CustomTraceDefinition definition, TmfEvent other) {
         super(other);
         fDefinition = definition;
         fData = new HashMap<String, String>();
     }
 
-    public CustomEvent(CustomTraceDefinition definition, TmfTimestamp timestamp, TmfEventSource source, TmfEventType type, TmfEventReference reference) {
-        super(timestamp, source, type, reference);
+    public CustomEvent(CustomTraceDefinition definition, ITmfTrace<?> parentTrace, TmfTimestamp timestamp, TmfEventSource source, TmfEventType type, TmfEventReference reference) {
+        super(parentTrace, timestamp, source, type, reference);
         fDefinition = definition;
         fData = new HashMap<String, String>();
     }

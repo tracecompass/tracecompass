@@ -53,6 +53,12 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     private CustomXmlEventType fEventType;
     private InputElement fRecordInputElement;
     
+    public CustomXmlTrace(CustomXmlTraceDefinition definition) {
+        fDefinition = definition;
+        fEventType = new CustomXmlEventType(fDefinition);
+        fRecordInputElement = getRecordInputElement(fDefinition.rootInputElement);
+    }
+
     public CustomXmlTrace(String name, CustomXmlTraceDefinition definition, String path, int cacheSize) throws FileNotFoundException {
         super(name, CustomXmlEvent.class, path, cacheSize);
         fDefinition = definition;
@@ -358,7 +364,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     }
     
     public CustomXmlEvent extractEvent(Element element, InputElement inputElement) {
-        CustomXmlEvent event = new CustomXmlEvent(fDefinition, TmfTimestamp.Zero, new TmfEventSource(""), fEventType, new TmfEventReference("")); //$NON-NLS-1$ //$NON-NLS-2$
+        CustomXmlEvent event = new CustomXmlEvent(fDefinition, this, TmfTimestamp.Zero, new TmfEventSource(""), fEventType, new TmfEventReference("")); //$NON-NLS-1$ //$NON-NLS-2$
         event.setContent(new CustomEventContent(event, new StringBuffer()));
         parseElement(element, event, inputElement);
         return event;

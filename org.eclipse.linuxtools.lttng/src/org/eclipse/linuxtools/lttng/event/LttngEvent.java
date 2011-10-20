@@ -23,6 +23,7 @@ public class LttngEvent extends TmfEvent {
     // Parameter-less constructor
     public LttngEvent() {
         super();
+        fType = LttngEventType.DEFAULT_EVENT_TYPE;
     }
 
     /**

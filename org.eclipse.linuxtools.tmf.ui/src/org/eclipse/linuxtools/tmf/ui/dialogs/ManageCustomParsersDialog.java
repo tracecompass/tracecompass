@@ -12,39 +12,17 @@
 
 package org.eclipse.linuxtools.tmf.ui.dialogs;
 
-import java.io.File;
-import java.net.URI;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
-import org.eclipse.linuxtools.tmf.ui.TmfUiPreferenceInitializer;
-import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.linuxtools.tmf.ui.internal.Messages;
-import org.eclipse.linuxtools.tmf.ui.parsers.ParserProviderManager;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTraceDefinition;
-import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTraceDefinition;
-import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.linuxtools.tmf.ui.parsers.wizards.CustomTxtParserWizard;
 import org.eclipse.linuxtools.tmf.ui.parsers.wizards.CustomXmlParserWizard;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -59,13 +37,6 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IReusableEditor;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.FileEditorInput;
 
 public class ManageCustomParsersDialog extends Dialog {
 
@@ -79,7 +50,6 @@ public class ManageCustomParsersDialog extends Dialog {
     Button deleteButton;
     Button importButton;
     Button exportButton;
-    Button parseButton;
     
     public ManageCustomParsersDialog(Shell parent) {
         super(parent);
@@ -142,12 +112,10 @@ public class ManageCustomParsersDialog extends Dialog {
                     editButton.setEnabled(false);
                     deleteButton.setEnabled(false);
                     exportButton.setEnabled(false);
-                    parseButton.setEnabled(false);
                 } else {
                     editButton.setEnabled(true);
                     deleteButton.setEnabled(true);
                     exportButton.setEnabled(true);
-                    parseButton.setEnabled(true);
                 }
             }});
         
@@ -277,108 +245,11 @@ public class ManageCustomParsersDialog extends Dialog {
                 }
             }});
 
-        parseButton = new Button(buttonContainer, SWT.PUSH);
-        parseButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-        parseButton.setText(Messages.ManageCustomParsersDialog_ParseButtonLabel);
-        parseButton.setEnabled(false);
-        parseButton.addSelectionListener(new SelectionListener(){
-            @Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
-            @Override
-			public void widgetSelected(SelectionEvent e) {
-                FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
-                dialog.setText(Messages.ManageCustomParsersDialog_TraceSelection + parserList.getSelection()[0]);
-                if (xmlButton.getSelection()) {
-                    dialog.setFilterExtensions(new String[] {"*.xml", "*"}); //$NON-NLS-1$ //$NON-NLS-2$
-                }
-                String path = dialog.open();
-                String parser = null;
-                if (path != null) {
-                    CustomTraceDefinition def = null;
-                    if (txtButton.getSelection()) {
-                        def = CustomTxtTraceDefinition.load(parserList.getSelection()[0]);
-                        parser = CustomTxtTrace.class.getCanonicalName() + "." + def.definitionName; //$NON-NLS-1$
-                    } else if (xmlButton.getSelection()) {
-                        def = CustomXmlTraceDefinition.load(parserList.getSelection()[0]);
-                        parser = CustomXmlTrace.class.getCanonicalName() + "." + def.definitionName; //$NON-NLS-1$
-                    }
-                    if (def != null) {
-                        try {
-                            IWorkspace workspace = ResourcesPlugin.getWorkspace();
-                            IPath location = Path.fromOSString(path);
-                            IFile file = workspace.getRoot().getFileForLocation(location);
-                            if (file == null) {
-                                file = createLink(new File(location.toPortableString()).toURI());
-                            }
-                            file.setPersistentProperty(ParserProviderManager.PARSER_PROPERTY, parser);
-                            IEditorInput editorInput = new FileEditorInput(file);
-                            IWorkbench wb = PlatformUI.getWorkbench();
-                            IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
-          
-                            String editorId = TmfEventsEditor.ID;
-                            IEditorPart editor = activePage.findEditor(editorInput);
-                            if (editor != null && editor instanceof IReusableEditor) {
-                                activePage.reuseEditor((IReusableEditor)editor, editorInput);
-                                activePage.activate(editor);
-                            } else {
-                                editor = activePage.openEditor(editorInput, editorId);
-                            }
-                        } catch (CoreException e1) {
-                            MessageDialog.openError(getShell(), "Parse Error", e1.getMessage()); //$NON-NLS-1$
-                        }
-                    }
-                }
-            }});
-
         fillParserList();
 
         getShell().setMinimumSize(300, 275);
         return composite;
     }
-
-	// /////////////////////////////////////////////////////////////////////////////
-	// FIXME: Duplicated in TmfEventsEditor
-	// From the legacy ProjectView
-	// /////////////////////////////////////////////////////////////////////////////
-
-	// ------------------------------------------------------------------------
-	// Static methods
-	// ------------------------------------------------------------------------
-
-	static public IFolder getActiveProjectTracesFolder() {
-		IEclipsePreferences node = new InstanceScope()
-				.getNode(TmfUiPlugin.PLUGIN_ID);
-		String activeProjectName = node.get(
-				TmfUiPreferenceInitializer.ACTIVE_PROJECT_PREFERENCE,
-				TmfUiPreferenceInitializer.ACTIVE_PROJECT_DEFAULT);
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		IProject[] projects = root.getProjects();
-		for (IProject project : projects) {
-			if (project.isAccessible()
-					&& project.getName().equals(activeProjectName)) {
-				return project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
-			}
-		}
-		return null;
-	}
-
-	static public IFile createLink(URI uri) throws CoreException {
-		IFolder folder = getActiveProjectTracesFolder();
-		if (folder == null || !folder.exists()) {
-			throw new CoreException(new Status(Status.ERROR,
-					TmfUiPlugin.PLUGIN_ID, "No active project set")); //$NON-NLS-1$
-		}
-		String path = uri.getPath();
-		// TODO: support duplicate file names
-		IFile file = folder.getFile(path.substring(path
-				.lastIndexOf(Path.SEPARATOR)));
-		if (!file.exists()) {
-			file.createLink(uri, IResource.NONE, null);
-		}
-		return file;
-	}
-
-	// /////////////////////////////////////////////////////////////////////////////
 
     /* (non-Javadoc)
      * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
@@ -402,7 +273,6 @@ public class ManageCustomParsersDialog extends Dialog {
         editButton.setEnabled(false);
         deleteButton.setEnabled(false);
         exportButton.setEnabled(false);
-        parseButton.setEnabled(false);
     }
 
 }

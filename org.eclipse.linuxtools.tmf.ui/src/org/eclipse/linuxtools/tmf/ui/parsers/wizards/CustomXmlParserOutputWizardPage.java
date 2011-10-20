@@ -196,7 +196,7 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
     }
     
     private void updatePreviewTable() {
-        final int MAX_NUM_ENTRIES = 50;
+        final int CACHE_SIZE = 50;
         definition.outputs = extractOutputs();
 
         try {
@@ -205,9 +205,9 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
             writer.write(wizard.inputPage.getInputText());
             writer.close();
             
-            ITmfTrace<?> trace = new CustomXmlTrace(tmpFile.getName(), definition, tmpFile.getAbsolutePath(), MAX_NUM_ENTRIES);
+            ITmfTrace<?> trace = new CustomXmlTrace(tmpFile.getName(), definition, tmpFile.getAbsolutePath(), CACHE_SIZE);
             previewTable.dispose();
-            previewTable = new CustomEventsTable(definition, tableContainer, MAX_NUM_ENTRIES);
+            previewTable = new CustomEventsTable(definition, tableContainer, CACHE_SIZE);
             previewTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
             previewTable.setTrace(trace, true);
         } catch (FileNotFoundException e) {

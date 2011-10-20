@@ -40,7 +40,12 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     
     private CustomTxtTraceDefinition fDefinition;
     private CustomTxtEventType fEventType;
-    
+
+    public CustomTxtTrace(CustomTxtTraceDefinition definition) {
+        fDefinition = definition;
+        fEventType = new CustomTxtEventType(fDefinition);
+    }
+
     public CustomTxtTrace(String name, CustomTxtTraceDefinition definition, String path, int cacheSize) throws FileNotFoundException {
         super(name, CustomTxtEvent.class, path, cacheSize);
         fDefinition = definition;
@@ -303,7 +308,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     }
     
     public CustomTxtEvent parseFirstLine(CustomTxtTraceContext context) {
-        CustomTxtEvent event = new CustomTxtEvent(fDefinition, TmfTimestamp.Zero, new TmfEventSource(""), fEventType, new TmfEventReference("")); //$NON-NLS-1$ //$NON-NLS-2$
+        CustomTxtEvent event = new CustomTxtEvent(fDefinition, this, TmfTimestamp.Zero, new TmfEventSource(""), fEventType, new TmfEventReference("")); //$NON-NLS-1$ //$NON-NLS-2$
         event.processGroups(context.inputLine, context.firstLineMatcher);
         event.setContent(new CustomEventContent(event, new StringBuffer(context.firstLine)));
         return event;

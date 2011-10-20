@@ -43,7 +43,7 @@ public class TmfEvent extends TmfData implements Cloneable {
     // Attributes
     // ------------------------------------------------------------------------
 
-	protected ITmfTrace         fParentTrace;
+	protected ITmfTrace<?>         fParentTrace;
 	protected long              fEventRank;
 	protected TmfTimestamp      fEffectiveTimestamp;
 	protected TmfTimestamp      fOriginalTimestamp;
@@ -60,13 +60,14 @@ public class TmfEvent extends TmfData implements Cloneable {
     // ------------------------------------------------------------------------
 
     /**
+     * @param trace the parent trace
      * @param originalTS the original timestamp
      * @param effectiveTS the effective timestamp
      * @param source the event source (generator)
      * @param type the event type
      * @param reference a free-form reference field
      */
-    public TmfEvent(ITmfTrace trace, long rank, TmfTimestamp originalTS, TmfTimestamp effectiveTS,
+    public TmfEvent(ITmfTrace<?> trace, long rank, TmfTimestamp originalTS, TmfTimestamp effectiveTS,
             TmfEventSource source, TmfEventType type, TmfEventReference reference)
     {
         fParentTrace        = trace;
@@ -90,6 +91,19 @@ public class TmfEvent extends TmfData implements Cloneable {
 	{
         this(null, -1, originalTS, effectiveTS, source, type, reference);
 	}
+
+    /**
+     * @param trace the parent trace
+     * @param timestamp the effective timestamp
+     * @param source the event source (generator)
+     * @param type the event type
+     * @param reference a free-form reference field
+     */
+    public TmfEvent(ITmfTrace<?> parentTrace, TmfTimestamp timestamp, TmfEventSource source,
+            TmfEventType type, TmfEventReference reference)
+    {
+        this(parentTrace, -1, timestamp, timestamp, source, type, reference);
+    }
 
 	/**
 	 * @param timestamp the effective timestamp
@@ -136,7 +150,7 @@ public class TmfEvent extends TmfData implements Cloneable {
     /**
      * @return the parent trace
      */
-    public ITmfTrace getParentTrace() {
+    public ITmfTrace<?> getParentTrace() {
         return fParentTrace;
     }
 

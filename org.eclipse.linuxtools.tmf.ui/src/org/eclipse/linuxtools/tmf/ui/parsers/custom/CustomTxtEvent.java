@@ -19,17 +19,23 @@ import org.eclipse.linuxtools.tmf.event.TmfEventReference;
 import org.eclipse.linuxtools.tmf.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTraceDefinition.InputData;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTraceDefinition.InputLine;
 
 public class CustomTxtEvent extends CustomEvent {
 
+    public CustomTxtEvent(CustomTxtTraceDefinition definition) {
+        super(definition);
+        fType = new CustomTxtEventType(definition);
+    }
+
     public CustomTxtEvent(CustomTxtTraceDefinition definition, TmfEvent other) {
         super(definition, other);
     }
 
-    public CustomTxtEvent(CustomTxtTraceDefinition definition, TmfTimestamp timestamp, TmfEventSource source, TmfEventType type, TmfEventReference reference) {
-        super(definition, timestamp, source, type, reference);
+    public CustomTxtEvent(CustomTxtTraceDefinition definition, ITmfTrace<?> parentTrace, TmfTimestamp timestamp, TmfEventSource source, TmfEventType type, TmfEventReference reference) {
+        super(definition, parentTrace, timestamp, source, type, reference);
     }
 
     public CustomTxtEvent(CustomTxtTraceDefinition definition, TmfTimestamp originalTS, TmfTimestamp effectiveTS, TmfEventSource source, TmfEventType type, TmfEventReference reference) {

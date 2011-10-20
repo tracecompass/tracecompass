@@ -12,43 +12,35 @@
 
 package org.eclipse.linuxtools.tmf.ui.editors;
 
+import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.linuxtools.tmf.TmfCorePlugin;
+import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
-import org.eclipse.linuxtools.tmf.ui.TmfUiPreferenceInitializer;
-import org.eclipse.linuxtools.tmf.ui.parsers.ParserProviderManager;
+import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomEventsTable;
+import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTrace;
+import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.linuxtools.tmf.ui.signal.TmfTraceClosedSignal;
 import org.eclipse.linuxtools.tmf.ui.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.ui.signal.TmfTraceParserUpdatedSignal;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
+import org.eclipse.linuxtools.tmf.util.TmfTraceType;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
@@ -58,7 +50,6 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IReusableEditor;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.ide.IGotoMarker;
 import org.osgi.framework.Bundle;
 
@@ -71,7 +62,8 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     
     private TmfEventsTable fEventsTable;
     private IResource fResource;
-    private ITmfTrace<?> fTrace;
+    @SuppressWarnings("rawtypes")
+    private ITmfTrace fTrace;
     private Composite fParent;
 
     @Override
@@ -82,6 +74,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     public void doSaveAs() {
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         if (input instanceof TmfEditorInput) {
@@ -89,17 +82,27 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             fTrace = ((TmfEditorInput) input).getTrace();
         } else if (input instanceof IFileEditorInput) {
             fResource = ((IFileEditorInput) input).getFile();
-            fTrace = ParserProviderManager.getTrace(fResource);
-            input = new TmfEditorInput(fResource, fTrace);
-        } else if (input instanceof FileStoreEditorInput) {
             try {
-                FileStoreEditorInput fileStoreEditorInput = (FileStoreEditorInput) input;
-                fResource = createLink(fileStoreEditorInput.getURI());
-                fTrace = ParserProviderManager.getTrace(fResource);
-                input = new TmfEditorInput(fResource, fTrace);
+                String traceTypeId = fResource.getPersistentProperty(TmfTraceElement.TRACETYPE);
+                if (traceTypeId != null) {
+                    for (IConfigurationElement ce : TmfTraceType.getTypeElements()) {
+                        if (traceTypeId.equals(ce.getAttribute(TmfTraceType.ID_ATTR))) {
+                            fTrace = (ITmfTrace<?>) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
+                            TmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
+                            String path = fResource.getLocation().toOSString();
+                            fTrace.initTrace(path, event.getClass(), true);
+                            break;
+                        }
+                    }
+                }
+            } catch (InvalidRegistryObjectException e) {
+                e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             } catch (CoreException e) {
-                throw new PartInitException(e.getMessage());
+                e.printStackTrace();
             }
+            input = new TmfEditorInput(fResource, fTrace);
         } else {
             throw new PartInitException("Invalid IEditorInput: " + input.getClass()); //$NON-NLS-1$
         }
@@ -109,49 +112,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         super.setSite(site);
         super.setInput(input);
     }
-
-    ///////////////////////////////////////////////////////////////////////////////
-    // FIXME: Duplicated in ManageCustomParsersDialog
-    // From the legacy ProjectView
-    ///////////////////////////////////////////////////////////////////////////////
-
-    // ------------------------------------------------------------------------
-    // Static methods
-    // ------------------------------------------------------------------------
-
-    static public IFolder getActiveProjectTracesFolder() {
-    	@SuppressWarnings("deprecation")
-        IEclipsePreferences node = new InstanceScope()
-    	.getNode(TmfUiPlugin.PLUGIN_ID);
-    	String activeProjectName = node.get(
-    			TmfUiPreferenceInitializer.ACTIVE_PROJECT_PREFERENCE,
-    			TmfUiPreferenceInitializer.ACTIVE_PROJECT_DEFAULT);
-    	IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-    	IProject[] projects = root.getProjects();
-    	for (IProject project : projects) {
-    		if (project.isAccessible()
-    				&& project.getName().equals(activeProjectName)) {
-    			return project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
-    		}
-    	}
-    	return null;
-    }
-
-    static public IFile createLink(URI uri) throws CoreException {
-    	IFolder folder = getActiveProjectTracesFolder();
-    	if (folder == null || !folder.exists()) {
-    		throw new CoreException(new Status(Status.ERROR, TmfUiPlugin.PLUGIN_ID, "No active project set")); //$NON-NLS-1$
-    	}
-    	String path = uri.getPath();
-    	// TODO: support duplicate file names
-    	IFile file = folder.getFile(path.substring(path
-    			.lastIndexOf(Path.SEPARATOR)));
-    	if (!file.exists()) {
-    		file.createLink(uri, IResource.NONE, null);
-    	}
-    	return file;
-    }
-    ///////////////////////////////////////////////////////////////////////////////
 
     @Override
     public boolean isDirty() {
@@ -227,16 +187,21 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     
     private TmfEventsTable getEventsTable(Composite parent, int cacheSize) {
         TmfEventsTable eventsTable = null;
-        IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(TmfCorePlugin.TMF_TRACE_TYPE_ID);
         try {
             String traceType = fResource.getPersistentProperty(TmfTraceElement.TRACETYPE);
-            for (IConfigurationElement ce : config) {
-                if (ce.getAttribute(TmfTraceElement.ID).equals(traceType)) {
-                    IConfigurationElement[] eventsTableTypeCE = ce.getChildren(TmfTraceElement.EVENTS_TABLE_TYPE);
+            if (traceType.startsWith(CustomTxtTrace.class.getCanonicalName())) {
+                return new CustomEventsTable(((CustomTxtTrace) fTrace).getDefinition(), parent, cacheSize);
+            }
+            if (traceType.startsWith(CustomXmlTrace.class.getCanonicalName())) {
+                return new CustomEventsTable(((CustomXmlTrace) fTrace).getDefinition(), parent, cacheSize);
+            }
+            for (IConfigurationElement ce : TmfTraceType.getTypeElements()) {
+                if (ce.getAttribute(TmfTraceType.ID_ATTR).equals(traceType)) {
+                    IConfigurationElement[] eventsTableTypeCE = ce.getChildren(TmfTraceType.EVENTS_TABLE_TYPE_ELEM);
                     if (eventsTableTypeCE.length != 1) {
                         break;
                     }
-                    String eventsTableType = eventsTableTypeCE[0].getAttribute(TmfTraceElement.CLASS);
+                    String eventsTableType = eventsTableTypeCE[0].getAttribute(TmfTraceType.CLASS_ATTR);
                     if (eventsTableType == null || eventsTableType.length() == 0) {
                         break;
                     }
@@ -326,11 +291,32 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     // Signal handlers
     // ------------------------------------------------------------------------
     
+    @SuppressWarnings("unchecked")
     @TmfSignalHandler
     public void traceParserUpdated(TmfTraceParserUpdatedSignal signal) {
         if (signal.getTraceResource().equals(fResource)) {
             broadcast(new TmfTraceClosedSignal(this, fTrace));
-            fTrace = ParserProviderManager.getTrace(fResource);
+            try {
+                fTrace = null;
+                String traceTypeId = fResource.getPersistentProperty(TmfTraceElement.TRACETYPE);
+                if (traceTypeId != null) {
+                    for (IConfigurationElement ce : TmfTraceType.getTypeElements()) {
+                        if (traceTypeId.equals(ce.getAttribute(TmfTraceType.ID_ATTR))) {
+                            fTrace = (ITmfTrace<?>) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
+                            TmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
+                            String path = fResource.getLocation().toOSString();
+                            fTrace.initTrace(path, event.getClass(), true);
+                            break;
+                        }
+                    }
+                }
+            } catch (InvalidRegistryObjectException e) {
+                e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (CoreException e) {
+                e.printStackTrace();
+            }
             fEventsTable.dispose();
             if (fTrace != null) {
                 fEventsTable = createEventsTable(fParent, fTrace.getCacheSize());

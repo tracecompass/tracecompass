@@ -29,7 +29,6 @@ public class TmfCorePlugin extends Plugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.eclipse.linuxtools.tmf"; //$NON-NLS-1$
-	public static final String TMF_TRACE_TYPE_ID = "org.eclipse.linuxtools.tmf.tracetype"; //$NON-NLS-1$
 
 	// The shared instance
 	private static TmfCorePlugin fPlugin;

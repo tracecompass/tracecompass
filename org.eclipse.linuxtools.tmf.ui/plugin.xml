@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="org.eclipse.linuxtools.tmf.ui.parserProviders" name="Parser Providers" schema="schema/org.eclipse.linuxtools.tmf.ui.parserprovider.exsd"/>
    <extension-point id="org.eclipse.linuxtools.tmf.ui.uml2SDLoader" name="TMF UML 2 Sequence Diagram Loader" schema="schema/org.eclipse.linuxtools.tmf.ui.uml2SDLoader.exsd"/>
 
     <extension
@@ -965,24 +964,12 @@
       </handler>
    </extension>
    <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="org.eclipse.linuxtools.tmf.ui.TmfUiPreferenceInitializer">
-      </initializer>
-   </extension>
-   <extension
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             id="org.eclipse.linuxtools.tmf.ui.content-type.trace"
             name="%contenttype.trace"
             priority="normal">
       </content-type>
-   </extension>
-   <extension
-         point="org.eclipse.linuxtools.tmf.ui.parserProviders">
-      <parserProvider
-            class="org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomParserProvider">
-      </parserProvider>
    </extension>
    <extension
          point="org.eclipse.ui.contexts">

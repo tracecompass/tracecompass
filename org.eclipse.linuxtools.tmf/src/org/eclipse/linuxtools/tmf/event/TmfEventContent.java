@@ -20,11 +20,11 @@ package org.eclipse.linuxtools.tmf.event;
 public class TmfEventContent implements Cloneable {
 
 	// Default field ids
-	public static final String FIELD_ID_TIMESTAMP = "$time$"; //$NON-NLS-1$
-	public static final String FIELD_ID_SOURCE    = "$sour$"; //$NON-NLS-1$
-	public static final String FIELD_ID_TYPE      = "$type$"; //$NON-NLS-1$
-	public static final String FIELD_ID_REFERENCE = "$refe$"; //$NON-NLS-1$
-	public static final String FIELD_ID_CONTENT   = "$cont$"; //$NON-NLS-1$
+	public static final String FIELD_ID_TIMESTAMP = ":timestamp:"; //$NON-NLS-1$
+	public static final String FIELD_ID_SOURCE    = ":source:"; //$NON-NLS-1$
+	public static final String FIELD_ID_TYPE      = ":type:"; //$NON-NLS-1$
+	public static final String FIELD_ID_REFERENCE = ":reference:"; //$NON-NLS-1$
+	public static final String FIELD_ID_CONTENT   = ":content:"; //$NON-NLS-1$
 	
     // ------------------------------------------------------------------------
     // Attributes
@@ -105,28 +105,28 @@ public class TmfEventContent implements Cloneable {
 	 * @return the corresponding field
 	 * @throws TmfNoSuchFieldException
 	 */
-	public Object getField(String id) throws TmfNoSuchFieldException {
-		if (fFields == null) {
-			parseContent();
-		}
-		try {
-	        return fFields[getType().getFieldIndex(id)];
-        } catch (TmfNoSuchFieldException e) {
-        	// Required for filtering from default TmfEventsTable columns
-        	if (id.equals(FIELD_ID_TIMESTAMP)) {
-                return new Long(fParentEvent.getTimestamp().getValue()).toString();       
-        	} else if (id.equals(FIELD_ID_SOURCE)) {
-        		return fParentEvent.getSource().getSourceId().toString();
-        	} else if (id.equals(FIELD_ID_TYPE)) {
-        		return fParentEvent.getType().getTypeId().toString();
-        	} else if (id.equals(FIELD_ID_REFERENCE)) {
-        		return fParentEvent.getReference().getReference().toString();
-        	} else if (id.equals(FIELD_ID_CONTENT)) {
-        		return fParentEvent.getContent().toString();
-        	}
-	        throw e;
+    public Object getField(String id) throws TmfNoSuchFieldException {
+        if (fFields == null) {
+            parseContent();
         }
-	}
+        try {
+            return fFields[getType().getFieldIndex(id)];
+        } catch (TmfNoSuchFieldException e) {
+            // Required for filtering from default TmfEventsTable columns
+            if (id.equals(FIELD_ID_CONTENT)) {
+                return fParentEvent.getContent().toString();
+            } else if (id.equals(FIELD_ID_TIMESTAMP)) {
+                return new Long(fParentEvent.getTimestamp().getValue()).toString();
+            } else if (id.equals(FIELD_ID_SOURCE)) {
+                return fParentEvent.getSource().getSourceId().toString();
+            } else if (id.equals(FIELD_ID_TYPE)) {
+                return fParentEvent.getType().getTypeId().toString();
+            } else if (id.equals(FIELD_ID_REFERENCE)) {
+                return fParentEvent.getReference().getReference().toString();
+            }
+            throw e;
+        }
+    }
 
 	/**
 	 * @param n the field index as per TmfEventType.getLabels()

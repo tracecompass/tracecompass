@@ -20,9 +20,16 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.linuxtools.tmf.TmfCorePlugin;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
+import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtEvent;
+import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTrace;
+import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTraceDefinition;
+import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomXmlEvent;
+import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomXmlTrace;
+import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomXmlTraceDefinition;
+import org.eclipse.linuxtools.tmf.util.TmfTraceType;
 import org.eclipse.ui.IActionFilter;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource2;
@@ -42,19 +49,6 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
     public static final QualifiedName TRACEBUNDLE = new QualifiedName("org.eclipse.linuxtools.tmf", "tracetype.bundle"); //$NON-NLS-1$//$NON-NLS-2$
     public static final QualifiedName TRACETYPE = new QualifiedName("org.eclipse.linuxtools.tmf", "tracetype.id"); //$NON-NLS-1$//$NON-NLS-2$
     public static final QualifiedName TRACEICON = new QualifiedName("org.eclipse.linuxtools.tmf", "tracetype.icon"); //$NON-NLS-1$//$NON-NLS-2$
-
-    // Extension point fields
-    public static final String TYPE = "type"; //$NON-NLS-1$
-    public static final String ID = "id"; //$NON-NLS-1$
-    public static final String CATEGORY = "category"; //$NON-NLS-1$
-    public static final String NAME = "name"; //$NON-NLS-1$
-    public static final String TRACE_TYPE = "trace_type"; //$NON-NLS-1$
-    public static final String EVENT_TYPE = "event_type"; //$NON-NLS-1$
-    public static final String ICON = "icon"; //$NON-NLS-1$
-
-    public static final String DEFAULT_EDITOR = "defaultEditor"; //$NON-NLS-1$
-    public static final String EVENTS_TABLE_TYPE = "eventsTableType"; //$NON-NLS-1$
-    public static final String CLASS = "class"; //$NON-NLS-1$
 
     // Other attributes
     public static final String BUNDLE = "bundle"; //$NON-NLS-1$
@@ -102,14 +96,14 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
 
     // Initialize statically at startup
     public static void init() {
-        IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(TmfCorePlugin.TMF_TRACE_TYPE_ID);
+        IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(TmfTraceType.TMF_TRACE_TYPE_ID);
         for (IConfigurationElement ce : config) {
-            String attribute = ce.getName();
-            if (attribute.equals(TYPE)) {
-                String traceTypeId = ce.getAttribute(ID);
+            String elementName = ce.getName();
+            if (elementName.equals(TmfTraceType.TYPE_ELEM)) {
+                String traceTypeId = ce.getAttribute(TmfTraceType.ID_ATTR);
                 sfTraceTypeAttributes.put(traceTypeId, ce);
-            } else if (attribute.equals(CATEGORY)) {
-                String categoryId = ce.getAttribute(ID);
+            } else if (elementName.equals(TmfTraceType.CATEGORY_ELEM)) {
+                String categoryId = ce.getAttribute(TmfTraceType.ID_ATTR);
                 sfTraceCategories.put(categoryId, ce);
             }
         }
@@ -152,8 +146,22 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
     public ITmfTrace<?> instantiateTrace() {
         try {
             if (fTraceTypeId != null) {
+                if (fTraceTypeId.startsWith(CustomTxtTrace.class.getCanonicalName())) {
+                    for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
+                        if (fTraceTypeId.equals(CustomTxtTrace.class.getCanonicalName() + ":" + def.definitionName)) { //$NON-NLS-1$
+                            return new CustomTxtTrace(def);
+                        }
+                    }
+                }
+                if (fTraceTypeId.startsWith(CustomXmlTrace.class.getCanonicalName())) {
+                    for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
+                        if (fTraceTypeId.equals(CustomXmlTrace.class.getCanonicalName() + ":" + def.definitionName)) { //$NON-NLS-1$
+                            return new CustomXmlTrace(def);
+                        }
+                    }
+                }
                 IConfigurationElement ce = sfTraceTypeAttributes.get(fTraceTypeId);
-                ITmfTrace<?> trace = (ITmfTrace<?>) ce.createExecutableExtension(TRACE_TYPE);
+                ITmfTrace<?> trace = (ITmfTrace<?>) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
                 return trace;
             }
         } catch (CoreException e) {
@@ -165,8 +173,22 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
     public TmfEvent instantiateEvent() {
         try {
             if (fTraceTypeId != null) {
+                if (fTraceTypeId.startsWith(CustomTxtTrace.class.getCanonicalName())) {
+                    for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
+                        if (fTraceTypeId.equals(CustomTxtTrace.class.getCanonicalName() + ":" + def.definitionName)) { //$NON-NLS-1$
+                            return new CustomTxtEvent(def);
+                        }
+                    }
+                }
+                if (fTraceTypeId.startsWith(CustomXmlTrace.class.getCanonicalName())) {
+                    for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
+                        if (fTraceTypeId.equals(CustomXmlTrace.class.getCanonicalName() + ":" + def.definitionName)) { //$NON-NLS-1$
+                            return new CustomXmlEvent(def);
+                        }
+                    }
+                }
                 IConfigurationElement ce = sfTraceTypeAttributes.get(fTraceTypeId);
-                TmfEvent event = (TmfEvent) ce.createExecutableExtension(EVENT_TYPE);
+                TmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
                 return event;
             }
         } catch (CoreException e) {
@@ -177,10 +199,16 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
 
     public String getEditorId() {
         if (fTraceTypeId != null) {
+            if (fTraceTypeId.startsWith(CustomTxtTrace.class.getCanonicalName())) {
+                return TmfEventsEditor.ID;
+            }
+            if (fTraceTypeId.startsWith(CustomXmlTrace.class.getCanonicalName())) {
+                return TmfEventsEditor.ID;
+            }
             IConfigurationElement ce = sfTraceTypeAttributes.get(fTraceTypeId);
-            IConfigurationElement[] defaultEditorCE = ce.getChildren(DEFAULT_EDITOR);
+            IConfigurationElement[] defaultEditorCE = ce.getChildren(TmfTraceType.DEFAULT_EDITOR_ELEM);
             if (defaultEditorCE.length == 1) {
-                return defaultEditorCE[0].getAttribute(ID);
+                return defaultEditorCE[0].getAttribute(TmfTraceType.ID_ATTR);
             }
         }
         return null;
@@ -251,7 +279,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
         if (sfEventType.equals(id)) {
             if (fTraceTypeId != null) {
                 IConfigurationElement ce = sfTraceTypeAttributes.get(fTraceTypeId);
-                return (ce != null) ? (getCategory(ce) + " : " + ce.getAttribute(NAME)) : ""; //$NON-NLS-1$ //$NON-NLS-2$
+                return (ce != null) ? (getCategory(ce) + " : " + ce.getAttribute(TmfTraceType.NAME_ATTR)) : ""; //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
 
@@ -259,11 +287,11 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
     }
 
     private String getCategory(IConfigurationElement ce) {
-        String categoryId = ce.getAttribute(CATEGORY);
+        String categoryId = ce.getAttribute(TmfTraceType.CATEGORY_ATTR);
         if (categoryId != null) {
             IConfigurationElement category = sfTraceCategories.get(categoryId);
-            if (category != null && !category.equals("")) { //$NON-NLS-1$
-                return category.getAttribute(NAME);
+            if (category != null) {
+                return category.getAttribute(TmfTraceType.NAME_ATTR);
             }
         }
         return "[no category]"; //$NON-NLS-1$

@@ -14,7 +14,6 @@ package org.eclipse.linuxtools.tmf.ui;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.linuxtools.tmf.ui.parsers.ParserProviderManager;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -61,7 +60,6 @@ public class TmfUiPlugin extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		TmfUiTracer.init();
-		ParserProviderManager.init();
 		TmfTraceElement.init();
 	}
 
