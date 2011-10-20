@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.linuxtools.tmf"
       label="%featureName"
-      version="0.3.2.qualifier"
+      version="0.4.0.qualifier"
       provider-name="%featureProvider">
 
    <description>
