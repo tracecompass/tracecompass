@@ -30,16 +30,16 @@ public class TestStateManager extends TestCase {
 	public void testSetTraceSelection() {
 		String logName = "traceset/trace-15316events_nolost_newformat";
 		
-		LTTngTrace testStream = null;
-		try {
-			testStream = new LTTngTrace(logName, false);
-		} catch (Exception e) {
+//		LTTngTrace testStream = null;
+//		try {
+//			testStream = new LTTngTrace(logName, true);
+//		} catch (Exception e) {
 //			e.printStackTrace();
-		}
-
-		if (testStream != null) {
-		    LTTngTrace[] streamList = new LTTngTrace[1];
-			streamList[0] = testStream;
+//		}
+//
+//		if (testStream != null) {
+//		    LTTngTrace[] streamList = new LTTngTrace[1];
+//			streamList[0] = testStream;
 			// TmfExperiment<LttngEvent> newExp = new
 			// TmfExperiment<LttngEvent>(LttngEvent.class, logName, streamList);
 			
@@ -57,6 +57,6 @@ public class TestStateManager extends TestCase {
 			// sb.append("\n" + event);
 			// }
 			// TraceDebug.debug("Events not Handled: " + sb.toString());
-		}
+//		}
 	}
 }

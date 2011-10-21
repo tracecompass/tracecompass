@@ -19,6 +19,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.linuxtools.tmf.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
@@ -66,7 +67,10 @@ public class OpenTraceHandler extends AbstractHandler {
         // Get the selection
         IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         IWorkbenchPart part = page.getActivePart();
-        ISelection selection = part.getSite().getSelectionProvider().getSelection();
+        ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
+        if (selectionProvider == null)
+            return false;
+        ISelection selection = selectionProvider.getSelection();
 
         // Make sure there is only one selection and that it is a trace
         fTrace = null;
