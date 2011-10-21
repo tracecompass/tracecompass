@@ -89,12 +89,12 @@ public class HistogramZoom implements MouseWheelListener {
         }
     }
 
-    public void setFullRange(long startTime, long endTime) {
+    public synchronized void setFullRange(long startTime, long endTime) {
         fAbsoluteStartTime = startTime;
         fAbsoluteEndTime = endTime;
     }
 
-    public void setNewRange(long startTime, long duration) {
+    public synchronized void setNewRange(long startTime, long duration) {
         if (startTime < fAbsoluteStartTime)
             startTime = fAbsoluteStartTime;
 
