@@ -46,7 +46,7 @@ public abstract class AbsTmfStatisticsTree {
      *            Strings to merge.
      * @return A new string containing all the strings.
      */
-    protected synchronized static String mergeString(String... strings) {
+    public synchronized static String mergeString(String... strings) {
         fBuilder.setLength(0);
         for (String s : strings)
             fBuilder.append(s);
@@ -62,11 +62,11 @@ public abstract class AbsTmfStatisticsTree {
      * HashSet are always faster than TreeSet.
      * </p>
      */
-    private Map<String, Set<String>> fKeys;
+    protected Map<String, Set<String>> fKeys;
     /**
      * <h4>The nodes in the tree.</f4>
      */
-    private HashMap<TmfFixedArray<String>, TmfStatisticsTreeNode> fNodes;
+    protected HashMap<TmfFixedArray<String>, TmfStatisticsTreeNode> fNodes;
 
     /**
      * <h4>Constructor.</h4>
@@ -110,7 +110,7 @@ public abstract class AbsTmfStatisticsTree {
      * 
      * @return The map.
      */
-    protected Map<String, Set<String>> getKeys() {
+    public Map<String, Set<String>> getKeys() {
         return fKeys;
     }
 

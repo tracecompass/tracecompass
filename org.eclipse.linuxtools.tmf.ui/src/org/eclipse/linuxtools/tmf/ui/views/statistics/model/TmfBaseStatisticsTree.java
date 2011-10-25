@@ -31,7 +31,7 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
     /**
      * <h4>Header for the event types categories.</h4>
      */
-    private static final String HEADER_EVENT_TYPES = Messages.TmfStatisticsData_EventTypes;
+    public static final String HEADER_EVENT_TYPES = Messages.TmfStatisticsData_EventTypes;
 
     /**
      * <h4>Indicate that it's a value.</h4>
@@ -43,8 +43,8 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
      * It differentiate a category of a value by being appended to a value.
      * </p>
      */
-    private static final String NODE = "z"; //$NON-NLS-1$
-    private static final String ROOT_NODE_KEY = mergeString(ROOT.get(0), NODE);
+    protected static final String NODE = "z"; //$NON-NLS-1$
+    protected static final String ROOT_NODE_KEY = mergeString(ROOT.get(0), NODE);
 
     public TmfBaseStatisticsTree() {
         super();
@@ -141,7 +141,7 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
      * @return Array of FixedArray representing the paths.
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private TmfFixedArray<String>[] getTypePaths(TmfEvent event, ITmfExtraEventInfo extraInfo) {
+    protected TmfFixedArray<String>[] getTypePaths(TmfEvent event, ITmfExtraEventInfo extraInfo) {
         String trace = extraInfo.getTraceName();
         // String type = event.getType().getTypeId(); // Add too much
         // informations
@@ -162,7 +162,7 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
      * @return Array of FixedArray representing the paths.
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private TmfFixedArray<String>[] getNormalPaths(TmfEvent event, ITmfExtraEventInfo extraInfo) {
+    protected TmfFixedArray<String>[] getNormalPaths(TmfEvent event, ITmfExtraEventInfo extraInfo) {
         String trace = extraInfo.getTraceName();
 
         TmfFixedArray[] paths = { new TmfFixedArray<String>(trace) };

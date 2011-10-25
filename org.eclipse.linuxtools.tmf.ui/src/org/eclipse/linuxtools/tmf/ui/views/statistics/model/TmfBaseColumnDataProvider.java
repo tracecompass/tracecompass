@@ -35,30 +35,30 @@ public class TmfBaseColumnDataProvider implements ITmfColumnDataProvider {
     /**
      * Contains the list of the columns
      */
-    private static Vector<TmfBaseColumnData> fColumnData = null;
+    protected static Vector<TmfBaseColumnData> fColumnData = null;
 
     /**
      * Level column names
      */
-    private final static String LEVEL_COLUMN = Messages.TmfStatisticsView_LevelColumn;
+    protected final static String LEVEL_COLUMN = Messages.TmfStatisticsView_LevelColumn;
     /**
      * Number of events column names
      */
-    private final static String EVENTS_COUNT_COLUMN = Messages.TmfStatisticsView_NbEventsColumn;
+    protected final static String EVENTS_COUNT_COLUMN = Messages.TmfStatisticsView_NbEventsColumn;
 
     /**
      * Level column tooltips
      */
-    private final static String LEVEL_COLUMN_TIP = Messages.TmfStatisticsView_LevelColumnTip;
+    protected final static String LEVEL_COLUMN_TIP = Messages.TmfStatisticsView_LevelColumnTip;
     /**
      * Number of events column tooltips
      */
-    private final static String EVENTS_COUNT_COLUMN_TIP = Messages.TmfStatisticsView_NbEventsTip;
+    protected final static String EVENTS_COUNT_COLUMN_TIP = Messages.TmfStatisticsView_NbEventsTip;
 
     /**
      * Level for which statistics should not be displayed.
      */
-    private static Set<String> fFolderLevels = new HashSet<String>(Arrays.asList(new String[] { "Event Types" })); //$NON-NLS-1$
+    protected Set<String> fFolderLevels = new HashSet<String>(Arrays.asList(new String[] { "Event Types" })); //$NON-NLS-1$
 
     /**
      * Create basic columns to represent the statistics data

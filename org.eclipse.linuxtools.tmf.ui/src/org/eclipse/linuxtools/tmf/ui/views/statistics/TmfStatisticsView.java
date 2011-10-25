@@ -68,7 +68,7 @@ public class TmfStatisticsView extends TmfView {
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.statistics"; //$NON-NLS-1$
 
     // view name
-    private static final String TMF_STATISTICS_VIEW = "StatisticsView"; //$NON-NLS-1$
+    public static final String TMF_STATISTICS_VIEW = "StatisticsView"; //$NON-NLS-1$
 
     // Refresh frequency
     protected static final Long STATS_INPUT_CHANGED_REFRESH = 5000L;
@@ -301,6 +301,7 @@ public class TmfStatisticsView extends TmfView {
                 // The experiment root is already present
                 TmfStatisticsTreeNode experimentTreeNode = TmfStatisticsTreeRootFactory.getStatTreeRoot(getTreeID(experimentName));
 
+                @SuppressWarnings("rawtypes")
                 ITmfTrace[] traces = experiment.getTraces();
 
                 // check if there is partial data loaded in the experiment

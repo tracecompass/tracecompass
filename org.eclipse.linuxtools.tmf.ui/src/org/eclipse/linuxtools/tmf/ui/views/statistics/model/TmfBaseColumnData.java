@@ -22,20 +22,20 @@ import org.eclipse.jface.viewers.ViewerComparator;
 public class TmfBaseColumnData implements ITmfStatisticsColumnData {
     
     // Name of the column.
-    private final String fHeader;
+    protected final String fHeader;
     // Width of the column.
-    private final int fWidth;
+    protected final int fWidth;
     // Alignment of the column.
-    private final int fAlignment;
+    protected final int fAlignment;
     // Tooltip of the column.
-    private final String fTooltip;
+    protected final String fTooltip;
     // Adapts a StatisticsTreeNode into the content of it's corresponding
     // cell for that column.
-    private final ColumnLabelProvider fLabelProvider;
+    protected final ColumnLabelProvider fLabelProvider;
     // Used to sort elements of this column. Can be null.
-    private final ViewerComparator fComparator;
+    protected final ViewerComparator fComparator;
     // Used to draw bar charts in this column. Can be null.
-    private final ITmfColumnPercentageProvider fPercentageProvider;
+    protected final ITmfColumnPercentageProvider fPercentageProvider;
     
     // Used to draw bar charts in columns.
     public interface ITmfColumnPercentageProvider {

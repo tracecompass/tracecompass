@@ -27,15 +27,15 @@ public class TmfStatisticsTreeNode {
 	/**
 	 * <h4>Value of the node.</h4>
 	 */
-	private TmfStatistics fValue;
+    protected TmfStatistics fValue;
 	/**
 	 * <h4>Path of the node.</h4>
 	 */
-	private TmfFixedArray<String> fPath;
+    protected TmfFixedArray<String> fPath;
 	/**
 	 * <h2>Corresponding StatisticsData.</h2>
 	 */
-	private AbsTmfStatisticsTree fNodes;
+    protected AbsTmfStatisticsTree fNodes;
 	/**
 	 * <h4>Constructor.</h4>
 	 * @param path Path to the node.
