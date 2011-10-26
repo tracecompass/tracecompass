@@ -755,7 +755,6 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
             final Job job = new Job("Indexing " + getName() + "...") { //$NON-NLS-1$ //$NON-NLS-2$
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
-                    System.out.println("Job start: " + this);
                     while (!monitor.isCanceled()) {
                         try {
                             Thread.sleep(100);
@@ -765,7 +764,6 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
                         }
                     }
                     monitor.done();
-                    System.out.println("Job stop: " + this);
                     return Status.OK_STATUS;
                 }
             };
