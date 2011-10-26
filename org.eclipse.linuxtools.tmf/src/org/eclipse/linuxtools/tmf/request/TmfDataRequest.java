@@ -419,8 +419,11 @@ public abstract class TmfDataRequest<T extends TmfData> implements ITmfDataReque
                 return;
             }
         }
-        handleCompleted();
-        completedLatch.countDown();
+        try {
+            handleCompleted();
+        } finally {
+            completedLatch.countDown();
+        }
     }
 
     /**

@@ -41,7 +41,7 @@ public class TmfRequestExecutor implements Executor {
 			return -1;
 		}
 	});
-	private Runnable fCurrentRequest;
+	private TmfThread fCurrentRequest;
 	
 	// ------------------------------------------------------------------------
 	// Constructors
@@ -83,6 +83,9 @@ public class TmfRequestExecutor implements Executor {
 	 * Stops the executor
 	 */
 	public void stop() {
+	    if (fCurrentRequest != null) {
+	        fCurrentRequest.cancel();
+	    }
 		fExecutor.shutdown();
 		if (Tracer.isComponentTraced()) Tracer.trace(fExecutor + " terminated"); //$NON-NLS-1$
 	}
@@ -105,6 +108,10 @@ public class TmfRequestExecutor implements Executor {
 					scheduleNext();
 				}
 			}
+            @Override
+            public void cancel() {
+                ((TmfThread) requestThread).cancel();
+            }
 		});
 		if (fCurrentRequest == null) {
 			scheduleNext();

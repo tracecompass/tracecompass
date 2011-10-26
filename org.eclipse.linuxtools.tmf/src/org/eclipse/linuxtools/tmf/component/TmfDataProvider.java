@@ -19,6 +19,7 @@ import java.util.concurrent.SynchronousQueue;
 
 import org.eclipse.linuxtools.tmf.Tracer;
 import org.eclipse.linuxtools.tmf.event.TmfData;
+import org.eclipse.linuxtools.tmf.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.request.TmfCoalescedDataRequest;
@@ -244,6 +245,8 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 
         // Process the request
         TmfThread thread = new TmfThread(request.getExecType()) {
+            
+            ITmfDataRequest<T> fRequest = request;
 
             @Override
             public void run() {
@@ -293,6 +296,13 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 
                 // Cleanup
                 context.dispose();
+            }
+
+            @Override
+            public void cancel() {
+                if (!fRequest.isCompleted()) {
+                    fRequest.cancel();
+                }
             }
         };
 

@@ -142,6 +142,13 @@ public class OpenTraceHandler extends AbstractHandler {
             }
 
         } else {
+            // Close the current experiment, if any
+            TmfExperiment<?> currentExperiment = TmfExperiment.getCurrentExperiment();
+            if (currentExperiment != null) {
+                currentExperiment.dispose();
+            }
+
+            // Open the new experiment and broadcast
             ITmfTrace[] traces = new ITmfTrace[] { trace };
             TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), fTrace.getName(), traces, trace.getCacheSize());
             TmfExperiment.setCurrentExperiment(experiment);

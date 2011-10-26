@@ -13,13 +13,8 @@ public class TmfThread extends Thread { // implements Comparator<ITmfDataRequest
 	public ExecutionType getExecType() {
 		return fExecType;
 	}
-//	
-//	public int compare(ITmfDataRequest<?> o1, ITmfDataRequest<?> o2) {
-//		if (o1.getExecType() == o2.getExecType())
-//			return 0;
-//		if (o1.getExecType() == ExecutionType.SHORT)
-//			return -1;
-//		return 1;
-//	}
+
+	public void cancel() {
+	}
 
 }
