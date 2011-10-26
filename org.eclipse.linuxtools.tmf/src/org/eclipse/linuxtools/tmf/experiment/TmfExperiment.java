@@ -740,6 +740,22 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
             fIndexing = true;
         }
 
+        final Job job = new Job("Indexing " + getName() + "...") { //$NON-NLS-1$ //$NON-NLS-2$
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+                while (!monitor.isCanceled()) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        return Status.OK_STATUS;
+                    }
+                }
+                monitor.done();
+                return Status.OK_STATUS;
+            }
+        };
+        job.schedule();
+
 //		fEventLog = openLogFile("TraceEvent.log");
 //        System.out.println(System.currentTimeMillis() + ": Experiment indexing started");
 
@@ -752,26 +768,9 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
             TmfTimestamp lastTime = (fTimeRange == TmfTimeRange.Null) ? null : fTimeRange.getEndTime();
             long initialNbEvents = fNbEvents;
 
-            final Job job = new Job("Indexing " + getName() + "...") { //$NON-NLS-1$ //$NON-NLS-2$
-                @Override
-                protected IStatus run(IProgressMonitor monitor) {
-                    while (!monitor.isCanceled()) {
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            monitor.done();
-                            return Status.OK_STATUS;
-                        }
-                    }
-                    monitor.done();
-                    return Status.OK_STATUS;
-                }
-            };
-
             @Override
             public void handleStarted() {
                 super.handleStarted();
-                job.schedule();
             }
 
             @Override
