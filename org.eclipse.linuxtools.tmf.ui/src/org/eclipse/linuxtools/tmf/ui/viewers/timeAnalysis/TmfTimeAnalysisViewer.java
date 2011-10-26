@@ -860,6 +860,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		_nameWidthPref = width;
 		if (width == 0) {
 			_minNameWidth = 0;
+            _nameWidth = 0;
 		}
 	}
 
