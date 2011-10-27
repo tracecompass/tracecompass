@@ -64,6 +64,7 @@ public class StateExperimentManager extends LTTngTreeNode implements ILttExperim
     private TmfTimeRange fCheckPointUpdateRange = null;
     private long fCheckPointNbEventsHandled = 0;
     private final Object fCheckPointUpdateSyncObj = new Object();
+    private boolean fInitial = false;
 
     // ========================================================================
     // Constructors
@@ -233,19 +234,12 @@ public class StateExperimentManager extends LTTngTreeNode implements ILttExperim
         }
 
         synchronized (fCheckPointUpdateSyncObj) {
-            fCheckPointUpdateBusy = true;
+            fCheckPointUpdateBusy = false;
             fCheckPointUpdatePending = false;
             fCheckPointUpdateIndex = 0;
         }
 
-        // trigger data request to build the state system check points
-        fStateCheckPointRequest = buildCheckPoints(experiment, experiment.getTimeRange(), true);
-
-        if (fStateCheckPointRequest == null) {
-            synchronized (fCheckPointUpdateSyncObj) {
-                fCheckPointUpdateBusy = false;
-            }
-        }
+        fInitial = true;
     }
 
     /*
@@ -280,7 +274,8 @@ public class StateExperimentManager extends LTTngTreeNode implements ILttExperim
         }
 
         // trigger data request to build the state system check points
-        fStateCheckPointRequest = buildCheckPoints(experiment, signal.getRange(), false);
+        fStateCheckPointRequest = buildCheckPoints(experiment, signal.getRange(), fInitial);
+        fInitial = false;
 
         if (fStateCheckPointRequest == null) {
             synchronized (fCheckPointUpdateSyncObj) {
