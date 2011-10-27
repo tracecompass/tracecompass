@@ -341,12 +341,12 @@ public class TmfNavigatorContentProvider implements ICommonContentProvider, IPip
 
     @Override
     public Object getPipelinedParent(Object anObject, Object aSuggestedParent) {
-        return null;
+        return aSuggestedParent;
     }
 
     @Override
     public PipelinedShapeModification interceptAdd(PipelinedShapeModification anAddModification) {
-        return null;
+        return anAddModification;
     }
 
     @Override
