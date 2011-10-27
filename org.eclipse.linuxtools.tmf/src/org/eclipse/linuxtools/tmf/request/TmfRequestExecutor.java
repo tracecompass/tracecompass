@@ -61,7 +61,7 @@ public class TmfRequestExecutor implements Executor {
 	/**
 	 * @return the number of pending requests
 	 */
-	public int getNbPendingRequests() {
+	public synchronized int getNbPendingRequests() {
 		return fRequestQueue.size();
 	}
 	
@@ -75,17 +75,22 @@ public class TmfRequestExecutor implements Executor {
 	/**
 	 * @return the termination state
 	 */
-	public boolean isTerminated() {
+	public synchronized boolean isTerminated() {
 		return fExecutor.isTerminated();
 	}
 	
 	/**
 	 * Stops the executor
 	 */
-	public void stop() {
+	public synchronized void stop() {
 	    if (fCurrentRequest != null) {
 	        fCurrentRequest.cancel();
 	    }
+	    
+	    while ((fCurrentRequest = fRequestQueue.poll()) != null) {
+	        fCurrentRequest.cancel();
+	    }
+
 		fExecutor.shutdown();
 		if (Tracer.isComponentTraced()) Tracer.trace(fExecutor + " terminated"); //$NON-NLS-1$
 	}
