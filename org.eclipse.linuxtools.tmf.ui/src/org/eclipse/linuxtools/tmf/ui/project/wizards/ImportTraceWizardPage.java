@@ -768,11 +768,11 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
             String traceTypeId = null;
             String traceIcon = null;
             String traceType = fTraceTypes.getText();
+            boolean traceTypeOK = false;
             if (traceType.startsWith(CUSTOM_TXT_CATEGORY)) {
-                ok = false;
                 for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
                     if (traceType.equals(CUSTOM_TXT_CATEGORY + " : " + def.definitionName)) { //$NON-NLS-1$
-                        ok = true;
+                        traceTypeOK = true;
                         traceBundle = TmfUiPlugin.getDefault().getBundle().getSymbolicName();
                         traceTypeId = CustomTxtTrace.class.getCanonicalName() + ":" + def.definitionName; //$NON-NLS-1$
                         traceIcon = DEFAULT_TRACE_ICON_PATH;
@@ -782,7 +782,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
             } else if (traceType.startsWith(CUSTOM_XML_CATEGORY)) {
                 for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
                     if (traceType.equals(CUSTOM_XML_CATEGORY + " : " + def.definitionName)) { //$NON-NLS-1$
-                        ok = true;
+                        traceTypeOK = true;
                         traceBundle = TmfUiPlugin.getDefault().getBundle().getSymbolicName();
                         traceTypeId = CustomXmlTrace.class.getCanonicalName() + ":" + def.definitionName; //$NON-NLS-1$
                         traceIcon = DEFAULT_TRACE_ICON_PATH;
@@ -792,14 +792,13 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
             } else {
                 IConfigurationElement ce = fTraceAttributes.get(traceType);
                 if (ce != null) {
+                    traceTypeOK = true;
                     traceBundle = ce.getContributor().getName();
                     traceTypeId = ce.getAttribute(TmfTraceType.ID_ATTR);
                     traceIcon = ce.getAttribute(TmfTraceType.ICON_ATTR);
-                } else {
-                    ok = false;
                 }
             }
-            if (ok && !traceType.equals("")) { //$NON-NLS-1$
+            if (ok && traceTypeOK && !traceType.equals("")) { //$NON-NLS-1$
                 // Tag the selected traces with their type
                 List<String> files = new ArrayList<String>(fileSystemObjects.keySet());
                 Collections.sort(files);
