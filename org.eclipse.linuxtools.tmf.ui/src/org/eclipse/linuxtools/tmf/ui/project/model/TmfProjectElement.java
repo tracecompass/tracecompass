@@ -12,10 +12,13 @@
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
 /**
  * <b><u>TmfProjectElement</u></b>
@@ -78,18 +81,17 @@ public class TmfProjectElement extends TmfProjectModelElement {
 
     @Override
     public void refresh() {
-        if (!Display.getDefault().isDisposed()) {
-            Display.getDefault().asyncExec(new Runnable() {
+        try {
+            new WorkspaceModifyOperation() {
                 @Override
-                public void run() {
-                    try {
-                        IProject project = getResource();
-                        project.touch(null);
-                    } catch (CoreException e) {
-                    }
+                protected void execute(IProgressMonitor monitor) throws CoreException, InvocationTargetException, InterruptedException {
+                  IProject project = getResource();
+                  project.touch(null);
                 }
-                
-            });
+            }.run(null);
+        } catch (InvocationTargetException e) {
+        } catch (InterruptedException e) {
+        } catch (RuntimeException e) {
         }
     }
 

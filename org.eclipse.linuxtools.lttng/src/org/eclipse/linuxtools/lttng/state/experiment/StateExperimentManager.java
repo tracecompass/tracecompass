@@ -71,7 +71,7 @@ public class StateExperimentManager extends LTTngTreeNode implements ILttExperim
     public StateExperimentManager(Long id, String name) {
         super(id, null, name, null);
         fexperimentListener = new StateExperimentListener("Experiment Manager", this); //$NON-NLS-1$
-        TmfSignalManager.register(this);
+        TmfSignalManager.registerVIP(this);
     }
 
     @TmfSignalHandler
