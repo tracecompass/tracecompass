@@ -14,7 +14,9 @@ package org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Lifeline;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.SyncMessage;
@@ -30,6 +32,18 @@ public class TmfUml2SDSyncLoaderFilterTest extends TestCase {
     private Uml2SDTestFacility fFacility;
 
     // ------------------------------------------------------------------------
+    // Static methods
+    // ------------------------------------------------------------------------ 
+
+    /**
+     * Returns test setup used when executing test case stand-alone.
+     * @return Test setup class 
+     */
+    public static Test suite() {
+        return new Uml2SDTestSetup(new TestSuite(TmfUml2SDSyncLoaderFilterTest.class));
+    }
+
+    // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
     public TmfUml2SDSyncLoaderFilterTest() {
@@ -42,7 +56,6 @@ public class TmfUml2SDSyncLoaderFilterTest extends TestCase {
     public void setUp() throws Exception {
         super.setUp();
         fFacility = Uml2SDTestFacility.getInstance();
-        fFacility.init(false);
         fFacility.selectExperiment();
     }
 
@@ -50,7 +63,6 @@ public class TmfUml2SDSyncLoaderFilterTest extends TestCase {
     @Override
     public void tearDown() throws Exception {
         fFacility.disposeExperiment();
-        fFacility.dispose();
         fFacility = null;
         super.tearDown();
     }

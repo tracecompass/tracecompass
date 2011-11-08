@@ -13,7 +13,9 @@ package org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.impl;
 
 import java.util.List;
 
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
@@ -68,6 +70,18 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
     private Uml2SDSignalValidator fTmfComponent;
 
     // ------------------------------------------------------------------------
+    // Static methods
+    // ------------------------------------------------------------------------ 
+
+    /**
+     * Returns test setup used when executing test case stand-alone.
+     * @return Test setup class 
+     */
+    public static Test suite() {
+        return new Uml2SDTestSetup(new TestSuite(TmfUml2SDSyncLoaderFindTest.class));
+    }
+    
+    // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
     public TmfUml2SDSyncLoaderFindTest() {
@@ -80,14 +94,12 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
     public void setUp() throws Exception {
         super.setUp();
         fFacility = Uml2SDTestFacility.getInstance();
-        fFacility.init(false);
         fFacility.selectExperiment();
     }
 
     @Override
     public void tearDown() throws Exception {
         fFacility.disposeExperiment();
-        fFacility.dispose();
         fFacility = null;
         super.tearDown();
     }

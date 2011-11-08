@@ -17,9 +17,6 @@ import junit.framework.TestSuite;
 public class AllTests {
 
     public static Test suite() {
-        // Create instance of the test facility for the TmfUml2SD test   
-        Uml2SDTestFacility.getInstance().init(true);
-        
         TestSuite suite = new TestSuite(AllTests.class.getName());
         //$JUnit-BEGIN$
         suite.addTestSuite(TmfUml2SDSyncLoaderExpTest.class);
@@ -29,6 +26,6 @@ public class AllTests {
         suite.addTestSuite(TmfUml2SDSyncLoaderFindTest.class);
         suite.addTestSuite(TmfUml2SDSyncLoaderFilterTest.class);
         //$JUnit-END$
-        return suite;
+        return new Uml2SDTestSetup(suite);
     }
 }

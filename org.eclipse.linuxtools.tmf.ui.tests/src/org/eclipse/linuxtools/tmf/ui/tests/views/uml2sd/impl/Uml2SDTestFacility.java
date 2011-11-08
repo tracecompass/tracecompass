@@ -58,7 +58,6 @@ public class Uml2SDTestFacility {
     private TmfExperiment<TmfEvent> fExperiment = null;
     
     private boolean fIsInitialized = false;
-    private boolean fIsGlobalTest = false;
     
     // ------------------------------------------------------------------------
     // Constructors
@@ -78,12 +77,10 @@ public class Uml2SDTestFacility {
 
     /**
      * Initial the test facility.
-     * @param isGlobal true if multiple test cases are run in sequence (AllTests) or false for a single test case
      */
-    public void init(boolean isGlobal) {
+    public void init() {
         
         if (!fIsInitialized) {
-            fIsGlobalTest = isGlobal;
 
             fParser = new TmfUml2SDTestTrace();
             fTrace = setupTrace(fParser);
@@ -129,7 +126,7 @@ public class Uml2SDTestFacility {
      * Dispose the resource
      */
     public void dispose() {
-        if (fIsInitialized && !fIsGlobalTest) {
+        if (fIsInitialized) {
             fExperiment.dispose();
 
             // Wait for all Eclipse jobs to finish
@@ -263,6 +260,7 @@ public class Uml2SDTestFacility {
      * Selects the experiment. 
      * @param wait true to wait for indexing to finish else false
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void selectExperiment(boolean wait) {
         fTrace = setupTrace(fParser);
 
