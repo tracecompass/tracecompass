@@ -1,6 +1,6 @@
 package org.eclipse.linuxtools.tmf.ui.parsers.custom;
 
-import org.eclipse.linuxtools.tmf.event.TmfEventType;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 
 public abstract class CustomEventType extends TmfEventType {
     

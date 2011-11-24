@@ -14,11 +14,11 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
-import org.eclipse.linuxtools.lttng.LttngConstants;
-import org.eclipse.linuxtools.lttng.event.LttngEvent;
-import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.request.ITmfDataRequest;
-import org.eclipse.linuxtools.tmf.request.TmfEventRequest;
+import org.eclipse.linuxtools.lttng.core.LttngConstants;
+import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 
 /**
  * <b><u>HistogramRequest</u></b>

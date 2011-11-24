@@ -15,9 +15,9 @@ package org.eclipse.linuxtools.tmf.ui.parsers.custom;
 import java.io.IOException;
 import java.util.regex.Matcher;
 
-import org.eclipse.linuxtools.tmf.io.BufferedRandomAccessFile;
-import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
-import org.eclipse.linuxtools.tmf.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.core.io.BufferedRandomAccessFile;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTraceDefinition.InputLine;
 
 public class CustomTxtTraceContext extends TmfContext {

@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.tmf.ui.views.timechart;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
 import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSettingsManager;

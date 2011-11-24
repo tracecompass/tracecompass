@@ -14,10 +14,10 @@ package org.eclipse.linuxtools.lttng.stubs;
 
 import java.io.IOException;
 
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.parser.ITmfEventParser;
-import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 
 /**
  * <b><u>TmfEventParserStub</u></b>

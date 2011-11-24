@@ -11,14 +11,14 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.impl;
 
-import org.eclipse.linuxtools.tmf.component.TmfComponent;
-import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.signal.TmfEndSynchSignal;
-import org.eclipse.linuxtools.tmf.signal.TmfRangeSynchSignal;
-import org.eclipse.linuxtools.tmf.signal.TmfSignalHandler;
-import org.eclipse.linuxtools.tmf.signal.TmfStartSynchSignal;
-import org.eclipse.linuxtools.tmf.signal.TmfTimeSynchSignal;
+import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.signal.TmfEndSynchSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.core.signal.TmfStartSynchSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
 
 /**
  *  Class to implement that certain signals are sent as well as are sent with correct content. 

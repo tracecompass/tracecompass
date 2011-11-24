@@ -14,9 +14,9 @@ package org.eclipse.linuxtools.tmf.ui.parsers.custom;
 
 import java.io.IOException;
 
-import org.eclipse.linuxtools.tmf.io.BufferedRandomAccessFile;
-import org.eclipse.linuxtools.tmf.trace.ITmfLocation;
-import org.eclipse.linuxtools.tmf.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.core.io.BufferedRandomAccessFile;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
+import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 
 public class CustomXmlTraceContext extends TmfContext {
     public BufferedRandomAccessFile raFile;

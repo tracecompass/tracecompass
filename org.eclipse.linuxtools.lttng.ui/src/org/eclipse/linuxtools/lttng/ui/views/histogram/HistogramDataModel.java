@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
 import java.util.Arrays;
 
-import org.eclipse.linuxtools.lttng.exceptions.EventOutOfSequenceException;
+import org.eclipse.linuxtools.lttng.core.exceptions.EventOutOfSequenceException;
 import org.eclipse.linuxtools.lttng.ui.LTTngUILogger;
 
 /**

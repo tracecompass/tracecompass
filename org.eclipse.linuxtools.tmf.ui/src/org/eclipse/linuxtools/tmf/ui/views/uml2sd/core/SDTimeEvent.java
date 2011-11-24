@@ -12,7 +12,7 @@
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 
 /**
  * @author sveyrier

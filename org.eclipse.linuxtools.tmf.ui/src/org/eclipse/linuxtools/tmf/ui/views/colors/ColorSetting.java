@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.ui.views.colors;
 
-import org.eclipse.linuxtools.tmf.filter.model.ITmfFilterTreeNode;
+import org.eclipse.linuxtools.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;

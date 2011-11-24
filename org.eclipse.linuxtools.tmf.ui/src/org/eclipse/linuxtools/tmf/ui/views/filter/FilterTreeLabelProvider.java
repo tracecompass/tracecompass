@@ -14,15 +14,15 @@ package org.eclipse.linuxtools.tmf.ui.views.filter;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.linuxtools.tmf.filter.model.TmfFilterAndNode;
-import org.eclipse.linuxtools.tmf.filter.model.TmfFilterCompareNode;
-import org.eclipse.linuxtools.tmf.filter.model.TmfFilterCompareNode.Type;
-import org.eclipse.linuxtools.tmf.filter.model.TmfFilterContainsNode;
-import org.eclipse.linuxtools.tmf.filter.model.TmfFilterEqualsNode;
-import org.eclipse.linuxtools.tmf.filter.model.TmfFilterEventTypeNode;
-import org.eclipse.linuxtools.tmf.filter.model.TmfFilterMatchesNode;
-import org.eclipse.linuxtools.tmf.filter.model.TmfFilterNode;
-import org.eclipse.linuxtools.tmf.filter.model.TmfFilterOrNode;
+import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterAndNode;
+import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterCompareNode;
+import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterContainsNode;
+import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterEqualsNode;
+import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterEventTypeNode;
+import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterMatchesNode;
+import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterNode;
+import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterOrNode;
+import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterCompareNode.Type;
 import org.eclipse.swt.graphics.Image;
 
 /**

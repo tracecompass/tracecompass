@@ -12,8 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.ui.viewers.events;
 
-import org.eclipse.linuxtools.tmf.filter.ITmfFilter;
-import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 public interface ITmfEventsFilterListener {
 

@@ -13,7 +13,7 @@
 package org.eclipse.linuxtools.tmf.ui.signal;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.linuxtools.tmf.signal.TmfSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 
 /**
  * <b><u>TmfTraceParserUpdatedSignal</u></b>

@@ -13,8 +13,8 @@
 package org.eclipse.linuxtools.tmf.ui.signal;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.linuxtools.tmf.signal.TmfSignal;
-import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.ITmfEventsFilterProvider;
 
 /**

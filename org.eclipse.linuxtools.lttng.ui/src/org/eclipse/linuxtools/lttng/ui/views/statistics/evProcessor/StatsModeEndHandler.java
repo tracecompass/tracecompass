@@ -12,9 +12,9 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.statistics.evProcessor;
 
-import org.eclipse.linuxtools.lttng.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.state.StateStrings.Events;
-import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
+import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.lttng.core.state.StateStrings.Events;
+import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.ui.views.statistics.model.StatisticsData;
 
 class StatsModeEndHandler extends AbstractStatsEventHandler {

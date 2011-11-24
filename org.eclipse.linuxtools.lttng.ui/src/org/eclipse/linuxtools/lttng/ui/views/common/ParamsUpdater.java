@@ -11,10 +11,10 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.common;
 
-import org.eclipse.linuxtools.lttng.event.LttngTimestamp;
+import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
-import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeScaleSelectionEvent;
 
 /**

@@ -3,7 +3,7 @@
  */
 package org.eclipse.linuxtools.lttng.stubs;
 
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 
 /**
  * @author francois

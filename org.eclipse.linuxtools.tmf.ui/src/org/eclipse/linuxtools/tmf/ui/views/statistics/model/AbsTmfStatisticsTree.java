@@ -17,9 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.ITmfExtraEventInfo;
-import org.eclipse.linuxtools.tmf.util.TmfFixedArray;
 
 /**
  * <h4>Base class for the statistics storage.</h4>

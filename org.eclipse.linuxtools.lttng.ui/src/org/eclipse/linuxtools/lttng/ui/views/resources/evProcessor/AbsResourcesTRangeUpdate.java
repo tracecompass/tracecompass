@@ -14,9 +14,9 @@ package org.eclipse.linuxtools.lttng.ui.views.resources.evProcessor;
 
 import java.util.Vector;
 
-import org.eclipse.linuxtools.lttng.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor;
-import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
+import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.lttng.core.state.evProcessor.ILttngEventProcessor;
+import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeComponent;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEvent;
@@ -28,7 +28,7 @@ import org.eclipse.linuxtools.lttng.ui.views.common.AbsTRangeUpdate;
 import org.eclipse.linuxtools.lttng.ui.views.common.ParamsUpdater;
 import org.eclipse.linuxtools.lttng.ui.views.resources.model.ResourceContainer;
 import org.eclipse.linuxtools.lttng.ui.views.resources.model.ResourceModelFactory;
-import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 
 public abstract class AbsResourcesTRangeUpdate extends AbsTRangeUpdate
 		implements ILttngEventProcessor {

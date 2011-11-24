@@ -12,11 +12,11 @@
 package org.eclipse.linuxtools.lttng.ui.model.trange;
 
 
-import org.eclipse.linuxtools.lttng.state.StateStrings;
-import org.eclipse.linuxtools.lttng.state.model.LTTngCPUState;
-import org.eclipse.linuxtools.lttng.state.model.LttngIRQState;
-import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
-import org.eclipse.linuxtools.lttng.state.model.LttngTrapState;
+import org.eclipse.linuxtools.lttng.core.state.StateStrings;
+import org.eclipse.linuxtools.lttng.core.state.model.LTTngCPUState;
+import org.eclipse.linuxtools.lttng.core.state.model.LttngIRQState;
+import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
+import org.eclipse.linuxtools.lttng.core.state.model.LttngTrapState;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource.ResourceTypes;
 
 /**

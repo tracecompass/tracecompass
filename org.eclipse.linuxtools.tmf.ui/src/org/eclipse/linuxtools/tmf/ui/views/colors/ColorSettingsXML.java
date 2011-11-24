@@ -27,9 +27,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.eclipse.linuxtools.tmf.filter.model.ITmfFilterTreeNode;
-import org.eclipse.linuxtools.tmf.filter.xml.TmfFilterContentHandler;
-import org.eclipse.linuxtools.tmf.filter.xml.TmfFilterXMLWriter;
+import org.eclipse.linuxtools.tmf.core.filter.model.ITmfFilterTreeNode;
+import org.eclipse.linuxtools.tmf.core.filter.xml.TmfFilterContentHandler;
+import org.eclipse.linuxtools.tmf.core.filter.xml.TmfFilterXMLWriter;
 import org.eclipse.swt.graphics.RGB;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

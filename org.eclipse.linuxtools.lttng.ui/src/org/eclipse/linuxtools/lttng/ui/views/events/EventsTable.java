@@ -13,9 +13,9 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.events;
 
-import org.eclipse.linuxtools.lttng.event.LttngEventContent;
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.event.TmfEventContent;
+import org.eclipse.linuxtools.lttng.core.event.LttngEventContent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.linuxtools.tmf.ui.widgets.ColumnData;
 import org.eclipse.swt.SWT;

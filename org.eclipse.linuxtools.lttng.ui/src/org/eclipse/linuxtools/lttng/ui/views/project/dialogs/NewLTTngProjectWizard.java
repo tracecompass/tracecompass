@@ -17,9 +17,9 @@ package org.eclipse.linuxtools.lttng.ui.views.project.dialogs;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.linuxtools.lttng.LTTngProjectNature;
-import org.eclipse.linuxtools.lttng.TraceHelper;
-import org.eclipse.linuxtools.tmf.TmfProjectNature;
+import org.eclipse.linuxtools.lttng.core.LTTngProjectNature;
+import org.eclipse.linuxtools.lttng.core.TraceHelper;
+import org.eclipse.linuxtools.tmf.core.TmfProjectNature;
 import org.eclipse.linuxtools.tmf.ui.project.wizards.NewTmfProjectWizard;
 
 /**

@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.tmf.ui.parsers.custom;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.linuxtools.tmf.ui.widgets.ColumnData;

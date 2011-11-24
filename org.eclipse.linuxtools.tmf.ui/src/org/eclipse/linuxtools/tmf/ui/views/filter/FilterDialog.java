@@ -13,8 +13,8 @@
 package org.eclipse.linuxtools.tmf.ui.views.filter;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.linuxtools.tmf.filter.model.ITmfFilterTreeNode;
-import org.eclipse.linuxtools.tmf.filter.model.TmfFilterNode;
+import org.eclipse.linuxtools.tmf.core.filter.model.ITmfFilterTreeNode;
+import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.linuxtools.tmf.ui.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;

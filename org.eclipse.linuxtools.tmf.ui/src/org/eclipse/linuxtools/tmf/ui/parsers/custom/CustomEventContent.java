@@ -2,7 +2,7 @@ package org.eclipse.linuxtools.tmf.ui.parsers.custom;
 
 import java.util.Arrays;
 
-import org.eclipse.linuxtools.tmf.event.TmfEventContent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
 
 public class CustomEventContent extends TmfEventContent {
 

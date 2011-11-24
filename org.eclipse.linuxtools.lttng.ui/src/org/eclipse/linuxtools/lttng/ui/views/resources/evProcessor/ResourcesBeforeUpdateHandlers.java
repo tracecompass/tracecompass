@@ -12,15 +12,15 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.resources.evProcessor;
 
-import org.eclipse.linuxtools.lttng.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.state.StateStrings.Channels;
-import org.eclipse.linuxtools.lttng.state.StateStrings.Events;
-import org.eclipse.linuxtools.lttng.state.StateStrings.Fields;
-import org.eclipse.linuxtools.lttng.state.evProcessor.ILttngEventProcessor;
-import org.eclipse.linuxtools.lttng.state.model.LttngTraceState;
+import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.lttng.core.state.StateStrings.Channels;
+import org.eclipse.linuxtools.lttng.core.state.StateStrings.Events;
+import org.eclipse.linuxtools.lttng.core.state.StateStrings.Fields;
+import org.eclipse.linuxtools.lttng.core.state.evProcessor.ILttngEventProcessor;
+import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource.ResourceTypes;
-import org.eclipse.linuxtools.tmf.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 
 /**
  * Creates instances of specific before state update handlers, per corresponding

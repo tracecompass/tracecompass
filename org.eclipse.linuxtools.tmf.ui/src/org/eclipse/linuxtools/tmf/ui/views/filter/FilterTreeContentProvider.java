@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.linuxtools.tmf.filter.model.ITmfFilterTreeNode;
+import org.eclipse.linuxtools.tmf.core.filter.model.ITmfFilterTreeNode;
 
 /**
  * <b><u>FilterTreeContentProvider</u></b>

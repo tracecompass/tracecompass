@@ -13,7 +13,7 @@
 package org.eclipse.linuxtools.tmf.ui.editors;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 public interface ITmfTraceEditor {
 

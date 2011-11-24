@@ -17,29 +17,11 @@
     <version>0.10.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>org.eclipse.linuxtools.tmf.core</artifactId>
+  <artifactId>org.eclipse.linuxtools.tmf</artifactId>
   <version>0.4.0-SNAPSHOT</version>
-  <packaging>eclipse-plugin</packaging>
+  <packaging>eclipse-feature</packaging>
 
-  <name>Linux Tools LTTng TMF Core Plug-in</name>
+  <name>Linux Tools LTTng TMF (Tracing and Monitoring Framework)</name>
 
- <build>
-     <!-- workaround for https://issues.sonatype.org/browse/TYCHO-168 -->
-     <resources>
-      <resource>
-        <directory>src</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </resource>
-    </resources>
-    <plugins>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-source-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-
- <groupId>org.eclipse.linuxtools.tmf</groupId>
+  <groupId>org.eclipse.linuxtools.tmf</groupId>
 </project>

@@ -12,9 +12,9 @@
 
 package org.eclipse.linuxtools.tmf.ui.views;
 
-import org.eclipse.linuxtools.tmf.component.ITmfComponent;
-import org.eclipse.linuxtools.tmf.signal.TmfSignal;
-import org.eclipse.linuxtools.tmf.signal.TmfSignalManager;
+import org.eclipse.linuxtools.tmf.core.component.ITmfComponent;
+import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 

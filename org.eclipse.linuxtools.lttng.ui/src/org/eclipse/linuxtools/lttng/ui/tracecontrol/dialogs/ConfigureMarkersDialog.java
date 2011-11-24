@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.linuxtools.lttng.tracecontrol.model.TargetResource;
-import org.eclipse.linuxtools.lttng.tracecontrol.service.ILttControllerService;
+import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TargetResource;
+import org.eclipse.linuxtools.lttng.core.tracecontrol.service.ILttControllerService;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.TraceControlConstants;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.Messages;

@@ -19,19 +19,19 @@ import java.util.Vector;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.event.TmfEventContent;
-import org.eclipse.linuxtools.tmf.event.TmfEventReference;
-import org.eclipse.linuxtools.tmf.event.TmfEventSource;
-import org.eclipse.linuxtools.tmf.event.TmfEventType;
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventReference;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.ITmfExtraEventInfo;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.model.Messages;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfBaseStatisticsTree;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.model.AbsTmfStatisticsTree;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfStatisticsTreeNode;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfTreeContentProvider;
-import org.eclipse.linuxtools.tmf.util.TmfFixedArray;
 
 @SuppressWarnings("nls")
 public class TmfTreeContentProviderTest extends TestCase {

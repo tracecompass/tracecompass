@@ -17,8 +17,8 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.impl;
  * Extends AsyncMessage class to provide additional information about the trace event.
  * </p>
  */
+import org.eclipse.linuxtools.tmf.core.uml2sd.ITmfAsyncSequenceDiagramEvent;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessage;
-import org.eclipse.linuxtools.tmf.uml2sd.ITmfAsyncSequenceDiagramEvent;
 
 public class TmfAsyncMessage extends AsyncMessage implements ITmfAsyncSequenceDiagramEvent {
 

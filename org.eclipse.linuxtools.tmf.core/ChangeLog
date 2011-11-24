@@ -1,0 +1,204 @@
+2011-03-10  Francois Chouinard  <fchouinard@gmail.com>
+
+    * src/org/eclipse/linuxtools/tmf/.options: Fixed a typo
+	* src/org/eclipse/linuxtools/tmf/signal/TmfSignalManager.java: Improved request tracing
+	* src/org/eclipse/linuxtools/tmf/request/TmfRequestExecutor.java: Improved request tracing
+	* src/org/eclipse/linuxtools/tmf/request/TmfEventRequest.java: Streamlined constructor
+	* src/org/eclipse/linuxtools/tmf/request/TmfDataRequest.java: Improved request tracing
+	* src/org/eclipse/linuxtools/tmf/component/TmfEventProvider.java: Improved request tracing
+	* src/org/eclipse/linuxtools/tmf/component/TmfDataProvider.java: Improved request tracing
+	* src/org/eclipse/linuxtools/tmf/Tracer.java: Improved request tracing
+    * src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Fixed request completion call
+	
+2010-12-13  Bernd Hufmann  <bhufmann@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java (armRequest): For data requests, seek only if necessary   
+
+2010-11-23  Francois Chouinard  <fchouinard@gmail.com> 
+
+	* src/org/eclipse/linuxtools/tmf/component/TmfDataProvider.java: Adjusted background request block size
+	* src/org/eclipse/linuxtools/tmf/trace/TmfTrace.java: Adjusted buffering between checkpoints
+
+2010-11-10  Francois Chouinard  <fchouinard@gmail.com>
+
+    Suppress warning for non-externalized strings
+	   * src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: 
+
+2010-11-09  Francois Chouinard  <fchouinard@gmail.com>
+
+    * src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java (getNextEvent): Fix for NullPointerException
+
+    Suppress warning for non-externalized strings
+	   * src/org/eclipse/linuxtools/tmf/component/TmfDataProvider.java (newCoalescedDataRequest): 
+	       (coalesceDataRequest): 
+	       (.run): 
+	       (queueRequest): 
+	   * src/org/eclipse/linuxtools/tmf/component/TmfEventProvider.java (newCoalescedDataRequest): 
+	   * src/org/eclipse/linuxtools/tmf/event/TmfEvent.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/event/TmfEventContent.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/event/TmfEventField.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/event/TmfEventReference.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/event/TmfEventSource.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/event/TmfEventType.java (DEFAULT_TYPE_ID): 
+	       (getLabel): 
+	       (toString): 
+	   * src/org/eclipse/linuxtools/tmf/event/TmfTimeRange.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/event/TmfTimestamp.java (synchronize): 
+	       (toString): 
+	   * src/org/eclipse/linuxtools/tmf/event/TmfTraceEvent.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java (TmfExperiment): 
+	       (toString): 
+	   * src/org/eclipse/linuxtools/tmf/experiment/TmfExperimentLocation.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/request/TmfCoalescedDataRequest.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/request/TmfCoalescedEventRequest.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/request/TmfDataRequest.java (TmfDataRequest): 
+	       (handleCompleted): 
+	       (start): 
+	       (done): 
+	       (toString): 
+	   * src/org/eclipse/linuxtools/tmf/request/TmfEventRequest.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/request/TmfRequestExecutor.java (TmfRequestExecutor): 
+	       (stop): 
+	       (.run): 
+	       (toString): 
+	   * src/org/eclipse/linuxtools/tmf/signal/TmfExperimentSelectedSignal.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/signal/TmfExperimentUpdatedSignal.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/signal/TmfSignalTracer.java (traceSignal): 
+	   * src/org/eclipse/linuxtools/tmf/signal/TmfTimeSynchSignal.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/signal/TmfTraceClosedSignal.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/signal/TmfTraceOpenedSignal.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/signal/TmfTraceParserUpdatedSignal.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/signal/TmfTraceSelectedSignal.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/signal/TmfTraceUpdatedSignal.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/TmfCorePlugin.java (PLUGIN_ID): 
+	   * src/org/eclipse/linuxtools/tmf/trace/TmfCheckpoint.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/trace/TmfContext.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/trace/TmfLocation.java (toString): 
+	       (clone): 
+	   * src/org/eclipse/linuxtools/tmf/trace/TmfTrace.java (toString): 
+	   * src/org/eclipse/linuxtools/tmf/Tracer.java: 
+
+2010-11-04  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Use the correct index page size 
+	* src/org/eclipse/linuxtools/tmf/trace/TmfTrace.java: Added indexTrace() and support code 
+
+2010-10-29  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java (getNextEvent): Removed an unnecessary clone() operation
+
+2010-10-27  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/component/ITmfDataProvider.java: Augmented API for coalescing (notifyPendingRequest) 
+	* src/org/eclipse/linuxtools/tmf/component/TmfDataProvider.java: Request coalescing and cancelling 
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Augmented API 
+	* src/org/eclipse/linuxtools/tmf/request/TmfCoalescedDataRequest.java: Improved coalescing and cancelling
+	* src/org/eclipse/linuxtools/tmf/request/TmfCoalescedEventRequest.java: Ditto
+	* src/org/eclipse/linuxtools/tmf/request/TmfDataRequest.java: Ditto
+	* src/org/eclipse/linuxtools/tmf/signal/TmfSignalManager.java: Renaming of a field
+
+2010-10-15  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/event/TmfEvent.java: Implement cloning
+	* src/org/eclipse/linuxtools/tmf/event/TmfEventContent.java: Implement cloning
+	* src/org/eclipse/linuxtools/tmf/event/TmfEventField.java: Implement cloning
+	* src/org/eclipse/linuxtools/tmf/event/TmfEventReference.java: Implement cloning
+	* src/org/eclipse/linuxtools/tmf/event/TmfEventSource.java: Implement cloning
+	* src/org/eclipse/linuxtools/tmf/event/TmfEventType.java: Implement cloning
+	* src/org/eclipse/linuxtools/tmf/event/TmfTimestamp.java: Implement cloning
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java (updateIndex): Fixed timestamp cloning
+	* src/org/eclipse/linuxtools/tmf/request/TmfDataRequest.java: Replaced lock.wait() by CountDownLatch
+	* src/org/eclipse/linuxtools/tmf/trace/TmfTrace.java (updateIndex): Fixed timestamp cloning
+
+2010-10-13  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/request/TmfRequestExecutor.java: Added checks for disposed widget 
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Added checks for disposed widget 
+	* src/org/eclipse/linuxtools/tmf/request/TmfDataRequest.java: Added waitForStart() API 
+	* src/org/eclipse/linuxtools/tmf/event/TmfEventContent.java: Added setEvent() 
+	* src/org/eclipse/linuxtools/tmf/event/TmfTimeRange.java: Added getIntersection() 
+	* src/org/eclipse/linuxtools/tmf/event/TmfTimestamp.java: Improved timestamp comparison 
+
+2010-09-17  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/component/TmfDataProvider.java: Adjusted to new handleData() API 
+	* src/org/eclipse/linuxtools/tmf/component/TmfEventProvider.java: Adjusted to new handleData() API 
+	* src/org/eclipse/linuxtools/tmf/event/TmfEvent.java: Support for single event 
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Adjusted to new handleData() API  
+	* src/org/eclipse/linuxtools/tmf/request/ITmfDataRequest.java: Adjusted to new handleData() API  
+	* src/org/eclipse/linuxtools/tmf/request/TmfCoalescedDataRequest.java: Adjusted to new handleData() API  
+	* src/org/eclipse/linuxtools/tmf/request/TmfCoalescedEventRequest.java: Adjusted to new handleData() API  
+	* src/org/eclipse/linuxtools/tmf/request/TmfDataRequest.java: Adjusted to new handleData() API 
+	* src/org/eclipse/linuxtools/tmf/request/TmfEventRequest.java: Adjusted to new handleData() API 
+
+2010-09-17  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/component/TmfDataProvider.java: Adjusted to new handleData() API 
+	* src/org/eclipse/linuxtools/tmf/component/TmfEventProvider.java: Adjusted to new handleData() API 
+	* src/org/eclipse/linuxtools/tmf/event/TmfEvent.java: Support for single event 
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Adjusted to new handleData() API  
+	* src/org/eclipse/linuxtools/tmf/request/ITmfDataRequest.java: Adjusted to new handleData() API  
+	* src/org/eclipse/linuxtools/tmf/request/TmfCoalescedDataRequest.java: Adjusted to new handleData() API  
+	* src/org/eclipse/linuxtools/tmf/request/TmfCoalescedEventRequest.java: Adjusted to new handleData() API  
+	* src/org/eclipse/linuxtools/tmf/request/TmfDataRequest.java: Adjusted to new handleData() API 
+	* src/org/eclipse/linuxtools/tmf/request/TmfEventRequest.java: Adjusted to new handleData() API 
+
+2010-09-15  Francois Chouinard  <fchouinard@gmail.com>
+
+    * src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Optimized TmfExperimentContext handling 
+	* src/org/eclipse/linuxtools/tmf/trace/TmfTrace.java: ExecutionType update
+	* src/org/eclipse/linuxtools/tmf/trace/TmfContext.java: ExecutionType update
+	* src/org/eclipse/linuxtools/tmf/request/TmfRequestExecutor.java: ExecutionType update
+	* src/org/eclipse/linuxtools/tmf/request/TmfEventRequest.java: ExecutionType update
+	* src/org/eclipse/linuxtools/tmf/request/TmfDataRequest.java: ExecutionType update
+	* src/org/eclipse/linuxtools/tmf/request/TmfCoalescedEventRequest.java: ExecutionType update
+	* src/org/eclipse/linuxtools/tmf/request/TmfCoalescedDataRequest.java: ExecutionType update
+	* src/org/eclipse/linuxtools/tmf/request/ITmfDataRequest.java: ExecutionType update
+	* src/org/eclipse/linuxtools/tmf/component/TmfDataProvider.java: ExecutionType update
+	* src/org/eclipse/linuxtools/tmf/Tracer.java: ExecutionType update
+
+2010-09-09  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/request/TmfCoalescedEventRequest.java: Fix in handleData()
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Made class extendable
+
+2010-07-20  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/component/TmfDataProvider.java:
+		- Use a specific lock object (instead of this) for synchronization
+		- Fix executor exception when request comes in immediately after dispose
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java:
+		- Fix constructor ignoring index page size
+		- Update saved context on parse to avoid unnecessary seeks
+
+2010-07-19  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java: Some modifications to make the experiment more generic.
+
+2010-07-13  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java (.updateExperiment): Added check for empty experiment
+	* src/org/eclipse/linuxtools/tmf/trace/TmfTrace.java (.updateTraceData): Added check for empty trace
+
+2010-07-12  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/signal/TmfTraceClosedSignal.java: New file.
+	* src/org/eclipse/linuxtools/tmf/signal/TmfTraceOpenedSignal.java: New file.
+	* src/org/eclipse/linuxtools/tmf/signal/TmfTraceParserUpdatedSignal.java: New file.
+	* src/org/eclipse/linuxtools/tmf/signal/TmfTraceSelectedSignal.java: New file.
+	* META-INF/MANIFEST.MF: Added a dependency on org.eclipse.core.resources
+	* src/org/eclipse/linuxtools/tmf/experiment/TmfExperiment.java (seekEvent): Commented out useless statements
+	* src/org/eclipse/linuxtools/tmf/trace/ITmfContext.java: Added a constant
+	* src/org/eclipse/linuxtools/tmf/trace/ITmfTrace.java: Added APIs
+	* src/org/eclipse/linuxtools/tmf/trace/TmfLocation.java: Added validation on location
+	* src/org/eclipse/linuxtools/tmf/trace/TmfTrace.java (getRank): Added
+	(indexTrace): Cleaned up warning
+	(queueLongRequest): Added background process handling
+
+2010-07-08  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/tmf/trace/TmfTrace.java (indexTrace): New method + renamed a constant
+
+2009-06-16  Andrew Overholt  <overholt@redhat.com>
+
+	* META-INF/MANIFEST.MF: Change provider from Ericsson to Eclipse.

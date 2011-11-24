@@ -15,18 +15,18 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import org.eclipse.linuxtools.tmf.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.event.TmfEventContent;
-import org.eclipse.linuxtools.tmf.event.TmfEventField;
-import org.eclipse.linuxtools.tmf.event.TmfEventReference;
-import org.eclipse.linuxtools.tmf.event.TmfEventSource;
-import org.eclipse.linuxtools.tmf.event.TmfEventType;
-import org.eclipse.linuxtools.tmf.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.parser.ITmfEventParser;
-import org.eclipse.linuxtools.tmf.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.trace.TmfContext;
-import org.eclipse.linuxtools.tmf.trace.TmfLocation;
-import org.eclipse.linuxtools.tmf.trace.TmfTraceStub;
+import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventReference;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
+import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
+import org.eclipse.linuxtools.tmf.stubs.trace.TmfTraceStub;
 
 public class TmfUml2SDTestTrace implements ITmfEventParser {
     
