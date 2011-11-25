@@ -112,7 +112,6 @@
     <module>org.eclipse.linuxtools.tmf.core.tests</module>
     <module>org.eclipse.linuxtools.tmf.ui</module>
     <module>org.eclipse.linuxtools.tmf.ui.tests</module>
-    <!--<module>org.eclipse.linuxtools.tmf.doc</module>-->
     <module>org.eclipse.linuxtools.lttng</module>
     <module>org.eclipse.linuxtools.lttng.core</module>
     <!--<module>org.eclipse.linuxtools.lttng.core.tests</module>-->
