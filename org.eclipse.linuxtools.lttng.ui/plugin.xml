@@ -749,11 +749,11 @@
       </category>
       <type
             category="org.eclipse.linuxtools.lttng.ui.category.lttng"
-            event_type="org.eclipse.linuxtools.lttng.event.LttngEvent"
+            event_type="org.eclipse.linuxtools.lttng.core.event.LttngEvent"
             icon="icons/obj16/tux2.png"
             id="org.eclipse.linuxtools.lttng.tracetype.kernel"
             name="%tracetype.type.kernel"
-            trace_type="org.eclipse.linuxtools.lttng.trace.LTTngTrace">
+            trace_type="org.eclipse.linuxtools.lttng.core.trace.LTTngTrace">
       </type>
    </extension>
 
