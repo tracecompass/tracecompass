@@ -20,6 +20,7 @@ import java.util.Vector;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
@@ -115,7 +116,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
         if (fTraceName == null) {
             fTraceName = ""; //$NON-NLS-1$
             if (path != null) {
-                int sep = path.lastIndexOf(File.separator);
+                int sep = path.lastIndexOf(Path.SEPARATOR);
                 fTraceName = (sep >= 0) ? path.substring(sep + 1) : path;
             }
         }
