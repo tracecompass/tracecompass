@@ -357,6 +357,9 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
             synchronized (fDecorateThreads) {
                 fDecorateThreads.remove(this);
             }
+            if (fContext != null) {
+            	fContext.dispose();
+            }
         }
 
         public void resetTraceEntry(TimeChartAnalysisEntry timeAnalysisEntry) {
@@ -434,6 +437,9 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
                     if (interrupted)
                         return;
                     if (fContext == null || fContext.getRank() != range.getFirstRank()) {
+                        if (fContext != null) {
+                        	fContext.dispose();
+                        }
                         fContext = trace.seekEvent(range.getFirstRank());
                         fContext.setRank(range.getFirstRank());
                     }
