@@ -116,7 +116,7 @@
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="org.eclipse.linuxtools.lttng.LTTngProjectNature">
+               class="org.eclipse.linuxtools.lttng.core.LTTngProjectNature">
          </run>
       </runtime>
    </extension>
@@ -468,7 +468,7 @@
    <extension point="org.eclipse.ui.popupMenus">
        <objectContribution
              id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.deletetrace"
-             objectClass="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+             objectClass="org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource">
           <action
                 class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.DeleteTrace"
                 enablesFor="*"
@@ -480,7 +480,7 @@
              <enablement>
                 <and>
                    <objectClass
-                         name="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+                         name="org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource">
                    </objectClass>
                    <objectState
                          name="canDelete"
@@ -493,7 +493,7 @@
        <objectContribution
              adaptable="false"
              id="org.eclipse.linuxtools.lttng.ui.tracecontrol.importtrace"
-             objectClass="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+             objectClass="org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource">
           <action
                 class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.ImportToProject"
                 enablesFor="*"
@@ -505,7 +505,7 @@
              <enablement>
                 <and>
                    <objectClass
-                         name="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+                         name="org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource">
                    </objectClass>
                    <objectState
                          name="canImport"
@@ -517,7 +517,7 @@
        </objectContribution>
       <objectContribution
                id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.createnewtrace"
-               objectClass="org.eclipse.linuxtools.lttng.tracecontrol.model.TargetResource">
+               objectClass="org.eclipse.linuxtools.lttng.core.tracecontrol.model.TargetResource">
             <action
                    label="%action.newtrace.label"
                    tooltip="%action.newtrace.tooltip"
@@ -528,14 +528,14 @@
                    id="actions.trace.new">
             <enablement>
              <and>
-              <objectClass name="org.eclipse.linuxtools.lttng.tracecontrol.model.TargetResource"/> 
+              <objectClass name="org.eclipse.linuxtools.lttng.core.tracecontrol.model.TargetResource"/> 
               <objectState name="canCreateNewTrace" value="yes"/> 
              </and>
             </enablement> 
            </action>
        </objectContribution>
        <objectContribution
-               objectClass="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource"
+               objectClass="org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource"
                id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.configuretrace">
            <action
                    label="%action.configuretrace.label"
@@ -547,7 +547,7 @@
                    id="actions.trace.configure">
             <enablement>
              <and>
-              <objectClass name="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource"/> 
+              <objectClass name="org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource"/> 
               <objectState name="canConfigure" value="yes"/> 
              </and>
             </enablement> 
@@ -555,7 +555,7 @@
        </objectContribution>
        <objectContribution
              id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.stoptrace"
-             objectClass="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+             objectClass="org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource">
           <action
                 class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.StopTrace"
                 enablesFor="*"
@@ -567,7 +567,7 @@
              <enablement>
                 <and>
                    <objectClass
-                         name="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+                         name="org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource">
                    </objectClass>
                    <objectState
                          name="canStop"
@@ -579,7 +579,7 @@
        </objectContribution>
        <objectContribution
              id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.pausetrace"
-             objectClass="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+             objectClass="org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource">
           <action
                 class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.PauseTrace"
                 enablesFor="*"
@@ -591,7 +591,7 @@
              <enablement>
                 <and>
                    <objectClass
-                         name="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+                         name="org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource">
                    </objectClass>
                    <objectState
                          name="canPause"
@@ -602,7 +602,7 @@
           </action>
        </objectContribution>
        <objectContribution
-               objectClass="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource"
+               objectClass="org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource"
                id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.starttrace">
            <action
                  class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.StartTrace"
@@ -614,7 +614,7 @@
                  tooltip="%action.start.tooltip">
             <enablement>
              <and>
-              <objectClass name="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource"/> 
+              <objectClass name="org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource"/> 
               <objectState name="canStart" value="yes"/> 
              </and>
             </enablement> 
@@ -622,7 +622,7 @@
        </objectContribution>
        
        <objectContribution
-               objectClass="org.eclipse.linuxtools.lttng.tracecontrol.model.TargetResource"
+               objectClass="org.eclipse.linuxtools.lttng.core.tracecontrol.model.TargetResource"
                id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.configuremarkers">
            <action
                    label="%action.configuremarkers.label"
@@ -660,7 +660,7 @@
             <enablement>
                <and>
                   <objectClass
-                        name="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+                        name="org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource">
                   </objectClass>
                   <objectState
                         name="canStop"
@@ -687,7 +687,7 @@
              <enablement>
                 <and>
                    <objectClass
-                         name="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+                         name="org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource">
                    </objectClass>
                    <objectState
                          name="canPause"
@@ -714,7 +714,7 @@
             <enablement>
                <and>
                   <objectClass
-                        name="org.eclipse.linuxtools.lttng.tracecontrol.model.TraceResource">
+                        name="org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource">
                   </objectClass>
                   <objectState
                         name="canStart"

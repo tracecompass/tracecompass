@@ -136,7 +136,7 @@
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="org.eclipse.linuxtools.tmf.TmfProjectNature">
+               class="org.eclipse.linuxtools.tmf.core.TmfProjectNature">
          </run>
       </runtime>
    </extension>
