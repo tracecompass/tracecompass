@@ -89,7 +89,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                         if (traceTypeId.equals(ce.getAttribute(TmfTraceType.ID_ATTR))) {
                             fTrace = (ITmfTrace<?>) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
                             TmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
-                            String path = fResource.getLocation().toOSString();
+                            String path = fResource.getLocationURI().getPath();
                             fTrace.initTrace(path, event.getClass(), true);
                             break;
                         }
@@ -304,7 +304,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                         if (traceTypeId.equals(ce.getAttribute(TmfTraceType.ID_ATTR))) {
                             fTrace = (ITmfTrace<?>) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
                             TmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
-                            String path = fResource.getLocation().toOSString();
+                            String path = fResource.getLocationURI().getPath();
                             fTrace.initTrace(path, event.getClass(), true);
                             break;
                         }
