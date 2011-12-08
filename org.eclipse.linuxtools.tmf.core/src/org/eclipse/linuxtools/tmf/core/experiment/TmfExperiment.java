@@ -100,6 +100,10 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     public void initTrace(String path, Class<T> eventType, int cacheSize, boolean indexTrace) throws FileNotFoundException {
     }
 
+    @Override
+    public void initTrace(String path, Class<T> eventType, int cacheSize, boolean indexTrace, String name) throws FileNotFoundException {
+    }
+
     /**
      * @param type
      * @param id

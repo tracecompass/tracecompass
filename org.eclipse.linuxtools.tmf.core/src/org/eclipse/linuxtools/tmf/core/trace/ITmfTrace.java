@@ -35,6 +35,8 @@ public interface ITmfTrace<T extends TmfEvent> extends ITmfComponent {
 
     public void initTrace(String path, Class<T> eventType, int cacheSize, boolean indexTrace) throws FileNotFoundException;
 
+    public void initTrace(String path, Class<T> eventType, int cacheSize, boolean indexTrace, String name) throws FileNotFoundException;
+
     // Trace type validation
     public boolean validate(IProject project, String path);
 
