@@ -17,6 +17,7 @@ import java.io.FileNotFoundException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -38,6 +39,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 
 /**
  * <b><u>OpenTraceHandler</u></b>
@@ -136,6 +138,9 @@ public class OpenTraceHandler extends AbstractHandler {
                     activePage.activate(editor);
                 } else {
                     editor = activePage.openEditor(editorInput, editorId);
+                    if (resource instanceof IFile) {
+                        IDE.setDefaultEditor((IFile) resource, editorId);
+                    }
                 }
             } catch (PartInitException e) {
                 e.printStackTrace();
