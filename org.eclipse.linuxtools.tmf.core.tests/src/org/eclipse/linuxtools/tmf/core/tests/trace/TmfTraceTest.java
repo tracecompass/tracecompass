@@ -94,7 +94,7 @@ public class TmfTraceTest extends TestCase {
     		try {
     	        URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
     			File test = new File(FileLocator.toFileURL(location).toURI());
-    	        fTrace = new TmfTraceStub(test.getPath(), BLOCK_SIZE, false);
+    	        fTrace = new TmfTraceStub(test.toURI().getPath(), BLOCK_SIZE, false);
     		} catch (URISyntaxException e) {
     			e.printStackTrace();
     		} catch (IOException e) {
@@ -114,7 +114,7 @@ public class TmfTraceTest extends TestCase {
 		try {
 	        URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
 			testfile = new File(FileLocator.toFileURL(location).toURI());
-			trace = new TmfTraceStub(testfile.getPath());
+			trace = new TmfTraceStub(testfile.toURI().getPath());
 		} catch (URISyntaxException e) {
 			fail("URISyntaxException");
 		} catch (IOException e) {
@@ -122,7 +122,7 @@ public class TmfTraceTest extends TestCase {
 		}
 		assertTrue  ("Open trace",   trace != null);
 		assertEquals("getType",      TmfEvent.class, trace.getType());
-		assertEquals("getPath",      testfile.getPath(), trace.getPath());
+		assertEquals("getPath",      testfile.toURI().getPath(), trace.getPath());
 		assertEquals("getName",      TEST_STREAM, trace.getName());
 		assertEquals("getCacheSize", TmfTrace.DEFAULT_INDEX_PAGE_SIZE, trace.getCacheSize());
     }
@@ -133,7 +133,7 @@ public class TmfTraceTest extends TestCase {
 		try {
 	        URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
 			testfile = new File(FileLocator.toFileURL(location).toURI());
-			trace = new TmfTraceStub(testfile.getPath(), 0);
+			trace = new TmfTraceStub(testfile.toURI().getPath(), 0);
 		} catch (URISyntaxException e) {
 			fail("URISyntaxException");
 		} catch (IOException e) {
@@ -141,7 +141,7 @@ public class TmfTraceTest extends TestCase {
 		}
 		assertTrue  ("Open trace",   trace != null);
 		assertEquals("getType",      TmfEvent.class, trace.getType());
-		assertEquals("getPath",      testfile.getPath(), trace.getPath());
+		assertEquals("getPath",      testfile.toURI().getPath(), trace.getPath());
 		assertEquals("getName",      TEST_STREAM, trace.getName());
 		assertEquals("getCacheSize", TmfTrace.DEFAULT_INDEX_PAGE_SIZE, trace.getCacheSize());
     }
