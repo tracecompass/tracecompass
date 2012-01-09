@@ -12,13 +12,16 @@
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ui.actions.WorkspaceModifyOperation;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.navigator.CommonNavigator;
+import org.eclipse.ui.navigator.CommonViewer;
 
 /**
  * <b><u>TmfProjectElement</u></b>
@@ -81,18 +84,19 @@ public class TmfProjectElement extends TmfProjectModelElement {
 
     @Override
     public void refresh() {
-        try {
-            new WorkspaceModifyOperation() {
-                @Override
-                protected void execute(IProgressMonitor monitor) throws CoreException, InvocationTargetException, InterruptedException {
-                  IProject project = getResource();
-                  project.touch(null);
+        Display.getDefault().asyncExec(new Runnable(){
+            @Override
+            public void run() {
+                IWorkbench wb = PlatformUI.getWorkbench();
+                IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+                for (IViewReference viewReference : activePage.getViewReferences()) {
+                    IViewPart viewPart = viewReference.getView(false);
+                    if (viewPart instanceof CommonNavigator) {
+                        CommonViewer commonViewer = ((CommonNavigator) viewPart).getCommonViewer();
+                        commonViewer.refresh();
+                    }
                 }
-            }.run(null);
-        } catch (InvocationTargetException e) {
-        } catch (InterruptedException e) {
-        } catch (RuntimeException e) {
-        }
+            }});
     }
 
     @Override
