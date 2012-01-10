@@ -85,6 +85,9 @@ public class TmfEventReference implements Cloneable {
 		if (!(other instanceof TmfEventReference))
 			return false;
 		TmfEventReference o = (TmfEventReference) other;
+		if (fReference == null) {
+		    return o.fReference == null;
+		}
         return fReference.equals(o.fReference);
     }
 

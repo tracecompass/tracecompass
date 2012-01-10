@@ -79,6 +79,9 @@ public class TmfEventSource implements Cloneable {
 		if (!(other instanceof TmfEventSource))
 			return false;
 		TmfEventSource o = (TmfEventSource) other;
+		if (fSourceId == null) {
+		    return o.fSourceId == null;
+		}
         return fSourceId.equals(o.fSourceId);
     }
 

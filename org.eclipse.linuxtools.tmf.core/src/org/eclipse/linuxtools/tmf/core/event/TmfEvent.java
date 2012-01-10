@@ -43,7 +43,7 @@ public class TmfEvent extends TmfData implements Cloneable {
     // Attributes
     // ------------------------------------------------------------------------
 
-	protected ITmfTrace<?>         fParentTrace;
+	protected ITmfTrace<?>      fParentTrace;
 	protected long              fEventRank;
 	protected TmfTimestamp      fEffectiveTimestamp;
 	protected TmfTimestamp      fOriginalTimestamp;
@@ -127,12 +127,12 @@ public class TmfEvent extends TmfData implements Cloneable {
     		throw new IllegalArgumentException();
         fParentTrace        = other.fParentTrace;
         fEventRank          = other.fEventRank;
-		fOriginalTimestamp  = new TmfTimestamp(other.fOriginalTimestamp);
-		fEffectiveTimestamp = new TmfTimestamp(other.fEffectiveTimestamp);
-		fSource    			= new TmfEventSource(other.fSource);
-		fType      			= new TmfEventType(other.fType);
-		fContent   			= new TmfEventContent(other.fContent);
-		fReference			= new TmfEventReference(other.fReference);
+		fOriginalTimestamp  = other.fOriginalTimestamp != null ? new TmfTimestamp(other.fOriginalTimestamp) : null;
+		fEffectiveTimestamp = other.fEffectiveTimestamp != null ? new TmfTimestamp(other.fEffectiveTimestamp) : null;
+		fSource    			= other.fSource != null ? new TmfEventSource(other.fSource) : null;
+		fType      			= other.fType != null ? new TmfEventType(other.fType) : null;
+		fContent   			= other.fContent != null ? new TmfEventContent(other.fContent) : null;
+		fReference			= other.fReference != null ? new TmfEventReference(other.fReference) : null;
 	}
 
     public TmfEvent() {
@@ -228,9 +228,9 @@ public class TmfEvent extends TmfData implements Cloneable {
     @Override
     public int hashCode() {
         int result = 17;
-        result = 37 * result + fSource.hashCode();
-        result = 37 * result + fType.hashCode();
-        result = 37 * result + fEffectiveTimestamp.hashCode();
+        result = 37 * result + (fSource != null ? fSource.hashCode() : 0);
+        result = 37 * result + (fType != null ? fType.hashCode() : 0);
+        result = 37 * result + (fEffectiveTimestamp != null ? fEffectiveTimestamp.hashCode() : 0);
         return result;
     }
 
@@ -239,7 +239,43 @@ public class TmfEvent extends TmfData implements Cloneable {
         if (!(other instanceof TmfEvent))
             return false;
         TmfEvent o = (TmfEvent) other;
-        return fEffectiveTimestamp.equals(o.fEffectiveTimestamp) && fSource.equals(o.fSource) && fType.equals(o.fType) && fContent.equals(o.fContent);
+        if (fEffectiveTimestamp == null) {
+            if (o.fEffectiveTimestamp != null) {
+                return false;
+            }
+        } else {
+            if (!fEffectiveTimestamp.equals(o.fEffectiveTimestamp)) {
+                return false;
+            }
+        }
+        if (fSource == null) {
+            if (o.fSource != null) {
+                return false;
+            }
+        } else {
+            if (!fSource.equals(o.fSource)) {
+                return false;
+            }
+        }
+        if (fType == null) {
+            if (o.fType != null) {
+                return false;
+            }
+        } else {
+            if (!fType.equals(o.fType)) {
+                return false;
+            }
+        }
+        if (fContent == null) {
+            if (o.fContent != null) {
+                return false;
+            }
+        } else {
+            if (!fContent.equals(o.fContent)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -255,12 +291,12 @@ public class TmfEvent extends TmfData implements Cloneable {
 			clone = (TmfEvent) super.clone();
 			clone.fParentTrace        = fParentTrace;
 			clone.fEventRank          = fEventRank;
-			clone.fOriginalTimestamp  = fOriginalTimestamp.clone();
-			clone.fEffectiveTimestamp = fEffectiveTimestamp.clone();
-			clone.fSource             = fSource.clone();
-			clone.fType               = fType.clone();
-			clone.fReference          = fReference.clone();
-			clone.fContent            = fContent.clone();
+			clone.fOriginalTimestamp  = fOriginalTimestamp != null ? fOriginalTimestamp.clone() : null;
+			clone.fEffectiveTimestamp = fEffectiveTimestamp != null ? fEffectiveTimestamp.clone() : null;
+			clone.fSource             = fSource != null ? fSource.clone() : null;
+			clone.fType               = fType != null ? fType.clone() : null;
+			clone.fReference          = fReference != null ? fReference.clone() : null;
+			clone.fContent            = fContent != null ? fContent.clone() : null;
 		}
 		catch (CloneNotSupportedException e) {
 			e.printStackTrace();

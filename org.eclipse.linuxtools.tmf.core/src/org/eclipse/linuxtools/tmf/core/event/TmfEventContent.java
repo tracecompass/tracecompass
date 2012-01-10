@@ -180,6 +180,9 @@ public class TmfEventContent implements Cloneable {
 		if (!(other instanceof TmfEventContent))
 			return false;
 		TmfEventContent o = (TmfEventContent) other;
+		if (fRawContent == null) {
+		    return o.fRawContent == null;
+		}
         return fRawContent.equals(o.fRawContent);
     }
 
