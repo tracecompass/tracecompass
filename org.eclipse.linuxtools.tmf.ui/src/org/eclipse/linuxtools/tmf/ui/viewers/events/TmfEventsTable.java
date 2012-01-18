@@ -457,11 +457,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     return;
                 }
                 Point point = fTable.toControl(Display.getDefault().getCursorLocation());
-                TableItem item = fTable.getItem(point);
+                TableItem item = fTable.getSelection().length > 0 ? fTable.getSelection()[0] : null;
                 if (item != null) {
                     Rectangle imageBounds = item.getImageBounds(0);
                     imageBounds.width = BOOKMARK_IMAGE.getBounds().width;
-                    if (imageBounds.contains(point)) {
+                    if (point.x <= imageBounds.x + imageBounds.width) {
                         // Right-click on left margin
                         Long rank = (Long) item.getData(Key.RANK);
                         if (rank != null && fBookmarksResource != null) {
