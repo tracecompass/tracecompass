@@ -380,7 +380,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
             rank += traceRank;
 
             // Set the trace location and read the corresponding event
-            expLocation.getLocation().locations[i] = context.getContexts()[i].getLocation();
+            expLocation.getLocation().locations[i] = context.getContexts()[i].getLocation().clone();
             context.getEvents()[i] = fTraces[i].getNextEvent(context.getContexts()[i]);
         }
 
@@ -597,7 +597,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
             TmfContext traceContext = expContext.getContexts()[trace];
             TmfExperimentLocation expLocation = (TmfExperimentLocation) expContext.getLocation();
 //	        expLocation.getLocation()[trace] = traceContext.getLocation().clone();
-            expLocation.getLocation().locations[trace] = traceContext.getLocation();
+            expLocation.getLocation().locations[trace] = traceContext.getLocation().clone();
 
 //	        updateIndex(expContext, timestamp);
 

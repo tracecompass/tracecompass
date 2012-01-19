@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.core.experiment;
 
+import java.util.Arrays;
+
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 
 public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable {
@@ -46,6 +48,28 @@ public class TmfLocationArray implements Comparable<TmfLocationArray>, Cloneable
 		}
 		return new TmfLocationArray(clones);
 	}
-	
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Arrays.hashCode(locations);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        TmfLocationArray other = (TmfLocationArray) obj;
+        if (!Arrays.equals(locations, other.locations))
+            return false;
+        return true;
+    }
+
 }
 
