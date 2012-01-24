@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Bernd Hufmann - Changed to updated histogram data model
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
@@ -75,7 +76,7 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
         fRangeStartTime = startTime;
         fRangeDuration = duration;
         fZoom.setNewRange(fRangeStartTime, fRangeDuration);
-        refresh();
+        fDataModel.complete();
     }
 
     @Override
@@ -131,7 +132,7 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
                 newStart = newEnd - fZoom.getDuration();
             }
             fRangeStartTime = newStart;
-            refresh();
+            fDataModel.complete();
         }
     }
 
@@ -166,7 +167,7 @@ public class FullTraceHistogram extends Histogram implements MouseMoveListener {
         long bucketSpan = fScaledData.fBucketDuration;
         int rangeWidth = (int) (fRangeDuration / bucketSpan);
 
-        int left = (int) ((fRangeStartTime - fDataModel.getStartTime()) / bucketSpan);
+        int left = (int) ((fRangeStartTime - fDataModel.getFirstBucketTime()) / bucketSpan);
         int right = left + rangeWidth;
         int center = (left + right) / 2;
         int height = fCanvas.getSize().y - 2;

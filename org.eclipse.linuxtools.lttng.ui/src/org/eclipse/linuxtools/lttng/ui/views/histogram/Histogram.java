@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Bernd Hufmann - Changed to updated histogram data model
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
@@ -69,14 +70,11 @@ import org.eclipse.swt.widgets.Text;
  * <li>number of events in that time range
  * </ul>
  */
-public abstract class Histogram implements ControlListener, PaintListener, KeyListener, MouseListener, MouseTrackListener {
+public abstract class Histogram implements ControlListener, PaintListener, KeyListener, MouseListener, MouseTrackListener, IHistogramModelListener {
 
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-
-    // Histogram refresh frequency
-    private final static int REFRESH_FREQUENCY = HistogramDataModel.DEFAULT_NUMBER_OF_BUCKETS;
 
     // Histogram colors
     private final Color fBackgroundColor = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
@@ -86,6 +84,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     // Timestamp scale (nanosecond)
     public static final byte TIME_SCALE = -9;
+    
+    public static final int HISTOGRAM_BAR_WIDTH = 1;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -118,6 +118,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
         createWidget(parent);
         fDataModel = new HistogramDataModel();
+        fDataModel.addHistogramListener(this);
         clear();
 
         fCanvas.addControlListener(this);
@@ -129,6 +130,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     public void dispose() {
         fHistoBarColor.dispose();
+        fDataModel.removeHistogramListener(this);
     }
 
     private void createWidget(Composite parent) {
@@ -238,7 +240,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // ------------------------------------------------------------------------
 
     public long getStartTime() {
-        return fDataModel.getStartTime();
+        return fDataModel.getFirstBucketTime();
     }
 
     public long getEndTime() {
@@ -247,6 +249,10 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     public long getTimeLimit() {
         return fDataModel.getTimeLimit();
+    }
+    
+    public HistogramDataModel getDataModel() {
+        return fDataModel;
     }
 
     // ------------------------------------------------------------------------
@@ -261,7 +267,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     public void clear() {
         fDataModel.clear();
         fScaledData = null;
-        refresh();
     }
 
     /**
@@ -269,12 +274,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      * 
      * @param timestamp
      */
-    public void countEvent(long timestamp) {
-        fDataModel.countEvent(timestamp);
-        if (fDataModel.getNbEvents() % REFRESH_FREQUENCY == 0) {
-            refresh();
-            refresh(); // This is intentional. Exercise left to the reader :-)
-        }
+    public void countEvent(long eventCount, long timestamp) {
+        fDataModel.countEvent(eventCount, timestamp);
     }
 
     /**
@@ -284,8 +285,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      */
     public void setCurrentEvent(long timestamp) {
         fCurrentEventTime = (timestamp > 0) ? timestamp : 0;
-        fDataModel.setCurrentEvent(timestamp);
-        refresh();
+        fDataModel.setCurrentEventNotifyListeners(timestamp);
     }
 
     /**
@@ -297,7 +297,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     public synchronized long getTimestamp(int offset) {
         assert offset > 0 && offset < fScaledData.fWidth;
         try {
-            return fDataModel.getStartTime() + fScaledData.fBucketDuration * offset;
+            return fDataModel.getFirstBucketTime() + fScaledData.fBucketDuration * offset;
         } catch (Exception e) {
             return 0; // TODO: Fix that racing condition (NPE)
         }
@@ -310,9 +310,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      * @return the offset of the corresponding bucket (-1 if invalid)
      */
     public synchronized int getOffset(long timestamp) {
-        if (timestamp < fDataModel.getStartTime() || timestamp > fDataModel.getEndTime())
+        if (timestamp < fDataModel.getFirstBucketTime() || timestamp > fDataModel.getEndTime())
             return -1;
-        return (int) ((timestamp - fDataModel.getStartTime()) / fScaledData.fBucketDuration);
+        return (int) ((timestamp - fDataModel.getFirstBucketTime()) / fScaledData.fBucketDuration);
     }
 
     /**
@@ -370,7 +370,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     /**
      * Refresh the histogram display
      */
-    protected void refresh() {
+    @Override
+    public void modelUpdated() {
         if (!fCanvas.isDisposed() && fCanvas.getDisplay() != null) {
             fCanvas.getDisplay().asyncExec(new Runnable() {
                 @Override
@@ -382,10 +383,10 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                         if (canvasWidth <= 0 || canvasHeight <= 0)
                             return;
                         fDataModel.setCurrentEvent(fCurrentEventTime);
-                        fScaledData = fDataModel.scaleTo(canvasWidth, canvasHeight);
+                        fScaledData = fDataModel.scaleTo(canvasWidth, canvasHeight, HISTOGRAM_BAR_WIDTH);
                         fCanvas.redraw();
                         // Display histogram and update X-,Y-axis labels
-                        fTimeRangeStartText.setText(HistogramUtils.nanosecondsToString(fDataModel.getStartTime()));
+                        fTimeRangeStartText.setText(HistogramUtils.nanosecondsToString(fDataModel.getFirstBucketTime()));
                         fTimeRangeEndText.setText(HistogramUtils.nanosecondsToString(fDataModel.getEndTime()));
                         fMaxNbEventsText.setText(Long.toString(fScaledData.fMaxValue));
                         // The Y-axis area might need to be re-sized
@@ -540,8 +541,12 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     }
 
     private String formatToolTipLabel(int index) {
-        long startTime = fDataModel.getStartTime() + fScaledData.fCurrentBucket * fScaledData.fBucketDuration;
-        long endTime = startTime + fScaledData.fBucketDuration;
+        long startTime = fScaledData.getBucketStartTime(fScaledData.fCurrentBucket);
+        // negative values are possible if time values came into the model in decreasing order 
+        if (startTime < 0) {
+            startTime = 0;
+        }
+        long endTime = fScaledData.getBucketEndTime(fScaledData.fCurrentBucket);
         int nbEvents = (index >= 0) ? fScaledData.fData[index] : 0;
 
         StringBuffer buffer = new StringBuffer();
@@ -561,12 +566,11 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     @Override
     public void controlMoved(ControlEvent event) {
-        refresh();
+        fDataModel.complete();
     }
 
     @Override
     public void controlResized(ControlEvent event) {
-        refresh();
+        fDataModel.complete();
     }
-
 }
