@@ -19,6 +19,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
@@ -88,7 +89,11 @@ public class TmfProjectElement extends TmfProjectModelElement {
             @Override
             public void run() {
                 IWorkbench wb = PlatformUI.getWorkbench();
-                IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+                IWorkbenchWindow wbWindow = wb.getActiveWorkbenchWindow();
+                if (wbWindow == null) {
+                    return;
+                }
+                IWorkbenchPage activePage = wbWindow.getActivePage();
                 for (IViewReference viewReference : activePage.getViewReferences()) {
                     IViewPart viewPart = viewReference.getView(false);
                     if (viewPart instanceof CommonNavigator) {
