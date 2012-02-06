@@ -243,6 +243,7 @@
             id="org.eclipse.linuxtools.lttng.ui.command.project.experiment.delete"
             name="%commands.experiment.delete">
       </command>
+      
    </extension>
    <extension
          id="org.eclipse.linuxtools.lttng.ui.menus"
@@ -428,6 +429,179 @@
             commandId="org.eclipse.linuxtools.lttng.ui.command.project.property">
       </handler>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            description="%commands.control.category.description"
+            id="org.eclipse.linuxtools.lttng.ui.commands.control.category"
+            name="%commands.control.category">
+      </category>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.control.category"
+            description="%commands.control.new.description"
+            id="org.eclipse.linuxtools.lttng.ui.command.newConnection"
+            name="%commands.control.new">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.control.category"
+            description="%commands.control.connect.description"
+            id="org.eclipse.linuxtools.lttng.ui.command.connect"
+            name="%commands.control.connect">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.control.category"
+            description="%commands.control.disconnect.description"
+            id="org.eclipse.linuxtools.lttng.ui.command.disconnect"
+            name="%commands.control.disconnect">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.control.category"
+            description="%commands.control.delete.description"
+            id="org.eclipse.linuxtools.lttng.ui.command.delete"
+            name="%commands.control.delete">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.linuxtools.lttng.ui.views.control">
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.newConnection"
+               icon="icons/elcl16/target_add.gif"
+               label="%commands.control.new"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.connect"
+               icon="icons/elcl16/connect.gif"
+               label="%commands.control.connect"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.disconnect"
+               icon="icons/elcl16/disconnect.gif"
+               label="%commands.control.disconnect"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.delete"
+               icon="icons/elcl16/target_delete.gif"
+               label="%commands.control.delete"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.linuxtools.lttng.ui.views.control">
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.connect"
+               icon="icons/elcl16/connect.gif"
+               label="%commands.control.connect"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        operator="or">
+                     <instanceof
+                           value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TargetNodeComponent">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.disconnect"
+               icon="icons/elcl16/disconnect.gif"
+               label="%commands.control.disconnect"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        operator="or">
+                     <instanceof
+                           value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TargetNodeComponent">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.command.delete"
+               icon="icons/elcl16/target_delete.gif"
+               label="%commands.control.delete"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        operator="or">
+                     <instanceof
+                           value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TargetNodeComponent">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.control.handlers.NewConnectionHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.newConnection">
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.control.handlers.ConnectHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.connect">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TargetNodeComponent">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.control.handlers.DisconnectHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.disconnect">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TargetNodeComponent">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.control.handlers.DeleteHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.command.delete">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TargetNodeComponent">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+      </handler>
+   </extension>
 
     <!-- ======================================= -->
     <!-- SubSystem Configuration                 -->
@@ -459,6 +633,15 @@
              label="%lttng.rse.subsystem.type.name"
              name="org.eclipse.linuxtools.lttng.ui.tracecontrol.systemType"
              subsystemConfigurationIds="org.eclipse.linuxtools.lttng.ui.tracecontrol.subsystems.TraceSubSystemConfiguration;org.eclipse.tm.tcf.rse.Processes;org.eclipse.tm.tcf.rse.Shells;org.eclipse.tm.tcf.rse.Files;org.eclipse.tm.tcf.rse.Terminals">
+       </systemType>
+       <systemType
+             description="%trace.control.rse.system.type.description"
+             icon="icons/obj16/systemlttng2.gif"
+             iconLive="icons/obj16/systemlttng2-live.gif"
+             id="org.eclipse.linuxtools.lttng.ui.control.systemType"
+             label="%trace.control.rse.system.type.name"
+             name="org.eclipse.linuxtools.lttng.ui.control.systemType"
+             subsystemConfigurationIds="ssh.shells;ssh.files;ssh.terminals;processes.shell.linux">
        </systemType>
     </extension>
      

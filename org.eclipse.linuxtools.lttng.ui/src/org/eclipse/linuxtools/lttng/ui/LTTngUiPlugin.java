@@ -14,11 +14,13 @@
 
 package org.eclipse.linuxtools.lttng.ui;
 
+import java.net.URL;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.linuxtools.lttng.core.tracecontrol.model.ProviderResource;
 import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TargetResource;
 import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource;
@@ -27,6 +29,7 @@ import org.eclipse.linuxtools.lttng.ui.tracecontrol.Messages;
 import org.eclipse.rse.services.clientserver.messages.SimpleSystemMessage;
 import org.eclipse.rse.services.clientserver.messages.SystemMessage;
 import org.eclipse.rse.ui.SystemBasePlugin;
+import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -135,5 +138,22 @@ public class LTTngUiPlugin extends SystemBasePlugin {
         putImageInRegistry(ICON_ID_UNCHECKED, path + "elcl16/unchecked.gif"); //$NON-NLS-1$
         putImageInRegistry(ICON_ID_IMPORT_TRACE, path + "elcl16/import_trace.gif"); //$NON-NLS-1$
         putImageInRegistry(ICON_ID_EDIT, path + "elcl16/edit.gif"); //$NON-NLS-1$
+    }
+    
+    /**
+     * Loads icon and puts it in the image registry 
+     * 
+     * @param url
+     * @return image
+     */
+    public Image loadIcon(String url) {
+        Image icon = getImageRegistry().get(url);
+        if (icon == null) {
+            URL imageURL = getBundle().getEntry(url);
+            ImageDescriptor descriptor = ImageDescriptor.createFromURL(imageURL);
+            icon = descriptor.createImage();
+            getImageRegistry().put(url, icon);
+        }
+        return icon;
     }
 }

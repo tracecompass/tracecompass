@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,29 +8,72 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Bernd Hufmann - Filled with content
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng.ui.views.control;
 
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponentChangedListener;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceControlRoot;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.part.ViewPart;
 
 /**
  * <b><u>ControlView</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * View implementation for Trace Control. 
+ * </p>
  */
-@Deprecated
-public class ControlView extends ViewPart {
+public class ControlView extends ViewPart implements ITraceControlComponentChangedListener {
 
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    /**
+     * View ID.
+     */
     public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.control"; //$NON-NLS-1$
 
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+
     /**
-	 * 
-	 */
-    public ControlView() {
-        // TODO Auto-generated constructor stub
+     * The tree viewer.
+     */
+    private TreeViewer fTreeViewer = null;
+    
+    /**
+     * The trace control root node. This provides access to the whole model. 
+     */
+    private ITraceControlComponent fRoot = null;
+    
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
+    // Accessors
+    // ------------------------------------------------------------------------
+    
+    /**
+     * @return returns the trace control tree node (model).
+     */
+    public ITraceControlComponent getTraceControlRoot() {
+        return fRoot;
     }
+
+    // ------------------------------------------------------------------------
+    // Operations
+    // ------------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -39,8 +82,22 @@ public class ControlView extends ViewPart {
      */
     @Override
     public void createPartControl(Composite parent) {
-        // TODO Auto-generated method stub
+        // Create tree viewer
+        fTreeViewer = new TreeViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
+        ColumnViewerToolTipSupport.enableFor(fTreeViewer);
 
+        fTreeViewer.setContentProvider(new TraceControlContentProvider());
+        fTreeViewer.setLabelProvider(new TraceControlLabelProvider());
+
+        // Create model root
+        fRoot = new TraceControlRoot();
+        fRoot.addComponentListener(this);
+        fTreeViewer.setInput(fRoot);
+
+        // Create context menu for the tree viewer
+        createContextMenu();
+        
+        getSite().setSelectionProvider(fTreeViewer);
     }
 
     /*
@@ -50,8 +107,69 @@ public class ControlView extends ViewPart {
      */
     @Override
     public void setFocus() {
-        // TODO Auto-generated method stub
-
+        fTreeViewer.getControl().setFocus();
+        final ISelection sel = fTreeViewer.getSelection();
+        if (sel == null) {
+            fTreeViewer.setSelection(new StructuredSelection(fRoot));
+            fTreeViewer.setSelection(null);
+            return;
+        }
+        fTreeViewer.setSelection(sel);
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponentChangedListener#componentAdded(org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent, org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent)
+     */
+    @Override
+    public void componentAdded(ITraceControlComponent parent, ITraceControlComponent component) {
+        componentChanged(component);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponentChangedListener#componentRemoved(org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent, org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent)
+     */
+    @Override
+    public void componentRemoved(ITraceControlComponent parent, ITraceControlComponent component) {
+        componentChanged(component);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponentChangedListener#componentChanged(org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent)
+     */
+    @Override
+    public void componentChanged(ITraceControlComponent component) {
+        if (fTreeViewer.getTree().isDisposed()) {
+            return;
+        }
+
+        fTreeViewer.getTree().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                if (fTreeViewer.getTree().isDisposed()) {
+                    return;
+                }
+                fTreeViewer.refresh();
+                // Change selection needed 
+                final ISelection sel = fTreeViewer.getSelection();
+                fTreeViewer.setSelection(null);
+                fTreeViewer.setSelection(sel);
+            }
+        });
+    }
+
+    // ------------------------------------------------------------------------
+    // Helper methods
+    // ------------------------------------------------------------------------
+    private void createContextMenu() {
+     // This is new code
+        // First we create a menu Manager
+        final MenuManager menuManager = new MenuManager();
+        final Menu menu = menuManager.createContextMenu(fTreeViewer.getTree());
+        // Set the MenuManager
+        fTreeViewer.getTree().setMenu(menu);
+        getSite().registerContextMenu(menuManager, fTreeViewer);
+    }
 }
