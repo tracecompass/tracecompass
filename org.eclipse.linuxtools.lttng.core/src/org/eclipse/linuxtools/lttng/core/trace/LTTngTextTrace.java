@@ -21,7 +21,6 @@ import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventContent;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventField;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventReference;
-import org.eclipse.linuxtools.lttng.core.event.LttngEventSource;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
@@ -35,7 +34,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
 public class LTTngTextTrace extends TmfTrace<LttngEvent> {
 	private LttngTimestamp                  eventTimestamp   = null;
-    private LttngEventSource                eventSource      = null;
+    private String                          eventSource      = null;
     private LttngEventType                  eventType        = null;
     private TextLttngEventContent           eventContent     = null;
     private LttngEventReference             eventReference   = null;
@@ -64,7 +63,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
         traceTypes      = new HashMap<String, LttngEventType>();
         
         eventTimestamp        = new LttngTimestamp();
-        eventSource           = new LttngEventSource();
+        eventSource           = "";
         eventType             = new LttngEventType();
         eventContent          = new TextLttngEventContent(currentLttngEvent);
         eventReference        = new LttngEventReference(this.getName());
@@ -238,7 +237,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
     			}
     			
 	    		// EventSource is always the same for now :
-	    		eventSource.setSourceId("Kernel Core"); //$NON-NLS-1$
+    			currentLttngEvent.setSource("Kernel Core"); //$NON-NLS-1$
 	    		
 	    		
 	    		// Tracefile and marker are first in the file
@@ -452,7 +451,7 @@ class TextLttngEvent extends LttngEvent {
 	
 	public TextLttngEvent(	TmfTrace<LttngEvent> parent,
 							LttngTimestamp timestamp, 
-							LttngEventSource source, 
+							String source, 
 							LttngEventType type, 
 							LttngEventContent content, 
 							LttngEventReference reference) 
@@ -465,7 +464,7 @@ class TextLttngEvent extends LttngEvent {
 		this(
 		        (TmfTrace<LttngEvent>) oldEvent.getTrace(),
 				(LttngTimestamp)oldEvent.getTimestamp(), 
-				(LttngEventSource)oldEvent.getSource(), 
+				oldEvent.getSource(), 
 				(LttngEventType)oldEvent.getType(), 
 				(LttngEventContent)oldEvent.getContent(), 
 				(LttngEventReference)oldEvent.getReference()

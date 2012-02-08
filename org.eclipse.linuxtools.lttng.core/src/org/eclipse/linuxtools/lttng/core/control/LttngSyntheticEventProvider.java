@@ -23,8 +23,8 @@ import org.eclipse.linuxtools.lttng.core.TraceDebug;
 import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.core.event.LttngSyntheticEvent;
-import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.core.event.LttngSyntheticEvent.SequenceInd;
+import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.core.model.LTTngTreeNode;
 import org.eclipse.linuxtools.lttng.core.request.LttngBaseEventRequest;
 import org.eclipse.linuxtools.lttng.core.state.evProcessor.ITransEventProcessor;
@@ -32,7 +32,6 @@ import org.eclipse.linuxtools.lttng.core.state.evProcessor.state.StateEventToHan
 import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.core.state.trace.IStateTraceManager;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
@@ -89,7 +88,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 
 		// prepare empty instance status indicators and allow them to travel via
 		// the framework
-		TmfEventSource source = new TmfEventSource(this);
+		String source = this.toString();
 		LttngEventType dtype = new LttngEventType();
 		LttngTimestamp statusTimeStamp = new LttngTimestamp(
 				TmfTimestamp.Zero);

@@ -13,7 +13,6 @@ package org.eclipse.linuxtools.lttng.core.event;
 
 import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
 /**
@@ -69,7 +68,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 	 * @param lttEvent
 	 */
 	public LttngSyntheticEvent(TmfTrace<LttngEvent> parent,
-			LttngTimestamp timestamp, TmfEventSource source,
+			LttngTimestamp timestamp, String source,
 			LttngEventType type, LttngEventContent content,
 			LttngEventReference reference, JniEvent lttEvent) {
 		super(parent, timestamp, source, type, content, reference, lttEvent);

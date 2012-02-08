@@ -226,7 +226,7 @@ public class LttngEventContent extends TmfEventContent {
         } else if (name.equals(LttngEventType.TIMESTAMP_LABEL) || name.equals(FIELD_ID_TIMESTAMP)) {
             return new Long(fParentEvent.getTimestamp().getValue()).toString();
         } else if (name.equals(FIELD_ID_SOURCE)) {
-            return fParentEvent.getSource().getSourceId().toString();
+            return fParentEvent.getSource();
         }
 
     	// *** VERIFY ***

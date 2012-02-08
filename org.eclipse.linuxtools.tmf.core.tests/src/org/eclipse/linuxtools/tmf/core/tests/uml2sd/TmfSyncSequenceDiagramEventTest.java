@@ -16,7 +16,6 @@ import junit.framework.TestCase;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventReference;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.uml2sd.TmfSyncSequenceDiagramEvent;
@@ -30,7 +29,7 @@ public class TmfSyncSequenceDiagramEventTest extends TestCase {
     private final String[] fLabels = new String[] { fLabel0, fLabel1 };
 
     private final TmfTimestamp      fTimestamp1 = new TmfTimestamp(12345, (byte) 2, 5);
-    private final TmfEventSource    fSource     = new TmfEventSource("Source");
+    private final String            fSource     = "Source";
     private final TmfEventType      fType       = new TmfEventType(fTypeId, fLabels);
     private final TmfEventReference fReference  = new TmfEventReference("Some reference");
 

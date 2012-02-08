@@ -16,7 +16,6 @@ import org.eclipse.linuxtools.lttng.core.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.core.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.lttng.core.trace.LTTngTrace;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 
@@ -96,7 +95,7 @@ public class LttngEventTest extends TestCase {
 		@SuppressWarnings("unused")
 		LttngEvent 			testAnotherEvent = null;
         LttngTimestamp		testTime		= null;
-        TmfEventSource 		testSource 		= null;
+        String      		testSource 		= null;
         LttngEventType   	testType   		= null;
         LttngEventContent	testContent		= null;
         LttngEventReference testReference 	= null;
@@ -110,7 +109,7 @@ public class LttngEventTest extends TestCase {
         		testMarkerFields = new String[1];
                 testEvent 	= null;
                 testTime	= new LttngTimestamp(0L);
-                testSource 	= new TmfEventSource("test");
+                testSource 	= "test";
                 testType   	= new LttngEventType("test", 0L, "test", 0, testMarkerFields);
                 testContent	= new LttngEventContent(testEvent);
                 testReference = new LttngEventReference("test", "test");
@@ -152,7 +151,7 @@ public class LttngEventTest extends TestCase {
     	
     	// These will test TMF functions but since we are expecting it to work...
     	assertEquals("Timestamp not what expected!",eventTimestamp,testEvent.getTimestamp().getValue());
-    	assertEquals("Source not what expected!",eventSource,testEvent.getSource().getSourceId());
+    	assertEquals("Source not what expected!",eventSource,testEvent.getSource());
     	assertEquals("Reference not what expected!",eventReference,((String)testEvent.getReference().toString()) );
     	
     	// These should be overridden functions

@@ -19,7 +19,6 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventReference;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
@@ -58,7 +57,7 @@ public class TmfUml2SDTestTrace implements ITmfEventParser {
             String signal = stream.readUTF();
 
             TmfEventReference tmfReference = new TmfEventReference(reference);
-            TmfEventSource tmfSource = new TmfEventSource(source);
+            String tmfSource = source;
             String[] labels = {"sender", "receiver", "signal"};
 
             TmfEventType tmfEventType = new TmfEventType(type, labels);

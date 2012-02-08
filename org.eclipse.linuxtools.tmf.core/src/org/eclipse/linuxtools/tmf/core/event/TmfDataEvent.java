@@ -42,7 +42,7 @@ public class TmfDataEvent implements Cloneable {
 
     protected ITmfTrace<? extends TmfDataEvent> fTrace;
     protected long fRank;
-    protected TmfEventSource fSource;
+    protected String fSource;
     protected TmfEventType fType;
     protected TmfEventContent fContent;
     protected TmfEventReference fReference;
@@ -67,7 +67,7 @@ public class TmfDataEvent implements Cloneable {
      * @param reference the event reference
      */
     public TmfDataEvent(ITmfTrace<? extends TmfDataEvent> trace, long rank,
-            TmfEventSource source, TmfEventType type, TmfEventContent content,
+            String source, TmfEventType type, TmfEventContent content,
             TmfEventReference reference)
     {
         fTrace = trace;
@@ -113,9 +113,16 @@ public class TmfDataEvent implements Cloneable {
     }
 
     /**
+     * @param source the event source
+     */
+    public void setSource(String source) {
+        fSource = source;
+    }
+
+    /**
      * @return the event source
      */
-    public TmfEventSource getSource() {
+    public String getSource() {
         return fSource;
     }
 

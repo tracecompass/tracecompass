@@ -21,7 +21,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventReference;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
@@ -57,7 +56,7 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
     private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, (byte) 2, 5);
     private final TmfTimestamp fTimestamp3 = new TmfTimestamp(12355, (byte) 2, 5);
 
-    private final TmfEventSource fSource = new TmfEventSource("Source");
+    private final String       fSource = "Source";
 
     private final TmfEventType fType1 = new TmfEventType(fTypeId1, fLabels);
     private final TmfEventType fType2 = new TmfEventType(fTypeId1, fLabels);

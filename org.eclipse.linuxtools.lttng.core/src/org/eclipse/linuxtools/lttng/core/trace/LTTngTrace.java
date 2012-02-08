@@ -23,7 +23,6 @@ import org.eclipse.linuxtools.lttng.core.TraceHelper;
 import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventContent;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventReference;
-import org.eclipse.linuxtools.lttng.core.event.LttngEventSource;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.core.event.LttngLocation;
 import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
@@ -71,7 +70,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     private JniTrace currentJniTrace;
 
     LttngTimestamp eventTimestamp;
-    LttngEventSource eventSource;
+    String eventSource;
     LttngEventContent eventContent;
     LttngEventReference eventReference;
 
@@ -137,7 +136,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 
         // Build the re-used event structure
         eventTimestamp = new LttngTimestamp();
-        eventSource = new LttngEventSource();
+        eventSource = "";
         this.eventType = new LttngEventType();
         eventContent = new LttngEventContent(currentLttngEvent);
         eventReference = new LttngEventReference(this.getName());
@@ -263,7 +262,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 
             // Verify that all those "default constructor" are safe to use
             clone.eventTimestamp = new LttngTimestamp();
-            clone.eventSource = new LttngEventSource();
+            clone.eventSource = "";
             clone.eventType = new LttngEventType();
             clone.eventContent = new LttngEventContent(clone.currentLttngEvent);
             clone.eventReference = new LttngEventReference(this.getName());
@@ -844,7 +843,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
             // all allocation done in the LttngTrace constructor
             // ***
             eventTimestamp.setValue(jniEvent.getEventTime().getTime());
-            eventSource.setSourceId(jniEvent.requestEventSource());
+            eventSource = jniEvent.requestEventSource();
 
             eventType = traceTypes.get(EventTypeKey.getEventTypeHash(jniEvent));
 
@@ -884,7 +883,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         // Allocating new memory is slow.
         // Parsing every events is very slow.
         eventTimestamp = new LttngTimestamp(jniEvent.getEventTime().getTime());
-        eventSource = new LttngEventSource(jniEvent.requestEventSource());
+        eventSource = jniEvent.requestEventSource();
         eventReference = new LttngEventReference(jniEvent.getParentTracefile().getTracefilePath(), this.getName());
         eventType = new LttngEventType(traceTypes.get(EventTypeKey.getEventTypeHash(jniEvent)));
         eventContent = new LttngEventContent(currentLttngEvent);

@@ -18,7 +18,6 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventReference;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.stubs.event.TmfEventTypeStub;
@@ -55,7 +54,7 @@ public class TmfEventFieldTest extends TestCase {
 	public TmfEventFieldTest(String name) {
 		super(name);
 		TmfTimestamp      fTimestamp   = new TmfTimestamp();
-		TmfEventSource    fEventSource = new TmfEventSource();
+		String            fEventSource = "";
 		TmfEventType      fEventType   = new TmfEventTypeStub();
 		TmfEventReference fReference   = new TmfEventReference();
 		TmfEvent          fEvent       = new TmfEvent(fTimestamp, fEventSource, fEventType, fReference);

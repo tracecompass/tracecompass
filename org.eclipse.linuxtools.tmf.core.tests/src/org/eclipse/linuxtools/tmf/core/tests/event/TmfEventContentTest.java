@@ -17,7 +17,6 @@ import junit.framework.TestCase;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventReference;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfNoSuchFieldException;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -37,7 +36,7 @@ public class TmfEventContentTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	private final TmfTimestamp      fTimestamp;
-	private final TmfEventSource    fEventSource;
+	private final String            fEventSource;
 	private final TmfEventType      fEventType;
 	private final TmfEventTypeStub  fEventTypeStub;
 	private final TmfEventReference fReference;
@@ -62,7 +61,7 @@ public class TmfEventContentTest extends TestCase {
 	public TmfEventContentTest(String name) {
 		super(name);
 		fTimestamp     = new TmfTimestamp();
-		fEventSource   = new TmfEventSource(new Object());
+		fEventSource   = "";
 		fEventType     = new TmfEventType();
 		fEventTypeStub = new TmfEventTypeStub();
 		fReference     = new TmfEventReference();
