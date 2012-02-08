@@ -19,7 +19,4 @@ package org.eclipse.linuxtools.tmf.core.event;
  * framework.
  */
 public abstract class TmfData {
-
-	public abstract boolean isNullRef();
-
 }

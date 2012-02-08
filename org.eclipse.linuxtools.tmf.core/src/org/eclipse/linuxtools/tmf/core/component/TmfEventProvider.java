@@ -58,7 +58,7 @@ public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvid
     @Override
     public boolean isCompleted(ITmfDataRequest<T> request, T data, int nbRead) {
         boolean requestCompleted = super.isCompleted(request, data, nbRead);
-        if (!requestCompleted && request instanceof ITmfEventRequest<?> && !data.isNullRef()) {
+        if (!requestCompleted && request instanceof ITmfEventRequest<?>) {
             TmfTimestamp endTime = ((ITmfEventRequest<?>) request).getRange().getEndTime();
             return data.getTimestamp().compareTo(endTime, false) > 0;
         }
