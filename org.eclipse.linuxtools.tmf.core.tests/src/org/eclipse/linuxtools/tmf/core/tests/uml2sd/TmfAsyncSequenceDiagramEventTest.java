@@ -46,7 +46,7 @@ public class TmfAsyncSequenceDiagramEventTest extends TestCase {
         fContent1 = new TmfEventContent(fEvent1, "Some content");
         fEvent1.setContent(fContent1);
 
-        fEvent2 = new TmfEvent(fTimestamp1, fTimestamp2, fSource, fType, fReference);
+        fEvent2 = new TmfEvent(fTimestamp2, fSource, fType, fReference);
         fContent2 = new TmfEventContent(fEvent2, "Some other content");
         fEvent2.setContent(fContent2);
     }

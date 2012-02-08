@@ -38,10 +38,6 @@ public class CustomTxtEvent extends CustomEvent {
         super(definition, parentTrace, timestamp, source, type, reference);
     }
 
-    public CustomTxtEvent(CustomTxtTraceDefinition definition, TmfTimestamp originalTS, TmfTimestamp effectiveTS, TmfEventSource source, TmfEventType type, TmfEventReference reference) {
-        super(definition, originalTS, effectiveTS, source, type, reference);
-    }
-
     public void processGroups(InputLine input, Matcher matcher) {
     	if (input.columns == null) {
     		return;

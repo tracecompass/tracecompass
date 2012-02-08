@@ -15,7 +15,6 @@ public class AllTests {
 		suite.addTestSuite(TmfEventContentTest.class);
 		suite.addTestSuite(TmfEventTypeTest.class);
 		suite.addTestSuite(TmfEventSourceTest.class);
-		suite.addTestSuite(TmfTraceEventTest.class);
 		suite.addTestSuite(TmfEventReferenceTest.class);
 		suite.addTestSuite(TmfTimestampTest.class);
 		suite.addTestSuite(TmfTimeRangeTest.class);

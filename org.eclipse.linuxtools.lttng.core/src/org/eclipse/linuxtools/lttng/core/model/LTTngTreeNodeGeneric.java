@@ -17,10 +17,11 @@ import java.util.Map;
 
 import org.eclipse.linuxtools.lttng.core.LttngConstants;
 import org.eclipse.linuxtools.lttng.core.TraceDebug;
-import org.eclipse.linuxtools.tmf.core.event.TmfData;
+import org.eclipse.linuxtools.tmf.core.event.TmfDataEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 
 public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
-		extends TmfData implements ILTTngTreeNode<E> {
+		extends TmfDataEvent implements ILTTngTreeNode<E> {
 
 	// ========================================================================
 	// Data
@@ -99,8 +100,7 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 * @see
 	 * org.eclipse.linuxtools.lttng.control.ILTTngAnalysisResource#getType()
 	 */
-	@Override
-	public Object getType() {
+	public Object getNodeType() {
 		return ftype;
 	}
 

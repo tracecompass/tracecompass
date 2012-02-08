@@ -463,7 +463,7 @@ class TextLttngEvent extends LttngEvent {
 	@SuppressWarnings("unchecked")
     public TextLttngEvent(TextLttngEvent oldEvent) {
 		this(
-		        (TmfTrace<LttngEvent>) oldEvent.getParentTrace(),
+		        (TmfTrace<LttngEvent>) oldEvent.getTrace(),
 				(LttngTimestamp)oldEvent.getTimestamp(), 
 				(LttngEventSource)oldEvent.getSource(), 
 				(LttngEventType)oldEvent.getType(), 

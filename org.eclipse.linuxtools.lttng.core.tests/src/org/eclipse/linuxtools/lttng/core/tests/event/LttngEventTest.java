@@ -162,7 +162,7 @@ public class LttngEventTest extends TestCase {
     	assertEquals("Marker not what expected!",eventMarker,testEvent.getMarkerName());
     	
     	// All events should have a parent
-    	assertNotNull("Trace parent for this event is null!", testEvent.getParentTrace() );
+    	assertNotNull("Trace parent for this event is null!", testEvent.getTrace() );
     	
     	// *** FIXME ***
     	// Depending from the Java version because of the "hashcode()" on String. 

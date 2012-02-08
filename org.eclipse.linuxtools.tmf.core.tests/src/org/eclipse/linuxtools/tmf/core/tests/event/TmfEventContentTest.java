@@ -180,14 +180,14 @@ public class TmfEventContentTest extends TestCase {
 		TmfEventContent basicContent1 = new TmfEventContent(fEvent, null);
 		TmfEventContent basicContent2 = new TmfEventContent(null, null);
 
-		assertTrue("hashCode", fBasicContent0.hashCode() != basicContent0.hashCode());
+		assertTrue("hashCode", fBasicContent0.hashCode() == basicContent0.hashCode());
 		assertTrue("hashCode", fBasicContent0.hashCode() != basicContent1.hashCode());
 		assertTrue("hashCode", fBasicContent0.hashCode() != basicContent2.hashCode());
 
 		assertTrue("hashCode", basicContent0.hashCode() != basicContent1.hashCode());
 		assertTrue("hashCode", basicContent0.hashCode() != basicContent2.hashCode());
 
-		assertTrue("hashCode", basicContent1.hashCode() != basicContent2.hashCode());
+		assertTrue("hashCode", basicContent1.hashCode() == basicContent2.hashCode());
 	}
 	
 	// ------------------------------------------------------------------------

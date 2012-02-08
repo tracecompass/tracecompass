@@ -34,10 +34,6 @@ public class CustomXmlEvent extends CustomEvent {
         super(definition, parentTrace, timestamp, source, type, reference);
     }
 
-    public CustomXmlEvent(CustomXmlTraceDefinition definition, TmfTimestamp originalTS, TmfTimestamp effectiveTS, TmfEventSource source, TmfEventType type, TmfEventReference reference) {
-        super(definition, originalTS, effectiveTS, source, type, reference);
-    }
-
     public void parseInput(String value, String name, int inputAction, String inputFormat) {
         if (value.length() == 0) {
             return;

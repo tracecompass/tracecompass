@@ -126,7 +126,7 @@ public class LTTngTreeNodeTest extends TestCase {
 	 * Test method for {@link org.eclipse.linuxtools.lttng.core.model.LTTngTreeNodeGeneric#getType()}.
 	 */
 	public void testGetType() {
-		assertEquals(this.getClass(), node15.getType());
+		assertEquals(this.getClass(), node15.getNodeType());
 	}
 
 	/**

@@ -88,11 +88,11 @@ public class TmfBaseStatisticsDataTest extends TestCase {
         fContent1 = new TmfEventContent(fEvent1, "Some content");
         fEvent1.setContent(fContent1);
 
-        fEvent2 = new TmfEvent(fTimestamp1, fTimestamp2, fSource, fType2, fReference);
+        fEvent2 = new TmfEvent(fTimestamp2, fSource, fType2, fReference);
         fContent2 = new TmfEventContent(fEvent2, "Some other content");
         fEvent2.setContent(fContent2);
         
-        fEvent3 = new TmfEvent(fTimestamp2, fTimestamp3, fSource, fType3, fReference);
+        fEvent3 = new TmfEvent(fTimestamp3, fSource, fType3, fReference);
         fContent3 = new TmfEventContent(fEvent3, "Some other different content");
         fEvent3.setContent(fContent3);
         

@@ -38,26 +38,6 @@ public class TmfTraceEvent extends TmfEvent {
     // ------------------------------------------------------------------------
 
 	/**
-	 * @param originalTS
-	 * @param effectiveTS
-	 * @param source
-	 * @param type
-	 * @param content
-	 * @param reference
-	 * @param path
-	 * @param file
-	 * @param line
-	 */
-	public TmfTraceEvent(TmfTimestamp originalTS, TmfTimestamp effectiveTS, TmfEventSource source,
-			TmfEventType type, TmfEventReference reference,	String path, String file, int line)
-	{
-		super(originalTS, effectiveTS, source, type, reference);
-		fSourcePath = path;
-		fFileName   = file;
-		fLineNumber = line;
-	}
-
-	/**
 	 * @param timestamp
 	 * @param source
 	 * @param type

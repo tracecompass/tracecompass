@@ -62,7 +62,7 @@ public class LttngEvent extends TmfEvent {
     @SuppressWarnings("unchecked")
     public LttngEvent(LttngEvent oldEvent) {
         this(	
-        		(TmfTrace<LttngEvent>) oldEvent.getParentTrace(),
+        		(TmfTrace<LttngEvent>) oldEvent.getTrace(),
         		(LttngTimestamp)oldEvent.getTimestamp(), 
         		(TmfEventSource)oldEvent.getSource(), 
         		(LttngEventType)oldEvent.getType(), 
@@ -77,7 +77,7 @@ public class LttngEvent extends TmfEvent {
      * @param parentTrace The new parent
      */
     public void setParentTrace(TmfTrace<LttngEvent> parentTrace) {
-		fParentTrace = parentTrace;
+		fTrace = parentTrace;
 	}
     
     

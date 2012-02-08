@@ -33,7 +33,7 @@ public interface ILTTngTreeNode<E extends ILTTngTreeNode<E>> extends IAdaptable 
 	 * 
 	 * @return
 	 */
-	public Object getType();
+	public Object getNodeType();
 
 	/**
 	 * Return this resource name

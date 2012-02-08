@@ -239,7 +239,7 @@ class StateUpdateHandlers {
 						Fields.LTT_FIELD_IRQ_ID);
 				if (irq == null || traceSt.getIrq_states().get(irq) == null) {
 					if (irq != null) {
-						TraceDebug.debug("Invalid irq (" + irq + "), ts = " + trcEvent.getOriginalTimestamp()); //$NON-NLS-1$ //$NON-NLS-2$
+						TraceDebug.debug("Invalid irq (" + irq + "), ts = " + trcEvent.getTimestamp()); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 					return true;
 				}

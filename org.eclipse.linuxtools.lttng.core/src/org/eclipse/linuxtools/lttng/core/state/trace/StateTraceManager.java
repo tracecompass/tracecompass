@@ -128,7 +128,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * @see org.eclipse.linuxtools.lttng.state.IStateManager#getEventLog()
 	 */
 	@Override
-	public ITmfTrace getTrace() {
+	public ITmfTrace getStateTrace() {
 		return fTrace;
 	}
 
@@ -156,7 +156,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 
 			TraceDebug.debug("Check point created here: " + eventCounter //$NON-NLS-1$
 					+ " -> " + eventTime.toString() + "************" //$NON-NLS-1$ //$NON-NLS-2$
-					+ getTrace().getName() + "   >>>>> Thread: " //$NON-NLS-1$
+					+ getStateTrace().getName() + "   >>>>> Thread: " //$NON-NLS-1$
 					+ Thread.currentThread().getId());
 
 			synchronized (fCheckPointsLock) {

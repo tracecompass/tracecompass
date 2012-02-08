@@ -53,22 +53,10 @@ public class CustomEvent extends TmfEvent {
         fData = new HashMap<String, String>();
     }
 
-    public CustomEvent(CustomTraceDefinition definition, TmfTimestamp originalTS, TmfTimestamp effectiveTS, TmfEventSource source, TmfEventType type, TmfEventReference reference) {
-        super(originalTS, effectiveTS, source, type, reference);
-        fDefinition = definition;
-        fData = new HashMap<String, String>();
-    }
-    
     @Override
     public TmfTimestamp getTimestamp() {
         if (fData != null) processData();
         return super.getTimestamp();
-    }
-
-    @Override
-    public TmfTimestamp getOriginalTimestamp() {
-        if (fData != null) processData();
-        return super.getOriginalTimestamp();
     }
 
     public String[] extractItemFields() {
@@ -84,12 +72,12 @@ public class CustomEvent extends TmfEvent {
             SimpleDateFormat dateFormat = new SimpleDateFormat(timeStampInputFormat);
             try {
                 date = dateFormat.parse(timeStampString);
-                fOriginalTimestamp = fEffectiveTimestamp = new TmfTimestamp(date.getTime(), TIMESTAMP_SCALE);
+                fTimestamp = new TmfTimestamp(date.getTime(), TIMESTAMP_SCALE);
             } catch (ParseException e) {
-                fOriginalTimestamp = fEffectiveTimestamp = TmfTimestamp.Zero;
+                fTimestamp = TmfTimestamp.Zero;
             }
         } else {
-            fOriginalTimestamp = fEffectiveTimestamp = TmfTimestamp.Zero;
+            fTimestamp = TmfTimestamp.Zero;
         }
         
         int i = 0;

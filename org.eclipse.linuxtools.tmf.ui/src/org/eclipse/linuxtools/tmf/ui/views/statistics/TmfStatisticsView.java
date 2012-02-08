@@ -470,7 +470,7 @@ public class TmfStatisticsView extends TmfView {
                     if (data != null) {
                         AbsTmfStatisticsTree statisticsData = TmfStatisticsTreeRootFactory.getStatTree(getTreeID(experiment.getName()));
                         
-                        final String traceName = data.getParentTrace().getName();
+                        final String traceName = data.getTrace().getName();
                         ITmfExtraEventInfo extraInfo = new ITmfExtraEventInfo() {
                             @Override
                             public String getTraceName() {

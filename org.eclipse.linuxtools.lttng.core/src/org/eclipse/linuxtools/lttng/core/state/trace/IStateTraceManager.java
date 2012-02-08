@@ -30,7 +30,7 @@ public interface IStateTraceManager {
 	 * 
 	 * @return
 	 */
-	public abstract ITmfTrace<?> getTrace();
+	public abstract ITmfTrace<?> getStateTrace();
 
 	/**
 	 * Restore to the closest checkpoint from TmfTimestamp

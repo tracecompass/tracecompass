@@ -170,7 +170,6 @@ public class TmfEventContent implements Cloneable {
 	@Override
     public int hashCode() {
 		int result = 17;
-		result = 37 * result + ((fParentEvent != null) ? fParentEvent.hashCode() : 0);
 		result = 37 * result + ((fRawContent  != null) ? fRawContent.hashCode()  : 0);
         return result;
     }
