@@ -14,7 +14,6 @@ public final class AllLTTngEventTests extends TestCase  {
         suite.addTestSuite(LttngTimestampTest.class);
         suite.addTestSuite(LttngEventFieldTest.class);
         suite.addTestSuite(LttngEventContentTest.class);
-        suite.addTestSuite(LttngEventReferenceTest.class);
         suite.addTestSuite(LttngEventTypeTest.class);
         suite.addTestSuite(LttngEventTest.class);
         

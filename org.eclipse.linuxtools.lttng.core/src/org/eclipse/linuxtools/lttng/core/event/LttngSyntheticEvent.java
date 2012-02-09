@@ -70,7 +70,7 @@ public class LttngSyntheticEvent extends LttngEvent {
 	public LttngSyntheticEvent(TmfTrace<LttngEvent> parent,
 			LttngTimestamp timestamp, String source,
 			LttngEventType type, LttngEventContent content,
-			LttngEventReference reference, JniEvent lttEvent) {
+			String reference, JniEvent lttEvent) {
 		super(parent, timestamp, source, type, content, reference, lttEvent);
 	}
 

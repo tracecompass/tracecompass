@@ -15,7 +15,6 @@ import junit.framework.TestCase;
 
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventReference;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.uml2sd.TmfAsyncSequenceDiagramEvent;
@@ -28,11 +27,11 @@ public class TmfAsyncSequenceDiagramEventTest extends TestCase {
     private final String   fLabel1 = "label2";
     private final String[] fLabels = new String[] { fLabel0, fLabel1 };
 
-    private final TmfTimestamp      fTimestamp1 = new TmfTimestamp(12345, (byte) 2, 5);
-    private final TmfTimestamp      fTimestamp2 = new TmfTimestamp(12350, (byte) 2, 5);
-    private final String            fSource     = "Source";
-    private final TmfEventType      fType       = new TmfEventType(fTypeId, fLabels);
-    private final TmfEventReference fReference  = new TmfEventReference("Some reference");
+    private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2, 5);
+    private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, (byte) 2, 5);
+    private final String       fSource     = "Source";
+    private final TmfEventType fType       = new TmfEventType(fTypeId, fLabels);
+    private final String       fReference  = "Some reference";
 
     private final TmfEvent fEvent1;
     private final TmfEvent fEvent2;

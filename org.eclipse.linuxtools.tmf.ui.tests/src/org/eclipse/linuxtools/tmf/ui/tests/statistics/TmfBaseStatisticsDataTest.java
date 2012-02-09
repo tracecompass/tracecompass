@@ -21,7 +21,6 @@ import junit.framework.TestCase;
 
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventReference;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
@@ -47,17 +46,17 @@ public class TmfBaseStatisticsDataTest extends TestCase {
     private final String   fLabel2 = "label3";
     private final String[] fLabels = new String[] { fLabel0, fLabel1, fLabel2 };
 
-    private final TmfTimestamp      fTimestamp1 = new TmfTimestamp(12345, (byte) 2, 5);
-    private final TmfTimestamp      fTimestamp2 = new TmfTimestamp(12350, (byte) 2, 5);
-    private final TmfTimestamp      fTimestamp3 = new TmfTimestamp(12355, (byte) 2, 5);
+    private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2, 5);
+    private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, (byte) 2, 5);
+    private final TmfTimestamp fTimestamp3 = new TmfTimestamp(12355, (byte) 2, 5);
     
-    private final String            fSource     = "Source";
+    private final String fSource = "Source";
     
-    private final TmfEventType      fType1      = new TmfEventType(fTypeId1, fLabels);
-    private final TmfEventType      fType2      = new TmfEventType(fTypeId1, fLabels);
-    private final TmfEventType      fType3      = new TmfEventType(fTypeId2, fLabels);
+    private final TmfEventType fType1 = new TmfEventType(fTypeId1, fLabels);
+    private final TmfEventType fType2 = new TmfEventType(fTypeId1, fLabels);
+    private final TmfEventType fType3 = new TmfEventType(fTypeId2, fLabels);
     
-    private final TmfEventReference fReference  = new TmfEventReference("Some reference");
+    private final String fReference = "Some reference";
 
     private final TmfEvent fEvent1;
     private final TmfEvent fEvent2;

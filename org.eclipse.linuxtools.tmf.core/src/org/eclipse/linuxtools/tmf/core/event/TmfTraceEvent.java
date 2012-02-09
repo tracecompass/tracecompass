@@ -48,7 +48,7 @@ public class TmfTraceEvent extends TmfEvent {
 	 * @param line
 	 */
 	public TmfTraceEvent(TmfTimestamp timestamp, String source, TmfEventType type,
-			TmfEventReference reference, String path, String file, int line)
+			String reference, String path, String file, int line)
 	{
 		super(timestamp, source, type, reference);
 		fSourcePath = path;

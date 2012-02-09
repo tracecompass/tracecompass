@@ -122,7 +122,7 @@ public class TmfEventContent implements Cloneable {
             } else if (id.equals(FIELD_ID_TYPE)) {
                 return fParentEvent.getType().getTypeId().toString();
             } else if (id.equals(FIELD_ID_REFERENCE)) {
-                return fParentEvent.getReference().getReference().toString();
+                return fParentEvent.getReference();
             }
             throw e;
         }

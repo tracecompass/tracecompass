@@ -45,7 +45,7 @@ public class TmfDataEvent implements Cloneable {
     protected String fSource;
     protected TmfEventType fType;
     protected TmfEventContent fContent;
-    protected TmfEventReference fReference;
+    protected String fReference;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -68,7 +68,7 @@ public class TmfDataEvent implements Cloneable {
      */
     public TmfDataEvent(ITmfTrace<? extends TmfDataEvent> trace, long rank,
             String source, TmfEventType type, TmfEventContent content,
-            TmfEventReference reference)
+            String reference)
     {
         fTrace = trace;
         fRank = rank;
@@ -150,7 +150,7 @@ public class TmfDataEvent implements Cloneable {
     /**
      * @return the event reference
      */
-    public TmfEventReference getReference() {
+    public String getReference() {
         return fReference;
     }
 

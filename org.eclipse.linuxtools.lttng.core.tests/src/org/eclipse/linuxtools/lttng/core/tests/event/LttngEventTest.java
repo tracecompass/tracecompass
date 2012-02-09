@@ -9,7 +9,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventContent;
-import org.eclipse.linuxtools.lttng.core.event.LttngEventReference;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.core.tests.LTTngCoreTestPlugin;
@@ -98,7 +97,7 @@ public class LttngEventTest extends TestCase {
         String      		testSource 		= null;
         LttngEventType   	testType   		= null;
         LttngEventContent	testContent		= null;
-        LttngEventReference testReference 	= null;
+        String              testReference 	= null;
         JniEvent			testJniEvent 	= null;
 		String[]			testMarkerFields = null;
 		
@@ -112,7 +111,7 @@ public class LttngEventTest extends TestCase {
                 testSource 	= "test";
                 testType   	= new LttngEventType("test", 0L, "test", 0, testMarkerFields);
                 testContent	= new LttngEventContent(testEvent);
-                testReference = new LttngEventReference("test", "test");
+                testReference = "test";
         }
         catch( Exception e) {
                 fail("Cannot allocate an EventStream, junit failed!");
@@ -152,7 +151,7 @@ public class LttngEventTest extends TestCase {
     	// These will test TMF functions but since we are expecting it to work...
     	assertEquals("Timestamp not what expected!",eventTimestamp,testEvent.getTimestamp().getValue());
     	assertEquals("Source not what expected!",eventSource,testEvent.getSource());
-    	assertEquals("Reference not what expected!",eventReference,((String)testEvent.getReference().toString()) );
+    	assertEquals("Reference not what expected!", eventReference, testEvent.getReference());
     	
     	// These should be overridden functions
     	assertEquals("Type not what expected!",eventType,testEvent.getType().getTypeId());

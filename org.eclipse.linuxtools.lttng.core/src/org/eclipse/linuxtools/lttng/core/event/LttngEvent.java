@@ -44,9 +44,9 @@ public class LttngEvent extends TmfEvent {
      * @see org.eclipse.linuxtools.org.eclipse.linuxtools.lttng.jni.JniEvent
      */
     public LttngEvent(TmfTrace<LttngEvent> parent, LttngTimestamp timestamp, String source, LttngEventType type, LttngEventContent content,
-            LttngEventReference reference, JniEvent lttEvent) {
+            String reference, JniEvent lttEvent)
+    {
         super(timestamp, source, type, reference);
-
         fContent = content;
         jniEventReference = lttEvent;
         setParentTrace(parent);
@@ -66,7 +66,7 @@ public class LttngEvent extends TmfEvent {
         		oldEvent.getSource(), 
         		(LttngEventType)oldEvent.getType(), 
         		(LttngEventContent)oldEvent.getContent(), 
-        		(LttngEventReference)oldEvent.getReference(), 
+        		oldEvent.getReference(), 
         		oldEvent.jniEventReference
         	);
     }
@@ -126,6 +126,10 @@ public class LttngEvent extends TmfEvent {
 
     public void setContent(LttngEventContent newContent) {
         fContent = newContent;
+    }
+
+    public void setReference(String reference) {
+        fReference = reference;
     }
 
     @Override

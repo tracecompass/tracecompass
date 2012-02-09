@@ -18,7 +18,6 @@ import java.io.RandomAccessFile;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventReference;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
@@ -31,7 +30,7 @@ public class TmfUml2SDTestTrace implements ITmfEventParser {
     
     @Override
     @SuppressWarnings({ "unchecked", "nls" })    
-    public TmfEvent parseNextEvent(ITmfTrace eventStream, TmfContext context) throws IOException {
+    public TmfEvent parseNextEvent(ITmfTrace<?> eventStream, TmfContext context) throws IOException {
         if (! (eventStream instanceof TmfTraceStub)) {
             return null;
         }
@@ -56,12 +55,10 @@ public class TmfUml2SDTestTrace implements ITmfEventParser {
             String receiver = stream.readUTF();
             String signal = stream.readUTF();
 
-            TmfEventReference tmfReference = new TmfEventReference(reference);
-            String tmfSource = source;
             String[] labels = {"sender", "receiver", "signal"};
 
             TmfEventType tmfEventType = new TmfEventType(type, labels);
-            TmfEvent tmfEvent = new TmfEvent(new TmfTimestamp(ts, (byte)-9), tmfSource, tmfEventType, tmfReference);
+            TmfEvent tmfEvent = new TmfEvent(new TmfTimestamp(ts, (byte)-9), source, tmfEventType, reference);
 
             String content = "[";
             content += sender;

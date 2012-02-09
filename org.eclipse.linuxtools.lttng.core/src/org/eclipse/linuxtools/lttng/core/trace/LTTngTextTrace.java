@@ -20,7 +20,6 @@ import java.util.HashMap;
 import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventContent;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventField;
-import org.eclipse.linuxtools.lttng.core.event.LttngEventReference;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
@@ -37,7 +36,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
     private String                          eventSource      = null;
     private LttngEventType                  eventType        = null;
     private TextLttngEventContent           eventContent     = null;
-    private LttngEventReference             eventReference   = null;
+    private String                          eventReference   = null;
     // The actual event
     private  TextLttngEvent                 currentLttngEvent = null;             
     
@@ -63,10 +62,10 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
         traceTypes      = new HashMap<String, LttngEventType>();
         
         eventTimestamp        = new LttngTimestamp();
-        eventSource           = "";
+        eventSource           = ""; //$NON-NLS-1$
         eventType             = new LttngEventType();
         eventContent          = new TextLttngEventContent(currentLttngEvent);
-        eventReference        = new LttngEventReference(this.getName());
+        eventReference        = getName();
         
         currentLttngEvent = new TextLttngEvent(this, eventTimestamp, eventSource, eventType, eventContent, eventReference);
         eventContent.setEvent(currentLttngEvent);
@@ -292,10 +291,10 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
 	    		String fullTracePath = tmpContent.substring(tmpPrevIndex, tmpCurIndex ).trim();
 	    		/*System.out.println(fullTracePath);*/
 	    		
-	    		eventReference.setValue(fullTracePath);
 	    		String traceName = fullTracePath.substring(fullTracePath.lastIndexOf("/")+1).trim(); //$NON-NLS-1$
 	    		/*System.out.println(traceName);*/
-	    		eventReference.setTracepath(traceName);
+	    		eventReference = traceName;
+	    		currentLttngEvent.setReference(traceName);
 	    		
 	    		
 	    		// The next few fields are relatives to the state system (pid, ppid, etc...) we need to skip them.
@@ -454,7 +453,7 @@ class TextLttngEvent extends LttngEvent {
 							String source, 
 							LttngEventType type, 
 							LttngEventContent content, 
-							LttngEventReference reference) 
+							String reference) 
 	{
 		super(parent, timestamp, source, type, content, reference, null);
 	}
@@ -467,7 +466,7 @@ class TextLttngEvent extends LttngEvent {
 				oldEvent.getSource(), 
 				(LttngEventType)oldEvent.getType(), 
 				(LttngEventContent)oldEvent.getContent(), 
-				(LttngEventReference)oldEvent.getReference()
+				oldEvent.getReference()
 			 );
 	}
 	

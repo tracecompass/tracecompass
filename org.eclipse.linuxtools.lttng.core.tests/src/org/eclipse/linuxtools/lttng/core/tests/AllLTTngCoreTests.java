@@ -7,7 +7,6 @@ import org.eclipse.linuxtools.lttng.core.tests.control.LTTngSyntheticEventProvid
 import org.eclipse.linuxtools.lttng.core.tests.control.LTTngSyntheticEventProviderTextTest;
 import org.eclipse.linuxtools.lttng.core.tests.event.LttngEventContentTest;
 import org.eclipse.linuxtools.lttng.core.tests.event.LttngEventFieldTest;
-import org.eclipse.linuxtools.lttng.core.tests.event.LttngEventReferenceTest;
 import org.eclipse.linuxtools.lttng.core.tests.event.LttngEventTest;
 import org.eclipse.linuxtools.lttng.core.tests.event.LttngEventTypeTest;
 import org.eclipse.linuxtools.lttng.core.tests.event.LttngTimestampTest;
@@ -34,7 +33,6 @@ public class AllLTTngCoreTests {
         suite.addTestSuite(LttngTimestampTest.class);
         suite.addTestSuite(LttngEventFieldTest.class);
         suite.addTestSuite(LttngEventContentTest.class);
-        suite.addTestSuite(LttngEventReferenceTest.class);
         suite.addTestSuite(LttngEventTypeTest.class);
         suite.addTestSuite(LttngEventTest.class);
 

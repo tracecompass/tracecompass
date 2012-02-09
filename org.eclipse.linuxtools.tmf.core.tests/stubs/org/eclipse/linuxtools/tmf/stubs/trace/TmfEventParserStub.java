@@ -19,7 +19,6 @@ import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventReference;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
@@ -106,9 +105,7 @@ public class TmfEventParserStub implements ITmfEventParser {
 
        	    TmfEvent event = new TmfEvent(
        	            new TmfTimestamp(ts, (byte) -3, 0),     // millisecs
-       	            source,
-       	            fTypes[typeIndex],
-       	            new TmfEventReference(name));
+       	            source, fTypes[typeIndex], name);
        	    TmfEventContent cnt = new TmfEventContent(event, content);
        	    event.setContent(cnt);
        	    return event;

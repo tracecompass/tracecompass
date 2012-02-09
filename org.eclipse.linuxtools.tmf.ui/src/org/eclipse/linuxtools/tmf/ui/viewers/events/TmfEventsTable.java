@@ -53,9 +53,9 @@ import org.eclipse.linuxtools.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterAndNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterNode;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
@@ -148,7 +148,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     protected SashForm fSashForm;
     protected TmfVirtualTable fTable;
     protected TmfRawEventViewer fRawViewer;
-    protected ITmfTrace fTrace;
+    protected ITmfTrace<?> fTrace;
     protected boolean fPackDone = false;
     protected HeaderState fHeaderState = HeaderState.SEARCH;
     protected long fSelectedRank = 0;
@@ -1292,7 +1292,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         if (event != null) {
             fields = new String[] { new Long(event.getTimestamp().getValue()).toString(),
                     event.getSource(), event.getType().getTypeId().toString(),
-                    event.getReference().getReference().toString(), event.getContent().toString() };
+                    event.getReference(), event.getContent().toString() };
         }
         return fields;
     }
@@ -1306,7 +1306,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * @param disposeOnClose
      *            true if the trace should be disposed when the table is disposed
      */
-    public void setTrace(ITmfTrace trace, boolean disposeOnClose) {
+    public void setTrace(ITmfTrace<?> trace, boolean disposeOnClose) {
         if (fTrace != null && fDisposeOnClose) {
             fTrace.dispose();
         }

@@ -222,7 +222,7 @@ public class LttngEventContent extends TmfEventContent {
         } else if (name.equals(LttngEventType.MARKER_LABEL) || name.equals(FIELD_ID_TYPE)) {
             return fParentEvent.getType().getTypeId().toString();
         } else if (name.equals(LttngEventType.TRACE_LABEL) || name.equals(FIELD_ID_REFERENCE)) {
-            return fParentEvent.getReference().getReference().toString();
+            return fParentEvent.getReference();
         } else if (name.equals(LttngEventType.TIMESTAMP_LABEL) || name.equals(FIELD_ID_TIMESTAMP)) {
             return new Long(fParentEvent.getTimestamp().getValue()).toString();
         } else if (name.equals(FIELD_ID_SOURCE)) {
