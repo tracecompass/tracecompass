@@ -17,6 +17,8 @@ import java.util.List;
 
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IBaseEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent;
+import org.eclipse.linuxtools.lttng.ui.views.control.property.KernelProviderPropertySource;
+import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
  * <b><u>KernelProviderComponent</u></b>
@@ -67,9 +69,21 @@ public class KernelProviderComponent extends TraceControlComponent {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceControlComponent#getAdapter(java.lang.Class)
+     */
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Object getAdapter(Class adapter) {
+        if (adapter == IPropertySource.class) {
+            return new KernelProviderPropertySource(this);
+        }
+        return null;
+    } 
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    
     
 }

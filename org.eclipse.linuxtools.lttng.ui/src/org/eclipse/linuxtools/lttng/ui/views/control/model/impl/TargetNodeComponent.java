@@ -226,6 +226,8 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
                        // Note: result might be null!
                        if(status.isOK()) {
                            handleConnected();
+                       } else {
+                           handleDisconnected();
                        }
                    }
                });

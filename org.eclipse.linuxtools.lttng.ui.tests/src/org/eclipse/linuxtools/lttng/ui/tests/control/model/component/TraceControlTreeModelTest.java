@@ -45,8 +45,7 @@ import org.junit.After;
 import org.junit.Before;
 
 /**
- * The class <code>TraceControlComponentTest</code> contains tests for the class <code>{@link TraceControlComponent}</code>.
- *
+ * The class <code>TraceControlTreeModelTest</code> contains tests for the tree component classes.
  */
 @SuppressWarnings("nls")
 public class TraceControlTreeModelTest extends TestCase {
@@ -115,26 +114,6 @@ public class TraceControlTreeModelTest extends TestCase {
         node.connect();
 
         TraceControlTestFacility.getInstance().waitForJobs();
-
-        // ------------------------------------------------------------------------
-        // Verify Node Properties (adapter)
-        // ------------------------------------------------------------------------
-        Object adapter = node.getAdapter(IPropertySource.class);
-        assertNotNull(adapter);
-        assertTrue(adapter instanceof TargetNodePropertySource);
-
-        TargetNodePropertySource source = (TargetNodePropertySource)adapter;
-
-        assertNull(source.getEditableValue());
-        assertFalse(source.isPropertySet(TargetNodePropertySource.TARGET_NODE_NAME_PROPERTY_ID));
-        assertNotNull(source.getPropertyDescriptors());
-
-        assertEquals("myNode", source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_NAME_PROPERTY_ID));
-        assertEquals("127.0.0.1",  source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_ADDRESS_PROPERTY_ID));
-        assertNull(source.getPropertyValue("test"));
-
-        adapter = node.getAdapter(IChannelInfo.class);
-        assertNull(adapter);
 
         // ------------------------------------------------------------------------
         // Verify Parameters of TargetNodeComponent
@@ -592,5 +571,4 @@ public class TraceControlTreeModelTest extends TestCase {
         ustProvider.setPid(pid);
     }
 
-    
 }

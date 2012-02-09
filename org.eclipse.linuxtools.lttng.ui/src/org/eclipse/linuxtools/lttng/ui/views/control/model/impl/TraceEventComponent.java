@@ -18,7 +18,9 @@ import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponen
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceEnablement;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceEventType;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceLogLevel;
+import org.eclipse.linuxtools.lttng.ui.views.control.property.TraceEventPropertySource;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.views.properties.IPropertySource;
 
 
 /**
@@ -159,6 +161,19 @@ public class TraceEventComponent extends TraceControlComponent {
     public void setLogLevel(String levelName) {
         fEventInfo.setLogLevel(levelName);
     }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceControlComponent#getAdapter(java.lang.Class)
+     */
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Object getAdapter(Class adapter) {
+        if (adapter == IPropertySource.class) {
+            return new TraceEventPropertySource(this);
+        }
+        return null;
+    } 
     
     // ------------------------------------------------------------------------
     // Operations

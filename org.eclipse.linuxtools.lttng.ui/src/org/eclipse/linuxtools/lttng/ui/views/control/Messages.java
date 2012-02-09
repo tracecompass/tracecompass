@@ -62,6 +62,28 @@ final public class Messages extends NLS {
     public static String TraceControl_ProviderDisplayName;
     public static String TraceControl_KernelProviderDisplayName;
     
+    // Property names
+    public static String TraceControl_SessionNamePropertyName;
+    public static String TraceControl_EventNamePropertyName;
+    public static String TraceControl_EventTypePropertyName;
+    public static String TraceControl_LogLevelPropertyName;
+    public static String TraceControl_StatePropertyName;
+    public static String TraceControl_DomainNamePropertyName;
+    public static String TraceControl_ChannelNamePropertyName;
+    public static String TraceControl_OverwriteModePropertyName;
+    public static String TraceControl_SubBufferSizePropertyName;
+    public static String TraceControl_NbSubBuffersPropertyName;
+    public static String TraceControl_SwitchTimerPropertyName;
+    public static String TraceControl_ReadTimerPropertyName;
+    public static String TraceControl_OutputTypePropertyName;
+    public static String TraceControl_HostNamePropertyName;
+    public static String TraceControl_HostAddressPropertyName;
+    public static String TraceControl_SessionPathPropertyName;
+    public static String TraceControl_ProviderNamePropertyName;
+    public static String TraceControl_ProcessIdPropertyName;
+    
+    
+ 
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

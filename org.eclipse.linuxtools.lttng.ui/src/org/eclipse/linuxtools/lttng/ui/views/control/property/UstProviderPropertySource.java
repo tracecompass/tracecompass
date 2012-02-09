@@ -12,63 +12,55 @@
 package org.eclipse.linuxtools.lttng.ui.views.control.property;
 
 import org.eclipse.linuxtools.lttng.ui.views.control.Messages;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TargetNodeComponent;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.UstProviderComponent;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
- * <b><u>TargetNodePropertySource</u></b>
+ * <b><u>UstProviderPropertySource</u></b>
  * <p>
- * Property source implementation for the target node component.
+ * Property source implementation for the UST provider component.
  * </p>
  */
-public class TargetNodePropertySource extends BasePropertySource {
+public class UstProviderPropertySource extends BasePropertySource {
 
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
     /**
-     * The node name property ID.
+     * The UST provider 'name' property ID.
      */
-    public static final String TARGET_NODE_NAME_PROPERTY_ID = "target.node.name"; //$NON-NLS-1$
+    public static final String UST_PROVIDER_NAME_PROPERTY_ID = "ust.provider.name"; //$NON-NLS-1$
     /**
-     * The node address property ID.
+     * The UST provider 'PID' property ID.
      */
-    public static final String TARGET_NODE_ADDRESS_PROPERTY_ID = "target.node.address"; //$NON-NLS-1$
+    public static final String UST_PROVIDER_PID_PROPERTY_ID = "ust.provider.pid"; //$NON-NLS-1$
     /**
-     * The state property ID.
+     *  The UST provider 'name' property name. 
      */
-    public static final String TARGET_NODE_STATE_PROPERTY_ID = "target.node.state"; //$NON-NLS-1$
+    public static final String UST_PROVIDER_NAME_PROPERTY_NAME = Messages.TraceControl_ProviderNamePropertyName;
     /**
-     *  The node name property name. 
+     * The UST provider 'type' property name.
      */
-    public static final String TARGET_NODE_NAME_PROPERTY_NAME = Messages.TraceControl_HostNamePropertyName;
-    /**
-     * The node address property name.
-     */
-    public static final String TARGET_NODE_ADDRESS_PROPERTY_NAME = Messages.TraceControl_HostAddressPropertyName;
-    /**
-     * The state address property name.
-     */
-    public static final String TARGET_NODE_STATE_PROPERTY_NAME = Messages.TraceControl_StatePropertyName;
-    
+    public static final String UST_PROVIDER_PID_PROPERTY_NAME = Messages.TraceControl_ProcessIdPropertyName;
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The node component which this property source is for. 
+     * The UST provider component which this property source is for. 
      */
-    private final TargetNodeComponent fTargetNode;
+    private UstProviderComponent fUstProvider;
     
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
     /**
      * Constructor
-     * @param component - the node component
+     * @param component - the UST provider component
      */
-    public TargetNodePropertySource(TargetNodeComponent component) {
-        fTargetNode = component;
+    public UstProviderPropertySource(UstProviderComponent component) {
+        fUstProvider = component;
     }
     
     // ------------------------------------------------------------------------
@@ -81,9 +73,8 @@ public class TargetNodePropertySource extends BasePropertySource {
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         return new IPropertyDescriptor[] {
-                new TextPropertyDescriptor(TARGET_NODE_NAME_PROPERTY_ID, TARGET_NODE_NAME_PROPERTY_NAME),
-                new TextPropertyDescriptor(TARGET_NODE_ADDRESS_PROPERTY_ID, TARGET_NODE_ADDRESS_PROPERTY_NAME),
-                new TextPropertyDescriptor(TARGET_NODE_STATE_PROPERTY_ID, TARGET_NODE_STATE_PROPERTY_NAME)};
+                new TextPropertyDescriptor(UST_PROVIDER_NAME_PROPERTY_ID, UST_PROVIDER_NAME_PROPERTY_NAME),
+                new TextPropertyDescriptor(UST_PROVIDER_PID_PROPERTY_ID, UST_PROVIDER_PID_PROPERTY_NAME)};
     }
 
     /*
@@ -92,15 +83,13 @@ public class TargetNodePropertySource extends BasePropertySource {
      */
     @Override
     public Object getPropertyValue(Object id) {
-        if(TARGET_NODE_NAME_PROPERTY_ID.equals(id)) {
-            return fTargetNode.getName();
+        if(UST_PROVIDER_NAME_PROPERTY_ID.equals(id)) {
+            return fUstProvider.getName();
         }
-        if (TARGET_NODE_ADDRESS_PROPERTY_ID.equals(id)) {
-            return fTargetNode.getHostName();
-        }
-        if (TARGET_NODE_STATE_PROPERTY_ID.equals(id)) {
-            return fTargetNode.getTargetNodeState().name();
+        if (UST_PROVIDER_PID_PROPERTY_ID.equals(id)) {
+            return String.valueOf(fUstProvider.getPid());
         }
         return null;
     }
+
 }

@@ -15,6 +15,8 @@ package org.eclipse.linuxtools.lttng.ui.views.control.model.impl;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IBaseEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IUstProviderInfo;
+import org.eclipse.linuxtools.lttng.ui.views.control.property.UstProviderPropertySource;
+import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
  * <b><u>UstProviderComponent</u></b>
@@ -87,6 +89,19 @@ public class UstProviderComponent extends TraceControlComponent {
         fProviderInfo.setPid(pid);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceControlComponent#getAdapter(java.lang.Class)
+     */
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Object getAdapter(Class adapter) {
+        if (adapter == IPropertySource.class) {
+            return new UstProviderPropertySource(this);
+        }
+        return null;
+    } 
+ 
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

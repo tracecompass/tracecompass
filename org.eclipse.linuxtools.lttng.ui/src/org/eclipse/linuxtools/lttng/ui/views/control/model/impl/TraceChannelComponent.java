@@ -17,7 +17,9 @@ import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceEnablement;
+import org.eclipse.linuxtools.lttng.ui.views.control.property.TraceChannelPropertySource;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.views.properties.IPropertySource;
 
 
 /**
@@ -194,6 +196,19 @@ public class TraceChannelComponent extends TraceControlComponent {
     public void setState(String stateName) {
         fChannelInfo.setState(stateName);
     }
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceControlComponent#getAdapter(java.lang.Class)
+     */
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Object getAdapter(Class adapter) {
+        if (adapter == IPropertySource.class) {
+            return new TraceChannelPropertySource(this);
+        }
+        return null;
+    } 
+    
     
     // ------------------------------------------------------------------------
     // Operations

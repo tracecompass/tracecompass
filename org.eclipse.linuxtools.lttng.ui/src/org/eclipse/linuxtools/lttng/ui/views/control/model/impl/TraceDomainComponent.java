@@ -15,6 +15,8 @@ import org.eclipse.linuxtools.lttng.ui.views.control.Messages;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IDomainInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent;
+import org.eclipse.linuxtools.lttng.ui.views.control.property.TraceDomainPropertySource;
+import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
  * <b><u>TraceDomainComponent</u></b>
@@ -71,6 +73,18 @@ public class TraceDomainComponent extends TraceControlComponent {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceControlComponent#getAdapter(java.lang.Class)
+     */
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Object getAdapter(Class adapter) {
+        if (adapter == IPropertySource.class) {
+            return new TraceDomainPropertySource(this);
+        }
+        return null;
+    } 
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

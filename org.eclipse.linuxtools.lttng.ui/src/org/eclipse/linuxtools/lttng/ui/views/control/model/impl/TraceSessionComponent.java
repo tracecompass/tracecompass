@@ -20,7 +20,9 @@ import org.eclipse.linuxtools.lttng.ui.views.control.model.IDomainInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ISessionInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceSessionState;
+import org.eclipse.linuxtools.lttng.ui.views.control.property.TraceSessionPropertySource;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
  * <b><u>TraceSessionComponent</u></b>
@@ -157,6 +159,19 @@ public class TraceSessionComponent extends TraceControlComponent {
         fSessionInfo.setSessionPath(sessionPath);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceControlComponent#getAdapter(java.lang.Class)
+     */
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Object getAdapter(Class adapter) {
+        if (adapter == IPropertySource.class) {
+            return new TraceSessionPropertySource(this);
+        }
+        return null;
+    } 
+    
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
