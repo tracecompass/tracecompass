@@ -274,7 +274,7 @@ public class TraceControlComponent implements ITraceControlComponent {
         if (component != null) {
             fChildren.add(component);
         }
-        fireCompenentAdded(this, component);
+        fireComponentAdded(this, component);
     }
 
     /*
@@ -287,7 +287,7 @@ public class TraceControlComponent implements ITraceControlComponent {
             fChildren.remove(component);
             component.dispose();
         }
-        fireCompenentRemoved(this, component);
+        fireComponentRemoved(this, component);
     }
 
     /*
@@ -360,13 +360,13 @@ public class TraceControlComponent implements ITraceControlComponent {
      * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent#fireCompenentAdded(org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent, org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent)
      */
     @Override
-    public void fireCompenentAdded(ITraceControlComponent parent, ITraceControlComponent component) {
+    public void fireComponentAdded(ITraceControlComponent parent, ITraceControlComponent component) {
         if (component == null) {
             return;
         }
 
         if (fParent != null) {
-            fParent.fireCompenentAdded(parent, component);
+            fParent.fireComponentAdded(parent, component);
         } else {
             Object[] listeners = fListeners.getListeners();
             for (int i = 0; i < listeners.length; i++) {
@@ -381,13 +381,13 @@ public class TraceControlComponent implements ITraceControlComponent {
      * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent#fireCompenentRemoved(org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent, org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent)
      */
     @Override
-    public void fireCompenentRemoved(ITraceControlComponent parent, ITraceControlComponent component) {
+    public void fireComponentRemoved(ITraceControlComponent parent, ITraceControlComponent component) {
         if (component == null) {
             return;
         }
 
         if (fParent != null) {
-            fParent.fireCompenentRemoved(parent, component);
+            fParent.fireComponentRemoved(parent, component);
         } else {
             Object[] listeners = fListeners.getListeners();
             for (int i = 0; i < listeners.length; i++) {
@@ -402,13 +402,13 @@ public class TraceControlComponent implements ITraceControlComponent {
      * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent#fireCompenentChanged(org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent)
      */
     @Override
-    public void fireCompenentChanged(ITraceControlComponent component) {
+    public void fireComponentChanged(ITraceControlComponent component) {
         if (component == null) {
             return;
         }
 
         if (fParent != null) {
-            fParent.fireCompenentChanged(component);
+            fParent.fireComponentChanged(component);
         } else {
             Object[] listeners = fListeners.getListeners();
             for (int i = 0; i < listeners.length; i++) {

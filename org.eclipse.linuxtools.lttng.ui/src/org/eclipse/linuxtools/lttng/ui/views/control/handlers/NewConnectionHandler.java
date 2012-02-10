@@ -11,10 +11,9 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.control.handlers;
 
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.IHandler;
-import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.linuxtools.lttng.ui.views.control.ControlView;
@@ -38,7 +37,7 @@ import org.eclipse.ui.PlatformUI;
  * Command handler for creation new connection for trace control.
  * </p>
  */
-public class NewConnectionHandler implements IHandler {
+public class NewConnectionHandler extends AbstractHandler {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -54,23 +53,15 @@ public class NewConnectionHandler implements IHandler {
     /**
      * The parent trace control component the new node will be added to. 
      */
-    private ITraceControlComponent fParent = null;
-    
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.commands.IHandler#dispose()
-     */
-    @Override
-    public void dispose() {
-    }
+    private ITraceControlComponent fRoot = null;
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+     * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
      */
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        assert (fParent != null);
+        assert (fRoot != null);
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         if (window == null) {
@@ -86,17 +77,13 @@ public class NewConnectionHandler implements IHandler {
         IHost[] hosts = registry.getHostsBySystemType(sysType);
 
         // Open dialog box for the node name and address
-        INewConnectionDialog dialog = new NewConnectionDialog(window.getShell(), fParent, hosts);
+        INewConnectionDialog dialog = new NewConnectionDialog(window.getShell(), fRoot, hosts);
 
         if (dialog.open() == Window.OK) {
 
             String hostName = dialog.getNodeName(); 
             String hostAddress = dialog.getNodeAddress();
 
-//      String hostName = "hallo"; 
-//      String hostAddress = "142.133.166.54";
-//      String hostName = "ha"; 
-//      String hostAddress = "192.168.0.196";
             // get the singleton RSE registry
             IHost host = null;
 
@@ -129,12 +116,12 @@ public class NewConnectionHandler implements IHandler {
             if (host != null) {
                 // successful creation of host
                 TargetNodeComponent node = null;
-                if (!fParent.containsChild(hostName)) {
-                    node = new TargetNodeComponent(hostName, fParent, host);
-                    fParent.addChild(node);
+                if (!fRoot.containsChild(hostName)) {
+                    node = new TargetNodeComponent(hostName, fRoot, host);
+                    fRoot.addChild(node);
                 }
                 else {
-                    node = (TargetNodeComponent)fParent.getChild(hostName);
+                    node = (TargetNodeComponent)fRoot.getChild(hostName);
                 }
 
                 node.connect();
@@ -143,13 +130,14 @@ public class NewConnectionHandler implements IHandler {
         return null;
     }
 
+
     /*
      * (non-Javadoc)
-     * @see org.eclipse.core.commands.IHandler#isEnabled()
+     * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
      */
     @Override
     public boolean isEnabled() {
-        fParent = null;
+        fRoot = null;
 
         // Check if we are closing down
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -165,38 +153,8 @@ public class NewConnectionHandler implements IHandler {
             return false;
         }
 
-        fParent = ((ControlView) part).getTraceControlRoot();
+        fRoot = ((ControlView) part).getTraceControlRoot();
         
-        return (fParent != null);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.commands.IHandler#isHandled()
-     */
-    @Override
-    public boolean isHandled() {
-        // TODO Auto-generated method stub
-        return true;
-    }
-
-    // ------------------------------------------------------------------------
-    // IHandlerListener
-    // ------------------------------------------------------------------------
-    
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.commands.IHandler#addHandlerListener(org.eclipse.core.commands.IHandlerListener)
-     */
-    @Override
-    public void addHandlerListener(IHandlerListener handlerListener) {
-    }
-    
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.commands.IHandler#removeHandlerListener(org.eclipse.core.commands.IHandlerListener)
-     */
-    @Override
-    public void removeHandlerListener(IHandlerListener handlerListener) {
+        return (fRoot != null);
     }
 }

@@ -196,7 +196,7 @@ public class TraceControlPropertiesTest extends TestCase {
 
         assertEquals("ust_tests_hello:tptest_sighandler", baseSource.getPropertyValue(BaseEventPropertySource.BASE_EVENT_NAME_PROPERTY_ID));
         assertEquals(TraceEventType.TRACEPOINT.name(), baseSource.getPropertyValue(BaseEventPropertySource.BASE_EVENT_TYPE_PROPERTY_ID));
-        assertEquals(TraceLogLevel.TRACE_MODULE.name(), baseSource.getPropertyValue(BaseEventPropertySource.BASE_EVENT_LOGLEVEL_PROPERTY_ID));
+        assertEquals(TraceLogLevel.TRACE_DEBUG_MODULE.name(), baseSource.getPropertyValue(BaseEventPropertySource.BASE_EVENT_LOGLEVEL_PROPERTY_ID));
 
         // ------------------------------------------------------------------------
         // Verify Session Properties (adapter)

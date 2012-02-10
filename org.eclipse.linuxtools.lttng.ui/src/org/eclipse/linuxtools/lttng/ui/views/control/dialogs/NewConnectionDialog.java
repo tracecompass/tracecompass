@@ -71,7 +71,7 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
      */
     private CCombo fExistingHostsCombo = null;
     /**
-     * The check box button for enablling/disabling the text input.
+     * The check box button for enabling/disabling the text input.
      */
     private Button fButton = null;
     /**
@@ -160,7 +160,7 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
 
         // Existing connections group
         fComboGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
-        fComboGroup.setText(Messages.TraceControl_NewNodeExistingConnetionsGroupName);
+        fComboGroup.setText(Messages.TraceControl_NewNodeExistingConnectionGroupName);
         layout = new GridLayout(2, true);
         fComboGroup.setLayout(layout); 
         GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
@@ -191,15 +191,15 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         fButton.setEnabled(fExistingHosts.length > 0);
         
         Label nodeNameLabel = new Label(fTextGroup, SWT.RIGHT);
-        nodeNameLabel.setText(Messages.TraceControl_NewNodeNameLabel);
+        nodeNameLabel.setText(Messages.TraceControl_NewNodeConnectionNameLabel);
         fNodeNameText = new Text(fTextGroup, SWT.NONE);
-        fNodeNameText.setToolTipText(Messages.TraceControl_NewNodeNameTooltip);
+        fNodeNameText.setToolTipText(Messages.TraceControl_NewNodeConnectionNameTooltip);
         fNodeNameText.setEnabled(fExistingHosts.length == 0);
         
         Label nodeAddressLabel = new Label(fTextGroup, SWT.RIGHT);
-        nodeAddressLabel.setText(Messages.TraceControl_NewNodeAddressLabel);
+        nodeAddressLabel.setText(Messages.TraceControl_NewNodeHostNameLabel);
         fNodeAddressText = new Text(fTextGroup, SWT.NONE);
-        fNodeAddressText.setToolTipText(Messages.TraceControl_NewNodeAddressTooltip);
+        fNodeAddressText.setToolTipText(Messages.TraceControl_NewNodeHostNameTooltip);
         fNodeAddressText.setEnabled(fExistingHosts.length == 0);
 
         fButton.addSelectionListener(new SelectionListener() {

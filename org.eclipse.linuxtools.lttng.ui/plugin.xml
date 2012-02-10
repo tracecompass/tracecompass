@@ -555,6 +555,14 @@
       <handler
             class="org.eclipse.linuxtools.lttng.ui.views.control.handlers.NewConnectionHandler"
             commandId="org.eclipse.linuxtools.lttng.ui.command.newConnection">
+         <activeWhen>
+            <with
+                  variable="activePart">
+               <instanceof
+                     value="org.eclipse.linuxtools.lttng.ui.views.control.ControlView">
+               </instanceof>
+            </with>
+         </activeWhen>
       </handler>
       <handler
             class="org.eclipse.linuxtools.lttng.ui.views.control.handlers.ConnectHandler"

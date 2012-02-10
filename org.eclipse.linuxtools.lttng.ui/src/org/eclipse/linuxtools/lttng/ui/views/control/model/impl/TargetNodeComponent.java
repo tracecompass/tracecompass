@@ -141,7 +141,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
     @Override
     public void setTargetNodeState(TargetNodeState state) {
         fState = state;
-        fireCompenentChanged(TargetNodeComponent.this);
+        fireComponentChanged(TargetNodeComponent.this);
     }
     
     /*

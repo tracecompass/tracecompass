@@ -34,7 +34,7 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
     /**
      * The trace log level.
      */
-    private TraceLogLevel fLogLevel = TraceLogLevel.TRACE_DEFAULT;
+    private TraceLogLevel fLogLevel = TraceLogLevel.TRACE_DEBUG;
   
     // ------------------------------------------------------------------------
     // Constructors
@@ -128,26 +128,26 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
             fLogLevel = TraceLogLevel.TRACE_NOTICE;
         } else if(TraceLogLevel.TRACE_INFO.getInName().equals(levelName)) {
             fLogLevel = TraceLogLevel.TRACE_INFO;
-        } else if(TraceLogLevel.TRACE_SYSTEM.getInName().equals(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_SYSTEM;
-        } else if(TraceLogLevel.TRACE_PROGRAM.getInName().equals(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_PROGRAM;
-        } else if(TraceLogLevel.TRACE_PROCESS.getInName().equals(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_PROCESS;
-        } else if(TraceLogLevel.TRACE_MODULE.getInName().equals(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_MODULE;
-        } else if(TraceLogLevel.TRACE_UNIT.getInName().equals(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_UNIT;
-        } else if(TraceLogLevel.TRACE_FUNCTION.getInName().equals(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_FUNCTION;
-        } else if(TraceLogLevel.TRACE_DEFAULT.getInName().equals(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_DEFAULT;
-        } else if(TraceLogLevel.TRACE_VERBOSE.getInName().equals(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_VERBOSE;
+        } else if(TraceLogLevel.TRACE_DEBUG_SYSTEM.getInName().equals(levelName)) {
+            fLogLevel = TraceLogLevel.TRACE_DEBUG_SYSTEM;
+        } else if(TraceLogLevel.TRACE_DEBUG_PROGRAM.getInName().equals(levelName)) {
+            fLogLevel = TraceLogLevel.TRACE_DEBUG_PROGRAM;
+        } else if(TraceLogLevel.TRACE_DEBUG_PROCESS.getInName().equals(levelName)) {
+            fLogLevel = TraceLogLevel.TRACE_DEBUG_PROCESS;
+        } else if(TraceLogLevel.TRACE_DEBUG_MODULE.getInName().equals(levelName)) {
+            fLogLevel = TraceLogLevel.TRACE_DEBUG_MODULE;
+        } else if(TraceLogLevel.TRACE_DEBUG_UNIT.getInName().equals(levelName)) {
+            fLogLevel = TraceLogLevel.TRACE_DEBUG_UNIT;
+        } else if(TraceLogLevel.TRACE_DEBUG_FUNCTION.getInName().equals(levelName)) {
+            fLogLevel = TraceLogLevel.TRACE_DEBUG_FUNCTION;
+        } else if(TraceLogLevel.TRACE_DEBUG_LINE.getInName().equals(levelName)) {
+            fLogLevel = TraceLogLevel.TRACE_DEBUG_LINE;
         } else if(TraceLogLevel.TRACE_DEBUG.getInName().equals(levelName)) {
             fLogLevel = TraceLogLevel.TRACE_DEBUG;
+        } else if(TraceLogLevel.LEVEL_UNKNOWN.getInName().equals(levelName)) {
+            fLogLevel = TraceLogLevel.LEVEL_UNKNOWN;
         } else {
-            fLogLevel = TraceLogLevel.TRACE_DEFAULT;
+            fLogLevel = TraceLogLevel.TRACE_DEBUG;
         }
     }
     

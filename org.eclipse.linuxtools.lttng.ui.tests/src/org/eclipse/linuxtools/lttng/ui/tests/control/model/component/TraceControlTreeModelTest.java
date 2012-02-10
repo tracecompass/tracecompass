@@ -197,7 +197,7 @@ public class TraceControlTreeModelTest extends TestCase {
         baseEventInfo = (BaseEventComponent) events[0];
         assertNotNull(baseEventInfo);
         assertEquals("ust_tests_hello:tptest_sighandler", baseEventInfo.getName());
-        assertEquals(TraceLogLevel.TRACE_MODULE, baseEventInfo.getLogLevel());
+        assertEquals(TraceLogLevel.TRACE_DEBUG_MODULE, baseEventInfo.getLogLevel());
         assertEquals(TraceEventType.TRACEPOINT, baseEventInfo.getEventType());
 
         baseEventInfo = (BaseEventComponent) events[1];
@@ -230,7 +230,7 @@ public class TraceControlTreeModelTest extends TestCase {
 
         baseEventInfo = (BaseEventComponent) events[1];
         assertEquals("ust_tests_hello:tptest", baseEventInfo.getName());
-        assertEquals(TraceLogLevel.TRACE_FUNCTION, baseEventInfo.getLogLevel());
+        assertEquals(TraceLogLevel.TRACE_DEBUG_FUNCTION, baseEventInfo.getLogLevel());
         assertEquals(TraceEventType.TRACEPOINT, baseEventInfo.getEventType());
         
         // verify getters and setters
@@ -379,13 +379,13 @@ public class TraceControlTreeModelTest extends TestCase {
         
         event = (TraceEventComponent) ustEvents[0];
         assertEquals("ust_tests_hello:tptest_sighandler", event.getName());
-        assertEquals(TraceLogLevel.TRACE_DEFAULT, event.getLogLevel());
+        assertEquals(TraceLogLevel.TRACE_DEBUG_LINE, event.getLogLevel());
         assertEquals(TraceEventType.TRACEPOINT, event.getEventType());
         assertEquals(TraceEnablement.DISABLED, event.getState());
         
         event = (TraceEventComponent) ustEvents[1];
         assertEquals("*", ustEvents[1].getName());
-        assertEquals(TraceLogLevel.TRACE_EMERG, event.getLogLevel());
+        assertEquals(TraceLogLevel.LEVEL_UNKNOWN, event.getLogLevel());
         assertEquals(TraceEventType.TRACEPOINT, event.getEventType());
         assertEquals(TraceEnablement.ENABLED, event.getState());
         
@@ -443,7 +443,7 @@ public class TraceControlTreeModelTest extends TestCase {
         
         event.setLogLevel(TraceLogLevel.TRACE_INFO);
         assertEquals(TraceLogLevel.TRACE_INFO, event.getLogLevel());
-        event.setLogLevel("TRACE_ALERT1");
+        event.setLogLevel("TRACE_ALERT");
         assertEquals(TraceLogLevel.TRACE_ALERT, event.getLogLevel());
 
         event.setEventType(TraceEventType.UNKNOWN);
@@ -470,7 +470,7 @@ public class TraceControlTreeModelTest extends TestCase {
         
         event.setLogLevel(TraceLogLevel.TRACE_INFO);
         assertEquals(TraceLogLevel.TRACE_INFO, event.getLogLevel());
-        event.setLogLevel("TRACE_ALERT1");
+        event.setLogLevel("TRACE_ALERT");
         assertEquals(TraceLogLevel.TRACE_ALERT, event.getLogLevel());
 
         event.setEventType(TraceEventType.UNKNOWN);

@@ -11,10 +11,7 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.control.handlers;
 
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.IHandler;
-import org.eclipse.core.commands.IHandlerListener;
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.linuxtools.lttng.ui.views.control.ControlView;
@@ -30,7 +27,7 @@ import org.eclipse.ui.PlatformUI;
  * Command handler implementation to delete a target host.
  * </p>
  */
-abstract public class BaseNodeHandler implements IHandler {
+abstract public class BaseNodeHandler extends AbstractHandler {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -56,22 +53,7 @@ abstract public class BaseNodeHandler implements IHandler {
     // ------------------------------------------------------------------------
     /*
      * (non-Javadoc)
-     * @see org.eclipse.core.commands.IHandler#dispose()
-     */
-    @Override
-    public void dispose() {
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
-     */
-    @Override
-    abstract public Object execute(ExecutionEvent event) throws ExecutionException;
-
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.commands.IHandler#isEnabled()
+     * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
      */
     @Override
     public boolean isEnabled() {
@@ -101,33 +83,5 @@ abstract public class BaseNodeHandler implements IHandler {
             fTargetNode = (element instanceof TargetNodeComponent) ? (TargetNodeComponent) element : null;
         }
         return fTargetNode != null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.commands.IHandler#isHandled()
-     */
-    @Override
-    public boolean isHandled() {
-        return true;
-    }
-
-    // ------------------------------------------------------------------------
-    // IHandlerListener
-    // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.commands.IHandler#addHandlerListener(org.eclipse.core.commands.IHandlerListener)
-     */
-    @Override
-    public void addHandlerListener(IHandlerListener handlerListener) {
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.core.commands.IHandler#removeHandlerListener(org.eclipse.core.commands.IHandlerListener)
-     */
-    @Override
-    public void removeHandlerListener(IHandlerListener handlerListener) {
     }
 }

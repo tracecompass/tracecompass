@@ -108,13 +108,6 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
     @Override
     public void setFocus() {
         fTreeViewer.getControl().setFocus();
-        final ISelection sel = fTreeViewer.getSelection();
-        if (sel == null) {
-            fTreeViewer.setSelection(new StructuredSelection(fRoot));
-            fTreeViewer.setSelection(null);
-            return;
-        }
-        fTreeViewer.setSelection(sel);
     }
     
     /*
@@ -164,7 +157,6 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
     // Helper methods
     // ------------------------------------------------------------------------
     private void createContextMenu() {
-     // This is new code
         // First we create a menu Manager
         final MenuManager menuManager = new MenuManager();
         final Menu menu = menuManager.createContextMenu(fTreeViewer.getTree());

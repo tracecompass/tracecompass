@@ -202,7 +202,7 @@ public class EventInfoTest extends TestCase {
         String result = fixture.toString();
 
         // add additional test code here
-        assertEquals("[EventInfo([BaseEventInfo([TraceInfo(Name=testName)],type=TRACEPOINT,level=TRACE_DEFAULT)],State=DISABLED)]", result);
+        assertEquals("[EventInfo([BaseEventInfo([TraceInfo(Name=testName)],type=TRACEPOINT,level=TRACE_DEBUG)],State=DISABLED)]", result);
     }
 
     // ------------------------------------------------------------------------

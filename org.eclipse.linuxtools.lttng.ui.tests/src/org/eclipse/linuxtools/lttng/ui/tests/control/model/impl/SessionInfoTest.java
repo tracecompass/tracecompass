@@ -198,7 +198,7 @@ public class SessionInfoTest extends TestCase {
         String result = fSessionInfo1.toString();
 
         // add additional test code here
-        assertEquals("[SessionInfo([TraceInfo(Name=session1)],State=ACTIVE,Domains=[DomainInfo([TraceInfo(Name=test1)],Channels=[ChannelInfo([TraceInfo(Name=channel1)],State=DISABLED,OverwriteMode=true,SubBuffersSize=13,NumberOfSubBuffers=12,SwitchTimer=10,ReadTimer=11,output=splice(),Events=[EventInfo([BaseEventInfo([TraceInfo(Name=event1)],type=TRACEPOINT,level=TRACE_DEFAULT)],State=ENABLED)])])])]", result);
+        assertEquals("[SessionInfo([TraceInfo(Name=session1)],State=ACTIVE,Domains=[DomainInfo([TraceInfo(Name=test1)],Channels=[ChannelInfo([TraceInfo(Name=channel1)],State=DISABLED,OverwriteMode=true,SubBuffersSize=13,NumberOfSubBuffers=12,SwitchTimer=10,ReadTimer=11,output=splice(),Events=[EventInfo([BaseEventInfo([TraceInfo(Name=event1)],type=TRACEPOINT,level=TRACE_DEBUG)],State=ENABLED)])])])]", result);
     }
     
     // ------------------------------------------------------------------------

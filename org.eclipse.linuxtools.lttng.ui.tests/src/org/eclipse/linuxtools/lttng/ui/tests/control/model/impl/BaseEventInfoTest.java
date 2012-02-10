@@ -78,10 +78,10 @@ public class BaseEventInfoTest extends TestCase {
         assertEquals(1, result.ordinal());
         
         TraceLogLevel level = fixture.getLogLevel();
-        assertEquals("TRACE_DEFAULT13", level.getInName());
-        assertEquals("TRACE_DEFAULT", level.name());
-        assertEquals("TRACE_DEFAULT", level.toString());
-        assertEquals(13, level.ordinal());
+        assertEquals("TRACE_DEBUG", level.getInName());
+        assertEquals("TRACE_DEBUG", level.name());
+        assertEquals("TRACE_DEBUG", level.toString());
+        assertEquals(14, level.ordinal());
     }
 
     /**
@@ -182,18 +182,18 @@ public class BaseEventInfoTest extends TestCase {
         // 2 set/get-operations are enough to test the method
         TraceLogLevel result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_CRIT2", result.getInName());
+        assertEquals("TRACE_CRIT", result.getInName());
         assertEquals("TRACE_CRIT", result.name());
         assertEquals("TRACE_CRIT", result.toString());
         assertEquals(2, result.ordinal());
 
-        fixture.setLogLevel(TraceLogLevel.TRACE_FUNCTION);
+        fixture.setLogLevel(TraceLogLevel.TRACE_DEBUG_FUNCTION);
         
         result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_FUNCTION12", result.getInName());
-        assertEquals("TRACE_FUNCTION", result.name());
-        assertEquals("TRACE_FUNCTION", result.toString());
+        assertEquals("TRACE_DEBUG_FUNCTION", result.getInName());
+        assertEquals("TRACE_DEBUG_FUNCTION", result.name());
+        assertEquals("TRACE_DEBUG_FUNCTION", result.toString());
         assertEquals(12, result.ordinal());
     }
     
@@ -205,156 +205,156 @@ public class BaseEventInfoTest extends TestCase {
     public void testSetLogLevel2() {
         BaseEventInfo fixture = new BaseEventInfo("event");
         fixture.setEventType(TraceEventType.TRACEPOINT);
-        fixture.setLogLevel("TRACE_EMERG0");
+        fixture.setLogLevel("TRACE_EMERG");
         
         TraceLogLevel result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_EMERG0", result.getInName());
+        assertEquals("TRACE_EMERG", result.getInName());
         assertEquals("TRACE_EMERG", result.name());
         assertEquals(0, result.ordinal());
 
         //------------------------
-        fixture.setLogLevel("TRACE_ALERT1");
+        fixture.setLogLevel("TRACE_ALERT");
         
         result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_ALERT1", result.getInName());
+        assertEquals("TRACE_ALERT", result.getInName());
         assertEquals("TRACE_ALERT", result.name());
         assertEquals(1, result.ordinal());
         
         //------------------------
-        fixture.setLogLevel("TRACE_CRIT2");
+        fixture.setLogLevel("TRACE_CRIT");
         
         result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_CRIT2", result.getInName());
+        assertEquals("TRACE_CRIT", result.getInName());
         assertEquals("TRACE_CRIT", result.name());
         assertEquals(2, result.ordinal());
 
         //------------------------
-        fixture.setLogLevel("TRACE_ERR3");
+        fixture.setLogLevel("TRACE_ERR");
         
         result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_ERR3", result.getInName());
+        assertEquals("TRACE_ERR", result.getInName());
         assertEquals("TRACE_ERR", result.name());
         assertEquals(3, result.ordinal());
 
         //------------------------
-        fixture.setLogLevel("TRACE_WARNING4");
+        fixture.setLogLevel("TRACE_WARNING");
         
         result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_WARNING4", result.getInName());
+        assertEquals("TRACE_WARNING", result.getInName());
         assertEquals("TRACE_WARNING", result.name());
         assertEquals(4, result.ordinal());
 
         //------------------------
-        fixture.setLogLevel("TRACE_NOTICE5");
+        fixture.setLogLevel("TRACE_NOTICE");
         
         result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_NOTICE5", result.getInName());
+        assertEquals("TRACE_NOTICE", result.getInName());
         assertEquals("TRACE_NOTICE", result.name());
         assertEquals(5, result.ordinal());
 
         //------------------------
-        fixture.setLogLevel("TRACE_INFO6");
+        fixture.setLogLevel("TRACE_INFO");
         
         result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_INFO6", result.getInName());
+        assertEquals("TRACE_INFO", result.getInName());
         assertEquals("TRACE_INFO", result.name());
         assertEquals(6, result.ordinal());
 
         //------------------------
-        fixture.setLogLevel("TRACE_SYSTEM7");
+        fixture.setLogLevel("TRACE_DEBUG_SYSTEM");
         
         result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_SYSTEM7", result.getInName());
-        assertEquals("TRACE_SYSTEM", result.name());
+        assertEquals("TRACE_DEBUG_SYSTEM", result.getInName());
+        assertEquals("TRACE_DEBUG_SYSTEM", result.name());
         assertEquals(7, result.ordinal());
 
         //------------------------
-        fixture.setLogLevel("TRACE_PROGRAM8");
+        fixture.setLogLevel("TRACE_DEBUG_PROGRAM");
         
         result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_PROGRAM8", result.getInName());
-        assertEquals("TRACE_PROGRAM", result.name());
+        assertEquals("TRACE_DEBUG_PROGRAM", result.getInName());
+        assertEquals("TRACE_DEBUG_PROGRAM", result.name());
         assertEquals(8, result.ordinal());
 
         //------------------------
-        fixture.setLogLevel("TRACE_PROCESS9");
+        fixture.setLogLevel("TRACE_DEBUG_PROCESS");
         
         result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_PROCESS9", result.getInName());
-        assertEquals("TRACE_PROCESS", result.name());
+        assertEquals("TRACE_DEBUG_PROCESS", result.getInName());
+        assertEquals("TRACE_DEBUG_PROCESS", result.name());
         assertEquals(9, result.ordinal());
 
         //------------------------
-        fixture.setLogLevel("TRACE_MODULE10");
+        fixture.setLogLevel("TRACE_DEBUG_MODULE");
         
         result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_MODULE10", result.getInName());
-        assertEquals("TRACE_MODULE", result.name());
+        assertEquals("TRACE_DEBUG_MODULE", result.getInName());
+        assertEquals("TRACE_DEBUG_MODULE", result.name());
         assertEquals(10, result.ordinal());
 
         //------------------------
-        fixture.setLogLevel("TRACE_UNIT11");
+        fixture.setLogLevel("TRACE_DEBUG_UNIT");
         
         result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_UNIT11", result.getInName());
-        assertEquals("TRACE_UNIT", result.name());
+        assertEquals("TRACE_DEBUG_UNIT", result.getInName());
+        assertEquals("TRACE_DEBUG_UNIT", result.name());
         assertEquals(11, result.ordinal());
 
         //------------------------
-        fixture.setLogLevel("TRACE_FUNCTION12");
+        fixture.setLogLevel("TRACE_DEBUG_FUNCTION");
         
         result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_FUNCTION12", result.getInName());
-        assertEquals("TRACE_FUNCTION", result.name());
+        assertEquals("TRACE_DEBUG_FUNCTION", result.getInName());
+        assertEquals("TRACE_DEBUG_FUNCTION", result.name());
         assertEquals(12, result.ordinal());
 
         //------------------------
-        fixture.setLogLevel("TRACE_DEFAULT13");
+        fixture.setLogLevel("TRACE_DEBUG_LINE");
         
         result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_DEFAULT13", result.getInName());
-        assertEquals("TRACE_DEFAULT", result.name());
+        assertEquals("TRACE_DEBUG_LINE", result.getInName());
+        assertEquals("TRACE_DEBUG_LINE", result.name());
         assertEquals(13, result.ordinal());
 
         //------------------------
-        fixture.setLogLevel("TRACE_VERBOSE14");
+        fixture.setLogLevel("TRACE_DEBUG");
         
         result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_VERBOSE14", result.getInName());
-        assertEquals("TRACE_VERBOSE", result.name());
+        assertEquals("TRACE_DEBUG", result.getInName());
+        assertEquals("TRACE_DEBUG", result.name());
         assertEquals(14, result.ordinal());
 
-        //------------------------
-        fixture.setLogLevel("TRACE_DEBUG15");
+        //-------------------------
+        fixture.setLogLevel("LEVEL_UNKNOWN");
         
         result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_DEBUG15", result.getInName());
-        assertEquals("TRACE_DEBUG", result.name());
+        assertEquals("LEVEL_UNKNOWN", result.getInName());
+        assertEquals("LEVEL_UNKNOWN", result.name());
         assertEquals(15, result.ordinal());
-
-        fixture.setLogLevel("garbabe");
+        
+        fixture.setLogLevel("garbage");
         
         result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_DEFAULT13", result.getInName());
-        assertEquals("TRACE_DEFAULT", result.name());
-        assertEquals(13, result.ordinal());
+        assertEquals("TRACE_DEBUG", result.getInName());
+        assertEquals("TRACE_DEBUG", result.name());
+        assertEquals(14, result.ordinal());
     }
     
 

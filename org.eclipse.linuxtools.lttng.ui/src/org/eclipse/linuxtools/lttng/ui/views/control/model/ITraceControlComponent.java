@@ -171,18 +171,18 @@ public interface ITraceControlComponent extends IAdaptable {
      * @param parent - the parent where the child was added.
      * @param component - the child that was added.
      */
-    public void fireCompenentAdded(ITraceControlComponent parent, ITraceControlComponent component);
+    public void fireComponentAdded(ITraceControlComponent parent, ITraceControlComponent component);
     
     /**
      * Notifies listeners about the removal of a child.
      * @param parent - the parent where the child was removed.
      * @param component - the child that was removed.
      */
-    public void fireCompenentRemoved(ITraceControlComponent parent, ITraceControlComponent component);
+    public void fireComponentRemoved(ITraceControlComponent parent, ITraceControlComponent component);
     
     /**
      * Notifies listeners about the change of a component.
      * @param component - the component that was changed.
      */
-    public void fireCompenentChanged(ITraceControlComponent component);
+    public void fireComponentChanged(ITraceControlComponent component);
 }

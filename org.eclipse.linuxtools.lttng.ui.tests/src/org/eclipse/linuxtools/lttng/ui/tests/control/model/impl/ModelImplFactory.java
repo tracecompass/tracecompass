@@ -54,7 +54,7 @@ public class ModelImplFactory {
         fBaseEventInfo1.setLogLevel(TraceLogLevel.TRACE_ERR);
         fBaseEventInfo2 = new BaseEventInfo("event2");
         fBaseEventInfo2.setEventType(TraceEventType.TRACEPOINT);
-        fBaseEventInfo1.setLogLevel(TraceLogLevel.TRACE_DEFAULT);
+        fBaseEventInfo1.setLogLevel(TraceLogLevel.TRACE_DEBUG);
         
         fEventInfo1 = new EventInfo("event1");
         fEventInfo1.setEventType(TraceEventType.TRACEPOINT);

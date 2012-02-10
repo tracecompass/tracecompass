@@ -228,12 +228,12 @@ public class LTTngControlServiceTest extends TestCase {
             assertEquals(2, ustEvents.length);
             
             assertEquals("ust_tests_hello:tptest_sighandler", ustEvents[0].getName());
-            assertEquals(TraceLogLevel.TRACE_DEFAULT, ustEvents[0].getLogLevel());
+            assertEquals(TraceLogLevel.TRACE_DEBUG_LINE, ustEvents[0].getLogLevel());
             assertEquals(TraceEventType.TRACEPOINT, ustEvents[0].getEventType());
             assertEquals(TraceEnablement.DISABLED, ustEvents[0].getState());
             
             assertEquals("*", ustEvents[1].getName());
-            assertEquals(TraceLogLevel.TRACE_EMERG, ustEvents[1].getLogLevel());
+            assertEquals(TraceLogLevel.LEVEL_UNKNOWN, ustEvents[1].getLogLevel());
             assertEquals(TraceEventType.TRACEPOINT, ustEvents[1].getEventType());
             assertEquals(TraceEnablement.ENABLED, ustEvents[1].getState());
             
@@ -303,7 +303,7 @@ public class LTTngControlServiceTest extends TestCase {
             IBaseEventInfo baseEventInfo = (IBaseEventInfo) events[0];
             assertNotNull(baseEventInfo);
             assertEquals("ust_tests_hello:tptest_sighandler", baseEventInfo.getName());
-            assertEquals(TraceLogLevel.TRACE_MODULE, baseEventInfo.getLogLevel());
+            assertEquals(TraceLogLevel.TRACE_DEBUG_MODULE, baseEventInfo.getLogLevel());
             assertEquals(TraceEventType.TRACEPOINT, baseEventInfo.getEventType());
             
             baseEventInfo = (IBaseEventInfo) events[1];
@@ -328,7 +328,7 @@ public class LTTngControlServiceTest extends TestCase {
             
             baseEventInfo = (IBaseEventInfo) events[1];
             assertEquals("ust_tests_hello:tptest", baseEventInfo.getName());
-            assertEquals(TraceLogLevel.TRACE_FUNCTION, baseEventInfo.getLogLevel());
+            assertEquals(TraceLogLevel.TRACE_DEBUG_FUNCTION, baseEventInfo.getLogLevel());
             assertEquals(TraceEventType.TRACEPOINT, baseEventInfo.getEventType());
 
         } catch (ExecutionException e) {

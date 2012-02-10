@@ -44,8 +44,8 @@ public class SessionNamesShell extends TestCommandShell {
             list.add("      output: splice()");
             list.add("");
             list.add("    Events:");
-            list.add("      block_rq_remap (loglevel: TRACE_EMERG0) (type: tracepoint) [enabled]");
-            list.add("      block_bio_remap (loglevel: TRACE_EMERG0) (type: tracepoint) [disabled]");
+            list.add("      block_rq_remap (loglevel: TRACE_EMERG (0)) (type: tracepoint) [enabled]");
+            list.add("      block_bio_remap (loglevel: TRACE_EMERG (0)) (type: tracepoint) [disabled]");
             list.add("");
             list.add("- channel1: [disabled]");
             list.add("");
@@ -88,8 +88,8 @@ public class SessionNamesShell extends TestCommandShell {
             list.add("      output: mmap()");
             list.add("");
             list.add("    Events:");
-            list.add("      ust_tests_hello:tptest_sighandler (loglevel: TRACE_DEFAULT13) (type: tracepoint) [disabled]");
-            list.add("      * (loglevel: TRACE_EMERG0) (type: tracepoint) [enabled]");
+            list.add("      ust_tests_hello:tptest_sighandler (loglevel: TRACE_DEBUG_LINE (13)) (type: tracepoint) [disabled]");
+            list.add("      * (type: tracepoint) [enabled]");
             list.add("");
             return new CommandResult(0, list.toArray(new String[list.size()]));
         } else if ("lttng list -u".equals(command)) {
@@ -98,21 +98,21 @@ public class SessionNamesShell extends TestCommandShell {
             list.add("-------------");
             list.add("");
             list.add("PID: 9379 - Name: /home/user/git/lttng-ust/tests/hello.cxx/.libs/lt-hello");
-            list.add("    ust_tests_hello:tptest_sighandler (loglevel: TRACE_MODULE10) (type: tracepoint)");
-            list.add("    ust_tests_hello:tptest (loglevel: TRACE_INFO6) (type: tracepoint)");
+            list.add("    ust_tests_hello:tptest_sighandler (loglevel: TRACE_DEBUG_MODULE (10)) (type: tracepoint)");
+            list.add("    ust_tests_hello:tptest (loglevel: TRACE_INFO (6)) (type: tracepoint)");
             list.add("");
             list.add("PID: 4852 - Name: /home/user/git/lttng-ust/tests/hello.cxx/.libs/lt-hello");
-            list.add("    ust_tests_hello:tptest_sighandler (loglevel: TRACE_WARNING4) (type: tracepoint)");
-            list.add("    ust_tests_hello:tptest (loglevel: TRACE_FUNCTION12) (type: tracepoint)");
+            list.add("    ust_tests_hello:tptest_sighandler (loglevel: TRACE_WARNING (4)) (type: tracepoint)");
+            list.add("    ust_tests_hello:tptest (loglevel: TRACE_DEBUG_FUNCTION (12)) (type: tracepoint)");
             list.add("");
             return new CommandResult(0, list.toArray(new String[list.size()]));
         } else if ("lttng list -k".equals(command)) {
             List<String> list = new ArrayList<String>();
             list.add("Kernel events:");
             list.add("-------------");
-            list.add("      sched_kthread_stop (loglevel: TRACE_EMERG0) (type: tracepoint)");
-            list.add("      sched_kthread_stop_ret (loglevel: TRACE_EMERG0) (type: tracepoint)");
-            list.add("      sched_wakeup_new (loglevel: TRACE_EMERG0) (type: tracepoint)");
+            list.add("      sched_kthread_stop (loglevel: TRACE_EMERG (0)) (type: tracepoint)");
+            list.add("      sched_kthread_stop_ret (loglevel: TRACE_EMERG (0)) (type: tracepoint)");
+            list.add("      sched_wakeup_new (loglevel: TRACE_EMERG (0)) (type: tracepoint)");
             list.add("");
             return new CommandResult(0, list.toArray(new String[list.size()]));
         } else if ("lttng list mysession1".equals(command)) {

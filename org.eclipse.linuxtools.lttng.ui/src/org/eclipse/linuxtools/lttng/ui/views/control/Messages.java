@@ -42,13 +42,13 @@ final public class Messages extends NLS {
     
     // Dialogs
     public static String TraceControl_NewDialogTitle;
-    public static String TraceControl_NewNodeExistingConnetionsGroupName;
+    public static String TraceControl_NewNodeExistingConnectionGroupName;
     public static String TraceControl_NewNodeEditButtonName;
     public static String TraceControl_NewNodeComboToolTip;
-    public static String TraceControl_NewNodeNameLabel;
-    public static String TraceControl_NewNodeNameTooltip;
-    public static String TraceControl_NewNodeAddressLabel;
-    public static String TraceControl_NewNodeAddressTooltip;
+    public static String TraceControl_NewNodeConnectionNameLabel;
+    public static String TraceControl_NewNodeConnectionNameTooltip;
+    public static String TraceControl_NewNodeHostNameLabel;
+    public static String TraceControl_NewNodeHostNameTooltip;
     public static String TraceControl_AlreadyExistsError;
     
     // Tree structure strings

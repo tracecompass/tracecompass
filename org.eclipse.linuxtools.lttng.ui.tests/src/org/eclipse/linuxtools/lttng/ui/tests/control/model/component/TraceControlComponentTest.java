@@ -180,7 +180,7 @@ public class TraceControlComponentTest extends TestCase {
         fixture.removeChild(root);
         assertTrue(validator.isRemovedCalled());
 
-        fixture.fireCompenentChanged(fixture);
+        fixture.fireComponentChanged(fixture);
         assertTrue(validator.isChangedCalled());
     }
 
@@ -240,20 +240,20 @@ public class TraceControlComponentTest extends TestCase {
         ListenerValidator validator = new ListenerValidator();
         fixture.addComponentListener(validator);
 
-        fixture.fireCompenentAdded(parent, component);
+        fixture.fireComponentAdded(parent, component);
         assertTrue(validator.isAddedCalled());
         assertEquals(parent.getName(), validator.getSavedParent().getName());
         assertEquals(component.getName(), validator.getSavedChild().getName());
         
         validator.initialize();
         
-        fixture.fireCompenentRemoved(parent, component);
+        fixture.fireComponentRemoved(parent, component);
         assertTrue(validator.isRemovedCalled());
         assertEquals(parent.getName(), validator.getSavedParent().getName());
         assertEquals(component.getName(), validator.getSavedChild().getName());
 
         validator.initialize();
-        fixture.fireCompenentChanged(fixture);
+        fixture.fireComponentChanged(fixture);
         assertTrue(validator.isChangedCalled());
         assertEquals(fixture.getName(), validator.getSavedComponent().getName());
     }
@@ -475,7 +475,7 @@ public class TraceControlComponentTest extends TestCase {
         fixture.removeChild(root);
         assertFalse(validator.isRemovedCalled());
 
-        fixture.fireCompenentChanged(fixture);
+        fixture.fireComponentChanged(fixture);
         assertFalse(validator.isChangedCalled());
     }
 

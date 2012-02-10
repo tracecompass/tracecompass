@@ -211,8 +211,10 @@ public class CommandShell implements ICommandShell {
         if (cmd == null || cmd.equals("")) //$NON-NLS-1$
             return cmd;
         StringBuffer formattedCommand = new StringBuffer();
-//        formattedCommand.append(cmd).append(CMD_DELIMITER);
-        formattedCommand.append(cmd).append("\\\r;"); //$NON-NLS-1$
+        // Make a multi line command by using \ and \r. This is needed for matching
+        // the DONE_MARKUP_STRING in echoed command when having a long command 
+        // (bigger than max SSH line)
+        formattedCommand.append(cmd).append("\\\r;"); //$NON-NLS-1$ 
         formattedCommand.append(SHELL_ECHO_CMD).append(DONE_MARKUP_STRING);
         formattedCommand.append(" $?"); //$NON-NLS-1$
         formattedCommand.append(CMD_DELIMITER);

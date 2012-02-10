@@ -27,12 +27,14 @@ import org.eclipse.linuxtools.lttng.ui.views.control.model.IDomainInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ISessionInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IUstProviderInfo;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.BaseEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.ChannelInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.DomainInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.EventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.SessionInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.UstProviderInfo;
+
 /**
  * <b><u>LTTngControlService</u></b>
  * <p>
@@ -49,99 +51,110 @@ public class LTTngControlService implements ILttngControlService {
      */
     private final static String CONTROL_COMMAND = "lttng"; //$NON-NLS-1$
     /**
-     * Command: lttng list. 
+     * Command: lttng list.
      */
     private final static String COMMAND_LIST = CONTROL_COMMAND + " list "; //$NON-NLS-1$
     /**
-     * Command to list kernel tracer information. 
+     * Command to list kernel tracer information.
      */
-    private final static String COMMAND_LIST_KERNEL = COMMAND_LIST + "-k";  //$NON-NLS-1$
+    private final static String COMMAND_LIST_KERNEL = COMMAND_LIST + "-k"; //$NON-NLS-1$
     /**
-     * Command to list user space trace information. 
+     * Command to list user space trace information.
      */
-    private final static String COMMAND_LIST_UST = COMMAND_LIST + "-u";  //$NON-NLS-1$
+    private final static String COMMAND_LIST_UST = COMMAND_LIST + "-u"; //$NON-NLS-1$
 
     // Parsing constants
     /**
      * Pattern to match for error output
      */
-    private final static String ERROR_PATTERN = "\\s*Error\\:.*"; //$NON-NLS-1$
+    private final static Pattern ERROR_PATTERN = Pattern.compile("\\s*Error\\:.*"); //$NON-NLS-1$
     /**
      * Pattern to match for session information (lttng list)
      */
-    private final static String SESSION_PATTERN = "\\s+(\\d+)\\)\\s+(.*)\\s+\\((.*)\\)\\s+\\[(active|inactive)\\].*"; //$NON-NLS-1$
+    private final static Pattern SESSION_PATTERN = Pattern.compile("\\s+(\\d+)\\)\\s+(.*)\\s+\\((.*)\\)\\s+\\[(active|inactive)\\].*"); //$NON-NLS-1$
     /**
      * Pattern to match for session information (lttng list <session>)
      */
-    private final static String TRACE_SESSION_PATTERN = "\\s*Tracing\\s+session\\s+(.*)\\:\\s+\\[(active|inactive)\\].*"; //$NON-NLS-1$
+    private final static Pattern TRACE_SESSION_PATTERN = Pattern.compile("\\s*Tracing\\s+session\\s+(.*)\\:\\s+\\[(active|inactive)\\].*"); //$NON-NLS-1$
     /**
      * Pattern to match for session path information (lttng list <session>)
      */
-    private final static String TRACE_SESSION_PATH_PATTERN = "\\s*Trace\\s+path\\:\\s+(.*)"; //$NON-NLS-1$
+    private final static Pattern TRACE_SESSION_PATH_PATTERN = Pattern.compile("\\s*Trace\\s+path\\:\\s+(.*)"); //$NON-NLS-1$
     /**
      * Pattern to match for kernel domain information (lttng list <session>)
      */
-    private final static String DOMAIN_KERNEL_PATTERN = "=== Domain: Kernel ==="; //$NON-NLS-1$
+    private final static Pattern DOMAIN_KERNEL_PATTERN = Pattern.compile("=== Domain: Kernel ==="); //$NON-NLS-1$
     /**
      * Pattern to match for ust domain information (lttng list <session>)
      */
-    private final static String DOMAIN_UST_GLOBAL_PATTERN = "=== Domain: UST global ==="; //$NON-NLS-1$
+    private final static Pattern DOMAIN_UST_GLOBAL_PATTERN = Pattern.compile("=== Domain: UST global ==="); //$NON-NLS-1$
     /**
      * Pattern to match for channels section (lttng list <session>)
      */
-    private final static String CHANNELS_SECTION_PATTERN = "\\s*Channels\\:";  //$NON-NLS-1$
+    private final static Pattern CHANNELS_SECTION_PATTERN = Pattern.compile("\\s*Channels\\:"); //$NON-NLS-1$
     /**
      * Pattern to match for channel information (lttng list <session>)
      */
-    private final static String CHANNEL_PATTERN = "\\s*-\\s+(.*)\\:\\s+\\[(enabled|disabled)\\]"; //$NON-NLS-1$
+    private final static Pattern CHANNEL_PATTERN = Pattern.compile("\\s*-\\s+(.*)\\:\\s+\\[(enabled|disabled)\\]"); //$NON-NLS-1$
     /**
      * Pattern to match for events section information (lttng list <session>)
      */
-    private final static String EVENT_SECTION_PATTERN = "\\s*Events\\:"; //$NON-NLS-1$
+    private final static Pattern EVENT_SECTION_PATTERN = Pattern.compile("\\s*Events\\:"); //$NON-NLS-1$
     /**
-     * Pattern to match for event information (no enabled events) (lttng list <session>)
+     * Pattern to match for event information (no enabled events) (lttng list
+     * <session>)
      */
-//    private final static String EVENT_NONE_PATTERN = "\\s+None"; //$NON-NLS-1$
+    //    private final static String EVENT_NONE_PATTERN = "\\s+None"; //$NON-NLS-1$
     /**
      * Pattern to match for event information (lttng list <session>)
      */
-    private final static String EVENT_PATTERN = "\\s+(.*)\\s+\\(loglevel:\\s+(.*)\\)\\s+\\(type:\\s+(.*)\\)\\s+\\[(enabled|disabled)\\].*"; //$NON-NLS-1$
+    private final static Pattern EVENT_PATTERN = Pattern.compile("\\s+(.*)\\s+\\(loglevel:\\s+(.*)\\s+\\(\\d*\\)\\)\\s+\\(type:\\s+(.*)\\)\\s+\\[(enabled|disabled)\\].*"); //$NON-NLS-1$
     /**
-     * Pattern to match for channel (overwite mode) information (lttng list <session>)
+     * Pattern to match a wildcarded event information (lttng list <session>)
      */
-    private final static String OVERWRITE_MODE_ATTRIBUTE = "\\s+overwrite\\s+mode\\:.*";  //$NON-NLS-1$
+    private final static Pattern WILDCARD_EVENT_PATTERN = Pattern.compile("\\s+(.*)\\s+\\(type:\\s+(.*)\\)\\s+\\[(enabled|disabled)\\].*"); //$NON-NLS-1$
+    /**
+     * Pattern to match for channel (overwite mode) information (lttng list
+     * <session>)
+     */
+    private final static Pattern OVERWRITE_MODE_ATTRIBUTE = Pattern.compile("\\s+overwrite\\s+mode\\:.*"); //$NON-NLS-1$
     /**
      * Pattern to match indicating false for overwrite mode
      */
     private final static String OVERWRITE_MODE_ATTRIBUTE_FALSE = "0"; //$NON-NLS-1$
     /**
-     * Pattern to match for channel (sub-buffer size) information (lttng list <session>)
+     * Pattern to match for channel (sub-buffer size) information (lttng list
+     * <session>)
      */
-    private final static String SUBBUFFER_SIZE_ATTRIBUTE = "\\s+subbufers\\s+size\\:.*"; //$NON-NLS-1$
+    private final static Pattern SUBBUFFER_SIZE_ATTRIBUTE = Pattern.compile("\\s+subbufers\\s+size\\:.*"); //$NON-NLS-1$
     /**
-     * Pattern to match for channel (number of sub-buffers) information (lttng list <session>)
+     * Pattern to match for channel (number of sub-buffers) information (lttng
+     * list <session>)
      */
-    private final static String NUM_SUBBUFFERS_ATTRIBUTE = "\\s+number\\s+of\\s+subbufers\\:.*"; //$NON-NLS-1$
+    private final static Pattern NUM_SUBBUFFERS_ATTRIBUTE = Pattern.compile("\\s+number\\s+of\\s+subbufers\\:.*"); //$NON-NLS-1$
     /**
-     * Pattern to match for channel (switch timer) information (lttng list <session>)
+     * Pattern to match for channel (switch timer) information (lttng list
+     * <session>)
      */
-    private final static String SWITCH_TIMER_ATTRIBUTE = "\\s+switch\\s+timer\\s+interval\\:.*"; //$NON-NLS-1$
+    private final static Pattern SWITCH_TIMER_ATTRIBUTE = Pattern.compile("\\s+switch\\s+timer\\s+interval\\:.*"); //$NON-NLS-1$
     /**
-     * Pattern to match for channel (read timer) information (lttng list <session>)
+     * Pattern to match for channel (read timer) information (lttng list
+     * <session>)
      */
-    private final static String READ_TIMER_ATTRIBUTE = "\\s+read\\s+timer\\s+interval\\:.*"; //$NON-NLS-1$
+    private final static Pattern READ_TIMER_ATTRIBUTE = Pattern.compile("\\s+read\\s+timer\\s+interval\\:.*"); //$NON-NLS-1$
     /**
-     * Pattern to match for channel (output type) information (lttng list <session>)
+     * Pattern to match for channel (output type) information (lttng list
+     * <session>)
      */
-    private final static String OUTPUT_ATTRIBUTE = "\\s+output\\:.*"; //$NON-NLS-1$
+    private final static Pattern OUTPUT_ATTRIBUTE = Pattern.compile("\\s+output\\:.*"); //$NON-NLS-1$
     /**
      * Pattern to match for provider information (lttng list -k/-u)
      */
-    private final static String PROVIDER_EVENT_PATTERN = "\\s*(.*)\\s+\\(loglevel:\\s+(.*)\\)\\s+\\(type:\\s+(.*)\\)"; //$NON-NLS-1$
+    private final static Pattern PROVIDER_EVENT_PATTERN = Pattern.compile("\\s*(.*)\\s+\\(loglevel:\\s+(.*)\\s+\\(\\d*\\)\\)\\s+\\(type:\\s+(.*)\\)"); //$NON-NLS-1$
     /**
      * Pattern to match for UST provider information (lttng list -u)
-     */   
-    private final static String UST_PROVIDER_PATTERN = "\\s*PID\\:\\s+(\\d+)\\s+-\\s+Name\\:\\s+(.*)"; //$NON-NLS-1$
+     */
+    private final static Pattern UST_PROVIDER_PATTERN = Pattern.compile("\\s*PID\\:\\s+(\\d+)\\s+-\\s+Name\\:\\s+(.*)"); //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -157,18 +170,24 @@ public class LTTngControlService implements ILttngControlService {
 
     /**
      * Constructor
-     * @param shell - the command shell implementation to use
+     * 
+     * @param shell
+     *            - the command shell implementation to use
      */
     public LTTngControlService(ICommandShell shell) {
         fCommandShell = shell;
     }
+
     // ------------------------------------------------------------------------
     // Operations
-    // ------------------------------------------------------------------------  
+    // ------------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#getSessionNames()
+     * 
+     * @see
+     * org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService
+     * #getSessionNames()
      */
     @Override
     public String[] getSessionNames() throws ExecutionException {
@@ -177,50 +196,54 @@ public class LTTngControlService implements ILttngControlService {
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#getSessionNames(org.eclipse.core.runtime.IProgressMonitor)
+     * 
+     * @see
+     * org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService
+     * #getSessionNames(org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
     public String[] getSessionNames(IProgressMonitor monitor) throws ExecutionException {
 
-      String command = COMMAND_LIST;
-      ICommandResult result = fCommandShell.executeCommand(command, monitor);
+        String command = COMMAND_LIST;
+        ICommandResult result = fCommandShell.executeCommand(command, monitor);
 
-      if (isError(result)) {
-          // TODO: no session available shouldn't be an error!
-          if (result.getOutput().length > 0 && result.getOutput()[0].matches(ERROR_PATTERN)) {
-              // no sessions available
-              return new String[0];
-          }
-          throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-      }
+        if (isError(result)) {
+            // TODO: no session available shouldn't be an error!
+            if (result.getOutput().length > 0 && ERROR_PATTERN.matcher(result.getOutput()[0]).matches()) {
+                // no sessions available
+                return new String[0];
+            }
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
+        }
 
-      // Output:
-      // Available tracing sessions:
-      //   1) mysession1 (/home/user/lttng-traces/mysession1-20120123-083928) [inactive]
-      //   2) mysession (/home/user/lttng-traces/mysession-20120123-083318) [inactive]
-      //
-      // Use lttng list <session_name> for more details 
-      
-      ArrayList<String> retArray = new ArrayList<String>();
-      int index = 0;
-      while (index < result.getOutput().length) {
-          String line = result.getOutput()[index];
-          try {
-              Pattern pattern = Pattern.compile(SESSION_PATTERN);
-              Matcher matcher = pattern.matcher(line);
-              if (matcher.matches()) {
-                  retArray.add(matcher.group(2).trim());
-              }
-          } catch (PatternSyntaxException e) {
-          }
-          index++;
-      }
-      return retArray.toArray(new String[retArray.size()]);
+        // Output:
+        // Available tracing sessions:
+        // 1) mysession1 (/home/user/lttng-traces/mysession1-20120123-083928)
+        // [inactive]
+        // 2) mysession (/home/user/lttng-traces/mysession-20120123-083318)
+        // [inactive]
+        //
+        // Use lttng list <session_name> for more details
+
+        ArrayList<String> retArray = new ArrayList<String>();
+        int index = 0;
+        while (index < result.getOutput().length) {
+            String line = result.getOutput()[index];
+            Matcher matcher = SESSION_PATTERN.matcher(line);
+            if (matcher.matches()) {
+                retArray.add(matcher.group(2).trim());
+            }
+            index++;
+        }
+        return retArray.toArray(new String[retArray.size()]);
     }
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#getSession(java.lang.String)
+     * 
+     * @see
+     * org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService
+     * #getSession(java.lang.String)
      */
     @Override
     public ISessionInfo getSession(String sessionName) throws ExecutionException {
@@ -229,7 +252,10 @@ public class LTTngControlService implements ILttngControlService {
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#getSession(java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+     * 
+     * @see
+     * org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService
+     * #getSession(java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
     public ISessionInfo getSession(String sessionName, IProgressMonitor monitor) throws ExecutionException {
@@ -243,77 +269,82 @@ public class LTTngControlService implements ILttngControlService {
         int index = 0;
 
         // Output:
-        //   Tracing session mysession2: [inactive]
-        //   Trace path: /home/eedbhu/lttng-traces/mysession2-20120123-110330
+        // Tracing session mysession2: [inactive]
+        // Trace path: /home/eedbhu/lttng-traces/mysession2-20120123-110330
         ISessionInfo sessionInfo = new SessionInfo(sessionName);
 
-        try {
-            while (index < result.getOutput().length) {
-                //   Tracing session mysession2: [inactive]
-                //   Trace path: /home/eedbhu/lttng-traces/mysession2-20120123-110330
-                //
-                //    === Domain: Kernel ===
-                //
-                String line = result.getOutput()[index];
-                if (line.matches(TRACE_SESSION_PATTERN)) {
-                    Pattern pattern = Pattern.compile(TRACE_SESSION_PATTERN);
-                    Matcher matcher = pattern.matcher(line);
-                    if (matcher.matches()) {
-                        sessionInfo.setSessionState(matcher.group(2));
-                    }
-                    index++;
-                } else if (line.matches(TRACE_SESSION_PATH_PATTERN)) {
-                    Pattern pattern = Pattern.compile(TRACE_SESSION_PATH_PATTERN);
-                    Matcher matcher = pattern.matcher(line);
-                    if (matcher.matches()) {
-                        sessionInfo.setSessionPath(matcher.group(1).trim());
-                    }
-                    index++;
-                }
-                else if (line.matches(DOMAIN_KERNEL_PATTERN)) {
-                    // Create Domain
-                    IDomainInfo domainInfo = new DomainInfo(Messages.TraceControl_KernelDomainDisplayName);
-                    sessionInfo.addDomain(domainInfo);
-
-                    // in domain kernel
-                    ArrayList<IChannelInfo> channels = new ArrayList<IChannelInfo>();
-                    index = parseDomain(result.getOutput(), index, channels);
-
-                    // set channels
-                    domainInfo.setChannels(channels);
-
-                } else if (line.contains(DOMAIN_UST_GLOBAL_PATTERN)) {
-                    IDomainInfo domainInfo = new DomainInfo(Messages.TraceControl_UstGlobalDomainDisplayName);
-                    sessionInfo.addDomain(domainInfo);
-
-                    // in domain kernel
-                    ArrayList<IChannelInfo> channels = new ArrayList<IChannelInfo>();
-                    index = parseDomain(result.getOutput(), index, channels);
-
-                    // set channels
-                    domainInfo.setChannels(channels);
-                } else {
-                    index++;
-                }
+        while (index < result.getOutput().length) {
+            // Tracing session mysession2: [inactive]
+            // Trace path: /home/eedbhu/lttng-traces/mysession2-20120123-110330
+            //
+            // === Domain: Kernel ===
+            //
+            String line = result.getOutput()[index];
+            Matcher matcher = TRACE_SESSION_PATTERN.matcher(line);
+            if (matcher.matches()) {
+                sessionInfo.setSessionState(matcher.group(2));
+                index++;
+                continue;
             }
-        } catch (PatternSyntaxException e) {
-            throw new ExecutionException("Invalid regular expression", e); //$NON-NLS-1$
-        }   
+
+            matcher = TRACE_SESSION_PATH_PATTERN.matcher(line);
+            if (matcher.matches()) {
+                sessionInfo.setSessionPath(matcher.group(1).trim());
+                index++;
+                continue;
+            }
+
+            matcher = DOMAIN_KERNEL_PATTERN.matcher(line);
+            if (matcher.matches()) {
+                // Create Domain
+                IDomainInfo domainInfo = new DomainInfo(Messages.TraceControl_KernelDomainDisplayName);
+                sessionInfo.addDomain(domainInfo);
+
+                // in domain kernel
+                ArrayList<IChannelInfo> channels = new ArrayList<IChannelInfo>();
+                index = parseDomain(result.getOutput(), index, channels);
+
+                // set channels
+                domainInfo.setChannels(channels);
+                continue;
+            }
+
+            matcher = DOMAIN_UST_GLOBAL_PATTERN.matcher(line);
+            if (matcher.matches()) {
+                IDomainInfo domainInfo = new DomainInfo(Messages.TraceControl_UstGlobalDomainDisplayName);
+                sessionInfo.addDomain(domainInfo);
+
+                // in domain kernel
+                ArrayList<IChannelInfo> channels = new ArrayList<IChannelInfo>();
+                index = parseDomain(result.getOutput(), index, channels);
+
+                // set channels
+                domainInfo.setChannels(channels);
+                continue;
+            }
+            index++;
+        }
         return sessionInfo;
     }
-    
+
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#getKernelProvider()
+     * 
+     * @see
+     * org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService
+     * #getKernelProvider()
      */
     @Override
     public List<IBaseEventInfo> getKernelProvider() throws ExecutionException {
         return getKernelProvider(new NullProgressMonitor());
     }
-    
+
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#getKernelProvider(org.eclipse.core.runtime.IProgressMonitor)
+     * 
+     * @see
+     * org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService
+     * #getKernelProvider(org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
     public List<IBaseEventInfo> getKernelProvider(IProgressMonitor monitor) throws ExecutionException {
@@ -322,10 +353,10 @@ public class LTTngControlService implements ILttngControlService {
         if (isError(result)) {
             throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        
-//        Kernel events:
-//        -------------
-//        sched_kthread_stop (type: tracepoint)
+
+        // Kernel events:
+        // -------------
+        // sched_kthread_stop (type: tracepoint)
         List<IBaseEventInfo> events = new ArrayList<IBaseEventInfo>();
         getProviderEventInfo(result.getOutput(), 0, events);
         return events;
@@ -333,16 +364,22 @@ public class LTTngControlService implements ILttngControlService {
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#getUstProvider()
+     * 
+     * @see
+     * org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService
+     * #getUstProvider()
      */
     @Override
     public List<IUstProviderInfo> getUstProvider() throws ExecutionException {
         return getUstProvider(new NullProgressMonitor());
     }
-    
+
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#getUstProvider(org.eclipse.core.runtime.IProgressMonitor)
+     * 
+     * @see
+     * org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService
+     * #getUstProvider(org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
     public List<IUstProviderInfo> getUstProvider(IProgressMonitor monitor) throws ExecutionException {
@@ -352,43 +389,42 @@ public class LTTngControlService implements ILttngControlService {
         if (isError(result)) {
             throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        
-//      UST events:
-//      -------------
-//
-//      PID: 3635 - Name: /home/user/git/lttng-ust/tests/hello.cxx/.libs/lt-hello
-//            ust_tests_hello:tptest_sighandler (loglevel: TRACE_EMERG0) (type: tracepoint)
-//            ust_tests_hello:tptest (loglevel: TRACE_EMERG0) (type: tracepoint)
-//        
-//      PID: 6459 - Name: /home/user/git/lttng-ust/tests/hello.cxx/.libs/lt-hello
-//            ust_tests_hello:tptest_sighandler (loglevel: TRACE_EMERG0) (type: tracepoint)
-//            ust_tests_hello:tptest (loglevel: TRACE_EMERG0) (type: tracepoint)
+
+        // UST events:
+        // -------------
+        //
+        // PID: 3635 - Name:
+        // /home/user/git/lttng-ust/tests/hello.cxx/.libs/lt-hello
+        // ust_tests_hello:tptest_sighandler (loglevel: TRACE_EMERG0) (type:
+        // tracepoint)
+        // ust_tests_hello:tptest (loglevel: TRACE_EMERG0) (type: tracepoint)
+        //
+        // PID: 6459 - Name:
+        // /home/user/git/lttng-ust/tests/hello.cxx/.libs/lt-hello
+        // ust_tests_hello:tptest_sighandler (loglevel: TRACE_EMERG0) (type:
+        // tracepoint)
+        // ust_tests_hello:tptest (loglevel: TRACE_EMERG0) (type: tracepoint)
 
         List<IUstProviderInfo> allProviders = new ArrayList<IUstProviderInfo>();
         IUstProviderInfo provider = null;
-        
+
         int index = 0;
         while (index < result.getOutput().length) {
             String line = result.getOutput()[index];
-            if (line.matches(UST_PROVIDER_PATTERN)) {
-                Pattern pattern = Pattern.compile(UST_PROVIDER_PATTERN);
+            Matcher matcher = UST_PROVIDER_PATTERN.matcher(line);
+            if (matcher.matches()) {
 
-                Matcher matcher = pattern.matcher(line);
-
-                if (matcher.matches()) {
-
-                    provider = new UstProviderInfo(matcher.group(2).trim());
-                    provider.setPid(Integer.valueOf(matcher.group(1).trim()));
-                    List<IBaseEventInfo> events = new ArrayList<IBaseEventInfo>();        
-                    index = getProviderEventInfo(result.getOutput(), ++index, events);
-                    provider.setEvents(events);
-                    allProviders.add(provider);
-                }
+                provider = new UstProviderInfo(matcher.group(2).trim());
+                provider.setPid(Integer.valueOf(matcher.group(1).trim()));
+                List<IBaseEventInfo> events = new ArrayList<IBaseEventInfo>();
+                index = getProviderEventInfo(result.getOutput(), ++index, events);
+                provider.setEvents(events);
+                allProviders.add(provider);
 
             } else {
                 index++;
             }
-            
+
         }
         return allProviders;
     }
@@ -398,19 +434,23 @@ public class LTTngControlService implements ILttngControlService {
     // ------------------------------------------------------------------------
     /**
      * Checks if command result is an error result.
-     * @param result - the command result to check
+     * 
+     * @param result
+     *            - the command result to check
      * @return true if error else false
      */
     private boolean isError(ICommandResult result) {
-        if ((result.getResult()) != 0 || (result.getOutput().length < 1 || result.getOutput()[0].matches(ERROR_PATTERN))) {
+        if ((result.getResult()) != 0 || (result.getOutput().length < 1 || ERROR_PATTERN.matcher(result.getOutput()[0]).matches())) {
             return true;
         }
         return false;
     }
-    
+
     /**
      * Formats the output string as single string.
-     * @param output - output array
+     * 
+     * @param output
+     *            - output array
      * @return - the formatted output
      */
     private String formatOutput(String[] output) {
@@ -424,81 +464,84 @@ public class LTTngControlService implements ILttngControlService {
         }
         return ret.toString();
     }
-    
+
     /**
      * Parses the domain information.
      * 
-     * @param output - a command output array
-     * @param currentIndex - current index in command output array
-     * @param channels - list for returning channel information
-     * @return the new current index in command output array 
+     * @param output
+     *            - a command output array
+     * @param currentIndex
+     *            - current index in command output array
+     * @param channels
+     *            - list for returning channel information
+     * @return the new current index in command output array
      * @throws PatternSyntaxException
      */
     private int parseDomain(String[] output, int currentIndex, List<IChannelInfo> channels) throws PatternSyntaxException {
         int index = currentIndex;
 
-//      Channels:
-//      -------------
-//      - channnel1: [enabled]
-//
-//          Attributes:
-//            overwrite mode: 0
-//            subbufers size: 262144
-//            number of subbufers: 4
-//            switch timer interval: 0
-//            read timer interval: 200
-//            output: splice()
-       
+        // Channels:
+        // -------------
+        // - channnel1: [enabled]
+        //
+        // Attributes:
+        // overwrite mode: 0
+        // subbufers size: 262144
+        // number of subbufers: 4
+        // switch timer interval: 0
+        // read timer interval: 200
+        // output: splice()
+
         while (index < output.length) {
             String line = output[index];
-            if (line.matches(CHANNELS_SECTION_PATTERN)) {
+
+            Matcher outerMatcher = CHANNELS_SECTION_PATTERN.matcher(line);
+            if (outerMatcher.matches()) {
                 IChannelInfo channelInfo = null;
                 while (index < output.length) {
                     String subLine = output[index];
-                    if (subLine.matches(CHANNEL_PATTERN)) {
-                        
-                        Pattern pattern = Pattern.compile(CHANNEL_PATTERN);
-                        Matcher matcher = pattern.matcher(subLine);
-                        channelInfo = new ChannelInfo(""); //$NON-NLS-1$
-                        if (matcher.matches()) {
-                            // get channel name
-                            channelInfo.setName(matcher.group(1));
-                            
-                            // get channel enablement
-                            channelInfo.setState(matcher.group(2));
 
-                            // add channel
-                            channels.add(channelInfo);
-                        }
-                    } else if (subLine.matches(OVERWRITE_MODE_ATTRIBUTE)) {
+                    Matcher innerMatcher = CHANNEL_PATTERN.matcher(subLine);
+                    if (innerMatcher.matches()) {
+                        channelInfo = new ChannelInfo(""); //$NON-NLS-1$
+                        // get channel name
+                        channelInfo.setName(innerMatcher.group(1));
+
+                        // get channel enablement
+                        channelInfo.setState(innerMatcher.group(2));
+
+                        // add channel
+                        channels.add(channelInfo);
+
+                    } else if (OVERWRITE_MODE_ATTRIBUTE.matcher(subLine).matches()) {
                         String value = getAttributeValue(subLine);
                         channelInfo.setOverwriteMode(!OVERWRITE_MODE_ATTRIBUTE_FALSE.equals(value));
-                    } else if (subLine.matches(SUBBUFFER_SIZE_ATTRIBUTE)) {
+                    } else if (SUBBUFFER_SIZE_ATTRIBUTE.matcher(subLine).matches()) {
                         channelInfo.setSubBufferSize(Long.valueOf(getAttributeValue(subLine)));
-                        
-                    } else if (subLine.matches(NUM_SUBBUFFERS_ATTRIBUTE)) {
+
+                    } else if (NUM_SUBBUFFERS_ATTRIBUTE.matcher(subLine).matches()) {
                         channelInfo.setNumberOfSubBuffers(Integer.valueOf(getAttributeValue(subLine)));
-                        
-                    } else if (subLine.matches(SWITCH_TIMER_ATTRIBUTE)) {
+
+                    } else if (SWITCH_TIMER_ATTRIBUTE.matcher(subLine).matches()) {
                         channelInfo.setSwitchTimer(Long.valueOf(getAttributeValue(subLine)));
-                        
-                    } else if (subLine.matches(READ_TIMER_ATTRIBUTE)) {
+
+                    } else if (READ_TIMER_ATTRIBUTE.matcher(subLine).matches()) {
                         channelInfo.setReadTimer(Long.valueOf(getAttributeValue(subLine)));
-                        
-                    } else if (subLine.matches(OUTPUT_ATTRIBUTE)) {
+
+                    } else if (OUTPUT_ATTRIBUTE.matcher(subLine).matches()) {
                         channelInfo.setOutputType(getAttributeValue(subLine));
-                        
-                    } else if (subLine.matches(EVENT_SECTION_PATTERN)) {
-                        List<IEventInfo> events = new ArrayList<IEventInfo>(); 
+
+                    } else if (EVENT_SECTION_PATTERN.matcher(subLine).matches()) {
+                        List<IEventInfo> events = new ArrayList<IEventInfo>();
                         index = parseEvents(output, index, events);
                         channelInfo.setEvents(events);
-                        // we want to stay at the current index to be able to exit the domain
+                        // we want to stay at the current index to be able to
+                        // exit the domain
                         continue;
-                    }
-                    else if (subLine.matches(DOMAIN_KERNEL_PATTERN)) {
+                    } else if (DOMAIN_KERNEL_PATTERN.matcher(subLine).matches()) {
                         return index;
 
-                    } else if (subLine.contains(DOMAIN_UST_GLOBAL_PATTERN)) {
+                    } else if (DOMAIN_UST_GLOBAL_PATTERN.matcher(subLine).matches()) {
                         return index;
                     }
                     index++;
@@ -512,9 +555,12 @@ public class LTTngControlService implements ILttngControlService {
     /**
      * Parses the event information within a domain.
      * 
-     * @param output - a command output array
-     * @param currentIndex - current index in command output array
-     * @param events - list for returning event information
+     * @param output
+     *            - a command output array
+     * @param currentIndex
+     *            - current index in command output array
+     * @param events
+     *            - list for returning event information
      * @return the new current index in command output array
      * @throws PatternSyntaxException
      */
@@ -523,27 +569,32 @@ public class LTTngControlService implements ILttngControlService {
 
         while (index < output.length) {
             String line = output[index];
-            if (line.matches(CHANNEL_PATTERN)) {
+            if (CHANNEL_PATTERN.matcher(line).matches()) {
                 // end of channel
                 return index;
-            } else if (line.matches(DOMAIN_KERNEL_PATTERN)) {
+            } else if (DOMAIN_KERNEL_PATTERN.matcher(line).matches()) {
                 // end of domain
                 return index;
-            } else if (line.contains(DOMAIN_UST_GLOBAL_PATTERN)) {
+            } else if (DOMAIN_UST_GLOBAL_PATTERN.matcher(line).matches()) {
                 // end of domain
                 return index;
-            } else if (line.matches(EVENT_PATTERN)) {
-                Pattern pattern = Pattern.compile(EVENT_PATTERN);
+            } 
 
-                Matcher matcher = pattern.matcher(line);
+            Matcher matcher = EVENT_PATTERN.matcher(line);
+            Matcher matcher2 = WILDCARD_EVENT_PATTERN.matcher(line);
 
-                if (matcher.matches()) {
-                    IEventInfo eventInfo = new EventInfo(matcher.group(1).trim());
-                    eventInfo.setLogLevel(matcher.group(2).trim());
-                    eventInfo.setEventType(matcher.group(3).trim());
-                    eventInfo.setState(matcher.group(4));
-                    events.add(eventInfo);
-                }
+            if (matcher.matches()) {
+                IEventInfo eventInfo = new EventInfo(matcher.group(1).trim());
+                eventInfo.setLogLevel(matcher.group(2).trim());
+                eventInfo.setEventType(matcher.group(3).trim());
+                eventInfo.setState(matcher.group(4));
+                events.add(eventInfo);
+            } else if (matcher2.matches()) {
+                IEventInfo eventInfo = new EventInfo(matcher2.group(1).trim());
+                eventInfo.setLogLevel(TraceLogLevel.LEVEL_UNKNOWN);
+                eventInfo.setEventType(matcher2.group(2).trim());
+                eventInfo.setState(matcher2.group(3));
+                events.add(eventInfo);
             }
 //            else if (line.matches(EVENT_NONE_PATTERN)) {
                 // do nothing
@@ -557,7 +608,8 @@ public class LTTngControlService implements ILttngControlService {
     /**
      * Parses a line with attributes: <attribute Name>: <attribute value>
      * 
-     * @param line - attribute line to parse
+     * @param line
+     *            - attribute line to parse
      * @return the attribute value as string
      * @throws PatternSyntaxException
      */
@@ -567,30 +619,29 @@ public class LTTngControlService implements ILttngControlService {
     }
 
     /**
-     * Parses the event information within a provider. 
+     * Parses the event information within a provider.
      * 
-     * @param output - a command output array
-     * @param currentIndex - current index in command output array
-     * @param events - list for returning event information
+     * @param output
+     *            - a command output array
+     * @param currentIndex
+     *            - current index in command output array
+     * @param events
+     *            - list for returning event information
      * @return the new current index in command output array
      */
     private int getProviderEventInfo(String[] output, int currentIndex, List<IBaseEventInfo> events) {
         int index = currentIndex;
         while (index < output.length) {
             String line = output[index];
-            if (line.matches(PROVIDER_EVENT_PATTERN)) {
-                // sched_kthread_stop (loglevel: TRACE_EMERG0) (type: tracepoint)
-                Pattern pattern = Pattern.compile(PROVIDER_EVENT_PATTERN);
-
-                Matcher matcher = pattern.matcher(line);
-
-                if (matcher.matches()) {
-                    IBaseEventInfo eventInfo = new BaseEventInfo(matcher.group(1).trim());
-                    eventInfo.setLogLevel(matcher.group(2).trim());
-                    eventInfo.setEventType(matcher.group(3).trim());
-                    events.add(eventInfo);
-                }
-            } else if (line.matches(UST_PROVIDER_PATTERN)) {
+            Matcher matcher = PROVIDER_EVENT_PATTERN.matcher(line);
+            if (matcher.matches()) {
+                // sched_kthread_stop (loglevel: TRACE_EMERG0) (type:
+                // tracepoint)
+                IBaseEventInfo eventInfo = new BaseEventInfo(matcher.group(1).trim());
+                eventInfo.setLogLevel(matcher.group(2).trim());
+                eventInfo.setEventType(matcher.group(3).trim());
+                events.add(eventInfo);
+            } else if (UST_PROVIDER_PATTERN.matcher(line).matches()) {
                 return index;
             }
             index++;
