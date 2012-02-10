@@ -68,7 +68,7 @@ public class TmfUml2SDSyncLoaderSignalTest extends TestCase {
         
         TmfTimeRange range = new TmfTimeRange(new Uml2SDTestTimestamp(9789689220871L), new Uml2SDTestTimestamp(9789773881426L));
         // Get range window for tests below
-        TmfTimestamp rangeWindow =  range.getEndTime().getDelta(range.getStartTime());
+        TmfTimestamp rangeWindow = (TmfTimestamp) range.getEndTime().getDelta(range.getStartTime());
         TmfTimestamp currentTime = new Uml2SDTestTimestamp(9789773782043L);
 
         fFacility.getTrace().broadcast(new TmfRangeSynchSignal(this, range, currentTime));

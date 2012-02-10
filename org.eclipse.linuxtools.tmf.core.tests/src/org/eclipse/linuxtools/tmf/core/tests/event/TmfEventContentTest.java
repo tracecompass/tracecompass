@@ -199,7 +199,7 @@ public class TmfEventContentTest extends TestCase {
 	}
 
 	public void testToString2() {
-		String expected = "[TmfEventContent(1,-10,true,some string,[TmfTimestamp(1,2,3)])]";
+		String expected = "[TmfEventContent(1,-10,true,some string,TmfTimestamp [fValue=1, fScale=2, fPrecision=3])]";
 		TmfEventContentStub content = new TmfEventContentStub(fEvent, fRawContent0);
 		assertEquals("toString", expected, content.toString());
 	}

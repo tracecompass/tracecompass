@@ -330,10 +330,10 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
 
             min = frame.getMinTime();
             max = frame.getMaxTime();
-            TmfTimestamp minMaxdelta = max.getDelta(min);
+            TmfTimestamp minMaxdelta = (TmfTimestamp) max.getDelta(min);
             double gr = (minMaxdelta.getValue()) / (double) 10;
 
-            TmfTimestamp delta = m2.getTime().getDelta(m1.getTime()).getDelta(min);
+            TmfTimestamp delta = (TmfTimestamp) m2.getTime().getDelta(m1.getTime()).getDelta(min);
             long absDelta = Math.abs(delta.getValue());
             
             ColorImpl color;
@@ -490,7 +490,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
                 int m1Y = Math.round(y1 * zoomValue);
                 int m2Y = Math.round(y2 * zoomValue);
                 if ((m1Y < e.y) && (m2Y >= e.y)) {
-                    TmfTimestamp delta = m2.getTime().getDelta(m1.getTime());
+                    TmfTimestamp delta = (TmfTimestamp) m2.getTime().getDelta(m1.getTime());
                     tooltip.showToolTip(delta, min, max);
                 }
             }
@@ -579,10 +579,10 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
             }
         }
 
-        TmfTimestamp minMaxdelta = max.getDelta(min);
+        TmfTimestamp minMaxdelta = (TmfTimestamp) max.getDelta(min);
         double gr = (minMaxdelta.getValue()) / (double) 10;
 
-        TmfTimestamp delta = time2.getDelta(time1).getDelta(min);
+        TmfTimestamp delta = (TmfTimestamp) time2.getDelta(time1).getDelta(min);
         long absDelta = Math.abs(delta.getValue());
 
         int colIndex = 0;
@@ -799,10 +799,10 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
                     done = true;
                     prevNodeY = m1Y;
                     nextNodeY = m2Y;
-                    TmfTimestamp minMaxdelta = max.getDelta(min);
+                    TmfTimestamp minMaxdelta = (TmfTimestamp) max.getDelta(min);
                     double gr = (minMaxdelta.getValue()) / (double) 10;
 
-                    TmfTimestamp delta = m2.getTime().getDelta(m1.getTime()).getDelta(min);
+                    TmfTimestamp delta = (TmfTimestamp) m2.getTime().getDelta(m1.getTime()).getDelta(min);
                     long absDelta = Math.abs(delta.getValue());
 
                     int colIndex = 0;
@@ -910,7 +910,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
                 int m1Y = Math.round(y1 * zoomValue);
                 int m2Y = Math.round(y2 * zoomValue);
                 if ((m1Y < prevNodeY + 1) && (m2Y >= prevNodeY + 1)) {
-                    TmfTimestamp delta = m2.getTime().getDelta(m1.getTime());
+                    TmfTimestamp delta = (TmfTimestamp) m2.getTime().getDelta(m1.getTime());
                     tooltip.showToolTip(delta, min, max);
                     tooltip.hideToolTip();
                 }

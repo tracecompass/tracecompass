@@ -593,7 +593,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
             //double delta = ((ITimeRange)toolTipNode).getLastTime()-((ITimeRange)currentGraphNode).getLastTime();
             TmfTimestamp firstTime = ((ITimeRange) currentGraphNode).getEndTime();
             TmfTimestamp lastTime = ((ITimeRange) toolTipNode).getEndTime();
-            TmfTimestamp delta = lastTime.getDelta(firstTime);
+            TmfTimestamp delta = (TmfTimestamp) lastTime.getDelta(firstTime);
             postfix += delta.toString();
         } else {
             if ((toolTipNode instanceof ITimeRange) && ((ITimeRange) toolTipNode).hasTimeInfo()) {

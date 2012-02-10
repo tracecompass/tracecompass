@@ -160,7 +160,7 @@ public class SpinnerGroup {
     }
 
     public TmfTimestamp getSpan() {
-        TmfTimestamp span = new TmfTimestamp(startTime.getAdjustment(endTime, NS_SCALING_FACTOR), NS_SCALING_FACTOR, 0);
+        TmfTimestamp span = (TmfTimestamp) startTime.getDelta(endTime);
         return span;
     }
 
@@ -171,7 +171,7 @@ public class SpinnerGroup {
 
     public void setStartTime(TmfTimestamp ts) {
     	try {
-    		startTime = ts.synchronize(0, NS_SCALING_FACTOR);
+    		startTime = (TmfTimestamp) ts.getDelta(new TmfTimestamp(0, NS_SCALING_FACTOR));
     		startSeconds = (int) (startTime.getValue() / NS_PER_SECOND);
     		startNanosec = (int) (startTime.getValue() % NS_PER_SECOND);
     	}
@@ -181,7 +181,7 @@ public class SpinnerGroup {
 
     public void setEndTime(TmfTimestamp ts) {
     	try {
-    		endTime = ts.synchronize(0, NS_SCALING_FACTOR);
+    	    endTime = (TmfTimestamp) ts.getDelta(new TmfTimestamp(0, NS_SCALING_FACTOR));
     		endSeconds = (int) (endTime.getValue() / NS_PER_SECOND);
     		endNanosec = (int) (endTime.getValue() % NS_PER_SECOND);
     	}
@@ -191,7 +191,7 @@ public class SpinnerGroup {
 
     public void setCurrentTime(TmfTimestamp ts) {
     	try {
-    		currentTime = ts.synchronize(0, NS_SCALING_FACTOR);
+    	    currentTime = (TmfTimestamp) ts.getDelta(new TmfTimestamp(0, NS_SCALING_FACTOR));
     		currentSeconds = (int) (currentTime.getValue() / NS_PER_SECOND);
     		currentNanosec = (int) (currentTime.getValue() % NS_PER_SECOND);
     	}

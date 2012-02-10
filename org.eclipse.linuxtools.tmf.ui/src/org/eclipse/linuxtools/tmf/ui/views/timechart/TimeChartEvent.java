@@ -40,7 +40,7 @@ public class TimeChartEvent implements ITimeEvent {
 
     public TimeChartEvent(TimeChartAnalysisEntry parentEntry, TmfEvent event, long rank, TimeChartDecorationProvider decorationProvider) {
         fParentEntry = parentEntry;
-        fTime = event.getTimestamp().synchronize((long) 0, TIMESTAMP_SCALE).getValue();
+        fTime = event.getTimestamp().normalize(0, TIMESTAMP_SCALE).getValue();
         fDuration = 0;
         fFirstRank = fLastRank = rank;
         fRankRangeList = new RankRangeList(rank);

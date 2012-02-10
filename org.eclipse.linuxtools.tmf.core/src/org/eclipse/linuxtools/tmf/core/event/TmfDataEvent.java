@@ -18,21 +18,11 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 /**
  * <b><u>TmfDataEvent</u></b>
  * <p>
- * The basic event structure in the TMF. In its canonical form, an event has:
- * <ul>
- * <li> a parent trace
- * <li> a rank (order within the trace)
- * <li> a source (reporting component)
- * <li> a type
- * <li> a content
- * </ul>
- * For convenience, a free-form reference field is also provided. It could be
- * used as e.g. a location marker (filename:lineno) to indicate where the event
- * was generated.
+ * A basic implementation of ITmfDataEvent.
  * 
  * Notice that for performance reasons TmfDataEvent is NOT immutable. If a copy
- * of an event is needed, use the copy constructor (shallow copy) or the
- * clone() method (deep copy).
+ * of an event is needed, use the copy constructor (shallow copy) or the clone()
+ * method (deep copy).
  */
 public class TmfDataEvent implements Cloneable {
 
@@ -233,8 +223,8 @@ public class TmfDataEvent implements Cloneable {
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        return "TmfDataEvent [fTrace=" + fTrace + ", fRank=" + fRank 
-                + ", fSource=" + fSource + ", fType=" + fType + ", fContent=" 
+        return "TmfDataEvent [fTrace=" + fTrace + ", fRank=" + fRank
+                + ", fSource=" + fSource + ", fType=" + fType + ", fContent="
                 + fContent + ", fReference=" + fReference + "]";
     }
 

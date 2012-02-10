@@ -453,7 +453,7 @@ public class BasicFrame extends GraphNode {
     }
 
     protected void updateMinMax(SDTimeEvent m1, SDTimeEvent m2) {
-        TmfTimestamp delta = m2.getTime().getDelta(m1.getTime());
+        TmfTimestamp delta = (TmfTimestamp) m2.getTime().getDelta(m1.getTime());
         if (computeMinMax) {
             minTime = delta.clone();
             if (minTime.compareTo(TmfTimestamp.Zero, false) < 0) {

@@ -60,7 +60,8 @@ public class TmfEvent extends TmfDataEvent implements Cloneable {
      * @param reference the event reference
      */
     public TmfEvent(ITmfTrace<?> trace, long rank, TmfTimestamp timestamp, String source,
-                    TmfEventType type, String reference) {
+                    TmfEventType type, String reference)
+    {
         super(trace, rank, source, type, null, reference);
         fTimestamp = timestamp;
     }
@@ -69,7 +70,8 @@ public class TmfEvent extends TmfDataEvent implements Cloneable {
      * Constructor - no rank
      */
     public TmfEvent(ITmfTrace<?> parentTrace, TmfTimestamp timestamp, String source,
-                    TmfEventType type, String reference) {
+                    TmfEventType type, String reference)
+    {
         this(parentTrace, -1, timestamp, source, type, reference);
     }
 

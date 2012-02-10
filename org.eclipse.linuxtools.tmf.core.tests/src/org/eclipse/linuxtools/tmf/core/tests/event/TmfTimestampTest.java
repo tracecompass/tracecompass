@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.core.tests.event;
 
 import junit.framework.TestCase;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 
 /**
@@ -30,8 +31,8 @@ public class TmfTimestampTest extends TestCase {
 
 	private final TmfTimestamp ts0 = new TmfTimestamp();
 	private final TmfTimestamp ts1 = new TmfTimestamp(12345);
-	private final TmfTimestamp ts2 = new TmfTimestamp(12345, (byte) -1);
-	private final TmfTimestamp ts3 = new TmfTimestamp(12345, (byte)  2, 5);
+	private final TmfTimestamp ts2 = new TmfTimestamp(12345, -1);
+	private final TmfTimestamp ts3 = new TmfTimestamp(12345,  2, 5);
 
 	private final TmfTimestamp ts0copy = new TmfTimestamp();
 	private final TmfTimestamp ts1copy = new TmfTimestamp(12345);
@@ -92,7 +93,7 @@ public class TmfTimestampTest extends TestCase {
 	}
 
 	public void testCopyConstructor() throws Exception {
-		TmfTimestamp ts0 = new TmfTimestamp(12345, (byte) 2, 5);
+		TmfTimestamp ts0 = new TmfTimestamp(12345, 2, 5);
 		TmfTimestamp ts = new TmfTimestamp(ts0);
 		assertEquals("getValue", 12345, ts.getValue());
 		assertEquals("getscale", 2, ts.getScale());
@@ -173,10 +174,10 @@ public class TmfTimestampTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testToString() throws Exception {
-		assertEquals("toString", "[TmfTimestamp(0,0,0)]",      ts0.toString());
-		assertEquals("toString", "[TmfTimestamp(12345,0,0)]",  ts1.toString());
-		assertEquals("toString", "[TmfTimestamp(12345,-1,0)]", ts2.toString());
-		assertEquals("toString", "[TmfTimestamp(12345,2,5)]",  ts3.toString());
+		assertEquals("toString", "TmfTimestamp [fValue=0, fScale=0, fPrecision=0]",      ts0.toString());
+		assertEquals("toString", "TmfTimestamp [fValue=12345, fScale=0, fPrecision=0]",  ts1.toString());
+		assertEquals("toString", "TmfTimestamp [fValue=12345, fScale=-1, fPrecision=0]", ts2.toString());
+		assertEquals("toString", "TmfTimestamp [fValue=12345, fScale=2, fPrecision=5]",  ts3.toString());
 	}
 
 	// ------------------------------------------------------------------------
@@ -206,104 +207,78 @@ public class TmfTimestampTest extends TestCase {
 	}
 
 	// ------------------------------------------------------------------------
-	// synchronize
+	// normalize
 	// ------------------------------------------------------------------------
 
-	public void testSynchronizeOffset() throws Exception {
+	public void testNormalizeOffset() throws Exception {
 
-		TmfTimestamp ts = ts0.synchronize(0, (byte) 0);
+		ITmfTimestamp ts = ts0.normalize(0, 0);
 		assertEquals("getValue",     0, ts.getValue());
 		assertEquals("getscale",     0, ts.getScale());
 		assertEquals("getPrecision", 0, ts.getPrecision());
 
-		ts = ts0.synchronize(12345, (byte) 0);
+		ts = ts0.normalize(12345, 0);
 		assertEquals("getValue", 12345, ts.getValue());
 		assertEquals("getscale",     0, ts.getScale());
 		assertEquals("getPrecision", 0, ts.getPrecision());
 
-		ts = ts0.synchronize(10, (byte) 0);
+		ts = ts0.normalize(10, 0);
 		assertEquals("getValue",    10, ts.getValue());
 		assertEquals("getscale",     0, ts.getScale());
 		assertEquals("getPrecision", 0, ts.getPrecision());
 
-		ts = ts0.synchronize(-10, (byte) 0);
+		ts = ts0.normalize(-10, 0);
 		assertEquals("getValue",   -10, ts.getValue());
 		assertEquals("getscale",     0, ts.getScale());
 		assertEquals("getPrecision", 0, ts.getPrecision());
 	}
 
-	public void testSynchronizeScale() throws Exception {
+	public void testNormalizeScale() throws Exception {
 
-		TmfTimestamp ts = ts0.synchronize(0, (byte) 10);
+		ITmfTimestamp ts = ts0.normalize(0, 10);
 		assertEquals("getValue",     0, ts.getValue());
 		assertEquals("getscale",    10, ts.getScale());
 		assertEquals("getPrecision", 0, ts.getPrecision());
 
-		ts = ts0.synchronize(0, (byte) -10);
+		ts = ts0.normalize(0, -10);
 		assertEquals("getValue",     0, ts.getValue());
 		assertEquals("getscale",   -10, ts.getScale());
 		assertEquals("getPrecision", 0, ts.getPrecision());
 	}
 
-	public void testSynchronizeOffsetAndScale() throws Exception {
-		byte SCALE = 12;
+	public void testNormalizeOffsetAndScale() throws Exception {
+		int SCALE = 12;
 
-		TmfTimestamp ts = ts0.synchronize(0, SCALE);
+		ITmfTimestamp ts = ts0.normalize(0, SCALE);
 		assertEquals("getValue",     0, ts.getValue());
 		assertEquals("getscale", SCALE, ts.getScale());
 		assertEquals("getPrecision", 0, ts.getPrecision());
 
-		ts = ts0.synchronize(12345, SCALE);
+		ts = ts0.normalize(12345, SCALE);
 		assertEquals("getValue", 12345, ts.getValue());
 		assertEquals("getscale", SCALE, ts.getScale());
 		assertEquals("getPrecision", 0, ts.getPrecision());
 
-		ts = ts0.synchronize(10, SCALE);
+		ts = ts0.normalize(10, SCALE);
 		assertEquals("getValue",    10, ts.getValue());
 		assertEquals("getscale", SCALE, ts.getScale());
 		assertEquals("getPrecision", 0, ts.getPrecision());
 
-		ts = ts0.synchronize(-10, SCALE);
+		ts = ts0.normalize(-10, SCALE);
 		assertEquals("getValue",   -10, ts.getValue());
 		assertEquals("getscale", SCALE, ts.getScale());
 		assertEquals("getPrecision", 0, ts.getPrecision());
 	}	
 	
 	// ------------------------------------------------------------------------
-	// getAdjustment
-	// ------------------------------------------------------------------------
-
-	public void testGetAdjustmentSameScale() throws Exception {
-		long delta = ts0.getAdjustment(ts0 , ts0.getScale());
-		assertEquals("delta", 0, delta);
-
-		delta = ts1.getAdjustment(ts1, ts1.getScale());
-		assertEquals("delta", 0, delta);
-
-		delta = ts0.getAdjustment(ts1, ts1.getScale());
-		assertEquals("delta", 12345, delta);
-
-		delta = ts1.getAdjustment(ts0, ts0.getScale());
-		assertEquals("delta", -12345, delta);
-	}
-
-	public void testGetAdjustmentDifferentScales() throws Exception {
-		long delta = ts0.getAdjustment(ts2, ts2.getScale());
-		assertEquals("delta", 12345, delta);
-
-		delta = ts2.getAdjustment(ts0, ts0.getScale());
-		assertEquals("delta", -1234, delta);
-	}
-
-	// ------------------------------------------------------------------------
-	// CompareTo
+	// compareTo
 	// ------------------------------------------------------------------------
 
 	public void testCompareToSameScale() throws Exception {
-		TmfTimestamp ts1 = new TmfTimestamp(900,  (byte) 0, 50);
-		TmfTimestamp ts2 = new TmfTimestamp(1000, (byte) 0, 50);
-		TmfTimestamp ts3 = new TmfTimestamp(1100, (byte) 0, 50);
-		TmfTimestamp ts4 = new TmfTimestamp(1000, (byte) 0, 75);
+		TmfTimestamp ts1 = new TmfTimestamp(900,  0, 50);
+		TmfTimestamp ts2 = new TmfTimestamp(1000, 0, 50);
+		TmfTimestamp ts3 = new TmfTimestamp(1100, 0, 50);
+		TmfTimestamp ts4 = new TmfTimestamp(1000, 0, 75);
 
 		assertTrue(ts1.compareTo(ts1, false) == 0);
 
@@ -321,10 +296,10 @@ public class TmfTimestampTest extends TestCase {
 	}
 
 	public void testCompareToDifferentScale() throws Exception {
-		TmfTimestamp ts1 = new TmfTimestamp(9000, (byte) -1, 50);
-		TmfTimestamp ts2 = new TmfTimestamp(1000, (byte) 0, 50);
-		TmfTimestamp ts3 = new TmfTimestamp(110,  (byte) 1, 50);
-		TmfTimestamp ts4 = new TmfTimestamp(1,    (byte) 3, 75);
+		TmfTimestamp ts1 = new TmfTimestamp(9000, -1, 50);
+		TmfTimestamp ts2 = new TmfTimestamp(1000,  0, 50);
+		TmfTimestamp ts3 = new TmfTimestamp(110,   1, 50);
+		TmfTimestamp ts4 = new TmfTimestamp(1,     3, 75);
 
 		assertTrue("CompareTo", ts1.compareTo(ts1, false) == 0);
 
@@ -342,10 +317,10 @@ public class TmfTimestampTest extends TestCase {
 	}
 
 	public void testCompareToWithinPrecision() throws Exception {
-		TmfTimestamp ts1 = new TmfTimestamp(900,  (byte) 0, 50);
-		TmfTimestamp ts2 = new TmfTimestamp(1000, (byte) 0, 50);
-		TmfTimestamp ts3 = new TmfTimestamp(1100, (byte) 0, 50);
-		TmfTimestamp ts4 = new TmfTimestamp(1000, (byte) 0, 75);
+		TmfTimestamp ts1 = new TmfTimestamp(900,  0, 50);
+		TmfTimestamp ts2 = new TmfTimestamp(1000, 0, 50);
+		TmfTimestamp ts3 = new TmfTimestamp(1100, 0, 50);
+		TmfTimestamp ts4 = new TmfTimestamp(1000, 0, 75);
 
 		assertTrue("CompareTo", ts1.compareTo(ts1, true) == 0);
 
@@ -363,10 +338,10 @@ public class TmfTimestampTest extends TestCase {
 	}
 
 	public void testCompareToLargeScale() throws Exception {
-		TmfTimestamp ts1 = new TmfTimestamp(-1,    (byte) 100);
-		TmfTimestamp ts2 = new TmfTimestamp(-1000, (byte) -100);
-		TmfTimestamp ts3 = new TmfTimestamp(1,     (byte) 100);
-		TmfTimestamp ts4 = new TmfTimestamp(1000,  (byte) -100);
+		TmfTimestamp ts1 = new TmfTimestamp(-1,     100);
+		TmfTimestamp ts2 = new TmfTimestamp(-1000, -100);
+		TmfTimestamp ts3 = new TmfTimestamp(1,      100);
+		TmfTimestamp ts4 = new TmfTimestamp(1000,  -100);
 
 		assertTrue("CompareTo", ts1.compareTo(ts2, false) < 0);
 		assertTrue("CompareTo", ts1.compareTo(ts3, false) < 0);
@@ -386,12 +361,12 @@ public class TmfTimestampTest extends TestCase {
 	}
 
 	public void testCompareToBigRanges() throws Exception {
-		TmfTimestamp ts0a = new TmfTimestamp( 0, Byte.MAX_VALUE);
-		TmfTimestamp ts0b = new TmfTimestamp( 0, Byte.MIN_VALUE);
-		TmfTimestamp ts1  = new TmfTimestamp(-1, Byte.MAX_VALUE);
-		TmfTimestamp ts2  = new TmfTimestamp(-1, Byte.MIN_VALUE);
-		TmfTimestamp ts3  = new TmfTimestamp( 1, Byte.MAX_VALUE);
-		TmfTimestamp ts4  = new TmfTimestamp( 1, Byte.MIN_VALUE);
+		TmfTimestamp ts0a = new TmfTimestamp( 0, Integer.MAX_VALUE);
+		TmfTimestamp ts0b = new TmfTimestamp( 0, Integer.MIN_VALUE);
+		TmfTimestamp ts1  = new TmfTimestamp(-1, Integer.MAX_VALUE);
+		TmfTimestamp ts2  = new TmfTimestamp(-1, Integer.MIN_VALUE);
+		TmfTimestamp ts3  = new TmfTimestamp( 1, Integer.MAX_VALUE);
+		TmfTimestamp ts4  = new TmfTimestamp( 1, Integer.MIN_VALUE);
 
 		assertEquals("CompareTo",  1, ts0a.compareTo(TmfTimestamp.BigBang,   false));
 		assertEquals("CompareTo", -1, ts0a.compareTo(TmfTimestamp.BigCrunch, false));
@@ -424,70 +399,67 @@ public class TmfTimestampTest extends TestCase {
 	
 	public void testDelta() throws Exception {
 	    // Delta for same scale and precision (delta > 0)
-	    TmfTimestamp ts0 = new TmfTimestamp(10, (byte)9);
-	    TmfTimestamp ts1 = new TmfTimestamp(5,  (byte)9);
-	    TmfTimestamp exp = new TmfTimestamp(5,  (byte)9);
+	    TmfTimestamp ts0 = new TmfTimestamp(10, 9);
+	    TmfTimestamp ts1 = new TmfTimestamp(5,  9);
+	    TmfTimestamp exp = new TmfTimestamp(5,  9);
 	    
-	    TmfTimestamp delta = ts0.getDelta(ts1);
+	    ITmfTimestamp delta = ts0.getDelta(ts1);
 	    assertEquals("getDelta", 0, delta.compareTo(exp, false));
 	    
 	    // Delta for same scale and precision (delta < 0)
-	    ts0 = new TmfTimestamp(5,  (byte)9);
-	    ts1 = new TmfTimestamp(10, (byte)9);
-	    exp = new TmfTimestamp(-5, (byte)9);
+	    ts0 = new TmfTimestamp( 5, 9);
+	    ts1 = new TmfTimestamp(10, 9);
+	    exp = new TmfTimestamp(-5, 9);
 
 	    delta = ts0.getDelta(ts1);
 	    assertEquals("getDelta", 0, delta.compareTo(exp, false));
 	    
 	    // Delta for different scale and same precision (delta > 0)
-        ts0 = new TmfTimestamp(5,  (byte)9);
-        ts1 = new TmfTimestamp(10, (byte)8);
-        exp = new TmfTimestamp(4,  (byte)9);
+        ts0 = new TmfTimestamp( 5, 9);
+        ts1 = new TmfTimestamp(10, 8);
+        exp = new TmfTimestamp( 4, 9);
 
         delta = ts0.getDelta(ts1);
         assertEquals("getDelta", 0, delta.compareTo(exp, false));
 
         // Delta for different scale and same precision (delta > 0)
-        ts0 = new TmfTimestamp(5,  (byte)9);
-        ts1 = new TmfTimestamp(10, (byte)7);
-        exp = new TmfTimestamp(5,  (byte)9);
+        ts0 = new TmfTimestamp( 5, 9);
+        ts1 = new TmfTimestamp(10, 7);
+        exp = new TmfTimestamp( 5, 9);
 
         delta = ts0.getDelta(ts1);
         assertEquals("getDelta", 0, delta.compareTo(exp, false));
 
         // Delta for different scale and same precision
-        ts0 = new TmfTimestamp(10, (byte)9);
-        ts1 = new TmfTimestamp(5,  (byte)8);
-        exp = new TmfTimestamp(10, (byte)9);
+        ts0 = new TmfTimestamp(10, 9);
+        ts1 = new TmfTimestamp( 5, 8);
+        exp = new TmfTimestamp(10, 9);
 
         delta = ts0.getDelta(ts1);
         assertEquals("getDelta", 0, delta.compareTo(exp, false));
 
         // Delta for same scale and different precision
-        ts0 = new TmfTimestamp(10, (byte)9,1);
-        ts1 = new TmfTimestamp(5,  (byte)9, 2);
-        exp = new TmfTimestamp(5,  (byte)9, 2);
+        ts0 = new TmfTimestamp(10, 9, 1);
+        ts1 = new TmfTimestamp( 5, 9, 2);
+        exp = new TmfTimestamp( 5, 9, 3);
 
         delta = ts0.getDelta(ts1);
         assertEquals("getDelta", 0, delta.compareTo(exp, true));
-        assertEquals("precision", 2, delta.getPrecision());
+        assertEquals("precision", 3, delta.getPrecision());
         
         // Delta for same scale and different precision
-        ts0 = new TmfTimestamp(5,  (byte)9, 2);
-        ts1 = new TmfTimestamp(10, (byte)9, 1);
-        exp = new TmfTimestamp(-5, (byte)9, 2);
+        ts0 = new TmfTimestamp( 5, 9, 2);
+        ts1 = new TmfTimestamp(10, 9, 1);
+        exp = new TmfTimestamp(-5, 9, 3);
 
         delta = ts0.getDelta(ts1);
-        assertEquals("getDelta", 0, delta.compareTo(exp, true));
-        assertEquals("precision", 2, delta.getPrecision());
+        assertEquals("getDelta",  0, delta.compareTo(exp, true));
+        assertEquals("precision", 3, delta.getPrecision());
 
         // Delta for different scale and different precision
-        ts0 = new TmfTimestamp(5,  (byte)9, 2);
-        ts1 = new TmfTimestamp(10, (byte)8, 1);
-        exp = new TmfTimestamp(4,  (byte)9, 2);
-        assertEquals("precision", 2, delta.getPrecision());
-        assertEquals("precision", 2, delta.getPrecision());
-
+        ts0 = new TmfTimestamp( 5, 9, 2);
+        ts1 = new TmfTimestamp(10, 8, 1);
+        exp = new TmfTimestamp( 4, 9, 3);
         delta = ts0.getDelta(ts1);
         assertEquals("getDelta", 0, delta.compareTo(exp, true));
         assertEquals("precision", 2, delta.getPrecision());

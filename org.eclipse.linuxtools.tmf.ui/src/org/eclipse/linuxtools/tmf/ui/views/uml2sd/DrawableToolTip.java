@@ -125,11 +125,11 @@ public class DrawableToolTip implements PaintListener {
         int step = SCALE_LENGTH / 10;
 
         // double gr = (max - min) / 10;
-        TmfTimestamp minMaxdelta = minMaxRange.getEndTime().getDelta(minMaxRange.getStartTime());
+        TmfTimestamp minMaxdelta = (TmfTimestamp) minMaxRange.getEndTime().getDelta(minMaxRange.getStartTime());
         double gr = (minMaxdelta.getValue()) / (double) 10;
 
         // double delta = currentValue-min;
-        TmfTimestamp delta = currentValue.getDelta(minMaxRange.getStartTime());
+        TmfTimestamp delta = (TmfTimestamp) currentValue.getDelta(minMaxRange.getStartTime());
         long absDelta = Math.abs(delta.getValue());
         
         int colIndex = 0;
