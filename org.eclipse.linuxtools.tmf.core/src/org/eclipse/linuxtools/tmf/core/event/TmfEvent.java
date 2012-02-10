@@ -138,11 +138,6 @@ public class TmfEvent extends TmfData implements Cloneable {
     public TmfEvent() {
     }
 
-    @Override
-    public boolean isNullRef() {
-        return this == NullEvent;
-    }
-
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------

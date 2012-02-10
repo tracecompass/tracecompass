@@ -286,16 +286,6 @@ public class LttngSyntheticEvent extends LttngEvent {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#isNullRef()
-	 */
-	@Override
-	public boolean isNullRef() {
-		return this == NullEvent;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.linuxtools.lttng.event.LttngEvent#toString()
 	 */
 	@Override

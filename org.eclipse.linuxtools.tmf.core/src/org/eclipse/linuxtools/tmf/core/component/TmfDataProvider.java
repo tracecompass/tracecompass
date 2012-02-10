@@ -391,7 +391,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
      * @return
      */
     public boolean isCompleted(ITmfDataRequest<T> request, T data, int nbRead) {
-        return request.isCompleted() || nbRead >= request.getNbRequested() || data.isNullRef();
+        return request.isCompleted() || nbRead >= request.getNbRequested();
     }
 
     // ------------------------------------------------------------------------
