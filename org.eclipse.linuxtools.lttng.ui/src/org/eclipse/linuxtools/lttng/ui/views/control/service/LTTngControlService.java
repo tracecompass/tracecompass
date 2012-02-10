@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -475,9 +474,8 @@ public class LTTngControlService implements ILttngControlService {
      * @param channels
      *            - list for returning channel information
      * @return the new current index in command output array
-     * @throws PatternSyntaxException
      */
-    private int parseDomain(String[] output, int currentIndex, List<IChannelInfo> channels) throws PatternSyntaxException {
+    private int parseDomain(String[] output, int currentIndex, List<IChannelInfo> channels) {
         int index = currentIndex;
 
         // Channels:
@@ -562,9 +560,8 @@ public class LTTngControlService implements ILttngControlService {
      * @param events
      *            - list for returning event information
      * @return the new current index in command output array
-     * @throws PatternSyntaxException
      */
-    private int parseEvents(String[] output, int currentIndex, List<IEventInfo> events) throws PatternSyntaxException {
+    private int parseEvents(String[] output, int currentIndex, List<IEventInfo> events) {
         int index = currentIndex;
 
         while (index < output.length) {
@@ -611,7 +608,6 @@ public class LTTngControlService implements ILttngControlService {
      * @param line
      *            - attribute line to parse
      * @return the attribute value as string
-     * @throws PatternSyntaxException
      */
     private String getAttributeValue(String line) {
         String[] temp = line.split("\\: "); //$NON-NLS-1$

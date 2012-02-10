@@ -16,7 +16,6 @@ package org.eclipse.linuxtools.lttng.ui.views.control;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponentChangedListener;
