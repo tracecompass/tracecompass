@@ -85,7 +85,7 @@ public class TmfDataEvent implements Cloneable {
     }
 
     // ------------------------------------------------------------------------
-    // ITmfDataEvent + Setters
+    // ITmfDataEvent
     // ------------------------------------------------------------------------
 
     /**
@@ -103,13 +103,6 @@ public class TmfDataEvent implements Cloneable {
     }
 
     /**
-     * @param source the event source
-     */
-    public void setSource(String source) {
-        fSource = source;
-    }
-
-    /**
      * @return the event source
      */
     public String getSource() {
@@ -124,13 +117,6 @@ public class TmfDataEvent implements Cloneable {
     }
 
     /**
-     * @param content the event new content
-     */
-    public void setContent(TmfEventContent content) {
-        fContent = content;
-    }
-
-    /**
      * @return the event content
      */
     public TmfEventContent getContent() {
@@ -142,6 +128,38 @@ public class TmfDataEvent implements Cloneable {
      */
     public String getReference() {
         return fReference;
+    }
+
+    // ------------------------------------------------------------------------
+    // Convenience setters
+    // ------------------------------------------------------------------------
+
+    /**
+     * @param source the new event source
+     */
+    protected void setSource(String source) {
+        fSource = source;
+    }
+
+    /**
+     * @param type the new event type
+     */
+    public void setType(TmfEventType type) {
+        fType = type;
+    }
+
+    /**
+     * @param content the event new content
+     */
+    public void setContent(TmfEventContent content) {
+        fContent = content;
+    }
+
+    /**
+     * @param reference the new event reference
+     */
+    public void setReference(String reference) {
+        fReference = reference;
     }
 
     // ------------------------------------------------------------------------

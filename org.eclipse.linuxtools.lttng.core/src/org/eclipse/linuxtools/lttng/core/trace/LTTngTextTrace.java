@@ -62,7 +62,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
         traceTypes      = new HashMap<String, LttngEventType>();
         
         eventTimestamp        = new LttngTimestamp();
-        eventSource           = ""; //$NON-NLS-1$
+        eventSource           = "Kernel Core"; //$NON-NLS-1$
         eventType             = new LttngEventType();
         eventContent          = new TextLttngEventContent(currentLttngEvent);
         eventReference        = getName();
@@ -235,10 +235,6 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
     				currentLttngEvent.getContent().emptyContent();
     			}
     			
-	    		// EventSource is always the same for now :
-    			currentLttngEvent.setSource("Kernel Core"); //$NON-NLS-1$
-	    		
-	    		
 	    		// Tracefile and marker are first in the file
 	    		// Sound like : 
 	    		//		kernel.syscall_entry:
