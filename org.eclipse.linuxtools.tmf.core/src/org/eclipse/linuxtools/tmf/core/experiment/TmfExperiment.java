@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -67,7 +68,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     protected TmfTimeRange fTimeRange;
 
     // The experiment reference timestamp (default: Zero)
-    protected TmfTimestamp fEpoch;
+    protected ITmfTimestamp fEpoch;
 
     // The experiment index
     protected Vector<TmfCheckpoint> fCheckpoints = new Vector<TmfCheckpoint>();
@@ -111,11 +112,11 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
      * @param epoch
      * @param indexPageSize
      */
-    public TmfExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, TmfTimestamp epoch, int indexPageSize) {
+    public TmfExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, ITmfTimestamp epoch, int indexPageSize) {
         this(type, id, traces, TmfTimestamp.Zero, indexPageSize, false);
     }
 
-    public TmfExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, TmfTimestamp epoch, int indexPageSize, boolean preIndexExperiment) {
+    public TmfExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, ITmfTimestamp epoch, int indexPageSize, boolean preIndexExperiment) {
         super(id, type);
 
         fTraces = traces;
@@ -223,12 +224,12 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     }
 
     @Override
-    public TmfTimestamp getStartTime() {
+    public ITmfTimestamp getStartTime() {
         return fTimeRange.getStartTime();
     }
 
     @Override
-    public TmfTimestamp getEndTime() {
+    public ITmfTimestamp getEndTime() {
         return fTimeRange.getEndTime();
     }
 
@@ -248,7 +249,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         return fCurrentExperiment;
     }
 
-    public TmfTimestamp getEpoch() {
+    public ITmfTimestamp getEpoch() {
         return fEpoch;
     }
 
@@ -264,7 +265,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
      * @return
      */
     @Override
-    public long getRank(TmfTimestamp timestamp) {
+    public long getRank(ITmfTimestamp timestamp) {
         TmfExperimentContext context = seekEvent(timestamp);
         return context.getRank();
     }
@@ -275,7 +276,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
      * @param index
      * @return
      */
-    public TmfTimestamp getTimestamp(int index) {
+    public ITmfTimestamp getTimestamp(int index) {
         TmfExperimentContext context = seekEvent(index);
         TmfEvent event = getNextEvent(context);
         return (event != null) ? event.getTimestamp() : null;
@@ -289,14 +290,14 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
      * Update the global time range
      */
     protected void updateTimeRange() {
-        TmfTimestamp startTime = fTimeRange != TmfTimeRange.Null ? fTimeRange.getStartTime() : TmfTimestamp.BigCrunch;
-        TmfTimestamp endTime = fTimeRange != TmfTimeRange.Null ? fTimeRange.getEndTime() : TmfTimestamp.BigBang;
+        ITmfTimestamp startTime = fTimeRange != TmfTimeRange.Null ? fTimeRange.getStartTime() : TmfTimestamp.BigCrunch;
+        ITmfTimestamp endTime = fTimeRange != TmfTimeRange.Null ? fTimeRange.getEndTime() : TmfTimestamp.BigBang;
 
         for (ITmfTrace<T> trace : fTraces) {
-            TmfTimestamp traceStartTime = trace.getStartTime();
+            ITmfTimestamp traceStartTime = trace.getStartTime();
             if (traceStartTime.compareTo(startTime, true) < 0)
                 startTime = traceStartTime;
-            TmfTimestamp traceEndTime = trace.getEndTime();
+            ITmfTimestamp traceEndTime = trace.getEndTime();
             if (traceEndTime.compareTo(endTime, true) > 0)
                 endTime = traceEndTime;
         }
@@ -309,7 +310,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     @Override
     public ITmfContext armRequest(ITmfDataRequest<T> request) {
 //		Tracer.trace("Ctx: Arming request - start");
-        TmfTimestamp timestamp = (request instanceof ITmfEventRequest<?>) ? ((ITmfEventRequest<T>) request).getRange().getStartTime()
+        ITmfTimestamp timestamp = (request instanceof ITmfEventRequest<?>) ? ((ITmfEventRequest<T>) request).getRange().getStartTime()
                 : null;
 
         if (TmfTimestamp.BigBang.equals(timestamp) || request.getIndex() > 0) {
@@ -402,7 +403,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
      * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#seekEvent(org.eclipse.linuxtools .tmf.event.TmfTimestamp)
      */
     @Override
-    public synchronized TmfExperimentContext seekEvent(TmfTimestamp timestamp) {
+    public synchronized TmfExperimentContext seekEvent(ITmfTimestamp timestamp) {
 
 //		Tracer.trace("Ctx: seekEvent(TS) - start");
 
@@ -571,7 +572,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
             return null;
         }
         int trace = TmfExperimentContext.NO_TRACE;
-        TmfTimestamp timestamp = TmfTimestamp.BigCrunch;
+        ITmfTimestamp timestamp = TmfTimestamp.BigCrunch;
         if (eventArray.length == 1) {
             if (eventArray[0] != null) {
                 timestamp = eventArray[0].getTimestamp();
@@ -581,7 +582,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
             for (int i = 0; i < eventArray.length; i++) {
                 TmfEvent event = eventArray[i];
                 if (event != null && event.getTimestamp() != null) {
-                    TmfTimestamp otherTS = event.getTimestamp();
+                    ITmfTimestamp otherTS = event.getTimestamp();
                     if (otherTS.compareTo(timestamp, true) < 0) {
                         trace = i;
                         timestamp = otherTS;
@@ -617,7 +618,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         return event;
     }
 
-    public synchronized void updateIndex(ITmfContext context, TmfTimestamp timestamp) {
+    public synchronized void updateIndex(ITmfContext context, ITmfTimestamp timestamp) {
         // Build the index as we go along
         long rank = context.getRank();
         if (context.isValidRank() && (rank % fIndexPageSize) == 0) {
@@ -664,11 +665,11 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
         // Scan the candidate events and identify the "next" trace to read from
         int trace = TmfExperimentContext.NO_TRACE;
-        TmfTimestamp timestamp = TmfTimestamp.BigCrunch;
+        ITmfTimestamp timestamp = TmfTimestamp.BigCrunch;
         for (int i = 0; i < expContext.getTraces().length; i++) {
             TmfEvent event = expContext.getEvents()[i];
             if (event != null && event.getTimestamp() != null) {
-                TmfTimestamp otherTS = event.getTimestamp();
+                ITmfTimestamp otherTS = event.getTimestamp();
                 if (otherTS.compareTo(timestamp, true) < 0) {
                     trace = i;
                     timestamp = otherTS;
@@ -768,8 +769,8 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
 //            long indexingStart = System.nanoTime();
 
-            TmfTimestamp startTime = (fTimeRange == TmfTimeRange.Null) ? null : fTimeRange.getStartTime();
-            TmfTimestamp lastTime = (fTimeRange == TmfTimeRange.Null) ? null : fTimeRange.getEndTime();
+            ITmfTimestamp startTime = (fTimeRange == TmfTimeRange.Null) ? null : fTimeRange.getStartTime();
+            ITmfTimestamp lastTime = (fTimeRange == TmfTimeRange.Null) ? null : fTimeRange.getEndTime();
             long initialNbEvents = fNbEvents;
 
             @Override
@@ -781,10 +782,10 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
             public void handleData(TmfEvent event) {
                 super.handleData(event);
                 if (event != null) {
-                    TmfTimestamp ts = event.getTimestamp();
+                    ITmfTimestamp ts = event.getTimestamp();
                     if (startTime == null)
-                        startTime = new TmfTimestamp(ts);
-                    lastTime = new TmfTimestamp(ts);
+                        startTime = ts.clone();
+                    lastTime = ts.clone();
                     if ((getNbRead() % fIndexPageSize) == 1 && getNbRead() != 1) {
                         updateExperiment();
                     }
@@ -825,7 +826,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
             private void updateExperiment() {
                 int nbRead = getNbRead();
                 if (startTime != null) {
-                    fTimeRange = new TmfTimeRange(startTime, new TmfTimestamp(lastTime));
+                    fTimeRange = new TmfTimeRange(startTime, lastTime.clone());
                 }
                 if (nbRead != 0) {
 //					updateTimeRange();
@@ -876,8 +877,8 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
                         if (fIndexingPendingRange == TmfTimeRange.Null) {
                             fIndexingPendingRange = signal.getRange();
                         } else {
-                            TmfTimestamp startTime = fIndexingPendingRange.getStartTime();
-                            TmfTimestamp endTime = fIndexingPendingRange.getEndTime();
+                            ITmfTimestamp startTime = fIndexingPendingRange.getStartTime();
+                            ITmfTimestamp endTime = fIndexingPendingRange.getEndTime();
                             if (signal.getRange().getStartTime().compareTo(startTime) < 0) {
                                 startTime = signal.getRange().getStartTime();
                             }

@@ -46,7 +46,7 @@ public class LttngTimestamp extends TmfTimestamp {
      * 
      * @param oldEventTime    The timestamp object we want to copy from
      */
-    public LttngTimestamp(TmfTimestamp oldEventTime) {
+    public LttngTimestamp(ITmfTimestamp oldEventTime) {
         this(oldEventTime.getValue());
     }
     

@@ -33,6 +33,7 @@ import org.eclipse.linuxtools.lttng.jni.JniTracefile;
 import org.eclipse.linuxtools.lttng.jni.common.JniTime;
 import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
@@ -418,7 +419,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * @see org.eclipse.linuxtools.tmf.core.trace.TmfContext
      */
     @Override
-    public synchronized TmfContext seekEvent(TmfTimestamp timestamp) {
+    public synchronized TmfContext seekEvent(ITmfTimestamp timestamp) {
 
         if (PrintDebug) {
             System.out.println("seekEvent(timestamp) timestamp -> " + timestamp); //$NON-NLS-1$
@@ -462,7 +463,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
             System.out.println("seekEvent(position) position -> " + position); //$NON-NLS-1$
         }
 
-        TmfTimestamp timestamp = null;
+        ITmfTimestamp timestamp = null;
         long index = position / getCacheSize();
 
         // Get the timestamp of the closest check point to the given position
@@ -607,7 +608,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     // this method was extracted for profiling purposes
     private void setPreviousAndCurrentTimes(TmfContext context, LttngEvent returnedEvent, LttngLocation curLocation) {
 
-        TmfTimestamp eventTimestamp = returnedEvent.getTimestamp();
+        ITmfTimestamp eventTimestamp = returnedEvent.getTimestamp();
         // long eventTime = eventTimestamp.getValue();
         previousLocation.setOperationTime(eventTimestamp.getValue());
         curLocation.setOperationTime(eventTimestamp.getValue());

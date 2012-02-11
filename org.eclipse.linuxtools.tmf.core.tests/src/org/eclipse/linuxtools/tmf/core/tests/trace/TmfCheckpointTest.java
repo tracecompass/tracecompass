@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.core.tests.trace;
 
 import junit.framework.TestCase;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpoint;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
@@ -30,9 +31,9 @@ public class TmfCheckpointTest extends TestCase {
 	// Variables
 	// ------------------------------------------------------------------------
 
-	TmfTimestamp fTimestamp1 = new TmfTimestamp();
-	TmfTimestamp fTimestamp2 = TmfTimestamp.BigBang;
-	TmfTimestamp fTimestamp3 = TmfTimestamp.BigCrunch;
+	ITmfTimestamp fTimestamp1 = new TmfTimestamp();
+	ITmfTimestamp fTimestamp2 = TmfTimestamp.BigBang;
+	ITmfTimestamp fTimestamp3 = TmfTimestamp.BigCrunch;
 
 	Long aLong1 = 12345L;
 	Long aLong2 = 23456L;

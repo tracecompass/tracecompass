@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.lttng.core.state.model.LttngExecutionState;
 import org.eclipse.linuxtools.lttng.core.state.model.LttngIRQState;
 import org.eclipse.linuxtools.lttng.core.state.model.LttngProcessState;
 import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 
 public abstract class AbsStateUpdate extends AbsStateProcessing implements
 		ILttngEventProcessor {
@@ -39,7 +39,7 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 	// push and pop from stack
 	// =======================================================================
 	protected void push_state(Long cpu, StateStrings.ExecutionMode execMode,
-	        String submode, int subModeId, TmfTimestamp eventTime, LttngTraceState traceSt) {
+	        String submode, int subModeId, ITmfTimestamp eventTime, LttngTraceState traceSt) {
 
 		LttngProcessState process = traceSt.getRunning_process().get(cpu);
 		LttngExecutionState exe_state = new LttngExecutionState();
@@ -55,7 +55,7 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 	}
 
 	protected void pop_state(Long cpu, StateStrings.ExecutionMode execMode,
-			LttngTraceState traceSt, TmfTimestamp eventTime) {
+			LttngTraceState traceSt, ITmfTimestamp eventTime) {
 
 		LttngProcessState process = traceSt.getRunning_process().get(cpu);
 
@@ -200,7 +200,7 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 	 * @return
 	 */
 	protected LttngProcessState create_process(LttngTraceState traceSt,
-			Long cpu, Long pid, Long tgid, final TmfTimestamp timestamp) {
+			Long cpu, Long pid, Long tgid, final ITmfTimestamp timestamp) {
 		LttngProcessState process = create_process(traceSt, cpu, pid, tgid,
 				ProcessStatus.LTTV_STATE_UNNAMED.getInName(), timestamp);
 		return process;
@@ -217,7 +217,7 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 	 */
 	protected LttngProcessState create_process(LttngTraceState traceSt,
 			Long cpu, Long pid, Long tgid, String name,
-			final TmfTimestamp timestamp) {
+			final ITmfTimestamp timestamp) {
 		LttngProcessState process;
 		process = new LttngProcessState(cpu, pid, tgid, name, timestamp.getValue(), traceSt.getTraceId());
 		traceSt.addProcessState(process);
@@ -233,7 +233,7 @@ public abstract class AbsStateUpdate extends AbsStateProcessing implements
 	 * @return
 	 */
 	protected LttngProcessState lttv_state_find_process_or_create(
-			LttngTraceState ts, Long cpu, Long pid, final TmfTimestamp timestamp) {
+			LttngTraceState ts, Long cpu, Long pid, final ITmfTimestamp timestamp) {
 	
 		LttngProcessState process = lttv_state_find_process(ts, cpu, pid);
 		/* Put ltt_time_zero creation time for non existing processes */

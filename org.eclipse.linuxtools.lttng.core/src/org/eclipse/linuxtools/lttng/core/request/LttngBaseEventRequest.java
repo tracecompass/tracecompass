@@ -13,8 +13,8 @@
 package org.eclipse.linuxtools.lttng.core.request;
 
 import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
@@ -39,7 +39,7 @@ public abstract class LttngBaseEventRequest extends TmfEventRequest<LttngEvent> 
 	 * time of the request for base events is adjusted to the nearest check
 	 * point
 	 */
-	private final TmfTimestamp fDispatchTime;
+	private final ITmfTimestamp fDispatchTime;
 
 	// ========================================================================
 	// Constructors
@@ -53,7 +53,7 @@ public abstract class LttngBaseEventRequest extends TmfEventRequest<LttngEvent> 
 	 * @param traceState
 	 * @param listener
 	 */
-	public LttngBaseEventRequest(TmfTimeRange range, TmfTimestamp dispatchTime, long offset, int nbEvents,
+	public LttngBaseEventRequest(TmfTimeRange range, ITmfTimestamp dispatchTime, long offset, int nbEvents,
 			int maxBlockSize, ITmfDataRequest.ExecutionType execType) {
 		super(LttngEvent.class, range, (int) offset, nbEvents, maxBlockSize, execType);		
 		fDispatchTime = dispatchTime;
@@ -119,7 +119,7 @@ public abstract class LttngBaseEventRequest extends TmfEventRequest<LttngEvent> 
 	/**
 	 * @return The time to start dispatching events to the application
 	 */
-	public TmfTimestamp getDispatchTime() {
+	public ITmfTimestamp getDispatchTime() {
 		return fDispatchTime;
 	}
 	

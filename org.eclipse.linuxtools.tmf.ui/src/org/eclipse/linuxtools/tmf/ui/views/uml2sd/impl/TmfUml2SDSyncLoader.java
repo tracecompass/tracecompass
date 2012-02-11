@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfNoSuchFieldException;
@@ -94,7 +95,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     // Checkpoint and page attributes
     protected List<TmfTimeRange> fCheckPoints = new ArrayList<TmfTimeRange>(MAX_NUM_OF_MSG);
     volatile protected int fCurrentPage = 0;
-    protected TmfTimestamp fCurrentTime = null;
+    protected ITmfTimestamp fCurrentTime = null;
     volatile protected boolean fIsSelect = false; 
 
     // Search attributes
@@ -128,7 +129,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     /**
      * @return returns the current time if available else null
      */
-    public TmfTimestamp getCurrentTime() {
+    public ITmfTimestamp getCurrentTime() {
         fLock.lock(); 
         try {
             if (fCurrentTime != null) { 
@@ -178,8 +179,8 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
             fIndexRequest = new TmfEventRequest<TmfEvent>(TmfEvent.class, window, TmfDataRequest.ALL_DATA, DEFAULT_BLOCK_SIZE, ITmfDataRequest.ExecutionType.BACKGROUND) {
 
-                private TmfTimestamp fFirstTime = null;
-                private TmfTimestamp fLastTime = null;
+                private ITmfTimestamp fFirstTime = null;
+                private ITmfTimestamp fLastTime = null;
                 private int fNbSeqEvents = 0;
                 private List<ITmfSyncSequenceDiagramEvent> fSdEvents = new ArrayList<ITmfSyncSequenceDiagramEvent>(MAX_NUM_OF_MSG);
 
@@ -1004,7 +1005,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
      * @param time The timestamp
      * @return page that contains the time
      */
-    protected int getPage(TmfTimestamp time) {
+    protected int getPage(ITmfTimestamp time) {
         int page;
         int size;
         fLock.lock();
@@ -1059,7 +1060,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
      * @param startTime The start time of time range.
      * @return
      */
-    protected TmfTimeRange getSignalTimeRange(TmfTimestamp startTime) {
+    protected TmfTimeRange getSignalTimeRange(ITmfTimestamp startTime) {
         fLock.lock();
         try {
             TmfTimestamp initialEndOfWindow = new TmfTimestamp(startTime.getValue() + fInitialWindow, startTime.getScale(), startTime.getPrecision());
@@ -1217,7 +1218,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
         private IProgressMonitor fMonitor;
         private boolean fIsFound = false;
-        private TmfTimestamp fFoundTime = null;
+        private ITmfTimestamp fFoundTime = null;
 
         /**
          * Constructor 
@@ -1315,7 +1316,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         /**
          * @return timestamp of found time.
          */
-        public TmfTimestamp getFoundTime() {
+        public ITmfTimestamp getFoundTime() {
             return fFoundTime;
         }
     }

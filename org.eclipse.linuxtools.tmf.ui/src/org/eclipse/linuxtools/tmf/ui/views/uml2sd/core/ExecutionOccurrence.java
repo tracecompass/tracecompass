@@ -12,6 +12,7 @@
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
@@ -32,7 +33,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
     protected int[] strokeRGB;
     protected IImage image, ellipsesImage;
 
-    protected TmfTimestamp startTime, endTime;
+    protected ITmfTimestamp startTime, endTime;
     protected boolean hasTime;
 
     /**
@@ -119,7 +120,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
      * @return the time
      */
     @Override
-    public TmfTimestamp getStartTime() {
+    public ITmfTimestamp getStartTime() {
         return startTime;
     }
 
@@ -129,7 +130,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
      * @return the time
      */
     @Override
-    public TmfTimestamp getEndTime() {
+    public ITmfTimestamp getEndTime() {
         return endTime;
     }
 

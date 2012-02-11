@@ -30,8 +30,8 @@ public class TmfTimeRange {
     // Attributes
 	// ------------------------------------------------------------------------
 
-	private final TmfTimestamp fStartTime;
-	private final TmfTimestamp fEndTime;
+	private final ITmfTimestamp fStartTime;
+	private final ITmfTimestamp fEndTime;
 
 	// ------------------------------------------------------------------------
     // Constructors
@@ -46,12 +46,12 @@ public class TmfTimeRange {
 	 * @param startTime
 	 * @param endTime
 	 */
-	public TmfTimeRange(TmfTimestamp startTime, TmfTimestamp endTime) {
+	public TmfTimeRange(ITmfTimestamp startTime, ITmfTimestamp endTime) {
 		if (startTime == null || endTime == null) {
     		throw new IllegalArgumentException();
 		}
-		fStartTime =  new TmfTimestamp(startTime);
-		fEndTime   =  new TmfTimestamp(endTime);
+		fStartTime = startTime.clone();
+		fEndTime   = endTime.clone();
 	}
 	
 	/**
@@ -62,8 +62,8 @@ public class TmfTimeRange {
     	if (other == null) {
     		throw new IllegalArgumentException();
     	}
-		fStartTime = new TmfTimestamp(other.fStartTime);
-		fEndTime   = new TmfTimestamp(other.fEndTime);
+        fStartTime = other.getStartTime().clone();
+        fEndTime   = other.getEndTime().clone();
 	}
 
 	// ------------------------------------------------------------------------
@@ -73,15 +73,15 @@ public class TmfTimeRange {
 	/**
 	 * @return The time range start time
 	 */
-	public TmfTimestamp getStartTime() {
-		return new TmfTimestamp(fStartTime);
+	public ITmfTimestamp getStartTime() {
+		return fStartTime;
 	}
 
 	/**
 	 * @return The time range end time
 	 */
-	public TmfTimestamp getEndTime() {
-		return new TmfTimestamp(fEndTime);
+	public ITmfTimestamp getEndTime() {
+		return fEndTime;
 	}
 
 	// ------------------------------------------------------------------------
@@ -94,7 +94,7 @@ public class TmfTimeRange {
 	 * @param ts
 	 * @return
 	 */
-	public boolean contains(TmfTimestamp ts) {
+	public boolean contains(ITmfTimestamp ts) {
 		// Zero acts as a "universal donor" timestamp
 		if (ts.equals(TmfTimestamp.Zero)) return true;
 		return (fStartTime.compareTo(ts, true) <= 0) && (fEndTime.compareTo(ts, true) >= 0);
@@ -124,8 +124,8 @@ public class TmfTimeRange {
 	 * @return
 	 */
 	public boolean contains(TmfTimeRange range) {
-		TmfTimestamp startTime = range.getStartTime();
-		TmfTimestamp endTime   = range.getEndTime();
+		ITmfTimestamp startTime = range.getStartTime();
+		ITmfTimestamp endTime   = range.getEndTime();
 		return (fStartTime.compareTo(startTime, true) <= 0) && (fEndTime.compareTo(endTime, true) >= 0);
 	}
 

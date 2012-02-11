@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -52,7 +53,7 @@ public class CustomEvent extends TmfEvent {
     }
 
     @Override
-    public TmfTimestamp getTimestamp() {
+    public ITmfTimestamp getTimestamp() {
         if (fData != null) processData();
         return super.getTimestamp();
     }

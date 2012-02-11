@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.ISDPreferences;
@@ -39,11 +40,11 @@ public class BasicFrame extends GraphNode {
     /**
      * Contains the max elapsed time between two consecutive messages in the whole frame
      */
-    protected TmfTimestamp maxTime = new TmfTimestamp(0);
+    protected ITmfTimestamp maxTime = new TmfTimestamp(0);
     /**
      * Contains the min elapsed time between two consecutive messages in the whole frame
      */
-    protected TmfTimestamp minTime = new TmfTimestamp(0);
+    protected ITmfTimestamp minTime = new TmfTimestamp(0);
 
     /**
      * Indicate if the min and max elapsed time between two consecutive messages in the whole frame need to be computed
@@ -82,8 +83,8 @@ public class BasicFrame extends GraphNode {
 
     protected boolean customMinMax = false;
 
-    protected TmfTimestamp minSDTime = new TmfTimestamp();
-    protected TmfTimestamp maxSDTime = new TmfTimestamp();
+    protected ITmfTimestamp minSDTime = new TmfTimestamp();
+    protected ITmfTimestamp maxSDTime = new TmfTimestamp();
     protected boolean initSDMin = true;
 
     /**
@@ -361,7 +362,7 @@ public class BasicFrame extends GraphNode {
      * 
      * @return the minimum GraphNode time
      */
-    public TmfTimestamp getMinTime() {
+    public ITmfTimestamp getMinTime() {
         if (lastExternalTimePref != SDViewPref.getInstance().excludeExternalTime()) {
             lastExternalTimePref = SDViewPref.getInstance().excludeExternalTime();
             computeMinMax = true;
@@ -393,7 +394,7 @@ public class BasicFrame extends GraphNode {
      * 
      * @return the maximum GraphNode time
      */
-    public TmfTimestamp getMaxTime() {
+    public ITmfTimestamp getMaxTime() {
         if (lastExternalTimePref != SDViewPref.getInstance().excludeExternalTime()) {
             lastExternalTimePref = SDViewPref.getInstance().excludeExternalTime();
             computeMinMax = true;
@@ -426,12 +427,12 @@ public class BasicFrame extends GraphNode {
         }
     }
 
-    public TmfTimestamp getSDMinTime() {
+    public ITmfTimestamp getSDMinTime() {
         computeMaxMinTime();
         return minSDTime;
     }
 
-    public TmfTimestamp getSDMaxTime() {
+    public ITmfTimestamp getSDMaxTime() {
         computeMaxMinTime();
         return maxSDTime;
     }
@@ -453,7 +454,7 @@ public class BasicFrame extends GraphNode {
     }
 
     protected void updateMinMax(SDTimeEvent m1, SDTimeEvent m2) {
-        TmfTimestamp delta = (TmfTimestamp) m2.getTime().getDelta(m1.getTime());
+        ITmfTimestamp delta = m2.getTime().getDelta(m1.getTime());
         if (computeMinMax) {
             minTime = delta.clone();
             if (minTime.compareTo(TmfTimestamp.Zero, false) < 0) {
@@ -485,7 +486,7 @@ public class BasicFrame extends GraphNode {
                 Object timedNode = list.get(i);
                 if ((timedNode instanceof ITimeRange) && ((ITimeRange) timedNode).hasTimeInfo()) {
                     int event = ((GraphNode) list.get(i)).getStartOccurrence();
-                    TmfTimestamp time = ((ITimeRange) list.get(i)).getStartTime();
+                    ITmfTimestamp time = ((ITimeRange) list.get(i)).getStartTime();
                     SDTimeEvent f = new SDTimeEvent(time, event, (ITimeRange) list.get(i));
                     timeArray.add(f);
                     if (event != ((GraphNode) list.get(i)).getEndOccurrence()) {

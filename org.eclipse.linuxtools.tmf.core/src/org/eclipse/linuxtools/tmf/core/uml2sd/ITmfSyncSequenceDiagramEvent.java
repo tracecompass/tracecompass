@@ -11,7 +11,7 @@
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.core.uml2sd;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 
 public interface ITmfSyncSequenceDiagramEvent {
     
@@ -33,5 +33,5 @@ public interface ITmfSyncSequenceDiagramEvent {
     /**
      * @return Start timestamp of message (i.e. send time)
      */
-    public TmfTimestamp getStartTime();
+    public ITmfTimestamp getStartTime();
 }

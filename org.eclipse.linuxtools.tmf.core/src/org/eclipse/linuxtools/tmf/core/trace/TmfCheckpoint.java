@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.trace;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 
 /**
  * <b><u>TmfCheckpoint</u></b>
@@ -26,7 +26,7 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint>, Cloneable {
     // Attributes
     // ------------------------------------------------------------------------
     
-    private TmfTimestamp fTimestamp;
+    private ITmfTimestamp fTimestamp;
 	private ITmfLocation<? extends Comparable> fLocation;
 
     // ------------------------------------------------------------------------
@@ -43,7 +43,7 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint>, Cloneable {
      * @param ts the checkpoint timestamp
      * @param location the corresponding trace location
      */
-    public TmfCheckpoint(TmfTimestamp ts, ITmfLocation<? extends Comparable> location) {
+    public TmfCheckpoint(ITmfTimestamp ts, ITmfLocation<? extends Comparable> location) {
         fTimestamp = ts;
         fLocation = location;
     }
@@ -55,7 +55,7 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint>, Cloneable {
     public TmfCheckpoint(TmfCheckpoint other) {
     	if (other == null)
     		throw new IllegalArgumentException();
-        fTimestamp = (TmfTimestamp) other.fTimestamp.clone();
+        fTimestamp = other.fTimestamp.clone();
         fLocation  = other.fLocation.clone();
     }
 
@@ -66,7 +66,7 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint>, Cloneable {
     /**
      * @return the checkpoint timestamp
      */
-    public TmfTimestamp getTimestamp() {
+    public ITmfTimestamp getTimestamp() {
         return fTimestamp;
     }
 
@@ -86,7 +86,7 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint>, Cloneable {
     	TmfCheckpoint result = null;
 		try {
 			result = (TmfCheckpoint) super.clone();
-	    	result.fTimestamp = new TmfTimestamp(fTimestamp);
+	    	result.fTimestamp = fTimestamp.clone();
 	    	result.fLocation  = fLocation.clone();
 	    	return result;
 		} catch (CloneNotSupportedException e) {

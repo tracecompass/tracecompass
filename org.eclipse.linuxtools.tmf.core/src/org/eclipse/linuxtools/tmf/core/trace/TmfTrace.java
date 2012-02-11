@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -80,8 +81,8 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     protected long fNbEvents = 0;
 
     // The time span of the event stream
-    private TmfTimestamp fStartTime = TmfTimestamp.BigCrunch;
-    private TmfTimestamp fEndTime = TmfTimestamp.BigBang;
+    private ITmfTimestamp fStartTime = TmfTimestamp.BigCrunch;
+    private ITmfTimestamp fEndTime = TmfTimestamp.BigBang;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -183,8 +184,8 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     public TmfTrace<T> clone() throws CloneNotSupportedException {
         TmfTrace<T> clone = (TmfTrace<T>) super.clone();
         clone.fCheckpoints = fCheckpoints;
-        clone.fStartTime = new TmfTimestamp(fStartTime);
-        clone.fEndTime = new TmfTimestamp(fEndTime);
+        clone.fStartTime = fStartTime.clone();
+        clone.fEndTime = fEndTime.clone();
         return clone;
     }
 
@@ -228,7 +229,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
      * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#getStartTime()
      */
     @Override
-    public TmfTimestamp getStartTime() {
+    public ITmfTimestamp getStartTime() {
         return fStartTime;
     }
 
@@ -236,7 +237,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
      * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#getEndTime()
      */
     @Override
-    public TmfTimestamp getEndTime() {
+    public ITmfTimestamp getEndTime() {
         return fEndTime;
     }
 
@@ -253,7 +254,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
      * @return
      */
     @Override
-    public long getRank(TmfTimestamp timestamp) {
+    public long getRank(ITmfTimestamp timestamp) {
         TmfContext context = seekEvent(timestamp);
         return context.getRank();
     }
@@ -315,7 +316,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
      * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#seekEvent(org.eclipse.linuxtools.tmf.event.TmfTimestamp)
      */
     @Override
-    public TmfContext seekEvent(TmfTimestamp timestamp) {
+    public TmfContext seekEvent(ITmfTimestamp timestamp) {
 
         if (timestamp == null) {
             timestamp = TmfTimestamp.BigBang;
@@ -411,7 +412,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
         return event;
     }
 
-    protected synchronized void updateIndex(ITmfContext context, long rank, TmfTimestamp timestamp) {
+    protected synchronized void updateIndex(ITmfContext context, long rank, ITmfTimestamp timestamp) {
         if (fStartTime.compareTo(timestamp, false) > 0)
             fStartTime = timestamp;
         if (fEndTime.compareTo(timestamp, false) < 0)
@@ -489,17 +490,17 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
         ITmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity, TmfDataRequest.ALL_DATA,
                 fIndexPageSize, ITmfDataRequest.ExecutionType.BACKGROUND) {
 
-            TmfTimestamp startTime = null;
-            TmfTimestamp lastTime = null;
+            ITmfTimestamp startTime = null;
+            ITmfTimestamp lastTime = null;
 
             @Override
             public void handleData(TmfEvent event) {
                 super.handleData(event);
                 if (event != null) {
-                    TmfTimestamp ts = event.getTimestamp();
+                    ITmfTimestamp ts = event.getTimestamp();
                     if (startTime == null)
-                        startTime = new TmfTimestamp(ts);
-                    lastTime = new TmfTimestamp(ts);
+                        startTime = ts.clone();
+                    lastTime = ts.clone();
 
                     if ((getNbRead() % fIndexPageSize) == 0) {
                         updateTrace();

@@ -17,6 +17,7 @@
 package org.eclipse.linuxtools.lttng.ui.views.histogram;
 
 import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
@@ -366,7 +367,7 @@ public class HistogramView extends TmfView {
         assert (signal != null);
 
         // Update the selected event time
-        TmfTimestamp currentTime = signal.getCurrentTime();
+        ITmfTimestamp currentTime = signal.getCurrentTime();
         fCurrentTimestamp = currentTime.getValue();
 
         // Notify the relevant widgets

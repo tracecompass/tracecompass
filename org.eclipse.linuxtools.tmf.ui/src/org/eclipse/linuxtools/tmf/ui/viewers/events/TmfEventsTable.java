@@ -44,6 +44,7 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
@@ -1621,7 +1622,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         return;
                     }
                     // Verify if event is within the trace range
-                    final TmfTimestamp timestamp[] = new TmfTimestamp[1];
+                    final ITmfTimestamp timestamp[] = new TmfTimestamp[1];
                     timestamp[0] = ts; // signal.getCurrentTime();
                     if (timestamp[0].compareTo(fTrace.getStartTime(), true) == -1) {
                         timestamp[0] = fTrace.getStartTime();

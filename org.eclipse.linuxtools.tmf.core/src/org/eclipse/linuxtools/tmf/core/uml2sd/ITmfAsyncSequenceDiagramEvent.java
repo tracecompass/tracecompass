@@ -11,11 +11,11 @@
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.core.uml2sd;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 
 public interface ITmfAsyncSequenceDiagramEvent extends ITmfSyncSequenceDiagramEvent {
     /**
      * @return End timestamp of message (i.e. receive time)
      */
-    public TmfTimestamp getEndTime();
+    public ITmfTimestamp getEndTime();
 }

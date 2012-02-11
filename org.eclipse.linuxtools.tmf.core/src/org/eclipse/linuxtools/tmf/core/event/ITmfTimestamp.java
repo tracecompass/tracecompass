@@ -16,7 +16,7 @@ package org.eclipse.linuxtools.tmf.core.event;
  * <b><u>ITmfTimestamp</u></b>
  * <p>
  */
-public interface ITmfTimestamp {
+public interface ITmfTimestamp extends Cloneable, Comparable<ITmfTimestamp> {
 
     /**
      * @return the timestamp value (magnitude)
@@ -58,5 +58,11 @@ public interface ITmfTimestamp {
      * @return the time difference (this - other) as an ITmfTimestamp
      */
     public ITmfTimestamp getDelta(ITmfTimestamp ts);
+
+    // Cloneable
+    public ITmfTimestamp clone();
+    
+    // Comparable
+    public int compareTo(ITmfTimestamp ts);
 
 }

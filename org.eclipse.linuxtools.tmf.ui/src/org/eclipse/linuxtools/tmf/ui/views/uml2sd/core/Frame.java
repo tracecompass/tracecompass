@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
@@ -619,7 +620,7 @@ public class Frame extends BasicFrame {
                                 ExecutionOccurrence eo = (ExecutionOccurrence) o;
                                 if (eo.hasTimeInfo()) {
                                     int event = eo.getStartOccurrence();
-                                    TmfTimestamp time = eo.getStartTime();
+                                    ITmfTimestamp time = eo.getStartTime();
                                     SDTimeEvent f = new SDTimeEvent(time, event, eo);
                                     timeArray.add(f);
                                     if (executionOccurrencesWithTime == null) {

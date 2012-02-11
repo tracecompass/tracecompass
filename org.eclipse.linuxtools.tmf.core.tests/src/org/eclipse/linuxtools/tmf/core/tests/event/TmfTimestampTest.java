@@ -40,8 +40,8 @@ public class TmfTimestampTest extends TestCase {
 	private final TmfTimestamp ts0copy2 = new TmfTimestamp();
 	private final TmfTimestamp ts1copy2 = new TmfTimestamp(12345);
 
-	private final TmfTimestamp bigBang   = new TmfTimestamp(TmfTimestamp.BigBang);
-	private final TmfTimestamp bigCrunch = new TmfTimestamp(TmfTimestamp.BigCrunch);
+	private final ITmfTimestamp bigBang   = TmfTimestamp.BigBang;
+	private final ITmfTimestamp bigCrunch = TmfTimestamp.BigCrunch;
 
 	// ------------------------------------------------------------------------
 	// Housekeping
@@ -196,7 +196,7 @@ public class TmfTimestampTest extends TestCase {
 	}
 
 	public void testClone() throws Exception {
-		TmfTimestamp timestamp = ts0.clone();
+		ITmfTimestamp timestamp = ts0.clone();
 		assertEquals("clone", timestamp, ts0);
 	}
 

@@ -12,9 +12,9 @@
 
 package org.eclipse.linuxtools.tmf.core.request;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 
 /**
  * <b><u>TmfCoalescedEventRequest</u></b>
@@ -98,8 +98,8 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
 			ok &= getIndex() == request.getIndex();
 			ok &= getExecType() == request.getExecType();
 			if (ok) {
-				TmfTimestamp startTime = ((ITmfEventRequest<T>) request).getRange().getStartTime();
-				TmfTimestamp endTime   = ((ITmfEventRequest<T>) request).getRange().getEndTime();
+				ITmfTimestamp startTime = ((ITmfEventRequest<T>) request).getRange().getStartTime();
+				ITmfTimestamp endTime   = ((ITmfEventRequest<T>) request).getRange().getEndTime();
 				if (!fRange.contains(startTime))
 					fRange = new TmfTimeRange(startTime, fRange.getEndTime());
 				if (!fRange.contains(endTime))
@@ -124,7 +124,7 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
     			if (request instanceof TmfEventRequest<?>) {
     				TmfEventRequest<T> req = (TmfEventRequest<T>) request;
        				if (!req.isCompleted()) {
-       					TmfTimestamp ts = data.getTimestamp();
+       					ITmfTimestamp ts = data.getTimestamp();
     					if (req.getRange().contains(ts)) {
     						req.handleData(data);
     					}

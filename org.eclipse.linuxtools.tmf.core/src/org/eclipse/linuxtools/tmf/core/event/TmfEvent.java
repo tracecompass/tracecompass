@@ -37,7 +37,7 @@ public class TmfEvent extends TmfDataEvent implements Cloneable {
     // Attributes
     // ------------------------------------------------------------------------
 
-    protected TmfTimestamp fTimestamp;
+    protected ITmfTimestamp fTimestamp;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -59,7 +59,7 @@ public class TmfEvent extends TmfDataEvent implements Cloneable {
      * @param type the event type
      * @param reference the event reference
      */
-    public TmfEvent(ITmfTrace<?> trace, long rank, TmfTimestamp timestamp, String source,
+    public TmfEvent(ITmfTrace<?> trace, long rank, ITmfTimestamp timestamp, String source,
                     TmfEventType type, String reference)
     {
         super(trace, rank, source, type, null, reference);
@@ -69,7 +69,7 @@ public class TmfEvent extends TmfDataEvent implements Cloneable {
     /**
      * Constructor - no rank
      */
-    public TmfEvent(ITmfTrace<?> parentTrace, TmfTimestamp timestamp, String source,
+    public TmfEvent(ITmfTrace<?> parentTrace, ITmfTimestamp timestamp, String source,
                     TmfEventType type, String reference)
     {
         this(parentTrace, -1, timestamp, source, type, reference);
@@ -78,7 +78,7 @@ public class TmfEvent extends TmfDataEvent implements Cloneable {
     /**
      * Constructor - no trace, no rank
      */
-    public TmfEvent(TmfTimestamp timestamp, String source, TmfEventType type, String reference) {
+    public TmfEvent(ITmfTimestamp timestamp, String source, TmfEventType type, String reference) {
         this(null, -1, timestamp, source, type, reference);
     }
 
@@ -89,7 +89,7 @@ public class TmfEvent extends TmfDataEvent implements Cloneable {
      */
     public TmfEvent(TmfEvent event) {
         super(event);
-        fTimestamp = event.fTimestamp != null ? new TmfTimestamp(event.fTimestamp) : null;
+        fTimestamp = event.fTimestamp != null ? event.fTimestamp.clone() : null;
     }
 
     // ------------------------------------------------------------------------
@@ -99,7 +99,7 @@ public class TmfEvent extends TmfDataEvent implements Cloneable {
     /**
      * @return the effective event timestamp
      */
-    public TmfTimestamp getTimestamp() {
+    public ITmfTimestamp getTimestamp() {
         return fTimestamp;
     }
 

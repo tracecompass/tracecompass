@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessage;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessageReturn;
@@ -68,8 +69,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
 
     protected Frame frame = null;
     protected List<SDTimeEvent> nodeList = null;
-    protected TmfTimestamp min = new TmfTimestamp();
-    protected TmfTimestamp max = new TmfTimestamp();
+    protected ITmfTimestamp min = new TmfTimestamp();
+    protected ITmfTimestamp max = new TmfTimestamp();
     protected float zoomValue = 1;
     protected DrawableToolTip tooltip = null;
 
@@ -528,8 +529,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         ITimeRange t1 = (ITimeRange) mes1;
         ITimeRange t2 = (ITimeRange) mes2;
 
-        TmfTimestamp time1 = t1.getStartTime();
-        TmfTimestamp time2 = t2.getStartTime();
+        ITmfTimestamp time1 = t1.getStartTime();
+        ITmfTimestamp time2 = t2.getStartTime();
         int event1 = mes1.getEventOccurrence();
         int event2 = mes2.getEventOccurrence();
 

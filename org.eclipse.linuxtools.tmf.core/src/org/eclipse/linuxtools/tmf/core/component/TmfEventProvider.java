@@ -13,13 +13,13 @@
 package org.eclipse.linuxtools.tmf.core.component;
 
 import org.eclipse.linuxtools.tmf.core.Tracer;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfCoalescedEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 
 /**
  * <b><u>TmfEventProvider</u></b>
@@ -59,7 +59,7 @@ public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvid
     public boolean isCompleted(ITmfDataRequest<T> request, T data, int nbRead) {
         boolean requestCompleted = super.isCompleted(request, data, nbRead);
         if (!requestCompleted && request instanceof ITmfEventRequest<?>) {
-            TmfTimestamp endTime = ((ITmfEventRequest<?>) request).getRange().getEndTime();
+            ITmfTimestamp endTime = ((ITmfEventRequest<?>) request).getRange().getEndTime();
             return data.getTimestamp().compareTo(endTime, false) > 0;
         }
         return requestCompleted;

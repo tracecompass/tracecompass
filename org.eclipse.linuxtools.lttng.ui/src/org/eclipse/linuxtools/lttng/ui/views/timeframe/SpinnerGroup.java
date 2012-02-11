@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.timeframe;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.swt.SWT;
@@ -52,17 +53,17 @@ public class SpinnerGroup {
     private Spinner nanosec;
 
     // The valid time range - start time
-    private TmfTimestamp startTime;
+    private ITmfTimestamp startTime;
     private int startSeconds;
     private int startNanosec;
 
     // The valid time range - end time
-    private TmfTimestamp endTime;
+    private ITmfTimestamp endTime;
     private int endSeconds;
     private int endNanosec;
 
     // The current time value
-    private TmfTimestamp currentTime;
+    private ITmfTimestamp currentTime;
     private int currentSeconds;
     private int currentNanosec;
     
@@ -81,7 +82,7 @@ public class SpinnerGroup {
      * @param range     - the valid time range (start/end time)
      * @param current   - the current time
      */
-    public SpinnerGroup(TimeFrameView owner, Composite parent, String groupName, TmfTimeRange range, TmfTimestamp current) {
+    public SpinnerGroup(TimeFrameView owner, Composite parent, String groupName, TmfTimeRange range, ITmfTimestamp current) {
 
     	fOwner = owner;
 
@@ -147,15 +148,15 @@ public class SpinnerGroup {
     // Get/Set
     // ====================================================================
 
-    public TmfTimestamp getStartTime() {
+    public ITmfTimestamp getStartTime() {
         return startTime;
     }
 
-    public TmfTimestamp getEndTime() {
+    public ITmfTimestamp getEndTime() {
         return endTime;
     }
 
-    public TmfTimestamp getCurrentTime() {
+    public ITmfTimestamp getCurrentTime() {
         return currentTime;
     }
 
@@ -169,7 +170,7 @@ public class SpinnerGroup {
         return range;
     }
 
-    public void setStartTime(TmfTimestamp ts) {
+    public void setStartTime(ITmfTimestamp ts) {
     	try {
     		startTime = (TmfTimestamp) ts.getDelta(new TmfTimestamp(0, NS_SCALING_FACTOR));
     		startSeconds = (int) (startTime.getValue() / NS_PER_SECOND);
@@ -179,7 +180,7 @@ public class SpinnerGroup {
     	}
     }
 
-    public void setEndTime(TmfTimestamp ts) {
+    public void setEndTime(ITmfTimestamp ts) {
     	try {
     	    endTime = (TmfTimestamp) ts.getDelta(new TmfTimestamp(0, NS_SCALING_FACTOR));
     		endSeconds = (int) (endTime.getValue() / NS_PER_SECOND);
@@ -189,7 +190,7 @@ public class SpinnerGroup {
     	}
     }
 
-    public void setCurrentTime(TmfTimestamp ts) {
+    public void setCurrentTime(ITmfTimestamp ts) {
     	try {
     	    currentTime = (TmfTimestamp) ts.getDelta(new TmfTimestamp(0, NS_SCALING_FACTOR));
     		currentSeconds = (int) (currentTime.getValue() / NS_PER_SECOND);
@@ -214,12 +215,12 @@ public class SpinnerGroup {
      * @param range
      * @param current
      */
-    public void setContent(TmfTimeRange range, TmfTimestamp current) {
+    public void setContent(TmfTimeRange range, ITmfTimestamp current) {
 
     	if (range != null) {
         	// Extract the time range
-            TmfTimestamp start = range.getStartTime();
-            TmfTimestamp end   = range.getEndTime();
+            ITmfTimestamp start = range.getStartTime();
+            ITmfTimestamp end   = range.getEndTime();
 
             // Assume start time is OK
             setStartTime(start);
@@ -256,7 +257,7 @@ public class SpinnerGroup {
      * @param range
      * @param current
      */
-    public void setValue(TmfTimestamp current) {
+    public void setValue(ITmfTimestamp current) {
 
         // Make sure [start time <= current time <= end time]
         // If not: current = min(max(start, current), end);

@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.signal;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 
 /**
  * <b><u>TmfTimeSynchSignal</u></b>
@@ -21,14 +21,14 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
  */
 public class TmfTimeSynchSignal extends TmfSignal {
 
-	private final TmfTimestamp fCurrentTime;
+	private final ITmfTimestamp fCurrentTime;
 
-	public TmfTimeSynchSignal(Object source, TmfTimestamp ts) {
+	public TmfTimeSynchSignal(Object source, ITmfTimestamp ts) {
 		super(source);
 		fCurrentTime = ts;
 	}
 
-	public TmfTimestamp getCurrentTime() {
+	public ITmfTimestamp getCurrentTime() {
 		return fCurrentTime;
 	}
 

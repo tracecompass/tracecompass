@@ -19,7 +19,7 @@ package org.eclipse.linuxtools.tmf.core.event;
  * <p>
  * A generic implementation of ITmfTimestamp.
  */
-public class TmfTimestamp implements ITmfTimestamp, Cloneable, Comparable<TmfTimestamp> {
+public class TmfTimestamp implements ITmfTimestamp {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -86,12 +86,12 @@ public class TmfTimestamp implements ITmfTimestamp, Cloneable, Comparable<TmfTim
      * 
      * @param timestamp the timestamp to copy
      */
-    public TmfTimestamp(TmfTimestamp timestamp) {
+    public TmfTimestamp(ITmfTimestamp timestamp) {
         if (timestamp == null)
             throw new IllegalArgumentException();
-        fValue = timestamp.fValue;
-        fScale = timestamp.fScale;
-        fPrecision = timestamp.fPrecision;
+        fValue = timestamp.getValue();
+        fScale = timestamp.getScale();
+        fPrecision = timestamp.getPrecision();
     }
 
     // ------------------------------------------------------------------------
@@ -173,9 +173,9 @@ public class TmfTimestamp implements ITmfTimestamp, Cloneable, Comparable<TmfTim
         // Check the corner cases (we can't use equals() because it uses compareTo()...)
         if (this == ts || (fValue == ts.getValue() && fScale == ts.getScale()))
             return 0;
-        if ((fValue == BigBang.fValue && fScale == BigBang.fScale) || (ts.getValue() == BigCrunch.fValue && ts.getScale() == BigCrunch.fScale))
+        if ((fValue == BigBang.getValue() && fScale == BigBang.getScale()) || (ts.getValue() == BigCrunch.getValue() && ts.getScale() == BigCrunch.getScale()))
             return -1;
-        if ((fValue == BigCrunch.fValue && fScale == BigCrunch.fScale) || (ts.getValue() == BigBang.fValue && ts.getScale() == BigBang.fScale))
+        if ((fValue == BigCrunch.getValue() && fScale == BigCrunch.getScale()) || (ts.getValue() == BigBang.getValue() && ts.getScale() == BigBang.getScale()))
             return 1;
         
         try {
@@ -216,7 +216,7 @@ public class TmfTimestamp implements ITmfTimestamp, Cloneable, Comparable<TmfTim
     // ------------------------------------------------------------------------
 
     @Override
-    public TmfTimestamp clone() {
+    public ITmfTimestamp clone() {
         TmfTimestamp clone = null;
         try {
             clone = (TmfTimestamp) super.clone();
@@ -233,8 +233,8 @@ public class TmfTimestamp implements ITmfTimestamp, Cloneable, Comparable<TmfTim
     // ------------------------------------------------------------------------
 
     @Override
-    public int compareTo(TmfTimestamp o) {
-        return compareTo(o, false);
+    public int compareTo(ITmfTimestamp ts) {
+        return compareTo(ts, false);
     }
 
     // ------------------------------------------------------------------------

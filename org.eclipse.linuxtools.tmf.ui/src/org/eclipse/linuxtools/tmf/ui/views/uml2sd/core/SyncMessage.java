@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 
 import java.util.Comparator;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.ISDPreferences;
@@ -58,7 +59,7 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
     /**
      * The time when the message occurs
      */
-    protected TmfTimestamp eventTime = new TmfTimestamp();
+    protected ITmfTimestamp eventTime = new TmfTimestamp();
 
     public static final String SYNC_MESS_TAG = "SyncMessage"; //$NON-NLS-1$
 
@@ -181,7 +182,7 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
      * 
      * @param time the time when the message occurs
      */
-    public void setTime(TmfTimestamp time) {
+    public void setTime(ITmfTimestamp time) {
         eventTime = time.clone();
         hasTime = true;
         if (getStartLifeline() != null && getStartLifeline().getFrame() != null)
@@ -196,7 +197,7 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
      * @return the time
      */
     @Override
-    public TmfTimestamp getEndTime() {
+    public ITmfTimestamp getEndTime() {
         return eventTime;
     }
 
@@ -206,7 +207,7 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
      * @return the time
      */
     @Override
-    public TmfTimestamp getStartTime() {
+    public ITmfTimestamp getStartTime() {
         return eventTime;
     }
 
