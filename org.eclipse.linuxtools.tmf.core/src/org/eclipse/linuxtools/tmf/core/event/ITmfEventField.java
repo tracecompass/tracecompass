@@ -16,7 +16,7 @@ package org.eclipse.linuxtools.tmf.core.event;
  * <b><u>ITmfEventField</u></b>
  * <p>
  */
-public interface ITmfEventField {
+public interface ITmfEventField extends Cloneable {
 
     /**
      * @return the field name
@@ -32,5 +32,10 @@ public interface ITmfEventField {
      * @return the list of subfields (if any)
      */
     public ITmfEventField[] getSubFields();
+
+    /**
+     * @return a clone of the event type
+     */
+    public ITmfEventType clone();
 
 }

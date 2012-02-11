@@ -15,6 +15,20 @@ package org.eclipse.linuxtools.tmf.core.event;
 /**
  * <b><u>ITmfTimestamp</u></b>
  * <p>
+ * The fundamental time reference in the TMF.
+ * <p>
+ * It defines a generic timestamp interface in its most basic form:
+ * <ul>
+ * <li>timestamp = [value] * 10**[scale] +/- [precision]
+ * </ul>
+ * Where:
+ * <ul>
+ * <li>[value] is an unstructured integer value
+ * <li>[scale] is the magnitude of the value wrt some application-specific
+ * base unit (e.g. the second)
+ * <li>[precision] indicates the error on the value (useful for comparing
+ * timestamps in different scales). Default: 0.
+ * </ul>
  */
 public interface ITmfTimestamp extends Cloneable, Comparable<ITmfTimestamp> {
 
@@ -59,10 +73,14 @@ public interface ITmfTimestamp extends Cloneable, Comparable<ITmfTimestamp> {
      */
     public ITmfTimestamp getDelta(ITmfTimestamp ts);
 
-    // Cloneable
+    /**
+     * @return a clone of the timestamp
+     */
     public ITmfTimestamp clone();
     
-    // Comparable
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
     public int compareTo(ITmfTimestamp ts);
 
 }

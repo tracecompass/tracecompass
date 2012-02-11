@@ -39,6 +39,12 @@ public interface ITmfEventContent extends Cloneable {
     public ITmfEventField[] getFields();
 
     /**
+     * @param index the field index
+     * @return the corresponding field
+     */
+    public ITmfEventField getField(int index) throws TmfNoSuchFieldException;
+
+    /**
      * @param name the field name
      * @return the corresponding field
      */
