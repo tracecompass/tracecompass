@@ -6,7 +6,8 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  * 
- * Contributors: Francois Chouinard - Initial API and implementation
+ * Contributors:
+ *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Updated as per TMF Event Model 1.0
  *******************************************************************************/
 

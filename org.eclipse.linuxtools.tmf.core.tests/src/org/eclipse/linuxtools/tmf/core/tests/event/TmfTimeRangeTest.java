@@ -12,10 +12,11 @@
 
 package org.eclipse.linuxtools.tmf.core.tests.event;
 
+import junit.framework.TestCase;
+
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
-
-import junit.framework.TestCase;
 
 /**
  * <b><u>TmfTimeRangeTest</u></b>
@@ -48,9 +49,10 @@ public class TmfTimeRangeTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testConstructor() throws Exception {
-		TmfTimestamp ts1 = new TmfTimestamp(12345);
-		TmfTimestamp ts2 = new TmfTimestamp(12350);
+		ITmfTimestamp ts1 = new TmfTimestamp(12345);
+		ITmfTimestamp ts2 = new TmfTimestamp(12350);
 		TmfTimeRange range = new TmfTimeRange(ts1, ts2);
+
 		assertEquals("startTime", ts1, range.getStartTime());
 		assertEquals("endTime",   ts2, range.getEndTime());
 	}
@@ -74,28 +76,31 @@ public class TmfTimeRangeTest extends TestCase {
 	}
 
 	public void testOpenRange1() throws Exception {
-		TmfTimestamp ts2 = new TmfTimestamp(12350);
+		ITmfTimestamp ts2 = new TmfTimestamp(12350);
 		TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, ts2);
+
 		assertEquals("startTime", TmfTimestamp.BigBang, range.getStartTime());
 		assertEquals("endTime",   ts2, range.getEndTime());
 	}
 
 	public void testOpenRange2() throws Exception {
-		TmfTimestamp ts1 = new TmfTimestamp(12345);
+		ITmfTimestamp ts1 = new TmfTimestamp(12345);
 		TmfTimeRange range = new TmfTimeRange(ts1, TmfTimestamp.BigCrunch);
+		
 		assertEquals("startTime", ts1, range.getStartTime());
 		assertEquals("endTime",   TmfTimestamp.BigCrunch, range.getEndTime());
 	}
 
 	public void testOpenRange3() throws Exception {
 		TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang,	TmfTimestamp.BigCrunch);
+
 		assertEquals("startTime", TmfTimestamp.BigBang,   range.getStartTime());
 		assertEquals("endTime",   TmfTimestamp.BigCrunch, range.getEndTime());
 	}
 	
 	public void testCopyConstructor() throws Exception {
-		TmfTimestamp ts1 = new TmfTimestamp(12345);
-		TmfTimestamp ts2 = new TmfTimestamp(12350);
+		ITmfTimestamp ts1 = new TmfTimestamp(12345);
+		ITmfTimestamp ts2 = new TmfTimestamp(12350);
 		TmfTimeRange range0 = new TmfTimeRange(ts1, ts2);
 		TmfTimeRange range1 = new TmfTimeRange(range0);
 
@@ -104,6 +109,7 @@ public class TmfTimeRangeTest extends TestCase {
 
 		TmfTimeRange range2 = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
 		TmfTimeRange range3 = new TmfTimeRange(range2);
+
 		assertEquals("startTime", TmfTimestamp.BigBang,   range3.getStartTime());
 		assertEquals("endTime",   TmfTimestamp.BigCrunch, range3.getEndTime());
 	}
@@ -123,8 +129,8 @@ public class TmfTimeRangeTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testEqualsReflexivity() throws Exception {
-		TmfTimestamp ts1 = new TmfTimestamp(12345);
-		TmfTimestamp ts2 = new TmfTimestamp(12350);
+		ITmfTimestamp ts1 = new TmfTimestamp(12345);
+		ITmfTimestamp ts2 = new TmfTimestamp(12350);
 		TmfTimeRange range1 = new TmfTimeRange(ts1, ts2);
 		TmfTimeRange range2 = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
 
@@ -136,8 +142,8 @@ public class TmfTimeRangeTest extends TestCase {
 	}
 	
 	public void testEqualsSymmetry() throws Exception {
-		TmfTimestamp ts1 = new TmfTimestamp(12345);
-		TmfTimestamp ts2 = new TmfTimestamp(12350);
+		ITmfTimestamp ts1 = new TmfTimestamp(12345);
+		ITmfTimestamp ts2 = new TmfTimestamp(12350);
 		TmfTimeRange range1a = new TmfTimeRange(ts1, ts2);
 		TmfTimeRange range1b = new TmfTimeRange(ts1, ts2);
 
@@ -152,8 +158,8 @@ public class TmfTimeRangeTest extends TestCase {
 	}
 	
 	public void testEqualsTransivity() throws Exception {
-		TmfTimestamp ts1 = new TmfTimestamp(12345);
-		TmfTimestamp ts2 = new TmfTimestamp(12350);
+		ITmfTimestamp ts1 = new TmfTimestamp(12345);
+		ITmfTimestamp ts2 = new TmfTimestamp(12350);
 		TmfTimeRange range1a = new TmfTimeRange(ts1, ts2);
 		TmfTimeRange range1b = new TmfTimeRange(ts1, ts2);
 		TmfTimeRange range1c = new TmfTimeRange(ts1, ts2);
@@ -164,8 +170,8 @@ public class TmfTimeRangeTest extends TestCase {
 	}
 	
 	public void testEqualsNull() throws Exception {
-		TmfTimestamp ts1 = new TmfTimestamp(12345);
-		TmfTimestamp ts2 = new TmfTimestamp(12350);
+		ITmfTimestamp ts1 = new TmfTimestamp(12345);
+		ITmfTimestamp ts2 = new TmfTimestamp(12350);
 		TmfTimeRange range1 = new TmfTimeRange(ts1, ts2);
 
 		assertTrue("equals", !range1.equals(null));
@@ -176,8 +182,8 @@ public class TmfTimeRangeTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testHashCode() throws Exception {
-		TmfTimestamp ts1 = new TmfTimestamp(12345);
-		TmfTimestamp ts2 = new TmfTimestamp(12350);
+		ITmfTimestamp ts1 = new TmfTimestamp(12345);
+		ITmfTimestamp ts2 = new TmfTimestamp(12350);
 		TmfTimeRange range1 = new TmfTimeRange(ts1, ts2);
 		TmfTimeRange range1b = new TmfTimeRange(range1);
 		TmfTimeRange range2 = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
@@ -194,11 +200,11 @@ public class TmfTimeRangeTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testToString() throws Exception {
-		TmfTimestamp ts1 = new TmfTimestamp(12345);
-		TmfTimestamp ts2 = new TmfTimestamp(12350);
+		ITmfTimestamp ts1 = new TmfTimestamp(12345);
+		ITmfTimestamp ts2 = new TmfTimestamp(12350);
 		TmfTimeRange range = new TmfTimeRange(ts1, ts2);
 
-		String expected = "[TmfTimeRange(" + ts1 + ":" + ts2 + ")]";
+		String expected = "TmfTimeRange [fStartTime=" + ts1 + ", fEndTime=" + ts2 + "]";
 		assertEquals("toString", expected, range.toString());
 	}
 	
@@ -207,8 +213,8 @@ public class TmfTimeRangeTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testContains() throws Exception {
-		TmfTimestamp ts1 = new TmfTimestamp(12345);
-		TmfTimestamp ts2 = new TmfTimestamp(12350);
+		ITmfTimestamp ts1 = new TmfTimestamp(12345);
+		ITmfTimestamp ts2 = new TmfTimestamp(12350);
 		TmfTimeRange range = new TmfTimeRange(ts1, ts2);
 
 		assertTrue("contains (lower bound)", range.contains(new TmfTimestamp(12345)));
@@ -225,36 +231,36 @@ public class TmfTimeRangeTest extends TestCase {
 
 	public void testGetIntersection() throws Exception {
 
-		TmfTimestamp ts1a = new TmfTimestamp(1000);
-		TmfTimestamp ts1b = new TmfTimestamp(2000);
+		ITmfTimestamp ts1a = new TmfTimestamp(1000);
+		ITmfTimestamp ts1b = new TmfTimestamp(2000);
 		TmfTimeRange range1 = new TmfTimeRange(ts1a, ts1b);
 
-		TmfTimestamp ts2a = new TmfTimestamp(2000);
-		TmfTimestamp ts2b = new TmfTimestamp(3000);
+		ITmfTimestamp ts2a = new TmfTimestamp(2000);
+		ITmfTimestamp ts2b = new TmfTimestamp(3000);
 		TmfTimeRange range2 = new TmfTimeRange(ts2a, ts2b);
 		
-		TmfTimestamp ts3a = new TmfTimestamp(3000);
-		TmfTimestamp ts3b = new TmfTimestamp(4000);
+		ITmfTimestamp ts3a = new TmfTimestamp(3000);
+		ITmfTimestamp ts3b = new TmfTimestamp(4000);
 		TmfTimeRange range3 = new TmfTimeRange(ts3a, ts3b);
 		
-		TmfTimestamp ts4a = new TmfTimestamp(1500);
-		TmfTimestamp ts4b = new TmfTimestamp(2500);
+		ITmfTimestamp ts4a = new TmfTimestamp(1500);
+		ITmfTimestamp ts4b = new TmfTimestamp(2500);
 		TmfTimeRange range4 = new TmfTimeRange(ts4a, ts4b);
 		
-		TmfTimestamp ts5a = new TmfTimestamp(1500);
-		TmfTimestamp ts5b = new TmfTimestamp(2000);
+		ITmfTimestamp ts5a = new TmfTimestamp(1500);
+		ITmfTimestamp ts5b = new TmfTimestamp(2000);
 		TmfTimeRange range5 = new TmfTimeRange(ts5a, ts5b);
 		
-		TmfTimestamp ts6a = new TmfTimestamp(2000);
-		TmfTimestamp ts6b = new TmfTimestamp(2500);
+		ITmfTimestamp ts6a = new TmfTimestamp(2000);
+		ITmfTimestamp ts6b = new TmfTimestamp(2500);
 		TmfTimeRange range6 = new TmfTimeRange(ts6a, ts6b);
 		
-		TmfTimestamp ts7a = new TmfTimestamp(1500);
-		TmfTimestamp ts7b = new TmfTimestamp(3500);
+		ITmfTimestamp ts7a = new TmfTimestamp(1500);
+		ITmfTimestamp ts7b = new TmfTimestamp(3500);
 		TmfTimeRange range7 = new TmfTimeRange(ts7a, ts7b);
 		
-		TmfTimestamp ts8a = new TmfTimestamp(2250);
-		TmfTimestamp ts8b = new TmfTimestamp(2750);
+		ITmfTimestamp ts8a = new TmfTimestamp(2250);
+		ITmfTimestamp ts8b = new TmfTimestamp(2750);
 		TmfTimeRange range8 = new TmfTimeRange(ts8a, ts8b);
 		
 		assertEquals("getIntersection (below - not contiguous)", null, range1.getIntersection(range3));

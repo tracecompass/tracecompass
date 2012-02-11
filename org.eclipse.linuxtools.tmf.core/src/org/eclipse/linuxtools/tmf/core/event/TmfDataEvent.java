@@ -137,7 +137,7 @@ public class TmfDataEvent implements Cloneable {
     /**
      * @param source the new event source
      */
-    protected void setSource(String source) {
+    public void setSource(String source) {
         fSource = source;
     }
 

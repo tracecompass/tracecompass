@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Francois Chouinard - Updated as per TMF Event Model 1.0
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.event;
@@ -15,16 +16,20 @@ package org.eclipse.linuxtools.tmf.core.event;
 /**
  * <b><u>TmfEventContent</u></b>
  * <p>
- * The event content.
+ * A basic implementation of ITmfEventContent.
  */
 public class TmfEventContent implements Cloneable {
 
-	// Default field ids
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+
+	// Default field IDs
 	public static final String FIELD_ID_TIMESTAMP = ":timestamp:"; //$NON-NLS-1$
-	public static final String FIELD_ID_SOURCE    = ":source:"; //$NON-NLS-1$
-	public static final String FIELD_ID_TYPE      = ":type:"; //$NON-NLS-1$
+	public static final String FIELD_ID_SOURCE    = ":source:";    //$NON-NLS-1$
+	public static final String FIELD_ID_TYPE      = ":type:";      //$NON-NLS-1$
 	public static final String FIELD_ID_REFERENCE = ":reference:"; //$NON-NLS-1$
-	public static final String FIELD_ID_CONTENT   = ":content:"; //$NON-NLS-1$
+	public static final String FIELD_ID_CONTENT   = ":content:";   //$NON-NLS-1$
 	
     // ------------------------------------------------------------------------
     // Attributes
@@ -146,12 +151,12 @@ public class TmfEventContent implements Cloneable {
     // Operators
     // ------------------------------------------------------------------------
 
-	/**
-	 * @param event
-	 */
-	public void setEvent(TmfEvent event) {
-		fParentEvent = event;
-	}
+//	/**
+//	 * @param event
+//	 */
+//	public void setEvent(TmfEvent event) {
+//		fParentEvent = event;
+//	}
 
 	/**
 	 * Parse the content into fields. By default, a single field (the raw
