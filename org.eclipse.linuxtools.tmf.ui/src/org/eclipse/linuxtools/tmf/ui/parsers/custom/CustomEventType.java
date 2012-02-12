@@ -4,8 +4,10 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 
 public abstract class CustomEventType extends TmfEventType {
     
+    private static String CONTEXT_ID = "CustomEventType"; //$NON-NLS-1$
+    
     public CustomEventType(CustomTraceDefinition definition) {
-        super(definition.definitionName, getLabels(definition));
+        super(CONTEXT_ID, definition.definitionName, getLabels(definition));
     }
 
     private static String[] getLabels(CustomTraceDefinition definition) {

@@ -40,9 +40,10 @@ public class TmfTreeContentProviderTest extends TestCase {
 
     private String fTestName = null;
 
+    private final String fContext = "UnitTest";
     private final String fTypeId1 = "Some type1";
     private final String fTypeId2 = "Some type2";
-
+ 
     private final String fLabel0 = "label1";
     private final String fLabel1 = "label2";
     private final String[] fLabels = new String[] { fLabel0, fLabel1 };
@@ -52,8 +53,8 @@ public class TmfTreeContentProviderTest extends TestCase {
 
     private final String fSource = "Source";
 
-    private final TmfEventType fType1 = new TmfEventType(fTypeId1, fLabels);
-    private final TmfEventType fType2 = new TmfEventType(fTypeId2, fLabels);
+    private final TmfEventType fType1 = new TmfEventType(fContext, fTypeId1, fLabels);
+    private final TmfEventType fType2 = new TmfEventType(fContext, fTypeId2, fLabels);
 
     private final String fReference = "Some reference";
 

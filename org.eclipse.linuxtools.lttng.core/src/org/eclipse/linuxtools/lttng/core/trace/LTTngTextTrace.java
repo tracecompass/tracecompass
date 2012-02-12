@@ -514,7 +514,7 @@ class TextLttngEventContent extends LttngEventContent {
     	LttngEventField returnedField = null;
     	String label = null;
 		try {
-			label = fParentEvent.getType().getLabel(position);
+			label = fParentEvent.getType().getFieldLabel(position);
 			returnedField = this.getField(label);
 		} 
 		catch (TmfNoSuchFieldException e) {

@@ -52,7 +52,7 @@ public class LttngEventField extends TmfEventField {
 	 * @param oldField     the field to copy from
 	 */
 	public LttngEventField(LttngEventField oldField) {
-		this(oldField.getParent(), oldField.getId(), oldField.getValue());
+		this(oldField.getContent(), oldField.getId(), oldField.getValue());
 	}
 	
 	@Override

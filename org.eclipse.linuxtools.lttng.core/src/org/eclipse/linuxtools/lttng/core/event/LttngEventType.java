@@ -23,6 +23,7 @@ import org.eclipse.linuxtools.tmf.core.event.*;
  */
 public class LttngEventType extends TmfEventType {
     
+    private static final String DEFAULT_CONTEXT = "Kernel Trace"; //$NON-NLS-1$
     private static final String DEFAULT_TYPE_ID = "Kernel Trace"; //$NON-NLS-1$
     // These should match the column names in LTTng Events Table
     public static final String TIMESTAMP_LABEL = "Timestamp"; //$NON-NLS-1$
@@ -52,7 +53,7 @@ public class LttngEventType extends TmfEventType {
      * 
      */
     public LttngEventType(String typeId, String[] labels) {
-        super(typeId, labels);
+        super(DEFAULT_CONTEXT, typeId, labels);
     }
     
     /**
@@ -63,7 +64,7 @@ public class LttngEventType extends TmfEventType {
      * @param thisMarkerfieldsName  MarkerFields related to this marker	
      */
     public LttngEventType(String thisTracefileName, Long thisCpuId, String thisMarkerName, int thisMarkerId, String[] thisMarkerfieldsName) {
-        super( thisTracefileName + "/" + thisCpuId + "/" + thisMarkerName, thisMarkerfieldsName); //$NON-NLS-1$ //$NON-NLS-2$
+        super(DEFAULT_CONTEXT, thisTracefileName + "/" + thisCpuId + "/" + thisMarkerName, thisMarkerfieldsName); //$NON-NLS-1$ //$NON-NLS-2$
         
         tracefileName   = thisTracefileName;
         cpuId           = thisCpuId;
@@ -77,7 +78,7 @@ public class LttngEventType extends TmfEventType {
      * @param oldType   Type we want to copy from
      */
     public LttngEventType(LttngEventType oldType) {
-        this(oldType.tracefileName, oldType.cpuId, oldType.markerName, oldType.markerId, oldType.getLabels());
+        this(oldType.tracefileName, oldType.cpuId, oldType.markerName, oldType.markerId, oldType.getFieldLabels());
     }
     
     

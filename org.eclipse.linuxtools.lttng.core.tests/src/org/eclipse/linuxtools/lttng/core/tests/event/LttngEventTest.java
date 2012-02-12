@@ -154,7 +154,7 @@ public class LttngEventTest extends TestCase {
     	assertEquals("Reference not what expected!", eventReference, testEvent.getReference());
     	
     	// These should be overridden functions
-    	assertEquals("Type not what expected!",eventType,testEvent.getType().getTypeId());
+    	assertEquals("Type not what expected!",eventType,testEvent.getType().getId());
     	assertEquals("Channel not what expected!",eventChannel,testEvent.getChannelName());
     	assertEquals("CpuId not what expected!",eventCpu,testEvent.getCpuId());
     	assertEquals("Marker not what expected!",eventMarker,testEvent.getMarkerName());

@@ -38,8 +38,9 @@ public class TmfBaseStatisticsDataTest extends TestCase {
     // ------------------------------------------------------------------------
     private       String   fTestName = null;
     
-    private final String   fTypeId1 = "Some type1";
-    private final String   fTypeId2 = "Some type2";
+    private final String fContext = "UnitTest";
+    private final String fTypeId1 = "Some type1";
+    private final String fTypeId2 = "Some type2";
     
     private final String   fLabel0 = "label1";
     private final String   fLabel1 = "label2";
@@ -52,9 +53,9 @@ public class TmfBaseStatisticsDataTest extends TestCase {
     
     private final String fSource = "Source";
     
-    private final TmfEventType fType1 = new TmfEventType(fTypeId1, fLabels);
-    private final TmfEventType fType2 = new TmfEventType(fTypeId1, fLabels);
-    private final TmfEventType fType3 = new TmfEventType(fTypeId2, fLabels);
+    private final TmfEventType fType1 = new TmfEventType(fContext, fTypeId1, fLabels);
+    private final TmfEventType fType2 = new TmfEventType(fContext, fTypeId1, fLabels);
+    private final TmfEventType fType3 = new TmfEventType(fContext, fTypeId2, fLabels);
     
     private final String fReference = "Some reference";
 
@@ -281,8 +282,8 @@ public class TmfBaseStatisticsDataTest extends TestCase {
         fStatsData.reset(new TmfFixedArray<String>(fTestName, Messages.TmfStatisticsData_EventTypes));
         
         assertEquals("reset", 0, fStatsData.getChildren(new TmfFixedArray<String>(fTestName, Messages.TmfStatisticsData_EventTypes)).size());
-        assertNull("reset", fStatsData.get(new TmfFixedArray<String>(fTestName, Messages.TmfStatisticsData_EventTypes, fType1.getTypeId())));
-        assertNull("reset", fStatsData.get(new TmfFixedArray<String>(fTestName, Messages.TmfStatisticsData_EventTypes, fType3.getTypeId())));
+        assertNull("reset", fStatsData.get(new TmfFixedArray<String>(fTestName, Messages.TmfStatisticsData_EventTypes, fType1.getId())));
+        assertNull("reset", fStatsData.get(new TmfFixedArray<String>(fTestName, Messages.TmfStatisticsData_EventTypes, fType3.getId())));
         
         fStatsData.reset(new TmfFixedArray<String>(fTestName));
         

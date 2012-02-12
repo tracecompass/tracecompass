@@ -48,12 +48,13 @@ public class TmfEventParserStub implements ITmfEventParser {
     public TmfEventParserStub() {
     	fTypes = new TmfEventType[NB_TYPES];
     	for (int i = 0; i < NB_TYPES; i++) {
-    		Vector<String> format = new Vector<String>();
+    		Vector<String> fields = new Vector<String>();
     		for (int j = 1; j <= i; j++) {
-    			format.add(new String("Fmt-" + i + "-Fld-" + j));
+    		    String field = "Fmt-" + i + "-Fld-" + j;
+    		    fields.add(field);
     		}
-    		String[] fields = new String[i];
-    		fTypes[i] = new TmfEventType("Type-" + i, format.toArray(fields));
+    		String[] fieldArray = new String[i];
+    		fTypes[i] = new TmfEventType("UnitTest", "Type-" + i, fields.toArray(fieldArray));
     	}
     }
 
@@ -64,7 +65,7 @@ public class TmfEventParserStub implements ITmfEventParser {
     static final String typePrefix = "Type-";
     @Override
 	@SuppressWarnings("unchecked")
-	public TmfEvent parseNextEvent(ITmfTrace eventStream, TmfContext context) throws IOException {
+	public TmfEvent parseNextEvent(ITmfTrace<?> eventStream, TmfContext context) throws IOException {
 
         if (! (eventStream instanceof TmfTraceStub)) {
             return null;

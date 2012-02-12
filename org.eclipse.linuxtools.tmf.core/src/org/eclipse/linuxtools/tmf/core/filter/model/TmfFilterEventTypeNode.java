@@ -58,7 +58,7 @@ public class TmfFilterEventTypeNode extends TmfFilterTreeNode {
         if (fType.contains(":")) { //$NON-NLS-1$
             // special case for custom parsers
             if (fType.startsWith(event.getClass().getCanonicalName())) {
-                if (fType.endsWith(event.getType().getTypeId())) {
+                if (fType.endsWith(event.getType().getId())) {
                     match = true;
                 }
             }

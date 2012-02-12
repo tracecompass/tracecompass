@@ -31,15 +31,16 @@ public class TmfEventTest extends TestCase {
 	// Variables
 	// ------------------------------------------------------------------------
 
-	private final String   fTypeId = "Some type";
-	private final String   fLabel0 = "label1";
-	private final String   fLabel1 = "label2";
-	private final String[] fLabels = new String[] { fLabel0, fLabel1 };
+    private final String   fContext = TmfEventType.DEFAULT_CONTEXT_ID; 
+	private final String   fTypeId  = "Some type";
+	private final String   fLabel0  = "label1";
+	private final String   fLabel1  = "label2";
+	private final String[] fLabels  = new String[] { fLabel0, fLabel1 };
 
 	private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2, 5);
 	private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, (byte) 2, 5);
 	private final String       fSource     = "Source";
-	private final TmfEventType fType       = new TmfEventType(fTypeId, fLabels);
+	private final TmfEventType fType       = new TmfEventType(fContext, fTypeId, fLabels);
 	private final String       fReference  = "Some reference";
 
 	private final TmfEvent fEvent1;
@@ -82,28 +83,28 @@ public class TmfEventTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testTmfEvent() {
-		assertEquals("getTimestamp",         fTimestamp1, fEvent1.getTimestamp());
-		assertEquals("getSource",            fSource,     fEvent1.getSource());
-		assertEquals("getType",              fType,       fEvent1.getType());
-		assertEquals("getContent",           fContent1,   fEvent1.getContent());
-		assertEquals("getReference",         fReference,  fEvent1.getReference());
+		assertEquals("getTimestamp", fTimestamp1, fEvent1.getTimestamp());
+		assertEquals("getSource",    fSource,     fEvent1.getSource());
+		assertEquals("getType",      fType,       fEvent1.getType());
+		assertEquals("getContent",   fContent1,   fEvent1.getContent());
+		assertEquals("getReference", fReference,  fEvent1.getReference());
 	}
 
 	public void testTmfEvent2() {
-		assertEquals("getTimestamp",         fTimestamp2, fEvent2.getTimestamp());
-		assertEquals("getSource",            fSource,     fEvent2.getSource());
-		assertEquals("getType",              fType,       fEvent2.getType());
-		assertEquals("getContent",           fContent2,   fEvent2.getContent());
-		assertEquals("getReference",         fReference,  fEvent2.getReference());
+		assertEquals("getTimestamp", fTimestamp2, fEvent2.getTimestamp());
+		assertEquals("getSource",    fSource,     fEvent2.getSource());
+		assertEquals("getType",      fType,       fEvent2.getType());
+		assertEquals("getContent",   fContent2,   fEvent2.getContent());
+		assertEquals("getReference", fReference,  fEvent2.getReference());
 	}
 
 	public void testTmfEventCopy() {
 		TmfEvent event = new TmfEvent(fEvent1);
-		assertEquals("getTimestamp",         fTimestamp1, event.getTimestamp());
-		assertEquals("getSource",            fSource,     event.getSource());
-		assertEquals("getType",              fType,       event.getType());
-		assertEquals("getContent",           fContent1,   event.getContent());
-		assertEquals("getReference",         fReference,  event.getReference());
+		assertEquals("getTimestamp", fTimestamp1, event.getTimestamp());
+		assertEquals("getSource",    fSource,     event.getSource());
+		assertEquals("getType",      fType,       event.getType());
+		assertEquals("getContent",   fContent1,   event.getContent());
+		assertEquals("getReference", fReference,  event.getReference());
 	}
 
 	public void testEventCopy2() throws Exception {

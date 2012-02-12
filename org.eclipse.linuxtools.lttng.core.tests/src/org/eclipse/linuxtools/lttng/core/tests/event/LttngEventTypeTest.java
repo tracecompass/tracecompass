@@ -108,7 +108,7 @@ public class LttngEventTypeTest extends TestCase {
         assertTrue("Cpu Id not what was expected!",firstEventCpu == tmpEventType.getCpuId() );
         assertTrue("Marker Name not what was expected!",firstEventMarker.equals((String)tmpEventType.getMarkerName()) );
         // Just test the non-nullity of labels
-        assertNotSame("getLabels returned null",null, tmpEventType.getLabels() );
+        assertNotSame("getLabels returned null",null, tmpEventType.getFieldLabels() );
     }
     
     public void testToString() {

@@ -52,11 +52,11 @@ public class TmfEventFieldTest extends TestCase {
 	 */
 	public TmfEventFieldTest(String name) {
 		super(name);
-		TmfTimestamp      fTimestamp   = new TmfTimestamp();
-		String            fEventSource = "";
-		TmfEventType      fEventType   = new TmfEventTypeStub();
-		String            fReference   = "";
-		TmfEvent          fEvent       = new TmfEvent(fTimestamp, fEventSource, fEventType, fReference);
+		TmfTimestamp fTimestamp   = new TmfTimestamp();
+		String       fEventSource = "";
+		TmfEventType fEventType   = new TmfEventTypeStub();
+		String       fReference   = "";
+		TmfEvent     fEvent       = new TmfEvent(fTimestamp, fEventSource, fEventType, fReference);
 
 		fContent = new TmfEventContent(fEvent, "Some content");
 
@@ -81,7 +81,7 @@ public class TmfEventFieldTest extends TestCase {
     // ------------------------------------------------------------------------
 
 	public void testTmfEventField() {
-		assertSame("getParent", fContent, fField0.getParent());
+		assertSame("getParent", fContent, fField0.getContent());
 		assertSame("getId",     fFieldId, fField0.getId());
 		assertSame("getValue",  fValue1,  fField0.getValue());
 	}
@@ -99,9 +99,9 @@ public class TmfEventFieldTest extends TestCase {
 	public void testTmfEventFieldCopy() {
 		TmfEventField original = new TmfEventField(fContent, fFieldId, fValue1);
 		TmfEventField field = new TmfEventField(original);
-		assertSame("getParent", fContent, field.getParent());
-		assertSame("getId",     fFieldId, field.getId());
-		assertSame("getValue",  fValue1,  field.getValue());
+		assertSame("getContent", fContent, field.getContent());
+		assertSame("getId",      fFieldId, field.getId());
+		assertSame("getValue",   fValue1,  field.getValue());
 	}
 
 	public void testTmfEventFieldCopy2() {
@@ -187,11 +187,11 @@ public class TmfEventFieldTest extends TestCase {
     // ------------------------------------------------------------------------
 
 	public void testToString() {
-		String expected1 = "[TmfEventField(" + fFieldId + ":" + fValue1.toString() + ")]";
+		String expected1 = "TmfEventField [fEventContent=" + fContent + ", fFieldId=" + fFieldId + ", fValue=" + fValue1.toString() + "]";
 		TmfEventField field = new TmfEventField(fContent, fFieldId, fValue1);
 		assertEquals("toString", expected1, field.toString());
 
-		String expected2 = "[TmfEventField(" + fFieldId + ":" + fValue2.toString() + ")]";
+        String expected2 = "TmfEventField [fEventContent=" + fContent + ", fFieldId=" + fFieldId + ", fValue=" + fValue2.toString() + "]";
 		field = new TmfEventField(fContent, fFieldId, fValue2);
 		assertEquals("toString", expected2, field.toString());
 	}

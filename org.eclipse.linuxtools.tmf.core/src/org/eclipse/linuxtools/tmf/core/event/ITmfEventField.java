@@ -19,9 +19,9 @@ package org.eclipse.linuxtools.tmf.core.event;
 public interface ITmfEventField extends Cloneable {
 
     /**
-     * @return the field name
+     * @return the field ID
      */
-    public String getName();
+    public String getId();
 
     /**
      * @return the field value
@@ -36,6 +36,6 @@ public interface ITmfEventField extends Cloneable {
     /**
      * @return a clone of the event type
      */
-    public ITmfEventType clone();
+    public ITmfEventField clone();
 
 }

@@ -35,6 +35,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterAndNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterCompareNode;
+import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterCompareNode.Type;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterContainsNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterEqualsNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterEventTypeNode;
@@ -42,15 +43,12 @@ import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterOrNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterRootNode;
-import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterCompareNode.Type;
 import org.eclipse.linuxtools.tmf.core.util.TmfTraceType;
 import org.eclipse.linuxtools.tmf.ui.internal.Messages;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtEvent;
-import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomXmlEvent;
-import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -343,7 +341,7 @@ class FilterViewer extends Composite {
                                 TmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
                                 TmfEventType eventType = event.getType();
                                 if (eventType != null) {
-                                    for (String field : eventType.getLabels()) {
+                                    for (String field : eventType.getFieldLabels()) {
                                         fieldsList.add(field);
                                     }
                                 }
@@ -382,7 +380,7 @@ class FilterViewer extends Composite {
                     if (eventType != null) {
                         fieldsList.add("[" + TmfTraceType.getCategoryName(ce.getAttribute(TmfTraceType.CATEGORY_ATTR)) + //$NON-NLS-1$
                                 " : " + ce.getAttribute(TmfTraceType.NAME_ATTR) + "]"); //$NON-NLS-1$ //$NON-NLS-2$
-                        for (String field : eventType.getLabels()) {
+                        for (String field : eventType.getFieldLabels()) {
                             fieldsList.add(field);
                         }
                         fieldsList.add(""); //$NON-NLS-1$

@@ -350,7 +350,7 @@ public abstract class TmfDataRequest<T extends TmfDataEvent> implements ITmfData
             handleSuccess();
         }
         if (Tracer.isRequestTraced())
-            Tracer.traceRequest(this, "completed (" + fNbRead + " events read)"); //$NON-NLS-1$
+            Tracer.traceRequest(this, "completed (" + fNbRead + " events read)"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override

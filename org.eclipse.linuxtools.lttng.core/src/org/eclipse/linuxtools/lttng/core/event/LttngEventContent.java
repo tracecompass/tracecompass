@@ -168,7 +168,7 @@ public class LttngEventContent extends TmfEventContent {
 				// An error was probably printed in convertEventTmfToJni() already, but keep in mind this is SERIOUS
 				if ( tmpEvent != null ) {
 					try {
-						name = tmpType.getLabel(pos);
+						name = tmpType.getFieldLabel(pos);
 					
 						Object newValue = tmpEvent.parseFieldByName(name);
 						tmpField = new LttngEventField(this, name, newValue );
@@ -195,7 +195,7 @@ public class LttngEventContent extends TmfEventContent {
         LttngEventField returnedField = null;
         String label = null;
 		try {
-			label = fParentEvent.getType().getLabel(position);
+			label = fParentEvent.getType().getFieldLabel(position);
 			
 			returnedField = (LttngEventField) this.getField(label);
 		} 
@@ -220,7 +220,7 @@ public class LttngEventContent extends TmfEventContent {
         if (name.equals(LttngEventType.CONTENT_LABEL) || name.equals(FIELD_ID_CONTENT)) {
             return fParentEvent.getContent().toString();
         } else if (name.equals(LttngEventType.MARKER_LABEL) || name.equals(FIELD_ID_TYPE)) {
-            return fParentEvent.getType().getTypeId().toString();
+            return fParentEvent.getType().getId();
         } else if (name.equals(LttngEventType.TRACE_LABEL) || name.equals(FIELD_ID_REFERENCE)) {
             return fParentEvent.getReference();
         } else if (name.equals(LttngEventType.TIMESTAMP_LABEL) || name.equals(FIELD_ID_TIMESTAMP)) {

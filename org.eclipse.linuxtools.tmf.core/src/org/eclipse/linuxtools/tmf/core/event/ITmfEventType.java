@@ -24,14 +24,26 @@ public interface ITmfEventType extends Cloneable {
     public String getContext();
 
     /**
-     * @return the event type name
+     * @return the event type ID
      */
-    public String getName();
+    public String getId();
 
     /**
-     * @return the event fields
+     * @return the event field labels
      */
-    public ITmfEventField[] getFields();
+    public String[] getFieldLabels();
+
+    /**
+     * @param index the event field index
+     * @return the corresponding event field label
+     */
+    public String getFieldLabel(int index) throws TmfNoSuchFieldException;
+
+    /**
+     * @param fieldId the event field ID
+     * @return the corresponding event field index
+     */
+    public int getFieldIndex(String fieldId) throws TmfNoSuchFieldException;
 
     /**
      * @return a clone of the event content

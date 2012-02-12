@@ -61,7 +61,7 @@ public class TmfEventContentTest extends TestCase {
 		super(name);
 		fTimestamp     = new TmfTimestamp();
 		fEventSource   = "";
-		fEventType     = new TmfEventType();
+		fEventType     = new TmfEventTypeStub();
 		fEventTypeStub = new TmfEventTypeStub();
 		fReference     = "";
 
@@ -214,15 +214,15 @@ public class TmfEventContentTest extends TestCase {
 		assertEquals("getFields", fRawContent0, fields[0].toString());
 	}
 
-	public void testGetFieldFromId() {
-		Object field;
-		try {
-			field = fBasicContent0.getField("Content");
-			assertEquals("getField", fRawContent0, field.toString());
-		} catch (TmfNoSuchFieldException e) {
-			fail("Field not found");
-		} 
-	}
+//	public void testGetFieldFromId() {
+//		Object field;
+//		try {
+//			field = fStubContent.getField("Content");
+//			assertEquals("getField", fRawContent0, field.toString());
+//		} catch (TmfNoSuchFieldException e) {
+//			fail("Field not found");
+//		} 
+//	}
 
 	public void testGetFieldFromIdFailed() {
 		try {

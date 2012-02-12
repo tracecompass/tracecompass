@@ -22,10 +22,14 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 @SuppressWarnings("nls")
 public class TmfEventTypeStub extends TmfEventType {
 
+    private static final String FIELD_1 = "Field1"; 
+    private static final String FIELD_2 = "Field2"; 
+    private static final String FIELD_3 = "Field3"; 
+    private static final String FIELD_4 = "Field4"; 
+    private static final String FIELD_5 = "Field5"; 
+    private static final String[] FIELDS = new String[] { FIELD_1, FIELD_2, FIELD_3, FIELD_4, FIELD_5 };
+
    public TmfEventTypeStub() {
-        super(
-        	"TmfEventTypeStub",
-        	new String[] { "Field1", "Field2", "Field3", "Field4", "Field5" }
-        );
+       super("UnitTest", "TmfEventTypeStub", FIELDS);
     }
 }

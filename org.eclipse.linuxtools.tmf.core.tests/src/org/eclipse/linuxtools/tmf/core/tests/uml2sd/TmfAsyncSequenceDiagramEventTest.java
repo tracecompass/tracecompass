@@ -22,15 +22,16 @@ import org.eclipse.linuxtools.tmf.core.uml2sd.TmfAsyncSequenceDiagramEvent;
 @SuppressWarnings("nls")
 public class TmfAsyncSequenceDiagramEventTest extends TestCase {
 
-    private final String   fTypeId = "Some type";
-    private final String   fLabel0 = "label1";
-    private final String   fLabel1 = "label2";
-    private final String[] fLabels = new String[] { fLabel0, fLabel1 };
+    private final String fContext = TmfEventType.DEFAULT_CONTEXT_ID; 
+    private final String fTypeId  = "Some type";
+    private final String fLabel0  = "label1";
+    private final String fLabel1  = "label2";
+    private final String[] fLabels  = new String[] { fLabel0, fLabel1 };
 
     private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2, 5);
     private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, (byte) 2, 5);
     private final String       fSource     = "Source";
-    private final TmfEventType fType       = new TmfEventType(fTypeId, fLabels);
+    private final TmfEventType fType       = new TmfEventType(fContext, fTypeId, fLabels);
     private final String       fReference  = "Some reference";
 
     private final TmfEvent fEvent1;
