@@ -55,8 +55,9 @@ public class TmfEventType implements ITmfEventType {
 	/**
 	 * Full constructor
 	 * 
-	 * @param type
-	 * @param format
+	 * @param context the type context
+	 * @param typeId the type name
+	 * @param labels the list of field labels
 	 */
 	public TmfEventType(String context, String typeId, String[] labels) {
 		if (context == null || typeId == null)
@@ -70,6 +71,9 @@ public class TmfEventType implements ITmfEventType {
 		    String id = fFieldLabels[i];
 			fFieldMap.put(id, i);
 		}
+
+		// Register to the event type manager
+		TmfEventTypeManager.getInstance().add(context, this);
 	}
 
 	/**
