@@ -30,22 +30,22 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final Histogram fHistogram;
+    protected final HistogramDataModel fHistogram;
 
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
 
-    public HistogramRequest(Histogram histogram, TmfTimeRange range, int rank, int nbEvents, ITmfDataRequest.ExecutionType execType) {
+    public HistogramRequest(HistogramDataModel histogram, TmfTimeRange range, int rank, int nbEvents, ITmfDataRequest.ExecutionType execType) {
         super(LttngEvent.class, range, rank, nbEvents, LttngConstants.DEFAULT_BLOCK_SIZE, execType);
         fHistogram = histogram;
     }
 
-    public HistogramRequest(Histogram histogram, TmfTimeRange range, ITmfDataRequest.ExecutionType execType) {
+    public HistogramRequest(HistogramDataModel histogram, TmfTimeRange range, ITmfDataRequest.ExecutionType execType) {
         this(histogram, range, 0, ALL_DATA, execType);
     }
 
-    public HistogramRequest(Histogram histogram, TmfTimeRange range, int rank, ITmfDataRequest.ExecutionType execType) {
+    public HistogramRequest(HistogramDataModel histogram, TmfTimeRange range, int rank, ITmfDataRequest.ExecutionType execType) {
         this(histogram, range, rank, ALL_DATA, execType);
     }
 
@@ -58,19 +58,19 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
         super.handleData(event);
         if (event != null) {
             long timestamp = event.getTimestamp().getValue();
-            fHistogram.countEvent(timestamp);
+            fHistogram.countEvent(getNbRead(), timestamp);
         }
     }
 
     @Override
     public void handleCompleted() {
-        fHistogram.refresh();
+        fHistogram.complete();
         super.handleCompleted();
     }
 
     @Override
     public void handleCancel() {
-        fHistogram.refresh();
+        fHistogram.clear();
         super.handleCancel();
     }
 

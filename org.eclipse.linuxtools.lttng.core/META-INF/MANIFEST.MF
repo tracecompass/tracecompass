@@ -17,6 +17,7 @@ Export-Package: org.eclipse.linuxtools.lttng.core,
  org.eclipse.linuxtools.lttng.core.control,
  org.eclipse.linuxtools.lttng.core.event,
  org.eclipse.linuxtools.lttng.core.exceptions,
+ org.eclipse.linuxtools.lttng.core.latency.analyzer,
  org.eclipse.linuxtools.lttng.core.model,
  org.eclipse.linuxtools.lttng.core.request,
  org.eclipse.linuxtools.lttng.core.signal,
@@ -28,7 +29,9 @@ Export-Package: org.eclipse.linuxtools.lttng.core,
  org.eclipse.linuxtools.lttng.core.state.resource,
  org.eclipse.linuxtools.lttng.core.state.trace,
  org.eclipse.linuxtools.lttng.core.trace,
+ org.eclipse.linuxtools.lttng.core.tracecontrol,
  org.eclipse.linuxtools.lttng.core.tracecontrol.model,
  org.eclipse.linuxtools.lttng.core.tracecontrol.model.config,
- org.eclipse.linuxtools.lttng.core.tracecontrol.service
+ org.eclipse.linuxtools.lttng.core.tracecontrol.service,
+ org.eclipse.linuxtools.lttng.core.util
 Bundle-Localization: plugin

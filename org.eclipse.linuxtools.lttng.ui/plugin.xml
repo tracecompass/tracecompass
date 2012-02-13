@@ -90,6 +90,15 @@
             name="%histogram.view.name"
             restorable="true">
       </view>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.lttng.ui.views.category"
+            class="org.eclipse.linuxtools.lttng.ui.views.latency.LatencyView"
+            icon="icons/eview16/graph.gif"
+            id="org.eclipse.linuxtools.lttng.ui.views.latency"
+            name="%latency.view.name"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.newWizards">
