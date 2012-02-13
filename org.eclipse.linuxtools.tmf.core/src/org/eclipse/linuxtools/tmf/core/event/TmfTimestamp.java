@@ -26,9 +26,9 @@ public class TmfTimestamp implements ITmfTimestamp {
     // ------------------------------------------------------------------------
 
     // The beginning and end of time
-    public static final TmfTimestamp BigBang   = new TmfTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE, 0);
-    public static final TmfTimestamp BigCrunch = new TmfTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE, 0);
-    public static final TmfTimestamp Zero      = new TmfTimestamp(0, 0, 0);
+    public static final ITmfTimestamp BigBang   = new TmfTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE, 0);
+    public static final ITmfTimestamp BigCrunch = new TmfTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE, 0);
+    public static final ITmfTimestamp Zero      = new TmfTimestamp(0, 0, 0);
 
     // ------------------------------------------------------------------------
     // Attributes

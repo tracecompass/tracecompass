@@ -52,11 +52,11 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> {
      * @param epoch
      * @param indexPageSize
      */
-    public LTTngExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, TmfTimestamp epoch, int indexPageSize) {
+    public LTTngExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, ITmfTimestamp epoch, int indexPageSize) {
         this(type, id, traces, TmfTimestamp.Zero, indexPageSize, false);
     }
 
-    public LTTngExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, TmfTimestamp epoch, int indexPageSize, boolean preIndexExperiment) {
+    public LTTngExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, ITmfTimestamp epoch, int indexPageSize, boolean preIndexExperiment) {
         super(type, id, traces, epoch, indexPageSize, preIndexExperiment);
     }
 

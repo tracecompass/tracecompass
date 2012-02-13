@@ -47,7 +47,7 @@ public class CustomEvent extends TmfEvent {
         fData = new HashMap<String, String>();
     }
 
-    public CustomEvent(CustomTraceDefinition definition, ITmfTrace<?> parentTrace, TmfTimestamp timestamp, String source, TmfEventType type, String reference) {
+    public CustomEvent(CustomTraceDefinition definition, ITmfTrace<?> parentTrace, ITmfTimestamp timestamp, String source, TmfEventType type, String reference) {
         super(parentTrace, timestamp, source, type, reference);
         fDefinition = definition;
         fData = new HashMap<String, String>();
