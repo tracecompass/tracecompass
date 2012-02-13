@@ -16,21 +16,21 @@ package org.eclipse.linuxtools.tmf.core.event;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
- * <b><u>TmfDataEvent</u></b>
+ * <b><u>TmfDataItem</u></b>
  * <p>
- * A basic implementation of ITmfDataEvent.
+ * A basic implementation of ITmfDataItem.
  * 
  * Notice that for performance reasons TmfDataEvent is NOT immutable. If a copy
  * of an event is needed, use the copy constructor (shallow copy) or the clone()
  * method (deep copy).
  */
-public class TmfDataEvent implements ITmfDataEvent {
+public class TmfDataItem implements ITmfDataItem {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    protected ITmfTrace<? extends TmfDataEvent> fTrace;
+    protected ITmfTrace<? extends TmfDataItem> fTrace;
     protected long fRank;
     protected String fSource;
     protected ITmfEventType fType;
@@ -44,7 +44,7 @@ public class TmfDataEvent implements ITmfDataEvent {
     /**
      * Default constructor
      */
-    public TmfDataEvent() {
+    public TmfDataItem() {
     }
 
     /**
@@ -56,7 +56,7 @@ public class TmfDataEvent implements ITmfDataEvent {
      * @param type the event type
      * @param reference the event reference
      */
-    public TmfDataEvent(ITmfTrace<? extends TmfDataEvent> trace, long rank,
+    public TmfDataItem(ITmfTrace<? extends TmfDataItem> trace, long rank,
             String source, TmfEventType type, TmfEventContent content,
             String reference)
     {
@@ -73,7 +73,7 @@ public class TmfDataEvent implements ITmfDataEvent {
      * 
      * @param event the original event
      */
-    public TmfDataEvent(TmfDataEvent event) {
+    public TmfDataItem(TmfDataItem event) {
         if (event == null)
             throw new IllegalArgumentException();
         fTrace = event.fTrace;
@@ -85,13 +85,13 @@ public class TmfDataEvent implements ITmfDataEvent {
     }
 
     // ------------------------------------------------------------------------
-    // ITmfDataEvent
+    // ITmfDataItem
     // ------------------------------------------------------------------------
 
     /**
      * @return the parent trace
      */
-    public ITmfTrace<? extends TmfDataEvent> getTrace() {
+    public ITmfTrace<? extends TmfDataItem> getTrace() {
         return fTrace;
     }
 
@@ -167,10 +167,10 @@ public class TmfDataEvent implements ITmfDataEvent {
     // ------------------------------------------------------------------------
 
     @Override
-    public TmfDataEvent clone() {
-        TmfDataEvent clone = null;
+    public TmfDataItem clone() {
+        TmfDataItem clone = null;
         try {
-            clone = (TmfDataEvent) super.clone();
+            clone = (TmfDataItem) super.clone();
             clone.fTrace = fTrace;
             clone.fRank = fRank;
             clone.fSource = fSource;
@@ -207,7 +207,7 @@ public class TmfDataEvent implements ITmfDataEvent {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        TmfDataEvent other = (TmfDataEvent) obj;
+        TmfDataItem other = (TmfDataItem) obj;
         if (fContent == null) {
             if (other.fContent != null)
                 return false;

@@ -113,7 +113,7 @@ public class TmfEventField implements ITmfEventField {
         try {
             clone = (TmfEventField) super.clone();
             clone.fEventContent = fEventContent;
-            clone.fFieldId = new String(fFieldId);
+            clone.fFieldId = fFieldId;
             clone.fValue = fValue;
             clone.fSubFields = (fSubFields != null) ? fSubFields.clone() : null;
         } catch (CloneNotSupportedException e) {

@@ -15,9 +15,9 @@ package org.eclipse.linuxtools.tmf.core.event;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
- * <b><u>ITmfDataEvent</u></b>
+ * <b><u>ITmfDataItem</u></b>
  * <p>
- * The basic event structure in the TMF. In its canonical form, an event has:
+ * The basic event structure in the TMF. In its canonical form, a data item has:
  * <ul>
  * <li> a parent trace
  * <li> a rank (order within the trace)
@@ -29,7 +29,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * used as e.g. a location marker (filename:lineno) to indicate where the event
  * was generated.
  */
-public interface ITmfDataEvent extends Cloneable {
+public interface ITmfDataItem extends Cloneable {
 
     /**
      * @return the trace that 'owns' the event
@@ -62,8 +62,8 @@ public interface ITmfDataEvent extends Cloneable {
     public String getReference();
 
     /**
-     * @return a clone of the data event
+     * @return a clone of the data item
      */
-    public ITmfDataEvent clone();
+    public ITmfDataItem clone();
     
 }

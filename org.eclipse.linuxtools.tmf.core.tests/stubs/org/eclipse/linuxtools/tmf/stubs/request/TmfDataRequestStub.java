@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.stubs.request;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfDataEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfDataItem;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 
 /**
@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
  * <p>
  * TODO: Implement me. Please.
  */
-public class TmfDataRequestStub<T extends TmfDataEvent> extends TmfDataRequest<T> {
+public class TmfDataRequestStub<T extends TmfDataItem> extends TmfDataRequest<T> {
 
     /**
      * Default constructor

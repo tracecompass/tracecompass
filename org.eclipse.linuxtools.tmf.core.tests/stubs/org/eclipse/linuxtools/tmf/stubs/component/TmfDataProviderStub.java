@@ -20,7 +20,7 @@ import java.net.URL;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.tmf.core.component.TmfDataProvider;
-import org.eclipse.linuxtools.tmf.core.event.TmfDataEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfDataItem;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
@@ -33,7 +33,7 @@ import org.eclipse.linuxtools.tmf.stubs.trace.TmfTraceStub;
  * TODO: Implement me. Please.
  */
 @SuppressWarnings("nls")
-public class TmfDataProviderStub extends TmfDataProvider<TmfDataEvent> {
+public class TmfDataProviderStub extends TmfDataProvider<TmfDataItem> {
 
     private static final String DIRECTORY   = "testfiles";
     private static final String TEST_STREAM = "M-Test-10K";
@@ -41,7 +41,7 @@ public class TmfDataProviderStub extends TmfDataProvider<TmfDataEvent> {
     private TmfTraceStub fTrace;
 
     public TmfDataProviderStub(String path) throws IOException {
-    	super("TmfDataProviderStub", TmfDataEvent.class);
+    	super("TmfDataProviderStub", TmfDataItem.class);
         URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
 		try {
 			File test = new File(FileLocator.toFileURL(location).toURI());
@@ -60,7 +60,7 @@ public class TmfDataProviderStub extends TmfDataProvider<TmfDataEvent> {
     // ------------------------------------------------------------------------
 
 	@Override
-	public ITmfContext armRequest(ITmfDataRequest<TmfDataEvent> request) {
+	public ITmfContext armRequest(ITmfDataRequest<TmfDataItem> request) {
 		if (request instanceof ITmfEventRequest<?>) {
 			ITmfContext context = fTrace.seekEvent(((ITmfEventRequest<?>) request).getRange().getStartTime());
 			return context;
@@ -69,12 +69,12 @@ public class TmfDataProviderStub extends TmfDataProvider<TmfDataEvent> {
 	}
 
 	@Override
-	public TmfDataEvent getNext(ITmfContext context) {
+	public TmfDataItem getNext(ITmfContext context) {
 		return fTrace.getNext(context);
 	}
 
 	@Override
-	public boolean isCompleted(ITmfDataRequest<TmfDataEvent> request, TmfDataEvent data, int nbRead) {
+	public boolean isCompleted(ITmfDataRequest<TmfDataItem> request, TmfDataItem data, int nbRead) {
 		return false;
 	}
 

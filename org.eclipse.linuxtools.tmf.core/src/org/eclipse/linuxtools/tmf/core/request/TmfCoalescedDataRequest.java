@@ -14,14 +14,14 @@ package org.eclipse.linuxtools.tmf.core.request;
 
 import java.util.Vector;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfDataEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfDataItem;
 
 /**
  * <b><u>TmfCoalescedDataRequest</u></b>
  * <p>
  * TODO: Implement me. Please.
  */
-public class TmfCoalescedDataRequest<T extends TmfDataEvent> extends TmfDataRequest<T> {
+public class TmfCoalescedDataRequest<T extends TmfDataItem> extends TmfDataRequest<T> {
 
     // ------------------------------------------------------------------------
     // Attributes

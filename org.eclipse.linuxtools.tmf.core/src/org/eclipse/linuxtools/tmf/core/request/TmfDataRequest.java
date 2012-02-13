@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.tmf.core.request;
 import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.linuxtools.tmf.core.Tracer;
-import org.eclipse.linuxtools.tmf.core.event.TmfDataEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfDataItem;
 
 /**
  * <b><u>TmfDataRequest</u></b>
@@ -69,7 +69,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfDataEvent;
  * 
  * TODO: Implement request failures (codes, etc...)
  */
-public abstract class TmfDataRequest<T extends TmfDataEvent> implements ITmfDataRequest<T> {
+public abstract class TmfDataRequest<T extends TmfDataItem> implements ITmfDataRequest<T> {
 
     // ------------------------------------------------------------------------
     // Constants

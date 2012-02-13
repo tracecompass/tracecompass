@@ -137,7 +137,7 @@ public class TmfEventType implements ITmfEventType {
             clone.fFieldMap = new HashMap<String, Integer>();
             for (int i = 0; i < fNbFields; i++) {
                 clone.fFieldLabels[i] = fFieldLabels[i];
-                clone.fFieldMap.put(fFieldLabels[i], new Integer(i));
+                clone.fFieldMap.put(fFieldLabels[i], Integer.valueOf(i));
             }
         }
         catch (CloneNotSupportedException e) {
