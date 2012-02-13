@@ -125,7 +125,7 @@ public class TmfEventType implements ITmfEventType {
     // ------------------------------------------------------------------------
 
     @Override
-    public TmfEventType clone() {
+    public ITmfEventType clone() {
         TmfEventType clone = null;
         try {
             clone = (TmfEventType) super.clone();

@@ -32,7 +32,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * Notice that for performance reasons TmfEvent is NOT immutable. If a copy of
  * the event is needed, use the copy constructor.
  */
-public class TmfEvent extends TmfDataEvent implements Cloneable {
+public class TmfEvent extends TmfDataEvent implements ITmfEvent {
 
     // ------------------------------------------------------------------------
     // Attributes

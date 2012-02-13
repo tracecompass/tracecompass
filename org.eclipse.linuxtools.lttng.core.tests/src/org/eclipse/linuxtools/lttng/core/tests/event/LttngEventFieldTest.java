@@ -13,6 +13,7 @@ import org.eclipse.linuxtools.lttng.core.event.LttngEventContent;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventField;
 import org.eclipse.linuxtools.lttng.core.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.core.trace.LTTngTextTrace;
+import org.eclipse.linuxtools.tmf.core.event.TmfNoSuchFieldException;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 
@@ -98,8 +99,13 @@ public class LttngEventFieldTest extends TestCase {
     	// *** To "really" test the field, we will get a real field from LTTngTrace
     	LTTngTextTrace tmpStream = initializeEventStream();
     	
-    	LttngEventField testField 	= (LttngEventField)tmpStream.getNextEvent( new TmfContext(new TmfLocation<Long>(0L), 0) ).getContent().getField(0);
-    	assertNotSame("getField is null!",null,testField);
+    	LttngEventField testField = null;
+        try {
+            testField = (LttngEventField) tmpStream.getNextEvent( new TmfContext(new TmfLocation<Long>(0L), 0) ).getContent().getField(0);
+        } catch (TmfNoSuchFieldException e) {
+            e.printStackTrace();
+        }
+    	assertNotSame("getField is null!", null, testField);
     	
     	// *** FIXME ***
     	// Depending from the Java version because of the "hashcode()" on String. 

@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -33,7 +34,7 @@ public class CustomEvent extends TmfEvent {
     
     protected CustomTraceDefinition fDefinition;
     protected Map<String, String> fData;
-    private String[] fColumnData;
+    private TmfEventField[] fColumnData;
 
     public CustomEvent(CustomTraceDefinition definition) {
         fDefinition = definition;
@@ -58,7 +59,7 @@ public class CustomEvent extends TmfEvent {
         return super.getTimestamp();
     }
 
-    public String[] extractItemFields() {
+    public TmfEventField[] extractItemFields() {
         if (fData != null) processData();
         return fColumnData;
     }
@@ -80,14 +81,14 @@ public class CustomEvent extends TmfEvent {
         }
         
         int i = 0;
-        fColumnData = new String[fDefinition.outputs.size()];
+        fColumnData = new TmfEventField[fDefinition.outputs.size()];
         for (OutputColumn outputColumn : fDefinition.outputs) {
             String value = fData.get(outputColumn.name);
             if (outputColumn.name.equals(CustomTraceDefinition.TAG_TIMESTAMP) && date != null) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat(fDefinition.timeStampOutputFormat);
-                fColumnData[i++] = dateFormat.format(date);
+                fColumnData[i++] = new TmfEventField(getContent(), outputColumn.name, dateFormat.format(date));
             } else {
-                fColumnData[i++] = (value != null ? value : ""); //$NON-NLS-1$
+                fColumnData[i++] = new TmfEventField(getContent(), outputColumn.name, (value != null ? value : "")); //$NON-NLS-1$
             }
         }
         fData = null;

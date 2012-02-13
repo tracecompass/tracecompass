@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.stubs.event;
 
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 
 /**
@@ -24,7 +25,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 @SuppressWarnings("nls")
 public class TmfEventContentStub extends TmfEventContent {
 
-	public TmfEventContentStub(TmfEvent parent, Object content) {
+	public TmfEventContentStub(TmfEvent parent, String content) {
 		super(parent, content);
 	}
 
@@ -34,12 +35,19 @@ public class TmfEventContentStub extends TmfEventContent {
 
 	@Override
 	protected void parseContent() {
-        Object field1 = new Integer(1);
-        Object field2 = new Integer(-10);
-        Object field3 = new Boolean(true);
-        Object field4 = new String("some string");
-        Object field5 = new TmfTimestamp(1, (byte) 2, 3);
-        fFields = new Object[] { field1, field2, field3, field4, field5 };
+        Object value1 = new Integer(1);
+        Object value2 = new Integer(-10);
+        Object value3 = new Boolean(true);
+        Object value4 = new String("some string");
+        Object value5 = new TmfTimestamp(1, (byte) 2, 3);
+
+        TmfEventField field1 = new TmfEventField(this, "field1", value1);
+        TmfEventField field2 = new TmfEventField(this, "field2", value2);
+        TmfEventField field3 = new TmfEventField(this, "field3", value3);
+        TmfEventField field4 = new TmfEventField(this, "field4", value4);
+        TmfEventField field5 = new TmfEventField(this, "field5", value5);
+
+        fFields = new TmfEventField[] { field1, field2, field3, field4, field5 };
 	}
 	
     @Override

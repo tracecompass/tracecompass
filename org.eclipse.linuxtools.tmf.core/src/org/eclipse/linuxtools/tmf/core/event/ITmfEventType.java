@@ -29,6 +29,11 @@ public interface ITmfEventType extends Cloneable {
     public String getId();
 
     /**
+     * @return the number of fields
+     */
+    public int getNbFields();
+
+    /**
      * @return the event field labels
      */
     public String[] getFieldLabels();

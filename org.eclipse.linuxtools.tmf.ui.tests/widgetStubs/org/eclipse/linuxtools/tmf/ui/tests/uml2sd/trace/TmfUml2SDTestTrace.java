@@ -69,14 +69,14 @@ public class TmfUml2SDTestTrace implements ITmfEventParser {
             TmfEventContent tmfContent = new TmfEventContent(tmfEvent, content) {
                 @Override
                 public void parseContent() {
-                    String raw = (String) fRawContent;
+                    String raw = fRawContent.toString();
                     int i = raw.indexOf(",");
                     String sender = raw.substring(1, i);
                     int k = raw.indexOf(",", i+1);
                     String receiver = raw.substring(i+1, k);
                     i = raw.indexOf(",", k+1);
                     String signal = raw.substring(k+1, raw.length() - 1);
-                    fFields = new Object[3];
+                    fFields = new TmfEventField[3];
                     fFields[0] = new TmfEventField(this, "sender", sender);
                     fFields[1] = new TmfEventField(this, "receiver", receiver);;
                     fFields[2] = new TmfEventField(this, "signal", signal);;

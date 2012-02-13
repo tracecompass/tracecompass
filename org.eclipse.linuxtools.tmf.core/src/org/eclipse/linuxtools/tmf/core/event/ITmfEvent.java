@@ -17,7 +17,7 @@ package org.eclipse.linuxtools.tmf.core.event;
  * <p>
  * The ITmfEvent is essentially an ITmfDataEvent with a timestamp.
 */
-public interface ITmfEvent extends ITmfDataEvent {
+public interface ITmfEvent extends ITmfDataEvent, Cloneable {
 
     /**
      * @return the event timestamp

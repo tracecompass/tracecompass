@@ -13,9 +13,10 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.events;
 
-import org.eclipse.linuxtools.lttng.core.event.LttngEventContent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventContent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.linuxtools.tmf.ui.widgets.ColumnData;
 import org.eclipse.swt.SWT;
@@ -63,16 +64,16 @@ public class EventsTable extends TmfEventsTable {
      * @return
      */
     @Override
-    protected String[] extractItemFields(TmfEvent event) {
-        String[] fields = new String[0];
-
+    protected TmfEventField[] extractItemFields(TmfEvent event) {
+        TmfEventField[] fields = new TmfEventField[0];
         if (event != null) {
-            fields = new String[] {
-                    event.getTimestamp().toString(),
-                    event.getReference().toString(),
-                    event.getType().toString(),
-                    ((LttngEventContent) event.getContent()).toString()
-            };
+            ITmfEventContent content = event.getContent();
+            fields = new TmfEventField[] {
+                     new TmfEventField(content, TmfEventContent.FIELD_ID_TIMESTAMP, ((Long) event.getTimestamp().getValue()).toString()),
+                     new TmfEventField(content, TmfEventContent.FIELD_ID_REFERENCE, event.getReference()),
+                     new TmfEventField(content, TmfEventContent.FIELD_ID_TYPE, event.getType().getId()),
+                     new TmfEventField(content, TmfEventContent.FIELD_ID_CONTENT, event.getContent().toString())
+                    };
         }
         return fields;
     }

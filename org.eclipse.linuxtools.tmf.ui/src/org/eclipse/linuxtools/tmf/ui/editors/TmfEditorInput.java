@@ -27,9 +27,9 @@ import org.eclipse.ui.ide.IDE;
 public class TmfEditorInput implements IEditorInput {
 
     private IResource fResource;
-    private ITmfTrace fTrace;
+    private ITmfTrace<?> fTrace;
 
-    public TmfEditorInput(IResource resource, ITmfTrace trace) {
+    public TmfEditorInput(IResource resource, ITmfTrace<?> trace) {
         fResource = resource;
         fTrace = trace;
     }
@@ -74,7 +74,7 @@ public class TmfEditorInput implements IEditorInput {
         return fResource;
     }
     
-    public ITmfTrace getTrace() {
+    public ITmfTrace<?> getTrace() {
         return fTrace;
     }
 

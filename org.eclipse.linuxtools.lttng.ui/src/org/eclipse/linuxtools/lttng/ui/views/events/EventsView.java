@@ -49,5 +49,4 @@ public class EventsView extends TmfEventsView {
     	return "[EventsView]";
     }
 
-
 }

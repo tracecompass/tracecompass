@@ -283,7 +283,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
                                     }
                                 }
                             }
-                            ((StringBuffer) event.getContent().getContent()).append("\n").append(line); //$NON-NLS-1$
+                            ((StringBuffer) event.getContent().getRawContent()).append("\n").append(line); //$NON-NLS-1$
                         }
                     }
                     rawPos = context.raFile.getFilePointer();
@@ -308,7 +308,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     public CustomTxtEvent parseFirstLine(CustomTxtTraceContext context) {
         CustomTxtEvent event = new CustomTxtEvent(fDefinition, this, (TmfTimestamp) TmfTimestamp.Zero, "", fEventType, ""); //$NON-NLS-1$ //$NON-NLS-2$
         event.processGroups(context.inputLine, context.firstLineMatcher);
-        event.setContent(new CustomEventContent(event, new StringBuffer(context.firstLine)));
+        event.setContent(new CustomEventContent(event, context.firstLine));
         return event;
     }
     

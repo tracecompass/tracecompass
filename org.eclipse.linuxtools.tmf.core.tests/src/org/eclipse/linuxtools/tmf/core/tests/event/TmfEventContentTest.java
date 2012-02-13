@@ -16,6 +16,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfNoSuchFieldException;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -42,8 +43,8 @@ public class TmfEventContentTest extends TestCase {
 	private final TmfEvent          fEvent;
 	private final TmfEvent          fEventStub;
 
-	private final Object fRawContent0 = new String("Some content");
-	private final Object fRawContent1 = new String("Some other content");
+	private final String fRawContent0 = "Some content";
+	private final String fRawContent1 = "Some other content";
 
 	private final TmfEventContent     fBasicContent0;
 	private final TmfEventContent     fBasicContent1;
@@ -91,14 +92,14 @@ public class TmfEventContentTest extends TestCase {
 	public void testTmfEventContent() {
 		assertSame("getLabels",    fEvent,       fBasicContent0.getEvent());
 		assertEquals("getType",    fEventType,   fBasicContent0.getType());
-		assertEquals("getContent", fRawContent0, fBasicContent0.getContent());
+		assertEquals("getContent", fRawContent0, fBasicContent0.getRawContent());
 	}
 
 	public void testTmfEventContentCopy() {
 		TmfEventContent content  = new TmfEventContent(fBasicContent0);
 		assertSame("getLabels",    fEvent,       content.getEvent());
 		assertEquals("getType",    fEventType,   content.getType());
-		assertEquals("getContent", fRawContent0, content.getContent());
+		assertEquals("getContent", fRawContent0, content.getRawContent());
 	}
 
 	public void testTmfEventContentCopy2() {
@@ -193,13 +194,13 @@ public class TmfEventContentTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testToString() {
-		String expected = "[TmfEventContent(" + fRawContent0 + ")]";
+	    String expected = "TmfEventContent [fRawContent=" + fRawContent0 + ", fFields=null]";
 		TmfEventContent content = new TmfEventContent(fEvent, fRawContent0);
 		assertEquals("toString", expected, content.toString());
 	}
 
 	public void testToString2() {
-		String expected = "[TmfEventContent(1,-10,true,some string,TmfTimestamp [fValue=1, fScale=2, fPrecision=3])]";
+        String expected = "TmfEventContent [fRawContent=" + fRawContent0 + ", fFields=null]";
 		TmfEventContentStub content = new TmfEventContentStub(fEvent, fRawContent0);
 		assertEquals("toString", expected, content.toString());
 	}
@@ -209,9 +210,10 @@ public class TmfEventContentTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testGetFields() {
+	    TmfEventField expected = new TmfEventField(fBasicContent0, TmfEventContent.FIELD_ID_CONTENT, fRawContent0);
 		Object[] fields = fBasicContent0.getFields(); 
 		assertEquals("getFields", 1, fields.length);
-		assertEquals("getFields", fRawContent0, fields[0].toString());
+		assertEquals("getFields", expected, fields[0]);
 	}
 
 //	public void testGetFieldFromId() {
@@ -234,8 +236,10 @@ public class TmfEventContentTest extends TestCase {
 	}
 
 	public void testGetFieldFromPos() {
+        String expected = "TmfEventField [fFieldId=" + 
+	           TmfEventContent.FIELD_ID_CONTENT + ", fValue=" + fRawContent0 + "]"; 
 		Object field = fBasicContent0.getField(0);
-		assertEquals("getField", fRawContent0, field.toString());
+		assertEquals("getField", expected, field.toString());
 	}
 
 	public void testGetFieldFromPosFailed() {
@@ -254,21 +258,27 @@ public class TmfEventContentTest extends TestCase {
 
 	public void testGetFieldFromId2() {
 		Object field;
+		TmfEventField expected;
 		try {
 			field = fStubContent.getField("Field1");
-			assertEquals("getField", new Integer(1), field);
+			expected = new TmfEventField(fStubContent, "field1", new Integer(1));
+			assertEquals("getField", expected, field);
 
 			field = fStubContent.getField("Field2");
-			assertEquals("getField", new Integer(-10), field);
+            expected = new TmfEventField(fStubContent, "field2", new Integer(-10));
+			assertEquals("getField", expected, field);
 
 			field = fStubContent.getField("Field3");
-			assertEquals("getField", new Boolean(true), field);
+            expected = new TmfEventField(fStubContent, "field3", new Boolean(true));
+			assertEquals("getField", expected, field);
 
 			field = fStubContent.getField("Field4");
-			assertEquals("getField", new String("some string"), field);
+            expected = new TmfEventField(fStubContent, "field4", "some string");
+			assertEquals("getField", expected, field);
 
 			field = fStubContent.getField("Field5");
-			assertEquals("getField", new TmfTimestamp(1, (byte) 2, 3), field);
+            expected = new TmfEventField(fStubContent, "field5", new TmfTimestamp(1, 2, 3));
+			assertEquals("getField", expected, field);
 
 		} catch (TmfNoSuchFieldException e) {
 			fail("Field not found");
@@ -278,21 +288,28 @@ public class TmfEventContentTest extends TestCase {
 	public void testGetFieldFromPos2() {
 		TmfEventContentStub content = new TmfEventContentStub(fEvent, fRawContent0);
 
-		Object field;
-		field = content.getField(0);
-		assertEquals("getField", new Integer(1), field);
+        Object field;
+        TmfEventField expected;
+
+        field = content.getField(0);
+		expected = new TmfEventField(content, "field1", new Integer(1));
+		assertEquals("getField", expected, field);
 
 		field = content.getField(1);
-		assertEquals("getField", new Integer(-10), field);
+        expected = new TmfEventField(content, "field2", new Integer(-10));
+		assertEquals("getField", expected, field);
 
 		field = content.getField(2);
-		assertEquals("getField", new Boolean(true), field);
+        expected = new TmfEventField(content, "field3", new Boolean(true));
+		assertEquals("getField", expected, field);
 
 		field = content.getField(3);
-		assertEquals("getField", new String("some string"), field);
+        expected = new TmfEventField(content, "field4", "some string");
+		assertEquals("getField",expected, field);
 
 		field = content.getField(4);
-		assertEquals("getField", new TmfTimestamp(1, (byte) 2, 3), field);
+        expected = new TmfEventField(content, "field5", new TmfTimestamp(1, 2, 3));
+		assertEquals("getField", expected, field);
 	}
 
 }

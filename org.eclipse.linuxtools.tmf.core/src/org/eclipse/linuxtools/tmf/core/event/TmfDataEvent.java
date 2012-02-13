@@ -24,7 +24,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * of an event is needed, use the copy constructor (shallow copy) or the clone()
  * method (deep copy).
  */
-public class TmfDataEvent implements Cloneable {
+public class TmfDataEvent implements ITmfDataEvent {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -33,8 +33,8 @@ public class TmfDataEvent implements Cloneable {
     protected ITmfTrace<? extends TmfDataEvent> fTrace;
     protected long fRank;
     protected String fSource;
-    protected TmfEventType fType;
-    protected TmfEventContent fContent;
+    protected ITmfEventType fType;
+    protected ITmfEventContent fContent;
     protected String fReference;
 
     // ------------------------------------------------------------------------
@@ -112,14 +112,14 @@ public class TmfDataEvent implements Cloneable {
     /**
      * @return the event type
      */
-    public TmfEventType getType() {
+    public ITmfEventType getType() {
         return fType;
     }
 
     /**
      * @return the event content
      */
-    public TmfEventContent getContent() {
+    public ITmfEventContent getContent() {
         return fContent;
     }
 

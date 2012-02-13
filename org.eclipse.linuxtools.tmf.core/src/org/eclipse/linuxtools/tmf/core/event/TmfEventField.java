@@ -24,7 +24,7 @@ public class TmfEventField implements ITmfEventField {
     // Attributes
     // ------------------------------------------------------------------------
 
-    protected TmfEventContent fEventContent;
+    protected ITmfEventContent fEventContent;
     protected String fFieldId;
     protected Object fValue;
     protected ITmfEventField[] fSubFields;
@@ -48,7 +48,7 @@ public class TmfEventField implements ITmfEventField {
      * @param id the event field id
      * @param value the event field value
      */
-    public TmfEventField(TmfEventContent content, String id, Object value) {
+    public TmfEventField(ITmfEventContent content, String id, Object value) {
         if (id == null) {
             throw new IllegalArgumentException();
         }
@@ -76,7 +76,7 @@ public class TmfEventField implements ITmfEventField {
     // ITmfEventField
     // ------------------------------------------------------------------------
 
-    public TmfEventContent getContent() {
+    public ITmfEventContent getContent() {
         return fEventContent;
     }
 
@@ -115,7 +115,7 @@ public class TmfEventField implements ITmfEventField {
             clone.fEventContent = fEventContent;
             clone.fFieldId = new String(fFieldId);
             clone.fValue = fValue;
-            clone.fSubFields = fSubFields.clone();
+            clone.fSubFields = (fSubFields != null) ? fSubFields.clone() : null;
         } catch (CloneNotSupportedException e) {
         }
         return clone;
@@ -165,7 +165,7 @@ public class TmfEventField implements ITmfEventField {
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        return "TmfEventField [fEventContent=" + fEventContent + ", fFieldId=" + fFieldId + ", fValue=" + fValue + "]";
+        return "TmfEventField [fFieldId=" + fFieldId + ", fValue=" + fValue + "]";
     }
 
 }

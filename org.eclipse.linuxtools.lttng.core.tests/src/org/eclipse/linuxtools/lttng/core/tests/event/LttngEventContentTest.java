@@ -167,7 +167,7 @@ public class LttngEventContentTest extends TestCase {
     	// getField(name)
     	assertEquals("getField(name) returned unexpected result!",firstEventContentFirstField, testContent.getField(firstEventContentFirstFieldName).toString());
     	// getRawContent
-    	assertNotSame("getRawContent() returned null!",null, testContent.getRawContent());
+    	assertNotSame("getRawContent() returned null!",null, testContent.getMapContent());
     	// Test that get event return the correct event
     	assertTrue("getEvent() returned unexpected result!", tmpEvent.getTimestamp().getValue() == testContent.getEvent().getTimestamp().getValue());
     	// getType()
@@ -199,7 +199,7 @@ public class LttngEventContentTest extends TestCase {
     	// getField(name)
     	assertEquals("getField(name) returned unexpected result!",secondEventContentSecondField, testContent.getField(secondEventContentSecondFieldName).toString());
     	// getRawContent
-    	assertNotSame("getRawContent() returned null!",null, testContent.getRawContent());
+    	assertNotSame("getRawContent() returned null!",null, testContent.getMapContent());
     	
     }
 	
@@ -248,11 +248,11 @@ public class LttngEventContentTest extends TestCase {
     	// Get all the fields to make sure there is something in the HashMap
     	testContent.getFields();
     	// Just making sure there is something in the HashMap
-    	assertNotSame("HashMap is empty but should not!", 0, testContent.getRawContent().size() );
+    	assertNotSame("HashMap is empty but should not!", 0, testContent.getMapContent().size() );
     	
     	// This is the actual test
     	testContent.emptyContent();
-    	assertSame("HashMap is not empty but should be!", 0, testContent.getRawContent().size() );
+    	assertSame("HashMap is not empty but should be!", 0, testContent.getMapContent().size() );
 	}
     
 	public void testToString() {

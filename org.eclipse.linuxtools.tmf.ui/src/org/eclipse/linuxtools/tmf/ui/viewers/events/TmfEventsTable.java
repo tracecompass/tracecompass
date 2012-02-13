@@ -44,9 +44,11 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventContent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
@@ -580,7 +582,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
 
     protected void setItemData(TableItem item, TmfEvent event, long rank) {
-        item.setText(extractItemFields(event));
+        TmfEventField[] fields = extractItemFields(event);
+        String[] content = new String[fields.length];
+        for (int i = 0; i < fields.length; i++) {
+            content[i] = (String) fields[i].getValue();
+        }
+        item.setText(content);
         item.setData(Key.TIMESTAMP, new TmfTimestamp(event.getTimestamp()));
         item.setData(Key.RANK, rank);
 
@@ -1288,12 +1295,18 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * 
      *         FIXME: Add support for column selection
      */
-    protected String[] extractItemFields(TmfEvent event) {
-        String[] fields = new String[0];
+    //TmfEventContent content, String id, Object value
+    protected TmfEventField[] extractItemFields(TmfEvent event) {
+        TmfEventField[] fields = new TmfEventField[0];
         if (event != null) {
-            fields = new String[] { new Long(event.getTimestamp().getValue()).toString(),
-                    event.getSource(), event.getType().getId(),
-                    event.getReference(), event.getContent().toString() };
+            ITmfEventContent content = event.getContent();
+            fields = new TmfEventField[] {
+                     new TmfEventField(content, TmfEventContent.FIELD_ID_TIMESTAMP, ((Long) event.getTimestamp().getValue()).toString()),
+                     new TmfEventField(content, TmfEventContent.FIELD_ID_SOURCE, event.getSource()),
+                     new TmfEventField(content, TmfEventContent.FIELD_ID_TYPE, event.getType().getId()),
+                     new TmfEventField(content, TmfEventContent.FIELD_ID_REFERENCE, event.getReference()),
+                     new TmfEventField(content, TmfEventContent.FIELD_ID_CONTENT, event.getContent().toString())
+                    };
         }
         return fields;
     }

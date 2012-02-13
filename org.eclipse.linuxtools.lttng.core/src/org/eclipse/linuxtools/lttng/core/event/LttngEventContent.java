@@ -68,7 +68,7 @@ public class LttngEventContent extends TmfEventContent {
      * @param oldContent  Content to copy from
      */
     public LttngEventContent(LttngEventContent oldContent) {
-        this((LttngEvent)oldContent.getEvent(), oldContent.getRawContent() );
+        this((LttngEvent)oldContent.getEvent(), oldContent.getMapContent() );
     }
     
     
@@ -108,7 +108,7 @@ public class LttngEventContent extends TmfEventContent {
      * @return  Currently parsed fields.
      */
     @Override
-    public Object[] getContent() {
+    public Object[] getRawContent() {
         Object[] returnedContent = fFieldsMap.values().toArray( new Object[fFieldsMap.size()] );
         
         return returnedContent;
@@ -119,7 +119,7 @@ public class LttngEventContent extends TmfEventContent {
      * 
      * @return  Currently parsed fields.
      */
-    public HashMap<String, LttngEventField> getRawContent() {
+    public HashMap<String, LttngEventField> getMapContent() {
         return fFieldsMap;
     }
     
@@ -155,7 +155,7 @@ public class LttngEventContent extends TmfEventContent {
      */
     @Override
     public synchronized LttngEventField[] getFields() {
-        if ( fFieldsMap.size() < fParentEvent.getType().getNbFields() ) {
+        if (fFieldsMap.size() < fParentEvent.getType().getNbFields()) {
         	LttngEventField tmpField = null;
         	LttngEventType tmpType = (LttngEventType)fParentEvent.getType();
         	
@@ -214,19 +214,19 @@ public class LttngEventContent extends TmfEventContent {
      * @see @see org.eclipse.linuxtools.lttng.event.LttngEventField
      */
     @Override
-    public synchronized Object getField(String name) {
+    public synchronized LttngEventField getField(String name) {
 
         // Check for generic table header fields
         if (name.equals(LttngEventType.CONTENT_LABEL) || name.equals(FIELD_ID_CONTENT)) {
-            return fParentEvent.getContent().toString();
+            return new LttngEventField(this, toString());
         } else if (name.equals(LttngEventType.MARKER_LABEL) || name.equals(FIELD_ID_TYPE)) {
-            return fParentEvent.getType().getId();
+            return new LttngEventField(this, fParentEvent.getType().getId());
         } else if (name.equals(LttngEventType.TRACE_LABEL) || name.equals(FIELD_ID_REFERENCE)) {
-            return fParentEvent.getReference();
+            return new LttngEventField(this, fParentEvent.getReference());
         } else if (name.equals(LttngEventType.TIMESTAMP_LABEL) || name.equals(FIELD_ID_TIMESTAMP)) {
-            return new Long(fParentEvent.getTimestamp().getValue()).toString();
+            return new LttngEventField(this, fParentEvent.getTimestamp().toString());
         } else if (name.equals(FIELD_ID_SOURCE)) {
-            return fParentEvent.getSource();
+            return new LttngEventField(this, fParentEvent.getSource());
         }
 
     	// *** VERIFY ***

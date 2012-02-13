@@ -231,7 +231,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
     			// -1 is the skip the end of line (\n)
     			nbCharRead += (tmpContent.length()+1);
 	    		
-    			if ( (currentLttngEvent != null) && (currentLttngEvent.getContent().getRawContent() != null) ) {
+    			if ( (currentLttngEvent != null) && (currentLttngEvent.getContent().getMapContent() != null) ) {
     				currentLttngEvent.getContent().emptyContent();
     			}
     			
@@ -494,17 +494,17 @@ class TextLttngEventContent extends LttngEventContent {
     }
     
     public TextLttngEventContent(TextLttngEventContent oldContent) {
-    	this( (TextLttngEvent)oldContent.fParentEvent, oldContent.getRawContent());
+    	this( (TextLttngEvent)oldContent.fParentEvent, oldContent.getMapContent());
     }
     
     @Override
     public LttngEventField[] getFields() {
-    	return getRawContent().values().toArray(new LttngEventField[getRawContent().size()]);
+    	return getMapContent().values().toArray(new LttngEventField[getMapContent().size()]);
     }
     
     @Override
     public LttngEventField getField(String name) {
-        LttngEventField returnedField = getRawContent().get(name);
+        LttngEventField returnedField = getMapContent().get(name);
         
         return returnedField;
     }

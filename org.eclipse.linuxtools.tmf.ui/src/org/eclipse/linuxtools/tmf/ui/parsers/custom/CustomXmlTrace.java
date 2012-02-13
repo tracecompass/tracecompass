@@ -186,7 +186,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
                 Element element = parseElementBuffer(elementBuffer);
                 
                 event = extractEvent(element, fRecordInputElement);
-                ((StringBuffer) event.getContent().getContent()).append(elementBuffer);
+                ((StringBuffer) event.getContent().getRawContent()).append(elementBuffer);
                 
                 String line;
                 String recordElementStart = "<" + fRecordInputElement.elementName; //$NON-NLS-1$
@@ -363,7 +363,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     
     public CustomXmlEvent extractEvent(Element element, InputElement inputElement) {
         CustomXmlEvent event = new CustomXmlEvent(fDefinition, this, TmfTimestamp.Zero, "", fEventType,""); //$NON-NLS-1$ //$NON-NLS-2$
-        event.setContent(new CustomEventContent(event, new StringBuffer()));
+        event.setContent(new CustomEventContent(event, new String()));
         parseElement(element, event, inputElement);
         return event;
     }

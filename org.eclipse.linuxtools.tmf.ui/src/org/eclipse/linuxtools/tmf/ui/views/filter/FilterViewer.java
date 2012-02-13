@@ -30,8 +30,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterAndNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterCompareNode;
@@ -339,7 +339,7 @@ class FilterViewer extends Composite {
                         if (ce.getAttribute(TmfTraceType.EVENT_TYPE_ATTR).equals(eventTypeNode.getEventType())) {
                             try {
                                 TmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
-                                TmfEventType eventType = event.getType();
+                                ITmfEventType eventType = event.getType();
                                 if (eventType != null) {
                                     for (String field : eventType.getFieldLabels()) {
                                         fieldsList.add(field);
@@ -376,7 +376,7 @@ class FilterViewer extends Composite {
             for (IConfigurationElement ce : TmfTraceType.getTypeElements()) {
                 try {
                     TmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
-                    TmfEventType eventType = event.getType();
+                    ITmfEventType eventType = event.getType();
                     if (eventType != null) {
                         fieldsList.add("[" + TmfTraceType.getCategoryName(ce.getAttribute(TmfTraceType.CATEGORY_ATTR)) + //$NON-NLS-1$
                                 " : " + ce.getAttribute(TmfTraceType.NAME_ATTR) + "]"); //$NON-NLS-1$ //$NON-NLS-2$

@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.lttng.core.event;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventContent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 
@@ -42,7 +43,7 @@ public class LttngEventField extends TmfEventField {
 	 * @param id       Name (label) of this field
 	 * @param value    Parsed value (payload) of this field
 	 */
-	public LttngEventField(TmfEventContent parent, String id, Object value) {
+	public LttngEventField(ITmfEventContent parent, String id, Object value) {
 		super(parent, id, value);
 	}
 	
