@@ -15,26 +15,28 @@ package org.eclipse.linuxtools.lttng.core.event;
 import java.util.HashMap;
 
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
-import org.eclipse.linuxtools.tmf.core.event.TmfNoSuchFieldException;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 
 /**
  * <b><u>LttngEventContent</u></b><p>
  * 
  * Lttng specific implementation of the TmfEventContent.<p>
  */
-public class LttngEventContent extends TmfEventContent {
+public class LttngEventContent extends TmfEventField {
+    
+    private LttngEvent fParentEvent;
     
     // Hash map that contain the (parsed) fields. This is the actual payload of the event.
-    HashMap<String, LttngEventField> fFieldsMap = new HashMap<String, LttngEventField>();
+    private HashMap<String, LttngEventField> fFieldsMap = new HashMap<String, LttngEventField>();
     
     /**
      * Default constructor.<p>
      * 
-     * 
      */
     public LttngEventContent() {
-        super(null, null);
+        super(ITmfEventField.ROOT_ID, null);
     }
     
     /**
@@ -45,7 +47,8 @@ public class LttngEventContent extends TmfEventContent {
      * @see org.eclipse.linuxtools.lttng.core.event.LttngEvent
      */
     public LttngEventContent(LttngEvent thisParent) {
-        super(thisParent, null);
+        super(ITmfEventField.ROOT_ID, null);
+        fParentEvent = thisParent;
     }
     
     /**
@@ -57,8 +60,8 @@ public class LttngEventContent extends TmfEventContent {
      * @see org.eclipse.linuxtools.lttng.core.event.LttngEvent
      */
     public LttngEventContent(LttngEvent thisParent, HashMap<String, LttngEventField> thisContent) {
-        super(thisParent, null);
-        
+        super(ITmfEventField.ROOT_ID, null);
+        fParentEvent = thisParent;
         fFieldsMap = thisContent;
     }
     
@@ -68,13 +71,11 @@ public class LttngEventContent extends TmfEventContent {
      * @param oldContent  Content to copy from
      */
     public LttngEventContent(LttngEventContent oldContent) {
-        this((LttngEvent)oldContent.getEvent(), oldContent.getMapContent() );
+        this((LttngEvent) oldContent.getEvent(), oldContent.getMapContent());
     }
     
-    
-    @Override
 	public LttngEvent getEvent() {
-        return (LttngEvent)fParentEvent;
+        return fParentEvent;
     }
     
     public void setEvent(LttngEvent newParent) {
@@ -84,13 +85,14 @@ public class LttngEventContent extends TmfEventContent {
     
     // *** VERIFY ***
     // These are not very useful, are they?
-    @Override
-	public LttngEventType getType() {
-        return (LttngEventType)fParentEvent.getType();
-    }
-    public void setType(LttngEventType newType) {
-        ((LttngEvent)fParentEvent).setType(newType);
-    }
+
+//    public LttngEventType getType() {
+//        return (LttngEventType)fParentEvent.getType();
+//    }
+    
+//    public void setType(LttngEventType newType) {
+//        ((LttngEvent)fParentEvent).setType(newType);
+//    }
     
     
     // ***TODO***
@@ -107,10 +109,8 @@ public class LttngEventContent extends TmfEventContent {
      * 
      * @return  Currently parsed fields.
      */
-    @Override
     public Object[] getRawContent() {
-        Object[] returnedContent = fFieldsMap.values().toArray( new Object[fFieldsMap.size()] );
-        
+        Object[] returnedContent = fFieldsMap.values().toArray(new Object[fFieldsMap.size()]);
         return returnedContent;
     }
     
@@ -155,11 +155,13 @@ public class LttngEventContent extends TmfEventContent {
      */
     @Override
     public synchronized LttngEventField[] getFields() {
-        if (fFieldsMap.size() < fParentEvent.getType().getNbFields()) {
+        int nbFields = fParentEvent.getType().getFieldNames().length;
+        
+        if (fFieldsMap.size() < nbFields) {
         	LttngEventField tmpField = null;
         	LttngEventType tmpType = (LttngEventType)fParentEvent.getType();
         	
-	        for ( int pos=0; pos<tmpType.getNbFields(); pos++ ) {
+	        for (int pos=0; pos < nbFields; pos++) {
 	            String name = null;
 	            LttngEvent lttngTmpEvent = (LttngEvent)getEvent(); //added for easier debugging
 				JniEvent tmpEvent = (lttngTmpEvent).convertEventTmfToJni();
@@ -167,16 +169,16 @@ public class LttngEventContent extends TmfEventContent {
 				// tmpEvent == null probably mean there is a discrepancy between Eclipse and C library
 				// An error was probably printed in convertEventTmfToJni() already, but keep in mind this is SERIOUS
 				if ( tmpEvent != null ) {
-					try {
-						name = tmpType.getFieldLabel(pos);
+//					try {
+						name = tmpType.getFieldName(pos);
 					
 						Object newValue = tmpEvent.parseFieldByName(name);
-						tmpField = new LttngEventField(this, name, newValue );
+                        tmpField = new LttngEventField(name, newValue, null);
 						fFieldsMap.put(name, tmpField);
-					}
-					catch (TmfNoSuchFieldException e) {
-						System.out.println("Invalid field position requested : " + pos + ", ignoring (getFields).");  //$NON-NLS-1$//$NON-NLS-2$
-					}
+//					}
+//					catch (TmfNoSuchFieldException e) {
+//						System.out.println("Invalid field position requested : " + pos + ", ignoring (getFields).");  //$NON-NLS-1$//$NON-NLS-2$
+//					}
 	            }
 	        }
         }
@@ -194,14 +196,13 @@ public class LttngEventContent extends TmfEventContent {
     public LttngEventField getField(int position) {
         LttngEventField returnedField = null;
         String label = null;
-		try {
-			label = fParentEvent.getType().getFieldLabel(position);
-			
+//		try {
+			label = fParentEvent.getType().getFieldName(position);
 			returnedField = (LttngEventField) this.getField(label);
-		} 
-		catch (TmfNoSuchFieldException e) {
-			System.out.println("Invalid field position requested : " + position + ", ignoring (getField).");  //$NON-NLS-1$//$NON-NLS-2$
-		}
+//		} 
+//		catch (TmfNoSuchFieldException e) {
+//			System.out.println("Invalid field position requested : " + position + ", ignoring (getField).");  //$NON-NLS-1$//$NON-NLS-2$
+//		}
         
         return returnedField;
     }
@@ -217,16 +218,16 @@ public class LttngEventContent extends TmfEventContent {
     public synchronized LttngEventField getField(String name) {
 
         // Check for generic table header fields
-        if (name.equals(LttngEventType.CONTENT_LABEL) || name.equals(FIELD_ID_CONTENT)) {
-            return new LttngEventField(this, toString());
-        } else if (name.equals(LttngEventType.MARKER_LABEL) || name.equals(FIELD_ID_TYPE)) {
-            return new LttngEventField(this, fParentEvent.getType().getId());
-        } else if (name.equals(LttngEventType.TRACE_LABEL) || name.equals(FIELD_ID_REFERENCE)) {
-            return new LttngEventField(this, fParentEvent.getReference());
-        } else if (name.equals(LttngEventType.TIMESTAMP_LABEL) || name.equals(FIELD_ID_TIMESTAMP)) {
-            return new LttngEventField(this, fParentEvent.getTimestamp().toString());
-        } else if (name.equals(FIELD_ID_SOURCE)) {
-            return new LttngEventField(this, fParentEvent.getSource());
+        if (name.equals(LttngEventType.CONTENT_LABEL) || name.equals(ITmfEvent.EVENT_FIELD_CONTENT)) {
+            return new LttngEventField(toString());
+        } else if (name.equals(LttngEventType.MARKER_LABEL) || name.equals(ITmfEvent.EVENT_FIELD_TYPE)) {
+            return new LttngEventField(fParentEvent.getType().getName());
+        } else if (name.equals(LttngEventType.TRACE_LABEL) || name.equals(ITmfEvent.EVENT_FIELD_REFERENCE)) {
+            return new LttngEventField(fParentEvent.getReference());
+        } else if (name.equals(LttngEventType.TIMESTAMP_LABEL) || name.equals(ITmfEvent.EVENT_FIELD_TIMESTAMP)) {
+            return new LttngEventField(fParentEvent.getTimestamp().toString());
+        } else if (name.equals(ITmfEvent.EVENT_FIELD_SOURCE)) {
+            return new LttngEventField(fParentEvent.getSource());
         }
 
     	// *** VERIFY ***
@@ -243,7 +244,8 @@ public class LttngEventContent extends TmfEventContent {
 	        	Object newValue =  tmpEvent.parseFieldByName(name);
 	            
 	            if ( newValue!= null ) {
-	                returnedField = new LttngEventField(this, name, newValue);
+	                returnedField = new LttngEventField(name, newValue);
+                    returnedField = new LttngEventField(name, newValue);
 	                fFieldsMap.put(name, returnedField );
 	            }
         	}
@@ -252,12 +254,11 @@ public class LttngEventContent extends TmfEventContent {
         return returnedField;
     }
     
-    // *** VERIFY ***
-    // *** Is this even useful?
-    @Override
-    protected void parseContent() {
-        fFields = getFields();
-    }
+//    // *** VERIFY ***
+//    // *** Is this even useful?
+//    protected void parseContent() {
+//        fSubfields = getFields();
+//    }
     
     /**
      * toString() method to print the content
@@ -282,10 +283,11 @@ public class LttngEventContent extends TmfEventContent {
 	public LttngEventContent clone() {
 		LttngEventContent clone = (LttngEventContent) super.clone();
 		LttngEventField[] fields = getFields();
-		clone.fFields = new LttngEventField[fields.length];
+		LttngEventField[] subfields = new LttngEventField[fields.length];
 		for (int i = 0; i < fields.length; i++) {
-			clone.fFields[i] = fields[i].clone();
+		    subfields[i] = (LttngEventField) fields[i].clone();
 		}
+		clone.setValue(getValue(), subfields);
 		clone.fFieldsMap = new HashMap<String, LttngEventField>();
 		for (String key : fFieldsMap.keySet()) {
 			clone.fFieldsMap.put(new String(key), ((LttngEventField) fFieldsMap.get(key)).clone());

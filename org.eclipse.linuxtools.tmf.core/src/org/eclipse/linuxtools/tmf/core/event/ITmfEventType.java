@@ -15,9 +15,23 @@ package org.eclipse.linuxtools.tmf.core.event;
 /**
  * <b><u>ITmfEventType</u></b>
  * <p>
+ * The TMF event event type. It contains a reference to the full field structure
+ * for that event type.
+ * <p>
+ * Types are unique within their context space.
  */
 public interface ITmfEventType extends Cloneable {
 
+    /**
+     * The default event type content 
+     */
+    public static final String DEFAULT_CONTEXT_ID = "TmfContext"; //$NON-NLS-1$
+
+    /**
+     * The default event type name 
+     */
+    public static final String DEFAULT_TYPE_ID = "TmfType"; //$NON-NLS-1$
+    
     /**
      * @return the event type context
      */
@@ -26,29 +40,23 @@ public interface ITmfEventType extends Cloneable {
     /**
      * @return the event type ID
      */
-    public String getId();
+    public String getName();
 
     /**
-     * @return the number of fields
+     * @return the event type root field
      */
-    public int getNbFields();
+    public ITmfEventField getRootField();
 
     /**
-     * @return the event field labels
+     * @return the event field names (labels)
      */
-    public String[] getFieldLabels();
+    public String[] getFieldNames();
 
     /**
      * @param index the event field index
      * @return the corresponding event field label
      */
-    public String getFieldLabel(int index) throws TmfNoSuchFieldException;
-
-    /**
-     * @param fieldId the event field ID
-     * @return the corresponding event field index
-     */
-    public int getFieldIndex(String fieldId) throws TmfNoSuchFieldException;
+    public String getFieldName(int index);
 
     /**
      * @return a clone of the event content

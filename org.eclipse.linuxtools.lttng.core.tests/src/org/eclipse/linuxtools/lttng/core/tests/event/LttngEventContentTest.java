@@ -101,7 +101,7 @@ public class LttngEventContentTest extends TestCase {
 		LttngEventContent testContent 	= null;
 		LttngEventContent testContent2 	= null;
         LttngEventField[] 	testFields  = new LttngEventField[1];
-        testFields[0] = new LttngEventField(testContent2, "test");
+        testFields[0] = new LttngEventField("test");
         
 	    // Default construction with good argument
         try {
@@ -153,7 +153,7 @@ public class LttngEventContentTest extends TestCase {
     	tmpEvent = (LttngEvent)tmpStream.getNextEvent(tmpContext);
 		testContent = prepareToTest();
     	// getFieldS()
-    	assertNotSame("getFields() returned null!",null,testContent.getFields() );
+    	assertNotSame("getFields() returned null!", null, testContent.getFields() );
     	
     	// *** FIXME ***
     	// Depending from the Java version because of the "hashcode()" on String. 
@@ -161,7 +161,7 @@ public class LttngEventContentTest extends TestCase {
     	//
     	// getField(int)
     	//assertEquals("getField(int) returned unexpected result!",firstEventContentFirstField, testContent.getField(0).toString());
-    	assertNotSame("getField(int) returned unexpected result!",null, testContent.getField(0).toString());
+    	assertNotSame("getField(int) returned unexpected result!", null, testContent.getField(0).toString());
     	
     	
     	// getField(name)
@@ -171,7 +171,7 @@ public class LttngEventContentTest extends TestCase {
     	// Test that get event return the correct event
     	assertTrue("getEvent() returned unexpected result!", tmpEvent.getTimestamp().getValue() == testContent.getEvent().getTimestamp().getValue());
     	// getType()
-    	assertEquals("getType() returned unexpected result!",firstEventContentType, testContent.getType().toString());
+    	assertEquals("getType() returned unexpected result!",firstEventContentType, testContent.getEvent().getType().toString());
     	
     	//*** To test getFields with a fields number >0, we need to move to an event that have some more
     	tmpStream = initializeEventStream();
@@ -189,17 +189,17 @@ public class LttngEventContentTest extends TestCase {
     	// Test that get event return the correct event
     	assertTrue("getEvent() returned unexpected result!",tmpEvent.getTimestamp().getValue() == testContent.getEvent().getTimestamp().getValue());
     	// getType()
-    	assertEquals("getType() returned unexpected result!",secondEventContentType, testContent.getType().toString());
+    	assertEquals("getType() returned unexpected result!",secondEventContentType, testContent.getEvent().getType().toString());
     	
     	
     	// getFieldS()
-    	assertNotSame("getFields() returned null!",null,testContent.getFields() );
+    	assertNotSame("getFields() returned null!", null, testContent.getFields() );
     	// getField(int)
     	assertEquals("getField(int) returned unexpected result!",secondEventContentSecondField, testContent.getField(1).toString());
     	// getField(name)
     	assertEquals("getField(name) returned unexpected result!",secondEventContentSecondField, testContent.getField(secondEventContentSecondFieldName).toString());
     	// getRawContent
-    	assertNotSame("getRawContent() returned null!",null, testContent.getMapContent());
+    	assertNotSame("getRawContent() returned null!", null, testContent.getMapContent());
     	
     }
 	
@@ -226,7 +226,7 @@ public class LttngEventContentTest extends TestCase {
     	
     	LttngEventType testType = new LttngEventType();
     	try {
-    		tmpContent.setType(testType);
+    		tmpContent.getEvent().setType(testType);
     	}
     	catch( Exception e) { 
         	fail("setType(type) failed!");

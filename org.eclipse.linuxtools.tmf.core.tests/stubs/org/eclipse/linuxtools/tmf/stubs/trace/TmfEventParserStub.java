@@ -17,8 +17,9 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Vector;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
@@ -54,7 +55,8 @@ public class TmfEventParserStub implements ITmfEventParser {
     		    fields.add(field);
     		}
     		String[] fieldArray = new String[i];
-    		fTypes[i] = new TmfEventType("UnitTest", "Type-" + i, fields.toArray(fieldArray));
+    		ITmfEventField rootField = TmfEventField.makeRoot(fields.toArray(fieldArray));
+    		fTypes[i] = new TmfEventType("UnitTest", "Type-" + i, rootField);
     	}
     }
 
@@ -104,11 +106,11 @@ public class TmfEventParserStub implements ITmfEventParser {
        	    }
        	    content += "]";
 
-       	    TmfEvent event = new TmfEvent(
+            TmfEventField root = new TmfEventField(ITmfEventField.ROOT_ID, content);
+       	    TmfEvent event = new TmfEvent(eventStream,
        	            new TmfTimestamp(ts, (byte) -3, 0),     // millisecs
-       	            source, fTypes[typeIndex], name);
-       	    TmfEventContent cnt = new TmfEventContent(event, content);
-       	    event.setContent(cnt);
+       	            source, fTypes[typeIndex], root, name);
+       	    event.setContent(root);
        	    return event;
        	} catch (EOFException e) {
        	}

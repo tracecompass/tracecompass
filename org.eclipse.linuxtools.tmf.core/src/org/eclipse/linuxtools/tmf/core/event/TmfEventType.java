@@ -13,10 +13,6 @@
 
 package org.eclipse.linuxtools.tmf.core.event;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * <b><u>TmfEventType</u></b>
  * <p>
@@ -25,21 +21,12 @@ import java.util.Map;
 public class TmfEventType implements ITmfEventType {
 
     // ------------------------------------------------------------------------
-    // Constants
-    // ------------------------------------------------------------------------
-
-    public static final String DEFAULT_CONTEXT_ID = "Context"; //$NON-NLS-1$
-    public static final String DEFAULT_TYPE_ID = "Type"; //$NON-NLS-1$
-	
-    // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
 	private String fContext;
 	private String fTypeId;
-	private int fNbFields;
-	private Map<String, Integer> fFieldMap;
-	private String[] fFieldLabels;
+	private ITmfEventField fRootField;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -52,29 +39,23 @@ public class TmfEventType implements ITmfEventType {
 		this(DEFAULT_CONTEXT_ID, DEFAULT_TYPE_ID, null);
 	}
 
-	/**
-	 * Full constructor
-	 * 
-	 * @param context the type context
-	 * @param typeId the type name
-	 * @param labels the list of field labels
-	 */
-	public TmfEventType(String context, String typeId, String[] labels) {
-		if (context == null || typeId == null)
-    		throw new IllegalArgumentException();
-		fContext = context;
-		fTypeId = typeId;
-		fFieldLabels = (labels != null) ? labels : new String[] { }; 
-		fNbFields = (fFieldLabels != null) ? fFieldLabels.length : 0;
-		fFieldMap = new HashMap<String, Integer>();
-		for (int i = 0; i < fNbFields; i++) {
-		    String id = fFieldLabels[i];
-			fFieldMap.put(id, i);
-		}
+    /**
+     * Full constructor
+     * 
+     * @param context the type context
+     * @param typeId the type name
+     * @param root the root field
+     */
+    public TmfEventType(String context, String typeId, ITmfEventField root) {
+        if (context == null || typeId == null)
+            throw new IllegalArgumentException();
+        fContext = context;
+        fTypeId = typeId;
+        fRootField = root;
 
-		// Register to the event type manager
-		TmfEventTypeManager.getInstance().add(context, this);
-	}
+        // Register to the event type manager
+        TmfEventTypeManager.getInstance().add(context, this);
+    }
 
 	/**
 	 * Copy constructor
@@ -84,11 +65,9 @@ public class TmfEventType implements ITmfEventType {
 	public TmfEventType(TmfEventType type) {
     	if (type == null)
     		throw new IllegalArgumentException();
-    	fContext     = type.fContext;
-		fTypeId      = type.fTypeId;
-        fFieldLabels = type.fFieldLabels;
-        fNbFields    = type.fNbFields;
-        fFieldMap    = type.fFieldMap;
+    	fContext = type.fContext;
+		fTypeId  = type.fTypeId;
+		fRootField    = type.fRootField;
 	}
 
     // ------------------------------------------------------------------------
@@ -99,29 +78,20 @@ public class TmfEventType implements ITmfEventType {
 		return fContext;
 	}
 
-    public String getId() {
+    public String getName() {
         return fTypeId;
     }
 
-	public int getNbFields() {
-		return fNbFields;
-	}
-
-    public String[] getFieldLabels() {
-        return fFieldLabels;
+    public ITmfEventField getRootField() {
+        return fRootField;
     }
 
-    public String getFieldLabel(int i) throws TmfNoSuchFieldException {
-        if (i >= 0 && i < fNbFields)
-            return fFieldLabels[i];
-        throw new TmfNoSuchFieldException("Invalid index (" + i + ")"); //$NON-NLS-1$//$NON-NLS-2$
+    public String[] getFieldNames() {
+        return (fRootField != null) ? fRootField.getFieldNames() : null;
     }
 
-    public int getFieldIndex(String fieldId) throws TmfNoSuchFieldException {
-        Integer index = fFieldMap.get(fieldId);
-        if (index == null)
-            throw (new TmfNoSuchFieldException("Invalid field (" + fieldId + ")")); //$NON-NLS-1$//$NON-NLS-2$
-        return index;
+    public String getFieldName(int index) {
+        return (fRootField != null) ? fRootField.getFieldName(index) : null;
     }
 
     // ------------------------------------------------------------------------
@@ -135,14 +105,7 @@ public class TmfEventType implements ITmfEventType {
             clone = (TmfEventType) super.clone();
             clone.fContext = fContext;
             clone.fTypeId = fTypeId;
-            // Clone the fields
-            clone.fNbFields = fNbFields;
-            clone.fFieldLabels = new String[fNbFields];
-            clone.fFieldMap = new HashMap<String, Integer>();
-            for (int i = 0; i < fNbFields; i++) {
-                clone.fFieldLabels[i] = fFieldLabels[i];
-                clone.fFieldMap.put(fFieldLabels[i], Integer.valueOf(i));
-            }
+            clone.fRootField = (fRootField != null) ? fRootField.clone() : null;
         }
         catch (CloneNotSupportedException e) {
         }
@@ -158,9 +121,6 @@ public class TmfEventType implements ITmfEventType {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((fContext == null) ? 0 : fContext.hashCode());
-        result = prime * result + Arrays.hashCode(fFieldLabels);
-        result = prime * result + ((fFieldMap == null) ? 0 : fFieldMap.hashCode());
-        result = prime * result + fNbFields;
         result = prime * result + ((fTypeId == null) ? 0 : fTypeId.hashCode());
         return result;
     }
@@ -179,15 +139,6 @@ public class TmfEventType implements ITmfEventType {
                 return false;
         } else if (!fContext.equals(other.fContext))
             return false;
-        if (!Arrays.equals(fFieldLabels, other.fFieldLabels))
-            return false;
-        if (fFieldMap == null) {
-            if (other.fFieldMap != null)
-                return false;
-        } else if (!fFieldMap.equals(other.fFieldMap))
-            return false;
-        if (fNbFields != other.fNbFields)
-            return false;
         if (fTypeId == null) {
             if (other.fTypeId != null)
                 return false;
@@ -199,27 +150,7 @@ public class TmfEventType implements ITmfEventType {
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        return "TmfEventType [fContext=" + fContext + ", fTypeId=" + fTypeId + ", fNbFields="
-                        + fNbFields + ", fFieldLabels=" + Arrays.toString(fFieldLabels) + "]";
+        return "TmfEventType [fContext=" + fContext + ", fTypeId=" + fTypeId + "]";
     }
-
-//	@Override
-//    public int hashCode() {
-//        return fTypeId.hashCode();
-//    }
-//
-//	@Override
-//    public boolean equals(Object other) {
-//		if (!(other instanceof TmfEventType))
-//			return false;
-//		TmfEventType o = (TmfEventType) other;
-//        return fTypeId.equals(o.fTypeId);
-//    }
-//
-//    @Override
-//    @SuppressWarnings("nls")
-//    public String toString() {
-//    	return "[TmfEventType:" + fTypeId + "]";
-//    }
 
 }

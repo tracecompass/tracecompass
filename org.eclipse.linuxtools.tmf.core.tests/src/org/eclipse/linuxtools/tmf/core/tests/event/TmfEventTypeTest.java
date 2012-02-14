@@ -14,8 +14,8 @@ package org.eclipse.linuxtools.tmf.core.tests.event;
 
 import junit.framework.TestCase;
 
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
-import org.eclipse.linuxtools.tmf.core.event.TmfNoSuchFieldException;
 
 /**
  * <b><u>TmfEventTypeTest</u></b>
@@ -37,10 +37,10 @@ public class TmfEventTypeTest extends TestCase {
     private final String[] fLabels1  = new String[] { fLabel0, fLabel1 };
     private final String[] fLabels2  = new String[] { fLabel1, fLabel0 };
 
-    private final TmfEventType fType0 = new TmfEventType(fContext, fTypeId,  fLabels1);
-    private final TmfEventType fType1 = new TmfEventType(fContext, fTypeId,  fLabels1);
-    private final TmfEventType fType2 = new TmfEventType(fContext, fTypeId,  fLabels1);
-    private final TmfEventType fType3 = new TmfEventType(fContext, fTypeId2, fLabels2);
+    private final TmfEventType fType0 = new TmfEventType(fContext, fTypeId,  TmfEventField.makeRoot(fLabels1));
+    private final TmfEventType fType1 = new TmfEventType(fContext, fTypeId,  TmfEventField.makeRoot(fLabels1));
+    private final TmfEventType fType2 = new TmfEventType(fContext, fTypeId,  TmfEventField.makeRoot(fLabels1));
+    private final TmfEventType fType3 = new TmfEventType(fContext, fTypeId2, TmfEventField.makeRoot(fLabels2));
 
     // ------------------------------------------------------------------------
     // Housekeeping
@@ -69,51 +69,45 @@ public class TmfEventTypeTest extends TestCase {
 
     public void testTmfEventTypeDefault() {
         TmfEventType type = new TmfEventType();
-        assertEquals("getTypeId",   TmfEventType.DEFAULT_TYPE_ID, type.getId());
-        assertEquals("getNbFields", 0, type.getNbFields());
-        assertEquals("getLabels",   0, type.getFieldLabels().length);
+        assertEquals("getTypeId", TmfEventType.DEFAULT_TYPE_ID, type.getName());
+        assertNull("getLabels", type.getFieldName(0));
 
-        try {
-            assertEquals("getFieldIndex", 0, type.getFieldIndex(fLabel0));
-            fail("getFieldIndex: no such field");
-            assertEquals("getLabel", 0, type.getFieldLabel(0));
-            fail("getFieldIndex: no such field");
-        } catch (TmfNoSuchFieldException e) {
-            // Success
-        }
+//            assertEquals("getFieldIndex", 0, type.getFieldIndex(fLabel0));
+//            fail("getFieldIndex: no such field");
+            assertNull("getLabel", type.getFieldName(0));
+//            fail("getFieldIndex: no such field");
     }
 
     public void testTmfEventType() {
-        TmfEventType type = new TmfEventType(fContext, fTypeId, fLabels1);
+        TmfEventType type = new TmfEventType(fContext, fTypeId, TmfEventField.makeRoot(fLabels1));
         String[] expected = new String[] { fLabel0, fLabel1 };
-        try {
-            assertEquals("getTypeId", fTypeId, type.getId());
-            assertEquals("getNbFields", fLabels1.length, type.getNbFields());
-            assertEquals("getFieldIndex", 0, type.getFieldIndex(fLabel0));
-            assertEquals("getFieldIndex", 1, type.getFieldIndex(fLabel1));
-            String[] labels = type.getFieldLabels();
+//        try {
+            assertEquals("getTypeId", fTypeId, type.getName());
+//            assertEquals("getFieldIndex", 0, type.getFieldIndex(fLabel0));
+//            assertEquals("getFieldIndex", 1, type.getFieldIndex(fLabel1));
+            String[] labels = type.getFieldNames();
             for (int i = 0; i < labels.length; i++) {
                 assertEquals("getLabels", expected[i], labels[i]);
             }
-            assertEquals("getLabel", fLabel0, type.getFieldLabel(0));
-            assertEquals("getLabel", fLabel1, type.getFieldLabel(1));
-        } catch (TmfNoSuchFieldException e) {
-            fail("getFieldIndex: no such field");
-        }
+            assertEquals("getLabel", fLabel0, type.getFieldName(0));
+            assertEquals("getLabel", fLabel1, type.getFieldName(1));
+//        } catch (TmfNoSuchFieldException e) {
+//            fail("getFieldIndex: no such field");
+//        }
 
-        try {
-            assertEquals("getFieldIndex", 0, type.getFieldIndex("Dummy"));
-            fail("getFieldIndex: inexistant field");
-        } catch (TmfNoSuchFieldException e) {
-            // Success
-        }
+//        try {
+//            assertEquals("getFieldIndex", 0, type.getFieldIndex("Dummy"));
+//            fail("getFieldIndex: inexistant field");
+//        } catch (TmfNoSuchFieldException e) {
+//            // Success
+//        }
 
-        try {
-            type.getFieldLabel(10);
-            fail("getLabel: inexistant field");
-        } catch (TmfNoSuchFieldException e) {
-            // Success
-        }
+//        try {
+            assertNull(type.getFieldName(10));
+//            fail("getLabel: inexistant field");
+//        } catch (TmfNoSuchFieldException e) {
+//            // Success
+//        }
     }
 
     public void testTmfEventType2() {
@@ -135,13 +129,12 @@ public class TmfEventTypeTest extends TestCase {
     }
 
     public void testTmfEventTypeCopy() {
-        TmfEventType original = new TmfEventType(fContext, fTypeId, fLabels1);
+        TmfEventType original = new TmfEventType(fContext, fTypeId, TmfEventField.makeRoot(fLabels1));
         TmfEventType copy = new TmfEventType(original);
         String[] expected = new String[] { fLabel0, fLabel1 };
 
-        assertEquals("getTypeId", fTypeId, copy.getId());
-        assertEquals("getNbFields", fLabels1.length, copy.getNbFields());
-        String[] labels = copy.getFieldLabels();
+        assertEquals("getTypeId", fTypeId, copy.getName());
+        String[] labels = copy.getFieldNames();
         for (int i = 0; i < labels.length; i++) {
             assertEquals("getLabels", expected[i], labels[i]);
         }
@@ -203,14 +196,12 @@ public class TmfEventTypeTest extends TestCase {
 
     public void testToString() {
         String expected1 = "TmfEventType [fContext=" + TmfEventType.DEFAULT_CONTEXT_ID +
-               ", fTypeId=" + TmfEventType.DEFAULT_TYPE_ID + 
-               ", fNbFields=0, fFieldLabels=[]]";
+               ", fTypeId=" + TmfEventType.DEFAULT_TYPE_ID + "]";
         TmfEventType type1 = new TmfEventType();
         assertEquals("toString", expected1, type1.toString());
 
-        String expected2 = "TmfEventType [fContext=" + fContext + ", fTypeId=" + fTypeId + 
-               ", fNbFields=2, fFieldLabels=[label1, label2]]";
-        TmfEventType type2 = new TmfEventType(fContext, fTypeId, fLabels1);
+        String expected2 = "TmfEventType [fContext=" + fContext + ", fTypeId=" + fTypeId + "]";
+        TmfEventType type2 = new TmfEventType(fContext, fTypeId, TmfEventField.makeRoot(fLabels1));
         assertEquals("toString", expected2, type2.toString());
     }
 

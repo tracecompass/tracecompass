@@ -18,12 +18,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 
 import org.eclipse.linuxtools.tmf.core.Tracer;
-import org.eclipse.linuxtools.tmf.core.event.TmfDataItem;
+import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.TmfCoalescedDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfRequestExecutor;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfStartSynchSignal;
@@ -42,7 +42,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
  * <p>
  * TODO: Add support for providing multiple data types.
  */
-public abstract class TmfDataProvider<T extends TmfDataItem> extends TmfComponent implements ITmfDataProvider<T> {
+public abstract class TmfDataProvider<T extends TmfEvent> extends TmfComponent implements ITmfDataProvider<T> {
 
     // ------------------------------------------------------------------------
     // Constants

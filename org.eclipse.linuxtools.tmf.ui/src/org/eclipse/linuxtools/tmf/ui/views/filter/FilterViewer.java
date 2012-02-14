@@ -341,7 +341,7 @@ class FilterViewer extends Composite {
                                 TmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
                                 ITmfEventType eventType = event.getType();
                                 if (eventType != null) {
-                                    for (String field : eventType.getFieldLabels()) {
+                                    for (String field : eventType.getRootField().getFieldNames()) {
                                         fieldsList.add(field);
                                     }
                                 }
@@ -380,7 +380,7 @@ class FilterViewer extends Composite {
                     if (eventType != null) {
                         fieldsList.add("[" + TmfTraceType.getCategoryName(ce.getAttribute(TmfTraceType.CATEGORY_ATTR)) + //$NON-NLS-1$
                                 " : " + ce.getAttribute(TmfTraceType.NAME_ATTR) + "]"); //$NON-NLS-1$ //$NON-NLS-2$
-                        for (String field : eventType.getFieldLabels()) {
+                        for (String field : eventType.getFieldNames()) {
                             fieldsList.add(field);
                         }
                         fieldsList.add(""); //$NON-NLS-1$

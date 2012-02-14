@@ -34,9 +34,9 @@ public class TmfTimestamp implements ITmfTimestamp {
     // Attributes
     // ------------------------------------------------------------------------
 
-    protected long fValue;      // The timestamp raw value
-    protected int fScale;       // The time scale
-    protected int fPrecision;   // The value precision (tolerance)
+    protected long fValue;    // The timestamp raw value
+    protected int fScale;     // The time scale
+    protected int fPrecision; // The value precision (tolerance)
 
     // ------------------------------------------------------------------------
     // Constructors

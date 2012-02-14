@@ -53,7 +53,7 @@ public class LttngEventType extends TmfEventType {
      * 
      */
     public LttngEventType(String typeId, String[] labels) {
-        super(DEFAULT_CONTEXT, typeId, labels);
+        super(DEFAULT_CONTEXT, typeId, TmfEventField.makeRoot(labels));
     }
     
     /**
@@ -64,7 +64,7 @@ public class LttngEventType extends TmfEventType {
      * @param thisMarkerfieldsName  MarkerFields related to this marker	
      */
     public LttngEventType(String thisTracefileName, Long thisCpuId, String thisMarkerName, int thisMarkerId, String[] thisMarkerfieldsName) {
-        super(DEFAULT_CONTEXT, thisTracefileName + "/" + thisCpuId + "/" + thisMarkerName, thisMarkerfieldsName); //$NON-NLS-1$ //$NON-NLS-2$
+        super(DEFAULT_CONTEXT, thisTracefileName + "/" + thisCpuId + "/" + thisMarkerName,  TmfEventField.makeRoot(thisMarkerfieldsName)); //$NON-NLS-1$ //$NON-NLS-2$
         
         tracefileName   = thisTracefileName;
         cpuId           = thisCpuId;
@@ -78,7 +78,7 @@ public class LttngEventType extends TmfEventType {
      * @param oldType   Type we want to copy from
      */
     public LttngEventType(LttngEventType oldType) {
-        this(oldType.tracefileName, oldType.cpuId, oldType.markerName, oldType.markerId, oldType.getFieldLabels());
+        this(oldType.tracefileName, oldType.cpuId, oldType.markerName, oldType.markerId, oldType.getFieldNames());
     }
     
     

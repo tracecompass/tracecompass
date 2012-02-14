@@ -13,10 +13,13 @@
 
 package org.eclipse.linuxtools.tmf.core.event;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <b><u>TmfEventField</u></b>
  * <p>
- * A basic implementation of ITmfEventField with no subfields.
+ * A basic implementation of ITmfEventField.
  */
 public class TmfEventField implements ITmfEventField {
 
@@ -24,11 +27,13 @@ public class TmfEventField implements ITmfEventField {
     // Attributes
     // ------------------------------------------------------------------------
 
-    protected ITmfEventContent fEventContent;
-    protected String fFieldId;
-    protected Object fValue;
-    protected ITmfEventField[] fSubFields;
+    private String fName;
+    private Object fValue;
+    private ITmfEventField[] fFields;
 
+    private String[] fFieldNames;
+    private Map<String, ITmfEventField> fNameMapping;
+    
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -42,20 +47,40 @@ public class TmfEventField implements ITmfEventField {
     }
 
     /**
-     * Full constructor
+     * Constructor for a terminal field (i.e. no subfields)
      * 
-     * @param content the event content (field container)
-     * @param id the event field id
+     * @param name the event field id
      * @param value the event field value
      */
-    public TmfEventField(ITmfEventContent content, String id, Object value) {
-        if (id == null) {
+    public TmfEventField(String name, Object value) {
+        this(name, value, new ITmfEventField[0]);
+    }
+
+    /**
+     * Constructor for a non-valued field (for structural purposes)
+     * 
+     * @param name the event field id
+     * @param subfields the list of subfields
+     */
+    public TmfEventField(String name, ITmfEventField[] fields) {
+        this(name, null, fields);
+    }
+
+    /**
+     * Full constructor
+     * 
+     * @param name the event field id
+     * @param value the event field value
+     * @param subfields the list of subfields
+     */
+    public TmfEventField(String name, Object value, ITmfEventField[] fields) {
+        if (name == null) {
             throw new IllegalArgumentException();
         }
-        fEventContent = content;
-        fFieldId = id;
+        fName = name;
         fValue = value;
-        fSubFields = null;
+        fFields = fields;
+        populateStructs();
     }
 
     /**
@@ -66,30 +91,48 @@ public class TmfEventField implements ITmfEventField {
     public TmfEventField(TmfEventField field) {
     	if (field == null)
     		throw new IllegalArgumentException();
-    	fEventContent  = field.fEventContent;
-    	fFieldId = field.fFieldId;
+    	fName = field.fName;
 		fValue = field.fValue;
-		fSubFields = field.fSubFields;
+		fFields = field.fFields;
+		fFieldNames = field.fFieldNames;
     }
 
     // ------------------------------------------------------------------------
     // ITmfEventField
     // ------------------------------------------------------------------------
 
-    public ITmfEventContent getContent() {
-        return fEventContent;
-    }
-
-    public String getId() {
-        return fFieldId;
+    public String getName() {
+        return fName;
     }
 
     public Object getValue() {
         return fValue;
     }
 
-    public ITmfEventField[] getSubFields() {
-        return fSubFields;
+    public String[] getFieldNames() {
+        return fFieldNames;
+    }
+
+    public String getFieldName(int index) {
+        ITmfEventField field = getField(index);
+        if (field != null) {
+            return field.getName();
+        }
+        return null;
+    }
+
+    public ITmfEventField[] getFields() {
+        return fFields;
+    }
+
+    public ITmfEventField getField(String name) {
+        return fNameMapping.get(name);
+    }
+
+    public ITmfEventField getField(int index) {
+        if (index >= 0 && index < fFields.length)
+            return fFields[index];
+        return null;
     }
 
     // ------------------------------------------------------------------------
@@ -97,10 +140,46 @@ public class TmfEventField implements ITmfEventField {
     // ------------------------------------------------------------------------
 
     /**
-     * @param value new field value
+     * @param value new field raw value
+     * @param fields the corresponding fields
      */
-    protected void setValue(Object value) {
+    protected void setValue(Object value, ITmfEventField[] fields) {
         fValue = value;
+        fFields = fields;
+        populateStructs();
+    }
+
+    // ------------------------------------------------------------------------
+    // Operations
+    // ------------------------------------------------------------------------
+
+    /**
+     * Create a root field from a list of labels.
+     * 
+     * @param labels the list of labels
+     * @return the (flat) root list
+     */
+    public final static ITmfEventField makeRoot(String[] labels) {
+        ITmfEventField[] fields = new ITmfEventField[labels.length];
+        for (int i = 0; i < labels.length; i++) {
+            fields[i] = new TmfEventField(labels[i], null);
+        }
+        ITmfEventField rootField = new TmfEventField(ITmfEventField.ROOT_ID, fields);
+        return rootField;
+    }
+
+    /*
+     * Populate the subfield names and the name map
+     */
+    private void populateStructs() {
+        int nbFields = (fFields != null) ? fFields.length : 0;
+        fFieldNames = new String[nbFields];
+        fNameMapping = new HashMap<String, ITmfEventField>();
+        for (int i = 0; i < nbFields; i++) {
+            String name = fFields[i].getName();
+            fFieldNames[i] = name;
+            fNameMapping.put(name, fFields[i]);
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -112,10 +191,10 @@ public class TmfEventField implements ITmfEventField {
         TmfEventField clone = null;
         try {
             clone = (TmfEventField) super.clone();
-            clone.fEventContent = fEventContent;
-            clone.fFieldId = fFieldId;
+            clone.fName = fName;
             clone.fValue = fValue;
-            clone.fSubFields = (fSubFields != null) ? fSubFields.clone() : null;
+            clone.fFields = (fFields != null) ? fFields.clone() : null;
+            clone.populateStructs();
         } catch (CloneNotSupportedException e) {
         }
         return clone;
@@ -129,8 +208,7 @@ public class TmfEventField implements ITmfEventField {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((fEventContent == null) ? 0 : fEventContent.hashCode());
-        result = prime * result + ((fFieldId == null) ? 0 : fFieldId.hashCode());
+        result = prime * result + ((fName == null) ? 0 : fName.hashCode());
         result = prime * result + ((fValue == null) ? 0 : fValue.hashCode());
         return result;
     }
@@ -144,15 +222,10 @@ public class TmfEventField implements ITmfEventField {
         if (getClass() != obj.getClass())
             return false;
         TmfEventField other = (TmfEventField) obj;
-        if (fEventContent == null) {
-            if (other.fEventContent != null)
+        if (fName == null) {
+            if (other.fName != null)
                 return false;
-        } else if (!fEventContent.equals(other.fEventContent))
-            return false;
-        if (fFieldId == null) {
-            if (other.fFieldId != null)
-                return false;
-        } else if (!fFieldId.equals(other.fFieldId))
+        } else if (!fName.equals(other.fName))
             return false;
         if (fValue == null) {
             if (other.fValue != null)
@@ -165,7 +238,7 @@ public class TmfEventField implements ITmfEventField {
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        return "TmfEventField [fFieldId=" + fFieldId + ", fValue=" + fValue + "]";
+        return "TmfEventField [fFieldId=" + fName + ", fValue=" + fValue + "]";
     }
 
 }

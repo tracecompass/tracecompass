@@ -27,7 +27,6 @@ import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
-import org.eclipse.linuxtools.tmf.core.event.TmfNoSuchFieldException;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
@@ -1332,22 +1331,18 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         //type = .*RECEIVE.* or .*SEND.*
         //content = sender:<sender name>:receiver:<receiver name>,signal:<signal name>
         String eventType = tmfEvent.getType().toString();
-        if (eventType.contains(Messages.TmfUml2SDSyncCloader_EventTypeSend) || 
-                eventType.contains(Messages.TmfUml2SDSyncCloader_EventTypeReceive)) {
-            try {
-                Object sender = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncCloader_FieldSender);
-                Object receiver = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncCloader_FieldReceiver);
-                Object name = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncCloader_FieldSignal);
-                if ((sender instanceof TmfEventField) && (receiver instanceof TmfEventField) && (name instanceof TmfEventField)) { 
-                    ITmfSyncSequenceDiagramEvent sdEvent = new TmfSyncSequenceDiagramEvent(tmfEvent, 
-                            ((TmfEventField)sender).getValue().toString(), 
-                            ((TmfEventField)receiver).getValue().toString(), 
-                            ((TmfEventField)name).getValue().toString());
+        if (eventType.contains(Messages.TmfUml2SDSyncCloader_EventTypeSend) || eventType.contains(Messages.TmfUml2SDSyncCloader_EventTypeReceive)) {
+            Object sender = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncCloader_FieldSender);
+            Object receiver = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncCloader_FieldReceiver);
+            Object name = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncCloader_FieldSignal);
+            if ((sender instanceof TmfEventField) && (receiver instanceof TmfEventField) && (name instanceof TmfEventField)) {
+                ITmfSyncSequenceDiagramEvent sdEvent = new TmfSyncSequenceDiagramEvent(tmfEvent,
+                                ((TmfEventField) sender).getValue().toString(),
+                                ((TmfEventField) receiver).getValue().toString(),
+                                ((TmfEventField) name).getValue().toString());
 
-                    return sdEvent;
-                }
-            } catch (TmfNoSuchFieldException e) {
-            } 
+                return sdEvent;
+            }
         }
         return null;
     }

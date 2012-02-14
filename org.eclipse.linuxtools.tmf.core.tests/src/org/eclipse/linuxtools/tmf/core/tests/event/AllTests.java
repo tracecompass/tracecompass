@@ -12,7 +12,6 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test suite for " + TmfCorePlugin.PLUGIN_ID + ".event"); //$NON-NLS-1$);
 		//$JUnit-BEGIN$
 		suite.addTestSuite(TmfEventFieldTest.class);
-		suite.addTestSuite(TmfEventContentTest.class);
 		suite.addTestSuite(TmfEventTypeTest.class);
 		suite.addTestSuite(TmfTimestampTest.class);
 		suite.addTestSuite(TmfTimeRangeTest.class);

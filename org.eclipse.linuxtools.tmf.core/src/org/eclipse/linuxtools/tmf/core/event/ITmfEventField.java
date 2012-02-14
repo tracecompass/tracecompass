@@ -15,13 +15,20 @@ package org.eclipse.linuxtools.tmf.core.event;
 /**
  * <b><u>ITmfEventField</u></b>
  * <p>
+ * The TMF event payload structure. Each field can be either a terminal or
+ * further decomposed into subfields.
  */
 public interface ITmfEventField extends Cloneable {
 
     /**
+     * The root field id (the main container)
+     */
+    public static final String ROOT_ID = ":root:"; //$NON-NLS-1$
+    
+    /**
      * @return the field ID
      */
-    public String getId();
+    public String getName();
 
     /**
      * @return the field value
@@ -29,9 +36,29 @@ public interface ITmfEventField extends Cloneable {
     public Object getValue();
 
     /**
-     * @return the list of subfields (if any)
+     * @return the list of subfield names (empty array if none)
      */
-    public ITmfEventField[] getSubFields();
+    public String[] getFieldNames();
+
+    /**
+     * @return the nth field name (null if absent or inexistent)
+     */
+    public String getFieldName(int index);
+
+    /**
+     * @return the list of subfields (empty array  if none)
+     */
+    public ITmfEventField[] getFields();
+
+    /**
+     * @return a specific subfield by name (null if absent or inexistent)
+     */
+    public ITmfEventField getField(String name);
+
+    /**
+     * @return a specific subfield by index (null if absent or inexistent)
+     */
+    public ITmfEventField getField(int index);
 
     /**
      * @return a clone of the event type

@@ -16,7 +16,7 @@ package org.eclipse.linuxtools.tmf.core.event;
 /**
  * <b><u>TmfTimeRange</u></b>
  * <p>
- * A utility class to define time ranges.
+ * A utility class to define and manage time ranges.
  */
 public class TmfTimeRange implements Cloneable {
 
@@ -77,7 +77,7 @@ public class TmfTimeRange implements Cloneable {
     }
 
     // ------------------------------------------------------------------------
-    // Accessors
+    // Getters
     // ------------------------------------------------------------------------
 
     /**

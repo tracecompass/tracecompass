@@ -19,8 +19,9 @@ import java.util.Vector;
 
 import junit.framework.TestCase;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
@@ -53,16 +54,16 @@ public class TmfTreeContentProviderTest extends TestCase {
 
     private final String fSource = "Source";
 
-    private final TmfEventType fType1 = new TmfEventType(fContext, fTypeId1, fLabels);
-    private final TmfEventType fType2 = new TmfEventType(fContext, fTypeId2, fLabels);
+    private final TmfEventType fType1 = new TmfEventType(fContext, fTypeId1, TmfEventField.makeRoot(fLabels));
+    private final TmfEventType fType2 = new TmfEventType(fContext, fTypeId2, TmfEventField.makeRoot(fLabels));
 
     private final String fReference = "Some reference";
 
     private final TmfEvent fEvent1;
     private final TmfEvent fEvent2;
 
-    private final TmfEventContent fContent1;
-    private final TmfEventContent fContent2;
+    private final TmfEventField fContent1;
+    private final TmfEventField fContent2;
 
     private final TmfBaseStatisticsTree fStatsData;
 
@@ -84,11 +85,11 @@ public class TmfTreeContentProviderTest extends TestCase {
         fTestName = name;
 
         fEvent1 = new TmfEvent(fTimestamp1, fSource, fType1, fReference);
-        fContent1 = new TmfEventContent(fEvent1, "Some content");
+        fContent1 = new TmfEventField(ITmfEventField.ROOT_ID, "Some content");
         fEvent1.setContent(fContent1);
 
         fEvent2 = new TmfEvent(fTimestamp2, fSource, fType2, fReference);
-        fContent2 = new TmfEventContent(fEvent2, "Some other content");
+        fContent2 = new TmfEventField(ITmfEventField.ROOT_ID, "Some other content");
         fEvent2.setContent(fContent2);
 
         fStatsData = new TmfBaseStatisticsTree();

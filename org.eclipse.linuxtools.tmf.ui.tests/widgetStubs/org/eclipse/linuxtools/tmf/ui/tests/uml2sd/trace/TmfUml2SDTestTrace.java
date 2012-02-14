@@ -15,8 +15,8 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -57,8 +57,8 @@ public class TmfUml2SDTestTrace implements ITmfEventParser {
 
             String[] labels = {"sender", "receiver", "signal"};
 
-            TmfEventType tmfEventType = new TmfEventType("UnitTest", type, labels);
-            TmfEvent tmfEvent = new TmfEvent(new TmfTimestamp(ts, (byte)-9), source, tmfEventType, reference);
+            TmfEventType tmfEventType = new TmfEventType("UnitTest", type, TmfEventField.makeRoot(labels));
+            TmfEvent tmfEvent = new TmfEvent(new TmfTimestamp(ts, -9), source, tmfEventType, reference);
 
             String content = "[";
             content += sender;
@@ -66,22 +66,13 @@ public class TmfUml2SDTestTrace implements ITmfEventParser {
             content += "," + signal;
             content += "]";
 
-            TmfEventContent tmfContent = new TmfEventContent(tmfEvent, content) {
-                @Override
-                public void parseContent() {
-                    String raw = fRawContent.toString();
-                    int i = raw.indexOf(",");
-                    String sender = raw.substring(1, i);
-                    int k = raw.indexOf(",", i+1);
-                    String receiver = raw.substring(i+1, k);
-                    i = raw.indexOf(",", k+1);
-                    String signal = raw.substring(k+1, raw.length() - 1);
-                    fFields = new TmfEventField[3];
-                    fFields[0] = new TmfEventField(this, "sender", sender);
-                    fFields[1] = new TmfEventField(this, "receiver", receiver);;
-                    fFields[2] = new TmfEventField(this, "signal", signal);;
-                }
-            };
+            // Pre-parse the content
+            TmfEventField[] fields = new TmfEventField[3];
+            fields[0] = new TmfEventField("sender", sender);
+            fields[1] = new TmfEventField("receiver", receiver);
+            fields[2] = new TmfEventField("signal", signal);
+            
+            ITmfEventField tmfContent = new TmfEventField(ITmfEventField.ROOT_ID, content, fields);
             tmfEvent.setContent(tmfContent);
 
             return tmfEvent;

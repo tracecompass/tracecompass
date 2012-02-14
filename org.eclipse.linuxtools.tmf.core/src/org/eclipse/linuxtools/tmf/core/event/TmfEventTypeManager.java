@@ -18,7 +18,7 @@ import java.util.HashMap;
  * <b><u>TmfEventTypeManager</u></b>
  * <p>
  * The TmfEventTypeManager acts as a central repository for the available
- * event types.
+ * event types. Types are managed in their context space.
  * <p>
  */
 public final class TmfEventTypeManager {
@@ -63,7 +63,7 @@ public final class TmfEventTypeManager {
         if (types == null) {
             types = new HashMap<String, ITmfEventType>();
         }
-        types.put(type.getId(), type);
+        types.put(type.getName(), type);
         fEventTypes.put(context, types);
     }
 

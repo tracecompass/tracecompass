@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.component;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfDataItem;
+import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 
 /**
@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
  * <p>
  * TODO: Implement me. Please.
  */
-public interface ITmfDataProvider<T extends TmfDataItem> {
+public interface ITmfDataProvider<T extends TmfEvent> {
 
     /**
      * Queues the request for processing.

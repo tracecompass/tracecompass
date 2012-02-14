@@ -286,7 +286,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
                                     }
                                 }
                             }
-                            ((StringBuffer) event.getContent().getRawContent()).append("\n").append(line); //$NON-NLS-1$
+                            ((StringBuffer) event.getContent().getValue()).append("\n").append(line); //$NON-NLS-1$
                         }
                     }
                     rawPos = context.raFile.getFilePointer();

@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfNoSuchFieldException;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 
 
@@ -113,44 +112,44 @@ public class TmfFilterCompareNode extends TmfFilterTreeNode {
 
 	@Override
 	public boolean matches(TmfEvent event) {
-		try {
-			Object value = event.getContent().getField(fField);
-			if (value == null) {
-				return false ^ fNot;
-			}
-			if (fType == Type.NUM) {
-				if (fValueNumber instanceof Number) {
-					if (value instanceof Number) {
-						Double valueDouble = ((Number) value).doubleValue();
-						return (valueDouble.compareTo(fValueNumber.doubleValue()) == fResult) ^ fNot;
-					} else {
-						try {
-							Double valueDouble = NumberFormat.getInstance().parse(value.toString()).doubleValue();
-							return (valueDouble.compareTo(fValueNumber.doubleValue()) == fResult) ^ fNot;
-						} catch (ParseException e) {
-						}
-					}
-				}
-			} else if (fType == Type.ALPHA) {
-				String valueString = value.toString();
-				return (valueString.compareTo(fValue.toString()) == fResult) ^ fNot;
-			} else if (fType == Type.TIMESTAMP) {
-				if (fValueTimestamp instanceof TmfTimestamp) {
-					if (value instanceof TmfTimestamp) {
-						TmfTimestamp valueTimestamp = (TmfTimestamp) value;
-						return (valueTimestamp.compareTo(fValueTimestamp, false) == fResult) ^ fNot;
-					} else {
-						try {
-							TmfTimestamp valueTimestamp = new TmfTimestamp((long) (1E9 * NumberFormat.getInstance().parse(value.toString()).doubleValue()));
-							return (valueTimestamp.compareTo(fValueTimestamp, false) == fResult) ^ fNot;
-						} catch (ParseException e) {
-						}
-					}
-				}
-			}
-		} catch (TmfNoSuchFieldException e) {
-		}
-		return false ^ fNot;
+        Object value = event.getContent().getField(fField).getValue();
+        if (value == null) {
+            return false ^ fNot;
+        }
+        if (fType == Type.NUM) {
+            if (fValueNumber instanceof Number) {
+                if (value instanceof Number) {
+                    Double valueDouble = ((Number) value).doubleValue();
+                    return (valueDouble.compareTo(fValueNumber.doubleValue()) == fResult) ^ fNot;
+                } else {
+                    try {
+                        Double valueDouble = NumberFormat.getInstance().parse(value.toString())
+                                        .doubleValue();
+                        return (valueDouble.compareTo(fValueNumber.doubleValue()) == fResult)
+                                        ^ fNot;
+                    } catch (ParseException e) {
+                    }
+                }
+            }
+        } else if (fType == Type.ALPHA) {
+            String valueString = value.toString();
+            return (valueString.compareTo(fValue.toString()) == fResult) ^ fNot;
+        } else if (fType == Type.TIMESTAMP) {
+            if (fValueTimestamp instanceof TmfTimestamp) {
+                if (value instanceof TmfTimestamp) {
+                    TmfTimestamp valueTimestamp = (TmfTimestamp) value;
+                    return (valueTimestamp.compareTo(fValueTimestamp, false) == fResult) ^ fNot;
+                } else {
+                    try {
+                        TmfTimestamp valueTimestamp = new TmfTimestamp((long) (1E9 * NumberFormat
+                                        .getInstance().parse(value.toString()).doubleValue()));
+                        return (valueTimestamp.compareTo(fValueTimestamp, false) == fResult) ^ fNot;
+                    } catch (ParseException e) {
+                    }
+                }
+            }
+        }
+        return false ^ fNot;
 	}
 
 	@Override

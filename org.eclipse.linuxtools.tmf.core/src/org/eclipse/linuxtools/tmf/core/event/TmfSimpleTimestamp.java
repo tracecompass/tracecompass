@@ -100,7 +100,7 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        return "TmfSimpleTimestamp [fValue=" + fValue + ", fScale=" + fScale + ", fPrecision=" + fPrecision + "]";
+        return "TmfSimpleTimestamp [fValue=" + fValue + "]";
     }
 
 }

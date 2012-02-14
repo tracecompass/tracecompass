@@ -13,9 +13,8 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.events;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfEventContent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.linuxtools.tmf.ui.widgets.ColumnData;
@@ -53,10 +52,10 @@ public class EventsTable extends TmfEventsTable {
 
     public EventsTable(Composite parent, int cacheSize) {
         super(parent, cacheSize, COLUMN_DATA);
-        fTable.getColumns()[0].setData(Key.FIELD_ID, TmfEventContent.FIELD_ID_TIMESTAMP);
-        fTable.getColumns()[1].setData(Key.FIELD_ID, TmfEventContent.FIELD_ID_REFERENCE);
-        fTable.getColumns()[2].setData(Key.FIELD_ID, TmfEventContent.FIELD_ID_TYPE);
-        fTable.getColumns()[3].setData(Key.FIELD_ID, TmfEventContent.FIELD_ID_CONTENT);
+        fTable.getColumns()[0].setData(Key.FIELD_ID, ITmfEvent.EVENT_FIELD_TIMESTAMP);
+        fTable.getColumns()[1].setData(Key.FIELD_ID, ITmfEvent.EVENT_FIELD_REFERENCE);
+        fTable.getColumns()[2].setData(Key.FIELD_ID, ITmfEvent.EVENT_FIELD_TYPE);
+        fTable.getColumns()[3].setData(Key.FIELD_ID, ITmfEvent.EVENT_FIELD_CONTENT);
     }
 
     /**
@@ -67,12 +66,11 @@ public class EventsTable extends TmfEventsTable {
     protected TmfEventField[] extractItemFields(TmfEvent event) {
         TmfEventField[] fields = new TmfEventField[0];
         if (event != null) {
-            ITmfEventContent content = event.getContent();
             fields = new TmfEventField[] {
-                     new TmfEventField(content, TmfEventContent.FIELD_ID_TIMESTAMP, ((Long) event.getTimestamp().getValue()).toString()),
-                     new TmfEventField(content, TmfEventContent.FIELD_ID_REFERENCE, event.getReference()),
-                     new TmfEventField(content, TmfEventContent.FIELD_ID_TYPE, event.getType().getId()),
-                     new TmfEventField(content, TmfEventContent.FIELD_ID_CONTENT, event.getContent().toString())
+                     new TmfEventField(ITmfEvent.EVENT_FIELD_TIMESTAMP, ((Long) event.getTimestamp().getValue()).toString()),
+                     new TmfEventField(ITmfEvent.EVENT_FIELD_REFERENCE, event.getReference()),
+                     new TmfEventField(ITmfEvent.EVENT_FIELD_TYPE, event.getType().getName()),
+                     new TmfEventField(ITmfEvent.EVENT_FIELD_CONTENT, event.getContent().toString())
                     };
         }
         return fields;

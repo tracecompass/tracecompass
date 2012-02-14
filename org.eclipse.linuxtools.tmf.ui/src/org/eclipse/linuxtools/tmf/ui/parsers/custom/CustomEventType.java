@@ -1,5 +1,7 @@
 package org.eclipse.linuxtools.tmf.ui.parsers.custom;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 
 public abstract class CustomEventType extends TmfEventType {
@@ -7,15 +9,16 @@ public abstract class CustomEventType extends TmfEventType {
     private static String CONTEXT_ID = "CustomEventType"; //$NON-NLS-1$
     
     public CustomEventType(CustomTraceDefinition definition) {
-        super(CONTEXT_ID, definition.definitionName, getLabels(definition));
+        super(CONTEXT_ID, definition.definitionName, getRootField(definition));
     }
 
-    private static String[] getLabels(CustomTraceDefinition definition) {
-        String[] labels = new String[definition.outputs.size()];
-        for (int i = 0; i < labels.length; i++) {
-            labels[i] = definition.outputs.get(i).name;
+    private static ITmfEventField getRootField(CustomTraceDefinition definition) {
+        ITmfEventField[] fields = new ITmfEventField[definition.outputs.size()];
+        for (int i = 0; i < fields.length; i++) {
+            fields[i] = new TmfEventField(definition.outputs.get(i).name, null);
         }
-        return labels;
+        ITmfEventField rootField = new TmfEventField(ITmfEventField.ROOT_ID, fields);
+        return rootField;
     }
 
 }

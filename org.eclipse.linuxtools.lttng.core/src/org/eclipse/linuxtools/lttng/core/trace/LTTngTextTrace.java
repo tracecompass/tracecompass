@@ -23,7 +23,6 @@ import org.eclipse.linuxtools.lttng.core.event.LttngEventField;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfNoSuchFieldException;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpoint;
@@ -373,7 +372,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
 		    			}
 		    			catch (NumberFormatException e) { }
 		    			
-		    			LttngEventField tmpField = new LttngEventField(eventContent, markerName, payload);
+		    			LttngEventField tmpField = new LttngEventField(markerName, payload);
 		    			fieldsMap.put(markerName, tmpField);
 		    			
 		    			tmpIndexBegin = tmpIndexEnd+1;
@@ -385,7 +384,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
 	    			markerName = ""; //$NON-NLS-1$
 	    			payload = ""; //$NON-NLS-1$
 	    			
-	    			LttngEventField tmpField = new LttngEventField(eventContent, markerName, payload);
+	    			LttngEventField tmpField = new LttngEventField(markerName, payload);
 	    			fieldsMap.put(markerName, tmpField);
 	    		}
 	    		
@@ -494,7 +493,7 @@ class TextLttngEventContent extends LttngEventContent {
     }
     
     public TextLttngEventContent(TextLttngEventContent oldContent) {
-    	this( (TextLttngEvent)oldContent.fParentEvent, oldContent.getMapContent());
+    	this(((TextLttngEvent) oldContent.getEvent()), oldContent.getMapContent());
     }
     
     @Override
@@ -513,13 +512,13 @@ class TextLttngEventContent extends LttngEventContent {
     public LttngEventField getField(int position) {
     	LttngEventField returnedField = null;
     	String label = null;
-		try {
-			label = fParentEvent.getType().getFieldLabel(position);
+//		try {
+			label = getEvent().getType().getFieldName(position);
 			returnedField = this.getField(label);
-		} 
-		catch (TmfNoSuchFieldException e) {
-			System.out.println("Invalid field position requested : " + position + ", ignoring (getField)."); //$NON-NLS-1$ //$NON-NLS-2$
-		}
+//		} 
+//		catch (TmfNoSuchFieldException e) {
+//			System.out.println("Invalid field position requested : " + position + ", ignoring (getField)."); //$NON-NLS-1$ //$NON-NLS-2$
+//		}
         
         return returnedField;
     }

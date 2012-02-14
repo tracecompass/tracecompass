@@ -105,7 +105,7 @@ public class LttngEventTest extends TestCase {
         try {
     			// In order to test LttngEvent, we need all these constructors/functions to work.
             	// Make sure to run their unit tests first!
-        		testMarkerFields = new String[1];
+        		testMarkerFields = new String[] { "test" };
                 testEvent 	= null;
                 testTime	= new LttngTimestamp(0L);
                 testSource 	= "test";
@@ -154,7 +154,7 @@ public class LttngEventTest extends TestCase {
     	assertEquals("Reference not what expected!", eventReference, testEvent.getReference());
     	
     	// These should be overridden functions
-    	assertEquals("Type not what expected!",eventType,testEvent.getType().getId());
+    	assertEquals("Type not what expected!",eventType,testEvent.getType().getName());
     	assertEquals("Channel not what expected!",eventChannel,testEvent.getChannelName());
     	assertEquals("CpuId not what expected!",eventCpu,testEvent.getCpuId());
     	assertEquals("Marker not what expected!",eventMarker,testEvent.getMarkerName());
@@ -177,7 +177,7 @@ public class LttngEventTest extends TestCase {
         LttngEventContent	testContent		= null;
         JniEvent			testJniEvent 	= null;
 		
-        String[] testMarkerFields = new String[1];
+        String[] testMarkerFields = new String[] { "test" };
         testType   	= new LttngEventType("test", 0L, "test", 0, testMarkerFields);
         testContent	= new LttngEventContent(testEvent);
         

@@ -12,8 +12,6 @@
 
 package org.eclipse.linuxtools.lttng.core.event;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfEventContent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 
 /**
@@ -25,49 +23,32 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
  * mean the fields will have a name and a value.
  */
 public class LttngEventField extends TmfEventField {
-	
-    /**
-     * Constructor with parameters.<p>
-     * 
-     * @param parent   Parent content for this field
-     * @param id       Name (label) of this field
-     */
-    public LttngEventField(TmfEventContent parent, String id) {
-        super(parent, id, null);
+
+    public LttngEventField(String name, Object value, LttngEventField[] subfields) {
+        super(name, value, subfields);
     }
     
-	/**
-	 * Constructor with parameters with optional value.<p>
-	 * 
-	 * @param parent   Parent content for this field
-	 * @param id       Name (label) of this field
-	 * @param value    Parsed value (payload) of this field
-	 */
-	public LttngEventField(ITmfEventContent parent, String id, Object value) {
-		super(parent, id, value);
-	}
-	
-	/**
-	 * Copy constructor.<p>
-	 * 
-	 * @param oldField     the field to copy from
-	 */
-	public LttngEventField(LttngEventField oldField) {
-		this(oldField.getContent(), oldField.getId(), oldField.getValue());
-	}
-	
-	@Override
-    @SuppressWarnings("nls")
-	public String toString() {
-		Object value = getValue();
-	    return getId() + ":" + ((value != null) ? value.toString() : "null");
-	}
-	
-	@Override
-	public LttngEventField clone() {
-		LttngEventField clone = (LttngEventField) super.clone();
-		clone.fValue = fValue;
-		return clone;
-	}
-	
+    public LttngEventField(String name, Object value) {
+        this(name, value, null);
+    }
+    
+    public LttngEventField(String name) {
+        this(name, null, null);
+    }
+
+    public LttngEventField(LttngEventField field) {
+        super(field);
+    }
+
+    @Override
+    public LttngEventField clone() {
+        LttngEventField clone = null;
+        clone = (LttngEventField) super.clone();
+        return clone;
+    }
+
+    @Override
+    public String toString() {
+        return getName() + ":" + getValue(); //$NON-NLS-1$
+    }
 }

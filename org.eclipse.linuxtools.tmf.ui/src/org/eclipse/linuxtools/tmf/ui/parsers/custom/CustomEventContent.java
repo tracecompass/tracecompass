@@ -1,24 +1,26 @@
 package org.eclipse.linuxtools.tmf.ui.parsers.custom;
 
-import java.util.Arrays;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
+public class CustomEventContent extends TmfEventField {
 
-public class CustomEventContent extends TmfEventContent {
-
+    CustomEvent fParent;
+    
     public CustomEventContent(CustomEvent parent, String content) {
-        super(parent, content);
+        super(ITmfEventField.ROOT_ID, content);
+        fParent = parent;
     }
 
-    @Override
-    protected void parseContent() {
-        CustomEvent event = (CustomEvent) fParentEvent;
-        fFields = event.extractItemFields();
-    }
-
-    @Override
-    public String toString() {
-        return Arrays.toString(getFields());
-    }
+//    @Override
+//    protected void parseContent() {
+//        CustomEvent event = (CustomEvent) fParentEvent;
+//        fFields = event.extractItemFields();
+//    }
+//
+//    @Override
+//    public String toString() {
+//        return Arrays.toString(getFields());
+//    }
 
 }
