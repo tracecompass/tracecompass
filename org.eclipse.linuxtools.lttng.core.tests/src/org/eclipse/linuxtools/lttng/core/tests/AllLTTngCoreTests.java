@@ -66,7 +66,7 @@ public class AllLTTngCoreTests {
         // suite.addTestSuite(StateBeforeUpdateFactory.class);
         // suite.addTestSuite(StateBeforeUpdateHandlers.class);
         suite.addTestSuite(LTTngStateResourceTest.class);
-
+        
         // $JUnit-END$
         return suite;
     }

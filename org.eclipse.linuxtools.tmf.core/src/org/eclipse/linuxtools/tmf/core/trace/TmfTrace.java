@@ -240,6 +240,14 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
         return fEndTime;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#getStreamingInterval()
+     */
+    @Override
+    public long getStreamingInterval() {
+        return 0;
+    }
+
     @SuppressWarnings("unchecked")
     public Vector<TmfCheckpoint> getCheckpoints() {
         return (Vector<TmfCheckpoint>) fCheckpoints.clone();

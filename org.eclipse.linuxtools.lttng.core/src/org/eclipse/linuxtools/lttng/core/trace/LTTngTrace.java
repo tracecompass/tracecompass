@@ -28,6 +28,7 @@ import org.eclipse.linuxtools.lttng.core.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.core.event.LttngLocation;
 import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.core.exceptions.LttngException;
+import org.eclipse.linuxtools.lttng.core.tracecontrol.utility.LiveTraceManager;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.lttng.jni.JniMarker;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
@@ -35,8 +36,13 @@ import org.eclipse.linuxtools.lttng.jni.JniTracefile;
 import org.eclipse.linuxtools.lttng.jni.common.JniTime;
 import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
+import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
+import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpoint;
@@ -66,6 +72,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     private final static boolean SHOW_LTT_DEBUG_DEFAULT = false;
     private final static boolean IS_PARSING_NEEDED_DEFAULT = !UniqueEvent;
     private final static int CHECKPOINT_PAGE_SIZE = 50000;
+    private final static long LTTNG_STREAMING_INTERVAL = 2000; // in ms
 
     // Reference to our JNI trace
     private JniTrace currentJniTrace;
@@ -90,6 +97,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     Vector<Integer> traceTypeNames;
     
     private String traceLibPath;
+
+    private long fStreamingInterval = 0;
 
     public LTTngTrace() {
     }
@@ -152,17 +161,99 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         // Set the currentEvent to the eventContent
         eventContent.setEvent(currentLttngEvent);
 
+        // // Bypass indexing if asked
+        // if ( bypassIndexing == false ) {
+        // indexTrace(true);
+        // }
+        // else {
+        // Even if we don't have any index, set ONE checkpoint
+        // fCheckpoints.add(new TmfCheckpoint(new LttngTimestamp(0L) , new
+        // LttngLocation() ) );
+
+        initializeStreamingMonitor();
+    }
+
+    private void initializeStreamingMonitor() {
+        JniTrace jniTrace = getCurrentJniTrace();
+        if (jniTrace == null || (!jniTrace.isLiveTraceSupported() || !LiveTraceManager.isLiveTrace(jniTrace.getTracepath()))) {
+            // Set the time range of the trace
+            TmfContext context = seekLocation(null);
+            LttngEvent event = getNextEvent(context);
+            LttngTimestamp startTime = new LttngTimestamp(event.getTimestamp());
+            LttngTimestamp endTime = new LttngTimestamp(currentJniTrace.getEndTime().getTime());
+            setTimeRange(new TmfTimeRange(startTime, endTime));
+            TmfTraceUpdatedSignal signal = new TmfTraceUpdatedSignal(this, this, getTimeRange());
+            broadcast(signal);
+            return;
+        }
+
         // Set the time range of the trace
         TmfContext context = seekLocation(null);
         LttngEvent event = getNextEvent(context);
-        LttngTimestamp startTime = new LttngTimestamp(event.getTimestamp());
-        LttngTimestamp endTime = new LttngTimestamp(currentJniTrace.getEndTime().getTime());
+        setEndTime(TmfTimestamp.BigBang);
+        final long startTime = event != null ? event.getTimestamp().getValue() : TmfTimestamp.BigBang.getValue();
+        fStreamingInterval = LTTNG_STREAMING_INTERVAL;
 
-        setTimeRange(new TmfTimeRange(startTime, endTime));
+        final Thread thread = new Thread("Streaming Monitor for trace " + getName()) { //$NON-NLS-1$
+            LttngTimestamp safeTimestamp = null;
+            TmfTimeRange timeRange = null;
 
-        if (currentJniTrace == null) {
-            System.out.println("Problem");
-        }
+            @Override
+            public void run() {
+                while (!fExecutor.isShutdown()) {
+                    TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
+                    if (experiment != null) {
+                        final TmfEventRequest request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity, 0, ExecutionType.FOREGROUND) {
+                            @Override
+                            public void handleCompleted() {
+                                updateJniTrace();
+                            }
+                        };
+                        synchronized (experiment) {
+                            experiment.sendRequest(request);
+                        }
+                        try {
+                            request.waitForCompletion();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        updateJniTrace();
+                    }
+                    try {
+                        Thread.sleep(LTTNG_STREAMING_INTERVAL);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            
+            private void updateJniTrace() {
+                JniTrace jniTrace = getCurrentJniTrace();
+                currentJniTrace.updateTrace();
+                long endTime = jniTrace.getEndTime().getTime();
+                LttngTimestamp startTimestamp = new LttngTimestamp(startTime);
+                LttngTimestamp endTimestamp = new LttngTimestamp(endTime);
+                if (safeTimestamp != null && safeTimestamp.compareTo(getTimeRange().getEndTime(), false) > 0) {
+                    timeRange = new TmfTimeRange(startTimestamp, safeTimestamp);
+                } else {
+                    timeRange = null;
+                }
+                safeTimestamp = endTimestamp;
+                if (timeRange != null) {
+                    setTimeRange(timeRange);
+                }
+            }
+        };
+        thread.start();
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.trace.TmfTrace#getStreamingInterval()
+     */
+    @Override
+    public long getStreamingInterval() {
+        return fStreamingInterval;
     }
 
     /**
@@ -426,10 +517,6 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
             System.out.println("seekEvent(timestamp) timestamp -> " + timestamp); //$NON-NLS-1$
         }
 
-        if (currentJniTrace == null) {
-            System.out.println("aie");
-        }
-        
         // Call JNI to seek
         currentJniTrace.seekToTime(new JniTime(timestamp.getValue()));
 

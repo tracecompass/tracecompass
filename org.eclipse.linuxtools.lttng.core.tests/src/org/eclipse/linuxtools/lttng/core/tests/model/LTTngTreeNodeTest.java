@@ -11,9 +11,9 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.core.tests.model;
 
-import org.eclipse.linuxtools.lttng.core.model.LTTngTreeNode;
-
 import junit.framework.TestCase;
+
+import org.eclipse.linuxtools.lttng.core.model.LTTngTreeNode;
 
 /**
  * @author alvaro

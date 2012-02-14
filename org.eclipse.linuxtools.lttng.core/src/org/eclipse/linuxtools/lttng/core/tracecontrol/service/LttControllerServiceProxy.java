@@ -185,21 +185,15 @@ public class LttControllerServiceProxy implements ILttControllerService {
         return new Command(fProxychannel, this, LttngConstants.Lttng_Control_GetActiveTraceInfo, new Object[] { provider, target, trace }) {
             @Override
             public void done(Exception error, Object[] args) {
-                String[] retStrArray = new String[0];
+                String[] strArray = new String[0];
                 Object str = null;
                 if (error == null) {
                     assert args.length == INVALID_ARG_LENGTH;
                     error = toDetailedError(toError(args[0]), args[1]);
                     str = args[1];
-                    String[] strArray = toStringArray(str.toString());
-                    retStrArray = new String[strArray.length];
-
-                    for (int i = 0; i < strArray.length; i++) {
-                        String[] tempStr = strArray[i].split(LttngConstants.Lttng_Control_GetActiveTraceInfoSeparator);
-                        retStrArray[i] = tempStr[1];
-                    }
+                    strArray = toStringArray(str.toString());
                 }
-                done.doneGetActiveTraceInfo(token, error, retStrArray);
+                done.doneGetActiveTraceInfo(token, error, strArray);
             }
         }.token;
     }
@@ -457,8 +451,8 @@ public class LttControllerServiceProxy implements ILttControllerService {
      * @see org.eclipse.linuxtools.lttng.rse.service.ILttControllerService#writeTraceNetwork(java.lang.String, java.lang.String, java.lang.String, int, java.lang.Boolean, java.lang.Boolean, java.lang.Boolean, org.eclipse.linuxtools.lttng.rse.service.ILttControllerService.DoneWriteTraceNetwork)
      */
     @Override
-    public IToken writeTraceNetwork(String provider, String target, String trace, int numChannel, Boolean isAppend, Boolean isFlightRecorder, Boolean isNormalOnly, final DoneWriteTraceNetwork done) {
-        return new Command(fProxychannel, this, LttngConstants.Lttng_Control_WriteTraceNetwork, new Object[] { provider, target, trace, numChannel, isAppend, isFlightRecorder, isNormalOnly }) {
+    public IToken writeTraceNetwork(String provider, String target, String trace, String path, int numChannel, Boolean isAppend, Boolean isFlightRecorder, Boolean isNormalOnly, final DoneWriteTraceNetwork done) {
+        return new Command(fProxychannel, this, LttngConstants.Lttng_Control_WriteTraceNetwork, new Object[] { provider, target, trace, path, numChannel, isAppend, isFlightRecorder, isNormalOnly }) {
             @Override
             public void done(Exception error, Object[] args) {
                 Object str = null;
@@ -468,6 +462,26 @@ public class LttControllerServiceProxy implements ILttControllerService {
                     str = args[1];
                 }
                 done.doneWriteTraceNetwork(token, error, str);
+            }
+        }.token;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.rse.service.ILttControllerService#stopWriteTraceNetwork(java.lang.String, java.lang.String, java.lang.String, org.eclipse.linuxtools.lttng.rse.service.ILttControllerService.DoneWriteTraceNetwork)
+     */
+    @Override
+    public IToken stopWriteTraceNetwork(String provider, String target, String trace, final DoneStopWriteTraceNetwork done) {
+        return new Command(fProxychannel, this, LttngConstants.Lttng_Control_StopWriteTraceNetwork, new Object[] { provider, target, trace }) {
+            @Override
+            public void done(Exception error, Object[] args) {
+                Object str = null;
+                if (error == null) {
+                    assert args.length == INVALID_ARG_LENGTH;
+                    error = toDetailedError(toError(args[0]), args[1]);
+                    str = args[1];
+                }
+                done.doneStopWriteTraceNetwork(token, error, str);
             }
         }.token;
     }

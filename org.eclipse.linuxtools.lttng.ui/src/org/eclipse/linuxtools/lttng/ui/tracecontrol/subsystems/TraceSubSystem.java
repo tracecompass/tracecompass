@@ -13,6 +13,7 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.tracecontrol.subsystems;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Vector;
@@ -28,9 +29,11 @@ import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource.TraceS
 import org.eclipse.linuxtools.lttng.core.tracecontrol.model.config.TraceConfig;
 import org.eclipse.linuxtools.lttng.core.tracecontrol.service.ILttControllerService;
 import org.eclipse.linuxtools.lttng.core.tracecontrol.service.LttControllerServiceProxy;
+import org.eclipse.linuxtools.lttng.core.tracecontrol.utility.LiveTraceManager;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
-import org.eclipse.linuxtools.lttng.ui.tracecontrol.TraceControlConstants;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.Messages;
+import org.eclipse.linuxtools.lttng.ui.tracecontrol.TraceControlConstants;
+import org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.ImportToProject;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.PauseTrace;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.connectorservice.TraceConnectorService;
 import org.eclipse.rse.core.events.ISystemResourceChangeEvents;
@@ -490,13 +493,6 @@ public class TraceSubSystem extends SubSystem implements ICommunicationsListener
                     // get trace info
                     TraceConfig traceConfig;
 
-                    // Currently, if a trace is active then all the setup commands have been executed
-                    // and it's either started or paused. However, currently there is no means to retrieve
-                    // the state (paused or started). So we set it to state started (even if trace is not actually
-                    // started on target the command pause will be successful. However, the use will have the wrong
-                    // impression that the trace is started) Therefore ... the state needs to be retrievable.
-                    // TODO update to correct state if there is a possibility to retrieve the correct state. 
-                    trace.setTraceState(TraceState.STARTED);  
                     try {
                         final ILttControllerService service = getControllerService();
                         traceConfig = new TCFTask<TraceConfig>() {
@@ -506,7 +502,7 @@ public class TraceSubSystem extends SubSystem implements ICommunicationsListener
                                 service.getActiveTraceInfo(target.getParent().getName(), target.getName(), trace.getName(), new ILttControllerService.DoneGetActiveTraceInfo() {
 
                                     @Override
-                                    public void doneGetActiveTraceInfo(IToken token, Exception error, String[] str) {
+                                    public void doneGetActiveTraceInfo(IToken token, Exception error, String[] strArray) {
                                         if (error != null) {
                                             // Notify with error
                                             error(error);
@@ -514,35 +510,62 @@ public class TraceSubSystem extends SubSystem implements ICommunicationsListener
                                         }
 
                                         TraceConfig config = new TraceConfig();
+                                        config.setTraceName(trace.getName());
+                                        config.setTraceTransport(TraceControlConstants.Lttng_Trace_Transport_Relay); 
                                         config.setIsAppend(false); 
-                                        if (str[3].equals("true")) { //$NON-NLS-1$
-                                            config.setMode(TraceConfig.FLIGHT_RECORDER_MODE);    
-                                        }
-                                        else if (str[1].equals("true")) { //$NON-NLS-1$
-                                            config.setMode(TraceConfig.NORMAL_MODE);
+                                        for (String pair : strArray) {
+                                            String[] pairArray = pair.split(LttngConstants.Lttng_Control_GetActiveTraceInfoSeparator);
+                                            if (pairArray.length != 2) {
+                                                continue;
+                                            }
+                                            String param = pairArray[0];
+                                            String value = pairArray[1];
+                                            if (param.equals(TraceControlConstants.ACTIVE_TRACE_INFO_PARAM_DESTINATION)) {
+                                                if (value.startsWith(TraceControlConstants.ACTIVE_TRACE_INFO_DESTINATION_PREFIX_LOCAL)) {
+                                                    config.setNetworkTrace(false);
+                                                    config.setTracePath(value.substring(TraceControlConstants.ACTIVE_TRACE_INFO_DESTINATION_PREFIX_LOCAL.length()));
+                                                } else if (value.startsWith(TraceControlConstants.ACTIVE_TRACE_INFO_DESTINATION_PREFIX_NETWORK)) {
+                                                    config.setNetworkTrace(true);
+                                                    config.setTracePath(value.substring(TraceControlConstants.ACTIVE_TRACE_INFO_DESTINATION_PREFIX_NETWORK.length()));
+                                                }
+                                            } else if (param.equals(TraceControlConstants.ACTIVE_TRACE_INFO_PARAM_NUM_THREAD)) {
+                                                config.setNumChannel(Integer.valueOf(value));
+                                            } else if (param.equals(TraceControlConstants.ACTIVE_TRACE_INFO_PARAM_NORMAL_ONLY)) {
+                                                if (value.equals(Boolean.toString(true))) {
+                                                    config.setMode(TraceConfig.NORMAL_MODE);
+                                                }
+                                            } else if (param.equals(TraceControlConstants.ACTIVE_TRACE_INFO_PARAM_FLIGHT_ONLY)) {
+                                                if (value.equals(Boolean.toString(true))) {
+                                                    config.setMode(TraceConfig.FLIGHT_RECORDER_MODE);
+                                                }
+                                            } else if (param.equals(TraceControlConstants.ACTIVE_TRACE_INFO_PARAM_ENABLED)) {
+                                                if (value.equals(Boolean.toString(true))) {
+                                                    trace.setTraceState(TraceState.STARTED);
+                                                } else {
+                                                    trace.setTraceState(TraceState.PAUSED);  
+                                                }
+                                            }
                                         }
 
-                                        if (str[5].equals(TraceConfig.InvalidTracePath)) {
-                                            config.setNetworkTrace(true); 
-                                        }
-                                        else {
-                                            config.setNetworkTrace(false);
-                                        }
-                                        config.setNumChannel(Integer.valueOf(str[0]));
-                                        config.setTraceName(trace.getName());
-                                        config.setTracePath(str[5]);
-                                        config.setTraceTransport(TraceControlConstants.Lttng_Trace_Transport_Relay); 
-                                        
                                         // Notify with active trace list
                                         done(config);
                                     }
                                 });
                             }}.get(TraceControlConstants.DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
+                        trace.setTraceConfig(traceConfig);
+                        if (traceConfig != null) {
+                            if (traceConfig.isNetworkTrace()) {
+                                // stop and restart the network transfer since TCF channel may be different
+                                if (fProviders == null) { // do this only on startup, not on refresh
+                                    restartTraceNetwork(service, trace, traceConfig);
+                                }
+                                LiveTraceManager.setLiveTrace(traceConfig.getTracePath(), true);
+                            }
+                        }
                     } catch (Exception e) {
                         if (e instanceof SystemMessageException) throw (SystemMessageException)e;
                         throw new SystemMessageException(LTTngUiPlugin.getDefault().getMessage(e));
                     }
-                    trace.setTraceConfig(traceConfig);
                 }
             }
         }
@@ -642,5 +665,154 @@ public class TraceSubSystem extends SubSystem implements ICommunicationsListener
      */
     public LttControllerServiceProxy getControllerService() throws Exception {
         return ((TraceConnectorService)getConnectorService()).getControllerService();
+    }
+
+    /*
+     * Stop and restart the network transfer. Only normal channels are written while trace is started.  
+     */
+    private void restartTraceNetwork(final ILttControllerService service, final TraceResource trace, final TraceConfig traceConfig) throws Exception {
+        File newDir = new File(traceConfig.getTracePath());
+        if (!newDir.exists()) {
+            boolean created = newDir.mkdirs();
+            if (!created) {
+                throw new Exception(Messages.Lttng_Control_ErrorCreateTracePath + ": " + traceConfig.getTracePath()); //$NON-NLS-1$
+            }
+            if (traceConfig.getProject() != null) {
+                ImportToProject.linkTrace(getShell(), trace, traceConfig.getProject(), traceConfig.getTraceName());
+            }
+        }
+
+        // stop the previous lttd
+        boolean ok = new TCFTask<Boolean>() {
+            @Override
+            public void run() {
+
+                // Setup trace transport using Lttng controller service proxy
+                service.stopWriteTraceNetwork(trace.getParent().getParent().getName(), 
+                        trace.getParent().getName(), 
+                        traceConfig.getTraceName(), 
+                        new ILttControllerService.DoneStopWriteTraceNetwork() {
+
+                    @Override
+                    public void doneStopWriteTraceNetwork(IToken token, Exception error, Object str) {
+                        if (error != null) {
+                            // Notify with error
+                            error(error);
+                            return;
+                        }
+
+                        // Notify about success
+                        done(true);
+                    }
+                });
+            }}.get(TraceControlConstants.DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
+
+        if (!ok) {
+            return;
+        }
+
+        // lttd will only perform the shutdown after stopWriteTraceNetwork
+        // when it receives the next on_read_subbuffer callback
+
+        if (trace.getTraceState() == TraceState.PAUSED) {
+            // we need to start the trace to make sure that the network transfer is stopped
+            ok = new TCFTask<Boolean>() {
+                @Override
+                public void run() {
+
+                    // Start the trace
+                    service.startTrace(trace.getParent().getParent().getName(), 
+                            trace.getParent().getName(), 
+                            traceConfig.getTraceName(), 
+                            new ILttControllerService.DoneStartTrace() {
+
+                        @Override
+                        public void doneStartTrace(IToken token, Exception error, Object str) {
+                            if (error != null) {
+                                // Notify with error
+                                error(error);
+                                return;
+                            }
+
+                            // Notify about success
+                            done(true);
+                        }
+                    });
+                }}.get(TraceControlConstants.DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
+
+            if (!ok) {
+                return;
+            }
+
+            trace.setTraceState(TraceState.STARTED);
+
+            // wait for the lttd shutdown
+            Thread.sleep(1000);
+
+            // return to paused state
+            ok = new TCFTask<Boolean>() {
+                @Override
+                public void run() {
+
+                    // Pause the trace
+                    service.pauseTrace(trace.getParent().getParent().getName(), 
+                            trace.getParent().getName(), 
+                            traceConfig.getTraceName(), 
+                            new ILttControllerService.DonePauseTrace() {
+
+                        @Override
+                        public void donePauseTrace(IToken token, Exception error, Object str) {
+                            if (error != null) {
+                                // Notify with error
+                                error(error);
+                                return;
+                            }
+
+                            // Notify about success
+                            done(true);
+                        }
+                    });
+                }}.get(TraceControlConstants.DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
+
+            if (!ok) {
+                return;
+            }
+
+            trace.setTraceState(TraceState.PAUSED);
+
+        } else {
+            // wait for the lttd shutdown
+            Thread.sleep(1000);
+        }
+
+        // start a new lttd
+        new TCFTask<Boolean>() {
+            @Override
+            public void run() {
+
+                // Setup trace transport using Lttng controller service proxy
+                service.writeTraceNetwork(trace.getParent().getParent().getName(), 
+                        trace.getParent().getName(), 
+                        traceConfig.getTraceName(), 
+                        traceConfig.getTracePath(), 
+                        traceConfig.getNumChannel(), 
+                        traceConfig.getIsAppend(), 
+                        false, 
+                        true, // write only normal channels 
+                        new ILttControllerService.DoneWriteTraceNetwork() {
+
+                    @Override
+                    public void doneWriteTraceNetwork(IToken token, Exception error, Object str) {
+                        if (error != null) {
+                            // Notify with error
+                            error(error);
+                            return;
+                        }
+
+                        // Notify about success
+                        done(true);
+                    }
+                });
+            }}.get(TraceControlConstants.DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
     }
 }

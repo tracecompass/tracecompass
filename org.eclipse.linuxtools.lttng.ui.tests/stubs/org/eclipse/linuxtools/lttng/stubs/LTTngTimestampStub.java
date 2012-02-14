@@ -15,7 +15,8 @@ public class LTTngTimestampStub extends TmfTimestamp {
     /**
 	 * 
 	 */
-	private static final long serialVersionUID = 216576768443708259L;
+	@SuppressWarnings("unused")
+    private static final long serialVersionUID = 216576768443708259L;
 
 	/**
      * @param value

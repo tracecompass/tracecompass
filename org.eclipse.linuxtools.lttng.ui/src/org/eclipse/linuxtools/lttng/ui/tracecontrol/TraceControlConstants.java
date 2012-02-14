@@ -13,6 +13,7 @@
 
 package org.eclipse.linuxtools.lttng.ui.tracecontrol;
 
+
 @SuppressWarnings("nls")
 public class TraceControlConstants {
 
@@ -30,6 +31,17 @@ public class TraceControlConstants {
     public static final String Lttng_Control_New_Event_Data = "new_trace_data";
     public static final String Lttng_Control_Unwrite_Trace_Data_Event = "unwrite_trace_data";
     public static final String Lttng_Control_Trace_Done_Event = "trace_done";
+
+    // the parameter names have to be coordinated with lttctltraceinfo.c in lttng-agent
+    public static final String ACTIVE_TRACE_INFO_PARAM_DESTINATION = "destination";
+    public static final String ACTIVE_TRACE_INFO_PARAM_NUM_THREAD = "numThread";
+    public static final String ACTIVE_TRACE_INFO_PARAM_NORMAL_ONLY = "normal_only";
+    public static final String ACTIVE_TRACE_INFO_PARAM_FLIGHT_ONLY = "flight_only";
+    public static final String ACTIVE_TRACE_INFO_PARAM_ENABLED = "enabled";
+
+    // the destination prefixes have to be coordinated with lttctlkerntransfer.c in lttng-agent
+    public static final String ACTIVE_TRACE_INFO_DESTINATION_PREFIX_LOCAL = "local:";
+    public static final String ACTIVE_TRACE_INFO_DESTINATION_PREFIX_NETWORK = "network:";
 
     // Default timeout for TCF tasks (in seconds)
     public static final int DEFAULT_TCF_TASK_TIMEOUT = 10;

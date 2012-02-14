@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright (C) 2011 Ericsson
+
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+
+   Contributors:
+       Ericsson - initial implementation
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>linuxtools-lttng-parent</artifactId>
+    <groupId>org.eclipse.linuxtools.lttng</groupId>
+    <version>0.10.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>org.eclipse.linuxtools.lttng.releng-site</artifactId>
+  <version>0.4.0-SNAPSHOT</version>
+  <name>Linux Tools LTTng Repository</name>
+  <packaging>eclipse-repository</packaging>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>deploy</id>
+            <phase>install</phase>
+              <goals>
+                <goal>run</goal>
+              </goals>
+              <configuration>
+              <tasks>
+                <delete includeemptydirs="false">
+                  <fileset
+                    dir="/var/www/technology/linuxtools/lttng/update-nightly/">
+                    <include name="**" />
+                  </fileset>
+                </delete>
+                <copy includeemptydirs="false"
+                  todir="/var/www/technology/linuxtools/lttng/update-nightly/">
+                  <fileset dir="target/repository">
+                    <include name="**" />
+                  </fileset>
+                </copy>
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

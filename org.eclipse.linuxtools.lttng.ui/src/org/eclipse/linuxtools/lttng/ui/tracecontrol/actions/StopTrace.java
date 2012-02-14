@@ -25,6 +25,7 @@ import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource;
 import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource.TraceState;
 import org.eclipse.linuxtools.lttng.core.tracecontrol.model.config.TraceConfig;
 import org.eclipse.linuxtools.lttng.core.tracecontrol.service.ILttControllerService;
+import org.eclipse.linuxtools.lttng.core.tracecontrol.utility.LiveTraceManager;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.Messages;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.TraceControlConstants;
@@ -122,7 +123,11 @@ public class StopTrace implements IObjectActionDelegate, IWorkbenchWindowActionD
                     }}.get(TraceControlConstants.DEFAULT_TCF_TASK_TIMEOUT, TimeUnit.SECONDS);
                     
                     trace.setTraceState(TraceState.STOPPED);
-                    
+
+                    if (trace.getTraceConfig() != null) {
+                        LiveTraceManager.setLiveTrace(trace.getTraceConfig().getTracePath(), false);
+                    }
+
                     ISystemRegistry registry = SystemStartHere.getSystemRegistry();
                     registry.fireRemoteResourceChangeEvent(ISystemRemoteChangeEvents.SYSTEM_REMOTE_RESOURCE_CHANGED, trace, trace.getParent(), subSystem, null);
 
@@ -212,6 +217,7 @@ public class StopTrace implements IObjectActionDelegate, IWorkbenchWindowActionD
                     service.writeTraceNetwork(trace.getParent().getParent().getName(), 
                             trace.getParent().getName(), 
                             traceConfig.getTraceName(), 
+                            traceConfig.getTracePath(), 
                             traceConfig.getNumChannel(), 
                             traceConfig.getIsAppend(), 
                             true, // write only flight recorder channels 

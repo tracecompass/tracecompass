@@ -179,6 +179,10 @@ public class LttngConstants {
      */
     public static final String Lttng_Control_WriteTraceNetwork = "writeTraceNetwork";
     /**
+     * <h4>LTTng trace control command to stop a network trace transfer</h4> 
+     */
+    public static final String Lttng_Control_StopWriteTraceNetwork = "stopWriteTraceNetwork";
+    /**
      * <h4>LTTng trace control command to start tracing.</h4> 
      */
     public static final String Lttng_Control_StartTrace = "startTrace";
