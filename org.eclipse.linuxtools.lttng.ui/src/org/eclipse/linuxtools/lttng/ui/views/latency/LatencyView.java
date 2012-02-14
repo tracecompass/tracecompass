@@ -264,6 +264,9 @@ public class LatencyView extends TmfView implements IGraphModelListener {
     
     @TmfSignalHandler
     public void experimentDisposed(TmfExperimentDisposedSignal<TmfEvent> signal) {
+        if (signal.getExperiment() != fExperiment) {
+            return;
+        }
         fTimeRange = TmfTimeRange.Null;
         fExperiment = null;
         fController.clear();

@@ -127,7 +127,7 @@ public class TmfNavigatorContentProvider implements ICommonContentProvider, IPip
 
         // Get the children from the model
         Map<String, ITmfProjectModelElement> childrenMap = new HashMap<String, ITmfProjectModelElement>();
-        TmfProjectElement tmfProject = TmfProjectRegistry.getProject(project);
+        TmfProjectElement tmfProject = TmfProjectRegistry.getProject(project, true);
         for (ITmfProjectModelElement element : tmfProject.getChildren()) {
             if (element instanceof TmfTraceFolder) {
                 TmfTraceFolder child = (TmfTraceFolder) element;
@@ -267,7 +267,8 @@ public class TmfNavigatorContentProvider implements ICommonContentProvider, IPip
             for (IResource resource : members) {
                 String name = resource.getName();
                 ITmfProjectModelElement trace = childrenMap.get(name);
-                if (trace == null) {
+                if (trace == null && !resource.isHidden()) {
+                    // exclude hidden resources (e.g. bookmarks file)
                     trace = new TmfTraceElement(name, resource, tmfExperiment);
                 }
                 children.add(trace);

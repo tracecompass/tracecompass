@@ -12,6 +12,11 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.events;
 
+import org.eclipse.linuxtools.lttng.core.trace.LTTngTrace;
+import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.linuxtools.tmf.ui.views.events.TmfEventsView;
 import org.eclipse.swt.widgets.Composite;
@@ -49,5 +54,19 @@ public class EventsView extends TmfEventsView {
     	return "[EventsView]";
     }
 
+    /*
+     * Overriden to prevent non-LTTng traces to be shown in the LTTng Events view
+     * @see org.eclipse.linuxtools.tmf.ui.views.events.TmfEventsView#experimentSelected(org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal)
+     */
+    @Override
+    @TmfSignalHandler
+    public void experimentSelected(TmfExperimentSelectedSignal<TmfEvent> signal) {
+        for (ITmfTrace<?> trace : signal.getExperiment().getTraces()) {
+            if (!(trace instanceof LTTngTrace)) {
+                return;
+            }
+        }
+        super.experimentSelected(signal);
+    }
 
 }

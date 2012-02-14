@@ -287,6 +287,9 @@ public class TmfStatisticsView extends TmfView {
      */
     @TmfSignalHandler
     public void experimentDisposed(TmfExperimentDisposedSignal<? extends TmfEvent> signal) {
+        if (signal.getExperiment() != TmfExperiment.getCurrentExperiment()) {
+            return;
+        }
         cancelOngoingRequest();
     }
 

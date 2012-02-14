@@ -88,13 +88,17 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
@@ -120,6 +124,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private static final Image STOP_IMAGE = TmfUiPlugin.getDefault().getImageFromPath("icons/elcl16/stop.gif"); //$NON-NLS-1$
     private static final String SEARCH_HINT = Messages.TmfEventsTable_SearchHint;
     private static final String FILTER_HINT = Messages.TmfEventsTable_FilterHint;
+    private static final int MAX_CACHE_SIZE = 1000;
 
     public interface Key {
         String SEARCH_TXT = "$srch_txt"; //$NON-NLS-1$
@@ -129,6 +134,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         String TIMESTAMP = "$time"; //$NON-NLS-1$
         String RANK = "$rank"; //$NON-NLS-1$
         String FIELD_ID = "$field_id"; //$NON-NLS-1$
+        String BOOKMARK = "$bookmark"; //$NON-NLS-1$
     }
 
     public static enum HeaderState {
@@ -148,7 +154,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     protected SashForm fSashForm;
     protected TmfVirtualTable fTable;
     protected TmfRawEventViewer fRawViewer;
-    protected ITmfTrace fTrace;
+    protected ITmfTrace<?> fTrace;
     protected boolean fPackDone = false;
     protected HeaderState fHeaderState = HeaderState.SEARCH;
     protected long fSelectedRank = 0;
@@ -264,6 +270,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         });
 
         cacheSize = Math.max(cacheSize, Display.getDefault().getBounds().height / fTable.getItemHeight());
+        cacheSize = Math.min(cacheSize, MAX_CACHE_SIZE);
         fCache = new TmfEventsCache(cacheSize, this);
 
         // Handle the table item requests
@@ -321,6 +328,66 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             }
         });
 
+        final Listener bookmarkListener = new Listener () {
+            Shell tooltipShell = null;
+            public void handleEvent(Event event) {
+                switch (event.type) {
+                case SWT.MouseHover:
+                    TableItem item = fTable.getItem(new Point(event.x, event.y));
+                    if (item == null) {
+                        return;
+                    }
+                    String tooltipText = (String) item.getData(Key.BOOKMARK);
+                    if (tooltipText == null) {
+                        return;
+                    };
+                    Rectangle bounds = item.getImageBounds(0);
+                    if (!bounds.contains(event.x,event.y)) {
+                        return;
+                    }
+                    if (tooltipShell != null && !tooltipShell.isDisposed()) {
+                        tooltipShell.dispose();
+                    }
+                    tooltipShell = new Shell(fTable.getShell(), SWT.ON_TOP | SWT.NO_FOCUS | SWT.TOOL);
+                    tooltipShell.setBackground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+                    FillLayout layout = new FillLayout();
+                    layout.marginWidth = 2;
+                    tooltipShell.setLayout(layout);
+                    Label label = new Label(tooltipShell, SWT.WRAP);
+                    label.setForeground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
+                    label.setBackground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+                    label.setText(tooltipText);
+                    label.addListener(SWT.MouseExit, this);
+                    label.addListener(SWT.MouseDown, this);
+                    label.addListener(SWT.MouseWheel, this);
+                    Point size = tooltipShell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+                    Point pt = fTable.toDisplay(event.x, event.y);
+                    tooltipShell.setBounds(pt.x, pt.y, size.x, size.y);
+                    tooltipShell.setVisible(true);
+                    break;
+                case SWT.Dispose:
+                case SWT.KeyDown:
+                case SWT.MouseMove:
+                case SWT.MouseExit:
+                case SWT.MouseDown:
+                case SWT.MouseWheel:
+                    if (tooltipShell != null) {
+                        tooltipShell.dispose();
+                        tooltipShell = null;
+                    }
+                    break;
+                }
+            }
+        };
+
+        fTable.addListener(SWT.MouseHover, bookmarkListener);
+        fTable.addListener(SWT.Dispose, bookmarkListener);
+        fTable.addListener(SWT.KeyDown, bookmarkListener);
+        fTable.addListener(SWT.MouseMove, bookmarkListener);
+        fTable.addListener(SWT.MouseExit, bookmarkListener);
+        fTable.addListener(SWT.MouseDown, bookmarkListener);
+        fTable.addListener(SWT.MouseWheel, bookmarkListener);
+
         // Create resources
         createResources();
 
@@ -330,9 +397,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
         fRawViewer = new TmfRawEventViewer(fSashForm, SWT.H_SCROLL | SWT.V_SCROLL);
 
-        fRawViewer.addSelectionListener(new SelectionAdapter() {
+        fRawViewer.addSelectionListener(new Listener() {
             @Override
-            public void widgetSelected(SelectionEvent e) {
+            public void handleEvent(Event e) {
                 if (e.data instanceof Long) {
                     long rank = (Long) e.data;
                     int index = (int) rank;
@@ -584,8 +651,17 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         item.setData(Key.RANK, rank);
 
         boolean bookmark = false;
-        if (fBookmarksMap.containsKey(rank)) {
+        Long markerId = fBookmarksMap.get(rank);
+        if (markerId != null) {
             bookmark = true;
+            try {
+                IMarker marker = fBookmarksResource.findMarker(markerId);
+                item.setData(Key.BOOKMARK, marker.getAttribute(IMarker.MESSAGE));
+            } catch (CoreException e) {
+                displayException(e);
+            }
+        } else {
+            item.setData(Key.BOOKMARK, null);
         }
 
         boolean searchMatch = false;
@@ -1306,7 +1382,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * @param disposeOnClose
      *            true if the trace should be disposed when the table is disposed
      */
-    public void setTrace(ITmfTrace trace, boolean disposeOnClose) {
+    public void setTrace(ITmfTrace<?> trace, boolean disposeOnClose) {
         if (fTrace != null && fDisposeOnClose) {
             fTrace.dispose();
         }
@@ -1414,7 +1490,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             fTable.refresh();
                         }
                     } catch (CoreException e) {
-                        e.printStackTrace();
+                        displayException(e);
                     }
                 }
             }
@@ -1445,7 +1521,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     bookmark.delete();
                 }
             } catch (CoreException e) {
-                e.printStackTrace();
+                displayException(e);
             }
         } else {
             addBookmark(fBookmarksResource);
@@ -1465,7 +1541,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             }
             fTable.refresh();
         } catch (CoreException e) {
-            e.printStackTrace();
+            displayException(e);
         }
     }
 
@@ -1515,31 +1591,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     // Signal handlers
     // ------------------------------------------------------------------------
 
-//	@TmfSignalHandler
-//    public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
-//        if ((signal.getExperiment() != fTrace) || fTable.isDisposed()) return;
-//        // Perform the refresh on the UI thread
-//		Display.getDefault().asyncExec(new Runnable() {
-//            @Override
-//			public void run() {
-//                if (!fTable.isDisposed() && fTrace != null) {
-//                	if (fTable.getData(Key.FILTER_OBJ) == null) {
-//                		fTable.setItemCount((int) fTrace.getNbEvents() + 1); // +1 for header row
-//                		if (fPendingGotoRank != -1 && fPendingGotoRank + 1 < fTable.getItemCount()) { // +1 for header row
-//                			fTable.setSelection((int) fPendingGotoRank + 1); // +1 for header row
-//                			fPendingGotoRank = -1;
-//                		}
-//                	} else {
-//                		startFilterThread();
-//                	}
-//                }
-//                if (!fRawViewer.isDisposed() && fTrace != null) {
-//                    fRawViewer.refreshEventCount();
-//                }
-//            }
-//        });
-//    }
-
     @TmfSignalHandler
     public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
         if ((signal.getExperiment() != fTrace) || fTable.isDisposed())
@@ -1551,8 +1602,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 if (!fTable.isDisposed() && fTrace != null) {
                     if (fTable.getData(Key.FILTER_OBJ) == null) {
                         fTable.setItemCount((int) fTrace.getNbEvents() + 1); // +1 for header row
-                        if (fPendingGotoRank != -1 && fPendingGotoRank + 1 < fTable.getItemCount()) { // +1 for header
-                                                                                                      // row
+                        if (fPendingGotoRank != -1 && fPendingGotoRank + 1 < fTable.getItemCount()) { // +1 for header row
                             fTable.setSelection((int) fPendingGotoRank + 1); // +1 for header row
                             fPendingGotoRank = -1;
                         }
@@ -1578,8 +1628,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 if (!fTable.isDisposed() && fTrace != null) {
                     if (fTable.getData(Key.FILTER_OBJ) == null) {
                         fTable.setItemCount((int) fTrace.getNbEvents() + 1); // +1 for header row
-                        if (fPendingGotoRank != -1 && fPendingGotoRank + 1 < fTable.getItemCount()) { // +1 for header
-                                                                                                      // row
+                        if (fPendingGotoRank != -1 && fPendingGotoRank + 1 < fTable.getItemCount()) { // +1 for header row
                             fTable.setSelection((int) fPendingGotoRank + 1); // +1 for header row
                             fPendingGotoRank = -1;
                         }
@@ -1656,6 +1705,22 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
             ((ITmfDataProvider<TmfEvent>) fTrace).sendRequest(subRequest);
         }
+    }
+
+    // ------------------------------------------------------------------------
+    // Error handling
+    // ------------------------------------------------------------------------
+
+    /**
+     * Display an exception in a message box
+     * 
+     * @param e the exception
+     */
+    private void displayException(Exception e) {
+        MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+        mb.setText(e.getClass().getName());
+        mb.setMessage(e.getMessage());
+        mb.open();
     }
 
 }

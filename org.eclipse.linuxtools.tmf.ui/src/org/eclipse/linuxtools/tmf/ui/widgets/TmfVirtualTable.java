@@ -155,7 +155,7 @@ public class TmfVirtualTable extends Composite {
 			}
 		});
 		// Implement a "fake" tooltip
-		final String TOOLTIP_DATA_KEY = "_TABLEITEM";
+		final String TOOLTIP_DATA_KEY = "_TABLEITEM"; //$NON-NLS-1$
 		final Listener labelListener = new Listener () {
 			public void handleEvent (Event event) {
 				Label label = (Label)event.widget;
@@ -481,7 +481,7 @@ public class TmfVirtualTable extends Composite {
 				event.index = index + fTableTopEventRank;
 			}
 			event.doit  = true;
-			notifyListeners(SWT.SetData, event);
+			fTable.notifyListeners(SWT.SetData, event);
 			return event.doit; // false if table item not updated yet in this thread
 		}
 		return true;
@@ -536,11 +536,17 @@ public class TmfVirtualTable extends Composite {
 	}
 
 	@Override
+    public void addListener(int eventType, Listener listener) {
+        fTable.addListener(eventType, listener);
+    }
+	
+	@Override
 	public void addKeyListener(KeyListener listener) {
 		fTable.addKeyListener(listener);
 	}
 
-	@Override
+
+    @Override
 	public void addMouseListener(MouseListener listener) {
 		fTable.addMouseListener(listener);
 	}

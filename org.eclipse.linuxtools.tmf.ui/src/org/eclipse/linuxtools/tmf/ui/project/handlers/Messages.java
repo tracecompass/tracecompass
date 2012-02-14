@@ -23,6 +23,7 @@ public class Messages extends NLS {
     public static String OpenTraceHandler_NoTrace;
 
     public static String OpenExperimentHandler_Title;
+    public static String OpenExperimentHandler_NoTraceType;
 
     public static String DeleteDialog_Title;
     public static String DeleteTraceHandler_Message;

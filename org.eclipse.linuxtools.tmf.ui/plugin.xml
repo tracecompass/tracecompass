@@ -158,19 +158,17 @@
             labelProvider="org.eclipse.linuxtools.tmf.ui.project.model.TmfNavigatorLabelProvider"
             name="%navigatorContent.name"
             priority="normal">
-         <enablement>
-            <and>
-               <instanceof
-                     value="org.eclipse.core.resources.IProject">
-               </instanceof>
-               <test
-                     property="org.eclipse.core.resources.projectNature"
-                     value="org.eclipse.linuxtools.tmf.project.nature">
-               </test>
-            </and>
-         </enablement>
          <triggerPoints>
             <or>
+               <and>
+                  <instanceof
+                        value="org.eclipse.core.resources.IProject">
+                  </instanceof>
+                  <test
+                        property="org.eclipse.core.resources.projectNature"
+                        value="org.eclipse.linuxtools.tmf.project.nature">
+                  </test>
+               </and>
                <instanceof
                      value="org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement">
                </instanceof>
@@ -181,11 +179,51 @@
                <instanceof
                      value="org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement">
                </instanceof>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
             </or></possibleChildren>
          <override
                policy="InvokeAlwaysRegardlessOfSuppressedExt"
                suppressedExtensionId="org.eclipse.ui.navigator.resourceContent">
          </override>
+         <actionProvider
+               class="org.eclipse.linuxtools.tmf.ui.project.handlers.TmfActionProvider"
+               id="org.eclipse.linuxtools.tmf.ui.navigator.actions.provider">
+            <enablement>
+               <or>
+                  <instanceof
+                        value="org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement">
+                  </instanceof>
+               </or>
+            </enablement>
+         </actionProvider>
+         <dropAssistant
+               class="org.eclipse.linuxtools.tmf.ui.project.handlers.DropAdapterAssistant"
+               id="org.eclipse.linuxtools.tmf.ui.navigator.dropAssistant">
+            <possibleDropTargets>
+               <or>
+                  <and>
+                     <instanceof
+                           value="org.eclipse.core.resources.IProject">
+                     </instanceof>
+                     <test
+                           property="org.eclipse.core.resources.projectNature"
+                           value="org.eclipse.linuxtools.tmf.project.nature">
+                     </test>
+                  </and>
+                  <instanceof
+                        value="org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement">
+                  </instanceof>
+               </or>
+            </possibleDropTargets>
+         </dropAssistant>
+         <commonWizard
+               menuGroupId="org.eclipse.linuxtools.tmf.ui.views.ui.wizards.menuGroupId"
+               type="new"
+               wizardId="org.eclipse.linuxtools.tmf.ui.views.ui.wizards.newProject">
+            <enablement></enablement>
+         </commonWizard>
       </navigatorContent>
    </extension>
    <extension
@@ -882,7 +920,7 @@
             contextId="org.eclipse.linuxtools.tmf.ui.view.uml2sd.context"
             commandId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.MoveSDRight"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
-      </key>                           
+      </key>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">

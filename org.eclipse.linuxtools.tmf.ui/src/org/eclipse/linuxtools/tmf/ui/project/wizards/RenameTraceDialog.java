@@ -15,6 +15,8 @@ package org.eclipse.linuxtools.tmf.ui.project.wizards;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.CoreException;
@@ -190,9 +192,9 @@ public class RenameTraceDialog extends SelectionStatusDialog {
         }
     }
 
-    private IResource renameTrace(String newName) {
+    private IResource renameTrace(final String newName) {
 
-        IPath oldPath = fTrace.getResource().getFullPath();
+        final IPath oldPath = fTrace.getResource().getFullPath();
         final IPath newPath = oldPath.append("../" + newName); //$NON-NLS-1$
 
         WorkspaceModifyOperation operation = new WorkspaceModifyOperation() {
@@ -202,6 +204,17 @@ public class RenameTraceDialog extends SelectionStatusDialog {
                     monitor.beginTask("", 1000); //$NON-NLS-1$
                     if (monitor.isCanceled()) {
                         throw new OperationCanceledException();
+                    }
+                    if (fTrace.getResource() instanceof IFolder) {
+                        IFolder folder = (IFolder) fTrace.getResource();
+                        IFile bookmarksFile = folder.getFile(fTrace.getName() + ' ');
+                        IFile newBookmarksFile = folder.getFile(newName + ' ');
+                        if (bookmarksFile.exists()) {
+                            if (!newBookmarksFile.exists()) {
+                                IPath newBookmarksPath = newBookmarksFile.getFullPath();
+                                bookmarksFile.move(newBookmarksPath, IResource.FORCE | IResource.SHALLOW, null);
+                            }
+                        }
                     }
                     fTrace.getResource().move(newPath, IResource.FORCE | IResource.SHALLOW, null);
                     if (monitor.isCanceled()) {

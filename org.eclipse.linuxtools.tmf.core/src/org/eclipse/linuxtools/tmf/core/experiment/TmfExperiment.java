@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -75,6 +76,12 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
     // The current experiment context
     protected TmfExperimentContext fExperimentContext;
+
+    // Flag to initialize only once
+    private boolean fInitialized = false;
+
+    // The experiment resource
+    private IResource fResource;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -701,6 +708,11 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     // ------------------------------------------------------------------------
 
     private synchronized void initializeStreamingMonitor() {
+        if (fInitialized) {
+            return;
+        }
+        fInitialized = true;
+
         if (getStreamingInterval() == 0) {
             TmfContext context = seekLocation(null);
             TmfEvent event = getNext(context);
@@ -708,8 +720,15 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
                 return;
             }
             TmfTimeRange timeRange = new TmfTimeRange(event.getTimestamp(), TmfTimestamp.BigCrunch);
-            TmfExperimentRangeUpdatedSignal signal = new TmfExperimentRangeUpdatedSignal(this, this, timeRange);
-            broadcast(signal);
+            final TmfExperimentRangeUpdatedSignal signal = new TmfExperimentRangeUpdatedSignal(this, this, timeRange);
+
+            // Broadcast in separate thread to prevent deadlock
+            new Thread() {
+                @Override
+                public void run() {
+                    broadcast(signal);
+                }
+            }.start();
             return;
         }
 
@@ -984,4 +1003,19 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         return null;
     }
 
+    /**
+     * Set the resource to be used for bookmarks on this experiment
+     * @param resource the bookmarks resource
+     */
+    public void setResource(IResource resource) {
+        fResource = resource;
+    }
+
+    /**
+     * Get the resource used for bookmarks on this experiment
+     * @return the bookmarks resource or null if none is set
+     */
+    public IResource getResource() {
+        return fResource;
+    }
 }

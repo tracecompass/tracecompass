@@ -22,18 +22,18 @@ import org.eclipse.linuxtools.tmf.ui.viewers.events.ITmfEventsFilterProvider;
  */
 public class TmfTraceOpenedSignal extends TmfSignal {
 
-    private final ITmfTrace fTrace;
+    private final ITmfTrace<?> fTrace;
     private final IResource fResource;
     private final ITmfEventsFilterProvider fEventsFilterProvider;
     
-    public TmfTraceOpenedSignal(Object source, ITmfTrace trace, IResource resource, ITmfEventsFilterProvider eventsFilterProvider) {
+    public TmfTraceOpenedSignal(Object source, ITmfTrace<?> trace, IResource resource, ITmfEventsFilterProvider eventsFilterProvider) {
         super(source);
         fTrace = trace;
         fResource = resource;
         fEventsFilterProvider = eventsFilterProvider;
     }
 
-    public ITmfTrace getTrace() {
+    public ITmfTrace<?> getTrace() {
         return fTrace;
     }
 

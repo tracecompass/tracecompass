@@ -122,7 +122,6 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     private boolean timeStampFound;
     private int logEntriesCount;
     private boolean logEntryFound;
-    private int logEntryNestedCount;
 
     protected CustomXmlParserInputWizardPage(ISelection selection, CustomXmlTraceDefinition definition) {
         super("CustomXmlParserWizardPage"); //$NON-NLS-1$
@@ -1458,7 +1457,6 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
         if (definition.rootInputElement != null) {
             logEntryFound = false;
-            logEntryNestedCount = 0;
             timeStampFound = false;
 
             errors.append(validateElement(definition.rootInputElement));
@@ -1518,7 +1516,6 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         if (inputElement != definition.rootInputElement) {
             if (inputElement.logEntry) {
                 logEntryFound = true;
-                logEntryNestedCount++;
             }
             if (inputElement.inputName.equals(CustomXmlTraceDefinition.TAG_TIMESTAMP)) {
                 timeStampFound = true;
@@ -1648,9 +1645,6 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
                 errors.append(validateElement(child));
             }
-        }
-        if (inputElement.logEntry) {
-            logEntryNestedCount--;
         }
         return errors;
     }
