@@ -98,11 +98,11 @@ public class TmfSignalManager {
 	 */
 	static int fSignalId = 0;
 	static public synchronized void dispatchSignal(TmfSignal signal) {
-		fSignalId++;
-		sendSignal(new TmfStartSynchSignal(fSignalId));
-		signal.setReference(fSignalId);
+		int signalId = fSignalId++;
+		sendSignal(new TmfStartSynchSignal(signalId));
+		signal.setReference(signalId);
 		sendSignal(signal);
-		sendSignal(new TmfEndSynchSignal(fSignalId));
+		sendSignal(new TmfEndSynchSignal(signalId));
 	}
 
     static private void sendSignal(TmfSignal signal) {

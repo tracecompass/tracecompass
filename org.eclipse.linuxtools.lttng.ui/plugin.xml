@@ -596,7 +596,7 @@
                 id="actions.trace.pause"
                 label="%action.pause.label"
                 menubarPath="additions"
-                tooltip="%action.puase.tooltip">
+                tooltip="%action.pause.tooltip">
              <enablement>
                 <and>
                    <objectClass

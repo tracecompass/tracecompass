@@ -14,8 +14,6 @@ package org.eclipse.linuxtools.lttng.core.tests.state;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.lttng.core.trace.LTTngTrace;
-
 /**
  * @author alvaro
  * 

@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.lttng.core.trace;
 
 import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
+import org.eclipse.linuxtools.lttng.core.tracecontrol.utility.LiveTraceManager;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
@@ -22,8 +23,8 @@ import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperimentContext;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperimentLocation;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
-import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
+import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
@@ -202,7 +203,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> {
         for (ITmfTrace trace : fTraces) {
             if (trace instanceof LTTngTrace) {
                 JniTrace jniTrace = ((LTTngTrace) trace).getCurrentJniTrace();
-                if (jniTrace != null && !jniTrace.isLiveTraceSupported()) {
+                if (jniTrace != null && (!jniTrace.isLiveTraceSupported() || !LiveTraceManager.isLiveTrace(jniTrace.getTracepath()))) {
                     updateTimeRange();
                     TmfExperimentRangeUpdatedSignal signal = new TmfExperimentRangeUpdatedSignal(LTTngExperiment.this, LTTngExperiment.this,
                             getTimeRange());

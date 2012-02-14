@@ -72,7 +72,7 @@ public class DownloadProxy {
             if (trace != null) {
                 TraceConfig conf = trace.getTraceConfig();
                 FileOutputStream fos = null;
-                if (!TraceConfig.InvalidTracePath.equals(conf.getTracePath())) {
+                if (conf != null && !TraceConfig.InvalidTracePath.equals(conf.getTracePath())) {
                     String fileName = conf.getTracePath() + "/" + args[3].toString();  //$NON-NLS-1$
                     try {
                         fos = new FileOutputStream(fileName, true);

@@ -27,6 +27,7 @@ import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource;
 import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource.TraceState;
 import org.eclipse.linuxtools.lttng.core.tracecontrol.model.config.TraceConfig;
 import org.eclipse.linuxtools.lttng.core.tracecontrol.service.ILttControllerService;
+import org.eclipse.linuxtools.lttng.core.tracecontrol.utility.LiveTraceManager;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.Messages;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.TraceControlConstants;
@@ -119,6 +120,10 @@ public class StartTrace implements IObjectActionDelegate, IWorkbenchWindowAction
                     startTrace(service, trace, traceConfig);
 
                     trace.setTraceState(TraceState.STARTED);
+
+                    if (trace.isNetworkTraceAndStarted()) {
+                        LiveTraceManager.setLiveTrace(trace.getTraceConfig().getTracePath(), true);
+                    }
 
                     // Refresh display
                     ISystemRegistry registry = SystemStartHere.getSystemRegistry();
@@ -278,6 +283,7 @@ public class StartTrace implements IObjectActionDelegate, IWorkbenchWindowAction
                     service.writeTraceNetwork(trace.getParent().getParent().getName(), 
                             trace.getParent().getName(), 
                             traceConfig.getTraceName(), 
+                            traceConfig.getTracePath(), 
                             traceConfig.getNumChannel(), 
                             traceConfig.getIsAppend(), 
                             false, 

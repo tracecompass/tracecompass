@@ -48,7 +48,8 @@ import org.xml.sax.SAXParseException;
 public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
 
     private static final TmfLocation<Long> NULL_LOCATION = new TmfLocation<Long>((Long) null);
-    
+    private static final int CACHE_SIZE = 100;
+
     private CustomXmlTraceDefinition fDefinition;
     private CustomXmlEventType fEventType;
     private InputElement fRecordInputElement;
@@ -67,9 +68,12 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     }
 
     @Override
+    public void initTrace(String path, Class<CustomXmlEvent> eventType, boolean indexTrace) throws FileNotFoundException {
+        super.initTrace(path, eventType, CACHE_SIZE, indexTrace);
+    }
+
+    @Override
     public TmfContext seekLocation(ITmfLocation<?> location) {
-        //System.out.println(Thread.currentThread().getName() + "::" + getName() + " seekLocation(" + ((location == null || location.getLocation() == null) ? "null" : location) + ")");
-        //new Throwable().printStackTrace();
         CustomXmlTraceContext context = new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
         if (NULL_LOCATION.equals(location) || !new File(getPath()).isFile()) {
             return context;
@@ -167,7 +171,6 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
 
     @Override
     public TmfEvent parseEvent(TmfContext tmfContext) {
-        //System.out.println(Thread.currentThread().getName() + ":: " + getName() + " parseEvent(" + tmfContext.getRank() + " @ " + (tmfContext.getLocation().getLocation() == null ? "null" : tmfContext.getLocation()));
         if (!(tmfContext instanceof CustomXmlTraceContext)) {
             return null;
         }

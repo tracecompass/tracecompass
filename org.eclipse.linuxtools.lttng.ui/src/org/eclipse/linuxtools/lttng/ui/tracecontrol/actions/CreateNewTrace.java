@@ -275,7 +275,7 @@ public class CreateNewTrace implements IObjectActionDelegate, IWorkbenchWindowAc
                 public void run() {
 
                     // Setup trace location using Lttng controller service proxy
-                    service.writeTraceNetwork(targetResource.getParent().getName(), targetResource.getName(), traceConfig.getTraceName(),
+                    service.writeTraceNetwork(targetResource.getParent().getName(), targetResource.getName(), traceConfig.getTracePath(), traceConfig.getTraceName(),
                             traceConfig.getNumChannel(), traceConfig.getIsAppend(), traceConfig.getMode() == TraceConfig.FLIGHT_RECORDER_MODE,
                             traceConfig.getMode() == TraceConfig.NORMAL_MODE, new ILttControllerService.DoneWriteTraceNetwork() {
 

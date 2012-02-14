@@ -83,7 +83,14 @@
         <module>org.eclipse.linuxtools.lttng.core.tests</module>
       </modules>
   </profile>
-
+  
+  <profile>
+    <id>lttngPackage</id>
+      <modules>
+        <module>org.eclipse.linuxtools.lttng.releng-site</module>
+      </modules>
+  </profile> 
+	
 </profiles>
 
   <build>

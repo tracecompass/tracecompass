@@ -87,6 +87,10 @@ public class TmfStatisticsView extends TmfView {
     protected TmfTimeRange fStatisticsUpdateRange = null;
     protected final Object fStatisticsUpdateSyncObj = new Object();
 
+    // Flag to force request the data from trace
+    protected boolean fRequestData = false; 
+
+    
     // Object to store the cursor while waiting for the experiment to load
     private Cursor fWaitCursor = null;
 
@@ -95,6 +99,7 @@ public class TmfStatisticsView extends TmfView {
 
     // Number of this instance. Used as an instance ID
     private int fInstanceNb;
+    
 
     /**
      * Constructor of a statistics view.
@@ -202,6 +207,7 @@ public class TmfStatisticsView extends TmfView {
         // Read current data if any available
         TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
         if (experiment != null) {
+            fRequestData = true;
             // Insert the statistics data into the tree
             @SuppressWarnings({ "rawtypes", "unchecked" })
             TmfExperimentSelectedSignal<?> signal = new TmfExperimentSelectedSignal(this, experiment);
@@ -345,9 +351,11 @@ public class TmfStatisticsView extends TmfView {
 
             // set input to a clean data model
             fTreeViewer.setInput(treeModelRoot);
-
-            // if the data is not available or has changed, reload it
-            requestData(experiment, experiment.getTimeRange());
+            
+            if (fRequestData) {
+                requestData(experiment, experiment.getTimeRange());
+                fRequestData = false;
+            }
         }
     }
 

@@ -70,7 +70,6 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
 
     @Override
     public void handleCancel() {
-        fHistogram.clear();
         super.handleCancel();
     }
 

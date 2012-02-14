@@ -197,7 +197,7 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
 
     protected void newCoalescedDataRequest(ITmfDataRequest<T> request) {
         synchronized (fLock) {
-            TmfCoalescedDataRequest<T> coalescedRequest = new TmfCoalescedDataRequest<T>(fType, request.getIndex(),
+            TmfCoalescedDataRequest<T> coalescedRequest = new TmfCoalescedDataRequest<T>(request.getDataType(), request.getIndex(),
                     request.getNbRequested(), request.getBlockSize(), request.getExecType());
             coalescedRequest.addRequest(request);
             if (Tracer.isRequestTraced()) {
@@ -271,7 +271,9 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
                     while (data != null && !isCompleted(request, data, nbRead)) {
                         if (fLogData)
                             Tracer.traceEvent(provider, request, data);
-                        request.handleData(data);
+                        if (request.getDataType().isInstance(data)) {
+                            request.handleData(data);
+                        }
 
                         // To avoid an unnecessary read passed the last data
                         // requested
@@ -332,7 +334,9 @@ public abstract class TmfDataProvider<T extends TmfData> extends TmfComponent im
                         @Override
                         public void handleData(T data) {
                             super.handleData(data);
-                            request.handleData(data);
+                            if (request.getDataType().isInstance(data)) {
+                                request.handleData(data);
+                            }
                             if (getNbRead() > CHUNK_SIZE[0]) {
                                 System.out.println("ERROR - Read too many events"); //$NON-NLS-1$
                             }

@@ -13,6 +13,7 @@ package org.eclipse.linuxtools.lttng.ui.model.trange;
 
 import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
 
+
 /**
  * @author alvaro
  * 

@@ -99,21 +99,23 @@ public class OpenExperimentHandler extends AbstractHandler {
         // Instantiate the experiment's traces
         List<TmfTraceElement> traceEntries = fExperiment.getTraces();
         int nbTraces = traceEntries.size();
+        int cacheSize = Integer.MAX_VALUE;
         ITmfTrace<?>[] traces = new ITmfTrace[nbTraces];
         for (int i = 0; i < nbTraces; i++) {
             TmfTraceElement element = traceEntries.get(i);
             ITmfTrace trace = element.instantiateTrace();
             TmfEvent traceEvent = element.instantiateEvent();
             try {
-                trace.initTrace(element.getLocation().getPath(), traceEvent.getClass());
+                trace.initTrace(element.getLocation().getPath(), traceEvent.getClass(), false);
             } catch (FileNotFoundException e) {
                 displayErrorMsg(""); //$NON-NLS-1$
             }
+            cacheSize = Math.min(cacheSize, trace.getCacheSize());
             traces[i] = trace;
         }
 
         // Create the experiment and signal
-        TmfExperiment experiment = new TmfExperiment(traces[0].getClass(), fExperiment.getName(), traces, traces[0].getCacheSize());
+        TmfExperiment experiment = new TmfExperiment(TmfEvent.class, fExperiment.getName(), traces, cacheSize);
         TmfExperiment.setCurrentExperiment(experiment);
         TmfSignalManager.dispatchSignal(new TmfExperimentSelectedSignal(this, experiment));
 

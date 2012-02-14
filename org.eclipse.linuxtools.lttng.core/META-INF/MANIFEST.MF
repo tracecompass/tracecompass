@@ -33,5 +33,6 @@ Export-Package: org.eclipse.linuxtools.lttng.core,
  org.eclipse.linuxtools.lttng.core.tracecontrol.model,
  org.eclipse.linuxtools.lttng.core.tracecontrol.model.config,
  org.eclipse.linuxtools.lttng.core.tracecontrol.service,
+ org.eclipse.linuxtools.lttng.core.tracecontrol.utility,
  org.eclipse.linuxtools.lttng.core.util
 Bundle-Localization: plugin

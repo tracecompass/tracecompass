@@ -93,6 +93,7 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
 		boolean ok = request.getIndex() == getIndex();
 		ok &= request.getNbRequested()  == getNbRequested();
 		ok &= request.getExecType()     == getExecType();
+		//ok &= request.getDataType()     == getDataType();
 		
 		return ok;
 	}
@@ -110,7 +111,9 @@ public class TmfCoalescedDataRequest<T extends TmfData> extends TmfDataRequest<T
 		if (getClass() == TmfCoalescedDataRequest.class) {
 	    	for (ITmfDataRequest<T> request : fRequests) {
 	    	    if (!request.isCompleted()) {
-	    	        request.handleData(data);
+                    if (request.getDataType().isInstance(data)) {
+                        request.handleData(data);
+                    }
 	    	    }
 	    	}
 		}
