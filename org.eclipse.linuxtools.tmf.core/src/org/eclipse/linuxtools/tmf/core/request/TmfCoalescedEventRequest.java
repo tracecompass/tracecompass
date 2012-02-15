@@ -97,6 +97,7 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
 			boolean ok = getNbRequested() == request.getNbRequested();
 			ok &= getIndex() == request.getIndex();
 			ok &= getExecType() == request.getExecType();
+            //ok &= getDataType() == request.getDataType();
 			if (ok) {
 				ITmfTimestamp startTime = ((ITmfEventRequest<T>) request).getRange().getStartTime();
 				ITmfTimestamp endTime   = ((ITmfEventRequest<T>) request).getRange().getEndTime();
@@ -115,29 +116,33 @@ public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDa
     // ------------------------------------------------------------------------
 
     @Override
-	public void handleData(T data) {
-    	super.handleData(data);
-    	for (ITmfDataRequest<T> request : fRequests) {
-    		if (data == null) {
-    			request.handleData(null);
-    		} else {
-    			if (request instanceof TmfEventRequest<?>) {
-    				TmfEventRequest<T> req = (TmfEventRequest<T>) request;
-       				if (!req.isCompleted()) {
-       					ITmfTimestamp ts = data.getTimestamp();
-    					if (req.getRange().contains(ts)) {
-    						req.handleData(data);
-    					}
-    				}
-    			}
-    			else {
-    				TmfDataRequest<T> req = (TmfDataRequest<T>) request;
-    				if (!req.isCompleted()) {
-    					req.handleData(data);
-    				}
-    			}
-    		}
-    	}
+    public void handleData(T data) {
+        super.handleData(data);
+        for (ITmfDataRequest<T> request : fRequests) {
+            if (data == null) {
+                request.handleData(null);
+            } else {
+                if (request instanceof TmfEventRequest<?>) {
+                    TmfEventRequest<T> req = (TmfEventRequest<T>) request;
+                    if (!req.isCompleted()) {
+                        ITmfTimestamp ts = data.getTimestamp();
+                        if (req.getRange().contains(ts)) {
+                            if (req.getDataType().isInstance(data)) {
+                                req.handleData(data);
+                            }
+                        }
+                    }
+                }
+                else {
+                    TmfDataRequest<T> req = (TmfDataRequest<T>) request;
+                    if (!req.isCompleted()) {
+                        if (req.getDataType().isInstance(data)) {
+                            req.handleData(data);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // ------------------------------------------------------------------------

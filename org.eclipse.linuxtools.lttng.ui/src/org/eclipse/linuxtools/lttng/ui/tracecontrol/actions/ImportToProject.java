@@ -30,8 +30,10 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource;
+import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.Messages;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.dialogs.ImportTraceDialog;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.ISubSystem;
@@ -246,33 +248,38 @@ public class ImportToProject implements IObjectActionDelegate, IWorkbenchWindowA
     /*
      * Method to create a symbolic link to a trace residing on the local host. 
      */
-	public static void linkTrace(Shell shell, TraceResource trace, IProject project, String traceName) {
-		IFolder traceFolder = project.getFolder(TRACE_FOLDER_NAME);
-		if (!traceFolder.exists()) {
-			MessageDialog.openWarning(shell,
-					Messages.ImportToProject_ImportFailed,
-					Messages.ImportToProject_NoProjectTraceFolder);
-			return;
-		}
-		
-		IFolder folder = traceFolder.getFolder(traceName);
-		if (folder.exists()) {
-			MessageDialog.openWarning(shell,
-					Messages.ImportToProject_ImportFailed,
-					Messages.ImportToProject_AlreadyExists);
-			return;
-		}
-		
-		File sourceFolder = new File(trace.getTraceConfig().getTracePath());
-		
-		try {
-			folder.createLink(sourceFolder.toURI(), IResource.REPLACE, null);
-		} catch (CoreException e) {
-			MessageDialog.openWarning(shell,
-					Messages.ImportToProject_ImportFailed,
-					e.getMessage());
-		}
-	}
+    public static void linkTrace(Shell shell, TraceResource trace, IProject project, String traceName) {
+        IFolder traceFolder = project.getFolder(TRACE_FOLDER_NAME);
+        if (!traceFolder.exists()) {
+            MessageDialog.openWarning(shell,
+                    Messages.ImportToProject_ImportFailed,
+                    Messages.ImportToProject_NoProjectTraceFolder);
+            return;
+        }
+
+        IFolder folder = traceFolder.getFolder(traceName);
+        if (folder.exists()) {
+            MessageDialog.openWarning(shell,
+                    Messages.ImportToProject_ImportFailed,
+                    Messages.ImportToProject_AlreadyExists);
+            return;
+        }
+
+        File sourceFolder = new File(trace.getTraceConfig().getTracePath());
+
+        try {
+            folder.createLink(sourceFolder.toURI(), IResource.REPLACE, null);
+            // Set the trace properties for this resource
+            // FIXME: update from extenstion point properties
+            folder.setPersistentProperty(TmfTraceElement.TRACEBUNDLE, LTTngUiPlugin.PLUGIN_ID);
+            folder.setPersistentProperty(TmfTraceElement.TRACETYPE, "org.eclipse.linuxtools.lttng.tracetype.kernel");
+            folder.setPersistentProperty(TmfTraceElement.TRACEICON, "icons/obj16/tux2.png");
+        } catch (CoreException e) {
+            MessageDialog.openWarning(shell,
+                    Messages.ImportToProject_ImportFailed,
+                    e.getMessage());
+        }
+    }
 
 	/*
      * (non-Javadoc)

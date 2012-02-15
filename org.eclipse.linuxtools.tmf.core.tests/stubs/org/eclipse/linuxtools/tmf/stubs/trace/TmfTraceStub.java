@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -250,7 +251,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     }
 
 	@Override
-	public void setEndTime(TmfTimestamp endTime) {
+	public void setEndTime(ITmfTimestamp endTime) {
     	super.setEndTime(endTime);
     }
 	

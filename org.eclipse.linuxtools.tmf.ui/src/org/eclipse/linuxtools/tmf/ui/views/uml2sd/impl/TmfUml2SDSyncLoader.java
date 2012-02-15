@@ -270,6 +270,9 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
      */
     @TmfSignalHandler 
     public void experimentDisposed(TmfExperimentDisposedSignal<TmfEvent> signal) {
+        if (signal.getExperiment() != TmfExperiment.getCurrentExperiment()) {
+            return;
+        }
         fLock.lock(); 
         try {
             if ((fIndexRequest != null) && !fIndexRequest.isCompleted()) {

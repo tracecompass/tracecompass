@@ -47,7 +47,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Slider;
-import org.eclipse.swt.widgets.TypedListener;
 
 /**
  * <b><u>TmfRawEventViewer</u></b>
@@ -70,7 +69,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     private static final int MAX_LINE_DATA_SIZE = 1000;
     private static final int SLIDER_MAX = 1000000;
 
-    private ITmfTrace fTrace;
+    private ITmfTrace<?> fTrace;
     private TmfContext fBottomContext;
     
     private ScrolledComposite fScrolledComposite;
@@ -241,7 +240,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         fStyledText.setMenu(menu);
     }
 
-    public void setTrace(ITmfTrace trace) {
+    public void setTrace(ITmfTrace<?> trace) {
 	    fTrace = trace;
 	    fTopLineIndex = 0;
 	    fLines.clear();
@@ -294,14 +293,13 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         }
     }
     
-    public void addSelectionListener(SelectionListener listener) {
+    public void addSelectionListener(Listener listener) {
         checkWidget();
         if (listener == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
-        TypedListener typedListener = new TypedListener(listener);
-        addListener (SWT.Selection, typedListener);
+        addListener (SWT.Selection, listener);
     }
 
-    public void removeSelectionListener(SelectionListener listener) {
+    public void removeSelectionListener(Listener listener) {
         checkWidget();
         if (listener == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
         removeListener(SWT.Selection, listener);

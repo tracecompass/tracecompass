@@ -112,7 +112,9 @@ public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvid
 						@Override
 						public void handleData(T data) {
 							super.handleData(data);
-							request.handleData(data);
+							if (request.getDataType().isInstance(data)) {
+							    request.handleData(data);
+							}
 							if (this.getNbRead() > CHUNK_SIZE[0]) {
 								System.out.println("ERROR - Read too many events"); //$NON-NLS-1$
 							}

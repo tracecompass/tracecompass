@@ -35,7 +35,8 @@ import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTraceDefinition.Inp
 public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
 
     private static final TmfLocation<Long> NULL_LOCATION = new TmfLocation<Long>((Long) null);
-    
+    private static final int CACHE_SIZE = 100;
+
     private CustomTxtTraceDefinition fDefinition;
     private CustomTxtEventType fEventType;
 
@@ -50,7 +51,12 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
         fEventType = new CustomTxtEventType(fDefinition);
     }
 
-	@Override
+    @Override
+    public void initTrace(String path, Class<CustomTxtEvent> eventType, boolean indexTrace) throws FileNotFoundException {
+        super.initTrace(path, eventType, CACHE_SIZE, indexTrace);
+    }
+
+    @Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ITmfTrace copy() {
         // TODO Auto-generated method stub
@@ -59,8 +65,6 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
 
     @Override
     public TmfContext seekLocation(ITmfLocation<?> location) {
-        //System.out.println(Thread.currentThread().getName() + "::" + getName() + " seekLocation(" + ((location == null || location.getLocation() == null) ? "null" : location) + ")");
-        //new Throwable().printStackTrace();
         CustomTxtTraceContext context = new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
         if (NULL_LOCATION.equals(location) || !new File(getPath()).isFile()) {
             return context;
@@ -155,7 +159,6 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
 
     @Override
     public TmfEvent parseEvent(TmfContext tmfContext) {
-        //System.out.println(Thread.currentThread().getName() + ":: " + getName() + " parseEvent(" + tmfContext.getRank() + " @ " + (tmfContext.getLocation().getLocation() == null ? "null" : tmfContext.getLocation()));
         if (!(tmfContext instanceof CustomTxtTraceContext)) {
             return null;
         }

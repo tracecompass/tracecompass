@@ -73,6 +73,11 @@ public interface ITmfTrace<T extends TmfEvent> extends ITmfComponent {
     public ITmfTimestamp getEndTime();
 
     /**
+     * @return the streaming interval in ms (0 if not streaming)
+     */
+    public long getStreamingInterval();
+
+    /**
      * Positions the trace at the first event with the specified timestamp or index (i.e. the nth event in the trace).
      * 
      * Returns a context which can later be used to read the event.

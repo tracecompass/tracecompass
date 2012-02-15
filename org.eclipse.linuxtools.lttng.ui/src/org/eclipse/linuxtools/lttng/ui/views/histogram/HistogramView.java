@@ -266,8 +266,7 @@ public class HistogramView extends TmfView {
     public void updateCurrentEventTime(long newTime) {
         if (fCurrentExperiment != null) {
             TmfTimeRange timeRange = new TmfTimeRange(new TmfTimestamp(newTime, TIME_SCALE), TmfTimestamp.BigCrunch);
-            HistogramRequest request = new HistogramRequest(fTimeRangeHistogram, timeRange, 0, 1,
-                    ExecutionType.FOREGROUND) {
+            HistogramRequest request = new HistogramRequest(fTimeRangeHistogram.getDataModel(), timeRange, 0, 1, ExecutionType.FOREGROUND) {
                 @Override
                 public void handleData(LttngEvent event) {
                     if (event != null) {
@@ -446,7 +445,7 @@ public class HistogramView extends TmfView {
 
         fTimeRangeHistogram.clear();
         fTimeRangeHistogram.setTimeRange(startTime, endTime - startTime);
-        fTimeRangeRequest = new HistogramRequest(fTimeRangeHistogram, timeRange, ExecutionType.FOREGROUND);
+        fTimeRangeRequest = new HistogramRequest(fTimeRangeHistogram.getDataModel(), timeRange, ExecutionType.FOREGROUND);
         fCurrentExperiment.sendRequest(fTimeRangeRequest);
     }
 
@@ -454,8 +453,8 @@ public class HistogramView extends TmfView {
         if (fFullTraceRequest != null && !fFullTraceRequest.isCompleted()) {
             fFullTraceRequest.cancel();
         }
-        fFullTraceRequest = new HistogramRequest(fFullTraceHistogram, fullRange,
-                (int) fFullTraceHistogram.fDataModel.getNbEvents(), ExecutionType.BACKGROUND);
+        fFullTraceRequest = new HistogramRequest(fFullTraceHistogram.getDataModel(), fullRange, (int) fFullTraceHistogram.fDataModel.getNbEvents(),
+                ExecutionType.BACKGROUND);
         fCurrentExperiment.sendRequest(fFullTraceRequest);
     }
 

@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -30,6 +31,7 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentDisposedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
@@ -75,6 +77,12 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
     // The current experiment context
     protected TmfExperimentContext fExperimentContext;
+
+    // Flag to initialize only once
+    private boolean fInitialized = false;
+
+    // The experiment resource
+    private IResource fResource;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -700,6 +708,84 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     // Indexing
     // ------------------------------------------------------------------------
 
+    private synchronized void initializeStreamingMonitor() {
+        if (fInitialized) {
+            return;
+        }
+        fInitialized = true;
+
+        if (getStreamingInterval() == 0) {
+            TmfContext context = seekLocation(null);
+            TmfEvent event = getNext(context);
+            if (event == null) {
+                return;
+            }
+            TmfTimeRange timeRange = new TmfTimeRange(event.getTimestamp(), TmfTimestamp.BigCrunch);
+            final TmfExperimentRangeUpdatedSignal signal = new TmfExperimentRangeUpdatedSignal(this, this, timeRange);
+
+            // Broadcast in separate thread to prevent deadlock
+            new Thread() {
+                @Override
+                public void run() {
+                    broadcast(signal);
+                }
+            }.start();
+            return;
+        }
+
+        final Thread thread = new Thread("Streaming Monitor for experiment " + getName()) { //$NON-NLS-1$
+            ITmfTimestamp safeTimestamp = null;
+            TmfTimeRange timeRange = null;
+
+            @Override
+            public void run() {
+                while (!fExecutor.isShutdown()) {
+                    if (!isIndexingBusy()) {
+                        ITmfTimestamp startTimestamp = TmfTimestamp.BigCrunch;
+                        ITmfTimestamp endTimestamp = TmfTimestamp.BigBang;
+                        for (ITmfTrace<T> trace : fTraces) {
+                            if (trace.getStartTime().compareTo(startTimestamp) < 0) {
+                                startTimestamp = trace.getStartTime();
+                            }
+                            if (trace.getStreamingInterval() != 0 && trace.getEndTime().compareTo(endTimestamp) > 0) {
+                                endTimestamp = trace.getEndTime();
+                            }
+                        }
+                        if (safeTimestamp != null && safeTimestamp.compareTo(getTimeRange().getEndTime(), false) > 0) {
+                            timeRange = new TmfTimeRange(startTimestamp, safeTimestamp);
+                        } else {
+                            timeRange = null;
+                        }
+                        safeTimestamp = endTimestamp;
+                        if (timeRange != null) {
+                            TmfExperimentRangeUpdatedSignal signal =
+                                    new TmfExperimentRangeUpdatedSignal(TmfExperiment.this, TmfExperiment.this, timeRange);
+                            broadcast(signal);
+                        }
+                    }
+                    try {
+                        Thread.sleep(getStreamingInterval());
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        thread.start();
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#getStreamingInterval()
+     */
+    @Override
+    public long getStreamingInterval() {
+        long interval = 0;
+        for (ITmfTrace<T> trace : fTraces) {
+            interval = Math.max(interval, trace.getStreamingInterval());
+        }
+        return interval;
+    }
+
     /*
      * The experiment holds the globally ordered events of its set of traces. It is expected to provide access to each
      * individual event by index i.e. it must be possible to request the Nth event of the experiment.
@@ -713,6 +799,8 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     protected int fIndexPageSize;
     protected boolean fIndexing = false;
     protected TmfTimeRange fIndexingPendingRange = TmfTimeRange.Null;
+
+    private Integer fEndSynchReference;
 
 //	private static BufferedWriter fEventLog = null;
 //	private static BufferedWriter openLogFile(String filename) {
@@ -848,7 +936,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
     protected void notifyListeners() {
         broadcast(new TmfExperimentUpdatedSignal(this, this)); // , null));
-        broadcast(new TmfExperimentRangeUpdatedSignal(this, this, fTimeRange)); // , null));
+        //broadcast(new TmfExperimentRangeUpdatedSignal(this, this, fTimeRange)); // , null));
     }
 
     // ------------------------------------------------------------------------
@@ -860,12 +948,26 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         TmfExperiment<?> experiment = signal.getExperiment();
         if (experiment == this) {
             setCurrentExperiment(experiment);
-            indexExperiment(false);
+            fEndSynchReference = new Integer(signal.getReference());
         }
     }
 
     @TmfSignalHandler
+    public void endSync(TmfEndSynchSignal signal) {
+        if (fEndSynchReference != null && fEndSynchReference.intValue() == signal.getReference()) {
+            fEndSynchReference = null;
+            initializeStreamingMonitor();
+        }
+        
+    }
+
+    @TmfSignalHandler
     public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
+    }
+
+    @TmfSignalHandler
+    public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
+        indexExperiment(false, (int) fNbEvents, signal.getRange());
     }
 
     @TmfSignalHandler
@@ -902,4 +1004,19 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         return null;
     }
 
+    /**
+     * Set the resource to be used for bookmarks on this experiment
+     * @param resource the bookmarks resource
+     */
+    public void setResource(IResource resource) {
+        fResource = resource;
+    }
+
+    /**
+     * Get the resource used for bookmarks on this experiment
+     * @return the bookmarks resource or null if none is set
+     */
+    public IResource getResource() {
+        return fResource;
+    }
 }

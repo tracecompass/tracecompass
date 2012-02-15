@@ -12,22 +12,27 @@
 
 package org.eclipse.linuxtools.tmf.ui.project.handlers;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
-import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
-import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEditorInput;
+import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IEditorInput;
@@ -47,6 +52,8 @@ import org.eclipse.ui.ide.IDE;
  * TODO: Add support for multiple trace selection
  */
 public class OpenTraceHandler extends AbstractHandler {
+
+    private static final String BOOKMARKS_HIDDEN_FILE = ".bookmarks"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -107,11 +114,24 @@ public class OpenTraceHandler extends AbstractHandler {
             return null;
         }
 
-        TmfEvent traceEvent = fTrace.instantiateEvent();
+        // If trace is under an experiment, use the original trace from the traces folder
+        if (fTrace.getParent() instanceof TmfExperimentElement) {
+            for (TmfTraceElement trace : fTrace.getProject().getTracesFolder().getTraces()) {
+                if (trace.getName().equals(fTrace.getName())) {
+                    fTrace = trace;
+                    break;
+                }
+            }
+        }
+
         ITmfTrace trace = fTrace.instantiateTrace();
-        if (trace == null) {
+        TmfEvent traceEvent = fTrace.instantiateEvent();
+        if (trace == null || traceEvent == null) {
             displayErrorMsg(Messages.OpenTraceHandler_NoTraceType);
             return null;
+        }
+        if (trace instanceof TmfTrace) {
+            ((TmfTrace) trace).setResource(fTrace.getResource());
         }
 
         // Get the editor_id from the extension point
@@ -145,19 +165,51 @@ public class OpenTraceHandler extends AbstractHandler {
             } catch (PartInitException e) {
                 e.printStackTrace();
             }
+            return null;
+        }
 
-        } else {
-            // Close the current experiment, if any
-            TmfExperiment<?> currentExperiment = TmfExperiment.getCurrentExperiment();
-            if (currentExperiment != null) {
-                currentExperiment.dispose();
+        try {
+            IResource resource = fTrace.getResource();
+            IFile file = null;
+            if (resource instanceof IFile) {
+                file = (IFile) resource;
+            } else if (resource instanceof IFolder){
+                IFile bookmarksFile = fTrace.getProject().getTracesFolder().getResource().getFile(BOOKMARKS_HIDDEN_FILE);
+                if (!bookmarksFile.exists()) {
+                    InputStream source = new ByteArrayInputStream(new byte[0]);
+                    bookmarksFile.create(source, true, null);
+                }
+                bookmarksFile.setHidden(true);
+
+                IFolder folder = (IFolder) resource;
+                file = folder.getFile(fTrace.getName() + ' ');
+                if (!file.exists()) {
+                    file.createLink(bookmarksFile.getLocation(), IResource.REPLACE, null);
+                }
+                file.setHidden(true);
+                file.setPersistentProperty(TmfTraceElement.TRACETYPE, TmfTrace.class.getCanonicalName());
             }
 
-            // Open the new experiment and broadcast
+            // Create the experiment and open in editor
             ITmfTrace[] traces = new ITmfTrace[] { trace };
             TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), fTrace.getName(), traces, trace.getCacheSize());
-            TmfExperiment.setCurrentExperiment(experiment);
-            TmfSignalManager.dispatchSignal(new TmfExperimentSelectedSignal(this, experiment));
+            experiment.setResource(file);
+
+            IEditorInput editorInput = new TmfEditorInput(file, experiment);
+            IWorkbench wb = PlatformUI.getWorkbench();
+            IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+
+            editorId = TmfEventsEditor.ID;
+            IEditorPart editor = activePage.findEditor(editorInput);
+            if (editor != null && editor instanceof IReusableEditor) {
+                activePage.reuseEditor((IReusableEditor) editor, editorInput);
+                activePage.activate(editor);
+            } else {
+                editor = activePage.openEditor(editorInput, editorId);
+                IDE.setDefaultEditor(file, editorId);
+            }
+        } catch (CoreException e) {
+            e.printStackTrace();
         }
         return null;
     }

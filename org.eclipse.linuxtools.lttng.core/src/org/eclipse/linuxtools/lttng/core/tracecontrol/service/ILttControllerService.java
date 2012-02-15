@@ -182,7 +182,7 @@ public interface ILttControllerService extends IService {
         void doneWriteTraceLocal(IToken token, Exception error, Object str);
     }
 
-    IToken writeTraceNetwork(String provider, String target, String trace, int numChannel, Boolean isAppend, Boolean isFlightRecorder, Boolean isNormalOnly, DoneWriteTraceNetwork done);
+    IToken writeTraceNetwork(String provider, String target, String trace, String path, int numChannel, Boolean isAppend, Boolean isFlightRecorder, Boolean isNormalOnly, DoneWriteTraceNetwork done);
 
     interface DoneWriteTraceNetwork {
         /**
@@ -193,6 +193,19 @@ public interface ILttControllerService extends IService {
          * @param str - response of the agent
          */
         void doneWriteTraceNetwork(IToken token, Exception error, Object str);
+    }
+
+    IToken stopWriteTraceNetwork(String provider, String target, String trace, DoneStopWriteTraceNetwork done);
+
+    interface DoneStopWriteTraceNetwork {
+        /**
+         * This method is called when stopWriteTraceNetwork() command is completed.
+         * 
+         * @param token - pending command handle.
+         * @param error - null if the command is successful.
+         * @param str - response of the agent
+         */
+        void doneStopWriteTraceNetwork(IToken token, Exception error, Object str);
     }
 
     IToken allocTrace(String provider, String target, String trace, DoneAllocTrace done);

@@ -12,12 +12,12 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
  org.eclipse.core.runtime;bundle-version="3.7.0",
  org.eclipse.linuxtools.tmf.core;bundle-version="0.4.0",
  org.eclipse.linuxtools.tmf.ui;bundle-version="0.4.0",
- org.eclipse.linuxtools.lttng.core;bundle-version="0.4.0",
  org.eclipse.tm.tcf.core;bundle-version="0.4.0",
  org.eclipse.rse.core;bundle-version="3.2.0",
  org.eclipse.rse.services;bundle-version="3.2.100",
  org.eclipse.rse.subsystems.files.core;bundle-version="3.2.100",
- org.eclipse.rse.ui;bundle-version="3.2.0"
+ org.eclipse.rse.ui;bundle-version="3.2.0",
+ org.eclipse.linuxtools.lttng.core;bundle-version="0.4.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
@@ -38,8 +38,13 @@ Export-Package: org.eclipse.linuxtools.lttng.ui;x-friends:="org.eclipse.linuxtoo
  org.eclipse.linuxtools.lttng.ui.views.controlflow;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
  org.eclipse.linuxtools.lttng.ui.views.controlflow.evProcessor;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
  org.eclipse.linuxtools.lttng.ui.views.controlflow.model;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
+ org.eclipse.linuxtools.lttng.ui.views.distribution.model,
  org.eclipse.linuxtools.lttng.ui.views.events;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
  org.eclipse.linuxtools.lttng.ui.views.histogram;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
+ org.eclipse.linuxtools.lttng.ui.views.latency;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
+ org.eclipse.linuxtools.lttng.ui.views.latency.dialogs;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
+ org.eclipse.linuxtools.lttng.ui.views.latency.listeners;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
+ org.eclipse.linuxtools.lttng.ui.views.latency.model;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
  org.eclipse.linuxtools.lttng.ui.views.project;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
  org.eclipse.linuxtools.lttng.ui.views.project.dialogs;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
  org.eclipse.linuxtools.lttng.ui.views.project.handlers;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",

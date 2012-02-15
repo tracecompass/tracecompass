@@ -115,6 +115,7 @@ public class TmfEventsView extends TmfView {
             setPartName(fTitlePrefix + " - " + fExperiment.getName()); //$NON-NLS-1$
             if (fEventsTable != null) {
             	fEventsTable.setTrace(fExperiment, false);
+                fEventsTable.refreshBookmarks(fExperiment.getResource());
             }
         }
     }

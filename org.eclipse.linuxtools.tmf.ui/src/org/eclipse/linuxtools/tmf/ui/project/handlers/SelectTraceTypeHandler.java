@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
@@ -108,6 +109,16 @@ public class SelectTraceTypeHandler extends AbstractHandler {
         boolean ok = true;
         for (Object element : fSelection.toList()) {
             TmfTraceElement trace = (TmfTraceElement) element;
+            // If trace is under an experiment, use the original trace from the traces folder
+            if (trace.getParent() instanceof TmfExperimentElement) {
+                for (TmfTraceElement aTrace : trace.getProject().getTracesFolder().getTraces()) {
+                    if (aTrace.getName().equals(trace.getName())) {
+                        trace = aTrace;
+                        break;
+                    }
+                }
+            }
+
             IResource resource = trace.getResource();
             if (resource != null) {
                 try {

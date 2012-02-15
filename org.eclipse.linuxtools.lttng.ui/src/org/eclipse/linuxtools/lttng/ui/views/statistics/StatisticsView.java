@@ -120,6 +120,9 @@ public class StatisticsView extends AbsTimeUpdateView {
     private boolean fStatisticsUpdatePending = false;
     private TmfTimeRange fStatisticsUpdateRange = null;
     private final Object fStatisticsUpdateSyncObj = new Object();
+    private boolean fClearData = true;
+    // Flag to force request the data from trace
+    private boolean fRequestData = false;
 
 	/**
 	 * Contains all the information necessary to build a column of the table.
@@ -487,6 +490,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 			
 			@SuppressWarnings({ "rawtypes", "unchecked" })
 			TmfExperimentSelectedSignal<?> signal = new TmfExperimentSelectedSignal(this, experiment);
+			fRequestData = true;
 			experimentSelected(signal);
 			
 		} else {
@@ -650,13 +654,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 	 */
 	@Override
 	public void modelIncomplete(ILttngSyntEventRequest request) {
-		Object input = treeViewer.getInput();
-		if (input != null && input instanceof StatisticsTreeNode) {
-			// The data from this experiment is invalid and shall be removed to
-			// refresh upon next selection
-		    String name = request.getExperimentName();
-			StatisticsTreeRootFactory.removeStatTreeRoot(name);
-		}
+        // Do not remove incomplete statistics, they can be completed upon next selection
 	}
 
 	/**
@@ -672,7 +670,8 @@ public class StatisticsView extends AbsTimeUpdateView {
 				// The experiment root is already present
 				StatisticsTreeNode experimentTreeNode = StatisticsTreeRootFactory.getStatTreeRoot(experimentName);
 
-				ITmfTrace[] traces = experiment.getTraces();
+				@SuppressWarnings("rawtypes")
+                ITmfTrace[] traces = experiment.getTraces();
 				
 				LTTngTreeNode expNode = StateManagerFactory.getExperimentManager().getSelectedExperiment();
 				
@@ -694,12 +693,13 @@ public class StatisticsView extends AbsTimeUpdateView {
 					}
 
 					if (same) {
-						// no need to reload data, all traces are already loaded
 						treeViewer.setInput(experimentTreeNode);
 						synchronized (fStatisticsUpdateSyncObj) {
 							fStatisticsUpdateBusy = false;
 							fStatisticsUpdatePending = false;
 						}
+						// request in case current data is incomplete
+						requestData(experiment, experiment.getTimeRange(), false);
 						return;
 					}
 				}
@@ -721,7 +721,11 @@ public class StatisticsView extends AbsTimeUpdateView {
 			}
 
 			// if the data is not available or has changed, reload it
-			requestData(experiment, experiment.getTimeRange(), true);
+			fClearData = true;
+			if(fRequestData) {
+			    requestData(experiment, experiment.getTimeRange(), fClearData);
+			    fRequestData = false;
+			}
 		}
 	}
 
@@ -737,7 +741,8 @@ public class StatisticsView extends AbsTimeUpdateView {
 			return;
 		}
 
-		requestData(experiment, signal.getRange(), false);
+		requestData(experiment, signal.getRange(), fClearData);
+		fClearData = false;
 	}
 
 	/**
@@ -761,7 +766,6 @@ public class StatisticsView extends AbsTimeUpdateView {
 			}
 
 			// send the initial request, to start filling up model
-			//eventRequest(fStatisticsUpdateIndex, nbRequested, fStatisticsUpdateStartTime, clearingData, ExecutionType.BACKGROUND);
 			eventRequest(index, range, clearingData, ExecutionType.BACKGROUND);
 		} else {
 			TraceDebug.debug("No selected experiment information available"); //$NON-NLS-1$

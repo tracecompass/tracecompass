@@ -112,6 +112,9 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
      */
     @TmfSignalHandler
     public void experimentDisposed(TmfExperimentDisposedSignal<? extends TmfEvent> experimentDisposedSignal) {
+        if (experimentDisposedSignal.getExperiment() != TmfExperiment.getCurrentExperiment()) {
+            return;
+        }
         fProvider.conditionallyCancelRequests();
     }
 	
