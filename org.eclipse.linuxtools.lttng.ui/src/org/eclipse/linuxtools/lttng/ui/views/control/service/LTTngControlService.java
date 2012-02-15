@@ -207,11 +207,6 @@ public class LTTngControlService implements ILttngControlService {
         ICommandResult result = fCommandShell.executeCommand(command, monitor);
 
         if (isError(result)) {
-            // TODO: no session available shouldn't be an error!
-            if (result.getOutput().length > 0 && ERROR_PATTERN.matcher(result.getOutput()[0]).matches()) {
-                // no sessions available
-                return new String[0];
-            }
             throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
