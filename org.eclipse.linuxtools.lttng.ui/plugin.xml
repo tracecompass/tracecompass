@@ -954,6 +954,9 @@
             id="org.eclipse.linuxtools.lttng.tracetype.kernel"
             name="%tracetype.type.kernel"
             trace_type="org.eclipse.linuxtools.lttng.core.trace.LTTngTrace">
+         <eventsTableType
+               class="org.eclipse.linuxtools.lttng.ui.views.events.EventsTable">
+         </eventsTableType>
       </type>
    </extension>
 

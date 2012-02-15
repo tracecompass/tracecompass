@@ -23,11 +23,27 @@ import org.eclipse.core.resources.IProject;
  */
 public class TmfProjectRegistry {
 
+    // The map of project resource to project model elements
     private static Map<IProject, TmfProjectElement> registry = new HashMap<IProject, TmfProjectElement>();
 
+    /**
+     * Get the project model element for a project resource
+     * @param project the project resource
+     * @return the project model element or null if it does not exist
+     */
     public static synchronized TmfProjectElement getProject(IProject project) {
+        return getProject(project, false);
+    }
+
+    /**
+     * Get the project model element for a project resource
+     * @param project the project resource
+     * @param force a flag controlling whether a new project should be created if it doesn't exist
+     * @return the project model element
+     */
+    public static synchronized TmfProjectElement getProject(IProject project, boolean force) {
         TmfProjectElement element = registry.get(project);
-        if (element == null) {
+        if (element == null && force) {
             registry.put(project, new TmfProjectElement(project.getName(), project, null));
             element = registry.get(project);
         }

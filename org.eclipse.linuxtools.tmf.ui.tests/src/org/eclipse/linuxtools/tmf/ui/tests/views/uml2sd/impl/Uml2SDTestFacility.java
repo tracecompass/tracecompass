@@ -269,6 +269,9 @@ public class Uml2SDTestFacility {
         fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, "TestExperiment", traces); //$NON-NLS-1$
         fTrace.broadcast(new TmfExperimentSelectedSignal<TmfEvent>(this, fExperiment));
         if (wait) {
+            while (fExperiment.getNbEvents() == 0) {
+                delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
+            }
             waitForJobs();
             delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         }

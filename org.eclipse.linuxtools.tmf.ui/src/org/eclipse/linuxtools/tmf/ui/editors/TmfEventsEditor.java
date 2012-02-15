@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.tmf.ui.editors;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
@@ -29,13 +30,23 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.core.util.TmfTraceType;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomEventsTable;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomXmlTrace;
+import org.eclipse.linuxtools.tmf.ui.project.handlers.Messages;
+import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfNavigatorContentProvider;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.signal.TmfTraceClosedSignal;
 import org.eclipse.linuxtools.tmf.ui.signal.TmfTraceOpenedSignal;
@@ -74,7 +85,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     public void doSaveAs() {
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         if (input instanceof TmfEditorInput) {
@@ -82,9 +93,88 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             fTrace = ((TmfEditorInput) input).getTrace();
         } else if (input instanceof IFileEditorInput) {
             fResource = ((IFileEditorInput) input).getFile();
+            if (fResource == null) {
+                throw new PartInitException("Invalid IFileEditorInput: " + input); //$NON-NLS-1$
+            }
             try {
                 String traceTypeId = fResource.getPersistentProperty(TmfTraceElement.TRACETYPE);
-                if (traceTypeId != null) {
+                if (traceTypeId.equals(TmfExperiment.class.getCanonicalName())) {
+                    // Special case: experiment bookmark resource
+                    TmfNavigatorContentProvider ncp = new TmfNavigatorContentProvider();
+                    ncp.getChildren(fResource.getProject()); // force the model to be populated
+                    TmfProjectElement project = TmfProjectRegistry.getProject(fResource.getProject());
+                    if (project == null) {
+                        throw new PartInitException(Messages.OpenExperimentHandler_NoTraceType);
+                    }
+                    for (ITmfProjectModelElement projectElement : project.getExperimentsFolder().getChildren()) {
+                        String traceName = fResource.getParent().getName();
+                        if (projectElement.getName().equals(traceName)) {
+                            TmfExperimentElement experimentElement = (TmfExperimentElement) projectElement;
+                            // Instantiate the experiment's traces
+                            List<TmfTraceElement> traceEntries = experimentElement.getTraces();
+                            int nbTraces = traceEntries.size();
+                            int cacheSize = Integer.MAX_VALUE;
+                            ITmfTrace<?>[] traces = new ITmfTrace[nbTraces];
+                            for (int i = 0; i < nbTraces; i++) {
+                                TmfTraceElement traceElement = traceEntries.get(i);
+                                ITmfTrace trace = traceElement.instantiateTrace();
+                                TmfEvent traceEvent = traceElement.instantiateEvent();
+                                if (trace == null || traceEvent == null) {
+                                    for (int j = 0; j < i; j++) {
+                                        traces[j].dispose();
+                                    }
+                                    throw new PartInitException(Messages.OpenExperimentHandler_NoTraceType);
+                                }
+                                try {
+                                    trace.initTrace(traceElement.getLocation().getPath(), traceEvent.getClass(), false);
+                                } catch (FileNotFoundException e) {
+                                }
+                                if (trace instanceof TmfTrace) {
+                                    ((TmfTrace) trace).setResource(traceElement.getResource());
+                                }
+                                cacheSize = Math.min(cacheSize, trace.getCacheSize());
+                                traces[i] = trace;
+                            }
+                            TmfExperiment experiment = new TmfExperiment(TmfEvent.class, experimentElement.getName(), traces, cacheSize);
+                            experiment.setResource(fResource);
+                            fTrace = experiment;
+                            TmfExperiment.setCurrentExperiment(experiment);
+                            TmfSignalManager.dispatchSignal(new TmfExperimentSelectedSignal(this, experiment));
+                            break;
+                        }
+                    }
+                } else if (traceTypeId.equals(TmfTrace.class.getCanonicalName())) {
+                 // Special case: trace bookmark resource
+                    TmfNavigatorContentProvider ncp = new TmfNavigatorContentProvider();
+                    ncp.getChildren(fResource.getProject()); // force the model to be populated
+                    TmfProjectElement project = TmfProjectRegistry.getProject(fResource.getProject());
+                    for (ITmfProjectModelElement projectElement : project.getTracesFolder().getChildren()) {
+                        String experimentName = fResource.getParent().getName();
+                        if (projectElement.getName().equals(experimentName)) {
+                            TmfTraceElement traceElement = (TmfTraceElement) projectElement;
+                            // Instantiate the experiment trace
+                            ITmfTrace trace = traceElement.instantiateTrace();
+                            TmfEvent traceEvent = traceElement.instantiateEvent();
+                            if (trace == null || traceEvent == null) {
+                                throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
+                            }
+                            try {
+                                trace.initTrace(traceElement.getLocation().getPath(), traceEvent.getClass(), false);
+                            } catch (FileNotFoundException e) {
+                            }
+                            if (trace instanceof TmfTrace) {
+                                ((TmfTrace) trace).setResource(traceElement.getResource());
+                            }
+                            ITmfTrace[] traces = new ITmfTrace[] { trace };
+                            TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), traceElement.getName(), traces, trace.getCacheSize());
+                            experiment.setResource(fResource);
+                            fTrace = experiment;
+                            TmfExperiment.setCurrentExperiment(experiment);
+                            TmfSignalManager.dispatchSignal(new TmfExperimentSelectedSignal(this, experiment));
+                            break;
+                        }
+                    }
+                } else if (traceTypeId != null) {
                     for (IConfigurationElement ce : TmfTraceType.getTypeElements()) {
                         if (traceTypeId.equals(ce.getAttribute(TmfTraceType.ID_ATTR))) {
                             fTrace = (ITmfTrace<?>) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
@@ -99,6 +189,8 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                 e.printStackTrace();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
+            } catch (PartInitException e) {
+                throw e;
             } catch (CoreException e) {
                 e.printStackTrace();
             }
@@ -186,6 +278,9 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     }
     
     private TmfEventsTable getEventsTable(Composite parent, int cacheSize) {
+        if (fTrace instanceof TmfExperiment) {
+            return getExperimentEventsTable((TmfExperiment<?>) fTrace, parent, cacheSize);
+        }
         TmfEventsTable eventsTable = null;
         try {
             String traceType = fResource.getPersistentProperty(TmfTraceElement.TRACETYPE);
@@ -236,6 +331,83 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         return eventsTable;
     }
 
+    /**
+     * Get the events table for an experiment.
+     * If all traces in the experiment are of the same type,
+     * use the extension point specified event table
+     * @param experiment the experiment
+     * @param parent the parent Composite
+     * @param cacheSize the event table cache size
+     * @return an events table of the appropriate type
+     */
+    private TmfEventsTable getExperimentEventsTable(TmfExperiment<?> experiment, Composite parent, int cacheSize) {
+        TmfEventsTable eventsTable = null;
+        String commonTraceType = null;
+        try {
+            for (ITmfTrace<?> trace : experiment.getTraces()) {
+                IResource resource = null;
+                if (trace instanceof TmfTrace) {
+                    resource = ((TmfTrace<?>) trace).getResource();
+                }
+                if (resource == null) {
+                    return null;
+                }
+                String traceType = resource.getPersistentProperty(TmfTraceElement.TRACETYPE);
+                if (commonTraceType != null && !commonTraceType.equals(traceType)) {
+                    return null;
+                }
+                commonTraceType = traceType;
+            }
+            if (commonTraceType == null) {
+                return null;
+            }
+            if (commonTraceType.startsWith(CustomTxtTrace.class.getCanonicalName())) {
+                return new CustomEventsTable(((CustomTxtTrace) experiment.getTraces()[0]).getDefinition(), parent, cacheSize);
+            }
+            if (commonTraceType.startsWith(CustomXmlTrace.class.getCanonicalName())) {
+                return new CustomEventsTable(((CustomXmlTrace) experiment.getTraces()[0]).getDefinition(), parent, cacheSize);
+            }
+            for (IConfigurationElement ce : TmfTraceType.getTypeElements()) {
+                if (ce.getAttribute(TmfTraceType.ID_ATTR).equals(commonTraceType)) {
+                    IConfigurationElement[] eventsTableTypeCE = ce.getChildren(TmfTraceType.EVENTS_TABLE_TYPE_ELEM);
+                    if (eventsTableTypeCE.length != 1) {
+                        break;
+                    }
+                    String eventsTableType = eventsTableTypeCE[0].getAttribute(TmfTraceType.CLASS_ATTR);
+                    if (eventsTableType == null || eventsTableType.length() == 0) {
+                        break;
+                    }
+                    Bundle bundle = Platform.getBundle(ce.getContributor().getName());
+                    Class<?> c = bundle.loadClass(eventsTableType);
+                    Class<?>[] constructorArgs = new Class[] { Composite.class, int.class };
+                    Constructor<?> constructor = c.getConstructor(constructorArgs);
+                    Object[] args = new Object[] { parent, cacheSize };
+                    eventsTable = (TmfEventsTable) constructor.newInstance(args);
+                    break;
+                }
+            }
+        } catch (CoreException e) {
+            e.printStackTrace();
+        } catch (InvalidRegistryObjectException e) {
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return eventsTable;
+    }
+
     @Override
 	public ITmfTrace<?> getTrace() {
         return fTrace;
@@ -246,11 +418,17 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     	return fResource;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public void setFocus() {
         fEventsTable.setFocus();
         if (fTrace != null) {
             broadcast(new TmfTraceSelectedSignal(this, fTrace));
+            if (fTrace instanceof TmfExperiment && !fTrace.equals(TmfExperiment.getCurrentExperiment())) {
+                TmfExperiment experiment = (TmfExperiment) fTrace;
+                TmfExperiment.setCurrentExperiment(experiment);
+                broadcast(new TmfExperimentSelectedSignal(this, experiment));
+            }
         }
     }
 
@@ -265,19 +443,28 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
 
     @Override
     public void resourceChanged(IResourceChangeEvent event) {
-    	for (IMarkerDelta delta : event.findMarkerDeltas(IMarker.BOOKMARK, false)) {
-    		if (delta.getResource().equals(fResource) && delta.getKind() == IResourceDelta.REMOVED) {
-    			final IMarker bookmark = delta.getMarker();
-    			Display.getDefault().asyncExec(new Runnable() {
-    				@Override
-    				public void run() {
-    					fEventsTable.removeBookmark(bookmark);
-    				}
-    			});
-    		}
-    	}
+        for (IMarkerDelta delta : event.findMarkerDeltas(IMarker.BOOKMARK, false)) {
+            if (delta.getResource().equals(fResource)) {
+                if (delta.getKind() == IResourceDelta.REMOVED) {
+                    final IMarker bookmark = delta.getMarker();
+                    Display.getDefault().asyncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            fEventsTable.removeBookmark(bookmark);
+                        }
+                    });
+                } else if (delta.getKind() == IResourceDelta.CHANGED) {
+                    Display.getDefault().asyncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            fEventsTable.getTable().refresh();
+                        }
+                    });
+                }
+            }
+        }
     }
-     
+
     // ------------------------------------------------------------------------
     // Global commands
     // ------------------------------------------------------------------------

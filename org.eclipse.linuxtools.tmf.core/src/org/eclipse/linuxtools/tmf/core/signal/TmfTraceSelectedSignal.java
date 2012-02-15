@@ -19,14 +19,14 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  */
 public class TmfTraceSelectedSignal extends TmfSignal {
 
-    private final ITmfTrace fTrace;
+    private final ITmfTrace<?> fTrace;
     
-    public TmfTraceSelectedSignal(Object source, ITmfTrace trace) {
+    public TmfTraceSelectedSignal(Object source, ITmfTrace<?> trace) {
         super(source);
         fTrace = trace;
     }
 
-    public ITmfTrace getTrace() {
+    public ITmfTrace<?> getTrace() {
         return fTrace;
     }
 

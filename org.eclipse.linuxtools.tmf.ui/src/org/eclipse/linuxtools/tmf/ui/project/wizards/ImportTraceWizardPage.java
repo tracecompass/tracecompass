@@ -51,6 +51,8 @@ import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomXmlTraceDefinition;
+import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.swt.SWT;
@@ -816,6 +818,12 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
                                 resource.setPersistentProperty(TmfTraceElement.TRACEBUNDLE, traceBundle);
                                 resource.setPersistentProperty(TmfTraceElement.TRACETYPE, traceTypeId);
                                 resource.setPersistentProperty(TmfTraceElement.TRACEICON, traceIcon);
+                                for (TmfTraceElement traceElement : TmfProjectRegistry.getProject(resource.getProject()).getTracesFolder().getTraces()) {
+                                    if (traceElement.getName().equals(resource.getName())) {
+                                        traceElement.refreshTraceType();
+                                        break;
+                                    }
+                                }
                             } catch (CoreException e) {
                                 e.printStackTrace();
                             }

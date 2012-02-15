@@ -654,13 +654,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 	 */
 	@Override
 	public void modelIncomplete(ILttngSyntEventRequest request) {
-		Object input = treeViewer.getInput();
-		if (input != null && input instanceof StatisticsTreeNode) {
-			// The data from this experiment is invalid and shall be removed to
-			// refresh upon next selection
-		    String name = request.getExperimentName();
-			StatisticsTreeRootFactory.removeStatTreeRoot(name);
-		}
+        // Do not remove incomplete statistics, they can be completed upon next selection
 	}
 
 	/**
@@ -699,12 +693,13 @@ public class StatisticsView extends AbsTimeUpdateView {
 					}
 
 					if (same) {
-						// no need to reload data, all traces are already loaded
 						treeViewer.setInput(experimentTreeNode);
 						synchronized (fStatisticsUpdateSyncObj) {
 							fStatisticsUpdateBusy = false;
 							fStatisticsUpdatePending = false;
 						}
+						// request in case current data is incomplete
+						requestData(experiment, experiment.getTimeRange(), false);
 						return;
 					}
 				}

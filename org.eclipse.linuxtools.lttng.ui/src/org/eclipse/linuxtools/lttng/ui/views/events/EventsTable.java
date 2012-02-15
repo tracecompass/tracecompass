@@ -13,7 +13,6 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.events;
 
-import org.eclipse.linuxtools.lttng.core.event.LttngEventContent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
@@ -71,7 +70,7 @@ public class EventsTable extends TmfEventsTable {
                     event.getTimestamp().toString(),
                     event.getReference().toString(),
                     event.getType().toString(),
-                    ((LttngEventContent) event.getContent()).toString()
+                    event.getContent().toString()
             };
         }
         return fields;

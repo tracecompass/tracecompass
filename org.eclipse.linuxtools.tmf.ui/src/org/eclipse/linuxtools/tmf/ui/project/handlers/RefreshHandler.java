@@ -15,6 +15,8 @@ package org.eclipse.linuxtools.tmf.ui.project.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
@@ -52,20 +54,25 @@ public class RefreshHandler extends AbstractHandler {
         if (selection instanceof TreeSelection) {
             TreeSelection treeSelection = (TreeSelection) selection;
             Object element = treeSelection.getFirstElement();
+            IResource resource = null;
             if (element instanceof TmfTraceFolder) {
                 TmfTraceFolder folder = (TmfTraceFolder) element;
-                TmfProjectElement project = (TmfProjectElement) folder.getProject();
-                project.refresh();
+                resource = folder.getResource();
             }
             else if (element instanceof TmfExperimentFolder) {
                 TmfExperimentFolder folder = (TmfExperimentFolder) element;
-                TmfProjectElement project = (TmfProjectElement) folder.getProject();
-                project.refresh();
+                resource = folder.getResource();
             }
             else if (element instanceof TmfExperimentElement) {
                 TmfExperimentElement folder = (TmfExperimentElement) element;
-                TmfProjectElement project = folder.getProject();
-                project.refresh();
+                resource = folder.getResource();
+            }
+            try {
+                if (resource != null) {
+                    resource.refreshLocal(IResource.DEPTH_INFINITE, null);
+                }
+            } catch (CoreException e) {
+                e.printStackTrace();
             }
         }
 

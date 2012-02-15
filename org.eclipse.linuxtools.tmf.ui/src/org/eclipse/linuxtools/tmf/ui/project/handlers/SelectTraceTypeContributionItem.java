@@ -142,20 +142,18 @@ public class SelectTraceTypeContributionItem extends CompoundContributionItem {
             icon = SELECTED_ICON;
         }
 
-        CommandContributionItemParameter param = new CommandContributionItemParameter(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow(), "my.parameterid", // id //$NON-NLS-1$
+        CommandContributionItemParameter param = new CommandContributionItemParameter(
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow(), // serviceLocator
+                "my.parameterid", // id //$NON-NLS-1$
                 SELECT_TRACE_TYPE_COMMAND_ID, // commandId
-                params, // parameters
-                icon, // icon
-                icon, // disabled icon
-                icon, // hover icon
-                label, // label
-                null, // mnemonic
-                null, // tooltip
-                CommandContributionItem.STYLE_PUSH, // style
-                null, // help context id
-                true // visibleEnable
+                CommandContributionItem.STYLE_PUSH // style
         );
+        param.parameters = params;
+        param.icon = icon;
+        param.disabledIcon = icon;
+        param.hoverIcon = icon;
+        param.label = label;
+        param.visibleEnabled = true;
 
         if (subMenu != null) {
             subMenu.add(new CommandContributionItem(param));

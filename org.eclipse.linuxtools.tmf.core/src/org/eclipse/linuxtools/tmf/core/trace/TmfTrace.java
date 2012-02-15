@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
@@ -82,6 +83,9 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
     // The time span of the event stream
     private TmfTimestamp fStartTime = TmfTimestamp.BigCrunch;
     private TmfTimestamp fEndTime = TmfTimestamp.BigBang;
+
+    // The trace resource
+    private IResource fResource;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -548,5 +552,21 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 
     protected void notifyListeners() {
         broadcast(new TmfTraceUpdatedSignal(this, this, new TmfTimeRange(fStartTime, fEndTime)));
+    }
+
+    /**
+     * Set the resource to be used for bookmarks on this trace
+     * @param resource the bookmarks resource
+     */
+    public void setResource(IResource resource) {
+        fResource = resource;
+    }
+
+    /**
+     * Get the resource used for bookmarks on this trace
+     * @return the bookmarks resource or null if none is set
+     */
+    public IResource getResource() {
+        return fResource;
     }
 }

@@ -22,7 +22,7 @@ import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysis
 
 public class TimeChartAnalysisEntry implements ITmfTimeAnalysisEntry {
 
-    private ITmfTrace fTrace;
+    private ITmfTrace<?> fTrace;
     private String fGroup;
     private Vector<TimeChartEvent> fTraceEvents;
     private int fPower = 0; // 2^fPower nanoseconds per vector position
@@ -31,12 +31,12 @@ public class TimeChartAnalysisEntry implements ITmfTimeAnalysisEntry {
     private long fStopTime = -1; // time of last event
     private long fLastRank = -1; // rank of last processed trace event
 
-    TimeChartAnalysisEntry(ITmfTrace trace, int modelSize) {
+    TimeChartAnalysisEntry(ITmfTrace<?> trace, int modelSize) {
         fTrace = trace;
         fTraceEvents = new Vector<TimeChartEvent>(modelSize);
     }
     
-    TimeChartAnalysisEntry(ITmfTrace trace, String group, int modelSize) {
+    TimeChartAnalysisEntry(ITmfTrace<?> trace, String group, int modelSize) {
         fTrace = trace;
         fTraceEvents = new Vector<TimeChartEvent>(modelSize);
         fGroup = group;
@@ -235,7 +235,7 @@ public class TimeChartAnalysisEntry implements ITmfTimeAnalysisEntry {
         }
     }
     
-    public ITmfTrace getTrace() {
+    public ITmfTrace<?> getTrace() {
         return fTrace;
     }
     
