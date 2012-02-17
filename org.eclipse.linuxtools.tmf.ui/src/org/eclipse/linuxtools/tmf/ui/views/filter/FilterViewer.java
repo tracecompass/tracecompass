@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.filter.model.ITmfFilterTreeNode;
@@ -338,7 +339,7 @@ class FilterViewer extends Composite {
                     for (IConfigurationElement ce : TmfTraceType.getTypeElements()) {
                         if (ce.getAttribute(TmfTraceType.EVENT_TYPE_ATTR).equals(eventTypeNode.getEventType())) {
                             try {
-                                TmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
+                                ITmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
                                 ITmfEventType eventType = event.getType();
                                 if (eventType != null) {
                                     for (String field : eventType.getRootField().getFieldNames()) {

@@ -327,7 +327,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         try {
             if ((signal.getSource() != this) && (fFrame != null) && !fIsSignalSent) {
                 TmfTimeRange newTimeRange = signal.getCurrentRange();
-                TmfTimestamp delta = (TmfTimestamp) newTimeRange.getEndTime().getDelta(newTimeRange.getStartTime());
+                ITmfTimestamp delta = (TmfTimestamp) newTimeRange.getEndTime().getDelta(newTimeRange.getStartTime());
                 fInitialWindow = delta.getValue();
 
                 fIsSelect = false;

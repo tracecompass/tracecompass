@@ -280,7 +280,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
         fEndTime = range.getEndTime();
     }
 
-    protected void setStartTime(TmfTimestamp startTime) {
+    protected void setStartTime(ITmfTimestamp startTime) {
         fStartTime = startTime;
     }
 

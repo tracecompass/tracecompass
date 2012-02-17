@@ -26,7 +26,7 @@ public interface ITmfEventField extends Cloneable {
     public static final String ROOT_ID = ":root:"; //$NON-NLS-1$
     
     /**
-     * @return the field ID
+     * @return the field name
      */
     public String getName();
 

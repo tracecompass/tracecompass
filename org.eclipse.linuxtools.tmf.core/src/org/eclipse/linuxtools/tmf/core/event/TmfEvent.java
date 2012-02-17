@@ -20,8 +20,9 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * <p>
  * A basic implementation of ITmfEvent.
  * 
- * Note that for performance reasons TmfEvent is NOT immutable. If a copy of
- * the event is needed, use the copy constructor.
+ * Note that for performance reasons TmfEvent is NOT immutable. If a shallow
+ * copy of the event is needed, use the copy constructor. Otherwise (deep copy)
+ * use clone().
  */
 public class TmfEvent implements ITmfEvent {
 
@@ -29,12 +30,39 @@ public class TmfEvent implements ITmfEvent {
     // Attributes
     // ------------------------------------------------------------------------
 
+    /**
+     * The trace containing the event
+     */
     protected ITmfTrace<? extends TmfEvent> fTrace;
+
+    /**
+     * The event rank within the trace
+     */
     protected long fRank;
+    
+    /**
+     * The event timestamp
+     */
     protected ITmfTimestamp fTimestamp;
+    
+    /**
+     * The event source
+     */
     protected String fSource;
+    
+    /**
+     * The event type
+     */
     protected ITmfEventType fType;
+    
+    /**
+     * The event content (root field)
+     */
     protected ITmfEventField fContent;
+    
+    /**
+     * The event reference
+     */
     protected String fReference;
 
     // ------------------------------------------------------------------------
@@ -59,7 +87,7 @@ public class TmfEvent implements ITmfEvent {
      * @param reference the event reference
      */
     public TmfEvent(ITmfTrace<? extends TmfEvent> trace, long rank, ITmfTimestamp timestamp, String source,
-                    TmfEventType type, ITmfEventField content, String reference)
+                    ITmfEventType type, ITmfEventField content, String reference)
     {
         fTrace = trace;
         fRank = rank;
@@ -74,7 +102,7 @@ public class TmfEvent implements ITmfEvent {
      * Constructor - no rank
      */
     public TmfEvent(ITmfTrace<? extends TmfEvent> trace, ITmfTimestamp timestamp, String source,
-            TmfEventType type, ITmfEventField content, String reference)
+            ITmfEventType type, ITmfEventField content, String reference)
     {
         this(trace, -1, timestamp, source, type, content, reference);
     }
@@ -83,7 +111,7 @@ public class TmfEvent implements ITmfEvent {
      * Constructor - no rank, no content
      */
     public TmfEvent(ITmfTrace<? extends TmfEvent> trace, ITmfTimestamp timestamp, String source,
-            TmfEventType type, String reference)
+            ITmfEventType type, String reference)
     {
         this(trace, -1, timestamp, source, type, null, reference);
     }
@@ -91,7 +119,7 @@ public class TmfEvent implements ITmfEvent {
     /**
      * Constructor - no rank, no content, no trace
      */
-    public TmfEvent(TmfTimestamp timestamp, String source, TmfEventType type, String reference)
+    public TmfEvent(TmfTimestamp timestamp, String source, ITmfEventType type, String reference)
     {
         this(null, -1, timestamp, source, type, null, reference);
     }
@@ -117,30 +145,58 @@ public class TmfEvent implements ITmfEvent {
     // ITmfEvent
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEvent#getTrace()
+     */
+    @Override
     public ITmfTrace<? extends TmfEvent> getTrace() {
         return fTrace;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEvent#getRank()
+     */
+    @Override
     public long getRank() {
         return fRank;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEvent#getTimestamp()
+     */
+    @Override
     public ITmfTimestamp getTimestamp() {
         return fTimestamp;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEvent#getSource()
+     */
+    @Override
     public String getSource() {
         return fSource;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEvent#getType()
+     */
+    @Override
     public ITmfEventType getType() {
         return fType;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEvent#getContent()
+     */
+    @Override
     public ITmfEventField getContent() {
         return fContent;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEvent#getReference()
+     */
+    @Override
     public String getReference() {
         return fReference;
     }
@@ -166,7 +222,7 @@ public class TmfEvent implements ITmfEvent {
     /**
      * @param type the new event type
      */
-    public void setType(TmfEventType type) {
+    public void setType(ITmfEventType type) {
         fType = type;
     }
 
@@ -188,6 +244,9 @@ public class TmfEvent implements ITmfEvent {
     // Cloneable
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#clone()
+     */
     @Override
     public TmfEvent clone() {
         TmfEvent clone = null;
@@ -209,6 +268,9 @@ public class TmfEvent implements ITmfEvent {
     // Object
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -223,6 +285,9 @@ public class TmfEvent implements ITmfEvent {
         return result;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -267,6 +332,9 @@ public class TmfEvent implements ITmfEvent {
         return true;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     @SuppressWarnings("nls")
     public String toString() {

@@ -20,7 +20,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
@@ -246,7 +245,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     }
 
 	@Override
-	public void setStartTime(TmfTimestamp startTime) {
+	public void setStartTime(ITmfTimestamp startTime) {
     	super.setStartTime(startTime);
     }
 

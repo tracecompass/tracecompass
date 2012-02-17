@@ -24,9 +24,15 @@ public class TmfTimeRange implements Cloneable {
     // Constants
     // ------------------------------------------------------------------------
 
+    /**
+     * The full possible time range
+     */
     public static final TmfTimeRange Eternity =
         new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
 
+    /**
+     * The null time range
+     */
     public static final TmfTimeRange Null =
         new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigBang);
 
@@ -59,8 +65,8 @@ public class TmfTimeRange implements Cloneable {
         if (startTime == null || endTime == null) {
             throw new IllegalArgumentException();
         }
-        fStartTime = startTime.clone();
-        fEndTime = endTime.clone();
+        fStartTime = startTime;
+        fEndTime = endTime;
     }
 
     /**
@@ -72,8 +78,8 @@ public class TmfTimeRange implements Cloneable {
         if (range == null) {
             throw new IllegalArgumentException();
         }
-        fStartTime = range.getStartTime().clone();
-        fEndTime = range.getEndTime().clone();
+        fStartTime = range.getStartTime();
+        fEndTime = range.getEndTime();
     }
 
     // ------------------------------------------------------------------------
@@ -146,6 +152,10 @@ public class TmfTimeRange implements Cloneable {
     // Cloneable
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#clone()
+     */
+    @Override
     public TmfTimeRange clone() {
         TmfTimeRange clone = null;
         try {
@@ -162,6 +172,9 @@ public class TmfTimeRange implements Cloneable {
     // Object
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -171,6 +184,9 @@ public class TmfTimeRange implements Cloneable {
         return result;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -193,6 +209,9 @@ public class TmfTimeRange implements Cloneable {
         return true;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     @SuppressWarnings("nls")
     public String toString() {

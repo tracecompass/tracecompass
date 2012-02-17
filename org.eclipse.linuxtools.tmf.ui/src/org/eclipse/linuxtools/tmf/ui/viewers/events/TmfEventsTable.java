@@ -45,6 +45,7 @@ import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
@@ -648,7 +649,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
 
     protected void setItemData(TableItem item, TmfEvent event, long rank) {
-        TmfEventField[] fields = extractItemFields(event);
+        ITmfEventField[] fields = extractItemFields(event);
         String[] content = new String[fields.length];
         for (int i = 0; i < fields.length; i++) {
             content[i] = (String) fields[i].getValue();
@@ -1371,8 +1372,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      *         FIXME: Add support for column selection
      */
     //TmfEventContent content, String id, Object value
-    protected TmfEventField[] extractItemFields(TmfEvent event) {
-        TmfEventField[] fields = new TmfEventField[0];
+    protected ITmfEventField[] extractItemFields(TmfEvent event) {
+        ITmfEventField[] fields = new TmfEventField[0];
         if (event != null) {
             fields = new TmfEventField[] {
                      new TmfEventField(ITmfEvent.EVENT_FIELD_TIMESTAMP, ((Long) event.getTimestamp().getValue()).toString()),

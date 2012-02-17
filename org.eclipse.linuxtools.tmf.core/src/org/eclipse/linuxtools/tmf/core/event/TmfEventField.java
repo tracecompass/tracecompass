@@ -101,18 +101,34 @@ public class TmfEventField implements ITmfEventField {
     // ITmfEventField
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getName()
+     */
+    @Override
     public String getName() {
         return fName;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getValue()
+     */
+    @Override
     public Object getValue() {
         return fValue;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getFieldNames()
+     */
+    @Override
     public String[] getFieldNames() {
         return fFieldNames;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getFieldName(int)
+     */
+    @Override
     public String getFieldName(int index) {
         ITmfEventField field = getField(index);
         if (field != null) {
@@ -121,14 +137,27 @@ public class TmfEventField implements ITmfEventField {
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getFields()
+     */
+    @Override
     public ITmfEventField[] getFields() {
         return fFields;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getField(java.lang.String)
+     */
+    @Override
     public ITmfEventField getField(String name) {
+        // FIXME: Add treatment for 'special' fields 
         return fNameMapping.get(name);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getField(int)
+     */
+    @Override
     public ITmfEventField getField(int index) {
         if (index >= 0 && index < fFields.length)
             return fFields[index];
@@ -186,6 +215,9 @@ public class TmfEventField implements ITmfEventField {
     // Cloneable
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#clone()
+     */
     @Override
     public ITmfEventField clone() {
         TmfEventField clone = null;
@@ -204,6 +236,9 @@ public class TmfEventField implements ITmfEventField {
     // Object
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -213,6 +248,9 @@ public class TmfEventField implements ITmfEventField {
         return result;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -235,6 +273,9 @@ public class TmfEventField implements ITmfEventField {
         return true;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     @SuppressWarnings("nls")
     public String toString() {

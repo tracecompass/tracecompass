@@ -56,6 +56,9 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
     // ITmfTimestamp
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.TmfTimestamp#normalize(long, int)
+     */
     @Override
     public ITmfTimestamp normalize(long offset, int scale) throws ArithmeticException {
         if (scale == 0) {
@@ -64,6 +67,9 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
         return super.normalize(offset, scale);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.TmfTimestamp#compareTo(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp, boolean)
+     */
     @Override
     public int compareTo(ITmfTimestamp ts, boolean withinPrecision) {
         if (ts instanceof TmfSimpleTimestamp) {
@@ -73,6 +79,9 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
         return super.compareTo(ts, withinPrecision);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.TmfTimestamp#getDelta(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp)
+     */
     @Override
     public ITmfTimestamp getDelta(ITmfTimestamp ts) {
         if (ts instanceof TmfSimpleTimestamp) {
@@ -85,6 +94,9 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
     // Object
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.TmfTimestamp#equals(java.lang.Object)
+     */
     @Override
     public boolean equals(Object other) {
         if (this == other)
@@ -97,6 +109,9 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
         return compareTo(ts, false) == 0;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.TmfTimestamp#toString()
+     */
     @Override
     @SuppressWarnings("nls")
     public String toString() {

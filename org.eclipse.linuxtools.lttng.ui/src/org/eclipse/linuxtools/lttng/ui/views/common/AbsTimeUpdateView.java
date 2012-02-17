@@ -553,7 +553,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	protected TmfTimeRange getInitTRange(TmfTimeRange experimentTRange) {
 		ITmfTimestamp expStartTime = experimentTRange.getStartTime();
 		ITmfTimestamp expEndTime = experimentTRange.getEndTime();
-		TmfTimestamp initialEndOfWindow = new LttngTimestamp(expStartTime
+		ITmfTimestamp initialEndOfWindow = new LttngTimestamp(expStartTime
 				.getValue()
 				+ INITIAL_WINDOW_OFFSET);
 		if (initialEndOfWindow.compareTo(expEndTime, false) < 0) {

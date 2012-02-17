@@ -25,18 +25,42 @@ public class TmfTimestamp implements ITmfTimestamp {
     // Constants
     // ------------------------------------------------------------------------
 
-    // The beginning and end of time
-    public static final ITmfTimestamp BigBang   = new TmfTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE, 0);
-    public static final ITmfTimestamp BigCrunch = new TmfTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE, 0);
-    public static final ITmfTimestamp Zero      = new TmfTimestamp(0, 0, 0);
+    /**
+     * The beginning of time
+     */
+    public static final ITmfTimestamp BigBang = 
+            new TmfTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE, 0);
+
+    /**
+     * The end of time
+     */
+    public static final ITmfTimestamp BigCrunch = 
+            new TmfTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE, 0);
+    
+    /**
+     * Zero
+     */
+    public static final ITmfTimestamp Zero = 
+            new TmfTimestamp(0, 0, 0);
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    protected long fValue;    // The timestamp raw value
-    protected int fScale;     // The time scale
-    protected int fPrecision; // The value precision (tolerance)
+    /**
+     * The timestamp raw value (mantissa)
+     */
+    protected long fValue;
+
+    /**
+     * The timestamp scale (magnitude)
+     */
+    protected int fScale;
+
+    /**
+     * The value precision (tolerance)
+     */
+    protected int fPrecision;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -98,14 +122,26 @@ public class TmfTimestamp implements ITmfTimestamp {
     // ITmfTimestamp
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#getValue()
+     */
+    @Override
     public long getValue() {
         return fValue;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#getScale()
+     */
+    @Override
     public int getScale() {
         return fScale;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#getPrecision()
+     */
+    @Override
     public int getPrecision() {
         return fPrecision;
     }
@@ -132,6 +168,10 @@ public class TmfTimestamp implements ITmfTimestamp {
         1000000000000000000L,
     };
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#normalize(long, int)
+     */
+    @Override
     public ITmfTimestamp normalize(long offset, int scale) throws ArithmeticException {
 
         long value = fValue;
@@ -168,6 +208,10 @@ public class TmfTimestamp implements ITmfTimestamp {
         return new TmfTimestamp(value, scale, precision);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#compareTo(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp, boolean)
+     */
+    @Override
     public int compareTo(ITmfTimestamp ts, boolean withinPrecision) {
 
         // Check the corner cases (we can't use equals() because it uses compareTo()...)
@@ -204,6 +248,9 @@ public class TmfTimestamp implements ITmfTimestamp {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#getDelta(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp)
+     */
     @Override
     public ITmfTimestamp getDelta(ITmfTimestamp ts) {
         ITmfTimestamp nts = ts.normalize(0, fScale);
@@ -215,6 +262,9 @@ public class TmfTimestamp implements ITmfTimestamp {
     // Cloneable
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#clone()
+     */
     @Override
     public ITmfTimestamp clone() {
         TmfTimestamp clone = null;
@@ -232,6 +282,9 @@ public class TmfTimestamp implements ITmfTimestamp {
     // Comparable
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#compareTo(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp)
+     */
     @Override
     public int compareTo(ITmfTimestamp ts) {
         return compareTo(ts, false);
@@ -241,6 +294,9 @@ public class TmfTimestamp implements ITmfTimestamp {
     // Object
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -251,6 +307,9 @@ public class TmfTimestamp implements ITmfTimestamp {
         return result;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
     public boolean equals(Object other) {
         if (this == other)
@@ -263,6 +322,9 @@ public class TmfTimestamp implements ITmfTimestamp {
         return compareTo(ts, false) == 0;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     @SuppressWarnings("nls")
     public String toString() {

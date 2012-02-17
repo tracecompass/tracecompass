@@ -374,12 +374,12 @@ public class BasicFrame extends GraphNode {
         return minTime;
     }
 
-    public void setMin(TmfTimestamp min) {
+    public void setMin(ITmfTimestamp min) {
         minTime = min;
         customMinMax = true;
     }
 
-    public void setMax(TmfTimestamp max) {
+    public void setMax(ITmfTimestamp max) {
         maxTime = max;
         customMinMax = true;
     }

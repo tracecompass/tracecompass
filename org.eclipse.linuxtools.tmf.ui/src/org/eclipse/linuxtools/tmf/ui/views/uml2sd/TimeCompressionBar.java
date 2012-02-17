@@ -331,10 +331,10 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
 
             min = frame.getMinTime();
             max = frame.getMaxTime();
-            TmfTimestamp minMaxdelta = (TmfTimestamp) max.getDelta(min);
+            ITmfTimestamp minMaxdelta = (TmfTimestamp) max.getDelta(min);
             double gr = (minMaxdelta.getValue()) / (double) 10;
 
-            TmfTimestamp delta = (TmfTimestamp) m2.getTime().getDelta(m1.getTime()).getDelta(min);
+            ITmfTimestamp delta = (TmfTimestamp) m2.getTime().getDelta(m1.getTime()).getDelta(min);
             long absDelta = Math.abs(delta.getValue());
             
             ColorImpl color;

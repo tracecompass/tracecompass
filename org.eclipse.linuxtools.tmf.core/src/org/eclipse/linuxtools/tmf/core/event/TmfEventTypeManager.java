@@ -37,10 +37,16 @@ public final class TmfEventTypeManager {
     // Constructors
     // ------------------------------------------------------------------------
 
+    /**
+     * The singleton constructor
+     */
     private TmfEventTypeManager() {
         fEventTypes = new HashMap<String, HashMap<String, ITmfEventType>>();
     }
 
+    /**
+     * @return the TmfEventTypeManager singleton
+     */
     public static synchronized TmfEventTypeManager getInstance() {
         if (fEventTypeManager == null) {
             fEventTypeManager = new TmfEventTypeManager();
@@ -125,6 +131,9 @@ public final class TmfEventTypeManager {
     // Object
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     @SuppressWarnings("nls")
     public String toString() {

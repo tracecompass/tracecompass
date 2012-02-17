@@ -703,7 +703,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         context.updateRank(1);
     }
 
-    protected void updateIndex(TmfContext context, long rank, TmfTimestamp timestamp) {
+    protected void updateIndex(TmfContext context, long rank, ITmfTimestamp timestamp) {
 
         if (getStartTime().compareTo(timestamp, false) > 0)
             setStartTime(timestamp);
@@ -724,7 +724,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         }
     }
 
-    private void addCheckPoint(TmfContext context, TmfTimestamp timestamp) {
+    private void addCheckPoint(TmfContext context, ITmfTimestamp timestamp) {
         ITmfLocation<?> location = context.getLocation().clone();
         fCheckpoints.add(new TmfCheckpoint(timestamp.clone(), location));
     }

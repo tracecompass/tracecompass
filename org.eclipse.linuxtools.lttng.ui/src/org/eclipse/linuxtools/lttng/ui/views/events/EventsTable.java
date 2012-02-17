@@ -14,6 +14,7 @@
 package org.eclipse.linuxtools.lttng.ui.views.events;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
@@ -63,8 +64,8 @@ public class EventsTable extends TmfEventsTable {
      * @return
      */
     @Override
-    protected TmfEventField[] extractItemFields(TmfEvent event) {
-        TmfEventField[] fields = new TmfEventField[0];
+    protected ITmfEventField[] extractItemFields(TmfEvent event) {
+        ITmfEventField[] fields = new TmfEventField[0];
         if (event != null) {
             fields = new TmfEventField[] {
                      new TmfEventField(ITmfEvent.EVENT_FIELD_TIMESTAMP, ((Long) event.getTimestamp().getValue()).toString()),
