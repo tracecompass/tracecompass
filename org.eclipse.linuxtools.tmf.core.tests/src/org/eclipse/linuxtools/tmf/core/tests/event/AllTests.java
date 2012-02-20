@@ -11,10 +11,12 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test suite for " + TmfCorePlugin.PLUGIN_ID + ".event"); //$NON-NLS-1$);
 		//$JUnit-BEGIN$
-		suite.addTestSuite(TmfEventFieldTest.class);
-		suite.addTestSuite(TmfEventTypeTest.class);
 		suite.addTestSuite(TmfTimestampTest.class);
+        suite.addTestSuite(TmfSimpleTimestampTest.class);
 		suite.addTestSuite(TmfTimeRangeTest.class);
+
+		suite.addTestSuite(TmfEventFieldTest.class);
+        suite.addTestSuite(TmfEventTypeTest.class);
 		suite.addTestSuite(TmfEventTest.class);
 		//$JUnit-END$
 		return suite;

@@ -44,7 +44,7 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
      * 
      * @param timestamp the timestamp to copy
      */
-    public TmfSimpleTimestamp(TmfSimpleTimestamp timestamp) {
+    public TmfSimpleTimestamp(ITmfTimestamp timestamp) {
         if (timestamp == null || timestamp.getScale() != 0 || timestamp.getPrecision() != 0)
             throw new IllegalArgumentException();
         fValue = timestamp.getValue();
@@ -106,6 +106,7 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
         if (!(other instanceof TmfSimpleTimestamp))
             return super.equals(other);
         TmfSimpleTimestamp ts = (TmfSimpleTimestamp) other;
+
         return compareTo(ts, false) == 0;
     }
 
