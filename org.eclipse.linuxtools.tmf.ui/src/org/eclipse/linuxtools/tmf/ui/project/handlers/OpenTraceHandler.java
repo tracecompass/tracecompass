@@ -28,10 +28,12 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
+import org.eclipse.linuxtools.tmf.ui.editors.EventsViewEditor;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEditorInput;
-import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.swt.widgets.MessageBox;
@@ -145,9 +147,40 @@ public class OpenTraceHandler extends AbstractHandler {
             return null;
         }
 
-        if (usesEditor) {
+        IResource resource = fTrace.getResource();
+        IFile file = null;
+        if (resource instanceof IFile) {
+            file = (IFile) resource;
+        } else if (resource instanceof IFolder){
             try {
-                IResource resource = fTrace.getResource();
+                IFile bookmarksFile = fTrace.getProject().getTracesFolder().getResource().getFile(BOOKMARKS_HIDDEN_FILE);
+                if (!bookmarksFile.exists()) {
+                    InputStream source = new ByteArrayInputStream(new byte[0]);
+                    bookmarksFile.create(source, true, null);
+                }
+                bookmarksFile.setHidden(true);
+
+                IFolder folder = (IFolder) resource;
+                file = folder.getFile(fTrace.getName() + '_');
+                if (!file.exists()) {
+                    file.createLink(bookmarksFile.getLocation(), IResource.REPLACE, null);
+                }
+                file.setHidden(true);
+                if (usesEditor) {
+                    file.setPersistentProperty(TmfTraceElement.TRACETYPE, fTrace.getTraceType());
+                } else {
+                    file.setPersistentProperty(TmfTraceElement.TRACETYPE, TmfTrace.class.getCanonicalName());
+                }
+            } catch (CoreException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (usesEditor) {
+            if (trace instanceof TmfTrace) {
+                ((TmfTrace) trace).setResource(file);
+            }
+            try {
                 IEditorInput editorInput = new TmfEditorInput(resource, trace);
                 IWorkbench wb = PlatformUI.getWorkbench();
                 IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
@@ -165,51 +198,15 @@ public class OpenTraceHandler extends AbstractHandler {
             } catch (PartInitException e) {
                 e.printStackTrace();
             }
-            return null;
-        }
-
-        try {
-            IResource resource = fTrace.getResource();
-            IFile file = null;
-            if (resource instanceof IFile) {
-                file = (IFile) resource;
-            } else if (resource instanceof IFolder){
-                IFile bookmarksFile = fTrace.getProject().getTracesFolder().getResource().getFile(BOOKMARKS_HIDDEN_FILE);
-                if (!bookmarksFile.exists()) {
-                    InputStream source = new ByteArrayInputStream(new byte[0]);
-                    bookmarksFile.create(source, true, null);
-                }
-                bookmarksFile.setHidden(true);
-
-                IFolder folder = (IFolder) resource;
-                file = folder.getFile(fTrace.getName() + ' ');
-                if (!file.exists()) {
-                    file.createLink(bookmarksFile.getLocation(), IResource.REPLACE, null);
-                }
-                file.setHidden(true);
-                file.setPersistentProperty(TmfTraceElement.TRACETYPE, TmfTrace.class.getCanonicalName());
-            }
-
-            // Create the experiment and open in editor
+        } else {
+            // Create the experiment
             ITmfTrace[] traces = new ITmfTrace[] { trace };
             TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), fTrace.getName(), traces, trace.getCacheSize());
             experiment.setResource(file);
-
-            IEditorInput editorInput = new TmfEditorInput(file, experiment);
-            IWorkbench wb = PlatformUI.getWorkbench();
-            IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
-
-            editorId = TmfEventsEditor.ID;
-            IEditorPart editor = activePage.findEditor(editorInput);
-            if (editor != null && editor instanceof IReusableEditor) {
-                activePage.reuseEditor((IReusableEditor) editor, editorInput);
-                activePage.activate(editor);
-            } else {
-                editor = activePage.openEditor(editorInput, editorId);
-                IDE.setDefaultEditor(file, editorId);
-            }
-        } catch (CoreException e) {
-            e.printStackTrace();
+    
+            TmfExperiment.setCurrentExperiment(experiment);
+            TmfSignalManager.dispatchSignal(new TmfExperimentSelectedSignal(this, experiment));
+            IDE.setDefaultEditor(file, EventsViewEditor.ID);
         }
         return null;
     }

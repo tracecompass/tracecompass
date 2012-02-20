@@ -83,6 +83,16 @@
                contentTypeId="org.eclipse.linuxtools.tmf.ui.content-type.trace">
          </contentTypeBinding>
       </editor>
+      <editor
+            class="org.eclipse.linuxtools.tmf.ui.editors.EventsViewEditor"
+            default="false"
+            icon="icons/eview16/events_view.gif"
+            id="org.eclipse.linuxtools.tmf.ui.editors.eventsView"
+            name="%eventsview.editor.name">
+         <contentTypeBinding
+               contentTypeId="org.eclipse.linuxtools.tmf.ui.content-type.trace">
+         </contentTypeBinding>
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.newWizards">
