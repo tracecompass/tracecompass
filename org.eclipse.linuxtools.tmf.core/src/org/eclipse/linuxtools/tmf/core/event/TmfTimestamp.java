@@ -239,12 +239,12 @@ public class TmfTimestamp implements ITmfTimestamp {
                 return 0;
             if (fValue  < 0 && value >= 0)
                 return -1;
-            if (fValue >= 0 && value  < 0)
+            if (fValue >= 0 && value < 0)
                 return 1;
 
             // Otherwise, just compare the scales
             int scale = ts.getScale();
-            return (fScale > scale) ? (fValue > 0) ? 1 : -1 : (fValue > 0) ? -1 : 1;  
+            return (fScale > scale) ? (fValue >= 0) ? 1 : -1 : (fValue >= 0) ? -1 : 1;  
         }
     }
 
