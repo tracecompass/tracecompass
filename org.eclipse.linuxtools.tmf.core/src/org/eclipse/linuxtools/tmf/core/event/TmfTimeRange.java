@@ -18,7 +18,7 @@ package org.eclipse.linuxtools.tmf.core.event;
  * <p>
  * A utility class to define and manage time ranges.
  */
-public class TmfTimeRange implements Cloneable {
+public final class TmfTimeRange implements Cloneable {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -179,8 +179,8 @@ public class TmfTimeRange implements Cloneable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((fEndTime == null) ? 0 : fEndTime.hashCode());
-        result = prime * result + ((fStartTime == null) ? 0 : fStartTime.hashCode());
+        result = prime * result + fEndTime.hashCode();
+        result = prime * result + fStartTime.hashCode();
         return result;
     }
 
@@ -196,15 +196,9 @@ public class TmfTimeRange implements Cloneable {
         if (getClass() != obj.getClass())
             return false;
         TmfTimeRange other = (TmfTimeRange) obj;
-        if (fEndTime == null) {
-            if (other.fEndTime != null)
-                return false;
-        } else if (!fEndTime.equals(other.fEndTime))
+        if (!fEndTime.equals(other.fEndTime))
             return false;
-        if (fStartTime == null) {
-            if (other.fStartTime != null)
-                return false;
-        } else if (!fStartTime.equals(other.fStartTime))
+        if (!fStartTime.equals(other.fStartTime))
             return false;
         return true;
     }
