@@ -110,6 +110,34 @@ public class TmfSimpleTimestampTest extends TestCase {
     }
 
     // ------------------------------------------------------------------------
+    // clone
+    // ------------------------------------------------------------------------
+
+    public class MyTimestamp extends TmfSimpleTimestamp {
+
+        @Override
+        public boolean equals(Object other) {
+            return super.equals(other);
+        }
+
+        @Override
+        public MyTimestamp clone() {
+            return (MyTimestamp) super.clone();
+        }
+    }
+
+    public void testClone() throws Exception {
+        ITmfTimestamp timestamp = ts0.clone();
+        assertEquals("clone", timestamp, ts0);
+    }
+
+    public void testClone2() throws Exception {
+        MyTimestamp timestamp = new MyTimestamp();
+        MyTimestamp clone = timestamp.clone();
+        assertEquals("clone", clone, timestamp);
+    }
+
+    // ------------------------------------------------------------------------
     // equals
     // ------------------------------------------------------------------------
 
@@ -160,34 +188,6 @@ public class TmfSimpleTimestampTest extends TestCase {
 
     public void testEqualsNonTimestamp() throws Exception {
         assertFalse("equals", ts0.equals(ts0.toString()));
-    }
-
-    // ------------------------------------------------------------------------
-    // clone
-    // ------------------------------------------------------------------------
-
-    public class MyTimestamp extends TmfSimpleTimestamp {
-
-        @Override
-        public boolean equals(Object other) {
-            return super.equals(other);
-        }
-
-        @Override
-        public MyTimestamp clone() {
-            return (MyTimestamp) super.clone();
-        }
-    }
-
-    public void testClone() throws Exception {
-        ITmfTimestamp timestamp = ts0.clone();
-        assertEquals("clone", timestamp, ts0);
-    }
-
-    public void testClone2() throws Exception {
-        MyTimestamp timestamp = new MyTimestamp();
-        MyTimestamp clone = timestamp.clone();
-        assertEquals("clone", clone, timestamp);
     }
 
     // ------------------------------------------------------------------------

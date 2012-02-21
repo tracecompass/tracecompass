@@ -146,8 +146,8 @@ public class TmfEventType implements ITmfEventType {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((fContext == null) ? 0 : fContext.hashCode());
-        result = prime * result + ((fTypeId == null) ? 0 : fTypeId.hashCode());
+        result = prime * result + fContext.hashCode();
+        result = prime * result + fTypeId.hashCode();
         return result;
     }
 
@@ -163,15 +163,9 @@ public class TmfEventType implements ITmfEventType {
         if (getClass() != obj.getClass())
             return false;
         TmfEventType other = (TmfEventType) obj;
-        if (fContext == null) {
-            if (other.fContext != null)
-                return false;
-        } else if (!fContext.equals(other.fContext))
+        if (!fContext.equals(other.fContext))
             return false;
-        if (fTypeId == null) {
-            if (other.fTypeId != null)
-                return false;
-        } else if (!fTypeId.equals(other.fTypeId))
+        if (!fTypeId.equals(other.fTypeId))
             return false;
         return true;
     }

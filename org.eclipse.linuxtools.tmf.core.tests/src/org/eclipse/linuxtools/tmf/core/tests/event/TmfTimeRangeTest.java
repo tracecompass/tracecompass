@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009, 2010, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Francois Chouinard - Adjusted for new Event Model
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.event;
@@ -121,6 +122,40 @@ public class TmfTimeRangeTest extends TestCase {
         }
     }
 
+    // ------------------------------------------------------------------------
+    // clone
+    // ------------------------------------------------------------------------
+
+    public void testClone() throws Exception {
+        ITmfTimestamp ts1 = new TmfTimestamp(12345);
+        ITmfTimestamp ts2 = new TmfTimestamp(12350);
+
+        TmfTimeRange range = new TmfTimeRange(ts1, ts2);
+        TmfTimeRange clone = range.clone();
+
+        assertEquals("clone", range, clone);
+        assertEquals("clone", ts1, clone.getStartTime());
+        assertEquals("clone", ts2, clone.getEndTime());
+    }
+    
+    // ------------------------------------------------------------------------
+    // hashCode
+    // ------------------------------------------------------------------------
+
+    public void testHashCode() throws Exception {
+        ITmfTimestamp ts1 = new TmfTimestamp(12345);
+        ITmfTimestamp ts2 = new TmfTimestamp(12350);
+        TmfTimeRange range1 = new TmfTimeRange(ts1, ts2);
+        TmfTimeRange range1b = new TmfTimeRange(range1);
+        TmfTimeRange range2 = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range2b = new TmfTimeRange(range2);
+
+        assertTrue("hashCode", range1.hashCode() == range1b.hashCode());
+        assertTrue("hashCode", range2.hashCode() == range2b.hashCode());
+
+        assertTrue("hashCode", range1.hashCode() != range2.hashCode());
+    }
+    
 	// ------------------------------------------------------------------------
 	// equals
 	// ------------------------------------------------------------------------
@@ -208,40 +243,6 @@ public class TmfTimeRangeTest extends TestCase {
         assertTrue("equals", !range1.equals(range3));
     }
     
-	// ------------------------------------------------------------------------
-	// hashCode
-	// ------------------------------------------------------------------------
-
-	public void testHashCode() throws Exception {
-		ITmfTimestamp ts1 = new TmfTimestamp(12345);
-		ITmfTimestamp ts2 = new TmfTimestamp(12350);
-		TmfTimeRange range1 = new TmfTimeRange(ts1, ts2);
-		TmfTimeRange range1b = new TmfTimeRange(range1);
-		TmfTimeRange range2 = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
-		TmfTimeRange range2b = new TmfTimeRange(range2);
-
-		assertTrue("hashCode", range1.hashCode() == range1b.hashCode());
-		assertTrue("hashCode", range2.hashCode() == range2b.hashCode());
-
-		assertTrue("hashCode", range1.hashCode() != range2.hashCode());
-	}
-	
-	// ------------------------------------------------------------------------
-	// clone
-	// ------------------------------------------------------------------------
-
-	public void testClone() throws Exception {
-		ITmfTimestamp ts1 = new TmfTimestamp(12345);
-		ITmfTimestamp ts2 = new TmfTimestamp(12350);
-
-		TmfTimeRange range = new TmfTimeRange(ts1, ts2);
-        TmfTimeRange clone = range.clone();
-
-		assertEquals("clone", range, clone);
-        assertEquals("clone", ts1, clone.getStartTime());
-        assertEquals("clone", ts2, clone.getEndTime());
-	}
-	
     // ------------------------------------------------------------------------
     // toString
     // ------------------------------------------------------------------------

@@ -52,7 +52,6 @@ public final class TmfTimeRange implements Cloneable {
      */
     @SuppressWarnings("unused")
     private TmfTimeRange() {
-        throw new AssertionError();
     }
 
     /**

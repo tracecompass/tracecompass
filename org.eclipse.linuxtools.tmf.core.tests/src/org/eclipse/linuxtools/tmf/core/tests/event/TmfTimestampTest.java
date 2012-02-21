@@ -8,7 +8,7 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
- *   Francois Chouinard - Revisit for TMF Event Model 1.0
+ *   Francois Chouinard - Adjusted for new Event Model
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.event;
@@ -128,6 +128,50 @@ public class TmfTimestampTest extends TestCase {
     }
 
     // ------------------------------------------------------------------------
+    // clone
+    // ------------------------------------------------------------------------
+
+    public class MyTimestamp extends TmfTimestamp {
+
+        @Override
+        public boolean equals(Object other) {
+            return super.equals(other);
+        }
+
+        @Override
+        public MyTimestamp clone() {
+            return (MyTimestamp) super.clone();
+        }
+    }
+
+    public void testClone() throws Exception {
+        ITmfTimestamp clone = ts0.clone();
+        assertEquals("clone", clone, ts0);
+    }
+
+    public void testClone2() throws Exception {
+        MyTimestamp timestamp = new MyTimestamp();
+        MyTimestamp clone = timestamp.clone();
+        assertEquals("clone", clone, timestamp);
+    }
+
+    // ------------------------------------------------------------------------
+    // hashCode
+    // ------------------------------------------------------------------------
+
+    public void testHashCode() throws Exception {
+        ITmfTimestamp ts0copy = new TmfTimestamp(ts0);
+        ITmfTimestamp ts1copy = new TmfTimestamp(ts1);
+        ITmfTimestamp ts2copy = new TmfTimestamp(ts2);
+
+        assertTrue("hashCode", ts0.hashCode() == ts0copy.hashCode());
+        assertTrue("hashCode", ts1.hashCode() == ts1copy.hashCode());
+        assertTrue("hashCode", ts2.hashCode() == ts2copy.hashCode());
+
+        assertTrue("hashCode", ts0.hashCode() != ts1.hashCode());
+    }
+    
+    // ------------------------------------------------------------------------
     // equals
     // ------------------------------------------------------------------------
 
@@ -183,34 +227,6 @@ public class TmfTimestampTest extends TestCase {
     }
     
     // ------------------------------------------------------------------------
-    // clone
-    // ------------------------------------------------------------------------
-
-    public class MyTimestamp extends TmfTimestamp {
-
-        @Override
-        public boolean equals(Object other) {
-            return super.equals(other);
-        }
-
-        @Override
-        public MyTimestamp clone() {
-            return (MyTimestamp) super.clone();
-        }
-    }
-
-    public void testClone() throws Exception {
-        ITmfTimestamp timestamp = ts0.clone();
-        assertEquals("clone", timestamp, ts0);
-    }
-
-    public void testClone2() throws Exception {
-        MyTimestamp timestamp = new MyTimestamp();
-        MyTimestamp clone = timestamp.clone();
-        assertEquals("clone", clone, timestamp);
-    }
-
-    // ------------------------------------------------------------------------
     // toString
     // ------------------------------------------------------------------------
 
@@ -221,22 +237,6 @@ public class TmfTimestampTest extends TestCase {
         assertEquals("toString", "TmfTimestamp [fValue=12345, fScale=2, fPrecision=5]", ts3.toString());
     }
 
-    // ------------------------------------------------------------------------
-    // hashCode
-    // ------------------------------------------------------------------------
-
-    public void testHashCode() throws Exception {
-        ITmfTimestamp ts0copy = new TmfTimestamp(ts0);
-        ITmfTimestamp ts1copy = new TmfTimestamp(ts1);
-        ITmfTimestamp ts2copy = new TmfTimestamp(ts2);
-
-        assertTrue("hashCode", ts0.hashCode() == ts0copy.hashCode());
-        assertTrue("hashCode", ts1.hashCode() == ts1copy.hashCode());
-        assertTrue("hashCode", ts2.hashCode() == ts2copy.hashCode());
-
-        assertTrue("hashCode", ts0.hashCode() != ts1.hashCode());
-    }
-    
     // ------------------------------------------------------------------------
     // normalize
     // ------------------------------------------------------------------------
