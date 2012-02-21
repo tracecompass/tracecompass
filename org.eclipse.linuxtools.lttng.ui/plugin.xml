@@ -39,15 +39,6 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng.ui.views.category"
-            class="org.eclipse.linuxtools.lttng.ui.views.events.EventsView"
-            icon="icons/eview16/events_view.gif"
-            id="org.eclipse.linuxtools.lttng.ui.views.events"
-            name="%events.view.name"
-            restorable="true">
-      </view>
-      <view
-            allowMultiple="false"
-            category="org.eclipse.linuxtools.lttng.ui.views.category"
             class="org.eclipse.linuxtools.lttng.ui.views.timeframe.TimeFrameView"
             icon="icons/eview16/time_frame_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.timeframe"

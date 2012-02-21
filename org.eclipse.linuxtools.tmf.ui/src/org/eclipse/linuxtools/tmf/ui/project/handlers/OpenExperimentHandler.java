@@ -28,8 +28,11 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
+import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
+import org.eclipse.linuxtools.tmf.ui.editors.EventsViewEditor;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEditorInput;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
@@ -111,7 +114,7 @@ public class OpenExperimentHandler extends AbstractHandler {
             }
             bookmarksFile.setHidden(true);
 
-            IFile file = fExperiment.getResource().getFile(fExperiment.getName() + ' ');
+            IFile file = fExperiment.getResource().getFile(fExperiment.getName() + '_');
             if (!file.exists()) {
                 file.createLink(bookmarksFile.getLocation(), IResource.REPLACE, null);
             }
@@ -122,6 +125,8 @@ public class OpenExperimentHandler extends AbstractHandler {
             List<TmfTraceElement> traceEntries = fExperiment.getTraces();
             int nbTraces = traceEntries.size();
             int cacheSize = Integer.MAX_VALUE;
+            boolean useEditor = true;
+            String experimentEditorId = null;
             ITmfTrace<?>[] traces = new ITmfTrace[nbTraces];
             for (int i = 0; i < nbTraces; i++) {
                 TmfTraceElement element = traceEntries.get(i);
@@ -143,25 +148,44 @@ public class OpenExperimentHandler extends AbstractHandler {
                     ((TmfTrace) trace).setResource(element.getResource());
                 }
                 cacheSize = Math.min(cacheSize, trace.getCacheSize());
+                String editorId = element.getEditorId();
+                if (editorId == null) {
+                    useEditor = false;
+                    experimentEditorId = null;
+                } else if (useEditor) {
+                    if (experimentEditorId == null) {
+                        experimentEditorId = editorId;
+                    } else if (!editorId.equals(experimentEditorId)) {
+                        useEditor = false;
+                    }
+                }
                 traces[i] = trace;
             }
 
-            // Create the experiment and open in editor
+            // Create the experiment
             TmfExperiment experiment = new TmfExperiment(TmfEvent.class, fExperiment.getName(), traces, cacheSize);
             experiment.setResource(file);
 
-            IEditorInput editorInput = new TmfEditorInput(file, experiment);
-            IWorkbench wb = PlatformUI.getWorkbench();
-            IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
-
-            String editorId = TmfEventsEditor.ID;
-            IEditorPart editor = activePage.findEditor(editorInput);
-            if (editor != null && editor instanceof IReusableEditor) {
-                activePage.reuseEditor((IReusableEditor) editor, editorInput);
-                activePage.activate(editor);
-            } else {
-                editor = activePage.openEditor(editorInput, editorId);
+            if (useEditor) {
+                IEditorInput editorInput = new TmfEditorInput(file, experiment);
+                IWorkbench wb = PlatformUI.getWorkbench();
+                IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+    
+                String editorId = TmfEventsEditor.ID;
+                IEditorPart editor = activePage.findEditor(editorInput);
+                if (editor != null && editor instanceof IReusableEditor) {
+                    activePage.reuseEditor((IReusableEditor) editor, editorInput);
+                    activePage.activate(editor);
+                } else {
+                    editor = activePage.openEditor(editorInput, editorId);
+                }
+                experiment.initTrace(null, null, true);
                 IDE.setDefaultEditor(file, editorId);
+                // editor should dispose the experiment on close
+            } else {
+                TmfExperiment.setCurrentExperiment(experiment);
+                TmfSignalManager.dispatchSignal(new TmfExperimentSelectedSignal(this, experiment));
+                IDE.setDefaultEditor(file, EventsViewEditor.ID);
             }
         } catch (CoreException e) {
             displayErrorMsg(e.getMessage());

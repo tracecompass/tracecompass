@@ -17,6 +17,7 @@ import org.eclipse.linuxtools.lttng.ui.views.controlflow.ControlFlowView;
 import org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramView;
 import org.eclipse.linuxtools.lttng.ui.views.resources.ResourcesView;
 import org.eclipse.linuxtools.lttng.ui.views.statistics.StatisticsView;
+import org.eclipse.linuxtools.tmf.ui.views.events.TmfEventsView;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
@@ -32,6 +33,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
     public static final String ID = "org.eclipse.linuxtools.lttng.ui.perspective"; //$NON-NLS-1$
 
     // LTTng views
+    private static final String EVENTS_VIEW_ID = TmfEventsView.ID;
     private static final String CONTROL_FLOW_VIEW_ID = ControlFlowView.ID;
     private static final String RESOURCES_VIEW_ID = ResourcesView.ID;
     private static final String STATISTICS_VIEW_ID = StatisticsView.ID;
@@ -51,7 +53,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
     @Override
     public void createInitialLayout(IPageLayout layout) {
 
-        layout.setEditorAreaVisible(true);
+        layout.setEditorAreaVisible(false);
 
         addFastViews(layout);
         addViewShortcuts(layout);
@@ -65,14 +67,19 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 
         // Create the top right folder
         IFolderLayout topRightFolder = layout.createFolder(
-                "topRightFolder", IPageLayout.TOP, 0.30f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
+                "topRightFolder", IPageLayout.TOP, 0.40f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
         topRightFolder.addView(CONTROL_FLOW_VIEW_ID);
         topRightFolder.addView(RESOURCES_VIEW_ID);
         topRightFolder.addView(STATISTICS_VIEW_ID);
 
+        // Create the middle right folder
+        IFolderLayout middleRightFolder = layout.createFolder(
+                "middleRightFolder", IPageLayout.BOTTOM, 0.40f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$ //$NON-NLS-2$
+        middleRightFolder.addView(EVENTS_VIEW_ID);
+
         // Create the bottom right folder
         IFolderLayout bottomRightFolder = layout.createFolder(
-                "bottomRightFolder", IPageLayout.BOTTOM, 0.50f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
+                "bottomRightFolder", IPageLayout.BOTTOM, 0.50f, "middleRightFolder"); //$NON-NLS-1$ //$NON-NLS-2$
         bottomRightFolder.addView(HISTOGRAM_VIEW_ID);
         bottomRightFolder.addView(PROPERTIES_VIEW_ID);
         bottomRightFolder.addView(BOOKMARKS_VIEW_ID);
