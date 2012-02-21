@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IBaseEventInfo;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ISessionInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IUstProviderInfo;
 
@@ -28,25 +29,11 @@ import org.eclipse.linuxtools.lttng.ui.views.control.model.IUstProviderInfo;
 public interface ILttngControlService {
     /**
      * Retrieves the existing sessions names from the node.
-     * @return an array with session names.
-     * @throws ExecutionException
-     */
-    public String[] getSessionNames() throws ExecutionException;
-    /**
-     * Retrieves the existing sessions names from the node.
      * @param monitor - a progress monitor
      * @return an array with session names.
      * @throws ExecutionException
      */
     public String[] getSessionNames(IProgressMonitor monitor) throws ExecutionException;
-    
-    /**
-     * Retrieves the session information with the given name the node.
-     * @param sessionName - the session name 
-     * @return session information
-     * @throws ExecutionException
-     */
-    public ISessionInfo getSession(String sessionName) throws ExecutionException;
     
     /**
      * Retrieves the session information with the given name the node.
@@ -57,12 +44,6 @@ public interface ILttngControlService {
      */    
     public ISessionInfo getSession(String sessionName, IProgressMonitor monitor) throws ExecutionException;
     
-    /**
-     * Retrieves the kernel provider information (i.e. the kernel events)
-     * @return the list of existing kernel events.
-     * @throws ExecutionException
-     */
-    public List<IBaseEventInfo> getKernelProvider() throws ExecutionException;
     /**
      * Retrieves the kernel provider information (i.e. the kernel events)
      * @param monitor - a progress monitor 
@@ -80,8 +61,65 @@ public interface ILttngControlService {
     /**
      * Retrieves the UST provider information from the node.
      * @param monitor - a progress monitor 
-     * @return - the UST provider information.
+     * @return the UST provider information.
      * @throws ExecutionException
      */
     public List<IUstProviderInfo> getUstProvider(IProgressMonitor monitor) throws ExecutionException;
+    
+    /**
+     * Creates a session with given session name and location.
+     * @param sessionName - a session name to create
+     * @param sessionPath - a path for storing the traces (use null for default)
+     * @param monitor - a progress monitor 
+     * @return the session information
+     * @throws ExecutionException
+     */
+    public ISessionInfo createSession(String sessionName, String sessionPath, IProgressMonitor monitor) throws ExecutionException;
+    
+    /**
+     * Destroys a session with given session name. 
+     * @param sessionName - a session name to destroy
+     * @param monitor - a progress monitor 
+     * @throws ExecutionException
+     */
+    public void destroySession(String sessionName, IProgressMonitor monitor) throws ExecutionException;
+
+    /**
+     * Starts a session with given session name. 
+     * @param sessionName - a session name to start
+     * @param monitor - a progress monitor 
+     * @throws ExecutionException
+     */    
+    public void startSession(String sessionName, IProgressMonitor monitor) throws ExecutionException;
+
+     /**
+      * Stops a session with given session name. 
+      * @param sessionName - a session name to stop
+      * @param monitor - a progress monitor 
+      * @throws ExecutionException
+      */
+     public void stopSession(String sessionName, IProgressMonitor monitor) throws ExecutionException;
+
+    
+     /**
+      * Enables a list of channels for given session and given channel information (configuration). 
+      * @param sessionName - a session name to create
+      * @param channelNames - a list of channel names to enable
+      * @param isKernel - a flag to indicate Kernel or UST (true for Kernel, false for UST) 
+      * @param info - channel information used for creation of a channel (or null for default)
+      * @param monitor - a progress monitor 
+      * @throws ExecutionException
+      */
+    public void enableChannel(String sessionName, List<String> channelNames, boolean isKernel, IChannelInfo info, IProgressMonitor monitor) throws ExecutionException;
+
+     /**
+      * Disables a list of channels for given session and given channel information (configuration). 
+      * @param sessionName - a session name to create
+      * @param channelNames - a list of channel names to enable
+      * @param isKernel - a flag to indicate Kernel or UST (true for Kernel, false for UST) 
+      * @param monitor - a progress monitor 
+      * @throws ExecutionException
+      */
+    public void disableChannel(String sessionName, List<String> channelNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException;
+    
 }

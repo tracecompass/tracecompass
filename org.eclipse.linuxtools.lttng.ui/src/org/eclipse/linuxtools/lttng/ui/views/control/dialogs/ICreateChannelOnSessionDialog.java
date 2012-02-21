@@ -11,32 +11,22 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.control.dialogs;
 
+
 /**
- * <b><u>INewConnectionDialog</u></b>
+ * <b><u>ICreateChannelOnSessionDialog</u></b>
  * <p>
- * Interface for connection information dialog.
+ * Interface for the create channel dialog when domain is known, i.e. dialog 
+ * was opened on session level.
  * </p>
  */
-public interface INewConnectionDialog {
-    
+public interface ICreateChannelOnSessionDialog extends ICreateChannelDialog {
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
     /**
-     * @return the connection name (alias).
+     * @return true for Kernel domain. False for UST.
      */
-    public String getConnectionName();
+    public boolean isKernel();
 
-    /**
-     * @return the host name (IP address or DNS name)
-     */
-    public String getHostName();
-
-    // ------------------------------------------------------------------------
-    // Operations
-    // ------------------------------------------------------------------------
-    /**
-     * @return returns the open return value
-     */
-    int open();
 }

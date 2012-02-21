@@ -12,31 +12,36 @@
 package org.eclipse.linuxtools.lttng.ui.views.control.dialogs;
 
 /**
- * <b><u>INewConnectionDialog</u></b>
+ * <b><u>ICreateSessionDialog</u></b>
  * <p>
- * Interface for connection information dialog.
+ * Interface for create session dialog.
  * </p>
  */
-public interface INewConnectionDialog {
+public interface ICreateSessionDialog {
     
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
     /**
-     * @return the connection name (alias).
+     * @return the session name.
      */
-    public String getConnectionName();
+    public String getSessionName();
 
     /**
-     * @return the host name (IP address or DNS name)
+     * @return the session path (null for default path)
      */
-    public String getHostName();
+    public String getSessionPath();
+    
+    /**
+     * @return true for default location else false
+     */
+    public boolean isDefaultSessionPath();
 
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
     /**
-     * @return returns the open return value
+     * @return the open return value
      */
     int open();
 }

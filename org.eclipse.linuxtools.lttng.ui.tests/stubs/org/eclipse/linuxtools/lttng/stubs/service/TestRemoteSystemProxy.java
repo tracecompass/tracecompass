@@ -2,7 +2,6 @@ package org.eclipse.linuxtools.lttng.stubs.service;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.linuxtools.lttng.stubs.service.shells.TestCommandShell;
 import org.eclipse.linuxtools.lttng.ui.views.control.remote.IRemoteSystemProxy;
 import org.eclipse.linuxtools.lttng.ui.views.control.service.ICommandShell;
 import org.eclipse.rse.core.model.IRSECallback;
@@ -10,6 +9,7 @@ import org.eclipse.rse.core.subsystems.ICommunicationsListener;
 import org.eclipse.rse.core.subsystems.ISubSystem;
 import org.eclipse.rse.services.shells.IShellService;
 import org.eclipse.rse.services.terminals.ITerminalService;
+import org.eclipse.rse.subsystems.files.core.servicesubsystem.IFileServiceSubSystem;
 
 public class TestRemoteSystemProxy implements IRemoteSystemProxy {
 
@@ -30,6 +30,10 @@ public class TestRemoteSystemProxy implements IRemoteSystemProxy {
 
     @Override
     public ISubSystem getTerminalServiceSubSystem() {
+        return null;
+    }
+    @Override
+    public IFileServiceSubSystem getFileServiceSubSystem() {
         return null;
     }
 

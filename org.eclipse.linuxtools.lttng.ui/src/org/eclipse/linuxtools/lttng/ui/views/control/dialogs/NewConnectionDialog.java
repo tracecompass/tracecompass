@@ -77,11 +77,11 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
     /**
      * The text widget for the node name (alias)
      */
-    private Text fNodeNameText = null;
+    private Text fConnectionNameText = null;
     /**
      * The text widget for the node address (IP or DNS name)
      */
-    private Text fNodeAddressText = null;
+    private Text fHostNameText = null;
     /**
      * The parent where the new node should be added.
      */
@@ -89,11 +89,11 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
     /**
      * The node name (alias) string.
      */
-    private String fNodeName = null;
+    private String fConnectionName = null;
     /**
      * The node address (IP or DNS name) string.
      */
-    private String fNodeAddress = null;
+    private String fHostName = null;
     
     /**
      * Input list of existing RSE hosts available for selection.
@@ -116,20 +116,20 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
     // ------------------------------------------------------------------------
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.dialogs.INewConnectionDialog#getNodeName()
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.dialogs.INewConnectionDialog#getConnectionName()
      */
     @Override
-    public String getNodeName() {
-        return fNodeName;
+    public String getConnectionName() {
+        return fConnectionName;
     }
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.dialogs.INewConnectionDialog#getNodeAddress()
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.dialogs.INewConnectionDialog#getHostName()
      */
     @Override
-    public String getNodeAddress() {
-        return fNodeAddress;
+    public String getHostName() {
+        return fHostName;
     }
 
     // ------------------------------------------------------------------------
@@ -190,17 +190,17 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         fButton.setText(Messages.TraceControl_NewNodeEditButtonName);
         fButton.setEnabled(fExistingHosts.length > 0);
         
-        Label nodeNameLabel = new Label(fTextGroup, SWT.RIGHT);
-        nodeNameLabel.setText(Messages.TraceControl_NewNodeConnectionNameLabel);
-        fNodeNameText = new Text(fTextGroup, SWT.NONE);
-        fNodeNameText.setToolTipText(Messages.TraceControl_NewNodeConnectionNameTooltip);
-        fNodeNameText.setEnabled(fExistingHosts.length == 0);
+        Label connectionNameLabel = new Label(fTextGroup, SWT.RIGHT);
+        connectionNameLabel.setText(Messages.TraceControl_NewNodeConnectionNameLabel);
+        fConnectionNameText = new Text(fTextGroup, SWT.NONE);
+        fConnectionNameText.setToolTipText(Messages.TraceControl_NewNodeConnectionNameTooltip);
+        fConnectionNameText.setEnabled(fExistingHosts.length == 0);
         
-        Label nodeAddressLabel = new Label(fTextGroup, SWT.RIGHT);
-        nodeAddressLabel.setText(Messages.TraceControl_NewNodeHostNameLabel);
-        fNodeAddressText = new Text(fTextGroup, SWT.NONE);
-        fNodeAddressText.setToolTipText(Messages.TraceControl_NewNodeHostNameTooltip);
-        fNodeAddressText.setEnabled(fExistingHosts.length == 0);
+        Label hostNameLabel = new Label(fTextGroup, SWT.RIGHT);
+        hostNameLabel.setText(Messages.TraceControl_NewNodeHostNameLabel);
+        fHostNameText = new Text(fTextGroup, SWT.NONE);
+        fHostNameText.setToolTipText(Messages.TraceControl_NewNodeHostNameTooltip);
+        fHostNameText.setEnabled(fExistingHosts.length == 0);
 
         fButton.addSelectionListener(new SelectionListener() {
             @Override
@@ -208,12 +208,12 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
                 if (fButton.getSelection()) {
                     fExistingHostsCombo.deselectAll();
                     fExistingHostsCombo.setEnabled(false);
-                    fNodeNameText.setEnabled(true);
-                    fNodeAddressText.setEnabled(true);
+                    fConnectionNameText.setEnabled(true);
+                    fHostNameText.setEnabled(true);
                 } else {
                     fExistingHostsCombo.setEnabled(true);
-                    fNodeNameText.setEnabled(false);
-                    fNodeAddressText.setEnabled(false);
+                    fConnectionNameText.setEnabled(false);
+                    fHostNameText.setEnabled(false);
                 }             
             }
 
@@ -226,8 +226,8 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
             @Override
             public void widgetSelected(SelectionEvent e) {
                 int index = fExistingHostsCombo.getSelectionIndex();
-                fNodeNameText.setText(fExistingHosts[index].getAliasName());
-                fNodeAddressText.setText(fExistingHosts[index].getHostName());
+                fConnectionNameText.setText(fExistingHosts[index].getAliasName());
+                fHostNameText.setText(fExistingHosts[index].getHostName());
             }
 
             @Override
@@ -237,14 +237,14 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         
         // layout widgets
         data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-        fNodeAddressText.setText("666.666.666.666"); //$NON-NLS-1$
-        Point minSize = fNodeAddressText.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+        fHostNameText.setText("666.666.666.666"); //$NON-NLS-1$
+        Point minSize = fHostNameText.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
         data.widthHint = minSize.x + 5;
         
-        fNodeNameText.setLayoutData(data);
-        fNodeAddressText.setLayoutData(data);
+        fConnectionNameText.setLayoutData(data);
+        fHostNameText.setLayoutData(data);
         
-        fNodeAddressText.setText(""); //$NON-NLS-1$
+        fHostNameText.setText(""); //$NON-NLS-1$
         
         return fDialogComposite;
     }
@@ -265,19 +265,19 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
     @Override
     protected void okPressed() {
         // Validate input data
-        fNodeName = fNodeNameText.getText();
-        fNodeAddress = fNodeAddressText.getText();
+        fConnectionName = fConnectionNameText.getText();
+        fHostName = fHostNameText.getText();
 
-        if (!"".equals(fNodeAddress)) { //$NON-NLS-1$
+        if (!"".equals(fHostName)) { //$NON-NLS-1$
             // If no node name is specified use the node address as name
-            if ("".equals(fNodeName)) { //$NON-NLS-1$
-                fNodeName = fNodeAddress;
+            if ("".equals(fConnectionName)) { //$NON-NLS-1$
+                fConnectionName = fHostName;
             }
             // Check if node with name already exists in parent
-            if(fParent.containsChild(fNodeName)) {
+            if(fParent.containsChild(fConnectionName)) {
                 MessageDialog.openError(getShell(),
                         Messages.TraceControl_NewDialogTitle,
-                        Messages.TraceControl_AlreadyExistsError + " (" + fNodeName + ")");  //$NON-NLS-1$//$NON-NLS-2$
+                        Messages.TraceControl_AlreadyExistsError + " (" + fConnectionName + ")");  //$NON-NLS-1$//$NON-NLS-2$
                 return;
             }
         }

@@ -18,6 +18,7 @@ import org.eclipse.rse.core.subsystems.ICommunicationsListener;
 import org.eclipse.rse.core.subsystems.ISubSystem;
 import org.eclipse.rse.services.shells.IShellService;
 import org.eclipse.rse.services.terminals.ITerminalService;
+import org.eclipse.rse.subsystems.files.core.servicesubsystem.IFileServiceSubSystem;
 
 /**
  * <b><u>IRemoteSystemProxy</u></b>
@@ -31,34 +32,40 @@ public interface IRemoteSystemProxy {
     // Operations
     // ------------------------------------------------------------------------
     /**
-     * Find the first shell service associated with the host.
+     * Find the first shell service.
      * 
      * @return shell service object, or <code>null</code> if not found.
      */
     public IShellService getShellService();
 
     /**
-     * Find the first terminal service associated with the host.
+     * Find the first terminal service.
      * 
      * @return shell service object, or <code>null</code> if not found.
      */
     public ITerminalService getTerminalService();
 
     /**
-     * Find the first IShellServiceSubSystem service associated with the host.
+     * Find the first IShellServiceSubSystem service.
      * 
      * @return shell service subsystem, or <code>null</code> if not found.
      */
     public ISubSystem getShellServiceSubSystem();
 
     /**
-     * Find the first ITerminalServiceSubSystem service associated with the host.
+     * Find the first ITerminalServiceSubSystem service.
      * 
      * @param host the connection 
      * @return shell service subsystem, or <code>null</code> if not found.
      */
     public ISubSystem getTerminalServiceSubSystem();
-
+    
+    /**
+     * Finds the File Service Subsystem.
+     * @return file service subsystem, or <code>null</code> if not found. 
+     */
+    public IFileServiceSubSystem getFileServiceSubSystem();
+    
     /**
      * Connects the shell service sub system. 
      * 

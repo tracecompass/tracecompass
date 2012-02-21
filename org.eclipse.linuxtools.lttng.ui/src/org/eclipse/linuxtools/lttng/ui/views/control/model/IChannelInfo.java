@@ -21,6 +21,38 @@ import java.util.List;
  */
 public interface IChannelInfo extends ITraceInfo {
 
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    /**
+     * Default value for overwrite mode.
+     */
+    public final static boolean DEFAULT_OVERWRITE_MODE = false;
+    /**
+     * Default value for sub-buffer size for a UST channel. 
+     */
+    public final static long DEFAULT_SUB_BUFFER_SIZE_UST = 4096L;
+    /**
+     * Default value for sub-buffer size for a Kernel channel. 
+     */
+    public final static long DEFAULT_SUB_BUFFER_SIZE_KERNEL = 262144L;
+    /**
+     * Default value for number of sub-buffer a UST channel. 
+     */
+    public final static int DEFAULT_NUMBER_OF_SUB_BUFFERS_UST = 8;
+    /**
+     * Default value for number of sub-buffer a Kernel channel. 
+     */
+    public final static int DEFAULT_NUMBER_OF_SUB_BUFFERS_KERNEL = 4;
+    /**
+     * Default value for number of the switch timer interval. 
+     */
+    public final static long DEFAULT_SWITCH_TIMER = 0;
+    /**
+     * Default value for number of the read timer interval. 
+     */
+    public final static long DEFAULT_READ_TIMER = 200;
+    
     /**
      * @return the overwrite mode value.
      */

@@ -34,6 +34,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
      * The channels information of the domain.
      */
     private List<IChannelInfo> fChannels = new ArrayList<IChannelInfo>();
+    private boolean fIsKernel = false;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -59,6 +60,25 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
                 fChannels.add(other.fChannels.get(i));
             }
         }
+        fIsKernel = other.fIsKernel;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.IDomainInfo#isKernel()
+     */
+    @Override
+    public boolean isKernel() {
+        return fIsKernel;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.IDomainInfo#setIsKernel(boolean)
+     */
+    @Override
+    public void setIsKernel(boolean isKernel) {
+        fIsKernel = isKernel;
     }
 
     // ------------------------------------------------------------------------
@@ -106,6 +126,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
             IChannelInfo channel = (IChannelInfo) iterator.next();
             result = 37 * result + channel.hashCode();
         }
+        result += 37 * result + (fIsKernel ? 1 : 0);
         return result;
     }
 
@@ -132,6 +153,10 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
                 return false;
             }
         }
+
+        if (fIsKernel != otherInfo.fIsKernel) {
+            return false;
+        }
         return true;
     }
     
@@ -154,6 +179,8 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
                     output.append(channel.toString());
                 }
             }
+            output.append(",isKernel=");
+            output.append(String.valueOf(fIsKernel));
             output.append(")]");
             return output.toString();
     }

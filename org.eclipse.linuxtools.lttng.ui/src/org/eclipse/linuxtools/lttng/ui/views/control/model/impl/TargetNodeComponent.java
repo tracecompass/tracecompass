@@ -175,8 +175,18 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
         return null;
     } 
     
+    /**
+     * @return remote host name
+     */
     public String getHostName() {
         return fHost.getHostName();
+    }
+
+    /**
+     * @return remote system proxy implementation
+     */
+    public IRemoteSystemProxy getRemoteSystemProxy() {
+        return fRemoteProxy;
     }
 
     // ------------------------------------------------------------------------

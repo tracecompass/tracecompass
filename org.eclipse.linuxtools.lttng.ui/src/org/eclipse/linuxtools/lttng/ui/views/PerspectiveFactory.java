@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.lttng.ui.views;
 
+import org.eclipse.linuxtools.lttng.ui.views.control.ControlView;
 import org.eclipse.linuxtools.lttng.ui.views.controlflow.ControlFlowView;
 import org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramView;
 import org.eclipse.linuxtools.lttng.ui.views.resources.ResourcesView;
@@ -35,6 +36,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
     private static final String RESOURCES_VIEW_ID = ResourcesView.ID;
     private static final String STATISTICS_VIEW_ID = StatisticsView.ID;
     private static final String HISTOGRAM_VIEW_ID = HistogramView.ID;
+    private static final String CONTROL_VIEW_ID = ControlView.ID;
 
     // Standard Eclipse views
     private static final String PROJECT_VIEW_ID = IPageLayout.ID_PROJECT_EXPLORER;
@@ -59,6 +61,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
         IFolderLayout topLeftFolder = layout.createFolder(
                 "topLeftFolder", IPageLayout.LEFT, 0.15f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
         topLeftFolder.addView(PROJECT_VIEW_ID);
+        topLeftFolder.addView(CONTROL_VIEW_ID);
 
         // Create the top right folder
         IFolderLayout topRightFolder = layout.createFolder(

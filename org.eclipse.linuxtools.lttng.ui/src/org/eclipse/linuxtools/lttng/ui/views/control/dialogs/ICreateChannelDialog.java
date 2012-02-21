@@ -11,32 +11,29 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.control.dialogs;
 
+import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
+
 /**
- * <b><u>INewConnectionDialog</u></b>
+ * <b><u>ICreateChannelDialog</u></b>
  * <p>
- * Interface for connection information dialog.
+ * Interface for the create channel dialog when domain is known.
  * </p>
  */
-public interface INewConnectionDialog {
+public interface ICreateChannelDialog {
     
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
     /**
-     * @return the connection name (alias).
+     * @return the configuration info for the new channel.
      */
-    public String getConnectionName();
-
-    /**
-     * @return the host name (IP address or DNS name)
-     */
-    public String getHostName();
-
+    public IChannelInfo getChannelInfo();
+    
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
     /**
-     * @return returns the open return value
+     * @return the open return value
      */
     int open();
 }

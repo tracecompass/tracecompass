@@ -11,6 +11,11 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.control.model.impl;
 
+import java.util.List;
+
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.lttng.ui.views.control.Messages;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IDomainInfo;
@@ -39,7 +44,7 @@ public class TraceDomainComponent extends TraceControlComponent {
     /**
      * The domain information.
      */
-    private IDomainInfo fDomainInfo = null; 
+    private IDomainInfo fDomainInfo = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -84,8 +89,87 @@ public class TraceDomainComponent extends TraceControlComponent {
             return new TraceDomainPropertySource(this);
         }
         return null;
-    } 
+    }
+    
+    /**
+     * @return session name from parent
+     */
+    public String getSessionName() {
+        return ((TraceSessionComponent)getParent()).getName();
+    }
+    
+    /**
+     * @return true if domain is kernel, false for UST
+     */
+    public boolean isKernel() {
+        return fDomainInfo.isKernel();
+    }
+    
+    /**
+     * Sets whether domain is  Kernel domain or UST 
+     * @param isKernel true for kernel, false for UST
+     */
+    public void setIsKernel(boolean isKernel) {
+        fDomainInfo.setIsKernel(isKernel);
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+    /**
+     * Retrieves the session configuration from the node. 
+     * @throws ExecutionException
+     */
+    public void getConfigurationFromNode() throws ExecutionException {
+        getConfigurationFromNode(new NullProgressMonitor());
+    }
+    /**
+     * Retrieves the session configuration from the node. 
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void getConfigurationFromNode(IProgressMonitor monitor) throws ExecutionException {
+        TraceSessionComponent session = (TraceSessionComponent) getParent();
+        session.getConfigurationFromNode(monitor);
+    }
+    /**
+     * Enables channels with given names which are part of this domain. If a given channel 
+     * doesn't exists it creates a new channel with the given parameters (or default values 
+     * if given parameter is null). 
+     * @param channelNames - a list of channel names to enable on this domain
+     * @param info - channel information to set for the channel (use null for default)
+     * @throws ExecutionException
+     */
+    public void enableChannels(List<String> channelNames, IChannelInfo info) throws ExecutionException {
+        enableChannels(channelNames, info, new NullProgressMonitor());
+    }
+    /**
+     * Enables channels with given names which are part of this domain. If a given channel 
+     * doesn't exists it creates a new channel with the given parameters (or default values 
+     * if given parameter is null). 
+     * @param channelNames - a list of channel names to enable on this domain
+     * @param info - channel information to set for the channel (use null for default)
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void enableChannels(List<String> channelNames, IChannelInfo info, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().enableChannel(getParent().getName(), channelNames, isKernel(), info, monitor);
+    }
+    /**
+     * Disables channels with given names which are part of this domain. 
+     * @param channelNames - a list of channel names to enable on this domain
+     * @throws ExecutionException
+     */
+    public void disableChannels(List<String> channelNames) throws ExecutionException {
+        disableChannels(channelNames, new NullProgressMonitor());
+    }
+    /**
+     * Disables channels with given names which are part of this domain. 
+     * @param channelNames - a list of channel names to enable on this domain
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void disableChannels(List<String> channelNames, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().disableChannel(getParent().getName(), channelNames, isKernel(), monitor);
+    }
 }

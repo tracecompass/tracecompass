@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.lttng.ui.views.control.model.impl;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.ISessionInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent;
 
 /**
@@ -47,7 +48,7 @@ public class TraceSessionGroup extends TraceControlComponent {
         super(name, parent);
         setImage(TRACE_SESSIONS_ICON_FILE);
     }
-    
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -75,5 +76,55 @@ public class TraceSessionGroup extends TraceControlComponent {
             addChild(session);
             session.getConfigurationFromNode(monitor);
         }
+    }
+
+    /**
+     * Creates a session with given session name and location. 
+     * @param sessionName - a session name to create
+     * @param sessionPath - a path for storing the traces (use null for default)
+     * @return the session information
+     * throws ExecutionExecption
+     */
+    public void createSession(final String sessionName, final String sessionPath) throws ExecutionException {
+        createSession(sessionName, sessionPath, new NullProgressMonitor());
+    }
+    
+    /**
+     * Creates a session with given session name and location. 
+     * @param sessionName - a session name to create
+     * @param sessionPath - a path for storing the traces (use null for default)
+     * @Param monitor - a progress monitor 
+     * @return the session information
+     * throws ExecutionExecption
+     */
+    public void createSession(final String sessionName, final String sessionPath, IProgressMonitor monitor) throws ExecutionException {
+        ISessionInfo sessionInfo = getControlService().createSession(sessionName, sessionPath, monitor);
+        if (sessionInfo != null) {
+            TraceSessionComponent session = new TraceSessionComponent(sessionInfo.getName(), TraceSessionGroup.this);
+            addChild(session);
+            session.getConfigurationFromNode(monitor);
+        }
+    }
+
+    /**
+     * Destroys a session with given session name. 
+     * @param sessionName - a session name to destroy
+     * throws ExecutionExecption
+     */
+    public void destroySession(final String sessionName) throws ExecutionException {
+        destroySession(sessionName, new NullProgressMonitor());
+    }
+    
+    /**
+     * Destroys a session with given session name. 
+     * @param sessionName - a session name to destroy
+     * @param monitor - a progress monitor
+     * throws ExecutionExecption
+     */
+    public void destroySession(final String sessionName, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().destroySession(sessionName, monitor);
+        ITraceControlComponent session = getChild(sessionName);
+        session.removeAllChildren();
+        removeChild(session);
     }
 }

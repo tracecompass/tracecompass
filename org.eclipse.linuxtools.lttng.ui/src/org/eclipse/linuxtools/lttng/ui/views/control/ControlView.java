@@ -82,7 +82,7 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
     @Override
     public void createPartControl(Composite parent) {
         // Create tree viewer
-        fTreeViewer = new TreeViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
+        fTreeViewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
         ColumnViewerToolTipSupport.enableFor(fTreeViewer);
 
         fTreeViewer.setContentProvider(new TraceControlContentProvider());

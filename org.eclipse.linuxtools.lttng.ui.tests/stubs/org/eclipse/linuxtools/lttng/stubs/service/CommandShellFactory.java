@@ -4,6 +4,7 @@ import org.eclipse.linuxtools.lttng.stubs.service.shells.GetSessionGarbageShell;
 import org.eclipse.linuxtools.lttng.stubs.service.shells.LttngNotExistsShell;
 import org.eclipse.linuxtools.lttng.stubs.service.shells.NoSessionNamesShell;
 import org.eclipse.linuxtools.lttng.stubs.service.shells.NoUstProviderShell;
+import org.eclipse.linuxtools.lttng.stubs.service.shells.SessionCreationErrorsShell;
 import org.eclipse.linuxtools.lttng.stubs.service.shells.SessionNotExistsShell;
 import org.eclipse.linuxtools.lttng.stubs.service.shells.SessionNamesShell;
 import org.eclipse.linuxtools.lttng.ui.views.control.service.ICommandShell;
@@ -43,5 +44,9 @@ public class CommandShellFactory {
 
     public ICommandShell getShellForNoUstProvider() {
         return new NoUstProviderShell();
+    }
+    
+    public ICommandShell getShellForSessionErrors() {
+        return new SessionCreationErrorsShell();
     }
 }

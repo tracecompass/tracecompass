@@ -23,6 +23,7 @@ import org.eclipse.rse.core.subsystems.ISubSystem;
 import org.eclipse.rse.services.IService;
 import org.eclipse.rse.services.shells.IShellService;
 import org.eclipse.rse.services.terminals.ITerminalService;
+import org.eclipse.rse.subsystems.files.core.servicesubsystem.IFileServiceSubSystem;
 
 /**
  * <b><u>RemoteSystemProxy</u></b>
@@ -36,7 +37,7 @@ public class RemoteSystemProxy implements IRemoteSystemProxy {
     // Attributes
     // ------------------------------------------------------------------------
     private IHost fHost;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -115,7 +116,24 @@ public class RemoteSystemProxy implements IRemoteSystemProxy {
         return null;
     }
 
-
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.remote.IRemoteSystemProxy#getFileServiceSubSystem()
+     */
+    @Override
+    public IFileServiceSubSystem getFileServiceSubSystem() {
+        if (fHost == null) {
+            return null;
+        }
+        ISubSystem[] subSystems = fHost.getSubSystems();
+        for (int i = 0; subSystems != null && i < subSystems.length; i++) {
+            if (subSystems[i] instanceof IFileServiceSubSystem) {
+                return (IFileServiceSubSystem)subSystems[i];
+            }
+        }
+        return null;
+    }
+    
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.lttng.ui.views.control.util.IRemoteSystemProxy#connect(org.eclipse.rse.core.model.IRSECallback)
      */

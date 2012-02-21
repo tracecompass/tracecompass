@@ -33,12 +33,26 @@ final public class Messages extends NLS {
 
     public static String TraceControl_CommandShellError;
     public static String TraceControl_CommandError;
+    public static String TraceControl_UnexpectedCommnadOutputFormat;
+    public static String TraceControl_UnexpectedNameError;
+    public static String TraceControl_UnexpectedPathError;
     
     // Commands
     public static String TraceControl_RetrieveNodeConfigurationJob;
     public static String TraceControl_ListSessionFailure;
     public static String TraceControl_EclipseCommandFailure;
     public static String TraceControl_NewNodeCreationFailure;
+    public static String TraceControl_CreateSessionJob;
+    
+    public static String TraceControl_DestroySessionJob;
+    public static String TraceControl_DestroyConfirmationTitle;
+    public static String TraceControl_DestroyConfirmationMessage;
+
+    public static String TraceControl_EnableChannelJob;
+    public static String TraceControl_DisableChannelJob;
+
+    public static String TraceControl_StartSessionJob;
+    public static String TraceControl_StopSessionJob;
     
     // Dialogs
     public static String TraceControl_NewDialogTitle;
@@ -51,8 +65,43 @@ final public class Messages extends NLS {
     public static String TraceControl_NewNodeHostNameTooltip;
     public static String TraceControl_AlreadyExistsError;
     
+    public static String TraceControl_CreateSessionDialogTitle;
+    public static String TraceControl_CreateSessionNameLabel;
+    public static String TraceControl_CreateSessionNameTooltip;
+    public static String TraceControl_CreateSessionPathLabel;
+    public static String TraceControl_CreateSessionPathTooltip;
+    public static String TraceControl_InvalidSessionNameError;
+    public static String TraceControl_SessionAlreadyExistsError;
+    public static String TraceControl_SessionPathAlreadyExistsError;
+    public static String TraceControl_InvalidSessionPathError;
+    public static String TraceControl_FileSubSystemError;
+
+    
+    public static String TraceControl_EnableChannelDialogTitle;
+    public static String TraceControl_EnableChannelNameLabel;
+    public static String TraceControl_EnableChannelNameLabelTooltip;
+    public static String TraceControl_EnableChannelSubBufferSizeTooltip;
+    public static String TraceControl_EnableChannelNbSubBuffersTooltip;
+    public static String TraceControl_EnableChannelSwitchTimerTooltip;
+    public static String TraceControl_EnableChannelReadTimerTooltip;
+    public static String TraceControl_EnableChannelOutputTypeTooltip;
+    public static String TraceControl_EnableChannelOverwriteModeTooltip;
+    
+    public static String TraceControl_InvalidChannelNameError;
+    public static String TraceControl_ChannelAlreadyExistsError;
+    
+//    public static String TraceControl_CreateSessionNameTooltip;
+//    public static String TraceControl_CreateSessionPathLabel;
+//    public static String TraceControl_CreateSessionPathTooltip;
+//    public static String TraceControl_SessionAlreadyExistsError;
+//    public static String TraceControl_SessionPathAlreadyExistsError;
+//    public static String TraceControl_InvalidSessionPathError;
+//    public static String TraceControl_FileSubSystemError;
+
+    
     // Tree structure strings
     public static String TraceControl_KernelDomainDisplayName;
+    public static String TraceControl_UstDisplayName;
     public static String TraceControl_UstGlobalDomainDisplayName;
     public static String TraceControl_AllSessionsDisplayName;
     public static String TraceControl_SessionDisplayName;

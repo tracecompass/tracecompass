@@ -38,17 +38,6 @@ abstract public class BaseNodeHandler extends AbstractHandler {
     protected TargetNodeComponent fTargetNode = null;
     
     // ------------------------------------------------------------------------
-    // Constructors
-    // ------------------------------------------------------------------------
-
-    // ------------------------------------------------------------------------
-    // Accessors
-    // ------------------------------------------------------------------------
-    public TargetNodeComponent getTargetNode() {
-        return fTargetNode;
-    }
-    
-    // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
     /*
@@ -76,7 +65,7 @@ abstract public class BaseNodeHandler extends AbstractHandler {
             return false;
         }
 
-        // Check if a project is selected
+        // Check if the node component is selected
         ISelection selection = page.getSelection(ControlView.ID);
         if (selection instanceof StructuredSelection) {
             Object element = ((StructuredSelection) selection).getFirstElement();

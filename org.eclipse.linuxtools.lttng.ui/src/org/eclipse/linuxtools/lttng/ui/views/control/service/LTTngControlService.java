@@ -12,6 +12,7 @@
 package org.eclipse.linuxtools.lttng.ui.views.control.service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,7 +61,31 @@ public class LTTngControlService implements ILttngControlService {
     /**
      * Command to list user space trace information.
      */
-    private final static String COMMAND_LIST_UST = COMMAND_LIST + "-u"; //$NON-NLS-1$
+    private final static String COMMAND_LIST_UST = COMMAND_LIST + "-u";  //$NON-NLS-1$
+    /**
+     * Command to create a session. 
+     */
+    private final static String COMMAND_CREATE_SESSION = CONTROL_COMMAND + " create "; //$NON-NLS-1$
+    /**
+     * Command to destroy a session. 
+     */
+    private final static String COMMAND_DESTROY_SESSION = CONTROL_COMMAND + " destroy "; //$NON-NLS-1$
+    /**
+     * Command to destroy a session. 
+     */
+    private final static String COMMAND_START_SESSION = CONTROL_COMMAND + " start "; //$NON-NLS-1$
+    /**
+     * Command to destroy a session. 
+     */
+    private final static String COMMAND_STOP_SESSION = CONTROL_COMMAND + " stop "; //$NON-NLS-1$
+    /**
+     * Command to enable a channel. 
+     */
+    private final static String COMMAND_ENABLE_CHANNEL = CONTROL_COMMAND + " enable-channel "; //$NON-NLS-1$
+    /**
+     * Command to destroy a session. 
+     */
+    private final static String COMMAND_DISABLE_CHANNEL = CONTROL_COMMAND + " disable-channel "; //$NON-NLS-1$
 
     // Parsing constants
     /**
@@ -154,7 +179,19 @@ public class LTTngControlService implements ILttngControlService {
      * Pattern to match for UST provider information (lttng list -u)
      */
     private final static Pattern UST_PROVIDER_PATTERN = Pattern.compile("\\s*PID\\:\\s+(\\d+)\\s+-\\s+Name\\:\\s+(.*)"); //$NON-NLS-1$
-
+    /**
+     * Pattern to match for session information (lttng create <session name>)
+     */
+    private final static Pattern CREATE_SESSION_NAME_PATTERN = Pattern.compile("\\s*Session\\s+(.*)\\s+created\\."); //$NON-NLS-1$
+    /**
+     * Pattern to match for session path information (lttng create <session name>)
+     */
+    private final static Pattern CREATE_SESSION_PATH_PATTERN = Pattern.compile("\\s*Traces\\s+will\\s+be\\s+written\\s+in\\s+(.*).*"); //$NON-NLS-1$
+    /**
+     * Pattern to match for session command output for "session name not found".
+     */
+    private final static Pattern SESSION_NOT_FOUND_ERROR_PATTERN = Pattern.compile("\\s*Error:\\s+Session\\s+name\\s+not\\s+found"); //$NON-NLS-1$
+    
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -180,18 +217,6 @@ public class LTTngControlService implements ILttngControlService {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService
-     * #getSessionNames()
-     */
-    @Override
-    public String[] getSessionNames() throws ExecutionException {
-        return getSessionNames(new NullProgressMonitor());
-    }
 
     /*
      * (non-Javadoc)
@@ -230,18 +255,6 @@ public class LTTngControlService implements ILttngControlService {
             index++;
         }
         return retArray.toArray(new String[retArray.size()]);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService
-     * #getSession(java.lang.String)
-     */
-    @Override
-    public ISessionInfo getSession(String sessionName) throws ExecutionException {
-        return getSession(sessionName, new NullProgressMonitor());
     }
 
     /*
@@ -300,6 +313,9 @@ public class LTTngControlService implements ILttngControlService {
 
                 // set channels
                 domainInfo.setChannels(channels);
+                
+                // set kernel flag
+                domainInfo.setIsKernel(true);
                 continue;
             }
 
@@ -308,29 +324,20 @@ public class LTTngControlService implements ILttngControlService {
                 IDomainInfo domainInfo = new DomainInfo(Messages.TraceControl_UstGlobalDomainDisplayName);
                 sessionInfo.addDomain(domainInfo);
 
-                // in domain kernel
+                // in domain UST
                 ArrayList<IChannelInfo> channels = new ArrayList<IChannelInfo>();
                 index = parseDomain(result.getOutput(), index, channels);
 
                 // set channels
                 domainInfo.setChannels(channels);
+                
+                // set kernel flag
+                domainInfo.setIsKernel(false);
                 continue;
             }
             index++;
         }
         return sessionInfo;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService
-     * #getKernelProvider()
-     */
-    @Override
-    public List<IBaseEventInfo> getKernelProvider() throws ExecutionException {
-        return getKernelProvider(new NullProgressMonitor());
     }
 
     /*
@@ -421,6 +428,236 @@ public class LTTngControlService implements ILttngControlService {
 
         }
         return allProviders;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#createSession(java.lang.String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+     */
+    @Override
+    public ISessionInfo createSession(String sessionName, String sessionPath, IProgressMonitor monitor) throws ExecutionException {
+
+        String newName = formatParameter(sessionName);
+        String newPath = formatParameter(sessionPath);
+
+        String command = COMMAND_CREATE_SESSION + newName;
+        if (newPath != null && !"".equals(newPath)) { //$NON-NLS-1$
+            command += " -o " + newPath; //$NON-NLS-1$
+        }
+
+        ICommandResult result = fCommandShell.executeCommand(command, monitor);
+        
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        //Session myssession2 created.
+        //Traces will be written in /home/user/lttng-traces/myssession2-20120209-095418
+        String[] output = result.getOutput();
+        
+        // Get and verify session name
+        Matcher matcher = CREATE_SESSION_NAME_PATTERN.matcher(output[0]);
+        String name = null;
+
+        if (matcher.matches()) {
+            name = String.valueOf(matcher.group(1).trim());
+        } else {
+            // Output format not expected
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + //$NON-NLS-1$ //$NON-NLS-2$ 
+                    Messages.TraceControl_UnexpectedCommnadOutputFormat + ":\n" + //$NON-NLS-1$ 
+                    formatOutput(result.getOutput())); 
+        }
+
+        if ((name == null) || (!name.equals(sessionName))) {
+            // Unexpected name returned
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + //$NON-NLS-1$ //$NON-NLS-2$ 
+                    Messages.TraceControl_UnexpectedNameError + ": " + name); //$NON-NLS-1$ 
+        }
+        
+        // Get and verify session path
+        matcher = CREATE_SESSION_PATH_PATTERN.matcher(output[1]);
+        String path = null;
+        
+        if (matcher.matches()) {
+            path = String.valueOf(matcher.group(1).trim());
+        } else {
+            // Output format not expected
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + //$NON-NLS-1$ //$NON-NLS-2$ 
+                    Messages.TraceControl_UnexpectedCommnadOutputFormat + ":\n" + //$NON-NLS-1$ 
+                    formatOutput(result.getOutput())); 
+        }
+
+        if ((path == null) || ((sessionPath != null) && (!path.contains(sessionPath)))) {
+            // Unexpected path
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + //$NON-NLS-1$ //$NON-NLS-2$ 
+                    Messages.TraceControl_UnexpectedPathError + ": " + name); //$NON-NLS-1$
+        }
+        
+        SessionInfo sessionInfo = new SessionInfo(name);
+        sessionInfo.setSessionPath(path);
+
+        return sessionInfo;
+    }
+    
+    @Override
+    public void destroySession(String sessionName, IProgressMonitor monitor) throws ExecutionException {
+        String newName = formatParameter(sessionName);
+        String command = COMMAND_DESTROY_SESSION + newName;
+
+        ICommandResult result = fCommandShell.executeCommand(command, monitor);
+        String[] output = result.getOutput();
+        
+        if (isError(result)) {
+            // In case "session not found" treat it as success 
+            if ((output == null) || (!SESSION_NOT_FOUND_ERROR_PATTERN.matcher(output[0]).matches())) {
+                throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+        }
+        //Session <sessionName> destroyed
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#startSession(java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+     */
+    @Override
+    public void startSession(String sessionName, IProgressMonitor monitor) throws ExecutionException {
+
+        String newSessionName = formatParameter(sessionName);
+
+        String command = COMMAND_START_SESSION + newSessionName;
+
+        ICommandResult result = fCommandShell.executeCommand(command, monitor);
+
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        //Session <sessionName> started
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#stopSession(java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+     */
+    @Override
+    public void stopSession(String sessionName, IProgressMonitor monitor) throws ExecutionException {
+        String newSessionName = formatParameter(sessionName);
+        String command = COMMAND_STOP_SESSION + newSessionName;
+
+        ICommandResult result = fCommandShell.executeCommand(command, monitor);
+
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        //Session <sessionName> stopped
+        
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#enableChannel(java.lang.String, java.util.List, boolean, org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo, org.eclipse.core.runtime.IProgressMonitor)
+     */
+    @Override
+    public void enableChannel(String sessionName, List<String> channelNames, boolean isKernel, IChannelInfo info, IProgressMonitor monitor) throws ExecutionException {
+
+        // no channels to enable
+        if (channelNames.size() == 0) {
+            return;
+        }
+
+        String newSessionName = formatParameter(sessionName);
+        
+        StringBuffer command = new StringBuffer(COMMAND_ENABLE_CHANNEL);
+
+        for (Iterator<String> iterator = channelNames.iterator(); iterator.hasNext();) {
+            String channel = (String) iterator.next();
+            command.append(channel);
+            if (iterator.hasNext()) {
+                command.append(","); //$NON-NLS-1$
+            }
+        }
+
+        if (isKernel) {
+            command.append(" -k ");
+        } else {
+            command.append(" -u ");
+        }
+
+        command.append(" -s "); //$NON-NLS-1$
+        command.append(newSessionName);
+
+        if (info != null) {
+//            --discard            Discard event when buffers are full (default)
+            // TODO discard
+
+//            --overwrite          Flight recorder mode
+            if (info.isOverwriteMode()) {
+                command.append(" --overwrite ");
+            }
+//            --subbuf-size SIZE   Subbuffer size in bytes
+//                                     (default: 4096, kernel default: 262144)
+            command.append(" --subbuf-size ");
+            command.append(String.valueOf(info.getSubBufferSize()));
+
+//            --num-subbuf NUM     Number of subbufers
+//                                     (default: 8, kernel default: 4)
+            command.append(" --num-subbuf ");
+            command.append(String.valueOf(info.getNumberOfSubBuffers()));
+            
+//            --switch-timer USEC  Switch timer interval in usec (default: 0)
+            command.append(" --switch-timer ");
+            command.append(String.valueOf(info.getSwitchTimer()));
+
+//            --read-timer USEC    Read timer interval in usec (default: 200)
+            command.append(" --read-timer ");
+            command.append(String.valueOf(info.getReadTimer()));
+        } 
+
+        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
+        
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#disableChannel(java.lang.String, java.util.List, org.eclipse.core.runtime.IProgressMonitor)
+     */
+    @Override
+    public void disableChannel(String sessionName, List<String> channelNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException{
+        
+        // no channels to enable
+        if (channelNames.size() == 0) {
+            return;
+        }
+
+        String newSessionName = formatParameter(sessionName);
+        
+        StringBuffer command = new StringBuffer(COMMAND_DISABLE_CHANNEL);
+
+        for (Iterator<String> iterator = channelNames.iterator(); iterator.hasNext();) {
+            String channel = (String) iterator.next();
+            command.append(channel);
+            if (iterator.hasNext()) {
+                command.append(","); //$NON-NLS-1$
+            }
+        }
+
+        if (isKernel) {
+            command.append(" -k ");
+        } else {
+            command.append(" -u ");
+        }
+
+        command.append(" -s "); //$NON-NLS-1$
+        command.append(newSessionName);
+
+        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
+        
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -640,4 +877,22 @@ public class LTTngControlService implements ILttngControlService {
         return index;
     }
 
+    /**
+     * Formats a command parameter for the command execution i.e. adds quotes 
+     * at the beginning and end if necessary.
+     * @param parameter - parameter to format
+     * @return formated parameter
+     */
+    private String formatParameter(String parameter) {
+        if (parameter != null) {
+            String newString = String.valueOf(parameter);
+
+            if (parameter.contains(" ")) { //$NON-NLS-1$
+                newString = "\"" + newString + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+            }
+            return newString;
+        }
+        return null;
+    }
+    
 }

@@ -105,14 +105,13 @@ public class TraceSessionComponent extends TraceControlComponent {
         return fActiveImage;
     }
 
-    
     /**
      * @return the whether the session is destroyed or not.
      */
     public boolean isDestroyed() {
         return fIsDestroyed;
     }
-    
+
     /**
      * Sets the session destroyed state to the given value.
      * @param destroyed - value to set.
@@ -120,7 +119,7 @@ public class TraceSessionComponent extends TraceControlComponent {
     public void setDestroyed(boolean destroyed) {
         fIsDestroyed = destroyed;
     }
-    
+
     /**
      * @return the session state state (active or inactive).
      */
@@ -135,7 +134,7 @@ public class TraceSessionComponent extends TraceControlComponent {
     public void setSessionState(TraceSessionState state) {
         fSessionInfo.setSessionState(state);
     }
-    
+
     /**
      * Sets the event state to the value specified by the given name.
      * @param stateName - state to set.
@@ -171,7 +170,7 @@ public class TraceSessionComponent extends TraceControlComponent {
         }
         return null;
     } 
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -189,12 +188,48 @@ public class TraceSessionComponent extends TraceControlComponent {
      * @throws ExecutionException
      */
     public void getConfigurationFromNode(IProgressMonitor monitor) throws ExecutionException {
+        removeAllChildren();
         fSessionInfo = getControlService().getSession(getName(), monitor);
         IDomainInfo[] domains = fSessionInfo.getDomains();
         for (int i = 0; i < domains.length; i++) {
-            TraceDomainComponent domainComponenent = new TraceDomainComponent(domains[i].getName(), this);
-            addChild(domainComponenent);
-            domainComponenent.setDomainInfo(domains[i]);
+            TraceDomainComponent domainComponent = new TraceDomainComponent(domains[i].getName(), this);
+            addChild(domainComponent);
+            domainComponent.setDomainInfo(domains[i]);
         }
     }
+    
+    /**
+     * Starts the session. 
+     * throws ExecutionExecption
+     */
+    public void startSession() throws ExecutionException {
+        startSession(new NullProgressMonitor());
+    }
+    
+    /**
+     * Starts the session.
+     * @param monitor - a progress monitor
+     * throws ExecutionExecption
+     */
+    public void startSession(IProgressMonitor monitor) throws ExecutionException {
+        getControlService().startSession(getName(), monitor);
+    }
+    
+    /**
+     * Starts the session. 
+     * throws ExecutionExecption
+     */
+    public void stopSession() throws ExecutionException {
+        startSession(new NullProgressMonitor());
+    }
+    
+    /**
+     * Starts the session.
+     * @param monitor - a progress monitor
+     * throws ExecutionExecption
+     */
+    public void stopSession(IProgressMonitor monitor) throws ExecutionException {
+        getControlService().stopSession(getName(), monitor);
+    }
+
 }

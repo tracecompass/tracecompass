@@ -81,8 +81,8 @@ public class NewConnectionHandler extends AbstractHandler {
 
         if (dialog.open() == Window.OK) {
 
-            String hostName = dialog.getNodeName(); 
-            String hostAddress = dialog.getNodeAddress();
+            String hostName = dialog.getConnectionName(); 
+            String hostAddress = dialog.getHostName();
 
             // get the singleton RSE registry
             IHost host = null;
@@ -97,7 +97,6 @@ public class NewConnectionHandler extends AbstractHandler {
             if (host == null) {
                 // if there's no host then we will create it
                 try {
-                    
                     // create the host object as an SSH Only connection
                     host = registry.createHost(
                             sysType,       //System Type Name
@@ -145,7 +144,7 @@ public class NewConnectionHandler extends AbstractHandler {
             return false;
         }
 
-        // Check if we are in the Project View
+        // Check if we are in the Control View
         IWorkbenchPage page = window.getActivePage();
         if (page == null) return false;
         IWorkbenchPart part = page.getActivePart();

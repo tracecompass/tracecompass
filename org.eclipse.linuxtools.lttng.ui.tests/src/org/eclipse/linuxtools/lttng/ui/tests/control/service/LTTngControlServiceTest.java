@@ -16,6 +16,8 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.lttng.stubs.service.CommandShellFactory;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IBaseEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
@@ -75,7 +77,7 @@ public class LTTngControlServiceTest extends TestCase {
     public void testGetSessionNames() {
         try {
             ILttngControlService service = new LTTngControlService(fShellFactory.getShellForLttngNotExistsShell());
-            service.getSessionNames();
+            service.getSessionNames(new NullProgressMonitor());
             fail("No exeption thrown");
             
         } catch (ExecutionException e) {
@@ -86,7 +88,7 @@ public class LTTngControlServiceTest extends TestCase {
     public void testGetSessionNames1() {
         try {
             ILttngControlService service = new LTTngControlService(fShellFactory.getShellForNoSessionNames());
-            String[] result = service.getSessionNames();
+            String[] result = service.getSessionNames(new NullProgressMonitor());
 
             assertNotNull(result);
             assertEquals(0, result.length);
@@ -99,7 +101,7 @@ public class LTTngControlServiceTest extends TestCase {
     public void testGetSessionNames2() {
         try {
             ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionNames());
-            String[] result = service.getSessionNames();
+            String[] result = service.getSessionNames(new NullProgressMonitor());
 
             assertNotNull(result);
             assertEquals(2, result.length);
@@ -114,7 +116,7 @@ public class LTTngControlServiceTest extends TestCase {
     public void testGetSessionNotExist() {
         try {
             ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionNotExists());
-            service.getSessionNames();
+            service.getSessionNames(new NullProgressMonitor());
             fail("No exeption thrown");
             
         } catch (ExecutionException e) {
@@ -125,7 +127,7 @@ public class LTTngControlServiceTest extends TestCase {
     public void testGetSessionNameGarbage() {
         try {
             ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionGarbage());
-            String[] result = service.getSessionNames();
+            String[] result = service.getSessionNames(new NullProgressMonitor());
 
             assertNotNull(result);
             assertEquals(0, result.length);
@@ -138,7 +140,7 @@ public class LTTngControlServiceTest extends TestCase {
     public void testGetSession1() {
         try {
             ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionNames());
-            ISessionInfo session = service.getSession("mysession");
+            ISessionInfo session = service.getSession("mysession", new NullProgressMonitor());
 
             // Verify Session
             assertNotNull(session);
@@ -238,7 +240,7 @@ public class LTTngControlServiceTest extends TestCase {
             assertEquals(TraceEnablement.ENABLED, ustEvents[1].getState());
             
             // next session (no detailed information available)
-            session = service.getSession("mysession1");
+            session = service.getSession("mysession1", new NullProgressMonitor());
             assertNotNull(session);
             assertEquals("mysession1", session.getName());
             assertEquals("/home/user/lttng-traces/mysession1-20120203-133225", session.getSessionPath());
@@ -255,7 +257,7 @@ public class LTTngControlServiceTest extends TestCase {
     public void testGetKernelProvider() {
         try {
             ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionNames());
-            List<IBaseEventInfo> events = service.getKernelProvider();
+            List<IBaseEventInfo> events = service.getKernelProvider(new NullProgressMonitor());
 
             // Verify event info
             assertNotNull(events);
@@ -348,5 +350,96 @@ public class LTTngControlServiceTest extends TestCase {
             fail(e.toString());
         }
     }
+    
+    public void testCreateSession() {
+        try {
+            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionNames());
+            ISessionInfo info = service.createSession("mysession2", null, new NullProgressMonitor());
+            assertNotNull(info);
+            assertEquals("mysession2", info.getName());
+            assertNotNull(info.getSessionPath());
+            assertTrue(info.getSessionPath().contains("mysession2"));
+            assertEquals(TraceSessionState.INACTIVE, info.getSessionState());
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+    
+    public void testCreateSessionErrors() {
+        ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionErrors());
+        try {
+            service.createSession("alreadyExist", null, new NullProgressMonitor());
+            fail("No exeption thrown");
+        } catch (ExecutionException e) {
+            // success
+        }
+        
+        try {
+            service.createSession("wrongName", null, new NullProgressMonitor());
+            fail("No exeption thrown");
+        } catch (ExecutionException e) {
+            // success
+        } 
+
+        try {
+            service.createSession("wrongPath", "/home/user/hallo", new NullProgressMonitor());
+            fail("No exeption thrown");
+        } catch (ExecutionException e) {
+            // success
+        } 
+
+        try {
+            ISessionInfo info = service.createSession("session with spaces", null, new NullProgressMonitor());
+            assertNotNull(info);
+            assertEquals("session with spaces", info.getName());
+            assertNotNull(info.getSessionPath());
+            assertTrue(info.getSessionPath().contains("session with spaces"));
+            assertEquals(TraceSessionState.INACTIVE, info.getSessionState());
+            
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        } 
+
+        try {
+            ISessionInfo info = service.createSession("pathWithSpaces", "/home/user/hallo user/here", new NullProgressMonitor());
+            assertNotNull(info);
+            assertEquals("pathWithSpaces", info.getName());
+            assertNotNull(info.getSessionPath());
+            assertTrue(info.getSessionPath().contains("/home/user/hallo user/here"));
+            assertEquals(TraceSessionState.INACTIVE, info.getSessionState());
+            
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        } 
+    }
+
+    void testDestroySession() {
+        try {
+            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionErrors());
+            service.destroySession("mysession2", new NullProgressMonitor());
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        } 
+    }
+    
+//    public void testCreateChannel() {
+//        try {
+//            
+////            public void enableChannel(String sessionName, List<String> channelNames, boolean isKernel, IChannelInfo info, IProgressMonitor monitor);
+//            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionNames());
+//            
+//            
+//            ISessionInfo info = service.createSession("mysession2", null, new NullProgressMonitor());
+//            assertNotNull(info);
+//            assertEquals("mysession2", info.getName());
+//            assertNotNull(info.getSessionPath());
+//            assertTrue(info.getSessionPath().contains("mysession2"));
+//            assertEquals(TraceSessionState.INACTIVE, info.getSessionState());
+//        } catch (ExecutionException e) {
+//            fail(e.toString());
+//        }
+//    }
+
+    
     
 }

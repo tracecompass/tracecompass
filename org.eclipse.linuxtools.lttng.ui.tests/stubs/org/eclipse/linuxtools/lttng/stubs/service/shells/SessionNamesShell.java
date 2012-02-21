@@ -121,6 +121,15 @@ public class SessionNamesShell extends TestCommandShell {
             list.add("    Trace path: /home/user/lttng-traces/mysession1-20120203-133225");
             list.add("");
             return new CommandResult(0, list.toArray(new String[list.size()]));
+        } else if ("lttng create mysession2".equals(command)) {
+            List<String> list = new ArrayList<String>();
+            list.add("Session mysession2 created.");
+            list.add("Traces will be written in /home/user/lttng-traces/mysession2-20120209-095418");
+            return new CommandResult(0, list.toArray(new String[list.size()]));
+        } else if ("lttng destroy mysession2".equals(command)) {
+            List<String> list = new ArrayList<String>();
+            list.add("Session mysession2 destrioyed.");
+            return new CommandResult(0, list.toArray(new String[list.size()]));
         }
 
         String[] output = new String[1];

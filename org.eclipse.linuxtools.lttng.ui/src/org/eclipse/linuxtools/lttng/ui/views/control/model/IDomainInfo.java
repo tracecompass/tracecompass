@@ -38,5 +38,17 @@ public interface IDomainInfo extends ITraceInfo {
      * @param channel - channel information to add.
      */
     public void addChannel(IChannelInfo channel);
+    
+    /**
+     * @return true if domain is kernel, false for UST
+     */
+    public boolean isKernel();
+    
+    /**
+     * Sets whether domain is  Kernel domain or UST 
+     * @param isKernel true for kernel, false for UST
+     */
+    public void setIsKernel(boolean isKernel);
+
 
 }
