@@ -36,7 +36,7 @@ public interface ITmfEventField extends Cloneable {
     public Object getValue();
 
     /**
-     * @return the list of subfield names (empty array if none)
+     * @return the list of subfield names (empty if none)
      */
     public String[] getFieldNames();
 
@@ -46,7 +46,7 @@ public interface ITmfEventField extends Cloneable {
     public String getFieldName(int index);
 
     /**
-     * @return the list of subfields (empty array  if none)
+     * @return the list of subfields (null if none)
      */
     public ITmfEventField[] getFields();
 

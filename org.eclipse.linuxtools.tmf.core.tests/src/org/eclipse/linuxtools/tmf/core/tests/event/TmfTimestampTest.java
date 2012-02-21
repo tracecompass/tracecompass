@@ -101,7 +101,7 @@ public class TmfTimestampTest extends TestCase {
         try {
             @SuppressWarnings("unused")
             ITmfTimestamp timestamp = new TmfTimestamp(null);
-            fail("null copy");
+            fail("TmfTimestamp: null argument");
         } catch (IllegalArgumentException e) {
         }
     }
@@ -321,24 +321,24 @@ public class TmfTimestampTest extends TestCase {
             ts1.normalize(0, +MAX_SCALE_DIFF - 1);
             ts1.normalize(0, -MAX_SCALE_DIFF + 1);
         } catch (ArithmeticException e) {
-            fail();
+            fail("normalize: scale error");
         }
 
         // Test at limit
         try {
             ts1.normalize(0, +MAX_SCALE_DIFF);
-            fail();
+            fail("normalize: scale error");
             ts1.normalize(0, -MAX_SCALE_DIFF);
-            fail();
+            fail("normalize: scale error");
         } catch (ArithmeticException e) {
         }
 
         // Test over limit
         try {
             ts1.normalize(0, +MAX_SCALE_DIFF + 1);
-            fail();
+            fail("normalize: scale error");
             ts1.normalize(0, -MAX_SCALE_DIFF - 1);
-            fail();
+            fail("normalize: scale error");
         } catch (ArithmeticException e) {
         }
     }

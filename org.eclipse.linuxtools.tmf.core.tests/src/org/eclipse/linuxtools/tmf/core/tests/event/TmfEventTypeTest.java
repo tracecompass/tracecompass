@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Ericsson
+ * Copyright (c) 2009, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Francois Chouinard - Adjusted for new Event Model
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.event;
@@ -21,7 +22,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 /**
  * <b><u>TmfEventTypeTest</u></b>
  * <p>
- * JUnit test suite for the TmfEventType class.
+ * Test suite for the TmfEventType class.
  */
 @SuppressWarnings("nls")
 public class TmfEventTypeTest extends TestCase {
@@ -149,7 +150,7 @@ public class TmfEventTypeTest extends TestCase {
     public void testCopyConstructorCornerCases() {
         try {
             new TmfEventType(null);
-            fail("null argument");
+            fail("TmfEventType: null argument");
         } catch (IllegalArgumentException e) {
         }
     }

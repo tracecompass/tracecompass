@@ -61,14 +61,14 @@ public class TmfTimeRangeTest extends TestCase {
     public void testBadConstructor() throws Exception {
         try {
             new TmfTimeRange(TmfTimestamp.BigBang, null);
-            fail("null copy");
+            fail("TmfTimeRange: bad end time");
         } catch (IllegalArgumentException e) {
             // Success
         }
 
         try {
             new TmfTimeRange(null, TmfTimestamp.BigCrunch);
-            fail("null copy");
+            fail("TmfTimeRange: bad start time");
         } catch (IllegalArgumentException e) {
             // Success
         }
@@ -116,7 +116,7 @@ public class TmfTimeRangeTest extends TestCase {
     public void testCopyConstructor2() throws Exception {
         try {
             new TmfTimeRange(null);
-            fail("null copy");
+            fail("TmfTimeRange: null argument");
         } catch (IllegalArgumentException e) {
             // Success
         }

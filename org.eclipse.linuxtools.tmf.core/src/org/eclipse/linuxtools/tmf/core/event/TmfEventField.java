@@ -19,7 +19,9 @@ import java.util.Map;
 /**
  * <b><u>TmfEventField</u></b>
  * <p>
- * A basic implementation of ITmfEventField.
+ * A basic implementation of ITmfEventField. Non-value fields are structural
+ * (i.e. used to represent the event structure including optional fields) while
+ * the valued fields are actual event fields.
  */
 public class TmfEventField implements ITmfEventField {
 
@@ -43,7 +45,16 @@ public class TmfEventField implements ITmfEventField {
      */
     @SuppressWarnings("unused")
     private TmfEventField() {
-        throw new AssertionError();
+    }
+
+    /**
+     * Constructor for a structural field
+     * 
+     * @param name the event field id
+     * @param subfields the list of subfields
+     */
+    public TmfEventField(String name, ITmfEventField[] fields) {
+        this(name, null, fields);
     }
 
     /**
@@ -53,17 +64,7 @@ public class TmfEventField implements ITmfEventField {
      * @param value the event field value
      */
     public TmfEventField(String name, Object value) {
-        this(name, value, new ITmfEventField[0]);
-    }
-
-    /**
-     * Constructor for a non-valued field (for structural purposes)
-     * 
-     * @param name the event field id
-     * @param subfields the list of subfields
-     */
-    public TmfEventField(String name, ITmfEventField[] fields) {
-        this(name, null, fields);
+        this(name, value, null);
     }
 
     /**
@@ -95,6 +96,7 @@ public class TmfEventField implements ITmfEventField {
 		fValue = field.fValue;
 		fFields = field.fFields;
 		fFieldNames = field.fFieldNames;
+        populateStructs();
     }
 
     // ------------------------------------------------------------------------
@@ -159,7 +161,7 @@ public class TmfEventField implements ITmfEventField {
      */
     @Override
     public ITmfEventField getField(int index) {
-        if (index >= 0 && index < fFields.length)
+        if (fFields != null && index >= 0 && index < fFields.length)
             return fFields[index];
         return null;
     }
@@ -243,7 +245,7 @@ public class TmfEventField implements ITmfEventField {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((fName == null) ? 0 : fName.hashCode());
+        result = prime * result + fName.hashCode();
         result = prime * result + ((fValue == null) ? 0 : fValue.hashCode());
         return result;
     }
@@ -260,10 +262,7 @@ public class TmfEventField implements ITmfEventField {
         if (getClass() != obj.getClass())
             return false;
         TmfEventField other = (TmfEventField) obj;
-        if (fName == null) {
-            if (other.fName != null)
-                return false;
-        } else if (!fName.equals(other.fName))
+        if (!fName.equals(other.fName))
             return false;
         if (fValue == null) {
             if (other.fValue != null)
