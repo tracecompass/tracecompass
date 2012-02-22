@@ -73,6 +73,13 @@ public class TmfEvent implements ITmfEvent {
      * Default constructor
      */
     public TmfEvent() {
+        fTrace = null;
+        fRank = -1;
+        fTimestamp = null;
+        fSource = null;
+        fType = null;
+        fContent = null;
+        fReference = null;
     }
 
     /**

@@ -293,11 +293,6 @@ public class TmfEventFieldTest extends TestCase {
         assertTrue("equals", fField2.equals(copy2));
     }
 
-    public void testEqualsNull() throws Exception {
-        assertFalse("equals", fField1.equals(null));
-        assertFalse("equals", fField2.equals(null));
-    }
-
     public void testEquals() throws Exception {
         assertTrue("equals", fStructTerminalField1.equals(fStructTerminalField3));
         assertTrue("equals", fStructTerminalField3.equals(fStructTerminalField1));
@@ -306,15 +301,36 @@ public class TmfEventFieldTest extends TestCase {
         assertFalse("equals", fField3.equals(fStructTerminalField1));
     }
 
+    public void testEqualsNull() throws Exception {
+        assertFalse("equals", fField1.equals(null));
+        assertFalse("equals", fField2.equals(null));
+    }
+
+    public void testNonEqualClasses() throws Exception {
+        assertFalse("equals", fField1.equals(fStructTerminalField1));
+        assertFalse("equals", fField1.equals(fValue1));
+    }
+
+    public void testNonEqualValues() throws Exception {
+        TmfEventField copy1 = new TmfEventField(fFieldName1, fValue1);
+        TmfEventField copy2 = new TmfEventField(fFieldName1, fValue1);
+        assertTrue("equals", copy1.equals(copy2));
+        assertTrue("equals", copy2.equals(copy1));
+
+        copy2 = new TmfEventField(fFieldName1, fValue2);
+        assertFalse("equals", copy1.equals(copy2));
+        assertFalse("equals", copy2.equals(copy1));
+
+        copy2 = new TmfEventField(fFieldName1, null);
+        assertFalse("equals", copy1.equals(copy2));
+        assertFalse("equals", copy2.equals(copy1));
+    }
+
     public void testNonEquals() throws Exception {
         assertFalse("equals", fField1.equals(fField2));
         assertFalse("equals", fField2.equals(fField1));
 
         assertFalse("equals", fField1.equals(fStructTerminalField1));
-    }
-
-    public void testEqualsNonType() throws Exception {
-        assertFalse("equals", fField1.equals(fValue1));
     }
 
     // ------------------------------------------------------------------------

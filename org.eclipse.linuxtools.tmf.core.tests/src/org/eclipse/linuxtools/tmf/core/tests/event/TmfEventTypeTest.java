@@ -34,15 +34,15 @@ public class TmfEventTypeTest extends TestCase {
     private final String fContext1 = "JUnit context 1";
     private final String fContext2 = "JUnit context 2";
 
-    private final String fTypeId1  = "Some type";
+    private final String fTypeId1 = "Some type";
     private final String fTypeId2 = "Some other type";
 
     private final String fLabel0 = "label1";
     private final String fLabel1 = "label2";
     
-    private final String[] fLabels0  = new String[] { };
-    private final String[] fLabels1  = new String[] { fLabel0, fLabel1 };
-    private final String[] fLabels2  = new String[] { fLabel1, fLabel0, fLabel1 };
+    private final String[] fLabels0 = new String[] { };
+    private final String[] fLabels1 = new String[] { fLabel0, fLabel1 };
+    private final String[] fLabels2 = new String[] { fLabel1, fLabel0, fLabel1 };
 
     private final TmfEventType fType0 = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels0));
     private final TmfEventType fType1 = new TmfEventType(fContext1, fTypeId2, TmfEventField.makeRoot(fLabels1));
@@ -202,8 +202,8 @@ public class TmfEventTypeTest extends TestCase {
         assertTrue("equals", fType0.equals(fType0));
         assertTrue("equals", fType3.equals(fType3));
 
-        assertTrue("equals", !fType0.equals(fType3));
-        assertTrue("equals", !fType3.equals(fType0));
+        assertFalse("equals", fType0.equals(fType3));
+        assertFalse("equals", fType3.equals(fType0));
     }
 
     public void testEqualsSymmetry() throws Exception {
@@ -252,7 +252,7 @@ public class TmfEventTypeTest extends TestCase {
         assertFalse("equals", fType3.equals(fType0));
     }
     
-    public void testEqualsNonType() throws Exception {
+    public void testNonEqualsClasses() throws Exception {
         assertFalse("equals", fType1.equals(fLabels1));
     }
     

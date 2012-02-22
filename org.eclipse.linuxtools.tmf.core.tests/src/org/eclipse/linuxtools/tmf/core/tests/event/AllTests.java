@@ -34,7 +34,7 @@ public class AllTests {
 		suite.addTestSuite(TmfEventFieldTest.class);
         suite.addTestSuite(TmfEventTypeTest.class);
 		suite.addTestSuite(TmfEventTest.class);
-//        suite.addTestSuite(TmfEventTypeManagerTest.class);
+        suite.addTestSuite(TmfEventTypeManagerTest.class);
 		//$JUnit-END$
 		return suite;
 	}
