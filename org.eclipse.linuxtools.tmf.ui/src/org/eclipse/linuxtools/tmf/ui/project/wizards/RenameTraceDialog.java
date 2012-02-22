@@ -207,8 +207,8 @@ public class RenameTraceDialog extends SelectionStatusDialog {
                     }
                     if (fTrace.getResource() instanceof IFolder) {
                         IFolder folder = (IFolder) fTrace.getResource();
-                        IFile bookmarksFile = folder.getFile(fTrace.getName() + ' ');
-                        IFile newBookmarksFile = folder.getFile(newName + ' ');
+                        IFile bookmarksFile = folder.getFile(fTrace.getName() + '_');
+                        IFile newBookmarksFile = folder.getFile(newName + '_');
                         if (bookmarksFile.exists()) {
                             if (!newBookmarksFile.exists()) {
                                 IPath newBookmarksPath = newBookmarksFile.getFullPath();
