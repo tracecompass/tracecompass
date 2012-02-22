@@ -270,7 +270,9 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> {
 
     @TmfSignalHandler
     public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
-        indexExperiment(false, (int) fNbEvents, signal.getRange());
+        if (signal.getExperiment() == this) {
+            indexExperiment(false, (int) fNbEvents, signal.getRange());
+        }
     }
 
     /*

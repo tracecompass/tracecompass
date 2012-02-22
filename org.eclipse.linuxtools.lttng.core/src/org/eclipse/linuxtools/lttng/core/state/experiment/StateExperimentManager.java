@@ -253,7 +253,7 @@ public class StateExperimentManager extends LTTngTreeNode implements ILttExperim
     public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
         TmfExperiment<LttngEvent> experiment = (TmfExperiment<LttngEvent>) signal.getExperiment();
         // validate
-        if (experiment != fSelectedExperiment.getValue()) {
+        if (fSelectedExperiment == null || experiment != fSelectedExperiment.getValue()) {
             return;
         }
 

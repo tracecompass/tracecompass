@@ -336,10 +336,12 @@ public class HistogramView extends TmfView {
     }
 
     @TmfSignalHandler
-    @SuppressWarnings("unchecked")
     public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
 
-        fCurrentExperiment = (TmfExperiment<LttngEvent>) signal.getExperiment();
+        if (signal.getExperiment() != fCurrentExperiment) {
+            return;
+        }
+
         boolean drawTimeRangeHistogram = fExperimentStartTime == 0;
         TmfTimeRange fullRange = signal.getRange();
 

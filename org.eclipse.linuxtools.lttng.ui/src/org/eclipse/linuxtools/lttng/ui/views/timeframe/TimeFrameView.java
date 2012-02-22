@@ -320,6 +320,9 @@ public class TimeFrameView extends TmfView {
      */
     @TmfSignalHandler
     public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
+        if (signal.getExperiment() != fExperiment) {
+            return;
+        }
 
         // Update the time frame
         // fTraceTimeRange = signal.getTrace().getTimeRange();

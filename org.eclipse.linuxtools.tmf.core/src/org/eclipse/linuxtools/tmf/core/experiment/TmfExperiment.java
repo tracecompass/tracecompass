@@ -94,23 +94,32 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     }
 
     @Override
-    public void initTrace(String path, Class<T> eventType) throws FileNotFoundException {
+    public void initTrace(String path, Class<T> eventType) {
     }
 
     @Override
-    public void initTrace(String path, Class<T> eventType, boolean indexTrace) throws FileNotFoundException {
+    public void initTrace(String path, Class<T> eventType, boolean indexTrace) {
+        if (indexTrace) {
+            initializeStreamingMonitor();
+        }
     }
 
     @Override
-    public void initTrace(String path, Class<T> eventType, int cacheSize) throws FileNotFoundException {
+    public void initTrace(String path, Class<T> eventType, int cacheSize) {
     }
 
     @Override
-    public void initTrace(String path, Class<T> eventType, int cacheSize, boolean indexTrace) throws FileNotFoundException {
+    public void initTrace(String path, Class<T> eventType, int cacheSize, boolean indexTrace) {
+        if (indexTrace) {
+            initializeStreamingMonitor();
+        }
     }
 
     @Override
-    public void initTrace(String path, Class<T> eventType, int cacheSize, boolean indexTrace, String name) throws FileNotFoundException {
+    public void initTrace(String path, Class<T> eventType, int cacheSize, boolean indexTrace, String name) {
+        if (indexTrace) {
+            initializeStreamingMonitor();
+        }
     }
 
     /**
@@ -199,6 +208,9 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
         TmfExperimentDisposedSignal<T> signal = new TmfExperimentDisposedSignal<T>(this, this);
         broadcast(signal);
+        if (fCurrentExperiment == this) {
+            fCurrentExperiment = null;
+        }
 
         if (fTraces != null) {
             for (ITmfTrace trace : fTraces) {
@@ -250,6 +262,9 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     // ------------------------------------------------------------------------
 
     public static void setCurrentExperiment(TmfExperiment<?> experiment) {
+        if (fCurrentExperiment != null && fCurrentExperiment != experiment) {
+            fCurrentExperiment.dispose();
+        }
         fCurrentExperiment = experiment;
     }
 
@@ -967,7 +982,9 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
     @TmfSignalHandler
     public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
-        indexExperiment(false, (int) fNbEvents, signal.getRange());
+        if (signal.getExperiment() == this) {
+            indexExperiment(false, (int) fNbEvents, signal.getRange());
+        }
     }
 
     @TmfSignalHandler

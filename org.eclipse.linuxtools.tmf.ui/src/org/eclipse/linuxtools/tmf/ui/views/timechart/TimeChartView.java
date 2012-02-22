@@ -545,9 +545,6 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
         if (fTimeAnalysisEntries == null)
             return;
         final ITmfTrace<?> trace = signal.getTrace();
-        if (trace instanceof TmfExperiment) {
-            return;
-        }
         final IResource resource = signal.getResource();
         final ITmfEventsFilterProvider eventsFilterProvider = signal.getEventsFilterProvider();
         TimeChartAnalysisEntry timeAnalysisEntry = null;

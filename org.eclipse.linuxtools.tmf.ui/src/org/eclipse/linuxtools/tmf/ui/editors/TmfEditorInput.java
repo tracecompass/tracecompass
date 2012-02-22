@@ -57,7 +57,7 @@ public class TmfEditorInput implements IEditorInput {
 
     @Override
 	public String getName() {
-        return fResource.getName();
+        return fTrace.getName();
     }
 
     @Override

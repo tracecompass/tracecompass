@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.lttng.core.tracecontrol;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "org.eclipse.linuxtools.lttng.tracecontrol.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.linuxtools.lttng.core.tracecontrol.messages"; //$NON-NLS-1$
     
     // Trace resource properties
     public static String Ltt_Trace_Property_TracePathName;
