@@ -21,15 +21,6 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng.ui.views.category"
-            class="org.eclipse.linuxtools.lttng.ui.views.project.ProjectView"
-            icon="icons/eview16/project_view.gif"
-            id="org.eclipse.linuxtools.lttng.ui.views.project"
-            name="%project.view.name"
-            restorable="true">
-      </view>
-      <view
-            allowMultiple="false"
-            category="org.eclipse.linuxtools.lttng.ui.views.category"
             class="org.eclipse.linuxtools.lttng.ui.views.control.ControlView"
             icon="icons/eview16/control_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.control"
