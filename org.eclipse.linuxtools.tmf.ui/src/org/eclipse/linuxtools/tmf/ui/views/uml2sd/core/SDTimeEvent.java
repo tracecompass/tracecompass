@@ -12,7 +12,7 @@
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 
 /**
  * @author sveyrier
@@ -20,17 +20,17 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
  */
 public class SDTimeEvent {
 
-    protected TmfTimestamp time;
+    protected ITmfTimestamp time;
     protected int event;
     protected ITimeRange node;
 
-    public SDTimeEvent(TmfTimestamp _time, int _event, ITimeRange _node) {
+    public SDTimeEvent(ITmfTimestamp _time, int _event, ITimeRange _node) {
         time = _time;
         event = _event;
         node = _node;
     }
 
-    public TmfTimestamp getTime() {
+    public ITmfTimestamp getTime() {
         return time;
     }
 

@@ -22,8 +22,6 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventReference;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
@@ -288,7 +286,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
                                     }
                                 }
                             }
-                            ((StringBuffer) event.getContent().getContent()).append("\n").append(line); //$NON-NLS-1$
+                            ((StringBuffer) event.getContent().getValue()).append("\n").append(line); //$NON-NLS-1$
                         }
                     }
                     rawPos = context.raFile.getFilePointer();
@@ -311,9 +309,9 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     }
     
     public CustomTxtEvent parseFirstLine(CustomTxtTraceContext context) {
-        CustomTxtEvent event = new CustomTxtEvent(fDefinition, this, TmfTimestamp.Zero, new TmfEventSource(""), fEventType, new TmfEventReference("")); //$NON-NLS-1$ //$NON-NLS-2$
+        CustomTxtEvent event = new CustomTxtEvent(fDefinition, this, (TmfTimestamp) TmfTimestamp.Zero, "", fEventType, ""); //$NON-NLS-1$ //$NON-NLS-2$
         event.processGroups(context.inputLine, context.firstLineMatcher);
-        event.setContent(new CustomEventContent(event, new StringBuffer(context.firstLine)));
+        event.setContent(new CustomEventContent(event, context.firstLine));
         return event;
     }
     

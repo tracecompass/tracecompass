@@ -25,12 +25,13 @@ import org.eclipse.linuxtools.lttng.ui.views.latency.model.Config;
 import org.eclipse.linuxtools.lttng.ui.views.latency.model.IGraphModelListener;
 import org.eclipse.linuxtools.lttng.ui.views.latency.model.LatencyController;
 import org.eclipse.linuxtools.lttng.ui.views.latency.model.LatencyGraphModel;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
-import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
+import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentDisposedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
@@ -320,8 +321,8 @@ public class LatencyView extends TmfView implements IGraphModelListener {
             fGraphViewer.clear();
             fHistogramViewer.clear();
             
-            TmfTimestamp startTime = signal.getCurrentRange().getStartTime();
-            TmfTimestamp endTime = signal.getCurrentRange().getEndTime();
+            ITmfTimestamp startTime = signal.getCurrentRange().getStartTime();
+            ITmfTimestamp endTime = signal.getCurrentRange().getEndTime();
             fTimeRange = new TmfTimeRange(startTime, endTime);
 
             fController.refreshModels(fExperiment, fTimeRange);

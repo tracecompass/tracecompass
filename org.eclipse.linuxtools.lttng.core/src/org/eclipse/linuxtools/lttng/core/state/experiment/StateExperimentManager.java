@@ -366,7 +366,7 @@ public class StateExperimentManager extends LTTngTreeNode implements ILttExperim
                 traceManager.clearCheckPoints();
 
                 // build the trace to manager mapping for event dispatching
-                trace = traceManager.getTrace();
+                trace = traceManager.getStateTrace();
                 synchronized (this) {
                     ftraceToManagerMap.put(trace, new StateTraceHelper(traceManager));
                 }
@@ -397,7 +397,7 @@ public class StateExperimentManager extends LTTngTreeNode implements ILttExperim
                 if (event != null) {
 //					Tracer.trace("Chk: " + event.getTimestamp());
                     fCheckPointNbEventsHandled++;
-                    ITmfTrace trace = event.getParentTrace();
+                    ITmfTrace trace = event.getTrace();
 
                     StateTraceHelper helper = ftraceToManagerMap.get(trace);
 
@@ -511,7 +511,7 @@ public class StateExperimentManager extends LTTngTreeNode implements ILttExperim
         public StateTraceHelper(IStateTraceManager stateManager) {
             this.stateTraceManager = stateManager;
             // Get the TraceState at the beginning of the trace
-            this.stateTraceManager.restoreCheckPointByTimestamp(stateManager.getTrace().getStartTime());
+            this.stateTraceManager.restoreCheckPointByTimestamp(stateManager.getStateTrace().getStartTime());
             this.stateTraceModel = this.stateTraceManager.getStateModel();
         }
 

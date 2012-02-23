@@ -44,8 +44,11 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
@@ -235,11 +238,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
         // Set the default column field ids if this is not a subclass
         if (Arrays.equals(columnData, COLUMN_DATA)) {
-            fTable.getColumns()[0].setData(Key.FIELD_ID, TmfEventContent.FIELD_ID_TIMESTAMP);
-            fTable.getColumns()[1].setData(Key.FIELD_ID, TmfEventContent.FIELD_ID_SOURCE);
-            fTable.getColumns()[2].setData(Key.FIELD_ID, TmfEventContent.FIELD_ID_TYPE);
-            fTable.getColumns()[3].setData(Key.FIELD_ID, TmfEventContent.FIELD_ID_REFERENCE);
-            fTable.getColumns()[4].setData(Key.FIELD_ID, TmfEventContent.FIELD_ID_CONTENT);
+            fTable.getColumns()[0].setData(Key.FIELD_ID, ITmfEvent.EVENT_FIELD_TIMESTAMP);
+            fTable.getColumns()[1].setData(Key.FIELD_ID, ITmfEvent.EVENT_FIELD_SOURCE);
+            fTable.getColumns()[2].setData(Key.FIELD_ID, ITmfEvent.EVENT_FIELD_TYPE);
+            fTable.getColumns()[3].setData(Key.FIELD_ID, ITmfEvent.EVENT_FIELD_REFERENCE);
+            fTable.getColumns()[4].setData(Key.FIELD_ID, ITmfEvent.EVENT_FIELD_CONTENT);
         }
 
         // Set the frozen row for header row
@@ -646,7 +649,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
 
     protected void setItemData(TableItem item, TmfEvent event, long rank) {
-        item.setText(extractItemFields(event));
+        ITmfEventField[] fields = extractItemFields(event);
+        String[] content = new String[fields.length];
+        for (int i = 0; i < fields.length; i++) {
+            content[i] = (String) fields[i].getValue();
+        }
+        item.setText(content);
         item.setData(Key.TIMESTAMP, new TmfTimestamp(event.getTimestamp()));
         item.setData(Key.RANK, rank);
 
@@ -1363,12 +1371,17 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * 
      *         FIXME: Add support for column selection
      */
-    protected String[] extractItemFields(TmfEvent event) {
-        String[] fields = new String[0];
+    //TmfEventContent content, String id, Object value
+    protected ITmfEventField[] extractItemFields(TmfEvent event) {
+        ITmfEventField[] fields = new TmfEventField[0];
         if (event != null) {
-            fields = new String[] { new Long(event.getTimestamp().getValue()).toString(),
-                    event.getSource().getSourceId().toString(), event.getType().getTypeId().toString(),
-                    event.getReference().getReference().toString(), event.getContent().toString() };
+            fields = new TmfEventField[] {
+                     new TmfEventField(ITmfEvent.EVENT_FIELD_TIMESTAMP, ((Long) event.getTimestamp().getValue()).toString()),
+                     new TmfEventField(ITmfEvent.EVENT_FIELD_SOURCE, event.getSource()),
+                     new TmfEventField(ITmfEvent.EVENT_FIELD_TYPE, event.getType().getName()),
+                     new TmfEventField(ITmfEvent.EVENT_FIELD_REFERENCE, event.getReference()),
+                     new TmfEventField(ITmfEvent.EVENT_FIELD_CONTENT, event.getContent().toString())
+                    };
         }
         return fields;
     }
@@ -1670,7 +1683,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         return;
                     }
                     // Verify if event is within the trace range
-                    final TmfTimestamp timestamp[] = new TmfTimestamp[1];
+                    final ITmfTimestamp timestamp[] = new TmfTimestamp[1];
                     timestamp[0] = ts; // signal.getCurrentTime();
                     if (timestamp[0].compareTo(fTrace.getStartTime(), true) == -1) {
                         timestamp[0] = fTrace.getStartTime();

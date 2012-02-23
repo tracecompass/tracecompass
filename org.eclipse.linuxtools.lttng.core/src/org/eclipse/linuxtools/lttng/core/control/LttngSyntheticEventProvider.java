@@ -23,8 +23,8 @@ import org.eclipse.linuxtools.lttng.core.TraceDebug;
 import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.core.event.LttngSyntheticEvent;
-import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.core.event.LttngSyntheticEvent.SequenceInd;
+import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.core.model.LTTngTreeNode;
 import org.eclipse.linuxtools.lttng.core.request.LttngBaseEventRequest;
 import org.eclipse.linuxtools.lttng.core.state.evProcessor.ITransEventProcessor;
@@ -32,7 +32,6 @@ import org.eclipse.linuxtools.lttng.core.state.evProcessor.state.StateEventToHan
 import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.core.state.trace.IStateTraceManager;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
@@ -89,7 +88,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 
 		// prepare empty instance status indicators and allow them to travel via
 		// the framework
-		TmfEventSource source = new TmfEventSource(this);
+		String source = this.toString();
 		LttngEventType dtype = new LttngEventType();
 		LttngTimestamp statusTimeStamp = new LttngTimestamp(
 				TmfTimestamp.Zero);
@@ -165,7 +164,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 
 			// validate that the checkpoint restored is within requested bounds
 			// (not outside the current trace's range or after the end of requested range)
-			TmfTimeRange traceRange = traceManager.getTrace().getTimeRange();
+			TmfTimeRange traceRange = traceManager.getStateTrace().getTimeRange();
 			if ((checkPoint == null) ||
 					checkPoint.getTimestamp().getValue() < traceRange.getStartTime().getValue() ||
 					checkPoint.getTimestamp().getValue() > traceRange.getEndTime().getValue() ||
@@ -186,7 +185,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 				}	
 			}		
 			// Save which trace state model corresponds to current trace
-			traceToTraceStateModel.put(traceManager.getTrace(), traceManager.getStateModel());
+			traceToTraceStateModel.put(traceManager.getStateTrace(), traceManager.getStateModel());
 		}
 
 		dispatchTime = reqWindow.getStartTime().getValue();
@@ -242,7 +241,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 			private void handleIncomingData(LttngEvent e) {
 				long eventTime = e.getTimestamp().getValue();
 
-				ITmfTrace inTrace = e.getParentTrace();
+				ITmfTrace inTrace = e.getTrace();
 				LttngTraceState traceModel = traceToTraceStateModel.get(inTrace);
 				
 				// queue the new event data
@@ -288,7 +287,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 					syntheticEvent = new LttngSyntheticEvent(e);
 				}
 
-				ITmfTrace inTrace = e.getParentTrace();
+				ITmfTrace inTrace = e.getTrace();
 				LttngTraceState traceModel = traceToTraceStateModel.get(inTrace);
 				
 				// Trace model needed by application handlers

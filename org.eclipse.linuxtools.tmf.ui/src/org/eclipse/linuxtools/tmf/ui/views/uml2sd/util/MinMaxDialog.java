@@ -121,13 +121,13 @@ public class MinMaxDialog extends Dialog {
         // double max=0;
         long min = 0;
         long max = 0;
-        byte scale = 0;
-        long precision = 0;
+        int scale = 0;
+        int precision = 0;
         try {
             min = Long.parseLong(minText.getText());
             max = Long.parseLong(maxText.getText());
-            scale = Byte.parseByte(scaleText.getText());
-            precision = Long.parseLong(precisionText.getText());
+            scale = Integer.parseInt(scaleText.getText());
+            precision = Integer.parseInt(precisionText.getText());
 
             sdWidget.getFrame().setMax(new TmfTimestamp(max, scale, precision));
             sdWidget.getFrame().setMin(new TmfTimestamp(min, scale, precision));

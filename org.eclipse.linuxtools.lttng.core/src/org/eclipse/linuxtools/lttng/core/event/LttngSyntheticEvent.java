@@ -13,7 +13,6 @@ package org.eclipse.linuxtools.lttng.core.event;
 
 import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
 /**
@@ -69,9 +68,9 @@ public class LttngSyntheticEvent extends LttngEvent {
 	 * @param lttEvent
 	 */
 	public LttngSyntheticEvent(TmfTrace<LttngEvent> parent,
-			LttngTimestamp timestamp, TmfEventSource source,
+			LttngTimestamp timestamp, String source,
 			LttngEventType type, LttngEventContent content,
-			LttngEventReference reference, JniEvent lttEvent) {
+			String reference, JniEvent lttEvent) {
 		super(parent, timestamp, source, type, content, reference, lttEvent);
 	}
 
@@ -123,15 +122,15 @@ public class LttngSyntheticEvent extends LttngEvent {
 	/**
 	 * /* (non-Javadoc)
 	 * 
-	 * @see org.eclipse.linuxtools.lttng.core.event.LttngEvent#getParentTrace()
+	 * @see org.eclipse.linuxtools.lttng.core.event.LttngEvent#getTrace()
 	 */
 	@SuppressWarnings("unchecked")
     @Override
-   public TmfTrace<LttngEvent> getParentTrace() {
+   public TmfTrace<LttngEvent> getTrace() {
 		if (baseEvent != null) {
-			return (TmfTrace<LttngEvent>) baseEvent.getParentTrace();
+			return (TmfTrace<LttngEvent>) baseEvent.getTrace();
 		} else {
-			return (TmfTrace<LttngEvent>) super.getParentTrace();
+			return (TmfTrace<LttngEvent>) super.getTrace();
 		}
 	}
 

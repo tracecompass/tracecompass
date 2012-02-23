@@ -18,9 +18,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventReference;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -34,7 +34,7 @@ public class CustomEvent extends TmfEvent {
     
     protected CustomTraceDefinition fDefinition;
     protected Map<String, String> fData;
-    private String[] fColumnData;
+    private TmfEventField[] fColumnData;
 
     public CustomEvent(CustomTraceDefinition definition) {
         fDefinition = definition;
@@ -47,31 +47,19 @@ public class CustomEvent extends TmfEvent {
         fData = new HashMap<String, String>();
     }
 
-    public CustomEvent(CustomTraceDefinition definition, ITmfTrace<?> parentTrace, TmfTimestamp timestamp, TmfEventSource source, TmfEventType type, TmfEventReference reference) {
+    public CustomEvent(CustomTraceDefinition definition, ITmfTrace<?> parentTrace, ITmfTimestamp timestamp, String source, TmfEventType type, String reference) {
         super(parentTrace, timestamp, source, type, reference);
         fDefinition = definition;
         fData = new HashMap<String, String>();
     }
 
-    public CustomEvent(CustomTraceDefinition definition, TmfTimestamp originalTS, TmfTimestamp effectiveTS, TmfEventSource source, TmfEventType type, TmfEventReference reference) {
-        super(originalTS, effectiveTS, source, type, reference);
-        fDefinition = definition;
-        fData = new HashMap<String, String>();
-    }
-    
     @Override
-    public TmfTimestamp getTimestamp() {
+    public ITmfTimestamp getTimestamp() {
         if (fData != null) processData();
         return super.getTimestamp();
     }
 
-    @Override
-    public TmfTimestamp getOriginalTimestamp() {
-        if (fData != null) processData();
-        return super.getOriginalTimestamp();
-    }
-
-    public String[] extractItemFields() {
+    public TmfEventField[] extractItemFields() {
         if (fData != null) processData();
         return fColumnData;
     }
@@ -84,23 +72,23 @@ public class CustomEvent extends TmfEvent {
             SimpleDateFormat dateFormat = new SimpleDateFormat(timeStampInputFormat);
             try {
                 date = dateFormat.parse(timeStampString);
-                fOriginalTimestamp = fEffectiveTimestamp = new TmfTimestamp(date.getTime(), TIMESTAMP_SCALE);
+                fTimestamp = new TmfTimestamp(date.getTime(), TIMESTAMP_SCALE);
             } catch (ParseException e) {
-                fOriginalTimestamp = fEffectiveTimestamp = TmfTimestamp.Zero;
+                fTimestamp = TmfTimestamp.Zero;
             }
         } else {
-            fOriginalTimestamp = fEffectiveTimestamp = TmfTimestamp.Zero;
+            fTimestamp = TmfTimestamp.Zero;
         }
         
         int i = 0;
-        fColumnData = new String[fDefinition.outputs.size()];
+        fColumnData = new TmfEventField[fDefinition.outputs.size()];
         for (OutputColumn outputColumn : fDefinition.outputs) {
             String value = fData.get(outputColumn.name);
             if (outputColumn.name.equals(CustomTraceDefinition.TAG_TIMESTAMP) && date != null) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat(fDefinition.timeStampOutputFormat);
-                fColumnData[i++] = dateFormat.format(date);
+                fColumnData[i++] = new TmfEventField(outputColumn.name, dateFormat.format(date));
             } else {
-                fColumnData[i++] = (value != null ? value : ""); //$NON-NLS-1$
+                fColumnData[i++] = new TmfEventField(outputColumn.name, (value != null ? value : "")); //$NON-NLS-1$
             }
         }
         fData = null;

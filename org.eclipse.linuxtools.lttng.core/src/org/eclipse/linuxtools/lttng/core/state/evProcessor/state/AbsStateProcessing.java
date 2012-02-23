@@ -201,7 +201,7 @@ public abstract class AbsStateProcessing {
 		sb.append(" number of fields: " + fields.length + "Fields: ");
 		for (int i = 0; i < fields.length; i++) {
 			field = (LttngEventField) fields[i];
-			sb.append(field.getId() + " ");
+			sb.append(field.getName() + " ");
 		}
 	
 		TraceDebug.debug(sb.toString(), 5);

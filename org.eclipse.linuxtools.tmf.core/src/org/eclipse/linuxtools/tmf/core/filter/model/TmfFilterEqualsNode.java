@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfNoSuchFieldException;
 
 
 public class TmfFilterEqualsNode extends TmfFilterTreeNode {
@@ -75,23 +74,19 @@ public class TmfFilterEqualsNode extends TmfFilterTreeNode {
 
 	@Override
 	public boolean matches(TmfEvent event) {
-		try {
-			Object value = event.getContent().getField(fField);
-			if (value == null) {
-				return false ^ fNot;
-			}
-			String valueString = value.toString();
-			if (valueString == null) {
-				return false ^ fNot;
-			}
-			if (fIgnoreCase) {
-				return valueString.equalsIgnoreCase(fValue) ^ fNot;
-			} else {
-				return valueString.equals(fValue) ^ fNot;
-			}
-		} catch (TmfNoSuchFieldException e) {
-			return false ^ fNot;
-		}
+        Object value = event.getContent().getField(fField);
+        if (value == null) {
+            return false ^ fNot;
+        }
+        String valueString = value.toString();
+        if (valueString == null) {
+            return false ^ fNot;
+        }
+        if (fIgnoreCase) {
+            return valueString.equalsIgnoreCase(fValue) ^ fNot;
+        } else {
+            return valueString.equals(fValue) ^ fNot;
+        }
 	}
 
 	@Override

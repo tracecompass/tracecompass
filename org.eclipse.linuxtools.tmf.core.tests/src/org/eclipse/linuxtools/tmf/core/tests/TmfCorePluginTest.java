@@ -57,7 +57,7 @@ public class TmfCorePluginTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	public void testTmfCorePluginId() throws Exception {
-		assertEquals("Plugin ID", "org.eclipse.linuxtools.tmf", TmfCorePlugin.PLUGIN_ID);
+		assertEquals("Plugin ID", "org.eclipse.linuxtools.tmf.core", TmfCorePlugin.PLUGIN_ID);
 	}
 
 	public void testGetDefault() throws Exception {

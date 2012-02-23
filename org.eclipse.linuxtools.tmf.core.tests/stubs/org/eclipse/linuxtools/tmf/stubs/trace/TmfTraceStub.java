@@ -17,9 +17,9 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
@@ -121,8 +121,8 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     }
  
     @Override
-	public ITmfTrace copy() {
-		ITmfTrace returnedValue = null;
+	public ITmfTrace<TmfEvent> copy() {
+		ITmfTrace<TmfEvent> returnedValue = null;
 		returnedValue = clone();
 		return returnedValue;
 	}
@@ -141,7 +141,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public TmfContext seekLocation(ITmfLocation location) {
+	public TmfContext seekLocation(ITmfLocation<?> location) {
 	    fLock.lock();
         try {
             if (fTrace != null) {
@@ -245,12 +245,12 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     }
 
 	@Override
-	public void setStartTime(TmfTimestamp startTime) {
+	public void setStartTime(ITmfTimestamp startTime) {
     	super.setStartTime(startTime);
     }
 
 	@Override
-	public void setEndTime(TmfTimestamp endTime) {
+	public void setEndTime(ITmfTimestamp endTime) {
     	super.setEndTime(endTime);
     }
 	

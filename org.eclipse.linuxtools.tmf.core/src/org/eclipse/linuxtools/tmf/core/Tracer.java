@@ -7,7 +7,7 @@ import java.io.IOException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.linuxtools.tmf.core.component.ITmfComponent;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
-import org.eclipse.linuxtools.tmf.core.event.TmfData;
+import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
@@ -171,7 +171,7 @@ public class Tracer {
         trace(message);
     }
 
-    public static void traceEvent(ITmfDataProvider<?> provider, ITmfDataRequest<?> request, TmfData data) {
+    public static void traceEvent(ITmfDataProvider<?> provider, ITmfDataRequest<?> request, TmfEvent data) {
         String message = ("[EVT] Provider=" + provider.toString() + ", Req=" + request.getRequestId() + ", Event=" + data
                 .toString());
         trace(message);

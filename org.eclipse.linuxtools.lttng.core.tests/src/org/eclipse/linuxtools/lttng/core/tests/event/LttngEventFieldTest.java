@@ -76,7 +76,7 @@ public class LttngEventFieldTest extends TestCase {
         
 	    // Default construction with good argument
         try {
-        	testField = new LttngEventField(testContent, "test", "test");
+        	testField = new LttngEventField("test", "test");
         }
         catch( Exception e) { 
         	fail("Default construction failed!");
@@ -84,7 +84,7 @@ public class LttngEventFieldTest extends TestCase {
         
         // Copy constructor with correct parameters
         try {
-        	testField = new LttngEventField(testContent, "test", "test");
+        	testField = new LttngEventField("test", "test");
         	testField2 = new LttngEventField(testField);
         }
         catch( Exception e) { 
@@ -98,15 +98,20 @@ public class LttngEventFieldTest extends TestCase {
     	// *** To "really" test the field, we will get a real field from LTTngTrace
     	LTTngTextTrace tmpStream = initializeEventStream();
     	
-    	LttngEventField testField 	= (LttngEventField)tmpStream.getNextEvent( new TmfContext(new TmfLocation<Long>(0L), 0) ).getContent().getField(0);
-    	assertNotSame("getField is null!",null,testField);
+    	LttngEventField testField = null;
+//        try {
+            testField = (LttngEventField) tmpStream.getNextEvent( new TmfContext(new TmfLocation<Long>(0L), 0) ).getContent().getField(0);
+//        } catch (TmfNoSuchFieldException e) {
+//            e.printStackTrace();
+//        }
+    	assertNotSame("getField is null!", null, testField);
     	
     	// *** FIXME ***
     	// Depending from the Java version because of the "hashcode()" on String. 
     	// We can't really test that safetly
     	//
     	//assertTrue("getName() returned unexpected result!",firstEventName.equals(testField.getId().toString()));
-    	assertNotSame("getName() returned unexpected result!",null, testField.getId());
+    	assertNotSame("getName() returned unexpected result!",null, testField.getName());
     	
     	assertTrue("getValue() returned unexpected result!",firstEventValue.equals(testField.getValue().toString()));
     	

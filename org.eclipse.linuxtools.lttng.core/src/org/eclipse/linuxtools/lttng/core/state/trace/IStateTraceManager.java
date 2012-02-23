@@ -2,8 +2,8 @@ package org.eclipse.linuxtools.lttng.core.state.trace;
 
 import org.eclipse.linuxtools.lttng.core.event.LttngSyntheticEvent;
 import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpoint;
 
@@ -30,7 +30,7 @@ public interface IStateTraceManager {
 	 * 
 	 * @return
 	 */
-	public abstract ITmfTrace<?> getTrace();
+	public abstract ITmfTrace<?> getStateTrace();
 
 	/**
 	 * Restore to the closest checkpoint from TmfTimestamp
@@ -45,7 +45,7 @@ public interface IStateTraceManager {
 	 *         state, null sent if input is invalid
 	 */
 	public abstract TmfCheckpoint restoreCheckPointByTimestamp(
-			TmfTimestamp eventTime);
+			ITmfTimestamp eventTime);
 
 	/**
 	 * Restore to the closest checkpoint from index

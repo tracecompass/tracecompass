@@ -11,8 +11,8 @@
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.core.uml2sd;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 
 /**
  * <b><u>TmfAsyncSequenceDiagramEvent</u></b>
@@ -25,7 +25,8 @@ public class TmfAsyncSequenceDiagramEvent extends TmfSyncSequenceDiagramEvent im
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    final protected TmfTimestamp fEndTime;
+
+    final protected ITmfTimestamp fEndTime;
     
     // ------------------------------------------------------------------------
     // Constructors
@@ -48,7 +49,7 @@ public class TmfAsyncSequenceDiagramEvent extends TmfSyncSequenceDiagramEvent im
      * @see org.eclipse.linuxtools.tmf.uml2sd.ITmfAsyncSequenceDiagramEvent#getEndTime()
      */
     @Override
-    public TmfTimestamp getEndTime() {
+    public ITmfTimestamp getEndTime() {
         return fEndTime;
     }
 }

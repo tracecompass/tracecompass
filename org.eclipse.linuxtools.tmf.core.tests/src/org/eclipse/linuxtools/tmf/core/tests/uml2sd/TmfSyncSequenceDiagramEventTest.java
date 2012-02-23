@@ -13,10 +13,9 @@ package org.eclipse.linuxtools.tmf.core.tests.uml2sd;
 
 import junit.framework.TestCase;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventReference;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.uml2sd.TmfSyncSequenceDiagramEvent;
@@ -24,23 +23,23 @@ import org.eclipse.linuxtools.tmf.core.uml2sd.TmfSyncSequenceDiagramEvent;
 @SuppressWarnings("nls")
 public class TmfSyncSequenceDiagramEventTest extends TestCase {
 
-    private final String   fTypeId = "Some type";
-    private final String   fLabel0 = "label1";
-    private final String   fLabel1 = "label2";
-    private final String[] fLabels = new String[] { fLabel0, fLabel1 };
+    private final String fContext = TmfEventType.DEFAULT_CONTEXT_ID; 
+    private final String fTypeId  = "Some type";
+    private final String fLabel0  = "label1";
+    private final String fLabel1  = "label2";
+    private final String[] fLabels  = new String[] { fLabel0, fLabel1 };
 
-    private final TmfTimestamp      fTimestamp1 = new TmfTimestamp(12345, (byte) 2, 5);
-    private final TmfEventSource    fSource     = new TmfEventSource("Source");
-    private final TmfEventType      fType       = new TmfEventType(fTypeId, fLabels);
-    private final TmfEventReference fReference  = new TmfEventReference("Some reference");
+    private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2, 5);
+    private final String       fSource     = "Source";
+    private final TmfEventType fType       = new TmfEventType(fContext, fTypeId, TmfEventField.makeRoot(fLabels));
+    private final String       fReference  = "Some reference";
 
     private final TmfEvent fEvent1;
-    private final TmfEventContent fContent1;
+    private final TmfEventField fContent1;
 
     public TmfSyncSequenceDiagramEventTest () {
-        fEvent1 = new TmfEvent(fTimestamp1, fSource, fType, fReference);
-        fContent1 = new TmfEventContent(fEvent1, "Some content");
-        fEvent1.setContent(fContent1);
+        fContent1 = new TmfEventField(ITmfEventField.ROOT_ID, "Some content");
+        fEvent1 = new TmfEvent(null, fTimestamp1, fSource, fType, fContent1, fReference);
     }
 
     @Override

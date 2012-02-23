@@ -22,8 +22,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.linuxtools.lttng.core.TraceHelper;
 import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventContent;
-import org.eclipse.linuxtools.lttng.core.event.LttngEventReference;
-import org.eclipse.linuxtools.lttng.core.event.LttngEventSource;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.core.event.LttngLocation;
 import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
@@ -36,6 +34,7 @@ import org.eclipse.linuxtools.lttng.jni.JniTracefile;
 import org.eclipse.linuxtools.lttng.jni.common.JniTime;
 import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -78,9 +77,9 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     private JniTrace currentJniTrace;
 
     LttngTimestamp eventTimestamp;
-    LttngEventSource eventSource;
+    String eventSource;
     LttngEventContent eventContent;
-    LttngEventReference eventReference;
+    String eventReference;
 
     // The actual event
     LttngEvent currentLttngEvent;
@@ -146,10 +145,10 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 
         // Build the re-used event structure
         eventTimestamp = new LttngTimestamp();
-        eventSource = new LttngEventSource();
+        eventSource = ""; //$NON-NLS-1$
         this.eventType = new LttngEventType();
         eventContent = new LttngEventContent(currentLttngEvent);
-        eventReference = new LttngEventReference(this.getName());
+        eventReference = getName();
 
         // Create the skeleton event
         currentLttngEvent = new LttngEvent(this, eventTimestamp, eventSource, this.eventType, eventContent,
@@ -354,10 +353,10 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 
             // Verify that all those "default constructor" are safe to use
             clone.eventTimestamp = new LttngTimestamp();
-            clone.eventSource = new LttngEventSource();
+            clone.eventSource = ""; //$NON-NLS-1$
             clone.eventType = new LttngEventType();
             clone.eventContent = new LttngEventContent(clone.currentLttngEvent);
-            clone.eventReference = new LttngEventReference(this.getName());
+            clone.eventReference = getName();
 
             // Create the skeleton event
             clone.currentLttngEvent = new LttngEvent(this, clone.eventTimestamp, clone.eventSource, clone.eventType,
@@ -511,7 +510,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * @see org.eclipse.linuxtools.tmf.core.trace.TmfContext
      */
     @Override
-    public synchronized TmfContext seekEvent(TmfTimestamp timestamp) {
+    public synchronized TmfContext seekEvent(ITmfTimestamp timestamp) {
 
         if (PrintDebug) {
             System.out.println("seekEvent(timestamp) timestamp -> " + timestamp); //$NON-NLS-1$
@@ -551,7 +550,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
             System.out.println("seekEvent(position) position -> " + position); //$NON-NLS-1$
         }
 
-        TmfTimestamp timestamp = null;
+        ITmfTimestamp timestamp = null;
         long index = position / getCacheSize();
 
         // Get the timestamp of the closest check point to the given position
@@ -696,7 +695,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     // this method was extracted for profiling purposes
     private void setPreviousAndCurrentTimes(TmfContext context, LttngEvent returnedEvent, LttngLocation curLocation) {
 
-        TmfTimestamp eventTimestamp = returnedEvent.getTimestamp();
+        ITmfTimestamp eventTimestamp = returnedEvent.getTimestamp();
         // long eventTime = eventTimestamp.getValue();
         previousLocation.setOperationTime(eventTimestamp.getValue());
         curLocation.setOperationTime(eventTimestamp.getValue());
@@ -704,7 +703,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         context.updateRank(1);
     }
 
-    protected void updateIndex(TmfContext context, long rank, TmfTimestamp timestamp) {
+    protected void updateIndex(TmfContext context, long rank, ITmfTimestamp timestamp) {
 
         if (getStartTime().compareTo(timestamp, false) > 0)
             setStartTime(timestamp);
@@ -725,7 +724,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         }
     }
 
-    private void addCheckPoint(TmfContext context, TmfTimestamp timestamp) {
+    private void addCheckPoint(TmfContext context, ITmfTimestamp timestamp) {
         ITmfLocation<?> location = context.getLocation().clone();
         fCheckpoints.add(new TmfCheckpoint(timestamp.clone(), location));
     }
@@ -931,12 +930,13 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
             // all allocation done in the LttngTrace constructor
             // ***
             eventTimestamp.setValue(jniEvent.getEventTime().getTime());
-            eventSource.setSourceId(jniEvent.requestEventSource());
+            eventSource = jniEvent.requestEventSource();
 
             eventType = traceTypes.get(EventTypeKey.getEventTypeHash(jniEvent));
 
-            eventReference.setValue(jniEvent.getParentTracefile().getTracefilePath());
-            eventReference.setTracepath(this.getName());
+            String fullTracePath = getName();
+            String reference = fullTracePath.substring(fullTracePath.lastIndexOf('/') + 1);
+            currentLttngEvent.setReference(reference);
 
             eventContent.emptyContent();
 
@@ -971,8 +971,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         // Allocating new memory is slow.
         // Parsing every events is very slow.
         eventTimestamp = new LttngTimestamp(jniEvent.getEventTime().getTime());
-        eventSource = new LttngEventSource(jniEvent.requestEventSource());
-        eventReference = new LttngEventReference(jniEvent.getParentTracefile().getTracefilePath(), this.getName());
+        eventSource = jniEvent.requestEventSource();
+        eventReference = getName();
         eventType = new LttngEventType(traceTypes.get(EventTypeKey.getEventTypeHash(jniEvent)));
         eventContent = new LttngEventContent(currentLttngEvent);
         currentLttngEvent = new LttngEvent(this, eventTimestamp, eventSource, eventType, eventContent, eventReference,

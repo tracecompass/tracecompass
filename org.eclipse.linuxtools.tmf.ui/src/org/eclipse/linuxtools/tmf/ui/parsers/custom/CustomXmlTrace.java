@@ -23,8 +23,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventReference;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
@@ -191,7 +189,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
                 Element element = parseElementBuffer(elementBuffer);
                 
                 event = extractEvent(element, fRecordInputElement);
-                ((StringBuffer) event.getContent().getContent()).append(elementBuffer);
+                ((StringBuffer) event.getContent().getValue()).append(elementBuffer);
                 
                 String line;
                 String recordElementStart = "<" + fRecordInputElement.elementName; //$NON-NLS-1$
@@ -367,8 +365,8 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     }
     
     public CustomXmlEvent extractEvent(Element element, InputElement inputElement) {
-        CustomXmlEvent event = new CustomXmlEvent(fDefinition, this, TmfTimestamp.Zero, new TmfEventSource(""), fEventType, new TmfEventReference("")); //$NON-NLS-1$ //$NON-NLS-2$
-        event.setContent(new CustomEventContent(event, new StringBuffer()));
+        CustomXmlEvent event = new CustomXmlEvent(fDefinition, this, TmfTimestamp.Zero, "", fEventType,""); //$NON-NLS-1$ //$NON-NLS-2$
+        event.setContent(new CustomEventContent(event, new String()));
         parseElement(element, event, inputElement);
         return event;
     }

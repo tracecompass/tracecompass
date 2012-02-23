@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009, 2010, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Thomas Gatterweh	- Updated scaling / synchronization
+ *   Francois Chouinard - Refactoring to align with TMF Event Model 1.0
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.event;
@@ -16,86 +17,89 @@ package org.eclipse.linuxtools.tmf.core.event;
 /**
  * <b><u>TmfTimestamp</u></b>
  * <p>
- * The fundamental time reference in the TMF.
- * <p>
- * It provides a generic timestamp implementation in its most basic form:
- * <ul>
- * <li>timestamp = [value] * 10**[scale] +/- [precision]
- * </ul>
- * Where:
- * <ul>
- * <li>[value] is an unstructured integer value
- * <li>[scale] is the magnitude of the value wrt some application-specific
- * base unit (e.g. the second)
- * <li>[precision] indicates the error on the value (useful for comparing
- * timestamps in different scales). Default: 0.
- * </ul>
- * In short:
- * <ul>
- * </ul>
- * To allow synchronization of timestamps from different reference clocks,
- * there is a possibility to "adjust" the timestamp by changing its scale
- * (traces of different time scale) and/or by adding an offset to its value
- * (clock drift between traces).
- * <p>
- * Notice that the adjusted timestamp value could be negative e.g. for events
- * that occurred before t0 wrt the reference clock.
+ * A generic implementation of ITmfTimestamp.
  */
-public class TmfTimestamp implements Cloneable, Comparable<TmfTimestamp> {
+public class TmfTimestamp implements ITmfTimestamp {
 
-	// ------------------------------------------------------------------------
-    // Attributes
-	// ------------------------------------------------------------------------
-
-    protected long fValue; 		// The timestamp raw value
-    protected byte fScale; 		// The time scale
-    protected long fPrecision; 	// The value precision (tolerance)
-
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Constants
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
-    // The beginning and end of time
-    public static final TmfTimestamp BigBang   = new TmfTimestamp(Long.MIN_VALUE, Byte.MAX_VALUE, 0);
-    public static final TmfTimestamp BigCrunch = new TmfTimestamp(Long.MAX_VALUE, Byte.MAX_VALUE, 0);
-    public static final TmfTimestamp Zero      = new TmfTimestamp(0, (byte) 0, 0);
+    /**
+     * The beginning of time
+     */
+    public static final ITmfTimestamp BigBang = 
+            new TmfTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE, 0);
 
-	// ------------------------------------------------------------------------
+    /**
+     * The end of time
+     */
+    public static final ITmfTimestamp BigCrunch = 
+            new TmfTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE, 0);
+    
+    /**
+     * Zero
+     */
+    public static final ITmfTimestamp Zero = 
+            new TmfTimestamp(0, 0, 0);
+
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+
+    /**
+     * The timestamp raw value (mantissa)
+     */
+    protected long fValue;
+
+    /**
+     * The timestamp scale (magnitude)
+     */
+    protected int fScale;
+
+    /**
+     * The value precision (tolerance)
+     */
+    protected int fPrecision;
+
+    // ------------------------------------------------------------------------
     // Constructors
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     /**
      * Default constructor
      */
     public TmfTimestamp() {
-        this(0, (byte) 0, 0);
+        this(0, 0, 0);
     }
 
     /**
-     * Simple constructor with value only
+     * Simple constructor (scale = precision = 0)
+     *
+     * @param value the timestamp value
      */
     public TmfTimestamp(long value) {
-        this(value, (byte) 0, 0);
+        this(value, 0, 0);
     }
 
     /**
-     * Simple constructor with value and scale
+     * Simple constructor (precision = 0)
      * 
-     * @param value
-     * @param scale
+     * @param value the timestamp value
+     * @param scale the timestamp scale
      */
-    public TmfTimestamp(long value, byte scale) {
+    public TmfTimestamp(long value, int scale) {
         this(value, scale, 0);
     }
 
     /**
-     * Constructor with value, scale and precision
+     * Full constructor
      * 
-     * @param value
-     * @param scale
-     * @param precision
+     * @param value the timestamp value
+     * @param scale the timestamp scale
+     * @param precision the timestamp precision
      */
-    public TmfTimestamp(long value, byte scale, long precision) {
+    public TmfTimestamp(long value, int scale, int precision) {
         fValue = value;
         fScale = scale;
         fPrecision = Math.abs(precision);
@@ -104,294 +108,227 @@ public class TmfTimestamp implements Cloneable, Comparable<TmfTimestamp> {
     /**
      * Copy constructor
      * 
-     * @param other
+     * @param timestamp the timestamp to copy
      */
-    public TmfTimestamp(TmfTimestamp other) {
-    	if (other == null)
-    		throw new IllegalArgumentException();
-        fValue = other.fValue;
-        fScale = other.fScale;
-        fPrecision = other.fPrecision;
+    public TmfTimestamp(ITmfTimestamp timestamp) {
+        if (timestamp == null)
+            throw new IllegalArgumentException();
+        fValue = timestamp.getValue();
+        fScale = timestamp.getScale();
+        fPrecision = timestamp.getPrecision();
     }
 
-	// ------------------------------------------------------------------------
-    // Accessors
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // ITmfTimestamp
+    // ------------------------------------------------------------------------
 
-    /**
-     * @return the timestamp value
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#getValue()
      */
+    @Override
     public long getValue() {
         return fValue;
     }
 
-    /**
-     * @return the timestamp scale
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#getScale()
      */
-    public byte getScale() {
+    @Override
+    public int getScale() {
         return fScale;
     }
 
-    /**
-     * @return the timestamp value precision
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#getPrecision()
      */
-    public long getPrecision() {
+    @Override
+    public int getPrecision() {
         return fPrecision;
     }
 
-	// ------------------------------------------------------------------------
-    // Operators
-	// ------------------------------------------------------------------------
+    private static final long scalingFactors[] = new long[] {
+        1L,
+        10L,
+        100L,
+        1000L,
+        10000L,
+        100000L,
+        1000000L,
+        10000000L,
+        100000000L,
+        1000000000L,
+        10000000000L,
+        100000000000L,
+        1000000000000L,
+        10000000000000L,
+        100000000000000L,
+        1000000000000000L,
+        10000000000000000L,
+        100000000000000000L,
+        1000000000000000000L,
+    };
 
-    /**
-     * Return a shifted and scaled timestamp.
-     * 
-     * Limitation: The scaling is limited to MAX_SCALING orders of magnitude.
-     * The main reason is that the 64 bits value starts to lose any significance
-     * meaning beyond that scale difference and it's not even worth the trouble
-     * to switch to BigDecimal arithmetics.
-     * 
-     * @param offset the shift value (in the same scale as newScale)
-     * @param newScale the new timestamp scale
-     * @return the synchronized timestamp in the new scale
-     * @throws ArithmeticException
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#normalize(long, int)
      */
-    public TmfTimestamp synchronize(long offset, byte newScale) throws ArithmeticException {
+    @Override
+    public ITmfTimestamp normalize(long offset, int scale) throws ArithmeticException {
 
-        long newValue = fValue;
-        long newPrecision = fPrecision;
+        long value = fValue;
+        int precision = fPrecision;
 
-        // Handle the easy case
-        if (fScale == newScale && offset == 0)
-        	return this;
-        
-        // Determine the scaling factor
-        if (fScale != newScale) {
-            int scaleDiff = Math.abs(fScale - newScale);
-            // Let's try to be realistic...
+        // Handle the trivial case
+        if (fScale == scale && offset == 0)
+            return new TmfTimestamp(this);
+
+        // First, scale the timestamp
+        if (fScale != scale) {
+            int scaleDiff = Math.abs(fScale - scale);
             if (scaleDiff >= scalingFactors.length) {
                 throw new ArithmeticException("Scaling exception"); //$NON-NLS-1$
             }
-            // Adjust the timestamp
+
             long scalingFactor = scalingFactors[scaleDiff];
-            if (newScale < fScale) {
-                newValue *= scalingFactor;
-                newPrecision *= scalingFactor;
+            if (scale < fScale) {
+                value *= scalingFactor;
+                precision *= scalingFactor;
             } else {
-                newValue /= scalingFactor;
-                newPrecision /= scalingFactor;
+                value /= scalingFactor;
+                precision /= scalingFactor;
             }
         }
 
+        // Then, apply the offset
         if (offset < 0) {
-        	newValue = (newValue < Long.MIN_VALUE - offset) ? Long.MIN_VALUE : newValue + offset;
+            value = (value < Long.MIN_VALUE - offset) ? Long.MIN_VALUE : value + offset;
         } else {
-        	newValue = (newValue > Long.MAX_VALUE - offset) ? Long.MAX_VALUE : newValue + offset;
+            value = (value > Long.MAX_VALUE - offset) ? Long.MAX_VALUE : value + offset;
         }
 
-        return new TmfTimestamp(newValue, newScale, newPrecision);
+        return new TmfTimestamp(value, scale, precision);
     }
 
-    private static final long scalingFactors[] = new long[] {
-    	1L,
-    	10L,
-    	100L,
-    	1000L,
-    	10000L,
-    	100000L,
-    	1000000L,
-    	10000000L,
-    	100000000L,
-    	1000000000L,
-    	10000000000L,
-    	100000000000L,
-    	1000000000000L,
-    	10000000000000L,
-    	100000000000000L,
-    	1000000000000000L,
-    	10000000000000000L,
-    	100000000000000000L,
-    	1000000000000000000L,
-    };
-
-    private static final long scalingLimits[] = new long[] {
-    	Long.MAX_VALUE / 1L,
-    	Long.MAX_VALUE / 10L,
-    	Long.MAX_VALUE / 100L,
-    	Long.MAX_VALUE / 1000L,
-    	Long.MAX_VALUE / 10000L,
-    	Long.MAX_VALUE / 100000L,
-    	Long.MAX_VALUE / 1000000L,
-    	Long.MAX_VALUE / 10000000L,
-    	Long.MAX_VALUE / 100000000L,
-    	Long.MAX_VALUE / 1000000000L,
-    	Long.MAX_VALUE / 10000000000L,
-    	Long.MAX_VALUE / 100000000000L,
-    	Long.MAX_VALUE / 1000000000000L,
-    	Long.MAX_VALUE / 10000000000000L,
-    	Long.MAX_VALUE / 100000000000000L,
-    	Long.MAX_VALUE / 1000000000000000L,
-    	Long.MAX_VALUE / 10000000000000000L,
-    	Long.MAX_VALUE / 100000000000000000L,
-    	Long.MAX_VALUE / 1000000000000000000L,
-    };
-
-    public static long getScalingFactor(byte scale)
-    {
-    	return scalingFactors[scale];
-    }
-    
-    /**
-     * Compute the adjustment, in the reference scale, needed to synchronize
-     * this timestamp with a reference timestamp.
-     * 
-     * @param reference the reference timestamp to synchronize with
-     * @param scale the scale of the adjustment
-     * @return the adjustment term in the reference time scale
-     * @throws ArithmeticException
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#compareTo(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp, boolean)
      */
-    public long getAdjustment(TmfTimestamp reference, byte scale) throws ArithmeticException {
-        TmfTimestamp ts1 = synchronize(0, scale);
-        TmfTimestamp ts2 = reference.synchronize(0, scale);
-        return ts2.fValue - ts1.fValue;
-    }
+    @Override
+    public int compareTo(ITmfTimestamp ts, boolean withinPrecision) {
 
-    /**
-     * Compute the delta between two timestamps (adjusted to scale of current timestamp).
-     * 
-     * @param reference the reference timestamp to synchronize with
-     * @return the delta timestamp 
-     * @throws ArithmeticException
-     */
-    public TmfTimestamp getDelta(TmfTimestamp other) throws ArithmeticException {
-        TmfTimestamp newSecond = other;
-        if ((fScale != other.fScale) || (fPrecision != other.fPrecision)) {
-            newSecond = other.synchronize(0, fScale);
+        // Check the corner cases (we can't use equals() because it uses compareTo()...)
+        if (this == ts || (fValue == ts.getValue() && fScale == ts.getScale()))
+            return 0;
+        if ((fValue == BigBang.getValue() && fScale == BigBang.getScale()) || (ts.getValue() == BigCrunch.getValue() && ts.getScale() == BigCrunch.getScale()))
+            return -1;
+        if ((fValue == BigCrunch.getValue() && fScale == BigCrunch.getScale()) || (ts.getValue() == BigBang.getValue() && ts.getScale() == BigBang.getScale()))
+            return 1;
+        
+        try {
+            ITmfTimestamp nts = ts.normalize(0, fScale);
+            long delta = fValue - nts.getValue();
+            if ((delta == 0) || (withinPrecision && (Math.abs(delta) <= (fPrecision + nts.getPrecision())))) {
+                return 0;
+            }
+            return (delta > 0) ? 1 : -1;
         }
-        return new TmfTimestamp(fValue - newSecond.fValue,
-                                fScale, 
-                                newSecond.fPrecision > fPrecision ? newSecond.fPrecision : fPrecision);
+        catch (ArithmeticException e) {
+            // Scaling error. We can figure it out nonetheless.
+
+            // First, look at the sign of the mantissa
+            long value = ts.getValue();
+            if (fValue == 0 && value == 0)
+                return 0;
+            if (fValue  < 0 && value >= 0)
+                return -1;
+            if (fValue >= 0 && value < 0)
+                return 1;
+
+            // Otherwise, just compare the scales
+            int scale = ts.getScale();
+            return (fScale > scale) ? (fValue >= 0) ? 1 : -1 : (fValue >= 0) ? -1 : 1;  
+        }
     }
 
-    /**
-     * Compare with another timestamp
-     * 
-     * @param other the other timestamp
-     * @param withinPrecision indicates if precision is to be take into consideration
-     * @return -1: this timestamp is lower (i.e. anterior)
-     *          0: timestamps are equal (within precision if requested)
-     *          1: this timestamp is higher (i.e. posterior)
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#getDelta(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp)
      */
-    public int compareTo(final TmfTimestamp other, boolean withinPrecision) {
-
-		// If values have the same time scale, perform the comparison
-		if (fScale == other.fScale) {
-			if (withinPrecision)
-				return compareWithinPrecision(this.fValue, this.fPrecision, other.fValue, other.fPrecision);
-			else
-				return compareNoPrecision(this.fValue, other.fValue);
-		}
-
-		// If values have different time scales, adjust to the finest one and
-		// then compare. If the scaling difference is too large, revert to
-		// some heuristics. Hopefully, nobody will try to compare galactic and
-		// quantic clock events...
-		int scaleDiff = Math.abs(fScale - other.fScale);
-		long factor, limit;
-		if (scaleDiff < scalingFactors.length) {
-			factor = scalingFactors[scaleDiff];
-			limit = scalingLimits[scaleDiff];
-		} else {
-			factor = 0;
-			limit = 0; // !!! 0 can always be scaled!!!
-		}
-
-		if (fScale < other.fScale) {
-			// this has finer scale, so other should be scaled
-			if (withinPrecision)
-				if (other.fValue > limit || other.fValue < -limit
-						|| other.fPrecision > limit
-						|| other.fPrecision < -limit)
-					return other.fValue > 0 ? -1 : +1; // other exceeds scaling limit
-				else
-					return compareWithinPrecision(this.fValue, this.fPrecision,
-							other.fValue * factor, other.fPrecision * factor);
-			else if (other.fValue > limit || other.fValue < -limit)
-				return other.fValue > 0 ? -1 : +1; // other exceeds scaling limit
-			else
-				return compareNoPrecision(this.fValue, other.fValue * factor);
-		} else {
-			// other has finer scale, so this should be scaled
-			if (withinPrecision)
-				if (this.fValue > limit || this.fValue < -limit
-						|| this.fPrecision > limit || this.fPrecision < -limit)
-					return this.fValue > 0 ? +1 : -1; // we exceed scaling limit
-				else
-					return compareWithinPrecision(this.fValue * factor,
-							this.fPrecision * factor, other.fValue,
-							other.fPrecision);
-			else if (this.fValue > limit || this.fValue < -limit)
-				return this.fValue > 0 ? +1 : -1; // we exceed scaling limit
-			else
-				return compareNoPrecision(this.fValue * factor, other.fValue);
-		}
+    @Override
+    public ITmfTimestamp getDelta(ITmfTimestamp ts) {
+        ITmfTimestamp nts = ts.normalize(0, fScale);
+        long value = fValue - nts.getValue();
+        return new TmfTimestamp(value, fScale, fPrecision + nts.getPrecision());
     }
 
-	private static int compareNoPrecision(long thisValue, long otherValue) {
-		return (thisValue == otherValue) ? 0 : (thisValue < otherValue) ? -1 : 1;
-	}
+    // ------------------------------------------------------------------------
+    // Cloneable
+    // ------------------------------------------------------------------------
 
-	private static int compareWithinPrecision(long thisValue, long thisPrecision, long otherValue, long otherPrecision) {
-		if ((thisValue + thisPrecision) < (otherValue - otherPrecision))
-			return -1;
-		if ((thisValue - thisPrecision) > (otherValue + otherPrecision))
-			return 1;
-		return 0;
-	}
+    /* (non-Javadoc)
+     * @see java.lang.Object#clone()
+     */
+    @Override
+    public ITmfTimestamp clone() {
+        TmfTimestamp clone = null;
+        try {
+            clone = (TmfTimestamp) super.clone();
+            clone.fValue = fValue;
+            clone.fScale = fScale;
+            clone.fPrecision = fPrecision;
+        } catch (CloneNotSupportedException e) {
+        }
+        return clone;
+    }
 
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // Comparable
+    // ------------------------------------------------------------------------
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#compareTo(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp)
+     */
+    @Override
+    public int compareTo(ITmfTimestamp ts) {
+        return compareTo(ts, false);
+    }
+
+    // ------------------------------------------------------------------------
     // Object
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
     public int hashCode() {
-		int result = 17;
-		result = 37 * result + (int) (fValue ^ (fValue >>> 32));
-		result = 37 * result + fScale;
-		result = 37 * result + (int) (fPrecision ^ (fPrecision >>> 32));
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (fValue ^ (fValue >>> 32));
+        result = prime * result + fScale;
+        result = prime * result + fPrecision;
         return result;
     }
 
-	@Override
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
     public boolean equals(Object other) {
+        if (this == other)
+            return true;
+        if (other == null)
+            return false;
         if (!(other instanceof TmfTimestamp))
-        	return false;
-        TmfTimestamp o = (TmfTimestamp) other;
-        return compareTo(o, false) == 0;
+            return false;
+        TmfTimestamp ts = (TmfTimestamp) other;
+        return compareTo(ts, false) == 0;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-    	return "[TmfTimestamp(" + fValue + "," + fScale + "," + fPrecision + ")]";
+        return "TmfTimestamp [fValue=" + fValue + ", fScale=" + fScale + ", fPrecision=" + fPrecision + "]";
     }
-
-    @Override
-    public TmfTimestamp clone() {
-    	TmfTimestamp clone = null;
-		try {
-			clone = (TmfTimestamp) super.clone();
-	        clone.fValue = fValue;
-	        clone.fScale = fScale;
-	        clone.fPrecision = fPrecision;
-		} catch (CloneNotSupportedException e) {
-		}
-		return clone;
-    }
-
-	@Override
-	public int compareTo(TmfTimestamp o) {
-		return compareTo(o, false);
-	}
 
 }

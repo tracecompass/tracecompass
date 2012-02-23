@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.linuxtools.tmf.ui.widgets.ColumnData;
@@ -44,10 +45,15 @@ public class CustomEventsTable extends TmfEventsTable {
     }
 
     @Override
-    public String[] extractItemFields(TmfEvent event) {
+    public TmfEventField[] extractItemFields(TmfEvent event) {
         if (event instanceof CustomEvent) {
-            return ((CustomEvent) event).extractItemFields();
+            TmfEventField[] fields = ((CustomEvent) event).extractItemFields();
+//            String[] labels = new String[fields.length];
+//            for (int i = 0; i < fields.length; i++) {
+//                labels[i] = (String) fields[i].getValue();
+//            }
+            return fields;
         }
-        return new String[0];
+        return new TmfEventField[0];
     }
 }

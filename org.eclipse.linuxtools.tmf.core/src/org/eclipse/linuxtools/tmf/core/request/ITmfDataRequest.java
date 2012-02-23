@@ -12,14 +12,14 @@
 
 package org.eclipse.linuxtools.tmf.core.request;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfData;
+import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 
 /**
  * <b><u>ITmfDataRequest</u></b>
  * <p>
  * TODO: Implement me. Please.
  */
-public interface ITmfDataRequest<T extends TmfData> {
+public interface ITmfDataRequest<T extends TmfEvent> {
 
 	// ------------------------------------------------------------------------
 	// Constants

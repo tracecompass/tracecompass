@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfNoSuchFieldException;
 
 
 public class TmfFilterMatchesNode extends TmfFilterTreeNode {
@@ -73,19 +72,15 @@ public class TmfFilterMatchesNode extends TmfFilterTreeNode {
 
 	@Override
 	public boolean matches(TmfEvent event) {
-		if (fPattern == null) {
-			return false ^ fNot;
-		}
-		try {
-			Object value = event.getContent().getField(fField);
-			if (value == null) {
-				return false ^ fNot;
-			}
-			String valueString = value.toString();
-			return fPattern.matcher(valueString).matches() ^ fNot;
-		} catch (TmfNoSuchFieldException e) {
-			return false ^ fNot;
-		}
+        if (fPattern == null) {
+            return false ^ fNot;
+        }
+        Object value = event.getContent().getField(fField);
+        if (value == null) {
+            return false ^ fNot;
+        }
+        String valueString = value.toString();
+        return fPattern.matcher(valueString).matches() ^ fNot;
 	}
 
 	@Override

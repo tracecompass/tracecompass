@@ -23,6 +23,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
@@ -591,15 +592,15 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
             postfix = " -> " + currentGraphNode.getName() + "\n" + SDMessages._138 + " "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
             
             //double delta = ((ITimeRange)toolTipNode).getLastTime()-((ITimeRange)currentGraphNode).getLastTime();
-            TmfTimestamp firstTime = ((ITimeRange) currentGraphNode).getEndTime();
-            TmfTimestamp lastTime = ((ITimeRange) toolTipNode).getEndTime();
-            TmfTimestamp delta = lastTime.getDelta(firstTime);
+            ITmfTimestamp firstTime = ((ITimeRange) currentGraphNode).getEndTime();
+            ITmfTimestamp lastTime = ((ITimeRange) toolTipNode).getEndTime();
+            TmfTimestamp delta = (TmfTimestamp) lastTime.getDelta(firstTime);
             postfix += delta.toString();
         } else {
             if ((toolTipNode instanceof ITimeRange) && ((ITimeRange) toolTipNode).hasTimeInfo()) {
                 postfix = "\n";//$NON-NLS-1$
-                TmfTimestamp firstTime = ((ITimeRange) toolTipNode).getStartTime();
-                TmfTimestamp lastTime = ((ITimeRange) toolTipNode).getEndTime();  
+                ITmfTimestamp firstTime = ((ITimeRange) toolTipNode).getStartTime();
+                ITmfTimestamp lastTime = ((ITimeRange) toolTipNode).getEndTime();  
                 
                 if (firstTime != null) {
                     if (lastTime != null && firstTime.compareTo(lastTime, true) != 0) {

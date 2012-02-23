@@ -37,6 +37,7 @@ import org.eclipse.linuxtools.lttng.core.state.model.LttngProcessState;
 import org.eclipse.linuxtools.lttng.core.state.model.LttngSoftIRQState;
 import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.core.state.model.LttngTrapState;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 
 /**
@@ -239,7 +240,7 @@ class StateUpdateHandlers {
 						Fields.LTT_FIELD_IRQ_ID);
 				if (irq == null || traceSt.getIrq_states().get(irq) == null) {
 					if (irq != null) {
-						TraceDebug.debug("Invalid irq (" + irq + "), ts = " + trcEvent.getOriginalTimestamp()); //$NON-NLS-1$ //$NON-NLS-2$
+						TraceDebug.debug("Invalid irq (" + irq + "), ts = " + trcEvent.getTimestamp()); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 					return true;
 				}
@@ -791,7 +792,7 @@ class StateUpdateHandlers {
 			public boolean process(LttngEvent trcEvent, LttngTraceState traceSt) {
 
 				Long cpu = trcEvent.getCpuId();
-				TmfTimestamp eventTime = trcEvent.getTimestamp();
+				ITmfTimestamp eventTime = trcEvent.getTimestamp();
 
 				LttngProcessState process = traceSt.getRunning_process().get(
 						cpu);
@@ -939,7 +940,7 @@ class StateUpdateHandlers {
 				Long cpu = trcEvent.getCpuId();
 				LttngProcessState process = traceSt.getRunning_process().get(
 						cpu);
-				TmfTimestamp timeStamp = trcEvent.getTimestamp();
+				ITmfTimestamp timeStamp = trcEvent.getTimestamp();
 
 				// /* Parent PID */
 				// Long parent_pid = getAFieldLong(trcEvent, traceSt,
@@ -1311,7 +1312,7 @@ class StateUpdateHandlers {
 				 */
 				/* else, if stack[0] is unknown, set to user mode, running */
 				LttngProcessState[] processes = traceSt.getProcesses();
-				TmfTimestamp time = trcEvent.getTimestamp();
+				ITmfTimestamp time = trcEvent.getTimestamp();
 				
 				for (int pos = 0; pos < processes.length; pos++) {
 					fix_process(processes[pos], time);
@@ -1334,7 +1335,7 @@ class StateUpdateHandlers {
 			 * @param timestamp
 			 */
 			private void fix_process(LttngProcessState process,
-					TmfTimestamp timestamp) {
+					ITmfTimestamp timestamp) {
 
 				LttngExecutionState es;
 
@@ -1500,7 +1501,7 @@ class StateUpdateHandlers {
 					if (process == null) {
 						parent_process = lttv_state_find_process(traceSt,
 								ANY_CPU, parent_pid);
-						TmfTimestamp eventTime = trcEvent.getTimestamp();
+						ITmfTimestamp eventTime = trcEvent.getTimestamp();
 						process = create_process(traceSt, cpu, pid, tgid,
 								command, eventTime);
 						if (parent_process != null) {

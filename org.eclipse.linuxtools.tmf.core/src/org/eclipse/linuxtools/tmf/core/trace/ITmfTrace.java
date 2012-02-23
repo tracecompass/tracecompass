@@ -16,9 +16,9 @@ import java.io.FileNotFoundException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.linuxtools.tmf.core.component.ITmfComponent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 
 /**
  * <b><u>ITmfTrace</u></b>
@@ -68,9 +68,9 @@ public interface ITmfTrace<T extends TmfEvent> extends ITmfComponent {
      */
     public TmfTimeRange getTimeRange();
 
-    public TmfTimestamp getStartTime();
+    public ITmfTimestamp getStartTime();
 
-    public TmfTimestamp getEndTime();
+    public ITmfTimestamp getEndTime();
 
     /**
      * @return the streaming interval in ms (0 if not streaming)
@@ -89,7 +89,7 @@ public interface ITmfTrace<T extends TmfEvent> extends ITmfComponent {
      */
     public TmfContext seekLocation(ITmfLocation<?> location);
 
-    public TmfContext seekEvent(TmfTimestamp timestamp);
+    public TmfContext seekEvent(ITmfTimestamp timestamp);
 
     public TmfContext seekEvent(long rank);
 
@@ -122,7 +122,7 @@ public interface ITmfTrace<T extends TmfEvent> extends ITmfComponent {
      * @param timestamp
      * @return
      */
-    public long getRank(TmfTimestamp timestamp);
+    public long getRank(ITmfTimestamp timestamp);
 
     /**
      * Return the event pointed by the supplied context (or null if no event left) and updates the context to the next

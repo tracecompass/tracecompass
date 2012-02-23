@@ -273,7 +273,7 @@ public abstract class AbsStateUpdate implements ILttngEventProcessor {
 		String expectedFieldName = expectedField.getInName();
 		for (int i = 0; i < fields.length; i++) {
 			field = (LttngEventField) fields[i];
-			fieldname = field.getId();
+			fieldname = field.getName();
 			if (fieldname.equals(expectedFieldName)) {
 				Object fieldObj = field.getValue();
 				if (fieldObj instanceof Long) {
@@ -328,7 +328,7 @@ public abstract class AbsStateUpdate implements ILttngEventProcessor {
 		String expectedFieldName = expectedField.getInName();
 		for (int i = 0; i < fields.length; i++) {
 			field = (LttngEventField) fields[i];
-			fieldname = field.getId();
+			fieldname = field.getName();
 			if (fieldname.equals(expectedFieldName)) {
 				Object fieldObj = field.getValue();
 				if (fieldObj instanceof String) {
@@ -362,7 +362,7 @@ public abstract class AbsStateUpdate implements ILttngEventProcessor {
 		sb.append(" number of fields: " + fields.length + "Fields: ");
 		for (int i = 0; i < fields.length; i++) {
 			field = (LttngEventField) fields[i];
-			sb.append(field.getId() + " ");
+			sb.append(field.getName() + " ");
 		}
 
 		TraceDebug.debug(sb.toString(), 5);

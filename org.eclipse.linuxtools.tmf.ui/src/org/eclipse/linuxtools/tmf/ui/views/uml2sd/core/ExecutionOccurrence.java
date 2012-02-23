@@ -12,7 +12,7 @@
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IImage;
@@ -32,7 +32,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
     protected int[] strokeRGB;
     protected IImage image, ellipsesImage;
 
-    protected TmfTimestamp startTime, endTime;
+    protected ITmfTimestamp startTime, endTime;
     protected boolean hasTime;
 
     /**
@@ -92,7 +92,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
      * 
      * @param time the time when the execution occurrence starts
      */
-    public void setStartTime(TmfTimestamp time) {
+    public void setStartTime(ITmfTimestamp time) {
         startTime = time.clone();
         hasTime = true;
         if (lifeline != null) {
@@ -105,7 +105,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
      * 
      * @param time the time when the execution occurrence ends
      */
-    public void setEndTime(TmfTimestamp time) {
+    public void setEndTime(ITmfTimestamp time) {
         endTime = time.clone();
         hasTime = true;
         if (lifeline != null) {
@@ -119,7 +119,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
      * @return the time
      */
     @Override
-    public TmfTimestamp getStartTime() {
+    public ITmfTimestamp getStartTime() {
         return startTime;
     }
 
@@ -129,7 +129,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
      * @return the time
      */
     @Override
-    public TmfTimestamp getEndTime() {
+    public ITmfTimestamp getEndTime() {
         return endTime;
     }
 

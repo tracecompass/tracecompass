@@ -2,7 +2,6 @@ package org.eclipse.linuxtools.lttng.core.event;
 
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
 /**
@@ -44,10 +43,10 @@ public class LttngEvent extends TmfEvent {
      * @see org.eclipse.linuxtools.lttng.core.event.LttngEventReference
      * @see org.eclipse.linuxtools.org.eclipse.linuxtools.lttng.jni.JniEvent
      */
-    public LttngEvent(TmfTrace<LttngEvent> parent, LttngTimestamp timestamp, TmfEventSource source, LttngEventType type, LttngEventContent content,
-            LttngEventReference reference, JniEvent lttEvent) {
+    public LttngEvent(TmfTrace<LttngEvent> parent, LttngTimestamp timestamp, String source, LttngEventType type, LttngEventContent content,
+            String reference, JniEvent lttEvent)
+    {
         super(timestamp, source, type, reference);
-
         fContent = content;
         jniEventReference = lttEvent;
         setParentTrace(parent);
@@ -62,12 +61,12 @@ public class LttngEvent extends TmfEvent {
     @SuppressWarnings("unchecked")
     public LttngEvent(LttngEvent oldEvent) {
         this(	
-        		(TmfTrace<LttngEvent>) oldEvent.getParentTrace(),
+        		(TmfTrace<LttngEvent>) oldEvent.getTrace(),
         		(LttngTimestamp)oldEvent.getTimestamp(), 
-        		(TmfEventSource)oldEvent.getSource(), 
+        		oldEvent.getSource(), 
         		(LttngEventType)oldEvent.getType(), 
         		(LttngEventContent)oldEvent.getContent(), 
-        		(LttngEventReference)oldEvent.getReference(), 
+        		oldEvent.getReference(), 
         		oldEvent.jniEventReference
         	);
     }
@@ -77,7 +76,7 @@ public class LttngEvent extends TmfEvent {
      * @param parentTrace The new parent
      */
     public void setParentTrace(TmfTrace<LttngEvent> parentTrace) {
-		fParentTrace = parentTrace;
+		fTrace = parentTrace;
 	}
     
     
@@ -127,6 +126,10 @@ public class LttngEvent extends TmfEvent {
 
     public void setContent(LttngEventContent newContent) {
         fContent = newContent;
+    }
+
+    public void setReference(String reference) {
+        fReference = reference;
     }
 
     @Override

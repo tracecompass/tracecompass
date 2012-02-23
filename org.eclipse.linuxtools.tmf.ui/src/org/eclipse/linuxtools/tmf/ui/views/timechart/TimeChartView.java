@@ -64,7 +64,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
 
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.timechart"; //$NON-NLS-1$
 
-    private static final byte TIMESTAMP_SCALE = -9;
+    private static final int TIMESTAMP_SCALE = -9;
 
     private final int fDisplayWidth;
     private Composite fComposite;
@@ -452,7 +452,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
                         if (event == null) {
                             break;
                         }
-                        long eventTime = event.getTimestamp().synchronize(0, (byte) -9).getValue();
+                        long eventTime = event.getTimestamp().normalize(0, -9).getValue();
                         if (eventTime >= timeChartEvent.getTime() && eventTime <= timeChartEvent.getTime() + timeChartEvent.getDuration()) {
                             priority = Math.min(priority, ColorSettingsManager.getColorSettingPriority(event));
                         }
@@ -611,7 +611,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
 
     @TmfSignalHandler
     public void currentTimeUpdated(TmfTimeSynchSignal signal) {
-        long time = signal.getCurrentTime().synchronize(0, TIMESTAMP_SCALE).getValue();
+        long time = signal.getCurrentTime().normalize(0, TIMESTAMP_SCALE).getValue();
         fViewer.setSelectedTime(time, true, this);
     }
 

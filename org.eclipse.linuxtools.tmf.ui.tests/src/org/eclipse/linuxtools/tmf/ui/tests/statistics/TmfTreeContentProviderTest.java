@@ -19,17 +19,16 @@ import java.util.Vector;
 
 import junit.framework.TestCase;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventReference;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.ITmfExtraEventInfo;
+import org.eclipse.linuxtools.tmf.ui.views.statistics.model.AbsTmfStatisticsTree;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.model.Messages;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfBaseStatisticsTree;
-import org.eclipse.linuxtools.tmf.ui.views.statistics.model.AbsTmfStatisticsTree;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfStatisticsTreeNode;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfTreeContentProvider;
 
@@ -42,9 +41,10 @@ public class TmfTreeContentProviderTest extends TestCase {
 
     private String fTestName = null;
 
+    private final String fContext = "UnitTest";
     private final String fTypeId1 = "Some type1";
     private final String fTypeId2 = "Some type2";
-
+ 
     private final String fLabel0 = "label1";
     private final String fLabel1 = "label2";
     private final String[] fLabels = new String[] { fLabel0, fLabel1 };
@@ -52,18 +52,18 @@ public class TmfTreeContentProviderTest extends TestCase {
     private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2, 5);
     private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, (byte) 2, 5);
 
-    private final TmfEventSource fSource = new TmfEventSource("Source");
+    private final String fSource = "Source";
 
-    private final TmfEventType fType1 = new TmfEventType(fTypeId1, fLabels);
-    private final TmfEventType fType2 = new TmfEventType(fTypeId2, fLabels);
+    private final TmfEventType fType1 = new TmfEventType(fContext, fTypeId1, TmfEventField.makeRoot(fLabels));
+    private final TmfEventType fType2 = new TmfEventType(fContext, fTypeId2, TmfEventField.makeRoot(fLabels));
 
-    private final TmfEventReference fReference = new TmfEventReference("Some reference");
+    private final String fReference = "Some reference";
 
     private final TmfEvent fEvent1;
     private final TmfEvent fEvent2;
 
-    private final TmfEventContent fContent1;
-    private final TmfEventContent fContent2;
+    private final TmfEventField fContent1;
+    private final TmfEventField fContent2;
 
     private final TmfBaseStatisticsTree fStatsData;
 
@@ -85,11 +85,11 @@ public class TmfTreeContentProviderTest extends TestCase {
         fTestName = name;
 
         fEvent1 = new TmfEvent(fTimestamp1, fSource, fType1, fReference);
-        fContent1 = new TmfEventContent(fEvent1, "Some content");
+        fContent1 = new TmfEventField(ITmfEventField.ROOT_ID, "Some content");
         fEvent1.setContent(fContent1);
 
-        fEvent2 = new TmfEvent(fTimestamp1, fTimestamp2, fSource, fType2, fReference);
-        fContent2 = new TmfEventContent(fEvent2, "Some other content");
+        fEvent2 = new TmfEvent(fTimestamp2, fSource, fType2, fReference);
+        fContent2 = new TmfEventField(ITmfEventField.ROOT_ID, "Some other content");
         fEvent2.setContent(fContent2);
 
         fStatsData = new TmfBaseStatisticsTree();

@@ -12,7 +12,7 @@
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 
 /**
  * @author sveyrier
@@ -20,9 +20,9 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
  */
 public interface ITimeRange {
 
-    public TmfTimestamp getStartTime();
+    public ITmfTimestamp getStartTime();
 
-    public TmfTimestamp getEndTime();
+    public ITmfTimestamp getEndTime();
 
     public boolean hasTimeInfo();
 }

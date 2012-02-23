@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessage;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessageReturn;
@@ -68,8 +69,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
 
     protected Frame frame = null;
     protected List<SDTimeEvent> nodeList = null;
-    protected TmfTimestamp min = new TmfTimestamp();
-    protected TmfTimestamp max = new TmfTimestamp();
+    protected ITmfTimestamp min = new TmfTimestamp();
+    protected ITmfTimestamp max = new TmfTimestamp();
     protected float zoomValue = 1;
     protected DrawableToolTip tooltip = null;
 
@@ -330,10 +331,10 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
 
             min = frame.getMinTime();
             max = frame.getMaxTime();
-            TmfTimestamp minMaxdelta = max.getDelta(min);
+            ITmfTimestamp minMaxdelta = (TmfTimestamp) max.getDelta(min);
             double gr = (minMaxdelta.getValue()) / (double) 10;
 
-            TmfTimestamp delta = m2.getTime().getDelta(m1.getTime()).getDelta(min);
+            ITmfTimestamp delta = (TmfTimestamp) m2.getTime().getDelta(m1.getTime()).getDelta(min);
             long absDelta = Math.abs(delta.getValue());
             
             ColorImpl color;
@@ -490,7 +491,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
                 int m1Y = Math.round(y1 * zoomValue);
                 int m2Y = Math.round(y2 * zoomValue);
                 if ((m1Y < e.y) && (m2Y >= e.y)) {
-                    TmfTimestamp delta = m2.getTime().getDelta(m1.getTime());
+                    TmfTimestamp delta = (TmfTimestamp) m2.getTime().getDelta(m1.getTime());
                     tooltip.showToolTip(delta, min, max);
                 }
             }
@@ -528,8 +529,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         ITimeRange t1 = (ITimeRange) mes1;
         ITimeRange t2 = (ITimeRange) mes2;
 
-        TmfTimestamp time1 = t1.getStartTime();
-        TmfTimestamp time2 = t2.getStartTime();
+        ITmfTimestamp time1 = t1.getStartTime();
+        ITmfTimestamp time2 = t2.getStartTime();
         int event1 = mes1.getEventOccurrence();
         int event2 = mes2.getEventOccurrence();
 
@@ -579,10 +580,10 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
             }
         }
 
-        TmfTimestamp minMaxdelta = max.getDelta(min);
+        TmfTimestamp minMaxdelta = (TmfTimestamp) max.getDelta(min);
         double gr = (minMaxdelta.getValue()) / (double) 10;
 
-        TmfTimestamp delta = time2.getDelta(time1).getDelta(min);
+        TmfTimestamp delta = (TmfTimestamp) time2.getDelta(time1).getDelta(min);
         long absDelta = Math.abs(delta.getValue());
 
         int colIndex = 0;
@@ -799,10 +800,10 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
                     done = true;
                     prevNodeY = m1Y;
                     nextNodeY = m2Y;
-                    TmfTimestamp minMaxdelta = max.getDelta(min);
+                    TmfTimestamp minMaxdelta = (TmfTimestamp) max.getDelta(min);
                     double gr = (minMaxdelta.getValue()) / (double) 10;
 
-                    TmfTimestamp delta = m2.getTime().getDelta(m1.getTime()).getDelta(min);
+                    TmfTimestamp delta = (TmfTimestamp) m2.getTime().getDelta(m1.getTime()).getDelta(min);
                     long absDelta = Math.abs(delta.getValue());
 
                     int colIndex = 0;
@@ -910,7 +911,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
                 int m1Y = Math.round(y1 * zoomValue);
                 int m2Y = Math.round(y2 * zoomValue);
                 if ((m1Y < prevNodeY + 1) && (m2Y >= prevNodeY + 1)) {
-                    TmfTimestamp delta = m2.getTime().getDelta(m1.getTime());
+                    TmfTimestamp delta = (TmfTimestamp) m2.getTime().getDelta(m1.getTime());
                     tooltip.showToolTip(delta, min, max);
                     tooltip.hideToolTip();
                 }

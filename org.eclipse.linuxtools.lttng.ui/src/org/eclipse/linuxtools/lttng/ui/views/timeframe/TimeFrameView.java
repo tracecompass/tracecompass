@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.lttng.ui.views.timeframe;
 
 import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
@@ -61,14 +62,14 @@ public class TimeFrameView extends TmfView {
     // ------------------------------------------------------------------------
 
     // The event log timestamp characteristics
-    private TmfTimestamp fTraceStartTime = new TmfTimestamp();
-    private TmfTimestamp fTraceEndTime = new TmfTimestamp();
+    private ITmfTimestamp fTraceStartTime = new TmfTimestamp();
+    private ITmfTimestamp fTraceEndTime = new TmfTimestamp();
 
-    private TmfTimestamp fCurrentTime = new TmfTimestamp();
+    private ITmfTimestamp fCurrentTime = new TmfTimestamp();
 
     private TmfTimeRange fTraceTimeRange = new TmfTimeRange(fTraceStartTime, fTraceEndTime);
     private TmfTimeRange fTraceSpan = new TmfTimeRange(fTraceStartTime, fTraceEndTime);
-    private byte fScale = 0;
+    private int fScale = 0;
 
     // Labels
     private static final String START_TIME_LABEL = Messages.TimeFrameView_WindowStartTime;
@@ -145,10 +146,10 @@ public class TimeFrameView extends TmfView {
         boolean trangeUpdated = false;
 
         // Collect the data
-        TmfTimestamp startTime = fStartGroup.getCurrentTime();
-        TmfTimestamp endTime = fEndGroup.getCurrentTime();
-        TmfTimestamp timeRange = fRangeGroup.getCurrentTime();
-        TmfTimestamp currentTime = fCurrentGroup.getCurrentTime();
+        ITmfTimestamp startTime = fStartGroup.getCurrentTime();
+        ITmfTimestamp endTime = fEndGroup.getCurrentTime();
+        ITmfTimestamp timeRange = fRangeGroup.getCurrentTime();
+        ITmfTimestamp currentTime = fCurrentGroup.getCurrentTime();
 
         // If startTime was set beyond endTime, adjust endTime and interval
         if (trigger == fStartGroup) {
@@ -170,9 +171,9 @@ public class TimeFrameView extends TmfView {
         if (trigger == fRangeGroup) {
             long start = startTime.getValue();
             long span = timeRange.getValue();
-            TmfTimestamp ts = new TmfTimestamp(start + span, startTime.getScale(), 0);
+            ITmfTimestamp ts = new TmfTimestamp(start + span, startTime.getScale(), 0);
             if (ts.compareTo(fTraceEndTime, false) > 0) {
-                ts = fTraceEndTime.synchronize(fTraceEndTime.getValue(), startTime.getScale());
+                ts = fTraceEndTime.clone();
             }
             endTime = ts;
             trangeUpdated = true;
@@ -180,8 +181,8 @@ public class TimeFrameView extends TmfView {
 
         // Compute the new time range
         TmfTimeRange subrange = new TmfTimeRange(startTime, endTime);
-        byte scale = startTime.getScale();
-        TmfTimestamp interval = new TmfTimestamp(startTime.getAdjustment(endTime, scale), scale, 0);
+        int scale = startTime.getScale();
+        ITmfTimestamp interval = (TmfTimestamp) startTime.getDelta(endTime);
 
         // Update the spinner groups
         fStartGroup.setContent(fTraceTimeRange, startTime);
@@ -229,10 +230,10 @@ public class TimeFrameView extends TmfView {
             @Override
             public void handleEvent(Event event) {
                 int ratio = fSlider.getSelection();
-                TmfTimestamp span = fCurrentGroup.getSpan();
+                ITmfTimestamp span = fCurrentGroup.getSpan();
                 long value = span.getValue() * ratio / SLIDER_RANGE;
-                TmfTimestamp start = fCurrentGroup.getStartTime();
-                TmfTimestamp current = new TmfTimestamp(start.getValue() + value, start.getScale(), 0);
+                ITmfTimestamp start = fCurrentGroup.getStartTime();
+                ITmfTimestamp current = new TmfTimestamp(start.getValue() + value, start.getScale(), 0);
                 fCurrentGroup.setValue(current);
             }
         });
@@ -243,16 +244,16 @@ public class TimeFrameView extends TmfView {
      * @param range
      * @param timestamp
      */
-    private void updateSlider(TmfTimeRange range, TmfTimestamp timestamp) {
+    private void updateSlider(TmfTimeRange range, ITmfTimestamp timestamp) {
 
         // Ignore update if disposed
         if (fSlider.isDisposed())
             return;
 
         // Determine the new relative position
-        byte scale = range.getEndTime().getScale();
-        long total = range.getStartTime().getAdjustment(range.getEndTime(), scale);
-        long relative = range.getStartTime().getAdjustment(timestamp, scale);
+        int scale = range.getEndTime().getScale();
+        long total = range.getStartTime().getDelta(range.getEndTime()).getValue();
+        long relative = range.getStartTime().getDelta(timestamp).getValue();
 
         // Set the slider value
         final long position = (total > 0) ? (relative * SLIDER_RANGE / total) : 0;
@@ -307,10 +308,10 @@ public class TimeFrameView extends TmfView {
 
         fCurrentTime = fTraceStartTime;
 
-        TmfTimestamp delta = new TmfTimestamp(fTraceStartTime.getAdjustment(fTraceEndTime, fScale), fScale, 0);
+        ITmfTimestamp delta = fTraceStartTime.getDelta(fTraceEndTime);
         fTraceSpan = new TmfTimeRange(new TmfTimestamp(0, fScale, 0), delta);
         // fRangeGroup.setContent(fTraceSpan, delta);
-        TmfTimestamp start = new TmfTimestamp(1, (byte) -1, 0);
+        ITmfTimestamp start = new TmfTimestamp(1, (byte) -1, 0);
         fRangeGroup.setContent(fTraceSpan, start);
     }
 
@@ -335,7 +336,7 @@ public class TimeFrameView extends TmfView {
         fEndGroup.setContent(fTraceTimeRange, fTraceEndTime);
         fCurrentGroup.setContent(fTraceTimeRange, fCurrentGroup.getCurrentTime());
 
-        TmfTimestamp delta = new TmfTimestamp(fTraceStartTime.getAdjustment(fTraceEndTime, fScale), fScale, 0);
+        ITmfTimestamp delta = fTraceStartTime.getDelta(fTraceEndTime);
         fTraceSpan = new TmfTimeRange(new TmfTimestamp(0, fScale, 0), delta);
         fRangeGroup.setContent(fTraceSpan, delta);
     }
@@ -348,8 +349,8 @@ public class TimeFrameView extends TmfView {
         if (signal.getSource() != this) {
             // Update the time frame
             TmfTimeRange selTimeRange = signal.getCurrentRange();
-            TmfTimestamp selStart = selTimeRange.getStartTime().synchronize(0, fScale);
-            TmfTimestamp selEnd = selTimeRange.getEndTime().synchronize(0, fScale);
+            ITmfTimestamp selStart = selTimeRange.getStartTime().normalize(0, fScale);
+            ITmfTimestamp selEnd   = selTimeRange.getEndTime().normalize(0, fScale);
 
             fupdateExternalListeners = false;
             // Update the widgets and prevent broadcast notifications to
@@ -358,7 +359,7 @@ public class TimeFrameView extends TmfView {
                 fStartGroup.setContent(fTraceTimeRange, selStart);
                 fEndGroup.setContent(fTraceTimeRange, selEnd);
 
-                TmfTimestamp delta = new TmfTimestamp(selStart.getAdjustment(selEnd, fScale), fScale, 0);
+                ITmfTimestamp delta = selStart.getDelta(selEnd);
 
                 fRangeGroup.setContent(fTraceSpan, delta);
             }
@@ -377,7 +378,7 @@ public class TimeFrameView extends TmfView {
         if (signal.getSource() != this) {
             // prevent loop to external notifications
             fupdateExternalListeners = false;
-            fCurrentTime = signal.getCurrentTime().synchronize(0, fStartGroup.getCurrentTime().getScale());
+            fCurrentTime = signal.getCurrentTime().normalize(0, fStartGroup.getCurrentTime().getScale());
             if (fStartGroup.getCurrentTime().compareTo(fCurrentTime, false) > 0) {
                 fStartGroup.setContent(new TmfTimeRange(fCurrentTime, fEndGroup.getCurrentTime()), fCurrentTime);
             }

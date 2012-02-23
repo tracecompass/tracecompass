@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 
 import java.util.Comparator;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.ISDPreferences;
@@ -54,12 +55,12 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
     /**
      * The time when the message begin
      */
-    protected TmfTimestamp endTime = new TmfTimestamp();
+    protected ITmfTimestamp endTime = new TmfTimestamp();
 
     /**
      * The time when the message end
      */
-    protected TmfTimestamp startTime = new TmfTimestamp();
+    protected ITmfTimestamp startTime = new TmfTimestamp();
 
     /**
      * The associated message.
@@ -329,7 +330,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      * 
      * @param time the time when the message end
      */
-    public void setEndTime(TmfTimestamp time) {
+    public void setEndTime(ITmfTimestamp time) {
         endTime = time.clone();
         hasTime = true;
         if (getStartLifeline() != null && getStartLifeline().getFrame() != null)
@@ -343,7 +344,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      * 
      * @param time the time when the message start
      */
-    public void setStartTime(TmfTimestamp time) {
+    public void setStartTime(ITmfTimestamp time) {
         startTime = time.clone();
         hasTime = true;
         if (getStartLifeline() != null && getStartLifeline().getFrame() != null)
@@ -358,7 +359,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      * @return the time
      */
     @Override
-    public TmfTimestamp getEndTime() {
+    public ITmfTimestamp getEndTime() {
         return endTime;
     }
 
@@ -368,7 +369,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      * @return the time
      */
     @Override
-    public TmfTimestamp getStartTime() {
+    public ITmfTimestamp getStartTime() {
         return startTime;
     }
 

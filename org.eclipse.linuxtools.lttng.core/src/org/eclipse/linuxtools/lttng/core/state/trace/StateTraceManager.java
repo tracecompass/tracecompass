@@ -18,8 +18,8 @@ import java.util.Vector;
 import org.eclipse.linuxtools.lttng.core.TraceDebug;
 import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.core.event.LttngSyntheticEvent;
-import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.core.event.LttngSyntheticEvent.SequenceInd;
+import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.core.model.LTTngTreeNode;
 import org.eclipse.linuxtools.lttng.core.request.ILttngSyntEventRequest;
 import org.eclipse.linuxtools.lttng.core.request.IRequestStatusListener;
@@ -32,6 +32,7 @@ import org.eclipse.linuxtools.lttng.core.state.model.StateModelFactory;
 import org.eclipse.linuxtools.lttng.core.state.resource.ILttngStateContext;
 import org.eclipse.linuxtools.lttng.core.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.lttng.core.trace.LTTngTrace;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -54,7 +55,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	private TmfExperiment<LttngEvent> fExperiment = null;
 
 	// immutable Objects
-	private final ITmfTrace fTrace;
+	private final ITmfTrace<?> fTrace;
 	private int fcpuNumber = -1;
 	private final ITransEventProcessor fStateUpdateProcessor;
 
@@ -80,7 +81,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * @param trace
 	 * @throws LttngStateException
 	 */
-	public StateTraceManager(Long id, LTTngTreeNode parent, String name, ITmfTrace trace) throws LttngStateException {
+	public StateTraceManager(Long id, LTTngTreeNode parent, String name, ITmfTrace<?> trace) throws LttngStateException {
 		super(id, parent, name, trace);
 
 		if (trace == null) {
@@ -128,7 +129,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * @see org.eclipse.linuxtools.lttng.state.IStateManager#getEventLog()
 	 */
 	@Override
-	public ITmfTrace getTrace() {
+	public ITmfTrace<?> getStateTrace() {
 		return fTrace;
 	}
 
@@ -145,7 +146,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * 
 	 * @return boolean True if a checkpoint was saved, false otherwise
 	 */
-	private void saveCheckPointIfNeeded(Long eventCounter, TmfTimestamp eventTime) {
+	private void saveCheckPointIfNeeded(Long eventCounter, ITmfTimestamp eventTime) {
 		// Save a checkpoint every LTTNG_STATE_SAVE_INTERVAL event
 		if ((eventCounter.longValue() % fcheckPointInterval) == 0) {
 
@@ -156,7 +157,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 
 			TraceDebug.debug("Check point created here: " + eventCounter //$NON-NLS-1$
 					+ " -> " + eventTime.toString() + "************" //$NON-NLS-1$ //$NON-NLS-2$
-					+ getTrace().getName() + "   >>>>> Thread: " //$NON-NLS-1$
+					+ getStateTrace().getName() + "   >>>>> Thread: " //$NON-NLS-1$
 					+ Thread.currentThread().getId());
 
 			synchronized (fCheckPointsLock) {
@@ -194,7 +195,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public TmfCheckpoint restoreCheckPointByTimestamp(TmfTimestamp eventTime) {
+	public TmfCheckpoint restoreCheckPointByTimestamp(ITmfTimestamp eventTime) {
 		TmfTimeRange experimentRange = fExperiment.getTimeRange();
 		TmfCheckpoint checkpoint = new TmfCheckpoint(fTrace.getStartTime(), new TmfLocation<Long>(0L));
 
@@ -433,7 +434,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 		 * @param count
 		 * @param time
 		 */
-		public void saveCheckPoint(Long count, TmfTimestamp time) {
+		public void saveCheckPoint(Long count, ITmfTimestamp time) {
 
 		}
 	}
@@ -513,7 +514,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 	 * ()
 	 */
 	@Override
-	public ITmfTrace getTraceIdRef() {
+	public ITmfTrace<?> getTraceIdRef() {
 		return fTrace;
 	}
 

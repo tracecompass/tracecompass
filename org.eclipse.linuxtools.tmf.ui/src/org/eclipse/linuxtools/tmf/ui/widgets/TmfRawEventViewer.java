@@ -392,7 +392,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                         if (event == null) {
                         	break;
                         }
-                        String[] lines = event.getRawText().split("\r?\n"); //$NON-NLS-1$
+                        String[] lines = event.getContent().toString().split("\r?\n"); //$NON-NLS-1$
                         for (int i = 0; i < lines.length; i++) {
                             String line = lines[i];
                             LineData lineData = new LineData(rank, location, line); 
@@ -438,7 +438,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
             if (event == null) {
                 break;
             }
-            for (String line : event.getRawText().split("\r?\n")) { //$NON-NLS-1$
+            for (String line : event.getContent().toString().split("\r?\n")) { //$NON-NLS-1$
                 int crPos;
                 if ((crPos = line.indexOf('\r')) != -1) {
                 	line = line.substring(0, crPos);

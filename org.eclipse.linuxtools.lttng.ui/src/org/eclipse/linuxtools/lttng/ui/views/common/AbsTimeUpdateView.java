@@ -27,12 +27,13 @@ import org.eclipse.linuxtools.lttng.core.request.RequestStartedSignal;
 import org.eclipse.linuxtools.lttng.core.state.evProcessor.ITransEventProcessor;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.lttng.ui.model.trange.ItemContainer;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
-import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
+import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentDisposedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
@@ -446,7 +447,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	
 			Long fCount = getSynEventCount();
 			ITransEventProcessor processor = getProcessor();
-			TmfTimestamp frunningTimeStamp;
+			ITmfTimestamp frunningTimeStamp;
 	
 			/*
 			 * (non-Javadoc)
@@ -550,9 +551,9 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	 * @return
 	 */
 	protected TmfTimeRange getInitTRange(TmfTimeRange experimentTRange) {
-		TmfTimestamp expStartTime = experimentTRange.getStartTime();
-		TmfTimestamp expEndTime = experimentTRange.getEndTime();
-		TmfTimestamp initialEndOfWindow = new LttngTimestamp(expStartTime
+		ITmfTimestamp expStartTime = experimentTRange.getStartTime();
+		ITmfTimestamp expEndTime = experimentTRange.getEndTime();
+		ITmfTimestamp initialEndOfWindow = new LttngTimestamp(expStartTime
 				.getValue()
 				+ INITIAL_WINDOW_OFFSET);
 		if (initialEndOfWindow.compareTo(expEndTime, false) < 0) {

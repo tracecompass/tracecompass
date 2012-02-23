@@ -12,11 +12,9 @@
 
 package org.eclipse.linuxtools.tmf.ui.parsers.custom;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventReference;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 public class CustomXmlEvent extends CustomEvent {
@@ -30,12 +28,8 @@ public class CustomXmlEvent extends CustomEvent {
         super(definition, other);
     }
 
-    public CustomXmlEvent(CustomXmlTraceDefinition definition, ITmfTrace<?> parentTrace, TmfTimestamp timestamp, TmfEventSource source, TmfEventType type, TmfEventReference reference) {
+    public CustomXmlEvent(CustomXmlTraceDefinition definition, ITmfTrace<?> parentTrace, ITmfTimestamp timestamp, String source, TmfEventType type, String reference) {
         super(definition, parentTrace, timestamp, source, type, reference);
-    }
-
-    public CustomXmlEvent(CustomXmlTraceDefinition definition, TmfTimestamp originalTS, TmfTimestamp effectiveTS, TmfEventSource source, TmfEventType type, TmfEventReference reference) {
-        super(definition, originalTS, effectiveTS, source, type, reference);
     }
 
     public void parseInput(String value, String name, int inputAction, String inputFormat) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ericsson
+ * Copyright (c) 2009, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,34 +8,25 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Francois Chouinard - Updated as per TMF Event Model 1.0
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.event;
 
-import java.util.HashMap;
-
 /**
  * <b><u>TmfEventType</u></b>
  * <p>
- * The event type.
+ * A basic implementation of ITmfEventType.
  */
-public class TmfEventType implements Cloneable {
+public class TmfEventType implements ITmfEventType {
 
-    // ------------------------------------------------------------------------
-    // Constants
-    // ------------------------------------------------------------------------
-
-	public static final String DEFAULT_TYPE_ID  = "TMF Default Type"; //$NON-NLS-1$
-	public static final String[] DEFAULT_LABELS = new String[] { "Content" }; //$NON-NLS-1$
-	
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-	private String   fTypeId;
-	private String[] fFieldLabels;
-	private int      fNbFields;
-	private HashMap<String, Integer> fFieldMap;
+	private String fContext;
+	private String fTypeId;
+	private ITmfEventField fRootField;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -45,126 +36,147 @@ public class TmfEventType implements Cloneable {
 	 * Default constructor
 	 */
 	public TmfEventType() {
-		this(DEFAULT_TYPE_ID, DEFAULT_LABELS);
+		this(DEFAULT_CONTEXT_ID, DEFAULT_TYPE_ID, null);
 	}
 
-	/**
-	 * @param type
-	 * @param format
-	 */
-	public TmfEventType(String typeId, String[] labels) {
-		if (typeId == null || labels == null)
-    		throw new IllegalArgumentException();
-		fTypeId      = typeId;
-		fFieldLabels = labels;
-		fNbFields    = fFieldLabels.length;
-		fFieldMap    = new HashMap<String, Integer>();
-		for (int i = 0; i < fNbFields; i++) {
-			fFieldMap.put(fFieldLabels[i], i);
-		}
-	}
+    /**
+     * Full constructor
+     * 
+     * @param context the type context
+     * @param typeId the type name
+     * @param root the root field
+     */
+    public TmfEventType(String context, String typeId, ITmfEventField root) {
+        if (context == null || typeId == null)
+            throw new IllegalArgumentException();
+        fContext = context;
+        fTypeId = typeId;
+        fRootField = root;
+
+        // Register to the event type manager
+        TmfEventTypeManager.getInstance().add(context, this);
+    }
 
 	/**
 	 * Copy constructor
-	 * @param other
+	 * 
+	 * @param type the other type
 	 */
-	public TmfEventType(TmfEventType other) {
-    	if (other == null)
+	public TmfEventType(TmfEventType type) {
+    	if (type == null)
     		throw new IllegalArgumentException();
-		fTypeId      = other.fTypeId;
-		fFieldLabels = other.fFieldLabels;
-		fNbFields    = other.fNbFields;
-		fFieldMap    = other.fFieldMap;
+    	fContext = type.fContext;
+		fTypeId  = type.fTypeId;
+		fRootField = type.fRootField;
 	}
 
     // ------------------------------------------------------------------------
-    // Accessors
+    // ITmfEventType
     // ------------------------------------------------------------------------
 
-	/**
-	 * @return
-	 */
-	public String getTypeId() {
-		return fTypeId;
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventType#getContext()
+     */
+    @Override
+	public String getContext() {
+		return fContext;
 	}
 
-	/**
-	 * @return
-	 */
-	public int getNbFields() {
-		return fNbFields;
-	}
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventType#getName()
+     */
+    @Override
+    public String getName() {
+        return fTypeId;
+    }
 
-	/**
-	 * @return
-	 */
-	public int getFieldIndex(String id) throws TmfNoSuchFieldException {
-		Integer index = fFieldMap.get(id);
-		if (index == null)
-			throw(new TmfNoSuchFieldException(id));
-		return index;
-	}
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventType#getRootField()
+     */
+    @Override
+    public ITmfEventField getRootField() {
+        return fRootField;
+    }
 
-	/**
-	 * @return
-	 */
-	public String[] getLabels() {
-		return fFieldLabels;
-	}
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventType#getFieldNames()
+     */
+    @Override
+    public String[] getFieldNames() {
+        return (fRootField != null) ? fRootField.getFieldNames() : null;
+    }
 
-	/**
-	 * @return
-	 */
-	public String getLabel(int i) throws TmfNoSuchFieldException {
-		if (i >= 0 && i < fNbFields)
-			return fFieldLabels[i];
-		throw new TmfNoSuchFieldException("Bad index (" + i + ")");  //$NON-NLS-1$//$NON-NLS-2$
-	}
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventType#getFieldName(int)
+     */
+    @Override
+    public String getFieldName(int index) {
+        return (fRootField != null) ? fRootField.getFieldName(index) : null;
+    }
+
+    // ------------------------------------------------------------------------
+    // Cloneable
+    // ------------------------------------------------------------------------
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#clone()
+     */
+    @Override
+    public ITmfEventType clone() {
+        TmfEventType clone = null;
+        try {
+            clone = (TmfEventType) super.clone();
+            clone.fContext = fContext;
+            clone.fTypeId = fTypeId;
+            clone.fRootField = (fRootField != null) ? fRootField.clone() : null;
+        }
+        catch (CloneNotSupportedException e) {
+        }
+        return clone;
+    }
 
     // ------------------------------------------------------------------------
     // Object
     // ------------------------------------------------------------------------
 
-	@Override
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
     public int hashCode() {
-        return fTypeId.hashCode();
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + fContext.hashCode();
+        result = prime * result + fTypeId.hashCode();
+        return result;
     }
 
-	@Override
-    public boolean equals(Object other) {
-		if (!(other instanceof TmfEventType))
-			return false;
-		TmfEventType o = (TmfEventType) other;
-        return fTypeId.equals(o.fTypeId);
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        TmfEventType other = (TmfEventType) obj;
+        if (!fContext.equals(other.fContext))
+            return false;
+        if (!fTypeId.equals(other.fTypeId))
+            return false;
+        return true;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-    	return "[TmfEventType:" + fTypeId + "]";
+        return "TmfEventType [fContext=" + fContext + ", fTypeId=" + fTypeId + "]";
     }
 
-	@Override
-	public TmfEventType clone() {
-		TmfEventType clone = null;
-		try {
-			clone = (TmfEventType) super.clone();
-			clone.fTypeId = new String(fTypeId);
-			clone.fNbFields = fNbFields;
-			// Clone the field labels
-			clone.fFieldLabels = new String[fFieldLabels.length];
-			for (int i = 0; i < fFieldLabels.length; i++) {
-				clone.fFieldLabels[i] = new String(fFieldLabels[i]);
-			}
-			// Clone the fields
-			clone.fFieldMap = new HashMap<String, Integer>();
-			for (String key : fFieldMap.keySet()) {
-				clone.fFieldMap.put(new String(key), new Integer(fFieldMap.get(key)));
-			}
-		}
-		catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
-		return clone;
-	}
 }

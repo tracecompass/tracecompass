@@ -18,10 +18,9 @@ import junit.framework.TestCase;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventContent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventReference;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
+import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
@@ -45,6 +44,8 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
 
     private String fTestName;
 
+    private final String fContext = "UnitTest";
+    
     private final String fTypeId1 = "Some type1";
     private final String fTypeId2 = "Some type2";
 
@@ -57,21 +58,21 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
     private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, (byte) 2, 5);
     private final TmfTimestamp fTimestamp3 = new TmfTimestamp(12355, (byte) 2, 5);
 
-    private final TmfEventSource fSource = new TmfEventSource("Source");
+    private final String       fSource = "Source";
 
-    private final TmfEventType fType1 = new TmfEventType(fTypeId1, fLabels);
-    private final TmfEventType fType2 = new TmfEventType(fTypeId1, fLabels);
-    private final TmfEventType fType3 = new TmfEventType(fTypeId2, fLabels);
+    private final TmfEventType fType1 = new TmfEventType(fContext, fTypeId1, TmfEventField.makeRoot(fLabels));
+    private final TmfEventType fType2 = new TmfEventType(fContext, fTypeId1, TmfEventField.makeRoot(fLabels));
+    private final TmfEventType fType3 = new TmfEventType(fContext, fTypeId2, TmfEventField.makeRoot(fLabels));
 
-    private final TmfEventReference fReference = new TmfEventReference("Some reference");
+    private final String fReference = "Some reference";
 
     private final TmfEvent fEvent1;
     private final TmfEvent fEvent2;
     private final TmfEvent fEvent3;
 
-    private final TmfEventContent fContent1;
-    private final TmfEventContent fContent2;
-    private final TmfEventContent fContent3;
+    private final TmfEventField fContent1;
+    private final TmfEventField fContent2;
+    private final TmfEventField fContent3;
 
     private final TmfBaseStatisticsTree fStatsData;
 
@@ -87,15 +88,15 @@ public class TmfBaseColumnDataProviderTest extends TestCase {
         fTestName = name;
 
         fEvent1 = new TmfEvent(fTimestamp1, fSource, fType1, fReference);
-        fContent1 = new TmfEventContent(fEvent1, "Some content");
+        fContent1 = new TmfEventField(ITmfEventField.ROOT_ID, "Some content");
         fEvent1.setContent(fContent1);
 
-        fEvent2 = new TmfEvent(fTimestamp1, fTimestamp2, fSource, fType2, fReference);
-        fContent2 = new TmfEventContent(fEvent2, "Some other content");
+        fEvent2 = new TmfEvent(fTimestamp2, fSource, fType2, fReference);
+        fContent2 = new TmfEventField(ITmfEventField.ROOT_ID, "Some other content");
         fEvent2.setContent(fContent2);
 
-        fEvent3 = new TmfEvent(fTimestamp2, fTimestamp3, fSource, fType3, fReference);
-        fContent3 = new TmfEventContent(fEvent3, "Some other different content");
+        fEvent3 = new TmfEvent(fTimestamp3, fSource, fType3, fReference);
+        fContent3 = new TmfEventField(ITmfEventField.ROOT_ID, "Some other different content");
         fEvent3.setContent(fContent3);
 
         fStatsData = new TmfBaseStatisticsTree();

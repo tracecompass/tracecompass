@@ -85,18 +85,18 @@ public class LttngEventTypeTest extends TestCase {
         
         // Default construction with good arguments
         try {
-            tmpEventType = new LttngEventType("test", 0L, "test",  0, new String[1]);
+            tmpEventType = new LttngEventType("test", 0L, "test",  0, new String[] { "test" });
         }
-        catch( Exception e) { 
+        catch (Exception e) { 
             fail("Construction failed!");
         }
         
         // Copy constructor
         try {
-            tmpEventType = new LttngEventType("test", 0L, "test", 0, new String[1]);
+            tmpEventType = new LttngEventType("test", 0L, "test", 0, new String[] { "test" });
             tmpEventType2 = new LttngEventType(tmpEventType);
         }
-        catch( Exception e) { 
+        catch (Exception e) { 
             fail("Construction failed!");
         }
     }
@@ -109,7 +109,7 @@ public class LttngEventTypeTest extends TestCase {
         assertTrue("Cpu Id not what was expected!",firstEventCpu == tmpEventType.getCpuId() );
         assertTrue("Marker Name not what was expected!",firstEventMarker.equals((String)tmpEventType.getMarkerName()) );
         // Just test the non-nullity of labels
-        assertNotSame("getLabels returned null",null, tmpEventType.getLabels() );
+        assertNotSame("getLabels returned null",null, tmpEventType.getFieldNames() );
     }
     
     public void testToString() {

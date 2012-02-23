@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
@@ -469,7 +469,7 @@ public class Frame extends BasicFrame {
      * @param bounds a two items array that will receive bounds if found
      * @return true if both bounds not null
      */
-    public boolean findDateBounds(TmfTimestamp dateToFind, ITimeRange bounds[]) {
+    public boolean findDateBounds(ITmfTimestamp dateToFind, ITimeRange bounds[]) {
         if (hasTimeInfo()) {
             List<SDTimeEvent> timeArray = buildTimeArray();
             bounds[0] = null;
@@ -619,7 +619,7 @@ public class Frame extends BasicFrame {
                                 ExecutionOccurrence eo = (ExecutionOccurrence) o;
                                 if (eo.hasTimeInfo()) {
                                     int event = eo.getStartOccurrence();
-                                    TmfTimestamp time = eo.getStartTime();
+                                    ITmfTimestamp time = eo.getStartTime();
                                     SDTimeEvent f = new SDTimeEvent(time, event, eo);
                                     timeArray.add(f);
                                     if (executionOccurrencesWithTime == null) {

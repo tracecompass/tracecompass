@@ -9,14 +9,12 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventContent;
-import org.eclipse.linuxtools.lttng.core.event.LttngEventReference;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.core.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.core.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.lttng.core.trace.LTTngTrace;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventSource;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 
@@ -96,10 +94,10 @@ public class LttngEventTest extends TestCase {
 		@SuppressWarnings("unused")
 		LttngEvent 			testAnotherEvent = null;
         LttngTimestamp		testTime		= null;
-        TmfEventSource 		testSource 		= null;
+        String      		testSource 		= null;
         LttngEventType   	testType   		= null;
         LttngEventContent	testContent		= null;
-        LttngEventReference testReference 	= null;
+        String              testReference 	= null;
         JniEvent			testJniEvent 	= null;
 		String[]			testMarkerFields = null;
 		
@@ -107,13 +105,13 @@ public class LttngEventTest extends TestCase {
         try {
     			// In order to test LttngEvent, we need all these constructors/functions to work.
             	// Make sure to run their unit tests first!
-        		testMarkerFields = new String[1];
+        		testMarkerFields = new String[] { "test" };
                 testEvent 	= null;
                 testTime	= new LttngTimestamp(0L);
-                testSource 	= new TmfEventSource("test");
+                testSource 	= "test";
                 testType   	= new LttngEventType("test", 0L, "test", 0, testMarkerFields);
                 testContent	= new LttngEventContent(testEvent);
-                testReference = new LttngEventReference("test", "test");
+                testReference = "test";
         }
         catch( Exception e) {
                 fail("Cannot allocate an EventStream, junit failed!");
@@ -152,17 +150,17 @@ public class LttngEventTest extends TestCase {
     	
     	// These will test TMF functions but since we are expecting it to work...
     	assertEquals("Timestamp not what expected!",eventTimestamp,testEvent.getTimestamp().getValue());
-    	assertEquals("Source not what expected!",eventSource,testEvent.getSource().getSourceId());
-    	assertEquals("Reference not what expected!",eventReference,((String)testEvent.getReference().toString()) );
+    	assertEquals("Source not what expected!",eventSource,testEvent.getSource());
+    	assertEquals("Reference not what expected!", eventReference, testEvent.getReference());
     	
     	// These should be overridden functions
-    	assertEquals("Type not what expected!",eventType,testEvent.getType().getTypeId());
+    	assertEquals("Type not what expected!",eventType,testEvent.getType().getName());
     	assertEquals("Channel not what expected!",eventChannel,testEvent.getChannelName());
     	assertEquals("CpuId not what expected!",eventCpu,testEvent.getCpuId());
     	assertEquals("Marker not what expected!",eventMarker,testEvent.getMarkerName());
     	
     	// All events should have a parent
-    	assertNotNull("Trace parent for this event is null!", testEvent.getParentTrace() );
+    	assertNotNull("Trace parent for this event is null!", testEvent.getTrace() );
     	
     	// *** FIXME ***
     	// Depending from the Java version because of the "hashcode()" on String. 
@@ -179,7 +177,7 @@ public class LttngEventTest extends TestCase {
         LttngEventContent	testContent		= null;
         JniEvent			testJniEvent 	= null;
 		
-        String[] testMarkerFields = new String[1];
+        String[] testMarkerFields = new String[] { "test" };
         testType   	= new LttngEventType("test", 0L, "test", 0, testMarkerFields);
         testContent	= new LttngEventContent(testEvent);
         

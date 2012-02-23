@@ -20,12 +20,9 @@ import java.util.HashMap;
 import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventContent;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventField;
-import org.eclipse.linuxtools.lttng.core.event.LttngEventReference;
-import org.eclipse.linuxtools.lttng.core.event.LttngEventSource;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfNoSuchFieldException;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpoint;
@@ -35,10 +32,10 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
 public class LTTngTextTrace extends TmfTrace<LttngEvent> {
 	private LttngTimestamp                  eventTimestamp   = null;
-    private LttngEventSource                eventSource      = null;
+    private String                          eventSource      = null;
     private LttngEventType                  eventType        = null;
     private TextLttngEventContent           eventContent     = null;
-    private LttngEventReference             eventReference   = null;
+    private String                          eventReference   = null;
     // The actual event
     private  TextLttngEvent                 currentLttngEvent = null;             
     
@@ -64,10 +61,10 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
         traceTypes      = new HashMap<String, LttngEventType>();
         
         eventTimestamp        = new LttngTimestamp();
-        eventSource           = new LttngEventSource();
+        eventSource           = "Kernel Core"; //$NON-NLS-1$
         eventType             = new LttngEventType();
         eventContent          = new TextLttngEventContent(currentLttngEvent);
-        eventReference        = new LttngEventReference(this.getName());
+        eventReference        = getName();
         
         currentLttngEvent = new TextLttngEvent(this, eventTimestamp, eventSource, eventType, eventContent, eventReference);
         eventContent.setEvent(currentLttngEvent);
@@ -233,14 +230,10 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
     			// -1 is the skip the end of line (\n)
     			nbCharRead += (tmpContent.length()+1);
 	    		
-    			if ( (currentLttngEvent != null) && (currentLttngEvent.getContent().getRawContent() != null) ) {
+    			if ( (currentLttngEvent != null) && (currentLttngEvent.getContent().getMapContent() != null) ) {
     				currentLttngEvent.getContent().emptyContent();
     			}
     			
-	    		// EventSource is always the same for now :
-	    		eventSource.setSourceId("Kernel Core"); //$NON-NLS-1$
-	    		
-	    		
 	    		// Tracefile and marker are first in the file
 	    		// Sound like : 
 	    		//		kernel.syscall_entry:
@@ -293,10 +286,10 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
 	    		String fullTracePath = tmpContent.substring(tmpPrevIndex, tmpCurIndex ).trim();
 	    		/*System.out.println(fullTracePath);*/
 	    		
-	    		eventReference.setValue(fullTracePath);
 	    		String traceName = fullTracePath.substring(fullTracePath.lastIndexOf("/")+1).trim(); //$NON-NLS-1$
 	    		/*System.out.println(traceName);*/
-	    		eventReference.setTracepath(traceName);
+	    		eventReference = traceName;
+	    		currentLttngEvent.setReference(traceName);
 	    		
 	    		
 	    		// The next few fields are relatives to the state system (pid, ppid, etc...) we need to skip them.
@@ -379,7 +372,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
 		    			}
 		    			catch (NumberFormatException e) { }
 		    			
-		    			LttngEventField tmpField = new LttngEventField(eventContent, markerName, payload);
+		    			LttngEventField tmpField = new LttngEventField(markerName, payload);
 		    			fieldsMap.put(markerName, tmpField);
 		    			
 		    			tmpIndexBegin = tmpIndexEnd+1;
@@ -391,7 +384,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
 	    			markerName = ""; //$NON-NLS-1$
 	    			payload = ""; //$NON-NLS-1$
 	    			
-	    			LttngEventField tmpField = new LttngEventField(eventContent, markerName, payload);
+	    			LttngEventField tmpField = new LttngEventField(markerName, payload);
 	    			fieldsMap.put(markerName, tmpField);
 	    		}
 	    		
@@ -452,10 +445,10 @@ class TextLttngEvent extends LttngEvent {
 	
 	public TextLttngEvent(	TmfTrace<LttngEvent> parent,
 							LttngTimestamp timestamp, 
-							LttngEventSource source, 
+							String source, 
 							LttngEventType type, 
 							LttngEventContent content, 
-							LttngEventReference reference) 
+							String reference) 
 	{
 		super(parent, timestamp, source, type, content, reference, null);
 	}
@@ -463,12 +456,12 @@ class TextLttngEvent extends LttngEvent {
 	@SuppressWarnings("unchecked")
     public TextLttngEvent(TextLttngEvent oldEvent) {
 		this(
-		        (TmfTrace<LttngEvent>) oldEvent.getParentTrace(),
+		        (TmfTrace<LttngEvent>) oldEvent.getTrace(),
 				(LttngTimestamp)oldEvent.getTimestamp(), 
-				(LttngEventSource)oldEvent.getSource(), 
+				oldEvent.getSource(), 
 				(LttngEventType)oldEvent.getType(), 
 				(LttngEventContent)oldEvent.getContent(), 
-				(LttngEventReference)oldEvent.getReference()
+				oldEvent.getReference()
 			 );
 	}
 	
@@ -500,17 +493,17 @@ class TextLttngEventContent extends LttngEventContent {
     }
     
     public TextLttngEventContent(TextLttngEventContent oldContent) {
-    	this( (TextLttngEvent)oldContent.fParentEvent, oldContent.getRawContent());
+    	this(((TextLttngEvent) oldContent.getEvent()), oldContent.getMapContent());
     }
     
     @Override
     public LttngEventField[] getFields() {
-    	return getRawContent().values().toArray(new LttngEventField[getRawContent().size()]);
+    	return getMapContent().values().toArray(new LttngEventField[getMapContent().size()]);
     }
     
     @Override
     public LttngEventField getField(String name) {
-        LttngEventField returnedField = getRawContent().get(name);
+        LttngEventField returnedField = getMapContent().get(name);
         
         return returnedField;
     }
@@ -519,13 +512,13 @@ class TextLttngEventContent extends LttngEventContent {
     public LttngEventField getField(int position) {
     	LttngEventField returnedField = null;
     	String label = null;
-		try {
-			label = fParentEvent.getType().getLabel(position);
+//		try {
+			label = getEvent().getType().getFieldName(position);
 			returnedField = this.getField(label);
-		} 
-		catch (TmfNoSuchFieldException e) {
-			System.out.println("Invalid field position requested : " + position + ", ignoring (getField)."); //$NON-NLS-1$ //$NON-NLS-2$
-		}
+//		} 
+//		catch (TmfNoSuchFieldException e) {
+//			System.out.println("Invalid field position requested : " + position + ", ignoring (getField)."); //$NON-NLS-1$ //$NON-NLS-2$
+//		}
         
         return returnedField;
     }

@@ -16,6 +16,7 @@ import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.core.tracecontrol.utility.LiveTraceManager;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
+import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -52,11 +53,11 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> {
      * @param epoch
      * @param indexPageSize
      */
-    public LTTngExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, TmfTimestamp epoch, int indexPageSize) {
+    public LTTngExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, ITmfTimestamp epoch, int indexPageSize) {
         this(type, id, traces, TmfTimestamp.Zero, indexPageSize, false);
     }
 
-    public LTTngExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, TmfTimestamp epoch, int indexPageSize, boolean preIndexExperiment) {
+    public LTTngExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, ITmfTimestamp epoch, int indexPageSize, boolean preIndexExperiment) {
         super(type, id, traces, epoch, indexPageSize, preIndexExperiment);
     }
 
@@ -137,7 +138,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> {
             return null;
         }
         int trace = TmfExperimentContext.NO_TRACE;
-        TmfTimestamp timestamp = TmfTimestamp.BigCrunch;
+        ITmfTimestamp timestamp = TmfTimestamp.BigCrunch;
         if (eventArray.length == 1) {
             if (eventArray[0] != null) {
                 timestamp = eventArray[0].getTimestamp();
@@ -147,7 +148,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> {
             for (int i = 0; i < eventArray.length; i++) {
                 TmfEvent event = eventArray[i];
                 if (event != null && event.getTimestamp() != null) {
-                    TmfTimestamp otherTS = event.getTimestamp();
+                    ITmfTimestamp otherTS = event.getTimestamp();
                     if (otherTS.compareTo(timestamp, true) < 0) {
                         trace = i;
                         timestamp = otherTS;
@@ -200,7 +201,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> {
             ;
             return;
         }
-        for (ITmfTrace trace : fTraces) {
+        for (ITmfTrace<?> trace : fTraces) {
             if (trace instanceof LTTngTrace) {
                 JniTrace jniTrace = ((LTTngTrace) trace).getCurrentJniTrace();
                 if (jniTrace != null && (!jniTrace.isLiveTraceSupported() || !LiveTraceManager.isLiveTrace(jniTrace.getTracepath()))) {
@@ -230,7 +231,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> {
                             }
                             long startTime = Long.MAX_VALUE;
                             long endTime = Long.MIN_VALUE;
-                            for (ITmfTrace trace : getTraces()) {
+                            for (ITmfTrace<?> trace : getTraces()) {
                                 if (trace instanceof LTTngTrace) {
                                     LTTngTrace lttngTrace = (LTTngTrace) trace;
                                     JniTrace jniTrace = lttngTrace.getCurrentJniTrace();
