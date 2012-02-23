@@ -48,11 +48,15 @@ final public class Messages extends NLS {
     public static String TraceControl_DestroyConfirmationTitle;
     public static String TraceControl_DestroyConfirmationMessage;
 
-    public static String TraceControl_EnableChannelJob;
-    public static String TraceControl_DisableChannelJob;
-
     public static String TraceControl_StartSessionJob;
     public static String TraceControl_StopSessionJob;
+
+    public static String TraceControl_ChangeChannelStateJob;
+    public static String TraceControl_ChangeEventStateJob;
+    
+    public static String TraceControl_EnableEventsJob;
+    public static String TraceControl_EnableEventsFailure;
+    public static String TraceControl_DisableEventsJob;
     
     // Dialogs
     public static String TraceControl_NewDialogTitle;
@@ -75,7 +79,6 @@ final public class Messages extends NLS {
     public static String TraceControl_SessionPathAlreadyExistsError;
     public static String TraceControl_InvalidSessionPathError;
     public static String TraceControl_FileSubSystemError;
-
     
     public static String TraceControl_EnableChannelDialogTitle;
     public static String TraceControl_EnableChannelNameLabel;
@@ -90,7 +93,15 @@ final public class Messages extends NLS {
     public static String TraceControl_InvalidChannelNameError;
     public static String TraceControl_ChannelAlreadyExistsError;
     
-//    public static String TraceControl_CreateSessionNameTooltip;
+    public static String TraceControl_EnableEventsDialogTitle;
+    public static String TraceControl_EnableEventsSessionGroupName;
+    public static String TraceControl_EnableEventsChannelGroupName;
+    public static String TraceControl_EnableEventsSessionsTooltip;
+    public static String TraceControl_EnableEventsChannelsTooltip;
+    public static String TraceControl_EnableEventsNoSessionError;
+    public static String TraceControl_EnableEventsNoChannelError;
+
+    
 //    public static String TraceControl_CreateSessionPathLabel;
 //    public static String TraceControl_CreateSessionPathTooltip;
 //    public static String TraceControl_SessionAlreadyExistsError;

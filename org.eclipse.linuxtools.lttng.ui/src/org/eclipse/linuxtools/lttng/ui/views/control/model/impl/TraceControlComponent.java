@@ -39,7 +39,7 @@ public class TraceControlComponent implements ITraceControlComponent {
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The nambe of the component
+     * The name of the component
      */
     private String fName = ""; //$NON-NLS-1$
     /**
@@ -58,9 +58,8 @@ public class TraceControlComponent implements ITraceControlComponent {
      * The list if children components.
      */
     private List<ITraceControlComponent> fChildren = new ArrayList<ITraceControlComponent>();
-    
     /**
-     * The list of listeners to be notfied about changes.
+     * The list of listeners to be notified about changes.
      */
     private ListenerList fListeners = new ListenerList();
 
@@ -177,29 +176,6 @@ public class TraceControlComponent implements ITraceControlComponent {
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent#getControlService()
-     */
-    @Override
-    public ILttngControlService getControlService() {
-        if (getParent() != null) {
-            return getParent().getControlService();
-        }
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent#setControlService(org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService)
-     */
-    @Override
-    public void setControlService(ILttngControlService service) {
-        if (getParent() != null) {
-            getParent().setControlService(service);
-        }
-    }
-    
-    /*
-     * (non-Javadoc)
      * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent#getParent()
      */
     @Override
@@ -222,7 +198,7 @@ public class TraceControlComponent implements ITraceControlComponent {
      */
     @Override
     public ITraceControlComponent[] getChildren() {
-        return (ITraceControlComponent [])fChildren.toArray(new TraceControlComponent[fChildren.size()]);
+        return (ITraceControlComponent [])fChildren.toArray(new ITraceControlComponent[fChildren.size()]);
     }
 
     /*
@@ -251,6 +227,45 @@ public class TraceControlComponent implements ITraceControlComponent {
             }
         }
         return child;
+    }
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent#getChildren(java.lang.Class)
+     */
+    @Override
+    public List<ITraceControlComponent> getChildren(Class<? extends ITraceControlComponent> clazz) {
+       List<ITraceControlComponent> list = new ArrayList<ITraceControlComponent>();
+
+       for (Iterator<ITraceControlComponent> iterator = fChildren.iterator(); iterator.hasNext();) {
+           ITraceControlComponent child = (ITraceControlComponent) iterator.next();
+           if (child.getClass() == clazz) {
+               list.add(child);
+           }
+       }
+       return list;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent#getControlService()
+     */
+    @Override
+    public ILttngControlService getControlService() {
+        if (getParent() != null) {
+            return getParent().getControlService();
+        }
+        return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent#setControlService(org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService)
+     */
+    @Override
+    public void setControlService(ILttngControlService service) {
+        if (getParent() != null) {
+            getParent().setControlService(service);
+        }
     }
 
     // ------------------------------------------------------------------------

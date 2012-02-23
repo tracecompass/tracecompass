@@ -11,6 +11,8 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.control.model.impl;
 
+import java.util.List;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -171,6 +173,14 @@ public class TraceSessionComponent extends TraceControlComponent {
         return null;
     } 
 
+    /**
+     * @return all available domains of this session.
+     */
+    public TraceDomainComponent[] getDomains() {
+        List<ITraceControlComponent> sessions = getChildren(TraceDomainComponent.class);
+        return (TraceDomainComponent[])sessions.toArray(new TraceDomainComponent[sessions.size()]);
+    }
+    
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -232,4 +242,24 @@ public class TraceSessionComponent extends TraceControlComponent {
         getControlService().stopSession(getName(), monitor);
     }
 
+    /**
+     * Enables a list of events with no additional parameters.
+     * @param eventNames - a list of event names to enabled.
+     * @param isKernel -  a flag for indicating kernel or UST.
+     * @throws ExecutionException
+     */
+    public void enableEvent(List<String> eventNames, boolean isKernel) throws ExecutionException {
+        enableEvent(eventNames, isKernel, new NullProgressMonitor());
+    }
+
+    /**
+     * Enables a list of events with no additional parameters.
+     * @param eventNames - a list of event names to enabled.
+     * @param isKernel -  a flag for indicating kernel or UST.
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void enableEvent(List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().enableEvent(getName(), null, eventNames, isKernel, monitor);
+    }
 }

@@ -73,44 +73,47 @@ public class CreateChannelOnSessionHandler extends AbstractHandler {
 
         final ICreateChannelOnSessionDialog dialog = new CreateChannelDialog(window.getShell());
 
-        if (dialog.open() == Window.OK) {
-            Job job = new Job(Messages.TraceControl_EnableChannelJob) {
-                @Override
-                protected IStatus run(IProgressMonitor monitor) {
-                    String errorString = null;
-
-                    List<String> channelNames = new ArrayList<String>();                    
-                    TraceDomainComponent newDomain = new TraceDomainComponent("dummy", fSession); //$NON-NLS-1$
-                    channelNames.add(dialog.getChannelInfo().getName());
-                    newDomain.setIsKernel(dialog.isKernel());
-
-                    try {
-                        newDomain.enableChannels(channelNames, dialog.getChannelInfo(), monitor);
-                    } catch (ExecutionException e) {
-                        if (errorString == null) {
-                            errorString = new String();
-                        } 
-                        errorString += e.toString() + "\n"; //$NON-NLS-1$
-                    }
-
-                    // get session configuration in all cases
-                    try {
-                        fSession.getConfigurationFromNode(monitor);
-                    } catch (ExecutionException e) {
-                        if (errorString == null) {
-                            errorString = new String();
-                        }
-                        errorString += Messages.TraceControl_ListSessionFailure + ": " + e.toString();  //$NON-NLS-1$ 
-                    } 
-
-                    if (errorString != null) {
-                        return new Status(Status.ERROR, LTTngUiPlugin.PLUGIN_ID, errorString);
-                    }
-                    return Status.OK_STATUS;
-                }};
-                job.setUser(true);
-                job.schedule();
+        if (dialog.open() != Window.OK) {
+            return null;
         }
+
+        Job job = new Job(Messages.TraceControl_ChangeChannelStateJob) {
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+                String errorString = null;
+
+                List<String> channelNames = new ArrayList<String>();                    
+                TraceDomainComponent newDomain = new TraceDomainComponent("dummy", fSession); //$NON-NLS-1$
+                channelNames.add(dialog.getChannelInfo().getName());
+                newDomain.setIsKernel(dialog.isKernel());
+
+                try {
+                    newDomain.enableChannels(channelNames, dialog.getChannelInfo(), monitor);
+                } catch (ExecutionException e) {
+                    if (errorString == null) {
+                        errorString = new String();
+                    } 
+                    errorString += e.toString() + "\n"; //$NON-NLS-1$
+                }
+
+                // get session configuration in all cases
+                try {
+                    fSession.getConfigurationFromNode(monitor);
+                } catch (ExecutionException e) {
+                    if (errorString == null) {
+                        errorString = new String();
+                    }
+                    errorString += Messages.TraceControl_ListSessionFailure + ": " + e.toString();  //$NON-NLS-1$ 
+                } 
+
+                if (errorString != null) {
+                    return new Status(Status.ERROR, LTTngUiPlugin.PLUGIN_ID, errorString);
+                }
+                return Status.OK_STATUS;
+            }
+        };
+        job.setUser(true);
+        job.schedule();
 
         return null;
     }

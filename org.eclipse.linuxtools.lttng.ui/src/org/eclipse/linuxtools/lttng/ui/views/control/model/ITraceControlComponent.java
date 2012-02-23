@@ -25,7 +25,7 @@ import org.eclipse.swt.graphics.Image;
  * </p>
  */
 public interface ITraceControlComponent extends IAdaptable {
-    
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -34,7 +34,6 @@ public interface ITraceControlComponent extends IAdaptable {
      * @return the name of the component
      */
     public String getName();
-    
     /**
      * Sets the name of the component to the given value.
      * @param name - name to set
@@ -55,11 +54,11 @@ public interface ITraceControlComponent extends IAdaptable {
      * @param image - image to the image location
      */
     public void setImage(Image image);
+
     /**
      * @return tool tip with information about the component.
      */
     public String getToolTip();
-    
     /**
      * Sets the tool tip with information about the component.
      * @param toolTip - the tool tip to set.
@@ -80,7 +79,6 @@ public interface ITraceControlComponent extends IAdaptable {
      * @return returns the parent component.
      */
     public ITraceControlComponent getParent();
-    
     /**
      * Sets the parent component.
      * @param parent - the parent to set.
@@ -91,31 +89,35 @@ public interface ITraceControlComponent extends IAdaptable {
      * @return the children components
      */
     public ITraceControlComponent[] getChildren();
-    
     /**
      * Sets the children components.
      * @param children - the children to set.
      */
     public void setChildren(List<ITraceControlComponent> children);
-    
     /**
      * Returns the child component with given name.
      * @param name - name of child to find.
      * @return child component or null.
      */
     public ITraceControlComponent getChild(String name);
+    /**
+     * Gets children for given class type.
+     * @param clazz - a class type to get
+     * @return list of trace control components matching given class type. 
+     */
+    public List<ITraceControlComponent> getChildren(Class<? extends ITraceControlComponent> clazz);
 
     /**
      * @return the LTTng control service implementation.
      */
     public ILttngControlService getControlService();
-    
+
     /**
      * Sets the LTTng control service implementation.
      * @param service - the service to set.
      */
     public void setControlService(ILttngControlService service); 
-    
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

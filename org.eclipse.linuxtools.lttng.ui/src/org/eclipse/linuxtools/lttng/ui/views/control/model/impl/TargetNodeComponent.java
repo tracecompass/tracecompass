@@ -11,6 +11,8 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.control.model.impl;
 
+import java.util.List;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -189,6 +191,19 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
         return fRemoteProxy;
     }
 
+    /**
+     * @return all available sessions.
+     */
+    public TraceSessionComponent[] getSessions() {
+        List<ITraceControlComponent> compenents = getChildren(TraceSessionGroup.class);
+        if (compenents.size() > 0) {
+            TraceSessionGroup group = (TraceSessionGroup)compenents.get(0); 
+            List<ITraceControlComponent> sessions = group.getChildren(TraceSessionComponent.class);
+            return (TraceSessionComponent[])sessions.toArray(new TraceSessionComponent[sessions.size()]);
+        }
+        return new TraceSessionComponent[0];
+    }
+    
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

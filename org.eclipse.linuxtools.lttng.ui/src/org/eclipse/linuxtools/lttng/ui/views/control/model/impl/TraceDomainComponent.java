@@ -99,6 +99,13 @@ public class TraceDomainComponent extends TraceControlComponent {
     }
     
     /**
+     * @return session from parent
+     */
+    public TraceSessionComponent getSession() {
+       return (TraceSessionComponent)getParent(); 
+    }
+
+    /**
      * @return true if domain is kernel, false for UST
      */
     public boolean isKernel() {
@@ -111,6 +118,14 @@ public class TraceDomainComponent extends TraceControlComponent {
      */
     public void setIsKernel(boolean isKernel) {
         fDomainInfo.setIsKernel(isKernel);
+    }
+    
+    /**
+     * @return returns all available channels for this domain.
+     */
+    public TraceChannelComponent[] getChannels() {
+        List<ITraceControlComponent> channels = getChildren(TraceChannelComponent.class);
+        return (TraceChannelComponent[])channels.toArray(new TraceChannelComponent[channels.size()]);
     }
 
     // ------------------------------------------------------------------------

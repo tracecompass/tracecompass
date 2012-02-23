@@ -121,5 +121,27 @@ public interface ILttngControlService {
       * @throws ExecutionException
       */
     public void disableChannel(String sessionName, List<String> channelNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException;
+
+    /**
+     * Enables a list of events with no additional parameters.
+     * @param sessionName - a session name
+     * @param channelName - a channel name (null for default channel)
+     * @param eventNames - a list of event names to enabled.
+     * @param isKernel -  a flag for indicating kernel or UST.
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void enableEvent(String sessionName, String channelName, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException;
     
+    /**
+     * Disables a list of events with no additional parameters.
+     * @param sessionName - a session name
+     * @param channelName - a channel name (null for default channel)
+     * @param eventNames - a list of event names to enabled.
+     * @param isKernel -  a flag for indicating kernel or UST.
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void disableEvent(String sessionName, String channelName, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException;
+
 }

@@ -83,10 +83,56 @@ public class LTTngControlService implements ILttngControlService {
      */
     private final static String COMMAND_ENABLE_CHANNEL = CONTROL_COMMAND + " enable-channel "; //$NON-NLS-1$
     /**
-     * Command to destroy a session. 
+     * Command to disable a channel. 
      */
     private final static String COMMAND_DISABLE_CHANNEL = CONTROL_COMMAND + " disable-channel "; //$NON-NLS-1$
+    /**
+     * Command to enable a event. 
+     */
+    private final static String COMMAND_ENABLE_EVENT = CONTROL_COMMAND + " enable-event "; //$NON-NLS-1$
+    /**
+     * Command to disable a event. 
+     */
+    private final static String COMMAND_DISABLE_EVENT = CONTROL_COMMAND + " disable-event "; //$NON-NLS-1$
 
+    // Command options constants 
+    /**
+     * Command line option for kernel tracer.
+     */
+    private final static String OPTION_KERNEL = " -k "; //$NON-NLS-1$
+    /**
+     * Command line option for UST tracer.
+     */
+    private final static String OPTION_UST = " -u "; //$NON-NLS-1$
+    /**
+     * Command line option for specifying a session.
+     */
+    private final static String OPTION_SESSION = " -s ";  //$NON-NLS-1$
+    /**
+     * Command line option for specifying a channel.
+     */
+    private final static String OPTION_CHANNEL = " -c ";  //$NON-NLS-1$
+    /**
+     * Optional command line option for configuring a channel's overwrite mode.
+     */
+    private final static String OPTION_OVERWRITE = " --overwrite ";  //$NON-NLS-1$ 
+    /**
+     * Optional command line option for configuring a channel's number of sub buffers.
+     */
+    private final static String OPTION_NUM_SUB_BUFFERS = " --num-subbuf ";  //$NON-NLS-1$
+    /**
+     * Optional command line option for configuring a channel's sub buffer size.
+     */
+    private final static String OPTION_SUB_BUFFER_SIZE = " --subbuf-size ";  //$NON-NLS-1$
+    /**
+     * Optional command line option for configuring a channel's switch timer interval.
+     */
+    private final static String OPTION_SWITCH_TIMER = " --switch-timer ";  //$NON-NLS-1$
+    /**
+     * Optional command line option for configuring a channel's read timer interval.
+     */
+    private final static String OPTION_READ_TIMER = " --read-timer ";  //$NON-NLS-1$
+    
     // Parsing constants
     /**
      * Pattern to match for error output
@@ -125,8 +171,7 @@ public class LTTngControlService implements ILttngControlService {
      */
     private final static Pattern EVENT_SECTION_PATTERN = Pattern.compile("\\s*Events\\:"); //$NON-NLS-1$
     /**
-     * Pattern to match for event information (no enabled events) (lttng list
-     * <session>)
+     * Pattern to match for event information (no enabled events) (lttng list <session>)
      */
     //    private final static String EVENT_NONE_PATTERN = "\\s+None"; //$NON-NLS-1$
     /**
@@ -577,38 +622,37 @@ public class LTTngControlService implements ILttngControlService {
         }
 
         if (isKernel) {
-            command.append(" -k ");
+            command.append(OPTION_KERNEL);
         } else {
-            command.append(" -u ");
+            command.append(OPTION_UST);
         }
 
-        command.append(" -s "); //$NON-NLS-1$
+        command.append(OPTION_SESSION);
         command.append(newSessionName);
 
         if (info != null) {
 //            --discard            Discard event when buffers are full (default)
-            // TODO discard
 
 //            --overwrite          Flight recorder mode
             if (info.isOverwriteMode()) {
-                command.append(" --overwrite ");
+                command.append(OPTION_OVERWRITE);
             }
 //            --subbuf-size SIZE   Subbuffer size in bytes
 //                                     (default: 4096, kernel default: 262144)
-            command.append(" --subbuf-size ");
+            command.append(OPTION_SUB_BUFFER_SIZE);
             command.append(String.valueOf(info.getSubBufferSize()));
 
 //            --num-subbuf NUM     Number of subbufers
 //                                     (default: 8, kernel default: 4)
-            command.append(" --num-subbuf ");
+            command.append(OPTION_NUM_SUB_BUFFERS);
             command.append(String.valueOf(info.getNumberOfSubBuffers()));
             
 //            --switch-timer USEC  Switch timer interval in usec (default: 0)
-            command.append(" --switch-timer ");
+            command.append(OPTION_SWITCH_TIMER);
             command.append(String.valueOf(info.getSwitchTimer()));
 
 //            --read-timer USEC    Read timer interval in usec (default: 200)
-            command.append(" --read-timer ");
+            command.append(OPTION_READ_TIMER);
             command.append(String.valueOf(info.getReadTimer()));
         } 
 
@@ -617,7 +661,6 @@ public class LTTngControlService implements ILttngControlService {
         if (isError(result)) {
             throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
         }
-
     }
 
     /*
@@ -625,7 +668,7 @@ public class LTTngControlService implements ILttngControlService {
      * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#disableChannel(java.lang.String, java.util.List, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    public void disableChannel(String sessionName, List<String> channelNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException{
+    public void disableChannel(String sessionName, List<String> channelNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
         
         // no channels to enable
         if (channelNames.size() == 0) {
@@ -645,12 +688,12 @@ public class LTTngControlService implements ILttngControlService {
         }
 
         if (isKernel) {
-            command.append(" -k ");
+            command.append(OPTION_KERNEL);
         } else {
-            command.append(" -u ");
+            command.append(OPTION_UST);
         }
 
-        command.append(" -s "); //$NON-NLS-1$
+        command.append(OPTION_SESSION);
         command.append(newSessionName);
 
         ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
@@ -660,6 +703,94 @@ public class LTTngControlService implements ILttngControlService {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#enableEvent(java.lang.String, java.lang.String, java.util.List, boolean, org.eclipse.core.runtime.IProgressMonitor)
+     */
+    @Override
+    public void enableEvent(String sessionName, String channelName, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
+        // no channels to enable
+        if (eventNames.size() == 0) {
+            return;
+        }
+
+        String newSessionName = formatParameter(sessionName);
+        
+        StringBuffer command = new StringBuffer(COMMAND_ENABLE_EVENT);
+
+        for (Iterator<String> iterator = eventNames.iterator(); iterator.hasNext();) {
+            String event = (String) iterator.next();
+            command.append(event);
+            if (iterator.hasNext()) {
+                command.append(","); //$NON-NLS-1$
+            }
+        }
+
+        if (isKernel) {
+            command.append(OPTION_KERNEL);
+        } else {
+            command.append(OPTION_UST);
+        }
+
+        command.append(OPTION_SESSION);
+        command.append(newSessionName);
+
+        if (channelName != null) {
+            command.append(OPTION_CHANNEL);
+            command.append(channelName);
+        }
+
+        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
+        
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#disableEvent(java.lang.String, java.lang.String, java.util.List, boolean, org.eclipse.core.runtime.IProgressMonitor)
+     */
+    @Override
+    public void disableEvent(String sessionName, String channelName, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
+        // no channels to enable
+        if (eventNames.size() == 0) {
+            return;
+        }
+
+        String newSessionName = formatParameter(sessionName);
+
+        StringBuffer command = new StringBuffer(COMMAND_DISABLE_EVENT);
+
+        for (Iterator<String> iterator = eventNames.iterator(); iterator.hasNext();) {
+            String event = (String) iterator.next();
+            command.append(event);
+            if (iterator.hasNext()) {
+                command.append(","); //$NON-NLS-1$
+            }
+        }
+
+        if (isKernel) {
+            command.append(OPTION_KERNEL);
+        } else {
+            command.append(OPTION_UST);
+        }
+
+        command.append(OPTION_SESSION);
+        command.append(newSessionName);
+
+        if (channelName != null) {
+            command.append(OPTION_CHANNEL);
+            command.append(channelName);
+        }
+
+        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
+        
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+    }
+    
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------

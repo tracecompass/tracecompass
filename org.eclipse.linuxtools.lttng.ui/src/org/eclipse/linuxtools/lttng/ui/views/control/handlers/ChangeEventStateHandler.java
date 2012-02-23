@@ -29,7 +29,7 @@ import org.eclipse.linuxtools.lttng.ui.views.control.ControlView;
 import org.eclipse.linuxtools.lttng.ui.views.control.Messages;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceEnablement;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceChannelComponent;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceDomainComponent;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceEventComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -37,33 +37,25 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * <b><u>ChangeChannelStateHandler</u></b>
+ * <b><u>EnableChannelHandler</u></b>
  * <p>
- * Abstract command handler implementation to enable or disabling a trace channel.
+ * Base Command handler implementation to enable or disabling a trace channel.
  * </p>
  */
-abstract public class ChangeChannelStateHandler extends AbstractHandler {
+abstract public class ChangeEventStateHandler extends AbstractHandler {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * Kernel domain component reference.
+     * Channel component reference.
      */
-    protected TraceDomainComponent fKernelDomain = null;
-    /**
-     * UST domain component reference.
-     */
-    protected TraceDomainComponent fUstDomain = null;
+    protected TraceChannelComponent fChannel = null;
     /**
      * The list of kernel channel components the command is to be executed on. 
      */
-    protected List<TraceChannelComponent> fKernelChannels = new ArrayList<TraceChannelComponent>();
-    /**
-     * The list of UST channel components the command is to be executed on. 
-     */
-    protected List<TraceChannelComponent> fUstChannels = new ArrayList<TraceChannelComponent>();
-
+    protected List<TraceEventComponent> fEvents = new ArrayList<TraceEventComponent>();
+    
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -76,13 +68,13 @@ abstract public class ChangeChannelStateHandler extends AbstractHandler {
     // Operations
     // ------------------------------------------------------------------------
     /**
-     * Changes the state of the given channels.
-     * @param domain - the domain of the channels.
-     * @param channelNames - a list of channel names 
+     * Change the state
+     * @param channel - channel of events to be enabled
+     * @param eventNames - list event names  
      * @param monitor - a progress monitor
      * @throws ExecutionException
      */
-    abstract protected void changeState(TraceDomainComponent domain, List<String> channelNames, IProgressMonitor monitor) throws ExecutionException; 
+    abstract protected void changeState(TraceChannelComponent channel, List<String> eventNames, IProgressMonitor monitor) throws ExecutionException; 
 
     /*
      * (non-Javadoc)
@@ -105,41 +97,20 @@ abstract public class ChangeChannelStateHandler extends AbstractHandler {
                 TraceSessionComponent session = null;
 
                 try {
-                    if (fKernelDomain != null) {
-                        session = (TraceSessionComponent)fKernelDomain.getParent();
+                    if (fChannel != null) {
+                        session = fChannel.getSession();
                         List<String> channelNames = new ArrayList<String>();
-                        for (Iterator<TraceChannelComponent> iterator = fKernelChannels.iterator(); iterator.hasNext();) {
+                        for (Iterator<TraceEventComponent> iterator = fEvents.iterator(); iterator.hasNext();) {
                             // Enable all selected channels which are disabled
-                            TraceChannelComponent channel = (TraceChannelComponent) iterator.next();
+                            TraceEventComponent channel = (TraceEventComponent) iterator.next();
                             channelNames.add(channel.getName());
                         }
                         
-                        changeState(fKernelDomain, channelNames, monitor);
+                        changeState(fChannel, channelNames, monitor);
 
-                        for (Iterator<TraceChannelComponent> iterator = fKernelChannels.iterator(); iterator.hasNext();) {
+                        for (Iterator<TraceEventComponent> iterator = fEvents.iterator(); iterator.hasNext();) {
                             // Enable all selected channels which are disabled
-                            TraceChannelComponent channel = (TraceChannelComponent) iterator.next();
-                            channel.setState(getNewState());
-                        }
-                    }
-
-                    if (fUstDomain != null) {
-                        if (session == null) {
-                            session = (TraceSessionComponent)fUstDomain.getParent();
-                        }
-
-                        List<String> channelNames = new ArrayList<String>();
-                        for (Iterator<TraceChannelComponent> iterator = fUstChannels.iterator(); iterator.hasNext();) {
-                            // Enable all selected channels which are disabled
-                            TraceChannelComponent channel = (TraceChannelComponent) iterator.next();
-                            channelNames.add(channel.getName());
-                        }
-
-                        changeState(fUstDomain, channelNames, monitor);
-                        
-                        for (Iterator<TraceChannelComponent> iterator = fUstChannels.iterator(); iterator.hasNext();) {
-                            // Enable all selected channels which are disabled
-                            TraceChannelComponent channel = (TraceChannelComponent) iterator.next();
+                            TraceEventComponent channel = (TraceEventComponent) iterator.next();
                             channel.setState(getNewState());
                         }
                     }
@@ -193,49 +164,49 @@ abstract public class ChangeChannelStateHandler extends AbstractHandler {
         if (selection instanceof StructuredSelection) {
             StructuredSelection structered = ((StructuredSelection) selection);
             String sessionName = null;
+            String channelName = null;
+            
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
                 Object element = (Object) iterator.next();
                  
-                if (element instanceof TraceChannelComponent) {
+                if (element instanceof TraceEventComponent) {
                     
                     // Add only TraceChannelComponents that are disabled
-                    TraceChannelComponent channel = (TraceChannelComponent) element;
+                    TraceEventComponent channel = (TraceEventComponent) element;
                     if (sessionName == null) {
                         sessionName = String.valueOf(channel.getSessionName());
                     }
+                    
+                    if (fChannel == null) {
+                        fChannel = (TraceChannelComponent)channel.getParent();
+                    }
 
-                    // Enable command only for channels of same session
-                    if (!sessionName.equals(channel.getSessionName())) {
+                    if (channelName == null) {
+                        channelName = channel.getChannelName();
+                    }
+                    
+                    // Enable command only for events of same session, same channel and domain
+                    if ((!sessionName.equals(channel.getSessionName())) ||
+                        (!channelName.equals(channel.getChannelName())) ||
+                        (fChannel.isKernel() != channel.isKernel())) {
                         reset();
                         break;
                     }
 
                     if ((channel.getState() != getNewState())) {
-                        if (channel.isKernel()) {
-                            fKernelChannels.add(channel);
-                            if (fKernelDomain == null) {
-                                fKernelDomain = (TraceDomainComponent) channel.getParent();
-                            }
-                        } else {
-                            fUstChannels.add(channel);
-                            if (fUstDomain == null) {
-                                fUstDomain = (TraceDomainComponent) channel.getParent();
-                            }
-                        }
+                        fEvents.add(channel);
                     }
                 }
             }
         }
-        return fKernelChannels.size() + fUstChannels.size() > 0;
+        return fEvents.size() > 0;
     }
 
     /**
      * Reset members
      */
     private void reset() {
-        fKernelDomain = null;
-        fUstDomain = null;
-        fKernelChannels.clear();
-        fUstChannels.clear();
+        fChannel = null;
+        fEvents.clear();
     }
 }

@@ -85,7 +85,7 @@ public class TraceSessionGroup extends TraceControlComponent {
      * @return the session information
      * throws ExecutionExecption
      */
-    public void createSession(final String sessionName, final String sessionPath) throws ExecutionException {
+    public void createSession(String sessionName, String sessionPath) throws ExecutionException {
         createSession(sessionName, sessionPath, new NullProgressMonitor());
     }
     
@@ -97,7 +97,7 @@ public class TraceSessionGroup extends TraceControlComponent {
      * @return the session information
      * throws ExecutionExecption
      */
-    public void createSession(final String sessionName, final String sessionPath, IProgressMonitor monitor) throws ExecutionException {
+    public void createSession(String sessionName, String sessionPath, IProgressMonitor monitor) throws ExecutionException {
         ISessionInfo sessionInfo = getControlService().createSession(sessionName, sessionPath, monitor);
         if (sessionInfo != null) {
             TraceSessionComponent session = new TraceSessionComponent(sessionInfo.getName(), TraceSessionGroup.this);
@@ -108,22 +108,21 @@ public class TraceSessionGroup extends TraceControlComponent {
 
     /**
      * Destroys a session with given session name. 
-     * @param sessionName - a session name to destroy
+     * @param session - a session component to destroy
      * throws ExecutionExecption
      */
-    public void destroySession(final String sessionName) throws ExecutionException {
-        destroySession(sessionName, new NullProgressMonitor());
+    public void destroySession(TraceSessionComponent session) throws ExecutionException {
+        destroySession(session, new NullProgressMonitor());
     }
     
     /**
      * Destroys a session with given session name. 
-     * @param sessionName - a session name to destroy
+     * @param session - a session component to destroy
      * @param monitor - a progress monitor
      * throws ExecutionExecption
      */
-    public void destroySession(final String sessionName, IProgressMonitor monitor) throws ExecutionException {
-        getControlService().destroySession(sessionName, monitor);
-        ITraceControlComponent session = getChild(sessionName);
+    public void destroySession(TraceSessionComponent session, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().destroySession(session.getName(), monitor);
         session.removeAllChildren();
         removeChild(session);
     }

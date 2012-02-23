@@ -508,7 +508,24 @@
             id="org.eclipse.linuxtools.lttng.ui.commands.control.stop"
             name="%commands.control.stop">
       </command>
-      
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.control.category"
+            description="%commands.control.enable.assign.description"
+            id="org.eclipse.linuxtools.lttng.ui.commands.control.assign.event"
+            name="%commands.control.enable.event">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.control.category"
+            description="%commands.control.enable.event.description"
+            id="org.eclipse.linuxtools.lttng.ui.commands.control.enable.event"
+            name="%commands.control.enable.event">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.control.category"
+            description="%commands.control.disable.event.description"
+            id="org.eclipse.linuxtools.lttng.ui.commands.control.disable.event"
+            name="%commands.control.disable.event">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -555,6 +572,13 @@
                label="%commands.control.stop"
                style="push">
          </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.commands.control.destroySession"
+               icon="icons/elcl16/delete_trace.gif"
+               label="%commands.control.destroy"
+               style="push">
+         </command>
+         
       </menuContribution>
       <menuContribution
             allPopups="false"
@@ -711,7 +735,6 @@
                </with>
                </visibleWhen>
          </command>
-         
          <command
                commandId="org.eclipse.linuxtools.lttng.ui.commands.control.enableChannel"
                icon="icons/elcl16/edit.gif"
@@ -748,7 +771,6 @@
                </with>
             </visibleWhen>
          </command>
-         
          <command
                commandId="org.eclipse.linuxtools.lttng.ui.commands.control.start"
                icon="icons/elcl16/start_trace.gif"
@@ -767,7 +789,6 @@
                </with>
             </visibleWhen>
          </command>
-
          <command
                commandId="org.eclipse.linuxtools.lttng.ui.commands.control.stop"
                icon="icons/elcl16/pause_trace.gif"
@@ -786,7 +807,64 @@
                </with>
             </visibleWhen>
          </command>
-         
+
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.commands.control.assign.event"
+               icon="icons/elcl16/edit.gif"
+               label="%commands.control.enable.event"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        operator="or">
+                     <instanceof
+                           value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.BaseEventComponent">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.commands.control.enable.event"
+               icon="icons/elcl16/edit.gif"
+               label="%commands.control.enable.event"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        operator="or">
+                     <instanceof
+                           value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceEventComponent">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.commands.control.disable.event"
+               icon="icons/elcl16/edit.gif"
+               label="%commands.control.disable.event"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        operator="or">
+                     <instanceof
+                           value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceEventComponent">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+
       </menuContribution>
       
    </extension>
@@ -966,6 +1044,54 @@
                      operator="or">
                   <instanceof
                         value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+      </handler>
+
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.control.handlers.AssignEventHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.commands.control.assign.event">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.BaseEventComponent">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+      </handler>
+
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.control.handlers.EnableEventHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.commands.control.enable.event">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceEventComponent">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+      </handler>
+
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.control.handlers.DisableEventHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.commands.control.disable.event">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceEventComponent">
                   </instanceof>
                </iterate>
             </with>

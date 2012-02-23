@@ -68,29 +68,38 @@ public class DestroySessionHandler extends AbstractHandler {
             return false;
         }
         // Get user confirmation
-        if (MessageDialog.openConfirm(window.getShell(), 
+        if (!MessageDialog.openConfirm(window.getShell(), 
                 Messages.TraceControl_DestroyConfirmationTitle, 
                 Messages.TraceControl_DestroyConfirmationMessage)) {
 
-            Job job = new Job(Messages.TraceControl_DestroySessionJob) {
-                @Override
-                protected IStatus run(IProgressMonitor monitor) {
-                    try {
-                        for (Iterator<TraceSessionComponent> iterator = fSessions.iterator(); iterator.hasNext();) {
-                            // Destroy all selected sessions
-                            TraceSessionComponent session = (TraceSessionComponent) iterator.next();
-                            TraceSessionGroup sessionGroup = (TraceSessionGroup)session.getParent();
-                            sessionGroup.destroySession(session.getName(), monitor);
-                        }
-                    } catch (ExecutionException e) {
-                        return new Status(Status.ERROR, LTTngUiPlugin.PLUGIN_ID, e.toString());
-                    }  
-                    return Status.OK_STATUS;
-                }
-            };
-            job.setUser(true);
-            job.schedule();
+            return null;
+            
         }
+
+        Job job = new Job(Messages.TraceControl_DestroySessionJob) {
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+                try {
+                    // Make a copy of the list of sessions to avoid ConcurrentModificationException when iterating 
+                    // over fSessions, since fSessions is modified in another thread triggered by the tree viewer refresh 
+                    // after removing a session.
+                    TraceSessionComponent[] sessions = (TraceSessionComponent[])fSessions.toArray(new TraceSessionComponent[fSessions.size()]);
+
+                    for (int i = 0; i < sessions.length; i++) {
+                        // Destroy all selected sessions
+                        TraceSessionComponent session = sessions[i];
+                        TraceSessionGroup sessionGroup = (TraceSessionGroup)session.getParent();
+                        sessionGroup.destroySession(session, monitor);
+                    }
+                } catch (ExecutionException e) {
+                    return new Status(Status.ERROR, LTTngUiPlugin.PLUGIN_ID, e.toString());
+                }  
+                return Status.OK_STATUS;
+            }
+        };
+        job.setUser(true);
+        job.schedule();
+
         return null;
     }
 

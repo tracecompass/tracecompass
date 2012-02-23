@@ -79,52 +79,53 @@ public class NewConnectionHandler extends AbstractHandler {
         // Open dialog box for the node name and address
         INewConnectionDialog dialog = new NewConnectionDialog(window.getShell(), fRoot, hosts);
 
-        if (dialog.open() == Window.OK) {
+        if (dialog.open() != Window.OK) {
+            return null;
+        }
 
-            String hostName = dialog.getConnectionName(); 
-            String hostAddress = dialog.getHostName();
+        String hostName = dialog.getConnectionName(); 
+        String hostAddress = dialog.getHostName();
 
-            // get the singleton RSE registry
-            IHost host = null;
+        // get the singleton RSE registry
+        IHost host = null;
 
-            for (int i = 0; i < hosts.length; i++) {
-                if (hosts[i].getAliasName().equals(hostName)) {
-                    host = hosts[i];
-                    break;
-                }
+        for (int i = 0; i < hosts.length; i++) {
+            if (hosts[i].getAliasName().equals(hostName)) {
+                host = hosts[i];
+                break;
+            }
+        }
+
+        if (host == null) {
+            // if there's no host then we will create it
+            try {
+                // create the host object as an SSH Only connection
+                host = registry.createHost(
+                        sysType,       //System Type Name
+                        hostName,      //Connection name
+                        hostAddress,   //IP Address        
+                        "Connection to Host"); //description //$NON-NLS-1$
+            }
+            catch (Exception e) {
+                MessageDialog.openError(window.getShell(),
+                        Messages.TraceControl_EclipseCommandFailure,
+                        Messages.TraceControl_NewNodeCreationFailure + " (" + hostName + ", " + hostAddress + ")" + ":\n" + e.toString());  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                return null;
+            }
+        }
+
+        if (host != null) {
+            // successful creation of host
+            TargetNodeComponent node = null;
+            if (!fRoot.containsChild(hostName)) {
+                node = new TargetNodeComponent(hostName, fRoot, host);
+                fRoot.addChild(node);
+            }
+            else {
+                node = (TargetNodeComponent)fRoot.getChild(hostName);
             }
 
-            if (host == null) {
-                // if there's no host then we will create it
-                try {
-                    // create the host object as an SSH Only connection
-                    host = registry.createHost(
-                            sysType,       //System Type Name
-                            hostName,      //Connection name
-                            hostAddress,   //IP Address        
-                            "Connection to Host"); //description //$NON-NLS-1$
-                }
-                catch (Exception e) {
-                    MessageDialog.openError(window.getShell(),
-                            Messages.TraceControl_EclipseCommandFailure,
-                            Messages.TraceControl_NewNodeCreationFailure + " (" + hostName + ", " + hostAddress + ")" + ":\n" + e.toString());  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-                    return null;
-                }
-            }
-            
-            if (host != null) {
-                // successful creation of host
-                TargetNodeComponent node = null;
-                if (!fRoot.containsChild(hostName)) {
-                    node = new TargetNodeComponent(hostName, fRoot, host);
-                    fRoot.addChild(node);
-                }
-                else {
-                    node = (TargetNodeComponent)fRoot.getChild(hostName);
-                }
-
-                node.connect();
-            }
+            node.connect();
         }
         return null;
     }

@@ -125,6 +125,21 @@ public class BaseEventComponent extends TraceControlComponent {
         }
         return null;
     } 
+
+    /**
+     * @return target node component. 
+     */
+    public TargetNodeComponent getTargetNode() {
+        return (TargetNodeComponent) getParent().getParent();
+    }
+
+    /**
+     * @return if provider kernel or UST
+     */
+    public boolean isKernel() {
+        return getParent() instanceof KernelProviderComponent;
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

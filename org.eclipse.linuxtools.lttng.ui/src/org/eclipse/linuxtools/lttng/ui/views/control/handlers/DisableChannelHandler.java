@@ -21,7 +21,7 @@ import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceDomainCompo
 /**
  * <b><u>DisableChannelHandler</u></b>
  * <p>
- * Command handler implementation to enable a trace channel.
+ * Command handler implementation to disable one or more trace channels per session and domain.
  * </p>
  */
 public class DisableChannelHandler extends ChangeChannelStateHandler {

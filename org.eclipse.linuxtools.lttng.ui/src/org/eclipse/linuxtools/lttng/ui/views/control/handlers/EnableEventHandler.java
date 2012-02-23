@@ -16,22 +16,22 @@ import java.util.List;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceEnablement;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceDomainComponent;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceChannelComponent;
 
 /**
- * <b><u>EnableChannelHandler</u></b>
+ * <b><u>EnableEventHandler</u></b>
  * <p>
- * Command handler implementation to enable one or more trace channels per session and domain.
+ * Command handler implementation to enable one or more events session, domain and channel.
  * </p>
  */
-public class EnableChannelHandler extends ChangeChannelStateHandler {
+public class EnableEventHandler extends ChangeEventStateHandler {
 
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.handlers.BaseChangeChannelStateHandler#getNewState()
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.handlers.ChangeEventStateHandler#getNewState()
      */
     @Override
     protected TraceEnablement getNewState() {
@@ -43,10 +43,10 @@ public class EnableChannelHandler extends ChangeChannelStateHandler {
     // ------------------------------------------------------------------------
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.handlers.BaseChangeChannelStateHandler#changeState(org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceDomainComponent, java.util.List, org.eclipse.core.runtime.IProgressMonitor)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.handlers.ChangeEventStateHandler#changeState(org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceChannelComponent, java.util.List, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    protected void changeState(TraceDomainComponent domain, List<String> channelNames, IProgressMonitor monitor) throws ExecutionException {
-        domain.enableChannels(channelNames, null, monitor);
+    protected void changeState(TraceChannelComponent channel, List<String> eventNames, IProgressMonitor monitor) throws ExecutionException{ 
+        channel.enableEvent(eventNames, monitor);
     }
 }

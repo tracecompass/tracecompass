@@ -65,24 +65,26 @@ public class CreateSessionHandler extends AbstractHandler {
         // Open dialog box for the node name and address
         ICreateSessionDialog dialog = new CreateSessionDialog(window.getShell(), fSessionGroup);
 
-        if (dialog.open() == Window.OK) {
-            final String sessionName = dialog.getSessionName();
-            final String sessionPath = dialog.isDefaultSessionPath() ? null : dialog.getSessionPath();
-            
-            Job job = new Job(Messages.TraceControl_CreateSessionJob) {
-                @Override
-                protected IStatus run(IProgressMonitor monitor) {
-                    try {
-                        fSessionGroup.createSession(sessionName, sessionPath, monitor);
-                    } catch (ExecutionException e) {
-                        return new Status(Status.ERROR, LTTngUiPlugin.PLUGIN_ID, e.toString());
-                    } 
-                    return Status.OK_STATUS;
-                }
-            };
-            job.setUser(true);
-            job.schedule();
+        if (dialog.open() != Window.OK) {
+            return null;
         }
+
+        final String sessionName = dialog.getSessionName();
+        final String sessionPath = dialog.isDefaultSessionPath() ? null : dialog.getSessionPath();
+
+        Job job = new Job(Messages.TraceControl_CreateSessionJob) {
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+                try {
+                    fSessionGroup.createSession(sessionName, sessionPath, monitor);
+                } catch (ExecutionException e) {
+                    return new Status(Status.ERROR, LTTngUiPlugin.PLUGIN_ID, e.toString());
+                } 
+                return Status.OK_STATUS;
+            }
+        };
+        job.setUser(true);
+        job.schedule();
         
         return null;
     }

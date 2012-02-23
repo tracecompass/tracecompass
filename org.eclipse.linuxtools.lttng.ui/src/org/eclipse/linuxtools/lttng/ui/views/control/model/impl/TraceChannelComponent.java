@@ -11,6 +11,11 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.control.model.impl;
 
+import java.util.List;
+
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
 import org.eclipse.linuxtools.lttng.ui.views.control.Messages;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
@@ -217,6 +222,13 @@ public class TraceChannelComponent extends TraceControlComponent {
     }
 
     /**
+     * @return session from parent
+     */
+    public TraceSessionComponent getSession() {
+       return ((TraceDomainComponent)getParent()).getSession(); 
+    }
+
+    /**
      * @return if domain is kernel or UST
      */
     public boolean isKernel() {
@@ -226,4 +238,41 @@ public class TraceChannelComponent extends TraceControlComponent {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+    /**
+     * Enables a list of events with no additional parameters.
+     * @param eventNames - a list of event names to enabled.
+     * @throws ExecutionException
+     */
+    public void enableEvent(List<String> eventNames) throws ExecutionException {
+        enableEvent(eventNames, new NullProgressMonitor());
+    }
+
+    /**
+     * Enables a list of events with no additional parameters.
+     * @param eventNames - a list of event names to enabled.
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void enableEvent(List<String> eventNames, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().enableEvent(getParent().getParent().getName(), getName(), eventNames, isKernel(), monitor);
+    }
+    
+    /**
+     * Enables a list of events with no additional parameters.
+     * @param eventNames - a list of event names to enabled.
+     * @throws ExecutionException
+     */
+    public void disableEvent(List<String> eventNames) throws ExecutionException {
+        disableEvent(eventNames, new NullProgressMonitor());
+    }
+
+    /**
+     * Enables a list of events with no additional parameters.
+     * @param eventNames - a list of event names to enabled.
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void disableEvent(List<String> eventNames, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().disableEvent(getParent().getParent().getName(), getName(), eventNames, isKernel(), monitor);
+    }
 }

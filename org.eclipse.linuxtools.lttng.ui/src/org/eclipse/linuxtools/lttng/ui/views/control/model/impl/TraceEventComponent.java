@@ -175,6 +175,27 @@ public class TraceEventComponent extends TraceControlComponent {
         return null;
     } 
     
+    /**
+     * @return session name from parent
+     */
+    public String getSessionName() {
+       return ((TraceChannelComponent)getParent()).getSessionName(); 
+    }
+
+    /**
+     * @return channel name from parent
+     */
+    public String getChannelName() {
+        return getParent().getName(); 
+    }
+
+    /**
+     * @return if domain is kernel or UST
+     */
+    public boolean isKernel() {
+        return ((TraceChannelComponent)getParent()).isKernel();
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
