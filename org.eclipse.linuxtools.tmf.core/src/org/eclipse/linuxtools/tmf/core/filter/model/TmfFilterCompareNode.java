@@ -17,7 +17,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 
 
@@ -111,8 +111,8 @@ public class TmfFilterCompareNode extends TmfFilterTreeNode {
 	}
 
 	@Override
-	public boolean matches(TmfEvent event) {
-        Object value = event.getContent().getField(fField).getValue();
+	public boolean matches(ITmfEvent event) {
+        Object value = getFieldValue(event, fField);
         if (value == null) {
             return false ^ fNot;
         }

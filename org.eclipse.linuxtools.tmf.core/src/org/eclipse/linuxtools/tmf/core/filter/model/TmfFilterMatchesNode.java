@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 
 public class TmfFilterMatchesNode extends TmfFilterTreeNode {
@@ -71,15 +71,17 @@ public class TmfFilterMatchesNode extends TmfFilterTreeNode {
 	}
 
 	@Override
-	public boolean matches(TmfEvent event) {
+	public boolean matches(ITmfEvent event) {
         if (fPattern == null) {
             return false ^ fNot;
         }
-        Object value = event.getContent().getField(fField);
+
+        Object value = getFieldValue(event, fField);
         if (value == null) {
             return false ^ fNot;
         }
         String valueString = value.toString();
+
         return fPattern.matcher(valueString).matches() ^ fNot;
 	}
 

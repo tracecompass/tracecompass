@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.tmf.core.filter.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 
 public class TmfFilterEventTypeNode extends TmfFilterTreeNode {
@@ -53,7 +53,7 @@ public class TmfFilterEventTypeNode extends TmfFilterTreeNode {
 	}
 
     @Override
-    public boolean matches(TmfEvent event) {
+    public boolean matches(ITmfEvent event) {
         boolean match = false;
         if (fType.contains(":")) { //$NON-NLS-1$
             // special case for custom parsers

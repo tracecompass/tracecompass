@@ -17,7 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 
 /**
  * <b><u>TmfFilterTreeNode</u></b>
@@ -148,7 +149,36 @@ public abstract class TmfFilterTreeNode implements ITmfFilterTreeNode, Cloneable
 	 * @see org.eclipse.linuxtools.tmf.filter.model.ITmfFilterTreeNode#matches(org.eclipse.linuxtools.tmf.event.TmfEvent)
 	 */
 	@Override
-	public abstract boolean matches(TmfEvent event);
+	public abstract boolean matches(ITmfEvent event);
+
+    /**
+     * @param event
+     * @param field
+     * @return
+     */
+    protected Object getFieldValue(ITmfEvent event, String field) {
+        Object value = null;
+        if (ITmfEvent.EVENT_FIELD_CONTENT.equals(field)) {
+            ITmfEventField content = event.getContent();
+            value = (content.getValue() != null) ? content.getValue().toString() : content.toString();
+        }
+        else if (ITmfEvent.EVENT_FIELD_TYPE.equals(field)) {
+            value = event.getType().getName();
+        }
+        else if (ITmfEvent.EVENT_FIELD_TIMESTAMP.equals(field)) {
+            value = ((Long) event.getTimestamp().getValue()).toString();
+        }
+        else if (ITmfEvent.EVENT_FIELD_SOURCE.equals(field)) {
+            value = event.getSource();
+        }
+        else if (ITmfEvent.EVENT_FIELD_REFERENCE.equals(field)) {
+            value = event.getReference();
+        }
+        else {
+            value = event.getContent().getField(field).getValue();
+        }
+        return value;
+    }
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.tmf.filter.model.ITmfFilterTreeNode#getValidChildren()
