@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.tmf.ui.project.wizards;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -184,7 +185,7 @@ public class RenameExperimentDialog extends SelectionStatusDialog {
         }
     }
 
-    private IFolder renameExperiment(String newName) {
+    private IFolder renameExperiment(final String newName) {
 
     	IPath oldPath = fExperiment.getResource().getFullPath();
     	final IPath newPath = oldPath.append("../" + newName); //$NON-NLS-1$
@@ -196,6 +197,15 @@ public class RenameExperimentDialog extends SelectionStatusDialog {
                     monitor.beginTask("", 1000); //$NON-NLS-1$
                     if (monitor.isCanceled()) {
                         throw new OperationCanceledException();
+                    }
+                    IFolder folder = (IFolder) fExperiment.getResource();
+                    IFile bookmarksFile = folder.getFile(fExperiment.getName() + '_');
+                    IFile newBookmarksFile = folder.getFile(newName + '_');
+                    if (bookmarksFile.exists()) {
+                        if (!newBookmarksFile.exists()) {
+                            IPath newBookmarksPath = newBookmarksFile.getFullPath();
+                            bookmarksFile.move(newBookmarksPath, IResource.FORCE | IResource.SHALLOW, null);
+                        }
                     }
                 	fExperiment.getResource().move(newPath, IResource.FORCE | IResource.SHALLOW, null);
                     if (monitor.isCanceled()) {
