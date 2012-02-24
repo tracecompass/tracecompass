@@ -123,7 +123,7 @@ public abstract class LttngTestPreparation extends TestCase {
 				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(ftracepath_T1),
 						null);
 				File testfile = new File(FileLocator.toFileURL(location).toURI());
-				LTTngTrace tmpStream = new LTTngTrace(testfile.getPath(), false);
+				LTTngTrace tmpStream = new LTTngTrace(testfile.getName(), testfile.getPath(), false);
 				frealStream = tmpStream;
 			} catch (Exception e) {
 				System.out.println("ERROR : Could not open " + ftracepath_T1);
@@ -142,7 +142,7 @@ public abstract class LttngTestPreparation extends TestCase {
 				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(),
 						new Path(fTextTracepath_T1), null);
 				File testfile = new File(FileLocator.toFileURL(location).toURI());
-				LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getPath());
+				LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getName(), testfile.getPath());
 				ftextStream_T1 = tmpStream;
 
 			} catch (Exception e) {

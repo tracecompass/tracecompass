@@ -52,7 +52,7 @@ public class TmfTraceTest extends TmfEventRequest<LttngEvent> {
 			// OUr experiment will contains ONE trace
         	@SuppressWarnings("unchecked")
 			ITmfTrace<LttngEvent>[] traces = new ITmfTrace[1];
-    		traces[0] = new LTTngTrace(TRACE_PATH);
+    		traces[0] = new LTTngTrace("", TRACE_PATH);
         	// Create our new experiment
             fExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class, "Headless", traces);
             

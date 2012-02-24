@@ -136,7 +136,7 @@ public class EventsViewEditor extends TmfEditor {
                                     throw new PartInitException(Messages.OpenExperimentHandler_NoTraceType);
                                 }
                                 try {
-                                    trace.initTrace(traceElement.getLocation().getPath(), traceEvent.getClass(), false);
+                                    trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), false);
                                 } catch (FileNotFoundException e) {
                                 }
                                 if (trace instanceof TmfTrace) {
@@ -169,7 +169,7 @@ public class EventsViewEditor extends TmfEditor {
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             }
                             try {
-                                trace.initTrace(traceElement.getLocation().getPath(), traceEvent.getClass(), false);
+                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), false);
                             } catch (FileNotFoundException e) {
                             }
                             if (trace instanceof TmfTrace) {
@@ -198,7 +198,7 @@ public class EventsViewEditor extends TmfEditor {
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             }
                             try {
-                                trace.initTrace(traceElement.getLocation().getPath(), traceEvent.getClass(), true);
+                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), true);
                             } catch (FileNotFoundException e) {
                             }
                             if (trace instanceof TmfTrace) {

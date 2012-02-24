@@ -94,29 +94,22 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
     }
 
     @Override
-    public void initTrace(String path, Class<T> eventType) {
+    public void initTrace(String name, String path, Class<T> eventType) {
     }
 
     @Override
-    public void initTrace(String path, Class<T> eventType, boolean indexTrace) {
+    public void initTrace(String name, String path, Class<T> eventType, boolean indexTrace) {
         if (indexTrace) {
             initializeStreamingMonitor();
         }
     }
 
     @Override
-    public void initTrace(String path, Class<T> eventType, int cacheSize) {
+    public void initTrace(String name, String path, Class<T> eventType, int cacheSize) {
     }
 
     @Override
-    public void initTrace(String path, Class<T> eventType, int cacheSize, boolean indexTrace) {
-        if (indexTrace) {
-            initializeStreamingMonitor();
-        }
-    }
-
-    @Override
-    public void initTrace(String path, Class<T> eventType, int cacheSize, boolean indexTrace, String name) {
+    public void initTrace(String name, String path, Class<T> eventType, int cacheSize, boolean indexTrace) {
         if (indexTrace) {
             initializeStreamingMonitor();
         }

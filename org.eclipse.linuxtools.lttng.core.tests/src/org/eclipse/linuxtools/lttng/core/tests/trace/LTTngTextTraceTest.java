@@ -71,7 +71,7 @@ public class LTTngTextTraceTest extends TestCase {
             try {
                 URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(tracepath1), null);
                 File testfile = new File(FileLocator.toFileURL(location).toURI());
-                LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getPath());
+                LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getName(), testfile.getPath());
                 testStream = tmpStream;
             } catch (Exception e) {
                 System.out.println("ERROR : Could not open " + tracepath1);
@@ -89,7 +89,7 @@ public class LTTngTextTraceTest extends TestCase {
         // Test constructor with argument on a wrong tracepath, skipping
         // indexing
         try {
-            LTTngTextTrace testStream = new LTTngTextTrace(wrongTracePath, skipIndexing);
+            LTTngTextTrace testStream = new LTTngTextTrace("wrong", wrongTracePath, skipIndexing);
             fail("Construction with wrong tracepath should fail!");
             testStream.dispose();
         } catch (Exception e) {
