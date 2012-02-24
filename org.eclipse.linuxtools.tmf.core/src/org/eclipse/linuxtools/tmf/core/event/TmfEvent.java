@@ -126,7 +126,7 @@ public class TmfEvent implements ITmfEvent {
     /**
      * Constructor - no rank, no content, no trace
      */
-    public TmfEvent(TmfTimestamp timestamp, String source, ITmfEventType type, String reference)
+    public TmfEvent(ITmfTimestamp timestamp, String source, ITmfEventType type, String reference)
     {
         this(null, -1, timestamp, source, type, null, reference);
     }

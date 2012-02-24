@@ -316,7 +316,8 @@
                icon="icons/etool16/import.gif"
                label="%commands.trace_folder.import"
                mnemonic="%commands.trace_folder.import.mnemonic"
-               style="push">
+               style="push"
+               tooltip="%commands.trace_folder.import.description">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -324,12 +325,11 @@
                   <count
                         value="1">
                   </count>
-                  <iterate>
-                     <and>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
-                        </instanceof>
-                     </and>
+                  <iterate
+                        operator="and">
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -344,7 +344,8 @@
                icon="icons/elcl16/refresh.gif"
                label="%commands.trace_folder.refresh"
                mnemonic="%commands.trace_folder.refresh.mnemonic"
-               style="push">
+               style="push"
+               tooltip="%commands.trace_folder.refresh.description">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -353,13 +354,11 @@
                         value="1">
                   </count>
                   <iterate
-                        ifEmpty="true"
+                        ifEmpty="false"
                         operator="and">
-                     <and>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
-                        </instanceof>
-                     </and>
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -370,7 +369,8 @@
                icon="icons/elcl16/open.gif"
                label="%commands.trace.open"
                mnemonic="%commands.trace.open.mnemonic"
-               style="push">
+               style="push"
+               tooltip="%commands.trace.open.descritption">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -378,11 +378,12 @@
                   <count
                         value="1">
                   </count>
-                  <iterate>
-                     <and>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
-                        </instanceof></and>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -393,7 +394,8 @@
                icon="IMG_TOOL_COPY"
                label="%commands.trace.copy"
                mnemonic="%commands.trace.copy.mnemonic"
-               style="push">
+               style="push"
+               tooltip="%commands.trace.copy.description">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -401,11 +403,12 @@
                   <count
                         value="1">
                   </count>
-                  <iterate>
-                     <and>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
-                        </instanceof></and>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -416,7 +419,8 @@
                icon="icons/elcl16/rename.gif"
                label="%commands.trace.rename"
                mnemonic="%commands.trace.rename.mnemonic"
-               style="push">
+               style="push"
+               tooltip="%commands.trace.rename.description">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -427,11 +431,9 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <and>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
-                        </instanceof>
-                     </and>
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -442,7 +444,8 @@
                icon="IMG_ETOOL_DELETE"
                label="%commands.trace.delete"
                mnemonic="%commands.trace.delete.mnemonic"
-               style="push">
+               style="push"
+               tooltip="%commands.trace.delete.description">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -454,6 +457,40 @@
                         <instanceof
                               value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
                         </instanceof>
+                        <not>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.eclipse.linuxtools.tmf.ui.isExperimentTrace">
+                           </test>
+                        </not>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.delete"
+               disabledIcon="IMG_ETOOL_DELETE_DISABLED"
+               icon="IMG_ETOOL_DELETE"
+               label="%commands.trace.remove"
+               mnemonic="%commands.trace.remove.mnemonic"
+               style="push"
+               tooltip="%commands.trace.remove.description">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                        </instanceof>
+                        <test
+                              forcePluginActivation="true"
+                              property="org.eclipse.linuxtools.tmf.ui.isExperimentTrace">
+                        </test>
                      </and>
                   </iterate>
                </with>
@@ -465,7 +502,8 @@
          </separator>
          <menu
                label="%commands.trace.select_trace_type"
-               mnemonic="%commands.trace.select_trace_type.mnemonic">
+               mnemonic="%commands.trace.select_trace_type.mnemonic"
+               tooltip="%commands.trace.select_trace_type.description">
             <dynamic
                   class="org.eclipse.linuxtools.tmf.ui.project.handlers.SelectTraceTypeContributionItem"
                   id="org.eclipse.linuxtools.tmf.ui.command.project.trace.select_trace_type.dynamic">
@@ -477,11 +515,9 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <and>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
-                        </instanceof>
-                     </and>
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -492,7 +528,8 @@
                icon="icons/etool16/new.gif"
                label="%commands.experiment_folder.new"
                mnemonic="%commands.experiment_folder.new.mnemonic"
-               style="push">
+               style="push"
+               tooltip="%commands.trace.select_trace_type">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -503,11 +540,9 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <and>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder">
-                        </instanceof>
-                     </and>
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -522,32 +557,8 @@
                icon="icons/elcl16/refresh.gif"
                label="%commands.experiment_folder.refresh"
                mnemonic="%commands.experiment_folder.refresh.mnemonic"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate
-                        ifEmpty="true"
-                        operator="and">
-                     <and>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder">
-                        </instanceof>
-                     </and>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.select"
-               icon="IMG_OBJ_ADD"
-               label="%commands.experiment.selecttraces"
-               mnemonic="%commands.experiment.selecttraces.mnemonic"
-               style="push">
+               style="push"
+               tooltip="%commands.experiment_folder.refresh.description">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -558,11 +569,33 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <and>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
-                        </instanceof>
-                     </and>
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.select"
+               icon="IMG_OBJ_ADD"
+               label="%commands.experiment.selecttraces"
+               mnemonic="%commands.experiment.selecttraces.mnemonic"
+               style="push"
+               tooltip="%commands.experiment.selecttraces.description">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -576,7 +609,8 @@
                icon="icons/elcl16/open.gif"
                label="%commands.experiment.open"
                mnemonic="%commands.experiment.open.mnemonic"
-               style="push">
+               style="push"
+               tooltip="%commands.experiment.open.description">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -587,11 +621,9 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <and>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
-                        </instanceof>
-                     </and>
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -602,7 +634,8 @@
                icon="IMG_TOOL_COPY"
                label="%commands.experiment.copy"
                mnemonic="%commands.experiment.copy.mnemonic"
-               style="push">
+               style="push"
+               tooltip="%commands.experiment.copy.description">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -613,11 +646,9 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <and>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
-                        </instanceof>
-                     </and>
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -627,7 +658,8 @@
                icon="icons/elcl16/rename.gif"
                label="%commands.experiment.rename"
                mnemonic="%commands.experiment.rename.mnemonic"
-               style="push">
+               style="push"
+               tooltip="%commands.experiment.rename.description">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -638,11 +670,9 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <and>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
-                        </instanceof>
-                     </and>
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -653,7 +683,8 @@
                icon="IMG_ETOOL_DELETE"
                label="%commands.experiment.delete"
                mnemonic="%commands.experiment.delete.mnemonic"
-               style="push">
+               style="push"
+               tooltip="%commands.experiment.delete.description">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -661,11 +692,9 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <and>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
-                        </instanceof>
-                     </and>
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -680,7 +709,8 @@
                icon="icons/elcl16/refresh.gif"
                label="%commands.experiment.refresh"
                mnemonic="%commands.experiment.refresh.mnemonic"
-               style="push">
+               style="push"
+               tooltip="%commands.experiment.refresh.description">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -689,13 +719,11 @@
                         value="1">
                   </count>
                   <iterate
-                        ifEmpty="true"
+                        ifEmpty="false"
                         operator="and">
-                     <and>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
-                        </instanceof>
-                     </and>
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -1058,6 +1086,16 @@
             namespace="org.eclipse.linuxtools.tmf.ui.propertyTester"
             properties="isInTraceFolder"
             type="org.eclipse.jface.viewers.ISelection">
+      </propertyTester>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.linuxtools.tmf.ui.TracePropertyTester"
+            id="org.eclipse.linuxtools.tmf.ui.tracePropertyTester"
+            namespace="org.eclipse.linuxtools.tmf.ui"
+            properties="isExperimentTrace"
+            type="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
       </propertyTester>
    </extension>
 

@@ -333,6 +333,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
         final Listener bookmarkListener = new Listener () {
             Shell tooltipShell = null;
+            @Override
             public void handleEvent(Event event) {
                 switch (event.type) {
                 case SWT.MouseHover:
@@ -1371,16 +1372,21 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * 
      *         FIXME: Add support for column selection
      */
-    //TmfEventContent content, String id, Object value
     protected ITmfEventField[] extractItemFields(TmfEvent event) {
         ITmfEventField[] fields = new TmfEventField[0];
         if (event != null) {
+            String timestamp = ((Long) event.getTimestamp().getValue()).toString();
+            String source = event.getSource();
+            String type = event.getType().getName();
+            String reference = event.getReference();
+            ITmfEventField content = event.getContent();
+            String value = (content.getValue() != null) ? content.getValue().toString() : content.toString();
             fields = new TmfEventField[] {
-                     new TmfEventField(ITmfEvent.EVENT_FIELD_TIMESTAMP, ((Long) event.getTimestamp().getValue()).toString()),
-                     new TmfEventField(ITmfEvent.EVENT_FIELD_SOURCE, event.getSource()),
-                     new TmfEventField(ITmfEvent.EVENT_FIELD_TYPE, event.getType().getName()),
-                     new TmfEventField(ITmfEvent.EVENT_FIELD_REFERENCE, event.getReference()),
-                     new TmfEventField(ITmfEvent.EVENT_FIELD_CONTENT, event.getContent().toString())
+                     new TmfEventField(ITmfEvent.EVENT_FIELD_TIMESTAMP, timestamp),
+                     new TmfEventField(ITmfEvent.EVENT_FIELD_SOURCE, source),
+                     new TmfEventField(ITmfEvent.EVENT_FIELD_TYPE, type),
+                     new TmfEventField(ITmfEvent.EVENT_FIELD_REFERENCE, reference),
+                     new TmfEventField(ITmfEvent.EVENT_FIELD_CONTENT, value)
                     };
         }
         return fields;
