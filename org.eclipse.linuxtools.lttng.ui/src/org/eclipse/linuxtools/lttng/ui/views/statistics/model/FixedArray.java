@@ -127,6 +127,10 @@ public final class FixedArray implements RandomAccess {
 	 */
 	@Override
 	public boolean equals(Object o) {
+	    if (o == this)
+	        return true;
+	    if (o == null)
+	        return false;
 		return Arrays.equals(fArray, ((FixedArray)o).fArray);
 	}
 	/**

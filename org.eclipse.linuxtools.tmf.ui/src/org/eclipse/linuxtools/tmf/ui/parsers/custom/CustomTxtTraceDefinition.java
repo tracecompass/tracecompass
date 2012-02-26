@@ -246,6 +246,12 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
 
         @Override
         public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
             if (!(obj instanceof Cardinality)) return false;
             Cardinality other = (Cardinality) obj;
             return (this.min == other.min && this.max == other.max);

@@ -10,11 +10,15 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui;
+package org.eclipse.linuxtools.tmf.ui.project.handlers;
+
+import java.util.Iterator;
 
 import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 
 /**
  * <b><u>TracePropertyTester</u></b>
@@ -26,6 +30,7 @@ public class TracePropertyTester extends PropertyTester {
     // Constants
     // ------------------------------------------------------------------------
     
+    private static String isInTraceFolder = "isInTraceFolder"; //$NON-NLS-1$
     private static String isExperimentTrace = "isExperimentTrace"; //$NON-NLS-1$
     
     // ------------------------------------------------------------------------
@@ -47,13 +52,33 @@ public class TracePropertyTester extends PropertyTester {
      */
     @Override
     public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
-        
+
+        // Check if the selected elements are in the trace folder
+        if (isInTraceFolder.equals(property)) {
+            if (receiver != null && receiver instanceof IStructuredSelection) {
+                Iterator<?> iter = ((IStructuredSelection) receiver).iterator();
+                while (iter.hasNext()) {
+                    Object item = iter.next();
+                    if (item instanceof TmfTraceElement) {
+                        TmfTraceElement trace = (TmfTraceElement) receiver;
+                        if (!(trace.getParent() instanceof TmfTraceFolder)) {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+
         // Check if the parent of a trace element is an experiment
-        if (receiver != null && receiver instanceof TmfTraceElement) {
+        if (isExperimentTrace.equals(property)) {
+            if (receiver != null && receiver instanceof TmfTraceElement) {
             TmfTraceElement trace = (TmfTraceElement) receiver;
-            if (isExperimentTrace.equals(property)) {
                 return trace.getParent() instanceof TmfExperimentElement;
             }
+            return false;
         }
 
         return false;

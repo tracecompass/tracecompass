@@ -1078,7 +1078,7 @@
             view="org.eclipse.linuxtools.tmf.ui.tmfUml2SDSyncView">
       </uml2SDLoader>
    </extension>
-   <extension
+   <!--extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
             class="org.eclipse.linuxtools.tmf.ui.project.handlers.PropertyTester"
@@ -1087,11 +1087,11 @@
             properties="isInTraceFolder"
             type="org.eclipse.jface.viewers.ISelection">
       </propertyTester>
-   </extension>
+   </extension -->
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="org.eclipse.linuxtools.tmf.ui.TracePropertyTester"
+            class="org.eclipse.linuxtools.tmf.ui.project.handlers.TracePropertyTester"
             id="org.eclipse.linuxtools.tmf.ui.tracePropertyTester"
             namespace="org.eclipse.linuxtools.tmf.ui"
             properties="isExperimentTrace"

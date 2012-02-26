@@ -623,7 +623,6 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 		if (selection instanceof EventImpl) {
 			EventImpl selEvent = (EventImpl) selection;
-			date = new Date((long) (selTimens / 1E-6));
 			System.out
 					.println("TsfTmIncubatorListener.tsfTmProcessEvent() Selected Event: \nType: "
 							+ selEvent.getType().toString()

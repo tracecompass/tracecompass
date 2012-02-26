@@ -33,7 +33,7 @@ public abstract class AbsTmfStatisticsTree {
     /**
      * <h4>String builder used to merge string with more efficacy.</h4>
      */
-    protected static StringBuilder fBuilder = new StringBuilder();
+    protected static final StringBuilder fBuilder = new StringBuilder();
     /**
      * <h4>Identification of the root.</h4>
      */

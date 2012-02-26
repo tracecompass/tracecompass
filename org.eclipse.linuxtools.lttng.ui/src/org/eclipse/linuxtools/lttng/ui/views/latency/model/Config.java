@@ -31,7 +31,7 @@ public class Config {
     /**
      * Time scale for TMF events;
      */
-    public static byte TIME_SCALE = -9;
+    public static final byte TIME_SCALE = -9;
     
     /**
      * Size of the point buffer holding point values before sending them to the view.

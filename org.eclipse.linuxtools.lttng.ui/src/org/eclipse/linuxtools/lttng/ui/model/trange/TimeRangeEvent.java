@@ -47,7 +47,7 @@ public class TimeRangeEvent extends TimeRangeComponent implements ITimeEvent {
 	public TimeRangeEvent(Long stime, Long etime,
 			TimeRangeComposite eventParent, Type type, String stateMode) {
 		super(stime, etime, eventParent);
-
+		parent = eventParent;
 		this.eventType = type;
 		this.stateMode = stateMode;
 	}

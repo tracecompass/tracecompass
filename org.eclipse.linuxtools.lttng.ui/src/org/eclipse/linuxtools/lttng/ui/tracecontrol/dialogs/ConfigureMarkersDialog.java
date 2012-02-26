@@ -239,8 +239,6 @@ public class ConfigureMarkersDialog extends Dialog {
 
             if (nbOfEqualsHack > 0) { 
                 String[] infosList = new String[nbOfEqualsHack];
-                @SuppressWarnings("unused")
-                String name = ""; //$NON-NLS-1$
                 String value = ""; //$NON-NLS-1$
 
                 int prevPos = 0;
@@ -252,8 +250,6 @@ public class ConfigureMarkersDialog extends Dialog {
                     eqPos = markerInfos.indexOf("=", curPos); //$NON-NLS-1$
 
                     if (eqPos >= 0) {
-                        name = markerInfos.substring(curPos, eqPos - 1);
-
                         prevPos = markerInfos.lastIndexOf(",", eqPos); //$NON-NLS-1$
                     } else {
                         prevPos = markerInfos.length() - 1;

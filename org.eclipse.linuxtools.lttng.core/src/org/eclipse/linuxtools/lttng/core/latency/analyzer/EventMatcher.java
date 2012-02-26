@@ -69,7 +69,7 @@ public class EventMatcher {
 	 * Event types identification Strings.
 	 */
 	@SuppressWarnings("nls")
-    public static String
+    public static final String
 		ADD_TO_PAGE_CACHE         = "add_to_page_cache",
 		BIO_BACKMERGE             = "bio_backmerge",
 		BIO_FRONTMERGE            = "bio_frontmerge",

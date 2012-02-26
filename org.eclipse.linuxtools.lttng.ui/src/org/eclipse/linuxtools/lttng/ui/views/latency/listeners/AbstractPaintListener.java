@@ -503,7 +503,7 @@ public abstract class AbstractPaintListener implements PaintListener {
      *            The y coordinate where to draw the axis.
      */
     public void paintHorizontalTicks(int y) {
-        if (fXMin >= 0L && fXMin >= 0L) {
+        if (fXMin >= 0L && fXMax >= 0L) {
             int nbTicks = (int)(getWidth()) / MAX_WIDTH_BETWEEN_TICKS + 1;
 
             for (int i = 0; i < nbTicks; i++) {
@@ -564,7 +564,7 @@ public abstract class AbstractPaintListener implements PaintListener {
      *            The x-coordinate where to draw the ticks.
      */
     public void paintVerticalTicks(int x) {
-        if (fYMin != 0L && fYMin != 0L) {
+        if (fYMin != 0L && fYMax != 0L) {
             int nbTicks = (int)(getHeight() / MAX_HEIGHT_BETWEEN_TICKS + 1);
 
             for (int i = 0; i < nbTicks; i++) {

@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.core.experiment;
 
-import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.Vector;
 
