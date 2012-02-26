@@ -9,7 +9,6 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.linuxtools.lttng.core.event.LttngEventContent;
 import org.eclipse.linuxtools.lttng.core.event.LttngEventField;
 import org.eclipse.linuxtools.lttng.core.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.core.trace.LTTngTextTrace;
@@ -69,7 +68,6 @@ public class LttngEventFieldTest extends TestCase {
 	}
 
 	public void testConstructors() {
-		LttngEventContent testContent = null;
 		LttngEventField testField 	= null;
 		@SuppressWarnings("unused")
 		LttngEventField testField2 	= null;

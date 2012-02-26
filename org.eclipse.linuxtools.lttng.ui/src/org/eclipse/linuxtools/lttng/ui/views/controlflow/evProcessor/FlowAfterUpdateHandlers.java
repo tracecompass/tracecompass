@@ -136,7 +136,7 @@ class FlowAfterUpdateHandlers {
 			        TimeRangeEventProcess localProcess = procContainer.findProcess(process_child.getPid(), process_child.getCpu(), traceSt.getTraceId(), process_child.getCreation_time() );
 			        
 			        if (localProcess == null) {
-			            if (child_pid.equals(0) || !child_pid.equals(process_child.getPpid())) {            
+			            if (child_pid == 0 || !child_pid.equals(process_child.getPpid())) {            
 			                TmfTimeRange timeRange = traceSt.getContext().getTraceTimeWindow();
                             localProcess = addLocalProcess(process_child, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
 			            }
@@ -189,7 +189,7 @@ class FlowAfterUpdateHandlers {
 			        TimeRangeEventProcess localProcess = procContainer.findProcess(process.getPid(), process.getCpu(), traceSt.getTraceId(),  process.getCreation_time());
 			        
 			        if (localProcess == null) {
-			            if (process.getPid().equals(0) || !process.getPid().equals(process.getPpid())) {			                
+			            if (process.getPid() == 0 || !process.getPid().equals(process.getPpid())) {			                
 			                TmfTimeRange timeRange = traceSt.getContext().getTraceTimeWindow();
 		                    localProcess = addLocalProcess(process, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
 			            }
@@ -231,7 +231,7 @@ class FlowAfterUpdateHandlers {
                     TimeRangeEventProcess localProcess = procContainer.findProcess(process.getPid(),  process.getCpu(), traceSt.getTraceId(), process.getCreation_time());
                     
                     if (localProcess == null) {
-                        if (process.getPid().equals(0) || !process.getPid().equals(process.getPpid())) {
+                        if (process.getPid() == 0 || !process.getPid().equals(process.getPpid())) {
                             TmfTimeRange timeRange = traceSt.getContext().getTraceTimeWindow();
                             localProcess = addLocalProcess(process, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
                         }
@@ -281,7 +281,7 @@ class FlowAfterUpdateHandlers {
                     TimeRangeEventProcess localProcess = procContainer.findProcess(process.getPid(), process.getCpu(), traceSt.getTraceId(), process.getCreation_time());
                     
                     if (localProcess == null) {
-                        if (process.getPid().equals(0) || !process.getPid().equals(process.getPpid())) {                         
+                        if (process.getPid() == 0 || !process.getPid().equals(process.getPpid())) {                         
                             TmfTimeRange timeRange = traceSt.getContext().getTraceTimeWindow();
                             localProcess = addLocalProcess(process, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
                         }
@@ -353,7 +353,7 @@ class FlowAfterUpdateHandlers {
     			            TimeRangeEventProcess localProcess = procContainer.findProcess(process_in.getPid(), process_in.getCpu(), traceSt.getTraceId(), process_in.getCreation_time());
     	                    
     			            if (localProcess == null) {
-        			            if (process_in.getPid().equals(0) || !process_in.getPid().equals(process_in.getPpid())) {
+        			            if (process_in.getPid() == 0 || !process_in.getPid().equals(process_in.getPpid())) {
                                     TmfTimeRange timeRange = traceSt.getContext().getTraceTimeWindow();
                                     localProcess = addLocalProcess(process_in, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
                                 }

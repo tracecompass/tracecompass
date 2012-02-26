@@ -99,7 +99,8 @@ public abstract class LTTngTreeNodeGeneric<E extends LTTngTreeNodeGeneric<E>>
 	 * @see
 	 * org.eclipse.linuxtools.lttng.control.ILTTngAnalysisResource#getType()
 	 */
-	public Object getNodeType() {
+	@Override
+    public Object getNodeType() {
 		return ftype;
 	}
 

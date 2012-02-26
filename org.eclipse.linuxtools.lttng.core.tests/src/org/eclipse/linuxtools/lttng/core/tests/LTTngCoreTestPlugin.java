@@ -13,7 +13,6 @@
 package org.eclipse.linuxtools.lttng.core.tests;
 
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.linuxtools.tmf.core.Tracer;
 import org.osgi.framework.BundleContext;
 
 /**

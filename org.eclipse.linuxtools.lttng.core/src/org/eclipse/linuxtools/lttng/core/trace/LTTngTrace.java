@@ -102,6 +102,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     public LTTngTrace() {
     }
 
+    @Override
     public boolean validate(IProject project, String path) {
         if (super.validate(project, path)) {
             String traceLibPath = TraceHelper.getTraceLibDirFromProject(project);
@@ -114,18 +115,22 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         return false;
     }
 
+    @Override
     public void initTrace(String name, String path, Class<LttngEvent> eventType) throws FileNotFoundException {
         initLTTngTrace(name, path, eventType, CHECKPOINT_PAGE_SIZE, false);
     }
 
+    @Override
     public void initTrace(String name, String path, Class<LttngEvent> eventType, int cacheSize) throws FileNotFoundException {
         initLTTngTrace(name, path, eventType, cacheSize, false);
     }
 
+    @Override
     public void initTrace(String name, String path, Class<LttngEvent> eventType, boolean indexTrace) throws FileNotFoundException {
         initLTTngTrace(name, path, eventType, CHECKPOINT_PAGE_SIZE, indexTrace);
     }
 
+    @Override
     public void initTrace(String name, String path, Class<LttngEvent> eventType, int cacheSize, boolean indexTrace) throws FileNotFoundException {
         initLTTngTrace(name, path, eventType, cacheSize, indexTrace);
     }
@@ -197,11 +202,13 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
             LttngTimestamp safeTimestamp = null;
             TmfTimeRange timeRange = null;
 
+            @SuppressWarnings("unchecked")
             @Override
             public void run() {
                 while (!fExecutor.isShutdown()) {
                     TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
                     if (experiment != null) {
+                        @SuppressWarnings("rawtypes")
                         final TmfEventRequest request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity, 0, ExecutionType.FOREGROUND) {
                             @Override
                             public void handleCompleted() {

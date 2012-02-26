@@ -41,7 +41,7 @@ public class StateManagerFactoryTestSupport {
 	 * 
 	 * @return
 	 */
-	public static IStateTraceManager getManager(ITmfTrace trace) {
+	public static IStateTraceManager getManager(ITmfTrace<?> trace) {
 		String traceUniqueId = trace.getName();
 
 		if (traceUniqueId == null) {

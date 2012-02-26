@@ -181,7 +181,7 @@ public class TimeFrameView extends TmfView {
 
         // Compute the new time range
         TmfTimeRange subrange = new TmfTimeRange(startTime, endTime);
-        int scale = startTime.getScale();
+//        int scale = startTime.getScale();
         ITmfTimestamp interval = (TmfTimestamp) startTime.getDelta(endTime);
 
         // Update the spinner groups
@@ -251,7 +251,7 @@ public class TimeFrameView extends TmfView {
             return;
 
         // Determine the new relative position
-        int scale = range.getEndTime().getScale();
+//        int scale = range.getEndTime().getScale();
         long total = range.getStartTime().getDelta(range.getEndTime()).getValue();
         long relative = range.getStartTime().getDelta(timestamp).getValue();
 

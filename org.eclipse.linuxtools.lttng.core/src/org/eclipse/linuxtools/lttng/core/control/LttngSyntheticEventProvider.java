@@ -71,7 +71,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 	long dispatchTime = 0L;
 	long dispatchIndex = 0L;
 	long eventIndex;
-	private final Map<ITmfTrace, LttngTraceState> traceToTraceStateModel = new HashMap<ITmfTrace, LttngTraceState>();
+	private final Map<ITmfTrace<?>, LttngTraceState> traceToTraceStateModel = new HashMap<ITmfTrace<?>, LttngTraceState>();
 
 	private boolean fIsExperimentNotified = false;
 
@@ -241,7 +241,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 			private void handleIncomingData(LttngEvent e) {
 				long eventTime = e.getTimestamp().getValue();
 
-				ITmfTrace inTrace = e.getTrace();
+				ITmfTrace<?> inTrace = e.getTrace();
 				LttngTraceState traceModel = traceToTraceStateModel.get(inTrace);
 				
 				// queue the new event data
@@ -287,7 +287,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 					syntheticEvent = new LttngSyntheticEvent(e);
 				}
 
-				ITmfTrace inTrace = e.getTrace();
+				ITmfTrace<?> inTrace = e.getTrace();
 				LttngTraceState traceModel = traceToTraceStateModel.get(inTrace);
 				
 				// Trace model needed by application handlers

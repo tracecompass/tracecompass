@@ -60,7 +60,7 @@ public class TracePropertyTester extends PropertyTester {
                 while (iter.hasNext()) {
                     Object item = iter.next();
                     if (item instanceof TmfTraceElement) {
-                        TmfTraceElement trace = (TmfTraceElement) receiver;
+                        TmfTraceElement trace = (TmfTraceElement) item;
                         if (!(trace.getParent() instanceof TmfTraceFolder)) {
                             return false;
                         }

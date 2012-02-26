@@ -54,7 +54,7 @@ public class StateExperimentManager extends LTTngTreeNode implements ILttExperim
     /**
      * Used to route incoming events to proper trace manager, during check point building
      */
-    private final Map<ITmfTrace, StateTraceHelper> ftraceToManagerMap = new HashMap<ITmfTrace, StateTraceHelper>();
+    private final Map<ITmfTrace<?>, StateTraceHelper> ftraceToManagerMap = new HashMap<ITmfTrace<?>, StateTraceHelper>();
 
     private LttngSyntheticEvent syntheticEvent = null;
     private ITmfDataRequest<LttngEvent> fStateCheckPointRequest = null;
@@ -169,11 +169,11 @@ public class StateExperimentManager extends LTTngTreeNode implements ILttExperim
             }
 
             // Make sure the traces exists in the tree
-            ITmfTrace[] rtraces = experiment.getTraces();
+            ITmfTrace<?>[] rtraces = experiment.getTraces();
             String traceName;
             LTTngTreeNode traceStateManagerNode;
             // StateStacksHandler
-            for (ITmfTrace rtrace : rtraces) {
+            for (ITmfTrace<?> rtrace : rtraces) {
                 traceName = rtrace.getName();
                 traceStateManagerNode = experimentNode.getChildByName(traceName);
                 // Node does not exist for this experiment, so needs to be
@@ -351,7 +351,7 @@ public class StateExperimentManager extends LTTngTreeNode implements ILttExperim
                 ftraceToManagerMap.clear();
             }
 
-            ITmfTrace trace;
+            ITmfTrace<?> trace;
             for (LTTngTreeNode traceStateManagerNode : traceNodes) {
                 IStateTraceManager traceManager;
                 try {
@@ -397,7 +397,7 @@ public class StateExperimentManager extends LTTngTreeNode implements ILttExperim
                 if (event != null) {
 //					Tracer.trace("Chk: " + event.getTimestamp());
                     fCheckPointNbEventsHandled++;
-                    ITmfTrace trace = event.getTrace();
+                    ITmfTrace<?> trace = event.getTrace();
 
                     StateTraceHelper helper = ftraceToManagerMap.get(trace);
 

@@ -402,7 +402,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         updatePreviews();
     }
 
-    private class InputLineTreeNodeContentProvider implements ITreeContentProvider {
+    private static class InputLineTreeNodeContentProvider implements ITreeContentProvider {
 
     	@Override
         public Object[] getElements(Object inputElement) {
@@ -550,8 +550,9 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             Object selection = ((IStructuredSelection)this.selection).getFirstElement();
             if (selection instanceof IFile) {
                 IFile file = (IFile)selection;
+                BufferedReader reader = null;
                 try {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(file.getContents()));
+                    reader = new BufferedReader(new InputStreamReader(file.getContents()));
                     StringBuilder sb = new StringBuilder();
                     String line = null;
                     while ((line = reader.readLine()) != null) {
@@ -562,6 +563,13 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                     return ""; //$NON-NLS-1$
                 } catch (IOException e) {
                     return ""; //$NON-NLS-1$
+                } finally {
+                    if (reader != null) {
+                        try {
+                            reader.close();
+                        } catch (IOException e) {
+                        }
+                    }
                 }
             }
         }
@@ -935,8 +943,6 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
     
     private class Line {
         private static final String INFINITY_STRING = "\u221E"; //$NON-NLS-1$
-        @SuppressWarnings("unused")
-		String name;
         InputLine inputLine;
         Group group;
         Composite labelComposite;
@@ -953,7 +959,6 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         Label addGroupLabel;
         
         public Line(Composite parent, String name, InputLine inputLine) {
-            this.name = name;
             this.inputLine = inputLine;
             
             group = new Group(parent, SWT.NONE);

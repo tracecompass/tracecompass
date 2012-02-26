@@ -99,8 +99,9 @@ public class LttngEventContentTest extends TestCase {
 	public void testConstructors() {
 		LttngEvent 		  testEvent = null;
 		LttngEventContent testContent 	= null;
-		LttngEventContent testContent2 	= null;
-        LttngEventField[] 	testFields  = new LttngEventField[1];
+		@SuppressWarnings("unused")
+        LttngEventContent testContent2 	= null;
+        LttngEventField[] testFields  = new LttngEventField[1];
         testFields[0] = new LttngEventField("test");
         
 	    // Default construction with good argument
