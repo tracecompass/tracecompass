@@ -35,6 +35,7 @@ public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvid
         super();
     }
 
+    @Override
     public void init(String name, Class<T> eventType) {
         super.init(name, eventType);
     }
@@ -146,7 +147,7 @@ public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvid
 							e.printStackTrace();
 						}
 
-						if (startIndex == 0 && nbRead[0] == CHUNK_SIZE[0]) { // do this only once if the event request index is unknown
+						if (startIndex == 0 && nbRead[0].equals(CHUNK_SIZE[0])) { // do this only once if the event request index is unknown
 							startIndex = subRequest.getIndex(); // update the start index with the index of the first subrequest's
 						}                                       // start time event which was set during the arm request
 						CHUNK_SIZE[0] = Math.min(request.getNbRequested() - nbRead[0], blockSize);
