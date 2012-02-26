@@ -131,7 +131,7 @@ public class TmfTimestampTest extends TestCase {
     // clone
     // ------------------------------------------------------------------------
 
-    public class MyTimestamp extends TmfTimestamp {
+    public static class MyTimestamp extends TmfTimestamp {
 
         @Override
         public boolean equals(Object other) {

@@ -159,7 +159,7 @@ public class TmfEventTypeTest extends TestCase {
     // clone
     // ------------------------------------------------------------------------
 
-    public class MyEventType extends TmfEventType {
+    public static class MyEventType extends TmfEventType {
 
         @Override
         public boolean equals(Object other) {
