@@ -113,6 +113,10 @@ public class LTTngControlService implements ILttngControlService {
      */
     private final static String OPTION_CHANNEL = " -c ";  //$NON-NLS-1$
     /**
+     * Command line option for specifying all events.
+     */
+    private final static String OPTION_ALL = " -a ";  //$NON-NLS-1$
+    /**
      * Optional command line option for configuring a channel's overwrite mode.
      */
     private final static String OPTION_OVERWRITE = " --overwrite ";  //$NON-NLS-1$ 
@@ -709,20 +713,25 @@ public class LTTngControlService implements ILttngControlService {
      */
     @Override
     public void enableEvent(String sessionName, String channelName, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
-        // no channels to enable
-        if (eventNames.size() == 0) {
-            return;
-        }
 
         String newSessionName = formatParameter(sessionName);
         
         StringBuffer command = new StringBuffer(COMMAND_ENABLE_EVENT);
 
-        for (Iterator<String> iterator = eventNames.iterator(); iterator.hasNext();) {
-            String event = (String) iterator.next();
-            command.append(event);
-            if (iterator.hasNext()) {
-                command.append(","); //$NON-NLS-1$
+        if (eventNames == null) {
+            command.append(OPTION_ALL);
+        } else {
+            // no events to enable
+            if (eventNames.size() == 0) {
+                return;
+            }
+
+            for (Iterator<String> iterator = eventNames.iterator(); iterator.hasNext();) {
+                String event = (String) iterator.next();
+                command.append(event);
+                if (iterator.hasNext()) {
+                    command.append(","); //$NON-NLS-1$
+                }
             }
         }
 
@@ -753,20 +762,23 @@ public class LTTngControlService implements ILttngControlService {
      */
     @Override
     public void disableEvent(String sessionName, String channelName, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
-        // no channels to enable
-        if (eventNames.size() == 0) {
-            return;
-        }
-
         String newSessionName = formatParameter(sessionName);
 
         StringBuffer command = new StringBuffer(COMMAND_DISABLE_EVENT);
+        if (eventNames == null) {
+            command.append(OPTION_ALL);
+        } else {
+            // no events to enable
+            if (eventNames.size() == 0) {
+                return;
+            }
 
-        for (Iterator<String> iterator = eventNames.iterator(); iterator.hasNext();) {
-            String event = (String) iterator.next();
-            command.append(event);
-            if (iterator.hasNext()) {
-                command.append(","); //$NON-NLS-1$
+            for (Iterator<String> iterator = eventNames.iterator(); iterator.hasNext();) {
+                String event = (String) iterator.next();
+                command.append(event);
+                if (iterator.hasNext()) {
+                    command.append(","); //$NON-NLS-1$
+                }
             }
         }
 

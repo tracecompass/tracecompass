@@ -95,18 +95,30 @@ abstract public class ChangeEventStateHandler extends AbstractHandler {
                 String errorString = null;
 
                 TraceSessionComponent session = null;
-
+                
                 try {
+                    boolean isAll = false;
                     if (fChannel != null) {
                         session = fChannel.getSession();
-                        List<String> channelNames = new ArrayList<String>();
+                        List<String> eventNames = new ArrayList<String>();
                         for (Iterator<TraceEventComponent> iterator = fEvents.iterator(); iterator.hasNext();) {
-                            // Enable all selected channels which are disabled
-                            TraceEventComponent channel = (TraceEventComponent) iterator.next();
-                            channelNames.add(channel.getName());
+                            // Enable/disable all selected channels which are disabled
+                            TraceEventComponent event = (TraceEventComponent) iterator.next();
+                            
+                            // Workaround for wildcard handling in lttng-tools
+                            if ("*".equals(event.getName())) { //$NON-NLS-1$
+                                isAll = true;
+                            } else { 
+                                eventNames.add(event.getName());
+                            }
                         }
-                        
-                        changeState(fChannel, channelNames, monitor);
+                        if (isAll) {
+                            changeState(fChannel, null, monitor);
+                        }
+
+                        if (eventNames.size() > 0) {
+                            changeState(fChannel, eventNames, monitor);
+                        }
 
                         for (Iterator<TraceEventComponent> iterator = fEvents.iterator(); iterator.hasNext();) {
                             // Enable all selected channels which are disabled
@@ -171,30 +183,29 @@ abstract public class ChangeEventStateHandler extends AbstractHandler {
                  
                 if (element instanceof TraceEventComponent) {
                     
-                    // Add only TraceChannelComponents that are disabled
-                    TraceEventComponent channel = (TraceEventComponent) element;
+                    TraceEventComponent event = (TraceEventComponent) element;
                     if (sessionName == null) {
-                        sessionName = String.valueOf(channel.getSessionName());
+                        sessionName = String.valueOf(event.getSessionName());
                     }
                     
                     if (fChannel == null) {
-                        fChannel = (TraceChannelComponent)channel.getParent();
+                        fChannel = (TraceChannelComponent)event.getParent();
                     }
 
                     if (channelName == null) {
-                        channelName = channel.getChannelName();
+                        channelName = event.getChannelName();
                     }
-                    
+
                     // Enable command only for events of same session, same channel and domain
-                    if ((!sessionName.equals(channel.getSessionName())) ||
-                        (!channelName.equals(channel.getChannelName())) ||
-                        (fChannel.isKernel() != channel.isKernel())) {
+                    if ((!sessionName.equals(event.getSessionName())) ||
+                        (!channelName.equals(event.getChannelName())) ||
+                        (fChannel.isKernel() != event.isKernel())) {
                         reset();
                         break;
                     }
 
-                    if ((channel.getState() != getNewState())) {
-                        fEvents.add(channel);
+                    if ((event.getState() != getNewState())) {
+                        fEvents.add(event);
                     }
                 }
             }

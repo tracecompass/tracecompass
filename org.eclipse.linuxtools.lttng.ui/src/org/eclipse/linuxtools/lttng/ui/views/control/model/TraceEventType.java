@@ -19,6 +19,7 @@ package org.eclipse.linuxtools.lttng.ui.views.control.model;
  */
 public enum TraceEventType { 
     TRACEPOINT("tracepoint"), //$NON-NLS-1$
+    SYSCALL("syscall"), //$NON-NLS-1$
     UNKNOWN("unknown"); //$NON-NLS-1$
 
     private final String fInName;
