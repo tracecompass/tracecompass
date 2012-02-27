@@ -955,7 +955,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         TmfExperiment<?> experiment = signal.getExperiment();
         if (experiment == this) {
             setCurrentExperiment(experiment);
-            fEndSynchReference = new Integer(signal.getReference());
+            fEndSynchReference = Integer.valueOf(signal.getReference());
         }
     }
 

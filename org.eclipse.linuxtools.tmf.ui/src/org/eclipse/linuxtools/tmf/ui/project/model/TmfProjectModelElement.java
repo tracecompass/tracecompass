@@ -124,13 +124,28 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement,
     // ------------------------------------------------------------------------
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((fChildren == null) ? 0 : fChildren.hashCode());
+        result = prime * result + ((fLocation == null) ? 0 : fLocation.hashCode());
+        result = prime * result + ((fName == null) ? 0 : fName.hashCode());
+        result = prime * result + ((fParent == null) ? 0 : fParent.hashCode());
+        result = prime * result + ((fPath == null) ? 0 : fPath.hashCode());
+        result = prime * result + ((fResource == null) ? 0 : fResource.hashCode());
+        return result;
+    }
+
+    @Override
     public boolean equals(Object other) {
         if (this == other)
             return true;
+        if (other == null)
+            return false;
         if (!(other instanceof TmfProjectModelElement))
             return false;
-        TmfProjectModelElement o = (TmfProjectModelElement) other;
-        return o.fName.equals(fName) && o.fLocation.equals(fLocation);
+        TmfProjectModelElement element = (TmfProjectModelElement) other;
+        return element.fName.equals(fName) && element.fLocation.equals(fLocation);
     }
 
 }

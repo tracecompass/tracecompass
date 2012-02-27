@@ -99,8 +99,7 @@ public class TmfTimestampTest extends TestCase {
 
     public void testCopyNullConstructor() throws Exception {
         try {
-            @SuppressWarnings("unused")
-            ITmfTimestamp timestamp = new TmfTimestamp(null);
+            new TmfTimestamp(null);
             fail("TmfTimestamp: null argument");
         } catch (IllegalArgumentException e) {
         }

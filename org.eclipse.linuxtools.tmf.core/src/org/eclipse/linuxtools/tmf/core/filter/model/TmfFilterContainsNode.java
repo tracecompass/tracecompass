@@ -101,8 +101,8 @@ public class TmfFilterContainsNode extends TmfFilterTreeNode {
 	@Override
 	public ITmfFilterTreeNode clone() {
 		TmfFilterContainsNode clone = (TmfFilterContainsNode) super.clone();
-		clone.fField = new String(fField);
-		clone.setValue(new String(fValue));
+		clone.fField = fField;
+		clone.setValue(fValue);
 		return clone;
 	}
 }

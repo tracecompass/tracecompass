@@ -117,7 +117,7 @@ public class TmfFilterCompareNode extends TmfFilterTreeNode {
             return false ^ fNot;
         }
         if (fType == Type.NUM) {
-            if (fValueNumber instanceof Number) {
+            if (fValueNumber != null) {
                 if (value instanceof Number) {
                     Double valueDouble = ((Number) value).doubleValue();
                     return (valueDouble.compareTo(fValueNumber.doubleValue()) == fResult) ^ fNot;
@@ -135,7 +135,7 @@ public class TmfFilterCompareNode extends TmfFilterTreeNode {
             String valueString = value.toString();
             return (valueString.compareTo(fValue.toString()) == fResult) ^ fNot;
         } else if (fType == Type.TIMESTAMP) {
-            if (fValueTimestamp instanceof TmfTimestamp) {
+            if (fValueTimestamp != null) {
                 if (value instanceof TmfTimestamp) {
                     TmfTimestamp valueTimestamp = (TmfTimestamp) value;
                     return (valueTimestamp.compareTo(fValueTimestamp, false) == fResult) ^ fNot;
@@ -168,8 +168,8 @@ public class TmfFilterCompareNode extends TmfFilterTreeNode {
 	@Override
 	public ITmfFilterTreeNode clone() {
 		TmfFilterCompareNode clone = (TmfFilterCompareNode) super.clone();
-		clone.fField = new String(fField);
-		clone.setValue(new String(fValue));
+		clone.fField = fField;
+		clone.setValue(fValue);
 		return clone;
 	}
 }

@@ -98,8 +98,8 @@ public class TmfFilterMatchesNode extends TmfFilterTreeNode {
 	@Override
 	public ITmfFilterTreeNode clone() {
 		TmfFilterMatchesNode clone = (TmfFilterMatchesNode) super.clone();
-		clone.fField = new String(fField);
-		clone.setRegex(new String(fRegex));
+		clone.fField = fField;
+		clone.setRegex(fRegex);
 		return clone;
 	}
 	

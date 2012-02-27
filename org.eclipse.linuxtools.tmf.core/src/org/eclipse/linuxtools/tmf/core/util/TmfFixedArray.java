@@ -30,7 +30,7 @@ import java.util.RandomAccess;
  *
  * @param <T> Type of the array content.
  */
-public final class TmfFixedArray<T> extends AbstractList<T> implements RandomAccess {
+public final class TmfFixedArray<T> extends AbstractList<T> implements RandomAccess, Cloneable {
     /**
      * Replace {@link java.util.Arrays#copyOf(Object[], int)} that do not exist in java 5.
      * @param <E> Content of the array.

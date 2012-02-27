@@ -88,22 +88,19 @@ public class TmfSimpleTimestampTest extends TestCase {
         ITmfTimestamp ts0b = new TmfTimestamp(0, 0, 1);
 
         try {
-            @SuppressWarnings("unused")
-            ITmfTimestamp timestamp = new TmfSimpleTimestamp(null);
+            new TmfSimpleTimestamp(null);
             fail("TmfSimpleTimestamp: null argument");
         } catch (IllegalArgumentException e) {
         }
 
         try {
-            @SuppressWarnings("unused")
-            ITmfTimestamp ts = new TmfSimpleTimestamp(ts0a);
+            new TmfSimpleTimestamp(ts0a);
             fail("TmfSimpleTimestamp: bad scale");
         } catch (IllegalArgumentException e) {
         }
 
         try {
-            @SuppressWarnings("unused")
-            ITmfTimestamp ts = new TmfSimpleTimestamp(ts0b);
+            new TmfSimpleTimestamp(ts0b);
             fail("TmfSimpleTimestamp: bad precision");
         } catch (IllegalArgumentException e) {
         }

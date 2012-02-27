@@ -134,6 +134,10 @@ public class TmfExperimentContext extends TmfContext {
  
     @Override
     public boolean equals(Object other) {
+        if (this == other)
+            return true;
+        if (!super.equals(other))
+            return false;
     	if (!(other instanceof TmfExperimentContext)) {
     		return false;
     	}

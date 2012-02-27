@@ -174,7 +174,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
 	    fLock.lock();
         try {
             if (fTrace != null) {
-                ITmfLocation<?> location = new TmfLocation<Long>(new Long((long) (ratio * fTrace.length())));
+                ITmfLocation<?> location = new TmfLocation<Long>(Long.valueOf((long) (ratio * fTrace.length())));
                 TmfContext context = seekLocation(location);
                 context.setRank(ITmfContext.UNKNOWN_RANK);
                 return context;

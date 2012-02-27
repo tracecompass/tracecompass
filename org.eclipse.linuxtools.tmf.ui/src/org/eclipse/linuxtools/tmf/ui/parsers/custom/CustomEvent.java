@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.ui.parsers.custom;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -93,4 +94,5 @@ public class CustomEvent extends TmfEvent {
         }
         fData = null;
     }
+
 }

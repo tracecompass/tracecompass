@@ -520,14 +520,14 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 		// new OpenCallStackViewAction().openView(false);
 		// Replaced by event notification
 		// updateModelSelection();
-		notifySelectionListeners(TmfTimeSelectionEvent.type.WIDGET_DEF_SEL);
+		notifySelectionListeners(TmfTimeSelectionEvent.Type.WIDGET_DEF_SEL);
 	}
 
 	@Override
 	public void widgetSelected(SelectionEvent e) {
 		// Replace by event notification
 		// updateModelSelection();
-		notifySelectionListeners(TmfTimeSelectionEvent.type.WIDGET_SEL);
+		notifySelectionListeners(TmfTimeSelectionEvent.Type.WIDGET_SEL);
 	}
 
 	@Override
@@ -725,7 +725,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	}
 
 	private synchronized void notifySelectionListeners(
-			TmfTimeSelectionEvent.type rtype) {
+			TmfTimeSelectionEvent.Type rtype) {
 		// Any listeners out there ?
 		if (widgetSelectionListners.size() > 0) {
 			// Locate the event selected

@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.core.experiment;
 
+import java.util.Arrays;
+
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 
 /**
@@ -51,4 +53,27 @@ public class TmfExperimentLocation extends TmfLocation<TmfLocationArray> {
 	public long[] getRanks() {
         return fRanks;
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Arrays.hashCode(fRanks);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        TmfExperimentLocation other = (TmfExperimentLocation) obj;
+        if (!Arrays.equals(fRanks, other.fRanks))
+            return false;
+        return true;
+    }
+
 }
