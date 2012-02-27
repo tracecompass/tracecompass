@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.tmf.core.filter.model;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 
 public class TmfFilterRootNode extends TmfFilterTreeNode {
@@ -36,7 +36,7 @@ public class TmfFilterRootNode extends TmfFilterTreeNode {
 	}
 
 	@Override
-	public boolean matches(TmfEvent event) {
+	public boolean matches(ITmfEvent event) {
 		for (ITmfFilterTreeNode node : getChildren()) {
 			if (! node.matches(event)) {
 				return false;

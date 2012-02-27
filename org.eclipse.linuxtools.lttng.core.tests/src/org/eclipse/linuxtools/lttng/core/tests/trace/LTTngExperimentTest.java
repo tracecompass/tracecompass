@@ -60,7 +60,7 @@ public class LTTngExperimentTest extends TestCase {
     		try {
 				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(path), null);
 				File testfile = new File(FileLocator.toFileURL(location).toURI());
-				LTTngTrace trace = new LTTngTrace(testfile.getPath(), false);
+				LTTngTrace trace = new LTTngTrace(testfile.getName(), testfile.getPath(), false);
     			fTraces[0] = trace;
     		} catch (URISyntaxException e) {
     			e.printStackTrace();

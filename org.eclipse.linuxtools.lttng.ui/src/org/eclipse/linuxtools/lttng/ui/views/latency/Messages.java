@@ -20,7 +20,9 @@ import org.eclipse.osgi.util.NLS;
  * 
  * @author Philippe Sawicki
  */
-public class Messages {
+public class Messages extends NLS {
+
+    private static final String BUNDLE_NAME = "org.eclipse.linuxtools.lttng.ui.views.latency.messages"; //$NON-NLS-1$
 
     public static String LatencyView_ViewName;
     public static String LatencyView_Action_IncreaseBarWidth_Tooltip;
@@ -69,12 +71,6 @@ public class Messages {
     public static String LatencyView_tmf_UI;
     public static String LatencyView_ClippingWarning;
     
-
-    /**
-     * Bundle name.
-     */
-    private static final String BUNDLE_NAME = "org.eclipse.linuxtools.lttng.ui.views.latency.messages"; //$NON-NLS-1$
-
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

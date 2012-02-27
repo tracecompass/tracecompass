@@ -140,7 +140,7 @@ public class OpenExperimentHandler extends AbstractHandler {
                     return null;
                 }
                 try {
-                    trace.initTrace(element.getLocation().getPath(), traceEvent.getClass(), false);
+                    trace.initTrace(fExperiment.getName(), element.getLocation().getPath(), traceEvent.getClass(), false);
                 } catch (FileNotFoundException e) {
                     displayErrorMsg(""); //$NON-NLS-1$
                 }
@@ -179,7 +179,7 @@ public class OpenExperimentHandler extends AbstractHandler {
                 } else {
                     editor = activePage.openEditor(editorInput, editorId);
                 }
-                experiment.initTrace(null, null, true);
+                experiment.initTrace(null, null, null, true);
                 IDE.setDefaultEditor(file, editorId);
                 // editor should dispose the experiment on close
             } else {

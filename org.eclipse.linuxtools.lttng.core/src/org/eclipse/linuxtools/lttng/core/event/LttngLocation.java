@@ -123,17 +123,42 @@ public class LttngLocation implements ITmfLocation<LttngTimestamp>, Comparable<L
 	// Object
 	// ------------------------------------------------------------------------
 
-	@Override
-	public boolean equals(Object other) {
-    	if (!(other instanceof LttngLocation)) {
-    		return false;
-    	}
-    	LttngLocation o = (LttngLocation) other;
-    	return (operationTime.equals(o.operationTime)) && (isLastOperationParse == o.isLastOperationParse) &&
-    		   (isLastOperationReadNext == o.isLastOperationReadNext) && (isLastOperationSeek == o.isLastOperationSeek);
-	}
-	
-	@Override
+	/* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (isLastOperationParse ? 1231 : 1237);
+        result = prime * result + (isLastOperationReadNext ? 1231 : 1237);
+        result = prime * result + (isLastOperationSeek ? 1231 : 1237);
+        result = prime * result + ((operationTime == null) ? 0 : operationTime.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof LttngLocation)) {
+            return false;
+        }
+        LttngLocation o = (LttngLocation) obj;
+        return (operationTime.equals(o.operationTime))
+                        && (isLastOperationParse == o.isLastOperationParse)
+                        && (isLastOperationReadNext == o.isLastOperationReadNext)
+                        && (isLastOperationSeek == o.isLastOperationSeek);
+    }
+
+    @Override
 	public String toString() {
 //		return "\tLttngLocation[ P/R/S : "  + isLastOperationParse + "/" + isLastOperationReadNext + "/" + isLastOperationSeek + "  Current : " + operationTime + " ]";
 		return operationTime.toString();

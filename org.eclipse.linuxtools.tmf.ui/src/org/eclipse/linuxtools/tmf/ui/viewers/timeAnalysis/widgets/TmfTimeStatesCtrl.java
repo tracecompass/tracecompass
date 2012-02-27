@@ -71,7 +71,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
     public static final boolean DEFAULT_DRAW_THREAD_JOIN = true;
     public static final boolean DEFAULT_DRAW_THREAD_WAIT = true;
     public static final boolean DEFAULT_DRAW_THREAD_RELEASE = true;
-    public static int H_SCROLLBAR_MAX = Integer.MAX_VALUE - 1;
+    public static final int H_SCROLLBAR_MAX = Integer.MAX_VALUE - 1;
 
     private final double zoomCoeff = 1.5;
 

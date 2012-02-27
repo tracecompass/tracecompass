@@ -26,7 +26,7 @@ public class TestStateManager extends TestCase {
 	 * for package state.experiment
 	 */
 	public void testSetTraceSelection() {
-		String logName = "traceset/trace-15316events_nolost_newformat";
+//		String logName = "traceset/trace-15316events_nolost_newformat";
 		
 //		LTTngTrace testStream = null;
 //		try {

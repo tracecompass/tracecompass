@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.filter.model;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 
 public class TmfFilterAndNode extends TmfFilterTreeNode {
@@ -40,7 +40,7 @@ public class TmfFilterAndNode extends TmfFilterTreeNode {
 	}
 
 	@Override
-	public boolean matches(TmfEvent event) {
+	public boolean matches(ITmfEvent event) {
 		for (ITmfFilterTreeNode node : getChildren()) {
 			if (! node.matches(event)) {
 				return false ^ fNot;

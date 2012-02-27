@@ -50,7 +50,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     private static int          NB_EVENTS    = 20000;
     private static int          BLOCK_SIZE   = 1000;
 
-    private static ITmfTrace[] fTraces;
+    private static ITmfTrace<?>[] fTraces;
     private static TmfExperiment<TmfEvent> fExperiment;
 
     private static byte SCALE = (byte) -3;
@@ -59,7 +59,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     // Housekeeping
     // ------------------------------------------------------------------------
 
-    private synchronized static ITmfTrace[] setupTrace(String path1, String path2) {
+    private synchronized static ITmfTrace<?>[] setupTrace(String path1, String path2) {
     	if (fTraces == null) {
     		fTraces = new ITmfTrace[2];
     		try {
@@ -80,10 +80,11 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     	return fTraces;
     }
 
+    @SuppressWarnings("unchecked")
     private synchronized static void setupExperiment() {
     	synchronized (TmfMultiTraceExperimentTest.class) {
     		if (fExperiment == null) {
-    			fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, fTraces, TmfTimestamp.Zero, BLOCK_SIZE, true);
+    			fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, (ITmfTrace<TmfEvent>[]) fTraces, TmfTimestamp.Zero, BLOCK_SIZE, true);
     		}
     	}
     }

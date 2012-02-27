@@ -58,7 +58,7 @@ public class HistogramView extends TmfView {
     public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.histogram"; //$NON-NLS-1$
 
     // The initial window span (in nanoseconds)
-    public static long INITIAL_WINDOW_SPAN = (1L * 100 * 1000 * 1000); // .1sec
+    public static final long INITIAL_WINDOW_SPAN = (1L * 100 * 1000 * 1000); // .1sec
 
     // Time scale
     private final byte TIME_SCALE = Histogram.TIME_SCALE;

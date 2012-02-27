@@ -168,7 +168,7 @@ public class TimeRangeEventProcess extends TimeRangeComposite implements
 		if (cpu != null) {
 			this.cpu = cpu;
 		} else {
-			cpu = 0L;
+		    this.cpu = 0L;
 		}
 	}
 

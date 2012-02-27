@@ -50,12 +50,12 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
     
     private  boolean showDebug = false;
     
-    public LTTngTextTrace(String path) throws Exception {
-    	this(path, true); // false);
+    public LTTngTextTrace(String name, String path) throws Exception {
+    	this(name, path, true); // false);
     }
     
-    public LTTngTextTrace(String path, boolean skipIndexing) throws Exception {
-        super(path, LttngEvent.class, path, 1, !skipIndexing);
+    public LTTngTextTrace(String name, String path, boolean skipIndexing) throws Exception {
+        super(name, LttngEvent.class, path, 1, !skipIndexing);
         
         tracepath = path;
         traceTypes      = new HashMap<String, LttngEventType>();
@@ -98,7 +98,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
     
     
     public LTTngTextTrace(LTTngTextTrace oldTrace) throws Exception { 
-    	this(oldTrace.getPath(), true);
+    	this(oldTrace.getName(), oldTrace.getPath(), true);
     	
     	// *** VERIFY ***
     	// Is this safe?

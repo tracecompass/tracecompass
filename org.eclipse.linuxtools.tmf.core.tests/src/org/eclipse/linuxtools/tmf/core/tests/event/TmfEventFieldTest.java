@@ -33,8 +33,8 @@ public class TmfEventFieldTest extends TestCase {
     private final String fFieldName1 = "Field-1";
     private final String fFieldName2 = "Field-2";
 
-    private final Object fValue1 = new String("Value");
-    private final Object fValue2 = new Integer(10);
+    private final Object fValue1 = "Value";
+    private final Object fValue2 = Integer.valueOf(10);
 
     private TmfEventField fField1 = new TmfEventField(fFieldName1, fValue1);
     private TmfEventField fField2 = new TmfEventField(fFieldName2, fValue2, null);
@@ -194,7 +194,7 @@ public class TmfEventFieldTest extends TestCase {
     // Modifiers
     // ------------------------------------------------------------------------
 
-    private class MyField extends TmfEventField {
+    private static class MyField extends TmfEventField {
 
         public MyField(String id, Object value) {
             super(id, value);

@@ -34,7 +34,7 @@ public class TraceConnectorServiceManager extends AbstractConnectorServiceManage
     // ------------------------------------------------------------------------
     private static TraceConnectorServiceManager INSTANCE = new TraceConnectorServiceManager();
 
-    public static int TCF_PORT = 1534;
+    public static final int TCF_PORT = 1534;
 
     // ------------------------------------------------------------------------
     // Constructors

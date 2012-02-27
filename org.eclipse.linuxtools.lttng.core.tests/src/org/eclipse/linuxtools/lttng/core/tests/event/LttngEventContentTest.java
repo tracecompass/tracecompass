@@ -64,7 +64,7 @@ public class LttngEventContentTest extends TestCase {
 			try {
 				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(tracepath1), null);
 				File testfile = new File(FileLocator.toFileURL(location).toURI());
-				LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getPath());
+				LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getName(), testfile.getPath());
 				testStream = tmpStream;
 			} 
 			catch (Exception e) {
@@ -99,8 +99,9 @@ public class LttngEventContentTest extends TestCase {
 	public void testConstructors() {
 		LttngEvent 		  testEvent = null;
 		LttngEventContent testContent 	= null;
-		LttngEventContent testContent2 	= null;
-        LttngEventField[] 	testFields  = new LttngEventField[1];
+		@SuppressWarnings("unused")
+        LttngEventContent testContent2 	= null;
+        LttngEventField[] testFields  = new LttngEventField[1];
         testFields[0] = new LttngEventField("test");
         
 	    // Default construction with good argument

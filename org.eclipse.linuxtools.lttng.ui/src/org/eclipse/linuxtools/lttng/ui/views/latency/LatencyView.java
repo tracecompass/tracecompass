@@ -61,7 +61,7 @@ public class LatencyView extends TmfView implements IGraphModelListener {
     // ------------------------------------------------------------------------
     
     // The initial window span (in nanoseconds)
-    public static long INITIAL_WINDOW_SPAN = (1L * 100 * 1000 * 1000); // .1sec
+    public static final long INITIAL_WINDOW_SPAN = (1L * 100 * 1000 * 1000); // .1sec
 
     /**
      * The view's unique ID.

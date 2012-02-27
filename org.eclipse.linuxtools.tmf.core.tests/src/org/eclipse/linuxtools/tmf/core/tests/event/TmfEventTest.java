@@ -300,7 +300,8 @@ public class TmfEventTest extends TestCase {
     // clone
     // ------------------------------------------------------------------------
 
-    public class MyEvent extends TmfEvent {
+    public static class MyEvent extends TmfEvent {
+
         @Override
         public boolean equals(Object other) {
             return super.equals(other);

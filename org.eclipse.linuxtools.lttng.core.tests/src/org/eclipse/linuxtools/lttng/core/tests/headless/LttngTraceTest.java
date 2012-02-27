@@ -30,6 +30,7 @@ public class LttngTraceTest {
 		
 		// Path of the trace
         final String TRACE_PATH = "/home/francois/Desktop/Workspaces/LTTngTraces/trace_2GB";
+        final String TRACE_NAME = "trace_2GB";
 		
         // *** Change to true to use the "fake" LttngTextTrace instead of LTTngTrace
         // To use this, you need a ".txt" trace. 
@@ -53,9 +54,9 @@ public class LttngTraceTest {
 		try {
 			// ** Use TextTrace (slow!) if it was asked 
 			if ( USE_TEXT_TRACE ) {
-				tmptrace = new LTTngTextTrace(TRACE_PATH, true);
+				tmptrace = new LTTngTextTrace(TRACE_NAME, TRACE_PATH, true);
 			} else {
-				tmptrace = new LTTngTrace(TRACE_PATH, null, true, true);
+				tmptrace = new LTTngTrace(TRACE_NAME, TRACE_PATH, null, true, true);
 			}
 			
 			LttngTimestamp tmpTime = new LttngTimestamp(0L);

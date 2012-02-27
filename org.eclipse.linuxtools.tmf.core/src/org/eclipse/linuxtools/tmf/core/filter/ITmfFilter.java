@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.filter;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 
 public interface ITmfFilter {
@@ -23,6 +23,6 @@ public interface ITmfFilter {
 	 * @param event The event to verify.
 	 * @return True if the event matches the filter conditions.
 	 */
-	public boolean matches(TmfEvent event);
+	public boolean matches(ITmfEvent event);
 	
 }

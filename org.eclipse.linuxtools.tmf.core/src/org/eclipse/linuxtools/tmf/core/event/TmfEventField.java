@@ -13,6 +13,7 @@
 
 package org.eclipse.linuxtools.tmf.core.event;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,7 +81,7 @@ public class TmfEventField implements ITmfEventField {
         }
         fName = name;
         fValue = value;
-        fFields = fields;
+        fFields = (fields != null) ? Arrays.copyOf(fields, fields.length) : null;
         populateStructs();
     }
 
@@ -124,7 +125,7 @@ public class TmfEventField implements ITmfEventField {
      */
     @Override
     public String[] getFieldNames() {
-        return fFieldNames;
+        return Arrays.copyOf(fFieldNames, fFieldNames.length);
     }
 
     /* (non-Javadoc)
@@ -144,7 +145,7 @@ public class TmfEventField implements ITmfEventField {
      */
     @Override
     public ITmfEventField[] getFields() {
-        return fFields;
+        return (fFields != null) ? Arrays.copyOf(fFields, fFields.length) : null;
     }
 
     /* (non-Javadoc)
@@ -152,7 +153,6 @@ public class TmfEventField implements ITmfEventField {
      */
     @Override
     public ITmfEventField getField(String name) {
-        // FIXME: Add treatment for 'special' fields 
         return fNameMapping.get(name);
     }
 

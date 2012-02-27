@@ -52,8 +52,8 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     }
 
     @Override
-    public void initTrace(String path, Class<CustomTxtEvent> eventType, boolean indexTrace) throws FileNotFoundException {
-        super.initTrace(path, eventType, CACHE_SIZE, indexTrace);
+    public void initTrace(String name, String path, Class<CustomTxtEvent> eventType, boolean indexTrace) throws FileNotFoundException {
+        super.initTrace(name, path, eventType, CACHE_SIZE, indexTrace);
     }
 
     @Override

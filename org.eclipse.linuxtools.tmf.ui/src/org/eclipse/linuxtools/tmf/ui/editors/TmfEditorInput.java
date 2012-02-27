@@ -78,8 +78,29 @@ public class TmfEditorInput implements IEditorInput {
         return fTrace;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
-	public boolean equals(Object obj) {
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((fResource == null) ? 0 : fResource.hashCode());
+        result = prime * result + ((fTrace == null) ? 0 : fTrace.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
         if (obj instanceof TmfEditorInput) {
             return fResource.equals(((TmfEditorInput) obj).fResource);
         } else if (obj instanceof IFileEditorInput) {
@@ -89,4 +110,5 @@ public class TmfEditorInput implements IEditorInput {
         }
         return false;
     }
+
 }

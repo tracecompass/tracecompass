@@ -14,7 +14,6 @@ package org.eclipse.linuxtools.tmf.core.tests.trace;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 

@@ -59,7 +59,7 @@ public class LttngEventTest extends TestCase {
 			try {
 				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(tracepath1), null);
 				File testfile = new File(FileLocator.toFileURL(location).toURI());
-				LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getPath(), skipIndexing);
+				LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getName(), testfile.getPath(), skipIndexing);
 				testStream = tmpStream;
 			} 
 			catch (Exception e) {

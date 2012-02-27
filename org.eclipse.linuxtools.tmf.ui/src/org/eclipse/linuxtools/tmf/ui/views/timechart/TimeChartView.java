@@ -26,7 +26,6 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;

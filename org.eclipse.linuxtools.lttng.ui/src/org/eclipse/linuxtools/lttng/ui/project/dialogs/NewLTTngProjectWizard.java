@@ -12,7 +12,7 @@
  *   Francois Chouinard - Rebase on TMF NewProjectWizard
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.ui.views.project.dialogs;
+package org.eclipse.linuxtools.lttng.ui.project.dialogs;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;

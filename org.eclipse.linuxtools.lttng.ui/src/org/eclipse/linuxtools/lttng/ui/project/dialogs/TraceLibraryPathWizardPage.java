@@ -9,14 +9,11 @@
  * Contributors:
  *   Yufen Kuo (ykuo@mvista.com) - Initial API and implementation
  *******************************************************************************/
-
-package org.eclipse.linuxtools.lttng.ui.views.project.dialogs;
+package org.eclipse.linuxtools.lttng.ui.project.dialogs;
 
 import java.io.File;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.linuxtools.lttng.core.TraceHelper;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -27,21 +24,22 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.dialogs.PropertyPage;
 
-public class TraceLibraryPathPropertyPage extends PropertyPage {
-
-    private static final String LTTVTRACEREAD_LOADER_LIBNAME = "lttvtraceread_loader";
+public class TraceLibraryPathWizardPage extends WizardPage {
+    private static final String LTTVTRACEREAD_LOADER_LIBNAME = "lttvtraceread_loader"; //$NON-NLS-1$
     private Button browsePathButton;
     private Text traceLibraryPath;
 
+    protected TraceLibraryPathWizardPage(String pageName) {
+        super(pageName);
+    }
+
     @Override
-    protected Control createContents(Composite parent) {
+    public void createControl(Composite parent) {
         Composite client = new Composite(parent, SWT.NONE);
         client.setLayoutData(new GridData(GridData.FILL_BOTH));
 
@@ -53,19 +51,18 @@ public class TraceLibraryPathPropertyPage extends PropertyPage {
         Label label = new Label(client, SWT.NONE);
         label.setText(Messages.TraceLibraryPath_label);
         traceLibraryPath = new Text(client, SWT.BORDER);
-        traceLibraryPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-                false));
+        traceLibraryPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         traceLibraryPath.addModifyListener(new ModifyListener() {
 
             @Override
             public void modifyText(ModifyEvent e) {
-                setValid(validateInputs());
+                boolean valid = validatePage();
+                setPageComplete(valid);
             }
 
         });
         browsePathButton = new Button(client, SWT.PUSH);
-        browsePathButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, false,
-                false));
+        browsePathButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
         browsePathButton.setText(Messages.TraceLibraryPath_browseBtn);
         browsePathButton.addSelectionListener(new SelectionAdapter() {
 
@@ -85,7 +82,7 @@ public class TraceLibraryPathPropertyPage extends PropertyPage {
         noLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false, false));
 
         Label descTextLabel = new Label(client, SWT.WRAP);
-        descTextLabel.setText(Messages.TraceLibraryPathProperty_Message);
+        descTextLabel.setText(Messages.TraceLibraryPathWizard_Message);
         GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
         gd.widthHint = 400;
         gd.horizontalSpan = 2;
@@ -93,8 +90,7 @@ public class TraceLibraryPathPropertyPage extends PropertyPage {
 
         Label noteBoldLabel = new Label(client, SWT.BOLD);
         noteBoldLabel.setText(Messages.TraceLibraryPath_Note);
-        noteBoldLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false,
-                false));
+        noteBoldLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false, false));
         Font font = noteBoldLabel.getFont();
         if (font.getFontData().length > 0)
             noteBoldLabel.setFont(new Font(client.getDisplay(), font
@@ -107,14 +103,22 @@ public class TraceLibraryPathPropertyPage extends PropertyPage {
         gd.widthHint = 400;
         gd.horizontalSpan = 2;
         noteTextLabel.setLayoutData(gd);
-                
-        performDefaults();
-        return client;
+        setControl(client);
+
     }
 
-    public boolean validateInputs() {
-        String path = traceLibraryPath.getText();
-        if (path != null && !path.trim().isEmpty()) {
+    public String getPath() {
+        if (traceLibraryPath != null && !traceLibraryPath.isDisposed()) {
+            String path = traceLibraryPath.getText();
+            if (path != null && !path.trim().isEmpty())
+                return path;
+        }
+        return null;
+    }
+
+    private boolean validatePage() {
+        String path = getPath();
+        if (path != null) {
             File file = new File(path);
             if (file.exists() && file.isDirectory()) {
                 File loaderLib = new File(path,
@@ -130,38 +134,7 @@ public class TraceLibraryPathPropertyPage extends PropertyPage {
         }
         setErrorMessage(null);
         return true;
-    }
 
-    @Override
-    protected void performDefaults() {
-        IResource resource = (IResource) getElement().getAdapter(
-                IResource.class);
-        IProject project = resource.getProject();
-        if (project != null) {
-            String traceLibDir = TraceHelper.getTraceLibDirFromProject(project);
-            if (traceLibDir != null) {
-                traceLibraryPath.setText(traceLibDir);
-            }
-        }
-        super.performDefaults();
-    }
-
-    @Override
-    public boolean performOk() {
-        IResource resource = (IResource) getElement().getAdapter(
-                IResource.class);
-        IProject project = resource.getProject();
-        boolean ok = false;
-        if (project != null) {
-            String libPath = traceLibraryPath.getText();
-            if (libPath == null || libPath.trim().isEmpty())
-                ok = TraceHelper.removeProjectPreference(project,
-                        "traceLibraryPath");
-            else
-                ok = TraceHelper.setProjectPreference(project,
-                        "traceLibraryPath", traceLibraryPath.getText());
-        }
-        return ok && super.performOk();
     }
 
 }

@@ -51,7 +51,6 @@ import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomXmlTraceDefinition;
-import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
@@ -588,7 +587,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
         String categoryId = ce.getAttribute(TmfTraceType.CATEGORY_ATTR);
         if (categoryId != null) {
             IConfigurationElement category = fTraceCategories.get(categoryId);
-            if (category != null && !category.equals("")) { //$NON-NLS-1$
+            if (category != null && !category.getName().equals("")) { //$NON-NLS-1$
                 return category.getAttribute(TmfTraceType.NAME_ATTR);
             }
         }

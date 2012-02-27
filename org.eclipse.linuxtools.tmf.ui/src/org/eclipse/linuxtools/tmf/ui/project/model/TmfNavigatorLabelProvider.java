@@ -122,6 +122,11 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
             return folder.getName() + " [" + folder.getTraces().size() + "]"; //$NON-NLS-1$//$NON-NLS-2$
         }
 
+        if (element instanceof TmfExperimentFolder) {
+            TmfExperimentFolder folder = (TmfExperimentFolder) element;
+            return folder.getName() + " [" + folder.getChildren().size() + "]"; //$NON-NLS-1$//$NON-NLS-2$
+        }
+
         // Catch all
         if (element instanceof ITmfProjectModelElement) {
             return ((ITmfProjectModelElement) element).getName();

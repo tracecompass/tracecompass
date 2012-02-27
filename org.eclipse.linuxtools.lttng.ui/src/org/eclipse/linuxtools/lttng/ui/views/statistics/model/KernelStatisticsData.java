@@ -912,6 +912,10 @@ public class KernelStatisticsData extends StatisticsData {
          */
         @Override
         public boolean equals(Object o) {
+            if (o == this)
+                return true;
+            if (o == null)
+                return false;
             if (fValue == ((KeyHelper) o).fValue && fName.equals(((KeyHelper) o).fName)) {
                 return true;
             }
@@ -1065,6 +1069,11 @@ public class KernelStatisticsData extends StatisticsData {
          */
         @Override
         public boolean equals(Object obj) {
+            if (obj == this)
+                return true;
+            if (obj == null)
+                return false;
+
             ProcessKey procKey = (ProcessKey) obj;
 
             if (procKey.fPid != this.fPid) {

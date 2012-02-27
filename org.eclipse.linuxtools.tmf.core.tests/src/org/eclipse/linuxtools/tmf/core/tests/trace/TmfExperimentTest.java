@@ -48,7 +48,7 @@ public class TmfExperimentTest extends TestCase {
     private static int          NB_EVENTS   = 10000;
     private static int    fDefaultBlockSize = 1000;
 
-    private static ITmfTrace[] fTraces;
+    private static ITmfTrace<?>[] fTraces;
     private static TmfExperiment<TmfEvent> fExperiment;
 
     private static byte SCALE = (byte) -3;
@@ -57,7 +57,7 @@ public class TmfExperimentTest extends TestCase {
     // Housekeeping
     // ------------------------------------------------------------------------
 
-    private ITmfTrace[] setupTrace(String path) {
+    private ITmfTrace<?>[] setupTrace(String path) {
     	if (fTraces == null) {
     		fTraces = new ITmfTrace[1];
     		try {
@@ -74,9 +74,10 @@ public class TmfExperimentTest extends TestCase {
     	return fTraces;
     }
 
+    @SuppressWarnings("unchecked")
     private void setupExperiment() {
     	if (fExperiment == null) {
-            fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, fTraces);
+            fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, (ITmfTrace<TmfEvent>[]) fTraces);
 //            fExperiment.indexExperiment();
     	}
     }

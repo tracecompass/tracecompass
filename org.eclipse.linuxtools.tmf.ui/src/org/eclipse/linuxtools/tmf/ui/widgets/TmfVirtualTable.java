@@ -157,7 +157,8 @@ public class TmfVirtualTable extends Composite {
 		// Implement a "fake" tooltip
 		final String TOOLTIP_DATA_KEY = "_TABLEITEM"; //$NON-NLS-1$
 		final Listener labelListener = new Listener () {
-			public void handleEvent (Event event) {
+			@Override
+            public void handleEvent (Event event) {
 				Label label = (Label)event.widget;
 				Shell shell = label.getShell ();
 				switch (event.type) {
@@ -182,7 +183,8 @@ public class TmfVirtualTable extends Composite {
 		Listener tableListener = new Listener () {
 			Shell tip = null;
 			Label label = null;
-			public void handleEvent (Event event) {
+			@Override
+            public void handleEvent (Event event) {
 				switch (event.type) {
 				case SWT.Dispose:
 				case SWT.KeyDown:

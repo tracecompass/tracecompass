@@ -128,6 +128,7 @@ public class LttngEvent extends TmfEvent {
         fContent = newContent;
     }
 
+    @Override
     public void setReference(String reference) {
         fReference = reference;
     }

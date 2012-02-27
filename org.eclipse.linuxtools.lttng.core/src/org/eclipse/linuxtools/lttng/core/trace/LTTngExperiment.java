@@ -268,6 +268,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> {
         thread.start();
     }
 
+    @Override
     @TmfSignalHandler
     public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
         if (signal.getExperiment() == this) {

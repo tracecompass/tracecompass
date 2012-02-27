@@ -27,15 +27,13 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 public interface ITmfTrace<T extends TmfEvent> extends ITmfComponent {
 
     // initTrace variants
-    public void initTrace(String path, Class<T> eventType) throws FileNotFoundException;
+    public void initTrace(String name, String path, Class<T> eventType) throws FileNotFoundException;
 
-    public void initTrace(String path, Class<T> eventType, int cacheSize) throws FileNotFoundException;
+    public void initTrace(String name, String path, Class<T> eventType, int cacheSize) throws FileNotFoundException;
 
-    public void initTrace(String path, Class<T> eventType, boolean indexTrace) throws FileNotFoundException;
+    public void initTrace(String name, String path, Class<T> eventType, boolean indexTrace) throws FileNotFoundException;
 
-    public void initTrace(String path, Class<T> eventType, int cacheSize, boolean indexTrace) throws FileNotFoundException;
-
-    public void initTrace(String path, Class<T> eventType, int cacheSize, boolean indexTrace, String name) throws FileNotFoundException;
+    public void initTrace(String name, String path, Class<T> eventType, int cacheSize, boolean indexTrace) throws FileNotFoundException;
 
     // Trace type validation
     public boolean validate(IProject project, String path);

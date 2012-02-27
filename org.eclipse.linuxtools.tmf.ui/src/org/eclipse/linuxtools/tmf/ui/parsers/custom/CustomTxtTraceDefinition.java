@@ -244,8 +244,29 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             return "(" + (min >= 0 ? min : "?") + "," + (max == INF ? "\u221E" : (max >= 0 ? max : "?")) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
         }
 
+        /* (non-Javadoc)
+         * @see java.lang.Object#hashCode()
+         */
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + max;
+            result = prime * result + min;
+            return result;
+        }
+
+        /* (non-Javadoc)
+         * @see java.lang.Object#equals(java.lang.Object)
+         */
         @Override
         public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
             if (!(obj instanceof Cardinality)) return false;
             Cardinality other = (Cardinality) obj;
             return (this.min == other.min && this.max == other.max);
