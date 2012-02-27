@@ -135,7 +135,7 @@ public class DomainInfoTest extends TestCase {
 
         String result = fixture.toString();
 
-        assertEquals("[DomainInfo([TraceInfo(Name=domain)],Channels=None)]", result);
+        assertEquals("[DomainInfo([TraceInfo(Name=domain)],Channels=None,isKernel=false)]", result);
     }
 
     /**
@@ -145,7 +145,7 @@ public class DomainInfoTest extends TestCase {
     public void testToString_2() {
         String result = fDomainInfo1.toString();
 
-        assertEquals("[DomainInfo([TraceInfo(Name=test1)],Channels=[ChannelInfo([TraceInfo(Name=channel1)],State=DISABLED,OverwriteMode=true,SubBuffersSize=13,NumberOfSubBuffers=12,SwitchTimer=10,ReadTimer=11,output=splice(),Events=[EventInfo([BaseEventInfo([TraceInfo(Name=event1)],type=TRACEPOINT,level=TRACE_DEBUG)],State=ENABLED)])])]", result);
+        assertEquals("[DomainInfo([TraceInfo(Name=test1)],Channels=[ChannelInfo([TraceInfo(Name=channel1)],State=DISABLED,OverwriteMode=true,SubBuffersSize=13,NumberOfSubBuffers=12,SwitchTimer=10,ReadTimer=11,output=splice(),Events=[EventInfo([BaseEventInfo([TraceInfo(Name=event1)],type=TRACEPOINT,level=TRACE_DEBUG)],State=ENABLED)])],isKernel=false)]", result);
     }
     
     // ------------------------------------------------------------------------

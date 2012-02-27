@@ -413,9 +413,9 @@ public class LTTngControlServiceTest extends TestCase {
         } 
     }
 
-    void testDestroySession() {
+    public void testDestroySession() {
         try {
-            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionErrors());
+            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionNames());
             service.destroySession("mysession2", new NullProgressMonitor());
         } catch (ExecutionException e) {
             fail(e.toString());

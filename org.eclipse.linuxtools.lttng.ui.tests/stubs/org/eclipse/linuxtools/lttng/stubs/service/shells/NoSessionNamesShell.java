@@ -11,7 +11,7 @@ public class NoSessionNamesShell extends TestCommandShell {
     @Override
     public ICommandResult executeCommand(String command, IProgressMonitor monitor, boolean checkReturnValue) throws ExecutionException {
         String[] output = new String[1];
-        output[0] = String.valueOf("Error: No Session found");
-        return new CommandResult(1, output);
+        output[0] = String.valueOf("Currently no available tracing session");
+        return new CommandResult(0, output);
     }
 }

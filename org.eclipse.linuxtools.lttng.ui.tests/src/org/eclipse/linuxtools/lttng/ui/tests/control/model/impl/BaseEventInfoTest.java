@@ -75,7 +75,7 @@ public class BaseEventInfoTest extends TestCase {
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(1, result.ordinal());
+        assertEquals(2, result.ordinal());
         
         TraceLogLevel level = fixture.getLogLevel();
         assertEquals("TRACE_DEBUG", level.getInName());
@@ -125,14 +125,14 @@ public class BaseEventInfoTest extends TestCase {
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(1, result.ordinal());
+        assertEquals(2, result.ordinal());
         
         fixture.setEventType("");
         result = fixture.getEventType();
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(1, result.ordinal());
+        assertEquals(2, result.ordinal());
         
         fixture.setEventType("tracepoint");
         result = fixture.getEventType();
@@ -166,7 +166,7 @@ public class BaseEventInfoTest extends TestCase {
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(1, result.ordinal());
+        assertEquals(2, result.ordinal());
     }
     
     /**
