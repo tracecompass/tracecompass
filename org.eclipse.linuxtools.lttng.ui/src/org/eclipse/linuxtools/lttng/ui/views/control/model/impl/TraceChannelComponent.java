@@ -235,6 +235,13 @@ public class TraceChannelComponent extends TraceControlComponent {
         return ((TraceDomainComponent)getParent()).isKernel();
     }
     
+    /**
+     * @return the parent target node
+     */
+    public TargetNodeComponent getTargetNode() {
+        return ((TraceDomainComponent)getParent()).getTargetNode();
+    }
+    
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -243,8 +250,8 @@ public class TraceChannelComponent extends TraceControlComponent {
      * @param eventNames - a list of event names to enabled.
      * @throws ExecutionException
      */
-    public void enableEvent(List<String> eventNames) throws ExecutionException {
-        enableEvent(eventNames, new NullProgressMonitor());
+    public void enableEvents(List<String> eventNames) throws ExecutionException {
+        enableEvents(eventNames, new NullProgressMonitor());
     }
 
     /**
@@ -253,8 +260,67 @@ public class TraceChannelComponent extends TraceControlComponent {
      * @param monitor - a progress monitor
      * @throws ExecutionException
      */
-    public void enableEvent(List<String> eventNames, IProgressMonitor monitor) throws ExecutionException {
-        getControlService().enableEvent(getParent().getParent().getName(), getName(), eventNames, isKernel(), monitor);
+    public void enableEvents(List<String> eventNames, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().enableEvents(getSessionName(), getName(), eventNames, isKernel(), monitor);
+    }
+    
+    /**
+     * Enables all syscalls (for kernel domain)
+     * @throws ExecutionException
+     */
+    public void enableSyscalls() throws ExecutionException {
+        enableSyscalls(new NullProgressMonitor());
+    }
+
+    /**
+     * Enables all syscalls (for kernel domain)
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void enableSyscalls(IProgressMonitor monitor) throws ExecutionException {
+        getControlService().enableSyscalls(getSessionName(), getName(), monitor);
+    }
+
+    /**
+     * Enables a dynamic probe (for kernel domain)
+     * @param eventName - event name for probe
+     * @param probe - the actual probe
+     * @throws ExecutionException
+     */
+    public void enableProbe(String eventName, String probe) throws ExecutionException {
+        enableProbe(eventName, probe, new NullProgressMonitor());
+    }
+
+    /**
+     * Enables a dynamic probe (for kernel domain)
+     * @param eventName - event name for probe
+     * @param probe - the actual probe
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void enableProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().enableProbe(getSessionName(), getName(), eventName, probe, monitor);
+    }
+
+    /**
+     * Enables a dynamic function entry/return probe (for kernel domain)
+     * @param eventName - event name for probe
+     * @param probe - the actual probe
+     * @throws ExecutionException
+     */
+    public void enableFunctionProbe(String eventName, String probe) throws ExecutionException {
+        enableFunctionProbe(eventName, probe, new NullProgressMonitor());
+    }
+    
+    /**
+     * Enables a dynamic function entry/return probe (for kernel domain)
+     * @param eventName - event name for probe
+     * @param probe - the actual probe
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void enableFunctionProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().enableFunctionProbe(getSessionName(), getName(), eventName, probe, monitor);
     }
     
     /**

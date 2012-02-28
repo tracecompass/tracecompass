@@ -11,15 +11,11 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.control.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.linuxtools.lttng.ui.views.control.ControlView;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TargetNodeComponent;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * <b><u>BaseNodeHandler</u></b>
@@ -27,7 +23,7 @@ import org.eclipse.ui.PlatformUI;
  * Command handler implementation to delete a target host.
  * </p>
  */
-abstract public class BaseNodeHandler extends AbstractHandler {
+abstract public class BaseNodeHandler extends BaseControlViewHandler {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -46,25 +42,15 @@ abstract public class BaseNodeHandler extends AbstractHandler {
      */
     @Override
     public boolean isEnabled() {
-        fTargetNode = null;
 
-        // Check if we are closing down
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null) {
-            return false;
-        }
-
-        // Check if we are in the Project View
-        IWorkbenchPage page = window.getActivePage();
+        // Get workbench page for the Control View
+        IWorkbenchPage page = getWorkbenchPage();
         if (page == null) {
             return false;
         }
 
-        IWorkbenchPart part = page.getActivePart();
-        if (!(part instanceof ControlView)) {
-            return false;
-        }
-
+        fTargetNode = null;
+        
         // Check if the node component is selected
         ISelection selection = page.getSelection(ControlView.ID);
         if (selection instanceof StructuredSelection) {
@@ -73,4 +59,6 @@ abstract public class BaseNodeHandler extends AbstractHandler {
         }
         return fTargetNode != null;
     }
+
+    
 }

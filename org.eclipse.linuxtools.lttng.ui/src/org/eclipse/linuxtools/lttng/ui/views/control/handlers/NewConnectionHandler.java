@@ -11,7 +11,6 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.control.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -37,7 +36,7 @@ import org.eclipse.ui.PlatformUI;
  * Command handler for creation new connection for trace control.
  * </p>
  */
-public class NewConnectionHandler extends AbstractHandler {
+public class NewConnectionHandler extends BaseControlViewHandler {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -137,22 +136,17 @@ public class NewConnectionHandler extends AbstractHandler {
      */
     @Override
     public boolean isEnabled() {
+        
+        // Get workbench page for the Control View
+        IWorkbenchPage page = getWorkbenchPage();
+        if (page == null) {
+            return false;
+        }
+
         fRoot = null;
 
-        // Check if we are closing down
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null) {
-            return false;
-        }
-
-        // Check if we are in the Control View
-        IWorkbenchPage page = window.getActivePage();
-        if (page == null) return false;
-        IWorkbenchPart part = page.getActivePart();
-        if (!(part instanceof ControlView)) {
-            return false;
-        }
-
+        // no need to verify part because it has been already done in getWorkbenchPage()
+        IWorkbenchPart part = page.getActivePart(); 
         fRoot = ((ControlView) part).getTraceControlRoot();
         
         return (fRoot != null);

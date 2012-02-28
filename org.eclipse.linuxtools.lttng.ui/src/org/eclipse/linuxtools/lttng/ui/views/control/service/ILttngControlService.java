@@ -110,7 +110,7 @@ public interface ILttngControlService {
       * @param monitor - a progress monitor 
       * @throws ExecutionException
       */
-    public void enableChannel(String sessionName, List<String> channelNames, boolean isKernel, IChannelInfo info, IProgressMonitor monitor) throws ExecutionException;
+    public void enableChannels(String sessionName, List<String> channelNames, boolean isKernel, IChannelInfo info, IProgressMonitor monitor) throws ExecutionException;
 
      /**
       * Disables a list of channels for given session and given channel information (configuration). 
@@ -120,7 +120,7 @@ public interface ILttngControlService {
       * @param monitor - a progress monitor 
       * @throws ExecutionException
       */
-    public void disableChannel(String sessionName, List<String> channelNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException;
+    public void disableChannels(String sessionName, List<String> channelNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException;
 
     /**
      * Enables a list of events with no additional parameters.
@@ -131,8 +131,39 @@ public interface ILttngControlService {
      * @param monitor - a progress monitor
      * @throws ExecutionException
      */
-    public void enableEvent(String sessionName, String channelName, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException;
-    
+    public void enableEvents(String sessionName, String channelName, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException;
+
+    /**
+     * Enables all syscall events.
+     * @param sessionName - a session name
+     * @param channelName - a channel name (null for default channel)
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void enableSyscalls(String sessionName, String channelName, IProgressMonitor monitor) throws ExecutionException;
+
+    /**
+     * Enables a dynamic probe.
+     * @param sessionName - a session name
+     * @param channelName - a channel name (null for default channel)
+     * @param monitor - a progress monitor
+     * @param eventName - a event name
+     * @param probe - a dynamic probe information 
+     * @throws ExecutionException
+     */
+    public void enableProbe(String sessionName, String channelName, String eventName, String probe, IProgressMonitor monitor) throws ExecutionException;
+
+    /**
+     * Enables a dynamic function entry/return probe.
+     * @param sessionName - a session name
+     * @param channelName - a channel name (null for default channel)
+     * @param monitor - a progress monitor
+     * @param eventName - a event name
+     * @param function - a dynamic function entry/return probe information 
+     * @throws ExecutionException
+     */
+    public void enableFunctionProbe(String sessionName, String channelName, String eventName, String probe, IProgressMonitor monitor) throws ExecutionException;
+
     /**
      * Disables a list of events with no additional parameters.
      * @param sessionName - a session name

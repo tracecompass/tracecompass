@@ -109,9 +109,9 @@ public class AssignEventHandler extends AbstractHandler {
                     TraceChannelComponent channel = dialog.getChannel();
                     if (channel == null) {
                         // enable events on default channel (which will be created by lttng-tools)
-                        dialog.getSession().enableEvent(eventNames, fIsKernel, monitor);
+                        dialog.getSession().enableEvents(eventNames, fIsKernel, monitor);
                     } else {
-                        channel.enableEvent(eventNames, monitor);
+                        channel.enableEvents(eventNames, monitor);
                     }
 
                 } catch (ExecutionException e) {

@@ -11,7 +11,6 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.control.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,7 +27,6 @@ import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.CreateSessionDialog
 import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.ICreateSessionDialog;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionGroup;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
@@ -38,7 +36,7 @@ import org.eclipse.ui.PlatformUI;
  * Command handler implementation to create a trace session.
  * </p>
  */
-public class CreateSessionHandler extends AbstractHandler {
+public class CreateSessionHandler extends BaseControlViewHandler {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -95,24 +93,14 @@ public class CreateSessionHandler extends AbstractHandler {
      */
     @Override
     public boolean isEnabled() {
-        fSessionGroup = null;
-
-        // Check if we are closing down
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null) {
-            return false;
-        }
-
-        // Check if we are in the Project View
-        IWorkbenchPage page = window.getActivePage();
+        
+        // Get workbench page for the Control View
+        IWorkbenchPage page = getWorkbenchPage();
         if (page == null) {
             return false;
         }
 
-        IWorkbenchPart part = page.getActivePart();
-        if (!(part instanceof ControlView)) {
-            return false;
-        }
+        fSessionGroup = null;
 
         // Check if the session group project is selected
         ISelection selection = page.getSelection(ControlView.ID);

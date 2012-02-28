@@ -117,6 +117,22 @@ public class LTTngControlService implements ILttngControlService {
      */
     private final static String OPTION_ALL = " -a ";  //$NON-NLS-1$
     /**
+     * Command line option for specifying tracepoint events.
+     */
+    private final static String OPTION_TRACEPOINT = " --tracepoint ";  //$NON-NLS-1$
+    /**
+     * Command line option for specifying syscall events.
+     */
+    private final static String OPTION_SYSCALL = " --syscall ";  //$NON-NLS-1$
+    /**
+     * Command line option for specifying a dynamic probe.
+     */
+    private final static String OPTION_PROBE = " --probe ";  //$NON-NLS-1$
+    /**
+     * Command line option for specifying a dynamic function entry/return probe.
+     */
+    private final static String OPTION_FUNCTION_PROBE = " --function ";  //$NON-NLS-1$
+    /**
      * Optional command line option for configuring a channel's overwrite mode.
      */
     private final static String OPTION_OVERWRITE = " --overwrite ";  //$NON-NLS-1$ 
@@ -606,7 +622,7 @@ public class LTTngControlService implements ILttngControlService {
      * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#enableChannel(java.lang.String, java.util.List, boolean, org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    public void enableChannel(String sessionName, List<String> channelNames, boolean isKernel, IChannelInfo info, IProgressMonitor monitor) throws ExecutionException {
+    public void enableChannels(String sessionName, List<String> channelNames, boolean isKernel, IChannelInfo info, IProgressMonitor monitor) throws ExecutionException {
 
         // no channels to enable
         if (channelNames.size() == 0) {
@@ -672,7 +688,7 @@ public class LTTngControlService implements ILttngControlService {
      * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#disableChannel(java.lang.String, java.util.List, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    public void disableChannel(String sessionName, List<String> channelNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
+    public void disableChannels(String sessionName, List<String> channelNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
         
         // no channels to enable
         if (channelNames.size() == 0) {
@@ -712,7 +728,7 @@ public class LTTngControlService implements ILttngControlService {
      * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#enableEvent(java.lang.String, java.lang.String, java.util.List, boolean, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    public void enableEvent(String sessionName, String channelName, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
+    public void enableEvents(String sessionName, String channelName, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
 
         String newSessionName = formatParameter(sessionName);
         
@@ -748,7 +764,9 @@ public class LTTngControlService implements ILttngControlService {
             command.append(OPTION_CHANNEL);
             command.append(channelName);
         }
-
+        
+        command.append(OPTION_TRACEPOINT);
+        
         ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
         
         if (isError(result)) {
@@ -756,6 +774,98 @@ public class LTTngControlService implements ILttngControlService {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#enableSyscalls(java.lang.String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+     */
+    @Override
+    public void enableSyscalls(String sessionName, String channelName, IProgressMonitor monitor) throws ExecutionException {
+        String newSessionName = formatParameter(sessionName);
+        
+        StringBuffer command = new StringBuffer(COMMAND_ENABLE_EVENT);
+
+        command.append(OPTION_ALL);
+        command.append(OPTION_KERNEL);
+
+        command.append(OPTION_SESSION);
+        command.append(newSessionName);
+
+        if (channelName != null) {
+            command.append(OPTION_CHANNEL);
+            command.append(channelName);
+        }
+        
+        command.append(OPTION_SYSCALL);
+        
+        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
+        
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
+        }        
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#enableProbe(java.lang.String, java.lang.String, java.lang.String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+     */
+    @Override
+    public void enableProbe(String sessionName, String channelName, String eventName, String probe, IProgressMonitor monitor) throws ExecutionException {
+        String newSessionName = formatParameter(sessionName);
+        
+        StringBuffer command = new StringBuffer(COMMAND_ENABLE_EVENT);
+
+        command.append(eventName);
+        command.append(OPTION_KERNEL);
+
+        command.append(OPTION_SESSION);
+        command.append(newSessionName);
+
+        if (channelName != null) {
+            command.append(OPTION_CHANNEL);
+            command.append(channelName);
+        }
+        
+        command.append(OPTION_PROBE);
+        command.append(probe);
+        
+        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
+        
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
+        }        
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#enableFunctionProbe(java.lang.String, java.lang.String, java.lang.String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+     */
+    @Override
+    public void enableFunctionProbe(String sessionName, String channelName, String eventName, String probe, IProgressMonitor monitor) throws ExecutionException {
+        String newSessionName = formatParameter(sessionName);
+        
+        StringBuffer command = new StringBuffer(COMMAND_ENABLE_EVENT);
+
+        command.append(eventName);
+        command.append(OPTION_KERNEL);
+
+        command.append(OPTION_SESSION);
+        command.append(newSessionName);
+
+        if (channelName != null) {
+            command.append(OPTION_CHANNEL);
+            command.append(channelName);
+        }
+        
+        command.append(OPTION_FUNCTION_PROBE);
+        command.append(probe);
+        
+        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
+        
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
+        }   
+    }
+    
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#disableEvent(java.lang.String, java.lang.String, java.util.List, boolean, org.eclipse.core.runtime.IProgressMonitor)

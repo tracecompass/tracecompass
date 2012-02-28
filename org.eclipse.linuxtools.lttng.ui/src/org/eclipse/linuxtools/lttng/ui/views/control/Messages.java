@@ -82,7 +82,7 @@ final public class Messages extends NLS {
     
     public static String TraceControl_EnableChannelDialogTitle;
     public static String TraceControl_EnableChannelNameLabel;
-    public static String TraceControl_EnableChannelNameLabelTooltip;
+    public static String TraceControl_EnableChannelNameTooltip;
     public static String TraceControl_EnableChannelSubBufferSizeTooltip;
     public static String TraceControl_EnableChannelNbSubBuffersTooltip;
     public static String TraceControl_EnableChannelSwitchTimerTooltip;
@@ -101,15 +101,24 @@ final public class Messages extends NLS {
     public static String TraceControl_EnableEventsNoSessionError;
     public static String TraceControl_EnableEventsNoChannelError;
 
-    
-//    public static String TraceControl_CreateSessionPathLabel;
-//    public static String TraceControl_CreateSessionPathTooltip;
-//    public static String TraceControl_SessionAlreadyExistsError;
-//    public static String TraceControl_SessionPathAlreadyExistsError;
-//    public static String TraceControl_InvalidSessionPathError;
-//    public static String TraceControl_FileSubSystemError;
+    public static String TraceControl_EnableKernelEventsDialogTitle;    
+    public static String TraceControl_EnableEventsTracepointGroupName;
+    public static String TraceControl_EnableEventsTracepointTreeTooltip;
+    public static String TraceControl_EnableEventsTracepointTreeAllLabel;
+    public static String TraceControl_EnableEventsSyscallName;
+    public static String TraceControl_EnableEventsSyscallTooltip;
+    public static String TraceControl_EnableEventsProbeGroupName;
+    public static String TraceControl_EnableEventsProbeEventNameLabel;
+    public static String TraceControl_EnableEventsProbeEventNameTooltip;
+    public static String TraceControl_EnableEventsProbeNameLabel;
+    public static String TraceControl_EnableEventsProbeNameTooltip;
+    public static String TraceControl_EnableEventsFucntionGroupName;
+    public static String TraceControl_EnableEventsFunctionEventNameTooltip;
+    public static String TraceControl_EnableEventsFunctionNameLabel;
 
+    public static String TraceControl_InvalidProbeNameError;
     
+
     // Tree structure strings
     public static String TraceControl_KernelDomainDisplayName;
     public static String TraceControl_UstDisplayName;

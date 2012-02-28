@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -32,7 +31,6 @@ import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceChannelComp
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceEventComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
@@ -42,7 +40,7 @@ import org.eclipse.ui.PlatformUI;
  * Base Command handler implementation to enable or disabling a trace channel.
  * </p>
  */
-abstract public class ChangeEventStateHandler extends AbstractHandler {
+abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -152,24 +150,13 @@ abstract public class ChangeEventStateHandler extends AbstractHandler {
      */
     @Override
     public boolean isEnabled() {
-        reset();
-
-        // Check if we are closing down
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null) {
-            return false;
-        }
-
-        // Check if we are in the Project View
-        IWorkbenchPage page = window.getActivePage();
+        // Get workbench page for the Control View
+        IWorkbenchPage page = getWorkbenchPage();
         if (page == null) {
             return false;
         }
 
-        IWorkbenchPart part = page.getActivePart();
-        if (!(part instanceof ControlView)) {
-            return false;
-        }
+        reset();
 
         // Check if one or more session are selected
         ISelection selection = page.getSelection(ControlView.ID);

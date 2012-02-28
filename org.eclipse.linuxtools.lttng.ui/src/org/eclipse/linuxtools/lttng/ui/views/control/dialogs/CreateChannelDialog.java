@@ -197,7 +197,7 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelOnSessi
         Label channelNameLabel = new Label(fDialogComposite, SWT.RIGHT);
         channelNameLabel.setText(Messages.TraceControl_EnableChannelNameLabel);
         fChannelNameText = new Text(fDialogComposite, SWT.NONE);
-        fChannelNameText.setToolTipText(Messages.TraceControl_EnableChannelNameLabelTooltip);
+        fChannelNameText.setToolTipText(Messages.TraceControl_EnableChannelNameTooltip);
         
         Label subBufferSizeLabel = new Label(fDialogComposite, SWT.RIGHT);
         subBufferSizeLabel.setText(Messages.TraceControl_SubBufferSizePropertyName);
@@ -303,7 +303,7 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelOnSessi
         }
 
         // Check for invalid names
-        if (!fChannelInfo.getName().matches("^[a-zA-Z0-9\\-\\_]{2,}$")) { //$NON-NLS-1$
+        if (!fChannelInfo.getName().matches("^[a-zA-Z0-9\\-\\_]{1,}$")) { //$NON-NLS-1$
             MessageDialog.openError(getShell(),
                   Messages.TraceControl_EnableChannelDialogTitle,
                   Messages.TraceControl_InvalidChannelNameError + " (" + fChannelInfo.getName() + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$

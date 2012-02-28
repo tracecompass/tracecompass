@@ -218,6 +218,25 @@
             id="org.eclipse.linuxtools.lttng.ui.commands.control.disable.event"
             name="%commands.control.disable.event">
       </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.control.category"
+            description="%commands.control.enable.event.description"
+            id="org.eclipse.linuxtools.lttng.ui.commands.control.enable.eventOnChannel"
+            name="%commands.control.enable.event">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.control.category"
+            description="%commands.control.enable.eventOnDomain.description"
+            id="org.eclipse.linuxtools.lttng.ui.commands.control.enable.eventOnDomain"
+            name="%commands.control.enable.eventOnDomain">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.control.category"
+            description="%commands.control.enable.eventOnDomain.description"
+            id="org.eclipse.linuxtools.lttng.ui.commands.control.enable.eventOnSession"
+            name="%commands.control.enable.eventOnDomain">
+      </command>
+      
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -267,7 +286,7 @@
          <command
                commandId="org.eclipse.linuxtools.lttng.ui.commands.control.destroySession"
                icon="icons/elcl16/delete_trace.gif"
-               label="%commands.control.destroy"
+               label="%commands.control.destroy.session"
                style="push">
          </command>
          
@@ -348,6 +367,42 @@
             </visibleWhen>
          </command>
          <command
+               commandId="org.eclipse.linuxtools.lttng.ui.commands.control.start"
+               icon="icons/elcl16/start_trace.gif"
+               label="%commands.control.start"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        operator="or">
+                     <instanceof
+                           value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.commands.control.stop"
+               icon="icons/elcl16/pause_trace.gif"
+               label="%commands.control.stop"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        operator="or">
+                     <instanceof
+                           value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
                commandId="org.eclipse.linuxtools.lttng.ui.commands.control.destroySession"
                icon="icons/elcl16/delete_trace.gif"
                label="%commands.control.destroy.session"
@@ -365,6 +420,10 @@
                </with>
             </visibleWhen>
          </command>
+         <separator
+               name="org.eclipse.linuxtools.lttng.ui.views.control.popup.separator1"
+               visible="true">
+         </separator>
          <command
                commandId="org.eclipse.linuxtools.lttng.ui.commands.control.createChannelOnSession"
                icon="icons/elcl16/add_button.gif"
@@ -389,6 +448,29 @@
                            </instanceof>
                         </iterate>
                      </not>
+                     <count
+                           value="1">
+                     </count>
+                  </and>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.commands.control.enable.eventOnSession"
+               icon="icons/elcl16/edit.gif"
+               label="%commands.control.enable.eventOnDomain"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <and>
+                     <iterate
+                           operator="or">
+                        <instanceof
+                              value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent">
+                        </instanceof>
+                     </iterate>
                      <count
                            value="1">
                      </count>
@@ -428,6 +510,29 @@
                </visibleWhen>
          </command>
          <command
+               commandId="org.eclipse.linuxtools.lttng.ui.commands.control.enable.eventOnDomain"
+               icon="icons/elcl16/edit.gif"
+               label="%commands.control.enable.eventOnDomain"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <and>
+                     <iterate
+                           operator="or">
+                        <instanceof
+                              value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceDomainComponent">
+                        </instanceof>
+                     </iterate>
+                     <count
+                           value="1">
+                     </count>
+                  </and>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
                commandId="org.eclipse.linuxtools.lttng.ui.commands.control.enableChannel"
                icon="icons/elcl16/edit.gif"
                label="%commands.control.enable.channel"
@@ -458,42 +563,6 @@
                         operator="or">
                      <instanceof
                            value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceChannelComponent">
-                     </instanceof>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="org.eclipse.linuxtools.lttng.ui.commands.control.start"
-               icon="icons/elcl16/start_trace.gif"
-               label="%commands.control.start"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="activeMenuSelection">
-                  <iterate
-                        operator="or">
-                     <instanceof
-                           value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent">
-                     </instanceof>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="org.eclipse.linuxtools.lttng.ui.commands.control.stop"
-               icon="icons/elcl16/pause_trace.gif"
-               label="%commands.control.stop"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="activeMenuSelection">
-                  <iterate
-                        operator="or">
-                     <instanceof
-                           value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent">
                      </instanceof>
                   </iterate>
                </with>
@@ -556,6 +625,32 @@
                </with>
             </visibleWhen>
          </command>
+
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.commands.control.enable.eventOnChannel"
+               icon="icons/elcl16/edit.gif"
+               label="%commands.control.enable.event"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <and>
+                     <iterate
+                           operator="or">
+                        <instanceof
+                              value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceChannelComponent">
+                        </instanceof>
+                     </iterate>
+                     <count
+                           value="1">
+                     </count>
+                  </and>
+               </with>
+            </visibleWhen>
+         </command>
+
+
 
       </menuContribution>
       
@@ -789,7 +884,53 @@
             </with>
          </activeWhen>
       </handler>
-      
+
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.control.handlers.EnableEventOnChannelHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.commands.control.enable.eventOnChannel">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceChannelComponent">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+      </handler>
+
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.control.handlers.EnableEventOnDomainHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.commands.control.enable.eventOnDomain">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceDomainComponent">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.control.handlers.EnableEventOnSessionHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.commands.control.enable.eventOnSession">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+      </handler>
    </extension>
 
     <!-- ======================================= -->

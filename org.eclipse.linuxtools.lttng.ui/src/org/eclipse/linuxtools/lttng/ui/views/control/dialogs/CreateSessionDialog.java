@@ -224,7 +224,7 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
         }
 
         // Check for invalid names
-        if (!fSessionName.matches("^[a-zA-Z0-9\\-\\_]{2,}$")) { //$NON-NLS-1$
+        if (!fSessionName.matches("^[a-zA-Z0-9\\-\\_]{1,}$")) { //$NON-NLS-1$
             MessageDialog.openError(getShell(),
                     Messages.TraceControl_CreateSessionDialogTitle,
                     Messages.TraceControl_InvalidSessionNameError + " (" + fSessionName + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$

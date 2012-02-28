@@ -47,6 +47,6 @@ public class EnableEventHandler extends ChangeEventStateHandler {
      */
     @Override
     protected void changeState(TraceChannelComponent channel, List<String> eventNames, IProgressMonitor monitor) throws ExecutionException{ 
-        channel.enableEvent(eventNames, monitor);
+        channel.enableEvents(eventNames, monitor);
     }
 }

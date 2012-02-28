@@ -53,6 +53,13 @@ public class TraceSessionGroup extends TraceControlComponent {
     // Accessors
     // ------------------------------------------------------------------------
 
+    /**
+     * @return the parent target node
+     */
+    public TargetNodeComponent getTargetNode() {
+        return (TargetNodeComponent)getParent();
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

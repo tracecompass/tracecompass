@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -34,7 +33,6 @@ import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceSessionState;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceDomainComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
@@ -44,7 +42,7 @@ import org.eclipse.ui.PlatformUI;
  * Command handler implementation to create a trace channel for known domain.
  * </p>
  */
-public class CreateChannelOnDomainHandler extends AbstractHandler {
+public class CreateChannelOnDomainHandler extends BaseControlViewHandler {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -123,24 +121,13 @@ public class CreateChannelOnDomainHandler extends AbstractHandler {
      */
     @Override
     public boolean isEnabled() {
-        fDomain = null;
-
-        // Check if we are closing down
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null) {
-            return false;
-        }
-
-        // Check if we are in the Project View
-        IWorkbenchPage page = window.getActivePage();
+        
+        // Get workbench page for the Control View
+        IWorkbenchPage page = getWorkbenchPage();
         if (page == null) {
             return false;
         }
-
-        IWorkbenchPart part = page.getActivePart();
-        if (!(part instanceof ControlView)) {
-            return false;
-        }
+        fDomain = null;
 
         // Check if one domain is selected
         ISelection selection = page.getSelection(ControlView.ID);

@@ -30,7 +30,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -106,6 +105,7 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
         super(shell);
         fIsKernel = isKernel;
         fSessions = Arrays.copyOf(sessions, sessions.length);
+        setShellStyle(SWT.RESIZE);
     }
 
     // ------------------------------------------------------------------------
@@ -153,10 +153,9 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
         // Main dialog panel
         fDialogComposite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(1, true);
-        fDialogComposite.setLayout(layout); 
-        Label label = new Label(fDialogComposite, SWT.NONE);
-        // a simple way to make dialog wider :-)
-        label.setText("                                                                                                  "); //$NON-NLS-1$
+        fDialogComposite.setLayout(layout);
+        fDialogComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+        
         fSessionsGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
         fSessionsGroup.setText(Messages.TraceControl_EnableEventsSessionGroupName);
         layout = new GridLayout(1, true);

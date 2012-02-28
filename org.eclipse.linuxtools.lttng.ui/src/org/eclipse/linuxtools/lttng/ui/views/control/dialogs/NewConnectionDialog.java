@@ -109,6 +109,7 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         if (hosts != null) {
             fExistingHosts = Arrays.copyOf(hosts, hosts.length);
         }
+        setShellStyle(SWT.RESIZE);
     }
 
     // ------------------------------------------------------------------------
@@ -156,19 +157,20 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         // Main dialog panel
         fDialogComposite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(1, true);
-        fDialogComposite.setLayout(layout); 
+        fDialogComposite.setLayout(layout);
+        fDialogComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         // Existing connections group
         fComboGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
         fComboGroup.setText(Messages.TraceControl_NewNodeExistingConnectionGroupName);
         layout = new GridLayout(2, true);
         fComboGroup.setLayout(layout); 
-        GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+        GridData data = new GridData(GridData.FILL_HORIZONTAL);
         fComboGroup.setLayoutData(data);
         
         fExistingHostsCombo = new CCombo(fComboGroup, SWT.READ_ONLY);
         fExistingHostsCombo.setToolTipText(Messages.TraceControl_NewNodeComboToolTip);
-        fExistingHostsCombo.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, false, false, 2, 1));
+        fExistingHostsCombo.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false, 2, 1));
 
         String items[] = new String[fExistingHosts.length];
         for (int i = 0; i < items.length; i++) {
@@ -180,13 +182,13 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
 
         // Node information grop
         fTextGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
-        layout = new GridLayout(2, true);
+        layout = new GridLayout(3, true);
         fTextGroup.setLayout(layout);
-        data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+        data = new GridData(GridData.FILL_HORIZONTAL);
         fTextGroup.setLayoutData(data);
         
         fButton = new Button(fTextGroup, SWT.CHECK);
-        fButton.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, false, false, 2, 1));
+        fButton.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false, 3, 1));
         fButton.setText(Messages.TraceControl_NewNodeEditButtonName);
         fButton.setEnabled(fExistingHosts.length > 0);
         
@@ -236,10 +238,11 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         });
         
         // layout widgets
-        data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+        data = new GridData(GridData.FILL_HORIZONTAL);
         fHostNameText.setText("666.666.666.666"); //$NON-NLS-1$
         Point minSize = fHostNameText.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
         data.widthHint = minSize.x + 5;
+        data.horizontalSpan = 2;
         
         fConnectionNameText.setLayoutData(data);
         fHostNameText.setLayoutData(data);
