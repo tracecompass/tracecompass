@@ -160,7 +160,7 @@ public class TmfEventType implements ITmfEventType {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof TmfEventType))
             return false;
         TmfEventType other = (TmfEventType) obj;
         if (!fContext.equals(other.fContext))

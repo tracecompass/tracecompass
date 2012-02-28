@@ -301,7 +301,7 @@ public class TmfEvent implements ITmfEvent {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof TmfEvent))
             return false;
         TmfEvent other = (TmfEvent) obj;
         if (fTrace == null) {

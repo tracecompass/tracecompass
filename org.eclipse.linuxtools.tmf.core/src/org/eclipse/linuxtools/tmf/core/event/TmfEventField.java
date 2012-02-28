@@ -259,7 +259,7 @@ public class TmfEventField implements ITmfEventField {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof TmfEventField))
             return false;
         TmfEventField other = (TmfEventField) obj;
         if (!fName.equals(other.fName))
