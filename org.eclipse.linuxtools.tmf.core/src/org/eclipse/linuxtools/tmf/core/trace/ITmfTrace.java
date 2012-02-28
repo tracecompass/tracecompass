@@ -16,15 +16,15 @@ import java.io.FileNotFoundException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.linuxtools.tmf.core.component.ITmfComponent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 
 /**
  * <b><u>ITmfTrace</u></b>
  * <p>
  */
-public interface ITmfTrace<T extends TmfEvent> extends ITmfComponent {
+public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
 
     // initTrace variants
     public void initTrace(String name, String path, Class<T> eventType) throws FileNotFoundException;
@@ -128,13 +128,13 @@ public interface ITmfTrace<T extends TmfEvent> extends ITmfComponent {
      * 
      * @return the next event in the stream
      */
-    public TmfEvent getNextEvent(TmfContext context);
+    public ITmfEvent getNextEvent(TmfContext context);
 
     /**
      * Return the event pointed by the supplied context (or null if no event left) and *does not* update the context.
      * 
      * @return the next event in the stream
      */
-    public TmfEvent parseEvent(TmfContext context);
+    public ITmfEvent parseEvent(TmfContext context);
 
 }

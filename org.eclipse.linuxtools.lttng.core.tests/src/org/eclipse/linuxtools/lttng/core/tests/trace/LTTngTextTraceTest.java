@@ -9,7 +9,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.lttng.core.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.core.trace.LTTngTextTrace;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
@@ -110,7 +110,7 @@ public class LTTngTextTraceTest extends TestCase {
     }
 */
     public void testGetNextEvent() {
-        TmfEvent tmpEvent = null;
+        ITmfEvent tmpEvent = null;
         LTTngTextTrace testStream1 = prepareStreamToTest();
 
         TmfContext tmpContext = new TmfContext(null, 0);
@@ -127,7 +127,7 @@ public class LTTngTextTraceTest extends TestCase {
     }
 
     public void testParseEvent() {
-        TmfEvent tmpEvent = null;
+        ITmfEvent tmpEvent = null;
         LTTngTextTrace testStream1 = prepareStreamToTest();
 
         TmfContext tmpContext = new TmfContext(null, 0);
@@ -144,7 +144,7 @@ public class LTTngTextTraceTest extends TestCase {
     }
 
     public void testSeekEventTimestamp() {
-        TmfEvent tmpEvent = null;
+        ITmfEvent tmpEvent = null;
         TmfContext tmpContext = new TmfContext(null, 0);
         LTTngTextTrace testStream1 = prepareStreamToTest();
 
@@ -175,7 +175,7 @@ public class LTTngTextTraceTest extends TestCase {
     }
 
     public void testSeekEventIndex() {
-        TmfEvent tmpEvent = null;
+        ITmfEvent tmpEvent = null;
         TmfContext tmpContext = new TmfContext(null, 0);
         LTTngTextTrace testStream1 = prepareStreamToTest();
 
@@ -206,7 +206,7 @@ public class LTTngTextTraceTest extends TestCase {
     }
 
     public void testSeekLocation() {
-        TmfEvent tmpEvent = null;
+        ITmfEvent tmpEvent = null;
         TmfContext tmpContext = new TmfContext(null, 0);
         LTTngTextTrace testStream1 = prepareStreamToTest();
 
@@ -238,7 +238,7 @@ public class LTTngTextTraceTest extends TestCase {
 
     @SuppressWarnings("unchecked")
     public void testGetter() {
-        TmfEvent tmpEvent = null;
+        ITmfEvent tmpEvent = null;
         LTTngTextTrace testStream1 = prepareStreamToTest();
         TmfContext tmpContext = new TmfContext(null, 0);
 

@@ -106,7 +106,7 @@ public class Uml2SDTestFacility {
     }
 
     
-    private TmfTraceStub setupTrace(ITmfEventParser parser) {
+    private TmfTraceStub setupTrace(ITmfEventParser<TmfEvent> parser) {
         
             try {
                 // Create test trace object

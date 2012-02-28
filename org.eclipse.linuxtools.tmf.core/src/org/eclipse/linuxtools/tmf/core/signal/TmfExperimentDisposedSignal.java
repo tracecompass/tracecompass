@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.signal;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 
 /**
@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
  * <p>
  * TODO: Implement me. Please.
  */
-public class TmfExperimentDisposedSignal<T extends TmfEvent> extends TmfSignal {
+public class TmfExperimentDisposedSignal<T extends ITmfEvent> extends TmfSignal {
 
 	private final TmfExperiment<T> fExperiment;
 	
@@ -29,7 +29,7 @@ public class TmfExperimentDisposedSignal<T extends TmfEvent> extends TmfSignal {
 		fExperiment = experiment;
 	}
 
-	public TmfExperiment<? extends TmfEvent> getExperiment() {
+	public TmfExperiment<? extends ITmfEvent> getExperiment() {
 		return fExperiment;
 	}
 

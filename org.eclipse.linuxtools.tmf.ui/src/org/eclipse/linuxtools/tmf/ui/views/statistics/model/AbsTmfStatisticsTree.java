@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.ITmfExtraEventInfo;
 
@@ -160,7 +160,7 @@ public abstract class AbsTmfStatisticsTree {
      * @param values
      *            Values desired.
      */
-    public abstract void increase(TmfEvent event, ITmfExtraEventInfo extraInfo, int values);
+    public abstract void increase(ITmfEvent event, ITmfExtraEventInfo extraInfo, int values);
 
     /**
      * <h4>Register an event.</h4>
@@ -172,7 +172,7 @@ public abstract class AbsTmfStatisticsTree {
      * @param extraInfo
      *            Extra information to pass along with the event.
      */
-    public abstract void registerEvent(TmfEvent event, ITmfExtraEventInfo extraInfo);
+    public abstract void registerEvent(ITmfEvent event, ITmfExtraEventInfo extraInfo);
 
     /**
      * <h4>Register that a new node was created.</h4>

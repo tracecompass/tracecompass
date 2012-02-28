@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.tmf.ui.views.timechart;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
 import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSettingsManager;
@@ -38,7 +38,7 @@ public class TimeChartEvent implements ITimeEvent {
     private TimeChartAnalysisEntry fItemizedEntry;
     private boolean fItemizing;
 
-    public TimeChartEvent(TimeChartAnalysisEntry parentEntry, TmfEvent event, long rank, TimeChartDecorationProvider decorationProvider) {
+    public TimeChartEvent(TimeChartAnalysisEntry parentEntry, ITmfEvent event, long rank, TimeChartDecorationProvider decorationProvider) {
         fParentEntry = parentEntry;
         fTime = event.getTimestamp().normalize(0, TIMESTAMP_SCALE).getValue();
         fDuration = 0;

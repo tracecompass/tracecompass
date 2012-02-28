@@ -26,11 +26,11 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 import org.eclipse.linuxtools.tmf.stubs.trace.TmfTraceStub;
 
-public class TmfUml2SDTestTrace implements ITmfEventParser {
+public class TmfUml2SDTestTrace implements ITmfEventParser<TmfEvent> {
     
     @Override
     @SuppressWarnings({ "unchecked", "nls" })    
-    public TmfEvent parseNextEvent(ITmfTrace<?> eventStream, TmfContext context) throws IOException {
+    public TmfEvent parseNextEvent(ITmfTrace<TmfEvent> eventStream, TmfContext context) throws IOException {
         if (! (eventStream instanceof TmfTraceStub)) {
             return null;
         }

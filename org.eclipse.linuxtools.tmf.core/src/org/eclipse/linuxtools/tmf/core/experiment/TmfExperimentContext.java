@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.experiment;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
@@ -45,7 +45,7 @@ public class TmfExperimentContext extends TmfContext {
 
 	private ITmfTrace<?>[]  fTraces = new ITmfTrace[0];
 	private TmfContext[] fContexts;
-	private TmfEvent[]   fEvents;
+	private ITmfEvent[]   fEvents;
 	private int lastTraceRead;
 
 	// ------------------------------------------------------------------------
@@ -56,7 +56,7 @@ public class TmfExperimentContext extends TmfContext {
 		super();
 		fTraces   = traces;
 		fContexts = contexts;
-		fEvents   = new TmfEvent[fTraces.length];
+		fEvents   = new ITmfEvent[fTraces.length];
 
 		ITmfLocation<?>[] locations = new ITmfLocation[fTraces.length];
 		long[] ranks = new long[fTraces.length];
@@ -106,7 +106,7 @@ public class TmfExperimentContext extends TmfContext {
 		return fContexts;
 	}
 
-	public TmfEvent[] getEvents() {
+	public ITmfEvent[] getEvents() {
 		return fEvents;
 	}
 

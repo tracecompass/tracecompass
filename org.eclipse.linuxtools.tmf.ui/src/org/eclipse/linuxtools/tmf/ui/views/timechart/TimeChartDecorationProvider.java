@@ -18,7 +18,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
 
 public class TimeChartDecorationProvider {
@@ -60,7 +60,7 @@ public class TimeChartDecorationProvider {
 		fFilterFilter = filter;
     }
 
-	public boolean isVisible(TmfEvent event) {
+	public boolean isVisible(ITmfEvent event) {
 		if (fFilterFilter != null) {
 			return fFilterFilter.matches(event);
 		}
@@ -71,7 +71,7 @@ public class TimeChartDecorationProvider {
 		fSearchFilter = filter;
     }
 	
-	public boolean isSearchMatch(TmfEvent event) {
+	public boolean isSearchMatch(ITmfEvent event) {
 		if (fSearchFilter != null) {
 			return fSearchFilter.matches(event);
 		}

@@ -24,7 +24,7 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
@@ -179,7 +179,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
                 }
                 while (true) {
                     long rank = context.getRank();
-                    TmfEvent event = trace.getNextEvent(context);
+                    ITmfEvent event = trace.getNextEvent(context);
                     if (event == null) {
                         done = true;
                         break;
@@ -447,7 +447,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
                         if (interrupted)
                             return;
                         long rank = fContext.getRank();
-                        TmfEvent event = trace.getNextEvent(fContext);
+                        ITmfEvent event = trace.getNextEvent(fContext);
                         if (event == null) {
                             break;
                         }

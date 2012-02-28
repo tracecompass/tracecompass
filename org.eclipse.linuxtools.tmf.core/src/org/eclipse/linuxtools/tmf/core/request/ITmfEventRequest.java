@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.request;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 
 /**
@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
  * <p>
  * TODO: Implement me. Please.
  */
-public interface ITmfEventRequest<T extends TmfEvent> extends ITmfDataRequest<T> {
+public interface ITmfEventRequest<T extends ITmfEvent> extends ITmfDataRequest<T> {
 
     /**
      * @return the requested time range

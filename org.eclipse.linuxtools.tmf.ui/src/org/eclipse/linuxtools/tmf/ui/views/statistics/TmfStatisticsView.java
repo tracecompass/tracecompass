@@ -19,14 +19,14 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
+import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
-import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentDisposedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
@@ -79,7 +79,7 @@ public class TmfStatisticsView extends TmfView {
     // The actual tree to display
     protected TreeViewer fTreeViewer;
     // Stores the request to the experiment
-    protected ITmfEventRequest<TmfEvent> fRequest = null;
+    protected ITmfEventRequest<ITmfEvent> fRequest = null;
 
     // Update synchronization parameters (used for streaming)
     protected boolean fStatisticsUpdateBusy = false;
@@ -286,7 +286,7 @@ public class TmfStatisticsView extends TmfView {
      * @param signal
      */
     @TmfSignalHandler
-    public void experimentDisposed(TmfExperimentDisposedSignal<? extends TmfEvent> signal) {
+    public void experimentDisposed(TmfExperimentDisposedSignal<? extends ITmfEvent> signal) {
         if (signal.getExperiment() != TmfExperiment.getCurrentExperiment()) {
             return;
         }
@@ -301,7 +301,7 @@ public class TmfStatisticsView extends TmfView {
      *            contains the information about the selection.
      */
     @TmfSignalHandler
-    public void experimentSelected(TmfExperimentSelectedSignal<? extends TmfEvent> signal) {
+    public void experimentSelected(TmfExperimentSelectedSignal<? extends ITmfEvent> signal) {
         if (signal != null) {
             TmfExperiment<?> experiment = signal.getExperiment();
             String experimentName = experiment.getName();
@@ -368,7 +368,7 @@ public class TmfStatisticsView extends TmfView {
     @SuppressWarnings("unchecked")
     @TmfSignalHandler
     public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
-        TmfExperiment<TmfEvent> experiment = (TmfExperiment<TmfEvent>) signal.getExperiment();
+        TmfExperiment<ITmfEvent> experiment = (TmfExperiment<ITmfEvent>) signal.getExperiment();
         // validate
         if (! experiment.equals(TmfExperiment.getCurrentExperiment())) {
             return;
@@ -473,10 +473,10 @@ public class TmfStatisticsView extends TmfView {
             }
 
             // Preparation of the event request
-            fRequest = new TmfEventRequest<TmfEvent>(TmfEvent.class, timeRange, index, TmfDataRequest.ALL_DATA, getIndexPageSize(), ExecutionType.BACKGROUND) {
+            fRequest = new TmfEventRequest<ITmfEvent>(ITmfEvent.class, timeRange, index, TmfDataRequest.ALL_DATA, getIndexPageSize(), ExecutionType.BACKGROUND) {
 
                 @Override
-                public void handleData(TmfEvent data) {
+                public void handleData(ITmfEvent data) {
                     super.handleData(data);
                     if (data != null) {
                         AbsTmfStatisticsTree statisticsData = TmfStatisticsTreeRootFactory.getStatTree(getTreeID(experiment.getName()));
@@ -519,7 +519,7 @@ public class TmfStatisticsView extends TmfView {
                     modelIncomplete(experiment.getName());
                 }
             };
-            ((TmfExperiment<TmfEvent>) experiment).sendRequest((ITmfDataRequest<TmfEvent>) fRequest);
+            ((TmfExperiment<ITmfEvent>) experiment).sendRequest((ITmfDataRequest<ITmfEvent>) fRequest);
             waitCursor(true);
         }
     }

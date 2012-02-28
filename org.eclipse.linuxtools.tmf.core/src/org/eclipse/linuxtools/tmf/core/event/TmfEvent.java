@@ -33,7 +33,7 @@ public class TmfEvent implements ITmfEvent {
     /**
      * The trace containing the event
      */
-    protected ITmfTrace<? extends TmfEvent> fTrace;
+    protected ITmfTrace<? extends ITmfEvent> fTrace;
 
     /**
      * The event rank within the trace
@@ -93,7 +93,7 @@ public class TmfEvent implements ITmfEvent {
      * @param type the event content (payload)
      * @param reference the event reference
      */
-    public TmfEvent(ITmfTrace<? extends TmfEvent> trace, long rank, ITmfTimestamp timestamp, String source,
+    public TmfEvent(ITmfTrace<? extends ITmfEvent> trace, long rank, ITmfTimestamp timestamp, String source,
                     ITmfEventType type, ITmfEventField content, String reference)
     {
         fTrace = trace;
@@ -108,7 +108,7 @@ public class TmfEvent implements ITmfEvent {
     /**
      * Constructor - no rank
      */
-    public TmfEvent(ITmfTrace<? extends TmfEvent> trace, ITmfTimestamp timestamp, String source,
+    public TmfEvent(ITmfTrace<? extends ITmfEvent> trace, ITmfTimestamp timestamp, String source,
             ITmfEventType type, ITmfEventField content, String reference)
     {
         this(trace, -1, timestamp, source, type, content, reference);
@@ -117,7 +117,7 @@ public class TmfEvent implements ITmfEvent {
     /**
      * Constructor - no rank, no content
      */
-    public TmfEvent(ITmfTrace<? extends TmfEvent> trace, ITmfTimestamp timestamp, String source,
+    public TmfEvent(ITmfTrace<? extends ITmfEvent> trace, ITmfTimestamp timestamp, String source,
             ITmfEventType type, String reference)
     {
         this(trace, -1, timestamp, source, type, null, reference);
@@ -136,16 +136,16 @@ public class TmfEvent implements ITmfEvent {
      * 
      * @param event the original event
      */
-    public TmfEvent(TmfEvent event) {
+    public TmfEvent(ITmfEvent event) {
         if (event == null)
             throw new IllegalArgumentException();
-        fTrace = event.fTrace;
-        fRank = event.fRank;
-        fTimestamp = event.fTimestamp;
-        fSource = event.fSource;
-        fType = event.fType;
-        fContent = event.fContent;
-        fReference = event.fReference;
+        fTrace = event.getTrace();
+        fRank = event.getRank();
+        fTimestamp = event.getTimestamp();
+        fSource = event.getSource();
+        fType = event.getType();
+        fContent = event.getContent();
+        fReference = event.getReference();
     }
 
     // ------------------------------------------------------------------------
@@ -156,7 +156,7 @@ public class TmfEvent implements ITmfEvent {
      * @see org.eclipse.linuxtools.tmf.core.event.ITmfEvent#getTrace()
      */
     @Override
-    public ITmfTrace<? extends TmfEvent> getTrace() {
+    public ITmfTrace<? extends ITmfEvent> getTrace() {
         return fTrace;
     }
 

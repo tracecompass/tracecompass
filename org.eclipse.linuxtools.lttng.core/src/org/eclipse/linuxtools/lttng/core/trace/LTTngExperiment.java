@@ -16,8 +16,8 @@ import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.core.tracecontrol.utility.LiveTraceManager;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
@@ -38,7 +38,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
  * Temporary class to resolve a basic incompatibility between TMF and LTTng.
  * <p>
  */
-public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> {
+public class LTTngExperiment<T extends ITmfEvent> extends TmfExperiment<T> {
 
     private static final int DEFAULT_INDEX_PAGE_SIZE = 50000;
 
@@ -108,7 +108,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> {
     // ------------------------------------------------------------------------
 
     @Override
-    public synchronized TmfEvent getNextEvent(TmfContext context) {
+    public synchronized ITmfEvent getNextEvent(TmfContext context) {
 
         // Validate the context
         if (!(context instanceof TmfExperimentContext)) {
@@ -133,7 +133,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> {
         }
 
         // Scan the candidate events and identify the "next" trace to read from
-        TmfEvent eventArray[] = expContext.getEvents();
+        ITmfEvent eventArray[] = expContext.getEvents();
         if (eventArray == null) {
             return null;
         }
@@ -146,7 +146,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> {
             }
         } else {
             for (int i = 0; i < eventArray.length; i++) {
-                TmfEvent event = eventArray[i];
+                ITmfEvent event = eventArray[i];
                 if (event != null && event.getTimestamp() != null) {
                     ITmfTimestamp otherTS = event.getTimestamp();
                     if (otherTS.compareTo(timestamp, true) < 0) {
@@ -158,7 +158,7 @@ public class LTTngExperiment<T extends TmfEvent> extends TmfExperiment<T> {
         }
 
         // Update the experiment context and set the "next" event
-        TmfEvent event = null;
+        ITmfEvent event = null;
         if (trace != TmfExperimentContext.NO_TRACE) {
 //	        updateIndex(expContext, timestamp);
 

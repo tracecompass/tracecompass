@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.component.TmfProviderManager;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -230,7 +231,7 @@ public class TmfTraceTest extends TestCase {
 		for (int i = 0; i < checkpoints.size(); i++) {
 			TmfCheckpoint checkpoint = checkpoints.get(i);
 			TmfContext context = new TmfContext(checkpoint.getLocation(), i * pageSize);
-			TmfEvent event = fTrace.parseEvent(context);
+			ITmfEvent event = fTrace.parseEvent(context);
 			assertTrue(context.getRank() == i * pageSize);
 			assertTrue((checkpoint.getTimestamp().compareTo(event.getTimestamp(), false) == 0));
 		}
@@ -248,7 +249,7 @@ public class TmfTraceTest extends TestCase {
     	TmfContext context = fTrace.seekEvent(new TmfTimestamp(0, SCALE, 0));
     	TmfContext svContext = new TmfContext(context);
 
-    	TmfEvent event = fTrace.parseEvent(context);
+    	ITmfEvent event = fTrace.parseEvent(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 0, context.getRank());
         assertTrue("parseEvent", context.equals(svContext));
@@ -293,7 +294,7 @@ public class TmfTraceTest extends TestCase {
     	TmfContext context = fTrace.seekEvent(new TmfTimestamp(0, SCALE, 0));
 
     	// Read NB_EVENTS
-    	TmfEvent event;
+    	ITmfEvent event;
         for (int i = 0; i < NB_READS; i++) {
             event = fTrace.getNextEvent(context);
             assertEquals("Event timestamp", i + 1, event.getTimestamp().getValue());
@@ -315,7 +316,7 @@ public class TmfTraceTest extends TestCase {
 
     	// Position trace at event rank 0
     	TmfContext context = fTrace.seekLocation(null);
-        TmfEvent event = fTrace.parseEvent(context);
+    	ITmfEvent event = fTrace.parseEvent(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 0, context.getRank());
 
@@ -364,7 +365,7 @@ public class TmfTraceTest extends TestCase {
         TmfContext context = fTrace.seekLocation(tmpContext.getLocation());
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
-        TmfEvent event = fTrace.parseEvent(context);
+        ITmfEvent event = fTrace.parseEvent(context);
         assertEquals("Event timestamp", 10, event.getTimestamp().getValue());
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
@@ -419,7 +420,7 @@ public class TmfTraceTest extends TestCase {
         TmfContext context = fTrace.seekLocation(tmpContext.getLocation());
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
     	
-        TmfEvent event = fTrace.parseEvent(context);
+        ITmfEvent event = fTrace.parseEvent(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
     	
@@ -451,7 +452,7 @@ public class TmfTraceTest extends TestCase {
     	TmfContext context = fTrace.seekEvent(new TmfTimestamp(1, SCALE, 0));
         assertEquals("Event rank", 0, context.getRank());
 
-        TmfEvent event = fTrace.parseEvent(context);
+        ITmfEvent event = fTrace.parseEvent(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 0, context.getRank());
     	
@@ -490,7 +491,7 @@ public class TmfTraceTest extends TestCase {
     	TmfContext context = fTrace.seekEvent(new TmfTimestamp(2, SCALE, 0));
         assertEquals("Event rank", 1, context.getRank());
     	
-        TmfEvent event = fTrace.parseEvent(context);
+        ITmfEvent event = fTrace.parseEvent(context);
         assertEquals("Event timestamp", 2, event.getTimestamp().getValue());
         assertEquals("Event rank", 1, context.getRank());
     	
@@ -553,7 +554,7 @@ public class TmfTraceTest extends TestCase {
     	TmfContext context = fTrace.seekEvent(new TmfTimestamp(-1, SCALE, 0));
         assertEquals("Event rank", 0, context.getRank());
     	
-        TmfEvent event = fTrace.parseEvent(context);
+        ITmfEvent event = fTrace.parseEvent(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 0, context.getRank());
     	
@@ -584,7 +585,7 @@ public class TmfTraceTest extends TestCase {
     	TmfContext context = fTrace.seekEvent(0);
         assertEquals("Event rank", 0, context.getRank());
     	
-        TmfEvent event = fTrace.parseEvent(context);
+        ITmfEvent event = fTrace.parseEvent(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 0, context.getRank());
     	
@@ -623,7 +624,7 @@ public class TmfTraceTest extends TestCase {
     	TmfContext context = fTrace.seekEvent(9);
         assertEquals("Event rank", 9, context.getRank());
     	
-        TmfEvent event = fTrace.parseEvent(context);
+        ITmfEvent event = fTrace.parseEvent(context);
         assertEquals("Event timestamp", 10, event.getTimestamp().getValue());
         assertEquals("Event rank", 9, context.getRank());
     	
@@ -674,7 +675,7 @@ public class TmfTraceTest extends TestCase {
     	TmfContext context = fTrace.seekEvent(-1);
         assertEquals("Event rank", 0, context.getRank());
     	
-        TmfEvent event = fTrace.parseEvent(context);
+        ITmfEvent event = fTrace.parseEvent(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 0, context.getRank());
     	
