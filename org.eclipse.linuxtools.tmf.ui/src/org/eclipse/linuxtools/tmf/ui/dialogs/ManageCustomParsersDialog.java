@@ -137,9 +137,11 @@ public class ManageCustomParsersDialog extends Dialog {
                 } else if (xmlButton.getSelection()) {
                     dialog = new WizardDialog(getShell(), new CustomXmlParserWizard());
                 }
-                dialog.open();
-                if (dialog.getReturnCode() == Dialog.OK) {
-                    fillParserList();
+                if (dialog != null) {
+                    dialog.open();
+                    if (dialog.getReturnCode() == Dialog.OK) {
+                        fillParserList();
+                    }
                 }
             }});
         
@@ -160,9 +162,11 @@ public class ManageCustomParsersDialog extends Dialog {
                     dialog = new WizardDialog(getShell(),
                             new CustomXmlParserWizard(CustomXmlTraceDefinition.load(parserList.getSelection()[0])));
                 }
-                dialog.open();
-                if (dialog.getReturnCode() == Dialog.OK) {
-                    fillParserList();
+                if (dialog != null) {
+                    dialog.open();
+                    if (dialog.getReturnCode() == Dialog.OK) {
+                        fillParserList();
+                    }
                 }
             }});
 

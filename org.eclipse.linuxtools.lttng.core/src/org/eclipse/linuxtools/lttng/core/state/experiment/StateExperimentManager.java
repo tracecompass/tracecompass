@@ -357,7 +357,7 @@ public class StateExperimentManager extends LTTngTreeNode implements ILttExperim
                 try {
                     traceManager = (IStateTraceManager) traceStateManagerNode;
                 } catch (ClassCastException e) {
-                    System.out.println(e.getStackTrace().toString());
+                    e.printStackTrace();
                     return null;
                 }
 

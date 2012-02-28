@@ -32,15 +32,15 @@ public class TmfCoalescedDataRequestTest extends TestCase {
 	// Variables
 	// ------------------------------------------------------------------------
 
-	private static TmfCoalescedDataRequest<TmfEvent> fRequest1;
-	private static TmfCoalescedDataRequest<TmfEvent> fRequest2;
-	private static TmfCoalescedDataRequest<TmfEvent> fRequest3;
-	private static TmfCoalescedDataRequest<TmfEvent> fRequest4;
+	private TmfCoalescedDataRequest<TmfEvent> fRequest1;
+	private TmfCoalescedDataRequest<TmfEvent> fRequest2;
+	private TmfCoalescedDataRequest<TmfEvent> fRequest3;
+	private TmfCoalescedDataRequest<TmfEvent> fRequest4;
 
-	private static TmfCoalescedDataRequest<TmfEvent> fRequest1b;
-	private static TmfCoalescedDataRequest<TmfEvent> fRequest1c;
+	private TmfCoalescedDataRequest<TmfEvent> fRequest1b;
+	private TmfCoalescedDataRequest<TmfEvent> fRequest1c;
 
-	private static int fRequestCount;
+	private int fRequestCount;
 	
 	// ------------------------------------------------------------------------
 	// Housekeeping

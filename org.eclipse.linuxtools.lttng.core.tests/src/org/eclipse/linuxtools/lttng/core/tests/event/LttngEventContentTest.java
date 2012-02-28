@@ -99,8 +99,6 @@ public class LttngEventContentTest extends TestCase {
 	public void testConstructors() {
 		LttngEvent 		  testEvent = null;
 		LttngEventContent testContent 	= null;
-		@SuppressWarnings("unused")
-        LttngEventContent testContent2 	= null;
         LttngEventField[] testFields  = new LttngEventField[1];
         testFields[0] = new LttngEventField("test");
         
@@ -133,7 +131,7 @@ public class LttngEventContentTest extends TestCase {
         // Copy constructor with correct parameters
         try {
         	testContent = new LttngEventContent(testEvent);
-        	testContent2 = new LttngEventContent(testContent);
+        	new LttngEventContent(testContent);
         }
         catch( Exception e) { 
         	fail("Copy constructor failed!");

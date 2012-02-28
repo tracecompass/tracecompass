@@ -69,8 +69,6 @@ public class LttngEventFieldTest extends TestCase {
 
 	public void testConstructors() {
 		LttngEventField testField 	= null;
-		@SuppressWarnings("unused")
-		LttngEventField testField2 	= null;
         
 	    // Default construction with good argument
         try {
@@ -83,7 +81,7 @@ public class LttngEventFieldTest extends TestCase {
         // Copy constructor with correct parameters
         try {
         	testField = new LttngEventField("test", "test");
-        	testField2 = new LttngEventField(testField);
+        	new LttngEventField(testField);
         }
         catch( Exception e) { 
         	fail("Copy constructor failed!");

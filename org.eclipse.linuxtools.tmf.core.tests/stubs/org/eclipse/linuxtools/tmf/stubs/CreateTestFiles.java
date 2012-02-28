@@ -68,7 +68,8 @@ public class CreateTestFiles {
             	createTestFile("testfiles" + File.separator + "O-" + FILE_NAMES[i], FILE_SIZES[i], true,  true);
             	createTestFile("testfiles" + File.separator + "E-" + FILE_NAMES[i], FILE_SIZES[i], true,  false);
                 createTestFile("testfiles" + File.separator + "R-" + FILE_NAMES[i], FILE_SIZES[i], false, false);
-            } catch (Exception e) {
+            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
             }
         }
 

@@ -39,7 +39,7 @@ public class TmfEventParserStub implements ITmfEventParser {
     // Attributes
     // ------------------------------------------------------------------------
 
-	private final int NB_TYPES = 10;
+	private static final int NB_TYPES = 10;
     private final TmfEventType[] fTypes;
 
     // ------------------------------------------------------------------------
@@ -75,8 +75,8 @@ public class TmfEventParserStub implements ITmfEventParser {
 
        	// Highly inefficient...
        	RandomAccessFile stream = ((TmfTraceStub) eventStream).getStream();
-       	String name = eventStream.getName();
-       	name = name.substring(name.lastIndexOf('/') + 1);
+//       	String name = eventStream.getName();
+//       	name = name.substring(name.lastIndexOf('/') + 1);
 
        	// no need to use synchronized since it's already cover by the calling method
        	
@@ -89,28 +89,26 @@ public class TmfEventParserStub implements ITmfEventParser {
        	    long ts        = stream.readLong();
        	    String source  = stream.readUTF();
        	    String type    = stream.readUTF();
-       	    @SuppressWarnings("unused")
-       	    int reference  = stream.readInt();
+       	    Integer reference  = stream.readInt();
        	    int typeIndex  = Integer.parseInt(type.substring(typePrefix.length()));
        	    String[] fields = new String[typeIndex];
        	    for (int i = 0; i < typeIndex; i++) {
        	        fields[i] = stream.readUTF();
        	    }
 
-       	    String content = "[";
+       	    StringBuffer content = new StringBuffer("[");
        	    if (typeIndex > 0) {
-       	        content += fields[0];
+       	        content.append(fields[0]);
        	    }
        	    for (int i = 1; i < typeIndex; i++) {
-       	        content += ", " + fields[i];
+       	        content.append(", ").append(fields[i]);
        	    }
-       	    content += "]";
+       	    content.append("]");
 
-            TmfEventField root = new TmfEventField(ITmfEventField.ROOT_ID, content);
+            TmfEventField root = new TmfEventField(ITmfEventField.ROOT_ID, content.toString());
        	    TmfEvent event = new TmfEvent(eventStream,
-       	            new TmfTimestamp(ts, (byte) -3, 0),     // millisecs
-       	            source, fTypes[typeIndex], root, name);
-       	    event.setContent(root);
+       	            new TmfTimestamp(ts, -3, 0),     // millisecs
+       	            source, fTypes[typeIndex], root, reference.toString());
        	    return event;
        	} catch (EOFException e) {
        	}

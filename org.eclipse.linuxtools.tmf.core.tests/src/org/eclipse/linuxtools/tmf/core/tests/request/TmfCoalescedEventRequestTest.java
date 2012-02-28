@@ -49,18 +49,18 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 	// Variables
 	// ------------------------------------------------------------------------
 
-	private static TmfTimeRange range1 = new TmfTimeRange(TmfTimeRange.Eternity);
-	private static TmfTimeRange range2 = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BigCrunch);
+	private TmfTimeRange range1 = new TmfTimeRange(TmfTimeRange.Eternity);
+	private TmfTimeRange range2 = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BigCrunch);
 	
-	private static TmfCoalescedEventRequest<TmfEvent> fRequest1;
-	private static TmfCoalescedEventRequest<TmfEvent> fRequest2;
-	private static TmfCoalescedEventRequest<TmfEvent> fRequest3;
-	private static TmfCoalescedEventRequest<TmfEvent> fRequest4;
+	private TmfCoalescedEventRequest<TmfEvent> fRequest1;
+	private TmfCoalescedEventRequest<TmfEvent> fRequest2;
+	private TmfCoalescedEventRequest<TmfEvent> fRequest3;
+	private TmfCoalescedEventRequest<TmfEvent> fRequest4;
 
-	private static TmfCoalescedEventRequest<TmfEvent> fRequest1b;
-	private static TmfCoalescedEventRequest<TmfEvent> fRequest1c;
+	private TmfCoalescedEventRequest<TmfEvent> fRequest1b;
+	private TmfCoalescedEventRequest<TmfEvent> fRequest1c;
 
-	private static int fRequestCount;
+	private int fRequestCount;
 	
 	// ------------------------------------------------------------------------
 	// Housekeeping
@@ -396,7 +396,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
     private static final int    BLOCK_SIZE  = 100;
 
     // Initialize the test trace
-    private static TmfTraceStub fTrace = null;
+    private TmfTraceStub fTrace = null;
     private synchronized TmfTraceStub setupTrace(String path) {
     	if (fTrace == null) {
     		try {
@@ -422,7 +422,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 
     ITmfDataProvider<TmfEvent>[] providers;
 
-    private class TmfTestTriggerSignal extends TmfSignal {
+    private static class TmfTestTriggerSignal extends TmfSignal {
     	public final boolean forceCancel;
 		public TmfTestTriggerSignal(Object source, boolean cancel) {
 			super(source);

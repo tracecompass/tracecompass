@@ -62,8 +62,8 @@ class FlowAfterUpdateHandlers {
 				TimeRangeEventProcess localProcess = procContainer.findProcess(pid_in, process_in.getCpu(), traceSt
 						.getTraceId(), process_in.getCreation_time());
 				
-				if ( localProcess == null ) {
-					if ( (pid_in == 0) || (pid_in != process_in.getPpid()) ) {
+				if (localProcess == null) {
+					if ((pid_in == 0) || !pid_in.equals(process_in.getPpid())) {
 					    TmfTimeRange timeRange = traceSt.getContext().getTraceTimeWindow();
 	                    localProcess = addLocalProcess(process_in, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
 					}

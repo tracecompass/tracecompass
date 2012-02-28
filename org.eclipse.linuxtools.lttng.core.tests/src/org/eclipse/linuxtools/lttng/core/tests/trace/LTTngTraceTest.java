@@ -88,13 +88,10 @@ public class LTTngTraceTest extends TestCase {
 	}
 
     public void testTraceConstructors() {
-		@SuppressWarnings("unused")
-		LTTngTrace testStream1 = null;
-        
 		// Default constructor
 		// Test constructor with argument on a wrong tracepath, skipping indexing
         try {
-        		testStream1 = new LTTngTrace("", wrongTracePath, skipIndexing);
+        		new LTTngTrace("", wrongTracePath, skipIndexing);
                 fail("Construction with wrong tracepath should fail!");
         }
         catch( Exception e) { 
@@ -104,12 +101,12 @@ public class LTTngTraceTest extends TestCase {
         try {
             URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(tracepath1), null);
             File testfile = new File(FileLocator.toFileURL(location).toURI());
-            testStream1 = new LTTngTrace(testfile.getName(), testfile.getPath(), skipIndexing);
+            new LTTngTrace(testfile.getName(), testfile.getPath(), skipIndexing);
         }
         catch( Exception e) {
                 fail("Construction with correct tracepath failed!");
         }
-        System.out.println("Test completed");
+//        System.out.println("Test completed");
 	}
 	
 	public void testGetNextEvent() {

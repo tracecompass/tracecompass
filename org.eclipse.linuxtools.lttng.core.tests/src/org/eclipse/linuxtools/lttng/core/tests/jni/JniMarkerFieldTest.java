@@ -54,20 +54,17 @@ public class JniMarkerFieldTest extends TestCase
                 
                 JniMarker tmpMarker = null;
                 
-                @SuppressWarnings("unused")
-				JniMarkerField tmpMarkerField1 = null;
-                @SuppressWarnings("unused")
-				JniMarkerField tmpMarkerField2 = null;
-                
                 // This event should be valid and will be used in test
                 try {
                         tmpMarker = JniTraceFactory.getJniTrace(tracepath, null, printLttDebug).requestEventByName(eventName).requestEventMarker();
                 }
-                catch( JniException e) { }
+                catch( JniException e) {
+                    fail("Could not get marker");
+                }
                 
                 // Test constructor with pointer on a correct pointer
                 try {
-                        tmpMarkerField1 = tmpMarker.allocateNewJniMarkerField( tmpMarker.getMarkerFieldsArrayList().get(0).getMarkerFieldPtr() );
+                        tmpMarker.allocateNewJniMarkerField( tmpMarker.getMarkerFieldsArrayList().get(0).getMarkerFieldPtr() );
                 }
                 catch( JniException e) {
                         fail("Construction with correct pointer failed!");

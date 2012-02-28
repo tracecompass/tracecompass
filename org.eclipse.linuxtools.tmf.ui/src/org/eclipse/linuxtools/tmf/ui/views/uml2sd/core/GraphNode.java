@@ -121,10 +121,10 @@ public abstract class GraphNode {
             GraphNode node = (GraphNode) fNodeList.get(fNodeList.size() - 1);
             Comparator<GraphNode> fcomp = nodeToAdd.getComparator();
             Comparator<GraphNode> bcomp = nodeToAdd.getBackComparator();
-            if ((fcomp != null) && (fcomp.compare(node, nodeToAdd) == 1)) {
+            if ((fcomp != null) && (fcomp.compare(node, nodeToAdd) > 0)) {
                 fSort.put(nodeToAdd.getArrayId(), Boolean.valueOf(true));
             }
-            if ((bcomp != null) && (bcomp.compare(node, nodeToAdd) == 1)) {
+            if ((bcomp != null) && (bcomp.compare(node, nodeToAdd) > 0)) {
                 bSort.put(nodeToAdd.getArrayId(), Boolean.valueOf(true));
             }
         }
@@ -504,7 +504,7 @@ public abstract class GraphNode {
                     if (i < ((List<GraphNode>) nodes.get(nodeType)).size() - 1) {
                         GraphNode next = (GraphNode) ((List<GraphNode>) nodes.get(nodeType)).get(i + 1);
 
-                        if ((comp != null) && (comp.compare(currentNode, next) == 1))
+                        if ((comp != null) && (comp.compare(currentNode, next) > 0))
                             sort.put(nodeType, Boolean.valueOf(true));
                     }
                     if (direction == 1) {
@@ -654,7 +654,7 @@ public abstract class GraphNode {
             GraphNode toDraw = (GraphNode) list.get(i);
             if (i < list.size() - 1) {
                 GraphNode next = (GraphNode) list.get(i + 1);
-                if ((comparator != null) && (comparator.compare(toDraw, next) == 1)) {
+                if ((comparator != null) && (comparator.compare(toDraw, next) > 0)) {
                     fSort.put(next.getArrayId(), Boolean.valueOf(true));
                 }
             }

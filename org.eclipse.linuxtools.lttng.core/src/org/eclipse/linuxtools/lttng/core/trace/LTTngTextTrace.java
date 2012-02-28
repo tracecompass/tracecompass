@@ -114,7 +114,8 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
     		returnedTrace = new LTTngTextTrace(this);
     	}
     	catch (Exception e) {
-    		System.out.println("ERROR : Could not create LTTngTextTrace copy (createTraceCopy).\nError is : " + e.getStackTrace()); //$NON-NLS-1$
+    		System.out.println("ERROR : Could not create LTTngTextTrace copy (createTraceCopy)"); //$NON-NLS-1$
+    		e.printStackTrace(); 
     	}
     	
     	return returnedTrace;
@@ -467,13 +468,13 @@ class TextLttngEvent extends LttngEvent {
 	
 	@Override
 	public JniEvent convertEventTmfToJni() {
-		System.out.println("WARNING : Cannot use convertEventTmfToJni() on a trace in text format."); //$NON-NLS-1$
+//		System.out.println("WARNING : Cannot use convertEventTmfToJni() on a trace in text format."); //$NON-NLS-1$
 		return null;
 	}
 	
 	@Override
 	public void updateJniEventReference(JniEvent newJniEventReference) {
-		System.out.println("WARNING : Cannot use updateJniEventReference on a trace in text format. Using null."); //$NON-NLS-1$
+//		System.out.println("WARNING : Cannot use updateJniEventReference on a trace in text format. Using null."); //$NON-NLS-1$
     }
 }
 

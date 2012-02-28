@@ -405,12 +405,17 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
         return parentTracefile;
     }
     
-	public boolean equals(JniEvent other) {
-		if (other != null) {
-			return (this.getEventTime().equals(other.getEventTime())
-				&&	this.parentTracefile.equals(other.parentTracefile));
-		}
-		return false;
+    @Override
+	public boolean equals(Object other) {
+        if (this == other)
+             return true;
+        if (other == null)
+            return false;
+		if (!(other instanceof JniEvent))
+		    return false;
+		JniEvent event = (JniEvent) other;
+		return (getEventTime().equals(event.getEventTime())
+				&&	parentTracefile.equals(event.parentTracefile));
 	}
     
     /**

@@ -206,17 +206,7 @@ public class TargetResource extends AbstractResource implements Comparable<Targe
         // We only check the name because the target name has to be unique
         if (other instanceof TargetResource) {
             TargetResource otherTarget = (TargetResource) other;
-            
-            if ((fName == null) && (otherTarget.fName == null)) {
-                return false;
-            }
-            else if ((fName == null) && (otherTarget.fName != null)) {
-                return false;
-            } 
-            else if ((fName != null) && (otherTarget.fName == null)) {
-                return false;
-            }
-            else {
+            if (fName != null) {
                 return fName.equals(otherTarget.fName);
             }
         }

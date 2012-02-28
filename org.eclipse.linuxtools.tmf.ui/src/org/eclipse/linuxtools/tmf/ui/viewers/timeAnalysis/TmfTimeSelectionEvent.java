@@ -21,20 +21,20 @@ public class TmfTimeSelectionEvent extends EventObject {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public enum type {WIDGET_DEF_SEL, WIDGET_SEL}
-	type dType;
+	public enum Type {WIDGET_DEF_SEL, WIDGET_SEL}
+	Type dType;
 	Object selection = null;
 	long selTime = 0;
 	int index = 0;
 	
-	public TmfTimeSelectionEvent(Object arg0, type rType, Object sel, long selectedTime) {
+	public TmfTimeSelectionEvent(Object arg0, Type rType, Object sel, long selectedTime) {
 		super(arg0);
 		dType = rType;
 		selection = sel;
 		selTime = selectedTime;
 	}
 	
-	public type getDType() {
+	public Type getDType() {
 		return dType;
 	}
 	

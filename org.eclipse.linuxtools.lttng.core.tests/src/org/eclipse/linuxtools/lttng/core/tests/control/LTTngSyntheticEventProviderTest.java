@@ -45,7 +45,7 @@ public class LTTngSyntheticEventProviderTest extends LttngTestPreparation {
 	}
 
 	public void testSyntheticEventRequest() {
-        System.out.println("testSyntheticEventRequest: test removed");
+//        System.out.println("testSyntheticEventRequest: test removed");
 //		init();
 //		// Create a new Experiment manager context
 //		IStateExperimentManager expManager = prepareExperimentContext(false);

@@ -79,7 +79,7 @@ public class ResourcesBeforeUpdateHandlers {
 				// According to Ltt, we should not draw anything if the channel
 				// is the kernel one
 				if (trcEvent.getChannelName().equals(
-						Channels.LTT_CHANNEL_KERNEL)) {
+						Channels.LTT_CHANNEL_KERNEL.name())) {
 					return false;
 				} else {
 
@@ -161,7 +161,7 @@ public class ResourcesBeforeUpdateHandlers {
 				// According to Ltt, we should not draw anything if the channel
 				// is the kernel one
 				if (trcEvent.getChannelName().equals(
-						Channels.LTT_CHANNEL_KERNEL)) {
+						Channels.LTT_CHANNEL_KERNEL.name())) {
 					return false;
 				} else {
 
@@ -250,7 +250,7 @@ public class ResourcesBeforeUpdateHandlers {
 				// According to Ltt, we should not draw anything if the channel
 				// is the kernel one
 				if (trcEvent.getChannelName().equals(
-						Channels.LTT_CHANNEL_KERNEL)) {
+						Channels.LTT_CHANNEL_KERNEL.name())) {
 					return false;
 				} else {
 

@@ -69,8 +69,6 @@ public class LttngTimestampTest extends TestCase {
 
     public void testConstructors() {
         LttngTimestamp tmpTime = null;
-        @SuppressWarnings("unused")
-        LttngTimestamp tmpTime2 = null;
 
         // Default construction with no argument
         try {
@@ -89,7 +87,7 @@ public class LttngTimestampTest extends TestCase {
         // Copy constructor
         try {
             tmpTime = new LttngTimestamp(1);
-            tmpTime2 = new LttngTimestamp(tmpTime);
+            new LttngTimestamp(tmpTime);
         } catch (Exception e) {
             fail("Construction failed!");
         }

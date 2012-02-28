@@ -197,9 +197,11 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	 * @param signal
 	 */
 	public void synchToTime(TmfTimeSynchSignal signal) {
+        if (signal == null)
+	        return;
 		if (synch) {
 			Object source = signal.getSource();
-			if (signal != null && source != null && source != this) {
+			if (source != null && source != this) {
 
 				if ((tsfviewer != null) && (!tsfviewer.getControl().isDisposed())) {
 
@@ -246,9 +248,11 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	 * @param clearingData
 	 */
 	public void synchToTimeRange(TmfRangeSynchSignal signal, boolean clearingData) {
+	    if (signal == null)
+	         return;
 		if (synch) {
 			Object source = signal.getSource();
-			if (signal != null && source != null && source != this) {
+			if (source != null && source != this) {
 				// Internal value is expected in nano seconds.
 				TmfTimeRange trange = signal.getCurrentRange();
 				TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();

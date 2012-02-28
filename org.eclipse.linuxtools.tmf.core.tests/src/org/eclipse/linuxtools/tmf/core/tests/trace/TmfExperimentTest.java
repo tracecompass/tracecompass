@@ -57,7 +57,7 @@ public class TmfExperimentTest extends TestCase {
     // Housekeeping
     // ------------------------------------------------------------------------
 
-    private ITmfTrace<?>[] setupTrace(String path) {
+    private synchronized ITmfTrace<?>[] setupTrace(String path) {
     	if (fTraces == null) {
     		fTraces = new ITmfTrace[1];
     		try {
@@ -75,7 +75,7 @@ public class TmfExperimentTest extends TestCase {
     }
 
     @SuppressWarnings("unchecked")
-    private void setupExperiment() {
+    private synchronized void setupExperiment() {
     	if (fExperiment == null) {
             fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, (ITmfTrace<TmfEvent>[]) fTraces);
 //            fExperiment.indexExperiment();

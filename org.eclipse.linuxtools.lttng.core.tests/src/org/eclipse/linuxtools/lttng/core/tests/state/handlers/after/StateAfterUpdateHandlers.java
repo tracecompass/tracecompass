@@ -44,7 +44,7 @@ class StateAfterUpdateHandlers {
 				// No syscall_entry update for initialization process
 				LttngProcessState process = traceSt.getRunning_process().get(cpu);
 
-				if (pid != process.getPid()) {
+				if (pid.equals(process.getPid())) {
 					TraceDebug
 							.debug("pid values don't match from before and after verification check");
 				}
@@ -62,8 +62,7 @@ class StateAfterUpdateHandlers {
 							.debug("The top of the stack does not match to the process state");
 				}
 
-				if (stackState.getExec_mode().getInName() != ExecutionMode.LTTV_STATE_SYSCALL
-						.getInName()) {
+				if (stackState.getExec_mode().getInName().equals(ExecutionMode.LTTV_STATE_SYSCALL.getInName())) {
 					TraceDebug.debug("Unexpected ExecutionMode: "
 							+ stackState.getExec_mode().getInName()
 							+ " Expected: "

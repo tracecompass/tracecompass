@@ -24,7 +24,7 @@ public class StateExperimentManagerTextTest extends LttngTestPreparation {
 	 * Test method for {@link org.eclipse.linuxtools.lttng.core.state.experiment.StateExperimentManager#experimentSelected_prep(org.eclipse.linuxtools.tmf.experiment.TmfExperiment)}.
 	 */
 	public void testExperimentSelected_text() {
-	    System.out.println("testExperimentSelected_text: test removed");
+//	    System.out.println("testExperimentSelected_text: test removed");
 		// make sure a TmfExperiment instance is registered as provider and
 		// selected as current
 //		TmfExperiment<LttngEvent> experiment = prepareTextExperimentToTest();
@@ -60,7 +60,7 @@ public class StateExperimentManagerTextTest extends LttngTestPreparation {
 	 * .
 	 */
 	public void testExperimentSelected_real() {
-        System.out.println("testExperimentSelected_real: test removed");
+//        System.out.println("testExperimentSelected_real: test removed");
 //		// Create a new Experiment manager context
 //		IStateExperimentManager expManager = prepareExperimentContext(true);
 //		expManager.waitForCompletion(true);

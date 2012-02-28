@@ -91,8 +91,6 @@ public class LttngEventTest extends TestCase {
 	public void testConstructors() {
         LttngEvent 			testEvent 		= null;
         LTTngTrace			testTrace 		= null;
-		@SuppressWarnings("unused")
-		LttngEvent 			testAnotherEvent = null;
         LttngTimestamp		testTime		= null;
         String      		testSource 		= null;
         LttngEventType   	testType   		= null;
@@ -128,7 +126,7 @@ public class LttngEventTest extends TestCase {
         // Test about copy constructor
         // Passing a null to copy constructor should fail
         try {
-        	testAnotherEvent = new  LttngEvent(null);
+        	 new LttngEvent(null);
             fail("Copy constructor with null old event should fail!");
 		}
 		catch( Exception e) { 
@@ -137,7 +135,7 @@ public class LttngEventTest extends TestCase {
 		// Copy constructor used properly
         testEvent = prepareToTest();
         try {
-        	testAnotherEvent = new  LttngEvent(testEvent);
+        	new LttngEvent(testEvent);
 		}
 		catch( Exception e) { 
 			fail("Correct utilisation of copy constructor failed!");

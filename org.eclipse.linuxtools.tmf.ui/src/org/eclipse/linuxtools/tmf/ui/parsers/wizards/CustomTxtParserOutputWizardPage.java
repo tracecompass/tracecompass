@@ -35,7 +35,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
     private CustomTxtParserWizard wizard;
     private CustomTxtTraceDefinition definition;
     ArrayList<Output> outputs = new ArrayList<Output>();
-    Output messageOutput;
+//    Output messageOutput;
     Composite container;
     SashForm sash;
     Text timestampFormatText;
@@ -258,9 +258,9 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
                     updatePreviewTable();
                 }
             });
-            if (messageOutput != null) {
-                enabledButton.moveAbove(messageOutput.enabledButton);
-            }
+//            if (messageOutput != null) {
+//                enabledButton.moveAbove(messageOutput.enabledButton);
+//            }
             
             nameLabel = new Text(parent, SWT.BORDER | SWT.READ_ONLY | SWT.SINGLE);
             nameLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));

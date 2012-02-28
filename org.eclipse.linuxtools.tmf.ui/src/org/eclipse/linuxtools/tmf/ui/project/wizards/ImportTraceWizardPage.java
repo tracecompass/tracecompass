@@ -677,13 +677,12 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
                 try {
                     IConfigurationElement ce = fTraceAttributes.get(traceTypeName);
                     tmfTrace = (ITmfTrace<?>) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
-                    if (!tmfTrace.validate(fProject, trace.getAbsolutePath())) {
+                    if (tmfTrace != null && !tmfTrace.validate(fProject, trace.getAbsolutePath())) {
                         setMessage(null);
                         setErrorMessage(Messages.ImportTraceWizard_TraceValidationFailed);
+                        tmfTrace.dispose();
                         return false;
                     }
-                    if (tmfTrace != null)
-                        tmfTrace.dispose();
                 } catch (CoreException e) {
                 } finally {
                     if (tmfTrace != null)
