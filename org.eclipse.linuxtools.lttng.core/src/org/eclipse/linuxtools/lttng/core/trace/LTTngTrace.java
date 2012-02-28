@@ -340,8 +340,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         try {
             returnedTrace = new LTTngTrace(this);
         } catch (Exception e) {
-            System.out
-                    .println("ERROR : Could not create LTTngTrace copy (createTraceCopy).\nError is : " + e.getStackTrace()); //$NON-NLS-1$
+            System.out.println("ERROR : Could not create LTTngTrace copy (createTraceCopy)."); //$NON-NLS-1$
+            e.printStackTrace();
         }
 
         return returnedTrace;

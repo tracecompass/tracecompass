@@ -127,12 +127,9 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement,
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((fChildren == null) ? 0 : fChildren.hashCode());
         result = prime * result + ((fLocation == null) ? 0 : fLocation.hashCode());
         result = prime * result + ((fName == null) ? 0 : fName.hashCode());
-        result = prime * result + ((fParent == null) ? 0 : fParent.hashCode());
         result = prime * result + ((fPath == null) ? 0 : fPath.hashCode());
-        result = prime * result + ((fResource == null) ? 0 : fResource.hashCode());
         return result;
     }
 

@@ -257,16 +257,7 @@ public class TraceResource extends AbstractResource implements Comparable<TraceR
         // We only check the name because the trace name has to be unique
         if (other instanceof TraceResource) {
             TraceResource otherTrace = (TraceResource) other;
-
-            if ((fName == null) && (otherTrace.fName == null)) {
-                return false;
-            } else if ((fName == null) && (otherTrace.fName != null)) {
-                return false;
-            }
-            else if ((fName != null) && (otherTrace.fName == null)) {
-                return false;
-            }
-            else {
+            if (fName != null) {
                 return fName.equals(otherTrace.fName);    
             }
         }

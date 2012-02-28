@@ -917,7 +917,8 @@ public abstract class JniTrace extends Jni_C_Common {
      * <p>
      */
     public void printTraceInformation() {
-        ltt_printTrace(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
+        if (DEFAULT_LTT_DEBUG)
+            ltt_printTrace(thisTracePtr.getLibraryId(), thisTracePtr.getPointer());
     }
 
     /**

@@ -123,7 +123,7 @@ public class Combinations extends TestCase {
 		try {
 			trace = JniTraceFactory.getJniTrace(tracepath, null, printLttDebug);
 		} catch (JniException e) {
-			e.printStackTrace();
+            fail("Could not open trace");
 		}
 
 		HashMap<String, Integer> eventCount = new HashMap<String, Integer>();

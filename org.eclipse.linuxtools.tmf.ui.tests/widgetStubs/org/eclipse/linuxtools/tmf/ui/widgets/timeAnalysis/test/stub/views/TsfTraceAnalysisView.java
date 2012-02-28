@@ -663,12 +663,14 @@ public class TsfTraceAnalysisView extends ViewPart implements
 
 	@Override
 	public void tsfTmProcessTimeScaleEvent(TmfTimeScaleSelectionEvent event) {
+	    if (event == null) 
+	        return;
 		Object source = event.getSource();
 		if (source == null || !(source instanceof ITimeAnalysisViewer)) {
 			return;
 		}
 
-		if (event != null && event instanceof TmfTimeScaleSelectionEvent) {
+		if (event instanceof TmfTimeScaleSelectionEvent) {
 			TmfTimeScaleSelectionEvent rEvent = (TmfTimeScaleSelectionEvent) event;
 			ITimeAnalysisViewer rViewer = (ITimeAnalysisViewer) event
 					.getSource();

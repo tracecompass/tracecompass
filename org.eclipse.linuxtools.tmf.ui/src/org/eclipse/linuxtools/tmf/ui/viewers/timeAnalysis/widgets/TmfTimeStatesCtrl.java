@@ -376,7 +376,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
         if (null == _timeProvider)
             return;
         ITmfTimeAnalysisEntry trace = getSelectedTrace();
-        if (trace == _timeProvider || trace == null)
+        if (trace == null)
             return;
         long selectedTime = _timeProvider.getSelectedTime();
         long endTime = _timeProvider.getEndTime();

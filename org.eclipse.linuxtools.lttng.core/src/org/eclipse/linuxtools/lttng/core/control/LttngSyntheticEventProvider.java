@@ -394,13 +394,13 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 	 * @param experiment
 	 */
 	private synchronized void updateExperimentNode(LTTngTreeNode experiment) {
-		if (experiment != null
-				&& experiment.getValue() instanceof TmfExperiment<?>) {
+	    if (experiment == null)
+	        return;
+		if (experiment.getValue() instanceof TmfExperiment<?>) {
 			fExperiment = experiment;
 		} else {
-			TraceDebug
-					.debug("Experiment received is not instance of TmfExperiment: " //$NON-NLS-1$
-							+ experiment.getClass().getName());
+			TraceDebug.debug("Experiment received is not instance of TmfExperiment: " //$NON-NLS-1$
+			          + experiment.getClass().getName());
 		}
 	}
 

@@ -56,20 +56,17 @@ public class JniMarkerTest extends TestCase
                 
                 JniEvent tmpEvent = null;
                 
-                @SuppressWarnings("unused")
-				JniMarker testMarker1 = null;
-                @SuppressWarnings("unused")
-				JniMarker testMarker2 = null;
-                
                 // This event should be valid and will be used in test
                 try {
                         tmpEvent = JniTraceFactory.getJniTrace(tracepath, null, printLttDebug).requestEventByName(eventName);
                 }
-                catch( JniException e) { }
+                catch( JniException e) {
+                    fail("Could not find event");
+                }
                 
                 // Test constructor with pointer on a correct pointer
                 try {
-                        testMarker1 = tmpEvent.getParentTracefile().allocateNewJniMarker( tmpEvent.requestEventMarker().getMarkerPtr() );
+                        tmpEvent.getParentTracefile().allocateNewJniMarker( tmpEvent.requestEventMarker().getMarkerPtr() );
                 }
                 catch( JniException e) {
                         fail("Construction with correct pointer failed!");

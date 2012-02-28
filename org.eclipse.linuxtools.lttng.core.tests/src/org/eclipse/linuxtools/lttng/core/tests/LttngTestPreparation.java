@@ -239,9 +239,6 @@ public abstract class LttngTestPreparation extends TestCase {
 						System.out.println("Expected Event: "
 								+ expectedEvents_T1[feventCount] + " actual: "
 								+ event.getTimestamp().getValue());
-					} else {
-						System.out.println("Synthetic Event: " + feventCount
-								+ " matched expected time");
 					}
 				}
 	
@@ -265,7 +262,7 @@ public abstract class LttngTestPreparation extends TestCase {
 				// requestCompleted();
 				// }
 	
-				System.out.println("handleCompleted(request:" + startIdx + ") Number of events processed: " + feventCount);
+//				System.out.println("handleCompleted(request:" + startIdx + ") Number of events processed: " + feventCount);
 			}
 	
 		};
@@ -353,7 +350,7 @@ public abstract class LttngTestPreparation extends TestCase {
 				// requestCompleted();
 				// }
 	
-				System.out.println("handleCompleted(request:" + startIdx + ") Number of events processed: " + feventCount);
+//				System.out.println("handleCompleted(request:" + startIdx + ") Number of events processed: " + feventCount);
 			}
 	
 		};

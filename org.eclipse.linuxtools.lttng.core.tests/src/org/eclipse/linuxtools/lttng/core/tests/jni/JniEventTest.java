@@ -94,21 +94,18 @@ public class JniEventTest extends TestCase
         public void testEventConstructors() {
                 JniTracefile testTracefile = null;
                 
-                @SuppressWarnings("unused")
-				JniEvent testEvent1 = null;
-                @SuppressWarnings("unused")
-				JniEvent testEvent2 = null;
-                
                 // This trace should be valid and will be used in test
                 try {
                         testTracefile = JniTraceFactory.getJniTrace(tracepath, null, printLttDebug).requestTracefileByName(eventName);
                 }
-                catch( JniException e) { }
+                catch( JniException e) {
+                    fail("Could not get trace file");
+                }
                 
                 
                 // Test constructor on a wrong marker HashMap
                 try {
-                        testEvent1 = testTracefile.allocateNewJniEvent( testTracefile.getCurrentEvent().getEventPtr(), null, testTracefile );
+                        testTracefile.allocateNewJniEvent( testTracefile.getCurrentEvent().getEventPtr(), null, testTracefile );
                         fail("Construction with wrong marker hashmap should fail!");
                 }
                 catch( JniException e) { 
@@ -116,16 +113,15 @@ public class JniEventTest extends TestCase
                 
                 // Test constructor on a wrong tracefile reference
                 try {
-                        testEvent1 = testTracefile.allocateNewJniEvent( testTracefile.getCurrentEvent().getEventPtr(), testTracefile.getTracefileMarkersMap(), null );
+                        testTracefile.allocateNewJniEvent( testTracefile.getCurrentEvent().getEventPtr(), testTracefile.getTracefileMarkersMap(), null );
                         fail("Construction with wrong tracefile reference should fail!");
                 }
                 catch( JniException e) { 
                 }
                 
-                
                 // Finally, test constructor with correct information
                 try {
-                        testEvent1 = testTracefile.allocateNewJniEvent( testTracefile.getCurrentEvent().getEventPtr(), testTracefile.getTracefileMarkersMap(), testTracefile );
+                        testTracefile.allocateNewJniEvent( testTracefile.getCurrentEvent().getEventPtr(), testTracefile.getTracefileMarkersMap(), testTracefile );
                 }
                 catch( JniException e) { 
                         fail("Construction with correct information failed!");

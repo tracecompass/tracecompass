@@ -431,20 +431,20 @@ public class TimeScaleCtrl extends TraceCtrl implements MouseListener,
 
 	@Override
 	public void mouseMove(MouseEvent e) {
-		if (_dragX0 < 0 || _dragState == 0) {
+		if (_dragX0 < 0 || _dragState == 0 || _timeProvider == null) {
 			return;
 		}
 		Point size = getSize();
 		int leftSpace = _timeProvider.getNameSpace();
 		int timeSpace = _timeProvider.getTimeSpace();
 		int x = e.x - leftSpace;
-		if (1 == _dragState && null != _timeProvider) {
+		if (1 == _dragState) {
 			if (x > 0 && size.x > leftSpace && _dragX != x) {
 				_dragX = x;
 				long time1 = _time0bak + (long) ((_time1bak - _time0bak) * ((double) _dragX0 / _dragX));
 				_timeProvider.setStartFinishTime(_time0bak, time1);
 			}
-		} else if (3 == _dragState && null != _timeProvider) {
+		} else if (3 == _dragState) {
 		    if (x < 0) {
 		        _dragX = 0;
 		    } else if (x > timeSpace) {
