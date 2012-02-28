@@ -20,7 +20,7 @@
   </parent>
 
   <artifactId>org.eclipse.linuxtools.tmf.ui.tests</artifactId>
-  <version>0.4.0-SNAPSHOT</version>
+  <version>0.5.0-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
   <name>Linux Tools LTTng TMF UI Unit Test Suite</name>
