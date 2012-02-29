@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.signal;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 
@@ -22,16 +22,16 @@ import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
  */
 public class TmfExperimentRangeUpdatedSignal extends TmfSignal {
 
-	private final TmfExperiment<? extends TmfEvent> fExperiment;
+	private final TmfExperiment<? extends ITmfEvent> fExperiment;
 	private final TmfTimeRange fTimeRange;
 	
-	public TmfExperimentRangeUpdatedSignal(Object source, TmfExperiment<? extends TmfEvent> experiment, TmfTimeRange range) { // , ITmfTrace trace) {
+	public TmfExperimentRangeUpdatedSignal(Object source, TmfExperiment<? extends ITmfEvent> experiment, TmfTimeRange range) { // , ITmfTrace trace) {
 		super(source);
 		fExperiment = experiment;
 		fTimeRange = range;
 	}
 
-	public TmfExperiment<? extends TmfEvent> getExperiment() {
+	public TmfExperiment<? extends ITmfEvent> getExperiment() {
 		return fExperiment;
 	}
 

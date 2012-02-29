@@ -12,8 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.core.request;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 
 /**
@@ -21,7 +21,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
  * <p>
  * TODO: Implement me. Please.
  */
-public class TmfCoalescedEventRequest<T extends TmfEvent> extends TmfCoalescedDataRequest<T> implements ITmfEventRequest<T> {
+public class TmfCoalescedEventRequest<T extends ITmfEvent> extends TmfCoalescedDataRequest<T> implements ITmfEventRequest<T> {
 
     // ------------------------------------------------------------------------
     // Attributes

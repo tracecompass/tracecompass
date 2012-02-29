@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.tmf.ui.widgets;
 
 import java.util.ArrayList;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
@@ -388,7 +388,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                     long rank = 0;
                     while (!context.getLocation().equals(endLocation)) {
                         location = context.getLocation().clone();
-                        TmfEvent event = fTrace.getNextEvent(context);
+                        ITmfEvent event = fTrace.getNextEvent(context);
                         if (event == null) {
                         	break;
                         }
@@ -434,7 +434,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 	        }
             long rank = fBottomContext.getRank();
             ITmfLocation<?> location = fBottomContext.getLocation() != null ? fBottomContext.getLocation().clone() : null;
-            TmfEvent event = fTrace.getNextEvent(fBottomContext);
+            ITmfEvent event = fTrace.getNextEvent(fBottomContext);
             if (event == null) {
                 break;
             }

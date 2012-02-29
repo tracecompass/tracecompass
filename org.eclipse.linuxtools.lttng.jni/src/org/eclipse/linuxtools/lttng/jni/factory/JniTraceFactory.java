@@ -79,7 +79,7 @@ public class JniTraceFactory {
             } else {
                 String errMsg = "Unrecognized/unsupported trace version\n\n" //$NON-NLS-1$
                         + "Library reported trace version " + traceVersion.getVersionAsString() + "\n\n" //$NON-NLS-1$ //$NON-NLS-2$
-                        + "Make sure that you installed the corresponding parsing library (liblttvtraceread-" + traceVersion.getVersionAsString() + ".so) " //$NON-NLS-1$ 
+                        + "Make sure that you installed the corresponding parsing library (liblttvtraceread-" + traceVersion.getVersionAsString() + ".so) " //$NON-NLS-1$ //$NON-NLS-2$ 
                         + "and that it can be found from either your LD_LIBRARY_PATH or the Trace Library Path (in LTTng project properties)\n\n" //$NON-NLS-1$
                         + "Refer to the LTTng User Guide for more information"; //$NON-NLS-1$
                 throw new JniException(errMsg);

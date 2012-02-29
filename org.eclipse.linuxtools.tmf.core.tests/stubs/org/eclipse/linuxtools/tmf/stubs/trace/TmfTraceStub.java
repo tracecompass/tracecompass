@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
@@ -44,7 +45,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     private RandomAccessFile fTrace;
 
     // The associated event parser
-    private ITmfEventParser fParser;
+    private ITmfEventParser<TmfEvent> fParser;
 
     // The synchronization lock
     private ReentrantLock fLock = new ReentrantLock();
@@ -99,7 +100,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * @param parser
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(String filename, int cacheSize, boolean waitForCompletion, ITmfEventParser parser) throws FileNotFoundException {
+    public TmfTraceStub(String filename, int cacheSize, boolean waitForCompletion, ITmfEventParser<TmfEvent> parser) throws FileNotFoundException {
         super(filename, TmfEvent.class, filename, cacheSize, false);
         fTrace = new RandomAccessFile(filename, "r");
         fParser = parser;
@@ -222,12 +223,12 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     }
 
 	@Override
-	public TmfEvent parseEvent(TmfContext context) {
+	public ITmfEvent parseEvent(TmfContext context) {
 	    fLock.lock();
        	try {
    			// parseNextEvent will update the context
        	    if (fTrace != null) {
-       	        TmfEvent event = fParser.parseNextEvent(this, context.clone());
+       	        ITmfEvent event = fParser.parseNextEvent(this, context.clone());
        	        return event;
        	    }
        	}

@@ -41,7 +41,7 @@ import org.eclipse.linuxtools.lttng.ui.views.statistics.evProcessor.StatsTimeCou
 import org.eclipse.linuxtools.lttng.ui.views.statistics.model.KernelStatisticsData;
 import org.eclipse.linuxtools.lttng.ui.views.statistics.model.StatisticsTreeNode;
 import org.eclipse.linuxtools.lttng.ui.views.statistics.model.StatisticsTreeRootFactory;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
@@ -661,7 +661,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 	 * @param signal
 	 */
 	@TmfSignalHandler
-	public void experimentSelected(TmfExperimentSelectedSignal<? extends TmfEvent> signal) {
+	public void experimentSelected(TmfExperimentSelectedSignal<? extends ITmfEvent> signal) {
 		if (signal != null) {
 			TmfExperiment<?> experiment = signal.getExperiment();
 			String experimentName =  experiment.getName();

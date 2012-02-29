@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.tmf.ui.views.colors;
 
 import java.util.ArrayList;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.TraceColorScheme;
 import org.eclipse.swt.SWT;
@@ -45,7 +45,7 @@ public class ColorSettingsManager {
 		fireColorSettingsChanged();
 	}
 	
-	public static ColorSetting getColorSetting(TmfEvent event) {
+	public static ColorSetting getColorSetting(ITmfEvent event) {
         for (int i = 0; i < fColorSettings.length; i++) {
         	ColorSetting colorSetting = fColorSettings[i];
         	if (colorSetting.getFilter() != null && colorSetting.getFilter().matches(event)) {
@@ -55,7 +55,7 @@ public class ColorSettingsManager {
         return DEFAULT_COLOR_SETTING;
 	}
 	
-	public static int getColorSettingPriority(TmfEvent event) {
+	public static int getColorSettingPriority(ITmfEvent event) {
         for (int i = 0; i < fColorSettings.length; i++) {
         	ColorSetting colorSetting = fColorSettings[i];
         	if (colorSetting.getFilter() != null && colorSetting.getFilter().matches(event)) {

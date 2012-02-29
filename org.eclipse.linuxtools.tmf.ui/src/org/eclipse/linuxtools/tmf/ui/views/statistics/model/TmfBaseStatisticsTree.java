@@ -18,7 +18,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.ITmfExtraEventInfo;
 
@@ -141,7 +141,7 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
      * @return Array of FixedArray representing the paths.
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    protected TmfFixedArray<String>[] getTypePaths(TmfEvent event, ITmfExtraEventInfo extraInfo) {
+    protected TmfFixedArray<String>[] getTypePaths(ITmfEvent event, ITmfExtraEventInfo extraInfo) {
         String trace = extraInfo.getTraceName();
         // String type = event.getType().getTypeId(); // Add too much
         // informations
@@ -162,7 +162,7 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
      * @return Array of FixedArray representing the paths.
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    protected TmfFixedArray<String>[] getNormalPaths(TmfEvent event, ITmfExtraEventInfo extraInfo) {
+    protected TmfFixedArray<String>[] getNormalPaths(ITmfEvent event, ITmfExtraEventInfo extraInfo) {
         String trace = extraInfo.getTraceName();
 
         TmfFixedArray[] paths = { new TmfFixedArray<String>(trace) };
@@ -174,7 +174,7 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
      * @see org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfStatisticsData#increase(org.eclipse.linuxtools.tmf.event.TmfEvent, org.eclipse.linuxtools.tmf.ui.views.statistics.ITmfEventInfo, int)
      */
     @Override
-    public void increase(TmfEvent event, ITmfExtraEventInfo extraInfo, int values) {
+    public void increase(ITmfEvent event, ITmfExtraEventInfo extraInfo, int values) {
         // Do nothing
     }
 
@@ -183,7 +183,7 @@ public class TmfBaseStatisticsTree extends AbsTmfStatisticsTree {
      * @see org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfStatisticsData#registerEvent(org.eclipse.linuxtools.tmf.event.TmfEvent, org.eclipse.linuxtools.tmf.ui.views.statistics.ITmfEventInfo)
      */
     @Override
-    public void registerEvent(TmfEvent event, ITmfExtraEventInfo extraInfo) {
+    public void registerEvent(ITmfEvent event, ITmfExtraEventInfo extraInfo) {
         TmfFixedArray<String>[] paths = getNormalPaths(event, extraInfo);
         for (TmfFixedArray<String> path : paths)
             ++(getOrCreate(path).getValue().nbEvents);

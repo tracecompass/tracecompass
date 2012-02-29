@@ -22,8 +22,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
@@ -50,7 +50,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
  * TmfExperiment presents a time-ordered, unified view of a set of TmfTraces that are part of a tracing experiment.
  * <p>
  */
-public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> implements ITmfTrace<T> {
+public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> implements ITmfTrace<T> {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -293,7 +293,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
      */
     public ITmfTimestamp getTimestamp(int index) {
         TmfExperimentContext context = seekEvent(index);
-        TmfEvent event = getNextEvent(context);
+        ITmfEvent event = getNextEvent(context);
         return (event != null) ? event.getTimestamp() : null;
     }
 
@@ -453,7 +453,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         context.setRank((long) index * fIndexPageSize);
 
         // And locate the event
-        TmfEvent event = parseEvent(context);
+        ITmfEvent event = parseEvent(context);
         while (event != null && event.getTimestamp().compareTo(timestamp, false) < 0) {
             getNextEvent(context);
             event = parseEvent(context);
@@ -495,7 +495,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         context.setRank((long) index * fIndexPageSize);
 
         // And locate the event
-        TmfEvent event = parseEvent(context);
+        ITmfEvent event = parseEvent(context);
         long pos = context.getRank();
         while (event != null && pos++ < rank) {
             getNextEvent(context);
@@ -557,7 +557,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 //	}
 
     @Override
-    public synchronized TmfEvent getNextEvent(TmfContext context) {
+    public synchronized ITmfEvent getNextEvent(TmfContext context) {
 
         // Validate the context
         if (!(context instanceof TmfExperimentContext)) {
@@ -582,7 +582,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         }
 
         // Scan the candidate events and identify the "next" trace to read from
-        TmfEvent eventArray[] = expContext.getEvents();
+        ITmfEvent eventArray[] = expContext.getEvents();
         if (eventArray == null) {
             return null;
         }
@@ -595,7 +595,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
             }
         } else {
             for (int i = 0; i < eventArray.length; i++) {
-                TmfEvent event = eventArray[i];
+                ITmfEvent event = eventArray[i];
                 if (event != null && event.getTimestamp() != null) {
                     ITmfTimestamp otherTS = event.getTimestamp();
                     if (otherTS.compareTo(timestamp, true) < 0) {
@@ -606,7 +606,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
             }
         }
         // Update the experiment context and set the "next" event
-        TmfEvent event = null;
+        ITmfEvent event = null;
         if (trace != TmfExperimentContext.NO_TRACE) {
             updateIndex(expContext, timestamp);
 
@@ -655,7 +655,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
      * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#parseEvent(org.eclipse.linuxtools .tmf.trace.TmfContext)
      */
     @Override
-    public TmfEvent parseEvent(TmfContext context) {
+    public ITmfEvent parseEvent(TmfContext context) {
 
         // Validate the context
         if (!(context instanceof TmfExperimentContext)) {
@@ -682,7 +682,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
         int trace = TmfExperimentContext.NO_TRACE;
         ITmfTimestamp timestamp = TmfTimestamp.BigCrunch;
         for (int i = 0; i < expContext.getTraces().length; i++) {
-            TmfEvent event = expContext.getEvents()[i];
+            ITmfEvent event = expContext.getEvents()[i];
             if (event != null && event.getTimestamp() != null) {
                 ITmfTimestamp otherTS = event.getTimestamp();
                 if (otherTS.compareTo(timestamp, true) < 0) {
@@ -692,7 +692,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
             }
         }
 
-        TmfEvent event = null;
+        ITmfEvent event = null;
         if (trace != TmfExperimentContext.NO_TRACE) {
             event = expContext.getEvents()[trace];
         }
@@ -723,7 +723,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 
         if (getStreamingInterval() == 0) {
             TmfContext context = seekLocation(null);
-            TmfEvent event = getNext(context);
+            ITmfEvent event = getNext(context);
             if (event == null) {
                 return;
             }
@@ -859,7 +859,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
 //		fEventLog = openLogFile("TraceEvent.log");
 //        System.out.println(System.currentTimeMillis() + ": Experiment indexing started");
 
-        ITmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, timeRange, index, TmfDataRequest.ALL_DATA,
+        ITmfEventRequest<ITmfEvent> request = new TmfEventRequest<ITmfEvent>(ITmfEvent.class, timeRange, index, TmfDataRequest.ALL_DATA,
                 fIndexPageSize, ITmfDataRequest.ExecutionType.BACKGROUND) { // PATA FOREGROUND
 
 //            long indexingStart = System.nanoTime();
@@ -874,7 +874,7 @@ public class TmfExperiment<T extends TmfEvent> extends TmfEventProvider<T> imple
             }
 
             @Override
-            public void handleData(TmfEvent event) {
+            public void handleData(ITmfEvent event) {
                 super.handleData(event);
                 if (event != null) {
                     ITmfTimestamp ts = event.getTimestamp();

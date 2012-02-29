@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Vector;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
@@ -33,7 +34,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
  * TODO: Implement me. Please.
  */
 @SuppressWarnings("nls")
-public class TmfEventParserStub implements ITmfEventParser {
+public class TmfEventParserStub implements ITmfEventParser<TmfEvent> {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -67,7 +68,7 @@ public class TmfEventParserStub implements ITmfEventParser {
     static final String typePrefix = "Type-";
     @Override
 	@SuppressWarnings("unchecked")
-	public TmfEvent parseNextEvent(ITmfTrace<?> eventStream, TmfContext context) throws IOException {
+	public ITmfEvent parseNextEvent(ITmfTrace<TmfEvent> eventStream, TmfContext context) throws IOException {
 
         if (! (eventStream instanceof TmfTraceStub)) {
             return null;
@@ -106,7 +107,7 @@ public class TmfEventParserStub implements ITmfEventParser {
        	    content.append("]");
 
             TmfEventField root = new TmfEventField(ITmfEventField.ROOT_ID, content.toString());
-       	    TmfEvent event = new TmfEvent(eventStream,
+       	    ITmfEvent event = new TmfEvent(eventStream,
        	            new TmfTimestamp(ts, -3, 0),     // millisecs
        	            source, fTypes[typeIndex], root, reference.toString());
        	    return event;

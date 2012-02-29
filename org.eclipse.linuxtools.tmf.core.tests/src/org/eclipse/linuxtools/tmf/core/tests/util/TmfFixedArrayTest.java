@@ -32,11 +32,11 @@ public class TmfFixedArrayTest extends TestCase {
     // ------------------------------------------------------------------------
     
     public TmfFixedArrayTest() {
-        fString1 = "First String";
-        fString2 = "Second String";
-        fString3 = "Third String";
-        fString4 = "Fourth String";
-        fString5 = "Fifth String";
+        fString1 = "First String"; //$NON-NLS-1$
+        fString2 = "Second String"; //$NON-NLS-1$
+        fString3 = "Third String"; //$NON-NLS-1$
+        fString4 = "Fourth String"; //$NON-NLS-1$
+        fString5 = "Fifth String"; //$NON-NLS-1$
         fFixedArray1 = new TmfFixedArray<String>(fString1, fString2, fString3);
         fFixedArray2 = new TmfFixedArray<String>(); // Empty array at the beginning
     }
@@ -56,9 +56,9 @@ public class TmfFixedArrayTest extends TestCase {
     // ------------------------------------------------------------------------
     
     public void testGet() throws Exception {
-        assertTrue("get", fString1.equals(fFixedArray1.get(0)));
-        assertTrue("get", fString2.equals(fFixedArray1.get(1)));
-        assertTrue("get", fString3.equals(fFixedArray1.get(2)));
+        assertTrue("get", fString1.equals(fFixedArray1.get(0))); //$NON-NLS-1$
+        assertTrue("get", fString2.equals(fFixedArray1.get(1))); //$NON-NLS-1$
+        assertTrue("get", fString3.equals(fFixedArray1.get(2))); //$NON-NLS-1$
         
         try {
             fFixedArray2.get(0);
@@ -71,10 +71,10 @@ public class TmfFixedArrayTest extends TestCase {
     
     public void testGetArray() throws Exception {
         String[] stringArray = fFixedArray1.getArray();
-        assertNotNull("getArray", stringArray);
-        assertTrue("getArray", fString1.equals(stringArray[0]));
-        assertTrue("getArray", fString2.equals(stringArray[1]));
-        assertTrue("getArray", fString3.equals(stringArray[2]));
+        assertNotNull("getArray", stringArray); //$NON-NLS-1$
+        assertTrue("getArray", fString1.equals(stringArray[0])); //$NON-NLS-1$
+        assertTrue("getArray", fString2.equals(stringArray[1])); //$NON-NLS-1$
+        assertTrue("getArray", fString3.equals(stringArray[2])); //$NON-NLS-1$
     }
     
     // ------------------------------------------------------------------------
@@ -82,11 +82,11 @@ public class TmfFixedArrayTest extends TestCase {
     // ------------------------------------------------------------------------
     
     public void testEqualsReflexivity() throws Exception {
-        assertTrue("equals", fFixedArray1.equals(fFixedArray1));
-        assertTrue("equals", fFixedArray2.equals(fFixedArray2));
+        assertTrue("equals", fFixedArray1.equals(fFixedArray1)); //$NON-NLS-1$
+        assertTrue("equals", fFixedArray2.equals(fFixedArray2)); //$NON-NLS-1$
         
-        assertTrue("equals", !fFixedArray1.equals(fFixedArray2));
-        assertTrue("equals", !fFixedArray2.equals(fFixedArray1));
+        assertTrue("equals", !fFixedArray1.equals(fFixedArray2)); //$NON-NLS-1$
+        assertTrue("equals", !fFixedArray2.equals(fFixedArray1)); //$NON-NLS-1$
     }
     
     @SuppressWarnings("unchecked")
@@ -94,11 +94,11 @@ public class TmfFixedArrayTest extends TestCase {
         TmfFixedArray<String> fixedArray1 = (TmfFixedArray<String>) fFixedArray1.clone();
         TmfFixedArray<String> fixedArray2 = (TmfFixedArray<String>) fFixedArray2.clone();
 
-        assertTrue("equals", fixedArray1.equals(fFixedArray1));
-        assertTrue("equals", fFixedArray1.equals(fixedArray1));
+        assertTrue("equals", fixedArray1.equals(fFixedArray1)); //$NON-NLS-1$
+        assertTrue("equals", fFixedArray1.equals(fixedArray1)); //$NON-NLS-1$
 
-        assertTrue("equals", fixedArray2.equals(fFixedArray2));
-        assertTrue("equals", fFixedArray2.equals(fixedArray2));
+        assertTrue("equals", fixedArray2.equals(fFixedArray2)); //$NON-NLS-1$
+        assertTrue("equals", fFixedArray2.equals(fixedArray2)); //$NON-NLS-1$
     }
     
     @SuppressWarnings("unchecked")
@@ -107,14 +107,14 @@ public class TmfFixedArrayTest extends TestCase {
         TmfFixedArray<String> fixedArray2 = (TmfFixedArray<String>) fFixedArray1.clone();
         TmfFixedArray<String> fixedArray3 = (TmfFixedArray<String>) fFixedArray1.clone();
 
-        assertTrue("equals", fixedArray1.equals(fixedArray2));
-        assertTrue("equals", fixedArray2.equals(fixedArray3));
-        assertTrue("equals", fixedArray1.equals(fixedArray3));
+        assertTrue("equals", fixedArray1.equals(fixedArray2)); //$NON-NLS-1$
+        assertTrue("equals", fixedArray2.equals(fixedArray3)); //$NON-NLS-1$
+        assertTrue("equals", fixedArray1.equals(fixedArray3)); //$NON-NLS-1$
     }
     
     public void testEqualsNull() throws Exception {
-        assertTrue("equals", !fFixedArray1.equals(null));
-        assertTrue("equals", !fFixedArray2.equals(null));
+        assertTrue("equals", !fFixedArray1.equals(null)); //$NON-NLS-1$
+        assertTrue("equals", !fFixedArray2.equals(null)); //$NON-NLS-1$
     }
     
     // ------------------------------------------------------------------------
@@ -125,14 +125,14 @@ public class TmfFixedArrayTest extends TestCase {
         TmfFixedArray<String> fixedArray         = new TmfFixedArray<String>();
         
         fixedArray = fixedArray.append(fString1, fString2, fString3);
-        assertEquals("append", 3, fixedArray.size());
-        assertTrue("append", fString1.equals(fixedArray.get(0)));
-        assertTrue("append", fString2.equals(fixedArray.get(1)));
-        assertTrue("append", fString3.equals(fixedArray.get(2)));
+        assertEquals("append", 3, fixedArray.size()); //$NON-NLS-1$
+        assertTrue("append", fString1.equals(fixedArray.get(0))); //$NON-NLS-1$
+        assertTrue("append", fString2.equals(fixedArray.get(1))); //$NON-NLS-1$
+        assertTrue("append", fString3.equals(fixedArray.get(2))); //$NON-NLS-1$
 
         fixedArray = fixedArray.append(fString4);
-        assertEquals("append", 4, fixedArray.size());
-        assertTrue("append", fString4.equals(fixedArray.get(3)));
+        assertEquals("append", 4, fixedArray.size()); //$NON-NLS-1$
+        assertTrue("append", fString4.equals(fixedArray.get(3))); //$NON-NLS-1$
     }
     
    
@@ -143,15 +143,15 @@ public class TmfFixedArrayTest extends TestCase {
         TmfFixedArray<String> fixedArray         = new TmfFixedArray<String>();
         
         fixedArray = fixedArray.append(fFixedArray1, fixedArrayToAppend1);
-        assertEquals("append", 4, fixedArray.size());
-        assertTrue("append", fString1.equals(fixedArray.get(0)));
-        assertTrue("append", fString2.equals(fixedArray.get(1)));
-        assertTrue("append", fString3.equals(fixedArray.get(2)));
-        assertTrue("append", fString4.equals(fixedArray.get(3)));
+        assertEquals("append", 4, fixedArray.size()); //$NON-NLS-1$
+        assertTrue("append", fString1.equals(fixedArray.get(0))); //$NON-NLS-1$
+        assertTrue("append", fString2.equals(fixedArray.get(1))); //$NON-NLS-1$
+        assertTrue("append", fString3.equals(fixedArray.get(2))); //$NON-NLS-1$
+        assertTrue("append", fString4.equals(fixedArray.get(3))); //$NON-NLS-1$
         
         fixedArray = fixedArray.append(fixedArrayToAppend2);
-        assertEquals("append", 5, fixedArray.size());
-        assertTrue("append", fString5.equals(fixedArray.get(4)));
+        assertEquals("append", 5, fixedArray.size()); //$NON-NLS-1$
+        assertTrue("append", fString5.equals(fixedArray.get(4))); //$NON-NLS-1$
     }
     
     // ------------------------------------------------------------------------
@@ -163,11 +163,11 @@ public class TmfFixedArrayTest extends TestCase {
         TmfFixedArray<String> fixedArray1 = (TmfFixedArray<String>) fFixedArray1.clone();
         TmfFixedArray<String> fixedArray2 = (TmfFixedArray<String>) fFixedArray2.clone();
 
-        assertTrue("hashCode", fixedArray1.hashCode() == fFixedArray1.hashCode());
-        assertTrue("hashCode", fFixedArray2.hashCode() == fixedArray2.hashCode());
+        assertTrue("hashCode", fixedArray1.hashCode() == fFixedArray1.hashCode()); //$NON-NLS-1$
+        assertTrue("hashCode", fFixedArray2.hashCode() == fixedArray2.hashCode()); //$NON-NLS-1$
 
-        assertTrue("hashCode", fFixedArray1.hashCode() != fixedArray2.hashCode());
-        assertTrue("hashCode", fFixedArray2.hashCode() != fixedArray1.hashCode());
+        assertTrue("hashCode", fFixedArray1.hashCode() != fixedArray2.hashCode()); //$NON-NLS-1$
+        assertTrue("hashCode", fFixedArray2.hashCode() != fixedArray1.hashCode()); //$NON-NLS-1$
     }
     
     // ------------------------------------------------------------------------
@@ -176,26 +176,26 @@ public class TmfFixedArrayTest extends TestCase {
 
     public void testToArray() {
         String[] expected1 = {fString1, fString2, fString3};
-        assertTrue("toArray", Arrays.equals(expected1, fFixedArray1.toArray()));
+        assertTrue("toArray", Arrays.equals(expected1, fFixedArray1.toArray())); //$NON-NLS-1$
         
         String[] expected2 = {};
-        assertTrue("toArray", Arrays.equals(expected2, fFixedArray2.toArray()));
+        assertTrue("toArray", Arrays.equals(expected2, fFixedArray2.toArray())); //$NON-NLS-1$
     }
 
     public void testToArrayArg() throws Exception {
         String[] stringArray = new String[3];
         fFixedArray1.toArray(stringArray);
-        assertTrue("toArrayArg", stringArray[0].equals(fFixedArray1.get(0)));
-        assertTrue("toArrayArg", stringArray[1].equals(fFixedArray1.get(1)));
-        assertTrue("toArrayArg", stringArray[2].equals(fFixedArray1.get(2)));
+        assertTrue("toArrayArg", stringArray[0].equals(fFixedArray1.get(0))); //$NON-NLS-1$
+        assertTrue("toArrayArg", stringArray[1].equals(fFixedArray1.get(1))); //$NON-NLS-1$
+        assertTrue("toArrayArg", stringArray[2].equals(fFixedArray1.get(2))); //$NON-NLS-1$
         
         String[] stringBigArray = new String[10];
         fFixedArray1.toArray(stringBigArray);
-        assertNull("toArrayArg", stringBigArray[3]);
+        assertNull("toArrayArg", stringBigArray[3]); //$NON-NLS-1$
         
         TmfFixedArray<Object> fFixedArrayObject  = new TmfFixedArray<Object>(fString1);
         stringArray = fFixedArrayObject.toArray(new String[0]);
-        assertTrue("toArrayArg", stringArray[0].equals(fString1));
+        assertTrue("toArrayArg", stringArray[0].equals(fString1)); //$NON-NLS-1$
     }
     
     // ------------------------------------------------------------------------
@@ -203,9 +203,9 @@ public class TmfFixedArrayTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testSize() {
-        assertEquals("toArray", 3, fFixedArray1.size());
+        assertEquals("toArray", 3, fFixedArray1.size()); //$NON-NLS-1$
         
-        assertEquals("toArray", 0, fFixedArray2.size());
+        assertEquals("toArray", 0, fFixedArray2.size()); //$NON-NLS-1$
     }
     
     // ------------------------------------------------------------------------
@@ -215,17 +215,17 @@ public class TmfFixedArrayTest extends TestCase {
     public void testSubArray() throws Exception {
         TmfFixedArray<String> subArray = fFixedArray1.subArray(1);
         
-        assertEquals("SubArray", 2, subArray.size());
-        assertTrue("SubArray", fString2.equals(subArray.get(0)));
-        assertTrue("SubArray", fString3.equals(subArray.get(1)));
+        assertEquals("SubArray", 2, subArray.size()); //$NON-NLS-1$
+        assertTrue("SubArray", fString2.equals(subArray.get(0))); //$NON-NLS-1$
+        assertTrue("SubArray", fString3.equals(subArray.get(1))); //$NON-NLS-1$
     }
     
     public void testSubArray2() {
         TmfFixedArray<String> subArray = fFixedArray1.subArray(1, 2);
         
-        assertEquals("SubArray", 2, subArray.size());
-        assertTrue("SubArray", fString2.equals(subArray.get(0)));
-        assertTrue("SubArray", fString3.equals(subArray.get(1)));
+        assertEquals("SubArray", 2, subArray.size()); //$NON-NLS-1$
+        assertTrue("SubArray", fString2.equals(subArray.get(0))); //$NON-NLS-1$
+        assertTrue("SubArray", fString3.equals(subArray.get(1))); //$NON-NLS-1$
     }
     
     // ------------------------------------------------------------------------
@@ -233,19 +233,19 @@ public class TmfFixedArrayTest extends TestCase {
     // ------------------------------------------------------------------------
     
     public void testSet() throws Exception {
-        String[] newString = {"new FirstString", "new SecondString", "new ThirdString"};
+        String[] newString = {"new FirstString", "new SecondString", "new ThirdString"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         
         fFixedArray1.set(0, newString[0]);
-        assertTrue("getArray", newString[0].equals(newString[0]));
+        assertTrue("getArray", newString[0].equals(newString[0])); //$NON-NLS-1$
         
         fFixedArray1.set(1, newString[1]);
-        assertTrue("getArray", newString[1].equals(newString[1]));
+        assertTrue("getArray", newString[1].equals(newString[1])); //$NON-NLS-1$
         
         fFixedArray1.set(2, newString[2]);
-        assertTrue("getArray", newString[2].equals(newString[2]));
+        assertTrue("getArray", newString[2].equals(newString[2])); //$NON-NLS-1$
         
         try {
-            fFixedArray2.set(0, "newString");
+            fFixedArray2.set(0, "newString"); //$NON-NLS-1$
             fail();
         } catch (Exception e) {
             // Success
@@ -258,9 +258,9 @@ public class TmfFixedArrayTest extends TestCase {
 
     public void testToString() {
         String expected1 = Arrays.asList(fString1, fString2, fString3).toString();
-        assertEquals("toString", expected1, fFixedArray1.toString());
+        assertEquals("toString", expected1, fFixedArray1.toString()); //$NON-NLS-1$
 
         String expected2 = Arrays.asList().toString();
-        assertEquals("toString", expected2, fFixedArray2.toString());
+        assertEquals("toString", expected2, fFixedArray2.toString()); //$NON-NLS-1$
     }
 }

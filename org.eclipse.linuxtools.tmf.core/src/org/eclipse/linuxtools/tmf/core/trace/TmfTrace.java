@@ -25,8 +25,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
@@ -52,7 +52,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
  * 
  * TODO: Add support for live streaming (notifications, incremental indexing, ...)
  */
-public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> implements ITmfTrace<T>, Cloneable {
+public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> implements ITmfTrace<T>, Cloneable {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -356,7 +356,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
 
         // And locate the event
         TmfContext nextEventContext = context.clone(); // Must use clone() to get the right subtype...
-        TmfEvent event = getNextEvent(nextEventContext);
+        ITmfEvent event = getNextEvent(nextEventContext);
         while (event != null && event.getTimestamp().compareTo(timestamp, false) < 0) {
             context.setLocation(nextEventContext.getLocation().clone());
             context.updateRank(1);
@@ -391,7 +391,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
         context.setRank(pos);
 
         if (pos < rank) {
-            TmfEvent event = getNextEvent(context);
+            ITmfEvent event = getNextEvent(context);
             while (event != null && ++pos < rank) {
                 event = getNextEvent(context);
             }
@@ -407,9 +407,9 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
      * linuxtools.tmf.trace.ITmfTrace.TraceContext)
      */
     @Override
-    public synchronized TmfEvent getNextEvent(TmfContext context) {
+    public synchronized ITmfEvent getNextEvent(TmfContext context) {
         // parseEvent() does not update the context
-        TmfEvent event = parseEvent(context);
+        ITmfEvent event = parseEvent(context);
         if (event != null) {
             updateIndex(context, context.getRank(), event.getTimestamp());
             context.setLocation(getCurrentLocation());
@@ -447,7 +447,7 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
      * 
      * @param event
      */
-    protected void processEvent(TmfEvent event) {
+    protected void processEvent(ITmfEvent event) {
         // Do nothing by default
     }
 
@@ -494,14 +494,14 @@ public abstract class TmfTrace<T extends TmfEvent> extends TmfEventProvider<T> i
         job.schedule();
 
         fCheckpoints.clear();
-        ITmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity, TmfDataRequest.ALL_DATA,
+        ITmfEventRequest<ITmfEvent> request = new TmfEventRequest<ITmfEvent>(ITmfEvent.class, TmfTimeRange.Eternity, TmfDataRequest.ALL_DATA,
                 fIndexPageSize, ITmfDataRequest.ExecutionType.BACKGROUND) {
 
             ITmfTimestamp startTime = null;
             ITmfTimestamp lastTime = null;
 
             @Override
-            public void handleData(TmfEvent event) {
+            public void handleData(ITmfEvent event) {
                 super.handleData(event);
                 if (event != null) {
                     ITmfTimestamp ts = event.getTimestamp();

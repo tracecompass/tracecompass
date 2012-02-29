@@ -270,10 +270,10 @@ public class ImportToProject implements IObjectActionDelegate, IWorkbenchWindowA
         try {
             folder.createLink(sourceFolder.toURI(), IResource.REPLACE, null);
             // Set the trace properties for this resource
-            // FIXME: update from extenstion point properties
+            // FIXME: update from extension point properties
             folder.setPersistentProperty(TmfTraceElement.TRACEBUNDLE, LTTngUiPlugin.PLUGIN_ID);
-            folder.setPersistentProperty(TmfTraceElement.TRACETYPE, "org.eclipse.linuxtools.lttng.tracetype.kernel");
-            folder.setPersistentProperty(TmfTraceElement.TRACEICON, "icons/obj16/tux2.png");
+            folder.setPersistentProperty(TmfTraceElement.TRACETYPE, "org.eclipse.linuxtools.lttng.tracetype.kernel"); //$NON-NLS-1$
+            folder.setPersistentProperty(TmfTraceElement.TRACEICON, "icons/obj16/tux2.png"); //$NON-NLS-1$
         } catch (CoreException e) {
             MessageDialog.openWarning(shell,
                     Messages.ImportToProject_ImportFailed,

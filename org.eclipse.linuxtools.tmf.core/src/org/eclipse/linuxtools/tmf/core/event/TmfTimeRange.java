@@ -192,7 +192,7 @@ public final class TmfTimeRange implements Cloneable {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof TmfTimeRange))
             return false;
         TmfTimeRange other = (TmfTimeRange) obj;
         if (!fEndTime.equals(other.fEndTime))

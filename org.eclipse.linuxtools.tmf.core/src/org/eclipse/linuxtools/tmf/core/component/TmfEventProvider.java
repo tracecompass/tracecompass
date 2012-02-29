@@ -13,8 +13,8 @@
 package org.eclipse.linuxtools.tmf.core.component;
 
 import org.eclipse.linuxtools.tmf.core.Tracer;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
  * <b><u>TmfEventProvider</u></b>
  * <p>
  */
-public abstract class TmfEventProvider<T extends TmfEvent> extends TmfDataProvider<T> {
+public abstract class TmfEventProvider<T extends ITmfEvent> extends TmfDataProvider<T> {
 
     // ------------------------------------------------------------------------
     // Constructors

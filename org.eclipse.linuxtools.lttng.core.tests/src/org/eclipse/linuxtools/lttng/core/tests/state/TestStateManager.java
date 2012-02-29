@@ -18,7 +18,6 @@ import junit.framework.TestCase;
  * @author alvaro
  * 
  */
-@SuppressWarnings("nls")
 public class TestStateManager extends TestCase {
 
 	/**

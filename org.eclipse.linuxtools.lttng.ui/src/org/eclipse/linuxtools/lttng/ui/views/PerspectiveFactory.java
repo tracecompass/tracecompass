@@ -74,7 +74,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 
         // Create the middle right folder
         IFolderLayout middleRightFolder = layout.createFolder(
-                "middleRightFolder", IPageLayout.BOTTOM, 0.40f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$ //$NON-NLS-2$
+                "middleRightFolder", IPageLayout.BOTTOM, 0.40f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$ 
         middleRightFolder.addView(EVENTS_VIEW_ID);
 
         // Create the bottom right folder

@@ -17,7 +17,6 @@ import org.eclipse.linuxtools.lttng.core.tests.LttngTestPreparation;
  * @author alvaro
  *
  */
-@SuppressWarnings("nls")
 public class StateExperimentManagerTextTest extends LttngTestPreparation {
 
 	/**
