@@ -29,7 +29,7 @@ import org.eclipse.linuxtools.lttng.jni.exception.JniTraceVersionException;
  */
 public class JniTraceVersion {
 	
-	private static final String LTTVTRACEREAD_LOADER_LIBNAME = "lttvtraceread_loader";
+	private static final String LTTVTRACEREAD_LOADER_LIBNAME = "lttvtraceread_loader"; //$NON-NLS-1$
 
 	// Native access functions
 	protected native void ltt_getTraceVersion(String tracepath);
@@ -128,7 +128,7 @@ public class JniTraceVersion {
 			if (newTraceLibPath == null || newTraceLibPath.isEmpty()) {
 				// Load the C library here.
 				// If LD_LIBRARY_PATH is not set correctly this will raise a java.lang.UnsatisfiedLinkError
-				System.loadLibrary(LTTVTRACEREAD_LOADER_LIBNAME); //$NON-NLS-1$
+				System.loadLibrary(LTTVTRACEREAD_LOADER_LIBNAME); 
 			} else {
 				File loaderLib = new File(newTraceLibPath, System.mapLibraryName(LTTVTRACEREAD_LOADER_LIBNAME));
                 System.load(loaderLib.getCanonicalPath());
