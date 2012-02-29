@@ -91,6 +91,18 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
     }
 
     // ------------------------------------------------------------------------
+    // Cloneable
+    // ------------------------------------------------------------------------
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#clone()
+     */
+    @Override
+    public TmfSimpleTimestamp clone() {
+        return (TmfSimpleTimestamp) super.clone();
+    }
+
+    // ------------------------------------------------------------------------
     // Object
     // ------------------------------------------------------------------------
 

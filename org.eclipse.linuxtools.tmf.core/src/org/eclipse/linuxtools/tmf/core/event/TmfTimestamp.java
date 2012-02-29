@@ -266,7 +266,7 @@ public class TmfTimestamp implements ITmfTimestamp {
      * @see java.lang.Object#clone()
      */
     @Override
-    public ITmfTimestamp clone() {
+    public TmfTimestamp clone() {
         TmfTimestamp clone = null;
         try {
             clone = (TmfTimestamp) super.clone();

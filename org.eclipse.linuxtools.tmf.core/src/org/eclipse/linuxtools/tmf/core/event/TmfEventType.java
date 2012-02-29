@@ -122,7 +122,7 @@ public class TmfEventType implements ITmfEventType {
      * @see java.lang.Object#clone()
      */
     @Override
-    public ITmfEventType clone() {
+    public TmfEventType clone() {
         TmfEventType clone = null;
         try {
             clone = (TmfEventType) super.clone();
