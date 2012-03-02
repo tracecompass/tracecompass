@@ -25,18 +25,21 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.linuxtools.tmf.core.TmfProjectNature;
 import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
+import org.eclipse.ui.INewWizard;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
-import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 /**
  * <b><u>NewTmfProjectWizard</u></b>
  * <p>
  */
-public class NewTmfProjectWizard extends BasicNewResourceWizard implements IExecutableExtension {
+public class NewTmfProjectWizard extends Wizard implements INewWizard, IExecutableExtension {
 
     private final String fTtitle;
     private final String fDescription;
@@ -146,6 +149,17 @@ public class NewTmfProjectWizard extends BasicNewResourceWizard implements IExec
             e.printStackTrace();
         }
         return null;
+    }
+
+    // ------------------------------------------------------------------------
+    // INewWizard
+    // ------------------------------------------------------------------------
+
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
+     */
+    @Override
+    public void init(IWorkbench iworkbench, IStructuredSelection istructuredselection) {
     }
 
     // ------------------------------------------------------------------------
