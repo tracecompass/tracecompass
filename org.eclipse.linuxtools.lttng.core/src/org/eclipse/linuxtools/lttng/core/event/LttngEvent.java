@@ -22,7 +22,7 @@ public class LttngEvent extends TmfEvent {
     // Parameter-less constructor
     public LttngEvent() {
         super();
-        fType = LttngEventType.DEFAULT_EVENT_TYPE;
+        super.setType(LttngEventType.DEFAULT_EVENT_TYPE);
     }
 
     /**
@@ -47,9 +47,9 @@ public class LttngEvent extends TmfEvent {
             String reference, JniEvent lttEvent)
     {
         super(timestamp, source, type, reference);
-        fContent = content;
+        super.setContent(content);
         jniEventReference = lttEvent;
-        setParentTrace(parent);
+        super.setTrace(parent);
     }
 
     /**
@@ -76,7 +76,7 @@ public class LttngEvent extends TmfEvent {
      * @param parentTrace The new parent
      */
     public void setParentTrace(TmfTrace<LttngEvent> parentTrace) {
-		fTrace = parentTrace;
+        super.setTrace(parentTrace);
 	}
     
     
@@ -121,25 +121,25 @@ public class LttngEvent extends TmfEvent {
 
     @Override
     public LttngEventContent getContent() {
-        return (LttngEventContent) fContent;
+        return (LttngEventContent) super.getContent();
     }
 
     public void setContent(LttngEventContent newContent) {
-        fContent = newContent;
+        super.setContent(newContent);
     }
 
     @Override
     public void setReference(String reference) {
-        fReference = reference;
+        super.setReference(reference);
     }
 
     @Override
     public LttngEventType getType() {
-        return (LttngEventType) fType;
+        return (LttngEventType) super.getType();
     }
 
     public void setType(LttngEventType newType) {
-        fType = newType;
+        super.setType(newType);
     }
 
     /**

@@ -58,7 +58,6 @@ public class TmfUml2SDTestTrace implements ITmfEventParser<TmfEvent> {
             String[] labels = {"sender", "receiver", "signal"};
 
             TmfEventType tmfEventType = new TmfEventType("UnitTest", type, TmfEventField.makeRoot(labels));
-            TmfEvent tmfEvent = new TmfEvent(new TmfTimestamp(ts, -9), source, tmfEventType, reference);
 
             String content = "[";
             content += sender;
@@ -73,7 +72,7 @@ public class TmfUml2SDTestTrace implements ITmfEventParser<TmfEvent> {
             fields[2] = new TmfEventField("signal", signal);
             
             ITmfEventField tmfContent = new TmfEventField(ITmfEventField.ROOT_ID, content, fields);
-            tmfEvent.setContent(tmfContent);
+            TmfEvent tmfEvent = new TmfEvent(eventStream, new TmfTimestamp(ts, -9), source, tmfEventType, tmfContent, reference);
 
             return tmfEvent;
         } catch (EOFException e) {
