@@ -223,18 +223,32 @@ public class TmfEventFieldTest extends TestCase {
     // clone
     // ------------------------------------------------------------------------
 
-    public void testClone() throws Exception {
-        ITmfEventField clone = fStructTerminalField1.clone();
-        assertEquals("clone", fStructTerminalField1, clone);
-
-        clone = fField1.clone();
+    public void testFieldClone() throws Exception {
+        TmfEventField clone = fField1.clone();
+        assertTrue("clone", fField1.clone().equals(fField1));
+        assertTrue("clone", clone.clone().equals(clone));
         assertEquals("clone", fField1, clone);
+        assertEquals("clone", clone, fField1);
 
         clone = fRootField.clone();
+        assertTrue("clone", fRootField.clone().equals(fRootField));
+        assertTrue("clone", clone.clone().equals(clone));
         assertEquals("clone", fRootField, clone);
+        assertEquals("clone", clone, fRootField);
+    }
+
+    public void testStructFieldClone() throws Exception {
+        TmfEventField clone = fStructTerminalField1.clone();
+        assertTrue("clone", fStructTerminalField1.clone().equals(fStructTerminalField1));
+        assertTrue("clone", clone.clone().equals(clone));
+        assertEquals("clone", fStructTerminalField1, clone);
+        assertEquals("clone", clone, fStructTerminalField1);
 
         clone = fStructRootField.clone();
+        assertTrue("clone", fStructRootField.clone().equals(fStructRootField));
+        assertTrue("clone", clone.clone().equals(clone));
         assertEquals("clone", fStructRootField, clone);
+        assertEquals("clone", clone, fStructRootField);
     }
 
     // ------------------------------------------------------------------------

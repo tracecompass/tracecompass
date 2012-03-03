@@ -64,7 +64,7 @@ public class TmfEventTest extends TestCase {
     private final ITmfEventField fContent1 = new TmfEventField(fRawContent1, fFields1);
     private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, 2, 5);
     private final String fReference1 = "Some reference";
-    private final TmfEvent fEvent1 = new TmfEvent(null, 0, fTimestamp1, fSource, fType, fContent1, fReference1);
+    private final ITmfEvent fEvent1 = new TmfEvent(null, 0, fTimestamp1, fSource, fType, fContent1, fReference1);
 
     private final Object fValue2a = "Another string";
     private final Object fValue2b = Integer.valueOf(-4);
@@ -75,7 +75,7 @@ public class TmfEventTest extends TestCase {
     private final ITmfEventField fContent2 = new TmfEventField(fRawContent2, fFields2);
     private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, 2, 5);
     private final String fReference2 = "Some other reference";
-    private final TmfEvent fEvent2 = new TmfEvent(null, 1, fTimestamp2, fSource, fType, fContent2, fReference2);
+    private final ITmfEvent fEvent2 = new TmfEvent(null, 1, fTimestamp2, fSource, fType, fContent2, fReference2);
 
     private final String fTracePath = "testfiles" + File.separator + "A-Test-10K";
 
@@ -227,7 +227,7 @@ public class TmfEventTest extends TestCase {
 
     private class TestEvent extends TmfEvent {
         
-        public TestEvent(TmfEvent event) {
+        public TestEvent(ITmfEvent event) {
             super(event);
         }
 
@@ -403,14 +403,24 @@ public class TmfEventTest extends TestCase {
         }
     }
 
-    public void testClone() throws Exception {
+    public void testClone1() throws Exception {
         ITmfEvent clone = fEvent1.clone();
+
+        assertTrue("clone", fEvent1.clone().equals(fEvent1));
+        assertTrue("clone", clone.clone().equals(clone));
+
         assertEquals("clone", fEvent1, clone);
+        assertEquals("clone", clone, fEvent1);
     }
 
     public void testClone2() throws Exception {
-        ITmfEvent event = new MyEvent();
-        ITmfEvent clone = event.clone();
+        TmfEvent event = new MyEvent();
+        TmfEvent clone = event.clone();
+
+        assertTrue("clone", event.clone().equals(event));
+        assertTrue("clone", clone.clone().equals(clone));
+
+        assertEquals("clone", event, clone);
         assertEquals("clone", clone, event);
     }
 

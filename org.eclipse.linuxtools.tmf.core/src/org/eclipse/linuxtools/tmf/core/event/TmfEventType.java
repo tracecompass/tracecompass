@@ -62,12 +62,12 @@ public class TmfEventType implements ITmfEventType {
 	 * 
 	 * @param type the other type
 	 */
-	public TmfEventType(TmfEventType type) {
+	public TmfEventType(ITmfEventType type) {
     	if (type == null)
     		throw new IllegalArgumentException();
-    	fContext = type.fContext;
-		fTypeId  = type.fTypeId;
-		fRootField = type.fRootField;
+    	fContext = type.getContext();
+		fTypeId  = type.getName();
+		fRootField = type.getRootField();
 	}
 
     // ------------------------------------------------------------------------

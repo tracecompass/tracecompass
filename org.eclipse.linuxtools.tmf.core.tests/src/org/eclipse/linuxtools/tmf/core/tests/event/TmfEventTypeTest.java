@@ -44,10 +44,10 @@ public class TmfEventTypeTest extends TestCase {
     private final String[] fLabels1 = new String[] { fLabel0, fLabel1 };
     private final String[] fLabels2 = new String[] { fLabel1, fLabel0, fLabel1 };
 
-    private final TmfEventType fType0 = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels0));
-    private final TmfEventType fType1 = new TmfEventType(fContext1, fTypeId2, TmfEventField.makeRoot(fLabels1));
-    private final TmfEventType fType2 = new TmfEventType(fContext2, fTypeId1, TmfEventField.makeRoot(fLabels2));
-    private final TmfEventType fType3 = new TmfEventType(fContext2, fTypeId2, TmfEventField.makeRoot(fLabels1));
+    private final ITmfEventType fType0 = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels0));
+    private final ITmfEventType fType1 = new TmfEventType(fContext1, fTypeId2, TmfEventField.makeRoot(fLabels1));
+    private final ITmfEventType fType2 = new TmfEventType(fContext2, fTypeId1, TmfEventField.makeRoot(fLabels2));
+    private final ITmfEventType fType3 = new TmfEventType(fContext2, fTypeId2, TmfEventField.makeRoot(fLabels1));
 
     // ------------------------------------------------------------------------
     // Housekeeping
@@ -174,13 +174,23 @@ public class TmfEventTypeTest extends TestCase {
 
     public void testClone() throws Exception {
         ITmfEventType clone = fType1.clone();
+
+        assertTrue("clone", fType1.clone().equals(fType1));
+        assertTrue("clone", clone.clone().equals(clone));
+
+        assertEquals("clone", clone, fType1);
         assertEquals("clone", fType1, clone);
     }
 
     public void testClone2() throws Exception {
         ITmfEventType type = new TmfEventType();
         ITmfEventType clone = type.clone();
+
+        assertTrue("clone", type.clone().equals(type));
+        assertTrue("clone", clone.clone().equals(clone));
+
         assertEquals("clone", clone, type);
+        assertEquals("clone", type, clone);
     }
 
     // ------------------------------------------------------------------------

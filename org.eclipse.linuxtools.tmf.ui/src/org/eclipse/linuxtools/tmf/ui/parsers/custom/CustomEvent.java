@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.ui.parsers.custom;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -92,6 +93,42 @@ public class CustomEvent extends TmfEvent {
             }
         }
         fData = null;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((fDefinition == null) ? 0 : fDefinition.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof CustomEvent)) {
+            return false;
+        }
+        CustomEvent other = (CustomEvent) obj;
+        if (fDefinition == null) {
+            if (other.fDefinition != null) {
+                return false;
+            }
+        } else if (!fDefinition.equals(other.fDefinition)) {
+            return false;
+        }
+        return true;
     }
 
 }

@@ -35,7 +35,7 @@ public class CustomXmlEvent extends CustomEvent {
 
     @Override
     public void setContent(ITmfEventField content) {
-        setContent(content);
+        super.setContent(content);
     }
 
     public void parseInput(String value, String name, int inputAction, String inputFormat) {

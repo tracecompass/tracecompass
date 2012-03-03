@@ -39,7 +39,7 @@ public class CustomTxtEvent extends CustomEvent {
 
     @Override
     public void setContent(ITmfEventField content) {
-        setContent(content);
+        super.setContent(content);
     }
 
     public void processGroups(InputLine input, Matcher matcher) {
