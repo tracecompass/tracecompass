@@ -46,36 +46,7 @@ public class TmfEvent implements ITmfEvent {
      * Default constructor
      */
     public TmfEvent() {
-        fTrace = null;
-        fRank = -1;
-        fTimestamp = null;
-        fSource = null;
-        fType = null;
-        fContent = null;
-        fReference = null;
-    }
-
-    /**
-     * Full constructor
-     * 
-     * @param trace the parent trace
-     * @param rank the event rank (in the trace)
-     * @param timestamp the event timestamp
-     * @param source the event source
-     * @param type the event type
-     * @param type the event content (payload)
-     * @param reference the event reference
-     */
-    public TmfEvent(ITmfTrace<? extends ITmfEvent> trace, long rank, ITmfTimestamp timestamp, String source,
-                    ITmfEventType type, ITmfEventField content, String reference)
-    {
-        fTrace = trace;
-        fRank = rank;
-        fTimestamp = timestamp;
-        fSource = source;
-        fType = type;
-        fContent = content;
-        fReference = reference;
+        this(null, -1, null, null, null, null, null);
     }
 
     /**
@@ -102,6 +73,29 @@ public class TmfEvent implements ITmfEvent {
     public TmfEvent(ITmfTimestamp timestamp, String source, ITmfEventType type, String reference)
     {
         this(null, -1, timestamp, source, type, null, reference);
+    }
+
+    /**
+     * Full constructor
+     * 
+     * @param trace the parent trace
+     * @param rank the event rank (in the trace)
+     * @param timestamp the event timestamp
+     * @param source the event source
+     * @param type the event type
+     * @param type the event content (payload)
+     * @param reference the event reference
+     */
+    public TmfEvent(ITmfTrace<? extends ITmfEvent> trace, long rank, ITmfTimestamp timestamp, String source,
+                    ITmfEventType type, ITmfEventField content, String reference)
+    {
+        fTrace = trace;
+        fRank = rank;
+        fTimestamp = timestamp;
+        fSource = source;
+        fType = type;
+        fContent = content;
+        fReference = reference;
     }
 
     /**
