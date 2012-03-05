@@ -58,6 +58,6 @@ public class TmfTraceType {
                 typeElements.add(element);
             }
         }
-        return typeElements.toArray(new IConfigurationElement[0]);
+        return typeElements.toArray(new IConfigurationElement[typeElements.size()]);
     }
 }

@@ -176,7 +176,7 @@ public class TmfEventField implements ITmfEventField {
      */
     protected void setValue(Object value, ITmfEventField[] fields) {
         fValue = value;
-        fFields = fields;
+        fFields = (fields != null) ? Arrays.copyOf(fields, fields.length) : null;
         populateStructs();
     }
 

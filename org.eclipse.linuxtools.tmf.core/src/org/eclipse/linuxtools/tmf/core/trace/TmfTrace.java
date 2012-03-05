@@ -204,7 +204,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @see org.eclipse.linuxtools.tmf.stream.ITmfEventStream#getNbEvents()
      */
     @Override
-    public long getNbEvents() {
+    public synchronized long getNbEvents() {
         return fNbEvents;
     }
 
@@ -323,8 +323,9 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#seekEvent(org.eclipse.linuxtools.tmf.event.TmfTimestamp)
      */
     @Override
-    public TmfContext seekEvent(ITmfTimestamp timestamp) {
+    public TmfContext seekEvent(ITmfTimestamp ts) {
 
+        ITmfTimestamp timestamp = ts;
         if (timestamp == null) {
             timestamp = TmfTimestamp.BigBang;
         }
@@ -342,7 +343,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         // Position the stream at the checkpoint
         ITmfLocation<?> location;
         synchronized (fCheckpoints) {
-            if (fCheckpoints.size() > 0) {
+            if (!fCheckpoints.isEmpty()) {
                 if (index >= fCheckpoints.size()) {
                     index = fCheckpoints.size() - 1;
                 }
@@ -376,7 +377,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         int index = (int) rank / fIndexPageSize;
         ITmfLocation<?> location;
         synchronized (fCheckpoints) {
-            if (fCheckpoints.size() == 0) {
+            if (fCheckpoints.isEmpty()) {
                 location = null;
             } else {
                 if (index >= fCheckpoints.size()) {
@@ -526,7 +527,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
                 super.handleCompleted();
             }
 
-            private void updateTrace() {
+            private synchronized void updateTrace() {
                 int nbRead = getNbRead();
                 if (nbRead != 0) {
                     fStartTime = startTime;
@@ -542,7 +543,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
             try {
                 request.waitForCompletion();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
             }
     }
 

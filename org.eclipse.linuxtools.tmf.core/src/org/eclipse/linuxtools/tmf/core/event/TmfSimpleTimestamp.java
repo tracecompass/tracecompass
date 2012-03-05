@@ -107,6 +107,14 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
     // ------------------------------------------------------------------------
 
     /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.event.TmfTimestamp#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.core.event.TmfTimestamp#equals(java.lang.Object)
      */
     @Override
