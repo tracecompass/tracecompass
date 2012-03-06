@@ -121,6 +121,8 @@ public class TmfUml2SDSyncLoaderSignalTest extends TestCase {
         fTmfComponent.setCurrentRange(null); // not used
 
         fFacility.getSdView().getSDWidget().moveTo(node); // selects the given node
+        // Wait for the selection to finish - needed due to new platform behavior in Juno
+		fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         assertTrue("TmfTimeSynchSignal", fTmfComponent.isSignalReceived());
         assertFalse("TmfTimeSynchSignal", fTmfComponent.isSignalError());
         assertFalse("TmfTimeSynchSignal", fTmfComponent.isCurrentTimeError());

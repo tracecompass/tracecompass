@@ -147,6 +147,8 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
         fTmfComponent.setSignalReceived(false);
         
         fFacility.getLoader().find(criteria);
+        // Wait for the selection to finish - needed due to new platform behavior in Juno   
+	    fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         assertTrue("find", fTmfComponent.isSignalReceived());
         assertFalse("find", fTmfComponent.isSignalError());
         assertFalse("find", fTmfComponent.isCurrentTimeError());
@@ -179,6 +181,8 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
         fTmfComponent.setSignalReceived(false);
         
         fFacility.getLoader().find(criteria);
+        // Wait for the selection to finish - needed due to new platform behavior in Juno
+		fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         assertTrue("find", fTmfComponent.isSignalReceived());
         assertFalse("find", fTmfComponent.isSignalError());
         assertFalse("find", fTmfComponent.isCurrentTimeError());
@@ -247,7 +251,9 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
         criteria.setLifeLineSelected(true);
         criteria.setExpression(IUml2SDTestConstants.FIRST_PLAYER_NAME);
         fFacility.getLoader().find(criteria);
-       
+        // Wait for the selection to finish - needed due to new platform behavior in Juno
+        fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
+
         assertEquals("find", TC_005_PAGE_VALUE, fFacility.getLoader().currentPage());
         selection = fFacility.getSdView().getSDWidget().getSelection();
         assertNotNull(selection);
