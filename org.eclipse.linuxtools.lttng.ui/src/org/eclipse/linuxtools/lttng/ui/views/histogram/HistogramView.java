@@ -168,7 +168,7 @@ public class HistogramView extends TmfView {
         gridData = new GridData();
         gridData.horizontalAlignment = SWT.CENTER;
         gridData.verticalAlignment = SWT.CENTER;
-        fCurrentEventTimeControl = new HistogramCurrentTimeControl(this, controlsComposite, SWT.BORDER, SWT.BORDER,
+        fCurrentEventTimeControl = new HistogramCurrentTimeControl(this, controlsComposite, SWT.BORDER, SWT.NONE,
                 currentEventLabel, HistogramUtils.nanosecondsToString(0L));
         fCurrentEventTimeControl.setLayoutData(gridData);
 
@@ -176,7 +176,7 @@ public class HistogramView extends TmfView {
         gridData = new GridData();
         gridData.horizontalAlignment = SWT.CENTER;
         gridData.verticalAlignment = SWT.CENTER;
-        fTimeSpanControl = new HistogramTimeRangeControl(this, controlsComposite, SWT.BORDER, SWT.BORDER,
+        fTimeSpanControl = new HistogramTimeRangeControl(this, controlsComposite, SWT.BORDER, SWT.NONE,
                 windowSpanLabel, HistogramUtils.nanosecondsToString(0L));
         fTimeSpanControl.setLayoutData(gridData);
 
