@@ -18,7 +18,7 @@
 				</td>
 				<td style="width: 60%" align="center"></td>
 				<td style="width: 20%" align="right">
-					<a href="LTTng-Trace-Control.html" title="LTTng Trace Control">
+					<a href="LTTng-Tracer-Control.html" title="LTTng Tracer Control">
 						<img alt="Next" border="0" src="../../../images/next.gif"/>
 					</a>
 				</td>
@@ -26,7 +26,7 @@
 			<tr>
 				<td style="width: 20%" align="left" valign="top">Getting Started</td>
 				<td style="width: 60%" align="center"></td>
-				<td style="width: 20%" align="right" valign="top">LTTng Trace Control</td>
+				<td style="width: 20%" align="right" valign="top">LTTng Tracer Control</td>
 			</tr>
 		</table><hr/>
 		<h1 id="LTTng_Perspective">LTTng Perspective</h1>
@@ -36,7 +36,7 @@
 				<a href="LTTng-Perspective.html#Project_View">Project View</a>
 			</li>
 			<li>
-				<a href="LTTng-Perspective.html#Events_View">Events View</a>
+				<a href="LTTng-Perspective.html#Events_View_or_Editor">Events View or Editor</a>
 			</li>
 			<li>
 				<a href="LTTng-Perspective.html#Histogram_View">Histogram View</a>
@@ -97,21 +97,24 @@
 		<p>
 			<img border="0" src="images/LTTngTraceSelectDialog.png"/>
 		</p>
-		<h2 id="Events_View">Events View</h2>
-		<p>The Events View shows the basic trace data in chronological order in a tabular format.</p>
+		<h3 id="Drag_and_Drop">Drag and Drop</h3>
+		<p>Traces can be also be imported to a project by dragging from another tracing project and dropping to the project's trace folder. The trace will be copied and the trace type will be set.</p>
+		<p>Any resource can be dragged and dropped from a non-tracing project, and any file or folder can be dragged from an external tool, into a tracing project's trace folder. The resource will be copied or imported as a new trace, however the trace type will be unknown and need to be set manually by the user.</p>
+		<p>It is also possible to drop a trace, resource, file or folder into an existing experiment. If the item does not already exist as a trace in the project's trace folder, it will first be copied or imported, then the trace will be added to the experiment.</p>
+		<h2 id="Events_View_or_Editor">Events View or Editor</h2>
+		<p>The Events view or editor shows the basic trace data in chronological order in a tabular format.</p>
+		<p>An Events editor is displayed when a trace or experiment is opened. The editor that has focus determines the currently selected trace or experiment used by the other views.</p>
+		<p>When opened, the Events view displays the events of the currently selected trace or experiment.</p>
 		<p>The header displays the current trace (or experiment) name. The table displays the following fields:</p>
 		<ul>
 			<li>
 				<b>Timestamp</b>: the event timestamp
 			</li>
 			<li>
-				<b>Source</b>: the component that generated the event
+				<b>Trace</b>: the trace that holds the event (e.g. experiments typically hold multiple traces)
 			</li>
 			<li>
-				<b>Type</b>: the event type
-			</li>
-			<li>
-				<b>Reference</b>: the trace that holds the event (e.g. experiments typically hold multiple traces)
+				<b>Marker</b>: the event type and localization
 			</li>
 			<li>
 				<b>Content</b>: the raw event content 
@@ -119,7 +122,7 @@
 		</ul>
 		<p>The first row of the table is the header row a.k.a. the Search and Filter row.</p>
 		<p>
-			<img border="0" src="images/EventsView.png"/>
+			<img border="0" src="images/EventsEditor.png"/>
 		</p>
 		<p>The highlighted event is the 
 			<i>current event</i> and is synchronized with the other views. If you select another event, the other views will be synchronized accordingly.
@@ -170,6 +173,26 @@
 			<b>Clear Filters</b> from the context menu to clear the header row and remove the filtering. All trace events will be now shown in the table. Note that the currently selected event will remain selected even after the filter is removed.
 		</p>
 		<p>You can also search on the subset of filtered events by toggling the header row to the Search Bar while a filter is applied. Searching and filtering conditions are independent of each other.</p>
+		<h4 id="Bookmarking">Bookmarking</h4>
+		<p>Any event of interest can be tagged with a bookmark.</p>
+		<p>To add a bookmark, double-click the left margin next to an event, or right-click the margin and select 
+			<b>Add bookmark...</b>. Alternatively use the 
+			<b>Edit</b> &gt; 
+			<b>Add bookmark...</b> menu. Edit the bookmark description as desired and press 
+			<b>OK</b>.
+		</p>
+		<p>The bookmark will be displayed in the left margin, and hovering the mouse over the bookmark icon will display the description in a tooltip.</p>
+		<p>The bookmark will be added to the 
+			<b>Bookmarks</b> view. In this view the bookmark description can be edited, and the bookmark can be deleted. Double-clicking the bookmark or selecting 
+			<b>Go to</b> from its context menu will open the trace or experiment and go directly to the event that was bookmarked.
+		</p>
+		<p>To remove a bookmark, double-click its icon, select 
+			<b>Remove Bookmark</b> from the left margin context menu, or select 
+			<b>Delete</b> from the Bookmarks view.
+		</p>
+		<p>
+			<img border="0" src="images/Bookmarks.png"/>
+		</p>
 		<h2 id="Histogram_View">Histogram View</h2>
 		<p>The Histogram View displays the trace events distribution with respect to time. When streaming a trace, this view is dynamically updated as the events are received.</p>
 		<p>
@@ -491,7 +514,7 @@
 					</a>
 				</td>
 				<td style="width: 20%" align="right">
-					<a href="LTTng-Trace-Control.html" title="LTTng Trace Control">
+					<a href="LTTng-Tracer-Control.html" title="LTTng Tracer Control">
 						<img alt="Next" border="0" src="../../../images/next.gif"/>
 					</a>
 				</td>
@@ -499,7 +522,7 @@
 			<tr>
 				<td style="width: 20%" align="left" valign="top">Getting Started</td>
 				<td style="width: 60%" align="center"></td>
-				<td style="width: 20%" align="right" valign="top">LTTng Trace Control</td>
+				<td style="width: 20%" align="right" valign="top">LTTng Tracer Control</td>
 			</tr>
 		</table>
 	</body>

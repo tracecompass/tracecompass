@@ -15,11 +15,13 @@
 			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Project_View" label="Project View">
 				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Creating_a_Project" label="Creating a Project"></topic>
 				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Importing_Traces_in_a_Project" label="Importing Traces in a Project"></topic>
+				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Drag_and_Drop" label="Drag and Drop"></topic>
 			</topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Events_View" label="Events View">
+			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Events_View_or_Editor" label="Events View or Editor">
 				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Searching_and_Filtering" label="Searching and Filtering">
 					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Searching" label="Searching"></topic>
 					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Filtering" label="Filtering"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Bookmarking" label="Bookmarking"></topic>
 				</topic>
 			</topic>
 			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Histogram_View" label="Histogram View"></topic>
@@ -37,23 +39,35 @@
 				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Tool_Bar_Menu" label="Tool Bar Menu"></topic>
 			</topic>
 		</topic>
-		<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Trace-Control.html" label="LTTng Trace Control">
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Trace-Control.html#Remote_Systems_View" label="Remote Systems View"></topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Trace-Control.html#Create_a_Remote_Connection" label="Create a Remote Connection">
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Trace-Control.html#General" label="General"></topic>
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Trace-Control.html#Connect_to_Remote_Host" label="Connect to Remote Host"></topic>
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Trace-Control.html#Configure_Kernel_Markers" label="Configure Kernel Markers"></topic>
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Trace-Control.html#Create_a_New_Kernel_Trace" label="Create a New Kernel Trace"></topic>
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Trace-Control.html#Configure_a_Trace_and_Trace_Channels" label="Configure a Trace and Trace Channels"></topic>
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Trace-Control.html#Start_a_Trace" label="Start a Trace"></topic>
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Trace-Control.html#Pause_a_Trace" label="Pause a Trace"></topic>
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Trace-Control.html#Stop_a_Trace" label="Stop a Trace"></topic>
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Trace-Control.html#Import_a_Trace_in_the_LTTng_Perspective" label="Import a Trace in the LTTng Perspective"></topic>
-				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Trace-Control.html#Delete_a_Trace" label="Delete a Trace"></topic>
+		<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html" label="LTTng Tracer Control">
+			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#LTTng_Tracer_Control_.28LTTng_Tracer_Toolchain_v0.x.29" label="LTTng Tracer Control (LTTng Tracer Toolchain v0.x)">
+				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Remote_Systems_View" label="Remote Systems View">
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Create_a_Remote_Connection" label="Create a Remote Connection"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#General" label="General"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Connect_to_Remote_Host" label="Connect to Remote Host"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Configure_Kernel_Markers" label="Configure Kernel Markers"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Create_a_New_Kernel_Trace" label="Create a New Kernel Trace"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Configure_a_Trace_and_Trace_Channels" label="Configure a Trace and Trace Channels"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Start_a_Trace" label="Start a Trace"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Pause_a_Trace" label="Pause a Trace"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Stop_a_Trace" label="Stop a Trace"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Import_a_Trace_in_the_LTTng_Perspective" label="Import a Trace in the LTTng Perspective"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Delete_a_Trace" label="Delete a Trace"></topic>
+				</topic>
+				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Property_View" label="Property View"></topic>
 			</topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Trace-Control.html#Property_View" label="Property View"></topic>
+			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#LTTng_Tracer_Control_.28LTTng_Tracer_Toolchain_v2.0_and_later.29" label="LTTng Tracer Control (LTTng Tracer Toolchain v2.0 and later)">
+				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Control_View" label="Control View">
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Creating_a_New_Connection_to_a_Remote_Host" label="Creating a New Connection to a Remote Host"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Disconnecting_from_a_Remote_Host" label="Disconnecting from a Remote Host"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Connecting_to_a_Remote_Host" label="Connecting to a Remote Host"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Deleting_to_a_Remote_Host_Connection" label="Deleting to a Remote Host Connection"></topic>
+				</topic>
+				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Property_View_2" label="Property View"></topic>
+			</topic>
 		</topic>
 		<topic href="Linux_Tools_Project/LTTng/User_Guide/Limitations.html" label="Limitations"></topic>
+		<topic href="Linux_Tools_Project/LTTng/User_Guide/CTF-Parser.html" label="CTF Parser"></topic>
 		<topic href="Linux_Tools_Project/LTTng/User_Guide/References.html" label="References"></topic>
 		<topic href="Linux_Tools_Project/LTTng/User_Guide/Updating-This-Document.html" label="Updating This Document"></topic>
 	</topic>
