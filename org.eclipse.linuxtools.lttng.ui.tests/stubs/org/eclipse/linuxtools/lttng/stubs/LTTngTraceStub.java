@@ -19,6 +19,7 @@ import java.io.RandomAccessFile;
 import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
@@ -145,7 +146,7 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> {
 	 * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#parseEvent()
 	 */
 	@Override
-	public ITmfEvent parseEvent(TmfContext context) {
+	public ITmfEvent parseEvent(ITmfContext context) {
        	try {
    			// paserNextEvent updates the context
        	    LttngEvent event = (LttngEvent) fParser.parseNextEvent(this, context);

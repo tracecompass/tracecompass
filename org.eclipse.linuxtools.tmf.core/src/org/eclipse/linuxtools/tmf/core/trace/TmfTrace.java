@@ -408,7 +408,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * linuxtools.tmf.trace.ITmfTrace.TraceContext)
      */
     @Override
-    public synchronized ITmfEvent getNextEvent(TmfContext context) {
+    public synchronized ITmfEvent getNextEvent(ITmfContext context) {
         // parseEvent() does not update the context
         ITmfEvent event = parseEvent(context);
         if (event != null) {

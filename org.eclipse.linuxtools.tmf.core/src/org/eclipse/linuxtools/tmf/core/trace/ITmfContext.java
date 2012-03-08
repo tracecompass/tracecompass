@@ -17,7 +17,7 @@ package org.eclipse.linuxtools.tmf.core.trace;
  * <p>
  * This is a place-holder for the context objects.
  */
-public interface ITmfContext {
+public interface ITmfContext extends Cloneable {
 
     public long UNKNOWN_RANK = -2L;
     public long INITIAL_RANK = -1L;
@@ -36,4 +36,7 @@ public interface ITmfContext {
     public void updateRank(int rank);
 
     public boolean isValidRank();
+
+    public ITmfContext clone();
+
 }

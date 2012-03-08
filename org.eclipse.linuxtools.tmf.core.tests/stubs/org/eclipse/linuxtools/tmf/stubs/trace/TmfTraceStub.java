@@ -223,7 +223,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     }
 
 	@Override
-	public ITmfEvent parseEvent(TmfContext context) {
+	public ITmfEvent parseEvent(ITmfContext context) {
 	    fLock.lock();
        	try {
    			// parseNextEvent will update the context

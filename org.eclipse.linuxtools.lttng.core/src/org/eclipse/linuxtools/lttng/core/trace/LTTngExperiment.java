@@ -29,6 +29,7 @@ import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 
@@ -108,7 +109,7 @@ public class LTTngExperiment<T extends ITmfEvent> extends TmfExperiment<T> {
     // ------------------------------------------------------------------------
 
     @Override
-    public synchronized ITmfEvent getNextEvent(TmfContext context) {
+    public synchronized ITmfEvent getNextEvent(ITmfContext context) {
 
         // Validate the context
         if (!(context instanceof TmfExperimentContext)) {

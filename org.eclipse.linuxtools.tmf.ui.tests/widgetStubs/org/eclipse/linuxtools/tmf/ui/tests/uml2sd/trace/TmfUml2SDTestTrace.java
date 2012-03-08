@@ -21,8 +21,8 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 import org.eclipse.linuxtools.tmf.stubs.trace.TmfTraceStub;
 
@@ -30,7 +30,7 @@ public class TmfUml2SDTestTrace implements ITmfEventParser<TmfEvent> {
     
     @Override
     @SuppressWarnings({ "unchecked", "nls" })    
-    public TmfEvent parseNextEvent(ITmfTrace<TmfEvent> eventStream, TmfContext context) throws IOException {
+    public TmfEvent parseNextEvent(ITmfTrace<TmfEvent> eventStream, ITmfContext context) throws IOException {
         if (! (eventStream instanceof TmfTraceStub)) {
             return null;
         }

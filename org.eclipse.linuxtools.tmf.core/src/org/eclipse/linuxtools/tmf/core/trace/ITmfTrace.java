@@ -128,13 +128,13 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
      * 
      * @return the next event in the stream
      */
-    public ITmfEvent getNextEvent(TmfContext context);
+    public ITmfEvent getNextEvent(ITmfContext context);
 
     /**
      * Return the event pointed by the supplied context (or null if no event left) and *does not* update the context.
      * 
      * @return the next event in the stream
      */
-    public ITmfEvent parseEvent(TmfContext context);
+    public ITmfEvent parseEvent(ITmfContext context);
 
 }

@@ -157,7 +157,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     }
 
     @Override
-    public synchronized TmfEvent getNextEvent(TmfContext context) {
+    public synchronized TmfEvent getNextEvent(ITmfContext context) {
         ITmfContext savedContext = context.clone();
         TmfEvent event = parseEvent(context);
         if (event != null) {
@@ -168,7 +168,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     }
 
     @Override
-    public TmfEvent parseEvent(TmfContext tmfContext) {
+    public TmfEvent parseEvent(ITmfContext tmfContext) {
         if (!(tmfContext instanceof CustomXmlTraceContext)) {
             return null;
         }

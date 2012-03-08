@@ -557,7 +557,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
 //	}
 
     @Override
-    public synchronized ITmfEvent getNextEvent(TmfContext context) {
+    public synchronized ITmfEvent getNextEvent(ITmfContext context) {
 
         // Validate the context
         if (!(context instanceof TmfExperimentContext)) {
@@ -655,7 +655,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
      * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#parseEvent(org.eclipse.linuxtools .tmf.trace.TmfContext)
      */
     @Override
-    public ITmfEvent parseEvent(TmfContext context) {
+    public ITmfEvent parseEvent(ITmfContext context) {
 
         // Validate the context
         if (!(context instanceof TmfExperimentContext)) {

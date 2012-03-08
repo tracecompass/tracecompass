@@ -24,6 +24,7 @@ import org.eclipse.linuxtools.lttng.core.event.LttngEventType;
 import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpoint;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
@@ -201,7 +202,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
         return 0;
     }
 
-    private LttngEvent parseMyNextEvent(TmfContext context) {
+    private LttngEvent parseMyNextEvent(ITmfContext context) {
     	
     	// All parsing variables declared here so to be able to print them into the catch if needed
     	String tmpContent = null;
@@ -428,7 +429,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
     }
     
 	@Override
-	public LttngEvent parseEvent(TmfContext context) {
+	public LttngEvent parseEvent(ITmfContext context) {
 		context = seekLocation(context.getLocation());
 		return parseMyNextEvent(context);
 		
