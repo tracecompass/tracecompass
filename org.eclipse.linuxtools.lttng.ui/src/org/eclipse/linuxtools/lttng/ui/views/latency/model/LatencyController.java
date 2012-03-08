@@ -13,12 +13,12 @@
 package org.eclipse.linuxtools.lttng.ui.views.latency.model;
 
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.linuxtools.lttng.ui.views.distribution.model.IBaseDistributionModel;
-import org.eclipse.linuxtools.lttng.ui.views.histogram.IHistogramDataModel;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
+import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
+import org.eclipse.linuxtools.tmf.ui.views.distribution.model.IBaseDistributionModel;
+import org.eclipse.linuxtools.tmf.ui.views.histogram.IHistogramDataModel;
 
 /**
  * <b><u>LatencyController</u></b>

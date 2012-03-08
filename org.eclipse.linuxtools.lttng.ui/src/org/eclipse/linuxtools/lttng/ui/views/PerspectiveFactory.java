@@ -14,10 +14,10 @@ package org.eclipse.linuxtools.lttng.ui.views;
 
 import org.eclipse.linuxtools.lttng.ui.views.control.ControlView;
 import org.eclipse.linuxtools.lttng.ui.views.controlflow.ControlFlowView;
-import org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramView;
 import org.eclipse.linuxtools.lttng.ui.views.resources.ResourcesView;
 import org.eclipse.linuxtools.lttng.ui.views.statistics.StatisticsView;
 import org.eclipse.linuxtools.tmf.ui.views.events.TmfEventsView;
+import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramView;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
@@ -25,7 +25,7 @@ import org.eclipse.ui.IPerspectiveFactory;
 /**
  * <b><u>PerspectiveFactory</u></b>
  * <p>
- * TODO: Implement me. Please.
+ * The default LTTng perspective.
  */
 public class PerspectiveFactory implements IPerspectiveFactory {
 

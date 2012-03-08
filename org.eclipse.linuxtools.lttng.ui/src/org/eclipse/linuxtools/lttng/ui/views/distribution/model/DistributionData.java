@@ -12,6 +12,7 @@
 package org.eclipse.linuxtools.lttng.ui.views.distribution.model;
 
 import org.eclipse.linuxtools.lttng.ui.views.latency.model.Config;
+import org.eclipse.linuxtools.tmf.ui.views.distribution.model.BaseDistributionData;
 
 /**
  * <b><u>DistributionData</u></b>

@@ -727,7 +727,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
             if (event == null) {
                 return;
             }
-            TmfTimeRange timeRange = new TmfTimeRange(event.getTimestamp(), TmfTimestamp.BigCrunch);
+            TmfTimeRange timeRange = new TmfTimeRange(event.getTimestamp().clone(), TmfTimestamp.BigCrunch);
             final TmfExperimentRangeUpdatedSignal signal = new TmfExperimentRangeUpdatedSignal(this, this, timeRange);
 
             // Broadcast in separate thread to prevent deadlock

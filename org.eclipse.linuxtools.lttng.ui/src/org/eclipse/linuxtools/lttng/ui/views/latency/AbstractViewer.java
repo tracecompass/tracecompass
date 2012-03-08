@@ -13,11 +13,11 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.latency;
 
-import org.eclipse.linuxtools.lttng.ui.views.distribution.model.IBaseDistributionModel;
 import org.eclipse.linuxtools.lttng.ui.views.latency.listeners.AbstractMouseListener;
 import org.eclipse.linuxtools.lttng.ui.views.latency.listeners.AbstractMouseTrackListener;
 import org.eclipse.linuxtools.lttng.ui.views.latency.listeners.AbstractPaintListener;
 import org.eclipse.linuxtools.lttng.ui.views.latency.listeners.ZoomListener;
+import org.eclipse.linuxtools.tmf.ui.views.distribution.model.IBaseDistributionModel;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Canvas;

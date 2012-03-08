@@ -11,7 +11,7 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.latency.model;
 
-import org.eclipse.linuxtools.lttng.ui.views.distribution.model.IBaseDistributionModel;
+import org.eclipse.linuxtools.tmf.ui.views.distribution.model.IBaseDistributionModel;
 
 /**
  * <b><u>IGraphDataModel</u></b>

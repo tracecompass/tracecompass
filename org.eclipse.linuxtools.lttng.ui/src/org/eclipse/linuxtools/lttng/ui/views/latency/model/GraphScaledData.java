@@ -18,7 +18,7 @@ package org.eclipse.linuxtools.lttng.ui.views.latency.model;
  */
 import java.util.Arrays;
 
-import org.eclipse.linuxtools.lttng.ui.views.distribution.model.BaseDistributionData;
+import org.eclipse.linuxtools.tmf.ui.views.distribution.model.BaseDistributionData;
 
 public class GraphScaledData {
 

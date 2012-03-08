@@ -17,12 +17,12 @@ import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.Vector;
 
-import org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramScaledData;
-import org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramUtils;
-import org.eclipse.linuxtools.lttng.ui.views.histogram.IHistogramDataModel;
 import org.eclipse.linuxtools.lttng.ui.views.latency.AbstractViewer;
 import org.eclipse.linuxtools.lttng.ui.views.latency.HistogramViewer;
 import org.eclipse.linuxtools.lttng.ui.views.latency.Messages;
+import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramScaledData;
+import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramUtils;
+import org.eclipse.linuxtools.tmf.ui.views.histogram.IHistogramDataModel;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;

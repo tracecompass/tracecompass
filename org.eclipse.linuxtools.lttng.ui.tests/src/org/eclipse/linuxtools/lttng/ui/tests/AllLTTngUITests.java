@@ -10,7 +10,6 @@ public class AllLTTngUITests  {
         suite.addTest(org.eclipse.linuxtools.lttng.ui.tests.control.model.impl.AllTests.suite());
         suite.addTest(org.eclipse.linuxtools.lttng.ui.tests.control.service.AllTests.suite());
         suite.addTest(org.eclipse.linuxtools.lttng.ui.tests.distribution.AllTests.suite());
-        suite.addTest(org.eclipse.linuxtools.lttng.ui.tests.histogram.AllTests.suite());
         suite.addTest(org.eclipse.linuxtools.lttng.ui.tests.control.model.component.AllTests.suite());
         //$JUnit-END$
         return suite;

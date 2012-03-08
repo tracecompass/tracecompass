@@ -31,6 +31,7 @@ public class AllTmfUITests {
         suite.addTest(org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.handlers.widgets.AllTests.suite());
         suite.addTest(org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.impl.AllTests.suite());
         suite.addTest(org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.load.AllTests.suite());
+        suite.addTest(org.eclipse.linuxtools.tmf.ui.tests.histogram.AllTests.suite());
 		//$JUnit-END$
 		return suite;
 	}
