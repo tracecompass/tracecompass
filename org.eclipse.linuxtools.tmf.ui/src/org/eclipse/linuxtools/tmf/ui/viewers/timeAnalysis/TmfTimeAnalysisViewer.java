@@ -464,6 +464,17 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	}
 
 	@Override
+	public void setTimeBounds(long beginTime, long endTime) {
+	    _beginTime = beginTime;
+	    _endTime = endTime;
+	    _time0_ = beginTime;
+	    _time1_ = endTime;
+	    _stateCtrl.adjustScrolls();
+	    _stateCtrl.redraw();
+	    _timeScaleCtrl.redraw();
+	}
+
+	@Override
 	public void resetStartFinishTime() {
 		setStartFinishTimeNotify(_time0_, _time1_);
 		_timeRangeFixed = false;

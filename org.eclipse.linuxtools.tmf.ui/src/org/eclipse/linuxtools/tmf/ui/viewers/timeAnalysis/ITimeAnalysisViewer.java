@@ -166,4 +166,12 @@ public interface ITimeAnalysisViewer extends ITmfViewer {
 
     public void setFocus();
 
+    /**
+     * Update the time bounds without changing the visible range
+     * 
+     * @param beginTime
+     * @param endTime
+     */
+    public void setTimeBounds(long beginTime, long endTime);
+
 }

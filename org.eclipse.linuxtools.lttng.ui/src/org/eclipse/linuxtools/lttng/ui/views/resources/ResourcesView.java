@@ -34,6 +34,7 @@ import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
@@ -526,6 +527,20 @@ public class ResourcesView extends AbsTimeUpdateView implements
 			}
 		}
 	}
+
+    @TmfSignalHandler
+    public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
+        if (signal.getExperiment().equals(TmfExperiment.getCurrentExperiment())) {
+            final TmfTimeRange range = signal.getExperiment().getTimeRange();
+            if (range != TmfTimeRange.NULL_RANGE) {
+                Display.getDefault().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        tsfviewer.setTimeBounds(range.getStartTime().getValue(), range.getEndTime().getValue());
+                    }});
+            }
+        }
+    }
 
 	/**
 	 * @param source
