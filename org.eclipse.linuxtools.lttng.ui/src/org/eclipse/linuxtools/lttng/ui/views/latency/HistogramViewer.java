@@ -13,12 +13,12 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.latency;
 
-import org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramDataModel;
-import org.eclipse.linuxtools.lttng.ui.views.histogram.IHistogramDataModel;
-import org.eclipse.linuxtools.lttng.ui.views.histogram.IHistogramModelListener;
 import org.eclipse.linuxtools.lttng.ui.views.latency.listeners.HistogramPaintListener;
 import org.eclipse.linuxtools.lttng.ui.views.latency.listeners.TooltipListener;
 import org.eclipse.linuxtools.lttng.ui.views.latency.listeners.ZoomListener;
+import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramDataModel;
+import org.eclipse.linuxtools.tmf.ui.views.histogram.IHistogramDataModel;
+import org.eclipse.linuxtools.tmf.ui.views.histogram.IHistogramModelListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,9 +8,10 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Francois Chouinard - Moved from LTTng to TMF
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.ui.views.histogram;
+package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -19,7 +20,6 @@ import org.eclipse.swt.widgets.Canvas;
 /**
  * <b><u>HistogramZoom</u></b>
  * <p>
- * TODO: Document me...
  */
 public class HistogramZoom implements MouseWheelListener {
 
@@ -46,7 +46,7 @@ public class HistogramZoom implements MouseWheelListener {
     private MouseScrollCounter fScrollCounter;
 
     // ------------------------------------------------------------------------
-    // Construction
+    // Constructors
     // ------------------------------------------------------------------------
 
     public HistogramZoom(Histogram histogram, Canvas canvas, long start, long end) {
@@ -183,7 +183,7 @@ public class HistogramZoom implements MouseWheelListener {
         private int nbScrollClick = 0;
 
         // --------------------------------------------------------------------
-        // Construction
+        // Constructors
         // --------------------------------------------------------------------
 
         public MouseScrollCounter(HistogramZoom zoom) {

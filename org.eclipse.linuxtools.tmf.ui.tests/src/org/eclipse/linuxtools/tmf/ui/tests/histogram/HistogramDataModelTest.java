@@ -11,13 +11,13 @@
  *   Bernd Hufmann - Adapt to junit.framework.TestCase
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.ui.tests.histogram;
+package org.eclipse.linuxtools.tmf.ui.tests.histogram;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramDataModel;
-import org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramScaledData;
-import org.eclipse.linuxtools.lttng.ui.views.histogram.IHistogramModelListener;
+import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramDataModel;
+import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramScaledData;
+import org.eclipse.linuxtools.tmf.ui.views.histogram.IHistogramModelListener;
 
 /**
  * <b><u>HistogramDataModelTest</u></b>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,17 +8,16 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
- *   Bernd Hufmann - Implementation of new interfaces /listeners and support for 
+ *   Bernd Hufmann - Implementation of new interfaces/listeners and support for 
  *                   time stamp in any order
+ *   Francois Chouinard - Moved from LTTng to TMF
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.ui.views.histogram;
+package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
 import java.util.Arrays;
 
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.linuxtools.lttng.core.exceptions.EventOutOfSequenceException;
-import org.eclipse.linuxtools.lttng.ui.LTTngUILogger;
 
 /**
  * <b><u>HistogramDataModel</u></b>
@@ -74,9 +73,6 @@ public class HistogramDataModel implements IHistogramDataModel {
 
     public static final int REFRESH_FREQUENCY = DEFAULT_NUMBER_OF_BUCKETS;
     
-//    // The ratio where an eccentric value will be truncated
-//    private static final int MAX_TO_AVERAGE_CUTOFF_RATIO = 5;
-
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -95,9 +91,13 @@ public class HistogramDataModel implements IHistogramDataModel {
     private long fCurrentEventTime;
     private long fTimeLimit;
     
-    // private listener lists
+    // Private listener lists
     private final ListenerList fModelListeners;
     
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
+
     public HistogramDataModel() {
         this(DEFAULT_NUMBER_OF_BUCKETS);
     }
@@ -192,6 +192,7 @@ public class HistogramDataModel implements IHistogramDataModel {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+
     @Override
     public void complete() {
         fireModelUpdateNotification();
@@ -242,9 +243,6 @@ public class HistogramDataModel implements IHistogramDataModel {
         
         // Validate
         if (timestamp < 0) {
-            String message = "Negative time value"; //$NON-NLS-1$
-            EventOutOfSequenceException exception = new EventOutOfSequenceException(message);
-            LTTngUILogger.logError(message, exception);
             return;
         }
         

@@ -15,13 +15,13 @@ package org.eclipse.linuxtools.lttng.ui.views.latency.listeners;
 
 import java.text.DecimalFormat;
 
-import org.eclipse.linuxtools.lttng.ui.views.distribution.model.BaseDistributionData;
-import org.eclipse.linuxtools.lttng.ui.views.histogram.HistogramUtils;
 import org.eclipse.linuxtools.lttng.ui.views.latency.AbstractViewer;
 import org.eclipse.linuxtools.lttng.ui.views.latency.GraphViewer;
 import org.eclipse.linuxtools.lttng.ui.views.latency.model.Config;
 import org.eclipse.linuxtools.lttng.ui.views.latency.model.GraphScaledData;
 import org.eclipse.linuxtools.lttng.ui.views.latency.model.IGraphDataModel;
+import org.eclipse.linuxtools.tmf.ui.views.distribution.model.BaseDistributionData;
+import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramUtils;
 
 /**
  * <b><u>GraphPaintListener</u></b>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010, 2011 Ericsson
+ * Copyright (c) 2009, 2010, 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,11 +12,12 @@
  *   Yuriy Vashchuk - Histograms optimisation.   
  *   Yuriy Vashchuk - Histogram Canvas Heritage correction
  *   Francois Chouinard - Cleanup and refactoring
+ *   Francois Chouinard - Moved from LTTng to TMF
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.ui.views.histogram;
+package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
-import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -55,7 +56,7 @@ public class HistogramView extends TmfView {
     // ------------------------------------------------------------------------
 
     // The view ID as defined in plugin.xml
-    public static final String ID = "org.eclipse.linuxtools.lttng.ui.views.histogram"; //$NON-NLS-1$
+    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.histogram"; //$NON-NLS-1$
 
     // The initial window span (in nanoseconds)
     public static final long INITIAL_WINDOW_SPAN = (1L * 100 * 1000 * 1000); // .1sec
@@ -71,7 +72,7 @@ public class HistogramView extends TmfView {
     private Composite fParent;
 
     // The current experiment
-    private TmfExperiment<LttngEvent> fCurrentExperiment;
+    private TmfExperiment<ITmfEvent> fCurrentExperiment;
 
     // Current timestamp/time window
     private long fExperimentStartTime;
@@ -234,7 +235,7 @@ public class HistogramView extends TmfView {
         fFullTraceHistogram = new FullTraceHistogram(this, fullRangeComposite);
 
         // Load the experiment if present
-        fCurrentExperiment = (TmfExperiment<LttngEvent>) TmfExperiment.getCurrentExperiment();
+        fCurrentExperiment = (TmfExperiment<ITmfEvent>) TmfExperiment.getCurrentExperiment();
         if (fCurrentExperiment != null)
             loadExperiment();
     }
@@ -242,7 +243,7 @@ public class HistogramView extends TmfView {
     @Override
     @SuppressWarnings("unchecked")
     public void setFocus() {
-        TmfExperiment<LttngEvent> experiment = (TmfExperiment<LttngEvent>) TmfExperiment.getCurrentExperiment();
+        TmfExperiment<ITmfEvent> experiment = (TmfExperiment<ITmfEvent>) TmfExperiment.getCurrentExperiment();
         if ((experiment != null) && (experiment != fCurrentExperiment)) {
             fCurrentExperiment = experiment;
             initializeHistograms();
@@ -268,7 +269,7 @@ public class HistogramView extends TmfView {
             TmfTimeRange timeRange = new TmfTimeRange(new TmfTimestamp(newTime, TIME_SCALE), TmfTimestamp.BigCrunch);
             HistogramRequest request = new HistogramRequest(fTimeRangeHistogram.getDataModel(), timeRange, 0, 1, ExecutionType.FOREGROUND) {
                 @Override
-                public void handleData(LttngEvent event) {
+                public void handleData(ITmfEvent event) {
                     if (event != null) {
                         TmfTimeSynchSignal signal = new TmfTimeSynchSignal(this, event.getTimestamp());
                         TmfSignalManager.dispatchSignal(signal);
@@ -324,9 +325,9 @@ public class HistogramView extends TmfView {
 
     @TmfSignalHandler
     @SuppressWarnings("unchecked")
-    public void experimentSelected(TmfExperimentSelectedSignal<LttngEvent> signal) {
+    public void experimentSelected(TmfExperimentSelectedSignal<ITmfEvent> signal) {
         assert (signal != null);
-        fCurrentExperiment = (TmfExperiment<LttngEvent>) signal.getExperiment();
+        fCurrentExperiment = (TmfExperiment<ITmfEvent>) signal.getExperiment();
         loadExperiment();
     }
 
@@ -423,7 +424,7 @@ public class HistogramView extends TmfView {
         sendFullRangeRequest(fullRange);
     }
 
-    private TmfTimeRange updateExperimentTimeRange(TmfExperiment<LttngEvent> experiment) {
+    private TmfTimeRange updateExperimentTimeRange(TmfExperiment<ITmfEvent> experiment) {
         fExperimentStartTime = 0;
         fExperimentEndTime = 0;
         fCurrentTimestamp = 0;

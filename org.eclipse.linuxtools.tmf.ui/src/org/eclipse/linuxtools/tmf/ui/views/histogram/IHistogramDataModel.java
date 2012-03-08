@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,14 +8,17 @@
  * 
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Francois Chouinard - Moved from LTTng to TMF
  *******************************************************************************/
-package org.eclipse.linuxtools.lttng.ui.views.histogram;
+
+package org.eclipse.linuxtools.tmf.ui.views.histogram;
+
+import org.eclipse.linuxtools.tmf.ui.views.distribution.model.IBaseDistributionModel;
 
 /**
  * <b><u>IHistogramDataModel</u></b>
  * <p>
  */
-import org.eclipse.linuxtools.lttng.ui.views.distribution.model.IBaseDistributionModel;
 
 public interface IHistogramDataModel extends IBaseDistributionModel {
     /**
@@ -35,4 +38,5 @@ public interface IHistogramDataModel extends IBaseDistributionModel {
      *         doesn't exceed [height] considering the bar width [barWidth]
      */
     public HistogramScaledData scaleTo(int width, int height, int barWidth);
+
 }

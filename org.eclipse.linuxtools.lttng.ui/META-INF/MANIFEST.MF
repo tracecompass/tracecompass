@@ -40,7 +40,6 @@ Export-Package: org.eclipse.linuxtools.lttng.ui;x-friends:="org.eclipse.linuxtoo
  org.eclipse.linuxtools.lttng.ui.views.controlflow.model;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
  org.eclipse.linuxtools.lttng.ui.views.distribution.model,
  org.eclipse.linuxtools.lttng.ui.views.events;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
- org.eclipse.linuxtools.lttng.ui.views.histogram;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
  org.eclipse.linuxtools.lttng.ui.views.latency;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
  org.eclipse.linuxtools.lttng.ui.views.latency.dialogs;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
  org.eclipse.linuxtools.lttng.ui.views.latency.listeners;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",

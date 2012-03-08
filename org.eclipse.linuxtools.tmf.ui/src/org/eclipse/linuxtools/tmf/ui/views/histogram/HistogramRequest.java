@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2011 Ericsson
+ * Copyright (c) 2009, 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,21 +10,22 @@
  *   William Bourque - Initial API and implementation
  *   Yuriy Vashchuk - Heritage correction.
  *   Francois Chouinard - Cleanup and refactoring
+ *   Francois Chouinard - Moved from LTTng to TMF
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.ui.views.histogram;
+package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
-import org.eclipse.linuxtools.lttng.core.LttngConstants;
-import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
 /**
  * <b><u>HistogramRequest</u></b>
  * <p>
  */
-public class HistogramRequest extends TmfEventRequest<LttngEvent> {
+public class HistogramRequest extends TmfEventRequest<ITmfEvent> {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -37,7 +38,7 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
     // ------------------------------------------------------------------------
 
     public HistogramRequest(HistogramDataModel histogram, TmfTimeRange range, int rank, int nbEvents, ITmfDataRequest.ExecutionType execType) {
-        super(LttngEvent.class, range, rank, nbEvents, LttngConstants.DEFAULT_BLOCK_SIZE, execType);
+        super(ITmfEvent.class, range, rank, nbEvents, TmfTrace.DEFAULT_INDEX_PAGE_SIZE, execType);
         fHistogram = histogram;
     }
 
@@ -54,7 +55,7 @@ public class HistogramRequest extends TmfEventRequest<LttngEvent> {
     // ------------------------------------------------------------------------
 
     @Override
-    public void handleData(LttngEvent event) {
+    public void handleData(ITmfEvent event) {
         super.handleData(event);
         if (event != null) {
             long timestamp = event.getTimestamp().getValue();

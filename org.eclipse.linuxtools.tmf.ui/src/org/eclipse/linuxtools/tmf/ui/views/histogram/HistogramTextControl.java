@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2011 Ericsson
+ * Copyright (c) 2009, 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,9 +9,10 @@
  * Contributors:
  *   Wiliam Bourque - Adapted from SpinnerGroup (in TimeFrameView)
  *   Francois Chouinard - Cleanup and refactoring
+ *   Francois Chouinard - Moved from LTTng to TMF
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.ui.views.histogram;
+package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;

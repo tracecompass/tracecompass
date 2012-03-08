@@ -9,15 +9,19 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.linuxtools.lttng.ui.views.histogram;
+package org.eclipse.linuxtools.tmf.ui.tests.histogram;
 
-/**
- * <b><u>IHistogramModelListener</u></b>
- * <p>
- */
-public interface IHistogramModelListener {
-    /**
-     * Method to notify listeners about model updates 
-     */
-    public void modelUpdated();
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+public class AllTests {
+
+    public static Test suite() {
+        
+        TestSuite suite = new TestSuite(AllTests.class.getName());
+        //$JUnit-BEGIN$
+        suite.addTestSuite(HistogramDataModelTest.class);
+        //$JUnit-END$
+        return suite;
+    }
 }

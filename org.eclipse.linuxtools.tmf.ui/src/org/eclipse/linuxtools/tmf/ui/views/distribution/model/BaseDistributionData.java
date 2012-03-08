@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,9 +8,10 @@
  * 
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Francois Chouinard - Moved from LTTng to TMF
  ******************************************************************************/
-package org.eclipse.linuxtools.lttng.ui.views.distribution.model;
 
+package org.eclipse.linuxtools.tmf.ui.views.distribution.model;
 
 /**
  * <b><u>BaseDistributionData</u></b>
@@ -21,6 +22,7 @@ public class BaseDistributionData {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+
     public final static int OUT_OF_RANGE_BUCKET = -1;
 
     /**
@@ -56,6 +58,7 @@ public class BaseDistributionData {
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+
     public BaseDistributionData(int nbBuckets) {
         fNbBuckets = nbBuckets;
         clear();
@@ -132,6 +135,7 @@ public class BaseDistributionData {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+
     public void clear() {
         fFirstBucketTime = 0;
         fFirstEventTime = 0;
@@ -139,4 +143,5 @@ public class BaseDistributionData {
         fLastBucket = 0;
         fBucketDuration = 1; // 1ns
     }
+
 }

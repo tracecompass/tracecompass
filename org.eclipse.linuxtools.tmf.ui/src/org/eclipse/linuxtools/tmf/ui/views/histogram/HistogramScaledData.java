@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,9 +9,10 @@
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Bernd Hufmann - Added setter and getter
+ *   Francois Chouinard - Moved from LTTng to TMF
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.ui.views.histogram;
+package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
 import java.util.Arrays;
 
@@ -78,6 +79,7 @@ public class HistogramScaledData {
     // ------------------------------------------------------------------------
     // Setter and Getter
     // ------------------------------------------------------------------------
+
     public long getFirstBucketTime() {
         return fFirstBucketTime;
     }
@@ -97,4 +99,5 @@ public class HistogramScaledData {
     public long getBucketEndTime(int index) {
         return getBucketStartTime(index) + fBucketDuration;
     }
+
 }
