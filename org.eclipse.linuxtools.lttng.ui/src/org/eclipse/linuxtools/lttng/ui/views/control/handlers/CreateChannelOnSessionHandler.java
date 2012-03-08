@@ -33,7 +33,6 @@ import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceSessionState;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceDomainComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 

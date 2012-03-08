@@ -19,6 +19,8 @@ import org.eclipse.linuxtools.lttng.ui.views.control.model.IBaseEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ISessionInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IUstProviderInfo;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.LogLevelType;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceLogLevel;
 
 
 /** <b><u>ILttngControlService</u></b>
@@ -146,9 +148,9 @@ public interface ILttngControlService {
      * Enables a dynamic probe.
      * @param sessionName - a session name
      * @param channelName - a channel name (null for default channel)
-     * @param monitor - a progress monitor
      * @param eventName - a event name
-     * @param probe - a dynamic probe information 
+     * @param probe - a dynamic probe information
+     * @param monitor - a progress monitor
      * @throws ExecutionException
      */
     public void enableProbe(String sessionName, String channelName, String eventName, String probe, IProgressMonitor monitor) throws ExecutionException;
@@ -157,13 +159,25 @@ public interface ILttngControlService {
      * Enables a dynamic function entry/return probe.
      * @param sessionName - a session name
      * @param channelName - a channel name (null for default channel)
-     * @param monitor - a progress monitor
      * @param eventName - a event name
-     * @param function - a dynamic function entry/return probe information 
+     * @param function - a dynamic function entry/return probe information
+     * @param monitor - a progress monitor 
      * @throws ExecutionException
      */
-    public void enableFunctionProbe(String sessionName, String channelName, String eventName, String probe, IProgressMonitor monitor) throws ExecutionException;
+    public void enableFunctionProbe(String sessionName, String channelName, String eventName, String function, IProgressMonitor monitor) throws ExecutionException;
 
+    /**
+     * Enables events using log level
+     * @param sessionName - a session name
+     * @param channelName - a channel name (null for default channel)
+     * @param eventName - a event name
+     * @param logLevelType - a log level type 
+     * @param level - a log level 
+     * @param monitor - a progress monitor  
+     * @throws ExecutionException
+     */
+    public void enableLogLevel(String sessionName, String channelName, String eventName, LogLevelType logLevelType, TraceLogLevel level, IProgressMonitor monitor) throws ExecutionException;    
+    
     /**
      * Disables a list of events with no additional parameters.
      * @param sessionName - a session name

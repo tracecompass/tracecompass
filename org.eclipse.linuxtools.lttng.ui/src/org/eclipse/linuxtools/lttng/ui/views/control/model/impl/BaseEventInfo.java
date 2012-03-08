@@ -87,8 +87,9 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
             fEventType = TraceEventType.TRACEPOINT;
         } else if(TraceEventType.SYSCALL.getInName().equals(typeName)) {
             fEventType = TraceEventType.SYSCALL;
-        }
-        else {
+        } else if (TraceEventType.PROBE.getInName().equals(typeName)) {
+            fEventType = TraceEventType.PROBE;  
+        } else {
             fEventType = TraceEventType.UNKNOWN;
         }
     }

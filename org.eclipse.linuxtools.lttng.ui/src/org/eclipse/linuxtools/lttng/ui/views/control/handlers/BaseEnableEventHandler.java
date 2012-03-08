@@ -22,11 +22,13 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.window.Window;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
 import org.eclipse.linuxtools.lttng.ui.views.control.Messages;
-import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.EnableKernelEventDialog;
-import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.IEnableKernelEventsDialog;
+import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.EnableEventsDialog;
+import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.IEnableEventsDialog;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.KernelProviderComponent;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.LogLevelType;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TargetNodeComponent;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceDomainComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceProviderGroup;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -35,8 +37,7 @@ import org.eclipse.ui.PlatformUI;
 /**
  * <b><u>EnableEventOnSessionHandler</u></b>
  * <p>
- * Command handler implementation to enable events for a known session and default channel 'channel0'
- * (which will be created if doesn't exist).
+ * Base command handler implementation to enable events.
  * </p>
  */
 abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
@@ -52,12 +53,54 @@ abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+    /**
+     * Enables a list of events for given parameters.
+     * @param eventNames - list of event names
+     * @param isKernel - true if kernel domain else false
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    abstract public void enableEvents(List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException;
+    /**
+     * Enables all syscall events.
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    abstract public void enableSyscalls(IProgressMonitor monitor) throws ExecutionException;
     
-    abstract void enableEvents(List<String> eventNames, IProgressMonitor monitor) throws ExecutionException;
-    abstract void enableSyscalls(IProgressMonitor monitor) throws ExecutionException;
-    abstract void enableProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException; 
-    abstract void enableFunctionProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException;
+    /**
+     * Enables a dynamic probe.
+     * @param eventName - a event name
+     * @param probe - a dynamic probe information
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    abstract public void enableProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException;
     
+    /**
+     * Enables a dynamic function entry/return probe.
+     * @param eventName - a event name
+     * @param function - a dynamic function entry/return probe information
+     * @param monitor - a progress monitor 
+     * @throws ExecutionException
+     */
+    abstract public void enableFunctionProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException;
+
+    /**
+     * Enables events using log level
+     * @param eventName - a event name
+     * @param logLevelType - a log level type 
+     * @param level - a log level 
+     * @param monitor - a progress monitor  
+     * @throws ExecutionException
+     */    
+    abstract public void enableLogLevel(String eventName, LogLevelType logLevelType, TraceLogLevel level, IProgressMonitor monitor) throws ExecutionException;
+    
+    /**
+     * @return returns the relevant domain (null if domain is not known)
+     */
+    abstract TraceDomainComponent getDomain();
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
@@ -73,10 +116,9 @@ abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
 
         TargetNodeComponent node = fSession.getTargetNode();
         List<ITraceControlComponent> providers = node.getChildren(TraceProviderGroup.class);
-        List<ITraceControlComponent> kernelProvider =  providers.get(0).getChildren(KernelProviderComponent.class);
-
-        final IEnableKernelEventsDialog dialog = new EnableKernelEventDialog(window.getShell(), (KernelProviderComponent)kernelProvider.get(0));
-
+        
+        final IEnableEventsDialog dialog = new EnableEventsDialog(window.getShell(), (TraceProviderGroup)providers.get(0), getDomain());
+        
         if (dialog.open() != Window.OK) {
             return null;
         }
@@ -86,52 +128,55 @@ abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
             protected IStatus run(IProgressMonitor monitor) {
                 String errorString = null;
 
-                // Enable tracepoint events
                 try {
-                    if (dialog.isAllTracePoints()) {
-                        enableEvents(null, monitor);
-                    } else {
-                        List<String> eventNames = dialog.getEventNames();
-                        if (eventNames.size() > 0) {
-                            enableEvents(eventNames, monitor);
+                    // Enable tracepoint events
+                    if (dialog.isTracepoints()) {
+                        if (dialog.isAllTracePoints()) {
+                            enableEvents(null, dialog.isKernel(), monitor);
+                        } else {
+                            List<String> eventNames = dialog.getEventNames();
+                            if (eventNames.size() > 0) {
+                                enableEvents(eventNames, dialog.isKernel(), monitor);
+                            }
                         }
                     }
-                } catch (ExecutionException e) {
-                    if (errorString == null) {
-                        errorString = new String();
-                    } 
-                    errorString += e.toString() + "\n"; //$NON-NLS-1$
-                }
 
-                // Enable syscall events
-                try {
+                    // Enable syscall events
                     if (dialog.isAllSysCalls()) {
-                        enableSyscalls(monitor);
-                    } 
-                } catch (ExecutionException e) {
-                    if (errorString == null) {
-                        errorString = new String();
-                    } 
-                    errorString += e.toString() + "\n"; //$NON-NLS-1$
-                }
-                
-                // Enable dynamic probe 
-                try {
-                    if ((dialog.getProbeEventName() != null && dialog.getProbeName() != null)) {
-                        enableProbe(dialog.getProbeEventName(), dialog.getProbeName(), monitor);
-                    } 
-                } catch (ExecutionException e) {
-                    if (errorString == null) {
-                        errorString = new String();
-                    } 
-                    errorString += e.toString() + "\n"; //$NON-NLS-1$
-                }
-                
-                // Enable dynamic function probe
-                try {
-                    if ((dialog.getFunctionEventName() != null) && (dialog.getFunction() != null)) {
-                        fSession.enableFunctionProbe(dialog.getFunctionEventName(), dialog.getFunction(), monitor);
-                    } 
+                        if (dialog.isAllSysCalls()) {
+                            enableSyscalls(monitor);
+                        } 
+                    }
+
+                    // Enable dynamic probe
+                    if (dialog.isDynamicProbe()) {
+                        if ((dialog.getProbeEventName() != null && dialog.getProbeName() != null)) {
+                            enableProbe(dialog.getProbeEventName(), dialog.getProbeName(), monitor);
+                        } 
+                    }
+
+                    // Enable dynamic function probe
+                    if (dialog.isDynamicFunctionProbe()) {
+                        if ((dialog.getFunctionEventName() != null) && (dialog.getFunction() != null)) {
+                            enableFunctionProbe(dialog.getFunctionEventName(), dialog.getFunction(), monitor);
+                        } 
+                    }
+
+                    // Enable event using a wildcard
+                    if (dialog.isWildcard()) {
+                        List<String> eventNames = dialog.getEventNames();
+                        eventNames.add(dialog.getWildcard());
+
+                        if (eventNames.size() > 0) {
+                            enableEvents(eventNames, dialog.isKernel(), monitor);
+                        }
+                    }
+                    
+                    // Enable events using log level
+                    if (dialog.isLogLevel()) {
+                        enableLogLevel(dialog.getLogLevelEventName(), dialog.getLogLevelType(), dialog.getLogLevel(), monitor);
+                    }
+
                 } catch (ExecutionException e) {
                     if (errorString == null) {
                         errorString = new String();

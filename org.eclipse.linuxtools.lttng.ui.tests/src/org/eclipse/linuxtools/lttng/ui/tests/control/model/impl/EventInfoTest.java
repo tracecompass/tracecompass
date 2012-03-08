@@ -75,7 +75,7 @@ public class EventInfoTest extends TestCase {
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(2, result.ordinal());
+        assertEquals(3, result.ordinal());
         
         TraceEnablement state = fixture.getState();
         assertEquals("disabled", state.getInName());
@@ -131,7 +131,7 @@ public class EventInfoTest extends TestCase {
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(2, result.ordinal());
+        assertEquals(3, result.ordinal());
         
         // setEventType(String typeName)
         String typeName = "";
@@ -141,7 +141,7 @@ public class EventInfoTest extends TestCase {
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(2, result.ordinal());
+        assertEquals(3, result.ordinal());
 
         typeName = "unknown";
 
@@ -151,7 +151,7 @@ public class EventInfoTest extends TestCase {
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(2, result.ordinal());
+        assertEquals(3, result.ordinal());
 
         // setState(String stateName)
         fixture.setState("disabled");

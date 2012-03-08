@@ -101,22 +101,35 @@ final public class Messages extends NLS {
     public static String TraceControl_EnableEventsNoSessionError;
     public static String TraceControl_EnableEventsNoChannelError;
 
-    public static String TraceControl_EnableKernelEventsDialogTitle;    
+    public static String TraceControl_EnableGroupSelectionName;
     public static String TraceControl_EnableEventsTracepointGroupName;
     public static String TraceControl_EnableEventsTracepointTreeTooltip;
     public static String TraceControl_EnableEventsTracepointTreeAllLabel;
     public static String TraceControl_EnableEventsSyscallName;
     public static String TraceControl_EnableEventsSyscallTooltip;
     public static String TraceControl_EnableEventsProbeGroupName;
-    public static String TraceControl_EnableEventsProbeEventNameLabel;
+    public static String TraceControl_EnableEventsEventNameLabel;
     public static String TraceControl_EnableEventsProbeEventNameTooltip;
     public static String TraceControl_EnableEventsProbeNameLabel;
     public static String TraceControl_EnableEventsProbeNameTooltip;
     public static String TraceControl_EnableEventsFucntionGroupName;
     public static String TraceControl_EnableEventsFunctionEventNameTooltip;
     public static String TraceControl_EnableEventsFunctionNameLabel;
+    
+    public static String TraceControl_EnableEventsWildcardGroupName;
+    public static String TraceControl_EnableEventsWildcardLabel;
+    public static String TraceControl_EnableEventsWildcardTooltip;
+    public static String TraceControl_EnableEventsLogLevelGroupName;
+    public static String TraceControl_EnableEventsLogLevelTypeName;
+    public static String TraceControl_EnableEventsLogLevelTypeTooltip;
+    public static String TraceControl_EnableEventsLogLevelOnlyTypeName;
+    public static String TraceControl_EnableEventsLogLevelOnlyTypeTooltip;
+    public static String TraceControl_EnableEventsLogLevelTooltip;
+    public static String TraceControl_EnableEventsLoglevelEventNameTooltip;
 
     public static String TraceControl_InvalidProbeNameError;
+    public static String TraceControl_InvalidWildcardError;
+    public static String TraceControl_InvalidLogLevelEventNameError;
     
 
     // Tree structure strings

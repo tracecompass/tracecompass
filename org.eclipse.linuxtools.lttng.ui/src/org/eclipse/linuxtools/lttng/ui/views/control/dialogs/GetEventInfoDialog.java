@@ -160,14 +160,12 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
         fSessionsGroup.setText(Messages.TraceControl_EnableEventsSessionGroupName);
         layout = new GridLayout(1, true);
         fSessionsGroup.setLayout(layout); 
-//        GridData data = new GridData(GridData.FILL, GridData.CENTER, true, false, 1, 1);
         GridData data = new GridData(GridData.FILL_HORIZONTAL);
         fSessionsGroup.setLayoutData(data);
 
         fSessionsCombo = new CCombo(fSessionsGroup, SWT.READ_ONLY);
         fSessionsCombo.setToolTipText(Messages.TraceControl_EnableEventsSessionsTooltip);
         fSessionsCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-//        fSessionsCombo.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false, 1, 1));
         
         String items[] = new String[fSessions.length];
         for (int i = 0; i < items.length; i++) {
@@ -182,12 +180,10 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
         layout = new GridLayout(1, true);
         fChannelsGroup.setLayout(layout);
         data = new GridData(GridData.FILL_HORIZONTAL);
-//        data = new GridData(GridData.FILL, GridData.CENTER, true, false, 1, 1);
         fChannelsGroup.setLayoutData(data);
         
         fChannelsCombo = new CCombo(fChannelsGroup, SWT.READ_ONLY);
         fChannelsCombo.setToolTipText(Messages.TraceControl_EnableEventsChannelsTooltip);
-//        fChannelsCombo.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false, 1, 1));
         fChannelsCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         fChannelsCombo.setEnabled(false);
 
@@ -228,7 +224,6 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
             public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
-//        label.setText("");
         return fDialogComposite;
     }
 

@@ -27,6 +27,7 @@ import org.eclipse.linuxtools.lttng.ui.views.control.model.IDomainInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ISessionInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IUstProviderInfo;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.LogLevelType;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.BaseEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.ChannelInfo;
@@ -132,6 +133,14 @@ public class LTTngControlService implements ILttngControlService {
      * Command line option for specifying a dynamic function entry/return probe.
      */
     private final static String OPTION_FUNCTION_PROBE = " --function ";  //$NON-NLS-1$
+    /**
+     * Command line option for specifying a log level range.
+     */
+    private final static String OPTION_LOGLEVEL = " --loglevel ";  //$NON-NLS-1$
+    /**
+     * Command line option for specifying a specific log level.
+     */
+    private final static String OPTION_LOGLEVEL_ONLY = " --loglevel-only ";  //$NON-NLS-1$
     /**
      * Optional command line option for configuring a channel's overwrite mode.
      */
@@ -865,7 +874,45 @@ public class LTTngControlService implements ILttngControlService {
             throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
         }   
     }
-    
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#enableLogLevel(java.lang.String, java.lang.String, java.lang.String, org.eclipse.linuxtools.lttng.ui.views.control.model.LogLevelType, org.eclipse.linuxtools.lttng.ui.views.control.model.TraceLogLevel, org.eclipse.core.runtime.IProgressMonitor)
+     */
+    @Override
+    public void enableLogLevel(String sessionName, String channelName, String eventName, LogLevelType logLevelType, TraceLogLevel level, IProgressMonitor monitor) throws ExecutionException {
+        String newSessionName = formatParameter(sessionName);
+        
+        StringBuffer command = new StringBuffer(COMMAND_ENABLE_EVENT);
+
+        command.append(eventName);
+        command.append(OPTION_UST);
+
+        command.append(OPTION_SESSION);
+        command.append(newSessionName);
+
+        if (channelName != null) {
+            command.append(OPTION_CHANNEL);
+            command.append(channelName);
+        }
+        
+        if (logLevelType == LogLevelType.LOGLEVEL) {
+            command.append(OPTION_LOGLEVEL);
+        } else if (logLevelType == LogLevelType.LOGLEVEL_ONLY) {
+            command.append(OPTION_LOGLEVEL_ONLY);
+            
+        } else {
+            return;
+        }
+        command.append(level.getInName());
+        
+        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
+        
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+    }
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#disableEvent(java.lang.String, java.lang.String, java.util.List, boolean, org.eclipse.core.runtime.IProgressMonitor)

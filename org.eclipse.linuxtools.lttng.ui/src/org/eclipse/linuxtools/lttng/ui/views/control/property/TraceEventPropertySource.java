@@ -11,7 +11,11 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.control.property;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.linuxtools.lttng.ui.views.control.Messages;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceEventComponent;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
@@ -88,11 +92,14 @@ public class TraceEventPropertySource extends BasePropertySource {
      */
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        return new IPropertyDescriptor[] {
-                new TextPropertyDescriptor(TRACE_EVENT_NAME_PROPERTY_ID, TRACE_EVENT_NAME_PROPERTY_NAME),
-                new TextPropertyDescriptor(TRACE_EVENT_TYPE_PROPERTY_ID, TRACE_EVENT_TYPE_PROPERTY_NAME),
-                new TextPropertyDescriptor(TRACE_EVENT_LOGLEVEL_PROPERTY_ID, TRACE_EVENT_LOGLEVEL_PROPERTY_NAME),
-                new TextPropertyDescriptor(TRACE_EVENT_STATE_PROPERTY_ID, TRACE_EVENT_STATE_PROPERTY_NAME)};
+        List<IPropertyDescriptor> list = new ArrayList<IPropertyDescriptor> ();
+        list.add(new TextPropertyDescriptor(TRACE_EVENT_NAME_PROPERTY_ID, TRACE_EVENT_NAME_PROPERTY_NAME));
+        list.add(new TextPropertyDescriptor(TRACE_EVENT_TYPE_PROPERTY_ID, TRACE_EVENT_TYPE_PROPERTY_NAME));
+        list.add( new TextPropertyDescriptor(TRACE_EVENT_STATE_PROPERTY_ID, TRACE_EVENT_STATE_PROPERTY_NAME));
+        if (fEvent.getLogLevel() != TraceLogLevel.LEVEL_UNKNOWN) {
+            list.add(new TextPropertyDescriptor(TRACE_EVENT_LOGLEVEL_PROPERTY_ID, TRACE_EVENT_LOGLEVEL_PROPERTY_NAME));
+        }
+        return (IPropertyDescriptor [])list.toArray(new IPropertyDescriptor[list.size()]);        
     }
 
     /*

@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.lttng.ui.views.control.model;
 /**
  * <b><u>TraceLogLevels</u></b>
  * <p>
- * Log Level state enumeration.
+ * Log Level enumeration.
  * </p>
  */
 @SuppressWarnings("nls")

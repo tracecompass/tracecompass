@@ -75,7 +75,7 @@ public class BaseEventInfoTest extends TestCase {
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(2, result.ordinal());
+        assertEquals(3, result.ordinal());
         
         TraceLogLevel level = fixture.getLogLevel();
         assertEquals("TRACE_DEBUG", level.getInName());
@@ -125,14 +125,14 @@ public class BaseEventInfoTest extends TestCase {
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(2, result.ordinal());
+        assertEquals(3, result.ordinal());
         
         fixture.setEventType("");
         result = fixture.getEventType();
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
-        assertEquals(2, result.ordinal());
+        assertEquals(3, result.ordinal());
         
         fixture.setEventType("tracepoint");
         result = fixture.getEventType();
@@ -141,6 +141,23 @@ public class BaseEventInfoTest extends TestCase {
         assertEquals("TRACEPOINT", result.name());
         assertEquals("TRACEPOINT", result.toString());
         assertEquals(0, result.ordinal());
+        
+        fixture.setEventType("syscall");
+        result = fixture.getEventType();
+        assertNotNull(result);
+        assertEquals("syscall", result.getInName());
+        assertEquals("SYSCALL", result.name());
+        assertEquals("SYSCALL", result.toString());
+        assertEquals(1, result.ordinal());
+        
+        fixture.setEventType("probe");
+        result = fixture.getEventType();
+        assertNotNull(result);
+        assertEquals("probe", result.getInName());
+        assertEquals("PROBE", result.name());
+        assertEquals("PROBE", result.toString());
+        assertEquals(2, result.ordinal());
+
     }
 
     /**
@@ -166,7 +183,24 @@ public class BaseEventInfoTest extends TestCase {
         assertEquals("unknown", result.getInName());
         assertEquals("UNKNOWN", result.name());
         assertEquals("UNKNOWN", result.toString());
+        assertEquals(3, result.ordinal());
+        
+        fixture.setEventType(TraceEventType.SYSCALL);
+        result = fixture.getEventType();
+        assertNotNull(result);
+        assertEquals("syscall", result.getInName());
+        assertEquals("SYSCALL", result.name());
+        assertEquals("SYSCALL", result.toString());
+        assertEquals(1, result.ordinal());
+        
+        fixture.setEventType(TraceEventType.PROBE);
+        result = fixture.getEventType();
+        assertNotNull(result);
+        assertEquals("probe", result.getInName());
+        assertEquals("PROBE", result.name());
+        assertEquals("PROBE", result.toString());
         assertEquals(2, result.ordinal());
+
     }
     
     /**

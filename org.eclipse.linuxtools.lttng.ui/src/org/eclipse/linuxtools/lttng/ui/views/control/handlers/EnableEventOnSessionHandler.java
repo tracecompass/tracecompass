@@ -19,7 +19,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.linuxtools.lttng.ui.views.control.ControlView;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.LogLevelType;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceSessionState;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceDomainComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent;
 import org.eclipse.ui.IWorkbenchPage;
 
@@ -41,11 +44,11 @@ public class EnableEventOnSessionHandler extends BaseEnableEventHandler {
     // ------------------------------------------------------------------------
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.handlers.BaseEnableEventHandler#enableEvents(java.util.List, org.eclipse.core.runtime.IProgressMonitor)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.handlers.BaseEnableEventHandler#enableEvents(java.util.List, boolean, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    void enableEvents(List<String> eventNames, IProgressMonitor monitor) throws ExecutionException {
-        fSession.enableEvents(eventNames, true, monitor);
+    public void enableEvents(List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
+        fSession.enableEvents(eventNames, isKernel, monitor);
     }
 
     /*
@@ -53,7 +56,7 @@ public class EnableEventOnSessionHandler extends BaseEnableEventHandler {
      * @see org.eclipse.linuxtools.lttng.ui.views.control.handlers.BaseEnableEventHandler#enableSyscalls(org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    void enableSyscalls(IProgressMonitor monitor) throws ExecutionException {
+    public void enableSyscalls(IProgressMonitor monitor) throws ExecutionException {
         fSession.enableSyscalls(monitor);
     }
 
@@ -62,7 +65,7 @@ public class EnableEventOnSessionHandler extends BaseEnableEventHandler {
      * @see org.eclipse.linuxtools.lttng.ui.views.control.handlers.BaseEnableEventHandler#enableProbe(java.lang.String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    void enableProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException {
+    public void enableProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException {
         fSession.enableProbe(eventName, probe, monitor);
     }
 
@@ -71,8 +74,27 @@ public class EnableEventOnSessionHandler extends BaseEnableEventHandler {
      * @see org.eclipse.linuxtools.lttng.ui.views.control.handlers.BaseEnableEventHandler#enableFunctionProbe(java.lang.String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    void enableFunctionProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException {
+    public void enableFunctionProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException {
         fSession.enableFunctionProbe(eventName, probe, monitor);
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.handlers.BaseEnableEventHandler#enableLogLevel(java.lang.String, org.eclipse.linuxtools.lttng.ui.views.control.model.LogLevelType, org.eclipse.linuxtools.lttng.ui.views.control.model.TraceLogLevel, org.eclipse.core.runtime.IProgressMonitor)
+     */
+    @Override
+    public void enableLogLevel(String eventName, LogLevelType logLevelType, TraceLogLevel level, IProgressMonitor monitor) throws ExecutionException {
+        fSession.enableLogLevel(eventName, logLevelType, level, monitor);
+    }
+
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.handlers.BaseEnableEventHandler#getDomain()
+     */
+    @Override
+    public TraceDomainComponent getDomain() {
+        return null;
     }
 
     /*
@@ -96,7 +118,7 @@ public class EnableEventOnSessionHandler extends BaseEnableEventHandler {
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
                 Object element = (Object) iterator.next();
                 if (element instanceof TraceSessionComponent) {
-                    // Add only TraceSessionComponents is inactive and not destroyed
+                    // Add only if corresponding TraceSessionComponents is inactive and not destroyed
                     TraceSessionComponent session = (TraceSessionComponent) element; 
                     if(session.getSessionState() == TraceSessionState.INACTIVE && !session.isDestroyed()) {
                         fSession = session;

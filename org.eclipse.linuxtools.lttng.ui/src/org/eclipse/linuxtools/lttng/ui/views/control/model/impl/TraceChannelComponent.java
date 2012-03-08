@@ -21,7 +21,9 @@ import org.eclipse.linuxtools.lttng.ui.views.control.Messages;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.LogLevelType;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceEnablement;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.lttng.ui.views.control.property.TraceChannelPropertySource;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.views.properties.IPropertySource;
@@ -323,6 +325,29 @@ public class TraceChannelComponent extends TraceControlComponent {
         getControlService().enableFunctionProbe(getSessionName(), getName(), eventName, probe, monitor);
     }
     
+    /**
+     * Enables events using log level.
+     * @param eventName - a event name
+     * @param logLevelType - a log level type 
+     * @param level - a log level 
+     * @throws ExecutionException
+     */
+    public void enableLogLevel(String eventName, LogLevelType logLevelType, TraceLogLevel level) throws ExecutionException {
+        enableLogLevel(eventName, logLevelType, level, new NullProgressMonitor());
+    }
+
+    /**
+     * Enables events using log level.
+     * @param eventName - a event name
+     * @param logLevelType - a log level type 
+     * @param level - a log level 
+     * @param monitor - a progress monitor  
+     * @throws ExecutionException
+     */
+    public void enableLogLevel(String eventName, LogLevelType logLevelType, TraceLogLevel level, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().enableLogLevel(getSessionName(), getName(), eventName, logLevelType, level, monitor);
+    }
+
     /**
      * Enables a list of events with no additional parameters.
      * @param eventNames - a list of event names to enabled.
