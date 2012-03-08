@@ -891,7 +891,9 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
             public void handleSuccess() {
 //                long indexingEnd = System.nanoTime();
 
-                if (getRange() != TmfTimeRange.Eternity) {
+                // if the end time is a real value then it is the streaming safe time stamp
+                // set the last time to the safe time stamp to prevent unnecessary indexing requests
+                if (getRange().getEndTime() != TmfTimestamp.BigCrunch) {
                     lastTime = getRange().getEndTime();
                 }
                 updateExperiment();
