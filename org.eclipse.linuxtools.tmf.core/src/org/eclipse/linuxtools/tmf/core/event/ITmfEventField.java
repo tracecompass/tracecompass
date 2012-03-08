@@ -20,11 +20,19 @@ package org.eclipse.linuxtools.tmf.core.event;
  */
 public interface ITmfEventField extends Cloneable {
 
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+
     /**
      * The root field id (the main container)
      */
-    public static final String ROOT_ID = ":root:"; //$NON-NLS-1$
+    public static final String ROOT_FIELD_ID = ":root:"; //$NON-NLS-1$
     
+    // ------------------------------------------------------------------------
+    // Getters
+    // ------------------------------------------------------------------------
+
     /**
      * @return the field name
      */
@@ -59,6 +67,10 @@ public interface ITmfEventField extends Cloneable {
      * @return a specific subfield by index (null if absent or inexistent)
      */
     public ITmfEventField getField(int index);
+
+    // ------------------------------------------------------------------------
+    // Cloneable
+    // ------------------------------------------------------------------------
 
     /**
      * @return a clone of the event type

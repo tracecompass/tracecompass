@@ -32,6 +32,10 @@ package org.eclipse.linuxtools.tmf.core.event;
  */
 public interface ITmfTimestamp extends Cloneable, Comparable<ITmfTimestamp> {
 
+    // ------------------------------------------------------------------------
+    // Getters
+    // ------------------------------------------------------------------------
+
     /**
      * @return the timestamp value (magnitude)
      */
@@ -46,6 +50,10 @@ public interface ITmfTimestamp extends Cloneable, Comparable<ITmfTimestamp> {
      * @return the timestamp precision (measurement tolerance)
      */
     public int getPrecision();
+
+    // ------------------------------------------------------------------------
+    // Operations
+    // ------------------------------------------------------------------------
 
     /**
      * Normalize (adjust scale and offset) of the timerstamp
@@ -73,11 +81,19 @@ public interface ITmfTimestamp extends Cloneable, Comparable<ITmfTimestamp> {
      */
     public ITmfTimestamp getDelta(ITmfTimestamp ts);
 
+    // ------------------------------------------------------------------------
+    // Cloneable
+    // ------------------------------------------------------------------------
+
     /**
      * @return a clone of the timestamp
      */
     public ITmfTimestamp clone();
     
+    // ------------------------------------------------------------------------
+    // Comparable
+    // ------------------------------------------------------------------------
+
     /* (non-Javadoc)
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */

@@ -189,7 +189,7 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
          * Verified Methods: loader.syncToTime(), loader.moveToMessage(), loader.moveToPage()
          * Expected result: Move to first page, focus on the beginning of the page, but no selection.
          */
-        fFacility.getTrace().broadcast(new TmfTimeSynchSignal(this, TmfTimestamp.BigBang));
+        fFacility.getTrace().broadcast(new TmfTimeSynchSignal(this, TmfTimestamp.BIG_BANG));
         fFacility.getLoader().waitForCompletion();
         fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         assertEquals("synchToTime", TC_004_PAGE_VALUE, fFacility.getLoader().currentPage());
@@ -203,7 +203,7 @@ public class TmfUml2SDSyncLoaderTimeTest extends TestCase {
          * Verified Methods: loader.syncToTime(), loader.moveToMessage(), loader.moveToPage()
          * Expected result: Move to last page, focus on the end of the page, but no selection.
          */
-        fFacility.getTrace().broadcast(new TmfTimeSynchSignal(this, TmfTimestamp.BigCrunch));
+        fFacility.getTrace().broadcast(new TmfTimeSynchSignal(this, TmfTimestamp.BIG_CRUNCH));
         fFacility.getLoader().waitForCompletion();
         fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         assertEquals("synchToTime", TC_005_PAGE_VALUE, fFacility.getLoader().currentPage());

@@ -194,8 +194,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         // Set the time range of the trace
         TmfContext context = seekLocation(null);
         LttngEvent event = getNextEvent(context);
-        setEndTime(TmfTimestamp.BigBang);
-        final long startTime = event != null ? event.getTimestamp().getValue() : TmfTimestamp.BigBang.getValue();
+        setEndTime(TmfTimestamp.BIG_BANG);
+        final long startTime = event != null ? event.getTimestamp().getValue() : TmfTimestamp.BIG_BANG.getValue();
         fStreamingInterval = LTTNG_STREAMING_INTERVAL;
 
         final Thread thread = new Thread("Streaming Monitor for trace " + getName()) { //$NON-NLS-1$
@@ -209,7 +209,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
                     TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
                     if (experiment != null) {
                         @SuppressWarnings("rawtypes")
-                        final TmfEventRequest request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity, 0, ExecutionType.FOREGROUND) {
+                        final TmfEventRequest request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.ETERNITY, 0, ExecutionType.FOREGROUND) {
                             @Override
                             public void handleCompleted() {
                                 updateJniTrace();

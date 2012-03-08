@@ -143,7 +143,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	private ViewProcessFilter tableFilter = null;
 	private ScrolledComposite scrollFrame = null;
 	
-	private TmfTimeRange initTimeRange = TmfTimeRange.Null;
+	private TmfTimeRange initTimeRange = TmfTimeRange.NULL_RANGE;
 
 	// private static SimpleDateFormat stimeformat = new SimpleDateFormat(
 	// "yy/MM/dd HH:mm:ss");
@@ -555,7 +555,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		if (experiment != null) {
 			TmfTimeRange experimentTRange = experiment.getTimeRange();
 
-			if (experimentTRange != TmfTimeRange.Null) {
+			if (experimentTRange != TmfTimeRange.NULL_RANGE) {
 				// send request and received the adjusted time used
 				TmfTimeRange adjustedTimeRange = initialExperimentDataRequest(this,
 						experimentTRange);
@@ -1047,8 +1047,8 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 			TmfTimeRange experimentTRange = signal.getExperiment()
 					.getTimeRange();
 
-			initTimeRange = TmfTimeRange.Null;
-			if (experimentTRange != TmfTimeRange.Null) {
+			initTimeRange = TmfTimeRange.NULL_RANGE;
+			if (experimentTRange != TmfTimeRange.NULL_RANGE) {
 				// prepare time intervals in widget
 				ModelUpdateInit(experimentTRange, experimentTRange, signal
 						.getSource());
@@ -1062,10 +1062,10 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 	@TmfSignalHandler
 	public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
-		if (initTimeRange == TmfTimeRange.Null && signal.getExperiment().equals(TmfExperiment.getCurrentExperiment())) {
+		if (initTimeRange == TmfTimeRange.NULL_RANGE && signal.getExperiment().equals(TmfExperiment.getCurrentExperiment())) {
 			TmfTimeRange experimentTRange = signal.getRange();
 
-			if (experimentTRange != TmfTimeRange.Null) {
+			if (experimentTRange != TmfTimeRange.NULL_RANGE) {
 				// prepare time intervals in widget
 				ModelUpdateInit(experimentTRange, experimentTRange, signal.getSource());
 

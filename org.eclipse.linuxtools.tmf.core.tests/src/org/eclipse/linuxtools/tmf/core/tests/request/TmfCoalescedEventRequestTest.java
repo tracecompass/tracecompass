@@ -49,8 +49,8 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 	// Variables
 	// ------------------------------------------------------------------------
 
-	private TmfTimeRange range1 = new TmfTimeRange(TmfTimeRange.Eternity);
-	private TmfTimeRange range2 = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BigCrunch);
+	private TmfTimeRange range1 = new TmfTimeRange(TmfTimeRange.ETERNITY);
+	private TmfTimeRange range2 = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BIG_CRUNCH);
 	
 	private TmfCoalescedEventRequest<TmfEvent> fRequest1;
 	private TmfCoalescedEventRequest<TmfEvent> fRequest2;
@@ -435,7 +435,7 @@ public class TmfCoalescedEventRequestTest extends TestCase {
 	@TmfSignalHandler
     public void trigger(final TmfTestTriggerSignal signal) {
 
-        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
 
         requestedEvents1 = new Vector<TmfEvent>();
         request1 = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {

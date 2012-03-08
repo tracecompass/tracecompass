@@ -77,7 +77,7 @@ public abstract class LttngTestPreparation extends TestCase {
 
 			// create experiment and associate traces
 			fTestExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class,
-					expId, traces, TmfTimestamp.Zero, TmfExperiment.DEFAULT_BLOCK_SIZE, true);
+					expId, traces, TmfTimestamp.ZERO, TmfExperiment.DEFAULT_BLOCK_SIZE, true);
 			// fTestExperiment.indexExperiment(waitForCompletion);
 
 			// Set the current selected experiment as the test experiment

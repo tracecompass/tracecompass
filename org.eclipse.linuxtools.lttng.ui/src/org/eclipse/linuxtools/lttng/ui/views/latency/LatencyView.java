@@ -212,7 +212,7 @@ public class LatencyView extends TmfView implements IGraphModelListener {
 
             TmfTimeRange experimentTRange = experiment.getTimeRange();
 
-            if (experimentTRange != TmfTimeRange.Null) {
+            if (experimentTRange != TmfTimeRange.NULL_RANGE) {
                 TmfExperimentSelectedSignal<TmfEvent> signal = new TmfExperimentSelectedSignal<TmfEvent>(this, experiment);
                 experimentSelected(signal);
             }
@@ -240,10 +240,10 @@ public class LatencyView extends TmfView implements IGraphModelListener {
             // Update the trace reference
             fExperiment = (TmfExperiment<LttngEvent>) signal.getExperiment();
 
-            fTimeRange = TmfTimeRange.Null;
+            fTimeRange = TmfTimeRange.NULL_RANGE;
             TmfTimeRange experimentTRange = fExperiment.getTimeRange();
 
-            if (!experimentTRange.equals(TmfTimeRange.Null)) {
+            if (!experimentTRange.equals(TmfTimeRange.NULL_RANGE)) {
                 fTimeRange = new TmfTimeRange(experimentTRange.getStartTime(), 
                         new TmfTimestamp(experimentTRange.getStartTime().getValue() + INITIAL_WINDOW_SPAN, experimentTRange.getStartTime().getScale(), experimentTRange.getStartTime().getPrecision()));
                 fController.refreshModels(fExperiment, fTimeRange);
@@ -252,10 +252,10 @@ public class LatencyView extends TmfView implements IGraphModelListener {
     }    
     @TmfSignalHandler
     public void experimentRangeUpdated(TmfExperimentRangeUpdatedSignal signal) {
-        if (fTimeRange == TmfTimeRange.Null && signal.getExperiment().equals(fExperiment)) {
+        if (fTimeRange == TmfTimeRange.NULL_RANGE && signal.getExperiment().equals(fExperiment)) {
             TmfTimeRange experimentTRange = signal.getRange();
 
-            if (experimentTRange != TmfTimeRange.Null) {
+            if (experimentTRange != TmfTimeRange.NULL_RANGE) {
                 fTimeRange = new TmfTimeRange(experimentTRange.getStartTime(), 
                         new TmfTimestamp(experimentTRange.getStartTime().getValue() + INITIAL_WINDOW_SPAN, experimentTRange.getStartTime().getScale(), experimentTRange.getStartTime().getPrecision()));
                 fController.refreshModels(fExperiment, fTimeRange);
@@ -268,7 +268,7 @@ public class LatencyView extends TmfView implements IGraphModelListener {
         if (signal.getExperiment() != fExperiment) {
             return;
         }
-        fTimeRange = TmfTimeRange.Null;
+        fTimeRange = TmfTimeRange.NULL_RANGE;
         fExperiment = null;
         fController.clear();
     }
@@ -349,7 +349,7 @@ public class LatencyView extends TmfView implements IGraphModelListener {
                 currentEventTime != Config.INVALID_EVENT_TIME) {
 
             // Queue update in the event request queue 
-            TmfTimeRange timeRange = new TmfTimeRange(new TmfTimestamp(currentEventTime, Config.TIME_SCALE), TmfTimestamp.BigCrunch);
+            TmfTimeRange timeRange = new TmfTimeRange(new TmfTimestamp(currentEventTime, Config.TIME_SCALE), TmfTimestamp.BIG_CRUNCH);
             TmfEventRequest<LttngEvent> request = new TmfEventRequest<LttngEvent>(LttngEvent.class, timeRange, 0, 1, ExecutionType.FOREGROUND) {
                 @Override
                 public void handleCompleted() {

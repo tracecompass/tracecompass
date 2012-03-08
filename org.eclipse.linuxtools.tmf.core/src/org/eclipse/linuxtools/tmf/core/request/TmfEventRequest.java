@@ -36,11 +36,11 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
      * @param range
      */
     public TmfEventRequest(Class<T> dataType) {
-        this(dataType, TmfTimeRange.Eternity, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
+        this(dataType, TmfTimeRange.ETERNITY, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
     public TmfEventRequest(Class<T> dataType, ExecutionType execType) {
-        this(dataType, TmfTimeRange.Eternity, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
+        this(dataType, TmfTimeRange.ETERNITY, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
     }
 
     /**

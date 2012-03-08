@@ -42,10 +42,10 @@ public class TmfAsyncSequenceDiagramEventTest extends TestCase {
 
    
     public TmfAsyncSequenceDiagramEventTest() {
-        fContent1 = new TmfEventField(ITmfEventField.ROOT_ID, "Some content");
+        fContent1 = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, "Some content");
         fEvent1 = new TmfEvent(null, fTimestamp1, fSource, fType, fContent1, fReference);
 
-        fContent2 = new TmfEventField(ITmfEventField.ROOT_ID, "Some other content");
+        fContent2 = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, "Some other content");
         fEvent2 = new TmfEvent(null, fTimestamp2, fSource, fType, fContent2, fReference);
     }
     

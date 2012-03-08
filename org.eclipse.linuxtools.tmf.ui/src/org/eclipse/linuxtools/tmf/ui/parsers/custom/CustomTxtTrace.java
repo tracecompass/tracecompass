@@ -309,7 +309,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     }
     
     public CustomTxtEvent parseFirstLine(CustomTxtTraceContext context) {
-        CustomTxtEvent event = new CustomTxtEvent(fDefinition, this, (TmfTimestamp) TmfTimestamp.Zero, "", fEventType, ""); //$NON-NLS-1$ //$NON-NLS-2$
+        CustomTxtEvent event = new CustomTxtEvent(fDefinition, this, (TmfTimestamp) TmfTimestamp.ZERO, "", fEventType, ""); //$NON-NLS-1$ //$NON-NLS-2$
         event.processGroups(context.inputLine, context.firstLineMatcher);
         event.setContent(new CustomEventContent(event, context.firstLine));
         return event;

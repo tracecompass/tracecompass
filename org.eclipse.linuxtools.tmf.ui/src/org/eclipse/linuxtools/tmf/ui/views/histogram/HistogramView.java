@@ -266,7 +266,7 @@ public class HistogramView extends TmfView {
 
     public void updateCurrentEventTime(long newTime) {
         if (fCurrentExperiment != null) {
-            TmfTimeRange timeRange = new TmfTimeRange(new TmfTimestamp(newTime, TIME_SCALE), TmfTimestamp.BigCrunch);
+            TmfTimeRange timeRange = new TmfTimeRange(new TmfTimestamp(newTime, TIME_SCALE), TmfTimestamp.BIG_CRUNCH);
             HistogramRequest request = new HistogramRequest(fTimeRangeHistogram.getDataModel(), timeRange, 0, 1, ExecutionType.FOREGROUND) {
                 @Override
                 public void handleData(ITmfEvent event) {
@@ -430,7 +430,7 @@ public class HistogramView extends TmfView {
         fCurrentTimestamp = 0;
 
         TmfTimeRange timeRange = fCurrentExperiment.getTimeRange();
-        if (timeRange != TmfTimeRange.Null) {
+        if (timeRange != TmfTimeRange.NULL_RANGE) {
             fExperimentStartTime = timeRange.getStartTime().getValue();
             fExperimentEndTime = timeRange.getEndTime().getValue();
             fCurrentTimestamp = fExperimentStartTime;

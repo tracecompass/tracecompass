@@ -174,7 +174,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
             }
 
             // TmfTimeRange window = getInitTRange(fExperiment.getTimeRange());
-            TmfTimeRange window = TmfTimeRange.Eternity;
+            TmfTimeRange window = TmfTimeRange.ETERNITY;
 
             fIndexRequest = new TmfEventRequest<TmfEvent>(TmfEvent.class, window, TmfDataRequest.ALL_DATA, DEFAULT_BLOCK_SIZE, ITmfDataRequest.ExecutionType.BACKGROUND) {
 
@@ -959,7 +959,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
      */
     protected void moveToPage(boolean notifyAll) {
 
-        TmfTimeRange window = TmfTimeRange.Eternity;
+        TmfTimeRange window = TmfTimeRange.ETERNITY;
 
         fLock.lock();
         try {

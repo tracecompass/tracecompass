@@ -457,18 +457,18 @@ public class BasicFrame extends GraphNode {
         ITmfTimestamp delta = m2.getTime().getDelta(m1.getTime());
         if (computeMinMax) {
             minTime = delta.clone();
-            if (minTime.compareTo(TmfTimestamp.Zero, false) < 0) {
+            if (minTime.compareTo(TmfTimestamp.ZERO, false) < 0) {
                 minTime = new TmfTimestamp(0, m1.getTime().getScale(), m1.getTime().getPrecision());
             }
             maxTime = minTime.clone();
             computeMinMax = false;
         }
 
-        if ((delta.compareTo(minTime, true) < 0) && (delta.compareTo(TmfTimestamp.Zero, false) > 0)) {
+        if ((delta.compareTo(minTime, true) < 0) && (delta.compareTo(TmfTimestamp.ZERO, false) > 0)) {
             minTime = delta.clone();
         }
 
-        if ((delta.compareTo(maxTime, true) > 0) && (delta.compareTo(TmfTimestamp.Zero, false) > 0)) {
+        if ((delta.compareTo(maxTime, true) > 0) && (delta.compareTo(TmfTimestamp.ZERO, false) > 0)) {
             maxTime = delta.clone();
         }
     }

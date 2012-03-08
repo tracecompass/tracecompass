@@ -365,7 +365,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     }
     
     public CustomXmlEvent extractEvent(Element element, InputElement inputElement) {
-        CustomXmlEvent event = new CustomXmlEvent(fDefinition, this, TmfTimestamp.Zero, "", fEventType,""); //$NON-NLS-1$ //$NON-NLS-2$
+        CustomXmlEvent event = new CustomXmlEvent(fDefinition, this, TmfTimestamp.ZERO, "", fEventType,""); //$NON-NLS-1$ //$NON-NLS-2$
         event.setContent(new CustomEventContent(event, new String()));
         parseElement(element, event, inputElement);
         return event;

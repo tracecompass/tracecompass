@@ -1060,7 +1060,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             if (nbRequested <= 0) {
                 return;
             }
-            request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity, (int) fFilterCheckCount,
+            request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.ETERNITY, (int) fFilterCheckCount,
                     nbRequested, fTrace.getCacheSize(), ExecutionType.BACKGROUND) {
                 @Override
                 public void handleData(TmfEvent event) {

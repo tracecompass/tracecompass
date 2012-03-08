@@ -38,7 +38,7 @@ public class TmfSyncSequenceDiagramEventTest extends TestCase {
     private final TmfEventField fContent1;
 
     public TmfSyncSequenceDiagramEventTest () {
-        fContent1 = new TmfEventField(ITmfEventField.ROOT_ID, "Some content");
+        fContent1 = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, "Some content");
         fEvent1 = new TmfEvent(null, fTimestamp1, fSource, fType, fContent1, fReference);
     }
 

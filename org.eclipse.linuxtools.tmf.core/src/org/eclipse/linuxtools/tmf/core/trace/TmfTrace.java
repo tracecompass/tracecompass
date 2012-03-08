@@ -82,8 +82,8 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     protected long fNbEvents = 0;
 
     // The time span of the event stream
-    private ITmfTimestamp fStartTime = TmfTimestamp.BigCrunch;
-    private ITmfTimestamp fEndTime = TmfTimestamp.BigBang;
+    private ITmfTimestamp fStartTime = TmfTimestamp.BIG_CRUNCH;
+    private ITmfTimestamp fEndTime = TmfTimestamp.BIG_BANG;
 
     // The trace resource
     private IResource fResource;
@@ -290,7 +290,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     @Override
     public ITmfContext armRequest(ITmfDataRequest<T> request) {
         if (request instanceof ITmfEventRequest<?>
-                && !TmfTimestamp.BigBang.equals(((ITmfEventRequest<T>) request).getRange().getStartTime()) && request.getIndex() == 0) {
+                && !TmfTimestamp.BIG_BANG.equals(((ITmfEventRequest<T>) request).getRange().getStartTime()) && request.getIndex() == 0) {
             ITmfContext context = seekEvent(((ITmfEventRequest<T>) request).getRange().getStartTime());
             ((ITmfEventRequest<T>) request).setStartIndex((int) context.getRank());
             return context;
@@ -327,7 +327,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
         ITmfTimestamp timestamp = ts;
         if (timestamp == null) {
-            timestamp = TmfTimestamp.BigBang;
+            timestamp = TmfTimestamp.BIG_BANG;
         }
 
         // First, find the right checkpoint
@@ -495,7 +495,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         job.schedule();
 
         fCheckpoints.clear();
-        ITmfEventRequest<ITmfEvent> request = new TmfEventRequest<ITmfEvent>(ITmfEvent.class, TmfTimeRange.Eternity, TmfDataRequest.ALL_DATA,
+        ITmfEventRequest<ITmfEvent> request = new TmfEventRequest<ITmfEvent>(ITmfEvent.class, TmfTimeRange.ETERNITY, TmfDataRequest.ALL_DATA,
                 fIndexPageSize, ITmfDataRequest.ExecutionType.BACKGROUND) {
 
             ITmfTimestamp startTime = null;

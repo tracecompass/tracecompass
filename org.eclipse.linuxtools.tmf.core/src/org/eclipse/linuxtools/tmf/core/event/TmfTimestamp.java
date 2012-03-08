@@ -28,19 +28,19 @@ public class TmfTimestamp implements ITmfTimestamp {
     /**
      * The beginning of time
      */
-    public static final ITmfTimestamp BigBang = 
+    public static final ITmfTimestamp BIG_BANG = 
             new TmfTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE, 0);
 
     /**
      * The end of time
      */
-    public static final ITmfTimestamp BigCrunch = 
+    public static final ITmfTimestamp BIG_CRUNCH = 
             new TmfTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE, 0);
     
     /**
      * Zero
      */
-    public static final ITmfTimestamp Zero = 
+    public static final ITmfTimestamp ZERO = 
             new TmfTimestamp(0, 0, 0);
 
     // ------------------------------------------------------------------------
@@ -217,9 +217,9 @@ public class TmfTimestamp implements ITmfTimestamp {
         // Check the corner cases (we can't use equals() because it uses compareTo()...)
         if (this == ts || (fValue == ts.getValue() && fScale == ts.getScale()))
             return 0;
-        if ((fValue == BigBang.getValue() && fScale == BigBang.getScale()) || (ts.getValue() == BigCrunch.getValue() && ts.getScale() == BigCrunch.getScale()))
+        if ((fValue == BIG_BANG.getValue() && fScale == BIG_BANG.getScale()) || (ts.getValue() == BIG_CRUNCH.getValue() && ts.getScale() == BIG_CRUNCH.getScale()))
             return -1;
-        if ((fValue == BigCrunch.getValue() && fScale == BigCrunch.getScale()) || (ts.getValue() == BigBang.getValue() && ts.getScale() == BigBang.getScale()))
+        if ((fValue == BIG_CRUNCH.getValue() && fScale == BIG_CRUNCH.getScale()) || (ts.getValue() == BIG_BANG.getValue() && ts.getScale() == BIG_BANG.getScale()))
             return 1;
         
         try {

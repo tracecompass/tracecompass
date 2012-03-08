@@ -71,7 +71,7 @@ public class TmfUml2SDTestTrace implements ITmfEventParser<TmfEvent> {
             fields[1] = new TmfEventField("receiver", receiver);
             fields[2] = new TmfEventField("signal", signal);
             
-            ITmfEventField tmfContent = new TmfEventField(ITmfEventField.ROOT_ID, content, fields);
+            ITmfEventField tmfContent = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, content, fields);
             TmfEvent tmfEvent = new TmfEvent(eventStream, new TmfTimestamp(ts, -9), source, tmfEventType, tmfContent, reference);
 
             return tmfEvent;

@@ -106,24 +106,24 @@ public class TmfTimestampTest extends TestCase {
     }
 
     public void testCopyConstructorBigBang() throws Exception {
-        ITmfTimestamp ts = new TmfTimestamp(TmfTimestamp.BigBang);
-        assertEquals("getValue", TmfTimestamp.BigBang.getValue(), ts.getValue());
-        assertEquals("getscale", TmfTimestamp.BigBang.getScale(), ts.getScale());
-        assertEquals("getPrecision", TmfTimestamp.BigBang.getPrecision(), ts.getPrecision());
+        ITmfTimestamp ts = new TmfTimestamp(TmfTimestamp.BIG_BANG);
+        assertEquals("getValue", TmfTimestamp.BIG_BANG.getValue(), ts.getValue());
+        assertEquals("getscale", TmfTimestamp.BIG_BANG.getScale(), ts.getScale());
+        assertEquals("getPrecision", TmfTimestamp.BIG_BANG.getPrecision(), ts.getPrecision());
     }
 
     public void testCopyConstructorBigCrunch() throws Exception {
-        ITmfTimestamp ts = new TmfTimestamp(TmfTimestamp.BigCrunch);
-        assertEquals("getValue", TmfTimestamp.BigCrunch.getValue(), ts.getValue());
-        assertEquals("getscale", TmfTimestamp.BigCrunch.getScale(), ts.getScale());
-        assertEquals("getPrecision", TmfTimestamp.BigCrunch.getPrecision(), ts.getPrecision());
+        ITmfTimestamp ts = new TmfTimestamp(TmfTimestamp.BIG_CRUNCH);
+        assertEquals("getValue", TmfTimestamp.BIG_CRUNCH.getValue(), ts.getValue());
+        assertEquals("getscale", TmfTimestamp.BIG_CRUNCH.getScale(), ts.getScale());
+        assertEquals("getPrecision", TmfTimestamp.BIG_CRUNCH.getPrecision(), ts.getPrecision());
     }
 
     public void testCopyConstructorZero() throws Exception {
-        ITmfTimestamp ts = new TmfTimestamp(TmfTimestamp.Zero);
-        assertEquals("getValue", TmfTimestamp.Zero.getValue(), ts.getValue());
-        assertEquals("getscale", TmfTimestamp.Zero.getScale(), ts.getScale());
-        assertEquals("getPrecision", TmfTimestamp.Zero.getPrecision(), ts.getPrecision());
+        ITmfTimestamp ts = new TmfTimestamp(TmfTimestamp.ZERO);
+        assertEquals("getValue", TmfTimestamp.ZERO.getValue(), ts.getValue());
+        assertEquals("getscale", TmfTimestamp.ZERO.getScale(), ts.getScale());
+        assertEquals("getPrecision", TmfTimestamp.ZERO.getPrecision(), ts.getPrecision());
     }
 
     // ------------------------------------------------------------------------

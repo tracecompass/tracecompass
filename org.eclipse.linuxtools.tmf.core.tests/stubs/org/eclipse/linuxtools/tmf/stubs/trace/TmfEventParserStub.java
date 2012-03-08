@@ -106,7 +106,7 @@ public class TmfEventParserStub implements ITmfEventParser<TmfEvent> {
        	    }
        	    content.append("]");
 
-            TmfEventField root = new TmfEventField(ITmfEventField.ROOT_ID, content.toString());
+            TmfEventField root = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, content.toString());
        	    ITmfEvent event = new TmfEvent(eventStream,
        	            new TmfTimestamp(ts, -3, 0),     // millisecs
        	            source, fTypes[typeIndex], root, reference.toString());

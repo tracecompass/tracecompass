@@ -74,10 +74,10 @@ public class CustomEvent extends TmfEvent {
                 date = dateFormat.parse(timeStampString);
                 setTimestamp(new TmfTimestamp(date.getTime(), TIMESTAMP_SCALE));
             } catch (ParseException e) {
-                setTimestamp(TmfTimestamp.Zero);
+                setTimestamp(TmfTimestamp.ZERO);
             }
         } else {
-            setTimestamp(TmfTimestamp.Zero);
+            setTimestamp(TmfTimestamp.ZERO);
         }
         
         int i = 0;
