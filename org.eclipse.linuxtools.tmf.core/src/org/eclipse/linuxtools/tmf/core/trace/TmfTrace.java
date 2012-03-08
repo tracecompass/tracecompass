@@ -85,7 +85,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     private ITmfTimestamp fStartTime = TmfTimestamp.BIG_CRUNCH;
     private ITmfTimestamp fEndTime = TmfTimestamp.BIG_BANG;
 
-    // The trace resource
+    // The properties resource
     private IResource fResource;
 
     // ------------------------------------------------------------------------
@@ -551,18 +551,20 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         broadcast(new TmfTraceUpdatedSignal(this, this, new TmfTimeRange(fStartTime, fEndTime)));
     }
 
-    /**
-     * Set the resource to be used for bookmarks on this trace
-     * @param resource the bookmarks resource
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#setResource(org.eclipse.core.resources.IResource)
      */
+    @Override
     public void setResource(IResource resource) {
         fResource = resource;
     }
 
-    /**
-     * Get the resource used for bookmarks on this trace
-     * @return the bookmarks resource or null if none is set
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getResource()
      */
+    @Override
     public IResource getResource() {
         return fResource;
     }

@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.tmf.ui.views.timechart;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -23,18 +24,18 @@ import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
 
 public class TimeChartDecorationProvider {
 
-	private IResource fResource;
+	private IFile fBookmarksFile;
     private Set<Long> fBookmarksSet = new HashSet<Long>();
     private ITmfFilter fFilterFilter;
     private ITmfFilter fSearchFilter;
 
-	public TimeChartDecorationProvider(IResource resource) {
-	    fResource = resource;
+	public TimeChartDecorationProvider(IFile bookmarksFile) {
+	    fBookmarksFile = bookmarksFile;
 	    refreshBookmarks();
     }
 
-	public IResource getResource() {
-		return fResource;
+	public IFile getBookmarksFile() {
+		return fBookmarksFile;
 	}
 	
 	public boolean isBookmark(long rank) {
@@ -44,7 +45,7 @@ public class TimeChartDecorationProvider {
 	public void refreshBookmarks() {
 		try {
 			fBookmarksSet.clear();
-	        for (IMarker bookmark : fResource.findMarkers(IMarker.BOOKMARK, false, IResource.DEPTH_ZERO)) {
+	        for (IMarker bookmark : fBookmarksFile.findMarkers(IMarker.BOOKMARK, false, IResource.DEPTH_ZERO)) {
 	        	int location = bookmark.getAttribute(IMarker.LOCATION, -1);
 	        	if (location != -1) {
 	        		Long rank = (long) location;

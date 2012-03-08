@@ -31,7 +31,6 @@ import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.ui.editors.EventsViewEditor;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEditorInput;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
@@ -47,6 +46,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.part.FileEditorInput;
 
 /**
  * <b><u>OpenExperimentHandler</u></b>
@@ -144,9 +144,7 @@ public class OpenExperimentHandler extends AbstractHandler {
                 } catch (FileNotFoundException e) {
                     displayErrorMsg(""); //$NON-NLS-1$
                 }
-                if (trace instanceof TmfTrace) {
-                    ((TmfTrace) trace).setResource(element.getResource());
-                }
+                trace.setResource(element.getResource());
                 cacheSize = Math.min(cacheSize, trace.getCacheSize());
                 String editorId = element.getEditorId();
                 if (editorId == null) {
@@ -164,7 +162,7 @@ public class OpenExperimentHandler extends AbstractHandler {
 
             // Create the experiment
             TmfExperiment experiment = new TmfExperiment(TmfEvent.class, fExperiment.getName(), traces, cacheSize);
-            experiment.setResource(file);
+            experiment.setBookmarksFile(file);
 
             if (useEditor) {
                 IEditorInput editorInput = new TmfEditorInput(file, experiment);
@@ -172,7 +170,7 @@ public class OpenExperimentHandler extends AbstractHandler {
                 IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
     
                 String editorId = TmfEventsEditor.ID;
-                IEditorPart editor = activePage.findEditor(editorInput);
+                IEditorPart editor = activePage.findEditor(new FileEditorInput(file));
                 if (editor != null && editor instanceof IReusableEditor) {
                     activePage.reuseEditor((IReusableEditor) editor, editorInput);
                     activePage.activate(editor);

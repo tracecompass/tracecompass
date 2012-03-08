@@ -12,11 +12,11 @@
 
 package org.eclipse.linuxtools.tmf.ui.editors;
 
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 public interface ITmfTraceEditor {
 
     public ITmfTrace<?> getTrace();
-    public IResource getResource();
+    public IFile getBookmarksFile();
 }

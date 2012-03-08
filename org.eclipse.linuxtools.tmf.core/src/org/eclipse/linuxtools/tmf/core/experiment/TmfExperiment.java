@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.tmf.core.experiment;
 import java.util.Collections;
 import java.util.Vector;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -80,7 +81,10 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     // Flag to initialize only once
     private boolean fInitialized = false;
 
-    // The experiment resource
+    // The experiment bookmarks file
+    private IFile fBookmarksFile;
+
+    // The properties resource
     private IResource fResource;
 
     // ------------------------------------------------------------------------
@@ -1016,17 +1020,33 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     }
 
     /**
-     * Set the resource to be used for bookmarks on this experiment
-     * @param resource the bookmarks resource
+     * Set the file to be used for bookmarks on this experiment
+     * @param file the bookmarks file
      */
+    public void setBookmarksFile(IFile file) {
+        fBookmarksFile = file;
+    }
+
+    /**
+     * Get the file used for bookmarks on this experiment
+     * @return the bookmarks file or null if none is set
+     */
+    public IFile getBookmarksFile() {
+        return fBookmarksFile;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#setResource(org.eclipse.core.resources.IResource)
+     */
+    @Override
     public void setResource(IResource resource) {
         fResource = resource;
     }
 
-    /**
-     * Get the resource used for bookmarks on this experiment
-     * @return the bookmarks resource or null if none is set
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getResource()
      */
+    @Override
     public IResource getResource() {
         return fResource;
     }

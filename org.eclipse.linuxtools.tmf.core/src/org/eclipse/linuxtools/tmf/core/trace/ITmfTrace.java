@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.tmf.core.trace;
 import java.io.FileNotFoundException;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.tmf.core.component.ITmfComponent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
@@ -137,4 +138,15 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
      */
     public ITmfEvent parseEvent(ITmfContext context);
 
+    /**
+     * Set the resource used for persistent properties on this trace
+     * @param resource the properties resource
+     */
+    public void setResource(IResource resource);
+
+    /**
+     * Get the resource used for persistent properties on this trace
+     * @return the properties resource or null if none is set
+     */
+    public IResource getResource();
 }

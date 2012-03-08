@@ -47,6 +47,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.part.FileEditorInput;
 
 /**
  * <b><u>OpenTraceHandler</u></b>
@@ -132,9 +133,7 @@ public class OpenTraceHandler extends AbstractHandler {
             displayErrorMsg(Messages.OpenTraceHandler_NoTraceType);
             return null;
         }
-        if (trace instanceof TmfTrace) {
-            ((TmfTrace) trace).setResource(fTrace.getResource());
-        }
+        trace.setResource(fTrace.getResource());
 
         // Get the editor_id from the extension point
         String editorId = fTrace.getEditorId();
@@ -181,11 +180,11 @@ public class OpenTraceHandler extends AbstractHandler {
                 ((TmfTrace) trace).setResource(file);
             }
             try {
-                IEditorInput editorInput = new TmfEditorInput(resource, trace);
+                IEditorInput editorInput = new TmfEditorInput(file, trace);
                 IWorkbench wb = PlatformUI.getWorkbench();
                 IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
 
-                IEditorPart editor = activePage.findEditor(editorInput);
+                IEditorPart editor = activePage.findEditor(new FileEditorInput(file));
                 if (editor != null && editor instanceof IReusableEditor) {
                     activePage.reuseEditor((IReusableEditor) editor, editorInput);
                     activePage.activate(editor);
@@ -202,7 +201,7 @@ public class OpenTraceHandler extends AbstractHandler {
             // Create the experiment
             ITmfTrace[] traces = new ITmfTrace[] { trace };
             TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), fTrace.getName(), traces, trace.getCacheSize());
-            experiment.setResource(file);
+            experiment.setBookmarksFile(file);
     
             TmfExperiment.setCurrentExperiment(experiment);
             TmfSignalManager.dispatchSignal(new TmfExperimentSelectedSignal(this, experiment));
