@@ -580,7 +580,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
         }
 
         // Format result
-        return traceTypes.toArray(new String[0]);
+        return traceTypes.toArray(new String[traceTypes.size()]);
     }
 
     private String getCategory(IConfigurationElement ce) {

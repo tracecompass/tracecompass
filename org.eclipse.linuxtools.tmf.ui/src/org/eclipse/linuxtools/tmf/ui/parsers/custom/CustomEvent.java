@@ -72,12 +72,12 @@ public class CustomEvent extends TmfEvent {
             SimpleDateFormat dateFormat = new SimpleDateFormat(timeStampInputFormat);
             try {
                 date = dateFormat.parse(timeStampString);
-                fTimestamp = new TmfTimestamp(date.getTime(), TIMESTAMP_SCALE);
+                setTimestamp(new TmfTimestamp(date.getTime(), TIMESTAMP_SCALE));
             } catch (ParseException e) {
-                fTimestamp = TmfTimestamp.Zero;
+                setTimestamp(TmfTimestamp.Zero);
             }
         } else {
-            fTimestamp = TmfTimestamp.Zero;
+            setTimestamp(TmfTimestamp.Zero);
         }
         
         int i = 0;
@@ -92,6 +92,42 @@ public class CustomEvent extends TmfEvent {
             }
         }
         fData = null;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((fDefinition == null) ? 0 : fDefinition.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof CustomEvent)) {
+            return false;
+        }
+        CustomEvent other = (CustomEvent) obj;
+        if (fDefinition == null) {
+            if (other.fDefinition != null) {
+                return false;
+            }
+        } else if (!fDefinition.equals(other.fDefinition)) {
+            return false;
+        }
+        return true;
     }
 
 }

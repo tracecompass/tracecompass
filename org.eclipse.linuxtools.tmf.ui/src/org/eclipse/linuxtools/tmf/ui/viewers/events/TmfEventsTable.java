@@ -653,7 +653,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         ITmfEventField[] fields = extractItemFields(event);
         String[] content = new String[fields.length];
         for (int i = 0; i < fields.length; i++) {
-            content[i] = (String) fields[i].getValue();
+            content[i] = fields[i].getValue() != null ? fields[i].getValue().toString() : ""; //$NON-NLS-1$
         }
         item.setText(content);
         item.setData(Key.TIMESTAMP, new TmfTimestamp(event.getTimestamp()));

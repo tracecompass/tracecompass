@@ -4,7 +4,7 @@
    <description url="http://download.eclipse.org/technology/linuxtools/updates-nightly">
       Nightly builds of Linux Tools project.
    </description>
-   <feature url="features/org.eclipse.linuxtools.lttng_0.4.0.qualifier.jar" id="org.eclipse.linuxtools.lttng" version="0.4.0.qualifier" os="linux" ws="*" arch="*">
+   <feature url="features/org.eclipse.linuxtools.lttng_0.5.0.qualifier.jar" id="org.eclipse.linuxtools.lttng" version="0.5.0.qualifier" os="linux" ws="*" arch="*">
       <category name="LTTng"/>
    </feature>
    <category-def name="LTTng" label="Linux Tools LTTng">

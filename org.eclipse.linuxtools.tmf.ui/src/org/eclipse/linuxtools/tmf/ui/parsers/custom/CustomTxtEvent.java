@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.ui.parsers.custom;
 
 import java.util.regex.Matcher;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
@@ -25,7 +26,7 @@ public class CustomTxtEvent extends CustomEvent {
 
     public CustomTxtEvent(CustomTxtTraceDefinition definition) {
         super(definition);
-        fType = new CustomTxtEventType(definition);
+        setType(new CustomTxtEventType(definition));
     }
 
     public CustomTxtEvent(CustomTxtTraceDefinition definition, TmfEvent other) {
@@ -34,6 +35,11 @@ public class CustomTxtEvent extends CustomEvent {
 
     public CustomTxtEvent(CustomTxtTraceDefinition definition, ITmfTrace<?> parentTrace, ITmfTimestamp timestamp, String source, TmfEventType type, String reference) {
         super(definition, parentTrace, timestamp, source, type, reference);
+    }
+
+    @Override
+    public void setContent(ITmfEventField content) {
+        super.setContent(content);
     }
 
     public void processGroups(InputLine input, Matcher matcher) {

@@ -145,13 +145,23 @@ public class TmfTimestampTest extends TestCase {
 
     public void testClone() throws Exception {
         ITmfTimestamp clone = ts0.clone();
+
+        assertTrue("clone", ts0.clone().equals(ts0));
+        assertTrue("clone", clone.clone().equals(clone));
+
         assertEquals("clone", clone, ts0);
+        assertEquals("clone", ts0, clone);
     }
 
     public void testClone2() throws Exception {
         MyTimestamp timestamp = new MyTimestamp();
         MyTimestamp clone = timestamp.clone();
+
+        assertTrue("clone", timestamp.clone().equals(timestamp));
+        assertTrue("clone", clone.clone().equals(clone));
+
         assertEquals("clone", clone, timestamp);
+        assertEquals("clone", timestamp, clone);
     }
 
     // ------------------------------------------------------------------------

@@ -135,7 +135,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     private void createWidget(Composite parent) {
 
-        final Color labelColor = parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND);
+        final Color labelColor = parent.getBackground();
         final Font fFont = adjustFont(parent);
 
         final int initalWidth = 10;

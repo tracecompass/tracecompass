@@ -97,10 +97,10 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
 
     private CountDownLatch startedLatch = new CountDownLatch(1);
     private CountDownLatch completedLatch = new CountDownLatch(1);
-    private boolean fRequestRunning = false;
-    private boolean fRequestCompleted = false;
-    private boolean fRequestFailed = false;
-    private boolean fRequestCanceled = false;
+    private boolean fRequestRunning;
+    private boolean fRequestCompleted;
+    private boolean fRequestFailed;
+    private boolean fRequestCanceled;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -179,6 +179,12 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
         fBlockSize = blockSize;
         fExecType = execType;
         fNbRead = 0;
+
+        fRequestRunning = false;
+        fRequestCompleted = false;
+        fRequestFailed = false;
+        fRequestCanceled = false;
+
         if (Tracer.isRequestTraced())
             Tracer.traceRequest(this, "created"); //$NON-NLS-1$
     }
@@ -341,7 +347,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
      * to handle these conditions.
      */
     @Override
-    public void handleCompleted() {
+    public synchronized void handleCompleted() {
         if (fRequestFailed) {
             handleFailure();
         } else if (fRequestCanceled) {

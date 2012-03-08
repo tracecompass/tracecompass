@@ -84,13 +84,11 @@ public class TmfTreeContentProviderTest extends TestCase {
 
         fTestName = name;
 
-        fEvent1 = new TmfEvent(fTimestamp1, fSource, fType1, fReference);
         fContent1 = new TmfEventField(ITmfEventField.ROOT_ID, "Some content");
-        fEvent1.setContent(fContent1);
+        fEvent1 = new TmfEvent(null, fTimestamp1, fSource, fType1, fContent1, fReference);
 
-        fEvent2 = new TmfEvent(fTimestamp2, fSource, fType2, fReference);
         fContent2 = new TmfEventField(ITmfEventField.ROOT_ID, "Some other content");
-        fEvent2.setContent(fContent2);
+        fEvent2 = new TmfEvent(null, fTimestamp2, fSource, fType2, fContent2, fReference);
 
         fStatsData = new TmfBaseStatisticsTree();
         fExtraInfo = new ITmfExtraEventInfo() {

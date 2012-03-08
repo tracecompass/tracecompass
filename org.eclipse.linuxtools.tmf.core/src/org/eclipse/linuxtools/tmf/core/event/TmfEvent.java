@@ -30,40 +30,13 @@ public class TmfEvent implements ITmfEvent {
     // Attributes
     // ------------------------------------------------------------------------
 
-    /**
-     * The trace containing the event
-     */
-    protected ITmfTrace<? extends ITmfEvent> fTrace;
-
-    /**
-     * The event rank within the trace
-     */
-    protected long fRank;
-    
-    /**
-     * The event timestamp
-     */
-    protected ITmfTimestamp fTimestamp;
-    
-    /**
-     * The event source
-     */
-    protected String fSource;
-    
-    /**
-     * The event type
-     */
-    protected ITmfEventType fType;
-    
-    /**
-     * The event content (root field)
-     */
-    protected ITmfEventField fContent;
-    
-    /**
-     * The event reference
-     */
-    protected String fReference;
+    private ITmfTrace<? extends ITmfEvent> fTrace;
+    private long fRank;
+    private ITmfTimestamp fTimestamp;
+    private String fSource;
+    private ITmfEventType fType;
+    private ITmfEventField fContent;
+    private String fReference;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -73,36 +46,7 @@ public class TmfEvent implements ITmfEvent {
      * Default constructor
      */
     public TmfEvent() {
-        fTrace = null;
-        fRank = -1;
-        fTimestamp = null;
-        fSource = null;
-        fType = null;
-        fContent = null;
-        fReference = null;
-    }
-
-    /**
-     * Full constructor
-     * 
-     * @param trace the parent trace
-     * @param rank the event rank (in the trace)
-     * @param timestamp the event timestamp
-     * @param source the event source
-     * @param type the event type
-     * @param type the event content (payload)
-     * @param reference the event reference
-     */
-    public TmfEvent(ITmfTrace<? extends ITmfEvent> trace, long rank, ITmfTimestamp timestamp, String source,
-                    ITmfEventType type, ITmfEventField content, String reference)
-    {
-        fTrace = trace;
-        fRank = rank;
-        fTimestamp = timestamp;
-        fSource = source;
-        fType = type;
-        fContent = content;
-        fReference = reference;
+        this(null, -1, null, null, null, null, null);
     }
 
     /**
@@ -129,6 +73,29 @@ public class TmfEvent implements ITmfEvent {
     public TmfEvent(ITmfTimestamp timestamp, String source, ITmfEventType type, String reference)
     {
         this(null, -1, timestamp, source, type, null, reference);
+    }
+
+    /**
+     * Full constructor
+     * 
+     * @param trace the parent trace
+     * @param rank the event rank (in the trace)
+     * @param timestamp the event timestamp
+     * @param source the event source
+     * @param type the event type
+     * @param type the event content (payload)
+     * @param reference the event reference
+     */
+    public TmfEvent(ITmfTrace<? extends ITmfEvent> trace, long rank, ITmfTimestamp timestamp, String source,
+                    ITmfEventType type, ITmfEventField content, String reference)
+    {
+        fTrace = trace;
+        fRank = rank;
+        fTimestamp = timestamp;
+        fSource = source;
+        fType = type;
+        fContent = content;
+        fReference = reference;
     }
 
     /**
@@ -213,37 +180,51 @@ public class TmfEvent implements ITmfEvent {
     // ------------------------------------------------------------------------
 
     /**
+     * @param trace the new event tarce
+     */
+    protected void setTrace(ITmfTrace<? extends ITmfEvent> trace) {
+        fTrace = trace;
+    }
+
+    /**
      * @param source the new event source
      */
-    public void setSource(String source) {
-        fSource = source;
+    protected void setRank(long rank) {
+        fRank = rank;
     }
 
     /**
      * @param timestamp the new event timestamp
      */
-    public void setTimestamp(ITmfTimestamp timestamp) {
+    protected void setTimestamp(ITmfTimestamp timestamp) {
         fTimestamp = timestamp;
+    }
+
+    /**
+     * @param source the new event source
+     */
+    protected void setSource(String source) {
+        fSource = source;
     }
 
     /**
      * @param type the new event type
      */
-    public void setType(ITmfEventType type) {
+    protected void setType(ITmfEventType type) {
         fType = type;
     }
 
     /**
      * @param content the event new content
      */
-    public void setContent(ITmfEventField content) {
+    protected void setContent(ITmfEventField content) {
         fContent = content;
     }
 
     /**
      * @param reference the new event reference
      */
-    public void setReference(String reference) {
+    protected void setReference(String reference) {
         fReference = reference;
     }
 

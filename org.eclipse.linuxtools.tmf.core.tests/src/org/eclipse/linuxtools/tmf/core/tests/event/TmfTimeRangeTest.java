@@ -133,6 +133,9 @@ public class TmfTimeRangeTest extends TestCase {
         TmfTimeRange range = new TmfTimeRange(ts1, ts2);
         TmfTimeRange clone = range.clone();
 
+        assertTrue("clone", range.clone().equals(range));
+        assertTrue("clone", clone.clone().equals(clone));
+
         assertEquals("clone", range, clone);
         assertEquals("clone", ts1, clone.getStartTime());
         assertEquals("clone", ts2, clone.getEndTime());

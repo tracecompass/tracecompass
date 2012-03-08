@@ -24,7 +24,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 public interface ITmfComponent {
 
 	/**
-	 * Get the component ID
+	 * @return the component ID (display name) 
 	 */
 	public String getName();
 
@@ -34,9 +34,9 @@ public interface ITmfComponent {
 	public void dispose();
 
 	/**
-	 * Broadcast a signal to all the interested listeners.
+	 * Propagate a signal to all the interested listeners.
 	 * 
-	 * @param signal
+	 * @param signal the signal to broadcast
 	 */
 	public void broadcast(TmfSignal signal);
 

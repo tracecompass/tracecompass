@@ -392,13 +392,15 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                         if (event == null) {
                         	break;
                         }
-                        String[] lines = event.getContent().toString().split("\r?\n"); //$NON-NLS-1$
-                        for (int i = 0; i < lines.length; i++) {
-                            String line = lines[i];
-                            LineData lineData = new LineData(rank, location, line); 
-                            fLines.add(index++, lineData);
-                            fTopLineIndex++;
-                            fLastTopLineIndex++;
+                        if (event.getContent() != null && event.getContent().getValue() != null) {
+                            String[] lines = event.getContent().getValue().toString().split("\r?\n"); //$NON-NLS-1$
+                            for (int i = 0; i < lines.length; i++) {
+                                String line = lines[i];
+                                LineData lineData = new LineData(rank, location, line); 
+                                fLines.add(index++, lineData);
+                                fTopLineIndex++;
+                                fLastTopLineIndex++;
+                            }
                         }
                         rank++;
                     }
@@ -438,13 +440,15 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
             if (event == null) {
                 break;
             }
-            for (String line : event.getContent().toString().split("\r?\n")) { //$NON-NLS-1$
-                int crPos;
-                if ((crPos = line.indexOf('\r')) != -1) {
-                	line = line.substring(0, crPos);
+            if (event.getContent() != null && event.getContent().getValue() != null) {
+                for (String line : event.getContent().getValue().toString().split("\r?\n")) { //$NON-NLS-1$
+                    int crPos;
+                    if ((crPos = line.indexOf('\r')) != -1) {
+                    	line = line.substring(0, crPos);
+                    }
+                    LineData lineData = new LineData(rank, location, line); 
+                    fLines.add(lineData);
                 }
-                LineData lineData = new LineData(rank, location, line); 
-                fLines.add(lineData);
             }
 	    }
 	    fTopLineIndex = Math.max(0, Math.min(fTopLineIndex, fLines.size() - 1));
