@@ -202,7 +202,7 @@ public class StateTraceManager extends LTTngTreeNode implements IStateTraceManag
 		// The GUI can have time limits higher than this log, since GUI can
 		// handle multiple logs. Ignore special null value of experiment time range.
         if ((eventTime.getValue() < 0) || 
-                (!experimentRange.equals(TmfTimeRange.Null) && (eventTime.getValue() > experimentRange.getEndTime().getValue()))) {
+                (!experimentRange.equals(TmfTimeRange.NULL_RANGE) && (eventTime.getValue() > experimentRange.getEndTime().getValue()))) {
 			return null;
 		}
 

@@ -32,14 +32,22 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  */
 public interface ITmfEvent extends Cloneable {
 
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+
     /**
      * Pre-defined event attributes 
      */
-    public String EVENT_FIELD_TIMESTAMP = ":timestamp:"; //$NON-NLS-1$
-    public String EVENT_FIELD_SOURCE    = ":source:";    //$NON-NLS-1$
-    public String EVENT_FIELD_TYPE      = ":type:";      //$NON-NLS-1$
-    public String EVENT_FIELD_CONTENT   = ":content:";   //$NON-NLS-1$
-    public String EVENT_FIELD_REFERENCE = ":reference:"; //$NON-NLS-1$
+    public static final String EVENT_FIELD_TIMESTAMP = ":timestamp:"; //$NON-NLS-1$
+    public static final String EVENT_FIELD_SOURCE    = ":source:";    //$NON-NLS-1$
+    public static final String EVENT_FIELD_TYPE      = ":type:";      //$NON-NLS-1$
+    public static final String EVENT_FIELD_CONTENT   = ":content:";   //$NON-NLS-1$
+    public static final String EVENT_FIELD_REFERENCE = ":reference:"; //$NON-NLS-1$
+
+    // ------------------------------------------------------------------------
+    // Getters
+    // ------------------------------------------------------------------------
 
     /**
      * @return the trace that 'owns' the event
@@ -75,6 +83,10 @@ public interface ITmfEvent extends Cloneable {
      * @return the event reference
      */
     public String getReference();
+
+    // ------------------------------------------------------------------------
+    // Cloneable
+    // ------------------------------------------------------------------------
 
     /**
      * @return a clone of the data item

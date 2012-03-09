@@ -82,10 +82,10 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     protected long fNbEvents = 0;
 
     // The time span of the event stream
-    private ITmfTimestamp fStartTime = TmfTimestamp.BigCrunch;
-    private ITmfTimestamp fEndTime = TmfTimestamp.BigBang;
+    private ITmfTimestamp fStartTime = TmfTimestamp.BIG_CRUNCH;
+    private ITmfTimestamp fEndTime = TmfTimestamp.BIG_BANG;
 
-    // The trace resource
+    // The properties resource
     private IResource fResource;
 
     // ------------------------------------------------------------------------
@@ -290,7 +290,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     @Override
     public ITmfContext armRequest(ITmfDataRequest<T> request) {
         if (request instanceof ITmfEventRequest<?>
-                && !TmfTimestamp.BigBang.equals(((ITmfEventRequest<T>) request).getRange().getStartTime()) && request.getIndex() == 0) {
+                && !TmfTimestamp.BIG_BANG.equals(((ITmfEventRequest<T>) request).getRange().getStartTime()) && request.getIndex() == 0) {
             ITmfContext context = seekEvent(((ITmfEventRequest<T>) request).getRange().getStartTime());
             ((ITmfEventRequest<T>) request).setStartIndex((int) context.getRank());
             return context;
@@ -327,7 +327,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
         ITmfTimestamp timestamp = ts;
         if (timestamp == null) {
-            timestamp = TmfTimestamp.BigBang;
+            timestamp = TmfTimestamp.BIG_BANG;
         }
 
         // First, find the right checkpoint
@@ -408,7 +408,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * linuxtools.tmf.trace.ITmfTrace.TraceContext)
      */
     @Override
-    public synchronized ITmfEvent getNextEvent(TmfContext context) {
+    public synchronized ITmfEvent getNextEvent(ITmfContext context) {
         // parseEvent() does not update the context
         ITmfEvent event = parseEvent(context);
         if (event != null) {
@@ -495,7 +495,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         job.schedule();
 
         fCheckpoints.clear();
-        ITmfEventRequest<ITmfEvent> request = new TmfEventRequest<ITmfEvent>(ITmfEvent.class, TmfTimeRange.Eternity, TmfDataRequest.ALL_DATA,
+        ITmfEventRequest<ITmfEvent> request = new TmfEventRequest<ITmfEvent>(ITmfEvent.class, TmfTimeRange.ETERNITY, TmfDataRequest.ALL_DATA,
                 fIndexPageSize, ITmfDataRequest.ExecutionType.BACKGROUND) {
 
             ITmfTimestamp startTime = null;
@@ -551,18 +551,20 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         broadcast(new TmfTraceUpdatedSignal(this, this, new TmfTimeRange(fStartTime, fEndTime)));
     }
 
-    /**
-     * Set the resource to be used for bookmarks on this trace
-     * @param resource the bookmarks resource
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#setResource(org.eclipse.core.resources.IResource)
      */
+    @Override
     public void setResource(IResource resource) {
         fResource = resource;
     }
 
-    /**
-     * Get the resource used for bookmarks on this trace
-     * @return the bookmarks resource or null if none is set
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getResource()
      */
+    @Override
     public IResource getResource() {
         return fResource;
     }

@@ -147,7 +147,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     }
 
     @Override
-    public synchronized TmfEvent getNextEvent(TmfContext context) {
+    public synchronized TmfEvent getNextEvent(ITmfContext context) {
         ITmfContext savedContext = context.clone();
         TmfEvent event = parseEvent(context);
         if (event != null) {
@@ -158,7 +158,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     }
 
     @Override
-    public TmfEvent parseEvent(TmfContext tmfContext) {
+    public TmfEvent parseEvent(ITmfContext tmfContext) {
         if (!(tmfContext instanceof CustomTxtTraceContext)) {
             return null;
         }
@@ -309,7 +309,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     }
     
     public CustomTxtEvent parseFirstLine(CustomTxtTraceContext context) {
-        CustomTxtEvent event = new CustomTxtEvent(fDefinition, this, (TmfTimestamp) TmfTimestamp.Zero, "", fEventType, ""); //$NON-NLS-1$ //$NON-NLS-2$
+        CustomTxtEvent event = new CustomTxtEvent(fDefinition, this, (TmfTimestamp) TmfTimestamp.ZERO, "", fEventType, ""); //$NON-NLS-1$ //$NON-NLS-2$
         event.processGroups(context.inputLine, context.firstLineMatcher);
         event.setContent(new CustomEventContent(event, context.firstLine));
         return event;

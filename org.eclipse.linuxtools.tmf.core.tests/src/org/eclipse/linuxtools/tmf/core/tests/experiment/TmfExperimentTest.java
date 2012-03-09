@@ -79,7 +79,7 @@ public class TmfExperimentTest extends TestCase {
     @SuppressWarnings("unchecked")
     private synchronized static void setupExperiment() {
     	if (fExperiment == null) {
-    		fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, (ITmfTrace<TmfEvent>[]) fTraces, TmfTimestamp.Zero, 1000, true);
+    		fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, (ITmfTrace<TmfEvent>[]) fTraces, TmfTimestamp.ZERO, 1000, true);
     	}
     }
 
@@ -106,7 +106,7 @@ public class TmfExperimentTest extends TestCase {
 	public void testBasicTmfExperimentConstructor() {
 
 		assertEquals("GetId", EXPERIMENT, fExperiment.getName());
-        assertEquals("GetEpoch", TmfTimestamp.Zero, fExperiment.getEpoch());
+        assertEquals("GetEpoch", TmfTimestamp.ZERO, fExperiment.getEpoch());
         assertEquals("GetNbEvents", NB_EVENTS, fExperiment.getNbEvents());
 
         long nbTraceEvents = fExperiment.getTraces()[0].getNbEvents();
@@ -563,7 +563,7 @@ public class TmfExperimentTest extends TestCase {
         final int nbEvents  = 1000;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
 
-        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
         final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, nbEvents, blockSize) {
             @Override
             public void handleData(TmfEvent event) {
@@ -591,7 +591,7 @@ public class TmfExperimentTest extends TestCase {
         final int nbEvents = 1000;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
 
-        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
         final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, nbEvents, blockSize) {
         	@Override
         	public void handleData(TmfEvent event) {
@@ -620,7 +620,7 @@ public class TmfExperimentTest extends TestCase {
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
         long nbExpectedEvents = NB_EVENTS;
 
-        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
         final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, nbEvents, blockSize) {
         	@Override
         	public void handleData(TmfEvent event) {
@@ -652,7 +652,7 @@ public class TmfExperimentTest extends TestCase {
         final int blockSize = fDefaultBlockSize;
         final Vector<TmfEvent> requestedEvents = new Vector<TmfEvent>();
 
-        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
         final TmfEventRequest<TmfEvent> request = new TmfEventRequest<TmfEvent>(TmfEvent.class, range, nbEvents, blockSize) {
         	int nbRead = 0;
         	@Override

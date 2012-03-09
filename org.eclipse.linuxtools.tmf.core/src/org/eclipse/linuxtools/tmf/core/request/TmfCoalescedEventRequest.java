@@ -37,11 +37,11 @@ public class TmfCoalescedEventRequest<T extends ITmfEvent> extends TmfCoalescedD
      * @param range
      */
     public TmfCoalescedEventRequest(Class<T> dataType) {
-        this(dataType, TmfTimeRange.Eternity, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
+        this(dataType, TmfTimeRange.ETERNITY, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
     public TmfCoalescedEventRequest(Class<T> dataType, ExecutionType execType) {
-        this(dataType, TmfTimeRange.Eternity, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
+        this(dataType, TmfTimeRange.ETERNITY, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
     }
 
     /**

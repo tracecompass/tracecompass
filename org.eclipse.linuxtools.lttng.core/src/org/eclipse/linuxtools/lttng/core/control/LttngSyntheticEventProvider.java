@@ -91,7 +91,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 		String source = this.toString();
 		LttngEventType dtype = new LttngEventType();
 		LttngTimestamp statusTimeStamp = new LttngTimestamp(
-				TmfTimestamp.Zero);
+				TmfTimestamp.ZERO);
 
 		fStatusEvent = new LttngSyntheticEvent(null, statusTimeStamp, source,
 				dtype, null, null, null);

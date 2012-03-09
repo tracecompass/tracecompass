@@ -17,7 +17,7 @@ public abstract class CustomEventType extends TmfEventType {
         for (int i = 0; i < fields.length; i++) {
             fields[i] = new TmfEventField(definition.outputs.get(i).name, null);
         }
-        ITmfEventField rootField = new TmfEventField(ITmfEventField.ROOT_ID, fields);
+        ITmfEventField rootField = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, fields);
         return rootField;
     }
 

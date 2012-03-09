@@ -29,6 +29,7 @@ import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 
@@ -54,7 +55,7 @@ public class LTTngExperiment<T extends ITmfEvent> extends TmfExperiment<T> {
      * @param indexPageSize
      */
     public LTTngExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, ITmfTimestamp epoch, int indexPageSize) {
-        this(type, id, traces, TmfTimestamp.Zero, indexPageSize, false);
+        this(type, id, traces, TmfTimestamp.ZERO, indexPageSize, false);
     }
 
     public LTTngExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, ITmfTimestamp epoch, int indexPageSize, boolean preIndexExperiment) {
@@ -67,7 +68,7 @@ public class LTTngExperiment<T extends ITmfEvent> extends TmfExperiment<T> {
      * @param traces
      */
     public LTTngExperiment(Class<T> type, String id, ITmfTrace<T>[] traces) {
-        this(type, id, traces, TmfTimestamp.Zero, DEFAULT_INDEX_PAGE_SIZE);
+        this(type, id, traces, TmfTimestamp.ZERO, DEFAULT_INDEX_PAGE_SIZE);
     }
 
     /**
@@ -77,7 +78,7 @@ public class LTTngExperiment<T extends ITmfEvent> extends TmfExperiment<T> {
      * @param indexPageSize
      */
     public LTTngExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, int indexPageSize) {
-        this(type, id, traces, TmfTimestamp.Zero, indexPageSize);
+        this(type, id, traces, TmfTimestamp.ZERO, indexPageSize);
     }
 
     @SuppressWarnings("unchecked")
@@ -108,7 +109,7 @@ public class LTTngExperiment<T extends ITmfEvent> extends TmfExperiment<T> {
     // ------------------------------------------------------------------------
 
     @Override
-    public synchronized ITmfEvent getNextEvent(TmfContext context) {
+    public synchronized ITmfEvent getNextEvent(ITmfContext context) {
 
         // Validate the context
         if (!(context instanceof TmfExperimentContext)) {
@@ -138,7 +139,7 @@ public class LTTngExperiment<T extends ITmfEvent> extends TmfExperiment<T> {
             return null;
         }
         int trace = TmfExperimentContext.NO_TRACE;
-        ITmfTimestamp timestamp = TmfTimestamp.BigCrunch;
+        ITmfTimestamp timestamp = TmfTimestamp.BIG_CRUNCH;
         if (eventArray.length == 1) {
             if (eventArray[0] != null) {
                 timestamp = eventArray[0].getTimestamp();
@@ -189,7 +190,7 @@ public class LTTngExperiment<T extends ITmfEvent> extends TmfExperiment<T> {
     protected void indexExperiment(final boolean waitForCompletion) {
         if (waitForCompletion) {
             TmfExperimentRangeUpdatedSignal signal = new TmfExperimentRangeUpdatedSignal(LTTngExperiment.this, LTTngExperiment.this,
-                    TmfTimeRange.Eternity);
+                    TmfTimeRange.ETERNITY);
             broadcast(signal);
             while (isIndexingBusy()) {
                 try {
@@ -220,7 +221,7 @@ public class LTTngExperiment<T extends ITmfEvent> extends TmfExperiment<T> {
             @Override
             public void run() {
                 while (!fExecutor.isShutdown()) {
-                    final TmfEventRequest<LttngEvent> request = new TmfEventRequest<LttngEvent>(LttngEvent.class, TmfTimeRange.Eternity, 0,
+                    final TmfEventRequest<LttngEvent> request = new TmfEventRequest<LttngEvent>(LttngEvent.class, TmfTimeRange.ETERNITY, 0,
                             ExecutionType.FOREGROUND) {
                         @Override
                         public void handleCompleted() {
@@ -253,7 +254,7 @@ public class LTTngExperiment<T extends ITmfEvent> extends TmfExperiment<T> {
                     try {
                         sendRequest((ITmfDataRequest<T>) request);
                         request.waitForCompletion();
-                        if (timeRange != null && !timeRange.equals(TmfTimeRange.Null)) {
+                        if (timeRange != null && !timeRange.equals(TmfTimeRange.NULL_RANGE)) {
                             TmfExperimentRangeUpdatedSignal signal = new TmfExperimentRangeUpdatedSignal(LTTngExperiment.this, LTTngExperiment.this,
                                     timeRange);
                             broadcast(signal);

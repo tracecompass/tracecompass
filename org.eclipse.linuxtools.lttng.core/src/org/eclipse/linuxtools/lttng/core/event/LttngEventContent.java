@@ -36,7 +36,7 @@ public class LttngEventContent extends TmfEventField {
      * 
      */
     public LttngEventContent() {
-        super(ITmfEventField.ROOT_ID, null);
+        super(ITmfEventField.ROOT_FIELD_ID, null);
     }
     
     /**
@@ -47,7 +47,7 @@ public class LttngEventContent extends TmfEventField {
      * @see org.eclipse.linuxtools.lttng.core.event.LttngEvent
      */
     public LttngEventContent(LttngEvent thisParent) {
-        super(ITmfEventField.ROOT_ID, null);
+        super(ITmfEventField.ROOT_FIELD_ID, null);
         fParentEvent = thisParent;
     }
     
@@ -60,7 +60,7 @@ public class LttngEventContent extends TmfEventField {
      * @see org.eclipse.linuxtools.lttng.core.event.LttngEvent
      */
     public LttngEventContent(LttngEvent thisParent, HashMap<String, LttngEventField> thisContent) {
-        super(ITmfEventField.ROOT_ID, null);
+        super(ITmfEventField.ROOT_FIELD_ID, null);
         fParentEvent = thisParent;
         fFieldsMap = thisContent;
     }

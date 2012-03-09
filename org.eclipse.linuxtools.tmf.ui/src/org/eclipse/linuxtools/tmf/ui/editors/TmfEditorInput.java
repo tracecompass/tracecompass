@@ -13,24 +13,21 @@
 package org.eclipse.linuxtools.tmf.ui.editors;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.ide.IDE;
 
 public class TmfEditorInput implements IEditorInput {
 
-    private IResource fResource;
+    private IFile fFile;
     private ITmfTrace<?> fTrace;
 
-    public TmfEditorInput(IResource resource, ITmfTrace<?> trace) {
-        fResource = resource;
+    public TmfEditorInput(IFile file, ITmfTrace<?> trace) {
+        fFile = file;
         fTrace = trace;
     }
     
@@ -41,18 +38,14 @@ public class TmfEditorInput implements IEditorInput {
 
     @Override
 	public boolean exists() {
-        return fResource.exists();
+        return fFile.exists();
     }
 
     @Override
 	public ImageDescriptor getImageDescriptor() {
-        if (fResource instanceof IFile) {
-            IFile file = (IFile) fResource;
-            IContentType contentType = IDE.getContentType(file);
-            return PlatformUI.getWorkbench().getEditorRegistry()
-                    .getImageDescriptor(file.getName(), contentType);
-        }
-        return null;
+        IContentType contentType = IDE.getContentType(fFile);
+        return PlatformUI.getWorkbench().getEditorRegistry()
+                .getImageDescriptor(fFile.getName(), contentType);
     }
 
     @Override
@@ -67,13 +60,13 @@ public class TmfEditorInput implements IEditorInput {
 
     @Override
 	public String getToolTipText() {
-        return fResource.getFullPath().makeRelative().toString();
+        return fFile.getFullPath().makeRelative().toString();
     }
 
-    public IResource getResource() {
-        return fResource;
+    public IFile getFile() {
+        return fFile;
     }
-    
+
     public ITmfTrace<?> getTrace() {
         return fTrace;
     }
@@ -85,8 +78,8 @@ public class TmfEditorInput implements IEditorInput {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((fResource == null) ? 0 : fResource.hashCode());
-        result = prime * result + ((fTrace == null) ? 0 : fTrace.hashCode());
+        result = prime * result + ((fFile == null) ? 0 : fFile.getLocation().hashCode());
+        result = prime * result + ((fTrace == null) ? 0 : fTrace.getName().hashCode());
         return result;
     }
 
@@ -95,20 +88,24 @@ public class TmfEditorInput implements IEditorInput {
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
+        if (this == obj)
             return true;
-        }
-        if (obj == null) {
+        if (obj == null)
             return false;
-        }
-        if (obj instanceof TmfEditorInput) {
-            return fResource.equals(((TmfEditorInput) obj).fResource);
-        } else if (obj instanceof IFileEditorInput) {
-            return ((IFileEditorInput) obj).getFile().equals(fResource);
-        } else if (obj instanceof FileStoreEditorInput) {
-            return ((FileStoreEditorInput) obj).getURI().equals(fResource.getRawLocationURI());
-        }
-        return false;
+        if (getClass() != obj.getClass())
+            return false;
+        TmfEditorInput other = (TmfEditorInput) obj;
+        if (fFile == null) {
+            if (other.fFile != null)
+                return false;
+        } else if (!fFile.getLocation().equals(other.fFile.getLocation()))
+            return false;
+        if (fTrace == null) {
+            if (other.fTrace != null)
+                return false;
+        } else if (!fTrace.getName().equals(other.fTrace.getName()))
+            return false;
+        return true;
     }
 
 }

@@ -195,7 +195,7 @@ public class TmfEventField implements ITmfEventField {
         for (int i = 0; i < labels.length; i++) {
             fields[i] = new TmfEventField(labels[i], null);
         }
-        ITmfEventField rootField = new TmfEventField(ITmfEventField.ROOT_ID, fields);
+        ITmfEventField rootField = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, fields);
         return rootField;
     }
 

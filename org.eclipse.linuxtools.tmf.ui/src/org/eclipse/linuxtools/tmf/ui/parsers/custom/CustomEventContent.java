@@ -8,7 +8,7 @@ public class CustomEventContent extends TmfEventField {
     CustomEvent fParent;
     
     public CustomEventContent(CustomEvent parent, String content) {
-        super(ITmfEventField.ROOT_ID, content);
+        super(ITmfEventField.ROOT_FIELD_ID, content);
         fParent = parent;
     }
 

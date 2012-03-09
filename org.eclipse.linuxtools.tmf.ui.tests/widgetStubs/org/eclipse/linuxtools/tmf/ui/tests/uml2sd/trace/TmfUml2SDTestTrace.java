@@ -21,8 +21,8 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 import org.eclipse.linuxtools.tmf.stubs.trace.TmfTraceStub;
 
@@ -30,7 +30,7 @@ public class TmfUml2SDTestTrace implements ITmfEventParser<TmfEvent> {
     
     @Override
     @SuppressWarnings({ "unchecked", "nls" })    
-    public TmfEvent parseNextEvent(ITmfTrace<TmfEvent> eventStream, TmfContext context) throws IOException {
+    public TmfEvent parseNextEvent(ITmfTrace<TmfEvent> eventStream, ITmfContext context) throws IOException {
         if (! (eventStream instanceof TmfTraceStub)) {
             return null;
         }
@@ -71,7 +71,7 @@ public class TmfUml2SDTestTrace implements ITmfEventParser<TmfEvent> {
             fields[1] = new TmfEventField("receiver", receiver);
             fields[2] = new TmfEventField("signal", signal);
             
-            ITmfEventField tmfContent = new TmfEventField(ITmfEventField.ROOT_ID, content, fields);
+            ITmfEventField tmfContent = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, content, fields);
             TmfEvent tmfEvent = new TmfEvent(eventStream, new TmfTimestamp(ts, -9), source, tmfEventType, tmfContent, reference);
 
             return tmfEvent;

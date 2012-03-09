@@ -194,8 +194,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         // Set the time range of the trace
         TmfContext context = seekLocation(null);
         LttngEvent event = getNextEvent(context);
-        setEndTime(TmfTimestamp.BigBang);
-        final long startTime = event != null ? event.getTimestamp().getValue() : TmfTimestamp.BigBang.getValue();
+        setEndTime(TmfTimestamp.BIG_BANG);
+        final long startTime = event != null ? event.getTimestamp().getValue() : TmfTimestamp.BIG_BANG.getValue();
         fStreamingInterval = LTTNG_STREAMING_INTERVAL;
 
         final Thread thread = new Thread("Streaming Monitor for trace " + getName()) { //$NON-NLS-1$
@@ -209,7 +209,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
                     TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
                     if (experiment != null) {
                         @SuppressWarnings("rawtypes")
-                        final TmfEventRequest request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity, 0, ExecutionType.FOREGROUND) {
+                        final TmfEventRequest request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.ETERNITY, 0, ExecutionType.FOREGROUND) {
                             @Override
                             public void handleCompleted() {
                                 updateJniTrace();
@@ -648,7 +648,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     public int nbEventsRead = 0;
 
     @Override
-    public synchronized LttngEvent getNextEvent(TmfContext context) {
+    public synchronized LttngEvent getNextEvent(ITmfContext context) {
 
         if (PrintDebug) {
             System.out.println("getNextEvent(context) context.getLocation() -> " //$NON-NLS-1$
@@ -706,7 +706,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     }
 
     // this method was extracted for profiling purposes
-    private void setPreviousAndCurrentTimes(TmfContext context, LttngEvent returnedEvent, LttngLocation curLocation) {
+    private void setPreviousAndCurrentTimes(ITmfContext context, LttngEvent returnedEvent, LttngLocation curLocation) {
 
         ITmfTimestamp eventTimestamp = returnedEvent.getTimestamp();
         // long eventTime = eventTimestamp.getValue();
@@ -758,7 +758,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     }
 
     // this method was extracted for profiling purposes
-    private LttngLocation getCurrentLocation(TmfContext context) {
+    private LttngLocation getCurrentLocation(ITmfContext context) {
         LttngLocation curLocation;
         curLocation = new LttngLocation();
         context.setLocation(curLocation);
@@ -779,7 +779,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * @see org.eclipse.linuxtools.tmf.core.trace.TmfContext
      */
     @Override
-    public synchronized LttngEvent parseEvent(TmfContext context) {
+    public synchronized LttngEvent parseEvent(ITmfContext context) {
 
         if (PrintDebug) {
             System.out.println("parseEvent(context) context.getLocation() -> " //$NON-NLS-1$

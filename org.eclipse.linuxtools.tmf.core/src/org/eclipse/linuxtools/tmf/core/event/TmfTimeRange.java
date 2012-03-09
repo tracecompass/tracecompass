@@ -27,14 +27,14 @@ public final class TmfTimeRange implements Cloneable {
     /**
      * The full possible time range
      */
-    public static final TmfTimeRange Eternity =
-        new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch);
+    public static final TmfTimeRange ETERNITY =
+        new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
 
     /**
      * The null time range
      */
-    public static final TmfTimeRange Null =
-        new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigBang);
+    public static final TmfTimeRange NULL_RANGE =
+        new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_BANG);
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -111,7 +111,7 @@ public final class TmfTimeRange implements Cloneable {
      */
     public boolean contains(ITmfTimestamp ts) {
         // Zero acts as a "universal donor" timestamp
-        if (ts.equals(TmfTimestamp.Zero))
+        if (ts.equals(TmfTimestamp.ZERO))
             return true;
         return (fStartTime.compareTo(ts, true) <= 0) && (fEndTime.compareTo(ts, true) >= 0);
     }

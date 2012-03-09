@@ -27,7 +27,6 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentDisposedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.core.util.TmfTraceType;
 import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomEventsTable;
@@ -113,10 +112,7 @@ public class TmfEventsView extends TmfView {
         String commonTraceType = null;
         try {
             for (ITmfTrace<?> trace : fExperiment.getTraces()) {
-                IResource resource = null;
-                if (trace instanceof TmfTrace) {
-                    resource = ((TmfTrace<?>) trace).getResource();
-                }
+                IResource resource = trace.getResource();
                 if (resource == null) {
                     return new TmfEventsTable(parent, cacheSize);
                 }
@@ -221,7 +217,7 @@ public class TmfEventsView extends TmfView {
             }
             fEventsTable = createEventsTable(fParent);
             fEventsTable.setTrace(fExperiment, false);
-            fEventsTable.refreshBookmarks(fExperiment.getResource());
+            fEventsTable.refreshBookmarks(fExperiment.getBookmarksFile());
             fParent.layout();
         }
     }

@@ -75,7 +75,7 @@ public class LTTngExperimentTest extends TestCase {
 
     private synchronized static void setupExperiment() {
     	if (fExperiment == null) {
-    		fExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class, EXPERIMENT, fTraces, TmfTimestamp.Zero, 1000, true);
+    		fExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class, EXPERIMENT, fTraces, TmfTimestamp.ZERO, 1000, true);
     	}
     }
 
@@ -102,7 +102,7 @@ public class LTTngExperimentTest extends TestCase {
 	public void testBasicTmfExperimentConstructor() {
 
 		assertEquals("GetId", EXPERIMENT, fExperiment.getName());
-        assertEquals("GetEpoch", TmfTimestamp.Zero, fExperiment.getEpoch());
+        assertEquals("GetEpoch", TmfTimestamp.ZERO, fExperiment.getEpoch());
         assertEquals("GetNbEvents", NB_EVENTS, fExperiment.getNbEvents());
 
         long nbTraceEvents = fExperiment.getTraces()[0].getNbEvents();

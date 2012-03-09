@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -173,7 +174,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
     // Bookmark map <Rank, MarkerId>
     protected Map<Long, Long> fBookmarksMap = new HashMap<Long, Long>();
-    protected IResource fBookmarksResource;
+    protected IFile fBookmarksFile;
     protected long fPendingGotoRank = -1;
 
     // SWT resources
@@ -535,7 +536,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     if (point.x <= imageBounds.x + imageBounds.width) {
                         // Right-click on left margin
                         Long rank = (Long) item.getData(Key.RANK);
-                        if (rank != null && fBookmarksResource != null) {
+                        if (rank != null && fBookmarksFile != null) {
                             if (fBookmarksMap.containsKey(rank)) {
                                 tablePopupMenu.add(new ToggleBookmarkAction(
                                         Messages.TmfEventsTable_RemoveBookmarkActionText, rank));
@@ -664,7 +665,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         if (markerId != null) {
             bookmark = true;
             try {
-                IMarker marker = fBookmarksResource.findMarker(markerId);
+                IMarker marker = fBookmarksFile.findMarker(markerId);
                 item.setData(Key.BOOKMARK, marker.getAttribute(IMarker.MESSAGE));
             } catch (CoreException e) {
                 displayException(e);
@@ -1060,7 +1061,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             if (nbRequested <= 0) {
                 return;
             }
-            request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.Eternity, (int) fFilterCheckCount,
+            request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.ETERNITY, (int) fFilterCheckCount,
                     nbRequested, fTrace.getCacheSize(), ExecutionType.BACKGROUND) {
                 @Override
                 public void handleData(TmfEvent event) {
@@ -1480,8 +1481,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     // Bookmark handling
     // ------------------------------------------------------------------------
 
-    public void addBookmark(IResource resource) {
-        fBookmarksResource = resource;
+    public void addBookmark(IFile bookmarksFile) {
+        fBookmarksFile = bookmarksFile;
         TableItem[] selection = fTable.getSelection();
         if (selection.length > 0) {
             TableItem tableItem = selection[0];
@@ -1499,7 +1500,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 if (dialog.open() == Dialog.OK) {
                     String message = dialog.getValue();
                     try {
-                        IMarker bookmark = resource.createMarker(IMarker.BOOKMARK);
+                        IMarker bookmark = bookmarksFile.createMarker(IMarker.BOOKMARK);
                         if (bookmark.exists()) {
                             bookmark.setAttribute(IMarker.MESSAGE, message.toString());
                             long rank = (Long) tableItem.getData(Key.RANK);
@@ -1528,14 +1529,14 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
 
     private void toggleBookmark(long rank) {
-        if (fBookmarksResource == null) {
+        if (fBookmarksFile == null) {
             return;
         }
         if (fBookmarksMap.containsKey(rank)) {
             Long markerId = fBookmarksMap.remove(rank);
             fTable.refresh();
             try {
-                IMarker bookmark = fBookmarksResource.findMarker(markerId);
+                IMarker bookmark = fBookmarksFile.findMarker(markerId);
                 if (bookmark != null) {
                     bookmark.delete();
                 }
@@ -1543,15 +1544,15 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 displayException(e);
             }
         } else {
-            addBookmark(fBookmarksResource);
+            addBookmark(fBookmarksFile);
         }
     }
 
-    public void refreshBookmarks(IResource resource) {
-        fBookmarksResource = resource;
+    public void refreshBookmarks(IFile bookmarksFile) {
+        fBookmarksFile = bookmarksFile;
         try {
             fBookmarksMap.clear();
-            for (IMarker bookmark : resource.findMarkers(IMarker.BOOKMARK, false, IResource.DEPTH_ZERO)) {
+            for (IMarker bookmark : bookmarksFile.findMarkers(IMarker.BOOKMARK, false, IResource.DEPTH_ZERO)) {
                 int location = bookmark.getAttribute(IMarker.LOCATION, -1);
                 if (location != -1) {
                     long rank = location;

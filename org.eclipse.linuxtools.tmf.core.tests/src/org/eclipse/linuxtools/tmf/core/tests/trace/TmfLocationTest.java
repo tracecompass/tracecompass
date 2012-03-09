@@ -98,7 +98,7 @@ public class TmfLocationTest extends TestCase {
 	public void testSetLocation() {
 		String       aString2    = "some other location";
 		Long         aLong2      = 1234567L;
-		TmfTimestamp aTimestamp2 = (TmfTimestamp) TmfTimestamp.BigBang;
+		TmfTimestamp aTimestamp2 = (TmfTimestamp) TmfTimestamp.BIG_BANG;
 
 		fLocation1.setLocation(aString2);
 		fLocation2.setLocation(aLong2);

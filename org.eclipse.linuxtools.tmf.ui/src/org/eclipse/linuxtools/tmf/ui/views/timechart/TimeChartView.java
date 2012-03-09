@@ -17,9 +17,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
@@ -104,10 +104,10 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
             if (editor instanceof ITmfTraceEditor) {
                 ITmfTrace<?> trace = ((ITmfTraceEditor) editor).getTrace();
                 if (trace != null) {
-                    IResource resource = ((ITmfTraceEditor) editor).getResource();
+                    IFile bookmarksFile = ((ITmfTraceEditor) editor).getBookmarksFile();
                     TimeChartAnalysisEntry timeAnalysisEntry = new TimeChartAnalysisEntry(trace, fDisplayWidth * 2);
                     fTimeAnalysisEntries.add(timeAnalysisEntry);
-                    fDecorationProviders.put(trace, new TimeChartDecorationProvider(resource));
+                    fDecorationProviders.put(trace, new TimeChartDecorationProvider(bookmarksFile));
                     Thread thread = new ProcessTraceThread(timeAnalysisEntry);
                     thread.start();
                 }
@@ -509,7 +509,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
     public void resourceChanged(IResourceChangeEvent event) {
         for (IMarkerDelta delta : event.findMarkerDeltas(IMarker.BOOKMARK, false)) {
             for (TimeChartDecorationProvider provider : fDecorationProviders.values()) {
-                if (delta.getResource().equals(provider.getResource())) {
+                if (delta.getResource().equals(provider.getBookmarksFile())) {
                     if (delta.getKind() == IResourceDelta.CHANGED && delta.getMarker().getAttribute(IMarker.LOCATION, -1) != -1) {
                         provider.refreshBookmarks();
                     } else if (delta.getKind() == IResourceDelta.REMOVED) {
@@ -544,7 +544,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
         if (fTimeAnalysisEntries == null)
             return;
         final ITmfTrace<?> trace = signal.getTrace();
-        final IResource resource = signal.getResource();
+        final IFile bookmarksFile = signal.getBookmarksFile();
         final ITmfEventsFilterProvider eventsFilterProvider = signal.getEventsFilterProvider();
         TimeChartAnalysisEntry timeAnalysisEntry = null;
         for (int i = 0; i < fTimeAnalysisEntries.size(); i++) {
@@ -556,7 +556,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
         if (timeAnalysisEntry == null) {
             timeAnalysisEntry = new TimeChartAnalysisEntry(trace, fDisplayWidth * 2);
             fTimeAnalysisEntries.add(timeAnalysisEntry);
-            fDecorationProviders.put(trace, new TimeChartDecorationProvider(resource));
+            fDecorationProviders.put(trace, new TimeChartDecorationProvider(bookmarksFile));
             Thread thread = new ProcessTraceThread(timeAnalysisEntry);
             thread.start();
         }

@@ -17,8 +17,8 @@ import java.io.IOException;
 import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 
 /**
  * <b><u>TmfEventParserStub</u></b>
@@ -31,7 +31,7 @@ public class LTTngEventParserStub implements ITmfEventParser<LttngEvent> {
      * @see org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser#parseNextEvent(org.eclipse.linuxtools.tmf.core.trace.ITmfTrace, org.eclipse.linuxtools.tmf.core.trace.TmfContext)
      */
     @Override
-    public ITmfEvent parseNextEvent(ITmfTrace<LttngEvent> stream, TmfContext context)
+    public ITmfEvent parseNextEvent(ITmfTrace<LttngEvent> stream, ITmfContext context)
                     throws IOException {
         // TODO Auto-generated method stub
         return null;

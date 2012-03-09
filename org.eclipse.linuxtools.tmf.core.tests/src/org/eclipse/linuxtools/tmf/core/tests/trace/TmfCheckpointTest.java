@@ -32,8 +32,8 @@ public class TmfCheckpointTest extends TestCase {
 	// ------------------------------------------------------------------------
 
 	ITmfTimestamp fTimestamp1 = new TmfTimestamp();
-	ITmfTimestamp fTimestamp2 = TmfTimestamp.BigBang;
-	ITmfTimestamp fTimestamp3 = TmfTimestamp.BigCrunch;
+	ITmfTimestamp fTimestamp2 = TmfTimestamp.BIG_BANG;
+	ITmfTimestamp fTimestamp3 = TmfTimestamp.BIG_CRUNCH;
 
 	Long aLong1 = 12345L;
 	Long aLong2 = 23456L;

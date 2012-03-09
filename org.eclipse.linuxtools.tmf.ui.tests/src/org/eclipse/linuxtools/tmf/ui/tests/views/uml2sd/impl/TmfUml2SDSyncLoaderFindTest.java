@@ -210,7 +210,7 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
         // set expected values
         fTmfComponent.setSource(fFacility.getLoader());
         fTmfComponent.setCurrentTime(TC_004_TIME_VALUE);
-        fTmfComponent.setCurrentRange(new TmfTimeRange(TmfTimestamp.BigBang, TmfTimestamp.BigCrunch)); // not used
+        fTmfComponent.setCurrentRange(new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH)); // not used
         
         fTmfComponent.setSignalReceived(false);
         

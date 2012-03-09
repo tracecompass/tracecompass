@@ -22,6 +22,10 @@ package org.eclipse.linuxtools.tmf.core.event;
  */
 public interface ITmfEventType extends Cloneable {
 
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+
     /**
      * The default event type content 
      */
@@ -32,6 +36,10 @@ public interface ITmfEventType extends Cloneable {
      */
     public static final String DEFAULT_TYPE_ID = "TmfType"; //$NON-NLS-1$
     
+    // ------------------------------------------------------------------------
+    // Getters
+    // ------------------------------------------------------------------------
+
     /**
      * @return the event type context
      */
@@ -57,6 +65,10 @@ public interface ITmfEventType extends Cloneable {
      * @return the corresponding event field label
      */
     public String getFieldName(int index);
+
+    // ------------------------------------------------------------------------
+    // Cloneable
+    // ------------------------------------------------------------------------
 
     /**
      * @return a clone of the event content

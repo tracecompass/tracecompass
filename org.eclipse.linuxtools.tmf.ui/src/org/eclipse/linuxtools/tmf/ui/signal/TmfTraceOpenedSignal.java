@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.ui.signal;
 
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.ITmfEventsFilterProvider;
@@ -23,13 +23,13 @@ import org.eclipse.linuxtools.tmf.ui.viewers.events.ITmfEventsFilterProvider;
 public class TmfTraceOpenedSignal extends TmfSignal {
 
     private final ITmfTrace<?> fTrace;
-    private final IResource fResource;
+    private final IFile fBookmarksFile;
     private final ITmfEventsFilterProvider fEventsFilterProvider;
     
-    public TmfTraceOpenedSignal(Object source, ITmfTrace<?> trace, IResource resource, ITmfEventsFilterProvider eventsFilterProvider) {
+    public TmfTraceOpenedSignal(Object source, ITmfTrace<?> trace, IFile bookmarksFile, ITmfEventsFilterProvider eventsFilterProvider) {
         super(source);
         fTrace = trace;
-        fResource = resource;
+        fBookmarksFile = bookmarksFile;
         fEventsFilterProvider = eventsFilterProvider;
     }
 
@@ -37,8 +37,8 @@ public class TmfTraceOpenedSignal extends TmfSignal {
         return fTrace;
     }
 
-    public IResource getResource() {
-        return fResource;
+    public IFile getBookmarksFile() {
+        return fBookmarksFile;
     }
 
     public ITmfEventsFilterProvider getEventsFilterProvider() {

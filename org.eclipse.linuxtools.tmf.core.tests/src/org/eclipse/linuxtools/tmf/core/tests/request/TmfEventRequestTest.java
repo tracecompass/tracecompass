@@ -33,8 +33,8 @@ public class TmfEventRequestTest extends TestCase {
 	// Variables
 	// ------------------------------------------------------------------------
 
-	private static TmfTimeRange range1 = new TmfTimeRange(TmfTimeRange.Eternity);
-	private static TmfTimeRange range2 = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BigCrunch);
+	private static TmfTimeRange range1 = new TmfTimeRange(TmfTimeRange.ETERNITY);
+	private static TmfTimeRange range2 = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BIG_CRUNCH);
 	
 	private static TmfEventRequest<TmfEvent> fRequest1;
 	private static TmfEventRequest<TmfEvent> fRequest1b;
@@ -73,7 +73,7 @@ public class TmfEventRequestTest extends TestCase {
 
 	private TmfEventRequest<TmfEvent> setupTestRequest(final boolean[] flags) {
 		
-		TmfEventRequest<TmfEvent> request = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, new TmfTimeRange(TmfTimeRange.Eternity), 100, 200) {
+		TmfEventRequest<TmfEvent> request = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, new TmfTimeRange(TmfTimeRange.ETERNITY), 100, 200) {
 		    @Override
 			public void handleCompleted() {
 		    	super.handleCompleted();
@@ -108,8 +108,8 @@ public class TmfEventRequestTest extends TestCase {
         assertEquals("getRequestId", fRequestCount++, request.getRequestId());
         assertEquals("getDataType",  TmfEvent.class, request.getDataType());
 
-        assertEquals("StartTime", TmfTimestamp.BigBang,   request.getRange().getStartTime());
-        assertEquals("EndTime",   TmfTimestamp.BigCrunch, request.getRange().getEndTime());
+        assertEquals("StartTime", TmfTimestamp.BIG_BANG,   request.getRange().getStartTime());
+        assertEquals("EndTime",   TmfTimestamp.BIG_CRUNCH, request.getRange().getEndTime());
 
         assertEquals("getIndex", 0, request.getIndex());
         assertEquals("getNbRequestedEvents", TmfDataRequest.ALL_DATA, request.getNbRequested());
@@ -122,14 +122,14 @@ public class TmfEventRequestTest extends TestCase {
 	}
 
 	public void testTmfEventRequestTimeRange() {
-        TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BIG_CRUNCH);
         TmfEventRequest<TmfEvent> request = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range);
 
         assertEquals("getRequestId", fRequestCount++, request.getRequestId());
         assertEquals("getDataType",  TmfEvent.class, request.getDataType());
 
         assertEquals("StartTime", new TmfTimestamp(), request.getRange().getStartTime());
-        assertEquals("EndTime",   TmfTimestamp.BigCrunch, request.getRange().getEndTime());
+        assertEquals("EndTime",   TmfTimestamp.BIG_CRUNCH, request.getRange().getEndTime());
 
         assertEquals("getIndex", 0, request.getIndex());
         assertEquals("getNbRequestedEvents", TmfDataRequest.ALL_DATA, request.getNbRequested());
@@ -142,14 +142,14 @@ public class TmfEventRequestTest extends TestCase {
 	}
 
 	public void testTmfEventRequestTimeRangeNbRequested() {
-        TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BIG_CRUNCH);
         TmfEventRequest<TmfEvent> request = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range, 100);
 
         assertEquals("getRequestId", fRequestCount++, request.getRequestId());
         assertEquals("getDataType",  TmfEvent.class, request.getDataType());
 
         assertEquals("StartTime", new TmfTimestamp(), request.getRange().getStartTime());
-        assertEquals("EndTime",   TmfTimestamp.BigCrunch, request.getRange().getEndTime());
+        assertEquals("EndTime",   TmfTimestamp.BIG_CRUNCH, request.getRange().getEndTime());
 
         assertEquals("getIndex", 0, request.getIndex());
         assertEquals("getNbRequestedEvents", 100, request.getNbRequested());
@@ -162,14 +162,14 @@ public class TmfEventRequestTest extends TestCase {
 	}
 
 	public void testTmfEventRequestTimeRangeNbRequestedBlocksize() {
-        TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BigCrunch);
+        TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BIG_CRUNCH);
         TmfEventRequest<TmfEvent> request = new TmfEventRequestStub<TmfEvent>(TmfEvent.class, range, 100, 200);
 
         assertEquals("getRequestId", fRequestCount++, request.getRequestId());
         assertEquals("getDataType",  TmfEvent.class, request.getDataType());
 
         assertEquals("StartTime", new TmfTimestamp(), request.getRange().getStartTime());
-        assertEquals("EndTime",   TmfTimestamp.BigCrunch, request.getRange().getEndTime());
+        assertEquals("EndTime",   TmfTimestamp.BIG_CRUNCH, request.getRange().getEndTime());
 
         assertEquals("getIndex", 0, request.getIndex());
         assertEquals("getNbRequestedEvents", 100, request.getNbRequested());
