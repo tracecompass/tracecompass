@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %BundleName
+Bundle-SymbolicName: org.eclipse.linuxtools.lttng2.core.tests
+Bundle-Version: 0.0.1.qualifier
+Bundle-Activator: org.eclipse.linuxtools.lttng2.core.tests.Activator
+Bundle-Vendor: %BundleProvider
+Require-Bundle: org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
