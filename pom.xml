@@ -129,6 +129,16 @@
     <module>org.eclipse.linuxtools.lttng.ui.tests</module>
 
     <module>org.eclipse.linuxtools.lttng2</module>
+    <module>org.eclipse.linuxtools.lttng2.core</module>
+    <module>org.eclipse.linuxtools.lttng2.core.tests</module>
+    <module>org.eclipse.linuxtools.lttng2.ui</module>
+    <module>org.eclipse.linuxtools.lttng2.ui.tests</module>
+
+    <module>org.eclipse.linuxtools.lttng2.kernel</module>
+    <module>org.eclipse.linuxtools.lttng2.kernel.core</module>
+    <module>org.eclipse.linuxtools.lttng2.kernel.core.tests</module>
+    <module>org.eclipse.linuxtools.lttng2.kernel.ui</module>
+    <module>org.eclipse.linuxtools.lttng2.kernel.ui.tests</module>
   </modules>
 
 </project>
