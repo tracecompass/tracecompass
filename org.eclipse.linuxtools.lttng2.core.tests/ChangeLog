@@ -1,0 +1,72 @@
+2010-12-15  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/tests/event/LttngTimestampTest.java: Added a proper test for toString()
+
+2010-11-23  Francois Chouinard  <fchouinard@gmail.com>  Adjusted tests to new API
+
+	* src/org/eclipse/linuxtools/lttng/state/experiment/StateExperimentManagerTextTest.java: 
+	* src/org/eclipse/linuxtools/lttng/state/resource/LTTngStateResourceTest.java: 
+	* src/org/eclipse/linuxtools/lttng/tests/event/LttngEventTest.java: 
+	* src/org/eclipse/linuxtools/lttng/tests/event/LttngEventTypeTest.java: 
+	* src/org/eclipse/linuxtools/lttng/tests/state/handlers/after/StateAfterUpdateHandlers.java: 
+	* src/org/eclipse/linuxtools/lttng/tests/state/handlers/before/StateBeforeUpdateHandlers.java: 
+
+2010-11-10  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxxtools/lttng/tests/headless/JniTraceTest.java: New file.
+	* src/org/eclipse/linuxxtools/lttng/tests/headless/LttngTraceTest.java: New file.
+	* src/org/eclipse/linuxxtools/lttng/tests/headless/TmfTraceTest.java: New file.
+
+2010-11-09  Francois Chouinard  <fchouinard@gmail.com>
+
+    Suppress warning for non-externalized strings
+	   * src/org/eclipse/linuxtools/lttng/control/LTTngSyntheticEventProviderTest.java: 
+	   * src/org/eclipse/linuxtools/lttng/LttngTestPreparation.java: 
+	   * src/org/eclipse/linuxtools/lttng/model/LTTngTreeNodeTest.java: 
+	   * src/org/eclipse/linuxtools/lttng/state/experiment/StateExperimentManagerTextTest.java: 
+	   * src/org/eclipse/linuxtools/lttng/state/resource/LTTngStateResourceTest.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/event/AllLttngTests.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/event/LttngEventContentTest.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/event/LttngEventFieldTest.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/event/LttngEventReferenceTest.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/event/LttngEventTest.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/event/LttngEventTypeTest.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/event/LttngTimestampTest.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/jni/AllJniTests.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/jni/Combinations.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/jni/JniEventTest.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/jni/JniMarkerFieldTest.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/jni/JniMarkerTest.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/jni/JniTracefileTest.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/jni/JniTraceTest.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/LTTngCoreTestPlugin.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/state/handlers/AbsStateUpdate.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/state/handlers/after/StateAfterUpdateHandlers.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/state/handlers/before/StateBeforeUpdateHandlers.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/state/tests/handlers/AbsStateUpdate.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/state/TestStateManager.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/trace/LTTngExperimentTest.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/trace/LTTngTextTraceTest.java: 
+	   * src/org/eclipse/linuxtools/lttng/tests/trace/LTTngTraceTest.java: 
+
+2010-10-27  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/LttngTestPreparation.java (prepareExperimentContext): Event provider adjustment
+
+2010-10-15  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/tests/trace/LTTngExperimentTest.java (fStartTime): Fixed unit test for updated start time
+2010-09-17  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/control/LTTngSyntheticEventProviderTest.java: Adjusted unit test
+	* src/org/eclipse/linuxtools/lttng/LttngTestPreparation.java: Adjusted unit test
+
+2010-09-15  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/control/LTTngSyntheticEventProviderTest.java: Problematic test
+	* src/org/eclipse/linuxtools/lttng/LttngTestPreparation.java: Problematic test
+
+2010-09-09  Francois Chouinard  <fchouinard@gmail.com>
+
+	* src/org/eclipse/linuxtools/lttng/tests/AllLTTngCoreTests.java: Invoke new test
+	* src/org/eclipse/linuxtools/lttng/tests/trace/LTTngExperimentTest.java: New test
