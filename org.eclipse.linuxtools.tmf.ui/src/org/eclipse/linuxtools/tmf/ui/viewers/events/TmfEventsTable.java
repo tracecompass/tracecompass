@@ -1550,6 +1550,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
     public void refreshBookmarks(IFile bookmarksFile) {
         fBookmarksFile = bookmarksFile;
+        if (bookmarksFile == null) {
+            fBookmarksMap.clear();
+            fTable.refresh();
+            return;
+        }
         try {
             fBookmarksMap.clear();
             for (IMarker bookmark : bookmarksFile.findMarkers(IMarker.BOOKMARK, false, IResource.DEPTH_ZERO)) {
