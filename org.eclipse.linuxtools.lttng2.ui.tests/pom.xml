@@ -39,8 +39,8 @@
         <artifactId>tycho-surefire-plugin</artifactId>
         <version>${tycho-version}</version>
         <configuration>
-          <testSuite>org.eclipse.linuxtools.lttng.ui.tests</testSuite>
-          <testClass>org.eclipse.linuxtools.lttng.ui.tests.AllLTTngUITests</testClass>
+          <testSuite>org.eclipse.linuxtools.lttng2.ui.tests</testSuite>
+          <testClass>org.eclipse.linuxtools.lttng2.ui.tests.AllTests</testClass>
           <useUIHarness>true</useUIHarness>
           <useUIThread>true</useUIThread>
           <product>org.eclipse.sdk.ide</product>

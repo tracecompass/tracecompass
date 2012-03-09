@@ -15,11 +15,20 @@ package org.eclipse.linuxtools.lttng2.ui.tests;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-public class AllLTTngUITests  {
+/**
+ * <b><u>AllTests</u></b>
+ * <p>
+ */
+public class AllTests {
+
     public static Test suite() {
-        TestSuite suite = new TestSuite(AllLTTngUITests.class.getName());
-        //$JUnit-BEGIN$
-        //$JUnit-END$
+        TestSuite suite = new TestSuite(AllTests.class.getName());
+        // $JUnit-BEGIN$
+
+        // Plug-in
+        suite.addTestSuite(ActivatorTest.class);
+
+        // $JUnit-END$
         return suite;
     }
 }

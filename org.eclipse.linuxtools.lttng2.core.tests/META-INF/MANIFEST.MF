@@ -7,9 +7,7 @@ Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.junit;bundle-version="3.8.2",
  org.eclipse.core.runtime;bundle-version="3.7.0",
- org.eclipse.core.resources;bundle-version="3.7.100",
- org.eclipse.linuxtools.lttng.core;bundle-version="0.4.0"
+ org.eclipse.core.resources;bundle-version="3.7.100"
 Bundle-Localization: plugin
 Bundle-Activator: org.eclipse.linuxtools.lttng2.core.tests.Activator
 Bundle-ActivationPolicy: lazy
-

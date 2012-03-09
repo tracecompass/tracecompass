@@ -45,10 +45,6 @@
                     <configuration>
                     <tasks>
                         <echo message="prepare phase" />
-                        <gunzip src="traceset/trace-15471events_nolost_newformat.tar.gz" dest="traceset/" />
-                        <untar src="traceset/trace-15471events_nolost_newformat.tar" dest="traceset/" />
-                        <gunzip src="traceset/trace-15316events_nolost_newformat.tar.gz" dest="traceset/" />
-                        <untar src="traceset/trace-15316events_nolost_newformat.tar" dest="traceset/" />
                     </tasks>
                     </configuration>
                         <goals>
@@ -63,7 +59,7 @@
             <version>${tycho-version}</version>
             <configuration>
                 <testSuite>org.eclipse.linuxtools.lttng2.core.tests</testSuite>
-                <testClass>org.eclipse.linuxtools.lttng2.core.tests.AllLTTngCoreTests</testClass>
+                <testClass>org.eclipse.linuxtools.lttng2.core.tests.AllTests</testClass>
                 <useUIHarness>false</useUIHarness>
                 <useUIThread>false</useUIThread>
                 <product>org.eclipse.sdk.ide</product>
@@ -72,5 +68,5 @@
     </plugins>
   </build>
 
- <groupId>org.eclipse.linuxtools.lttng</groupId>
+ <groupId>org.eclipse.linuxtools.lttng2</groupId>
 </project>

@@ -10,24 +10,25 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng2.kernel.core.tests;
+package org.eclipse.linuxtools.lttng2.core.tests;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
- * <b><u>AllLTTngCoreTests</u></b>
- * <p>
- * LTTng Core test suite.
+ * <b><u>AllTests</u></b>
  * <p>
  */
-public class AllLTTngCoreTests {
+public class AllTests {
 
     public static Test suite() {
-        TestSuite suite = new TestSuite(AllLTTngCoreTests.class.getName());
+        TestSuite suite = new TestSuite(AllTests.class.getName());
         // $JUnit-BEGIN$
+
+        // Plug-in
+        suite.addTestSuite(ActivatorTest.class);
+
         // $JUnit-END$
         return suite;
     }
-
 }
