@@ -16,8 +16,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Set;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.linuxtools.lttng.core.LttngConstants;
 import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
@@ -820,7 +820,7 @@ public class KernelStatisticsData extends StatisticsData {
      * @author bhufmann
      * 
      */
-    final private class KeyProvider {
+    private static final class KeyProvider {
 
         /**
          * <h4>Instance counter for unique ID generation.</h4>
@@ -887,7 +887,7 @@ public class KernelStatisticsData extends StatisticsData {
      * @author bhufmann
      * 
      */
-    private class KeyHelper implements Cloneable {
+    private static final class KeyHelper implements Cloneable {
 
         // Short pre-fix
         private final static String UNKNOWN_PREFIX = "P"; //$NON-NLS-1$
@@ -916,7 +916,10 @@ public class KernelStatisticsData extends StatisticsData {
                 return true;
             if (o == null)
                 return false;
-            if (fValue == ((KeyHelper) o).fValue && fName.equals(((KeyHelper) o).fName)) {
+            if (!(o instanceof KeyHelper))
+                return false;
+            KeyHelper kh = (KeyHelper) o;
+            if (fValue == kh.fValue && fName.equals(kh.fName)) {
                 return true;
             }
             return false;
@@ -970,7 +973,7 @@ public class KernelStatisticsData extends StatisticsData {
      * @author bhufmann
      * 
      */
-    final private class ProcessKeyProvider {
+    private static final class ProcessKeyProvider {
         /**
          * <h4>Instance counter for unique ID generation.</h4>
          */
@@ -1029,7 +1032,7 @@ public class KernelStatisticsData extends StatisticsData {
     * @author bhufmann
     * 
     */
-    final class ProcessKey implements Cloneable {
+    private static final class ProcessKey implements Cloneable {
         private int fPid = 0;
         private int fCpuId = 0;
         private long fCreationTime = 0;
@@ -1072,6 +1075,8 @@ public class KernelStatisticsData extends StatisticsData {
             if (obj == this)
                 return true;
             if (obj == null)
+                return false;
+            if (!(obj instanceof ProcessKey))
                 return false;
 
             ProcessKey procKey = (ProcessKey) obj;

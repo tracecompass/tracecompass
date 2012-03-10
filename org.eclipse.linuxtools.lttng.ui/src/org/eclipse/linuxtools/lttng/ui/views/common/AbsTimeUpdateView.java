@@ -146,7 +146,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 			boolean clearData = request.isclearDataInd();
 			// Indicate if current data needs to be cleared and if so
 			// specify the new experiment time range that applies
-			ModelUpdatePrep(trange, clearData);
+			modelUpdatePrep(trange, clearData);
 		}
 	}
 
@@ -597,7 +597,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	 *            - new total time range e.g. Experiment level
 	 * @param clearAllData
 	 */
-	protected void ModelUpdatePrep(TmfTimeRange timeRange, boolean clearAllData) {
+	protected void modelUpdatePrep(TmfTimeRange timeRange, boolean clearAllData) {
 		ItemContainer<?> itemContainer = getItemContainer();
 		if (clearAllData) {
 			// start fresh e.g. new experiment selected
@@ -632,7 +632,7 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 	 * @param visibleRange
 	 * @param source
 	 */
-	protected void ModelUpdateInit(TmfTimeRange boundaryRange, TmfTimeRange visibleRange, Object source) {
+	protected void modelUpdateInit(TmfTimeRange boundaryRange, TmfTimeRange visibleRange, Object source) {
 		// Update the view boundaries
 		if (boundaryRange != null) {
 			ItemContainer<?> itemContainer = getItemContainer();

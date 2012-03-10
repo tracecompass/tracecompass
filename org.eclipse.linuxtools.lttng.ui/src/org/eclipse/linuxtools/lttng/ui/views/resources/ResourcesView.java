@@ -154,7 +154,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 				TmfTimeRange adjustedTimeRange = initialExperimentDataRequest(this, experimentTRange);
 
 				// initialize widget time boundaries and filtering parameters
-				ModelUpdateInit(experimentTRange, adjustedTimeRange, this);
+				modelUpdateInit(experimentTRange, adjustedTimeRange, this);
 			}
 		} else {
 			TraceDebug.debug("No selected experiment information available"); //$NON-NLS-1$
@@ -505,7 +505,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 			initTimeRange = TmfTimeRange.NULL_RANGE;
 			if (experimentTRange != TmfTimeRange.NULL_RANGE) {
 				// prepare time intervals in widget
-				ModelUpdateInit(experimentTRange, experimentTRange, signal.getSource());
+				modelUpdateInit(experimentTRange, experimentTRange, signal.getSource());
 
 				// request initial data
 				initialExperimentDataRequest(signal.getSource(), experimentTRange);
@@ -520,7 +520,7 @@ public class ResourcesView extends AbsTimeUpdateView implements
 
 			if (experimentTRange != TmfTimeRange.NULL_RANGE) {
 				// prepare time intervals in widget
-				ModelUpdateInit(experimentTRange, experimentTRange, signal.getSource());
+				modelUpdateInit(experimentTRange, experimentTRange, signal.getSource());
 
 				// request initial data
 				initialExperimentDataRequest(signal.getSource(), experimentTRange);

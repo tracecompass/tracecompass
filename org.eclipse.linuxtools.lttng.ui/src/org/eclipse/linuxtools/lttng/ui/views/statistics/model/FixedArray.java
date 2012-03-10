@@ -26,7 +26,7 @@ import java.util.RandomAccess;
  *
  * @param <T> Type of the array content.
  */
-public final class FixedArray implements RandomAccess {
+public final class FixedArray implements RandomAccess, Cloneable {
 	/**
 	 * Replace {@link java.util.Arrays#copyOf(Object[], int)} that do not exist in java 5.
 	 * @param array Original array to copy from.
@@ -121,18 +121,23 @@ public final class FixedArray implements RandomAccess {
 	public Object clone() {
 		return new FixedArray(copyOf(fArray, fArray.length));
 	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object o) {
-	    if (o == this)
-	        return true;
-	    if (o == null)
-	        return false;
-		return Arrays.equals(fArray, ((FixedArray)o).fArray);
-	}
+    public boolean equals(Object other) {
+        if (this == other)
+            return true;
+        if (other == null)
+            return false;
+        if (!(other instanceof FixedArray))
+            return false;
+        FixedArray array = (FixedArray) other;
+        return Arrays.equals(fArray, array.fArray);
+    }
+
 	/**
 	 * Gets value of given index.
 	 * @param index 

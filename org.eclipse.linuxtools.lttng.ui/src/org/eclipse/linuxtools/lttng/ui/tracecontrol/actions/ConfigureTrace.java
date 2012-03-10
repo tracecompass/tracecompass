@@ -97,7 +97,7 @@ public class ConfigureTrace implements IObjectActionDelegate, IWorkbenchWindowAc
         final TraceConfig result = wizard.getTraceConfig();
 
         if (result != null) {
-            try {
+//            try {
 
                 // Update channel settings
                 TraceChannels channels = result.getTraceChannels();
@@ -167,17 +167,17 @@ public class ConfigureTrace implements IObjectActionDelegate, IWorkbenchWindowAc
                 ISystemRegistry registry = SystemStartHere.getSystemRegistry();
                 registry.fireRemoteResourceChangeEvent(ISystemRemoteChangeEvents.SYSTEM_REMOTE_RESOURCE_CHANGED, fSelectedTrace, fSelectedTrace.getParent(), fSelectedTrace.getSubSystem(), null);
 
-            } catch (Exception e) {
-                SystemMessageException sysExp;
-                if (e instanceof SystemMessageException) {
-                    sysExp = (SystemMessageException)e;
-                } else {
-                    sysExp = new SystemMessageException(LTTngUiPlugin.getDefault().getMessage(e));    
-                }
-                
-                SystemBasePlugin.logError(Messages.Lttng_Control_ErrorConfigureTrace + " (" +  //$NON-NLS-1$
-                        Messages.Lttng_Resource_Trace + ": "  + fSelectedTrace.getName() + ")", sysExp); //$NON-NLS-1$ //$NON-NLS-2$
-            }
+//            } catch (SystemMessageException e) {
+//                SystemMessageException sysExp;
+//                if (e instanceof SystemMessageException) {
+//                    sysExp = (SystemMessageException)e;
+//                } else {
+//                    sysExp = new SystemMessageException(LTTngUiPlugin.getDefault().getMessage(e));    
+//                }
+//                
+//                SystemBasePlugin.logError(Messages.Lttng_Control_ErrorConfigureTrace + " (" +  //$NON-NLS-1$
+//                        Messages.Lttng_Resource_Trace + ": "  + fSelectedTrace.getName() + ")", sysExp); //$NON-NLS-1$ //$NON-NLS-2$
+//            }
         }
     }
 

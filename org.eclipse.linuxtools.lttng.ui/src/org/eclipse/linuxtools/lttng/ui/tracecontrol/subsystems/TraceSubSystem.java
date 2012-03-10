@@ -69,6 +69,7 @@ public class TraceSubSystem extends SubSystem implements ICommunicationsListener
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+
     private ProviderResource[] fProviders; // master list of Providers
 
     // ------------------------------------------------------------------------
@@ -198,7 +199,7 @@ public class TraceSubSystem extends SubSystem implements ICommunicationsListener
                 }
             }
         }
-        return fProviders;
+        return (fProviders != null) ? Arrays.copyOf(fProviders, fProviders.length) : null;
     }
 
     /**

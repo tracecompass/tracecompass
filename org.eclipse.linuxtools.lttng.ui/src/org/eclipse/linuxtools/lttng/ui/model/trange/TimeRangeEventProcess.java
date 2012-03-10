@@ -229,4 +229,96 @@ public class TimeRangeEventProcess extends TimeRangeComposite implements
 		",trace=" + traceID + ",ptype=" + processType + ",cpu=" + cpu + ",brand=" + brand + "]";
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((brand == null) ? 0 : brand.hashCode());
+        result = prime * result + ((cpu == null) ? 0 : cpu.hashCode());
+        result = prime * result + ((creationTime == null) ? 0 : creationTime.hashCode());
+        result = prime * result + ((pid == null) ? 0 : pid.hashCode());
+        result = prime * result + ((ppid == null) ? 0 : ppid.hashCode());
+        result = prime * result + ((processType == null) ? 0 : processType.hashCode());
+        result = prime * result + ((tgid == null) ? 0 : tgid.hashCode());
+        result = prime * result + ((traceID == null) ? 0 : traceID.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof TimeRangeEventProcess)) {
+            return false;
+        }
+        TimeRangeEventProcess other = (TimeRangeEventProcess) obj;
+        if (brand == null) {
+            if (other.brand != null) {
+                return false;
+            }
+        } else if (!brand.equals(other.brand)) {
+            return false;
+        }
+        if (cpu == null) {
+            if (other.cpu != null) {
+                return false;
+            }
+        } else if (!cpu.equals(other.cpu)) {
+            return false;
+        }
+        if (creationTime == null) {
+            if (other.creationTime != null) {
+                return false;
+            }
+        } else if (!creationTime.equals(other.creationTime)) {
+            return false;
+        }
+        if (pid == null) {
+            if (other.pid != null) {
+                return false;
+            }
+        } else if (!pid.equals(other.pid)) {
+            return false;
+        }
+        if (ppid == null) {
+            if (other.ppid != null) {
+                return false;
+            }
+        } else if (!ppid.equals(other.ppid)) {
+            return false;
+        }
+        if (processType == null) {
+            if (other.processType != null) {
+                return false;
+            }
+        } else if (!processType.equals(other.processType)) {
+            return false;
+        }
+        if (tgid == null) {
+            if (other.tgid != null) {
+                return false;
+            }
+        } else if (!tgid.equals(other.tgid)) {
+            return false;
+        }
+        if (traceID == null) {
+            if (other.traceID != null) {
+                return false;
+            }
+        } else if (!traceID.equals(other.traceID)) {
+            return false;
+        }
+        return true;
+    }
+
 }

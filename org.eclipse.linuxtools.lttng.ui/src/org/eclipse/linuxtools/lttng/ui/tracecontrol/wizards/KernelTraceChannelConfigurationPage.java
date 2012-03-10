@@ -69,6 +69,7 @@ public class KernelTraceChannelConfigurationPage extends WizardPage implements I
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+    
     private TraceChannels fChannels;
     private TraceState fTraceState;
     private Composite container;
@@ -323,7 +324,7 @@ public class KernelTraceChannelConfigurationPage extends WizardPage implements I
     /*
      * Local class to configure table columns
      */
-    final public class ColumnData {
+    private static final class ColumnData {
         // Name of the column.
         public final String header;
         // Width of the column.
@@ -477,7 +478,7 @@ public class KernelTraceChannelConfigurationPage extends WizardPage implements I
      * Local class dialog box implementation for setting values for all
      * rows for a given column  
      */
-    public class SetDialog extends Dialog {
+    private static final class SetDialog extends Dialog {
 
         // ------------------------------------------------------------------------
         // Attributes

@@ -67,9 +67,6 @@ public class SpinnerGroup {
     private int currentSeconds;
     private int currentNanosec;
     
-	@SuppressWarnings("unused")
-	private TimeFrameView fOwner;
-
     /**
      * <b><u>Constructor</u></b>
      * <p>
@@ -83,8 +80,6 @@ public class SpinnerGroup {
      * @param current   - the current time
      */
     public SpinnerGroup(TimeFrameView owner, Composite parent, String groupName, TmfTimeRange range, ITmfTimestamp current) {
-
-    	fOwner = owner;
 
         // Create the group
         group = new Group(parent, SWT.BORDER);

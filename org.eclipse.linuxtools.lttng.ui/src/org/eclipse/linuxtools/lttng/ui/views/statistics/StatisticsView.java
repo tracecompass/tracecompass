@@ -127,7 +127,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 	/**
 	 * Contains all the information necessary to build a column of the table.
 	 */
-	private class ColumnData {
+	private static class ColumnData {
 		// Name of the column.
 		public final String header;
 		// Width of the column.
@@ -292,7 +292,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 	 * 
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider
 	 */
-	class TreeContentProvider implements ITreeContentProvider {
+	private static class TreeContentProvider implements ITreeContentProvider {
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -571,7 +571,7 @@ public class StatisticsView extends AbsTimeUpdateView {
 	}
 
 	@Override
-	public void ModelUpdatePrep(TmfTimeRange timeRange, boolean clearAllData) {
+	public void modelUpdatePrep(TmfTimeRange timeRange, boolean clearAllData) {
 		Object input = treeViewer.getInput();
 		if ((input != null) && (input instanceof StatisticsTreeNode) && (!treeViewer.getTree().isDisposed())) {
 			if (clearAllData) {
@@ -627,9 +627,9 @@ public class StatisticsView extends AbsTimeUpdateView {
 
 	private static int level = 0;
     private void printRecursively(StatisticsTreeNode node) {
-        String tab = ""; //$NON-NLS-1$
+        StringBuffer tab = new StringBuffer(""); //$NON-NLS-1$
         for (int i = 0; i < level; i++) {
-            tab += "\t"; //$NON-NLS-1$
+            tab.append("\t"); //$NON-NLS-1$
         }
         level++;
         TraceDebug.traceSV(tab + node.getContent());

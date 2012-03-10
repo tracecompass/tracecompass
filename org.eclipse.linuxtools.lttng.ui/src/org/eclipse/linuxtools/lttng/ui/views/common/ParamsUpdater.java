@@ -30,23 +30,22 @@ public class ParamsUpdater {
 	// Data
 	// ========================================================================
 
-	private long startTime = 0;
-	private long endTime = Long.MAX_VALUE;
-	private Long selectedTime = null;
-	private final int DEFAULT_WIDTH = 2000; // number of estimated pixels
-													// that
-	// can hold the time range space
-	private int width = DEFAULT_WIDTH; // width in pixels used to represent the
-	// time interval
-	private double pixelsPerNs = 0;
-	private int eventsDiscarded = 0;
-	private int eventsDiscardedOutOfView = 0;
-	private int eventsDiscardedNotVisible = 0;
-	private int eventsDiscardedWrongOrder = 0;
-	private TmfTimeRange trange = null;
+    private long startTime = 0;
+    private long endTime = Long.MAX_VALUE;
+    private static Long selectedTime = null;
+    private final int DEFAULT_WIDTH = 2000; // number of estimated pixels that
+                                            // can hold the time range space
+    private int width = DEFAULT_WIDTH; // width in pixels used to represent the
+                                       // time interval
+    private double pixelsPerNs = 0;
+    private int eventsDiscarded = 0;
+    private int eventsDiscardedOutOfView = 0;
+    private int eventsDiscardedNotVisible = 0;
+    private int eventsDiscardedWrongOrder = 0;
+    private TmfTimeRange trange = null;
 
-	public static final int OUT_OF_VIEWRANGE = 0;
-	public static final int NOT_VISIBLE = 1;
+    public static final int OUT_OF_VIEWRANGE = 0;
+    public static final int NOT_VISIBLE = 1;
 
 	// ========================================================================
 	// Methods

@@ -65,7 +65,7 @@ class FlowAfterUpdateHandlers {
 				if (localProcess == null) {
 					if ((pid_in == 0) || !pid_in.equals(process_in.getPpid())) {
 					    TmfTimeRange timeRange = traceSt.getContext().getTraceTimeWindow();
-	                    localProcess = addLocalProcess(process_in, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
+	                    addLocalProcess(process_in, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
 					}
 					else {
 						TraceDebug
@@ -138,7 +138,7 @@ class FlowAfterUpdateHandlers {
 			        if (localProcess == null) {
 			            if (child_pid == 0 || !child_pid.equals(process_child.getPpid())) {            
 			                TmfTimeRange timeRange = traceSt.getContext().getTraceTimeWindow();
-                            localProcess = addLocalProcess(process_child, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
+                            addLocalProcess(process_child, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
 			            }
 			            else {
 			                TraceDebug.debug("localProcess is null with child_pid not 0 or child_pid equals PPID (getProcessForkHandler)"); //$NON-NLS-1$
@@ -191,7 +191,7 @@ class FlowAfterUpdateHandlers {
 			        if (localProcess == null) {
 			            if (process.getPid() == 0 || !process.getPid().equals(process.getPpid())) {			                
 			                TmfTimeRange timeRange = traceSt.getContext().getTraceTimeWindow();
-		                    localProcess = addLocalProcess(process, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
+		                    addLocalProcess(process, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
 			            }
 			            else {
 			                TraceDebug.debug("process pid is not 0 or pid equals ppid! (getProcessExitHandler)"); //$NON-NLS-1$
@@ -233,7 +233,7 @@ class FlowAfterUpdateHandlers {
                     if (localProcess == null) {
                         if (process.getPid() == 0 || !process.getPid().equals(process.getPpid())) {
                             TmfTimeRange timeRange = traceSt.getContext().getTraceTimeWindow();
-                            localProcess = addLocalProcess(process, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
+                            addLocalProcess(process, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
                         }
                         else {
                             TraceDebug.debug("process pid is not 0 or pid equals ppid! (getProcessExecHandler)"); //$NON-NLS-1$
@@ -283,7 +283,7 @@ class FlowAfterUpdateHandlers {
                     if (localProcess == null) {
                         if (process.getPid() == 0 || !process.getPid().equals(process.getPpid())) {                         
                             TmfTimeRange timeRange = traceSt.getContext().getTraceTimeWindow();
-                            localProcess = addLocalProcess(process, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
+                            addLocalProcess(process, timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue(), traceSt.getTraceId());
                         }
                         else {
                             TraceDebug.debug("process pid is not 0 or pid equals ppid! (GetThreadBrandHandler)"); //$NON-NLS-1$

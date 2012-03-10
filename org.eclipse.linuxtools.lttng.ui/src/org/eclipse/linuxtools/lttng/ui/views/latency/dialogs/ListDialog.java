@@ -68,12 +68,12 @@ public class ListDialog extends AbstractDialog {
     /**
      * Column names (header titles).
      */
-    protected static final String[] COLUMN_NAMES = { "#", Messages.LatencyView_Dialogs_ListEvents_Columns_Trigger, Messages.LatencyView_Dialogs_ListEvents_Columns_End }; //$NON-NLS-1$
+    static final String[] COLUMN_NAMES = { "#", Messages.LatencyView_Dialogs_ListEvents_Columns_Trigger, Messages.LatencyView_Dialogs_ListEvents_Columns_End }; //$NON-NLS-1$
 
     /**
      * Column widths.
      */
-    protected static final int[] COLUMN_WIDTHS = { 25, 250, 250 };
+    static final int[] COLUMN_WIDTHS = { 25, 250, 250 };
 
     /**
      * The table style.

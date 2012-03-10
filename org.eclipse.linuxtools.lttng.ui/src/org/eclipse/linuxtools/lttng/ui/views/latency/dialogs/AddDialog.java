@@ -77,17 +77,17 @@ public class AddDialog extends AbstractDialog {
     /**
      * Start table column names (header titles).
      */
-    protected static final String[] START_COLUMN_NAMES = { "", Messages.LatencyView_Dialogs_AddEvents_Columns_Start }; //$NON-NLS-1$
+    static final String[] START_COLUMN_NAMES = { "", Messages.LatencyView_Dialogs_AddEvents_Columns_Start }; //$NON-NLS-1$
 
     /**
      * End table column names (header titles).
      */
-    protected static final String[] END_COLUMN_NAMES = { "", Messages.LatencyView_Dialogs_AddEvents_Columns_End }; //$NON-NLS-1$
+    static final String[] END_COLUMN_NAMES = { "", Messages.LatencyView_Dialogs_AddEvents_Columns_End }; //$NON-NLS-1$
 
     /**
      * List table column names (header titles).
      */
-    protected static final String[] LIST_COLUMN_NAMES = {
+    static final String[] LIST_COLUMN_NAMES = {
             "#", //$NON-NLS-1$
             Messages.LatencyView_Dialogs_AddEvents_Columns_List_Trigger,
             Messages.LatencyView_Dialogs_AddEvents_Columns_List_End };
@@ -95,7 +95,7 @@ public class AddDialog extends AbstractDialog {
     /**
      * Column widths.
      */
-    protected static final int[] COLUMN_WIDTHS = { 25, 250, 250 };
+    static final int[] COLUMN_WIDTHS = { 25, 250, 250 };
 
     /**
      * Possible event types.

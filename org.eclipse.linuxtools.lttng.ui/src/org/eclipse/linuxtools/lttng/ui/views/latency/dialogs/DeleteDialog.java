@@ -84,18 +84,18 @@ public class DeleteDialog extends ListDialog {
 
                 int[] selectedIndices = fTable.getSelectionIndices();
 
-                String deletePairs = ""; //$NON-NLS-1$
+                StringBuffer deletePairs = new StringBuffer(""); //$NON-NLS-1$
                 for (int i = 0; i < selectedIndices.length; i++) {
                     int index = selectedIndices[i];
-                    deletePairs += "\t* " + fEventStartTypes.get(index) + " / " + fEventEndTypes.get(index); //$NON-NLS-1$ //$NON-NLS-2$
+                    deletePairs.append("\t* ").append(fEventStartTypes.get(index)).append(" / ").append(fEventEndTypes.get(index)); //$NON-NLS-1$ //$NON-NLS-2$
 
                     if (i < selectedIndices.length - 1) {
-                        deletePairs += "\n"; //$NON-NLS-1$
+                        deletePairs.append("\n"); //$NON-NLS-1$
                     }
                 }
 
                 boolean confirmDeletion = MessageDialog.openQuestion(getShell(), Messages.LatencyView_Dialogs_DeleteEvents_Confirm_Title,
-                        Messages.LatencyView_Dialogs_DeleteEvents_Confirm_Message + "\n\n" + deletePairs); //$NON-NLS-1$
+                        Messages.LatencyView_Dialogs_DeleteEvents_Confirm_Message + "\n\n" + deletePairs.toString()); //$NON-NLS-1$
 
                 if (confirmDeletion) {
                     // Remove the events starting from the end of the list, otherwise the TableItem elements will lose

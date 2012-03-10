@@ -162,7 +162,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	 * example).
 	 */
 
-	class ViewContentProvider implements
+	static class ViewContentProvider implements
 	/* ILazyContentProvider, */IStructuredContentProvider {
 		private TableViewer cviewer = null;
 		private ITmfTimeAnalysisEntry[] elements = null;
@@ -198,7 +198,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		}
 	}
 
-	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
+	static class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 		@Override
 		public String getColumnText(Object obj, int index) {
 			String strRes = ""; //$NON-NLS-1$
@@ -261,7 +261,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		}
 	}
 
-	class ViewProcessFilter extends ViewerFilter {
+	static class ViewProcessFilter extends ViewerFilter {
 
 		private Vector<ITmfTimeAnalysisEntry> filteredSet = new Vector<ITmfTimeAnalysisEntry>();
 		StructuredViewer viewer;
@@ -415,9 +415,6 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 					return;
 				}
 
-				TableItem item;
-				int count;
-
 				switch (e.keyCode) {
 				case SWT.PAGE_DOWN:
 					updateScrollPageDown();
@@ -426,16 +423,13 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 					updateScrollUp();
 					break;
 				case SWT.HOME:
-					// Home
-					count = table.getItemCount();
-					item = table.getItem(0);
 					// Go to the top
 					scrollFrame.setOrigin(origin.x, 0);
 					break;
 				case SWT.END:
 					// End Selected
-					count = table.getItemCount();
-					item = table.getItem(count - 1);
+					int count = table.getItemCount();
+					TableItem item = table.getItem(count - 1);
 					int itemStartPos = item.getBounds().y;
 					// Get to the bottom
 					scrollFrame.setOrigin(origin.x, itemStartPos);
@@ -547,10 +541,10 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		// as well as time space width in pixels, used by the time analysis
 		// widget
 		// Read relevant values
-		int timeSpaceWidth = tsfviewer.getTimeSpace();
-		if (timeSpaceWidth < 0) {
-			timeSpaceWidth = -timeSpaceWidth;
-		}
+//		int timeSpaceWidth = tsfviewer.getTimeSpace();
+//		if (timeSpaceWidth < 0) {
+//			timeSpaceWidth = -timeSpaceWidth;
+//		}
 
 		TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
 		if (experiment != null) {
@@ -562,7 +556,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 						experimentTRange);
 	
 				// initialize widget time boundaries and filtering parameters
-				ModelUpdateInit(experimentTRange, adjustedTimeRange, this);
+				modelUpdateInit(experimentTRange, adjustedTimeRange, this);
 			}
 		} else {
 			TraceDebug.debug("No selected experiment information available"); //$NON-NLS-1$
@@ -1051,7 +1045,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 			initTimeRange = TmfTimeRange.NULL_RANGE;
 			if (experimentTRange != TmfTimeRange.NULL_RANGE) {
 				// prepare time intervals in widget
-				ModelUpdateInit(experimentTRange, experimentTRange, signal
+				modelUpdateInit(experimentTRange, experimentTRange, signal
 						.getSource());
 	
 				// request initial data
@@ -1068,7 +1062,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 			if (experimentTRange != TmfTimeRange.NULL_RANGE) {
 				// prepare time intervals in widget
-				ModelUpdateInit(experimentTRange, experimentTRange, signal.getSource());
+				modelUpdateInit(experimentTRange, experimentTRange, signal.getSource());
 
 				// request initial data
 				initialExperimentDataRequest(signal.getSource(), experimentTRange);

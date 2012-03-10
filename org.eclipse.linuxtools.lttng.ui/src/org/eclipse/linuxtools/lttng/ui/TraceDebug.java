@@ -39,20 +39,20 @@ public class TraceDebug {
         String warnTrace = Platform.getDebugOption(pluginID + "/warn");
 
         if (debugTrace != null) {
-            DEBUG = (new Boolean(debugTrace)).booleanValue();
+            DEBUG = Boolean.valueOf(debugTrace);
         }
 
         if (infoTrace != null) {
-            INFO = (new Boolean(infoTrace)).booleanValue();
+            INFO = Boolean.valueOf(infoTrace);
         }
 
         if (warnTrace != null) {
-            WARN = (new Boolean(warnTrace)).booleanValue();
+            WARN = Boolean.valueOf(warnTrace);
         }
 
         String cfvTrace = Platform.getDebugOption(pluginID + "/cfv");
         if (cfvTrace != null) {
-            CFV = (new Boolean(cfvTrace)).booleanValue();
+            CFV = Boolean.valueOf(cfvTrace);
             if (CFV) {
                 try {
                     fCFVfile = new PrintWriter(new FileWriter("CFVTrace.txt"));
@@ -64,7 +64,7 @@ public class TraceDebug {
 
         String rvTrace = Platform.getDebugOption(pluginID + "/rv");
         if (rvTrace != null) {
-            RV = (new Boolean(rvTrace)).booleanValue();
+            RV = Boolean.valueOf(rvTrace);
             if (RV) {
                 try {
                     fRVfile = new PrintWriter(new FileWriter("RVTrace.txt"));
@@ -76,7 +76,7 @@ public class TraceDebug {
 
         String svTrace = Platform.getDebugOption(pluginID + "/sv");
         if (svTrace != null) {
-            SV = (new Boolean(svTrace)).booleanValue();
+            SV = Boolean.valueOf(svTrace);
             if (SV) {
                 try {
                     fSVfile = new PrintWriter(new FileWriter("SVTrace.txt"));

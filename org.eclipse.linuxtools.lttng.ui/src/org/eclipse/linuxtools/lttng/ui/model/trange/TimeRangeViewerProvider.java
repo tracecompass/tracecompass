@@ -13,7 +13,7 @@ package org.eclipse.linuxtools.lttng.ui.model.trange;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 
 import org.eclipse.linuxtools.lttng.core.state.StateStrings.BdevMode;
 import org.eclipse.linuxtools.lttng.core.state.StateStrings.CpuMode;
@@ -230,12 +230,11 @@ public class TimeRangeViewerProvider extends TmfTimeAnalysisProvider {
     }
     
     protected String findObject(StateColor Value, Map<String, StateColor> map) {
-		Set<String> keys = map.keySet();
-		for (String key : keys) {
-			if (map.get(key).equals(Value)) {
-				return key;
-			}
-		}
+        for (Entry<String, StateColor> entry : map.entrySet()) {
+            if (entry.getValue().equals(Value)) {
+                return entry.getKey();
+            }
+        }
 		return "Not Found"; //$NON-NLS-1$
 	}
 }
