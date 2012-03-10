@@ -182,10 +182,6 @@ public class TimeScaleCtrl extends TraceCtrl implements MouseListener,
 		GC gc = e.gc;
 		gc.fillRectangle(rect);
 		
-		if (null == _timeProvider) {
-			return;
-		}
-
 		long time0 = _timeProvider.getTime0();
 		long time1 = _timeProvider.getTime1();
 		long selectedTime = _timeProvider.getSelectedTime();

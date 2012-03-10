@@ -66,15 +66,15 @@ public class HistogramZoom implements MouseWheelListener {
     // Accessors
     // ------------------------------------------------------------------------
 
-    public long getStartTime() {
+    public synchronized long getStartTime() {
         return fRangeStartTime;
     }
 
-    public long getEndTime() {
+    public synchronized long getEndTime() {
         return fRangeStartTime + fRangeDuration;
     }
 
-    public long getDuration() {
+    public synchronized long getDuration() {
         return fRangeDuration;
     }
 
@@ -164,7 +164,7 @@ public class HistogramZoom implements MouseWheelListener {
     // DelayedMouseScroll
     // ------------------------------------------------------------------------
 
-    private class MouseScrollCounter extends Thread {
+    private static class MouseScrollCounter extends Thread {
 
         // --------------------------------------------------------------------
         // Constants

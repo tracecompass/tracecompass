@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
 
+import java.util.Arrays;
+
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource2;
@@ -77,6 +79,6 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
     }
 
     // ------------------------------------------------------------------------}
-    // IPropertySource2    // ------------------------------------------------------------------------    @Override    public Object getEditableValue() {        return null;    }    @Override    public IPropertyDescriptor[] getPropertyDescriptors() {        return sfDescriptors;    }    @Override    public Object getPropertyValue(Object id) {        if (sfName.equals(id))            return getName();        if (sfPath.equals(id))            return getPath().toString();        if (sfLocation.equals(id))            return getLocation().toString();        return null;    }    @Override    public void resetPropertyValue(Object id) {    }    @Override    public void setPropertyValue(Object id, Object value) {    }    @Override    public boolean isPropertyResettable(Object id) {        return false;    }    @Override    public boolean isPropertySet(Object id) {        return false;    }
+    // IPropertySource2    // ------------------------------------------------------------------------    @Override    public Object getEditableValue() {        return null;    }    @Override    public IPropertyDescriptor[] getPropertyDescriptors() {        return (sfDescriptors != null) ? Arrays.copyOf(sfDescriptors, sfDescriptors.length) : null;    }    @Override    public Object getPropertyValue(Object id) {        if (sfName.equals(id))            return getName();        if (sfPath.equals(id))            return getPath().toString();        if (sfLocation.equals(id))            return getLocation().toString();        return null;    }    @Override    public void resetPropertyValue(Object id) {    }    @Override    public void setPropertyValue(Object id, Object value) {    }    @Override    public boolean isPropertyResettable(Object id) {        return false;    }    @Override    public boolean isPropertySet(Object id) {        return false;    }
 
 }

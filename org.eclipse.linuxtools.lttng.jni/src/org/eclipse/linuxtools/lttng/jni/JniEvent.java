@@ -241,7 +241,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant
      */
-    public int positionToFirstEvent() {
+    protected int positionToFirstEvent() {
         eventState = ltt_positionToFirstEvent(tracefilePtr.getLibraryId(), tracefilePtr.getPointer());
         
         return eventState;
@@ -404,20 +404,50 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
     public JniTracefile getParentTracefile() {
         return parentTracefile;
     }
-    
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
-	public boolean equals(Object other) {
-        if (this == other)
-             return true;
-        if (other == null)
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((eventTime == null) ? 0 : eventTime.hashCode());
+        result = prime * result + ((parentTracefile == null) ? 0 : parentTracefile.hashCode());
+        return result;
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
-		if (!(other instanceof JniEvent))
-		    return false;
-		JniEvent event = (JniEvent) other;
-		return (getEventTime().equals(event.getEventTime())
-				&&	parentTracefile.equals(event.parentTracefile));
-	}
-    
+        }
+        if (!(obj instanceof JniEvent)) {
+            return false;
+        }
+        JniEvent other = (JniEvent) obj;
+        if (eventTime == null) {
+            if (other.eventTime != null) {
+                return false;
+            }
+        } else if (!eventTime.equals(other.eventTime)) {
+            return false;
+        }
+        if (parentTracefile == null) {
+            if (other.parentTracefile != null) {
+                return false;
+            }
+        } else if (!parentTracefile.equals(other.parentTracefile)) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Compare fonction for JNIEvent.<p>
      * <p>

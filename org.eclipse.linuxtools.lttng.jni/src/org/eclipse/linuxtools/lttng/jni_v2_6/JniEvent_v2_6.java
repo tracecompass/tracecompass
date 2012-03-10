@@ -34,8 +34,7 @@ public class JniEvent_v2_6 extends JniEvent {
 	protected JniEvent_v2_6() {
 		super();
     }
-	
-	
+
 	public JniEvent_v2_6(JniEvent_v2_6 oldEvent) {
 		super(oldEvent);
 	}
@@ -44,5 +43,4 @@ public class JniEvent_v2_6 extends JniEvent {
     	super(newEventPtr, newMarkersMap, newParentTracefile);
     }
 
-	
 }

@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
@@ -841,10 +842,11 @@ public class ImportTraceWizardPage extends WizardResourceImportPage implements L
 
         // Determine the sorted canonical list of items to import
         List<File> fileList = new ArrayList<File>();
-        for (String key : fileSystemObjects.keySet()) {
-            fileList.add(fileSystemObjects.get(key));
+        for (Entry<String, File> entry : fileSystemObjects.entrySet()) {
+            fileList.add(entry.getValue());
         }
         Collections.sort(fileList);
+
 
         // Perform a distinct import operation for everything that has the same prefix
         // (distinct prefixes correspond to traces - we don't want to re-create parent structures)

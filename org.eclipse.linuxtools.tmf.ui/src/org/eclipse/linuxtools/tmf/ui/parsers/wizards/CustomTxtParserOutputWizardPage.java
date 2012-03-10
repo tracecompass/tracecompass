@@ -38,11 +38,11 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
 //    Output messageOutput;
     Composite container;
     SashForm sash;
-    Text timestampFormatText;
-    Text timestampPreviewText;
+//    Text timestampFormatText;
+//    Text timestampPreviewText;
     ScrolledComposite outputsScrolledComposite;
     Composite outputsContainer;
-    ScrolledComposite inputScrolledComposite;
+//    ScrolledComposite inputScrolledComposite;
     Composite tableContainer;
     CustomEventsTable previewTable;
     File tmpFile;

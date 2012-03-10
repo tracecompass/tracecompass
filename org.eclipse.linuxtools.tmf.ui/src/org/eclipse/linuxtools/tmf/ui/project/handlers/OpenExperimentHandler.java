@@ -175,7 +175,7 @@ public class OpenExperimentHandler extends AbstractHandler {
                     activePage.reuseEditor((IReusableEditor) editor, editorInput);
                     activePage.activate(editor);
                 } else {
-                    editor = activePage.openEditor(editorInput, editorId);
+                    activePage.openEditor(editorInput, editorId);
                 }
                 experiment.initTrace(null, null, null, true);
                 IDE.setDefaultEditor(file, editorId);

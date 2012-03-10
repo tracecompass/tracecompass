@@ -189,7 +189,7 @@ public class OpenTraceHandler extends AbstractHandler {
                     activePage.reuseEditor((IReusableEditor) editor, editorInput);
                     activePage.activate(editor);
                 } else {
-                    editor = activePage.openEditor(editorInput, editorId);
+                    activePage.openEditor(editorInput, editorId);
                     if (resource instanceof IFile) {
                         IDE.setDefaultEditor((IFile) resource, editorId);
                     }

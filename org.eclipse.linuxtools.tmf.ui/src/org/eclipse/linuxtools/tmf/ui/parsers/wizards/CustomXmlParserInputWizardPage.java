@@ -464,7 +464,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         }
     }
 
-    private class InputElementTreeNodeContentProvider implements ITreeContentProvider {
+    private static class InputElementTreeNodeContentProvider implements ITreeContentProvider {
 
         @Override
         public Object[] getElements(Object inputElement) {
@@ -505,7 +505,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         }
     }
 
-    private class InputElementTreeLabelProvider extends ColumnLabelProvider {
+    private static class InputElementTreeLabelProvider extends ColumnLabelProvider {
 
         @Override
         public Image getImage(Object element) {
@@ -666,14 +666,16 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             }
         }
         if (inputStream != null) {
+            BufferedReader reader = null;
             try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                reader = new BufferedReader(new InputStreamReader(inputStream));
                 StringBuilder sb = new StringBuilder();
                 String line = null;
                 while ((line = reader.readLine()) != null) {
                     sb.append(line + "\n"); //$NON-NLS-1$
                 }
                 parseXmlInput(sb.toString());
+                reader.close();
                 return sb.toString();
             } catch (IOException e) {
                 return ""; //$NON-NLS-1$
@@ -738,6 +740,13 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         updatePreviews(false);
     }
 
+    private void initValues() {
+        timeStampValue = null;
+        timeStampFormat = null;
+        logEntriesCount = 0;
+        logEntryFound = false;
+    }
+
     private void updatePreviews(boolean updateAll) {
         if (inputText == null) {
             // early update during construction
@@ -748,10 +757,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             return;
         }
 
-        timeStampValue = null;
-        timeStampFormat = null;
-        logEntriesCount = 0;
-        logEntryFound = false;
+        initValues();
 
         selectedElement.updatePreview();
 

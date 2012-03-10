@@ -35,7 +35,7 @@ public class TmfBaseColumnDataProvider implements ITmfColumnDataProvider {
     /**
      * Contains the list of the columns
      */
-    protected static Vector<TmfBaseColumnData> fColumnData = null;
+    static Vector<TmfBaseColumnData> fColumnData = null;
 
     /**
      * Level column names

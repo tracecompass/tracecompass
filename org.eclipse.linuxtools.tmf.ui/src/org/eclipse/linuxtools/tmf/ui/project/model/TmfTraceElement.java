@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -258,7 +259,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
 
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        return sfDescriptors;
+        return (sfDescriptors != null) ? Arrays.copyOf(sfDescriptors, sfDescriptors.length) : null;
     }
 
     @Override
