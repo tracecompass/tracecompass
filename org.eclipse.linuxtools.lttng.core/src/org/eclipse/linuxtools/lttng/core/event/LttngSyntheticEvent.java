@@ -295,4 +295,53 @@ public class LttngSyntheticEvent extends LttngEvent {
 			return super.toString();
 		}
 	}
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((baseEvent == null) ? 0 : baseEvent.hashCode());
+        result = prime * result + ((fTraceModel == null) ? 0 : fTraceModel.hashCode());
+        result = prime * result + ((sequence == null) ? 0 : sequence.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof LttngSyntheticEvent)) {
+            return false;
+        }
+        LttngSyntheticEvent other = (LttngSyntheticEvent) obj;
+        if (baseEvent == null) {
+            if (other.baseEvent != null) {
+                return false;
+            }
+        } else if (!baseEvent.equals(other.baseEvent)) {
+            return false;
+        }
+        if (fTraceModel == null) {
+            if (other.fTraceModel != null) {
+                return false;
+            }
+        } else if (!fTraceModel.equals(other.fTraceModel)) {
+            return false;
+        }
+        if (sequence != other.sequence) {
+            return false;
+        }
+        return true;
+    }
+
 }

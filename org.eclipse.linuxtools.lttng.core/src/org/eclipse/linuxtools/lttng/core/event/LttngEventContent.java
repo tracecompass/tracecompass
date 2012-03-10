@@ -74,11 +74,11 @@ public class LttngEventContent extends TmfEventField {
         this((LttngEvent) oldContent.getEvent(), oldContent.getMapContent());
     }
     
-	public LttngEvent getEvent() {
+	public synchronized LttngEvent getEvent() {
         return fParentEvent;
     }
     
-    public void setEvent(LttngEvent newParent) {
+    public synchronized void setEvent(LttngEvent newParent) {
         fParentEvent = newParent;
     }
     
@@ -193,7 +193,7 @@ public class LttngEventContent extends TmfEventField {
      * @see @see org.eclipse.linuxtools.lttng.event.LttngEventField
      */
     @Override
-    public LttngEventField getField(int position) {
+    public synchronized LttngEventField getField(int position) {
         LttngEventField returnedField = null;
         String label = null;
 //		try {
@@ -244,7 +244,6 @@ public class LttngEventContent extends TmfEventField {
 	        	Object newValue =  tmpEvent.parseFieldByName(name);
 	            
 	            if ( newValue!= null ) {
-	                returnedField = new LttngEventField(name, newValue);
                     returnedField = new LttngEventField(name, newValue);
 	                fFieldsMap.put(name, returnedField );
 	            }
@@ -290,9 +289,45 @@ public class LttngEventContent extends TmfEventField {
 		clone.setValue(getValue(), subfields);
 		clone.fFieldsMap = new HashMap<String, LttngEventField>();
 		for (String key : fFieldsMap.keySet()) {
-			clone.fFieldsMap.put(new String(key), ((LttngEventField) fFieldsMap.get(key)).clone());
+			clone.fFieldsMap.put(key, ((LttngEventField) fFieldsMap.get(key)).clone());
 		}
 		return clone;
 	}
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((fFieldsMap == null) ? 0 : fFieldsMap.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof LttngEventContent)) {
+            return false;
+        }
+        LttngEventContent other = (LttngEventContent) obj;
+        if (fFieldsMap == null) {
+            if (other.fFieldsMap != null) {
+                return false;
+            }
+        } else if (!fFieldsMap.equals(other.fFieldsMap)) {
+            return false;
+        }
+        return true;
+    }
 
 }

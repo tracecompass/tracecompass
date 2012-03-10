@@ -225,7 +225,7 @@ public class TmfEventTest extends TestCase {
     // Setters
     // ------------------------------------------------------------------------
 
-    private class TestEvent extends TmfEvent {
+    private static class TestEvent extends TmfEvent {
         
         public TestEvent(ITmfEvent event) {
             super(event);

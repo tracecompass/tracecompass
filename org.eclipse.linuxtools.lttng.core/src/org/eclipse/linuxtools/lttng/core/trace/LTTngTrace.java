@@ -65,11 +65,11 @@ class LTTngTraceException extends LttngException {
  */
 public class LTTngTrace extends TmfTrace<LttngEvent> {
 
-    public static boolean PrintDebug = false;
-    public static boolean UniqueEvent = true;
+    public final static boolean PRINT_DEBUG = false;
+    public final static boolean UNIQUE_EVENT = true;
 
     private final static boolean SHOW_LTT_DEBUG_DEFAULT = false;
-    private final static boolean IS_PARSING_NEEDED_DEFAULT = !UniqueEvent;
+    private final static boolean IS_PARSING_NEEDED_DEFAULT = !UNIQUE_EVENT;
     private final static int CHECKPOINT_PAGE_SIZE = 50000;
     private final static long LTTNG_STREAMING_INTERVAL = 2000; // in ms
 
@@ -135,7 +135,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         initLTTngTrace(name, path, eventType, cacheSize, indexTrace);
     }
 
-    private void initLTTngTrace(String name, String path, Class<LttngEvent> eventType, int cacheSize, boolean indexTrace) throws FileNotFoundException {
+    private synchronized void initLTTngTrace(String name, String path, Class<LttngEvent> eventType, int cacheSize, boolean indexTrace) throws FileNotFoundException {
         super.initTrace(name, path, eventType, indexTrace);
         try {
             currentJniTrace = JniTraceFactory.getJniTrace(path, traceLibPath, SHOW_LTT_DEBUG_DEFAULT);
@@ -482,7 +482,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         // // [lmcfrch]
         // lastTime = 0;
 
-        if (PrintDebug) {
+        if (PRINT_DEBUG) {
             System.out.println("seekLocation(location) location -> " + location); //$NON-NLS-1$
         }
 
@@ -525,7 +525,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     @Override
     public synchronized TmfContext seekEvent(ITmfTimestamp timestamp) {
 
-        if (PrintDebug) {
+        if (PRINT_DEBUG) {
             System.out.println("seekEvent(timestamp) timestamp -> " + timestamp); //$NON-NLS-1$
         }
 
@@ -559,7 +559,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     @Override
     public synchronized TmfContext seekEvent(long position) {
 
-        if (PrintDebug) {
+        if (PRINT_DEBUG) {
             System.out.println("seekEvent(position) position -> " + position); //$NON-NLS-1$
         }
 
@@ -650,7 +650,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     @Override
     public synchronized LttngEvent getNextEvent(ITmfContext context) {
 
-        if (PrintDebug) {
+        if (PRINT_DEBUG) {
             System.out.println("getNextEvent(context) context.getLocation() -> " //$NON-NLS-1$
                     + context.getLocation());
         }
@@ -673,7 +673,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         if ((!(curLocation.isLastOperationParse()))
                 || (previousLocation.getOperationTimeValue() != curLocation.getOperationTimeValue())) {
             if (previousLocation.getOperationTimeValue() != curLocation.getOperationTimeValue()) {
-                if (PrintDebug) {
+                if (PRINT_DEBUG) {
                     System.out.println("\t\tSeeking in getNextEvent. [ LastTime : " //$NON-NLS-1$
                             + previousLocation.getOperationTimeValue() + " CurrentTime" //$NON-NLS-1$
                             + curLocation.getOperationTimeValue() + " ]"); //$NON-NLS-1$
@@ -706,7 +706,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     }
 
     // this method was extracted for profiling purposes
-    private void setPreviousAndCurrentTimes(ITmfContext context, LttngEvent returnedEvent, LttngLocation curLocation) {
+    private synchronized void setPreviousAndCurrentTimes(ITmfContext context, LttngEvent returnedEvent, LttngLocation curLocation) {
 
         ITmfTimestamp eventTimestamp = returnedEvent.getTimestamp();
         // long eventTime = eventTimestamp.getValue();
@@ -743,7 +743,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     }
 
     // this method was extracted for profiling purposes
-    private LttngEvent readNextEvent(LttngLocation curLocation) {
+    private synchronized LttngEvent readNextEvent(LttngLocation curLocation) {
         LttngEvent returnedEvent;
         // Read the next event from the trace. The last one will NO LONGER BE
         // VALID.
@@ -781,7 +781,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     @Override
     public synchronized LttngEvent parseEvent(ITmfContext context) {
 
-        if (PrintDebug) {
+        if (PRINT_DEBUG) {
             System.out.println("parseEvent(context) context.getLocation() -> " //$NON-NLS-1$
                     + context.getLocation());
         }
@@ -824,7 +824,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
             // Previous time != Current time : We need to reposition to the
             // current time
             if (previousLocation.getOperationTimeValue() != curLocation.getOperationTimeValue()) {
-                if (PrintDebug) {
+                if (PRINT_DEBUG) {
                     System.out.println("\t\tSeeking in getNextEvent. [ LastTime : " //$NON-NLS-1$
                             + previousLocation.getOperationTimeValue() + " CurrentTime" //$NON-NLS-1$
                             + curLocation.getOperationTimeValue() + " ]"); //$NON-NLS-1$
@@ -930,7 +930,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      */
     public synchronized LttngEvent convertJniEventToTmf(JniEvent jniEvent, boolean isParsingNeeded) {
 
-        if (UniqueEvent) {
+        if (UNIQUE_EVENT) {
 
             // ***
             // UNHACKED : We can no longer do that because TCF need to maintain

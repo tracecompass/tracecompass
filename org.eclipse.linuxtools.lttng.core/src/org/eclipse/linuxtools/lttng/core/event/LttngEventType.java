@@ -115,11 +115,67 @@ public class LttngEventType extends TmfEventType {
     @Override
 	public LttngEventType clone() {
     	LttngEventType clone = (LttngEventType) super.clone();
-		clone.tracefileName = new String(tracefileName);
-		clone.cpuId         = new Long(cpuId);
-		clone.markerName    = new String(markerName);
+		clone.tracefileName = tracefileName;
+		clone.cpuId         = Long.valueOf(cpuId);
+		clone.markerName    = markerName;
 		clone.markerId      = markerId;
     	return clone;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((cpuId == null) ? 0 : cpuId.hashCode());
+        result = prime * result + markerId;
+        result = prime * result + ((markerName == null) ? 0 : markerName.hashCode());
+        result = prime * result + ((tracefileName == null) ? 0 : tracefileName.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof LttngEventType)) {
+            return false;
+        }
+        LttngEventType other = (LttngEventType) obj;
+        if (cpuId == null) {
+            if (other.cpuId != null) {
+                return false;
+            }
+        } else if (!cpuId.equals(other.cpuId)) {
+            return false;
+        }
+        if (markerId != other.markerId) {
+            return false;
+        }
+        if (markerName == null) {
+            if (other.markerName != null) {
+                return false;
+            }
+        } else if (!markerName.equals(other.markerName)) {
+            return false;
+        }
+        if (tracefileName == null) {
+            if (other.tracefileName != null) {
+                return false;
+            }
+        } else if (!tracefileName.equals(other.tracefileName)) {
+            return false;
+        }
+        return true;
     }
 
 }

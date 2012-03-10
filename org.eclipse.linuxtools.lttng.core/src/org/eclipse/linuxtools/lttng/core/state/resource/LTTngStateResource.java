@@ -92,4 +92,44 @@ public class LTTngStateResource extends
 		return fcontext;
 	}
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((fcontext == null) ? 0 : fcontext.hashCode());
+        result = prime * result + ((fstateMode == null) ? 0 : fstateMode.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof LTTngStateResource)) {
+            return false;
+        }
+        LTTngStateResource other = (LTTngStateResource) obj;
+        if (fcontext == null) {
+            if (other.fcontext != null) {
+                return false;
+            }
+        } else if (!fcontext.equals(other.fcontext)) {
+            return false;
+        }
+        if (fstateMode != other.fstateMode) {
+            return false;
+        }
+        return true;
+    }
+
 }

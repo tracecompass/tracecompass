@@ -104,7 +104,7 @@ public class LttngSyntheticEventProvider extends TmfEventProvider<LttngSynthetic
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ITmfContext armRequest(final ITmfDataRequest<LttngSyntheticEvent> request) {
+	public synchronized ITmfContext armRequest(final ITmfDataRequest<LttngSyntheticEvent> request) {
 		// validate
 		// make sure we have the right type of request
 		if (!(request instanceof ITmfEventRequest<?>)) {

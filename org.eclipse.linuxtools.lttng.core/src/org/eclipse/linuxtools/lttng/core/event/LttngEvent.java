@@ -209,4 +209,40 @@ public class LttngEvent extends TmfEvent {
     	return clone;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public synchronized int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((jniEventReference == null) ? 0 : jniEventReference.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public synchronized boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof LttngEvent)) {
+            return false;
+        }
+        LttngEvent other = (LttngEvent) obj;
+        if (jniEventReference == null) {
+            if (other.jniEventReference != null) {
+                return false;
+            }
+        } else if (!jniEventReference.equals(other.jniEventReference)) {
+            return false;
+        }
+        return true;
+    }
+
 }

@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.core.state;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -624,28 +625,28 @@ public class StateStrings {
 	 * @return the mapping from int (0..255) to system call names
 	 */
 	public String[] getSyscallNames() {
-		return syscall_names;
+		return Arrays.copyOf(syscall_names, syscall_names.length);
 	}
 
 	/**
 	 * @return the mapping from int (0..255) to trap names
 	 */
 	public String[] getTrapNames() {
-		return trap_names;
+		return Arrays.copyOf(trap_names, trap_names.length);
 	}
 
 	/**
 	 * @return the mapping from int (0..255) to IRQ names
 	 */
 	public String[] getIrqNames() {
-		return irq_names;
+		return Arrays.copyOf(irq_names, irq_names.length);
 	}
 
 	/**
 	 * @return the mapping from int (0..31) to soft IRQ names
 	 */
 	public String[] getSoftIrqNames() {
-		return soft_irq_names;
+		return Arrays.copyOf(soft_irq_names, soft_irq_names.length);
 	}
 
 }

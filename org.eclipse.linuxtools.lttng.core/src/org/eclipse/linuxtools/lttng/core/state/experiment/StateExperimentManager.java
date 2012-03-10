@@ -490,13 +490,14 @@ public class StateExperimentManager extends LTTngTreeNode implements ILttExperim
         return syntheticEvent;
     }
 
+    
     /**
      * Helper class that wraps the StateTraceManager, the current LTTngTraceState and the number of read events
      * 
      * @author bHufmann
      * 
      */
-    private class StateTraceHelper {
+    private static class StateTraceHelper {
 
         IStateTraceManager stateTraceManager = null;
         long numberEventsRead = 0;
