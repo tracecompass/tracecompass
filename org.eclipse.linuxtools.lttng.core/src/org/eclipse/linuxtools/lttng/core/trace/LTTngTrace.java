@@ -504,6 +504,12 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         // seekEvent(timestamp)
         TmfContext context = seekEvent(curLocation.getOperationTime());
 
+        // If the location is marked with the read next flag
+        // then it is pointing to the next event following the operation time
+        if (curLocation.isLastOperationReadNext()) {
+            getNextEvent(context);
+        }
+
         return context;
     }
 
