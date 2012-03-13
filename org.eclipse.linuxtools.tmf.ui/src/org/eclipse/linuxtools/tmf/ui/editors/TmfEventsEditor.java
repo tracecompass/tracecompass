@@ -290,8 +290,10 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         }
         TmfEventsTable eventsTable = null;
         try {
-            String traceType = null;
-                traceType = fTrace.getResource().getPersistentProperty(TmfTraceElement.TRACETYPE);
+            if (fTrace.getResource() == null) {
+                return null;
+            }
+            String traceType = fTrace.getResource().getPersistentProperty(TmfTraceElement.TRACETYPE);
             if (traceType == null) {
                 return null;
             }
