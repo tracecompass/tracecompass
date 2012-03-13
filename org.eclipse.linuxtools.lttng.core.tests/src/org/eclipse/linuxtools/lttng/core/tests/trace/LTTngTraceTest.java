@@ -58,6 +58,9 @@ public class LTTngTraceTest extends TestCase {
     private final static long   locationToSeekTest1 = 13589826657302L;
     private final static long   contextValueAfterSeekTest1 = 13589826657302L;
     private final static String seek1EventReference = tracename + "/vm_state_0"; 
+    private final static long   seekTimestamp = 13589826657302L;
+    private final static long   nextEventTimestamp = 13589826659739L;
+    private final static long   nextnextEventTimestamp = 13589826662017L;
     
     private final static long   timestampToSeekLast = 13589906758692L;
     private final static Long	indexToSeekLast = 15315L;
@@ -230,7 +233,183 @@ public class LTTngTraceTest extends TestCase {
 		assertNotSame("tmpEvent is null after seekLocation() to start ",null,tmpEvent );
 		assertTrue("tmpEvent has wrong reference after seekLocation() to start", firstEventReference.contains((String)tmpEvent.getReference()));
 	}
-	
+
+    public void testLocationOperations() {
+        TmfEvent tmpEvent = null;
+        TmfContext tmpContext = new TmfContext(null, 0);
+        LTTngTrace testStream1 = prepareStreamToTest();
+
+        // Test LttngLocation after a seek
+        tmpContext = testStream1.seekLocation(new LttngLocation(seekTimestamp));
+        LttngLocation location = (LttngLocation) tmpContext.getLocation().clone();
+        assertTrue("location has wrong flag", location.isLastOperationSeek());
+        assertEquals("location has wrong operation time", seekTimestamp, location.getOperationTimeValue());
+        tmpContext = testStream1.seekLocation(location);
+        tmpEvent = testStream1.getNextEvent(tmpContext);
+        assertTrue("tmpContext is null after getNextEvent()", tmpEvent != null);
+        assertEquals("tmpEvent has wrong timestamp", seekTimestamp, tmpEvent.getTimestamp().getValue());
+
+        // Test LttngLocation after a parse
+        tmpContext = testStream1.seekLocation(new LttngLocation(seekTimestamp));
+        tmpEvent = testStream.parseEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", seekTimestamp, tmpEvent.getTimestamp().getValue());
+        location = (LttngLocation) tmpContext.getLocation().clone();
+        assertTrue("location has wrong flag", location.isLastOperationParse());
+        assertEquals("location has wrong operation time", seekTimestamp, location.getOperationTimeValue());
+        tmpContext = testStream1.seekLocation(location);
+        tmpEvent = testStream1.getNextEvent(tmpContext);
+        assertTrue("tmpContext is null after getNextEvent()", tmpEvent != null);
+        assertEquals("tmpEvent has wrong timestamp", seekTimestamp, tmpEvent.getTimestamp().getValue());
+
+        // Test LttngLocation after a getNext
+        tmpContext = testStream1.seekLocation(new LttngLocation(seekTimestamp));
+        tmpEvent = testStream.getNextEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", seekTimestamp, tmpEvent.getTimestamp().getValue());
+        location = (LttngLocation) tmpContext.getLocation().clone();
+        assertTrue("location has wrong flag", location.isLastOperationReadNext());
+        assertEquals("location has wrong operation time", seekTimestamp, location.getOperationTimeValue());
+        tmpContext = testStream1.seekLocation(location);
+        tmpEvent = testStream1.getNextEvent(tmpContext);
+        assertTrue("tmpContext is null after getNextEvent()", tmpEvent != null);
+        assertEquals("tmpEvent has wrong timestamp", nextEventTimestamp, tmpEvent.getTimestamp().getValue());
+
+        // Test LttngLocation after a parse and parse
+        tmpContext = testStream1.seekLocation(new LttngLocation(seekTimestamp));
+        tmpEvent = testStream.parseEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", seekTimestamp, tmpEvent.getTimestamp().getValue());
+        tmpEvent = testStream.parseEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", seekTimestamp, tmpEvent.getTimestamp().getValue());
+        location = (LttngLocation) tmpContext.getLocation().clone();
+        assertTrue("location has wrong flag", location.isLastOperationParse());
+        assertEquals("location has wrong operation time", seekTimestamp, location.getOperationTimeValue());
+        tmpContext = testStream1.seekLocation(location);
+        tmpEvent = testStream1.getNextEvent(tmpContext);
+        assertTrue("tmpContext is null after getNextEvent()", tmpEvent != null);
+        assertEquals("tmpEvent has wrong timestamp", seekTimestamp, tmpEvent.getTimestamp().getValue());
+
+        // Test LttngLocation after a getNext and getNext
+        tmpContext = testStream1.seekLocation(new LttngLocation(seekTimestamp));
+        tmpEvent = testStream.getNextEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", seekTimestamp, tmpEvent.getTimestamp().getValue());
+        tmpEvent = testStream.getNextEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", nextEventTimestamp, tmpEvent.getTimestamp().getValue());
+        location = (LttngLocation) tmpContext.getLocation().clone();
+        assertTrue("location has wrong flag", location.isLastOperationReadNext());
+        assertEquals("location has wrong operation time", nextEventTimestamp, location.getOperationTimeValue());
+        tmpContext = testStream1.seekLocation(location);
+        tmpEvent = testStream1.getNextEvent(tmpContext);
+        assertTrue("tmpContext is null after getNextEvent()", tmpEvent != null);
+        assertEquals("tmpEvent has wrong timestamp", nextnextEventTimestamp, tmpEvent.getTimestamp().getValue());
+
+        // Test LttngLocation after a getNext and parse
+        tmpContext = testStream1.seekLocation(new LttngLocation(seekTimestamp));
+        tmpEvent = testStream.getNextEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", seekTimestamp, tmpEvent.getTimestamp().getValue());
+        tmpEvent = testStream.parseEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", nextEventTimestamp, tmpEvent.getTimestamp().getValue());
+        location = (LttngLocation) tmpContext.getLocation().clone();
+        assertTrue("location has wrong flag", location.isLastOperationParse());
+        assertEquals("location has wrong operation time", nextEventTimestamp, location.getOperationTimeValue());
+        tmpContext = testStream1.seekLocation(location);
+        tmpEvent = testStream1.getNextEvent(tmpContext);
+        assertTrue("tmpContext is null after getNextEvent()", tmpEvent != null);
+        assertEquals("tmpEvent has wrong timestamp", nextEventTimestamp, tmpEvent.getTimestamp().getValue());
+
+        // Test LttngLocation after a parse and getNext
+        tmpContext = testStream1.seekLocation(new LttngLocation(seekTimestamp));
+        tmpEvent = testStream.parseEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", seekTimestamp, tmpEvent.getTimestamp().getValue());
+        tmpEvent = testStream.getNextEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", seekTimestamp, tmpEvent.getTimestamp().getValue());
+        location = (LttngLocation) tmpContext.getLocation().clone();
+        assertTrue("location has wrong flag", location.isLastOperationReadNext());
+        assertEquals("location has wrong operation time", seekTimestamp, location.getOperationTimeValue());
+        tmpContext = testStream1.seekLocation(location);
+        tmpEvent = testStream1.getNextEvent(tmpContext);
+        assertTrue("tmpContext is null after getNextEvent()", tmpEvent != null);
+        assertEquals("tmpEvent has wrong timestamp", nextEventTimestamp, tmpEvent.getTimestamp().getValue());
+
+        // Test LttngLocation after a parse, getNext and parse
+        tmpContext = testStream1.seekLocation(new LttngLocation(seekTimestamp));
+        tmpEvent = testStream.parseEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", seekTimestamp, tmpEvent.getTimestamp().getValue());
+        tmpEvent = testStream.getNextEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", seekTimestamp, tmpEvent.getTimestamp().getValue());
+        tmpEvent = testStream.parseEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", nextEventTimestamp, tmpEvent.getTimestamp().getValue());
+        location = (LttngLocation) tmpContext.getLocation().clone();
+        assertTrue("location has wrong flag", location.isLastOperationParse());
+        assertEquals("location has wrong operation time", nextEventTimestamp, location.getOperationTimeValue());
+        tmpContext = testStream1.seekLocation(location);
+        tmpEvent = testStream1.getNextEvent(tmpContext);
+        assertTrue("tmpContext is null after getNextEvent()", tmpEvent != null);
+        assertEquals("tmpEvent has wrong timestamp", nextEventTimestamp, tmpEvent.getTimestamp().getValue());
+
+        // Test LttngLocation after a parse, getNext and getNext
+        tmpContext = testStream1.seekLocation(new LttngLocation(seekTimestamp));
+        tmpEvent = testStream.parseEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", seekTimestamp, tmpEvent.getTimestamp().getValue());
+        tmpEvent = testStream.getNextEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", seekTimestamp, tmpEvent.getTimestamp().getValue());
+        tmpEvent = testStream.getNextEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", nextEventTimestamp, tmpEvent.getTimestamp().getValue());
+        location = (LttngLocation) tmpContext.getLocation().clone();
+        assertTrue("location has wrong flag", location.isLastOperationReadNext());
+        assertEquals("location has wrong operation time", nextEventTimestamp, location.getOperationTimeValue());
+        tmpContext = testStream1.seekLocation(location);
+        tmpEvent = testStream1.getNextEvent(tmpContext);
+        assertTrue("tmpContext is null after getNextEvent()", tmpEvent != null);
+        assertEquals("tmpEvent has wrong timestamp", nextnextEventTimestamp, tmpEvent.getTimestamp().getValue());
+
+        // Test LttngLocation after a getNext, parse and parse
+        tmpContext = testStream1.seekLocation(new LttngLocation(seekTimestamp));
+        tmpEvent = testStream.getNextEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", seekTimestamp, tmpEvent.getTimestamp().getValue());
+        tmpEvent = testStream.parseEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", nextEventTimestamp, tmpEvent.getTimestamp().getValue());
+        tmpEvent = testStream.parseEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", nextEventTimestamp, tmpEvent.getTimestamp().getValue());
+        location = (LttngLocation) tmpContext.getLocation().clone();
+        assertTrue("location has wrong flag", location.isLastOperationParse());
+        assertEquals("location has wrong operation time", nextEventTimestamp, location.getOperationTimeValue());
+        tmpContext = testStream1.seekLocation(location);
+        tmpEvent = testStream1.getNextEvent(tmpContext);
+        assertTrue("tmpContext is null after getNextEvent()", tmpEvent != null);
+        assertEquals("tmpEvent has wrong timestamp", nextEventTimestamp, tmpEvent.getTimestamp().getValue());
+
+        // Test LttngLocation after a getNext, parse and getNext
+        tmpContext = testStream1.seekLocation(new LttngLocation(seekTimestamp));
+        tmpEvent = testStream.getNextEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", seekTimestamp, tmpEvent.getTimestamp().getValue());
+        tmpEvent = testStream.parseEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", nextEventTimestamp, tmpEvent.getTimestamp().getValue());
+        tmpEvent = testStream.getNextEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", nextEventTimestamp, tmpEvent.getTimestamp().getValue());
+        location = (LttngLocation) tmpContext.getLocation().clone();
+        assertTrue("location has wrong flag", location.isLastOperationReadNext());
+        assertEquals("location has wrong operation time", nextEventTimestamp, location.getOperationTimeValue());
+        tmpContext = testStream1.seekLocation(location);
+        tmpEvent = testStream1.getNextEvent(tmpContext);
+        assertTrue("tmpContext is null after getNextEvent()", tmpEvent != null);
+        assertEquals("tmpEvent has wrong timestamp", nextnextEventTimestamp, tmpEvent.getTimestamp().getValue());
+
+        // Test LttngLocation after a getNext, getNext and parse
+        tmpContext = testStream1.seekLocation(new LttngLocation(seekTimestamp));
+        tmpEvent = testStream.getNextEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", seekTimestamp, tmpEvent.getTimestamp().getValue());
+        tmpEvent = testStream.getNextEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", nextEventTimestamp, tmpEvent.getTimestamp().getValue());
+        tmpEvent = testStream.parseEvent(tmpContext);
+        assertEquals("tmpEvent has wrong timestamp", nextnextEventTimestamp, tmpEvent.getTimestamp().getValue());
+        location = (LttngLocation) tmpContext.getLocation().clone();
+        assertTrue("location has wrong flag", location.isLastOperationParse());
+        assertEquals("location has wrong operation time", nextnextEventTimestamp, location.getOperationTimeValue());
+        tmpContext = testStream1.seekLocation(location);
+        tmpEvent = testStream1.getNextEvent(tmpContext);
+        assertTrue("tmpContext is null after getNextEvent()", tmpEvent != null);
+        assertEquals("tmpEvent has wrong timestamp", nextnextEventTimestamp, tmpEvent.getTimestamp().getValue());
+    }
+
 	public void testGetter() {
     	TmfEvent tmpEvent = null;
     	LTTngTrace testStream1 = prepareStreamToTest();
