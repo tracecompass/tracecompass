@@ -504,6 +504,12 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         // seekEvent(timestamp)
         TmfContext context = seekEvent(curLocation.getOperationTime());
 
+        // If the location is marked with the read next flag
+        // then it is pointing to the next event following the operation time
+        if (curLocation.isLastOperationReadNext()) {
+            getNextEvent(context);
+        }
+
         return context;
     }
 
@@ -689,11 +695,10 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
             // one we read)
             returnedEvent = currentLttngEvent;
 
-            // *** IMPORTANT!
-            // Reset (erase) the operation marker to both location, to be able
-            // to detect we did NOT "read" this event
-            previousLocation.resetLocationState();
-            curLocation.resetLocationState();
+            // Set the operation marker as read to both locations, to be able to
+            // detect we need to read the next event
+            previousLocation.setLastOperationReadNext();
+            curLocation.setLastOperationReadNext();
         }
 
         // If we read an event, set it's time to the locations (both previous
@@ -750,8 +755,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         returnedEvent = readEvent(curLocation);
         nbEventsRead++;
 
-        // Set the operation marker as read to both location, to be able to
-        // detect we did "read" this event
+        // Set the operation marker as read to both locations, to be able to
+        // detect we need to read the next event
         previousLocation.setLastOperationReadNext();
         curLocation.setLastOperationReadNext();
         return returnedEvent;
@@ -814,12 +819,11 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 
         // *** Positionning trick :
         // ParseEvent only read the trace if :
-        // 1- The last operation was NOT a ParseEvent or a GetNextEvent --> A
-        // read is required
+        // 1- The last operation was NOT a ParseEvent --> A read is required
         // OR
         // 2- The time of the previous location is different from the current
         // one --> A seek + a read is required
-        if (((!(curLocation.isLastOperationParse())) && ((!(curLocation.isLastOperationReadNext()))))
+        if (!curLocation.isLastOperationParse()
                 || (previousLocation.getOperationTimeValue() != curLocation.getOperationTimeValue())) {
             // Previous time != Current time : We need to reposition to the
             // current time
