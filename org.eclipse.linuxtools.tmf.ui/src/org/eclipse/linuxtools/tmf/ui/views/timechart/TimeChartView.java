@@ -31,6 +31,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.ui.editors.ITmfTraceEditor;
@@ -157,7 +158,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
         if (decorationProvider == null) {
             return; // the trace has been closed
         }
-        TmfContext context = null;
+        ITmfContext context = null;
         // TmfTimestamp lastTimestamp = null;
         boolean done = false;
         while (!done) {
@@ -339,7 +340,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
         private volatile boolean interrupted = false;
         private final TimeChartAnalysisEntry fTimeAnalysisEntry;
         private final TimeChartDecorationProvider fDecorationProvider;
-        private TmfContext fContext;
+        private ITmfContext fContext;
         private int fCount = 0;
 
         private DecorateThread(TimeChartAnalysisEntry timeAnalysisEntry) {

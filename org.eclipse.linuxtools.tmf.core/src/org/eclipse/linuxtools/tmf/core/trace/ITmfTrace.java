@@ -86,11 +86,11 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
      * @param rank
      * @return a context object for subsequent reads
      */
-    public TmfContext seekLocation(ITmfLocation<?> location);
+    public ITmfContext seekLocation(ITmfLocation<?> location);
 
-    public TmfContext seekEvent(ITmfTimestamp timestamp);
+    public ITmfContext seekEvent(ITmfTimestamp timestamp);
 
-    public TmfContext seekEvent(long rank);
+    public ITmfContext seekEvent(long rank);
 
     /**
      * Positions the trace at the event located at the specified ratio.
@@ -101,7 +101,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
      *            a floating-point number between 0.0 (beginning) and 1.0 (end)
      * @return a context object for subsequent reads
      */
-    public TmfContext seekLocation(double ratio);
+    public ITmfContext seekLocation(double ratio);
 
     /**
      * Returns the ratio corresponding to the specified location.

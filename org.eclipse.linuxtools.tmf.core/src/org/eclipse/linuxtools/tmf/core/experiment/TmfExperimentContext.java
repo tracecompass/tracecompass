@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.tmf.core.experiment;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
@@ -102,7 +103,7 @@ public class TmfExperimentContext extends TmfContext {
 		return fTraces;
 	}
 
-	public TmfContext[] getContexts() {
+	public ITmfContext[] getContexts() {
 		return fContexts;
 	}
 

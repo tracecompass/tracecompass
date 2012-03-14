@@ -30,6 +30,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 
@@ -128,7 +129,7 @@ public class LTTngExperiment<T extends ITmfEvent> extends TmfExperiment<T> {
         // If an event was consumed previously, get the next one from that trace
         int lastTrace = expContext.getLastTrace();
         if (lastTrace != TmfExperimentContext.NO_TRACE) {
-            TmfContext traceContext = expContext.getContexts()[lastTrace];
+            ITmfContext traceContext = expContext.getContexts()[lastTrace];
             expContext.getEvents()[lastTrace] = expContext.getTraces()[lastTrace].getNextEvent(traceContext);
             expContext.setLastTrace(TmfExperimentContext.NO_TRACE);
         }
@@ -163,9 +164,9 @@ public class LTTngExperiment<T extends ITmfEvent> extends TmfExperiment<T> {
         if (trace != TmfExperimentContext.NO_TRACE) {
 //	        updateIndex(expContext, timestamp);
 
-            TmfContext traceContext = expContext.getContexts()[trace];
+            ITmfContext traceContext = expContext.getContexts()[trace];
             TmfExperimentLocation expLocation = (TmfExperimentLocation) expContext.getLocation();
-            expLocation.getLocation().locations[trace] = traceContext.getLocation();
+            expLocation.getLocation().locations[trace] = (ITmfLocation<? extends Comparable<?>>) traceContext.getLocation();
 
             updateIndex(expContext, timestamp);
 
