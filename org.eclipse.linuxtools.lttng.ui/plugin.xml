@@ -119,11 +119,11 @@
     <extension point="org.eclipse.rse.core.subsystemConfigurations">
         <configuration
               category="users"
-              class="org.eclipse.linuxtools.lttng.ui.tracecontrol.subsystems.TraceSubSystemConfiguration"
+              class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.subsystems.TraceSubSystemConfiguration"
               description="%lttng.rse.subsystem.config.description"
               icon="icons/obj16/garland16.gif"
               iconlive="icons/obj16/garland16-live.gif"
-              id="org.eclipse.linuxtools.lttng.ui.tracecontrol.subsystems.TraceSubSystemConfiguration"
+              id="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.subsystems.TraceSubSystemConfiguration"
               name="%lttng.rse.subsystem.config.name"
               systemTypeIds="org.eclipse.tm.tcf.rse.systemType"
               vendor="%Bundle-Vendor">
@@ -139,10 +139,10 @@
              description="%lttng.rse.subsystem.type.description"
              icon="icons/obj16/systemlttng.gif"
              iconLive="icons/obj16/systemlttng-live.gif"
-             id="org.eclipse.linuxtools.lttng.ui.tracecontrol.systemType"
+             id="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.systemType"
              label="%lttng.rse.subsystem.type.name"
-             name="org.eclipse.linuxtools.lttng.ui.tracecontrol.systemType"
-             subsystemConfigurationIds="org.eclipse.linuxtools.lttng.ui.tracecontrol.subsystems.TraceSubSystemConfiguration;org.eclipse.tm.tcf.rse.Processes;org.eclipse.tm.tcf.rse.Shells;org.eclipse.tm.tcf.rse.Files;org.eclipse.tm.tcf.rse.Terminals">
+             name="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.systemType"
+             subsystemConfigurationIds="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.subsystems.TraceSubSystemConfiguration;org.eclipse.tm.tcf.rse.Processes;org.eclipse.tm.tcf.rse.Shells;org.eclipse.tm.tcf.rse.Files;org.eclipse.tm.tcf.rse.Terminals">
        </systemType>
     </extension>
      
@@ -151,7 +151,7 @@
    <!-- ======================================= -->
    <extension point="org.eclipse.ui.popupMenus">
        <objectContribution
-             id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.deletetrace"
+             id="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.deletetrace"
              objectClass="org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource">
           <action
                 class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.DeleteTrace"
@@ -176,13 +176,13 @@
        </objectContribution>
        <objectContribution
              adaptable="false"
-             id="org.eclipse.linuxtools.lttng.ui.tracecontrol.importtrace"
+             id="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.importtrace"
              objectClass="org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource">
           <action
                 class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.ImportToProject"
                 enablesFor="*"
                 icon="icons/elcl16/import_trace.gif"
-                id="org.eclipse.linuxtools.lttng.ui.tracecontrol.action1"
+                id="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.action1"
                 label="%action.import.label"
                 menubarPath="additions"
                 tooltip="%action.import.tooltip">
@@ -200,7 +200,7 @@
           </action>
        </objectContribution>
       <objectContribution
-               id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.createnewtrace"
+               id="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.createnewtrace"
                objectClass="org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TargetResource">
             <action
                    label="%action.newtrace.label"
@@ -238,7 +238,7 @@
            </action>
        </objectContribution>
        <objectContribution
-             id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.stoptrace"
+             id="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.stoptrace"
              objectClass="org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource">
           <action
                 class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.StopTrace"
@@ -262,7 +262,7 @@
           </action>
        </objectContribution>
        <objectContribution
-             id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.pausetrace"
+             id="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.pausetrace"
              objectClass="org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource">
           <action
                 class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.PauseTrace"
@@ -287,7 +287,7 @@
        </objectContribution>
        <objectContribution
                objectClass="org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource"
-               id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.starttrace">
+               id="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.starttrace">
            <action
                  class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.StartTrace"
                  enablesFor="*"
@@ -307,7 +307,7 @@
        
        <objectContribution
                objectClass="org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TargetResource"
-               id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.configuremarkers">
+               id="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.configuremarkers">
            <action
                    label="%action.configuremarkers.label"
                    tooltip="%action.configuremarkers.tooltip"
@@ -329,7 +329,7 @@
          
          
       <viewContribution
-            id="org.eclipse.linuxtools.lttng.ui.tracecontrol.viewContribution.stop"
+            id="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.viewContribution.stop"
             targetID="org.eclipse.rse.ui.view.systemView">
          <action
                class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.StopTrace"
@@ -356,7 +356,7 @@
       </viewContribution>
       
       <viewContribution
-            id="org.eclipse.linuxtools.lttng.ui.tracecontrol.viewContribution.pause"
+            id="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.viewContribution.pause"
             targetID="org.eclipse.rse.ui.view.systemView">
          <action
                class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.PauseTrace"
@@ -383,7 +383,7 @@
       </viewContribution>
       
       <viewContribution
-            id="org.eclipse.linuxtools.lttng.ui.tracecontrol.viewContribution.start"
+            id="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.viewContribution.start"
             targetID="org.eclipse.rse.ui.view.systemView">
          <action
                class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.StartTrace"
