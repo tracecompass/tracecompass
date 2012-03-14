@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+
 /**
  * <b><u>SequenceDeclaration</u></b>
  */
@@ -52,7 +54,15 @@ public class SequenceDeclaration implements IDeclaration {
     @Override
     public SequenceDefinition createDefinition(
             IDefinitionScope definitionScope, String fieldName) {
-        return new SequenceDefinition(this, definitionScope, fieldName);
+        SequenceDefinition ret = null;
+        try {
+            ret = new SequenceDefinition(this, definitionScope, fieldName);
+        } catch (CTFReaderException e) {
+            // Temporarily catch this here, eventually this should be thrown
+            // up the call stack
+            e.printStackTrace();
+        }
+        return ret;
     }
 
     @Override
