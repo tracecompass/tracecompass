@@ -11,7 +11,7 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.model.trange;
 
-import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
+import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngTraceState;
 
 
 /**

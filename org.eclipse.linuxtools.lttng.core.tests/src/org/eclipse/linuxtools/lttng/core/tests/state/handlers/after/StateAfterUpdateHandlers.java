@@ -13,13 +13,13 @@ package org.eclipse.linuxtools.lttng.core.tests.state.handlers.after;
 
 
 
-import org.eclipse.linuxtools.lttng.core.TraceDebug;
-import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.core.state.StateStrings.ExecutionMode;
-import org.eclipse.linuxtools.lttng.core.state.evProcessor.ILttngEventProcessor;
-import org.eclipse.linuxtools.lttng.core.state.model.LttngExecutionState;
-import org.eclipse.linuxtools.lttng.core.state.model.LttngProcessState;
-import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
+import org.eclipse.linuxtools.internal.lttng.core.TraceDebug;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.internal.lttng.core.state.StateStrings.ExecutionMode;
+import org.eclipse.linuxtools.internal.lttng.core.state.evProcessor.ILttngEventProcessor;
+import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngExecutionState;
+import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngProcessState;
+import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.core.tests.state.handlers.AbsStateUpdate;
 
 /**

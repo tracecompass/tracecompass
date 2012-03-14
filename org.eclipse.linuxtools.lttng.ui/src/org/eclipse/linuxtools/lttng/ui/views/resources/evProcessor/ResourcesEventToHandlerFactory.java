@@ -15,13 +15,13 @@ package org.eclipse.linuxtools.lttng.ui.views.resources.evProcessor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.core.event.LttngSyntheticEvent;
-import org.eclipse.linuxtools.lttng.core.event.LttngSyntheticEvent.SequenceInd;
-import org.eclipse.linuxtools.lttng.core.state.StateStrings;
-import org.eclipse.linuxtools.lttng.core.state.evProcessor.AbsEventToHandlerResolver;
-import org.eclipse.linuxtools.lttng.core.state.evProcessor.ILttngEventProcessor;
-import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngSyntheticEvent;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngSyntheticEvent.SequenceInd;
+import org.eclipse.linuxtools.internal.lttng.core.state.StateStrings;
+import org.eclipse.linuxtools.internal.lttng.core.state.evProcessor.AbsEventToHandlerResolver;
+import org.eclipse.linuxtools.internal.lttng.core.state.evProcessor.ILttngEventProcessor;
+import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngTraceState;
 
 /**
  * Builds a Map from string event name to a processing handler object, the

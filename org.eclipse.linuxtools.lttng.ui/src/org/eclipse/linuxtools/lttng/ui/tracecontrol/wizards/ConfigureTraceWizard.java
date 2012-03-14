@@ -17,11 +17,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.config.TraceChannel;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.config.TraceChannels;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.config.TraceConfig;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.service.ILttControllerService;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.config.TraceChannel;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.config.TraceChannels;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.config.TraceConfig;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.service.ILttControllerService;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.TraceControlConstants;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.subsystems.TraceSubSystem;

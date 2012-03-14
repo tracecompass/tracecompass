@@ -14,7 +14,7 @@
 package org.eclipse.linuxtools.lttng.ui.views.latency.dialogs;
 
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.linuxtools.lttng.core.latency.analyzer.EventMatcher;
+import org.eclipse.linuxtools.internal.lttng.core.latency.analyzer.EventMatcher;
 import org.eclipse.linuxtools.lttng.ui.views.latency.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;

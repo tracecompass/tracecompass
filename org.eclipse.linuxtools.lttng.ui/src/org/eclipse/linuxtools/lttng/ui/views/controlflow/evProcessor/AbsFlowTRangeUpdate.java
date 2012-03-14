@@ -14,10 +14,10 @@ package org.eclipse.linuxtools.lttng.ui.views.controlflow.evProcessor;
 
 import java.util.Vector;
 
-import org.eclipse.linuxtools.lttng.core.state.StateStrings.ProcessStatus;
-import org.eclipse.linuxtools.lttng.core.state.evProcessor.ILttngEventProcessor;
-import org.eclipse.linuxtools.lttng.core.state.model.LttngProcessState;
-import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
+import org.eclipse.linuxtools.internal.lttng.core.state.StateStrings.ProcessStatus;
+import org.eclipse.linuxtools.internal.lttng.core.state.evProcessor.ILttngEventProcessor;
+import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngProcessState;
+import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeComponent;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEvent;

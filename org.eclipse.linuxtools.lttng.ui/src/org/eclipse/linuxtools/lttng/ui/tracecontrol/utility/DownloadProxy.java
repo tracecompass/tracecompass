@@ -17,8 +17,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.config.TraceConfig;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.config.TraceConfig;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.subsystems.TraceSubSystem;
 import org.eclipse.rse.ui.SystemBasePlugin;
 import org.eclipse.tm.tcf.protocol.JSON;

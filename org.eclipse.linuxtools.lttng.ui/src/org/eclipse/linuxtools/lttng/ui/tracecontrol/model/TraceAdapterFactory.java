@@ -14,9 +14,9 @@
 package org.eclipse.linuxtools.lttng.ui.tracecontrol.model;
 
 import org.eclipse.core.runtime.IAdapterFactory;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.ProviderResource;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TargetResource;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.ProviderResource;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TargetResource;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource;
 import org.eclipse.rse.ui.view.AbstractSystemRemoteAdapterFactory;
 import org.eclipse.rse.ui.view.ISystemViewElementAdapter;
 import org.eclipse.ui.views.properties.IPropertySource;

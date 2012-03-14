@@ -19,13 +19,13 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.linuxtools.lttng.core.LttngConstants;
-import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.core.state.StateStrings.Events;
-import org.eclipse.linuxtools.lttng.core.state.StateStrings.ExecutionMode;
-import org.eclipse.linuxtools.lttng.core.state.StateStrings.ProcessStatus;
-import org.eclipse.linuxtools.lttng.core.state.model.LttngProcessState;
-import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
+import org.eclipse.linuxtools.internal.lttng.core.LttngConstants;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.internal.lttng.core.state.StateStrings.Events;
+import org.eclipse.linuxtools.internal.lttng.core.state.StateStrings.ExecutionMode;
+import org.eclipse.linuxtools.internal.lttng.core.state.StateStrings.ProcessStatus;
+import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngProcessState;
+import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngTraceState;
 
 /**
  * <h4>Class that process the LTTng kernel events.</h4>

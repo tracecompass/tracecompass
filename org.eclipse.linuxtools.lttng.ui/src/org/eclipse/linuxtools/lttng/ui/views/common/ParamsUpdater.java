@@ -11,7 +11,7 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.common;
 
-import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;

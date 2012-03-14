@@ -20,7 +20,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.Messages;
 import org.eclipse.rse.core.events.ISystemRemoteChangeEvents;
 import org.eclipse.rse.core.model.ISystemRegistry;

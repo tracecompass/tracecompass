@@ -12,12 +12,12 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.resources.evProcessor;
 
-import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.core.state.StateStrings.Channels;
-import org.eclipse.linuxtools.lttng.core.state.StateStrings.Events;
-import org.eclipse.linuxtools.lttng.core.state.StateStrings.Fields;
-import org.eclipse.linuxtools.lttng.core.state.evProcessor.ILttngEventProcessor;
-import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.internal.lttng.core.state.StateStrings.Channels;
+import org.eclipse.linuxtools.internal.lttng.core.state.StateStrings.Events;
+import org.eclipse.linuxtools.internal.lttng.core.state.StateStrings.Fields;
+import org.eclipse.linuxtools.internal.lttng.core.state.evProcessor.ILttngEventProcessor;
+import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngTraceState;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource.ResourceTypes;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;

@@ -13,8 +13,8 @@
 package org.eclipse.linuxtools.lttng.ui.tracecontrol.wizards;
 
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.config.TraceChannel;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.config.TraceChannels;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.config.TraceChannel;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.config.TraceChannels;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;

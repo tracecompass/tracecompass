@@ -12,9 +12,9 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.resources.evProcessor;
 
-import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.core.state.evProcessor.ILttngEventProcessor;
-import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.internal.lttng.core.state.evProcessor.ILttngEventProcessor;
+import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngTraceState;
 
 /**
  * Creates instances of specific after state update handlers, per corresponding

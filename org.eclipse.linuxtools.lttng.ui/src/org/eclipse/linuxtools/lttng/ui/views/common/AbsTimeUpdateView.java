@@ -14,17 +14,17 @@ package org.eclipse.linuxtools.lttng.ui.views.common;
 
 import java.util.Arrays;
 
-import org.eclipse.linuxtools.lttng.core.LttngConstants;
-import org.eclipse.linuxtools.lttng.core.control.LttngCoreProviderFactory;
-import org.eclipse.linuxtools.lttng.core.control.LttngSyntheticEventProvider;
-import org.eclipse.linuxtools.lttng.core.event.LttngSyntheticEvent;
-import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
-import org.eclipse.linuxtools.lttng.core.request.ILttngSyntEventRequest;
-import org.eclipse.linuxtools.lttng.core.request.IRequestStatusListener;
-import org.eclipse.linuxtools.lttng.core.request.LttngSyntEventRequest;
-import org.eclipse.linuxtools.lttng.core.request.RequestCompletedSignal;
-import org.eclipse.linuxtools.lttng.core.request.RequestStartedSignal;
-import org.eclipse.linuxtools.lttng.core.state.evProcessor.ITransEventProcessor;
+import org.eclipse.linuxtools.internal.lttng.core.LttngConstants;
+import org.eclipse.linuxtools.internal.lttng.core.control.LttngCoreProviderFactory;
+import org.eclipse.linuxtools.internal.lttng.core.control.LttngSyntheticEventProvider;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngSyntheticEvent;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngTimestamp;
+import org.eclipse.linuxtools.internal.lttng.core.request.ILttngSyntEventRequest;
+import org.eclipse.linuxtools.internal.lttng.core.request.IRequestStatusListener;
+import org.eclipse.linuxtools.internal.lttng.core.request.LttngSyntEventRequest;
+import org.eclipse.linuxtools.internal.lttng.core.request.RequestCompletedSignal;
+import org.eclipse.linuxtools.internal.lttng.core.request.RequestStartedSignal;
+import org.eclipse.linuxtools.internal.lttng.core.state.evProcessor.ITransEventProcessor;
 import org.eclipse.linuxtools.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.lttng.ui.model.trange.ItemContainer;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;

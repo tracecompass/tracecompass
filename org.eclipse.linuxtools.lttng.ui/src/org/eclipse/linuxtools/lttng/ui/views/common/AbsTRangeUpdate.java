@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.common;
 
-import org.eclipse.linuxtools.lttng.core.state.evProcessor.ILttngEventProcessor;
-import org.eclipse.linuxtools.lttng.core.state.evProcessor.state.AbsStateProcessing;
-import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
+import org.eclipse.linuxtools.internal.lttng.core.state.evProcessor.ILttngEventProcessor;
+import org.eclipse.linuxtools.internal.lttng.core.state.evProcessor.state.AbsStateProcessing;
+import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngTraceState;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 
 public abstract class AbsTRangeUpdate extends AbsStateProcessing implements

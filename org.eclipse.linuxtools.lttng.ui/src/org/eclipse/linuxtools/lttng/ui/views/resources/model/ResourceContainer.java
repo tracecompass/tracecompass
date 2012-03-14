@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.lttng.ui.views.resources.model;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.eclipse.linuxtools.lttng.core.TraceDebug;
+import org.eclipse.linuxtools.internal.lttng.core.TraceDebug;
 import org.eclipse.linuxtools.lttng.ui.model.trange.ItemContainer;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource;
 import org.eclipse.linuxtools.lttng.ui.model.trange.TimeRangeEventResource.ResourceTypes;

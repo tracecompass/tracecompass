@@ -29,7 +29,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.Messages;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.dialogs.ImportTraceDialog;

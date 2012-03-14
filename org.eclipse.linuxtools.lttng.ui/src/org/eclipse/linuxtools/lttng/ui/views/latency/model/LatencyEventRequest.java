@@ -12,9 +12,9 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.latency.model;
 
-import org.eclipse.linuxtools.lttng.core.LttngConstants;
-import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.core.latency.analyzer.EventMatcher;
+import org.eclipse.linuxtools.internal.lttng.core.LttngConstants;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.internal.lttng.core.latency.analyzer.EventMatcher;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;

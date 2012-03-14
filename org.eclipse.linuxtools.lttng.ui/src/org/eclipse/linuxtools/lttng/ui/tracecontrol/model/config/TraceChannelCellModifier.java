@@ -13,8 +13,8 @@
 package org.eclipse.linuxtools.lttng.ui.tracecontrol.model.config;
 
 import org.eclipse.jface.viewers.ICellModifier;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource.TraceState;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.config.TraceChannel;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource.TraceState;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.config.TraceChannel;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.wizards.KernelTraceChannelConfigurationPage;
 import org.eclipse.swt.widgets.TableItem;
 

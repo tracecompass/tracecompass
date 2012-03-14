@@ -17,7 +17,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.lttng.ui.views.latency.dialogs.AddDialog;
 import org.eclipse.linuxtools.lttng.ui.views.latency.dialogs.DeleteDialog;
 import org.eclipse.linuxtools.lttng.ui.views.latency.dialogs.ListDialog;

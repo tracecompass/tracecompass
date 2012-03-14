@@ -19,9 +19,9 @@ import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.ProviderResource;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TargetResource;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.ProviderResource;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TargetResource;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.Messages;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.model.TraceAdapterFactory;
 import org.eclipse.rse.services.clientserver.messages.SimpleSystemMessage;

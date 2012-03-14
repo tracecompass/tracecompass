@@ -15,9 +15,9 @@ package org.eclipse.linuxtools.lttng.ui.views.controlflow.evProcessor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.linuxtools.lttng.core.state.StateStrings;
-import org.eclipse.linuxtools.lttng.core.state.evProcessor.AbsEventToHandlerResolver;
-import org.eclipse.linuxtools.lttng.core.state.evProcessor.ILttngEventProcessor;
+import org.eclipse.linuxtools.internal.lttng.core.state.StateStrings;
+import org.eclipse.linuxtools.internal.lttng.core.state.evProcessor.AbsEventToHandlerResolver;
+import org.eclipse.linuxtools.internal.lttng.core.state.evProcessor.ILttngEventProcessor;
 
 /**
  * Builds a Map from string event name to a processing handler object, the

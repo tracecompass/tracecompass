@@ -11,9 +11,9 @@ package org.eclipse.linuxtools.lttng.core.tests.headless;
  *   William Bourque (wbourque@gmail.com) - Initial API and implementation
  *******************************************************************************/
 
-import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.core.event.LttngTimestamp;
-import org.eclipse.linuxtools.lttng.core.trace.LTTngTrace;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngTimestamp;
+import org.eclipse.linuxtools.internal.lttng.core.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;

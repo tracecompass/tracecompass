@@ -13,9 +13,9 @@ package org.eclipse.linuxtools.lttng.core.tests.state.resource;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.lttng.core.state.resource.ILttngStateContext;
-import org.eclipse.linuxtools.lttng.core.state.resource.LTTngStateResource;
-import org.eclipse.linuxtools.lttng.core.state.resource.ILTTngStateResource.GlobalStateMode;
+import org.eclipse.linuxtools.internal.lttng.core.state.resource.ILttngStateContext;
+import org.eclipse.linuxtools.internal.lttng.core.state.resource.LTTngStateResource;
+import org.eclipse.linuxtools.internal.lttng.core.state.resource.ILTTngStateResource.GlobalStateMode;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
@@ -149,7 +149,7 @@ public class LTTngStateResourceTest extends TestCase {
 	// =======================================================================
 	/**
 	 * Test method for
-	 * {@link org.eclipse.linuxtools.lttng.core.state.resource.LTTngStateResource#getChildren()}
+	 * {@link org.eclipse.linuxtools.internal.lttng.core.state.resource.LTTngStateResource#getChildren()}
 	 * .
 	 */
 	public void testGetChildren() {
@@ -171,7 +171,7 @@ public class LTTngStateResourceTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.eclipse.linuxtools.lttng.core.state.resource.LTTngStateResource#getStateMode()}
+	 * {@link org.eclipse.linuxtools.internal.lttng.core.state.resource.LTTngStateResource#getStateMode()}
 	 */
 	public void testStateMode() {
 		// check default
@@ -185,7 +185,7 @@ public class LTTngStateResourceTest extends TestCase {
 	
 	/**
 	 * Test method for
-	 * {@link org.eclipse.linuxtools.lttng.core.state.resource.LTTngStateResource#getContext()}
+	 * {@link org.eclipse.linuxtools.internal.lttng.core.state.resource.LTTngStateResource#getContext()}
 	 */
 	public void testContext() {
 		assertEquals(context, node60.getContext());

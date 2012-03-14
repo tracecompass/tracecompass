@@ -1,6 +1,6 @@
 package org.eclipse.linuxtools.lttng.core.tests;
 
-import org.eclipse.linuxtools.lttng.core.TraceDebug;
+import org.eclipse.linuxtools.internal.lttng.core.TraceDebug;
 
 public class ActivateDebugging {
 

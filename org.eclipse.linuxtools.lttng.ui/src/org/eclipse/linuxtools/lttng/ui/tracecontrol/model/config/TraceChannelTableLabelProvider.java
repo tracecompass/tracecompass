@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.lttng.ui.tracecontrol.model.config;
 
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.config.TraceChannel;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.config.TraceChannel;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
 import org.eclipse.swt.graphics.Image;
 

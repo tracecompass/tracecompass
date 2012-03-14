@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.lttng.ui.tracecontrol.model.config;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.config.TraceChannels;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.config.TraceChannels;
 
 /**
  * <b><u>TraceChannelTableContentProvider</u></b>

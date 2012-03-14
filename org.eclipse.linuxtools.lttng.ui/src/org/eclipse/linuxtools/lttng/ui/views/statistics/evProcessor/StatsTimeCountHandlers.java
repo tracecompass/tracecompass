@@ -12,11 +12,11 @@
 
 package org.eclipse.linuxtools.lttng.ui.views.statistics.evProcessor;
 
-import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.core.state.StateStrings;
-import org.eclipse.linuxtools.lttng.core.state.StateStrings.Events;
-import org.eclipse.linuxtools.lttng.core.state.evProcessor.ILttngEventProcessor;
-import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.internal.lttng.core.state.StateStrings;
+import org.eclipse.linuxtools.internal.lttng.core.state.StateStrings.Events;
+import org.eclipse.linuxtools.internal.lttng.core.state.evProcessor.ILttngEventProcessor;
+import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngTraceState;
 
 /**
  * Process the system call entry event
@@ -186,7 +186,7 @@ class StatsTimeCountHandlers {
 	}
 	/**
 	 * <h4>Get the process exit handler</h4>
-	 * <p> Handles: {@link org.eclipse.linuxtools.lttng.core.state.StateStrings.Events#LTT_EVENT_PROCESS_EXIT}.</p>
+	 * <p> Handles: {@link org.eclipse.linuxtools.internal.lttng.core.state.StateStrings.Events#LTT_EVENT_PROCESS_EXIT}.</p>
 	 * @return The handler.
 	 */
 	ILttngEventProcessor getProcessExitHandler() {

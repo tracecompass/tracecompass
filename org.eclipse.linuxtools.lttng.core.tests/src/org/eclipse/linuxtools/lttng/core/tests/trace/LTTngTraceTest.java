@@ -7,9 +7,9 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.linuxtools.lttng.core.event.LttngLocation;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngLocation;
+import org.eclipse.linuxtools.internal.lttng.core.trace.LTTngTrace;
 import org.eclipse.linuxtools.lttng.core.tests.LTTngCoreTestPlugin;
-import org.eclipse.linuxtools.lttng.core.trace.LTTngTrace;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;

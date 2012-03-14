@@ -1,12 +1,12 @@
 package org.eclipse.linuxtools.lttng.core.tests.state.handlers;
 
-import org.eclipse.linuxtools.lttng.core.TraceDebug;
-import org.eclipse.linuxtools.lttng.core.event.LttngEvent;
-import org.eclipse.linuxtools.lttng.core.event.LttngEventField;
-import org.eclipse.linuxtools.lttng.core.state.StateStrings.Fields;
-import org.eclipse.linuxtools.lttng.core.state.evProcessor.ILttngEventProcessor;
-import org.eclipse.linuxtools.lttng.core.state.model.LttngExecutionState;
-import org.eclipse.linuxtools.lttng.core.state.model.LttngTraceState;
+import org.eclipse.linuxtools.internal.lttng.core.TraceDebug;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
+import org.eclipse.linuxtools.internal.lttng.core.event.LttngEventField;
+import org.eclipse.linuxtools.internal.lttng.core.state.StateStrings.Fields;
+import org.eclipse.linuxtools.internal.lttng.core.state.evProcessor.ILttngEventProcessor;
+import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngExecutionState;
+import org.eclipse.linuxtools.internal.lttng.core.state.model.LttngTraceState;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 
 @SuppressWarnings("nls")

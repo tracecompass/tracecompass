@@ -15,9 +15,9 @@ package org.eclipse.linuxtools.lttng.ui.tracecontrol.wizards;
 import java.io.File;
 
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.TraceResource.TraceState;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.config.TraceConfig;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource.TraceState;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.config.TraceConfig;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.TraceControlConstants;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.Messages;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.subsystems.TraceSubSystem;

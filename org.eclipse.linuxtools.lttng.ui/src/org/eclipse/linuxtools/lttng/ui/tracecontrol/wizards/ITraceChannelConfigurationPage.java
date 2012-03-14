@@ -13,7 +13,7 @@
 package org.eclipse.linuxtools.lttng.ui.tracecontrol.wizards;
 
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.model.config.TraceChannels;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.config.TraceChannels;
 
 public interface ITraceChannelConfigurationPage extends IWizardPage {
 

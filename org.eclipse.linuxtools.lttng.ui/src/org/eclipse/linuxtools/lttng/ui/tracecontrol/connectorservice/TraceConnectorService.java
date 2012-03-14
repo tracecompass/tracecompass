@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.linuxtools.lttng.core.LttngConstants;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.service.ILttControllerService;
-import org.eclipse.linuxtools.lttng.core.tracecontrol.service.LttControllerServiceProxy;
+import org.eclipse.linuxtools.internal.lttng.core.LttngConstants;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.service.ILttControllerService;
+import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.service.LttControllerServiceProxy;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.Messages;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.TraceControlConstants;
 import org.eclipse.linuxtools.lttng.ui.tracecontrol.subsystems.TraceSubSystem;
