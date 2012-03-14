@@ -5,7 +5,7 @@
          id="org.eclipse.linuxtools.lttng.ui.perspective"
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="org.eclipse.linuxtools.lttng.ui.views.PerspectiveFactory"
+            class="org.eclipse.linuxtools.internal.lttng.ui.views.PerspectiveFactory"
             icon="icons/obj16/garland16.png"
             id="org.eclipse.linuxtools.lttng.ui.perspective"
             name="%perspective.category.name">
@@ -21,7 +21,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng.ui.views.category"
-            class="org.eclipse.linuxtools.lttng.ui.views.control.ControlView"
+            class="org.eclipse.linuxtools.internal.lttng.ui.views.control.ControlView"
             icon="icons/eview16/control_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.control"
             name="%control.view.name"
@@ -30,7 +30,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng.ui.views.category"
-            class="org.eclipse.linuxtools.lttng.ui.views.timeframe.TimeFrameView"
+            class="org.eclipse.linuxtools.internal.lttng.ui.views.timeframe.TimeFrameView"
             icon="icons/eview16/time_frame_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.timeframe"
             name="%timeframe.view.name"
@@ -39,7 +39,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng.ui.views.category"
-            class="org.eclipse.linuxtools.lttng.ui.views.controlflow.ControlFlowView"
+            class="org.eclipse.linuxtools.internal.lttng.ui.views.controlflow.ControlFlowView"
             icon="icons/eview16/control_flow_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.controlflow"
             name="%controlflow.view.name"
@@ -48,7 +48,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng.ui.views.category"
-            class="org.eclipse.linuxtools.lttng.ui.views.resources.ResourcesView"
+            class="org.eclipse.linuxtools.internal.lttng.ui.views.resources.ResourcesView"
             icon="icons/eview16/resources_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.resources"
             name="%resources.view.name"
@@ -57,7 +57,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng.ui.views.category"
-            class="org.eclipse.linuxtools.lttng.ui.views.statistics.StatisticsView"
+            class="org.eclipse.linuxtools.internal.lttng.ui.views.statistics.StatisticsView"
             icon="icons/eview16/statistics_view.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.statistics"
             name="%statistics.view.name"
@@ -66,7 +66,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng.ui.views.category"
-            class="org.eclipse.linuxtools.lttng.ui.views.latency.LatencyView"
+            class="org.eclipse.linuxtools.internal.lttng.ui.views.latency.LatencyView"
             icon="icons/eview16/graph.gif"
             id="org.eclipse.linuxtools.lttng.ui.views.latency"
             name="%latency.view.name"
@@ -81,7 +81,7 @@
       </category>
       <wizard
             category="org.eclipse.linuxtools.lttng.ui.wizards.new"
-            class="org.eclipse.linuxtools.lttng.ui.project.dialogs.NewLTTngProjectWizard"
+            class="org.eclipse.linuxtools.internal.lttng.ui.project.dialogs.NewLTTngProjectWizard"
             descriptionImage="icons/obj16/garland16.png"
             finalPerspective="org.eclipse.linuxtools.lttng.ui.perspective"
             icon="icons/obj16/garland16.png"
@@ -154,7 +154,7 @@
              id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.deletetrace"
              objectClass="org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource">
           <action
-                class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.DeleteTrace"
+                class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.DeleteTrace"
                 enablesFor="*"
                 icon="icons/elcl16/delete_trace.gif"
                 id="actions.trace.delete"
@@ -179,7 +179,7 @@
              id="org.eclipse.linuxtools.lttng.ui.tracecontrol.importtrace"
              objectClass="org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource">
           <action
-                class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.ImportToProject"
+                class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.ImportToProject"
                 enablesFor="*"
                 icon="icons/elcl16/import_trace.gif"
                 id="org.eclipse.linuxtools.lttng.ui.tracecontrol.action1"
@@ -206,7 +206,7 @@
                    label="%action.newtrace.label"
                    tooltip="%action.newtrace.tooltip"
                    icon="icons/elcl16/new_trace.gif"
-                   class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.CreateNewTrace"
+                   class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.CreateNewTrace"
                    menubarPath="additions"
                    enablesFor="1"
                    id="actions.trace.new">
@@ -225,7 +225,7 @@
                    label="%action.configuretrace.label"
                    tooltip="%action.configuretrace.tooltip"
                    icon="icons/elcl16/configure_trace.gif"
-                   class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.ConfigureTrace"
+                   class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.ConfigureTrace"
                    menubarPath="additions"
                    enablesFor="1"
                    id="actions.trace.configure">
@@ -241,7 +241,7 @@
              id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.stoptrace"
              objectClass="org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource">
           <action
-                class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.StopTrace"
+                class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.StopTrace"
                 enablesFor="*"
                 icon="icons/elcl16/stop_trace.gif"
                 id="actions.trace.stop"
@@ -265,7 +265,7 @@
              id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.pausetrace"
              objectClass="org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource">
           <action
-                class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.PauseTrace"
+                class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.PauseTrace"
                 enablesFor="*"
                 icon="icons/elcl16/pause_trace.gif"
                 id="actions.trace.pause"
@@ -289,7 +289,7 @@
                objectClass="org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource"
                id="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.starttrace">
            <action
-                 class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.StartTrace"
+                 class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.StartTrace"
                  enablesFor="*"
                  icon="icons/elcl16/start_trace.gif"
                  id="actions.trace.start"
@@ -312,7 +312,7 @@
                    label="%action.configuremarkers.label"
                    tooltip="%action.configuremarkers.tooltip"
                    icon="icons/elcl16/configure_markers.gif"
-                   class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.ConfigureMarkers"
+                   class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.ConfigureMarkers"
                    menubarPath="additions"
                    enablesFor="1"
                    id="actions.markers.configure">
@@ -332,7 +332,7 @@
             id="org.eclipse.linuxtools.lttng.ui.tracecontrol.viewContribution.stop"
             targetID="org.eclipse.rse.ui.view.systemView">
          <action
-               class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.StopTrace"
+               class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.StopTrace"
                enablesFor="*"
                icon="icons/elcl16/stop_trace.gif"
                id="actions.trace.stop"
@@ -359,7 +359,7 @@
             id="org.eclipse.linuxtools.lttng.ui.tracecontrol.viewContribution.pause"
             targetID="org.eclipse.rse.ui.view.systemView">
          <action
-               class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.PauseTrace"
+               class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.PauseTrace"
                enablesFor="*"
                icon="icons/elcl16/pause_trace.gif"
                id="actions.trace.pause"
@@ -386,7 +386,7 @@
             id="org.eclipse.linuxtools.lttng.ui.tracecontrol.viewContribution.start"
             targetID="org.eclipse.rse.ui.view.systemView">
          <action
-               class="org.eclipse.linuxtools.lttng.ui.tracecontrol.actions.StartTrace"
+               class="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.StartTrace"
                enablesFor="*"
                icon="icons/elcl16/start_trace.gif"
                id="actions.trace.start"
@@ -413,7 +413,7 @@
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
-            class="org.eclipse.linuxtools.lttng.ui.project.dialogs.TraceLibraryPathPropertyPage"
+            class="org.eclipse.linuxtools.internal.lttng.ui.project.dialogs.TraceLibraryPathPropertyPage"
             id="org.eclipse.linuxtools.lttng.ui.propertyPage.libPath"
             name="%project.propertyPage.tracelibPath">
          <filter name="nature"
@@ -439,7 +439,7 @@
             name="%tracetype.type.kernel"
             trace_type="org.eclipse.linuxtools.internal.lttng.core.trace.LTTngTrace">
          <eventsTableType
-               class="org.eclipse.linuxtools.lttng.ui.views.events.EventsTable">
+               class="org.eclipse.linuxtools.internal.lttng.ui.views.events.EventsTable">
          </eventsTableType>
       </type>
    </extension>
