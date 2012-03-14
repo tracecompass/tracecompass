@@ -14,6 +14,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.SequenceDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.SequenceDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,9 +43,10 @@ public class SequenceDefinitionTest {
 
     /**
      * Perform pre-test initialization.
+     * @throws CTFReaderException 
      */
     @Before
-    public void setUp() {
+    public void setUp() throws CTFReaderException {
         StructDeclaration structDec;
         StructDefinition structDef;
 
@@ -75,7 +77,7 @@ public class SequenceDefinitionTest {
         // Add additional tear down code here
     }
 
-    private static SequenceDefinition initNonString() {
+    private static SequenceDefinition initNonString() throws CTFReaderException {
         StructDeclaration structDec;
         StructDefinition structDef;
 

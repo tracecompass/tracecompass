@@ -19,6 +19,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,9 +65,10 @@ public class CTFEventFieldTest {
 
     /**
      * Run the CTFEventField parseField(Definition,String) method test.
+     * @throws CTFReaderException 
      */
     @Test
-    public void testParseField_complex() {
+    public void testParseField_complex() throws CTFReaderException {
         int len = 32;
         IntegerDeclaration id = new IntegerDeclaration(len, false, len,
                 ByteOrder.LITTLE_ENDIAN, Encoding.ASCII);
@@ -91,9 +93,10 @@ public class CTFEventFieldTest {
 
     /**
      * Run the CTFEventField parseField(Definition,String) method test.
+     * @throws CTFReaderException 
      */
     @Test
-    public void testParseField_simple() {
+    public void testParseField_simple() throws CTFReaderException {
         Definition fieldDef = new SequenceDefinition(new SequenceDeclaration(
                 "", new StringDeclaration()), null, fieldName); //$NON-NLS-1$
 
