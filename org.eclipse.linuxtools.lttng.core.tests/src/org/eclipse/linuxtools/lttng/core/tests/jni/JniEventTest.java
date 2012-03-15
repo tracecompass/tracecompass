@@ -33,10 +33,10 @@ package org.eclipse.linuxtools.lttng.core.tests.jni;
 
 import junit.framework.TestCase;
 
+import org.eclipse.linuxtools.internal.lttng.jni.common.JniTime;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.lttng.jni.JniTracefile;
-import org.eclipse.linuxtools.lttng.jni.common.JniTime;
-import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
 
 @SuppressWarnings("nls")

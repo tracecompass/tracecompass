@@ -1,6 +1,6 @@
 package org.eclipse.linuxtools.lttng.jni;
 
-import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant;
+import org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Constant;
 
 /*******************************************************************************
  * Copyright (c) 2009 Ericsson

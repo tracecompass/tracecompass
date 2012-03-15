@@ -14,11 +14,11 @@ package org.eclipse.linuxtools.lttng.jni;
 
 import java.util.HashMap;
 
-import org.eclipse.linuxtools.lttng.jni.common.JniTime;
-import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id;
-import org.eclipse.linuxtools.lttng.jni.exception.JniEventException;
-import org.eclipse.linuxtools.lttng.jni.exception.JniException;
-import org.eclipse.linuxtools.lttng.jni.exception.JniNoSuchEventException;
+import org.eclipse.linuxtools.internal.lttng.jni.common.JniTime;
+import org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniEventException;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniException;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniNoSuchEventException;
 
 /**
  * <b><u>JniEvent</u></b> <p>
@@ -120,7 +120,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      *            
      * @exception JniException
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id
      * @see org.eclipse.linuxtools.lttng.jni.JniMarker
      * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
      */
@@ -161,7 +161,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * @return LTT read status, as defined in Jni_C_Constant.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Constant
      */
      public int readNextEvent() {
         // Ask Ltt to read the next event for this particular tracefile
@@ -186,7 +186,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * @return LTT read status, as defined in Jni_C_Constant
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Constant
      */
     public int seekToTime(JniTime seekTime) {
         // Ask Ltt to read the next event for this particular tracefile
@@ -209,7 +209,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * @return LTT read status, as defined in Jni_C_Constant
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Constant
      */
     public int seekOrFallBack(JniTime seekTime) {
         // Save the old time
@@ -239,7 +239,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * @return LTT read status, as defined in Jni_C_Constant
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Constant
      */
     protected int positionToFirstEvent() {
         eventState = ltt_positionToFirstEvent(tracefilePtr.getLibraryId(), tracefilePtr.getPointer());
@@ -370,7 +370,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * @return The actual (long converted) pointer or NULL.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id
      */
     public Jni_C_Pointer_And_Library_Id getTracefilePtr() {
         return new Jni_C_Pointer_And_Library_Id(thisEventPtr.getLibraryId(), ltt_getTracefilePtr(thisEventPtr.getLibraryId(), thisEventPtr.getPointer()) );
@@ -384,7 +384,7 @@ public abstract class JniEvent extends Jni_C_Common implements Comparable<JniEve
      * 
      * @return The actual (long converted) pointer or NULL.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id
      */
     public Jni_C_Pointer_And_Library_Id getEventPtr() {
         return thisEventPtr;

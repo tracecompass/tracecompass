@@ -14,9 +14,9 @@ package org.eclipse.linuxtools.lttng.jni;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id;
-import org.eclipse.linuxtools.lttng.jni.exception.JniException;
-import org.eclipse.linuxtools.lttng.jni.exception.JniMarkerException;
+import org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniException;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniMarkerException;
 
 /**
  * <b><u>JniMarker</u></b><p>
@@ -168,7 +168,7 @@ public abstract class JniMarker extends Jni_C_Common
      * 
      * @return The actual (long converted) pointer or NULL
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id
      */
     public Jni_C_Pointer_And_Library_Id getMarkerPtr() {
         return thisMarkerPtr;
@@ -241,7 +241,7 @@ public abstract class JniMarker extends Jni_C_Common
      * 
      * @throws JniException			The construction (allocation) failed.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id
      * @see org.eclipse.linuxtools.lttng.jni.JniMarkerField
      */
     public abstract JniMarkerField allocateNewJniMarkerField(Jni_C_Pointer_And_Library_Id newMarkerFieldPtr) throws JniException;

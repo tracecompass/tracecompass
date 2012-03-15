@@ -13,7 +13,7 @@ package org.eclipse.linuxtools.internal.lttng.core.trace;
  *******************************************************************************/
 
 import org.eclipse.linuxtools.internal.lttng.core.exceptions.LttngException;
-import org.eclipse.linuxtools.lttng.jni.exception.JniTraceVersionException;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniTraceVersionException;
 import org.eclipse.linuxtools.lttng.jni.factory.JniTraceVersion;
 
 /**

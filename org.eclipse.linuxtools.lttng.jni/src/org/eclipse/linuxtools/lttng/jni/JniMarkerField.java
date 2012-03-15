@@ -1,8 +1,8 @@
 package org.eclipse.linuxtools.lttng.jni;
 
-import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id;
-import org.eclipse.linuxtools.lttng.jni.exception.JniException;
-import org.eclipse.linuxtools.lttng.jni.exception.JniMarkerFieldException;
+import org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniException;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniMarkerFieldException;
 
 
 /**
@@ -66,7 +66,7 @@ public abstract class JniMarkerField extends Jni_C_Common
      * 
      * @exception JniException
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id
      */
     public JniMarkerField(Jni_C_Pointer_And_Library_Id newMarkerFieldPtr) throws JniException {
         thisMarkerFieldPtr = newMarkerFieldPtr;
@@ -105,7 +105,7 @@ public abstract class JniMarkerField extends Jni_C_Common
      * 
      * @return The actual (long converted) pointer or NULL
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id
      */
     public Jni_C_Pointer_And_Library_Id getMarkerFieldPtr() {
         return thisMarkerFieldPtr;

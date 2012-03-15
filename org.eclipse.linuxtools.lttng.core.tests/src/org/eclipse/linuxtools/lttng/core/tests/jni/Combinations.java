@@ -9,11 +9,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.lttng.jni.JniMarker;
 import org.eclipse.linuxtools.lttng.jni.JniMarkerField;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
-import org.eclipse.linuxtools.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
 
 

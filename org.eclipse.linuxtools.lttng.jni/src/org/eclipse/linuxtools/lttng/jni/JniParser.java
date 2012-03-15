@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.lttng.jni;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer;
+import org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer;
 
 /**
  * <b><u>JniParser</u></b><p>

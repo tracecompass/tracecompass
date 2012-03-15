@@ -12,10 +12,11 @@ package org.eclipse.linuxtools.lttng.core.tests.headless;
  *******************************************************************************/
 
 import java.util.ArrayList;
+
+import org.eclipse.linuxtools.internal.lttng.jni.common.JniTime;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.lttng.jni.JniMarkerField;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
-import org.eclipse.linuxtools.lttng.jni.common.JniTime;
 import org.eclipse.linuxtools.lttng.jni.factory.JniTraceFactory;
 
 

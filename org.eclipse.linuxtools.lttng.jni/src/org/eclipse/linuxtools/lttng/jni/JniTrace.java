@@ -20,12 +20,12 @@ import java.util.PriorityQueue;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.linuxtools.lttng.jni.common.JniTime;
-import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id;
-import org.eclipse.linuxtools.lttng.jni.exception.JniException;
-import org.eclipse.linuxtools.lttng.jni.exception.JniOpenTraceFailedException;
-import org.eclipse.linuxtools.lttng.jni.exception.JniTraceException;
-import org.eclipse.linuxtools.lttng.jni.exception.JniTracefileWithoutEventException;
+import org.eclipse.linuxtools.internal.lttng.jni.common.JniTime;
+import org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniException;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniOpenTraceFailedException;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniTraceException;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniTracefileWithoutEventException;
 
 /**
  * <b><u>JniTrace</u></b>
@@ -229,7 +229,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * @exception JniException
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id
      */
     public JniTrace(Jni_C_Pointer_And_Library_Id newPtr, boolean newPrintDebug) throws JniException {
         thisTracePtr = newPtr;
@@ -612,7 +612,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * @param seekTime The time where we want to seek to
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.JniTime
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.JniTime
      */
     public void seekToTime(JniTime seekTime) {
 
@@ -643,7 +643,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * @param seekTime The time where we want to seek to
      * 
      * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
-     * @see org.eclipse.linuxtools.lttng.jni.common.JniTime
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.JniTime
      */
     public void seekToTime(JniTime seekTime, JniTracefile targetTracefile) {
         // Invalidate the current read event
@@ -674,7 +674,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * @return The event just after the seeked time or null if none available.
      * 
      * @see org.eclipse.linuxtools.lttng.jni.JniEvent
-     * @see org.eclipse.linuxtools.lttng.jni.common.JniTime
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.JniTime
      */
     public JniEvent seekAndRead(JniTime seekTime) {
         JniEvent returnedEvent = null;
@@ -703,7 +703,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * @return The event just after the seeked time or null if none available.
      * 
      * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
-     * @see org.eclipse.linuxtools.lttng.jni.common.JniTime
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.JniTime
      * @see org.eclipse.linuxtools.lttng.jni.JniEvent
      */
     public JniEvent seekAndRead(JniTime seekTime, JniTracefile targetTracefile) {
@@ -837,7 +837,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * @return Time of the last event read
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.JniTime
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.JniTime
      */
     public JniTime getCurrentEventTimestamp() {
         JniTime returnedTime = null;
@@ -861,7 +861,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * 
      * @return The actual (long converted) pointer or NULL.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id
      */
     public Jni_C_Pointer_And_Library_Id getTracePtr() {
         return thisTracePtr;
@@ -992,7 +992,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * @throws JniException The construction (allocation) failed.
      * 
      * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id
      * @see org.eclipse.linuxtools.lttng.jni.JniTrace
      */
     public abstract JniTracefile allocateNewJniTracefile(Jni_C_Pointer_And_Library_Id newPtr, JniTrace newParentTrace) throws JniException;
