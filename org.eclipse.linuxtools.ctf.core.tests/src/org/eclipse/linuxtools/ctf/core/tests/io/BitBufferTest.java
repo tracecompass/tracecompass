@@ -1,0 +1,207 @@
+package org.eclipse.linuxtools.ctf.core.tests.io;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+/**
+ * The class <code>BitBufferTest</code> contains tests for the class
+ * <code>{@link BitBuffer}</code>.
+ * 
+ * @author ematkho
+ * @version $Revision: 1.0 $
+ */
+public class BitBufferTest {
+
+    private BitBuffer fixture;
+
+    /**
+     * Launch the test.
+     * 
+     * @param args
+     *            the command line arguments
+     */
+    public static void main(String[] args) {
+        new org.junit.runner.JUnitCore().run(BitBufferTest.class);
+    }
+
+    /**
+     * Perform pre-test initialization.
+     */
+    @Before
+    public void setUp() {
+        fixture = new BitBuffer(java.nio.ByteBuffer.allocateDirect(128));
+        fixture.setByteOrder(ByteOrder.BIG_ENDIAN);
+        fixture.setByteBuffer(ByteBuffer.allocate(0));
+        fixture.position(1);
+    }
+
+    /**
+     * Perform post-test clean-up.
+     */
+    @After
+    public void tearDown() {
+        // Add additional tear down code here
+    }
+
+    /**
+     * Run the BitBuffer() constructor test.
+     */
+    @Test
+    public void testBitBuffer() {
+        BitBuffer result = new BitBuffer();
+
+        assertNotNull(result);
+        assertEquals(0, result.position());
+        assertEquals(null, result.getByteBuffer());
+    }
+
+    /**
+     * Run the BitBuffer(ByteBuffer) constructor test.
+     */
+    @Test
+    public void testBitBuffer_fromByteBuffer() {
+        ByteBuffer buf = ByteBuffer.allocate(0);
+        BitBuffer result = new BitBuffer(buf);
+
+        assertNotNull(result);
+        assertEquals(0, result.position());
+    }
+
+    /**
+     * Run the boolean canRead(int) method test.
+     */
+    @Test
+    public void testCanRead_1param() {
+        int length = 1;
+        boolean result = fixture.canRead(length);
+
+        assertEquals(false, result);
+    }
+
+    /**
+     * Run the boolean canRead(int,int) method test.
+     */
+    @Test
+    public void testCanRead_2params() {
+        int index = 1;
+        int length = 1;
+        boolean result = fixture.canRead(index, length);
+
+        assertEquals(false, result);
+    }
+
+    /**
+     * Run the void clear() method test.
+     */
+    @Test
+    public void testClear() {
+        fixture.clear();
+    }
+
+    /**
+     * Run the ByteBuffer getByteBuffer() method test.
+     */
+    @Test
+    public void testGetByteBuffer() {
+        ByteBuffer result = fixture.getByteBuffer();
+
+        assertNotNull(result);
+        assertEquals(
+                "java.nio.HeapByteBuffer[pos=0 lim=0 cap=0]", result.toString()); //$NON-NLS-1$
+        assertEquals(false, result.isDirect());
+        assertEquals(true, result.hasArray());
+        assertEquals(0, result.arrayOffset());
+        assertEquals(0, result.limit());
+        assertEquals(0, result.remaining());
+        assertEquals(0, result.position());
+        assertEquals(0, result.capacity());
+        assertEquals(false, result.hasRemaining());
+        assertEquals(false, result.isReadOnly());
+    }
+
+    /**
+     * Run the ByteOrder getByteOrder() method test.
+     */
+    @Test
+    public void testGetByteOrder() {
+        ByteOrder result = fixture.getByteOrder();
+
+        assertNotNull(result);
+        assertEquals("BIG_ENDIAN", result.toString()); //$NON-NLS-1$
+    }
+
+    /**
+     * Run the ByteOrder order() method test.
+     */
+    @Test
+    public void testGetOrder() {
+        ByteOrder result = fixture.order();
+
+        assertNotNull(result);
+        assertEquals("BIG_ENDIAN", result.toString()); //$NON-NLS-1$
+    }
+
+    /**
+     * Run the void order(ByteOrder) method test.
+     */
+    @Test
+    public void testSetOrder() {
+        ByteOrder order = ByteOrder.BIG_ENDIAN;
+
+        fixture.order(order);
+    }
+
+    /**
+     * Run the int position() method test.
+     */
+    @Test
+    public void testGetPosition() {
+        int result = fixture.position();
+
+        assertEquals(1, result);
+    }
+
+    /**
+     * Run the void position(int) method test.
+     */
+    @Test
+    public void testSetPosition() {
+        int newPosition = 1;
+        fixture.position(newPosition);
+    }
+
+    /**
+     * Run the void setByteBuffer(ByteBuffer) method test.
+     */
+    @Test
+    public void testSetByteBuffer() {
+        ByteBuffer buf = ByteBuffer.allocate(0);
+        fixture.setByteBuffer(buf);
+    }
+
+    /**
+     * Run the void setByteBuffer(ByteBuffer) method test.
+     */
+    @Test
+    public void testSetByteBuffer_null() {
+        ByteBuffer buf = null;
+        fixture.setByteBuffer(buf);
+    }
+
+    /**
+     * Run the void setByteOrder(ByteOrder) method test.
+     */
+    @Test
+    public void testSetByteOrder() {
+        ByteOrder byteOrder = ByteOrder.BIG_ENDIAN;
+        fixture.setByteOrder(byteOrder);
+    }
+}

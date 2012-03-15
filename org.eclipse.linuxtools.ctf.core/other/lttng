@@ -1,0 +1,131 @@
+#!/bin/bash
+# LTTng Trace Control bash completion
+#
+
+_lttng_complete_sessions() {
+    local sessions
+    if  ! _complete_as_root ; then
+        sessions=$(for i in $(ls -d ~/.lttng/*/); do  basename $i; done)
+        COMPREPLY=( $(compgen -W "${sessions}" -- $cur) )
+    #else
+        # Permission denied, what should we do ?
+        # sessions=$(for i in $(ls -d ~root/.lttng/*/); do  basename $i; done)
+        #COMPREPLY=( $(compgen -W "${sessions}" -- $cur) )
+    fi
+}
+
+_lttng_create() {
+    local create_opts
+    create_opts="-h --help -o --output"
+    
+    case $prev in
+    --output|-o)
+        _filedir -d
+        return
+        ;;
+    esac
+    
+    case $cur in
+    -*)
+        COMPREPLY=( $(compgen -W "${create_opts}" -- $cur) )
+        return
+        ;;
+    esac
+}
+
+_lttng_start_stop() {
+    local start_stop_opts
+    start_stop_opts="-h --help"
+
+    case $cur in
+    -*)
+        COMPREPLY=( $(compgen -W "${start_stop_opts}" -- $cur) )
+        ;;
+    *)
+        _lttng_complete_sessions
+        ;;
+    esac
+}
+
+_lttng_opts() {
+    local opts
+    opts=$(lttng --dump-options)
+
+    COMPREPLY=( $(compgen -W "${opts}" -- $cur) )
+}
+
+_lttng_commands() {
+    COMPREPLY=( $(compgen -W "$commands" -- $cur) )
+}
+
+_lttng_before_command() {
+    # Check if the previous word should alter the behavior
+    case $prev in
+    --group|-g)
+        COMPREPLY=( $(compgen -g -- $cur) )
+        return
+        ;;
+    esac
+
+    case $cur in
+    -*)
+        # If the current word starts with a dash, complete with options
+        _lttng_opts
+        ;;
+    *)
+        # Otherwise complete with commands
+        _lttng_commands
+        ;;
+    esac
+}
+
+_lttng_after_command() {
+    case $command_found in
+    "create")
+        _lttng_create
+        ;;
+    "start"|"stop")
+        _lttng_start_stop
+        ;;
+    esac
+}
+
+_lttng_is_command() {
+    for command in $commands; do
+        if [ "$1" == "$command" ]; then
+            return 0
+        fi
+    done
+    
+    return 1
+}
+
+_lttng() {
+    local cur prev commands command_found command_found_index
+    
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    commands=$(lttng --dump-commands)
+    
+    command_found=""
+    command_found_index=-1
+
+    for (( i = 1 ; i < ${#COMP_WORDS[@]} ; i++ )); do
+        _lttng_is_command ${COMP_WORDS[$i]}
+        if [ $? -eq 0 ]; then
+            command_found=${COMP_WORDS[$i]}
+            command_found_index=$i
+            break
+        fi
+        
+    done
+    
+    if [ -n "$command_found" ] && [ "$COMP_CWORD" -gt "$command_found_index" ]; then
+        _lttng_after_command
+    else
+        _lttng_before_command
+    fi
+}
+
+complete -F _lttng lttng
+
