@@ -285,7 +285,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
      * 
      * @throws ExecutionException
      */
-    public void getConfigurationFromNode() throws ExecutionException {
+    public void getConfigurationFromNode() {
         Job job = new Job(Messages.TraceControl_RetrieveNodeConfigurationJob) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
@@ -310,7 +310,11 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
         };
         job.setUser(true);
         job.schedule();
+    }
 
+    public void refresh() {
+        removeAllChildren();
+        getConfigurationFromNode();
     }
 
     // ------------------------------------------------------------------------

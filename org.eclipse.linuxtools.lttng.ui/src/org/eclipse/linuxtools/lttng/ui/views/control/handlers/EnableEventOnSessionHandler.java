@@ -62,22 +62,13 @@ public class EnableEventOnSessionHandler extends BaseEnableEventHandler {
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.handlers.BaseEnableEventHandler#enableProbe(java.lang.String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.handlers.BaseEnableEventHandler#enableProbe(java.lang.String, boolean, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    public void enableProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException {
-        fSession.enableProbe(eventName, probe, monitor);
+    public void enableProbe(String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException {
+        fSession.enableProbe(eventName, isFunction, probe, monitor);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.handlers.BaseEnableEventHandler#enableFunctionProbe(java.lang.String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
-     */
-    @Override
-    public void enableFunctionProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException {
-        fSession.enableFunctionProbe(eventName, probe, monitor);
-    }
-    
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.lttng.ui.views.control.handlers.BaseEnableEventHandler#enableLogLevel(java.lang.String, org.eclipse.linuxtools.lttng.ui.views.control.model.LogLevelType, org.eclipse.linuxtools.lttng.ui.views.control.model.TraceLogLevel, org.eclipse.core.runtime.IProgressMonitor)

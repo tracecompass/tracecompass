@@ -106,7 +106,7 @@ public interface ILttngControlService {
      /**
       * Enables a list of channels for given session and given channel information (configuration). 
       * @param sessionName - a session name to create
-      * @param channelNames - a list of channel names to enable
+      * @param channelNames - a list of channel names to be enabled
       * @param isKernel - a flag to indicate Kernel or UST (true for Kernel, false for UST) 
       * @param info - channel information used for creation of a channel (or null for default)
       * @param monitor - a progress monitor 
@@ -117,7 +117,7 @@ public interface ILttngControlService {
      /**
       * Disables a list of channels for given session and given channel information (configuration). 
       * @param sessionName - a session name to create
-      * @param channelNames - a list of channel names to enable
+      * @param channelNames - a list of channel names to be enabled
       * @param isKernel - a flag to indicate Kernel or UST (true for Kernel, false for UST) 
       * @param monitor - a progress monitor 
       * @throws ExecutionException
@@ -127,8 +127,8 @@ public interface ILttngControlService {
     /**
      * Enables a list of events with no additional parameters.
      * @param sessionName - a session name
-     * @param channelName - a channel name (null for default channel)
-     * @param eventNames - a list of event names to enabled.
+     * @param channelName - a channel name or null for default channel
+     * @param eventNames - a list of event names to be enabled, or null (list of size = 0)for all events .
      * @param isKernel -  a flag for indicating kernel or UST.
      * @param monitor - a progress monitor
      * @throws ExecutionException
@@ -138,33 +138,23 @@ public interface ILttngControlService {
     /**
      * Enables all syscall events.
      * @param sessionName - a session name
-     * @param channelName - a channel name (null for default channel)
+     * @param channelName - a channel name or null for default channel
      * @param monitor - a progress monitor
      * @throws ExecutionException
      */
     public void enableSyscalls(String sessionName, String channelName, IProgressMonitor monitor) throws ExecutionException;
 
     /**
-     * Enables a dynamic probe.
+     * Enables a dynamic probe or dynamic function entry/return probe.
      * @param sessionName - a session name
-     * @param channelName - a channel name (null for default channel)
+     * @param channelName - a channel name or null for default channel
      * @param eventName - a event name
+     * @param isFunction - true for dynamic function entry/return probe else false 
      * @param probe - a dynamic probe information
      * @param monitor - a progress monitor
      * @throws ExecutionException
      */
-    public void enableProbe(String sessionName, String channelName, String eventName, String probe, IProgressMonitor monitor) throws ExecutionException;
-
-    /**
-     * Enables a dynamic function entry/return probe.
-     * @param sessionName - a session name
-     * @param channelName - a channel name (null for default channel)
-     * @param eventName - a event name
-     * @param function - a dynamic function entry/return probe information
-     * @param monitor - a progress monitor 
-     * @throws ExecutionException
-     */
-    public void enableFunctionProbe(String sessionName, String channelName, String eventName, String function, IProgressMonitor monitor) throws ExecutionException;
+    public void enableProbe(String sessionName, String channelName, String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException;
 
     /**
      * Enables events using log level

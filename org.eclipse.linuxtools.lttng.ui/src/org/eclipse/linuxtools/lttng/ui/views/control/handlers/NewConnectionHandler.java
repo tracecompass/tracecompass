@@ -18,7 +18,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.linuxtools.lttng.ui.views.control.ControlView;
 import org.eclipse.linuxtools.lttng.ui.views.control.Messages;
 import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.INewConnectionDialog;
-import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.NewConnectionDialog;
+import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.TraceControlDialogFactory;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TargetNodeComponent;
 import org.eclipse.rse.core.IRSESystemType;
@@ -76,7 +76,9 @@ public class NewConnectionHandler extends BaseControlViewHandler {
         IHost[] hosts = registry.getHostsBySystemType(sysType);
 
         // Open dialog box for the node name and address
-        INewConnectionDialog dialog = new NewConnectionDialog(window.getShell(), fRoot, hosts);
+        final INewConnectionDialog dialog = TraceControlDialogFactory.getInstance().getNewConnectionDialog();
+        dialog.setTraceControlParent(fRoot);
+        dialog.setHosts(hosts);
 
         if (dialog.open() != Window.OK) {
             return null;

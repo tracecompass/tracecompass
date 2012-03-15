@@ -24,7 +24,7 @@ import org.eclipse.ui.views.properties.IPropertySource;
 
 
 /**
- * <b><u>TraceChannelComponent</u></b>
+ * <b><u>TraceEventComponent</u></b>
  * <p>
  * Implementation of the trace channel component.
  * </p>
@@ -48,7 +48,7 @@ public class TraceEventComponent extends TraceControlComponent {
     /**
      * The event information.
      */
-    private IEventInfo fEventInfo = null;
+    protected IEventInfo fEventInfo = null;
     /**
      * The image to be displayed when in disabled state.
      */

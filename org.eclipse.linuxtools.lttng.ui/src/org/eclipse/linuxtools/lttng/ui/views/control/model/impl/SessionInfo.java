@@ -158,6 +158,33 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
     public void addDomain(IDomainInfo domainInfo) {
         fDomains.add(domainInfo);
     }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceInfo#formatString()
+     */
+    @Override
+    @SuppressWarnings("nls")
+    public String formatString() {
+        StringBuffer output = new StringBuffer();
+        // Tracing session mysession: [active]
+        output.append("Tracing session ");
+        output.append(getName());
+        output.append(": [");
+        output.append(getSessionState().getInName());
+        output.append("]\n");
+        
+        //    Trace path: /home/user/lttng-traces/mysession-20120129-084256
+        output.append("    Trace path: ");
+        output.append(getSessionPath());
+        output.append("\n");
+        
+        for (Iterator<IDomainInfo> iterator = fDomains.iterator(); iterator.hasNext();) {
+            IDomainInfo domain = (IDomainInfo) iterator.next();
+            output.append(domain.formatString());
+        }
+        return output.toString();
+    }
     
     /*
      * (non-Javadoc)
@@ -165,14 +192,11 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
      */
     @Override
     public int hashCode() {
-        int result = 17;
-        result = 37 * result + super.hashCode();
-        result = 37 * result + fSessionPath.hashCode();
-        result = 37 * result + fState.hashCode();
-        for (Iterator<IDomainInfo> iterator = fDomains.iterator(); iterator.hasNext();) {
-            IDomainInfo domain = (IDomainInfo) iterator.next();
-            result = 37 * result + domain.hashCode();
-        }
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((fDomains == null) ? 0 : fDomains.hashCode());
+        result = prime * result + ((fSessionPath == null) ? 0 : fSessionPath.hashCode());
+        result = prime * result + ((fState == null) ? 0 : (fState.ordinal() + 1));
         return result;
     }
 
@@ -181,34 +205,37 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
      * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceInfo#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof SessionInfo)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
             return false;
         }
-        SessionInfo otherInfo = (SessionInfo) other;
-        if (!super.equals(otherInfo)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        if (!fSessionPath.equals(otherInfo.fSessionPath)) {
-            return false;
-        }
-        
-        if (fState.ordinal() != otherInfo.fState.ordinal()) {
-            return false;
-        }
-        
-        if (fDomains.size() != otherInfo.fDomains.size()) {
-            return false;
-        }
-        for (int i = 0; i < fDomains.size(); i++) {
-            if (!fDomains.get(i).equals(otherInfo.fDomains.get(i))) {
+        SessionInfo other = (SessionInfo) obj;
+        if (fDomains == null) {
+            if (other.fDomains != null) {
                 return false;
             }
+        } else if (!fDomains.equals(other.fDomains)) {
+            return false;
+        }
+        if (fSessionPath == null) {
+            if (other.fSessionPath != null) {
+                return false;
+            }
+        } else if (!fSessionPath.equals(other.fSessionPath)) {
+            return false;
+        }
+        if (fState != other.fState) {
+            return false;
         }
         return true;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceInfo#toString()
@@ -223,8 +250,8 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
             output.append(fState);
             output.append(",Domains=");
             for (Iterator<IDomainInfo> iterator = fDomains.iterator(); iterator.hasNext();) {
-                IDomainInfo channel = (IDomainInfo) iterator.next();
-                output.append(channel.toString());
+                IDomainInfo domain = (IDomainInfo) iterator.next();
+                output.append(domain.toString());
             }
             output.append(")]");
             return output.toString();

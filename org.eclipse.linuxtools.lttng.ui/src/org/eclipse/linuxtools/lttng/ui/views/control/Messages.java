@@ -163,9 +163,10 @@ final public class Messages extends NLS {
     public static String TraceControl_SessionPathPropertyName;
     public static String TraceControl_ProviderNamePropertyName;
     public static String TraceControl_ProcessIdPropertyName;
+    public static String TraceControl_ProbeAddressPropertyName;
+    public static String TraceControl_ProbeOffsetPropertyName;
+    public static String TraceControl_ProbeSymbolPropertyName;
     
-    
- 
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

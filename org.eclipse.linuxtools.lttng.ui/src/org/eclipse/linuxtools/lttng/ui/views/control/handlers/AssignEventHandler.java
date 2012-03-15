@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,8 +27,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
 import org.eclipse.linuxtools.lttng.ui.views.control.ControlView;
 import org.eclipse.linuxtools.lttng.ui.views.control.Messages;
-import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.GetEventInfoDialog;
 import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.IGetEventInfoDialog;
+import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.TraceControlDialogFactory;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.BaseEventComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.KernelProviderComponent;
@@ -38,9 +37,6 @@ import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceChannelComp
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.UstProviderComponent;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * <b><u>EnableEventHandler</u></b>
@@ -49,7 +45,7 @@ import org.eclipse.ui.PlatformUI;
  * This is done on the trace provider level.
  * </p>
  */
-public class AssignEventHandler extends AbstractHandler {
+public class AssignEventHandler extends BaseControlViewHandler {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -80,14 +76,10 @@ public class AssignEventHandler extends AbstractHandler {
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
 
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-
-        if (window == null) {
-            return false;
-        }
-
         // Open dialog box to retrieve the session and channel where the events should be enabled in.
-        final IGetEventInfoDialog dialog = new GetEventInfoDialog(window.getShell(), fIsKernel, fSessions);
+        final IGetEventInfoDialog dialog = TraceControlDialogFactory.getInstance().getGetEventInfoDialog();
+        dialog.setIsKernel(fIsKernel);
+        dialog.setSessions(fSessions);
 
         if (dialog.open() != Window.OK) {
             return null;
@@ -149,20 +141,9 @@ public class AssignEventHandler extends AbstractHandler {
         fSessions = null;
         fIsKernel = null;
 
-        // Check if we are closing down
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null) {
-            return false;
-        }
-
-        // Check if we are in the Project View
-        IWorkbenchPage page = window.getActivePage();
+     // Get workbench page for the Control View
+        IWorkbenchPage page = getWorkbenchPage();
         if (page == null) {
-            return false;
-        }
-
-        IWorkbenchPart part = page.getActivePart();
-        if (!(part instanceof ControlView)) {
             return false;
         }
 

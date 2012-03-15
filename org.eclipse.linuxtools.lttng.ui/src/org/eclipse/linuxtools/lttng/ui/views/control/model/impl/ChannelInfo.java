@@ -275,69 +275,120 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
     
     /*
      * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceInfo#formatString()
+     */
+    @SuppressWarnings("nls")
+    @Override
+    public String formatString() {
+        StringBuffer output = new StringBuffer();
+        //- channel0: [enabled]
+        output.append("\n- ");
+        output.append(getName());
+        output.append(": [");
+        output.append(getState().getInName());
+        output.append("]\n");
+        //     Attributes:
+        output.append("\n    Attributes:\n");
+        //     overwrite mode: 0
+        output.append("      overwrite mode: ");
+        output.append(isOverwriteMode() ? "1" : "0");
+        //         subbufers size: 262144
+        output.append("\n      subbufers size: ");
+        output.append(getSubBufferSize());
+        //         number of subbufers: 4
+        output.append("\n      number of subbufers: ");
+        output.append(getNumberOfSubBuffers());
+        //        switch timer interval: 0
+        output.append("\n      switch timer interval: ");
+        output.append(getSwitchTimer());
+        //         read timer interval: 200
+        output.append("\n      read timer interval: ");
+        output.append(getReadTimer());
+        //         output: splice()
+        output.append("\n      output: ");
+        output.append(getOutputType());
+        output.append("\n\n");
+
+        output.append("    Events:");
+        if (fEvents.isEmpty()) {
+            output.append("\n      None");
+        } else {
+            for (Iterator<IEventInfo> iterator = fEvents.iterator(); iterator.hasNext();) {
+                IEventInfo event = (IEventInfo) iterator.next();
+                output.append(event.formatString());
+            }
+        }
+        output.append("\n");
+
+        return output.toString();
+    }
+    
+    /*
+     * (non-Javadoc)
      * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceInfo#hashCode()
      */
     @Override
     public int hashCode() {
-        int result = 17;
-        result = 37 * result + super.hashCode();
-        result = 37 * result + Boolean.valueOf(fOverwriteMode).hashCode();
-        result = 37 * result + Long.valueOf(fSubBufferSize).hashCode();
-        result = 37 * result + fNumberOfSubBuffers;
-        result = 37 * result + Long.valueOf(fSwitchTimer).hashCode();
-        result = 37 * result + Long.valueOf(fReadTimer).hashCode();
-        result = 37 * result + (fOutputType != null ? fOutputType.hashCode() : 0);
-        result = 37 * result + fState.ordinal();
-        for (Iterator<IEventInfo> iterator = fEvents.iterator(); iterator.hasNext();) {
-            IEventInfo event = (IEventInfo) iterator.next();
-            result = 37 * result + event.hashCode();
-        }
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((fEvents == null) ? 0 : fEvents.hashCode());
+        result = prime * result + fNumberOfSubBuffers;
+        result = prime * result + ((fOutputType == null) ? 0 : fOutputType.hashCode());
+        result = prime * result + (fOverwriteMode ? 1231 : 1237);
+        result = prime * result + (int) (fReadTimer ^ (fReadTimer >>> 32));
+        result = prime * result + ((fState == null) ? 0 : (fState.ordinal() + 1));
+        result = prime * result + (int) (fSubBufferSize ^ (fSubBufferSize >>> 32));
+        result = prime * result + (int) (fSwitchTimer ^ (fSwitchTimer >>> 32));
         return result;
-    }
+    }  
 
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceInfo#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof ChannelInfo)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
             return false;
         }
-
-        ChannelInfo otherInfo = (ChannelInfo) other;
-        if (!super.equals(otherInfo)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        if (fOverwriteMode != otherInfo.fOverwriteMode) {
-            return false;
-        }
-        if (fSubBufferSize != otherInfo.fSubBufferSize) {
-            return false;
-        }
-        if (fNumberOfSubBuffers != otherInfo.fNumberOfSubBuffers) {
-            return false;
-        }
-        if (fSwitchTimer != otherInfo.fSwitchTimer) {
-            return false;
-        }
-        if (fReadTimer != otherInfo.fReadTimer) {
-            return false;
-        }
-        if (fState.ordinal() != otherInfo.fState.ordinal()) {
-            return false;
-        }
-        if (!fOutputType.equals(otherInfo.fOutputType)) {
-            return false;
-        }
-        if (fEvents.size() != otherInfo.fEvents.size()) {
-            return false;
-        }
-        for (int i = 0; i < fEvents.size(); i++) {
-            if (!fEvents.get(i).equals(otherInfo.fEvents.get(i))) {
+        ChannelInfo other = (ChannelInfo) obj;
+        if (fEvents == null) {
+            if (other.fEvents != null) {
                 return false;
             }
+        } else if (!fEvents.equals(other.fEvents)) {
+            return false;
+        }
+        if (fNumberOfSubBuffers != other.fNumberOfSubBuffers) {
+            return false;
+        }
+        if (fOutputType == null) {
+            if (other.fOutputType != null) {
+                return false;
+            }
+        } else if (!fOutputType.equals(other.fOutputType)) {
+            return false;
+        }
+        if (fOverwriteMode != other.fOverwriteMode) {
+            return false;
+        }
+        if (fReadTimer != other.fReadTimer) {
+            return false;
+        }
+        if (fState != other.fState) {
+            return false;
+        }
+        if (fSubBufferSize != other.fSubBufferSize) {
+            return false;
+        }
+        if (fSwitchTimer != other.fSwitchTimer) {
+            return false;
         }
         return true;
     }
@@ -378,4 +429,6 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
             output.append(")]");
             return output.toString();
     }
+
+
 }

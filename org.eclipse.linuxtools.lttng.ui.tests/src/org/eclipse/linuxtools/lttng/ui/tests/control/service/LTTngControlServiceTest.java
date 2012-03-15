@@ -11,24 +11,32 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.tests.control.service;
 
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.lttng.stubs.service.CommandShellFactory;
+import org.eclipse.linuxtools.lttng.stubs.service.shells.LTTngToolsFileShell;
+import org.eclipse.linuxtools.lttng.ui.tests.LTTngUITestPlugin;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IBaseEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IDomainInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ISessionInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IUstProviderInfo;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.LogLevelType;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceEnablement;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceEventType;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceSessionState;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.ChannelInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService;
 import org.eclipse.linuxtools.lttng.ui.views.control.service.LTTngControlService;
 /**
@@ -36,10 +44,33 @@ import org.eclipse.linuxtools.lttng.ui.views.control.service.LTTngControlService
  */
 @SuppressWarnings("nls")
 public class LTTngControlServiceTest extends TestCase {
+
+    private static final String DIRECTORY   = "testfiles";
+    private static final String TEST_STREAM = "LTTngServiceTest.cfg";
+    
+    private static final String SCEN_LTTNG_NOT_INSTALLED = "LttngNotInstalled";
+    private static final String SCEN_NO_SESSION_AVAILABLE = "NoSessionAvailable";
+    private static final String SCEN_GET_SESSION_NAMES1 = "GetSessionNames1";
+    private static final String SCEN_GET_SESSION_NAME_NOT_EXIST = "GetSessionNameNotExist";
+    private static final String SCEN_GET_SESSION_GARBAGE_OUT = "GetSessionGarbageOut";
+    private static final String SCEN_GET_SESSION1 = "GetSession1";
+    private static final String SCEN_GET_KERNEL_PROVIDER1 = "GetKernelProvider1";
+    private static final String SCEN_GET_UST_PROVIDER1 = "GetUstProvider1";
+    private static final String SCEN_GET_UST_PROVIDER2 = "GetUstProvider2";
+    private static final String SCEN_CREATE_SESSION1 = "CreateSession1";
+    private static final String SCEN_CREATE_SESSION_VARIANTS = "CreateSessionVariants";
+    private static final String SCEN_DESTROY_SESSION1 = "DestroySession1";
+    private static final String SCEN_CHANNEL_HANDLING = "ChannelHandling";
+    private static final String SCEN_EVENT_HANDLING = "EventHandling";
+
     // ------------------------------------------------------------------------
     // Test data
     // ------------------------------------------------------------------------
-    private CommandShellFactory fShellFactory; 
+    private CommandShellFactory fShellFactory;
+    private String fTestfile;
+    private LTTngToolsFileShell fShell;
+    private ILttngControlService fService;
+
     
    // ------------------------------------------------------------------------
     // Static methods
@@ -58,6 +89,14 @@ public class LTTngControlServiceTest extends TestCase {
     public void setUp() throws Exception {
         super.setUp();
         fShellFactory = CommandShellFactory.getInstance();
+
+        URL location = FileLocator.find(LTTngUITestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
+        File testfile = new File(FileLocator.toFileURL(location).toURI());
+        fTestfile = testfile.getAbsolutePath();
+        
+        fShell = fShellFactory.getFileShell();
+        fShell.loadScenarioFile(fTestfile);
+        fService = new LTTngControlService(fShell);
     }
 
     /**
@@ -76,10 +115,9 @@ public class LTTngControlServiceTest extends TestCase {
     
     public void testGetSessionNames() {
         try {
-            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForLttngNotExistsShell());
-            service.getSessionNames(new NullProgressMonitor());
+            fShell.setScenario(SCEN_LTTNG_NOT_INSTALLED);
+            fService.getSessionNames(new NullProgressMonitor());
             fail("No exeption thrown");
-            
         } catch (ExecutionException e) {
          // success
         }
@@ -87,8 +125,8 @@ public class LTTngControlServiceTest extends TestCase {
     
     public void testGetSessionNames1() {
         try {
-            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForNoSessionNames());
-            String[] result = service.getSessionNames(new NullProgressMonitor());
+            fShell.setScenario(SCEN_NO_SESSION_AVAILABLE);
+            String[] result = fService.getSessionNames(new NullProgressMonitor());
 
             assertNotNull(result);
             assertEquals(0, result.length);
@@ -97,11 +135,11 @@ public class LTTngControlServiceTest extends TestCase {
             fail(e.toString());
         }
     }
-    
+
     public void testGetSessionNames2() {
         try {
-            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionNames());
-            String[] result = service.getSessionNames(new NullProgressMonitor());
+            fShell.setScenario(SCEN_GET_SESSION_NAMES1);
+            String[] result = fService.getSessionNames(new NullProgressMonitor());
 
             assertNotNull(result);
             assertEquals(2, result.length);
@@ -112,11 +150,11 @@ public class LTTngControlServiceTest extends TestCase {
             fail(e.toString());
         }
     }
-    
+
     public void testGetSessionNotExist() {
         try {
-            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionNotExists());
-            service.getSessionNames(new NullProgressMonitor());
+            fShell.setScenario(SCEN_GET_SESSION_NAME_NOT_EXIST);
+            fService.getSessionNames(new NullProgressMonitor());
             fail("No exeption thrown");
             
         } catch (ExecutionException e) {
@@ -126,8 +164,8 @@ public class LTTngControlServiceTest extends TestCase {
     
     public void testGetSessionNameGarbage() {
         try {
-            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionGarbage());
-            String[] result = service.getSessionNames(new NullProgressMonitor());
+            fShell.setScenario(SCEN_GET_SESSION_GARBAGE_OUT);
+            String[] result = fService.getSessionNames(new NullProgressMonitor());
 
             assertNotNull(result);
             assertEquals(0, result.length);
@@ -139,8 +177,8 @@ public class LTTngControlServiceTest extends TestCase {
     
     public void testGetSession1() {
         try {
-            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionNames());
-            ISessionInfo session = service.getSession("mysession", new NullProgressMonitor());
+            fShell.setScenario(SCEN_GET_SESSION1);
+            ISessionInfo session = fService.getSession("mysession", new NullProgressMonitor());
 
             // Verify Session
             assertNotNull(session);
@@ -240,7 +278,7 @@ public class LTTngControlServiceTest extends TestCase {
             assertEquals(TraceEnablement.ENABLED, ustEvents[1].getState());
             
             // next session (no detailed information available)
-            session = service.getSession("mysession1", new NullProgressMonitor());
+            session = fService.getSession("mysession1", new NullProgressMonitor());
             assertNotNull(session);
             assertEquals("mysession1", session.getName());
             assertEquals("/home/user/lttng-traces/mysession1-20120203-133225", session.getSessionPath());
@@ -256,8 +294,8 @@ public class LTTngControlServiceTest extends TestCase {
 
     public void testGetKernelProvider() {
         try {
-            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionNames());
-            List<IBaseEventInfo> events = service.getKernelProvider(new NullProgressMonitor());
+            fShell.setScenario(SCEN_GET_KERNEL_PROVIDER1);
+            List<IBaseEventInfo> events = fService.getKernelProvider(new NullProgressMonitor());
 
             // Verify event info
             assertNotNull(events);
@@ -286,8 +324,8 @@ public class LTTngControlServiceTest extends TestCase {
 
     public void testGetUstProvider() {
         try {
-            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionNames());
-            List<IUstProviderInfo> providers = service.getUstProvider();
+            fShell.setScenario(SCEN_GET_UST_PROVIDER1);
+            List<IUstProviderInfo> providers = fService.getUstProvider();
 
             // Check all providers
             assertNotNull(providers);
@@ -337,11 +375,11 @@ public class LTTngControlServiceTest extends TestCase {
             fail(e.toString());
         }
     }
-    
+
     public void testUstProvider2() {
         try {
-            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForNoUstProvider());
-            List<IUstProviderInfo> providers = service.getUstProvider();
+            fShell.setScenario(SCEN_GET_UST_PROVIDER2);
+            List<IUstProviderInfo> providers = fService.getUstProvider();
 
             assertNotNull(providers);
             assertEquals(0, providers.size());
@@ -350,11 +388,12 @@ public class LTTngControlServiceTest extends TestCase {
             fail(e.toString());
         }
     }
-    
+
     public void testCreateSession() {
         try {
-            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionNames());
-            ISessionInfo info = service.createSession("mysession2", null, new NullProgressMonitor());
+            fShell.setScenario(SCEN_CREATE_SESSION1);
+
+            ISessionInfo info = fService.createSession("mysession2", null, new NullProgressMonitor());
             assertNotNull(info);
             assertEquals("mysession2", info.getName());
             assertNotNull(info.getSessionPath());
@@ -364,32 +403,34 @@ public class LTTngControlServiceTest extends TestCase {
             fail(e.toString());
         }
     }
-    
-    public void testCreateSessionErrors() {
-        ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionErrors());
+
+    public void testCreateSessionVariants() {
+
+        fShell.setScenario(SCEN_CREATE_SESSION_VARIANTS);
+
         try {
-            service.createSession("alreadyExist", null, new NullProgressMonitor());
+            fService.createSession("alreadyExist", null, new NullProgressMonitor());
             fail("No exeption thrown");
         } catch (ExecutionException e) {
             // success
         }
         
         try {
-            service.createSession("wrongName", null, new NullProgressMonitor());
+            fService.createSession("wrongName", null, new NullProgressMonitor());
             fail("No exeption thrown");
         } catch (ExecutionException e) {
             // success
         } 
 
         try {
-            service.createSession("wrongPath", "/home/user/hallo", new NullProgressMonitor());
+            fService.createSession("withPath", "/home/user/hallo", new NullProgressMonitor());
             fail("No exeption thrown");
         } catch (ExecutionException e) {
             // success
         } 
 
         try {
-            ISessionInfo info = service.createSession("session with spaces", null, new NullProgressMonitor());
+            ISessionInfo info = fService.createSession("session with spaces", null, new NullProgressMonitor());
             assertNotNull(info);
             assertEquals("session with spaces", info.getName());
             assertNotNull(info.getSessionPath());
@@ -401,7 +442,7 @@ public class LTTngControlServiceTest extends TestCase {
         } 
 
         try {
-            ISessionInfo info = service.createSession("pathWithSpaces", "/home/user/hallo user/here", new NullProgressMonitor());
+            ISessionInfo info = fService.createSession("pathWithSpaces", "/home/user/hallo user/here", new NullProgressMonitor());
             assertNotNull(info);
             assertEquals("pathWithSpaces", info.getName());
             assertNotNull(info.getSessionPath());
@@ -415,31 +456,202 @@ public class LTTngControlServiceTest extends TestCase {
 
     public void testDestroySession() {
         try {
-            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionNames());
-            service.destroySession("mysession2", new NullProgressMonitor());
+            fShell.setScenario(SCEN_DESTROY_SESSION1);
+            fService.destroySession("mysession2", new NullProgressMonitor());
         } catch (ExecutionException e) {
             fail(e.toString());
         } 
     }
-    
-//    public void testCreateChannel() {
-//        try {
-//            
-////            public void enableChannel(String sessionName, List<String> channelNames, boolean isKernel, IChannelInfo info, IProgressMonitor monitor);
-//            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForSessionNames());
-//            
-//            
-//            ISessionInfo info = service.createSession("mysession2", null, new NullProgressMonitor());
-//            assertNotNull(info);
-//            assertEquals("mysession2", info.getName());
-//            assertNotNull(info.getSessionPath());
-//            assertTrue(info.getSessionPath().contains("mysession2"));
-//            assertEquals(TraceSessionState.INACTIVE, info.getSessionState());
-//        } catch (ExecutionException e) {
-//            fail(e.toString());
-//        }
-//    }
 
+    public void testCreateChannel() {
+        try {
+
+            String sessionName = "mysession2";
+            List<String> list = new ArrayList<String>();
+            String kernelChannel0 = "mychannel0";
+            String kernelChannel1 = "mychannel1";
+            list.add(kernelChannel0);
+            list.add(kernelChannel1);
+            
+            fShell.setScenario(SCEN_CHANNEL_HANDLING);
+            
+            // Create/enable/configure 2 kernel channels
+            ChannelInfo chanInfo = new ChannelInfo("");
+            chanInfo.setOverwriteMode(true);
+            chanInfo.setSubBufferSize(16384);
+            chanInfo.setReadTimer(100);
+            chanInfo.setSwitchTimer(200);
+            chanInfo.setNumberOfSubBuffers(2);
+            fService.enableChannels(sessionName, list, true, chanInfo, new NullProgressMonitor());
+            
+            // Create/enable/configure 1 UST channel
+            list.clear();
+            list.add("ustChannel");
+            
+            chanInfo = new ChannelInfo("");
+            chanInfo.setOverwriteMode(true);
+            chanInfo.setSubBufferSize(32768);
+            chanInfo.setReadTimer(200);
+            chanInfo.setSwitchTimer(100);
+            chanInfo.setNumberOfSubBuffers(1);
+            fService.enableChannels(sessionName, list, false, chanInfo, new NullProgressMonitor());
+
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+
+    public void testDisableChannel() {
+        try {
+
+            String sessionName = "mysession2";
+            List<String> list = new ArrayList<String>();
+            String kernelChannel0 = "mychannel0";
+            String kernelChannel1 = "mychannel1";
+            list.add(kernelChannel0);
+            list.add(kernelChannel1);
+            
+            fShell.setScenario(SCEN_CHANNEL_HANDLING);
+            fService.disableChannels(sessionName, list, true, new NullProgressMonitor());
+            
+            list.clear();
+            list.add("ustChannel");
+            fService.disableChannels(sessionName, list, false, new NullProgressMonitor());
+
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
     
+    public void testEnableChannel() {
+        try {
+
+            String sessionName = "mysession2";
+            List<String> list = new ArrayList<String>();
+            String kernelChannel0 = "mychannel0";
+            String kernelChannel1 = "mychannel1";
+            list.add(kernelChannel0);
+            list.add(kernelChannel1);
+            
+            fShell.setScenario(SCEN_CHANNEL_HANDLING);
+            fService.enableChannels(sessionName, list, true, null, new NullProgressMonitor());
+            
+            // Create/enable/configure 1 UST channel
+            list.clear();
+            list.add("ustChannel");
+            
+            fService.enableChannels(sessionName, list, false, null, new NullProgressMonitor());
+
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+    
+//    public void tesEnableChannelNoTracer() {
+//        try {
+//            ILttngControlService service = new LTTngControlService(fShellFactory.getShellForChannelNoTracer());
+//            service.getSessionNames(new NullProgressMonitor());
+//            fail("No exeption thrown");
+//            
+//        } catch (ExecutionException e) {
+//            // success
+//        }
+//    }    
+    
+    public void testEnableEvents() {
+        try {
+            // 1) session name, channel = null, 3 event names, kernel
+            String sessionName = "mysession2";
+            List<String> list = new ArrayList<String>();
+            String eventName0 = "block_rq_remap";
+            String eventName1 = "block_bio_remap";
+            String eventName2 = "softirq_entry";
+            list.add(eventName0);
+            list.add(eventName1);
+            list.add(eventName2);
+            fShell.setScenario(SCEN_EVENT_HANDLING);
+            fService.enableEvents(sessionName, null, list, true, new NullProgressMonitor());
+            
+            // 2) session name, channel=mychannel, event name= null, kernel
+            String channelName = "mychannel";
+            fService.enableEvents(sessionName, channelName, null, true, new NullProgressMonitor());
+
+            // 3) session name, channel=mychannel, 1 event name, ust
+            String ustEventName = "ust_tests_hello:tptest_sighandler";
+            list.clear();
+            list.add(ustEventName);
+            fService.enableEvents(sessionName, channelName, list, false, new NullProgressMonitor());
+            
+            // 4) session name, channel = mychannel, no event name, ust
+            list.clear();
+            fService.enableEvents(sessionName, channelName, list, false, new NullProgressMonitor());
+            
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+    
+    public void testEnableSyscalls() {
+        try {
+            // 1) session name, channel = null, 3 event names, kernel
+            String sessionName = "mysession2";
+            String channelName = "mychannel";
+            
+            fShell.setScenario(SCEN_EVENT_HANDLING);
+
+            // 1) session name, channel = null 
+            fService.enableSyscalls(sessionName, null, new NullProgressMonitor());
+
+            // 2) session name, channel = mychannel
+            fService.enableSyscalls(sessionName, channelName, new NullProgressMonitor());
+                        
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+
+    public void testDynamicProbe() {
+        try {
+            // 1) session name, channel = null, 3 event names, kernel
+            String sessionName = "mysession2";
+            String channelName = "mychannel";
+            String eventName0 = "myevent0";
+            String eventName1 = "myevent1";
+            String functionProbe = "0xc0101340";
+            String dynProbe = "init_post";
+            
+            fShell.setScenario(SCEN_EVENT_HANDLING);
+
+            // 1) session name, channel = null, event name, function probe, probe 
+            fService.enableProbe(sessionName, null, eventName0, true, functionProbe, new NullProgressMonitor());
+
+            // 2) session name, channel = mychannel
+            fService.enableProbe(sessionName, channelName, eventName1, false, dynProbe, new NullProgressMonitor());
+                        
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+
+    public void testEnableLogLevel() {
+        try {
+            // 1) session name, channel = null, 3 event names, kernel
+            String sessionName = "mysession2";
+            String channelName = "mychannel";
+            String eventName4 = "myevent4";
+            String eventName5 = "myevent5";
+            
+            fShell.setScenario(SCEN_EVENT_HANDLING);
+            
+            // 1) session name, channel = null, event name, loglevel-only, TRACE_DEBUG
+            fService.enableLogLevel(sessionName, null, eventName4, LogLevelType.LOGLEVEL_ONLY, TraceLogLevel.TRACE_DEBUG, new NullProgressMonitor());
+
+            // 2) session name, channel = mychannel, null, loglevel, TRACE_DEBUG_FUNCTION
+            fService.enableLogLevel(sessionName, channelName, eventName5, LogLevelType.LOGLEVEL, TraceLogLevel.TRACE_DEBUG_FUNCTION, new NullProgressMonitor());
+
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
     
 }

@@ -157,41 +157,65 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
     
     /*
      * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceInfo#formatString()
+     */
+    @SuppressWarnings("nls")
+    @Override
+    public String formatString() {
+        StringBuffer output = new StringBuffer();
+        //    ust_tests_hello:tptest_sighandler (loglevel: TRACE_DEBUG_MODULE (10)) (type: tracepoint)");
+        output.append("\n      ");
+        output.append(getName());
+        if (fLogLevel != TraceLogLevel.LEVEL_UNKNOWN) {
+            output.append(" (loglevel: ");
+            output.append(fLogLevel.getInName());
+            output.append(" (");
+            output.append(fLogLevel.ordinal());
+            output.append("))");
+        }
+        output.append(" (type: ");
+        output.append(fEventType.getInName());
+        output.append(")");
+        return output.toString();
+    }
+    
+    /*
+     * (non-Javadoc)
      * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceInfo#hashCode()
      */
     @Override
     public int hashCode() {
-        int result = 17;
-        result = 37 * result + super.hashCode();
-        result = 37 * result + fEventType.ordinal();
-        result = 37 * result + fLogLevel.ordinal();
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((fEventType == null) ? 0 : (fEventType.ordinal() + 1));
+        result = prime * result + ((fLogLevel == null) ? 0 : (fLogLevel.ordinal() + 1));
         return result;
-    }
+    }    
 
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceInfo#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof BaseEventInfo)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
             return false;
         }
-
-        BaseEventInfo otherInfo = (BaseEventInfo) other;
-        if (!super.equals(otherInfo)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        if (fEventType.ordinal() != otherInfo.fEventType.ordinal()) {
+        BaseEventInfo other = (BaseEventInfo) obj;
+        if (fEventType != other.fEventType) {
             return false;
         }
-        
-        if (fLogLevel.ordinal() != otherInfo.fLogLevel.ordinal()) {
+        if (fLogLevel != other.fLogLevel) {
             return false;
         }
         return true;
-    }
+    }    
 
     /*
      * (non-Javadoc)
@@ -210,4 +234,8 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
             output.append(")]");
             return output.toString();
     }
+
+ 
+
+
 }

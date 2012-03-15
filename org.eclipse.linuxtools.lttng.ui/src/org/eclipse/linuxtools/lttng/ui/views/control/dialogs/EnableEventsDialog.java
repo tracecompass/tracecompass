@@ -96,28 +96,11 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
      * @param shell - a shell for the display of the dialog
      * @param providerGroup - the trace provider group
      */
-    public EnableEventsDialog(Shell shell, TraceProviderGroup providerGroup) {
-        this(shell, providerGroup, null);
+    public EnableEventsDialog(Shell shell) {
+        super(shell);
+        setShellStyle(SWT.RESIZE);
     }
     
-    /**
-     * Constructor
-     * @param shell - a shell for the display of the dialog
-     * @param providerGroup - a trace provider group
-     * @param domain - a domain of the events (null if not known) 
-     */
-    public EnableEventsDialog(Shell shell, TraceProviderGroup providerGroup, TraceDomainComponent domain) {
-        super(shell);
-        fProviderGroup = providerGroup;
-        setShellStyle(SWT.RESIZE);
-        fDomain = domain;
-        if (fDomain != null) {
-            fIsKernel = fDomain.isKernel();
-        } else {
-            fIsKernel = true;
-        }
-    }
-
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -331,6 +314,29 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
     public boolean isKernel() {
         return fIsKernel;
     }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.dialogs.IEnableEventsDialog#setTraceProviderGroup(org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceProviderGroup)
+     */
+    @Override
+    public void setTraceProviderGroup(TraceProviderGroup providerGroup) {
+        fProviderGroup = providerGroup;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.dialogs.IEnableEventsDialog#setTraceDomainComponent(org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceDomainComponent)
+     */
+    @Override
+    public void setTraceDomainComponent(TraceDomainComponent domain) {
+        fDomain = domain;
+        if (fDomain != null) {
+            fIsKernel = fDomain.isKernel();
+        } else {
+            fIsKernel = true;
+        }
+    }
 
     // ------------------------------------------------------------------------
     // Operations
@@ -391,8 +397,11 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         // ------------------------------------------------------------------------
         // Kernel or UST event data group 
         // ------------------------------------------------------------------------
+        fUstComposite = null;
+        fKernelComposite = null;
         if (fIsKernel) {
             createKernelComposite();
+            fUstComposite = null;
         } else {
             createUstComposite();
         }

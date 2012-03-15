@@ -228,45 +228,26 @@ public class TraceDomainComponent extends TraceControlComponent {
     /**
      * Enables a dynamic probe (for kernel domain)
      * @param eventName - event name for probe
-     * @param probe - the actual probe
+     * @param isFunction - true for dynamic function entry/return probe else false
+      * @param probe - the actual probe
      * @throws ExecutionException
      */
-    public void enableProbe(String eventName, String probe) throws ExecutionException {
-        enableProbe(eventName, probe, new NullProgressMonitor());
+    public void enableProbe(String eventName, boolean isFunction, String probe) throws ExecutionException {
+        enableProbe(eventName, isFunction, probe, new NullProgressMonitor());
     }
     
     /**
      * Enables a dynamic probe (for kernel domain)
      * @param eventName - event name for probe
+     * @param isFunction - true for dynamic function entry/return probe else false
      * @param probe - the actual probe
      * @param monitor - a progress monitor
      * @throws ExecutionException
      */
-    public void enableProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException {
-        getControlService().enableProbe(getSessionName(), null, eventName, probe, monitor);
+    public void enableProbe(String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().enableProbe(getSessionName(), null, eventName, isFunction, probe, monitor);
     }
 
-    /**
-     * Enables a dynamic function entry/return probe (for kernel domain)
-     * @param eventName - event name for probe
-     * @param probe - the actual probe
-     * @throws ExecutionException
-     */
-    public void enableFunctionProbe(String eventName, String probe) throws ExecutionException {
-        enableFunctionProbe(eventName, probe, new NullProgressMonitor());
-    }
-    
-    /**
-     * Enables a dynamic function entry/return probe (for kernel domain)
-     * @param eventName - event name for probe
-     * @param probe - the actual probe
-     * @param monitor - a progress monitor
-     * @throws ExecutionException
-     */
-    public void enableFunctionProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException {
-        getControlService().enableFunctionProbe(getSessionName(), null, eventName, probe, monitor);
-    }
-    
     /**
      * Enables events using log level.
      * @param eventName - a event name

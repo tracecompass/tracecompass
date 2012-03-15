@@ -15,6 +15,7 @@ import org.eclipse.linuxtools.lttng.ui.views.control.model.IBaseEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IDomainInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IEventInfo;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.IProbeEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ISessionInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IUstProviderInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceEnablement;
@@ -25,6 +26,7 @@ import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.BaseEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.ChannelInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.DomainInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.EventInfo;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.ProbeEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.SessionInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.UstProviderInfo;
 
@@ -47,6 +49,8 @@ public class ModelImplFactory {
     private IBaseEventInfo fBaseEventInfo2 = null;
     private IUstProviderInfo fUstProviderInfo1 = null;
     private IUstProviderInfo fUstProviderInfo2 = null;
+    private IProbeEventInfo fProbeEventInfo1 = null;
+    private IProbeEventInfo fProbeEventInfo2 = null;
     
     public ModelImplFactory() {
         fBaseEventInfo1 = new BaseEventInfo("event1");
@@ -115,6 +119,17 @@ public class ModelImplFactory {
         fSessionInfo2.setSessionState(TraceSessionState.INACTIVE);
         fSessionInfo2.addDomain(fDomainInfo1);
         fSessionInfo2.addDomain(fDomainInfo2);
+
+        fProbeEventInfo1 = new ProbeEventInfo("probeEvent1");
+        fProbeEventInfo1.setEventType(TraceEventType.TRACEPOINT);
+        fProbeEventInfo1.setState(TraceEnablement.ENABLED);
+        fProbeEventInfo1.setAddress("0xc1231234");
+
+        fProbeEventInfo2 = new ProbeEventInfo("probeEvent2");
+        fProbeEventInfo2.setEventType(TraceEventType.UNKNOWN);
+        fProbeEventInfo2.setState(TraceEnablement.DISABLED);
+        fProbeEventInfo2.setOffset("0x100");
+        fProbeEventInfo2.setSymbol("init_post");
     }
     
     public ISessionInfo getSessionInfo1() {
@@ -168,4 +183,13 @@ public class ModelImplFactory {
     public IUstProviderInfo getUstProviderInfo2() {
         return fUstProviderInfo2;
     }
+    
+    public IProbeEventInfo getProbeEventInfo1() {
+        return fProbeEventInfo1;
+    }
+
+    public IProbeEventInfo getProbeEventInfo2() {
+        return fProbeEventInfo2;
+    }
+
 }

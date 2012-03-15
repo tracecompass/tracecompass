@@ -27,14 +27,12 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
 import org.eclipse.linuxtools.lttng.ui.views.control.ControlView;
 import org.eclipse.linuxtools.lttng.ui.views.control.Messages;
-import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.CreateChannelDialog;
 import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.ICreateChannelOnSessionDialog;
+import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.TraceControlDialogFactory;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceSessionState;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceDomainComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * <b><u>CreateChannelOnSessionHandler</u></b>
@@ -63,13 +61,7 @@ public class CreateChannelOnSessionHandler extends BaseControlViewHandler {
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
 
-        final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-
-        if (window == null) {
-            return false;
-        }
-
-        final ICreateChannelOnSessionDialog dialog = new CreateChannelDialog(window.getShell());
+        final ICreateChannelOnSessionDialog dialog =  TraceControlDialogFactory.getInstance().getCreateChannelOnSessionDialog();
 
         if (dialog.open() != Window.OK) {
             return null;

@@ -119,23 +119,8 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelOnSessi
      * @param shell - a shell for the display of the dialog
      */
     public CreateChannelDialog(Shell shell) {
-        this(shell, null);
-    }
-
-    
-    /**
-     * Constructor
-     * @param shell - a shell for the display of the dialog
-     * @param domain - a domain to create channel on. Use null for creating a channel on session level.
-     */
-    public CreateChannelDialog(Shell shell, TraceDomainComponent domain) {
-        super(shell);
-        fDomain = domain;
-        if (fDomain != null) {
-            fIsKernel = fDomain.isKernel();
-        } else {
-            fIsKernel = true;
-        }
+       super(shell);
+       fIsKernel = true;
 
         // Common verify listener
         fVerifyListener = new VerifyListener() {
@@ -157,6 +142,20 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelOnSessi
     @Override
     public IChannelInfo getChannelInfo() {
         return fChannelInfo;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.dialogs.ICreateChannelDialog#setDomainComponent(org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceDomainComponent)
+     */
+    @Override
+    public void setDomainComponent(TraceDomainComponent domain) {
+        fDomain = domain;
+        if (fDomain != null) {
+            fIsKernel = fDomain.isKernel();
+        } else {
+            fIsKernel = true;
+        }
     }
 
     /*

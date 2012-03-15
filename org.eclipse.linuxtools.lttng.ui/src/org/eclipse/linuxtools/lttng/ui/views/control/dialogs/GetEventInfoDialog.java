@@ -98,13 +98,9 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
     /**
      * Constructor of dialog box.
      * @param shell - the shell for the dialog box
-     * @param isKernel - a flag to indicate Kernel or UST events.
-     * @param sessions - a list of available sessions
      */
-    public GetEventInfoDialog(Shell shell, boolean isKernel, TraceSessionComponent[] sessions) {
+    public GetEventInfoDialog(Shell shell) {
         super(shell);
-        fIsKernel = isKernel;
-        fSessions = Arrays.copyOf(sessions, sessions.length);
         setShellStyle(SWT.RESIZE);
     }
 
@@ -127,6 +123,24 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
     @Override
     public TraceChannelComponent getChannel() {
         return fChannel;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.dialogs.IGetEventInfoDialog#setIsKernel(boolean)
+     */
+    @Override
+    public void setIsKernel(boolean isKernel) {
+        fIsKernel = isKernel;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.dialogs.IGetEventInfoDialog#setSessions(org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent[])
+     */
+    @Override
+    public void setSessions(TraceSessionComponent[] sessions) {
+        fSessions = Arrays.copyOf(sessions, sessions.length);
     }
 
     // ------------------------------------------------------------------------

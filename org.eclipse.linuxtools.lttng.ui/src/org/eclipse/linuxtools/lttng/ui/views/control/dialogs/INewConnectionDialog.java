@@ -11,6 +11,9 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.control.dialogs;
 
+import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent;
+import org.eclipse.rse.core.model.IHost;
+
 /**
  * <b><u>INewConnectionDialog</u></b>
  * <p>
@@ -31,6 +34,18 @@ public interface INewConnectionDialog {
      * @return the host name (IP address or DNS name)
      */
     public String getHostName();
+    
+    /**
+     * Sets the trace control root
+     * @param parent - the trace control parent
+     */
+    public void setTraceControlParent(ITraceControlComponent parent);
+    
+    /**
+     * Sets the available hosts to select.
+     * @param hosts - the available hosts
+     */
+    public void setHosts(IHost[] hosts);
 
     // ------------------------------------------------------------------------
     // Operations

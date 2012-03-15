@@ -11,6 +11,8 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.control.dialogs;
 
+import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionGroup;
+
 /**
  * <b><u>ICreateSessionDialog</u></b>
  * <p>
@@ -36,6 +38,12 @@ public interface ICreateSessionDialog {
      * @return true for default location else false
      */
     public boolean isDefaultSessionPath();
+    
+    /**
+     * Set trace session group.
+     * @param group - the session group
+     */
+    public void setTraceSessionGroup(TraceSessionGroup group);
 
     // ------------------------------------------------------------------------
     // Operations

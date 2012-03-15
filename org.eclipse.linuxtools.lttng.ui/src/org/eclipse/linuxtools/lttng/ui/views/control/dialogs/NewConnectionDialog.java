@@ -103,12 +103,8 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
-    public NewConnectionDialog(Shell shell, ITraceControlComponent parent, IHost[] hosts) {
+    public NewConnectionDialog(Shell shell) {
         super(shell);
-        fParent = parent;
-        if (hosts != null) {
-            fExistingHosts = Arrays.copyOf(hosts, hosts.length);
-        }
         setShellStyle(SWT.RESIZE);
     }
 
@@ -131,6 +127,26 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
     @Override
     public String getHostName() {
         return fHostName;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.dialogs.INewConnectionDialog#setTraceControlParent(org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent)
+     */
+    @Override
+    public void setTraceControlParent(ITraceControlComponent parent) {
+        fParent = parent;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.dialogs.INewConnectionDialog#setHosts(org.eclipse.rse.core.model.IHost[])
+     */
+    @Override
+    public void setHosts(IHost[] hosts) {
+        if (hosts != null) {
+            fExistingHosts = Arrays.copyOf(hosts, hosts.length);
+        }
     }
 
     // ------------------------------------------------------------------------

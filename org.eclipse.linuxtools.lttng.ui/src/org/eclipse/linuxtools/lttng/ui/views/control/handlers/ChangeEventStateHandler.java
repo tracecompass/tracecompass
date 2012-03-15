@@ -120,8 +120,8 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
 
                         for (Iterator<TraceEventComponent> iterator = fEvents.iterator(); iterator.hasNext();) {
                             // Enable all selected channels which are disabled
-                            TraceEventComponent channel = (TraceEventComponent) iterator.next();
-                            channel.setState(getNewState());
+                            TraceEventComponent ev = (TraceEventComponent) iterator.next();
+                            ev.setState(getNewState());
                         }
                     }
                 } catch (ExecutionException e) {

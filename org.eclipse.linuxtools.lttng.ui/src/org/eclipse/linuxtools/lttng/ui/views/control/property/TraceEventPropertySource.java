@@ -70,7 +70,7 @@ public class TraceEventPropertySource extends BasePropertySource {
     /**
      * The event component which this property source is for. 
      */
-    private final TraceEventComponent fEvent;
+    protected final TraceEventComponent fEvent;
     
     // ------------------------------------------------------------------------
     // Constructors

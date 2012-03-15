@@ -23,6 +23,7 @@ public class AllTests {
         suite.addTestSuite(BaseEventInfoTest.class);
         suite.addTestSuite(DomainInfoTest.class);
         suite.addTestSuite(EventInfoTest.class);
+        suite.addTestSuite(ProbeEventInfoTest.class);
         suite.addTestSuite(ChannelInfoTest.class);
         suite.addTestSuite(SessionInfoTest.class);
         suite.addTestSuite(TraceInfoTest.class);

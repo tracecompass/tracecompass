@@ -1,7 +1,19 @@
+/**********************************************************************
+ * Copyright (c) 2012 Ericsson
+ * 
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: 
+ *   Bernd Hufmann - Initial API and implementation
+ **********************************************************************/
 package org.eclipse.linuxtools.lttng.stubs.service;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.linuxtools.lttng.stubs.service.shells.LTTngToolsFileShell;
 import org.eclipse.linuxtools.lttng.ui.views.control.remote.IRemoteSystemProxy;
 import org.eclipse.linuxtools.lttng.ui.views.control.service.ICommandShell;
 import org.eclipse.rse.core.model.IRSECallback;
@@ -12,6 +24,10 @@ import org.eclipse.rse.services.terminals.ITerminalService;
 import org.eclipse.rse.subsystems.files.core.servicesubsystem.IFileServiceSubSystem;
 
 public class TestRemoteSystemProxy implements IRemoteSystemProxy {
+    
+    private LTTngToolsFileShell fShell = null;
+    private String fTestFile = null;
+    private String fScenario = null;
 
     @Override
     public IShellService getShellService() {
@@ -46,12 +62,23 @@ public class TestRemoteSystemProxy implements IRemoteSystemProxy {
 
     @Override
     public void disconnect() throws ExecutionException {
+        fShell = null;
     }
 
     @Override
     public ICommandShell createCommandShell() throws ExecutionException {
-        ICommandShell shell = CommandShellFactory.getInstance().getShellForSessionNames();
-        return shell;
+        if (fShell == null) { 
+            fShell = CommandShellFactory.getInstance().getFileShell();
+            if ((fTestFile != null) && (fScenario != null)) {
+                try {
+                    fShell.loadScenarioFile(fTestFile);
+                } catch (Exception e) {
+                    throw new ExecutionException(e.toString());
+                }
+                fShell.setScenario(fScenario);
+            }
+        }
+        return fShell;
     }
 
     @Override
@@ -61,5 +88,15 @@ public class TestRemoteSystemProxy implements IRemoteSystemProxy {
     @Override
     public void removeCommunicationListener(ICommunicationsListener listener) {
     }
-
+    
+    public void setTestFile(String testFile) {
+        fTestFile = testFile;
+    }
+    
+    public void setScenario(String scenario) {
+        fScenario = scenario;
+        if (fShell != null) {
+            fShell.setScenario(fScenario);
+        }
+    }
 }

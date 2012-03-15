@@ -22,8 +22,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.window.Window;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
 import org.eclipse.linuxtools.lttng.ui.views.control.Messages;
-import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.EnableEventsDialog;
 import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.IEnableEventsDialog;
+import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.TraceControlDialogFactory;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.LogLevelType;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceLogLevel;
@@ -71,21 +71,13 @@ abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
     /**
      * Enables a dynamic probe.
      * @param eventName - a event name
+     * @param isFunction - true for dynamic function entry/return probe else false
      * @param probe - a dynamic probe information
      * @param monitor - a progress monitor
      * @throws ExecutionException
      */
-    abstract public void enableProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException;
+    abstract public void enableProbe(String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException;
     
-    /**
-     * Enables a dynamic function entry/return probe.
-     * @param eventName - a event name
-     * @param function - a dynamic function entry/return probe information
-     * @param monitor - a progress monitor 
-     * @throws ExecutionException
-     */
-    abstract public void enableFunctionProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException;
-
     /**
      * Enables events using log level
      * @param eventName - a event name
@@ -116,9 +108,11 @@ abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
 
         TargetNodeComponent node = fSession.getTargetNode();
         List<ITraceControlComponent> providers = node.getChildren(TraceProviderGroup.class);
-        
-        final IEnableEventsDialog dialog = new EnableEventsDialog(window.getShell(), (TraceProviderGroup)providers.get(0), getDomain());
-        
+
+        final IEnableEventsDialog dialog = TraceControlDialogFactory.getInstance().getEnableEventsDialog();
+        dialog.setTraceProviderGroup((TraceProviderGroup)providers.get(0));
+        dialog.setTraceDomainComponent(getDomain());
+
         if (dialog.open() != Window.OK) {
             return null;
         }
@@ -151,14 +145,14 @@ abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
                     // Enable dynamic probe
                     if (dialog.isDynamicProbe()) {
                         if ((dialog.getProbeEventName() != null && dialog.getProbeName() != null)) {
-                            enableProbe(dialog.getProbeEventName(), dialog.getProbeName(), monitor);
+                            enableProbe(dialog.getProbeEventName(), false, dialog.getProbeName(), monitor);
                         } 
                     }
 
                     // Enable dynamic function probe
                     if (dialog.isDynamicFunctionProbe()) {
                         if ((dialog.getFunctionEventName() != null) && (dialog.getFunction() != null)) {
-                            enableFunctionProbe(dialog.getFunctionEventName(), dialog.getFunction(), monitor);
+                            enableProbe(dialog.getFunctionEventName(), true, dialog.getFunction(), monitor);
                         } 
                     }
 

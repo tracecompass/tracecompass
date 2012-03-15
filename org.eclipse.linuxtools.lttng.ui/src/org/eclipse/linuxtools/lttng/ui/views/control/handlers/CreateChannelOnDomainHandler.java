@@ -27,14 +27,12 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
 import org.eclipse.linuxtools.lttng.ui.views.control.ControlView;
 import org.eclipse.linuxtools.lttng.ui.views.control.Messages;
-import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.CreateChannelDialog;
 import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.ICreateChannelDialog;
+import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.TraceControlDialogFactory;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceSessionState;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceDomainComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * <b><u>CreateChannelOnDomainHandler</u></b>
@@ -62,14 +60,9 @@ public class CreateChannelOnDomainHandler extends BaseControlViewHandler {
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
 
-        final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-
-        if (window == null) {
-            return false;
-        }
-
         // Get channel information from user
-        final ICreateChannelDialog dialog = new CreateChannelDialog(window.getShell(), fDomain);
+        final ICreateChannelDialog dialog = TraceControlDialogFactory.getInstance().getCreateChannelDialog();
+        dialog.setDomainComponent(fDomain);
 
         if (dialog.open() != Window.OK) {
             return null;

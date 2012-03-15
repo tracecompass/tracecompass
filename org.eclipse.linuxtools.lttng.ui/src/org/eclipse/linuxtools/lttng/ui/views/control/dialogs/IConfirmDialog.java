@@ -9,29 +9,18 @@
  * Contributors: 
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
-package org.eclipse.linuxtools.lttng.ui.views.control.model;
+package org.eclipse.linuxtools.lttng.ui.views.control.dialogs;
+
+import org.eclipse.swt.widgets.Shell;
 
 /**
- * <b><u>ITraceInfo</u></b>
+ * <b><u>IConfirmDialog</u></b>
  * <p>
- * Interface for retrieve trace comon information.
+ * Interface for a confirmation dialog.
  * </p>
  */
-
-public interface ITraceInfo {
-    /**
-     * @return the name of the information element.
-     */
-    public String getName();
+public interface IConfirmDialog {
     
-    /**
-     * Sets the name of the information element.
-     * @param name
-     */
-    public void setName(String name);
+    public boolean openConfirm(Shell parent, String title, String message);
     
-    /** 
-     * @return a formated (readable) String with content.
-     */
-    public String formatString();
 }

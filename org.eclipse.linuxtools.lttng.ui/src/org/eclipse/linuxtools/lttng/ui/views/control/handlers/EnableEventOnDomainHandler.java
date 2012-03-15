@@ -66,20 +66,11 @@ public class EnableEventOnDomainHandler extends BaseEnableEventHandler {
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.handlers.BaseEnableEventHandler#enableProbe(java.lang.String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.handlers.BaseEnableEventHandler#enableProbe(java.lang.String, boolean, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    public void enableProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException {
-        fDomain.enableProbe(eventName, probe, monitor);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.handlers.BaseEnableEventHandler#enableFunctionProbe(java.lang.String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
-     */
-    @Override
-    public void enableFunctionProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException {
-        fDomain.enableFunctionProbe(eventName, probe, monitor);
+    public void enableProbe(String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException {
+        fDomain.enableProbe(eventName, isFunction, probe, monitor);
     }
 
     /*

@@ -11,11 +11,17 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.tests.control.model.component;
 
+import java.io.File;
+import java.net.URL;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.lttng.stubs.service.TestRemoteSystemProxy;
+import org.eclipse.linuxtools.lttng.ui.tests.LTTngUITestPlugin;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TargetNodeState;
@@ -29,6 +35,7 @@ import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TargetNodeCompon
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceChannelComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceDomainComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceEventComponent;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceProbeEventComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.UstProviderComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.property.BaseEventPropertySource;
@@ -37,6 +44,7 @@ import org.eclipse.linuxtools.lttng.ui.views.control.property.TargetNodeProperty
 import org.eclipse.linuxtools.lttng.ui.views.control.property.TraceChannelPropertySource;
 import org.eclipse.linuxtools.lttng.ui.views.control.property.TraceDomainPropertySource;
 import org.eclipse.linuxtools.lttng.ui.views.control.property.TraceEventPropertySource;
+import org.eclipse.linuxtools.lttng.ui.views.control.property.TraceProbeEventPropertySource;
 import org.eclipse.linuxtools.lttng.ui.views.control.property.TraceSessionPropertySource;
 import org.eclipse.linuxtools.lttng.ui.views.control.property.UstProviderPropertySource;
 import org.eclipse.rse.core.model.Host;
@@ -52,6 +60,14 @@ import org.junit.Before;
  */
 @SuppressWarnings("nls")
 public class TraceControlPropertiesTest extends TestCase {
+
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    private static final String DIRECTORY   = "testfiles";
+    private static final String TEST_STREAM = "ListInfoTest.cfg";
+    private static final String SCEN_LIST_INFO_TEST = "ListInfoTest";
+
     
     // ------------------------------------------------------------------------
     // Test data
@@ -105,6 +121,11 @@ public class TraceControlPropertiesTest extends TestCase {
         
         TestRemoteSystemProxy proxy = new TestRemoteSystemProxy();
 
+        URL location = FileLocator.find(LTTngUITestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
+        File testfile = new File(FileLocator.toFileURL(location).toURI());
+        proxy.setTestFile(testfile.getAbsolutePath());
+        proxy.setScenario(SCEN_LIST_INFO_TEST);
+            
         ITraceControlComponent root = TraceControlTestFacility.getInstance().getControlView().getTraceControlRoot();
 
         @SuppressWarnings("restriction")
@@ -266,7 +287,7 @@ public class TraceControlPropertiesTest extends TestCase {
         // ------------------------------------------------------------------------
         ITraceControlComponent[] channel0Events = channel.getChildren();
         assertNotNull(channel0Events);
-        assertEquals(2, channel0Events.length);
+        assertEquals(5, channel0Events.length);
         assertTrue(channel0Events[0] instanceof TraceEventComponent);
         
         TraceEventComponent event = (TraceEventComponent) channel0Events[0];
@@ -282,5 +303,44 @@ public class TraceControlPropertiesTest extends TestCase {
         assertEquals(TraceLogLevel.TRACE_EMERG.name(), eventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_LOGLEVEL_PROPERTY_ID));
         assertEquals(TraceEventType.TRACEPOINT.name(), eventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_TYPE_PROPERTY_ID));
         assertEquals(TraceEnablement.ENABLED.name(), eventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_STATE_PROPERTY_ID));
+        
+        // ------------------------------------------------------------------------
+        // Verify Probe Event Properties (adapter)
+        // ------------------------------------------------------------------------
+        assertTrue(channel0Events[2] instanceof TraceProbeEventComponent);
+        
+        TraceProbeEventComponent probeEvent = (TraceProbeEventComponent) channel0Events[2];
+        
+        adapter = probeEvent.getAdapter(IPropertySource.class);
+        assertNotNull(adapter);
+        assertTrue(adapter instanceof TraceProbeEventPropertySource);
+
+        TraceProbeEventPropertySource probeEventSource = (TraceProbeEventPropertySource)adapter;
+        assertNotNull(probeEventSource.getPropertyDescriptors());
+        assertEquals(4, probeEventSource.getPropertyDescriptors().length);
+        
+        assertEquals("myevent2", probeEventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_NAME_PROPERTY_ID));
+        assertEquals(TraceEventType.PROBE.name(), probeEventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_TYPE_PROPERTY_ID));
+        assertEquals(TraceEnablement.ENABLED.name(), probeEventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_STATE_PROPERTY_ID));
+        assertEquals("0xc0101340", probeEventSource.getPropertyValue(TraceProbeEventPropertySource.TRACE_EVENT_PROBE_ADDRESS_PROPERTY_ID));
+        
+        assertTrue(channel0Events[3] instanceof TraceProbeEventComponent);
+        
+        probeEvent = (TraceProbeEventComponent) channel0Events[3];
+        
+        adapter = probeEvent.getAdapter(IPropertySource.class);
+        assertNotNull(adapter);
+        assertTrue(adapter instanceof TraceProbeEventPropertySource);
+
+        probeEventSource = (TraceProbeEventPropertySource)adapter;
+        assertNotNull(probeEventSource.getPropertyDescriptors());
+        assertEquals(5, probeEventSource.getPropertyDescriptors().length);
+        
+        assertEquals("myevent0", probeEventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_NAME_PROPERTY_ID));
+        assertEquals(TraceEventType.PROBE.name(), probeEventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_TYPE_PROPERTY_ID));
+        assertEquals(TraceEnablement.ENABLED.name(), probeEventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_STATE_PROPERTY_ID));
+        assertEquals("0x0", probeEventSource.getPropertyValue(TraceProbeEventPropertySource.TRACE_EVENT_PROBE_OFFSET_PROPERTY_ID));
+        assertEquals("init_post", probeEventSource.getPropertyValue(TraceProbeEventPropertySource.TRACE_EVENT_PROBE_SYMBOL_PROPERTY_ID));
+        
     }
 }

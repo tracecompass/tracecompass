@@ -11,12 +11,19 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.tests.control.model.component;
 
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.NotEnabledException;
+import org.eclipse.core.commands.NotHandledException;
+import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.lttng.ui.views.control.ControlView;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.IHandlerService;
 
 /**
  *  Singleton class to facilitate the test cases. Creates UML2SD view and loader objects as well as provides
@@ -30,6 +37,8 @@ public class TraceControlTestFacility {
 
     final static public int WAIT_FOR_JOBS_DELAY = 1000; 
     final static public int GUI_REFESH_DELAY = 500;
+    
+    final static public String COMMAND_CATEGORY_PREFIX = "org.eclipse.linuxtools.lttng.ui.commands.control."; //$NON-NLS-1$
     
     // ------------------------------------------------------------------------
     // Attributes
@@ -124,4 +133,11 @@ public class TraceControlTestFacility {
     public ControlView getControlView() {
         return fControlView;
     }
+
+    public void executeCommand(String commandId) throws ExecutionException, NotDefinedException, NotEnabledException, NotHandledException {
+//        ICommandService commandService = (ICommandService) fControlView.getSite().getService(ICommandService.class);
+        IHandlerService handlerService = (IHandlerService) fControlView.getSite().getService(IHandlerService.class);
+        handlerService.executeCommand(COMMAND_CATEGORY_PREFIX + commandId, null);
+    }
+
 }

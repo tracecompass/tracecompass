@@ -16,6 +16,7 @@ package org.eclipse.linuxtools.lttng.ui.views.control;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponentChangedListener;
@@ -151,6 +152,29 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
             }
         });
     }
+    
+    /**
+     * Sets the selected component in the tree
+     * @param component - component to select
+     */
+    public void setSelection(ITraceControlComponent component) {
+        StructuredSelection selection = new StructuredSelection(component);
+        fTreeViewer.setSelection(selection);
+    }
+
+    /**
+     * Sets the selected components in the tree
+     * @param component - array of components to select
+     */
+    public void setSelection(ITraceControlComponent[] components) {
+        StructuredSelection selection = new StructuredSelection(components);
+        fTreeViewer.setSelection(selection);
+    }
+    
+//    public ITraceControlComponent getSelection() {
+//        ISelection selection = fTreeViewer.getSelection();
+//        
+//    }
 
     // ------------------------------------------------------------------------
     // Helper methods

@@ -74,6 +74,22 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
 
     /*
      * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceInfo#formatString()
+     */
+    @SuppressWarnings("nls")
+    @Override
+    public String formatString() {
+        StringBuffer output = new StringBuffer();
+        //    ust_tests_hello:tptest_sighandler (loglevel: TRACE_DEBUG_MODULE (10)) (type: tracepoint) [enabled]");
+        output.append(super.formatString());
+        output.append(" [");
+        output.append(fState.getInName());
+        output.append("]");
+        return output.toString();
+    }
+
+    /*
+     * (non-Javadoc)
      * @see org.eclipse.linuxtools.lttng.ui.views.control.model.IEventInfo#setState(java.lang.String)
      */
     @Override
@@ -92,9 +108,9 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
      */
     @Override
     public int hashCode() {
-        int result = 17;
-        result = 37 * result + super.hashCode();
-        result = 37 * result + fState.ordinal();
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((fState == null) ? 0 : (fState.ordinal() + 1));
         return result;
     }
 
@@ -103,23 +119,23 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
      * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.BaseEventInfo#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof EventInfo)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
             return false;
         }
-
-        EventInfo otherInfo = (EventInfo) other;
-        if (!super.equals(otherInfo)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        if (fState.ordinal() != otherInfo.fState.ordinal()) {
+        EventInfo other = (EventInfo) obj;
+        if (fState != other.fState) {
             return false;
         }
         return true;
     }
-    
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.BaseEventInfo#toString()

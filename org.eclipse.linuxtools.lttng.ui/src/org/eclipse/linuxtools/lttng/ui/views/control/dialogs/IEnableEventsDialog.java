@@ -11,6 +11,9 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.views.control.dialogs;
 
+import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceDomainComponent;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceProviderGroup;
+
 /**
  * <b><u>IEnableKernelEvents</u></b>
  * <p>
@@ -26,6 +29,18 @@ public interface IEnableEventsDialog extends IEnableKernelEvents, IEnableUstEven
      * @return the session the events shall be enabled.
      */
     public boolean isKernel();
+    
+    /**
+     * Sets the trace provider group.
+     * @param providerGroup -  a trace provider group
+     */
+    public void setTraceProviderGroup(TraceProviderGroup providerGroup);
+    
+    /**
+     * Sets the trace domain component.
+     * @param domain - a domain of the events (null if not known)
+     */
+    public void setTraceDomainComponent(TraceDomainComponent domain);
 
     // ------------------------------------------------------------------------
     // Operations

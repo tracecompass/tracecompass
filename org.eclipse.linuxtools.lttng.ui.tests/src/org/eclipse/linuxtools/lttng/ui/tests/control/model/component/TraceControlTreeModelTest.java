@@ -11,12 +11,17 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.tests.control.model.component;
 
+import java.io.File;
+import java.net.URL;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.lttng.stubs.service.TestRemoteSystemProxy;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
+import org.eclipse.linuxtools.lttng.ui.tests.LTTngUITestPlugin;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TargetNodeState;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceEnablement;
@@ -27,20 +32,18 @@ import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.BaseEventCompone
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.KernelProviderComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TargetNodeComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceChannelComponent;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceControlComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceEventComponent;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceProbeEventComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceProviderGroup;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionGroup;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.UstProviderComponent;
-import org.eclipse.linuxtools.lttng.ui.views.control.property.TargetNodePropertySource;
 import org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService;
 import org.eclipse.linuxtools.lttng.ui.views.control.service.LTTngControlService;
 import org.eclipse.rse.core.model.Host;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.internal.core.model.SystemProfile;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.views.properties.IPropertySource;
 import org.junit.After;
 import org.junit.Before;
 
@@ -50,9 +53,16 @@ import org.junit.Before;
 @SuppressWarnings("nls")
 public class TraceControlTreeModelTest extends TestCase {
     
+    private static final String DIRECTORY   = "testfiles";
+    private static final String TEST_STREAM = "ListInfoTest.cfg";
+    private static final String SCEN_LIST_INFO_TEST = "ListInfoTest";
+    
     // ------------------------------------------------------------------------
     // Test data
     // ------------------------------------------------------------------------
+    
+    private TestRemoteSystemProxy fProxy;
+    private String fTestFile; 
     
     // ------------------------------------------------------------------------
     // Static methods
@@ -80,6 +90,10 @@ public class TraceControlTreeModelTest extends TestCase {
     @Override
     @Before
     public void setUp() throws Exception {
+        fProxy = new TestRemoteSystemProxy();
+        URL location = FileLocator.find(LTTngUITestPlugin.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
+        File testfile = new File(FileLocator.toFileURL(location).toURI());
+        fTestFile = testfile.getAbsolutePath();
     }
 
     /**
@@ -100,15 +114,16 @@ public class TraceControlTreeModelTest extends TestCase {
     public void testTraceControlComponents()
         throws Exception {
         
-        TestRemoteSystemProxy proxy = new TestRemoteSystemProxy();
-
+        fProxy.setTestFile(fTestFile);
+        fProxy.setScenario(SCEN_LIST_INFO_TEST);
+        
         ITraceControlComponent root = TraceControlTestFacility.getInstance().getControlView().getTraceControlRoot();
 
         @SuppressWarnings("restriction")
         IHost host = new Host(new SystemProfile("myProfile", true));
         host.setHostName("127.0.0.1");
 
-        TargetNodeComponent node = new TargetNodeComponent("myNode", root, host, proxy);
+        TargetNodeComponent node = new TargetNodeComponent("myNode", root, host, fProxy);
 
         root.addChild(node);
         node.connect();
@@ -290,9 +305,12 @@ public class TraceControlTreeModelTest extends TestCase {
         // ------------------------------------------------------------------------
         ITraceControlComponent[] channel0Events = channel.getChildren();
         assertNotNull(channel0Events);
-        assertEquals(2, channel0Events.length);
+        assertEquals(5, channel0Events.length);
         assertTrue(channel0Events[0] instanceof TraceEventComponent);
         assertTrue(channel0Events[1] instanceof TraceEventComponent);
+        assertTrue(channel0Events[2] instanceof TraceProbeEventComponent);
+        assertTrue(channel0Events[3] instanceof TraceProbeEventComponent);
+        assertTrue(channel0Events[4] instanceof TraceEventComponent);
         
         TraceEventComponent event = (TraceEventComponent) channel0Events[0];
         assertEquals("block_rq_remap", event.getName());
@@ -306,6 +324,30 @@ public class TraceControlTreeModelTest extends TestCase {
         assertEquals(TraceEventType.TRACEPOINT, event.getEventType());
         assertEquals(TraceEnablement.DISABLED, event.getState());
 
+        TraceProbeEventComponent probeEvent = (TraceProbeEventComponent) channel0Events[2];
+        assertEquals("myevent2", probeEvent.getName());
+        assertEquals(TraceLogLevel.LEVEL_UNKNOWN, probeEvent.getLogLevel());
+        assertEquals(TraceEventType.PROBE, probeEvent.getEventType());
+        assertEquals(TraceEnablement.ENABLED, probeEvent.getState());
+        assertEquals("0xc0101340", probeEvent.getAddress());
+        assertNull(probeEvent.getOffset());
+        assertNull(probeEvent.getSymbol());
+
+        probeEvent = (TraceProbeEventComponent) channel0Events[3];
+        assertEquals("myevent0", probeEvent.getName());
+        assertEquals(TraceLogLevel.LEVEL_UNKNOWN, probeEvent.getLogLevel());
+        assertEquals(TraceEventType.PROBE, probeEvent.getEventType());
+        assertEquals(TraceEnablement.ENABLED, probeEvent.getState());
+        assertNull(probeEvent.getAddress());
+        assertEquals("0x0", probeEvent.getOffset());
+        assertEquals("init_post", probeEvent.getSymbol());
+        
+        event = (TraceEventComponent) channel0Events[4];
+        assertEquals("syscalls", event.getName());
+        assertEquals(TraceLogLevel.LEVEL_UNKNOWN, event.getLogLevel());
+        assertEquals(TraceEventType.SYSCALL, event.getEventType());
+        assertEquals(TraceEnablement.ENABLED, event.getState());
+        
         // ------------------------------------------------------------------------
         // Verify Kernel's channel1
         // ------------------------------------------------------------------------

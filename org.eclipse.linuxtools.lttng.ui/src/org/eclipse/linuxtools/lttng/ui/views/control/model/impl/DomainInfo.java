@@ -116,17 +116,43 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
     
     /*
      * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceInfo#formatString()
+     */
+    @SuppressWarnings("nls")
+    @Override
+    public String formatString() {
+        StringBuffer output = new StringBuffer();
+        //=== Domain: Kernel ===
+        output.append("\n=== Domain: ");
+        output.append(getName());
+        output.append(" ===\n");
+        output.append("\n");
+        // Channels:
+        output.append("Channels:\n");
+        // -------------
+        output.append("-------------");
+        if (fChannels.isEmpty()) {
+            output.append("\nNone");
+        } else {
+            for (Iterator<IChannelInfo> iterator = fChannels.iterator(); iterator.hasNext();) {
+                IChannelInfo channel = (IChannelInfo) iterator.next();
+                output.append(channel.formatString());
+            }
+        }
+        output.append("\n");
+        return output.toString();
+    }
+    
+    /*
+     * (non-Javadoc)
      * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceInfo#hashCode()
      */
     @Override
     public int hashCode() {
-        int result = 17;
-        result = 37 * result + super.hashCode();
-        for (Iterator<IChannelInfo> iterator = fChannels.iterator(); iterator.hasNext();) {
-            IChannelInfo channel = (IChannelInfo) iterator.next();
-            result = 37 * result + channel.hashCode();
-        }
-        result += 37 * result + (fIsKernel ? 1 : 0);
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((fChannels == null) ? 0 : fChannels.hashCode());
+        result = prime * result + (fIsKernel ? 1231 : 1237);
         return result;
     }
 
@@ -135,31 +161,30 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
      * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceInfo#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof DomainInfo)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
             return false;
         }
-
-        DomainInfo otherInfo = (DomainInfo) other;
-        if (!super.equals(otherInfo)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        if (fChannels.size() != otherInfo.fChannels.size()) {
-            return false;
-        }
-        for (int i = 0; i < fChannels.size(); i++) {
-            if (!fChannels.get(i).equals(otherInfo.fChannels.get(i))) {
+        DomainInfo other = (DomainInfo) obj;
+        if (fChannels == null) {
+            if (other.fChannels != null) {
                 return false;
             }
+        } else if (!fChannels.equals(other.fChannels)) {
+            return false;
         }
-
-        if (fIsKernel != otherInfo.fIsKernel) {
+        if (fIsKernel != other.fIsKernel) {
             return false;
         }
         return true;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceInfo#toString()
@@ -184,4 +209,5 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
             output.append(")]");
             return output.toString();
     }
+    
 }

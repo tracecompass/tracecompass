@@ -1,13 +1,17 @@
+/**********************************************************************
+ * Copyright (c) 2012 Ericsson
+ * 
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: 
+ *   Bernd Hufmann - Initial API and implementation
+ **********************************************************************/
 package org.eclipse.linuxtools.lttng.stubs.service;
 
-import org.eclipse.linuxtools.lttng.stubs.service.shells.GetSessionGarbageShell;
-import org.eclipse.linuxtools.lttng.stubs.service.shells.LttngNotExistsShell;
-import org.eclipse.linuxtools.lttng.stubs.service.shells.NoSessionNamesShell;
-import org.eclipse.linuxtools.lttng.stubs.service.shells.NoUstProviderShell;
-import org.eclipse.linuxtools.lttng.stubs.service.shells.SessionCreationErrorsShell;
-import org.eclipse.linuxtools.lttng.stubs.service.shells.SessionNotExistsShell;
-import org.eclipse.linuxtools.lttng.stubs.service.shells.SessionNamesShell;
-import org.eclipse.linuxtools.lttng.ui.views.control.service.ICommandShell;
+import org.eclipse.linuxtools.lttng.stubs.service.shells.LTTngToolsFileShell;
 
 public class CommandShellFactory {
 
@@ -22,31 +26,15 @@ public class CommandShellFactory {
         return fInstance;
     }
 
-    public ICommandShell getShellForNoSessionNames() {
-        return new NoSessionNamesShell();
-    }
-
-    public ICommandShell getShellForSessionNames() {
-        return new SessionNamesShell();
-    }
-
-    public ICommandShell getShellForLttngNotExistsShell() {
-        return new LttngNotExistsShell();
-    }
+//    public ICommandShell getRealShell() {
+//        ISystemRegistry registry = RSECorePlugin.getTheSystemRegistry();
+//        IHost host = registry.getLocalHost();
+//        RemoteSystemProxy proxy = new RemoteSystemProxy(host);
+//        ICommandShell shell = new LTTngToolsSimulatorShell(proxy);
+//        return shell;
+//    }
     
-    public ICommandShell getShellForSessionNotExists() {
-        return new SessionNotExistsShell();
-    }
-    
-    public ICommandShell getShellForSessionGarbage() {
-        return new GetSessionGarbageShell();
-    }
-
-    public ICommandShell getShellForNoUstProvider() {
-        return new NoUstProviderShell();
-    }
-    
-    public ICommandShell getShellForSessionErrors() {
-        return new SessionCreationErrorsShell();
+    public LTTngToolsFileShell getFileShell() {
+        return new LTTngToolsFileShell();
     }
 }

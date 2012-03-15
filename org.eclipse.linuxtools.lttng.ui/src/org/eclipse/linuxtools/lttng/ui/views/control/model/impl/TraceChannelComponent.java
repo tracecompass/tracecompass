@@ -99,7 +99,13 @@ public class TraceChannelComponent extends TraceControlComponent {
         fChannelInfo = channelInfo;
         IEventInfo[] events = fChannelInfo.getEvents();
         for (int i = 0; i < events.length; i++) {
-            TraceEventComponent event = new TraceEventComponent(events[i].getName(), this);
+            TraceEventComponent event = null;
+            if (events[i].getClass() == ProbeEventInfo.class) {
+                event = new TraceProbeEventComponent(events[i].getName(), this);
+            } else {
+                event = new TraceEventComponent(events[i].getName(), this);
+            }
+
             event.setEventInfo(events[i]);
             addChild(event);
         }
@@ -286,45 +292,26 @@ public class TraceChannelComponent extends TraceControlComponent {
     /**
      * Enables a dynamic probe (for kernel domain)
      * @param eventName - event name for probe
+     * @param isFunction - true for dynamic function entry/return probe else false
      * @param probe - the actual probe
      * @throws ExecutionException
      */
-    public void enableProbe(String eventName, String probe) throws ExecutionException {
-        enableProbe(eventName, probe, new NullProgressMonitor());
+    public void enableProbe(String eventName, boolean isFunction, String probe) throws ExecutionException {
+        enableProbe(eventName, isFunction, probe, new NullProgressMonitor());
     }
 
     /**
      * Enables a dynamic probe (for kernel domain)
      * @param eventName - event name for probe
+     * @param isFunction - true for dynamic function entry/return probe else false 
      * @param probe - the actual probe
      * @param monitor - a progress monitor
      * @throws ExecutionException
      */
-    public void enableProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException {
-        getControlService().enableProbe(getSessionName(), getName(), eventName, probe, monitor);
+    public void enableProbe(String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().enableProbe(getSessionName(), getName(), eventName, isFunction, probe, monitor);
     }
 
-    /**
-     * Enables a dynamic function entry/return probe (for kernel domain)
-     * @param eventName - event name for probe
-     * @param probe - the actual probe
-     * @throws ExecutionException
-     */
-    public void enableFunctionProbe(String eventName, String probe) throws ExecutionException {
-        enableFunctionProbe(eventName, probe, new NullProgressMonitor());
-    }
-    
-    /**
-     * Enables a dynamic function entry/return probe (for kernel domain)
-     * @param eventName - event name for probe
-     * @param probe - the actual probe
-     * @param monitor - a progress monitor
-     * @throws ExecutionException
-     */
-    public void enableFunctionProbe(String eventName, String probe, IProgressMonitor monitor) throws ExecutionException {
-        getControlService().enableFunctionProbe(getSessionName(), getName(), eventName, probe, monitor);
-    }
-    
     /**
      * Enables events using log level.
      * @param eventName - a event name

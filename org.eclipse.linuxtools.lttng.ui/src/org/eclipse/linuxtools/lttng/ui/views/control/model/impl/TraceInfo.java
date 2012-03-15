@@ -79,14 +79,23 @@ public class TraceInfo implements ITraceInfo {
     
     /*
      * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceInfo#formatString()
+     */
+    @Override
+    public String formatString() {
+        return toString();
+    }
+    
+    /*
+     * (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
-        if (fName == null) {
-            return 17;
-        }
-        return fName.hashCode();
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((fName == null) ? 0 : fName.hashCode());
+        return result;
     }
 
     /*
@@ -94,15 +103,26 @@ public class TraceInfo implements ITraceInfo {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof TraceInfo)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
         }
-
-        TraceInfo otherInfo = (TraceInfo) other;
-        return fName.equals(otherInfo.fName);
-    }
-    
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        TraceInfo other = (TraceInfo) obj;
+        if (fName == null) {
+            if (other.fName != null) {
+                return false;
+            }
+        } else if (!fName.equals(other.fName)) {
+            return false;
+        }
+        return true;
+    }    
     /*
      * (non-Javadoc)
      * @see java.lang.Object#toString()

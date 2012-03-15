@@ -125,16 +125,37 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
     
     /*
      * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceInfo#formatString()
+     */
+    @SuppressWarnings("nls")
+    @Override
+    public String formatString() {
+        StringBuffer output = new StringBuffer();
+        //PID: 9379 - Name: /home/user/git/lttng-ust/tests/hello.cxx/.libs/lt-hello
+        output.append("\nPID: ");
+        output.append(fPid);
+        output.append(" - Name: ");
+        output.append(getName());
+        for (Iterator<IBaseEventInfo> iterator = fEvents.iterator(); iterator.hasNext();) {
+            IBaseEventInfo event = (IBaseEventInfo) iterator.next();
+            output.append(event.formatString());
+        }
+        output.append("\n");
+
+        return output.toString();
+    }
+
+    
+    /*
+     * (non-Javadoc)
      * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceInfo#hashCode()
      */
     @Override
     public int hashCode() {
-        int result = 17;
-        result = 37 * result + super.hashCode();
-        for (Iterator<IBaseEventInfo> iterator = fEvents.iterator(); iterator.hasNext();) {
-            IBaseEventInfo event = (IBaseEventInfo) iterator.next();
-            result = 37 * result + event.hashCode();
-        }
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((fEvents == null) ? 0 : fEvents.hashCode());
+        result = prime * result + fPid;
         return result;
     }
 
@@ -143,23 +164,26 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
      * @see org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceInfo#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof UstProviderInfo)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
             return false;
         }
-
-        UstProviderInfo otherUstInfo = (UstProviderInfo) other;
-        if (!super.equals(otherUstInfo)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-
-        if (fEvents.size() != otherUstInfo.fEvents.size()) {
-            return false;
-        }
-        for (int i = 0; i < fEvents.size(); i++) {
-            if (!fEvents.get(i).equals(otherUstInfo.fEvents.get(i))) {
+        UstProviderInfo other = (UstProviderInfo) obj;
+        if (fEvents == null) {
+            if (other.fEvents != null) {
                 return false;
             }
+        } else if (!fEvents.equals(other.fEvents)) {
+            return false;
+        }
+        if (fPid != other.fPid) {
+            return false;
         }
         return true;
     }
@@ -188,4 +212,6 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
             output.append(")]");
             return output.toString();
     }
+
+ 
 }

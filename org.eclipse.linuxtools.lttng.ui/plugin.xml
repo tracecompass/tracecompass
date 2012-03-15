@@ -139,6 +139,12 @@
       </command>
       <command
             categoryId="org.eclipse.linuxtools.lttng.ui.commands.control.category"
+            description="%commands.control.refresh.description"
+            id="org.eclipse.linuxtools.lttng.ui.commands.control.refresh"
+            name="%commands.control.refresh">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.lttng.ui.commands.control.category"
             description="%commands.control.delete.description"
             id="org.eclipse.linuxtools.lttng.ui.commands.control.delete"
             name="%commands.control.delete">
@@ -253,6 +259,12 @@
                style="push">
          </command>
          <command
+               commandId="org.eclipse.linuxtools.lttng.ui.commands.control.refresh"
+               icon="icons/elcl16/refresh.gif"
+               label="%commands.control.refresh"
+               style="push">
+         </command>
+         <command
                commandId="org.eclipse.linuxtools.lttng.ui.commands.control.delete"
                icon="icons/elcl16/target_delete.gif"
                label="%commands.control.delete"
@@ -316,6 +328,24 @@
                         operator="or">
                      <instanceof
                            value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TargetNodeComponent">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.lttng.ui.commands.control.refresh"
+               icon="icons/elcl16/refresh.gif"
+               label="%commands.control.refresh"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        operator="or">
+                     <instanceof
+                           value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceControlComponent">
                      </instanceof>
                   </iterate>
                </with>
@@ -685,6 +715,21 @@
                      operator="or">
                   <instanceof
                         value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TargetNodeComponent">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.lttng.ui.views.control.handlers.RefreshHandler"
+            commandId="org.eclipse.linuxtools.lttng.ui.commands.control.refresh">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceControlComponent">
                   </instanceof>
                </iterate>
             </with>

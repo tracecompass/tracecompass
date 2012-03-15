@@ -21,12 +21,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
 import org.eclipse.linuxtools.lttng.ui.views.control.ControlView;
 import org.eclipse.linuxtools.lttng.ui.views.control.Messages;
+import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.IConfirmDialog;
+import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.TraceControlDialogFactory;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceSessionState;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionComponent;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionGroup;
@@ -66,12 +67,12 @@ public class DestroySessionHandler extends BaseControlViewHandler {
             return false;
         }
         // Get user confirmation
-        if (!MessageDialog.openConfirm(window.getShell(), 
+        IConfirmDialog dialog = TraceControlDialogFactory.getInstance().getConfirmDialog();
+        if (!dialog.openConfirm(window.getShell(), 
                 Messages.TraceControl_DestroyConfirmationTitle, 
                 Messages.TraceControl_DestroyConfirmationMessage)) {
 
             return null;
-            
         }
 
         Job job = new Job(Messages.TraceControl_DestroySessionJob) {

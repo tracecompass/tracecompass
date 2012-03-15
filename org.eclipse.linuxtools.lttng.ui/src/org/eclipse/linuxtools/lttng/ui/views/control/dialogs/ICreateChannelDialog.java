@@ -12,6 +12,7 @@
 package org.eclipse.linuxtools.lttng.ui.views.control.dialogs;
 
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceDomainComponent;
 
 /**
  * <b><u>ICreateChannelDialog</u></b>
@@ -28,6 +29,12 @@ public interface ICreateChannelDialog {
      * @return the configuration info for the new channel.
      */
     public IChannelInfo getChannelInfo();
+    
+    /**
+     * Sets the domain component
+     * @param domain - the trace domain component
+     */
+    public void setDomainComponent(TraceDomainComponent domain);
     
     // ------------------------------------------------------------------------
     // Operations

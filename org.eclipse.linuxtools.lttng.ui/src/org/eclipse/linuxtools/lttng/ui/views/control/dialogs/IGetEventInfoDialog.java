@@ -34,6 +34,18 @@ public interface IGetEventInfoDialog {
      * @return the channel the events shall be enabled. Null for default channel.
      */
     public TraceChannelComponent getChannel();
+    
+    /**
+     * Sets flag about domain.
+     * @param isKernel - true for kernel, false for UST
+     */
+    public void setIsKernel(boolean isKernel);
+    
+    /**
+     * Sets available session.
+     * @param sessions - a array of available sessions.
+     */
+    public void setSessions(TraceSessionComponent[] sessions);
 
     // ------------------------------------------------------------------------
     // Operations

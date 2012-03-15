@@ -25,14 +25,17 @@ import org.eclipse.linuxtools.lttng.ui.views.control.model.IBaseEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IDomainInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IEventInfo;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.IProbeEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.ISessionInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.IUstProviderInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.LogLevelType;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceEventType;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.BaseEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.ChannelInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.DomainInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.EventInfo;
+import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.ProbeEventInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.SessionInfo;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.UstProviderInfo;
 
@@ -212,6 +215,18 @@ public class LTTngControlService implements ILttngControlService {
      */
     private final static Pattern WILDCARD_EVENT_PATTERN = Pattern.compile("\\s+(.*)\\s+\\(type:\\s+(.*)\\)\\s+\\[(enabled|disabled)\\].*"); //$NON-NLS-1$
     /**
+     * Pattern to match a probe address information (lttng list <session>)
+     */
+    private final static Pattern PROBE_ADDRESS_PATTERN = Pattern.compile("\\s+(addr)\\:\\s+(0x[0-9a-fA-F]{1,8})"); //$NON-NLS-1$
+    /**
+     * Pattern to match a probe OFFSET information (lttng list <session>)
+     */
+    private final static Pattern PROBE_OFFSET_PATTERN = Pattern.compile("\\s+(offset)\\:\\s+(0x[0-9a-fA-F]{1,8})"); //$NON-NLS-1$
+    /**
+     * Pattern to match a probe SYMBOL information (lttng list <session>)
+     */
+    private final static Pattern PROBE_SYMBOL_PATTERN = Pattern.compile("\\s+(symbol)\\:\\s+(.+)"); //$NON-NLS-1$
+    /**
      * Pattern to match for channel (overwite mode) information (lttng list
      * <session>)
      */
@@ -340,9 +355,11 @@ public class LTTngControlService implements ILttngControlService {
      */
     @Override
     public ISessionInfo getSession(String sessionName, IProgressMonitor monitor) throws ExecutionException {
+        
         String command = COMMAND_LIST + sessionName;
         ICommandResult result = fCommandShell.executeCommand(command, monitor);
-
+        
+        
         if (isError(result)) {
             throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
         }
@@ -743,13 +760,9 @@ public class LTTngControlService implements ILttngControlService {
         
         StringBuffer command = new StringBuffer(COMMAND_ENABLE_EVENT);
 
-        if (eventNames == null) {
+        if (eventNames == null || eventNames.size() == 0) {
             command.append(OPTION_ALL);
         } else {
-            // no events to enable
-            if (eventNames.size() == 0) {
-                return;
-            }
 
             for (Iterator<String> iterator = eventNames.iterator(); iterator.hasNext();) {
                 String event = (String) iterator.next();
@@ -818,7 +831,7 @@ public class LTTngControlService implements ILttngControlService {
      * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#enableProbe(java.lang.String, java.lang.String, java.lang.String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    public void enableProbe(String sessionName, String channelName, String eventName, String probe, IProgressMonitor monitor) throws ExecutionException {
+    public void enableProbe(String sessionName, String channelName, String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException {
         String newSessionName = formatParameter(sessionName);
         
         StringBuffer command = new StringBuffer(COMMAND_ENABLE_EVENT);
@@ -833,8 +846,12 @@ public class LTTngControlService implements ILttngControlService {
             command.append(OPTION_CHANNEL);
             command.append(channelName);
         }
+        if (isFunction) {
+            command.append(OPTION_FUNCTION_PROBE);
+        } else {
+            command.append(OPTION_PROBE);
+        }
         
-        command.append(OPTION_PROBE);
         command.append(probe);
         
         ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
@@ -842,37 +859,6 @@ public class LTTngControlService implements ILttngControlService {
         if (isError(result)) {
             throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
         }        
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService#enableFunctionProbe(java.lang.String, java.lang.String, java.lang.String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
-     */
-    @Override
-    public void enableFunctionProbe(String sessionName, String channelName, String eventName, String probe, IProgressMonitor monitor) throws ExecutionException {
-        String newSessionName = formatParameter(sessionName);
-        
-        StringBuffer command = new StringBuffer(COMMAND_ENABLE_EVENT);
-
-        command.append(eventName);
-        command.append(OPTION_KERNEL);
-
-        command.append(OPTION_SESSION);
-        command.append(newSessionName);
-
-        if (channelName != null) {
-            command.append(OPTION_CHANNEL);
-            command.append(channelName);
-        }
-        
-        command.append(OPTION_FUNCTION_PROBE);
-        command.append(probe);
-        
-        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
-        
-        if (isError(result)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-        }   
     }
 
     /*
@@ -1118,17 +1104,69 @@ public class LTTngControlService implements ILttngControlService {
                 eventInfo.setEventType(matcher.group(3).trim());
                 eventInfo.setState(matcher.group(4));
                 events.add(eventInfo);
+                index++;
             } else if (matcher2.matches()) {
                 IEventInfo eventInfo = new EventInfo(matcher2.group(1).trim());
                 eventInfo.setLogLevel(TraceLogLevel.LEVEL_UNKNOWN);
                 eventInfo.setEventType(matcher2.group(2).trim());
                 eventInfo.setState(matcher2.group(3));
-                events.add(eventInfo);
+                
+                if (eventInfo.getEventType() == TraceEventType.PROBE) {
+                    IProbeEventInfo probeEvent = new ProbeEventInfo(eventInfo.getName());
+                    probeEvent.setLogLevel(eventInfo.getLogLevel());
+                    probeEvent.setEventType(eventInfo.getEventType());
+                    probeEvent.setState(eventInfo.getState());
+
+                    // Overwrite eventinfo
+                    eventInfo = probeEvent;
+
+                    // myevent2 (type: probe) [enabled]
+                    // addr: 0xc0101340
+                    // myevent0 (type: probe) [enabled]
+                    // offset: 0x0
+                    // symbol: init_post
+                    index++;
+                    while (index < output.length) {
+                        String probeLine = output[index];
+                        // parse probe
+                        Matcher addrMatcher = PROBE_ADDRESS_PATTERN.matcher(probeLine);
+                        Matcher offsetMatcher = PROBE_OFFSET_PATTERN.matcher(probeLine);
+                        Matcher symbolMatcher = PROBE_SYMBOL_PATTERN.matcher(probeLine);
+                        if (addrMatcher.matches()) {
+                            String addr = addrMatcher.group(2).trim();
+                            probeEvent.setAddress(addr);
+                        } else if (offsetMatcher.matches()) {
+                            String offset = offsetMatcher.group(2).trim();
+                            probeEvent.setOffset(offset);
+                        } else if (symbolMatcher.matches()) {
+                            String symbol = symbolMatcher.group(2).trim();
+                            probeEvent.setSymbol(symbol);
+                        } else if ((EVENT_PATTERN.matcher(probeLine).matches()) || (WILDCARD_EVENT_PATTERN.matcher(probeLine).matches())) {
+                            break;
+                        } else if (CHANNEL_PATTERN.matcher(probeLine).matches()) {
+                            break;
+                        } else if (DOMAIN_KERNEL_PATTERN.matcher(probeLine).matches()) {
+                            // end of domain
+                            break;
+                        } else if (DOMAIN_UST_GLOBAL_PATTERN.matcher(probeLine).matches()) {
+                            // end of domain
+                            break;
+                        }
+                        index++;
+                    }
+                    events.add(eventInfo);
+                } else {
+                    events.add(eventInfo);
+                    index++;
+                    continue;
+                }
+            } else {
+                index++;
             }
 //            else if (line.matches(EVENT_NONE_PATTERN)) {
                 // do nothing
 //            } else 
-            index++;
+
         }
 
         return index;

@@ -23,12 +23,10 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.linuxtools.lttng.ui.LTTngUiPlugin;
 import org.eclipse.linuxtools.lttng.ui.views.control.ControlView;
 import org.eclipse.linuxtools.lttng.ui.views.control.Messages;
-import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.CreateSessionDialog;
 import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.ICreateSessionDialog;
+import org.eclipse.linuxtools.lttng.ui.views.control.dialogs.TraceControlDialogFactory;
 import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionGroup;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * <b><u>CreateSessionHandler</u></b>
@@ -55,13 +53,10 @@ public class CreateSessionHandler extends BaseControlViewHandler {
      */
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null) {
-            return false;
-        }
 
         // Open dialog box for the node name and address
-        ICreateSessionDialog dialog = new CreateSessionDialog(window.getShell(), fSessionGroup);
+        ICreateSessionDialog dialog = TraceControlDialogFactory.getInstance().getCreateSessionDialog();
+        dialog.setTraceSessionGroup(fSessionGroup);
 
         if (dialog.open() != Window.OK) {
             return null;

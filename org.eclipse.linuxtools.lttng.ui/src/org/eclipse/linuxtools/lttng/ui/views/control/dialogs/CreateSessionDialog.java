@@ -87,11 +87,9 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
     /**
      * Constructor
      * @param shell - a shell for the display of the dialog
-     * @param parent - trace control parent for validation of session name
      */
-    public CreateSessionDialog(Shell shell, TraceSessionGroup parent) {
+    public CreateSessionDialog(Shell shell) {
         super(shell);
-        fParent = parent;
     }
 
     // ------------------------------------------------------------------------
@@ -122,6 +120,15 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
     @Override
     public boolean isDefaultSessionPath() {
         return fIsDefaultPath;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.lttng.ui.views.control.dialogs.ICreateSessionDialog#setTraceSessionGroup(org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceSessionGroup)
+     */
+    @Override
+    public void setTraceSessionGroup(TraceSessionGroup group) {
+        fParent = group;
     }
 
     // ------------------------------------------------------------------------
