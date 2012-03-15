@@ -613,7 +613,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
         return hit;
     }
 
-    public Item getItem(Point pt) {
+    Item getItem(Point pt) {
         int idx = hitTest(pt.x, pt.y);
         return idx >= 0 ? (Item) _data._items[idx] : null;
     }

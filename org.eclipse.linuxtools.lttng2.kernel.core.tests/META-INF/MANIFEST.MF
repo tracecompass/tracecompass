@@ -12,4 +12,3 @@ Require-Bundle: org.junit;bundle-version="3.8.2",
 Bundle-Localization: plugin
 Bundle-Activator: org.eclipse.linuxtools.lttng2.kernel.core.tests.Activator
 Bundle-ActivationPolicy: lazy
-

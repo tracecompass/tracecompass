@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-SymbolicName: org.eclipse.linuxtools.ctf.parser
+Bundle-Version: 0.1.0.qualifier
+Export-Package: org.eclipse.linuxtools.ctf.parser
+Bundle-Vendor: %Bundle-Vendor
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.antlr.runtime;bundle-version="3.0.0"
