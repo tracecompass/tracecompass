@@ -12,7 +12,7 @@
  *   
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.ui;
+package org.eclipse.linuxtools.internal.lttng.ui;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.ProviderResource;
 import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TargetResource;
 import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResource;
-import org.eclipse.linuxtools.internal.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.Messages;
 import org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.model.TraceAdapterFactory;
 import org.eclipse.rse.services.clientserver.messages.SimpleSystemMessage;

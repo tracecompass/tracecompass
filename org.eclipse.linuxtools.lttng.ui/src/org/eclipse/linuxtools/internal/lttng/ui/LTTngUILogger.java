@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.internal.lttng.ui;
 
-import org.eclipse.linuxtools.lttng.ui.Activator;
 
 /**
  * <b><u>LTTngUILogger</u></b>

@@ -98,7 +98,7 @@
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="org.eclipse.linuxtools.lttng.core.LTTngProjectNature">
+               class="org.eclipse.linuxtools.internal.lttng.core.LTTngProjectNature">
          </run>
       </runtime>
    </extension>

@@ -30,12 +30,12 @@ import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.config.Trac
 import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.service.ILttControllerService;
 import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.service.LttControllerServiceProxy;
 import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.utility.LiveTraceManager;
+import org.eclipse.linuxtools.internal.lttng.ui.Activator;
 import org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.Messages;
 import org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.TraceControlConstants;
 import org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.ImportToProject;
 import org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions.PauseTrace;
 import org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.connectorservice.TraceConnectorService;
-import org.eclipse.linuxtools.lttng.ui.Activator;
 import org.eclipse.rse.core.events.ISystemResourceChangeEvents;
 import org.eclipse.rse.core.events.SystemResourceChangeEvent;
 import org.eclipse.rse.core.filters.ISystemFilter;

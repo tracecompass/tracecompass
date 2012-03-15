@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.linuxtools.lttng.ui;singleton:=true
 Bundle-Version: 0.5.0.qualifier
-Bundle-Activator: org.eclipse.linuxtools.lttng.ui.Activator
+Bundle-Activator: org.eclipse.linuxtools.internal.lttng.ui.Activator
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
  org.eclipse.ui.ide;bundle-version="3.7.0",
@@ -21,8 +21,7 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
-Export-Package: org.eclipse.linuxtools.lttng.ui,
- org.eclipse.linuxtools.internal.lttng.ui;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
+Export-Package: org.eclipse.linuxtools.internal.lttng.ui;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
  org.eclipse.linuxtools.internal.lttng.ui.model.trange;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
  org.eclipse.linuxtools.internal.lttng.ui.tracecontrol;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",
  org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.actions;x-friends:="org.eclipse.linuxtools.lttng.ui.tests",

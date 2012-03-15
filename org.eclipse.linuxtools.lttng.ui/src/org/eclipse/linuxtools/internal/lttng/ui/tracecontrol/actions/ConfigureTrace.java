@@ -27,11 +27,11 @@ import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.config.Trac
 import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.config.TraceChannels;
 import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.config.TraceConfig;
 import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.service.ILttControllerService;
+import org.eclipse.linuxtools.internal.lttng.ui.Activator;
 import org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.Messages;
 import org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.TraceControlConstants;
 import org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.subsystems.TraceSubSystem;
 import org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.wizards.ConfigureTraceWizard;
-import org.eclipse.linuxtools.lttng.ui.Activator;
 import org.eclipse.rse.core.events.ISystemRemoteChangeEvents;
 import org.eclipse.rse.core.model.ISystemRegistry;
 import org.eclipse.rse.core.model.SystemStartHere;
