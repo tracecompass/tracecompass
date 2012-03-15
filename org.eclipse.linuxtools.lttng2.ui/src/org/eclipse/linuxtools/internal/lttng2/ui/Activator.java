@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.internal.lttng2.ui;
 
+import java.net.URL;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
@@ -106,6 +108,23 @@ public class Activator extends AbstractUIPlugin {
         if (icon == null) {
             icon = getImageDescripterFromPath(path).createImage();
             plugin.getImageRegistry().put(path, icon);
+        }
+        return icon;
+    }
+    
+    /**
+     * Loads the image in the plug-ins image registry (if necessary) and returns the image
+     * @param url - URL relative to the Bundle
+     * @return  the image
+     */
+    public Image loadIcon(String url) {
+        String key = plugin.getBundle().getSymbolicName() + "/" + url; //$NON-NLS-1$
+        Image icon = plugin.getImageRegistry().get(key);
+        if (icon == null) {
+            URL imageURL = plugin.getBundle().getResource(url);
+            ImageDescriptor descriptor = ImageDescriptor.createFromURL(imageURL);
+            icon = descriptor.createImage();
+            plugin.getImageRegistry().put(key, icon);
         }
         return icon;
     }
