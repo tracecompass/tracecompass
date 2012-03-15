@@ -7,7 +7,7 @@
       <perspective
             class="org.eclipse.linuxtools.internal.lttng2.ui.views.PerspectiveFactory"
             icon="icons/obj16/garland16.png"
-            id="org.eclipse.linuxtools.lttng.ui.perspective"
+            id="org.eclipse.linuxtools.lttng2.ui.perspective"
             name="%perspective.category.name">
       </perspective>
    </extension>
