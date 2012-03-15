@@ -35,9 +35,11 @@ public class MetadataTest {
 
     /**
      * Perform pre-test initialization.
+     * 
+     * @throws CTFReaderException 
      */
     @Before
-    public void setUp() {
+    public void setUp() throws CTFReaderException {
         fixture = new Metadata(TestParams.createTrace());
     }
 

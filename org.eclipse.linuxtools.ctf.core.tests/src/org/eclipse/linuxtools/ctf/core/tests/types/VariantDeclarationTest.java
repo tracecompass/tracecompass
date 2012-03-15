@@ -11,6 +11,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDefinition;
 import org.eclipse.linuxtools.ctf.core.tests.TestParams;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -77,9 +78,11 @@ public class VariantDeclarationTest {
     /**
      * Run the VariantDefinition createDefinition(DefinitionScope,String) method
      * test.
+     * 
+     * @throws CTFReaderException 
      */
     @Test
-    public void testCreateDefinition() {
+    public void testCreateDefinition() throws CTFReaderException {
         fixture.setTag(""); //$NON-NLS-1$
         IDefinitionScope definitionScope = createDefinitionScope();
         String fieldName = ""; //$NON-NLS-1$
@@ -89,7 +92,7 @@ public class VariantDeclarationTest {
         assertNotNull(result);
     }
 
-    private static IDefinitionScope createDefinitionScope() {
+    private static IDefinitionScope createDefinitionScope() throws CTFReaderException {
         VariantDeclaration declaration = new VariantDeclaration();
         declaration.setTag(""); //$NON-NLS-1$
         VariantDeclaration variantDeclaration = new VariantDeclaration();

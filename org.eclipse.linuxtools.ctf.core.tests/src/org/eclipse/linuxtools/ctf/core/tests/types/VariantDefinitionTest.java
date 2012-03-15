@@ -21,6 +21,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDefinition;
 import org.eclipse.linuxtools.ctf.core.tests.TestParams;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,9 +51,11 @@ public class VariantDefinitionTest {
      * Perform pre-test initialization.
      * 
      * Not sure it needs to be that complicated, oh well...
+     * 
+     * @throws CTFReaderException 
      */
     @Before
-    public void setUp() {
+    public void setUp() throws CTFReaderException {
         VariantDeclaration vDecl1, vDecl2, vDecl3;
         VariantDefinition vDef1, vDef2;
         StructDefinition sDef1, sDef2;
@@ -90,9 +93,11 @@ public class VariantDefinitionTest {
 
     /**
      * Run the VariantDefinition(VariantDeclaration,DefinitionScope,String)
+     * 
+     * @throws CTFReaderException 
      */
     @Test
-    public void testVariantDefinition() {
+    public void testVariantDefinition() throws CTFReaderException {
         VariantDeclaration declaration = new VariantDeclaration();
         declaration.setTag(""); //$NON-NLS-1$
         VariantDeclaration variantDeclaration = new VariantDeclaration();
@@ -271,9 +276,11 @@ public class VariantDefinitionTest {
 
     /**
      * Run the void setTagDefinition(EnumDefinition) method test.
+     * 
+     * @throws CTFReaderException 
      */
     @Test
-    public void testSetTagDefinition() {
+    public void testSetTagDefinition() throws CTFReaderException {
         VariantDeclaration vDecl;
         VariantDefinition vDef;
         StructDefinition structDef;

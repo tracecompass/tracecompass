@@ -36,9 +36,10 @@ public class CTFTraceReaderTest {
 
     /**
      * Perform pre-test initialization.
+     * @throws CTFReaderException 
      */
     @Before
-    public void setUp() {
+    public void setUp() throws CTFReaderException {
         fixture = new CTFTraceReader(TestParams.createTrace());
     }
 
@@ -53,9 +54,10 @@ public class CTFTraceReaderTest {
     /**
      * Run the CTFTraceReader(CTFTrace) constructor test. Open a known good
      * trace.
+     * @throws CTFReaderException 
      */
     @Test
-    public void testOpen_existing() {
+    public void testOpen_existing() throws CTFReaderException {
         CTFTrace trace = TestParams.createTrace();
 
         CTFTraceReader result = new CTFTraceReader(trace);
@@ -139,9 +141,10 @@ public class CTFTraceReaderTest {
      *
      * Both trace reader are different objects, so they shouldn't "equals" each
      * other.
+     * @throws CTFReaderException 
      */
     @Test
-    public void testEquals() {
+    public void testEquals() throws CTFReaderException {
         CTFTraceReader fixture2 = new CTFTraceReader(TestParams.createTrace());
         assertFalse(fixture.equals(fixture2));
     }

@@ -37,14 +37,9 @@ public abstract class TestParams {
         return emptyTrace;
     }
     
-    public static CTFTrace createTrace() {
+    public static CTFTrace createTrace() throws CTFReaderException {
         if (testTrace1 == null) {
-            try {
-                testTrace1 = new CTFTrace(testTracePath1);
-            } catch (CTFReaderException e) {
-                /* We know this trace should exist */
-                throw new RuntimeException(e);
-            }
+            testTrace1 = new CTFTrace(testTracePath1);
         }
         return testTrace1;
     }

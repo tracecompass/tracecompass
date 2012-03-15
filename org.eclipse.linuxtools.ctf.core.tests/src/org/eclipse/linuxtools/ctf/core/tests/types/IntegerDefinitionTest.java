@@ -14,6 +14,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.tests.TestParams;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
 import org.junit.After;
@@ -44,9 +45,11 @@ public class IntegerDefinitionTest {
     /**
      * Perform pre-test initialization. We know the structDef won't be null (or
      * else the tests will fail), so we can safely suppress the warning.
+     * 
+     * @throws CTFReaderException 
      */
     @Before
-    public void setUp() {
+    public void setUp() throws CTFReaderException {
         CTFTrace trace = TestParams.createTrace();
         CTFTraceReader tr = new CTFTraceReader(trace);
         String name = ""; //$NON-NLS-1$

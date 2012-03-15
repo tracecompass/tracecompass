@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import java.nio.channels.FileChannel;
 
 import org.eclipse.linuxtools.ctf.core.tests.TestParams;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInput;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
@@ -59,9 +60,11 @@ public class StreamInputReaderTimestampComparatorTest {
 
     /**
      * Run the int compare(StreamInputReader,StreamInputReader) method test.
+     * 
+     * @throws CTFReaderException 
      */
     @Test
-    public void testCompare() {
+    public void testCompare() throws CTFReaderException {
         StreamInputReader a, b;
         a = new StreamInputReader(new StreamInput(new Stream(
                 TestParams.createTrace()), (FileChannel) null,

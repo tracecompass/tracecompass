@@ -702,8 +702,8 @@ public class IOStructGen {
                 throw new ParseException("fields expects a type specifier"); //$NON-NLS-1$
             }
 
-            IDeclaration fieldsDecl = parseTypeSpecifierList(typeSpecifier,
-                    null);
+            IDeclaration fieldsDecl;
+            fieldsDecl = parseTypeSpecifierList(typeSpecifier, null);
 
             if (!(fieldsDecl instanceof StructDeclaration)) {
                 throw new ParseException("fields expects a struct"); //$NON-NLS-1$

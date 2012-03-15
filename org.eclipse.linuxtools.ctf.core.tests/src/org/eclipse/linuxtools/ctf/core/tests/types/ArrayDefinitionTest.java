@@ -20,6 +20,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.tests.TestParams;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
 import org.junit.After;
@@ -53,10 +54,12 @@ public class ArrayDefinitionTest {
      * 
      * structDef shouldn't be null after parsing the CTFTraceReader object, so
      * we can ignore the warning.
+     * 
+     * @throws CTFReaderException 
      */
-
+    @SuppressWarnings("null")
     @Before
-    public void setUp() {
+    public void setUp() throws CTFReaderException {
         this.trace = TestParams.createTrace();
 
         CTFTraceReader tr = new CTFTraceReader(this.trace);

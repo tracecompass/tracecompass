@@ -18,6 +18,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDefinition;
 import org.eclipse.linuxtools.ctf.core.tests.TestParams;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
 
@@ -50,9 +51,11 @@ public class StructDefinitionTest {
 
     /**
      * Perform pre-test initialization.
+     * 
+     * @throws CTFReaderException 
      */
     @Before
-    public void setUp() {
+    public void setUp() throws CTFReaderException {
         CTFTrace c = TestParams.createTrace();
         CTFTraceReader tr = new CTFTraceReader(c);
         EventDefinition ed = tr.getCurrentEventDef();
@@ -82,15 +85,6 @@ public class StructDefinitionTest {
     @Test
     public void testGetDefinitions_1() {
         HashMap<String, Definition> result = fixture.getDefinitions();
-        assertNotNull(result);
-    }
-
-    /**
-     * Run the String getPath() method test.
-     */
-    @Test
-    public void testGetPath() {
-        String result = fixture.getPath();
         assertNotNull(result);
     }
 

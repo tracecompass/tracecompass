@@ -11,6 +11,7 @@ import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.metadata.exceptions.ParseException;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.tests.TestParams;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInput;
@@ -41,9 +42,11 @@ public class StreamTest {
 
     /**
      * Perform pre-test initialization.
+     * 
+     * @throws CTFReaderException 
      */
     @Before
-    public void setUp() {
+    public void setUp() throws CTFReaderException {
         fixture = new Stream(TestParams.createTrace());
         fixture.setEventContext(new StructDeclaration(1L));
         fixture.setPacketContext(new StructDeclaration(1L));
@@ -63,9 +66,11 @@ public class StreamTest {
 
     /**
      * Run the Stream(CTFTrace) constructor test.
+     * 
+     * @throws CTFReaderException 
      */
     @Test
-    public void testStream() {
+    public void testStream() throws CTFReaderException {
         CTFTrace trace = TestParams.createTrace();
         Stream result = new Stream(trace);
         assertNotNull(result);

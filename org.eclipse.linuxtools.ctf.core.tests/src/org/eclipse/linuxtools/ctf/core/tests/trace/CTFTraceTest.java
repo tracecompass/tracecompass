@@ -97,9 +97,10 @@ public class CTFTraceTest {
      * Run the void addStream(Stream) method test.
      * 
      * @throws ParseException
+     * @throws CTFReaderException 
      */
     @Test
-    public void testAddStream() throws ParseException {
+    public void testAddStream() throws ParseException, CTFReaderException {
         Stream stream = new Stream(TestParams.createTrace());
         stream.setId(1L);
         fixture.addStream(stream);
