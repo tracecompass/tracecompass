@@ -10,7 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.stubs;
+package org.eclipse.linuxtools.internal.lttng.stubs;
 
 import java.io.IOException;
 

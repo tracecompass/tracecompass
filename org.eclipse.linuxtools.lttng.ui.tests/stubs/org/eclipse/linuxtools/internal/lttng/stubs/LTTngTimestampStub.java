@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.eclipse.linuxtools.lttng.stubs;
+package org.eclipse.linuxtools.internal.lttng.stubs;
 
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 
