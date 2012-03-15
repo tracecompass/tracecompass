@@ -67,7 +67,7 @@ public class ActivatorTest extends TestCase {
     // ------------------------------------------------------------------------
 
     /**
-     * Test method for {@link org.eclipse.linuxtools.lttng2.ui.Activator#Activator()}.
+     * Test method for {@link org.eclipse.linuxtools.internal.lttng2.ui.Activator#Activator()}.
      */
     @Test
     public void testActivator() {
@@ -75,7 +75,7 @@ public class ActivatorTest extends TestCase {
     }
 
     /**
-     * Test method for {@link org.eclipse.linuxtools.lttng2.ui.Activator#getDefault()}.
+     * Test method for {@link org.eclipse.linuxtools.internal.lttng2.ui.Activator#getDefault()}.
      */
     @Test
     public void testGetDefault() {
@@ -83,7 +83,7 @@ public class ActivatorTest extends TestCase {
     }
 
     /**
-     * Test method for {@link org.eclipse.linuxtools.lttng2.ui.Activator#start(org.osgi.framework.BundleContext)}.
+     * Test method for {@link org.eclipse.linuxtools.internal.lttng2.ui.Activator#start(org.osgi.framework.BundleContext)}.
      */
     @Test
     public void testStartBundleContext() {
@@ -91,7 +91,7 @@ public class ActivatorTest extends TestCase {
     }
 
     /**
-     * Test method for {@link org.eclipse.linuxtools.lttng2.ui.Activator#stop(org.osgi.framework.BundleContext)}.
+     * Test method for {@link org.eclipse.linuxtools.internal.lttng2.ui.Activator#stop(org.osgi.framework.BundleContext)}.
      */
     @Test
     public void testStopBundleContext() {
