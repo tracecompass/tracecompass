@@ -13,7 +13,7 @@ package org.eclipse.linuxtools.lttng.core.tests.model;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.lttng.core.model.LTTngTreeNode;
+import org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNode;
 
 /**
  * @author alvaro
@@ -96,7 +96,7 @@ public class LTTngTreeNodeTest extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.eclipse.linuxtools.lttng.core.model.LTTngTreeNode#getChildren()}.
+	 * Test method for {@link org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNode#getChildren()}.
 	 */
 	public void testGetChildren() {
 		LTTngTreeNode[] childrensOf60 = node60.getChildren();
@@ -116,21 +116,21 @@ public class LTTngTreeNodeTest extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.eclipse.linuxtools.lttng.core.model.LTTngTreeNodeGeneric#getId()}.
+	 * Test method for {@link org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNodeGeneric#getId()}.
 	 */
 	public void testGetId() {
 		assertEquals(15L, node15.getId().longValue());
 	}
 
 	/**
-	 * Test method for {@link org.eclipse.linuxtools.lttng.core.model.LTTngTreeNodeGeneric#getType()}.
+	 * Test method for {@link org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNodeGeneric#getType()}.
 	 */
 	public void testGetType() {
 		assertEquals(this.getClass(), node15.getNodeType());
 	}
 
 	/**
-	 * Test method for {@link org.eclipse.linuxtools.lttng.core.model.LTTngTreeNodeGeneric#getChildByName(java.lang.String)}.
+	 * Test method for {@link org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNodeGeneric#getChildByName(java.lang.String)}.
 	 */
 	public void testGetChildByName() {
 		LTTngTreeNode child65 = node60.getChildByName("node65");
@@ -143,7 +143,7 @@ public class LTTngTreeNodeTest extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.eclipse.linuxtools.lttng.core.model.LTTngTreeNodeGeneric#removeChild(org.eclipse.linuxtools.lttng.core.model.ILTTngTreeNode)}.
+	 * Test method for {@link org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNodeGeneric#removeChild(org.eclipse.linuxtools.internal.lttng.core.model.ILTTngTreeNode)}.
 	 */
 	public void testRemoveChild() {
 		// Verify node20
@@ -184,7 +184,7 @@ public class LTTngTreeNodeTest extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.eclipse.linuxtools.lttng.core.model.LTTngTreeNodeGeneric#getChildById(java.lang.Integer)}.
+	 * Test method for {@link org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNodeGeneric#getChildById(java.lang.Integer)}.
 	 */
 	public void testGetChildById() {
 		LTTngTreeNode child65 = node60.getChildById(65L);
@@ -197,14 +197,14 @@ public class LTTngTreeNodeTest extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.eclipse.linuxtools.lttng.core.model.LTTngTreeNodeGeneric#getParent()}.
+	 * Test method for {@link org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNodeGeneric#getParent()}.
 	 */
 	public void testGetParent() {
 		assertEquals(node60, node67.getParent());
 	}
 
 	/**
-	 * Test method for {@link org.eclipse.linuxtools.lttng.core.model.LTTngTreeNodeGeneric#setParent(org.eclipse.linuxtools.lttng.core.model.ILTTngTreeNode)}.
+	 * Test method for {@link org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNodeGeneric#setParent(org.eclipse.linuxtools.internal.lttng.core.model.ILTTngTreeNode)}.
 	 */
 	public void testSetParent() {
 		node30.removeChild(node35);
@@ -215,7 +215,7 @@ public class LTTngTreeNodeTest extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.eclipse.linuxtools.lttng.core.model.LTTngTreeNodeGeneric#hasChildren()}.
+	 * Test method for {@link org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNodeGeneric#hasChildren()}.
 	 */
 	public void testHasChildren() {
 		assertEquals(true, node10.hasChildren());
@@ -227,14 +227,14 @@ public class LTTngTreeNodeTest extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.eclipse.linuxtools.lttng.core.model.LTTngTreeNodeGeneric#getName()}.
+	 * Test method for {@link org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNodeGeneric#getName()}.
 	 */
 	public void testGetName() {
 		assertEquals("node40", node40.getName());
 	}
 
 	/**
-	 * Test method for {@link org.eclipse.linuxtools.lttng.core.model.LTTngTreeNodeGeneric#getPath()}.
+	 * Test method for {@link org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNodeGeneric#getPath()}.
 	 */
 	public void testGetPath() {
 		String path = node60.getPath();
@@ -243,7 +243,7 @@ public class LTTngTreeNodeTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.eclipse.linuxtools.lttng.core.model.LTTngTreeNodeGeneric#getAdapter()}
+	 * {@link org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNodeGeneric#getAdapter()}
 	 * .
 	 */
 	public void testGetAdapter() {
@@ -253,7 +253,7 @@ public class LTTngTreeNodeTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.eclipse.linuxtools.lttng.core.model.LTTngTreeNodeGeneric#getAttibute()}
+	 * {@link org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNodeGeneric#getAttibute()}
 	 * .
 	 */
 	public void testGetAttribute() {

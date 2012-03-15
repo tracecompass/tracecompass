@@ -16,11 +16,11 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IEventInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceEnablement;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.ChannelInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.EventInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IChannelInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IEventInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.TraceEnablement;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.impl.ChannelInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.impl.EventInfo;
 
 /**
  * The class <code>ChannelInfoTest</code> contains tests for the class <code>{@link ChannelInfo}</code>.

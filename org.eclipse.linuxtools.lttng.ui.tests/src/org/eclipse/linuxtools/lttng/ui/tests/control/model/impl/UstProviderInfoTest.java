@@ -16,10 +16,10 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IBaseEventInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IUstProviderInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.BaseEventInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.UstProviderInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IBaseEventInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IUstProviderInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.impl.BaseEventInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.impl.UstProviderInfo;
 
 /**
  * The class <code>ChannelInfoTest</code> contains tests for the class <code>{@link UstProviderInfo}</code>.

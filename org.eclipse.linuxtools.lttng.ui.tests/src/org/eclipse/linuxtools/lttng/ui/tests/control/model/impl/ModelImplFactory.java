@@ -11,24 +11,24 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.lttng.ui.tests.control.model.impl;
 
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IBaseEventInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IDomainInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IEventInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IProbeEventInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.ISessionInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IUstProviderInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceEnablement;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceEventType;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceLogLevel;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceSessionState;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.BaseEventInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.ChannelInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.DomainInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.EventInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.ProbeEventInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.SessionInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.UstProviderInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IBaseEventInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IChannelInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IDomainInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IEventInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IProbeEventInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.ISessionInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IUstProviderInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.TraceEnablement;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.TraceEventType;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.TraceLogLevel;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.TraceSessionState;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.impl.BaseEventInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.impl.ChannelInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.impl.DomainInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.impl.EventInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.impl.ProbeEventInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.impl.SessionInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.impl.UstProviderInfo;
 
 /**
  *  Test facility to constants across test case 

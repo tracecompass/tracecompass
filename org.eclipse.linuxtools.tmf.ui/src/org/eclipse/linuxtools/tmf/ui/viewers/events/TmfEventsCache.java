@@ -26,7 +26,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 public class TmfEventsCache {
 
-	public class CachedEvent {
+	public static class CachedEvent {
 		TmfEvent event;
 		long rank;
 
@@ -55,7 +55,7 @@ public class TmfEventsCache {
     	clear();
     }
     
-    public void clear() {
+    public synchronized void clear() {
     	fCacheStartIndex = 0;
     	fCacheEndIndex = 0;
     	fFilterIndex.clear();
@@ -71,7 +71,7 @@ public class TmfEventsCache {
     	clear();
     }
     
-    public CachedEvent getEvent(int index) {
+    public synchronized CachedEvent getEvent(int index) {
         if ((index >= fCacheStartIndex) && (index < fCacheEndIndex)) {
             int i = index - fCacheStartIndex;
             return fCache[i];
@@ -80,7 +80,7 @@ public class TmfEventsCache {
     	return null;
     }
 
-    public CachedEvent peekEvent(int index) {
+    public synchronized CachedEvent peekEvent(int index) {
         if ((index >= fCacheStartIndex) && (index < fCacheEndIndex)) {
             int i = index - fCacheStartIndex;
             return fCache[i];
@@ -102,12 +102,12 @@ public class TmfEventsCache {
     	}
     	if (fFilter != null && index % fCache.length == 0) {
     		int i = index / fCache.length;
-    		fFilterIndex.add(i, new Integer((int) rank));
+    		fFilterIndex.add(i, Integer.valueOf((int) rank));
     	}
     }
     
     @SuppressWarnings("unchecked")
-    public int getFilteredEventIndex(final long rank) {
+    public synchronized int getFilteredEventIndex(final long rank) {
     	int current;
     	int startRank;
     	TmfDataRequest<TmfEvent> request;

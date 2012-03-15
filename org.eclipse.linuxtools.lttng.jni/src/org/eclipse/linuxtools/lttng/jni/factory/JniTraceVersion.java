@@ -14,8 +14,8 @@ package org.eclipse.linuxtools.lttng.jni.factory;
 
 import java.io.File;
 
-import org.eclipse.linuxtools.lttng.jni.exception.JniException;
-import org.eclipse.linuxtools.lttng.jni.exception.JniTraceVersionException;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniException;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniTraceVersionException;
 
 /**
  * <b><u>JniTraceVersion</u></b>

@@ -26,8 +26,8 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.linuxtools.lttng.ui.views.control.service.CommandResult;
-import org.eclipse.linuxtools.lttng.ui.views.control.service.ICommandResult;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.service.CommandResult;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.service.ICommandResult;
 
 public class LTTngToolsFileShell extends TestCommandShell {
 

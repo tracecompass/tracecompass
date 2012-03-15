@@ -11,8 +11,8 @@
  **********************************************************************/
 package org.eclipse.linuxtools.lttng.ui.tests.control.model.impl;
 
-import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponent;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceControlComponentChangedListener;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.ITraceControlComponent;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.ITraceControlComponentChangedListener;
 
 /**
  * The class can be used to validate the listener interface.

@@ -13,12 +13,12 @@ package org.eclipse.linuxtools.lttng.ui.tests.control.model.impl;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IProbeEventInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceEnablement;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceEventType;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.BaseEventInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.EventInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.ProbeEventInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IProbeEventInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.TraceEnablement;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.TraceEventType;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.impl.BaseEventInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.impl.EventInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.impl.ProbeEventInfo;
 
 /**
  * The class <code>BaseEventInfoTest</code> contains test for the class <code>{@link BaseEventInfo}</code>.

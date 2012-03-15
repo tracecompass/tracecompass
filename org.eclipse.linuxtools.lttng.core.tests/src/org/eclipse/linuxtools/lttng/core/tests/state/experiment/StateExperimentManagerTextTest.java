@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.lttng.core.tests.LttngTestPreparation;
 public class StateExperimentManagerTextTest extends LttngTestPreparation {
 
 	/**
-	 * Test method for {@link org.eclipse.linuxtools.lttng.core.state.experiment.StateExperimentManager#experimentSelected_prep(org.eclipse.linuxtools.tmf.experiment.TmfExperiment)}.
+	 * Test method for {@link org.eclipse.linuxtools.internal.lttng.core.state.experiment.StateExperimentManager#experimentSelected_prep(org.eclipse.linuxtools.tmf.experiment.TmfExperiment)}.
 	 */
 	public void testExperimentSelected_text() {
 //	    System.out.println("testExperimentSelected_text: test removed");
@@ -55,7 +55,7 @@ public class StateExperimentManagerTextTest extends LttngTestPreparation {
 
 	/**
 	 * Test method for
-	 * {@link org.eclipse.linuxtools.lttng.core.state.experiment.StateExperimentManager#experimentSelected_prep(org.eclipse.linuxtools.tmf.experiment.TmfExperiment)}
+	 * {@link org.eclipse.linuxtools.internal.lttng.core.state.experiment.StateExperimentManager#experimentSelected_prep(org.eclipse.linuxtools.tmf.experiment.TmfExperiment)}
 	 * .
 	 */
 	public void testExperimentSelected_real() {

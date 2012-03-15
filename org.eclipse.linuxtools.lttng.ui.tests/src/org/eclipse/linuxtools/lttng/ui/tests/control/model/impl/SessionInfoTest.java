@@ -16,10 +16,10 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IDomainInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.ISessionInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceSessionState;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.SessionInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IDomainInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.ISessionInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.TraceSessionState;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.impl.SessionInfo;
 
 /**
  * The class <code>ChannelInfoTest</code> contains tests for the class <code>{@link SessionInfo}</code>.

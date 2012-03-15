@@ -424,15 +424,15 @@ public class Utils {
 			sig = sig.substring(0, pos);
 		}
 		String args[] = sig.split(","); //$NON-NLS-1$
-		sig = "("; //$NON-NLS-1$
+        StringBuffer result = new StringBuffer("("); //$NON-NLS-1$
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i].trim();
 			if (arg.length() == 0 && args.length == 1)
 				break;
-			sig += getTypeSignature(arg);
+			result.append(getTypeSignature(arg));
 		}
-		sig += ")" + getTypeSignature(ret); //$NON-NLS-1$
-		return sig;
+		result.append(")").append(getTypeSignature(ret)); //$NON-NLS-1$
+		return result.toString();
 	}
 
 	static public String getTypeSignature(String type) {
@@ -444,30 +444,30 @@ public class Utils {
 		int pos = type.indexOf('[');
 		if (pos >= 0)
 			type = type.substring(0, pos);
-		String sig = "";                //$NON-NLS-1$
+		StringBuffer sig = new StringBuffer(""); //$NON-NLS-1$
 		for (int j = 0; j < dim; j++)
-			sig += "[";                 //$NON-NLS-1$
+			sig.append("[");                 //$NON-NLS-1$
 		if (type.equals("boolean"))     //$NON-NLS-1$
-			sig += "Z";                 //$NON-NLS-1$
+			sig.append("Z");                 //$NON-NLS-1$
 		else if (type.equals("byte"))   //$NON-NLS-1$
-			sig += "B";                 //$NON-NLS-1$
+			sig.append("B");                 //$NON-NLS-1$
 		else if (type.equals("char"))   //$NON-NLS-1$
-			sig += "C";                 //$NON-NLS-1$
+			sig.append("C");                 //$NON-NLS-1$
 		else if (type.equals("short"))  //$NON-NLS-1$
-			sig += "S";                 //$NON-NLS-1$
+			sig.append("S");                 //$NON-NLS-1$
 		else if (type.equals("int"))    //$NON-NLS-1$
-			sig += "I";                 //$NON-NLS-1$
+			sig.append("I");                 //$NON-NLS-1$
 		else if (type.equals("long"))   //$NON-NLS-1$
-			sig += "J";                 //$NON-NLS-1$
+			sig.append("J");                 //$NON-NLS-1$
 		else if (type.equals("float"))  //$NON-NLS-1$
-			sig += "F";                 //$NON-NLS-1$
+			sig.append("F");                 //$NON-NLS-1$
 		else if (type.equals("double")) //$NON-NLS-1$
-			sig += "D";                 //$NON-NLS-1$
+			sig.append("D");                 //$NON-NLS-1$
 		else if (type.equals("void"))   //$NON-NLS-1$
-			sig += "V";                 //$NON-NLS-1$
+			sig.append("V");                 //$NON-NLS-1$
 		else
-			sig += "L" + type.replace('.', '/') + ";"; //$NON-NLS-1$ //$NON-NLS-2$
-		return sig;
+			sig.append("L").append(type.replace('.', '/')).append(";"); //$NON-NLS-1$ //$NON-NLS-2$
+		return sig.toString();
 	}
 
 	// static public boolean openSource(Object element) {

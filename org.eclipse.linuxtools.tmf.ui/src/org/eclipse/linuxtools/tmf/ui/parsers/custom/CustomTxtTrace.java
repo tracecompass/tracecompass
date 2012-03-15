@@ -112,7 +112,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
                 if (raFile.read() == '\n') break;
                 pos--;
             }
-            ITmfLocation<?> location = new TmfLocation<Long>(new Long(pos));
+            ITmfLocation<?> location = new TmfLocation<Long>(pos);
             TmfContext context = seekLocation(location);
             context.setRank(ITmfContext.UNKNOWN_RANK);
             return context;

@@ -13,6 +13,8 @@
 
 package org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.dialogs;
 
+import java.util.Arrays;
+
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -46,7 +48,7 @@ public class TmfTimeFilterDialog extends TitleAreaDialog {
 			boolean[] filter) {
 		super(parentShell);
 
-		this.threads = threads;
+		this.threads = (threads != null) ? Arrays.copyOf(threads, threads.length) : null;
 		if (filter != null)
 			this.filter = (boolean[]) filter.clone();
 		
@@ -138,7 +140,7 @@ public class TmfTimeFilterDialog extends TitleAreaDialog {
 	}
 
 	public boolean[] getFilter() {
-		return filter;
+		return (filter != null) ? Arrays.copyOf(filter, filter.length) : null;
 	}
 
 	/**
@@ -177,7 +179,7 @@ public class TmfTimeFilterDialog extends TitleAreaDialog {
 		}
 	}
 
-	class ViewLabelProvider extends LabelProvider implements
+	private static class ViewLabelProvider extends LabelProvider implements
 			ITableLabelProvider {
 		@Override
 		public Image getImage(Object obj) {
@@ -203,7 +205,7 @@ public class TmfTimeFilterDialog extends TitleAreaDialog {
 		}
 	}
 
-	class TraceComparator extends ViewerComparator {
+	private static class TraceComparator extends ViewerComparator {
 		@Override
 		public int compare(Viewer viewer, Object e1, Object e2) {
 			// TODO: AA: Provide comparator externally

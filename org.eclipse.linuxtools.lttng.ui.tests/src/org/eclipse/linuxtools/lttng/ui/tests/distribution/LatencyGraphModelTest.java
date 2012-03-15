@@ -2,10 +2,10 @@ package org.eclipse.linuxtools.lttng.ui.tests.distribution;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.lttng.ui.views.latency.model.Config;
-import org.eclipse.linuxtools.lttng.ui.views.latency.model.GraphScaledData;
-import org.eclipse.linuxtools.lttng.ui.views.latency.model.IGraphModelListener;
-import org.eclipse.linuxtools.lttng.ui.views.latency.model.LatencyGraphModel;
+import org.eclipse.linuxtools.internal.lttng.ui.views.latency.model.Config;
+import org.eclipse.linuxtools.internal.lttng.ui.views.latency.model.GraphScaledData;
+import org.eclipse.linuxtools.internal.lttng.ui.views.latency.model.IGraphModelListener;
+import org.eclipse.linuxtools.internal.lttng.ui.views.latency.model.LatencyGraphModel;
 
 @SuppressWarnings("nls")
 public class LatencyGraphModelTest extends TestCase {

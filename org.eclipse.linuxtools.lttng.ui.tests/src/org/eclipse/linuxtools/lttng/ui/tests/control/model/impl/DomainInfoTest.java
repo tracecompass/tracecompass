@@ -16,9 +16,9 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IDomainInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.DomainInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IChannelInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IDomainInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.impl.DomainInfo;
 
 /**
  * The class <code>ChannelInfoTest</code> contains tests for the class <code>{@link DomainInfo}</code>.

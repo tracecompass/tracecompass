@@ -22,23 +22,23 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IBaseEventInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IChannelInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IDomainInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IEventInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.ISessionInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.IUstProviderInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.LogLevelType;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.TraceEnablement;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.TraceEventType;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.TraceLogLevel;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.TraceSessionState;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.impl.ChannelInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.service.ILttngControlService;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.service.LTTngControlService;
 import org.eclipse.linuxtools.lttng.stubs.service.CommandShellFactory;
 import org.eclipse.linuxtools.lttng.stubs.service.shells.LTTngToolsFileShell;
 import org.eclipse.linuxtools.lttng.ui.tests.LTTngUITestPlugin;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IBaseEventInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IChannelInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IDomainInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IEventInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.ISessionInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.IUstProviderInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.LogLevelType;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceEnablement;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceEventType;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceLogLevel;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.TraceSessionState;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.ChannelInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.service.ILttngControlService;
-import org.eclipse.linuxtools.lttng.ui.views.control.service.LTTngControlService;
 /**
  * The class <code>LTTngControlServiceTest</code> contains test for the class <code>{@link  LTTngControlService}</code>.
  */

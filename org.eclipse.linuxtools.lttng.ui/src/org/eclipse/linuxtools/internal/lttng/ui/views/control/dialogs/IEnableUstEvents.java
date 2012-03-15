@@ -1,0 +1,76 @@
+/**********************************************************************
+ * Copyright (c) 2012 Ericsson
+ * 
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: 
+ *   Bernd Hufmann - Initial API and implementation
+ **********************************************************************/
+package org.eclipse.linuxtools.internal.lttng.ui.views.control.dialogs;
+
+import java.util.List;
+
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.LogLevelType;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.TraceLogLevel;
+
+/**
+ * <b><u>IEnableKernelEvents</u></b>
+ * <p>
+ * Interface for providing information about UST events to be enabled.
+ * </p>
+ */
+public interface IEnableUstEvents {
+
+    // ------------------------------------------------------------------------
+    // Accessors
+    // ------------------------------------------------------------------------
+ 
+    /**
+     * @return a flag whether the tracepoints shall be configured.
+     */
+    public boolean isTracepoints();
+    
+    /**
+     * @return a flag indicating whether all tracepoints shall be enabled or not.
+     */
+    public boolean isAllTracePoints();
+
+    /**
+     * @return a list of event names to be enabled.
+     */
+    public List<String> getEventNames();
+
+    /**
+     * @return a flag whether events using wildcards should be enabled
+     */
+    public boolean isWildcard();
+
+    /**
+     * @return a wildcard 
+     */
+    public String getWildcard();
+
+    /**
+     * @return a flag whether events using log levels should be enabled 
+     */
+    public boolean isLogLevel();
+
+    /**
+     * @return a log level type (loglevel or loglevel-only)
+     */
+    public LogLevelType getLogLevelType();
+    
+    /**
+     * @return a log level
+     */
+    public TraceLogLevel getLogLevel();
+
+    /**
+     * @return a event name for the log level enable action
+     */
+    public String getLogLevelEventName();
+   
+}

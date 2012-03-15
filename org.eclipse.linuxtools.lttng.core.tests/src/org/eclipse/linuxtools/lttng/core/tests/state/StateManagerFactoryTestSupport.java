@@ -15,10 +15,10 @@ package org.eclipse.linuxtools.lttng.core.tests.state;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.linuxtools.lttng.core.model.LTTngTreeNode;
-import org.eclipse.linuxtools.lttng.core.state.LttngStateException;
-import org.eclipse.linuxtools.lttng.core.state.trace.IStateTraceManager;
-import org.eclipse.linuxtools.lttng.core.state.trace.StateTraceManager;
+import org.eclipse.linuxtools.internal.lttng.core.model.LTTngTreeNode;
+import org.eclipse.linuxtools.internal.lttng.core.state.LttngStateException;
+import org.eclipse.linuxtools.internal.lttng.core.state.trace.IStateTraceManager;
+import org.eclipse.linuxtools.internal.lttng.core.state.trace.StateTraceManager;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**

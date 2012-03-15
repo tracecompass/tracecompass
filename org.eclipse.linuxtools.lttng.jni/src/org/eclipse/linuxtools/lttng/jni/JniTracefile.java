@@ -14,13 +14,13 @@ package org.eclipse.linuxtools.lttng.jni;
 
 import java.util.HashMap;
 
-import org.eclipse.linuxtools.lttng.jni.common.JniTime;
-import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer;
-import org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id;
-import org.eclipse.linuxtools.lttng.jni.exception.JniException;
-import org.eclipse.linuxtools.lttng.jni.exception.JniNoSuchEventException;
-import org.eclipse.linuxtools.lttng.jni.exception.JniTracefileException;
-import org.eclipse.linuxtools.lttng.jni.exception.JniTracefileWithoutEventException;
+import org.eclipse.linuxtools.internal.lttng.jni.common.JniTime;
+import org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer;
+import org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniException;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniNoSuchEventException;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniTracefileException;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniTracefileWithoutEventException;
 
 /**
  * <b><u>JniTracefile</u></b>
@@ -172,7 +172,7 @@ public abstract class JniTracefile extends Jni_C_Common
      * @exception JniException
      * 
      * @see org.eclipse.linuxtools.lttng.jni.JniTrace
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id
      */
     public JniTracefile(Jni_C_Pointer_And_Library_Id newPtr, JniTrace newParentTrace) throws JniException {
     	thisTracefilePtr = newPtr;
@@ -195,7 +195,7 @@ public abstract class JniTracefile extends Jni_C_Common
      *      
      * @return LTT read status, as defined in Jni_C_Constant
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Constant
      */
     public int readNextEvent() {
         return currentEvent.readNextEvent();
@@ -210,7 +210,7 @@ public abstract class JniTracefile extends Jni_C_Common
      * 
      * @return LTT read status, as defined in Jni_C_Constant
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Constant
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Constant
      */
     public int seekToTime(JniTime seekTime) {
         return currentEvent.seekToTime(seekTime);
@@ -404,7 +404,7 @@ public abstract class JniTracefile extends Jni_C_Common
      * 
      * @return The actual (long converted) pointer or NULL.
      * 
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id
      */
     public Jni_C_Pointer_And_Library_Id getTracefilePtr() {
         return thisTracefilePtr;
@@ -485,7 +485,7 @@ public abstract class JniTracefile extends Jni_C_Common
      * @throws JniException			The construction (allocation) failed.
      * 
      * @see org.eclipse.linuxtools.lttng.jni.JniEvent
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id
      * @see org.eclipse.linuxtools.lttng.jni.JniMarker
      * @see org.eclipse.linuxtools.lttng.jni.JniTracefile
      */
@@ -507,7 +507,7 @@ public abstract class JniTracefile extends Jni_C_Common
      * @throws JniException			The construction (allocation) failed.
      * 
      * @see org.eclipse.linuxtools.lttng.jni.JniMarker
-     * @see org.eclipse.linuxtools.lttng.jni.common.Jni_C_Pointer_And_Library_Id
+     * @see org.eclipse.linuxtools.internal.lttng.jni.common.Jni_C_Pointer_And_Library_Id
      */
 	public abstract JniMarker allocateNewJniMarker(Jni_C_Pointer_And_Library_Id newMarkerPtr) throws JniException;
 	

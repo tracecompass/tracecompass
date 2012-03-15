@@ -90,7 +90,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     private int fCursorYCoordinate = -1;
     private int fHoldSelection = 0;
 
-	class LineData {
+	private static class LineData {
 	    long rank;
 	    ITmfLocation<?> location;
 	    String string;
@@ -109,7 +109,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         }
 	}
 
-	class CaretPosition {
+	private static class CaretPosition {
 	    int time;
 	    int caretOffset;
 	    public CaretPosition(int time, int caretOffset) {
@@ -308,7 +308,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     private void sendSelectionEvent(LineData lineData) {
         Event event = new Event();
         if (fActualRanks) {
-            event.data = new Long(lineData.rank);
+            event.data = Long.valueOf(lineData.rank);
         } else {
             event.data = lineData.location;
         }

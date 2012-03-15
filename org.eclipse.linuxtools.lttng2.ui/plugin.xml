@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="org.eclipse.linuxtools.lttng2.ui.perspective"
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.eclipse.linuxtools.internal.lttng2.ui.views.PerspectiveFactory"
+            icon="icons/obj16/garland16.png"
+            id="org.eclipse.linuxtools.lttng.ui.perspective"
+            name="%perspective.category.name">
+      </perspective>
+   </extension>
+</plugin>

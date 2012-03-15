@@ -12,12 +12,12 @@ package org.eclipse.linuxtools.lttng.jni.factory;
  *   Yufen Kuo       (ykuo@mvista.com) - add support to allow user specify trace library path
  *******************************************************************************/
 
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniException;
+import org.eclipse.linuxtools.internal.lttng.jni.exception.JniTraceVersionException;
+import org.eclipse.linuxtools.internal.lttng.jni_v2_3.JniTrace_v2_3;
+import org.eclipse.linuxtools.internal.lttng.jni_v2_5.JniTrace_v2_5;
+import org.eclipse.linuxtools.internal.lttng.jni_v2_6.JniTrace_v2_6;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
-import org.eclipse.linuxtools.lttng.jni.exception.JniException;
-import org.eclipse.linuxtools.lttng.jni.exception.JniTraceVersionException;
-import org.eclipse.linuxtools.lttng.jni_v2_3.JniTrace_v2_3;
-import org.eclipse.linuxtools.lttng.jni_v2_5.JniTrace_v2_5;
-import org.eclipse.linuxtools.lttng.jni_v2_6.JniTrace_v2_6;
 
 /**
  * <b><u>JniTraceFactory</u></b>

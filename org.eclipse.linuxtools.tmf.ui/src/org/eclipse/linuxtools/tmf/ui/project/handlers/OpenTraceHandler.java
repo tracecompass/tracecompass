@@ -133,7 +133,6 @@ public class OpenTraceHandler extends AbstractHandler {
             displayErrorMsg(Messages.OpenTraceHandler_NoTraceType);
             return null;
         }
-        trace.setResource(fTrace.getResource());
 
         // Get the editor_id from the extension point
         String editorId = fTrace.getEditorId();
@@ -145,6 +144,7 @@ public class OpenTraceHandler extends AbstractHandler {
             displayErrorMsg(Messages.OpenTraceHandler_NoTrace);
             return null;
         }
+        trace.setResource(fTrace.getResource());
 
         IResource resource = fTrace.getResource();
         IFile file = null;
@@ -176,9 +176,6 @@ public class OpenTraceHandler extends AbstractHandler {
         }
 
         if (usesEditor) {
-            if (trace instanceof TmfTrace) {
-                ((TmfTrace) trace).setResource(file);
-            }
             try {
                 IEditorInput editorInput = new TmfEditorInput(file, trace);
                 IWorkbench wb = PlatformUI.getWorkbench();
@@ -189,7 +186,7 @@ public class OpenTraceHandler extends AbstractHandler {
                     activePage.reuseEditor((IReusableEditor) editor, editorInput);
                     activePage.activate(editor);
                 } else {
-                    editor = activePage.openEditor(editorInput, editorId);
+                    activePage.openEditor(editorInput, editorId);
                     if (resource instanceof IFile) {
                         IDE.setDefaultEditor((IFile) resource, editorId);
                     }

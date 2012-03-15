@@ -13,8 +13,8 @@ package org.eclipse.linuxtools.lttng.ui.tests.control.model.impl;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.lttng.ui.views.control.model.ITraceInfo;
-import org.eclipse.linuxtools.lttng.ui.views.control.model.impl.TraceInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.ITraceInfo;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.model.impl.TraceInfo;
 
 /**
  * The class <code>TraceInfoTest</code> contains test for the class <code>{@link TraceInfo}</code>.

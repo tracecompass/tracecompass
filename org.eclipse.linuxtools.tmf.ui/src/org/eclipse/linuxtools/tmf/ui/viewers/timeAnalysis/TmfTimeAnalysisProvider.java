@@ -37,7 +37,7 @@ public abstract class TmfTimeAnalysisProvider {
 		private String stateName;
 
 		StateColor() {
-			String undef = new String("Undefined"); //$NON-NLS-1$
+			String undef = "Undefined"; //$NON-NLS-1$
 			this.stateName = undef;
 		}
 

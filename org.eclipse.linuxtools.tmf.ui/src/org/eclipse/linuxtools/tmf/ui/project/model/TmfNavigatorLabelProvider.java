@@ -37,10 +37,9 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
     // Constants
     // ------------------------------------------------------------------------
 
-    private final Image fFolderIcon = PlatformUI.getWorkbench().getSharedImages()
-            .getImage(ISharedImages.IMG_OBJ_FOLDER);
-    private final String fTraceIconFile = "icons/elcl16/trace.gif"; //$NON-NLS-1$
-    private final String fExperimentIconFile = "icons/elcl16/experiment.gif"; //$NON-NLS-1$
+    private static final Image fFolderIcon = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
+    private static final String fTraceIconFile = "icons/elcl16/trace.gif"; //$NON-NLS-1$
+    private static final String fExperimentIconFile = "icons/elcl16/experiment.gif"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes

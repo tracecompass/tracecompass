@@ -13,9 +13,9 @@ package org.eclipse.linuxtools.lttng.stubs.service;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.remote.IRemoteSystemProxy;
+import org.eclipse.linuxtools.internal.lttng.ui.views.control.service.ICommandShell;
 import org.eclipse.linuxtools.lttng.stubs.service.shells.LTTngToolsFileShell;
-import org.eclipse.linuxtools.lttng.ui.views.control.remote.IRemoteSystemProxy;
-import org.eclipse.linuxtools.lttng.ui.views.control.service.ICommandShell;
 import org.eclipse.rse.core.model.IRSECallback;
 import org.eclipse.rse.core.subsystems.ICommunicationsListener;
 import org.eclipse.rse.core.subsystems.ISubSystem;
