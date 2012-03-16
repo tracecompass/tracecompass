@@ -33,9 +33,14 @@ public class DeleteHandler extends BaseNodeHandler {
      */
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        ITraceControlComponent root = fTargetNode.getParent();
-        fTargetNode.removeAllChildren();
-        root.removeChild(fTargetNode);
+        fLock.lock();
+        try {
+            ITraceControlComponent root = fTargetNode.getParent();
+            fTargetNode.removeAllChildren();
+            root.removeChild(fTargetNode);
+        } finally {
+            fLock.unlock();
+        }
         return null;
     }
 
@@ -45,6 +50,13 @@ public class DeleteHandler extends BaseNodeHandler {
      */
     @Override
     public boolean isEnabled() {
-        return (super.isEnabled() && (fTargetNode.getTargetNodeState() == TargetNodeState.DISCONNECTED));    
+        boolean isEnabled = false;
+        fLock.lock();
+        try {
+           isEnabled = (super.isEnabled() && (fTargetNode.getTargetNodeState() == TargetNodeState.DISCONNECTED));
+        } finally {
+            fLock.unlock();
+        }
+        return isEnabled;
      }
 }

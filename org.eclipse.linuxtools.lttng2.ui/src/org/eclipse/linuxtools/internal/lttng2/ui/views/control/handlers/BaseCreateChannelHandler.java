@@ -1,0 +1,121 @@
+/**********************************************************************
+ * Copyright (c) 2012 Ericsson
+ * 
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: 
+ *   Bernd Hufmann - Initial API and implementation
+ **********************************************************************/
+package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.window.Window;
+import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.ICreateChannelDialog;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.TraceControlDialogFactory;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IChannelInfo;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent;
+
+/**
+ * <b><u>BaseCreateChannelHandler</u></b>
+ * <p>
+ * Base implementation of aCommand handler implementation to create a trace channel.  
+ * </p>
+ */
+abstract class BaseCreateChannelHandler extends BaseControlViewHandler {
+
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+    protected CommandParameter fParam;
+
+    // ------------------------------------------------------------------------
+    // Operations
+    // ------------------------------------------------------------------------
+    /**
+     * Enables channels with given names which are part of this domain. If a given channel 
+     * doesn't exists it creates a new channel with the given parameters (or default values 
+     * if given parameter is null). 
+     * @param - a parameter instance with data for the command execution
+     * @param channelNames - a list of channel names to enable on this domain
+     * @param info - channel information to set for the channel (use null for default)
+     * @param isKernel -  a flag for indicating kernel or UST.
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    abstract public void enableChannel(CommandParameter param, List<String> channelNames, IChannelInfo info, boolean isKernel, IProgressMonitor monitor) throws ExecutionException; 
+    
+    /**
+     * @param - a parameter instance with data for the command execution
+     * @return returns the relevant domain (null if domain is not known)
+     */
+    abstract public TraceDomainComponent getDomain(CommandParameter param);
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+     */
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        fLock.lock();
+        try {
+            final CommandParameter param = fParam.clone();
+
+            final ICreateChannelDialog dialog =  TraceControlDialogFactory.getInstance().getCreateChannelDialog();
+            dialog.setDomainComponent(getDomain(param));
+
+            if (dialog.open() != Window.OK) {
+                return null;
+            }
+
+            Job job = new Job(Messages.TraceControl_ChangeChannelStateJob) {
+                @Override
+                protected IStatus run(IProgressMonitor monitor) {
+                    StringBuffer errorString = new StringBuffer();
+
+                    List<String> channelNames = new ArrayList<String>();                    
+                    channelNames.add(dialog.getChannelInfo().getName());
+
+                    try {
+                        enableChannel(param, channelNames, dialog.getChannelInfo(), dialog.isKernel(), monitor);
+                    } catch (ExecutionException e) {
+                        errorString.append(e.toString());
+                        errorString.append("\n"); //$NON-NLS-1$
+                    }
+
+                    // get session configuration in all cases
+                    try {
+                        param.getSession().getConfigurationFromNode(monitor);
+                    } catch (ExecutionException e) {
+                        errorString.append(Messages.TraceControl_ListSessionFailure);
+                        errorString.append(": "); //$NON-NLS-1$
+                        errorString.append(e.toString());
+                    } 
+
+                    if (errorString.length() > 0) {
+                        return new Status(Status.ERROR, Activator.PLUGIN_ID, errorString.toString());
+                    }
+                    return Status.OK_STATUS;
+                }
+            };
+            job.setUser(true);
+            job.schedule();
+        } finally {
+            fLock.unlock();
+        }
+        return null;
+    }
+
+}

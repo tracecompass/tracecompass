@@ -175,7 +175,7 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
         }
         output.append(" (type: ");
         output.append(fEventType.getInName());
-        output.append(")");
+        output.append(')');
         return output.toString();
     }
     

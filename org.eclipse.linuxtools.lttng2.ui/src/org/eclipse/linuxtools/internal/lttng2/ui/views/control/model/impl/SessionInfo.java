@@ -177,7 +177,7 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
         //    Trace path: /home/user/lttng-traces/mysession-20120129-084256
         output.append("    Trace path: ");
         output.append(getSessionPath());
-        output.append("\n");
+        output.append('\n');
         
         for (Iterator<IDomainInfo> iterator = fDomains.iterator(); iterator.hasNext();) {
             IDomainInfo domain = (IDomainInfo) iterator.next();

@@ -36,6 +36,12 @@ public interface ICreateChannelDialog {
      */
     public void setDomainComponent(TraceDomainComponent domain);
     
+    /**
+     * @return true for Kernel domain. False for UST.
+     */
+    public boolean isKernel();
+
+    
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

@@ -12,6 +12,7 @@
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -39,7 +40,7 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.UstPro
 import org.eclipse.ui.IWorkbenchPage;
 
 /**
- * <b><u>EnableEventHandler</u></b>
+ * <b><u>AssignEventHandler</u></b>
  * <p>
  * Command handler implementation to assign events to a session and channel and enable/configure them.
  * This is done on the trace provider level.
@@ -51,19 +52,9 @@ public class AssignEventHandler extends BaseControlViewHandler {
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The list of event components the command is to be executed on. 
+     * The command execution parameter.
      */
-    private List<BaseEventComponent> fEvents = new ArrayList<BaseEventComponent>();
-    
-    /**
-     * The list of available sessions.
-     */
-    private TraceSessionComponent[] fSessions;
-    
-    /**
-     * Flag for indicating Kernel or UST.
-     */
-    Boolean fIsKernel = null;
+    private Parameter fParam;
     
     // ------------------------------------------------------------------------
     // Operations
@@ -76,58 +67,68 @@ public class AssignEventHandler extends BaseControlViewHandler {
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
 
-        // Open dialog box to retrieve the session and channel where the events should be enabled in.
-        final IGetEventInfoDialog dialog = TraceControlDialogFactory.getInstance().getGetEventInfoDialog();
-        dialog.setIsKernel(fIsKernel);
-        dialog.setSessions(fSessions);
+        fLock.lock();
+        try {
+            // Make a copy for thread safety
+            final Parameter param = new Parameter(fParam);
 
-        if (dialog.open() != Window.OK) {
-            return null;
+            // Open dialog box to retrieve the session and channel where the events should be enabled in.
+            final IGetEventInfoDialog dialog = TraceControlDialogFactory.getInstance().getGetEventInfoDialog();
+            dialog.setIsKernel(param.isKernel());
+            dialog.setSessions(param.getSessions());
+
+            if (dialog.open() != Window.OK) {
+                return null;
+            }
+
+            Job job = new Job(Messages.TraceControl_EnableEventsJob) {
+                @Override
+                protected IStatus run(IProgressMonitor monitor) {
+
+                    StringBuffer errorString = new StringBuffer();
+                    try {
+                        List<String> eventNames = new ArrayList<String>();
+                        List<BaseEventComponent> events = param.getEvents();
+                        // Create list of event names
+                        for (Iterator<BaseEventComponent> iterator = events.iterator(); iterator.hasNext();) {
+                            BaseEventComponent event = (BaseEventComponent) iterator.next();
+                            eventNames.add(event.getName());
+                        }
+
+                        TraceChannelComponent channel = dialog.getChannel();
+                        if (channel == null) {
+                            // enable events on default channel (which will be created by lttng-tools)
+                            dialog.getSession().enableEvents(eventNames, param.isKernel(), monitor);
+                        } else {
+                            channel.enableEvents(eventNames, monitor);
+                        }
+
+                    } catch (ExecutionException e) {
+                        errorString.append(e.toString());
+                        errorString.append('\n');
+                    }
+
+                    // get session configuration in all cases
+                    try {
+                        dialog.getSession().getConfigurationFromNode(monitor);
+                    } catch (ExecutionException e) {
+                        errorString.append(Messages.TraceControl_ListSessionFailure);
+                        errorString.append(": "); //$NON-NLS-1$
+                        errorString.append(e.toString());
+                    } 
+
+                    if (errorString.length() > 0) {
+                        return new Status(Status.ERROR, Activator.PLUGIN_ID, errorString.toString());
+                    }
+                    return Status.OK_STATUS;
+                }
+            };
+            job.setUser(true);
+            job.schedule();
+        } finally {
+            fLock.unlock();
         }
 
-        Job job = new Job(Messages.TraceControl_EnableEventsJob) {
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-
-                String errorString = null;
-                try {
-                    List<String> eventNames = new ArrayList<String>();
-                    // Create list of event names
-                    for (Iterator<BaseEventComponent> iterator = fEvents.iterator(); iterator.hasNext();) {
-                        BaseEventComponent event = (BaseEventComponent) iterator.next();
-                        eventNames.add(event.getName());
-                    }
-
-                    TraceChannelComponent channel = dialog.getChannel();
-                    if (channel == null) {
-                        // enable events on default channel (which will be created by lttng-tools)
-                        dialog.getSession().enableEvents(eventNames, fIsKernel, monitor);
-                    } else {
-                        channel.enableEvents(eventNames, monitor);
-                    }
-
-                } catch (ExecutionException e) {
-                    errorString = e.toString() + "\n"; //$NON-NLS-1$
-                }
-
-                // get session configuration in all cases
-                try {
-                    dialog.getSession().getConfigurationFromNode(monitor);
-                } catch (ExecutionException e) {
-                    if (errorString == null) {
-                        errorString = new String();
-                    }
-                    errorString += Messages.TraceControl_ListSessionFailure + ": " + e.toString();  //$NON-NLS-1$ 
-                } 
-
-                if (errorString != null) {
-                    return new Status(Status.ERROR, Activator.PLUGIN_ID, errorString);
-                }
-                return Status.OK_STATUS;
-            }
-        };
-        job.setUser(true);
-        job.schedule();
         return null;
     }
 
@@ -137,11 +138,11 @@ public class AssignEventHandler extends BaseControlViewHandler {
      */
     @Override
     public boolean isEnabled() {
-        fEvents.clear();
-        fSessions = null;
-        fIsKernel = null;
+        ArrayList<BaseEventComponent> events = new ArrayList<BaseEventComponent>();
+        TraceSessionComponent[] sessions = null;
+        Boolean isKernel = null;
 
-     // Get workbench page for the Control View
+        // Get workbench page for the Control View
         IWorkbenchPage page = getWorkbenchPage();
         if (page == null) {
             return false;
@@ -167,25 +168,91 @@ public class AssignEventHandler extends BaseControlViewHandler {
                     } else {
                         return false;
                     }
-                    if (fIsKernel == null) {
-                        fIsKernel = Boolean.valueOf(temp);
+                    if (isKernel == null) {
+                        isKernel = Boolean.valueOf(temp);
                     } else {
                         // don't mix events from Kernel and UST provider
-                        if (fIsKernel.booleanValue() != temp) {
+                        if (isKernel.booleanValue() != temp) {
                             return false;
                         }
                     }
 
                     // Add BaseEventComponents
-                    fEvents.add(event);
+                    events.add(event);
                     
-                    if (fSessions == null) {
+                    if (sessions == null) {
                         TargetNodeComponent  root = (TargetNodeComponent)event.getParent().getParent().getParent();
-                        fSessions = root.getSessions();
+                        sessions = root.getSessions();
                     }
                 }
             }
         }
-        return ((fEvents.size() > 0) && (fSessions != null) && (fSessions.length > 0));
+
+        boolean isEnabled = ((!events.isEmpty()) && (sessions != null) && (sessions.length > 0));
+        fLock.lock();
+        try {
+            fParam = null;
+            if(isEnabled) {
+                fParam = new Parameter(sessions, events, isKernel);
+            }
+        } finally {
+            fLock.unlock();
+        }
+        return isEnabled;
+    }
+
+    /**
+     *  Class containing parameter for the command execution. 
+     */
+    final static private class Parameter {
+
+        /**
+         * The list of event components the command is to be executed on. 
+         */
+        private List<BaseEventComponent> fEvents;
+        
+        /**
+         * The list of available sessions.
+         */
+        final private TraceSessionComponent[] fSessions;
+        
+        /**
+         * Flag for indicating Kernel or UST.
+         */
+        final private boolean fIsKernel;
+        
+        /**
+         * Constructor
+         * 
+         * @param sessions - a array of trace sessions
+         * @param events - a lists of events to enable
+         * @param isKernel - domain (true for kernel or UST)
+         */
+        public Parameter(TraceSessionComponent[] sessions, List<BaseEventComponent> events, boolean isKernel) {
+            fSessions = Arrays.copyOf(sessions, sessions.length);
+            fEvents = new ArrayList<BaseEventComponent>();
+            fEvents.addAll(events);
+            fIsKernel = isKernel;
+        }
+        
+        /**
+         * Copy constructor
+         * @param other - a parameter to copy
+         */
+        public Parameter(Parameter other) {
+            this(other.fSessions, other.fEvents, other.fIsKernel);
+        }
+        
+        public TraceSessionComponent[] getSessions() {
+            return fSessions;
+        }
+        
+        public List<BaseEventComponent> getEvents() {
+            return fEvents;
+        }
+        
+        public boolean isKernel() {
+            return fIsKernel;
+        }
     }
 }

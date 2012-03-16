@@ -258,7 +258,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
     }
 
     /**
-    * Validates the kernel composite input data.
+    * Validates the UST composite input data.
     * @return true if configured data is valid and can be retrieved.
     */
     public boolean isValid() {
@@ -301,6 +301,18 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
 
         if(!temp.matches("\\s*")) { //$NON-NLS-1$
           fLogLevelEventName = temp;
+        }
+
+        TraceLogLevel[] levels = TraceLogLevel.values();
+        int id = fLogLevelCombo.getSelectionIndex();
+        if ((id < 0) && fIsLogLevel) {
+            MessageDialog.openError(getShell(),
+                    Messages.TraceControl_EnableEventsDialogTitle,
+                    Messages.TraceControl_InvalidLogLevel + " (" + temp + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$
+
+            return false;
+        } else {
+            fLogLevel = levels[id];
         }
 
         // initialize log level event name string
@@ -524,7 +536,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
     /**
      * Content provider for the tracepoints tree. 
      */
-    final public class UstContentProvider extends TraceControlContentProvider {
+    final static public class UstContentProvider extends TraceControlContentProvider {
         @Override
         public Object[] getChildren(Object parentElement) {
             if (parentElement instanceof TargetNodeComponent) {
@@ -545,7 +557,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
     /**
      * Content label for the tracepoints tree. 
      */
-     final public class UstLabelProvider extends TraceControlLabelProvider {
+     final static public class UstLabelProvider extends TraceControlLabelProvider {
         @Override
         public Image getImage(Object element) {
             return null;

@@ -139,7 +139,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
                 output.append(channel.formatString());
             }
         }
-        output.append("\n");
+        output.append('\n');
         return output.toString();
     }
     

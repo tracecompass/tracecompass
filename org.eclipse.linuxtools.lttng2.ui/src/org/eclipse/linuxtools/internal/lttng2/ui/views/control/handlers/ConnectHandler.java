@@ -33,7 +33,12 @@ public class ConnectHandler extends BaseNodeHandler {
      */
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        fTargetNode.connect();
+        fLock.lock();
+        try {
+            fTargetNode.connect();
+        } finally {
+            fLock.unlock();
+        }
         return null;
     }
 
@@ -43,6 +48,13 @@ public class ConnectHandler extends BaseNodeHandler {
      */
     @Override
     public boolean isEnabled() {
-        return (super.isEnabled() && (fTargetNode.getTargetNodeState() == TargetNodeState.DISCONNECTED));    
+        boolean isEnabled = false;
+        fLock.lock();
+        try {
+           isEnabled = (super.isEnabled() && (fTargetNode.getTargetNodeState() == TargetNodeState.DISCONNECTED));
+        } finally {
+            fLock.unlock();
+        }
+        return isEnabled;
      }
 }

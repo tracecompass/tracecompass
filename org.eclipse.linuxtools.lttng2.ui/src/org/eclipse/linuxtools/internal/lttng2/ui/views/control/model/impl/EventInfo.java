@@ -84,7 +84,7 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
         output.append(super.formatString());
         output.append(" [");
         output.append(fState.getInName());
-        output.append("]");
+        output.append(']');
         return output.toString();
     }
 

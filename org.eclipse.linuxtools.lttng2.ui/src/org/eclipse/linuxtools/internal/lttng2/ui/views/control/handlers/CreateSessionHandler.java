@@ -54,31 +54,37 @@ public class CreateSessionHandler extends BaseControlViewHandler {
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
 
-        // Open dialog box for the node name and address
-        ICreateSessionDialog dialog = TraceControlDialogFactory.getInstance().getCreateSessionDialog();
-        dialog.setTraceSessionGroup(fSessionGroup);
+        fLock.lock();
+        try {
+            final TraceSessionGroup sessionGroup = fSessionGroup; 
+                    
+            // Open dialog box for the node name and address
+            ICreateSessionDialog dialog = TraceControlDialogFactory.getInstance().getCreateSessionDialog();
+            dialog.setTraceSessionGroup(sessionGroup);
 
-        if (dialog.open() != Window.OK) {
-            return null;
-        }
-
-        final String sessionName = dialog.getSessionName();
-        final String sessionPath = dialog.isDefaultSessionPath() ? null : dialog.getSessionPath();
-
-        Job job = new Job(Messages.TraceControl_CreateSessionJob) {
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-                try {
-                    fSessionGroup.createSession(sessionName, sessionPath, monitor);
-                } catch (ExecutionException e) {
-                    return new Status(Status.ERROR, Activator.PLUGIN_ID, e.toString());
-                } 
-                return Status.OK_STATUS;
+            if (dialog.open() != Window.OK) {
+                return null;
             }
-        };
-        job.setUser(true);
-        job.schedule();
-        
+
+            final String sessionName = dialog.getSessionName();
+            final String sessionPath = dialog.isDefaultSessionPath() ? null : dialog.getSessionPath();
+
+            Job job = new Job(Messages.TraceControl_CreateSessionJob) {
+                @Override
+                protected IStatus run(IProgressMonitor monitor) {
+                    try {
+                        sessionGroup.createSession(sessionName, sessionPath, monitor);
+                    } catch (ExecutionException e) {
+                        return new Status(Status.ERROR, Activator.PLUGIN_ID, e.toString());
+                    } 
+                    return Status.OK_STATUS;
+                }
+            };
+            job.setUser(true);
+            job.schedule();
+        } finally {
+            fLock.unlock();
+        }
         return null;
     }
 
@@ -95,14 +101,25 @@ public class CreateSessionHandler extends BaseControlViewHandler {
             return false;
         }
 
-        fSessionGroup = null;
+        TraceSessionGroup sessionGroup = null;
 
         // Check if the session group project is selected
         ISelection selection = page.getSelection(ControlView.ID);
         if (selection instanceof StructuredSelection) {
             Object element = ((StructuredSelection) selection).getFirstElement();
-            fSessionGroup = (element instanceof TraceSessionGroup) ? (TraceSessionGroup) element : null;
+            sessionGroup = (element instanceof TraceSessionGroup) ? (TraceSessionGroup) element : null;
         }
-        return fSessionGroup != null;
+
+        boolean isEnabled = sessionGroup != null;
+        fLock.lock();
+        try {
+            fSessionGroup = null;
+            if(isEnabled) {
+                fSessionGroup = sessionGroup;
+            }
+        } finally {
+            fLock.unlock();
+        }
+        return isEnabled;
     }
 }

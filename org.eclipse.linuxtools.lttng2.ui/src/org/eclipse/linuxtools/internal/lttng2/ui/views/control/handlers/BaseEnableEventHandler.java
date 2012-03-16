@@ -30,7 +30,6 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceLogLev
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TargetNodeComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceProviderGroup;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
@@ -46,52 +45,58 @@ abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * The session component the command is to be executed on. 
+     * The command execution parameter.
      */
-    protected TraceSessionComponent fSession = null;
+    protected CommandParameter fParam = null;
 
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
     /**
      * Enables a list of events for given parameters.
+     * @param - a parameter instance with data for the command execution
      * @param eventNames - list of event names
      * @param isKernel - true if kernel domain else false
      * @param monitor - a progress monitor
      * @throws ExecutionException
      */
-    abstract public void enableEvents(List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException;
+    abstract public void enableEvents(CommandParameter param, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException;
+
     /**
      * Enables all syscall events.
+     * @param - a parameter instance with data for the command execution
      * @param monitor - a progress monitor
      * @throws ExecutionException
      */
-    abstract public void enableSyscalls(IProgressMonitor monitor) throws ExecutionException;
+    abstract public void enableSyscalls(CommandParameter param, IProgressMonitor monitor) throws ExecutionException;
     
     /**
      * Enables a dynamic probe.
+     * @param - a parameter instance with data for the command execution
      * @param eventName - a event name
      * @param isFunction - true for dynamic function entry/return probe else false
      * @param probe - a dynamic probe information
      * @param monitor - a progress monitor
      * @throws ExecutionException
      */
-    abstract public void enableProbe(String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException;
+    abstract public void enableProbe(CommandParameter param, String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException;
     
     /**
      * Enables events using log level
+     * @param - a parameter instance with data for the command execution
      * @param eventName - a event name
      * @param logLevelType - a log level type 
      * @param level - a log level 
      * @param monitor - a progress monitor  
      * @throws ExecutionException
      */    
-    abstract public void enableLogLevel(String eventName, LogLevelType logLevelType, TraceLogLevel level, IProgressMonitor monitor) throws ExecutionException;
+    abstract public void enableLogLevel(CommandParameter param, String eventName, LogLevelType logLevelType, TraceLogLevel level, IProgressMonitor monitor) throws ExecutionException;
     
     /**
+     * @param - a parameter instance with data for the command execution
      * @return returns the relevant domain (null if domain is not known)
      */
-    abstract TraceDomainComponent getDomain();
+    abstract TraceDomainComponent getDomain(CommandParameter param);
 
     /*
      * (non-Javadoc)
@@ -105,98 +110,95 @@ abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
         if (window == null) {
             return false;
         }
+        fLock.lock();
+        try {
+            // Make a copy for thread safety
+            final CommandParameter param = fParam.clone();
 
-        TargetNodeComponent node = fSession.getTargetNode();
-        List<ITraceControlComponent> providers = node.getChildren(TraceProviderGroup.class);
+            TargetNodeComponent node = param.getSession().getTargetNode();
+            List<ITraceControlComponent> providers = node.getChildren(TraceProviderGroup.class);
 
-        final IEnableEventsDialog dialog = TraceControlDialogFactory.getInstance().getEnableEventsDialog();
-        dialog.setTraceProviderGroup((TraceProviderGroup)providers.get(0));
-        dialog.setTraceDomainComponent(getDomain());
+            final IEnableEventsDialog dialog = TraceControlDialogFactory.getInstance().getEnableEventsDialog();
+            dialog.setTraceProviderGroup((TraceProviderGroup)providers.get(0));
+            dialog.setTraceDomainComponent(getDomain(param));
 
-        if (dialog.open() != Window.OK) {
-            return null;
-        }
+            if (dialog.open() != Window.OK) {
+                return null;
+            }
 
-        Job job = new Job(Messages.TraceControl_ChangeEventStateJob) {
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-                String errorString = null;
+            Job job = new Job(Messages.TraceControl_ChangeEventStateJob) {
+                @Override
+                protected IStatus run(IProgressMonitor monitor) {
+                    StringBuffer errorString = new StringBuffer();
 
-                try {
-                    // Enable tracepoint events
-                    if (dialog.isTracepoints()) {
-                        if (dialog.isAllTracePoints()) {
-                            enableEvents(null, dialog.isKernel(), monitor);
-                        } else {
-                            List<String> eventNames = dialog.getEventNames();
-                            if (eventNames.size() > 0) {
-                                enableEvents(eventNames, dialog.isKernel(), monitor);
+                    try {
+                        // Enable tracepoint events
+                        if (dialog.isTracepoints()) {
+                            if (dialog.isAllTracePoints()) {
+                                enableEvents(param, null, dialog.isKernel(), monitor);
+                            } else {
+                                List<String> eventNames = dialog.getEventNames();
+                                if (!eventNames.isEmpty()) {
+                                    enableEvents(param, eventNames, dialog.isKernel(), monitor);
+                                }
                             }
                         }
-                    }
 
-                    // Enable syscall events
-                    if (dialog.isAllSysCalls()) {
+                        // Enable syscall events
                         if (dialog.isAllSysCalls()) {
-                            enableSyscalls(monitor);
-                        } 
-                    }
-
-                    // Enable dynamic probe
-                    if (dialog.isDynamicProbe()) {
-                        if ((dialog.getProbeEventName() != null && dialog.getProbeName() != null)) {
-                            enableProbe(dialog.getProbeEventName(), false, dialog.getProbeName(), monitor);
-                        } 
-                    }
-
-                    // Enable dynamic function probe
-                    if (dialog.isDynamicFunctionProbe()) {
-                        if ((dialog.getFunctionEventName() != null) && (dialog.getFunction() != null)) {
-                            enableProbe(dialog.getFunctionEventName(), true, dialog.getFunction(), monitor);
-                        } 
-                    }
-
-                    // Enable event using a wildcard
-                    if (dialog.isWildcard()) {
-                        List<String> eventNames = dialog.getEventNames();
-                        eventNames.add(dialog.getWildcard());
-
-                        if (eventNames.size() > 0) {
-                            enableEvents(eventNames, dialog.isKernel(), monitor);
+                            enableSyscalls(param, monitor);
                         }
-                    }
-                    
-                    // Enable events using log level
-                    if (dialog.isLogLevel()) {
-                        enableLogLevel(dialog.getLogLevelEventName(), dialog.getLogLevelType(), dialog.getLogLevel(), monitor);
+
+                        // Enable dynamic probe
+                        if (dialog.isDynamicProbe() && (dialog.getProbeEventName() != null) && (dialog.getProbeName() != null)) {
+                            enableProbe(param, dialog.getProbeEventName(), false, dialog.getProbeName(), monitor);
+                        }
+
+                        // Enable dynamic function probe
+                        if (dialog.isDynamicFunctionProbe() && (dialog.getFunctionEventName() != null) && (dialog.getFunction() != null)) {
+                            enableProbe(param, dialog.getFunctionEventName(), true, dialog.getFunction(), monitor);
+                        }
+
+                        // Enable event using a wildcard
+                        if (dialog.isWildcard()) {
+                            List<String> eventNames = dialog.getEventNames();
+                            eventNames.add(dialog.getWildcard());
+
+                            if (!eventNames.isEmpty()) {
+                                enableEvents(param, eventNames, dialog.isKernel(), monitor);
+                            }
+                        }
+
+                        // Enable events using log level
+                        if (dialog.isLogLevel()) {
+                            enableLogLevel(param, dialog.getLogLevelEventName(), dialog.getLogLevelType(), dialog.getLogLevel(), monitor);
+                        }
+
+                    } catch (ExecutionException e) {
+                        errorString.append(e.toString());
+                        errorString.append('\n');
                     }
 
-                } catch (ExecutionException e) {
-                    if (errorString == null) {
-                        errorString = new String();
+                    // get session configuration in all cases
+                    try {
+                        param.getSession().getConfigurationFromNode(monitor);
+                    } catch (ExecutionException e) {
+                        errorString.append(Messages.TraceControl_ListSessionFailure);
+                        errorString.append(": "); //$NON-NLS-1$
+                        errorString.append(e.toString());
                     } 
-                    errorString += e.toString() + "\n"; //$NON-NLS-1$
-                }
 
-                // get session configuration in all cases
-                try {
-                    fSession.getConfigurationFromNode(monitor);
-                } catch (ExecutionException e) {
-                    if (errorString == null) {
-                        errorString = new String();
+                    if (errorString.length() > 0) {
+                        return new Status(Status.ERROR, Activator.PLUGIN_ID, errorString.toString());
                     }
-                    errorString += Messages.TraceControl_ListSessionFailure + ": " + e.toString();  //$NON-NLS-1$ 
-                } 
-
-                if (errorString != null) {
-                    return new Status(Status.ERROR, Activator.PLUGIN_ID, errorString);
+                    return Status.OK_STATUS;
                 }
-                return Status.OK_STATUS;
-            }
-        };
-        job.setUser(true);
-        job.schedule();
-
+            };
+            job.setUser(true);
+            job.schedule();
+        } finally {
+            fLock.unlock();
+        }
         return null;
     }
 }

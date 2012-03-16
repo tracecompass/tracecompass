@@ -12,6 +12,7 @@
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.property;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
@@ -80,11 +81,11 @@ public class TraceProbeEventPropertySource extends TraceEventPropertySource {
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         IPropertyDescriptor[] superProperties = super.getPropertyDescriptors();
-        List<IPropertyDescriptor> list = new ArrayList<IPropertyDescriptor>();
-        for (int i = 0; i < superProperties.length; i++) {
-            list.add(superProperties[i]);
-        }
-        
+
+        List<IPropertyDescriptor> superList = Arrays.asList(superProperties);
+        ArrayList<IPropertyDescriptor> list = new ArrayList<IPropertyDescriptor>();
+        list.addAll(superList);
+
         if (fEvent instanceof TraceProbeEventComponent) {
             TraceProbeEventComponent event = (TraceProbeEventComponent) fEvent;
             if (event.getAddress() != null) {

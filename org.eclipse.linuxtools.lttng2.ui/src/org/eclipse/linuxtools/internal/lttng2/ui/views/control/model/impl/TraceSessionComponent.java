@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IDomainInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ISessionInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
@@ -251,6 +252,33 @@ public class TraceSessionComponent extends TraceControlComponent {
         getControlService().stopSession(getName(), monitor);
     }
 
+    /**
+     * Enables channels with given names which are part of this domain. If a given channel 
+     * doesn't exists it creates a new channel with the given parameters (or default values 
+     * if given parameter is null). 
+     * @param channelNames - a list of channel names to enable on this domain
+     * @param info - channel information to set for the channel (use null for default)
+     * @param isKernel -  a flag for indicating kernel or UST.
+     * @throws ExecutionException
+     */
+    public void enableChannels(List<String> channelNames, IChannelInfo info, boolean isKernel) throws ExecutionException {
+        enableChannels(channelNames, info, isKernel, new NullProgressMonitor());
+    }
+
+    /**
+     * Enables channels with given names which are part of this domain. If a given channel 
+     * doesn't exists it creates a new channel with the given parameters (or default values 
+     * if given parameter is null). 
+     * @param channelNames - a list of channel names to enable on this domain
+     * @param info - channel information to set for the channel (use null for default)
+     * @param isKernel -  a flag for indicating kernel or UST.
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void enableChannels(List<String> channelNames, IChannelInfo info, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().enableChannels(getName(), channelNames, isKernel, info, monitor);
+    }
+    
     /**
      * Enables a list of events with no additional parameters.
      * @param eventNames - a list of event names to enabled.

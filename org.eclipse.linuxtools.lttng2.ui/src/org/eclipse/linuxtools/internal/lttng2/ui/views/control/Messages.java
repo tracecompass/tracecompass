@@ -130,6 +130,7 @@ final public class Messages extends NLS {
     public static String TraceControl_InvalidProbeNameError;
     public static String TraceControl_InvalidWildcardError;
     public static String TraceControl_InvalidLogLevelEventNameError;
+    public static String TraceControl_InvalidLogLevel;
     
 
     // Tree structure strings

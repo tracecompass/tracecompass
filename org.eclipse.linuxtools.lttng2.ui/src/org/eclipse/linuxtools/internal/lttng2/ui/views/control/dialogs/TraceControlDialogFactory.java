@@ -3,7 +3,7 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
 import org.eclipse.ui.PlatformUI;
 
 
-public class TraceControlDialogFactory {
+final public class TraceControlDialogFactory {
 
     // ------------------------------------------------------------------------
     // Members
@@ -23,11 +23,6 @@ public class TraceControlDialogFactory {
      * The create channel dialog (on domain level)
      */
     private ICreateChannelDialog fCreateChannelDialog;
-    
-    /**
-     * The create channel dialog (on session level)
-     */
-    private ICreateChannelOnSessionDialog fCreateChannelOnSessionDialog;
     
     /**
      * The create session dialog.
@@ -66,8 +61,8 @@ public class TraceControlDialogFactory {
     /**
      * @return TraceControlDialogFactory instance
      */
-    public static TraceControlDialogFactory getInstance() {
-        if (null == fInstance) {
+    public synchronized static TraceControlDialogFactory getInstance() {
+        if (fInstance == null) {
             fInstance = new TraceControlDialogFactory();
         }
         return fInstance;
@@ -77,7 +72,7 @@ public class TraceControlDialogFactory {
      * @return new connection dialog
      */
     public INewConnectionDialog getNewConnectionDialog() {
-        if (null == fNewConnectionDialog) {
+        if (fNewConnectionDialog == null) {
             fNewConnectionDialog = new NewConnectionDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
         }
         return fNewConnectionDialog;
@@ -95,7 +90,7 @@ public class TraceControlDialogFactory {
      * @return create channel dialog (on domain level)
      */
     public ICreateChannelDialog getCreateChannelDialog() {
-        if (null == fCreateChannelDialog) {
+        if (fCreateChannelDialog == null) {
             fCreateChannelDialog = new CreateChannelDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
         }
         return fCreateChannelDialog;
@@ -110,28 +105,10 @@ public class TraceControlDialogFactory {
     }
     
     /**
-     * @return create channel dialog (on session level)
-     */
-    public ICreateChannelOnSessionDialog getCreateChannelOnSessionDialog() {
-        if (null == fCreateChannelOnSessionDialog) {
-            fCreateChannelOnSessionDialog = new CreateChannelDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-        }
-        return fCreateChannelOnSessionDialog;
-    }
-
-    /**
-     * Sets a create channel dialog implementation (on domain level).
-     * @param createChannelDialog - a create channel dialog implementation
-     */
-    public void setCreateChannelOnSessionDialog(ICreateChannelOnSessionDialog createChannelDialog) {
-        fCreateChannelOnSessionDialog = createChannelDialog;
-    }
-
-    /**
      * @return create session dialog implementation
      */
     public ICreateSessionDialog getCreateSessionDialog() {
-        if (null == fCreateSessionDialog) {
+        if (fCreateSessionDialog == null) {
             fCreateSessionDialog = new CreateSessionDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
         }
         return fCreateSessionDialog;
@@ -149,7 +126,7 @@ public class TraceControlDialogFactory {
      * @return enable events dialog implementation.
      */
     public IEnableEventsDialog getEnableEventsDialog() {
-        if (null == fEnableEventsDialog) {
+        if (fEnableEventsDialog == null) {
             fEnableEventsDialog = new EnableEventsDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
         }
         return fEnableEventsDialog;
@@ -167,7 +144,7 @@ public class TraceControlDialogFactory {
      * @return get events info dialog implementation.
      */
     public IGetEventInfoDialog getGetEventInfoDialog() {
-        if (null == fGetEventInfoDialog) {
+        if (fGetEventInfoDialog == null) {
             fGetEventInfoDialog = new GetEventInfoDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
         }
         return fGetEventInfoDialog;
@@ -185,7 +162,7 @@ public class TraceControlDialogFactory {
      * @return the confirmation dialog implementation
      */
     public IConfirmDialog getConfirmDialog() {
-        if (null == fConfirmDialog) {
+        if (fConfirmDialog == null) {
             fConfirmDialog = new ConfirmDialog();
         }
         return fConfirmDialog;

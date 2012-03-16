@@ -114,19 +114,24 @@ public class NewConnectionHandler extends BaseControlViewHandler {
                 return null;
             }
         }
-
+        
         if (host != null) {
-            // successful creation of host
-            TargetNodeComponent node = null;
-            if (!fRoot.containsChild(hostName)) {
-                node = new TargetNodeComponent(hostName, fRoot, host);
-                fRoot.addChild(node);
-            }
-            else {
-                node = (TargetNodeComponent)fRoot.getChild(hostName);
-            }
+            fLock.lock();
+            try {
+                // successful creation of host
+                TargetNodeComponent node = null;
+                if (!fRoot.containsChild(hostName)) {
+                    node = new TargetNodeComponent(hostName, fRoot, host);
+                    fRoot.addChild(node);
+                }
+                else {
+                    node = (TargetNodeComponent)fRoot.getChild(hostName);
+                }
 
-            node.connect();
+                node.connect();
+            } finally {
+                fLock.unlock();
+            }
         }
         return null;
     }
@@ -145,12 +150,24 @@ public class NewConnectionHandler extends BaseControlViewHandler {
             return false;
         }
 
-        fRoot = null;
+        ITraceControlComponent root = null;
 
         // no need to verify part because it has been already done in getWorkbenchPage()
         IWorkbenchPart part = page.getActivePart(); 
-        fRoot = ((ControlView) part).getTraceControlRoot();
+        root = ((ControlView) part).getTraceControlRoot();
         
-        return (fRoot != null);
+        boolean isEnabled = root != null;
+        
+        fLock.lock();
+        try {
+            fRoot = null;
+            if (isEnabled) {
+                fRoot = root;
+            }
+        } finally {
+            fLock.unlock();
+        }
+        
+        return isEnabled;
     }
 }

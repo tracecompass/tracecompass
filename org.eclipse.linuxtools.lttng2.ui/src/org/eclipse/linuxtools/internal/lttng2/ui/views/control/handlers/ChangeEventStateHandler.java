@@ -46,13 +46,9 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
     // Attributes
     // ------------------------------------------------------------------------
     /**
-     * Channel component reference.
+     * The command execution parameter.
      */
-    protected TraceChannelComponent fChannel = null;
-    /**
-     * The list of kernel channel components the command is to be executed on. 
-     */
-    protected List<TraceEventComponent> fEvents = new ArrayList<TraceEventComponent>();
+    protected Parameter fParam;
     
     // ------------------------------------------------------------------------
     // Accessors
@@ -87,60 +83,72 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
             return false;
         }
 
-        Job job = new Job(Messages.TraceControl_ChangeChannelStateJob) {
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-                String errorString = null;
+        fLock.lock();
+        try {
+            
+            final Parameter param = new Parameter(fParam);
 
-                TraceSessionComponent session = null;
-                
-                try {
-                    boolean isAll = false;
-                    if (fChannel != null) {
-                        session = fChannel.getSession();
-                        List<String> eventNames = new ArrayList<String>();
-                        for (Iterator<TraceEventComponent> iterator = fEvents.iterator(); iterator.hasNext();) {
-                            // Enable/disable all selected channels which are disabled
-                            TraceEventComponent event = (TraceEventComponent) iterator.next();
+            Job job = new Job(Messages.TraceControl_ChangeChannelStateJob) {
+                @Override
+                protected IStatus run(IProgressMonitor monitor) {
+                    StringBuffer errorString = new StringBuffer();
+
+                    TraceSessionComponent session = null;
+
+                    try {
+                        boolean isAll = false;
+                        if (param.getChannel() != null) {
+                            session = param.getChannel().getSession();
+                            List<String> eventNames = new ArrayList<String>();
+                            List<TraceEventComponent> events = param.getEvents();
                             
-                            // Workaround for wildcard handling in lttng-tools
-                            if ("*".equals(event.getName())) { //$NON-NLS-1$
-                                isAll = true;
-                            } else { 
-                                eventNames.add(event.getName());
+                            for (Iterator<TraceEventComponent> iterator = events.iterator(); iterator.hasNext();) {
+                                // Enable/disable all selected channels which are disabled
+                                TraceEventComponent event = (TraceEventComponent) iterator.next();
+
+                                // Workaround for wildcard handling in lttng-tools
+                                if ("*".equals(event.getName())) { //$NON-NLS-1$
+                                    isAll = true;
+                                } else { 
+                                    eventNames.add(event.getName());
+                                }
+                            }
+                            if (isAll) {
+                                changeState(param.getChannel(), null, monitor);
+                            }
+
+                            if (!eventNames.isEmpty()) {
+                                changeState(param.getChannel(), eventNames, monitor);
+                            }
+
+                            for (Iterator<TraceEventComponent> iterator = events.iterator(); iterator.hasNext();) {
+                                // Enable all selected channels which are disabled
+                                TraceEventComponent ev = (TraceEventComponent) iterator.next();
+                                ev.setState(getNewState());
                             }
                         }
-                        if (isAll) {
-                            changeState(fChannel, null, monitor);
-                        }
-
-                        if (eventNames.size() > 0) {
-                            changeState(fChannel, eventNames, monitor);
-                        }
-
-                        for (Iterator<TraceEventComponent> iterator = fEvents.iterator(); iterator.hasNext();) {
-                            // Enable all selected channels which are disabled
-                            TraceEventComponent ev = (TraceEventComponent) iterator.next();
-                            ev.setState(getNewState());
-                        }
+                    } catch (ExecutionException e) {
+                        errorString.append(e.toString());
+                        errorString.append('\n');
                     }
-                } catch (ExecutionException e) {
-                    errorString = e.toString() + "\n"; //$NON-NLS-1$
+
+                    if (session != null) {
+                        // In all cases notify listeners  
+                        session.fireComponentChanged(session);
+                    }
+
+                    if (errorString.length() > 0) {
+                        return new Status(Status.ERROR, Activator.PLUGIN_ID, errorString.toString());
+                    }
+
+                    return Status.OK_STATUS;
                 }
-
-                // In all cases notify listeners  
-                session.fireComponentChanged(session);
-
-                if (errorString != null) {
-                    return new Status(Status.ERROR, Activator.PLUGIN_ID, errorString);
-                }
-
-                return Status.OK_STATUS;
-            }
-        };
-        job.setUser(true);
-        job.schedule();
-
+            };
+            job.setUser(true);
+            job.schedule();
+        } finally {
+            fLock.unlock();
+        }
         return null;
     }
 
@@ -156,10 +164,12 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
             return false;
         }
 
-        reset();
-
         // Check if one or more session are selected
         ISelection selection = page.getSelection(ControlView.ID);
+        
+        TraceChannelComponent channel = null;
+        List<TraceEventComponent> events = new ArrayList<TraceEventComponent>();
+
         if (selection instanceof StructuredSelection) {
             StructuredSelection structered = ((StructuredSelection) selection);
             String sessionName = null;
@@ -175,8 +185,8 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
                         sessionName = String.valueOf(event.getSessionName());
                     }
                     
-                    if (fChannel == null) {
-                        fChannel = (TraceChannelComponent)event.getParent();
+                    if (channel == null) {
+                        channel = (TraceChannelComponent)event.getParent();
                     }
 
                     if (channelName == null) {
@@ -186,25 +196,69 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
                     // Enable command only for events of same session, same channel and domain
                     if ((!sessionName.equals(event.getSessionName())) ||
                         (!channelName.equals(event.getChannelName())) ||
-                        (fChannel.isKernel() != event.isKernel())) {
-                        reset();
+                        (channel.isKernel() != event.isKernel())) {
+                        events.clear();
                         break;
                     }
 
                     if ((event.getState() != getNewState())) {
-                        fEvents.add(event);
+                        events.add(event);
                     }
                 }
             }
         }
-        return fEvents.size() > 0;
+        boolean isEnabled = !events.isEmpty();
+
+        fLock.lock();
+        try {
+            fParam = null;
+            if (isEnabled) {
+                fParam = new Parameter(channel, events);
+            }
+        } finally {
+            fLock.unlock();
+        }
+        return isEnabled;
     }
 
     /**
-     * Reset members
+     *  Class containing parameter for the command execution. 
      */
-    private void reset() {
-        fChannel = null;
-        fEvents.clear();
+    protected class Parameter {
+        /**
+         * Channel component reference.
+         */
+        final private TraceChannelComponent fChannel;
+        /**
+         * The list of kernel channel components the command is to be executed on. 
+         */
+        final private List<TraceEventComponent> fEvents = new ArrayList<TraceEventComponent>();
+        
+        public Parameter(TraceChannelComponent channel, List<TraceEventComponent> events) {
+            fChannel = channel;
+            fEvents.addAll(events);
+        }
+        
+        /**
+         * Copy constructor
+         * @param other - a parameter to copy
+         */
+        public Parameter(Parameter other) {
+            this(other.fChannel, other.fEvents);
+        }
+        
+        /**
+         * @return the trace channel component.
+         */
+        public TraceChannelComponent getChannel() {
+            return fChannel;
+        }
+        
+        /**
+         * @return a list of trace event components.
+         */
+        public List<TraceEventComponent> getEvents() {
+            return fEvents;
+        }
     }
 }

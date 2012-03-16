@@ -49,7 +49,12 @@ public class RefreshHandler extends BaseControlViewHandler {
      */
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        fNode.refresh();
+        fLock.lock();
+        try {
+            fNode.refresh();
+        } finally {
+            fLock.unlock();
+        }
         return null;
     }
 
@@ -59,7 +64,6 @@ public class RefreshHandler extends BaseControlViewHandler {
      */
     @Override
     public boolean isEnabled() {
-        fNode = null;
 
         // Get workbench page for the Control View
         IWorkbenchPage page = getWorkbenchPage();
@@ -67,6 +71,7 @@ public class RefreshHandler extends BaseControlViewHandler {
             return false;
         }
 
+        TargetNodeComponent node = null;
         // Check if one or more session are selected
         ISelection selection = page.getSelection(ControlView.ID);
         if (selection instanceof StructuredSelection) {
@@ -82,12 +87,25 @@ public class RefreshHandler extends BaseControlViewHandler {
                             component = (TraceControlComponent) component.getParent();
                         }
                         if (component != null) {
-                            fNode = (TargetNodeComponent) component;
+                            node = (TargetNodeComponent) component;
                         }
                     }
                 }
             }
         }
-        return fNode != null;
+        
+        boolean isEnabled = node != null;
+        
+        fLock.lock();
+        try {
+            fNode = null;
+            if (isEnabled) {
+                fNode = node;
+            }
+        } finally {
+            fLock.unlock();
+        }
+        
+        return isEnabled;
     }
 }

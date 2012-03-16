@@ -451,11 +451,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
      */
     @Override
     protected void okPressed() {
-        if (fKernelButton.getSelection() == true) {
-            fIsKernel = true;
-        } else {
-            fIsKernel = false;
-        }
+        fIsKernel = fKernelButton.getSelection();
 
         // Validate kernel composite in case of kernel domain
         if (fKernelComposite != null && !fKernelComposite.isValid()) {

@@ -49,15 +49,23 @@ abstract public class BaseNodeHandler extends BaseControlViewHandler {
             return false;
         }
 
-        fTargetNode = null;
-        
+        TargetNodeComponent node = null;
         // Check if the node component is selected
         ISelection selection = page.getSelection(ControlView.ID);
         if (selection instanceof StructuredSelection) {
             Object element = ((StructuredSelection) selection).getFirstElement();
-            fTargetNode = (element instanceof TargetNodeComponent) ? (TargetNodeComponent) element : null;
+            node = (element instanceof TargetNodeComponent) ? (TargetNodeComponent) element : null;
         }
-        return fTargetNode != null;
+        boolean isEnabled = node != null;
+        fLock.lock();
+        try {
+            if (isEnabled) {
+                fTargetNode = node;
+            }
+        } finally {
+            fLock.unlock();
+        }
+        return isEnabled;
     }
 
     

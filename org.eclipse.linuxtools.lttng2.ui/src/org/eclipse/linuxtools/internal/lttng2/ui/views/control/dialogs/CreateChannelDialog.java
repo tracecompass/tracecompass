@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Text;
  * Dialog box for collecting channel creation information.
  * </p>
  */
-public class CreateChannelDialog extends Dialog implements ICreateChannelOnSessionDialog {
+public class CreateChannelDialog extends Dialog implements ICreateChannelDialog {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -63,23 +63,23 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelOnSessi
     /**
      * The overwrite mode of the channel.
      */
-    private Button fOverwriteModeButton;
+    private Button fOverwriteModeButton = null;
     /**
      * The sub-buffer size of the channel.
      */
-    private Text fSubBufferSizeText;
+    private Text fSubBufferSizeText = null;
     /**
      * The number of sub-buffers of the channel.
      */
-    private Text fNumberOfSubBuffersText;
+    private Text fNumberOfSubBuffersText = null;
     /**
      * The switch timer interval of the channel.
      */
-    private Text fSwitchTimerText;
+    private Text fSwitchTimerText = null;
     /**
      * The read timer interval of the channel.
      */
-    private Text fReadTimerText;
+    private Text fReadTimerText = null;
     /**
      * Group composite for domain selection.
      */
@@ -87,24 +87,24 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelOnSessi
     /**
      * Radio button for selecting kernel domain.
      */
-    private Button fKernelButton;
+    private Button fKernelButton = null;
     /**
      * Radio button for selecting UST domain.
      */
-    private Button fUstButton;
+    private Button fUstButton = null;
     /**
      * The parent domain component where the channel node should be added. 
      * Null in case of creation on session level.
      */
-    private TraceDomainComponent fDomain;
+    private TraceDomainComponent fDomain = null;
     /**
      * Common verify listener for numeric text input.  
      */
-    private VerifyListener fVerifyListener;
+    private VerifyListener fVerifyListener = null;
     /**
      * Output channel information.
      */
-    private IChannelInfo fChannelInfo;
+    private IChannelInfo fChannelInfo = null;
     /**
      * Output domain information. True in case of Kernel domain. False for UST.     
      */
@@ -160,7 +160,7 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelOnSessi
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.ICreateChannelOnSessionDialog#isKernel()
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.ICreateChannelDialog#isKernel()
      */
     @Override
     public boolean isKernel() {
@@ -295,11 +295,7 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelOnSessi
         fChannelInfo.setReadTimer(Long.parseLong(fReadTimerText.getText()));
         fChannelInfo.setOverwriteMode(fOverwriteModeButton.getSelection());
 
-        if (fKernelButton.getSelection() == true) {
-            fIsKernel = true;
-        } else {
-            fIsKernel = false;
-        }
+        fIsKernel = fKernelButton.getSelection();
 
         // Check for invalid names
         if (!fChannelInfo.getName().matches("^[a-zA-Z0-9\\-\\_]{1,}$")) { //$NON-NLS-1$

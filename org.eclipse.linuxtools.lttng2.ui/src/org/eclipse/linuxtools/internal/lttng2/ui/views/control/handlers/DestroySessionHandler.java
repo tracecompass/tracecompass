@@ -130,6 +130,6 @@ public class DestroySessionHandler extends BaseControlViewHandler {
                 }
             }
         }
-        return fSessions.size() > 0;
+        return !fSessions.isEmpty();
     }
 }

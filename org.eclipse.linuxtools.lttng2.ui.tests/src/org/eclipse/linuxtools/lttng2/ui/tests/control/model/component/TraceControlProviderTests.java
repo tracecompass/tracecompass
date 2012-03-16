@@ -26,7 +26,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.lttng2.stubs.service.TestRemoteSystemProxy;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IConfirmDialog;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.ICreateChannelOnSessionDialog;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.ICreateChannelDialog;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.ICreateSessionDialog;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IGetEventInfoDialog;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.TraceControlDialogFactory;
@@ -286,7 +286,7 @@ public class TraceControlProviderTests extends TestCase {
         // ------------------------------------------------------------------------
         // Create Channel on UST global domain
         // ------------------------------------------------------------------------
-        TraceControlDialogFactory.getInstance().setCreateChannelOnSessionDialog(new CreateChannelOnSessionDialogStub());
+        TraceControlDialogFactory.getInstance().setCreateChannelDialog(new CreateChannelDialogStub());
 
         fFacility.getControlView().setSelection(session);
         // Give GUI time to actually execute refresh
@@ -917,7 +917,7 @@ public class TraceControlProviderTests extends TestCase {
         }
     }
     
-    public class CreateChannelOnSessionDialogStub implements ICreateChannelOnSessionDialog {
+    public class CreateChannelDialogStub implements ICreateChannelDialog {
 
         @Override
         public IChannelInfo getChannelInfo() {

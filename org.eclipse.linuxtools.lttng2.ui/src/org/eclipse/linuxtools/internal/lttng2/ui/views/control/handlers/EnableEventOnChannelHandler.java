@@ -38,57 +38,64 @@ public class EnableEventOnChannelHandler extends BaseEnableEventHandler {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    /**
-     * The channel component the command is to be executed on. 
-     */
-    private TraceChannelComponent fChannel = null;
 
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableEvents(java.util.List, boolean, org.eclipse.core.runtime.IProgressMonitor)
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableEvents(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter, java.util.List, boolean, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    public void enableEvents(List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
-        fChannel.enableEvents(eventNames, monitor);
+    public void enableEvents(CommandParameter param, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
+        if (param instanceof ChannelCommandParameter) {
+            ((ChannelCommandParameter)param).getChannel().enableEvents(eventNames, monitor);
+        }
     }
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableSyscalls(org.eclipse.core.runtime.IProgressMonitor)
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableSyscalls(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    public void enableSyscalls(IProgressMonitor monitor) throws ExecutionException {
-        fChannel.enableSyscalls(monitor);
+    public void enableSyscalls(CommandParameter param, IProgressMonitor monitor) throws ExecutionException {
+        if (param instanceof ChannelCommandParameter) {
+            ((ChannelCommandParameter)param).getChannel().enableSyscalls(monitor);
+        }
     }
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableProbe(java.lang.String, boolean, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableProbe(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter, java.lang.String, boolean, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    public void enableProbe(String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException {
-        fChannel.enableProbe(eventName, isFunction, probe, monitor);
+    public void enableProbe(CommandParameter param, String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException {
+        if (param instanceof ChannelCommandParameter) {
+            ((ChannelCommandParameter)param).getChannel().enableProbe(eventName, isFunction, probe, monitor);
+        }
     }
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableLogLevel(java.lang.String, org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.LogLevelType, org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceLogLevel, org.eclipse.core.runtime.IProgressMonitor)
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableLogLevel(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter, java.lang.String, org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.LogLevelType, org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceLogLevel, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    public void enableLogLevel(String eventName, LogLevelType logLevelType, TraceLogLevel level, IProgressMonitor monitor) throws ExecutionException {
-        fChannel.enableLogLevel(eventName, logLevelType, level, monitor);
+    public void enableLogLevel(CommandParameter param, String eventName, LogLevelType logLevelType, TraceLogLevel level, IProgressMonitor monitor) throws ExecutionException {
+        if (param instanceof ChannelCommandParameter) {
+            ((ChannelCommandParameter)param).getChannel().enableLogLevel(eventName, logLevelType, level, monitor);
+        }
     }
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#getDomain()
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#getDomain(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter)
      */
     @Override
-    public TraceDomainComponent getDomain() {
-        return (TraceDomainComponent) fChannel.getParent();
+    public TraceDomainComponent getDomain(CommandParameter param) {
+        if (param instanceof ChannelCommandParameter) {
+            return (TraceDomainComponent) ((ChannelCommandParameter)param).getChannel().getParent();
+        } 
+        return null;
     }
 
     /*
@@ -103,7 +110,8 @@ public class EnableEventOnChannelHandler extends BaseEnableEventHandler {
             return false;
         }
 
-        fChannel = null;
+        TraceChannelComponent channel = null;
+        TraceSessionComponent session = null;
         ISelection selection = page.getSelection(ControlView.ID);
         if (selection instanceof StructuredSelection) {
             StructuredSelection structered = ((StructuredSelection) selection);
@@ -111,16 +119,26 @@ public class EnableEventOnChannelHandler extends BaseEnableEventHandler {
                 Object element = (Object) iterator.next();
                 if (element instanceof TraceChannelComponent) {
                     // Add only if corresponding TraceSessionComponents is inactive and not destroyed
-                    TraceChannelComponent channel = (TraceChannelComponent) element; 
-                    TraceSessionComponent session = channel.getSession();
+                    TraceChannelComponent tmpChannel = (TraceChannelComponent) element; 
+                    session = tmpChannel.getSession();
                     if(session.getSessionState() == TraceSessionState.INACTIVE && !session.isDestroyed()) {
-                        fChannel = channel;
-                        fSession = session;
+                        channel = tmpChannel;
                     }
                 }
             }
         }
-        return fChannel != null;
+        
+        boolean isEnabled = (channel != null);
+        fLock.lock();
+        try {
+            fParam = null;
+            if(isEnabled) {
+                fParam = new ChannelCommandParameter(session, channel);
+            }
+        } finally {
+            fLock.unlock();
+        }
+        return isEnabled;
     }
-
 }
+

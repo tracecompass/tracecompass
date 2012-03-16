@@ -67,7 +67,7 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
     /**
      * The parent where the new node should be added.
      */
-    private TraceSessionGroup fParent;
+    private TraceSessionGroup fParent = null;
     /**
      * The session name string.
      */

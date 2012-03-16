@@ -140,7 +140,7 @@ public class ProbeEventInfo extends EventInfo implements IProbeEventInfo {
        } else {
            output.append("\n        offset: ");
            output.append(fOffset);
-           output.append("\n");
+           output.append('\n');
            output.append("        symbol: ");
            output.append(fSymbol);
        }

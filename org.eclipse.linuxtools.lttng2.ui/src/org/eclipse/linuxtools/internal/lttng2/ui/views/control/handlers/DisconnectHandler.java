@@ -13,6 +13,7 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TargetNodeState;
 
 /**
@@ -33,7 +34,14 @@ public class DisconnectHandler extends BaseNodeHandler {
      */
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        fTargetNode.disconnect();
+        fLock.lock();
+        try {
+            ITraceControlComponent root = fTargetNode.getParent();
+            fTargetNode.disconnect();
+            root.removeChild(fTargetNode);
+        } finally {
+            fLock.unlock();
+        }
         return null;
     }
 
@@ -43,6 +51,13 @@ public class DisconnectHandler extends BaseNodeHandler {
     */
     @Override
     public boolean isEnabled() {
-        return super.isEnabled() && (fTargetNode.getTargetNodeState() == TargetNodeState.CONNECTED);
+        boolean isEnabled = false;
+        fLock.lock();
+        try {
+           isEnabled = super.isEnabled() && (fTargetNode.getTargetNodeState() == TargetNodeState.CONNECTED);
+        } finally {
+            fLock.unlock();
+        }
+        return isEnabled;
     }
 }

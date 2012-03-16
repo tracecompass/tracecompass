@@ -38,58 +38,66 @@ public class EnableEventOnDomainHandler extends BaseEnableEventHandler {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    /**
-     * The domain component the command is to be executed on. 
-     */
-    private TraceDomainComponent fDomain = null;
 
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableEvents(java.util.List, boolean, org.eclipse.core.runtime.IProgressMonitor)
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableEvents(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter, java.util.List, boolean, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    public void enableEvents(List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
-        fDomain.enableEvents(eventNames, monitor);
+    public void enableEvents(CommandParameter param, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
+        if (param instanceof DomainCommandParameter) {
+            ((DomainCommandParameter)param).getDomain().enableEvents(eventNames, monitor);
+        }
     }
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableSyscalls(org.eclipse.core.runtime.IProgressMonitor)
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableSyscalls(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    public void enableSyscalls(IProgressMonitor monitor) throws ExecutionException {
-        fDomain.enableSyscalls(monitor);
+    public void enableSyscalls(CommandParameter param, IProgressMonitor monitor) throws ExecutionException {
+        if (param instanceof DomainCommandParameter) {
+            ((DomainCommandParameter)param).getDomain().enableSyscalls(monitor);
+        }
     }
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableProbe(java.lang.String, boolean, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableProbe(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter, java.lang.String, boolean, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    public void enableProbe(String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException {
-        fDomain.enableProbe(eventName, isFunction, probe, monitor);
+    public void enableProbe(CommandParameter param, String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException {
+        if (param instanceof DomainCommandParameter) {
+            ((DomainCommandParameter)param).getDomain().enableProbe(eventName, isFunction, probe, monitor);
+        }
     }
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableLogLevel(java.lang.String, org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.LogLevelType, org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceLogLevel, org.eclipse.core.runtime.IProgressMonitor)
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#enableLogLevel(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter, java.lang.String, org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.LogLevelType, org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceLogLevel, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    public void enableLogLevel(String eventName, LogLevelType logLevelType, TraceLogLevel level, IProgressMonitor monitor) throws ExecutionException {
-        fDomain.enableLogLevel(eventName, logLevelType, level, monitor);
+    public void enableLogLevel(CommandParameter param, String eventName, LogLevelType logLevelType, TraceLogLevel level, IProgressMonitor monitor) throws ExecutionException {
+        if (param instanceof DomainCommandParameter) {
+            ((DomainCommandParameter)param).getDomain().enableLogLevel(eventName, logLevelType, level, monitor);
+        }
     }
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#getDomain()
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseEnableEventHandler#getDomain(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter)
      */
     @Override
-    public TraceDomainComponent getDomain() {
-        return fDomain;
+    public TraceDomainComponent getDomain(CommandParameter param) {
+        if (param instanceof DomainCommandParameter) {
+            return ((DomainCommandParameter)param).getDomain();
+        }
+        return null;
     }
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
@@ -102,7 +110,8 @@ public class EnableEventOnDomainHandler extends BaseEnableEventHandler {
             return false;
         }
 
-        fDomain = null;
+        TraceDomainComponent domain = null;
+        TraceSessionComponent session = null;
         ISelection selection = page.getSelection(ControlView.ID);
         if (selection instanceof StructuredSelection) {
             StructuredSelection structered = ((StructuredSelection) selection);
@@ -110,15 +119,25 @@ public class EnableEventOnDomainHandler extends BaseEnableEventHandler {
                 Object element = (Object) iterator.next();
                 if (element instanceof TraceDomainComponent) {
                     // Add only if corresponding TraceSessionComponents is inactive and not destroyed
-                    TraceDomainComponent domain = (TraceDomainComponent) element; 
-                    TraceSessionComponent session = domain.getSession();
+                    TraceDomainComponent tmpDomain = (TraceDomainComponent) element; 
+                    session = tmpDomain.getSession();
                     if(session.getSessionState() == TraceSessionState.INACTIVE && !session.isDestroyed()) {
-                        fDomain = domain;
-                        fSession = session;
+                        domain = tmpDomain;
                     }
                 }
             }
         }
-        return fDomain != null;
+        
+        boolean isEnabled = (domain != null);
+        fLock.lock();
+        try {
+            fParam = null;
+            if(isEnabled) {
+                fParam = new DomainCommandParameter(session, domain);
+            }
+        } finally {
+            fLock.unlock();
+        }
+        return isEnabled;
     }
 }

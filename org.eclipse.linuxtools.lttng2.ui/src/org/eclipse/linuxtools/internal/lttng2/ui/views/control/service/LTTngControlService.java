@@ -101,6 +101,10 @@ public class LTTngControlService implements ILttngControlService {
 
     // Command options constants 
     /**
+     * Command line option for output path.
+     */
+    private final static String OPTION_OUTPUT_PATH = " -o "; //$NON-NLS-1$
+    /**
      * Command line option for kernel tracer.
      */
     private final static String OPTION_KERNEL = " -k "; //$NON-NLS-1$
@@ -358,8 +362,7 @@ public class LTTngControlService implements ILttngControlService {
         
         String command = COMMAND_LIST + sessionName;
         ICommandResult result = fCommandShell.executeCommand(command, monitor);
-        
-        
+
         if (isError(result)) {
             throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
         }
@@ -531,12 +534,16 @@ public class LTTngControlService implements ILttngControlService {
         String newName = formatParameter(sessionName);
         String newPath = formatParameter(sessionPath);
 
-        String command = COMMAND_CREATE_SESSION + newName;
+        StringBuffer command = new StringBuffer(); 
+        command.append(COMMAND_CREATE_SESSION);
+        command.append(newName);
+
         if (newPath != null && !"".equals(newPath)) { //$NON-NLS-1$
-            command += " -o " + newPath; //$NON-NLS-1$
+            command.append(OPTION_OUTPUT_PATH);
+            command.append(newPath);
         }
 
-        ICommandResult result = fCommandShell.executeCommand(command, monitor);
+        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
         
         if (isError(result)) {
             throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
@@ -597,15 +604,12 @@ public class LTTngControlService implements ILttngControlService {
         ICommandResult result = fCommandShell.executeCommand(command, monitor);
         String[] output = result.getOutput();
         
-        if (isError(result)) {
-            // In case "session not found" treat it as success 
-            if ((output == null) || (!SESSION_NOT_FOUND_ERROR_PATTERN.matcher(output[0]).matches())) {
+        if (isError(result) && ((output == null) || (!SESSION_NOT_FOUND_ERROR_PATTERN.matcher(output[0]).matches()))) {
                 throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-        }
+       }
         //Session <sessionName> destroyed
     }
-
+    
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#startSession(java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
@@ -651,7 +655,7 @@ public class LTTngControlService implements ILttngControlService {
     public void enableChannels(String sessionName, List<String> channelNames, boolean isKernel, IChannelInfo info, IProgressMonitor monitor) throws ExecutionException {
 
         // no channels to enable
-        if (channelNames.size() == 0) {
+        if (channelNames.isEmpty()) {
             return;
         }
 
@@ -663,7 +667,7 @@ public class LTTngControlService implements ILttngControlService {
             String channel = (String) iterator.next();
             command.append(channel);
             if (iterator.hasNext()) {
-                command.append(","); //$NON-NLS-1$
+                command.append(',');
             }
         }
 
@@ -717,7 +721,7 @@ public class LTTngControlService implements ILttngControlService {
     public void disableChannels(String sessionName, List<String> channelNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
         
         // no channels to enable
-        if (channelNames.size() == 0) {
+        if (channelNames.isEmpty()) {
             return;
         }
 
@@ -729,7 +733,7 @@ public class LTTngControlService implements ILttngControlService {
             String channel = (String) iterator.next();
             command.append(channel);
             if (iterator.hasNext()) {
-                command.append(","); //$NON-NLS-1$
+                command.append(',');
             }
         }
 
@@ -760,7 +764,7 @@ public class LTTngControlService implements ILttngControlService {
         
         StringBuffer command = new StringBuffer(COMMAND_ENABLE_EVENT);
 
-        if (eventNames == null || eventNames.size() == 0) {
+        if (eventNames == null || eventNames.isEmpty()) {
             command.append(OPTION_ALL);
         } else {
 
@@ -768,7 +772,7 @@ public class LTTngControlService implements ILttngControlService {
                 String event = (String) iterator.next();
                 command.append(event);
                 if (iterator.hasNext()) {
-                    command.append(","); //$NON-NLS-1$
+                    command.append(',');
                 }
             }
         }
@@ -912,7 +916,7 @@ public class LTTngControlService implements ILttngControlService {
             command.append(OPTION_ALL);
         } else {
             // no events to enable
-            if (eventNames.size() == 0) {
+            if (eventNames.isEmpty()) {
                 return;
             }
 
@@ -920,7 +924,7 @@ public class LTTngControlService implements ILttngControlService {
                 String event = (String) iterator.next();
                 command.append(event);
                 if (iterator.hasNext()) {
-                    command.append(","); //$NON-NLS-1$
+                    command.append(',');
                 }
             }
         }
@@ -1223,12 +1227,14 @@ public class LTTngControlService implements ILttngControlService {
      */
     private String formatParameter(String parameter) {
         if (parameter != null) {
-            String newString = String.valueOf(parameter);
+            StringBuffer newString = new StringBuffer();
+            newString.append(parameter);
 
             if (parameter.contains(" ")) { //$NON-NLS-1$
-                newString = "\"" + newString + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+                newString.insert(0, "\""); //$NON-NLS-1$
+                newString.append("\""); //$NON-NLS-1$
             }
-            return newString;
+            return newString.toString();
         }
         return null;
     }

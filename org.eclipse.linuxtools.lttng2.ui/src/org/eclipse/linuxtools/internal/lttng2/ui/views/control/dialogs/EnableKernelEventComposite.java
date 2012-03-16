@@ -555,7 +555,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     /**
      * Content provider for the tracepoints tree. 
      */
-    final public class KernelContentProvider extends TraceControlContentProvider {
+    final static public class KernelContentProvider extends TraceControlContentProvider {
         @Override
         public Object[] getChildren(Object parentElement) {
             if (parentElement instanceof TraceProviderGroup) {
@@ -572,7 +572,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     /**
      * Content label for the tracepoints tree. 
      */
-    final public class KernelLabelProvider extends TraceControlLabelProvider {
+    final static public class KernelLabelProvider extends TraceControlLabelProvider {
         @Override
         public Image getImage(Object element) {
             return null;

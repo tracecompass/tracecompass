@@ -11,6 +11,8 @@
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.ControlView;
 import org.eclipse.ui.IWorkbenchPage;
@@ -26,6 +28,14 @@ import org.eclipse.ui.PlatformUI;
  */
 abstract public class BaseControlViewHandler extends AbstractHandler {
 
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+    /**
+     * The synchronization lock.
+     */
+    protected ReentrantLock fLock = new ReentrantLock();
+    
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

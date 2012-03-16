@@ -11,24 +11,15 @@
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.window.Window;
-import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.ControlView;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.ICreateChannelDialog;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.TraceControlDialogFactory;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceSessionState;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent;
@@ -40,71 +31,35 @@ import org.eclipse.ui.IWorkbenchPage;
  * Command handler implementation to create a trace channel for known domain.
  * </p>
  */
-public class CreateChannelOnDomainHandler extends BaseControlViewHandler {
+public class CreateChannelOnDomainHandler extends BaseCreateChannelHandler {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    /**
-     * The the domain component the command is to be executed on. 
-     */
-    private TraceDomainComponent fDomain; 
 
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
     /*
      * (non-Javadoc)
-     * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseCreateChannelHandler#enableChannel(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter, java.util.List, org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IChannelInfo, boolean, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    public Object execute(ExecutionEvent event) throws ExecutionException {
-
-        // Get channel information from user
-        final ICreateChannelDialog dialog = TraceControlDialogFactory.getInstance().getCreateChannelDialog();
-        dialog.setDomainComponent(fDomain);
-
-        if (dialog.open() != Window.OK) {
-            return null;
+    public void enableChannel(CommandParameter param, List<String> channelNames, IChannelInfo info, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
+        if (param instanceof DomainCommandParameter) {
+            ((DomainCommandParameter)param).getDomain().enableChannels(channelNames, info, monitor);
         }
-
-        Job job = new Job(Messages.TraceControl_ChangeChannelStateJob) {
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-                String errorString = null;
-
-                List<String> channelNames = new ArrayList<String>();
-                channelNames.add(dialog.getChannelInfo().getName());
-
-                try {
-                    fDomain.enableChannels(channelNames, dialog.getChannelInfo(), monitor);
-                } catch (ExecutionException e) {
-                    if (errorString == null) {
-                        errorString = new String();
-                    } 
-                    errorString += e.toString() + "\n"; //$NON-NLS-1$
-                }
-
-                // get session configuration in all cases
-                try {
-                    fDomain.getConfigurationFromNode(monitor);
-                } catch (ExecutionException e) {
-                    if (errorString == null) {
-                        errorString = new String();
-                    }
-                    errorString += Messages.TraceControl_ListSessionFailure + ": " + e.toString();  //$NON-NLS-1$ 
-                } 
-
-                if (errorString != null) {
-                    return new Status(Status.ERROR, Activator.PLUGIN_ID, errorString);
-                }
-                return Status.OK_STATUS;
-            }
-        };
-        
-        job.setUser(true);
-        job.schedule();
-            
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.BaseCreateChannelHandler#getDomain(org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CommandParameter)
+     */
+    @Override
+    public TraceDomainComponent getDomain(CommandParameter param) {
+        if (param instanceof DomainCommandParameter) {
+            return ((DomainCommandParameter)param).getDomain();
+        }
         return null;
     }
 
@@ -120,8 +75,10 @@ public class CreateChannelOnDomainHandler extends BaseControlViewHandler {
         if (page == null) {
             return false;
         }
-        fDomain = null;
-
+        
+        TraceDomainComponent domain = null;
+        TraceSessionComponent session = null;
+        
         // Check if one domain is selected
         ISelection selection = page.getSelection(ControlView.ID);
         if (selection instanceof StructuredSelection) {
@@ -129,15 +86,30 @@ public class CreateChannelOnDomainHandler extends BaseControlViewHandler {
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
                 Object element = (Object) iterator.next();
                 if (element instanceof TraceDomainComponent) {
-                    TraceDomainComponent domain = (TraceDomainComponent) element;
-                    TraceSessionComponent session = (TraceSessionComponent) domain.getParent();
+                    TraceDomainComponent tmpDomain = (TraceDomainComponent) element;
+                    session = (TraceSessionComponent) tmpDomain.getParent();
+                    
                     // Add only TraceDomainComponent whose TraceSessionComponent parent is inactive and not destroyed
                     if ((session.getSessionState() == TraceSessionState.INACTIVE) && (!session.isDestroyed())) {
-                        fDomain = domain;
+                        domain = tmpDomain;
                     }
                 }
             }
         }
-        return fDomain != null;
+        
+        boolean isEnabled = domain != null;
+        
+        fLock.lock();
+        try {
+            fParam = null;
+            if (isEnabled) {
+                fParam = new DomainCommandParameter(session, domain);
+            }
+        } finally {
+            fLock.unlock();
+        }
+        
+        return isEnabled;
     }
+    
 }

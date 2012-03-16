@@ -318,7 +318,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
                 output.append(event.formatString());
             }
         }
-        output.append("\n");
+        output.append('\n');
 
         return output.toString();
     }

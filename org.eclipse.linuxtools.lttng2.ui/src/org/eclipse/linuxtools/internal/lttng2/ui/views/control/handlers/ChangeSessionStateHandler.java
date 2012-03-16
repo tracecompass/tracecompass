@@ -81,28 +81,37 @@ abstract public class ChangeSessionStateHandler extends BaseControlViewHandler {
             return false;
         }
 
-        Job job = new Job(Messages.TraceControl_StartSessionJob) {
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-                try {
-                    for (Iterator<TraceSessionComponent> iterator = fSessions.iterator(); iterator.hasNext();) {
+        fLock.lock();
+        try {
+            
+            final List<TraceSessionComponent> sessions = new ArrayList<TraceSessionComponent>();
+            sessions.addAll(fSessions);
 
-                        // Start all selected sessions
-                        TraceSessionComponent session = (TraceSessionComponent) iterator.next();
-                        changeState(session, monitor);
+            Job job = new Job(Messages.TraceControl_StartSessionJob) {
+                @Override
+                protected IStatus run(IProgressMonitor monitor) {
+                    try {
+                        for (Iterator<TraceSessionComponent> iterator = sessions.iterator(); iterator.hasNext();) {
 
-                        // Set Session state
-                        session.setSessionState(getNewState());
-                        session.fireComponentChanged(session);
-                    }
-                } catch (ExecutionException e) {
-                    return new Status(Status.ERROR, Activator.PLUGIN_ID, e.toString());
-                }  
-                return Status.OK_STATUS;
-            }
-        };
-        job.setUser(true);
-        job.schedule();
+                            // Start all selected sessions
+                            TraceSessionComponent session = (TraceSessionComponent) iterator.next();
+                            changeState(session, monitor);
+
+                            // Set Session state
+                            session.setSessionState(getNewState());
+                            session.fireComponentChanged(session);
+                        }
+                    } catch (ExecutionException e) {
+                        return new Status(Status.ERROR, Activator.PLUGIN_ID, e.toString());
+                    }  
+                    return Status.OK_STATUS;
+                }
+            };
+            job.setUser(true);
+            job.schedule();
+        } finally {
+            fLock.unlock();
+        }
         return null;
     }
 
@@ -118,7 +127,7 @@ abstract public class ChangeSessionStateHandler extends BaseControlViewHandler {
             return false;
         }
 
-        fSessions.clear();
+        List<TraceSessionComponent> sessions = new ArrayList<TraceSessionComponent>(0);
 
         // Check if one or more session are selected
         ISelection selection = page.getSelection(ControlView.ID);
@@ -130,11 +139,21 @@ abstract public class ChangeSessionStateHandler extends BaseControlViewHandler {
                     // Add only TraceSessionComponents that are inactive and not destroyed
                     TraceSessionComponent session = (TraceSessionComponent) element;
                     if ((session.getSessionState() != getNewState()) && (!session.isDestroyed())) {
-                        fSessions.add((TraceSessionComponent)element);
+                        sessions.add(session);
                     }
                 }
             }
         }
-        return fSessions.size() > 0;
+        boolean isEnabled = !sessions.isEmpty();
+        fLock.lock();
+        try {
+            fSessions = null;
+            if (isEnabled) {
+                fSessions = sessions;
+            }
+        } finally {
+            fLock.unlock();
+        }
+        return isEnabled;
     }
 }
