@@ -605,7 +605,7 @@ public class CTFTrace implements IDefinitionScope {
         return environment;
     }
 
-    public String LookupEnvironment( String key )
+    public String lookupEnvironment( String key )
     {
         return environment.get(key);
     }

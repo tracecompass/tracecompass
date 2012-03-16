@@ -86,45 +86,49 @@ public class StructDefinition extends Definition implements IDefinitionScope {
          * sequence refers to a field that is after it, the field's definition
          * will not be there yet in the hashmap.
          */
-        return definitions.get(lookupPath);
+        Definition retVal = definitions.get(lookupPath);
+        if (retVal == null) {
+            retVal = definitions.get("_" + lookupPath); //$NON-NLS-1$
+        }
+        return retVal;
     }
 
     public ArrayDefinition lookupArray(String name) {
-        Definition def = definitions.get(name);
+        Definition def = lookupDefinition(name);
         return (ArrayDefinition) ((def instanceof ArrayDefinition) ? def : null);
     }
 
     public EnumDefinition lookupEnum(String name) {
-        Definition def = definitions.get(name);
+        Definition def = lookupDefinition(name);
         return (EnumDefinition) ((def instanceof EnumDefinition) ? def : null);
     }
 
     public IntegerDefinition lookupInteger(String name) {
-        Definition def = definitions.get(name);
+        Definition def = lookupDefinition(name);
         return (IntegerDefinition) ((def instanceof IntegerDefinition) ? def
                 : null);
     }
 
     public SequenceDefinition lookupSequence(String name) {
-        Definition def = definitions.get(name);
+        Definition def = lookupDefinition(name);
         return (SequenceDefinition) ((def instanceof SequenceDefinition) ? def
                 : null);
     }
 
     public StringDefinition lookupString(String name) {
-        Definition def = definitions.get(name);
+        Definition def = lookupDefinition(name);
         return (StringDefinition) ((def instanceof StringDefinition) ? def
                 : null);
     }
 
     public StructDefinition lookupStruct(String name) {
-        Definition def = definitions.get(name);
+        Definition def = lookupDefinition(name);
         return (StructDefinition) ((def instanceof StructDefinition) ? def
                 : null);
     }
 
     public VariantDefinition lookupVariant(String name) {
-        Definition def = definitions.get(name);
+        Definition def = lookupDefinition(name);
         return (VariantDefinition) ((def instanceof VariantDefinition) ? def
                 : null);
     }
@@ -144,7 +148,7 @@ public class StructDefinition extends Definition implements IDefinitionScope {
 
         while (listIterator.hasNext()) {
             String field = listIterator.next();
-            builder.append(definitions.get(field).toString());
+            builder.append(lookupDefinition(field).toString());
             n++;
             if (n != size) {
                 builder.append(", "); //$NON-NLS-1$
