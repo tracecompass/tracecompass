@@ -18,12 +18,8 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.UUID;
 
 import org.antlr.runtime.tree.CommonTree;
@@ -713,31 +709,10 @@ public class IOStructGen {
                 throw new ParseException("fields expects a struct"); //$NON-NLS-1$
             }
             /*
-             * The following is done to remove the underscores in the event
-             * names. These underscores were added by the LTTng tracer.
+             * The underscores in the event names.
+             * These underscores were added by the LTTng tracer.
              */
-            StructDeclaration fields = (StructDeclaration) fieldsDecl;
-            HashMap<String, IDeclaration> fieldMap = fields.getFields();
-            List<String> fieldsList = fields.getFieldsList();
-            HashMap<String, String> translationMap = new HashMap<String, String>();
-            Set<String> keys = fieldMap.keySet();
-            for (String key : keys) {
-                if (key.startsWith("_", 0)) {//$NON-NLS-1$
-                    final String newKey = key.substring(1);
-                    translationMap.put(key, newKey);
-                    fieldsList.set(fieldsList.indexOf(key), newKey);
-                }
-            }
-            Iterator<Entry<String, String>> it = translationMap.entrySet()
-                    .iterator();
-            while (it.hasNext()) {
-                final Entry<String, String> pairs = it.next();
-                final String oldKey = pairs.getKey();
-                final String newKey = pairs.getValue();
-                final IDeclaration value = fieldMap.get(oldKey);
-                fieldMap.put(newKey, value);
-                fieldMap.remove(oldKey);
-            }
+            final StructDeclaration fields = (StructDeclaration) fieldsDecl;
             event.setFields(fields);
 
         } else {
@@ -1600,9 +1575,6 @@ public class IOStructGen {
             IDeclaration decl = parseTypeDeclarator(typeDeclaratorNode,
                     typeSpecifierListNode, identifierSB);
             String fieldName = identifierSB.toString();
-            if (identifierSB.charAt(0) == '_') {
-                fieldName = identifierSB.substring(1);
-            }
 
             if (struct.hasField(fieldName)) {
                 throw new ParseException("struct: duplicate field " //$NON-NLS-1$
