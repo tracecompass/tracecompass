@@ -22,7 +22,7 @@ import org.junit.Test;
 /**
  * The class <code>StreamTest</code> contains tests for the class
  * <code>{@link Stream}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -32,7 +32,7 @@ public class StreamTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -79,7 +79,7 @@ public class StreamTest {
     /**
      * Run the void addEvent(EventDeclaration) method test with the basic
      * event.
-     * @throws ParseException 
+     * @throws ParseException
      */
     @Test
     public void testAddEvent_base() throws ParseException {
@@ -88,10 +88,10 @@ public class StreamTest {
     }
 
     /**
-     * Run the void addEvent(EventDeclaration) method test with an event 
+     * Run the void addEvent(EventDeclaration) method test with an event
      * of which we modified the id.
-     * @throws ParseException 
-     * 
+     * @throws ParseException
+     *
      * @throws ParseException
      */
     @Test
@@ -99,6 +99,7 @@ public class StreamTest {
         EventDeclaration event = new EventDeclaration();
         event.setId(1L);
         fixture.addEvent(event);
+        assertNotNull(fixture);
     }
 
     /**
@@ -107,6 +108,13 @@ public class StreamTest {
     @Test
     public void testEventContextIsSet() {
         assertTrue(fixture.eventContextIsSet());
+    }
+    /**
+     * Run the boolean eventContextIsSet() method test.
+     */
+    @Test
+    public void testToString() {
+        assertNotNull(fixture.toString());
     }
 
     /**

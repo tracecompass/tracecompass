@@ -358,6 +358,7 @@ public class Metadata {
         @Override
         public String toString() {
             /* Only for debugging, shouldn't be externalized */
+            /* Therefore it cannot be covered by test cases */
             return "MetadataPacketHeader [magic=0x" //$NON-NLS-1$
                     + Integer.toHexString(magic) + ", uuid=" //$NON-NLS-1$
                     + Arrays.toString(uuid) + ", checksum=" + checksum //$NON-NLS-1$
