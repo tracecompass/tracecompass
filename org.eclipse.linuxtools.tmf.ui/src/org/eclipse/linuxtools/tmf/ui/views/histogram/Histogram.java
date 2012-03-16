@@ -259,7 +259,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    public abstract void setFullRange(long startTime, long endTime);
     public abstract void updateTimeRange(long startTime, long endTime);
 
     /**
@@ -390,9 +389,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                         fTimeRangeStartText.setText(HistogramUtils.nanosecondsToString(fDataModel.getFirstBucketTime()));
                         fTimeRangeEndText.setText(HistogramUtils.nanosecondsToString(fDataModel.getEndTime()));
                         fMaxNbEventsText.setText(Long.toString(fScaledData.fMaxValue));
-                        
-                        setFullRange(fDataModel.getFirstBucketTime(), fDataModel.getEndTime());
-                        
                         // The Y-axis area might need to be re-sized
                         fMaxNbEventsText.getParent().layout();
                     }

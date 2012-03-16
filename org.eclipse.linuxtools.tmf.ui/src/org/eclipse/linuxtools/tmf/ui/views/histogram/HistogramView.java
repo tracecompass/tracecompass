@@ -25,6 +25,7 @@ import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
@@ -361,6 +362,19 @@ public class HistogramView extends TmfView {
         }
 
         sendFullRangeRequest(fullRange);
+    }
+
+    @TmfSignalHandler
+    public void experimentUpdated(TmfExperimentUpdatedSignal signal) {
+        if (signal.getExperiment() != fCurrentExperiment) {
+            return;
+        }
+        TmfTimeRange fullRange = signal.getExperiment().getTimeRange();
+        fExperimentStartTime = fullRange.getStartTime().getValue();
+        fExperimentEndTime = fullRange.getEndTime().getValue();
+
+        fFullTraceHistogram.setFullRange(fExperimentStartTime, fExperimentEndTime);
+        fTimeRangeHistogram.setFullRange(fExperimentStartTime, fExperimentEndTime);
     }
 
     @TmfSignalHandler
