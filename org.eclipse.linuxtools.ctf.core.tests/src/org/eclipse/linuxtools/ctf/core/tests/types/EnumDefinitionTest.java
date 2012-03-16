@@ -19,7 +19,7 @@ import org.junit.Test;
 /**
  * The class <code>EnumDefinitionTest</code> contains tests for the class
  * <code>{@link EnumDefinition}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -29,7 +29,7 @@ public class EnumDefinitionTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -44,7 +44,7 @@ public class EnumDefinitionTest {
     public void setUp() {
         EnumDeclaration declaration = new EnumDeclaration(
                 new IntegerDeclaration(1, true, 1, ByteOrder.BIG_ENDIAN,
-                        Encoding.ASCII));
+                        Encoding.ASCII, null));
         String fieldName = ""; //$NON-NLS-1$
 
         fixture = new EnumDefinition(declaration, null, fieldName);

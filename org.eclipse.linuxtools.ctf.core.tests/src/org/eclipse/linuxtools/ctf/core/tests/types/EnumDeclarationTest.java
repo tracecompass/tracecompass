@@ -19,7 +19,7 @@ import org.junit.Test;
 /**
  * The class <code>EnumDeclarationTest</code> contains tests for the class
  * <code>{@link EnumDeclaration}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -29,7 +29,7 @@ public class EnumDeclarationTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -43,7 +43,7 @@ public class EnumDeclarationTest {
     @Before
     public void setUp() {
         fixture = new EnumDeclaration(new IntegerDeclaration(1, true, 1,
-                ByteOrder.BIG_ENDIAN, Encoding.ASCII));
+                ByteOrder.BIG_ENDIAN, Encoding.ASCII, null));
     }
 
     /**
@@ -60,7 +60,7 @@ public class EnumDeclarationTest {
     @Test
     public void testEnumDeclaration() {
         IntegerDeclaration containerType = new IntegerDeclaration(1, true, 1,
-                ByteOrder.BIG_ENDIAN, Encoding.ASCII);
+                ByteOrder.BIG_ENDIAN, Encoding.ASCII, null);
 
         EnumDeclaration result = new EnumDeclaration(containerType);
 

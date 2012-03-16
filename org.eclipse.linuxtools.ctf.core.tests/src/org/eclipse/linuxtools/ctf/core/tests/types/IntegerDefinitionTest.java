@@ -24,7 +24,7 @@ import org.junit.Test;
 /**
  * The class <code>IntegerDefinitionTest</code> contains tests for the class
  * <code>{@link IntegerDefinition}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -34,7 +34,7 @@ public class IntegerDefinitionTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -88,7 +88,7 @@ public class IntegerDefinitionTest {
     @Test
     public void testIntegerDefinition() {
         IntegerDeclaration declaration = new IntegerDeclaration(1, true, 1,
-                ByteOrder.BIG_ENDIAN, Encoding.ASCII);
+                ByteOrder.BIG_ENDIAN, Encoding.ASCII, null);
         IDefinitionScope definitionScope = null;
         String fieldName = ""; //$NON-NLS-1$
 

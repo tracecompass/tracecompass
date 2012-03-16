@@ -29,7 +29,7 @@ import org.junit.Test;
 /**
  * The class <code>VariantDefinitionTest</code> contains tests for the class
  * <code>{@link VariantDefinition}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -39,7 +39,7 @@ public class VariantDefinitionTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -49,7 +49,7 @@ public class VariantDefinitionTest {
 
     /**
      * Perform pre-test initialization.
-     * 
+     *
      * Not sure it needs to be that complicated, oh well...
      * 
      * @throws CTFReaderException 
@@ -76,7 +76,7 @@ public class VariantDefinitionTest {
         sDef2 = new StructDefinition(new StructDeclaration(1L), vDef2, fName);
 
         eDef = new EnumDefinition(new EnumDeclaration(new IntegerDeclaration(1,
-                true, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII)), sDef2, fName);
+                true, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, fName)), sDef2, fName);
 
         fixture = new VariantDefinition(vDecl1, sDef1, fName);
         fixture.setTagDefinition(eDef);
@@ -293,7 +293,7 @@ public class VariantDefinitionTest {
         structDef = new StructDefinition(new StructDeclaration(1L), vDef, fName);
         tagDefinition = new EnumDefinition(new EnumDeclaration(
                 new IntegerDeclaration(1, true, 1, ByteOrder.BIG_ENDIAN,
-                        Encoding.ASCII)), structDef, fName);
+                        Encoding.ASCII, fName)), structDef, fName);
 
         fixture.setTagDefinition(tagDefinition);
     }

@@ -22,7 +22,7 @@ import org.junit.Test;
 /**
  * The class <code>SequenceDefinitionTest</code> contains tests for the class
  * <code>{@link SequenceDefinition}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -33,7 +33,7 @@ public class SequenceDefinitionTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -51,7 +51,7 @@ public class SequenceDefinitionTest {
         StructDefinition structDef;
 
         IntegerDeclaration id = new IntegerDeclaration(8, false, 8,
-                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8);
+                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, null);
         String lengthName = "LengthName"; //$NON-NLS-1$
         structDec = new StructDeclaration(0);
         structDec.addField(lengthName, id);
@@ -83,7 +83,7 @@ public class SequenceDefinitionTest {
 
         int len = 32;
         IntegerDeclaration id = new IntegerDeclaration(len, false, len,
-                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8);
+                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, null);
         String lengthName = "LengthName"; //$NON-NLS-1$
         structDec = new StructDeclaration(0);
         structDec.addField(lengthName, id);

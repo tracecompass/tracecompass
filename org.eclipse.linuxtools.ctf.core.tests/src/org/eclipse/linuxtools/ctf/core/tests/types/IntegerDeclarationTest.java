@@ -14,7 +14,7 @@ import org.junit.Test;
 /**
  * The class <code>IntegerDeclarationTest</code> contains tests for the class
  * <code>{@link IntegerDeclaration}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -24,7 +24,7 @@ public class IntegerDeclarationTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -38,7 +38,7 @@ public class IntegerDeclarationTest {
     @Before
     public void setUp() {
         fixture = new IntegerDeclaration(1, true, 1, ByteOrder.BIG_ENDIAN,
-                Encoding.ASCII);
+                Encoding.ASCII, null);
     }
 
     /**
@@ -62,7 +62,7 @@ public class IntegerDeclarationTest {
         Encoding encoding = Encoding.ASCII;
 
         IntegerDeclaration result = new IntegerDeclaration(len, signed, base,
-                byteOrder, encoding);
+                byteOrder, encoding, null);
 
         assertNotNull(result);
         assertEquals(1, result.getBase());
@@ -129,7 +129,7 @@ public class IntegerDeclarationTest {
     @Test
     public void testIsCharacter_8bytes() {
         IntegerDeclaration fixture8 = new IntegerDeclaration(8, true, 1,
-                ByteOrder.BIG_ENDIAN, Encoding.ASCII);
+                ByteOrder.BIG_ENDIAN, Encoding.ASCII, null);
 
         boolean result = fixture8.isCharacter();
         assertEquals(true, result);
@@ -150,7 +150,7 @@ public class IntegerDeclarationTest {
     @Test
     public void testIsSigned_unsigned() {
         IntegerDeclaration fixture_unsigned = new IntegerDeclaration(1, false,
-                1, ByteOrder.BIG_ENDIAN, Encoding.ASCII);
+                1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, null);
 
         boolean result = fixture_unsigned.isSigned();
         assertEquals(false, result);

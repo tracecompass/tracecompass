@@ -28,18 +28,20 @@ public class IntegerDeclaration implements IDeclaration {
     private int base;
     private ByteOrder byteOrder;
     private Encoding encoding;
+    private final String clock;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
     public IntegerDeclaration(int len, boolean signed, int base,
-            ByteOrder byteOrder, Encoding encoding) {
+            ByteOrder byteOrder, Encoding encoding, String clock) {
         this.length = len;
         this.signed = signed;
         this.base = base;
         this.byteOrder = byteOrder;
         this.encoding = encoding;
+        this.clock = clock;
     }
 
     // ------------------------------------------------------------------------

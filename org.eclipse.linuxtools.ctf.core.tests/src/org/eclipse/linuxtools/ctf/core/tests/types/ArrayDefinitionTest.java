@@ -30,7 +30,7 @@ import org.junit.Test;
 /**
  * The class <code>ArrayDefinitionTest</code> contains tests for the class
  * <code>{@link ArrayDefinition}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -41,7 +41,7 @@ public class ArrayDefinitionTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -51,7 +51,7 @@ public class ArrayDefinitionTest {
 
     /**
      * Perform pre-test initialization.
-     * 
+     *
      * structDef shouldn't be null after parsing the CTFTraceReader object, so
      * we can ignore the warning.
      * 
@@ -191,7 +191,7 @@ public class ArrayDefinitionTest {
     @Test
     public void testIsString_complex() {
         final IntegerDeclaration id = new IntegerDeclaration(8, false, 16,
-                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8);
+                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, null);
         ArrayDeclaration ad = new ArrayDeclaration(0, id);
         ArrayDefinition ownFixture = new ArrayDefinition(ad, this.trace,
                 "Testx"); //$NON-NLS-1$
@@ -202,7 +202,7 @@ public class ArrayDefinitionTest {
 
             String content = "test" + i; //$NON-NLS-1$
             defs[i] = new IntegerDefinition(new IntegerDeclaration(8, false,
-                    16, ByteOrder.LITTLE_ENDIAN, Encoding.UTF8), null, content);
+                    16, ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, content), null, content);
             defs[i].setValue(i);
         }
 

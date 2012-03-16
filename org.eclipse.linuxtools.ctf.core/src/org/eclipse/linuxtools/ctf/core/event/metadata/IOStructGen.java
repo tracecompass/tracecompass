@@ -258,9 +258,15 @@ public class IOStructGen {
             switch (type) {
             case CTFParser.INTEGER:
             case CTFParser.DECIMAL_LITERAL:
-                //FIXME
-                //HACK
-                //EVIL
+                /*
+                 * Not a pretty hack, this is to make sure that there is no number
+                 * overflow due to 63 bit integers. The offset should only really
+                 * be an issue in the year 2262. the tracer in C/ASM can write an offset in
+                 * an unsigned 64 bit long. In java, the last bit, being set to 1 will
+                 * be read as a negative number, but since it is too big a positive it will
+                 * throw an exception. this will happen in 2^63 ns from 1970.
+                 * Therefore 293 years from 1970
+                 */
                 Long numValue;
                 try{
                     numValue = Long.parseLong(value.getText());
@@ -1057,7 +1063,7 @@ public class IOStructGen {
          * sequence. For example, int a[3][len] means that we have an array of 3
          * (sequences of length 'len' of (int)).
          */
-        if (lengths != null) {
+        if (lengths.size() > 0 ) {
             /* We begin at the end */
             Collections.reverse(lengths);
 
@@ -1227,8 +1233,7 @@ public class IOStructGen {
         long size = 0;
         long alignment = 0;
         int base = 10;
-        @SuppressWarnings("unused")
-        String clock;
+        String clock = null;
 
         Encoding encoding = Encoding.NONE;
 
@@ -1293,13 +1298,13 @@ public class IOStructGen {
         }
 
         integerDeclaration = new IntegerDeclaration((int) size, signed, base,
-                byteOrder, encoding);
+                byteOrder, encoding, clock);
 
         assert (integerDeclaration != null);
         return integerDeclaration;
     }
 
-    private String getClock(CommonTree rightNode) {
+    private static String getClock(CommonTree rightNode) {
         return rightNode.getChild(1).getChild(0).getChild(0).getText();
     }
 
