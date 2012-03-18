@@ -138,6 +138,18 @@ public interface IStateHistoryBackend {
      */
     public ITmfStateInterval doSingularQuery(long t, int attributeQuark)
             throws TimeRangeException, AttributeNotFoundException;
+    
+    /**
+     * Simple check to make sure the requested timestamps are within the borders
+     * of this state history. This is used internally, but could also be used
+     * by the request sender (to check before sending in a lot of requests for
+     * example).
+     * 
+     * @param t
+     *            The queried timestamp
+     * @return True if the timestamp is within range, false if not.
+     */
+    public boolean checkValidTime(long t);
 
     /**
      * Debug method to print the contents of the history backend.

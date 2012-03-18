@@ -80,8 +80,11 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     /**
      * Existing history constructor. Use this to open an existing state-file.
      * 
-     * @param existingFileName Filename/location of the history we want to load
-     * @throws IOException If we can't read the file, if it doesn't exist or is not recognized
+     * @param existingFileName
+     *            Filename/location of the history we want to load
+     * @throws IOException
+     *             If we can't read the file, if it doesn't exist or is not
+     *             recognized
      */
     public HistoryTreeBackend(File existingStateFile) throws IOException {
         sht = new HistoryTree(existingStateFile);
@@ -161,15 +164,8 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         return getRelevantInterval(t, attributeQuark);
     }
 
-    /**
-     * Simple check to make sure the requested timestamps are within the borders
-     * of this tree.
-     * 
-     * @param t
-     *            The queried timestamp
-     * @return True if it's within range, false if not.
-     */
-    private boolean checkValidTime(long t) {
+    @Override
+    public boolean checkValidTime(long t) {
         return (t >= sht.getTreeStart() && t <= sht.getTreeEnd());
     }
 
@@ -249,8 +245,8 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     }
 
     /**
-     * The basic debugPrint method will print the tree structure, but not
-     * their contents.
+     * The basic debugPrint method will print the tree structure, but not their
+     * contents.
      * 
      * This method here print the contents (the intervals) as well.
      * 

@@ -228,11 +228,20 @@ public class StateHistorySystem extends StateSystem {
     public List<ITmfStateInterval> queryHistoryRange(int attributeQuark, long t1,
             long t2) throws TimeRangeException, AttributeNotFoundException {
 
-        List<ITmfStateInterval> intervals = new ArrayList<ITmfStateInterval>();
+        List<ITmfStateInterval> intervals;
         ITmfStateInterval currentInterval;
         long ts;
+        
+        if ( !(backend.checkValidTime(t1) && backend.checkValidTime(t2)) ) {
+            /* 
+             * One of the two timestamps is out of range, don't bother
+             * with the requests
+             */
+            throw new TimeRangeException();
+        }
 
         /* Get the initial state at time T1 */
+        intervals = new ArrayList<ITmfStateInterval>();
         currentInterval = querySingleState(t1, attributeQuark);
         intervals.add(currentInterval);
 
