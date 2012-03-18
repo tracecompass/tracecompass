@@ -131,11 +131,10 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
         try {
             final CTFTrace temp = new CTFTrace(path);
             return temp.majortIsSet(); // random test
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (CTFReaderException e) {
+            /* Nope, not a CTF trace we can read */
+            return false;
         }
-        return false;
     }
 
     @Override
@@ -335,7 +334,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
         this.fResource = fResource;
     }
 
-    public CTFTrace getCTFTrace() {
+    CTFTrace getCTFTrace() {
         return fTrace;
     }
 }
