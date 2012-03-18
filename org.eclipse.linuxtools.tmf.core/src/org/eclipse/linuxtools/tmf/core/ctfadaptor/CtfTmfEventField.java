@@ -38,7 +38,12 @@ public abstract class CtfTmfEventField implements ITmfEventField {
     // ------------------------------------------------------------------------
 
     protected CtfTmfEventField(String name) {
-        this.name = name;
+        /* Strip the damn underscores, screw you CTF */
+        if ( name.startsWith("_") ) { //$NON-NLS-1$
+            this.name = name.substring(1);
+        } else {
+            this.name = name;
+        }
     }
 
     // ------------------------------------------------------------------------

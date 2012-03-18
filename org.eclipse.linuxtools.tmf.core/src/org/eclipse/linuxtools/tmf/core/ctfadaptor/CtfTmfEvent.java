@@ -250,8 +250,8 @@ public final class CtfTmfEvent implements ITmfEvent {
 
     @Override
     public String getSource() {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO Returns eventName for now
+        return eventName;
     }
 
     @Override

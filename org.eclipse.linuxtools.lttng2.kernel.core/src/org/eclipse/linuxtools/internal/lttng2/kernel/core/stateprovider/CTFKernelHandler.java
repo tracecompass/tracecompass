@@ -76,7 +76,7 @@ class CTFKernelHandler implements Runnable {
 
         try {
             event = inQueue.take();
-            while (event.getTimestamp() != null) {
+            while (event.getTimestampValue() != -1) {
                 processEvent(event);
                 event = inQueue.take();
             }
@@ -109,7 +109,7 @@ class CTFKernelHandler implements Runnable {
     private void processEvent(CtfTmfEvent event) {
         currentEvent = event;
         ITmfEventField content = event.getContent();
-        String eventName = event.getType().getName();
+        String eventName = event.getSource();
 
         long ts = event.getTimestamp().getValue();
         int quark;
