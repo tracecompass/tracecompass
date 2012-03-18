@@ -196,14 +196,14 @@ public class StateSystemFullHistoryTest {
      */
     @Test(expected = TimeRangeException.class)
     public void testFullQueryInvalidTime1() throws TimeRangeException {
-        shs.loadStateAtTime(CTFTestFiles.startTime1 + 20L
+        shs.loadStateAtTime(CTFTestFiles.startTime + 20L
                 * CTFTestFiles.NANOSECS_PER_SEC);
 
     }
 
     @Test(expected = TimeRangeException.class)
     public void testFullQueryInvalidTime2() throws TimeRangeException {
-        shs.loadStateAtTime(CTFTestFiles.startTime1 - 20L
+        shs.loadStateAtTime(CTFTestFiles.startTime - 20L
                 * CTFTestFiles.NANOSECS_PER_SEC);
 
     }
@@ -213,7 +213,7 @@ public class StateSystemFullHistoryTest {
             throws AttributeNotFoundException, TimeRangeException {
 
         int quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
-        long time = CTFTestFiles.startTime1 + 20L
+        long time = CTFTestFiles.startTime + 20L
                 * CTFTestFiles.NANOSECS_PER_SEC;
         shs.querySingleState(time, quark);
     }
@@ -223,7 +223,7 @@ public class StateSystemFullHistoryTest {
             throws AttributeNotFoundException, TimeRangeException {
 
         int quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
-        long time = CTFTestFiles.startTime1 - 20L
+        long time = CTFTestFiles.startTime - 20L
                 * CTFTestFiles.NANOSECS_PER_SEC;
         shs.querySingleState(time, quark);
     }
@@ -233,9 +233,9 @@ public class StateSystemFullHistoryTest {
             TimeRangeException {
 
         int quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
-        long time1 = CTFTestFiles.startTime1 - 20L
+        long time1 = CTFTestFiles.startTime - 20L
                 * CTFTestFiles.NANOSECS_PER_SEC; /* invalid */
-        long time2 = CTFTestFiles.startTime1 + 1L
+        long time2 = CTFTestFiles.startTime + 1L
                 * CTFTestFiles.NANOSECS_PER_SEC; /* valid */
 
         shs.queryHistoryRange(quark, time1, time2);
@@ -246,9 +246,9 @@ public class StateSystemFullHistoryTest {
             AttributeNotFoundException {
 
         int quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
-        long time1 = CTFTestFiles.startTime1 + 1L
+        long time1 = CTFTestFiles.startTime + 1L
                 * CTFTestFiles.NANOSECS_PER_SEC; /* valid */
-        long time2 = CTFTestFiles.startTime1 + 20L
+        long time2 = CTFTestFiles.startTime + 20L
                 * CTFTestFiles.NANOSECS_PER_SEC; /* invalid */
 
         shs.queryHistoryRange(quark, time1, time2);
@@ -259,9 +259,9 @@ public class StateSystemFullHistoryTest {
             AttributeNotFoundException {
 
         int quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
-        long time1 = CTFTestFiles.startTime1 - 1L
+        long time1 = CTFTestFiles.startTime - 1L
                 * CTFTestFiles.NANOSECS_PER_SEC; /* invalid */
-        long time2 = CTFTestFiles.startTime1 + 20L
+        long time2 = CTFTestFiles.startTime + 20L
                 * CTFTestFiles.NANOSECS_PER_SEC; /* invalid */
 
         shs.queryHistoryRange(quark, time1, time2);

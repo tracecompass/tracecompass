@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
 
+import java.io.FileNotFoundException;
+
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CTFDummyInput;
 import org.junit.BeforeClass;
 
@@ -25,7 +27,7 @@ public class CTFDummyInputTest extends CTFKernelStateInputTest {
 
     /* Hiding superclass method */
     @BeforeClass
-    public static void initialize() {
+    public static void initialize() throws FileNotFoundException {
         input = new CTFDummyInput(CTFTestFiles.getTestTrace());
     }
 

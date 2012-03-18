@@ -14,6 +14,8 @@ package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
 
 import static org.junit.Assert.*;
 
+import java.io.FileNotFoundException;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,7 +34,7 @@ public class CTFKernelStateInputTest {
     protected static IStateChangeInput input;
 
     @BeforeClass
-    public static void initialize() {
+    public static void initialize() throws FileNotFoundException {
         input = new CTFKernelStateInput(CTFTestFiles.getTestTrace());
 
     }
@@ -46,7 +48,7 @@ public class CTFKernelStateInputTest {
     public void testOpening() {
         long testStartTime;
         testStartTime = input.getStartTime();
-        assertTrue(testStartTime == CTFTestFiles.startTime1);
+        assertEquals(testStartTime, CTFTestFiles.startTime);
     }
 
     @Test

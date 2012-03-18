@@ -34,23 +34,17 @@ public abstract class CTFTestFiles {
      * and extract it at the root of the project. You can also set up a custom
      * path below.
      */
-    public final static String traceFile1 = "trace1/kernel"; //$NON-NLS-1$
-    public final static long startTime1 = 17620320801208L;
+    public final static String traceFile = "traces/trace2"; //$NON-NLS-1$
+    public final static long startTime = 18669367225825L;
 
-    public static CtfTmfTrace trace1 = null;
+    public static CtfTmfTrace trace = null;
 
-    public static CtfTmfTrace getTestTrace() {
-        if (trace1 == null) {
-            trace1 = new CtfTmfTrace();
-            try {
-                trace1.initTrace("test-trace1", traceFile1, CtfTmfEvent.class); //$NON-NLS-1$
-            } catch (FileNotFoundException e) {
-                /* If we don't have the file, we shouldn't even try the tests... */
-                e.printStackTrace();
-                return null;
-            }
+    public static CtfTmfTrace getTestTrace() throws FileNotFoundException {
+        if (trace == null) {
+            trace = new CtfTmfTrace();
+            trace.initTrace("test-trace2", traceFile, CtfTmfEvent.class); //$NON-NLS-1$
         }
-        return trace1;
+        return trace;
     }
 
 }
