@@ -50,6 +50,8 @@ public class StateSystemFullHistoryTest {
     protected static IStateHistoryBackend hp;
     protected static StateHistorySystem shs;
 
+    private final static long interestingTimestamp1 = 18670067372290L;
+
     protected static String getTestFileName() {
         return "/tmp/statefile.ht"; //$NON-NLS-1$
     }
@@ -118,17 +120,17 @@ public class StateSystemFullHistoryTest {
         int quark, valueInt;
         String valueStr;
 
-        shs.loadStateAtTime(17622841472359L);
+        shs.loadStateAtTime(interestingTimestamp1);
 
         quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
         interval = shs.queryState(quark);
         valueInt = interval.getStateValue().unboxInt();
-        assertTrue(valueInt == 1929);
+        assertEquals(1397, valueInt);
 
-        quark = shs.getQuarkAbsolute("Threads", "1197", "Exec_name");
+        quark = shs.getQuarkAbsolute("Threads", "1432", "Exec_name");
         interval = shs.queryState(quark);
         valueStr = interval.getStateValue().unboxStr();
-        assertTrue(valueStr.equals("apache2"));
+        assertEquals("gdbus", valueStr);
 
         // FIXME fails at the moment (attribute type is int, and = 3129??), I'll
         // figure it out later
@@ -152,15 +154,15 @@ public class StateSystemFullHistoryTest {
     public void testSingleQuery1() throws AttributeNotFoundException,
             TimeRangeException, StateValueTypeException {
 
-        long timestamp = 17622841472359L;
+        long timestamp = interestingTimestamp1;
         int quark;
         ITmfStateInterval interval;
         String valueStr;
 
-        quark = shs.getQuarkAbsolute("Threads", "1197", "Exec_name");
+        quark = shs.getQuarkAbsolute("Threads", "1432", "Exec_name");
         interval = shs.querySingleState(timestamp, quark);
         valueStr = interval.getStateValue().unboxStr();
-        assertTrue(valueStr.equals("apache2"));
+        assertEquals("gdbus", valueStr);
     }
 
     @Test
@@ -177,16 +179,16 @@ public class StateSystemFullHistoryTest {
     public void testRangeQuery1() throws AttributeNotFoundException,
             TimeRangeException, StateValueTypeException {
 
-        long time1 = 17622841472359L;
+        long time1 = interestingTimestamp1;
         long time2 = time1 + 1L * CTFTestFiles.NANOSECS_PER_SEC;
         int quark;
         List<ITmfStateInterval> intervals;
 
         quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
         intervals = shs.queryHistoryRange(quark, time1, time2);
-        assertTrue(intervals.size() == 1018); /* Number of context switches! */
-        assertTrue(intervals.get(100).getStateValue().unboxInt() == 2974);
-        assertTrue(intervals.get(205).getEndTime() == 17622977386059L);
+        assertEquals(487, intervals.size()); /* Number of context switches! */
+        assertEquals(1685, intervals.get(100).getStateValue().unboxInt());
+        assertEquals(18670480869135L, intervals.get(205).getEndTime());
     }
 
     /**
@@ -196,15 +198,15 @@ public class StateSystemFullHistoryTest {
      */
     @Test(expected = TimeRangeException.class)
     public void testFullQueryInvalidTime1() throws TimeRangeException {
-        shs.loadStateAtTime(CTFTestFiles.startTime + 20L
-                * CTFTestFiles.NANOSECS_PER_SEC);
+        long ts = CTFTestFiles.startTime + 20L * CTFTestFiles.NANOSECS_PER_SEC;
+        shs.loadStateAtTime(ts);
 
     }
 
     @Test(expected = TimeRangeException.class)
     public void testFullQueryInvalidTime2() throws TimeRangeException {
-        shs.loadStateAtTime(CTFTestFiles.startTime - 20L
-                * CTFTestFiles.NANOSECS_PER_SEC);
+        long ts = CTFTestFiles.startTime - 20L * CTFTestFiles.NANOSECS_PER_SEC;
+        shs.loadStateAtTime(ts);
 
     }
 
@@ -213,9 +215,8 @@ public class StateSystemFullHistoryTest {
             throws AttributeNotFoundException, TimeRangeException {
 
         int quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
-        long time = CTFTestFiles.startTime + 20L
-                * CTFTestFiles.NANOSECS_PER_SEC;
-        shs.querySingleState(time, quark);
+        long ts = CTFTestFiles.startTime + 20L * CTFTestFiles.NANOSECS_PER_SEC;
+        shs.querySingleState(ts, quark);
     }
 
     @Test(expected = TimeRangeException.class)
@@ -223,9 +224,8 @@ public class StateSystemFullHistoryTest {
             throws AttributeNotFoundException, TimeRangeException {
 
         int quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
-        long time = CTFTestFiles.startTime - 20L
-                * CTFTestFiles.NANOSECS_PER_SEC;
-        shs.querySingleState(time, quark);
+        long ts = CTFTestFiles.startTime - 20L * CTFTestFiles.NANOSECS_PER_SEC;
+        shs.querySingleState(ts, quark);
     }
 
     @Test(expected = TimeRangeException.class)
@@ -233,12 +233,10 @@ public class StateSystemFullHistoryTest {
             TimeRangeException {
 
         int quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
-        long time1 = CTFTestFiles.startTime - 20L
-                * CTFTestFiles.NANOSECS_PER_SEC; /* invalid */
-        long time2 = CTFTestFiles.startTime + 1L
-                * CTFTestFiles.NANOSECS_PER_SEC; /* valid */
+        long ts1 = CTFTestFiles.startTime - 20L * CTFTestFiles.NANOSECS_PER_SEC; /* invalid */
+        long ts2 = CTFTestFiles.startTime + 1L * CTFTestFiles.NANOSECS_PER_SEC; /* valid */
 
-        shs.queryHistoryRange(quark, time1, time2);
+        shs.queryHistoryRange(quark, ts1, ts2);
     }
 
     @Test(expected = TimeRangeException.class)
@@ -246,12 +244,10 @@ public class StateSystemFullHistoryTest {
             AttributeNotFoundException {
 
         int quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
-        long time1 = CTFTestFiles.startTime + 1L
-                * CTFTestFiles.NANOSECS_PER_SEC; /* valid */
-        long time2 = CTFTestFiles.startTime + 20L
-                * CTFTestFiles.NANOSECS_PER_SEC; /* invalid */
+        long ts1 = CTFTestFiles.startTime + 1L * CTFTestFiles.NANOSECS_PER_SEC; /* valid */
+        long ts2 = CTFTestFiles.startTime + 20L * CTFTestFiles.NANOSECS_PER_SEC; /* invalid */
 
-        shs.queryHistoryRange(quark, time1, time2);
+        shs.queryHistoryRange(quark, ts1, ts2);
     }
 
     @Test(expected = TimeRangeException.class)
@@ -259,12 +255,10 @@ public class StateSystemFullHistoryTest {
             AttributeNotFoundException {
 
         int quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
-        long time1 = CTFTestFiles.startTime - 1L
-                * CTFTestFiles.NANOSECS_PER_SEC; /* invalid */
-        long time2 = CTFTestFiles.startTime + 20L
-                * CTFTestFiles.NANOSECS_PER_SEC; /* invalid */
+        long ts1 = CTFTestFiles.startTime - 1L * CTFTestFiles.NANOSECS_PER_SEC; /* invalid */
+        long ts2 = CTFTestFiles.startTime + 20L * CTFTestFiles.NANOSECS_PER_SEC; /* invalid */
 
-        shs.queryHistoryRange(quark, time1, time2);
+        shs.queryHistoryRange(quark, ts1, ts2);
     }
 
     /**
@@ -288,42 +282,36 @@ public class StateSystemFullHistoryTest {
     @Test(expected = StateValueTypeException.class)
     public void testQueryInvalidValuetype1() throws StateValueTypeException,
             AttributeNotFoundException, TimeRangeException {
-
         ITmfStateInterval interval;
         int quark;
 
-        shs.loadStateAtTime(17622841472359L);
-
+        shs.loadStateAtTime(interestingTimestamp1);
         quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
         interval = shs.queryState(quark);
-        interval.getStateValue().unboxStr(); /*
-                                              * This is supposed to be a int
-                                              * value
-                                              */
+
+        /* This is supposed to be an int value */
+        interval.getStateValue().unboxStr();
     }
 
     @Test(expected = StateValueTypeException.class)
     public void testQueryInvalidValuetype2() throws StateValueTypeException,
             AttributeNotFoundException, TimeRangeException {
-
         ITmfStateInterval interval;
         int quark;
 
-        shs.loadStateAtTime(17622841472359L);
-
-        quark = shs.getQuarkAbsolute("Threads", "1197", "Exec_name");
+        shs.loadStateAtTime(interestingTimestamp1);
+        quark = shs.getQuarkAbsolute("Threads", "1432", "Exec_name");
         interval = shs.queryState(quark);
-        interval.getStateValue().unboxInt(); /*
-                                              * This is supposed to be a String
-                                              * value
-                                              */
+
+        /* This is supposed to be a String value */
+        interval.getStateValue().unboxInt();
     }
 
     @Test
     public void testFullAttributeName() throws AttributeNotFoundException {
         int quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
         String name = shs.getFullAttributePath(quark);
-        assertTrue(name.equals("CPUs/0/Current_thread"));
+        assertEquals(name, "CPUs/0/Current_thread");
     }
 
     @Test
