@@ -20,6 +20,7 @@ import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysis
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.TimeEvent;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.ScrollBar;
 
 /**
  * <b><u>ITimeAnalysisWidget</u></b>
@@ -173,5 +174,23 @@ public interface ITimeAnalysisViewer extends ITmfViewer {
      * @param endTime
      */
     public void setTimeBounds(long beginTime, long endTime);
+
+    /**
+     * Get the horizontal scrollbar
+     * @return the horizontal scrollbar
+     */
+    public ScrollBar getHorizontalBar();
+
+    /**
+     * Get the vertical scrollbar
+     * @return the vertical scrollbar
+     */
+    public ScrollBar getVerticalBar();
+
+    /**
+     * Set the top index
+     * @param the top index
+     */
+    public void setTopIndex(int index);
 
 }

@@ -610,6 +610,9 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 		// Obtain the current resource array
 		ITmfTimeAnalysisEntry[] itemArr = itemContainer.readItems();
 
+		// sort the array by pid
+		Arrays.sort(itemArr);
+
 		// clean up data and boundaries
 		displayModel(itemArr, -1, -1, false, -1, -1, null);
 
@@ -640,6 +643,9 @@ public abstract class AbsTimeUpdateView extends TmfView implements IRequestStatu
 				itemContainer.clearItems();
 				// Obtain the current process array
 				ITmfTimeAnalysisEntry[] itemArr = itemContainer.readItems();
+
+				// sort the array by pid
+				Arrays.sort(itemArr);
 
 				long startTime = boundaryRange.getStartTime().getValue();
 				long endTime = boundaryRange.getEndTime().getValue();
