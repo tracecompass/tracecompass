@@ -562,6 +562,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
 //		Tracer.trace(result.toString());
 //	}
 
+    @SuppressWarnings("unchecked")
     @Override
     public synchronized ITmfEvent getNextEvent(ITmfContext context) {
 

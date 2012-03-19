@@ -32,7 +32,6 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 
 /**
  * <b><u>LTTngExperiment</u></b>
@@ -109,6 +108,7 @@ public class LTTngExperiment<T extends ITmfEvent> extends TmfExperiment<T> {
     // ITmfTrace trace positioning
     // ------------------------------------------------------------------------
 
+    @SuppressWarnings("unchecked")
     @Override
     public synchronized ITmfEvent getNextEvent(ITmfContext context) {
 

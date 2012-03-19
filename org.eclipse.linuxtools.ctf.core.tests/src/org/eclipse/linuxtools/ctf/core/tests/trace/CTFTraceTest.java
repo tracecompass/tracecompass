@@ -356,14 +356,14 @@ public class CTFTraceTest {
     public void testSetClock_2() {
         String name = ""; //$NON-NLS-1$
         CTFClock ctfClock = new CTFClock();
-        ctfClock.addAttribute("name", "Bob");
-        ctfClock.addAttribute("pi", new Double(java.lang.Math.PI));
+        ctfClock.addAttribute("name", "Bob"); //$NON-NLS-1$ //$NON-NLS-2$
+        ctfClock.addAttribute("pi", new Double(java.lang.Math.PI)); //$NON-NLS-1$
         fixture.addClock(name, ctfClock);
         CTFClock result = fixture.getClock(name);
 
         assertNotNull(result);
-        assertTrue( (Double)ctfClock.getProperty("pi")> 3.0);
-        assertTrue( ctfClock.getName().equals("Bob"));
+        assertTrue( (Double)ctfClock.getProperty("pi")> 3.0); //$NON-NLS-1$
+        assertTrue( ctfClock.getName().equals("Bob")); //$NON-NLS-1$
     }
 
     /**
@@ -371,7 +371,7 @@ public class CTFTraceTest {
      */
     @Test
     public void testLookupEnvironment_1() {
-        String key = "";
+        String key = ""; //$NON-NLS-1$
         String result = fixture.lookupEnvironment(key);
         assertNull(result);
     }
@@ -381,7 +381,7 @@ public class CTFTraceTest {
      */
     @Test
     public void testLookupEnvironment_2() {
-        String key = "test";
+        String key = "test"; //$NON-NLS-1$
         String result = fixture.lookupEnvironment(key);
         assertNull(result);
     }
@@ -391,7 +391,7 @@ public class CTFTraceTest {
      */
     @Test
     public void testLookupEnvironment_3() {
-        String key = "test";
+        String key = "test"; //$NON-NLS-1$
         fixture.addEnvironmentVar(key, key);
         String result = fixture.lookupEnvironment(key);
         assertTrue(result.equals(key));
@@ -402,9 +402,9 @@ public class CTFTraceTest {
      */
     @Test
     public void testLookupEnvironment_4() {
-        String key = "test";
-        fixture.addEnvironmentVar(key, "bozo");
-        fixture.addEnvironmentVar(key, "the clown");
+        String key = "test"; //$NON-NLS-1$
+        fixture.addEnvironmentVar(key, "bozo"); //$NON-NLS-1$
+        fixture.addEnvironmentVar(key, "the clown"); //$NON-NLS-1$
         String result = fixture.lookupEnvironment(key);
         assertNotNull(result);
     }

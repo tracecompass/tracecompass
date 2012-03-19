@@ -57,7 +57,6 @@ public class ArrayDefinitionTest {
      * 
      * @throws CTFReaderException 
      */
-    @SuppressWarnings("null")
     @Before
     public void setUp() throws CTFReaderException {
         this.trace = TestParams.createTrace();

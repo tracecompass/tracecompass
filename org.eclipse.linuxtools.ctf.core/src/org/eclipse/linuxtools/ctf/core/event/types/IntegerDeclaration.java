@@ -28,6 +28,7 @@ public class IntegerDeclaration implements IDeclaration {
     private int base;
     private ByteOrder byteOrder;
     private Encoding encoding;
+    @SuppressWarnings("unused")
     private final String clock;
 
     // ------------------------------------------------------------------------
