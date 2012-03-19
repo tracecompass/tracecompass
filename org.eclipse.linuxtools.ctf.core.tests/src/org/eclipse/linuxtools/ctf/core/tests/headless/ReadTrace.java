@@ -28,10 +28,10 @@ public class ReadTrace {
      */
     @SuppressWarnings("nls")
     public static void main(String[] args) {
-        final String TRACE_PATH = "Tests/traces/trace20m";
+        final String TRACE_PATH = "Tests/traces/trace20m1";
 
         // Change this to enable text output
-        final boolean USE_TEXT = false;
+        final boolean USE_TEXT = true;
 
         // Work variables
         Long nbEvent = 0L;
@@ -61,7 +61,7 @@ public class ReadTrace {
             }
         }
         stop = System.nanoTime();
-        System.out.println("Time taken for " + nbEvent + " " + (stop - start)
+        System.out.println("Time taken for " + nbEvent + " events " + (stop - start)
                 + "ns ");
         System.out.println(((stop - start) / nbEvent) + "ns/event ");
     }
