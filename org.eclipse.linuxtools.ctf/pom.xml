@@ -18,7 +18,6 @@
   </parent>
 
   <name>Linux Tools LTTng CTF (Common Trace Format)</name>
-  <groupId>org.eclipse.linuxtools.ctf</groupId>
   <artifactId>org.eclipse.linuxtools.ctf</artifactId>
   <version>0.1.0-SNAPSHOT</version>
 
