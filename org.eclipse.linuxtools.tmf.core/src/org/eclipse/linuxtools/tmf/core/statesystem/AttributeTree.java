@@ -285,32 +285,41 @@ final class AttributeTree {
      * Returns the sub-attributes of the quark passed in parameter
      * 
      * @param attributeQuark
+     * @param recursive
      * @return
      * @throws AttributeNotFoundException
      */
-    List<Integer> getSubAttributes(int attributeQuark)
+    List<Integer> getSubAttributes(int attributeQuark, boolean recursive)
             throws AttributeNotFoundException {
         List<Integer> listOfChildren = new ArrayList<Integer>();
         Attribute startingAttribute;
-        
+
         /* Check if the quark is valid */
-        if ( attributeQuark < 0 || attributeQuark >= attributeList.size()) {
+        if (attributeQuark < 0 || attributeQuark >= attributeList.size()) {
             throw new AttributeNotFoundException();
         }
-        
+
         /* Set up the node from which we'll start the search */
-        if ( attributeQuark == -1 ) {
+        if (attributeQuark == -1) {
             startingAttribute = attributeTreeRoot;
         } else {
             startingAttribute = attributeList.get(attributeQuark);
         }
-        
+
         /* Iterate through the sub-attributes and add them to the list */
-        for (Attribute childNode : startingAttribute.getSubAttributesList()) {
-            listOfChildren.add(childNode.getQuark());
-        }
+        addSubAttributes(listOfChildren, startingAttribute, recursive);
 
         return listOfChildren;
+    }
+
+    private void addSubAttributes(List<Integer> list, Attribute curAttribute,
+            boolean recursive) {
+        for (Attribute childNode : curAttribute.getSubAttributesList()) {
+            list.add(childNode.getQuark());
+            if (recursive) {
+                addSubAttributes(list, childNode, true);
+            }
+        }
     }
 
     String getFullAttributeName(int quark) {

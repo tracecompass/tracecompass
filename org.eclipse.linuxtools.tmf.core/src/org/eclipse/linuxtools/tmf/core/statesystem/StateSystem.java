@@ -141,13 +141,16 @@ public class StateSystem {
      * @param quark
      *            The attribute of which you want to sub-attributes. You can use
      *            "-1" here to specify the root node.
+     * @param recursive
+     *            True if you want all recursive sub-attributes, false if you
+     *            only want the first level.
      * @return A List of integers, matching the quarks of the sub-attributes.
      * @throws AttributeNotFoundException
      *             If the quark was not existing or invalid.
      */
-    public List<Integer> getSubAttributes(int quark)
+    public List<Integer> getSubAttributes(int quark, boolean recursive)
             throws AttributeNotFoundException {
-        return attributeTree.getSubAttributes(quark);
+        return attributeTree.getSubAttributes(quark, recursive);
     }
 
     /**
@@ -337,8 +340,13 @@ public class StateSystem {
     public void removeAttribute(long t, int attributeQuark)
             throws TimeRangeException, AttributeNotFoundException {
         assert (attributeQuark >= 0);
-        /* "Nullify our children first, recursively */
-        List<Integer> childAttributes = attributeTree.getSubAttributes(attributeQuark);
+        List<Integer> childAttributes;
+
+        /*
+         * "Nullify our children first, recursively. We pass 'false' because we
+         * handle the recursion ourselves.
+         */
+        childAttributes = attributeTree.getSubAttributes(attributeQuark, false);
         for (Integer childNodeQuark : childAttributes) {
             assert (attributeQuark != childNodeQuark);
             removeAttribute(t, childNodeQuark);
