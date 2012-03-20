@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.ctf.core.tests.headless;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Vector;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
@@ -31,43 +32,61 @@ public class ReadTrace {
         final String TRACE_PATH = "Tests/traces/trace20m1";
 
         // Change this to enable text output
-        final boolean USE_TEXT = true;
+        final boolean USE_TEXT = false;
 
         // Work variables
         Long nbEvent = 0L;
+        Vector<Double> benchs = new Vector<Double>();
         CTFTrace trace = null;
-        try {
-            trace = new CTFTrace(TRACE_PATH);
-        } catch (CTFReaderException e) {
-
-            nbEvent = (long) -1;
-        }
         long start, stop;
-        start = System.nanoTime();
-        if (nbEvent != -1) {
-            CTFTraceReader traceReader = new CTFTraceReader(trace);
+        for (int loops = 0; loops < 100; loops++) {
+            try {
+                nbEvent = 0L;
+                trace = new CTFTrace(TRACE_PATH);
+            } catch (CTFReaderException e) {
+                nbEvent = (long) -1;
+            }
 
             start = System.nanoTime();
-            while (traceReader.hasMoreEvents()) {
-                EventDefinition ed = traceReader.getCurrentEventDef();
-                nbEvent++;
-                if (USE_TEXT) {
-                    String output = formatDate(ed.timestamp + trace.getOffset());
-                    System.out.println("Event " + nbEvent + " Time " + output
-                            + " type " + ed.getDeclaration().getName()
-                            + " on CPU " + ed.getCPU());
+            if (nbEvent != -1) {
+                CTFTraceReader traceReader = new CTFTraceReader(trace);
+
+                start = System.nanoTime();
+                while (traceReader.hasMoreEvents()) {
+                    EventDefinition ed = traceReader.getCurrentEventDef();
+                    nbEvent++;
+                    if (USE_TEXT) {
+                        String output = formatDate(ed.timestamp
+                                + trace.getOffset());
+                        System.out.println("Event " + nbEvent + " Time "
+                                + output + " type "
+                                + ed.getDeclaration().getName() + " on CPU "
+                                + ed.getCPU());
+                    }
+                    traceReader.advance();
                 }
-                traceReader.advance();
             }
+            stop = System.nanoTime();
+            System.out.print('.');
+            double time = (stop - start) / (double) nbEvent;
+            benchs.add(time);
         }
-        stop = System.nanoTime();
-        System.out.println("Time taken for " + nbEvent + " events " + (stop - start)
-                + "ns ");
-        System.out.println(((stop - start) / nbEvent) + "ns/event ");
+        System.out.println("");
+        double avg = 0;
+        for (Double val : benchs) {
+            avg += val;
+        }
+        avg /= benchs.size();
+        System.out.println("Time to read = " + avg + " events/ns");
+        for(Double val:benchs){
+            System.out.print(val );System.out.print( ", ");
+        }
+
     }
 
     /**
-     * @param timestamp the timestamp in UTC to convert to nanoseconds.
+     * @param timestamp
+     *            the timestamp in UTC to convert to nanoseconds.
      * @return formatted string.
      */
     private static String formatDate(long timestamp) {
