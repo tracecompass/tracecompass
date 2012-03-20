@@ -632,4 +632,12 @@ public class CTFTrace implements IDefinitionScope {
         return null;
     }
 
+    public long getOffset() {
+        if(getClock() == null )
+        {
+            return 0;
+        }
+        return (Long) getClock().getProperty("offset");
+    }
+
 }
