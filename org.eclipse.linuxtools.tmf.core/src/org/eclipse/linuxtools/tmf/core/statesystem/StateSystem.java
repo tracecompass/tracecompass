@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.tmf.core.statesystem;
 
 import java.io.PrintWriter;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
@@ -151,6 +152,114 @@ public class StateSystem {
     public List<Integer> getSubAttributes(int quark, boolean recursive)
             throws AttributeNotFoundException {
         return attributeTree.getSubAttributes(quark, recursive);
+    }
+
+    /**
+     * Batch quark-retrieving method. This method allows you to specify a path
+     * pattern which includes a wildcard "*" somewhere. It will check all the
+     * existing attributes in the attribute tree and return those who match the
+     * pattern.
+     * 
+     * For example, passing ("Threads", "*", "Exec_mode") will return the list
+     * of quarks for attributes "Threads/1000/Exec_mode",
+     * "Threads/1500/Exec_mode", and so on, depending on what exists at this
+     * time in the attribute tree.
+     * 
+     * If no wildcard is specified, the behavior is the same as
+     * getQuarkAbsolute() (except it will return a List with one entry). This
+     * method will never create new attributes.
+     * 
+     * Only one wildcard "*" is supported at this time.
+     * 
+     * @param pattern
+     *            The array of strings representing the pattern to look for. It
+     *            should ideally contain one entry that is only a "*".
+     * @return A List of attribute quarks, representing attributes that matched
+     *         the pattern. If no attribute matched, the list will be empty (but
+     *         not null).
+     */
+    public List<Integer> getQuarks(String... pattern) {
+        List<Integer> quarks = new LinkedList<Integer>();
+        List<String> prefix = new LinkedList<String>();
+        List<String> suffix = new LinkedList<String>();
+        boolean split = false;
+        String[] prefixStr;
+        String[] suffixStr;
+        List<Integer> directChildren;
+        int startingAttribute;
+
+        /* Fill the "prefix" and "suffix" parts of the pattern around the '*' */
+        for (String entry : pattern) {
+            if (entry.equals("*")) { //$NON-NLS-1$
+                if (split) {
+                    /*
+                     * Split was already true? This means there was more than
+                     * one wildcard. This is not supported, return an empty
+                     * list.
+                     */
+                    return quarks;
+                }
+                split = true;
+                continue;
+            }
+
+            if (split) {
+                suffix.add(entry);
+            } else {
+                prefix.add(entry);
+            }
+        }
+        prefixStr = prefix.toArray(new String[prefix.size()]);
+        suffixStr = suffix.toArray(new String[suffix.size()]);
+
+        /*
+         * If there was no wildcard, we'll only return the one matching
+         * attribute, if there is one.
+         */
+        if (split == false) {
+            int quark;
+            try {
+                quark = getQuarkAbsolute(prefixStr);
+            } catch (AttributeNotFoundException e) {
+                /* It's fine, we'll just return the empty List */
+                return quarks;
+            }
+            quarks.add(quark);
+            return quarks;
+        }
+
+        try {
+            if (prefix.size() == 0) {
+                /*
+                 * If 'prefix' is empty, this means the wildcard was the first
+                 * element. Look for the root node's sub-attributes.
+                 */
+                startingAttribute = -1;
+            } else {
+                startingAttribute = getQuarkAbsolute(prefixStr);
+            }
+            directChildren = attributeTree.getSubAttributes(startingAttribute,
+                    false);
+        } catch (AttributeNotFoundException e) {
+            /* That attribute path did not exist, return the empty array */
+            return quarks;
+        }
+
+        /*
+         * Iterate of all the sub-attributes, and only keep those who match the
+         * 'suffix' part of the initial pattern.
+         */
+        for (int childQuark : directChildren) {
+            int matchingQuark;
+            try {
+                matchingQuark = getQuarkRelative(childQuark, suffixStr);
+            } catch (AttributeNotFoundException e) {
+                continue;
+            }
+            quarks.add(matchingQuark);
+        }
+
+        return quarks;
     }
 
     /**

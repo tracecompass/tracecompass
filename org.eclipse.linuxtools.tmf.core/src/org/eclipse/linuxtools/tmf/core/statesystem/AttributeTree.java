@@ -295,7 +295,7 @@ final class AttributeTree {
         Attribute startingAttribute;
 
         /* Check if the quark is valid */
-        if (attributeQuark < 0 || attributeQuark >= attributeList.size()) {
+        if (attributeQuark < -1 || attributeQuark >= attributeList.size()) {
             throw new AttributeNotFoundException();
         }
 
