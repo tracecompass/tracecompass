@@ -64,7 +64,7 @@ final class AttributeTree {
 
         /* Message for exceptions, shouldn't be externalized */
         final String errorMessage = "The attribute tree file section is either invalid or corrupted."; //$NON-NLS-1$
-        
+
         ArrayList<String[]> list = new ArrayList<String[]>();
         byte[] curByteArray;
         String curFullString;
@@ -281,12 +281,35 @@ final class AttributeTree {
         return attributeList.get(quark).getSubAttributesList().size();
     }
 
-    ArrayList<Integer> getSubAttributes(int attributeQuark) {
-        ArrayList<Integer> listOfChildren = new ArrayList<Integer>();
-
-        for (Attribute childNode : attributeList.get(attributeQuark).getSubAttributesList()) {
+    /**
+     * Returns the sub-attributes of the quark passed in parameter
+     * 
+     * @param attributeQuark
+     * @return
+     * @throws AttributeNotFoundException
+     */
+    List<Integer> getSubAttributes(int attributeQuark)
+            throws AttributeNotFoundException {
+        List<Integer> listOfChildren = new ArrayList<Integer>();
+        Attribute startingAttribute;
+        
+        /* Check if the quark is valid */
+        if ( attributeQuark < 0 || attributeQuark >= attributeList.size()) {
+            throw new AttributeNotFoundException();
+        }
+        
+        /* Set up the node from which we'll start the search */
+        if ( attributeQuark == -1 ) {
+            startingAttribute = attributeTreeRoot;
+        } else {
+            startingAttribute = attributeList.get(attributeQuark);
+        }
+        
+        /* Iterate through the sub-attributes and add them to the list */
+        for (Attribute childNode : startingAttribute.getSubAttributesList()) {
             listOfChildren.add(childNode.getQuark());
         }
+
         return listOfChildren;
     }
 

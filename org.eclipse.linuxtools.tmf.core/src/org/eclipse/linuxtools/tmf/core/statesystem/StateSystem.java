@@ -136,6 +136,21 @@ public class StateSystem {
     }
 
     /**
+     * Return the sub-attributes of the target attribute, as a List of quarks.
+     * 
+     * @param quark
+     *            The attribute of which you want to sub-attributes. You can use
+     *            "-1" here to specify the root node.
+     * @return A List of integers, matching the quarks of the sub-attributes.
+     * @throws AttributeNotFoundException
+     *             If the quark was not existing or invalid.
+     */
+    public List<Integer> getSubAttributes(int quark)
+            throws AttributeNotFoundException {
+        return attributeTree.getSubAttributes(quark);
+    }
+
+    /**
      * @name External methods related to insertions in the history -
      */
 
