@@ -41,9 +41,11 @@ public class StreamInputPacketReaderTest {
 
     /**
      * Perform pre-test initialization.
+     * 
+     * @throws CTFReaderException 
      */
     @Before
-    public void setUp() {
+    public void setUp() throws CTFReaderException {
         // FIXME The test is broken here. "FileChannel" can't be null because we
         // need it further in. Heck this whole thing shouldn't be public in the
         // first place, perhaps fixing that is the best way to go.
@@ -62,9 +64,11 @@ public class StreamInputPacketReaderTest {
 
     /**
      * Run the StreamInputPacketReader(StreamInputReader) constructor test.
+     * 
+     * @throws CTFReaderException 
      */
     @Test
-    public void testStreamInputPacketReader() {
+    public void testStreamInputPacketReader() throws CTFReaderException {
         StreamInputReader streamInputReader;
         StreamInputPacketReader result;
 

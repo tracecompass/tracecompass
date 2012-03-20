@@ -9,6 +9,7 @@ import java.nio.channels.FileChannel;
 
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.tests.TestParams;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInput;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputPacketIndex;
@@ -39,9 +40,11 @@ public class StreamInputTest {
 
     /**
      * Perform pre-test initialization.
+     * 
+     * @throws CTFReaderException 
      */
     @Before
-    public void setUp() {
+    public void setUp() throws CTFReaderException {
         fixture = new StreamInput(new Stream(TestParams.createTrace()),
                 (FileChannel) null, createFile());
         fixture.setTimestampEnd(1L);

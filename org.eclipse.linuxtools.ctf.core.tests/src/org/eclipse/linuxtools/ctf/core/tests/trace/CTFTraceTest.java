@@ -3,6 +3,7 @@ package org.eclipse.linuxtools.ctf.core.tests.trace;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -10,6 +11,7 @@ import java.nio.ByteOrder;
 import java.util.Map;
 import java.util.UUID;
 
+import org.eclipse.linuxtools.ctf.core.event.CTFClock;
 import org.eclipse.linuxtools.ctf.core.event.metadata.exceptions.ParseException;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
@@ -24,7 +26,7 @@ import org.junit.Test;
 /**
  * The class <code>CTFTraceTest</code> contains tests for the class
  * <code>{@link CTFTrace}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -34,7 +36,7 @@ public class CTFTraceTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -74,7 +76,7 @@ public class CTFTraceTest {
 
     /**
      * Run the CTFTrace(File) constructor test with an invalid path.
-     * 
+     *
      * @throws CTFReaderException
      */
     @Test(expected = org.eclipse.linuxtools.ctf.core.trace.CTFReaderException.class)
@@ -95,11 +97,12 @@ public class CTFTraceTest {
 
     /**
      * Run the void addStream(Stream) method test.
-     * 
+     *
      * @throws ParseException
+     * @throws CTFReaderException 
      */
     @Test
-    public void testAddStream() throws ParseException {
+    public void testAddStream() throws ParseException, CTFReaderException {
         Stream stream = new Stream(TestParams.createTrace());
         stream.setId(1L);
         fixture.addStream(stream);
@@ -303,4 +306,107 @@ public class CTFTraceTest {
         UUID uuid = UUID.randomUUID();
         fixture.setUUID(uuid);
     }
+
+    /**
+     * Run the CTFClock getClock() method test.
+     */
+    @Test
+    public void testGetClock_1() {
+        CTFClock result = fixture.getClock();
+        assertNull(result);
+    }
+
+    /**
+     * Run the CTFClock getClock() method test.
+     *
+     */
+    @Test
+    public void testGetClock_2() {
+        CTFClock result = fixture.getClock("Blabla"); //$NON-NLS-1$
+        assertNull(result);
+    }
+
+    /**
+     * Run the CTFClock getClock(String) method test.
+     */
+    @Test
+    public void testGetClock_3() {
+        String name = ""; //$NON-NLS-1$
+        CTFClock result = fixture.getClock(name);
+        assertNull(result);
+    }
+
+
+    /**
+     * Run the CTFClock getClock(String) method test.
+     */
+    @Test
+    public void testSetClock_1() {
+        String name = ""; //$NON-NLS-1$
+        fixture.addClock(name, new CTFClock());
+        CTFClock result = fixture.getClock(name);
+
+        assertNotNull(result);
+    }
+
+    /**
+     * Run the CTFClock getClock(String) method test.
+     */
+    @Test
+    public void testSetClock_2() {
+        String name = ""; //$NON-NLS-1$
+        CTFClock ctfClock = new CTFClock();
+        ctfClock.addAttribute("name", "Bob"); //$NON-NLS-1$ //$NON-NLS-2$
+        ctfClock.addAttribute("pi", new Double(java.lang.Math.PI)); //$NON-NLS-1$
+        fixture.addClock(name, ctfClock);
+        CTFClock result = fixture.getClock(name);
+
+        assertNotNull(result);
+        assertTrue( (Double)ctfClock.getProperty("pi")> 3.0); //$NON-NLS-1$
+        assertTrue( ctfClock.getName().equals("Bob")); //$NON-NLS-1$
+    }
+
+    /**
+     * Run the String lookupEnvironment(String) method test.
+     */
+    @Test
+    public void testLookupEnvironment_1() {
+        String key = ""; //$NON-NLS-1$
+        String result = fixture.lookupEnvironment(key);
+        assertNull(result);
+    }
+
+    /**
+     * Run the String lookupEnvironment(String) method test.
+     */
+    @Test
+    public void testLookupEnvironment_2() {
+        String key = "test"; //$NON-NLS-1$
+        String result = fixture.lookupEnvironment(key);
+        assertNull(result);
+    }
+
+    /**
+     * Run the String lookupEnvironment(String) method test.
+     */
+    @Test
+    public void testLookupEnvironment_3() {
+        String key = "test"; //$NON-NLS-1$
+        fixture.addEnvironmentVar(key, key);
+        String result = fixture.lookupEnvironment(key);
+        assertTrue(result.equals(key));
+    }
+
+    /**
+     * Run the String lookupEnvironment(String) method test.
+     */
+    @Test
+    public void testLookupEnvironment_4() {
+        String key = "test"; //$NON-NLS-1$
+        fixture.addEnvironmentVar(key, "bozo"); //$NON-NLS-1$
+        fixture.addEnvironmentVar(key, "the clown"); //$NON-NLS-1$
+        String result = fixture.lookupEnvironment(key);
+        assertNotNull(result);
+    }
+
 }

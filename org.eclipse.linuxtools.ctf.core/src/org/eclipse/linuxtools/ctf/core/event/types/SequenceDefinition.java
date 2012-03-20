@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.ctf.core.event.types;
 
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 
 /**
  * <b><u>SequenceDefinition</u></b>
@@ -24,7 +25,7 @@ public class SequenceDefinition extends Definition {
     // ------------------------------------------------------------------------
 
     private final SequenceDeclaration declaration;
-    private IntegerDefinition lengthDefinition;
+    private final IntegerDefinition lengthDefinition;
     private Definition definitions[];
     private int currentLength;
 
@@ -33,27 +34,29 @@ public class SequenceDefinition extends Definition {
     // ------------------------------------------------------------------------
 
     public SequenceDefinition(SequenceDeclaration declaration,
-            IDefinitionScope definitionScope, String fieldName) {
+            IDefinitionScope definitionScope, String fieldName) throws CTFReaderException {
         super(definitionScope, fieldName);
-
+        Definition lenDef = null;
+        
         this.declaration = declaration;
-        // this.definitionScope = definitionScope;
 
         if (definitionScope != null) {
-            Definition lenDef = definitionScope.lookupDefinition(declaration.getLengthName());
-            lengthDefinition = (IntegerDefinition) lenDef;
+            lenDef = definitionScope.lookupDefinition(declaration.getLengthName());
         }
-        /*
-         * if (lenDef == null) { throw new
-         * Exception("Sequence length field not found"); }
-         *
-         * if (!(lenDef instanceof IntegerDefinition)) { throw new
-         * Exception("Sequence length field not integer"); }
-         */
-        /*
-         * if (this.lengthDefinition.declaration.signed) { throw new
-         * Exception("Sequence length must not be signed"); }
-         */
+
+         if (lenDef == null) { 
+             throw new CTFReaderException("Sequence length field not found"); //$NON-NLS-1$
+         }
+        
+         if (!(lenDef instanceof IntegerDefinition)) {
+             throw new CTFReaderException("Sequence length field not integer"); //$NON-NLS-1$
+         }
+
+         lengthDefinition = (IntegerDefinition) lenDef;
+
+        if (this.lengthDefinition.getDeclaration().isSigned()) {
+            throw new CTFReaderException("Sequence length must not be signed"); //$NON-NLS-1$
+        }
     }
 
     // ------------------------------------------------------------------------

@@ -400,7 +400,9 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
             rank += traceRank;
 
             // Set the trace location and read the corresponding event
-            expLocation.getLocation().locations[i] = context.getContexts()[i].getLocation().clone();
+            /* The (TmfContext) cast should be safe since we created 'context'
+             * ourselves higher up. */
+            expLocation.getLocation().locations[i] = ((TmfContext) context.getContexts()[i]).getLocation().clone();
             context.getEvents()[i] = fTraces[i].getNextEvent(context.getContexts()[i]);
         }
 
@@ -560,6 +562,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
 //		Tracer.trace(result.toString());
 //	}
 
+    @SuppressWarnings("unchecked")
     @Override
     public synchronized ITmfEvent getNextEvent(ITmfContext context) {
 
@@ -580,7 +583,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         // If an event was consumed previously, get the next one from that trace
         int lastTrace = expContext.getLastTrace();
         if (lastTrace != TmfExperimentContext.NO_TRACE) {
-            TmfContext traceContext = expContext.getContexts()[lastTrace];
+            ITmfContext traceContext = expContext.getContexts()[lastTrace];
             expContext.getEvents()[lastTrace] = expContext.getTraces()[lastTrace].getNextEvent(traceContext);
             expContext.setLastTrace(TmfExperimentContext.NO_TRACE);
         }
@@ -614,10 +617,10 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         if (trace != TmfExperimentContext.NO_TRACE) {
             updateIndex(expContext, timestamp);
 
-            TmfContext traceContext = expContext.getContexts()[trace];
+            ITmfContext traceContext = expContext.getContexts()[trace];
             TmfExperimentLocation expLocation = (TmfExperimentLocation) expContext.getLocation();
 //	        expLocation.getLocation()[trace] = traceContext.getLocation().clone();
-            expLocation.getLocation().locations[trace] = traceContext.getLocation().clone();
+            expLocation.getLocation().locations[trace] = (ITmfLocation<? extends Comparable<?>>) traceContext.getLocation().clone();
 
 //	        updateIndex(expContext, timestamp);
 
@@ -676,7 +679,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         // If an event was consumed previously, get the next one from that trace
         int lastTrace = expContext.getLastTrace();
         if (lastTrace != TmfExperimentContext.NO_TRACE) {
-            TmfContext traceContext = expContext.getContexts()[lastTrace];
+            ITmfContext traceContext = expContext.getContexts()[lastTrace];
             expContext.getEvents()[lastTrace] = expContext.getTraces()[lastTrace].getNextEvent(traceContext);
             expContext.setLastTrace(TmfExperimentContext.NO_TRACE);
             fExperimentContext = (TmfExperimentContext) context;

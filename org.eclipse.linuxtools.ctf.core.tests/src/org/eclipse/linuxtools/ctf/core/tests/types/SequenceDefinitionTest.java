@@ -14,6 +14,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.SequenceDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.SequenceDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +22,7 @@ import org.junit.Test;
 /**
  * The class <code>SequenceDefinitionTest</code> contains tests for the class
  * <code>{@link SequenceDefinition}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -32,7 +33,7 @@ public class SequenceDefinitionTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -42,14 +43,15 @@ public class SequenceDefinitionTest {
 
     /**
      * Perform pre-test initialization.
+     * @throws CTFReaderException 
      */
     @Before
-    public void setUp() {
+    public void setUp() throws CTFReaderException {
         StructDeclaration structDec;
         StructDefinition structDef;
 
         IntegerDeclaration id = new IntegerDeclaration(8, false, 8,
-                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8);
+                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, null);
         String lengthName = "LengthName"; //$NON-NLS-1$
         structDec = new StructDeclaration(0);
         structDec.addField(lengthName, id);
@@ -75,13 +77,13 @@ public class SequenceDefinitionTest {
         // Add additional tear down code here
     }
 
-    private static SequenceDefinition initNonString() {
+    private static SequenceDefinition initNonString() throws CTFReaderException {
         StructDeclaration structDec;
         StructDefinition structDef;
 
         int len = 32;
         IntegerDeclaration id = new IntegerDeclaration(len, false, len,
-                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8);
+                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, null);
         String lengthName = "LengthName"; //$NON-NLS-1$
         structDec = new StructDeclaration(0);
         structDec.addField(lengthName, id);

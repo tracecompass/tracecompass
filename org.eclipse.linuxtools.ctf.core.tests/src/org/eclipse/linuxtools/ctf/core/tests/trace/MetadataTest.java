@@ -15,7 +15,7 @@ import org.junit.Test;
 /**
  * The class <code>MetadataTest</code> contains tests for the class
  * <code>{@link Metadata}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -25,7 +25,7 @@ public class MetadataTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -35,9 +35,11 @@ public class MetadataTest {
 
     /**
      * Perform pre-test initialization.
+     * 
+     * @throws CTFReaderException 
      */
     @Before
-    public void setUp() {
+    public void setUp() throws CTFReaderException {
         fixture = new Metadata(TestParams.createTrace());
     }
 
@@ -67,8 +69,17 @@ public class MetadataTest {
     }
 
     /**
+     * Test toString
+     */
+    @Test
+    public void testToSting() {
+        String result = fixture.toString();
+        assertNotNull(result);
+    }
+
+    /**
      * Run the void parse() method test.
-     * 
+     *
      * @throws CTFReaderException
      */
     @Test(expected = org.eclipse.linuxtools.ctf.core.trace.CTFReaderException.class)

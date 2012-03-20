@@ -3,3 +3,5 @@ bin
 javaCompiler...args
 build.xml
 target
+
+traces/

@@ -13,6 +13,7 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.internal.lttng.ui.views.controlflow;
 
+import java.util.Arrays;
 import java.util.Vector;
 
 import org.eclipse.jface.action.Action;
@@ -21,9 +22,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -67,19 +65,19 @@ import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeSelectionEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
@@ -129,7 +127,6 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	private TableViewer tableViewer;
 	// private int totalNumItems = 0;
 	// Actions
-	private Action doubleClickAction;
 	private Action resetScale;
 	private Action nextEvent;
 	private Action prevEvent;
@@ -142,10 +139,11 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	private Action zoomFilter;
 
 	private ViewProcessFilter tableFilter = null;
-	private ScrolledComposite scrollFrame = null;
 	
 	private TmfTimeRange initTimeRange = TmfTimeRange.NULL_RANGE;
 
+	private static final Object FILLER = new Object();
+	private static int numFillerRows;
 	// private static SimpleDateFormat stimeformat = new SimpleDateFormat(
 	// "yy/MM/dd HH:mm:ss");
 
@@ -194,7 +192,12 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 		@Override
 		public Object[] getElements(Object inputElement) {
-			return elements;
+            // add filler elements to ensure alignment with time analysis viewer
+            Object[] oElements = Arrays.copyOf(elements, elements.length + numFillerRows, new Object[0].getClass());
+            for (int i = 0; i < numFillerRows; i++) {
+                oElements[elements.length + i] = FILLER;
+            }
+            return oElements;
 		}
 	}
 
@@ -240,6 +243,8 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 				default:
 					break;
 				}
+			} else if (obj == FILLER) {
+			    return ""; //$NON-NLS-1$
 			} else {
 				return getText(obj);
 			}
@@ -287,6 +292,8 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 					// The element is marked to be filtered out
 					return false;
 				}
+			} else if (element == FILLER) {
+			    return true; // never filter the filler element
 			} else {
 				TraceDebug.debug("Unexpected type of filter element received: " //$NON-NLS-1$
 						+ element.toString());
@@ -317,14 +324,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 	@Override
 	public void createPartControl(Composite parent) {
 
-		scrollFrame = new ScrolledComposite(parent, SWT.V_SCROLL);
-		
-		scrollFrame.setExpandVertical(true);
-		scrollFrame.setExpandHorizontal(true);
-		scrollFrame.setAlwaysShowScrollBars(true);
-		
-		SashForm sash = new SashForm(scrollFrame, SWT.NONE);
-		scrollFrame.setContent(sash);
+		SashForm sash = new SashForm(parent, SWT.NONE);
 
 		tableViewer = new TableViewer(sash, SWT.FULL_SELECTION | SWT.H_SCROLL);
 		tableViewer.setContentProvider(new ViewContentProvider(tableViewer));
@@ -339,155 +339,35 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 					if (sel instanceof IStructuredSelection) {
 						firstSel = ((IStructuredSelection) sel).getFirstElement();
 
-						// Make sure the selection is visible
-						updateScrollOrigin();
-
 						if (firstSel instanceof ITmfTimeAnalysisEntry) {
 							ITmfTimeAnalysisEntry trace = (ITmfTimeAnalysisEntry) firstSel;
 							tsfviewer.setSelectedTrace(trace);
+							int selection = tsfviewer.getVerticalBar().getSelection();
+							tableViewer.getTable().setTopIndex(selection);
+						} else if (firstSel == FILLER) {
+						    // filler element was selected, select the last item instead
+						    Table table = tableViewer.getTable();
+						    table.select(table.getItemCount() - 1 - numFillerRows); // subtract the filler elements
+						    Object selectedItem = ((IStructuredSelection) tableViewer.getSelection()).getFirstElement();
+						    if (selectedItem instanceof ITmfTimeAnalysisEntry) {
+						        tsfviewer.setSelectedTrace((ITmfTimeAnalysisEntry) selectedItem);
+						        int selection = tsfviewer.getVerticalBar().getSelection();
+						        tableViewer.getTable().setTopIndex(selection);
+						    }
 						}
 					}
 				}
 			}
-
-			/**
-			 * Make sure the selected item is visible
-			 */
-			private void updateScrollOrigin() {
-				Table table = tableViewer.getTable();
-				if (table != null && table.getItemCount() > 0) {
-					TableItem item = table.getSelection()[0];
-					if (item == null) {
-						// no selected reference to go up or down
-						return;
-					}
-
-					Rectangle itemRect = item.getBounds();
-					int step = itemRect.height;
-
-					// calculate height of horizontal bar
-					int hscrolly = 0;
-					ScrollBar hbar = scrollFrame.getHorizontalBar();
-					if (hbar != null) {
-						hscrolly = hbar.getSize().y;
-					}
-
-					int visibleHeight = scrollFrame.getSize().y - hscrolly;
-
-					// the current scrollbar offset to adjust i.e. start
-					// of
-					// the visible window
-					Point origin = scrollFrame.getOrigin();
-					// end of visible window
-					int endy = origin.y + visibleHeight;
-
-					int itemStartPos = itemRect.y + table.getHeaderHeight() + table.getBorderWidth()
-							+ table.getParent().getBorderWidth();
-
-					// Item End Position
-					int itemEndPos = itemStartPos + step;
-
-					// check if need to go up
-					if (origin.y >= step && itemStartPos < origin.y) {
-						// one step up
-						scrollFrame.setOrigin(origin.x, origin.y - step);
-
-					}
-
-							// check if it needs to go down
-					if (itemEndPos > endy) {
-						// one step down
-						scrollFrame.setOrigin(origin.x, origin.y + step);
-
-							}
-				}
-			}
 		});
-		
-		// Listen to page up /down and Home / Enc keys
-		tableViewer.getTable().addKeyListener(new KeyListener() {
-			@Override
-			public void keyPressed(KeyEvent e) {
-				Table table = tableViewer.getTable();
-				Point origin = scrollFrame.getOrigin();
-				if (table == null || table.getItemCount() < 1) {
-					// nothing to page
-					return;
-				}
 
-				switch (e.keyCode) {
-				case SWT.PAGE_DOWN:
-					updateScrollPageDown();
-					break;
-				case SWT.PAGE_UP:
-					updateScrollUp();
-					break;
-				case SWT.HOME:
-					// Go to the top
-					scrollFrame.setOrigin(origin.x, 0);
-					break;
-				case SWT.END:
-					// End Selected
-					int count = table.getItemCount();
-					TableItem item = table.getItem(count - 1);
-					int itemStartPos = item.getBounds().y;
-					// Get to the bottom
-					scrollFrame.setOrigin(origin.x, itemStartPos);
-					break;
-				default:
-					break;
-				}
-			}
+		table.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseScrolled(MouseEvent e) {
+                ScrollBar scrollBar = tsfviewer.getVerticalBar();
+                tsfviewer.setTopIndex(scrollBar.getSelection() - e.count);
+                tableViewer.getTable().setTopIndex(scrollBar.getSelection());
+            }});
 
-			@Override
-			public void keyReleased(KeyEvent e) {
-				// Nothing to do
-
-			}
-
-			/**
-			 * Scroll one page down
-			 */
-			private void updateScrollPageDown() {
-				// null protection before calling private method
-				Table table = tableViewer.getTable();
-				int step = table.getItemHeight();
-
-				int hscrolly = 0;
-				ScrollBar hbar = scrollFrame.getHorizontalBar();
-				if (hbar != null) {
-					hscrolly = hbar.getSize().y;
-				}
-
-				Point origin = scrollFrame.getOrigin();
-				int visibleHeight = scrollFrame.getSize().y - hscrolly;
-				int endy = origin.y + visibleHeight;
-
-				scrollFrame.setOrigin(origin.x, endy - step);
-			}
-
-			/**
-			 * Scroll one page up
-			 */
-			private void updateScrollUp() {
-				// null protection before calling private method
-				Table table = tableViewer.getTable();
-				int step = table.getItemHeight();
-
-				int hscrolly = 0;
-				ScrollBar hbar = scrollFrame.getHorizontalBar();
-				if (hbar != null) {
-					hscrolly = hbar.getSize().y;
-				}
-
-				Point origin = scrollFrame.getOrigin();
-				int visibleHeight = scrollFrame.getSize().y - hscrolly;
-				int pageUpPos = origin.y - visibleHeight + step;
-				pageUpPos = pageUpPos > 0 ? pageUpPos : 0;
-				scrollFrame.setOrigin(origin.x, pageUpPos);
-			}
-
-		});
 		// Describe table
 		applyTableLayout(table);
 
@@ -497,6 +377,8 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		int headerHeight = table.getHeaderHeight();
 		table.getVerticalBar().setVisible(false);
 
+		numFillerRows = Display.getDefault().getBounds().height / itemHeight;
+
 		tsfviewer = TmfViewerFactory.createViewer(sash, new FlowTimeRangeViewerProvider(getParamsUpdater()));
 
 		// Traces shall not be grouped to allow synchronisation
@@ -504,7 +386,6 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		tsfviewer.setItemHeight(itemHeight);
 		tsfviewer.setBorderWidth(borderWidth);
 		tsfviewer.setHeaderHeight(headerHeight);
-		tsfviewer.setVisibleVerticalScroll(false);
 		// Names provided by the table
 		tsfviewer.setNameWidthPref(0);
 		tsfviewer.setAcceptSelectionAPIcalls(true);
@@ -515,6 +396,22 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 		tsfviewer.addFilterSelectionListner(this);
 		tsfviewer.addWidgetTimeScaleSelectionListner(this);
 
+		tsfviewer.getVerticalBar().addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ScrollBar scrollBar = (ScrollBar) e.widget;
+                int selection = scrollBar.getSelection();
+                tableViewer.getTable().setTopIndex(selection);
+            }});
+
+        tsfviewer.getControl().addControlListener(new ControlAdapter(){
+            @Override
+            public void controlResized(ControlEvent e) {
+                // ensure the viewers are aligned
+                int selection = tsfviewer.getVerticalBar().getSelection();
+                tableViewer.getTable().setTopIndex(selection);
+            }});
+
 		sash.setWeights(new int[] { 1, 1 });
 		// Create the help context id for the viewer's control
 		// TODO: Associate with help system
@@ -524,27 +421,7 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 		makeActions();
 		hookContextMenu();
-		hookDoubleClickAction();
 		contributeToActionBars();
-
-		// scrollFrame.addControlListener(new ControlAdapter() {
-		//
-		// @Override
-		// public void controlResized(ControlEvent e) {
-		// tsfviewer.resizeControls();
-		// updateScrolls(scrollFrame);
-		// }
-		// });
-
-		// set the initial view parameter values
-		// Experiment start and end time
-		// as well as time space width in pixels, used by the time analysis
-		// widget
-		// Read relevant values
-//		int timeSpaceWidth = tsfviewer.getTimeSpace();
-//		if (timeSpaceWidth < 0) {
-//			timeSpaceWidth = -timeSpaceWidth;
-//		}
 
 		TmfExperiment<?> experiment = TmfExperiment.getCurrentExperiment();
 		if (experiment != null) {
@@ -803,31 +680,6 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 						"icons/elcl16/filter_items.gif")); //$NON-NLS-1$
 		zoomFilter.setChecked(false);
 
-		// PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_SYNCED);
-
-		doubleClickAction = new Action() {
-			@Override
-			public void run() {
-				ISelection selection = tableViewer.getSelection();
-				Object obj = ((IStructuredSelection) selection)
-						.getFirstElement();
-				showMessage("Double-click detected on " + obj.toString()); //$NON-NLS-1$
-			}
-		};
-	}
-
-	private void hookDoubleClickAction() {
-		tableViewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(DoubleClickEvent event) {
-				doubleClickAction.run();
-			}
-		});
-	}
-
-	private void showMessage(String message) {
-		MessageDialog.openInformation(tableViewer.getControl().getShell(),
-				Messages.getString("ControlFlowView.msgSlogan"), message); //$NON-NLS-1$
 	}
 
 	/**
@@ -929,16 +781,6 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 
 						tsfviewer.resizeControls();
 
-						// Adjust asynchronously the size of the vertical scroll bar to fit the
-						// contents 
-                        tableViewer.getTable().getDisplay().asyncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                if ((scrollFrame != null) && (!scrollFrame.isDisposed())) {
-                                    updateScrolls(scrollFrame);
-                                }
-                            }
-                        });
 					}
 				}
 			});
@@ -981,14 +823,6 @@ public class ControlFlowView extends AbsTimeUpdateView implements
 			}
 			tableViewer.refresh();
 		}
-	}
-
-	/**
-	 * @param scrollFrame
-	 * @param wrapper
-	 */
-	private void updateScrolls(final ScrolledComposite scrollFrame) {
-		scrollFrame.setMinSize(tableViewer.getTable().computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 
 	/**

@@ -15,9 +15,9 @@ package org.eclipse.linuxtools.tmf.ui.widgets;
 import java.util.ArrayList;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CaretEvent;
 import org.eclipse.swt.custom.CaretListener;
@@ -70,7 +70,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     private static final int SLIDER_MAX = 1000000;
 
     private ITmfTrace<?> fTrace;
-    private TmfContext fBottomContext;
+    private ITmfContext fBottomContext;
     
     private ScrolledComposite fScrolledComposite;
     private Composite fTextArea;
@@ -382,7 +382,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 while (fTopLineIndex < 0) {
                     ITmfLocation<?> endLocation = fLines.get(0).location;
                     firstRatio = Math.max(0, firstRatio - delta);
-                    TmfContext context = fTrace.seekLocation(firstRatio);
+                    ITmfContext context = fTrace.seekLocation(firstRatio);
                     ITmfLocation<?> location;
                     int index = 0;
                     long rank = 0;

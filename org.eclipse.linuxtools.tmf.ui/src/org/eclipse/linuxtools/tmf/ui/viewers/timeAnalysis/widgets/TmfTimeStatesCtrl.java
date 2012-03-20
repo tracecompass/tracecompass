@@ -283,6 +283,14 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
         return changed;
     }
 
+    public void setTopIndex(int idx) {
+        idx = Math.min(idx, _data._items.length - countPerPage());
+        idx = Math.max(0,  idx);
+        _topItem = idx;
+        getVerticalBar().setSelection(_topItem);
+        redraw();
+    }
+
     @Override
     public ISelection getSelection() {
         PlainSelection sel = new PlainSelection();
@@ -1537,17 +1545,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
     public void focusGained(FocusEvent e) {
         _isInFocus = true;
         redraw();
-        if (mouseScrollFilterListener == null) {
-            mouseScrollFilterListener = new Listener() {
-                // This filter is used to prevent scrolling of the view when the
-                // mouse wheel is used to zoom
-                @Override
-                public void handleEvent(Event event) {
-                    event.doit = false;
-                }
-            };
-            getDisplay().addFilter(SWT.MouseWheel, mouseScrollFilterListener);
-        }
     }
 
     @Override
@@ -1558,10 +1555,6 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
             _dragState = DRAG_NONE;
         }
         redraw();
-        if (mouseScrollFilterListener != null) {
-            getDisplay().removeFilter(SWT.MouseWheel, mouseScrollFilterListener);
-            mouseScrollFilterListener = null;
-        }
     }
 
     public boolean isInFocus() {
@@ -1791,10 +1784,25 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
 
     @Override
     public void mouseEnter(MouseEvent e) {
+        if (mouseScrollFilterListener == null) {
+            mouseScrollFilterListener = new Listener() {
+                // This filter is used to prevent scrolling of the view when the
+                // mouse wheel is used to zoom
+                @Override
+                public void handleEvent(Event event) {
+                    event.doit = false;
+                }
+            };
+            getDisplay().addFilter(SWT.MouseWheel, mouseScrollFilterListener);
+        }
     }
 
     @Override
     public void mouseExit(MouseEvent e) {
+        if (mouseScrollFilterListener != null) {
+            getDisplay().removeFilter(SWT.MouseWheel, mouseScrollFilterListener);
+            mouseScrollFilterListener = null;
+        }
         if (_mouseHover) {
             _mouseHover = false;
             redraw();
@@ -1807,7 +1815,7 @@ public class TmfTimeStatesCtrl extends TraceCtrl implements FocusListener, KeyLi
 
     @Override
     public void mouseScrolled(MouseEvent e) {
-        if (!_isInFocus || _dragState != DRAG_NONE)
+        if ((mouseScrollFilterListener == null) || _dragState != DRAG_NONE)
             return;
         if (e.count > 0) {
             zoom(true);

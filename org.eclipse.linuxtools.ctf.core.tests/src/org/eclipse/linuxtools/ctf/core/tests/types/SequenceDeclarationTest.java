@@ -20,7 +20,7 @@ import org.junit.Test;
 /**
  * The class <code>SequenceDeclarationTest</code> contains tests for the class
  * <code>{@link SequenceDeclaration}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -30,7 +30,7 @@ public class SequenceDeclarationTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -70,7 +70,7 @@ public class SequenceDeclarationTest {
     @Test
     public void testCreateDefinition() {
         IntegerDeclaration id = new IntegerDeclaration(8, false, 8,
-                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8);
+                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, null);
         String fieldName = "LengthName"; //$NON-NLS-1$
         StructDeclaration structDec = new StructDeclaration(0);
         structDec.addField(fieldName, id);

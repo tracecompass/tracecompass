@@ -43,13 +43,15 @@ public class StreamInputReaderTest {
 
     /**
      * Perform pre-test initialization.
+     * 
+     * @throws CTFReaderException 
      */
     @Before
-    public void setUp() {
-        fixture = createStreamInputReader();
+    public void setUp() throws CTFReaderException {
+        fixture = getStreamInputReader();
         fixture.setName(1);
         fixture.setCurrentEvent(new EventDefinition(new EventDeclaration(),
-                createStreamInputReader()));
+                getStreamInputReader()));
     }
 
     /**
@@ -60,7 +62,7 @@ public class StreamInputReaderTest {
         // Add additional tear down code here
     }
 
-    private static StreamInputReader createStreamInputReader() {
+    private static StreamInputReader getStreamInputReader() throws CTFReaderException {
         CTFTrace trace = TestParams.createTrace();
         Stream s = trace.getStream((long) 0);
         Set<StreamInput> streamInput = s.getStreamInputs();
@@ -178,11 +180,13 @@ public class StreamInputReaderTest {
     /**
      * Run the seek test. Seek by passing an EventDefinition to which we've
      * given the timestamp we want.
+     * 
+     * @throws CTFReaderException 
      */
     @Test
-    public void testSeek_eventDefinition() {
+    public void testSeek_eventDefinition() throws CTFReaderException {
         EventDefinition eventDefinition = new EventDefinition(
-                new EventDeclaration(), createStreamInputReader());
+                new EventDeclaration(), getStreamInputReader());
         eventDefinition.timestamp = 1L;
         fixture.setCurrentEvent(eventDefinition);
     }

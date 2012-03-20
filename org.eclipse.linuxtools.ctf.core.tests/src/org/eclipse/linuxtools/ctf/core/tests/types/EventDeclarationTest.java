@@ -12,6 +12,7 @@ import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.tests.TestParams;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
 import org.eclipse.linuxtools.ctf.core.trace.Stream;
@@ -44,9 +45,11 @@ public class EventDeclarationTest {
 
     /**
      * Perform pre-test initialization.
+     * 
+     * @throws CTFReaderException 
      */
     @Before
-    public void setUp() {
+    public void setUp() throws CTFReaderException {
         fixture = new EventDeclaration();
         fixture.setContext(new StructDeclaration(1L));
         fixture.setId(1L);
@@ -94,9 +97,11 @@ public class EventDeclarationTest {
 
     /**
      * Run the EventDefinition createDefinition(StreamInputReader) method test.
+     * 
+     * @throws CTFReaderException 
      */
     @Test
-    public void testCreateDefinition() {
+    public void testCreateDefinition() throws CTFReaderException {
         StreamInputReader streamInputReader = new StreamInputReader(
                 new StreamInput(new Stream(TestParams.createTrace()),
                         (FileChannel) null, TestParams.getEmptyFile()));
@@ -107,9 +112,11 @@ public class EventDeclarationTest {
 
     /**
      * Run the boolean equals(Object) method test.
+     * 
+     * @throws CTFReaderException 
      */
     @Test
-    public void testEquals() {
+    public void testEquals() throws CTFReaderException {
         EventDeclaration obj = new EventDeclaration();
         obj.setContext(new StructDeclaration(1L));
         obj.setId(1L);
@@ -326,9 +333,11 @@ public class EventDeclarationTest {
 
     /**
      * Test for the EventDefinition class
+     * 
+     * @throws CTFReaderException 
      */
     @Test
-    public void testEventDefinition() {
+    public void testEventDefinition() throws CTFReaderException {
         CTFTrace trace = TestParams.createTrace();
         CTFTraceReader tr = new CTFTraceReader(trace);
         tr.advance();

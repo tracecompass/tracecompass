@@ -42,6 +42,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.ScrollBar;
 
 public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProvider, SelectionListener {
 
@@ -930,4 +931,29 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	public void waitCursor(boolean waitInd) {
 		_stateCtrl.waitCursor(waitInd);
 	}
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITimeAnalysisViewer#getHorizontalBar()
+     */
+    @Override
+    public ScrollBar getHorizontalBar() {
+        return _stateCtrl.getHorizontalBar();
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITimeAnalysisViewer#getVerticalBar()
+     */
+    @Override
+    public ScrollBar getVerticalBar() {
+        return _stateCtrl.getVerticalBar();
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITimeAnalysisViewer#setTopIndex(int)
+     */
+    @Override
+    public void setTopIndex(int index) {
+        _stateCtrl.setTopIndex(index);
+    }
+
 }

@@ -319,6 +319,9 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     // ITmfTrace
     // ------------------------------------------------------------------------
 
+    @Override
+    public abstract TmfContext seekLocation(ITmfLocation<?> location);
+    
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#seekEvent(org.eclipse.linuxtools.tmf.event.TmfTimestamp)
      */
