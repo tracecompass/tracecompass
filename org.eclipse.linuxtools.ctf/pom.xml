@@ -19,7 +19,10 @@
 
   <name>Linux Tools LTTng CTF (Common Trace Format)</name>
   <artifactId>org.eclipse.linuxtools.ctf</artifactId>
+  <groupid>org.eclipse.linuxtools.ctf</groupid>
   <version>0.1.0-SNAPSHOT</version>
+
+  <packaging>eclipse-feature</packaging>
 
   <build>
     <plugins>
