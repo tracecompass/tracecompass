@@ -140,7 +140,7 @@ public class OpenExperimentHandler extends AbstractHandler {
                     return null;
                 }
                 try {
-                    trace.initTrace(fExperiment.getName(), element.getLocation().getPath(), traceEvent.getClass(), false);
+                    trace.initTrace(element.getName(), element.getLocation().getPath(), traceEvent.getClass(), false);
                 } catch (FileNotFoundException e) {
                     displayErrorMsg(""); //$NON-NLS-1$
                 }
