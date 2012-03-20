@@ -29,10 +29,11 @@ public abstract class CTFTestFiles {
 
     /*
      * To run these tests, you will need to download the following trace, at:
-     * http://www.dorsal.polymtl.ca/~alexmont/data/trace1.tar.bz2
+     * http://www.dorsal.polymtl.ca/~alexmont/data/trace2.tar.bz2
      * 
-     * and extract it at the root of the project. You can also set up a custom
-     * path below.
+     * and extract it in the
+     * .../org.eclipse.linuxtools.lttng2.kernel.core.tests/traces/ directory.
+     * You can also set up a custom path below.
      */
     public final static String traceFile = "traces/trace2"; //$NON-NLS-1$
     public final static long startTime = 18669367225825L;
