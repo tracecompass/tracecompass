@@ -47,14 +47,16 @@ import org.eclipse.swt.graphics.Image;
 import org.junit.After;
 import org.junit.Before;
 
-
 /**
  * The class <code>TraceControlTreeModelTest</code> contains tests for the tree component classes.
  */
 @SuppressWarnings("nls")
 public class TraceControlTreeModelTest extends TestCase {
-    
-    private static final String DIRECTORY   = "testfiles";
+ 
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+
     private static final String TEST_STREAM = "ListInfoTest.cfg";
     private static final String SCEN_LIST_INFO_TEST = "ListInfoTest";
     
@@ -92,7 +94,7 @@ public class TraceControlTreeModelTest extends TestCase {
     @Before
     public void setUp() throws Exception {
         fProxy = new TestRemoteSystemProxy();
-        URL location = FileLocator.find(Activator.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
+        URL location = FileLocator.find(Activator.getDefault().getBundle(), new Path(TraceControlTestFacility.DIRECTORY + File.separator + TEST_STREAM), null);
         File testfile = new File(FileLocator.toFileURL(location).toURI());
         fTestFile = testfile.getAbsolutePath();
     }
@@ -440,6 +442,8 @@ public class TraceControlTreeModelTest extends TestCase {
         assertEquals(TargetNodeState.DISCONNECTED, node.getTargetNodeState());
         assertNotNull(node.getImage());
         assertNotSame(connectedImage, node.getImage());
+        
+        node.getParent().removeChild(node);
     }
     
     private void verifySessionGetterSetters(TraceSessionComponent session) {

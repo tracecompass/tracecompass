@@ -17,6 +17,8 @@ import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.ControlView;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PartInitException;
@@ -32,10 +34,14 @@ public class TraceControlTestFacility {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    final static public int WAIT_FOR_JOBS_DELAY = 1000; 
-    final static public int GUI_REFESH_DELAY = 500;
-
-    final static public String COMMAND_CATEGORY_PREFIX = "org.eclipse.linuxtools.internal.lttng2.ui.commands.control."; //$NON-NLS-1$
+    public final static int WAIT_FOR_JOBS_DELAY = 1000; 
+    public final static int GUI_REFESH_DELAY = 500;
+           
+    public final static String DIRECTORY = "testfiles"; //$NON-NLS-1$
+    public final static String COMMAND_CATEGORY_PREFIX = "org.eclipse.linuxtools.internal.lttng2.ui.commands.control."; //$NON-NLS-1$
+    public final static String SCEN_INIT_TEST = "Initialize"; //$NON-NLS-1$
+    public final static String SCEN_SCENARIO_SESSION_HANDLING = "SessionHandling"; //$NON-NLS-1$
+    public final static String SCEN_SCENARIO_SESSION_HANDLING_WITH_PATH = "SessionHandlingWithPath"; //$NON-NLS-1$
     
     // ------------------------------------------------------------------------
     // Attributes
@@ -86,6 +92,9 @@ public class TraceControlTestFacility {
     }
 
     
+    /**
+     * Disposes the facility (and GUI)
+     */
     public void dispose() {
         if (fIsInitialized) {
             waitForJobs();
@@ -94,7 +103,11 @@ public class TraceControlTestFacility {
             fIsInitialized = false;
         }
     }
-    
+
+    /**
+     * Creates a delay for given time.
+     * @param waitTimeMillis - time in milli seconds
+     */
     public void delay(long waitTimeMillis) {
         Display display = Display.getCurrent();
         if (display != null) {
@@ -123,7 +136,6 @@ public class TraceControlTestFacility {
         }
     }
 
-
     /**
      * @return current control view
      */
@@ -131,10 +143,129 @@ public class TraceControlTestFacility {
         return fControlView;
     }
 
-    public void executeCommand(String commandId) throws ExecutionException, NotDefinedException, NotEnabledException, NotHandledException {
-//        ICommandService commandService = (ICommandService) fControlView.getSite().getService(ICommandService.class);
-        IHandlerService handlerService = (IHandlerService) fControlView.getSite().getService(IHandlerService.class);
-        handlerService.executeCommand(COMMAND_CATEGORY_PREFIX + commandId, null);
+    /**
+     * Executes an Eclipse command with command ID after selecting passed component
+     * @param component - component to select in the tree
+     * @param commandId - command ID
+     * @throws ExecutionException
+     * @throws NotDefinedException
+     * @throws NotEnabledException
+     * @throws NotHandledException
+     */
+    public void executeCommand(ITraceControlComponent component, String commandId) throws ExecutionException, NotDefinedException, NotEnabledException, NotHandledException {
+        setSelection(component);
+        executeCommand(commandId);
+    }
+    
+    /**
+     * Executes an Eclipse command with command ID after selecting passed components
+     * @param components - array of components to select in the tree
+     * @param commandId - command ID
+     * @throws ExecutionException
+     * @throws NotDefinedException
+     * @throws NotEnabledException
+     * @throws NotHandledException
+     */
+    public void executeCommand(ITraceControlComponent[] components, String commandId) throws ExecutionException, NotDefinedException, NotEnabledException, NotHandledException {
+        setSelection(components);
+        executeCommand(commandId);
     }
 
+    /**
+     * Executes an Eclipse command with command ID
+     * @param commandId
+     * @throws ExecutionException
+     * @throws NotDefinedException
+     * @throws NotEnabledException
+     * @throws NotHandledException
+     */
+    public void executeCommand(String commandId) throws ExecutionException, NotDefinedException, NotEnabledException, NotHandledException {
+        IHandlerService handlerService = (IHandlerService) fControlView.getSite().getService(IHandlerService.class);
+        handlerService.executeCommand(COMMAND_CATEGORY_PREFIX + commandId, null);
+        waitForJobs();
+    }
+
+    /**
+     * Selects passed component
+     * @param component - component to select in the tree
+     * @param commandId - command ID
+     */
+    public void setSelection(ITraceControlComponent component) {
+        fControlView.setSelection(component);
+
+        // Give GUI time to actually execute refresh
+        delay(TraceControlTestFacility.GUI_REFESH_DELAY);
+    }
+
+    
+    /**
+     * Selects passed components
+     * @param components - array of component to select in the tree
+     * @param commandId - command ID
+     */
+    public void setSelection(ITraceControlComponent[] components) {
+        fControlView.setSelection(components);
+
+        // Give GUI time to actually execute refresh
+        delay(TraceControlTestFacility.GUI_REFESH_DELAY);
+    }
+    
+    /**
+     * Creates session on passed session group.
+     * @param group - session group
+     * @return - trace session group if it's successful else null
+     * @throws ExecutionException
+     * @throws NotDefinedException
+     * @throws NotEnabledException
+     * @throws NotHandledException
+     */
+    @SuppressWarnings("nls")
+    public TraceSessionComponent createSession(ITraceControlComponent group) throws ExecutionException, NotDefinedException, NotEnabledException, NotHandledException {
+        executeCommand(group, "createSession");
+        
+        ITraceControlComponent[] sessions = group.getChildren();
+        if ((sessions == null) || (sessions.length == 0)) {
+            return null;
+        }
+        return (TraceSessionComponent)sessions[0];
+    }
+    
+    /**
+     * Destroys a given session.
+     * @param session - session to destroy
+     * @throws ExecutionException
+     * @throws NotDefinedException
+     * @throws NotEnabledException
+     * @throws NotHandledException
+     */
+    @SuppressWarnings("nls")
+    public void destroySession(TraceSessionComponent session) throws ExecutionException, NotDefinedException, NotEnabledException, NotHandledException {
+        executeCommand(session, "destroySession");
+    }
+    
+    /**
+     * Starts a given session
+     * @param session - session to start
+     * @throws ExecutionException
+     * @throws NotDefinedException
+     * @throws NotEnabledException
+     * @throws NotHandledException
+     */
+    @SuppressWarnings("nls")
+    public void startSession(TraceSessionComponent session) throws ExecutionException, NotDefinedException, NotEnabledException, NotHandledException {
+        executeCommand(session, "start");
+    }
+    
+    /**
+     * Stops a given session
+     * @param session - session to stop
+     * @throws ExecutionException
+     * @throws NotDefinedException
+     * @throws NotEnabledException
+     * @throws NotHandledException
+     */
+    @SuppressWarnings("nls")
+    public void stopSession(TraceSessionComponent session) throws ExecutionException, NotDefinedException, NotEnabledException, NotHandledException {
+        executeCommand(session, "stop");
+    }
 }

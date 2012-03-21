@@ -22,7 +22,10 @@ public class AllTests {
         //$JUnit-BEGIN$
         suite.addTestSuite(TraceControlComponentTest.class);
         suite.addTestSuite(TraceControlTreeModelTest.class);
-        suite.addTestSuite(TraceControlProviderTests.class);
+        suite.addTestSuite(TraceControlKernelProviderTests.class);
+        suite.addTestSuite(TraceControlUstProviderTests.class);
+        suite.addTestSuite(TraceControlKernelSessionTests.class);
+        suite.addTestSuite(TraceControlUstSessionTests.class);
         suite.addTestSuite(TraceControlPropertiesTest.class);
         //$JUnit-END$
         return new ModelImplTestSetup(suite);

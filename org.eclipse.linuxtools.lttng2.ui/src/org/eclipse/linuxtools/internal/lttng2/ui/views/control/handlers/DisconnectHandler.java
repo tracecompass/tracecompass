@@ -36,9 +36,7 @@ public class DisconnectHandler extends BaseNodeHandler {
     public Object execute(ExecutionEvent event) throws ExecutionException {
         fLock.lock();
         try {
-            ITraceControlComponent root = fTargetNode.getParent();
             fTargetNode.disconnect();
-            root.removeChild(fTargetNode);
         } finally {
             fLock.unlock();
         }

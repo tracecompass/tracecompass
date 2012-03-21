@@ -111,14 +111,13 @@ public class TraceControlPropertiesTest extends TestCase {
      */
     @Override
     @After
-    public void tearDown()  throws Exception {
+    public void tearDown() throws Exception {
     }
     
     /**
      * Run the TraceControlComponent.
      */
-    public void testTraceControlComponents()
-        throws Exception {
+    public void testComponentProperties() throws Exception {
         
         TestRemoteSystemProxy proxy = new TestRemoteSystemProxy();
 
@@ -343,5 +342,10 @@ public class TraceControlPropertiesTest extends TestCase {
         assertEquals("0x0", probeEventSource.getPropertyValue(TraceProbeEventPropertySource.TRACE_EVENT_PROBE_OFFSET_PROPERTY_ID));
         assertEquals("init_post", probeEventSource.getPropertyValue(TraceProbeEventPropertySource.TRACE_EVENT_PROBE_SYMBOL_PROPERTY_ID));
         
+        //-------------------------------------------------------------------------
+        // Delete node
+        //-------------------------------------------------------------------------
+        node.disconnect();
+        node.getParent().removeChild(node);
     }
 }

@@ -123,32 +123,32 @@
       <command
             categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
             description="%commands.control.enable.event.description"
-            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enable.event"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEvent"
             name="%commands.control.enable.event">
       </command>
       <command
             categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
             description="%commands.control.disable.event.description"
-            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.disable.event"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.disableEvent"
             name="%commands.control.disable.event">
       </command>
       <command
             categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
             description="%commands.control.enable.event.description"
-            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enable.eventOnChannel"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnChannel"
             name="%commands.control.enable.event">
       </command>
       <command
             categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
             description="%commands.control.enable.eventOnDomain.description"
-            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enable.eventOnDomain"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnDomain"
             name="%commands.control.enable.eventOnDomain">
       </command>
       <command
             categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
-            description="%commands.control.enable.eventOnDomain.description"
-            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enable.eventOnSession"
-            name="%commands.control.enable.eventOnDomain">
+            description="%commands.control.enable.eventOnSession.description"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnSession"
+            name="%commands.control.enable.eventOnSession">
       </command>
       
    </extension>
@@ -394,7 +394,7 @@
             </visibleWhen>
          </command>
          <command
-               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enable.eventOnSession"
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnSession"
                icon="icons/elcl16/edit.gif"
                label="%commands.control.enable.eventOnDomain"
                style="push">
@@ -448,7 +448,7 @@
                </visibleWhen>
          </command>
          <command
-               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enable.eventOnDomain"
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnDomain"
                icon="icons/elcl16/edit.gif"
                label="%commands.control.enable.eventOnDomain"
                style="push">
@@ -527,7 +527,7 @@
          </command>
 
          <command
-               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enable.event"
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEvent"
                icon="icons/elcl16/edit.gif"
                label="%commands.control.enable.event"
                style="push">
@@ -546,7 +546,7 @@
          </command>
 
          <command
-               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.disable.event"
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.disableEvent"
                icon="icons/elcl16/edit.gif"
                label="%commands.control.disable.event"
                style="push">
@@ -565,7 +565,7 @@
          </command>
 
          <command
-               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enable.eventOnChannel"
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnChannel"
                icon="icons/elcl16/edit.gif"
                label="%commands.control.enable.event"
                style="push">
@@ -808,7 +808,7 @@
 
       <handler
             class="org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.EnableEventHandler"
-            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enable.event">
+            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEvent">
          <activeWhen>
             <with
                   variable="selection">
@@ -824,7 +824,7 @@
 
       <handler
             class="org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.DisableEventHandler"
-            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.disable.event">
+            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.disableEvent">
          <activeWhen>
             <with
                   variable="selection">
@@ -840,7 +840,7 @@
 
       <handler
             class="org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.EnableEventOnChannelHandler"
-            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enable.eventOnChannel">
+            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnChannel">
          <activeWhen>
             <with
                   variable="selection">
@@ -856,7 +856,7 @@
 
       <handler
             class="org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.EnableEventOnDomainHandler"
-            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enable.eventOnDomain">
+            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnDomain">
          <activeWhen>
             <with
                   variable="selection">
@@ -871,7 +871,7 @@
       </handler>
       <handler
             class="org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.EnableEventOnSessionHandler"
-            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enable.eventOnSession">
+            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnSession">
          <activeWhen>
             <with
                   variable="selection">
