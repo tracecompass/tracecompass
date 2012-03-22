@@ -19,11 +19,13 @@ public interface ITimeEvent {
 	public long getTime();
 
 	/**
-	 * Returning <list> <li>-1: Considers duration to be from current event till
-	 * the next</li> <li>0: Duration is not relevant e.g. a Burst / no state
-	 * associated</li> <li>>0: Valid duration value specified</list>
-	 * 
 	 * @return
+	 * <list>
+	 * <li>-1: Considers duration to be from current event till the next</li>
+	 * <li>0: Duration is not relevant e.g. a Burst / no state associated</li>
+	 * <li>>0: Valid duration value specified</li>
+	 * </list>
+	 * <p>
 	 */
 	public long getDuration();
 

@@ -82,8 +82,6 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
      * Returns a context which can later be used to read the event.
      * 
      * @param location
-     * @param timestamp
-     * @param rank
      * @return a context object for subsequent reads
      */
     public ITmfContext seekLocation(ITmfLocation<?> location);
@@ -118,8 +116,8 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
      * Returns the rank of the first event with the requested timestamp. If none, returns the index of the next event
      * (if any).
      * 
-     * @param timestamp
-     * @return
+     * @param timestamp the requested event timestamp
+     * @return the corresponding event rank
      */
     public long getRank(ITmfTimestamp timestamp);
 

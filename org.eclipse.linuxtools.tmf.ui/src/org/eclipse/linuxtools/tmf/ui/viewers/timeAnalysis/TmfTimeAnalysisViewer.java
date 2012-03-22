@@ -903,7 +903,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	/**
 	 * needed in case there's a need to associate a context menu
 	 * 
-	 * @return
+	 * @return the state control (selection provider)
 	 */
 	@Override
 	public Control getControl() {
@@ -913,7 +913,7 @@ public class TmfTimeAnalysisViewer implements ITimeAnalysisViewer, ITimeDataProv
 	/**
 	 * Get the selection provider
 	 * 
-	 * @return
+     * @return the selection provider
 	 */
 	@Override
 	public ISelectionProvider getSelectionProvider() {

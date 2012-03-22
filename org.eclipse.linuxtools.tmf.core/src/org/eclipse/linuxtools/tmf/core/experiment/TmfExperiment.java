@@ -280,8 +280,8 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
      * Returns the rank of the first event with the requested timestamp. If none, returns the index of the next event
      * (if any).
      * 
-     * @param timestamp
-     * @return
+     * @param timestamp the event timestamp
+     * @return the corresponding event rank
      */
     @Override
     public long getRank(ITmfTimestamp timestamp) {
@@ -292,8 +292,8 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     /**
      * Returns the timestamp of the event at the requested index. If none, returns null.
      * 
-     * @param index
-     * @return
+     * @param index the event index (rank)
+     * @return the corresponding event timestamp
      */
     public ITmfTimestamp getTimestamp(int index) {
         TmfExperimentContext context = seekEvent(index);
@@ -538,13 +538,6 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         return null;
     }
 
-    /**
-     * Scan the next events from all traces and return the next one in chronological order.
-     * 
-     * @param context
-     * @return
-     */
-
 //	private void dumpContext(TmfExperimentContext context, boolean isBefore) {
 
 //		TmfContext context0 = context.getContexts()[0];
@@ -562,6 +555,12 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
 //		Tracer.trace(result.toString());
 //	}
 
+    /**
+     * Scan the next events from all traces and return the next one in chronological order.
+     * 
+     * @param context the trace context
+     * @return the next event
+     */
     @SuppressWarnings("unchecked")
     @Override
     public synchronized ITmfEvent getNextEvent(ITmfContext context) {

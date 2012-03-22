@@ -803,52 +803,52 @@ public class ScrollView extends Composite {
     /**
      * Change the size of the contents area.
      * 
-     * @param w new width of the area.
-     * @param h new height of the area.
+     * @param width new width of the area.
+     * @param height new height of the area.
      */
-    public void resizeContents(int _w, int _h) {
+    public void resizeContents(int width, int height) {
         // System.out.println("SV--resizeContents("+_w+","+_h+" ) {");
-        if (_w < 0)
-            _w = 0;
-        if (_h < 0)
-            _h = 0;
+        if (width < 0)
+            width = 0;
+        if (height < 0)
+            height = 0;
 
         int oldW = contents_width_;
         int oldH = contents_height_;
 
-        if (_w == oldW && _h == oldH)
+        if (width == oldW && height == oldH)
             return;
 
         // System.out.println("RESIZE-CONTENTS("+_w+","+_h+")");
-        contents_width_ = _w;
-        contents_height_ = _h;
+        contents_width_ = width;
+        contents_height_ = height;
 
-        if (oldW > _w) {
-            int s = _w;
-            _w = oldW;
+        if (oldW > width) {
+            int s = width;
+            width = oldW;
             oldW = s;
         }
 
         int vis_width = getVisibleWidth();
         int vis_height = getVisibleHeight();
         if (oldW < vis_width) {
-            if (_w > vis_width) {
-                _w = vis_width;
+            if (width > vis_width) {
+                width = vis_width;
             }
-            viewcontrol_.redraw(getContentsX() + oldW, 0, _w - oldW, vis_height, true);
+            viewcontrol_.redraw(getContentsX() + oldW, 0, width - oldW, vis_height, true);
         }
 
-        if (oldH > _h) {
-            int s = _h;
-            _h = oldH;
+        if (oldH > height) {
+            int s = height;
+            height = oldH;
             oldH = s;
         }
 
         if (oldH < vis_height) {
-            if (_h > vis_height) {
-                _h = vis_height;
+            if (height > vis_height) {
+                height = vis_height;
             }
-            viewcontrol_.redraw(0, getContentsY() + oldH, vis_width, _h - oldH, true);
+            viewcontrol_.redraw(0, getContentsY() + oldH, vis_width, height - oldH, true);
         }
         if (updateScrollBarVisiblity()) {
             layout();
@@ -1247,8 +1247,8 @@ public class ScrollView extends Composite {
      * @param y
      * @return org.eclipse.swt.graphics.Point
      */
-    public final Point viewToContents(int _x, int _y) {
-        Point p = new Point(viewToContentsX(_x), viewToContentsY(_y));
+    public final Point viewToContents(int x, int y) {
+        Point p = new Point(viewToContentsX(x), viewToContentsY(y));
         return p;
     }
 
@@ -1269,8 +1269,8 @@ public class ScrollView extends Composite {
      * @param y
      * @return org.eclipse.swt.graphics.Point
      */
-    public final Point contentsToView(int _x, int _y) {
-        Point p = new Point(contentsToViewX(_x), contentsToViewY(_y));
+    public final Point contentsToView(int x, int y) {
+        Point p = new Point(contentsToViewX(x), contentsToViewY(y));
         return p;
     }
 
@@ -1336,8 +1336,6 @@ public class ScrollView extends Composite {
 
     /**
      * Called when ScrollView view is resized.
-     * 
-     * @param _event
      */
     protected void viewResized() {
         // System.out.println("SV--viewResizeEvent()");

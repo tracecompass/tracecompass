@@ -92,8 +92,6 @@ public class CTFTraceReader {
 
     /**
      * Copy constructor
-     *
-     * @return
      */
     public CTFTraceReader copyFrom() {
         CTFTraceReader newReader = null;
@@ -111,7 +109,7 @@ public class CTFTraceReader {
     /**
      * Return the start time of this trace (== timestamp of the first event)
      *
-     * @return
+     * @return the trace start time
      */
     public long getStartTime() {
         return this.startTime;
@@ -267,7 +265,7 @@ public class CTFTraceReader {
      *
      * @param timestamp
      *            the timestamp to seek to
-     * @return
+     * @return true if the trace has more events following the timestamp
      */
     public boolean seek(long timestamp) {
         /*

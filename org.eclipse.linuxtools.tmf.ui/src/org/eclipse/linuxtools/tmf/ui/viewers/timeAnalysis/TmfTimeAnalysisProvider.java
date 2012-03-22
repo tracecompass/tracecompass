@@ -191,7 +191,7 @@ public abstract class TmfTimeAnalysisProvider {
 	 * convert it to an internal color index
 	 * 
 	 * @param event
-	 * @return
+	 * @return the internal color index
 	 */
 	public int getEventColorVal(ITimeEvent event) {
 		StateColor colors = getEventColor(event);
@@ -234,7 +234,7 @@ public abstract class TmfTimeAnalysisProvider {
 	 * Select the color for the different internal variants of events.
 	 * 
 	 * @param event
-	 * @return
+	 * @return the corresponding event color
 	 */
 	public abstract StateColor getEventColor(ITimeEvent event);
 
@@ -244,7 +244,7 @@ public abstract class TmfTimeAnalysisProvider {
 	 * [java.lang.Thread]
 	 * 
 	 * @param trace
-	 * @return
+	 * @return the trace class name
 	 */
 	public abstract String getTraceClassName(ITmfTimeAnalysisEntry trace);
 
@@ -261,7 +261,7 @@ public abstract class TmfTimeAnalysisProvider {
 	 *            True return String value in Upper case
 	 * @param extInfo
 	 *            Verbose, add additional information if applicable
-	 * @return
+	 * @return the event name
 	 */
 	public abstract String getEventName(ITimeEvent event, boolean upper,
 			boolean extInfo);
@@ -303,7 +303,7 @@ public abstract class TmfTimeAnalysisProvider {
 	 * different icons according to specific event /state combination
 	 * 
 	 * @param obj
-	 * @return
+	 * @return the image icon
 	 */
 	public Image getItemImage(Object obj) {
 	    /*

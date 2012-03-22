@@ -46,7 +46,7 @@ public class FilterDialog extends Dialog {
 	}
 
 	/**
-	 * @param fFilter the filter to set
+	 * @param filter the filter to set
 	 */
 	public void setFilter(ITmfFilterTreeNode filter) {
 		fRoot = new TmfFilterNode(null);
@@ -59,7 +59,7 @@ public class FilterDialog extends Dialog {
 	}
 	
 	/**
-	 * @return the fFilter
+	 * @return the filter
 	 */
 	public ITmfFilterTreeNode getFilter() {
 		if (fRoot != null && fRoot.hasChildren()) {

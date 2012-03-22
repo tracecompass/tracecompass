@@ -24,19 +24,23 @@ public class TmfDataRequestStub<T extends TmfEvent> extends TmfDataRequest<T> {
 
     /**
      * Default constructor
+     * 
+     * @param dataType
      */
     public TmfDataRequestStub(Class<T> dataType) {
         super(dataType);
     }
 
     /**
-     * @param nbRequested
+     * @param dataType
+     * @param index
      */
     public TmfDataRequestStub(Class<T> dataType, int index) {
         super(dataType, index);
     }
 
     /**
+     * @param dataType
      * @param index
      * @param nbRequested
      */
@@ -45,6 +49,7 @@ public class TmfDataRequestStub<T extends TmfEvent> extends TmfDataRequest<T> {
     }
 
     /**
+     * @param dataType
      * @param index
      * @param nbRequested
      * @param blockSize
@@ -53,6 +58,9 @@ public class TmfDataRequestStub<T extends TmfEvent> extends TmfDataRequest<T> {
         super(dataType, index, nbRequested, blockSize);
     }
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.linuxtools.tmf.core.request.TmfDataRequest#handleData(org.eclipse.linuxtools.tmf.core.event.ITmfEvent)
+	 */
 	@Override
 	public void handleData(T data) {
 		super.handleData(data);

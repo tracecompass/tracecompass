@@ -642,9 +642,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
 
     /**
-     * @param table
+     * @param columnData
      * 
-     *            FIXME: Add support for column selection
+     * FIXME: Add support for column selection
      */
     protected void setColumnHeaders(ColumnData[] columnData) {
         fTable.setColumnHeaders(columnData);

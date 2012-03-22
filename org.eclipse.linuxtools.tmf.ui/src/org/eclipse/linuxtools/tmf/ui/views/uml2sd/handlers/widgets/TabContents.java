@@ -214,7 +214,7 @@ public class TabContents extends Composite {
     }
 
     /**
-     * @param t
+     * @param found
      */
     public void setResult(boolean found) {
         result.setVisible(!found);
@@ -234,7 +234,6 @@ public class TabContents extends Composite {
 
     /**
      * @param okButton
-     * @todo Generated comment
      */
     public void setOkButton(Button okButton) {
         parentOkButton = okButton;

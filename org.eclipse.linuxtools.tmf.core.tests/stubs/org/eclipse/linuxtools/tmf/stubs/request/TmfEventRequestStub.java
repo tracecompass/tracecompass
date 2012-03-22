@@ -24,13 +24,14 @@ import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 public class TmfEventRequestStub<T extends TmfEvent> extends TmfEventRequest<T> {
 
     /**
-     * @param range
+     * @param dataType
      */
     public TmfEventRequestStub(Class<T> dataType) {
     	super(dataType);
     }
 
     /**
+     * @param dataType
      * @param range
      */
     public TmfEventRequestStub(Class<T> dataType, TmfTimeRange range) {
@@ -38,6 +39,7 @@ public class TmfEventRequestStub<T extends TmfEvent> extends TmfEventRequest<T> 
     }
 
     /**
+     * @param dataType
      * @param range
      * @param nbRequested
      */
@@ -46,14 +48,18 @@ public class TmfEventRequestStub<T extends TmfEvent> extends TmfEventRequest<T> 
     }
     
     /**
+     * @param dataType
      * @param range
      * @param nbRequested
-     * @param blockSize Size of the largest blocks expected
+     * @param blockSize
      */
     public TmfEventRequestStub(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize) {
     	super(dataType, range, nbRequested, blockSize);
     }
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.linuxtools.tmf.core.request.TmfDataRequest#handleData(org.eclipse.linuxtools.tmf.core.event.ITmfEvent)
+	 */
 	@Override
 	public void handleData(T data) {
 		super.handleData(data);

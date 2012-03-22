@@ -491,7 +491,7 @@ public abstract class JniTrace extends Jni_C_Common {
      * Note : If the events were read before, the top event and the event
      * currently loaded (currentEvent) are most likely the same.
      * 
-     * @@return The top event in the stack or null if no event is available or if the heap is null.
+     * @return The top event in the stack or null if no event is available or if the heap is null.
      * 
      * @see org.eclipse.linuxtools.lttng.jni.JniEvent
      */

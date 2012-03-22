@@ -21,13 +21,20 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 /**
  * <b><u>ITmfEventParser</u></b>
  * <p>
- * TODO: Implement me. Please.
  */
 public interface ITmfEventParser<T extends ITmfEvent> {
 
     /**
-     * @return
+     * @return a parsed event
      * @throws IOException 
      */
-	public ITmfEvent parseNextEvent(ITmfTrace<T> stream, ITmfContext context) throws IOException;
+	/**
+	 * Parses the trace event referenced by the context.
+	 * 
+	 * @param trace the event stream
+	 * @param context the trace context
+	 * @return the parsed event
+	 * @throws IOException
+	 */
+	public ITmfEvent parseNextEvent(ITmfTrace<T> trace, ITmfContext context) throws IOException;
 }

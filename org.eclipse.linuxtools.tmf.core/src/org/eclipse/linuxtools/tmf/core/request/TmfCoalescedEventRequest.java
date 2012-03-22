@@ -19,7 +19,6 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 /**
  * <b><u>TmfCoalescedEventRequest</u></b>
  * <p>
- * TODO: Implement me. Please.
  */
 public class TmfCoalescedEventRequest<T extends ITmfEvent> extends TmfCoalescedDataRequest<T> implements ITmfEventRequest<T> {
 
@@ -34,57 +33,117 @@ public class TmfCoalescedEventRequest<T extends ITmfEvent> extends TmfCoalescedD
     // ------------------------------------------------------------------------
 
     /**
-     * @param range
+     * Request all the events of a given type (high priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
      */
     public TmfCoalescedEventRequest(Class<T> dataType) {
         this(dataType, TmfTimeRange.ETERNITY, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
-    public TmfCoalescedEventRequest(Class<T> dataType, ExecutionType execType) {
-        this(dataType, TmfTimeRange.ETERNITY, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
+    /**
+     * Request all the events of a given type (given priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param priority the requested execution priority
+     */
+    public TmfCoalescedEventRequest(Class<T> dataType, ExecutionType priority) {
+        this(dataType, TmfTimeRange.ETERNITY, ALL_DATA, DEFAULT_BLOCK_SIZE, priority);
     }
 
     /**
-     * @param range
+     * Request all the events of a given type for the given time range (high priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param range the time range of the requested events
      */
     public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range) {
         this(dataType, range, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
-    public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, ExecutionType execType) {
-        this(dataType, range, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
+    /**
+     * Request all the events of a given type for the given time range (given priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param range the time range of the requested events
+     * @param priority the requested execution priority
+     */
+    public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, ExecutionType priority) {
+        this(dataType, range, ALL_DATA, DEFAULT_BLOCK_SIZE, priority);
     }
 
     /**
-     * @param range
-     * @param nbRequested
+     * Request 'n' events of a given type from the given time range (high priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param range the time range of the requested events
+     * @param nbRequested the number of events requested
      */
     public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested) {
         this(dataType, range, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
-    
-    public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, ExecutionType execType) {
-        this(dataType, range, nbRequested, DEFAULT_BLOCK_SIZE, execType);
-    }
-    
+
     /**
-     * @param range
-     * @param nbRequested
-     * @param blockSize Size of the largest blocks expected
+     * Request 'n' events of a given type for the given time range (given priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param range the time range of the requested events
+     * @param nbRequested the number of events requested
+     * @param priority the requested execution priority
+     */
+    public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, ExecutionType priority) {
+        this(dataType, range, nbRequested, DEFAULT_BLOCK_SIZE, priority);
+    }
+
+    /**
+     * Request 'n' events of a given type for the given time range (high priority).
+     * Events are returned in blocks of the given size.
+     * 
+     * @param dataType the requested data type
+     * @param range the time range of the requested events
+     * @param nbRequested the number of events requested
+     * @param blockSize the number of events per block
      */
     public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize) {
-    	super(dataType, 0, nbRequested, blockSize, ExecutionType.FOREGROUND);
-    	fRange = range;
+        super(dataType, 0, nbRequested, blockSize, ExecutionType.FOREGROUND);
+        fRange = range;
     }
 
-    public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize, ExecutionType execType) {
-    	super(dataType, 0, nbRequested, blockSize, execType);
-    	fRange = range;
+    /**
+     * Request 'n' events of a given type for the given time range (given priority).
+     * Events are returned in blocks of the given size.
+     * 
+     * @param dataType the requested data type
+     * @param range the time range of the requested events
+     * @param nbRequested the number of events requested
+     * @param blockSize the number of events per block
+     * @param priority the requested execution priority
+     */
+    public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize, ExecutionType priority) {
+        super(dataType, 0, nbRequested, blockSize, priority);
+        fRange = range;
     }
 
-    public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, int index, int nbRequested, int blockSize, ExecutionType execType) {
-    	super(dataType, index, nbRequested, blockSize, execType);
-    	fRange = range;
+    /**
+     * Request 'n' events of a given type for the given time range (given priority).
+     * Events are returned in blocks of the given size.
+     * 
+     * @param dataType the requested data type
+     * @param range the time range of the requested events
+     * @param index the index of the first event to retrieve
+     * @param nbRequested the number of events requested
+     * @param blockSize the number of events per block
+     * @param priority the requested execution priority
+     */
+    public TmfCoalescedEventRequest(Class<T> dataType, TmfTimeRange range, int index, int nbRequested, int blockSize, ExecutionType priority) {
+        super(dataType, index, nbRequested, blockSize, priority);
+        fRange = range;
     }
 
     // ------------------------------------------------------------------------

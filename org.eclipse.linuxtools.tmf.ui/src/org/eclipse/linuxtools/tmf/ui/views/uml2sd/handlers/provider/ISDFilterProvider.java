@@ -28,7 +28,7 @@ public interface ISDFilterProvider extends ISDGraphNodeSupporter {
     /**
      * Called when the Filter dialog box OK button is pressed
      * 
-     * @param toApply user selection made in the dialog box
+     * @param filters user selection made in the dialog box
      * @return true if the filter applied
      */
     public boolean filter(List<?> filters);

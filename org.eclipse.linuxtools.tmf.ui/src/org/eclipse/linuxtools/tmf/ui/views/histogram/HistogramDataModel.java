@@ -302,7 +302,7 @@ public class HistogramDataModel implements IHistogramDataModel {
      * 
      * @param width
      * @param height
-     * @param bar width
+     * @param barWidth
      * @return the result array of size [width] and where the highest value
      *         doesn't exceed [height]
      */

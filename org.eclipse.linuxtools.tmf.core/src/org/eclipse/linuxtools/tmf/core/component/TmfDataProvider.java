@@ -145,8 +145,6 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
 
     /**
      * This method queues the coalesced requests.
-     * 
-     * @param thread
      */
     @Override
     public void fireRequest() {
@@ -390,9 +388,10 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
     /**
      * Checks if the data meets the request completion criteria.
      * 
-     * @param request
-     * @param data
-     * @return
+     * @param request the request
+     * @param data the data to verify
+     * @param nbRead the number of events read so far
+     * @return true if completion criteria is met
      */
     public boolean isCompleted(ITmfDataRequest<T> request, T data, int nbRead) {
         return request.isCompleted() || nbRead >= request.getNbRequested();

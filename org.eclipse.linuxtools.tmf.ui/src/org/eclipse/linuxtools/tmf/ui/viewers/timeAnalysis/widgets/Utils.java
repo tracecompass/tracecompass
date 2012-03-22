@@ -149,27 +149,27 @@ public class Utils {
 	}
 
 	/**
-	 * Formats time in format: MM:SS:NNN
-	 * 
-	 * @param v
-	 * @param option
-	 *            0: MMMM:ss:nnnnnnnnn, 1: HH:MM:ss MMM.mmmm.nnn
-	 * @return
+     * Formats time in format: MM:SS:NNN
+     * 
+	 * @param time time
+	 * @param format  0: MMMM:ss:nnnnnnnnn, 1: HH:MM:ss MMM.mmmm.nnn
+	 * @param resolution the resolution
+	 * @return the formatted time
 	 */
-	static public String formatTime(long v, TimeFormat format, Resolution res) {
+	static public String formatTime(long time, TimeFormat format, Resolution resolution) {
 		// if format is absolute (Calendar)
 		if (format == TimeFormat.ABSOLUTE) {
-			return formatTimeAbs(v, res);
+			return formatTimeAbs(time, resolution);
 		}
 
 		StringBuffer str = new StringBuffer();
-		boolean neg = v < 0;
+		boolean neg = time < 0;
 		if (neg) {
-			v = -v;
+			time = -time;
 			str.append('-');
 		}
 
-		long sec = (long) (v * 1E-9);
+		long sec = (long) (time * 1E-9);
 		// TODO: Expand to make it possible to select the minute, second, nanosecond format
 		//printing minutes is suppressed just sec and ns
 		// if (sec / 60 < 10)
@@ -180,7 +180,7 @@ public class Utils {
 		// if (sec < 10)
 		// str.append('0');
 		str.append(sec);
-		String ns = formatNs(v, res);
+		String ns = formatNs(time, resolution);
 		if (!ns.equals("")) { //$NON-NLS-1$
 			str.append(':');
 			str.append(ns);
@@ -193,7 +193,7 @@ public class Utils {
 	 * From input time in nanoseconds, convert to Date format YYYY-MM-dd
 	 * 
 	 * @param absTime
-	 * @return
+	 * @return the formatted date
 	 */
 	public static String formatDate(long absTime) {
 		String sdate = sdateformat.format(new Date((long) (absTime * 1E-6)));
@@ -204,7 +204,7 @@ public class Utils {
 	 * Formats time in ns to Calendar format: HH:MM:SS MMM.mmm.nnn
 	 * 
 	 * @param time
-	 * @return
+	 * @return the formatted time
 	 */
 	static public String formatTimeAbs(long time, Resolution res) {
 		StringBuffer str = new StringBuffer();
@@ -226,7 +226,7 @@ public class Utils {
 	 * 
 	 * @param time
 	 * @param res
-	 * @return
+	 * @return the formatted nanosec
 	 */
 	public static String formatNs(long time, Resolution res) {
 		StringBuffer temp = new StringBuffer();

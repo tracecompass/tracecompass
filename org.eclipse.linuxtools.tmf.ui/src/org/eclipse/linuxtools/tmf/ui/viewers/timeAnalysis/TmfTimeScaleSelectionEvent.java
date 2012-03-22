@@ -49,28 +49,28 @@ public class TmfTimeScaleSelectionEvent extends EventObject {
 	}
 	
 	/**
-	 * @return
+	 * @return the start time
 	 */
 	public long getTime0() {
 		return time0;
 	}
 	
 	/**
-	 * @return
+	 * @return the end time
 	 */
 	public long getTime1() {
 		return time1;
 	}
 
 	/**
-	 * @return
+	 * @return the selection width
 	 */
 	public int getWidth() {
 		return width;
 	}
 
 	/**
-	 * @return
+	 * @return the selected time
 	 */
 	public long getSelectedTime() {
 		return selectedTime;

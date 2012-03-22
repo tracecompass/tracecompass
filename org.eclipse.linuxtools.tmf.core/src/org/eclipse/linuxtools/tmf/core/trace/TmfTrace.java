@@ -257,8 +257,8 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * Returns the rank of the first event with the requested timestamp. If none, returns the index of the next event
      * (if any).
      * 
-     * @param timestamp
-     * @return
+     * @param timestamp the requested event timestamp
+     * @return the corresponding event rank
      */
     @Override
     public long getRank(ITmfTimestamp timestamp) {
@@ -304,7 +304,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * subsequent read.
      * 
      * @param context
-     * @return
+     * @return the event referred to by context
      */
     @SuppressWarnings("unchecked")
     @Override

@@ -455,8 +455,9 @@ public class TmfStatisticsView extends TmfView {
 
     /**
      * Perform the request for an experiment and populates the statistics tree with event.
+     * 
      * @param experiment experiment for which we need the statistics data.
-     * @param time range to request
+     * @param timeRange to request
      */
     @SuppressWarnings("unchecked")
     protected void requestData(final TmfExperiment<?> experiment, TmfTimeRange timeRange) {

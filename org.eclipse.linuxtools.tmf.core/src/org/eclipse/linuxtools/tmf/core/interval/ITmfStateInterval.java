@@ -29,28 +29,28 @@ public interface ITmfStateInterval {
     /**
      * Retrieve the start time of the interval
      * 
-     * @return
+     * @return the start time of the interval
      */
     public long getStartTime();
 
     /**
      * Retrieve the end time of the interval
      * 
-     * @return
+     * @return the end time of the interval
      */
     public long getEndTime();
 
     /**
      * Retrieve the quark of the attribute this state interval refers to
      * 
-     * @return
+     * @return the quark of the attribute this state interval refers to
      */
     public int getAttribute();
 
     /**
      * Retrieve the state value represented by this interval
      * 
-     * @return
+     * @return the state value represented by this interval
      */
     public ITmfStateValue getStateValue();
 

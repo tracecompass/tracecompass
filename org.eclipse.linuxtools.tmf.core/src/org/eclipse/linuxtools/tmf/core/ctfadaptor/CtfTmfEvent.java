@@ -201,7 +201,7 @@ public final class CtfTmfEvent implements ITmfEvent {
      * this ID is not constant from one trace to another for the same event
      * types! Use "getEventName()" for a constant reference.
      *
-     * @return
+     * @return the event ID
      */
     public long getID() {
         return this.typeId;

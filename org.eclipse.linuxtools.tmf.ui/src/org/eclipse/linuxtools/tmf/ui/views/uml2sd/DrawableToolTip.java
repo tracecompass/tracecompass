@@ -88,14 +88,13 @@ public class DrawableToolTip implements PaintListener {
      * Display the tooltip using the given time range(min,max) the current value and the time unit The tooltip will stay
      * on screen until it is told otherwise
      * 
-     * @param _value the current in the scale
-     * @param _min the scale min
-     * @param _max the scale max
-     * @param unit the scale unit
+     * @param value the current in the scale
+     * @param min the scale min
+     * @param max the scale max
      */
-    public void showToolTip(ITmfTimestamp _value, ITmfTimestamp min, ITmfTimestamp max) {
+    public void showToolTip(ITmfTimestamp value, ITmfTimestamp min, ITmfTimestamp max) {
         minMaxRange = new TmfTimeRange(min.clone(), max.clone());
-        currentValue = _value.clone();
+        currentValue = value.clone();
 
         int w = toolTipShell.getBounds().width;
         int h = toolTipShell.getBounds().height;

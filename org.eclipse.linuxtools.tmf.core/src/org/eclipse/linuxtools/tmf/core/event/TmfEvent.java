@@ -83,7 +83,7 @@ public class TmfEvent implements ITmfEvent {
      * @param timestamp the event timestamp
      * @param source the event source
      * @param type the event type
-     * @param type the event content (payload)
+     * @param content the event content (payload)
      * @param reference the event reference
      */
     public TmfEvent(ITmfTrace<? extends ITmfEvent> trace, long rank, ITmfTimestamp timestamp, String source,
@@ -180,14 +180,14 @@ public class TmfEvent implements ITmfEvent {
     // ------------------------------------------------------------------------
 
     /**
-     * @param trace the new event tarce
+     * @param trace the new event trace
      */
     protected void setTrace(ITmfTrace<? extends ITmfEvent> trace) {
         fTrace = trace;
     }
 
     /**
-     * @param source the new event source
+     * @param rank the new event rank
      */
     protected void setRank(long rank) {
         fRank = rank;

@@ -152,9 +152,9 @@ public abstract class TmfFilterTreeNode implements ITmfFilterTreeNode, Cloneable
 	public abstract boolean matches(ITmfEvent event);
 
     /**
-     * @param event
-     * @param field
-     * @return
+     * @param event the event
+     * @param field the field id
+     * @return the field value
      */
     protected Object getFieldValue(ITmfEvent event, String field) {
         Object value = null;

@@ -237,22 +237,22 @@ public class Frame extends BasicFrame {
      * Adds a lifeline to the frame lifelines list. The lifeline X drawing order depends on the lifeline addition order
      * into the frame lifelines list.
      * 
-     * @param the lifeline to add
+     * @param lifeline the lifeline to add
      */
-    public void addLifeLine(Lifeline lifeLine) {
+    public void addLifeLine(Lifeline lifeline) {
         computeMinMax = true;
-        if (lifeLine == null)
+        if (lifeline == null)
             return;
         // set the lifeline parent frame
-        lifeLine.setFrame(this);
+        lifeline.setFrame(this);
         // Increate the frame lifeline counter
         // and set the lifeline drawing order
-        lifeLine.setIndex(getNewHorizontalIndex());
-        if (lifeLine.hasTimeInfo()) {
+        lifeline.setIndex(getNewHorizontalIndex());
+        if (lifeline.hasTimeInfo()) {
             timeInfo = true;
         }
         // add the lifeline to the lifelines list
-        addNode(lifeLine);
+        addNode(lifeline);
     }
 
     /**
@@ -542,7 +542,7 @@ public class Frame extends BasicFrame {
      * For drawing performance reason, it is recommended to add synchronous syncMessages in the same order they should
      * appear along the Y axis in the Frame.
      * 
-     * @param the message to add
+     * @param message the message to add
      */
     public void addMessage(BaseMessage message) {
         addNode(message);

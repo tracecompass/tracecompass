@@ -1060,7 +1060,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     /**
      * Gets time range for time range signal.
      * @param startTime The start time of time range.
-     * @return
+     * @return the time range
      */
     protected TmfTimeRange getSignalTimeRange(ITmfTimestamp startTime) {
         fLock.lock();
@@ -1099,7 +1099,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
     /**
      * Checks if filter criteria matches a lifeline name (sender or receiver) in given SD event. 
-     * @param sdEvent The SD event to check
+     * @param lifeline the message receiver
      * @return true if match else false.
      */
     protected boolean filterLifeLine(String lifeline) {
