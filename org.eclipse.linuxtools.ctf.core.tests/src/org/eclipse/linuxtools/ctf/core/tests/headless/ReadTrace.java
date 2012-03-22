@@ -34,35 +34,45 @@ public class ReadTrace {
         // Change this to enable text output
         final boolean USE_TEXT = false;
 
+        final int LOOP_COUNT = 1;
+
         // Work variables
         Long nbEvent = 0L;
         Vector<Double> benchs = new Vector<Double>();
         CTFTrace trace = null;
         long start, stop;
-        for (int loops = 0; loops < 100; loops++) {
+        for (int loops = 0; loops < LOOP_COUNT; loops++) {
             try {
                 nbEvent = 0L;
                 trace = new CTFTrace(TRACE_PATH);
             } catch (CTFReaderException e) {
-                nbEvent = (long) -1;
+                // do nothing
             }
-
+            long prev = -1;
             start = System.nanoTime();
-            if (nbEvent != -1) {
+            if (USE_TEXT) {
+                System.out.println("Event, " + " Time, " + " type, " + " CPU ");
+            }
+            if (trace != null) {
                 CTFTraceReader traceReader = new CTFTraceReader(trace);
 
                 start = System.nanoTime();
+
                 while (traceReader.hasMoreEvents()) {
                     EventDefinition ed = traceReader.getCurrentEventDef();
                     nbEvent++;
+                    if (prev == traceReader.getIndex()) {
+                        System.out.println("Error on events " + prev);
+                    }
+                    prev = traceReader.getIndex();
                     if (USE_TEXT) {
                         String output = formatDate(ed.timestamp
                                 + trace.getOffset());
-                        System.out.println("Event " + nbEvent + " Time "
-                                + output + " type "
-                                + ed.getDeclaration().getName() + " on CPU "
-                                + ed.getCPU());
+                        System.out.println(traceReader.getIndex() + ", "
+                                + output + ", " + ed.getDeclaration().getName()
+                                + ", " + ed.getCPU());
                     }
+
                     traceReader.advance();
                 }
             }
@@ -78,8 +88,9 @@ public class ReadTrace {
         }
         avg /= benchs.size();
         System.out.println("Time to read = " + avg + " events/ns");
-        for(Double val:benchs){
-            System.out.print(val );System.out.print( ", ");
+        for (Double val : benchs) {
+            System.out.print(val);
+            System.out.print(", ");
         }
 
     }

@@ -53,6 +53,11 @@ public class StreamInputPacketIndexEntry {
      */
     public long timestampEnd = 0;
 
+
+    public long indexBegin = 0;
+
+    public long rankEnd = 0;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -82,6 +87,10 @@ public class StreamInputPacketIndexEntry {
      */
     boolean includes(long ts) {
         return (ts >= timestampBegin) && (ts <= timestampEnd);
+    }
+
+    boolean includesRank(long rank){
+        return (rank >= indexBegin) && (rank <= rankEnd);
     }
 
     @Override
