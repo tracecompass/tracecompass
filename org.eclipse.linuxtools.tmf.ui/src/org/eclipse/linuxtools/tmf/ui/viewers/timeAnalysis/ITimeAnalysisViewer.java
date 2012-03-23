@@ -189,7 +189,7 @@ public interface ITimeAnalysisViewer extends ITmfViewer {
 
     /**
      * Set the top index
-     * @param the top index
+     * @param index the top index
      */
     public void setTopIndex(int index);
 

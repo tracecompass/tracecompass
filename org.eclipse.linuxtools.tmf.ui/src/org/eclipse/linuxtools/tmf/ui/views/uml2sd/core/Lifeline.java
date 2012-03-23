@@ -170,7 +170,7 @@ public class Lifeline extends GraphNode {
      * operation mostly to store in the frame the greater event found in the diagram (used to determine the frame
      * height)
      * 
-     * @param index the new current event occurrence
+     * @param eventOcc the new current event occurrence
      */
     public void setCurrentEventOccurrence(int eventOcc) {
         if ((frame != null) && (frame.getMaxEventOccurrence() < eventOcc))
@@ -316,8 +316,8 @@ public class Lifeline extends GraphNode {
      * Force the lifeline to be drawn at the given coordinate
      * 
      * @param context - the context to draw into
-     * @param x1 - the x coordinate
-     * @param y1 - the y coordinate
+     * @param x - the x coordinate
+     * @param y - the y coordinate
      */
     public void draw(IGC context, int x, int y) {
         // Set the draw color depending if the lifeline must be selected or not

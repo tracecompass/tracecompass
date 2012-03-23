@@ -32,7 +32,7 @@ public class TmfStatisticsTreeRootFactory {
     /**
      * Provide a statisticsTree instance per trace
      * 
-     * @return
+     * @return the corresponding trace statistics tree
      */
     public static TmfStatisticsTreeNode getStatTreeRoot(String traceUniqueId) {
 
@@ -46,7 +46,7 @@ public class TmfStatisticsTreeRootFactory {
     /**
      * 
      * @param traceUniqueId
-     * @return
+     * @return the corresponding trace statistics tree
      */
     public static AbsTmfStatisticsTree getStatTree(String traceUniqueId) {
         if (traceUniqueId == null)
@@ -59,10 +59,10 @@ public class TmfStatisticsTreeRootFactory {
     /**
      * Add the new trace statistics data in the tree. Can be used later on if the same traces is selected back.
      * 
-     * @param experimentName
+     * @param traceUniqueId
      *            the name of the trace which will be used as a key to store the data. Must be different for each traces, otherwise the traces might
      *            be overwritten which would trigger a reload of the same trace.
-     * @param data
+     * @param statsData
      *            the information about the trace
      */
     public static void addStatsTreeRoot(String traceUniqueId, AbsTmfStatisticsTree statsData) {
@@ -77,7 +77,7 @@ public class TmfStatisticsTreeRootFactory {
     /**
      * 
      * @param traceUniqueId
-     * @return
+     * @return true if the trace id is known
      */
     public static boolean containsTreeRoot(String traceUniqueId) {
         return fTreeInstances.containsKey(traceUniqueId);

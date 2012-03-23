@@ -18,7 +18,7 @@ import java.util.List;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessage;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessageReturn;
@@ -100,8 +100,10 @@ public class SearchFilterDialog extends Dialog {
     }
 
     /**
-     * @param theView
-     * @param _provider
+     * @param view_
+     * @param provider_
+     * @param filter_
+     * @param style
      */
     public SearchFilterDialog(SDView view_, ISDGraphNodeSupporter provider_, boolean filter_, int style) {
         super(view_.getSDWidget().getShell());
@@ -285,8 +287,6 @@ public class SearchFilterDialog extends Dialog {
 
     /**
      * Get the current end-user settings from the dialog to a Criteria
-     * 
-     * @param content
      */
     public void copyToCriteria() {
         criteria = new Criteria();
@@ -302,8 +302,7 @@ public class SearchFilterDialog extends Dialog {
     }
 
     /**
-     * @return
-     * @todo Generated comment
+     * @return the tab content
      */
     protected TabContents getTabContents() {
         TabContents content = null;

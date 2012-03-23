@@ -50,8 +50,8 @@ public class TmfFilterXMLWriter {
 	/**
 	 * The XMLParser constructor
 	 * 
-	 * @param uri The XML file to parse
-	 * @throws ParserConfigurationException 
+     * @param root The tree root
+   	 * @throws ParserConfigurationException 
 	 */ 
 	public TmfFilterXMLWriter(final ITmfFilterTreeNode root) throws IOException, ParserConfigurationException {
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();

@@ -19,7 +19,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
-import org.eclipse.linuxtools.tmf.stubs.request.TmfEventRequestStub;
+import org.eclipse.linuxtools.tmf.tests.stubs.request.TmfEventRequestStub;
 
 /**
  * <b><u>TmfEventRequestTest</u></b>

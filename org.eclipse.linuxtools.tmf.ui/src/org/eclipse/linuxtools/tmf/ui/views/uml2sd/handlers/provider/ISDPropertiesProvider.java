@@ -22,7 +22,7 @@ public interface ISDPropertiesProvider {
     /**
      * Returns the IPropertySheetEntry that will fill in the properties view
      * 
-     * @return
+     * @return the property sheet entry
      */
     public IPropertySheetPage getPropertySheetEntry();
 

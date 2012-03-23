@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.core.event;
 
 import java.util.HashMap;
 
+
 /**
  * <b><u>TmfEventTypeManager</u></b>
  * <p>

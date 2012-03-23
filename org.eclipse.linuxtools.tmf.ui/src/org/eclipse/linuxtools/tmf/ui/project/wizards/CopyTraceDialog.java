@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.tmf.ui.project.wizards;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.CoreException;
@@ -26,10 +26,11 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
-import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
@@ -58,7 +59,7 @@ public class CopyTraceDialog extends SelectionStatusDialog {
 
     private final TmfTraceElement fTrace;
     private Text fNewTraceName;
-    private IContainer fTraceFolder;
+    private IFolder fTraceFolder;
     private TmfProjectElement fProject;
 
     // ------------------------------------------------------------------------
@@ -68,8 +69,8 @@ public class CopyTraceDialog extends SelectionStatusDialog {
     public CopyTraceDialog(Shell shell, TmfTraceElement trace) {
         super(shell);
         fTrace = trace;
-        ITmfProjectModelElement parent = trace.getParent();
-        fTraceFolder = (IContainer) parent.getResource();
+        TmfTraceFolder folder = (TmfTraceFolder) trace.getParent();
+        fTraceFolder = folder.getResource();
         fProject = trace.getProject();
         setTitle(Messages.CopyTraceDialog_DialogTitle);
         setStatusLineAboveButtons(true);
@@ -185,7 +186,7 @@ public class CopyTraceDialog extends SelectionStatusDialog {
         }
     }
 
-    private IResource copyTrace(String newName) {
+    private IResource copyTrace(final String newName) {
 
         IPath oldPath = fTrace.getResource().getFullPath();
         final IPath newPath = oldPath.append("../" + newName); //$NON-NLS-1$
@@ -199,6 +200,15 @@ public class CopyTraceDialog extends SelectionStatusDialog {
                         throw new OperationCanceledException();
                     }
                     fTrace.getResource().copy(newPath, IResource.FORCE | IResource.SHALLOW, null);
+                    // Delete any bookmarks file found in copied trace folder
+                    IFolder folder = fTraceFolder.getFolder(newName);
+                    if (folder.exists()) {
+                        for (IResource member : folder.members()) {
+                            if (TmfTrace.class.getCanonicalName().equals(member.getPersistentProperty(TmfTraceElement.TRACETYPE))) {
+                                member.delete(true, null);
+                            }
+                        }
+                    }
                     if (monitor.isCanceled()) {
                         throw new OperationCanceledException();
                     }

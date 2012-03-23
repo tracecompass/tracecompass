@@ -13,7 +13,7 @@ package org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.load;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.LoadersManager;

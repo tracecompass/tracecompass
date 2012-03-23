@@ -24,7 +24,7 @@ import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
-import org.eclipse.linuxtools.tmf.stubs.trace.TmfTraceStub;
+import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 
 public class TmfUml2SDTestTrace implements ITmfEventParser<TmfEvent> {
     

@@ -26,7 +26,7 @@ import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.stubs.trace.TmfTraceStub;
+import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 import org.eclipse.linuxtools.tmf.ui.tests.TmfUITestPlugin;
 import org.eclipse.linuxtools.tmf.ui.tests.uml2sd.trace.TmfUml2SDTestTrace;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
@@ -87,6 +87,18 @@ public class Uml2SDTestFacility {
             
             IViewPart view;
             try {
+                // Remove welcome view to avoid interference during test execution
+                view = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow()
+                        .getActivePage()
+                        .findView("org.eclipse.ui.internal.introview"); //$NON-NLS-1$
+                
+                if (view != null) {
+                    PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow()
+                    .getActivePage().hideView(view); 
+                }
+                
                 view = PlatformUI.getWorkbench()
                                  .getActiveWorkbenchWindow()
                                  .getActivePage()

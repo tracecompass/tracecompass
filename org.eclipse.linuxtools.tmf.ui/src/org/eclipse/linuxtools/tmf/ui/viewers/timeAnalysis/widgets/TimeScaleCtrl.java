@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import org.eclipse.linuxtools.tmf.ui.internal.Messages;
+import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.Utils.Resolution;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;

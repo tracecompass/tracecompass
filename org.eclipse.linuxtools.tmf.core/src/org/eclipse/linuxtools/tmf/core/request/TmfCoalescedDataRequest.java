@@ -19,7 +19,6 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 /**
  * <b><u>TmfCoalescedDataRequest</u></b>
  * <p>
- * TODO: Implement me. Please.
  */
 public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest<T> {
 
@@ -27,6 +26,9 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
     // Attributes
     // ------------------------------------------------------------------------
 
+	/**
+	 * The list of coalesced requests
+	 */
 	protected Vector<ITmfDataRequest<T>> fRequests = new Vector<ITmfDataRequest<T>>();
 
     // ------------------------------------------------------------------------
@@ -34,50 +36,99 @@ public class TmfCoalescedDataRequest<T extends ITmfEvent> extends TmfDataRequest
     // ------------------------------------------------------------------------
 
     /**
-     * Default constructor
+     * Request all the events of a given type (high priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
      */
     public TmfCoalescedDataRequest(Class<T> dataType) {
         this(dataType, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
-    public TmfCoalescedDataRequest(Class<T> dataType, ExecutionType execType) {
-        this(dataType, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
+    /**
+     * Request all the events of a given type (given priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param priority the requested execution priority
+     */
+    public TmfCoalescedDataRequest(Class<T> dataType, ExecutionType priority) {
+        this(dataType, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, priority);
     }
 
     /**
-     * @param nbRequested
+     * Request all the events of a given type from the given index (high priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param index the index of the first event to retrieve
      */
     public TmfCoalescedDataRequest(Class<T> dataType, int index) {
         this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
-    public TmfCoalescedDataRequest(Class<T> dataType, int index, ExecutionType execType) {
-        this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
+    /**
+     * Request all the events of a given type from the given index (given priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param index the index of the first event to retrieve
+     * @param priority the requested execution priority
+     */
+    public TmfCoalescedDataRequest(Class<T> dataType, int index, ExecutionType priority) {
+        this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE, priority);
     }
 
     /**
-     * @param index
-     * @param nbRequested
+     * Request 'n' events of a given type from the given index (high priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param index the index of the first event to retrieve
+     * @param nbRequested the number of events requested
      */
     public TmfCoalescedDataRequest(Class<T> dataType, int index, int nbRequested) {
         this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
-    public TmfCoalescedDataRequest(Class<T> dataType, int index, int nbRequested, ExecutionType execType) {
-        this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE, execType);
+    /**
+     * Request 'n' events of a given type from the given index (given priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param index the index of the first event to retrieve
+     * @param nbRequested the number of events requested
+     * @param priority the requested execution priority
+     */
+    public TmfCoalescedDataRequest(Class<T> dataType, int index, int nbRequested, ExecutionType priority) {
+        this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE, priority);
     }
 
     /**
-     * @param index
-     * @param nbRequested
-     * @param blockSize
+     * Request 'n' events of a given type from the given index (high priority).
+     * Events are returned in blocks of the given size.
+     * 
+     * @param dataType the requested data type
+     * @param index the index of the first event to retrieve
+     * @param nbRequested the number of events requested
+     * @param blockSize the number of events per block
      */
     public TmfCoalescedDataRequest(Class<T> dataType, int index, int nbRequested, int blockSize) {
         super(dataType, index, nbRequested, blockSize, ExecutionType.FOREGROUND);
     }
 
-    public TmfCoalescedDataRequest(Class<T> dataType, int index, int nbRequested, int blockSize, ExecutionType execType) {
-        super(dataType, index, nbRequested, blockSize, execType);
+    /**
+     * Request 'n' events of a given type from the given index (given priority).
+     * Events are returned in blocks of the given size.
+     * 
+     * @param dataType the requested data type
+     * @param index the index of the first event to retrieve
+     * @param nbRequested the number of events requested
+     * @param blockSize the number of events per block
+     * @param priority the requested execution priority
+     */
+    public TmfCoalescedDataRequest(Class<T> dataType, int index, int nbRequested, int blockSize, ExecutionType priority) {
+        super(dataType, index, nbRequested, blockSize, priority);
     }
 
     // ------------------------------------------------------------------------

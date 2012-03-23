@@ -139,7 +139,7 @@ public abstract class CtfTmfEventField implements ITmfEventField {
     /**
      * Return the int representing this field's value type
      * 
-     * @return
+     * @return the field type
      */
     public abstract int getFieldType();
 
@@ -147,16 +147,17 @@ public abstract class CtfTmfEventField implements ITmfEventField {
      * Return this field's value. You can cast it to the correct type depending
      * on what getFieldType says.
      * 
-     * @return
+     * @return the field value
      */
     @Override
     public abstract Object getValue();
 
     /**
-     * @name Other methods defined by ITmfEventField, but not used here: the CTF
+     * Other methods defined by ITmfEventField, but not used here: the CTF
      *       fields do not have sub-fields (yet!)
+     * 
+     * @return the field names
      */
-
     @Override
     public String[] getFieldNames() {
         return null;

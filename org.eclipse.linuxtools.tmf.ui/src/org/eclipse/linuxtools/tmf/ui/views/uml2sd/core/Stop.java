@@ -21,9 +21,7 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.ISDPreferences;
  * A stop is never drawn it is assigned to a lifeline.<br>
  * <br>
  * 
- * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Lifeline#setStop(Stop)
  * @author sveyrier
- * 
  */
 public class Stop extends GraphNode {
 

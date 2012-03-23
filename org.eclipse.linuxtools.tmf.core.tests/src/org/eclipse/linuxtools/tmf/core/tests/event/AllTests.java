@@ -16,7 +16,7 @@ package org.eclipse.linuxtools.tmf.core.tests.event;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.eclipse.linuxtools.tmf.core.TmfCorePlugin;
+import org.eclipse.linuxtools.internal.tmf.core.TmfCorePlugin;
 
 /**
  * <b><u>AllTests</u></b>

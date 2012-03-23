@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.ctf.core.tests;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.ctf.core.CtfCorePlugin;
+import org.eclipse.linuxtools.internal.ctf.core.Activator;
 
 /**
  * <b><u>CtfCorePluginTest</u></b>
@@ -28,7 +28,7 @@ public class CtfCorePluginTest extends TestCase {
     // ------------------------------------------------------------------------
 
     // Plug-in instantiation
-    static final CtfCorePlugin fPlugin = CtfCorePlugin.getDefault();
+    static final Activator fPlugin = Activator.getDefault();
 
     // ------------------------------------------------------------------------
     // Housekeping
@@ -58,17 +58,17 @@ public class CtfCorePluginTest extends TestCase {
 
     public static void testCtfCorePluginId() {
         assertEquals(
-                "Plugin ID", "org.eclipse.linuxtools.ctf", CtfCorePlugin.PLUGIN_ID); //$NON-NLS-1$ //$NON-NLS-2$
+                "Plugin ID", "org.eclipse.linuxtools.ctf", Activator.PLUGIN_ID); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     public static void testGetDefault() {
-        CtfCorePlugin plugin = CtfCorePlugin.getDefault();
+        Activator plugin = Activator.getDefault();
         assertEquals("getDefault()", plugin, fPlugin); //$NON-NLS-1$
     }
 
     public static void testLog() {
         try {
-            CtfCorePlugin.getDefault().log("Some message"); //$NON-NLS-1$
+            Activator.getDefault().log("Some message"); //$NON-NLS-1$
         } catch (Exception e) {
             fail();
         }

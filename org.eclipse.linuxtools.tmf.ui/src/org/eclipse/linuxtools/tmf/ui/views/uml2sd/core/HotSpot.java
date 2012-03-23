@@ -74,7 +74,7 @@ public class HotSpot extends GraphNode {
     /**
      * Set the lifeline on which the execution occurrence appears.
      * 
-     * @param theLifeline - the parent lifeline
+     * @param occ the parent lifeline
      */
     public void setExecution(BasicExecutionOccurrence occ) {
         execOcc = occ;

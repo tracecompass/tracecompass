@@ -106,7 +106,7 @@ public class FilterCriteria {
     }
 
     /**
-     * @param positive The positive to set.
+     * @param positive_ The positive to set.
      */
     public void setPositive(boolean positive_) {
         positive = positive_;
@@ -120,7 +120,6 @@ public class FilterCriteria {
     }
 
     /**
-     * @return Returns the class loader name.
      */
     public void setLoaderClassName(String loaderClassName_) {
         loaderClassName = loaderClassName_;

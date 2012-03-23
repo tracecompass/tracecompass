@@ -17,8 +17,8 @@ import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.Vector;
 
-import org.eclipse.linuxtools.ctf.core.CtfCorePlugin;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
+import org.eclipse.linuxtools.internal.ctf.core.Activator;
 /**
  * Reads the events of a trace.
  */
@@ -92,8 +92,6 @@ public class CTFTraceReader {
 
     /**
      * Copy constructor
-     *
-     * @return
      */
     public CTFTraceReader copyFrom() {
         CTFTraceReader newReader = null;
@@ -111,7 +109,7 @@ public class CTFTraceReader {
     /**
      * Return the start time of this trace (== timestamp of the first event)
      *
-     * @return
+     * @return the trace start time
      */
     public long getStartTime() {
         return this.startTime;
@@ -267,7 +265,7 @@ public class CTFTraceReader {
      *
      * @param timestamp
      *            the timestamp to seek to
-     * @return
+     * @return true if the trace has more events following the timestamp
      */
     public boolean seek(long timestamp) {
         /*
@@ -342,7 +340,7 @@ public class CTFTraceReader {
             }
 
             sb.append("]\t" + this.eventCountPerTraceFile[se.getName()] + " Events"); //$NON-NLS-1$//$NON-NLS-2$
-            CtfCorePlugin.getDefault().log(sb.toString());
+            Activator.getDefault().log(sb.toString());
         }
     }
 

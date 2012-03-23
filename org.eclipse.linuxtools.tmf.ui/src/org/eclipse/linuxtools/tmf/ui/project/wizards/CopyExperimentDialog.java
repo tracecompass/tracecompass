@@ -14,7 +14,6 @@ package org.eclipse.linuxtools.tmf.ui.project.wizards;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -27,10 +26,12 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
@@ -59,7 +60,7 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
 
 	private final TmfExperimentElement fExperiment;
 	private Text fNewExperimentName;
-    private IContainer fExperimentFolder;
+    private IFolder fExperimentFolder;
     private TmfProjectElement fProject;
 
     // ------------------------------------------------------------------------
@@ -184,7 +185,7 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
         }
     }
 
-    private IFolder copyExperiment(String newName) {
+    private IFolder copyExperiment(final String newName) {
 
     	IPath oldPath = fExperiment.getResource().getFullPath();
     	final IPath newPath = oldPath.append("../" + newName); //$NON-NLS-1$
@@ -197,7 +198,16 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
                     if (monitor.isCanceled()) {
                         throw new OperationCanceledException();
                     }
-                	fExperiment.getResource().copy(newPath, IResource.FORCE | IResource.SHALLOW, null);
+                    fExperiment.getResource().copy(newPath, IResource.FORCE | IResource.SHALLOW, null);
+                    // Delete any bookmarks file found in copied experiment folder
+                    IFolder folder = fExperimentFolder.getFolder(newName);
+                    if (folder.exists()) {
+                        for (IResource member : folder.members()) {
+                            if (TmfExperiment.class.getCanonicalName().equals(member.getPersistentProperty(TmfTraceElement.TRACETYPE))) {
+                                member.delete(true, null);
+                            }
+                        }
+                    }
                     if (monitor.isCanceled()) {
                         throw new OperationCanceledException();
                     }

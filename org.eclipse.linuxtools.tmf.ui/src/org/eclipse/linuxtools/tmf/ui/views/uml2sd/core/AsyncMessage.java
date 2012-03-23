@@ -164,7 +164,6 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      * A new EventOccurence will be create on this lifeLine.<br>
      * 
      * @param lifeline the message sender
-     * @param autoCreateEvent if true, create an eventOccurence lifeline given in parameter
      */
     public void autoSetStartLifeline(Lifeline lifeline) {
         lifeline.getNewEventOccurrence();
@@ -176,7 +175,6 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      * A new EventOccurence will be create on this lifeLine.<br>
      * 
      * @param lifeline the message receiver
-     * @param autoCreateEvent if true, create an eventOccurence lifeline given in parameter
      */
     public void autoSetEndLifeline(Lifeline lifeline) {
         lifeline.getNewEventOccurrence();

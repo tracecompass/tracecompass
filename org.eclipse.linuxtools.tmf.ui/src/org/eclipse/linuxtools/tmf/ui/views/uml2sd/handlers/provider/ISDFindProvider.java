@@ -31,7 +31,7 @@ public interface ISDFindProvider extends ISDGraphNodeSupporter {
      * @param toApply user selection made in the dialog box
      * @return true if the find got a non empty result
      */
-    public boolean find(Criteria toapply);
+    public boolean find(Criteria toApply);
 
     /**
      * Called when dialog is closed

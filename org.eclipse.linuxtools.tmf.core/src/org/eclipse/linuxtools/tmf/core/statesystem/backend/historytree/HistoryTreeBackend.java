@@ -80,7 +80,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     /**
      * Existing history constructor. Use this to open an existing state-file.
      * 
-     * @param existingFileName
+     * @param existingStateFile
      *            Filename/location of the history we want to load
      * @throws IOException
      *             If we can't read the file, if it doesn't exist or is not

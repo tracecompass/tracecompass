@@ -24,6 +24,7 @@ public interface IHistogramDataModel extends IBaseDistributionModel {
     /**
      * Add event to the correct bucket, compacting the if needed.
      * 
+     * @param eventCount the event to count
      * @param timestamp the timestamp of the event to count
      */
     public void countEvent(long eventCount, long timestamp);
@@ -33,7 +34,7 @@ public interface IHistogramDataModel extends IBaseDistributionModel {
      * 
      * @param width
      * @param height
-     * @param bar width
+     * @param barWidth
      * @return the result array of size [width] and where the highest value
      *         doesn't exceed [height] considering the bar width [barWidth]
      */

@@ -15,8 +15,8 @@ package org.eclipse.linuxtools.tmf.ui.views.colors;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.TraceColorScheme;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;

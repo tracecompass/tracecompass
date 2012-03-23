@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.linuxtools.tmf.ui.TmfUiTracer;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiTracer;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.ISDPreferences;
 
@@ -146,7 +146,7 @@ public abstract class GraphNode {
      * Set the graph node name.<br>
      * It is the name display in the view to label the graph node.
      * 
-     * @param the name to set
+     * @param nodeName the name to set
      */
     public void setName(String nodeName) {
         name = nodeName;
@@ -260,10 +260,10 @@ public abstract class GraphNode {
      * Returns the GraphNode visibility for the given visible area. Wrong visibility calculation, may strongly impact
      * drawing performance
      * 
-     * @param vx
-     * @param vy
-     * @param vwidth
-     * @param vheight
+     * @param x
+     * @param y
+     * @param width
+     * @param height
      * @return true if visible false otherwise
      */
     public boolean isVisible(int x, int y, int width, int height) {
@@ -564,7 +564,6 @@ public abstract class GraphNode {
      * After, depending on the visible area, only visible GraphNodes are drawn.<br>
      * 
      * @param context the context to draw to
-     * @param drawFrame indicate if the frame rectangle need to be redrawn
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#draw(IGC)
      */
     protected void drawChildenNodes(IGC context) {

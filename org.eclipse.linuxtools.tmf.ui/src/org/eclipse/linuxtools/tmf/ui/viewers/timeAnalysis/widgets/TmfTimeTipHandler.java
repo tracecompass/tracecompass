@@ -17,7 +17,7 @@ package org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.eclipse.linuxtools.tmf.ui.internal.Messages;
+import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITimeAnalysisViewer.TimeFormat;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;

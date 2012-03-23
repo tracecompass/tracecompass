@@ -239,7 +239,7 @@ public class Criteria {
 
     /**
      * @param to
-     * @return
+     * @return usual comparison result (< 0, 0, > 0)
      */
     public boolean compareTo(Criteria to) {
         boolean retVal = true;

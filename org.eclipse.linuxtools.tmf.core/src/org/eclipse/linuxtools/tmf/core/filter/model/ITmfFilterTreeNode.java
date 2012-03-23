@@ -70,7 +70,7 @@ public interface ITmfFilterTreeNode extends ITmfFilter {
 	 * <h4>Remove the node from its parent</h4>
 	 * 
 	 * <p>Shifts all nodes after the removed one to prevent having an empty spot. 
-	 * See {@link #replaceChildren(int, ITmfFilterTreeNode)} to replace a node.</p>
+	 * See {@link #replaceChild(int, ITmfFilterTreeNode)} to replace a node.</p>
 	 * 
 	 * @return The removed node. 
 	 */
@@ -80,7 +80,7 @@ public interface ITmfFilterTreeNode extends ITmfFilter {
 	 * <h4>Remove the child from the current node</h4>
 	 * 
 	 * <p>Shifts all nodes after the removed one to prevent having an empty spot. 
-	 * See {@link #replaceChildren(int, ITmfFilterTreeNode)} to replace a node.</p>
+	 * See {@link #replaceChild(int, ITmfFilterTreeNode)} to replace a node.</p>
 	 * 
 	 * @return The removed node. 
 	 */

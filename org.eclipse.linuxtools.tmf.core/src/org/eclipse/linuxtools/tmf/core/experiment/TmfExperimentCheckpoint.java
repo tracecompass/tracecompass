@@ -34,8 +34,8 @@ public class TmfExperimentCheckpoint implements Comparable<TmfExperimentCheckpoi
     // ------------------------------------------------------------------------
 
     /**
-     * @param ts
-     * @param location
+     * @param ts the checkpoint timestamp
+     * @param contexts the corresponding set of trace contexts
      */
     public TmfExperimentCheckpoint(TmfTimestamp ts, TmfContext[] contexts) {
         fTimestamp = ts;

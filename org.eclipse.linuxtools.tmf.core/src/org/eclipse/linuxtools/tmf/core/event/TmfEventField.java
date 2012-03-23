@@ -52,7 +52,7 @@ public class TmfEventField implements ITmfEventField {
      * Constructor for a structural field
      * 
      * @param name the event field id
-     * @param subfields the list of subfields
+     * @param fields the list of subfields
      */
     public TmfEventField(String name, ITmfEventField[] fields) {
         this(name, null, fields);
@@ -73,7 +73,7 @@ public class TmfEventField implements ITmfEventField {
      * 
      * @param name the event field id
      * @param value the event field value
-     * @param subfields the list of subfields
+     * @param fields the list of subfields
      */
     public TmfEventField(String name, Object value, ITmfEventField[] fields) {
         if (name == null) {

@@ -13,9 +13,9 @@
 package org.eclipse.linuxtools.tmf.ui.views.filter;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterNode;
-import org.eclipse.linuxtools.tmf.ui.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -46,7 +46,7 @@ public class FilterDialog extends Dialog {
 	}
 
 	/**
-	 * @param fFilter the filter to set
+	 * @param filter the filter to set
 	 */
 	public void setFilter(ITmfFilterTreeNode filter) {
 		fRoot = new TmfFilterNode(null);
@@ -59,7 +59,7 @@ public class FilterDialog extends Dialog {
 	}
 	
 	/**
-	 * @return the fFilter
+	 * @return the filter
 	 */
 	public ITmfFilterTreeNode getFilter() {
 		if (fRoot != null && fRoot.hasChildren()) {

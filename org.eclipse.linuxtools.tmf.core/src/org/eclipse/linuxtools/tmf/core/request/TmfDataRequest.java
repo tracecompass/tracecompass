@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.tmf.core.request;
 
 import java.util.concurrent.CountDownLatch;
 
-import org.eclipse.linuxtools.tmf.core.Tracer;
+import org.eclipse.linuxtools.internal.tmf.core.Tracer;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 /**
@@ -114,70 +114,104 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     }
 
     /**
-     * Default constructor
+     * Request all the events of a given type (high priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
      * 
-     * @param dataType
-     *            the requested data type
+     * @param dataType the requested data type
      */
     public TmfDataRequest(Class<T> dataType) {
         this(dataType, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
-    public TmfDataRequest(Class<T> dataType, ExecutionType execType) {
-        this(dataType, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
+    /**
+     * Request all the events of a given type (given priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param priority the requested execution priority
+     */
+    public TmfDataRequest(Class<T> dataType, ExecutionType priority) {
+        this(dataType, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, priority);
     }
 
     /**
-     * @param dataType
-     *            the requested data type
-     * @param nbRequested
-     *            the number of data items requested
+     * Request all the events of a given type from the given index (high priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param index the index of the first event to retrieve
      */
     public TmfDataRequest(Class<T> dataType, int index) {
         this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
-    public TmfDataRequest(Class<T> dataType, int index, ExecutionType execType) {
-        this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
+    /**
+     * Request all the events of a given type from the given index (given priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param index the index of the first event to retrieve
+     * @param priority the requested execution priority
+     */
+    public TmfDataRequest(Class<T> dataType, int index, ExecutionType priority) {
+        this(dataType, index, ALL_DATA, DEFAULT_BLOCK_SIZE, priority);
     }
 
     /**
-     * @param dataType
-     *            the requested data type
-     * @param index
-     *            the index (rank) of the first event requested
-     * @param blockSize
-     *            the number of data items per block
+     * Request 'n' events of a given type from the given index (high priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param index the index of the first event to retrieve
+     * @param nbRequested the number of events requested
      */
     public TmfDataRequest(Class<T> dataType, int index, int nbRequested) {
         this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
-    public TmfDataRequest(Class<T> dataType, int index, int nbRequested, ExecutionType execType) {
-        this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE, execType);
+    /**
+     * Request 'n' events of a given type from the given index (given priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param index the index of the first event to retrieve
+     * @param nbRequested the number of events requested
+     * @param priority the requested execution priority
+     */
+    public TmfDataRequest(Class<T> dataType, int index, int nbRequested, ExecutionType priority) {
+        this(dataType, index, nbRequested, DEFAULT_BLOCK_SIZE, priority);
     }
 
     /**
-     * @param dataType
-     *            the requested data type
-     * @param index
-     *            the index (rank) of the first event requested
-     * @param nbRequested
-     *            the number of data items requested
-     * @param blockSize
-     *            the number of data items per block
+     * Request 'n' events of a given type from the given index (high priority).
+     * Events are returned in blocks of the given size.
+     * 
+     * @param dataType the requested data type
+     * @param index the index of the first event to retrieve
+     * @param nbRequested the number of events requested
+     * @param blockSize the number of events per block
      */
     public TmfDataRequest(Class<T> dataType, int index, int nbRequested, int blockSize) {
         this(dataType, index, nbRequested, blockSize, ExecutionType.FOREGROUND);
     }
 
-    public TmfDataRequest(Class<T> dataType, int index, int nbRequested, int blockSize, ExecutionType execType) {
+    /**
+     * Request 'n' events of a given type from the given index (given priority).
+     * Events are returned in blocks of the given size.
+     * 
+     * @param dataType the requested data type
+     * @param index the index of the first event to retrieve
+     * @param nbRequested the number of events requested
+     * @param blockSize the number of events per block
+     * @param priority the requested execution priority
+     */
+    public TmfDataRequest(Class<T> dataType, int index, int nbRequested, int blockSize, ExecutionType priority) {
         fRequestId = fRequestNumber++;
         fDataType = dataType;
         fIndex = index;
         fNbRequested = nbRequested;
         fBlockSize = blockSize;
-        fExecType = execType;
+        fExecType = priority;
         fNbRead = 0;
 
         fRequestRunning = false;
@@ -218,7 +252,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     }
 
     /**
-     * @return the index of the first event requested
+     * @return the execution type (priority)
      */
     @Override
     public ExecutionType getExecType() {
@@ -250,7 +284,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     }
 
     /**
-     * @return indicates if the request is completed
+     * @return indicates if the request is currently running
      */
     @Override
     public synchronized boolean isRunning() {
@@ -266,7 +300,7 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     }
 
     /**
-     * @return indicates if the request is canceled
+     * @return indicates if the request has failed
      */
     @Override
     public synchronized boolean isFailed() {
@@ -308,23 +342,19 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     // ------------------------------------------------------------------------
 
     /**
-     * Sets the data object to specified value. To be called by the asynchronous method implementor.
+     * Handle incoming data, one event at a time i.e. this method is invoked
+     * for every data item obtained by the request.
      * 
-     * @param data
-     *            Data value to set.
-     */
-
-    /**
-     * Handle a block of incoming data. This method is called every time a block of data becomes available.
+     * - Data items are received in the order they appear in the stream
+     * - Called by the request processor, in its execution thread, every time
+     *   a block of data becomes available.
+     * - Request processor performs a synchronous call to handleData() i.e.
+     *   its execution threads holds until handleData() returns.
+     * - Original data items are disposed of on return i.e. keep a reference
+     *   (or a copy) if some persistence is needed between invocations.
+     * - When there is no more data, done() is called.
      * 
-     * - Data items are received in the order they appear in the stream. - Called by the request processor, in its
-     * execution thread, every time a block of data becomes available. - Request processor performs a synchronous call
-     * to handlePartialResult() i.e. its execution threads holds until handlePartialData() returns. - Original data
-     * items are disposed of on return i.e. keep a reference (or a copy) if some persistence is needed between
-     * invocations. - When there is no more data, done() is called.
-     * 
-     * @param events
-     *            - an events
+     * @param data a piece of data
      */
     @Override
     public void handleData(T data) {
@@ -340,11 +370,14 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
     }
 
     /**
-     * Handle the completion of the request. It is called when there is no more data available either because: - the
-     * request completed normally - the request failed - the request was canceled
+     * Handle the completion of the request. It is called when there is no
+     * more data available either because:
+     * - the request completed normally 
+     * - the request failed 
+     * - the request was canceled
      * 
-     * As a convenience, handleXXXX methods are provided. They are meant to be overridden by the application if it needs
-     * to handle these conditions.
+     * As a convenience, handleXXXX methods are provided. They are meant to be
+     * overridden by the application if it needs to handle these conditions.
      */
     @Override
     public synchronized void handleCompleted() {

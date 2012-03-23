@@ -33,54 +33,114 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
     // ------------------------------------------------------------------------
 
     /**
-     * @param range
+     * Request all the events of a given type (high priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
      */
     public TmfEventRequest(Class<T> dataType) {
         this(dataType, TmfTimeRange.ETERNITY, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
-    public TmfEventRequest(Class<T> dataType, ExecutionType execType) {
-        this(dataType, TmfTimeRange.ETERNITY, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
+    /**
+     * Request all the events of a given type (given priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param priority the requested execution priority
+     */
+    public TmfEventRequest(Class<T> dataType, ExecutionType priority) {
+        this(dataType, TmfTimeRange.ETERNITY, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, priority);
     }
 
     /**
-     * @param range
+     * Request all the events of a given type for the given time range (high priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param range the time range of the requested events
      */
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range) {
         this(dataType, range, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
 
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, ExecutionType execType) {
-        this(dataType, range, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, execType);
+    /**
+     * Request all the events of a given type for the given time range (given priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param range the time range of the requested events
+     * @param priority the requested execution priority
+     */
+    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, ExecutionType priority) {
+        this(dataType, range, 0, ALL_DATA, DEFAULT_BLOCK_SIZE, priority);
     }
 
     /**
-     * @param range
-     * @param nbRequested
+     * Request 'n' events of a given type from the given time range (high priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param range the time range of the requested events
+     * @param nbRequested the number of events requested
      */
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested) {
         this(dataType, range, 0, nbRequested, DEFAULT_BLOCK_SIZE, ExecutionType.FOREGROUND);
     }
     
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, ExecutionType execType) {
-        this(dataType, range, 0, nbRequested, DEFAULT_BLOCK_SIZE, execType);
+    /**
+     * Request 'n' events of a given type for the given time range (given priority)
+     * Events are returned in blocks of the default size (DEFAULT_BLOCK_SIZE).
+     * 
+     * @param dataType the requested data type
+     * @param range the time range of the requested events
+     * @param nbRequested the number of events requested
+     * @param priority the requested execution priority
+     */
+    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, ExecutionType priority) {
+        this(dataType, range, 0, nbRequested, DEFAULT_BLOCK_SIZE, priority);
     }
     
     /**
-     * @param range
-     * @param nbRequested
-     * @param blockSize Size of the largest blocks expected
+     * Request 'n' events of a given type for the given time range (high priority).
+     * Events are returned in blocks of the given size.
+     * 
+     * @param dataType the requested data type
+     * @param range the time range of the requested events
+     * @param nbRequested the number of events requested
+     * @param blockSize the number of events per block
      */
     public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize) {
     	this(dataType, range, 0, nbRequested, blockSize, ExecutionType.FOREGROUND);
     }
 
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize, ExecutionType execType) {
-    	this(dataType, range, 0, nbRequested, blockSize, execType);
+    /**
+     * Request 'n' events of a given type for the given time range (given priority).
+     * Events are returned in blocks of the given size.
+     * 
+     * @param dataType the requested data type
+     * @param range the time range of the requested events
+     * @param nbRequested the number of events requested
+     * @param blockSize the number of events per block
+     * @param priority the requested execution priority
+     */
+    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize, ExecutionType priority) {
+    	this(dataType, range, 0, nbRequested, blockSize, priority);
     }
 
-    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int index, int nbRequested, int blockSize, ExecutionType execType) {
-    	super(dataType, index, nbRequested, blockSize, execType);
+    /**
+     * Request 'n' events of a given type for the given time range (given priority).
+     * Events are returned in blocks of the given size.
+     * 
+     * @param dataType the requested data type
+     * @param range the time range of the requested events
+     * @param index the index of the first event to retrieve
+     * @param nbRequested the number of events requested
+     * @param blockSize the number of events per block
+     * @param priority the requested execution priority
+     */
+    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int index, int nbRequested, int blockSize, ExecutionType priority) {
+    	super(dataType, index, nbRequested, blockSize, priority);
     	fRange = range;
     }
 
@@ -103,7 +163,8 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
     /**
      * this method is called by the event provider to set the index corresponding
      * to the time range start time once it is known
-     * @param index the start time index
+     * 
+     * @param index the start index
      */
     @Override
 	public void setStartIndex(int index) {

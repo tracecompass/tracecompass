@@ -17,7 +17,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 
-import org.eclipse.linuxtools.tmf.core.Tracer;
+import org.eclipse.linuxtools.internal.tmf.core.Tracer;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
@@ -145,8 +145,6 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
 
     /**
      * This method queues the coalesced requests.
-     * 
-     * @param thread
      */
     @Override
     public void fireRequest() {
@@ -390,9 +388,10 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
     /**
      * Checks if the data meets the request completion criteria.
      * 
-     * @param request
-     * @param data
-     * @return
+     * @param request the request
+     * @param data the data to verify
+     * @param nbRead the number of events read so far
+     * @return true if completion criteria is met
      */
     public boolean isCompleted(ITmfDataRequest<T> request, T data, int nbRead) {
         return request.isCompleted() || nbRead >= request.getNbRequested();

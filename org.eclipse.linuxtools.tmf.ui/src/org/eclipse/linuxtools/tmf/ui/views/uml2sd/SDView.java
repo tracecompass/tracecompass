@@ -26,8 +26,8 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.linuxtools.tmf.ui.ITmfImageConstants;
-import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
+import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BaseMessage;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Frame;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode;
@@ -848,7 +848,9 @@ public class SDView extends ViewPart {
     /**
      * Set the frame and ensure an object is visible from an other thread than the one executing the main loop
      * 
-     * @param sm
+     * @param frame
+     * @param x
+     * @param y
      */
     public void setFrameAndEnsureVisibleSync(final Frame frame, final int x, final int y) {
         if (getSDWidget() == null || getSDWidget().isDisposed()) {
@@ -866,7 +868,9 @@ public class SDView extends ViewPart {
     /**
      * Set the frame and ensure an object is visible
      * 
-     * @param sm
+     * @param frame
+     * @param x
+     * @param y
      */
     public void setFrameAndEnsureVisible(Frame frame, int x, int y) {
         getSDWidget().clearSelection();
@@ -882,6 +886,8 @@ public class SDView extends ViewPart {
 
     /**
      * Toggle between default and wait cursors from an other thread than the one executing the main loop
+     * 
+     * @param wait_
      */
     public void toggleWaitCursorAsync(final boolean wait_) {
         if (getSDWidget() == null || getSDWidget().isDisposed()) {

@@ -114,7 +114,7 @@ public interface ISDPreferences {
     /**
      * Returns the time compression bar selection color
      * 
-     * @return
+     * @return the time compression bar selection color 
      */
     public IColor getTimeCompressionSelectionColor();
 

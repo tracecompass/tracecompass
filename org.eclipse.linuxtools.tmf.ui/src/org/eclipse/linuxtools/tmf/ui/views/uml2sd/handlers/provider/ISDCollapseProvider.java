@@ -26,7 +26,7 @@ public interface ISDCollapseProvider {
      * Called back when the sequence diagram is requesting 2 lifelines collapsing
      * 
      * @param lifeline1 - One of the lifeline to collapse
-     * @param Lifeline2 - The other lifeline to collapse with
+     * @param lifeline2 - The other lifeline to collapse with
      */
     public void collapseTwoLifelines(Lifeline lifeline1, Lifeline lifeline2);
 
