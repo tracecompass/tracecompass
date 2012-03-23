@@ -315,6 +315,31 @@ public class StateSystemFullHistoryTest {
     }
 
     @Test
+    public void testGetQuarks_begin() {
+        List<Integer> list = shs.getQuarks("*", "1577", "Exec_name");
+
+        assertEquals(1, list.size());
+        assertEquals(Integer.valueOf(479), list.get(0));
+    }
+
+    @Test
+    public void testGetQuarks_middle() {
+        List<Integer> list = shs.getQuarks("Threads", "*", "Exec_name");
+
+        assertEquals(Integer.valueOf(36), list.get(4));
+        assertEquals(Integer.valueOf(100), list.get(10));
+        assertEquals(Integer.valueOf(116), list.get(12));
+    }
+
+    @Test
+    public void testGetQuarks_end() {
+        List<Integer> list = shs.getQuarks("Threads", "1577", "*");
+
+        assertEquals(3, list.size());
+        assertEquals(Integer.valueOf(479), list.get(1));
+    }
+
+    @Test
     public void testDebugPrinting() throws FileNotFoundException {
         shs.debugPrint(new PrintWriter(new File("/dev/null")));
     }

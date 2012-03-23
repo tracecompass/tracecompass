@@ -207,10 +207,14 @@ final class AttributeTree {
      */
     int getQuarkDontAdd(int startingNodeQuark, String... subPath)
             throws AttributeNotFoundException {
-        assert (subPath != null && subPath.length > 0);
         assert (startingNodeQuark >= -1);
 
         Attribute prevNode;
+
+        /* If subPath is empty, simply return the starting quark */
+        if (subPath == null || subPath.length == 0) {
+            return startingNodeQuark;
+        }
 
         /* Get the "starting node" */
         if (startingNodeQuark == -1) {
