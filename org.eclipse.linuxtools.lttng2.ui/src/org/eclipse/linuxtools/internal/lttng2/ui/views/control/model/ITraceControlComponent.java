@@ -133,6 +133,12 @@ public interface ITraceControlComponent extends IAdaptable {
     public void addChild(ITraceControlComponent component);
     
     /**
+     * Adds several components.
+     * @param components - array of components to add.
+     */
+//    public void addChildren(ITraceControlComponent[] components);
+    
+    /**
      * Removes the given child component. 
      * @param component - the child to remove.
      */

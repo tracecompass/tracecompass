@@ -112,6 +112,7 @@ public class TraceControlPropertiesTest extends TestCase {
     @Override
     @After
     public void tearDown() throws Exception {
+        TraceControlTestFacility.getInstance().waitForJobs();
     }
     
     /**

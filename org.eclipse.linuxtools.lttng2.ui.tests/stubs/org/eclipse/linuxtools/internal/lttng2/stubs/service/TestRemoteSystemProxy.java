@@ -56,6 +56,7 @@ public class TestRemoteSystemProxy implements IRemoteSystemProxy {
 
     @Override
     public void connect(IRSECallback callback) throws ExecutionException {
+//        System.out.println("in done: proxy connect ");
         if (callback != null) {
             callback.done(Status.OK_STATUS, null);
         }

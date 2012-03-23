@@ -202,14 +202,14 @@ public class TraceControlComponent implements ITraceControlComponent {
     }
 
     /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent#setChildren(java.util.List)
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponents#etChildren(java.util.List)
      */
     @Override
     public void setChildren(List<ITraceControlComponent> children) {
         for (Iterator<ITraceControlComponent> iterator = children.iterator(); iterator.hasNext();) {
             ITraceControlComponent traceControlComponent = (ITraceControlComponent) iterator.next();
             fChildren.add(traceControlComponent);
+            fireComponentChanged(this);
         }
     }
 

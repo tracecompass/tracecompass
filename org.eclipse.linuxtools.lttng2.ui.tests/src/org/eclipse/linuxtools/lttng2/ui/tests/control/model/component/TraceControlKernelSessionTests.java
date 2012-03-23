@@ -112,6 +112,7 @@ public class TraceControlKernelSessionTests extends TestCase {
     @Override
     @After
     public void tearDown()  throws Exception {
+        fFacility.waitForJobs();
     }
     
     /**
@@ -131,9 +132,14 @@ public class TraceControlKernelSessionTests extends TestCase {
         TargetNodeComponent node = new TargetNodeComponent("myNode", root, host, fProxy);
 
         root.addChild(node);
-        node.connect();
-
         fFacility.waitForJobs();
+
+        fFacility.executeCommand(node, "connect");
+        int i = 0;
+        while ((i < 10) && (node.getTargetNodeState() != TargetNodeState.CONNECTED)) {
+            i++;
+            fFacility.delay(TraceControlTestFacility.GUI_REFESH_DELAY);
+        }
 
         // Verify that node is connected
         assertEquals(TargetNodeState.CONNECTED, node.getTargetNodeState());

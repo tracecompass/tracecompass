@@ -13,6 +13,9 @@
 
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelection;
@@ -25,6 +28,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.progress.UIJob;
 
 /**
  * <b><u>ControlView</u></b>
@@ -116,7 +120,7 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
      */
     @Override
     public void componentAdded(ITraceControlComponent parent, ITraceControlComponent component) {
-        componentChanged(component);
+        componentChanged(parent);
     }
 
     /*
@@ -125,7 +129,7 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
      */
     @Override
     public void componentRemoved(ITraceControlComponent parent, ITraceControlComponent component) {
-        componentChanged(component);
+        componentChanged(parent);
     }
 
     /*
@@ -133,24 +137,30 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponentChangedListener#componentChanged(org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent)
      */
     @Override
-    public void componentChanged(ITraceControlComponent component) {
+    public void componentChanged(final ITraceControlComponent component) {
         if (fTreeViewer.getTree().isDisposed()) {
             return;
         }
 
-        fTreeViewer.getTree().getDisplay().asyncExec(new Runnable() {
+        UIJob myJob = new UIJob("Refresh") { //$NON-NLS-1$
             @Override
-            public void run() {
+            public IStatus runInUIThread(IProgressMonitor monitor) {
                 if (fTreeViewer.getTree().isDisposed()) {
-                    return;
+                    return Status.OK_STATUS;
                 }
-                fTreeViewer.refresh();
+                
+                fTreeViewer.refresh(component);
+
                 // Change selection needed 
                 final ISelection sel = fTreeViewer.getSelection();
                 fTreeViewer.setSelection(null);
                 fTreeViewer.setSelection(sel);
+
+                return Status.OK_STATUS;
             }
-        });
+        };
+        myJob.setUser(false);
+        myJob.schedule();
     }
     
     /**
@@ -158,8 +168,9 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
      * @param component - component to select
      */
     public void setSelection(ITraceControlComponent component) {
-        StructuredSelection selection = new StructuredSelection(component);
-        fTreeViewer.setSelection(selection);
+        ITraceControlComponent[] components = new ITraceControlComponent[1];
+        components[0] = component;
+        setSelection(components);
     }
 
     /**
@@ -167,8 +178,16 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
      * @param component - array of components to select
      */
     public void setSelection(ITraceControlComponent[] components) {
-        StructuredSelection selection = new StructuredSelection(components);
-        fTreeViewer.setSelection(selection);
+        final StructuredSelection selection = new StructuredSelection(components);
+        UIJob myJob = new UIJob("Select") { //$NON-NLS-1$
+            @Override
+            public IStatus runInUIThread(IProgressMonitor monitor) {
+                fTreeViewer.setSelection(selection);
+                return Status.OK_STATUS;
+            }
+        };
+        myJob.setUser(false);
+        myJob.schedule();
     }
     
 //    public ITraceControlComponent getSelection() {

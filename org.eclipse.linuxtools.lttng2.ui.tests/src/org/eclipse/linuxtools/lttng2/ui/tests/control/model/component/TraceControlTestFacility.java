@@ -75,6 +75,18 @@ public class TraceControlTestFacility {
 
             IViewPart view;
             try {
+                
+                view = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow()
+                        .getActivePage()
+                        .findView("org.eclipse.ui.internal.introview"); //$NON-NLS-1$
+                
+                if (view != null) {
+                    PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow()
+                    .getActivePage().hideView(view); 
+                }
+
                 view = PlatformUI.getWorkbench()
                                  .getActiveWorkbenchWindow()
                                  .getActivePage()
@@ -192,9 +204,8 @@ public class TraceControlTestFacility {
      */
     public void setSelection(ITraceControlComponent component) {
         fControlView.setSelection(component);
-
-        // Give GUI time to actually execute refresh
-        delay(TraceControlTestFacility.GUI_REFESH_DELAY);
+        // Selection is done in own job
+        waitForJobs();
     }
 
     
@@ -206,8 +217,8 @@ public class TraceControlTestFacility {
     public void setSelection(ITraceControlComponent[] components) {
         fControlView.setSelection(components);
 
-        // Give GUI time to actually execute refresh
-        delay(TraceControlTestFacility.GUI_REFESH_DELAY);
+        // Selection is done in own job
+        waitForJobs();
     }
     
     /**

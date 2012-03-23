@@ -11,6 +11,7 @@
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -98,6 +99,7 @@ public class TraceChannelComponent extends TraceControlComponent {
     public void setChannelInfo(IChannelInfo channelInfo) {
         fChannelInfo = channelInfo;
         IEventInfo[] events = fChannelInfo.getEvents();
+        List<ITraceControlComponent> eventComponents = new ArrayList<ITraceControlComponent>();
         for (int i = 0; i < events.length; i++) {
             TraceEventComponent event = null;
             if (events[i].getClass() == ProbeEventInfo.class) {
@@ -106,8 +108,12 @@ public class TraceChannelComponent extends TraceControlComponent {
                 event = new TraceEventComponent(events[i].getName(), this);
             }
 
+            eventComponents.add(event);
             event.setEventInfo(events[i]);
-            addChild(event);
+//            addChild(event);
+        }
+        if (!eventComponents.isEmpty()) {
+            setChildren(eventComponents);
         }
     }
 

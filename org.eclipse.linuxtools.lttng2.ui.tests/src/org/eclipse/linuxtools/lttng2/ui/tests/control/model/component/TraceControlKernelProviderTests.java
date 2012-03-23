@@ -107,12 +107,14 @@ public class TraceControlKernelProviderTests extends TestCase {
     @Override
     @After
     public void tearDown() throws Exception {
+        fFacility.waitForJobs();
     }
     
     /**
      * Run the TraceControlComponent.
      */
     public void testKernelProviderTree() throws Exception {
+        
         
         fProxy.setTestFile(fTestFile);
         fProxy.setScenario(TraceControlTestFacility.SCEN_INIT_TEST);
@@ -122,13 +124,19 @@ public class TraceControlKernelProviderTests extends TestCase {
         @SuppressWarnings("restriction")
         IHost host = new Host(new SystemProfile("myProfile", true));
         host.setHostName("127.0.0.1");
-
+        
         TargetNodeComponent node = new TargetNodeComponent("myNode", root, host, fProxy);
 
         root.addChild(node);
-        node.connect();
 
         fFacility.waitForJobs();
+
+        fFacility.executeCommand(node, "connect");
+        int i = 0;
+        while ((i < 20) && (node.getTargetNodeState() != TargetNodeState.CONNECTED)) {
+            i++;
+            fFacility.delay(TraceControlTestFacility.GUI_REFESH_DELAY);
+        }
 
         // Verify that node is connected
         assertEquals(TargetNodeState.CONNECTED, node.getTargetNodeState());

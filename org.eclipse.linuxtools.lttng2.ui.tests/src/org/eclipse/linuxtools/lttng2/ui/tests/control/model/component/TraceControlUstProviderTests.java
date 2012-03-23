@@ -109,6 +109,7 @@ public class TraceControlUstProviderTests extends TestCase {
     @Override
     @After
     public void tearDown() throws Exception {
+        fFacility.waitForJobs();
     }
     
     /**
@@ -128,9 +129,15 @@ public class TraceControlUstProviderTests extends TestCase {
         TargetNodeComponent node = new TargetNodeComponent("myNode", root, host, fProxy);
         root.addChild(node);
         
-        fFacility.delay(TraceControlTestFacility.GUI_REFESH_DELAY);
+        fFacility.waitForJobs();
         
         fFacility.executeCommand(node, "connect");
+
+        int i = 0;
+        while ((i < 10) && (node.getTargetNodeState() != TargetNodeState.CONNECTED)) {
+            i++;
+            fFacility.delay(TraceControlTestFacility.GUI_REFESH_DELAY);
+        }
         
         // Verify that node is connected
         assertEquals(TargetNodeState.CONNECTED, node.getTargetNodeState());
