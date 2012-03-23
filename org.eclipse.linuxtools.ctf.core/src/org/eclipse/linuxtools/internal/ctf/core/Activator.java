@@ -10,7 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.ctf.core;
+package org.eclipse.linuxtools.internal.ctf.core;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
@@ -18,12 +18,11 @@ import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 /**
- * <b><u>CtfCorePlugin</u></b>
+ * <b><u>Activator</u></b>
  * <p>
- * The activator class controls the plug-in life cycle. No more than one such
- * plug-in can exist at any time.
+ * The activator class controls the plug-in life cycle.
  */
-public class CtfCorePlugin extends Plugin {
+public class Activator extends Plugin {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -33,13 +32,13 @@ public class CtfCorePlugin extends Plugin {
     public static final String PLUGIN_ID = "org.eclipse.linuxtools.ctf"; //$NON-NLS-1$
 
     // The shared instance
-    private static CtfCorePlugin fPlugin;
+    private static Activator fPlugin;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
-    public CtfCorePlugin() {
+    public Activator() {
         setDefault(this);
     }
 
@@ -47,11 +46,11 @@ public class CtfCorePlugin extends Plugin {
     // Accessors
     // ------------------------------------------------------------------------
 
-    public static CtfCorePlugin getDefault() {
+    public static Activator getDefault() {
         return fPlugin;
     }
 
-    private static void setDefault(CtfCorePlugin plugin) {
+    private static void setDefault(Activator plugin) {
         fPlugin = plugin;
     }
 

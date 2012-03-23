@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.antlr.runtime.tree.CommonTree;
-import org.eclipse.linuxtools.ctf.core.CtfCorePlugin;
 import org.eclipse.linuxtools.ctf.core.event.CTFClock;
 import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.metadata.exceptions.ParseException;
@@ -39,6 +38,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.ctf.parser.CTFParser;
+import org.eclipse.linuxtools.internal.ctf.core.Activator;
 
 /*
  * Asserts throughout this class denote the assumptions we can make because of
@@ -1132,7 +1132,7 @@ public class IOStructGen {
 
         switch (firstChild.getType()) {
         case CTFParser.FLOATING_POINT:
-            CtfCorePlugin
+            Activator
                     .getDefault()
                     .log("parseTypeSpecifierList: floating_point not implemented yet"); //$NON-NLS-1$
             break;
