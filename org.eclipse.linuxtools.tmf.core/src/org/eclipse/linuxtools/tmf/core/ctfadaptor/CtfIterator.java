@@ -11,7 +11,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
     private final CtfTmfTrace ctfTmfTrace;
 
     private CtfLocation curLocation;
-    private long curRank;
+    private final long curRank;
 
     /**
      * Create a new CTF trace iterator, which initially points at the first
@@ -68,18 +68,24 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
         return ret;
     }
 
+    public boolean seekRank(long rank) {
+        boolean ret = false;
+        ret = super.seekIndex(rank);
+
+        if (ret) {
+            curLocation.setLocation(getCurrentEvent().getTimestampValue());
+        }
+        return ret;
+    }
+
     @Override
     public long getRank() {
-        final CtfTmfEvent current = getCurrentEvent();
-        if (current != null) {
-            return getCurrentEvent().getRank();
-        }
-        return 0;
+        return super.getIndex();
     }
 
     @Override
     public void setRank(long rank) {
-        // FIXME NYI
+        seekRank( rank );
     }
 
     /*
@@ -115,12 +121,12 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
 
     @Override
     public void updateRank(int rank) {
-        curRank = rank;
+        // not needed I think
     }
 
     @Override
     public boolean isValidRank() {
-        return true;
+        return (getRank() > -1);
     }
 
     @Override

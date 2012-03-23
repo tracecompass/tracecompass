@@ -1,7 +1,6 @@
 package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 
 import java.io.FileNotFoundException;
-import java.util.Vector;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -18,7 +17,6 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpoint;
 
 public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
         ITmfTrace<CtfTmfEvent> {
@@ -27,22 +25,12 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
     // Constants
     // ------------------------------------------------------------------------
 
-    // The default number of events to cache
-    // TODO: Make the DEFAULT_CACHE_SIZE a preference
-    public static final int DEFAULT_INDEX_PAGE_SIZE = 50000;
-
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
     // the Ctf Trace
     private CTFTrace fTrace;
-
-    // The cache page size AND checkpoints interval
-    protected int fIndexPageSize = DEFAULT_INDEX_PAGE_SIZE;
-
-    // The set of event stream checkpoints (for random access)
-    private Vector<TmfCheckpoint> fCheckpoints = new Vector<TmfCheckpoint>();
 
     // The number of events collected
     protected long fNbEvents = 0;
@@ -124,7 +112,6 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
     public CtfTmfTrace clone() throws CloneNotSupportedException {
         CtfTmfTrace clone = null;
         clone = (CtfTmfTrace) super.clone();
-        clone.setfCheckpoints(this.fCheckpoints);
         clone.fStartTime = this.fStartTime.clone();
         clone.fEndTime = this.fEndTime.clone();
         clone.fTrace = this.fTrace;
@@ -213,10 +200,14 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
     @Override
     public ITmfContext armRequest(ITmfDataRequest<CtfTmfEvent> request) {
         if ((request instanceof ITmfEventRequest<?>)
-                && !TmfTimestamp.BIG_BANG.equals(((ITmfEventRequest<CtfTmfEvent>) request).getRange().getStartTime())
+                && !TmfTimestamp.BIG_BANG
+                        .equals(((ITmfEventRequest<CtfTmfEvent>) request)
+                                .getRange().getStartTime())
                 && (request.getIndex() == 0)) {
-            ITmfContext context = seekEvent(((ITmfEventRequest<CtfTmfEvent>) request).getRange().getStartTime());
-            ((ITmfEventRequest<CtfTmfEvent>) request).setStartIndex((int) context.getRank());
+            ITmfContext context = seekEvent(((ITmfEventRequest<CtfTmfEvent>) request)
+                    .getRange().getStartTime());
+            ((ITmfEventRequest<CtfTmfEvent>) request)
+                    .setStartIndex((int) context.getRank());
             return context;
         }
         return seekEvent(request.getIndex());
@@ -225,10 +216,10 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
     /**
      * The trace reader keeps its own iterator: the "context" parameter here
      * will be ignored.
-     * 
+     *
      * If you wish to specify a new context, instantiate a new CtfIterator and
      * seek() it to where you want, and use that to read events.
-     * 
+     *
      * FIXME merge with getNextEvent below once they both use the same parameter
      * type.
      */
@@ -250,7 +241,10 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
 
     @Override
     public double getLocationRatio(ITmfLocation<?> location) {
-        return 0;
+        CtfIterator curLocation = (CtfIterator) location;
+        return ((double) curLocation.getCurrentEvent().getTimestampValue() -
+                curLocation.getStartTime())
+                / (curLocation.getEndTime() - curLocation.getStartTime());
     }
 
     @Override
@@ -291,14 +285,6 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
     @Override
     public CtfTmfEvent parseEvent(ITmfContext context) {
         return iterator.getCurrentEvent();
-    }
-
-    public Vector<TmfCheckpoint> getfCheckpoints() {
-        return this.fCheckpoints;
-    }
-
-    public void setfCheckpoints(Vector<TmfCheckpoint> fCheckpoints) {
-        this.fCheckpoints = fCheckpoints;
     }
 
     @Override

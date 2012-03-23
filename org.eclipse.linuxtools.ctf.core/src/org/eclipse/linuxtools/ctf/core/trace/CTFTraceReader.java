@@ -65,7 +65,7 @@ public class CTFTraceReader {
      */
     private long index;
 
-    private long startIndex;
+    private final long startIndex[];
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -97,6 +97,11 @@ public class CTFTraceReader {
         this.startTime = prio.peek().getCurrentEvent().timestamp;
         this.endTime = this.startTime;
         this.index = 0;
+        startIndex = new long[prio.size()];
+        for( int  i = 0; i < prio.size(); i++ )
+        {
+            startIndex[i] = 0;
+        }
     }
 
     /**
@@ -254,12 +259,14 @@ public class CTFTraceReader {
              */
             index++;
             StreamInputPacketReader packetReader = top.getPacketReader();
+
             if (packetReader.hasMoreEvents() == false) {
+                int n = this.streamInputReaders.indexOf(packetReader);
                 StreamInputPacketIndexEntry currentPacket = packetReader
                         .getCurrentPacket();
-                currentPacket.indexBegin = startIndex;
-                currentPacket.rankEnd = index;
-                startIndex = index + 1;
+                currentPacket.indexBegin = startIndex[n];
+                currentPacket.indexEnd = index;
+                startIndex[n] = index + 1;
             }
         }
         /*
@@ -306,22 +313,25 @@ public class CTFTraceReader {
          */
         this.prio.clear();
         index = 0;
+        long offset = 0;
         for (StreamInputReader streamInputReader : this.streamInputReaders) {
             /*
              * Seek the trace reader.
              */
-            long offset = streamInputReader.seek(timestamp);
+            offset += streamInputReader.seek(timestamp);
 
             /*
              * Add it to the priority queue if there is a current event.
              */
+
+        }
+        for (StreamInputReader streamInputReader : this.streamInputReaders  ) {
             if (streamInputReader.getCurrentEvent() != null) {
                 this.prio.add(streamInputReader);
                 index = Math.max(index, streamInputReader.getPacketReader()
                         .getCurrentPacket().indexBegin + offset);
             }
         }
-
         return hasMoreEvents();
     }
 
