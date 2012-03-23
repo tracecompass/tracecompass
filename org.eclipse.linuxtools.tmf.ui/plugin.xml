@@ -123,14 +123,14 @@
       </wizard>
       <wizard
             category="org.eclipse.linuxtools.tmf.ui.wizards.new"
-            class="org.eclipse.linuxtools.tmf.ui.parsers.wizards.CustomTxtParserWizard"
+            class="org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards.CustomTxtParserWizard"
             icon="icons/etool16/customparser_wizard.gif"
             id="org.eclipse.linuxtools.tmf.ui.wizards.custom.text"
             name="%project.new.wizard.custom.text.parser">
       </wizard>
       <wizard
             category="org.eclipse.linuxtools.tmf.ui.wizards.new"
-            class="org.eclipse.linuxtools.tmf.ui.parsers.wizards.CustomXmlParserWizard"
+            class="org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards.CustomXmlParserWizard"
             icon="icons/etool16/customparser_wizard.gif"
             id="org.eclipse.linuxtools.tmf.ui.wizards.custom.xml"
             name="%project.new.wizard.custom.xml.parser">
@@ -207,7 +207,7 @@
                suppressedExtensionId="org.eclipse.ui.navigator.resourceContent">
          </override>
          <actionProvider
-               class="org.eclipse.linuxtools.tmf.ui.project.handlers.TmfActionProvider"
+               class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.TmfActionProvider"
                id="org.eclipse.linuxtools.tmf.ui.navigator.actions.provider">
             <enablement>
                <or>
@@ -218,7 +218,7 @@
             </enablement>
          </actionProvider>
          <dropAssistant
-               class="org.eclipse.linuxtools.tmf.ui.project.handlers.DropAdapterAssistant"
+               class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DropAdapterAssistant"
                id="org.eclipse.linuxtools.tmf.ui.navigator.dropAssistant">
             <possibleDropTargets>
                <or>
@@ -514,7 +514,7 @@
                mnemonic="%commands.trace.select_trace_type.mnemonic"
                tooltip="%commands.trace.select_trace_type.description">
             <dynamic
-                  class="org.eclipse.linuxtools.tmf.ui.project.handlers.SelectTraceTypeContributionItem"
+                  class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.SelectTraceTypeContributionItem"
                   id="org.eclipse.linuxtools.tmf.ui.command.project.trace.select_trace_type.dynamic">
             </dynamic>
             <visibleWhen
@@ -972,71 +972,71 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.project.handlers.ImportTraceHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.ImportTraceHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.import">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.project.handlers.RefreshHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.RefreshHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.refresh">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.project.handlers.OpenTraceHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.OpenTraceHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.open">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.project.handlers.CopyTraceHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.CopyTraceHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.copy">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.project.handlers.RenameTraceHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.RenameTraceHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.rename">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.project.handlers.DeleteTraceHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteTraceHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.delete">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.project.handlers.SelectTraceTypeHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.SelectTraceTypeHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.trace.select_trace_type">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.project.handlers.NewExperimentHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.NewExperimentHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment_folder.new">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.project.handlers.RefreshHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.RefreshHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment_folder.refresh">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.project.handlers.SelectTracesHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.SelectTracesHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.select">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.project.handlers.OpenExperimentHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.OpenExperimentHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.open">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.project.handlers.CopyExperimentHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.CopyExperimentHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.copy">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.project.handlers.RenameExperimentHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.RenameExperimentHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.rename">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.project.handlers.DeleteExperimentHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteExperimentHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.delete">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.project.handlers.RefreshHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.RefreshHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.project.experiment.refresh">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.commands.ManageCustomParsersCommandHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.commands.ManageCustomParsersCommandHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.managecustomparsers">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.editors.handlers.AddBookmarkHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.editors.handlers.AddBookmarkHandler"
             commandId="org.eclipse.ui.edit.addBookmark">
          <activeWhen>
             <with
@@ -1066,7 +1066,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="org.eclipse.linuxtools.tmf.ui.preferences.TmfTracingPreferencePage"
+            class="org.eclipse.linuxtools.internal.tmf.ui.preferences.TmfTracingPreferencePage"
             id="org.eclipse.linuxtools.tmf.ui.TmfTracingPreferences"
             name="%preference.page.trace.name">
       </page>
@@ -1100,7 +1100,7 @@
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="org.eclipse.linuxtools.tmf.ui.project.handlers.TracePropertyTester"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.TracePropertyTester"
             id="org.eclipse.linuxtools.tmf.ui.tracePropertyTester"
             namespace="org.eclipse.linuxtools.tmf.ui"
             properties="isExperimentTrace"

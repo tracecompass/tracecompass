@@ -17,11 +17,11 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterRootNode;
 import org.eclipse.linuxtools.tmf.core.filter.xml.TmfFilterXMLParser;
 import org.eclipse.linuxtools.tmf.core.filter.xml.TmfFilterXMLWriter;
-import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
 import org.xml.sax.SAXException;
 
 public class FilterManager {
