@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import org.eclipse.linuxtools.tmf.core.Tracer;
+import org.eclipse.linuxtools.internal.tmf.core.Tracer;
 import org.eclipse.linuxtools.tmf.core.component.TmfThread;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 

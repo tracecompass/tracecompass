@@ -24,7 +24,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.linuxtools.tmf.core.util.TmfTraceType;
+import org.eclipse.linuxtools.internal.tmf.core.util.TmfTraceType;
 import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.tmf.ui.parsers.custom.CustomTxtTraceDefinition;

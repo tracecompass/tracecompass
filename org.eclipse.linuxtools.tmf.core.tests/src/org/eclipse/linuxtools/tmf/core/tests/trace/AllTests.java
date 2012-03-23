@@ -3,7 +3,7 @@ package org.eclipse.linuxtools.tmf.core.tests.trace;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.eclipse.linuxtools.tmf.core.TmfCorePlugin;
+import org.eclipse.linuxtools.internal.tmf.core.TmfCorePlugin;
 
 @SuppressWarnings("nls")
 public class AllTests {

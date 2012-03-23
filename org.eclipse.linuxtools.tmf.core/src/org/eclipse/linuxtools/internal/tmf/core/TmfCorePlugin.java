@@ -10,7 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core;
+package org.eclipse.linuxtools.internal.tmf.core;
 
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;

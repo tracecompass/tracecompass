@@ -17,7 +17,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 
-import org.eclipse.linuxtools.tmf.core.Tracer;
+import org.eclipse.linuxtools.internal.tmf.core.Tracer;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;

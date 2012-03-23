@@ -10,7 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.stubs.event;
+package org.eclipse.linuxtools.tmf.tests.stubs.event;
 
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 

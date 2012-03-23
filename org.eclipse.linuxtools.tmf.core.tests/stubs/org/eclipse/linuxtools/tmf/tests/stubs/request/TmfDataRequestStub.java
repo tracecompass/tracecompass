@@ -10,7 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.stubs.request;
+package org.eclipse.linuxtools.tmf.tests.stubs.request;
 
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;

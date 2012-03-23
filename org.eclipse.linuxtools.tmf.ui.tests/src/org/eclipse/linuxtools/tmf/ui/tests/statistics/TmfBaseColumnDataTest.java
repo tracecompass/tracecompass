@@ -17,7 +17,7 @@ import junit.framework.TestCase;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
+import org.eclipse.linuxtools.internal.tmf.core.util.TmfFixedArray;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfBaseColumnData;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfBaseColumnData.ITmfColumnPercentageProvider;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.model.TmfBaseStatisticsTree;

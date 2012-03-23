@@ -10,7 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.stubs.component;
+package org.eclipse.linuxtools.tmf.tests.stubs.component;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
-import org.eclipse.linuxtools.tmf.stubs.trace.TmfTraceStub;
+import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 
 /**
  * <b><u>TmfDataProviderStub</u></b>

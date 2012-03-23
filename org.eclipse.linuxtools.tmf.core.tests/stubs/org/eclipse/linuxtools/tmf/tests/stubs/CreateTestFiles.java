@@ -10,7 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.stubs;
+package org.eclipse.linuxtools.tmf.tests.stubs;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;

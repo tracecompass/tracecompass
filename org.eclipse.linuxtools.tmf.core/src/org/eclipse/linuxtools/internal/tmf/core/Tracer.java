@@ -1,4 +1,4 @@
-package org.eclipse.linuxtools.tmf.core;
+package org.eclipse.linuxtools.internal.tmf.core;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

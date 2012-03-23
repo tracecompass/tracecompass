@@ -10,7 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.util;
+package org.eclipse.linuxtools.internal.tmf.core.util;
 
 import java.util.ArrayList;
 

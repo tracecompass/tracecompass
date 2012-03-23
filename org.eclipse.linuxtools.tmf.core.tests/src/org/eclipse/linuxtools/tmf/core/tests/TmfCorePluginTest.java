@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.tests;
 
-import org.eclipse.linuxtools.tmf.core.TmfCorePlugin;
+import org.eclipse.linuxtools.internal.tmf.core.TmfCorePlugin;
 
 import junit.framework.TestCase;
 

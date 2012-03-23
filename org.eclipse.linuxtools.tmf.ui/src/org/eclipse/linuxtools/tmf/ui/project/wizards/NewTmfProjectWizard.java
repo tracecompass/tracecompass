@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.linuxtools.tmf.core.TmfProjectNature;
+import org.eclipse.linuxtools.internal.tmf.core.TmfProjectNature;
 import org.eclipse.linuxtools.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;

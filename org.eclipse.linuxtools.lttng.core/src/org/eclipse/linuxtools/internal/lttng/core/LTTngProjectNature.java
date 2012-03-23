@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.internal.lttng.core;
 
-import org.eclipse.linuxtools.tmf.core.TmfProjectNature;
+import org.eclipse.linuxtools.internal.tmf.core.TmfProjectNature;
 
 /**
  * <b><u>LTTngProjectNature</u></b>

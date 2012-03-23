@@ -25,10 +25,10 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfStartSynchSignal;
-import org.eclipse.linuxtools.tmf.stubs.component.TmfEventProviderStub;
-import org.eclipse.linuxtools.tmf.stubs.component.TmfSyntheticEventProviderStub;
-import org.eclipse.linuxtools.tmf.stubs.event.TmfSyntheticEventStub;
-import org.eclipse.linuxtools.tmf.stubs.trace.TmfTraceStub;
+import org.eclipse.linuxtools.tmf.tests.stubs.component.TmfEventProviderStub;
+import org.eclipse.linuxtools.tmf.tests.stubs.component.TmfSyntheticEventProviderStub;
+import org.eclipse.linuxtools.tmf.tests.stubs.event.TmfSyntheticEventStub;
+import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 
 /**
  * <b><u>TmfClientTest</u></b>

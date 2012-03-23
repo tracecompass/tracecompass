@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.tmf.core.request;
 
 import java.util.concurrent.CountDownLatch;
 
-import org.eclipse.linuxtools.tmf.core.Tracer;
+import org.eclipse.linuxtools.internal.tmf.core.Tracer;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 /**

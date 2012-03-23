@@ -18,7 +18,7 @@ import junit.framework.TestCase;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.TmfCoalescedDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
-import org.eclipse.linuxtools.tmf.stubs.request.TmfDataRequestStub;
+import org.eclipse.linuxtools.tmf.tests.stubs.request.TmfDataRequestStub;
 
 /**
  * <b><u>TmfCoalescedDataRequestTest</u></b>

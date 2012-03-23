@@ -13,7 +13,7 @@
 package org.eclipse.linuxtools.tmf.core.tests;
 
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.linuxtools.tmf.core.Tracer;
+import org.eclipse.linuxtools.internal.tmf.core.Tracer;
 import org.osgi.framework.BundleContext;
 
 /**

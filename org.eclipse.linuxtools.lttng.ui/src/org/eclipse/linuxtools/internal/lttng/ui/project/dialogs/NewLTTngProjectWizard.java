@@ -19,7 +19,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.linuxtools.internal.lttng.core.LTTngProjectNature;
 import org.eclipse.linuxtools.internal.lttng.core.TraceHelper;
-import org.eclipse.linuxtools.tmf.core.TmfProjectNature;
+import org.eclipse.linuxtools.internal.tmf.core.TmfProjectNature;
 import org.eclipse.linuxtools.tmf.ui.project.wizards.NewTmfProjectWizard;
 
 /**

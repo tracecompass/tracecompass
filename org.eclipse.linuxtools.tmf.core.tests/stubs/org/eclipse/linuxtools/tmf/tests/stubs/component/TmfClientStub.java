@@ -10,12 +10,12 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.stubs.component;
+package org.eclipse.linuxtools.tmf.tests.stubs.component;
 
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.component.TmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.component.TmfProviderManager;
-import org.eclipse.linuxtools.tmf.stubs.event.TmfSyntheticEventStub;
+import org.eclipse.linuxtools.tmf.tests.stubs.event.TmfSyntheticEventStub;
 
 /**
  * <b><u>TmfClientStub</u></b>

@@ -10,7 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.stubs.component;
+package org.eclipse.linuxtools.tmf.tests.stubs.component;
 
 import java.util.concurrent.TimeUnit;
 
@@ -24,7 +24,7 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
-import org.eclipse.linuxtools.tmf.stubs.event.TmfSyntheticEventStub;
+import org.eclipse.linuxtools.tmf.tests.stubs.event.TmfSyntheticEventStub;
 
 /**
  * <b><u>TmfSyntheticEventProviderStub</u></b>

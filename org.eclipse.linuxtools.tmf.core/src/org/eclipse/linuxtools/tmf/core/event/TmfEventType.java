@@ -13,6 +13,7 @@
 
 package org.eclipse.linuxtools.tmf.core.event;
 
+
 /**
  * <b><u>TmfEventType</u></b>
  * <p>

@@ -26,7 +26,7 @@ import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.stubs.trace.TmfTraceStub;
+import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 import org.eclipse.linuxtools.tmf.ui.tests.TmfUITestPlugin;
 import org.eclipse.linuxtools.tmf.ui.tests.uml2sd.trace.TmfUml2SDTestTrace;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
