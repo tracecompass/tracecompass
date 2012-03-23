@@ -13,7 +13,7 @@
  * $Id: TimeScaleCtrl.java,v 1.5 2008/06/16 21:04:49 jkubasta Exp $ 
  *****************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.ui.viewers.timeAnalysis.widgets;
+package org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -22,7 +22,7 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
-import org.eclipse.linuxtools.internal.tmf.ui.viewers.timeAnalysis.widgets.Utils.Resolution;
+import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.Utils.Resolution;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;

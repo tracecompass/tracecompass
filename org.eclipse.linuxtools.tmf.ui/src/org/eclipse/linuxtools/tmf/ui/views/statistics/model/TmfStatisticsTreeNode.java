@@ -16,7 +16,7 @@ package org.eclipse.linuxtools.tmf.ui.views.statistics.model;
 
 import java.util.Collection;
 
-import org.eclipse.linuxtools.internal.tmf.core.util.TmfFixedArray;
+import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
 
 /**
  * <h4>A tree where nodes can be accessed efficiently using paths.</h4>

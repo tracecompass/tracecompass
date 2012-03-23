@@ -11,7 +11,7 @@
  * $Id: ThreadFilterDialog.java,v 1.2 2008/03/05 17:31:07 ewchan Exp $ 
  *****************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.ui.viewers.timeAnalysis.dialogs;
+package org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.dialogs;
 
 import java.util.Arrays;
 

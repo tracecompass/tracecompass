@@ -104,7 +104,7 @@ public class ColorSetting {
 	
 	/**
 	 * @return the tick color index (0-15)
-	 * @see org.eclipse.linuxtools.internal.tmf.ui.viewers.timeAnalysis.widgets.TraceColorScheme
+	 * @see org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.TraceColorScheme
 	 */
 	public int getTickColorIndex() {
 		return fTickColorIndex;
@@ -112,7 +112,7 @@ public class ColorSetting {
 	
 	/**
 	 * @param tickColorIndex the tick color index to set (0-15)
-	 * @see org.eclipse.linuxtools.internal.tmf.ui.viewers.timeAnalysis.widgets.TraceColorScheme
+	 * @see org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.TraceColorScheme
 	 */
 	public void setTickColorIndex(int tickColorIndex) {
 		fTickColorIndex = tickColorIndex;

@@ -11,7 +11,7 @@
  *   Mathieu Denis  (mathieu.denis@polymtl.ca)  - Correction and refactoring
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.core.util;
+package org.eclipse.linuxtools.tmf.core.util;
 
 import java.lang.reflect.Array;
 import java.util.AbstractList;

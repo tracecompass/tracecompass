@@ -19,12 +19,12 @@ import java.util.Vector;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.internal.tmf.core.util.TmfFixedArray;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.ITmfExtraEventInfo;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.model.AbsTmfStatisticsTree;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.model.Messages;

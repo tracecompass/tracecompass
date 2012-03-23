@@ -12,17 +12,17 @@
  *
  * $Id: ThreadsTipHandler.java,v 1.5 2007/06/06 19:16:16 gnagarajan Exp $
  *****************************************************************************/
-package org.eclipse.linuxtools.internal.tmf.ui.viewers.timeAnalysis.widgets;
+package org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets;
 
 import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
-import org.eclipse.linuxtools.internal.tmf.ui.viewers.timeAnalysis.widgets.Utils.Resolution;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.ITimeAnalysisViewer.TimeFormat;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
+import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.Utils.Resolution;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;

@@ -14,10 +14,10 @@ package org.eclipse.linuxtools.tmf.ui.views.timechart;
 
 import java.util.Map;
 
-import org.eclipse.linuxtools.internal.tmf.ui.viewers.timeAnalysis.widgets.TraceColorScheme;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
+import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.TraceColorScheme;
 import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSettingsManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;

@@ -16,7 +16,7 @@ import java.util.Arrays;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.internal.tmf.core.util.TmfFixedArray;
+import org.eclipse.linuxtools.tmf.core.util.TmfFixedArray;
 
 public class TmfFixedArrayTest extends TestCase {
     

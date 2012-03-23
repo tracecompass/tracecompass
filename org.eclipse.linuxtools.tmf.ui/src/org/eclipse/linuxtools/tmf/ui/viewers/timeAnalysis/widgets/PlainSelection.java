@@ -13,7 +13,7 @@
  * $Id: PlainSelection.java,v 1.1 2007/04/20 13:06:49 ewchan Exp $ 
  *****************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.ui.viewers.timeAnalysis.widgets;
+package org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -13,7 +13,7 @@
  * $Id: Utils.java,v 1.11 2008/06/16 21:04:49 jkubasta Exp $ 
  *****************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.ui.viewers.timeAnalysis.widgets;
+package org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

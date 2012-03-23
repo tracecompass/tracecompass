@@ -13,7 +13,7 @@
  * $Id: TraceCtrl.java,v 1.2 2007/02/27 18:37:36 ewchan Exp $ 
  *****************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.ui.viewers.timeAnalysis.widgets;
+package org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;

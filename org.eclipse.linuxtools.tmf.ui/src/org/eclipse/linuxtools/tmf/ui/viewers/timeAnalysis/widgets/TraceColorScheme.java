@@ -13,7 +13,7 @@
  * $Id: TraceColorScheme.java,v 1.3 2008/05/09 16:11:24 jkubasta Exp $ 
  *****************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.ui.viewers.timeAnalysis.widgets;
+package org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets;
 
 import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider.StateColor;
 import org.eclipse.swt.SWT;

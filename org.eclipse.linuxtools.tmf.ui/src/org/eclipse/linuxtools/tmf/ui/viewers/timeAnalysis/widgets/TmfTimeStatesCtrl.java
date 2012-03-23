@@ -13,7 +13,7 @@
  * $Id: ThreadStatesCtrl.java,v 1.15 2008/07/11 13:49:01 aalexeev Exp $ 
  *****************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.ui.viewers.timeAnalysis.widgets;
+package org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets;
 
 import java.util.ArrayList;
 import java.util.HashMap;

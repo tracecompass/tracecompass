@@ -10,7 +10,7 @@
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.tmf.core.util;
+package org.eclipse.linuxtools.tmf.core.util;
 
 import java.util.LinkedList;
 import java.util.List;
