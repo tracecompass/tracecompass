@@ -87,6 +87,18 @@ public class Uml2SDTestFacility {
             
             IViewPart view;
             try {
+                // Remove welcome view to avoid interference during test execution
+                view = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow()
+                        .getActivePage()
+                        .findView("org.eclipse.ui.internal.introview"); //$NON-NLS-1$
+                
+                if (view != null) {
+                    PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow()
+                    .getActivePage().hideView(view); 
+                }
+                
                 view = PlatformUI.getWorkbench()
                                  .getActiveWorkbenchWindow()
                                  .getActivePage()
