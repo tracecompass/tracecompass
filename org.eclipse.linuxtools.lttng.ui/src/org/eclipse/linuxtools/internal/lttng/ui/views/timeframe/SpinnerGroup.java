@@ -79,7 +79,7 @@ public class SpinnerGroup {
      * @param range     - the valid time range (start/end time)
      * @param current   - the current time
      */
-    public SpinnerGroup(TimeFrameView owner, Composite parent, String groupName, TmfTimeRange range, ITmfTimestamp current) {
+    public SpinnerGroup(@SuppressWarnings("deprecation") TimeFrameView owner, Composite parent, String groupName, TmfTimeRange range, ITmfTimestamp current) {
 
         // Create the group
         group = new Group(parent, SWT.BORDER);
