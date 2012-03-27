@@ -71,6 +71,7 @@ public class Uml2SDTestFacility {
     public static Uml2SDTestFacility getInstance() {
         if (fInstance == null) {
             fInstance = new Uml2SDTestFacility();
+            fInstance.init();
         }
         return fInstance;
     }

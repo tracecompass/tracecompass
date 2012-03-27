@@ -89,7 +89,7 @@ public interface ITmfEvent extends Cloneable {
     // ------------------------------------------------------------------------
 
     /**
-     * @return a clone of the data item
+     * @return a clone of the event
      */
     public ITmfEvent clone();
     

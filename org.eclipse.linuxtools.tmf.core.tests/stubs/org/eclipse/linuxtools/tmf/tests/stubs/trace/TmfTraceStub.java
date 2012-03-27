@@ -55,54 +55,54 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     // ------------------------------------------------------------------------
 
     /**
-     * @param filename
+     * @param path
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(String filename) throws FileNotFoundException {
-        this(filename, DEFAULT_INDEX_PAGE_SIZE, false);
+    public TmfTraceStub(String path) throws FileNotFoundException {
+        this(path, DEFAULT_INDEX_PAGE_SIZE, false);
     }
 
     /**
-     * @param filename
+     * @param path
      * @param cacheSize
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(String filename, int cacheSize) throws FileNotFoundException {
-        this(filename, cacheSize, false);
+    public TmfTraceStub(String path, int cacheSize) throws FileNotFoundException {
+        this(path, cacheSize, false);
     }
 
     /**
-     * @param filename
+     * @param path
      * @param waitForCompletion
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(String filename, boolean waitForCompletion) throws FileNotFoundException {
-        this(filename, DEFAULT_INDEX_PAGE_SIZE, waitForCompletion);
+    public TmfTraceStub(String path, boolean waitForCompletion) throws FileNotFoundException {
+        this(path, DEFAULT_INDEX_PAGE_SIZE, waitForCompletion);
     }
     
     /**
-     * @param filename
+     * @param path
      * @param cacheSize
      * @param waitForCompletion
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(String filename, int cacheSize, boolean waitForCompletion) throws FileNotFoundException {
-        super(null, TmfEvent.class, filename, cacheSize, false);
-        fTrace = new RandomAccessFile(filename, "r");
+    public TmfTraceStub(String path, int cacheSize, boolean waitForCompletion) throws FileNotFoundException {
+        super(null, TmfEvent.class, path, cacheSize, false);
+        fTrace = new RandomAccessFile(path, "r");
         fParser = new TmfEventParserStub();
     }
 
     
     /**
-     * @param filename
+     * @param path
      * @param cacheSize
      * @param waitForCompletion
      * @param parser
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(String filename, int cacheSize, boolean waitForCompletion, ITmfEventParser<TmfEvent> parser) throws FileNotFoundException {
-        super(filename, TmfEvent.class, filename, cacheSize, false);
-        fTrace = new RandomAccessFile(filename, "r");
+    public TmfTraceStub(String path, int cacheSize, boolean waitForCompletion, ITmfEventParser<TmfEvent> parser) throws FileNotFoundException {
+        super(path, TmfEvent.class, path, cacheSize, false);
+        fTrace = new RandomAccessFile(path, "r");
         fParser = parser;
     }
     

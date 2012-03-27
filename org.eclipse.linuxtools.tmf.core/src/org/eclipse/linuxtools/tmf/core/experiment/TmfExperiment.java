@@ -137,11 +137,8 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         fIndexPageSize = indexPageSize;
         fTimeRange = TmfTimeRange.NULL_RANGE;
 
-        if (preIndexExperiment) {
-            indexExperiment(true);
-            updateTimeRange();
-        }
-
+        indexExperiment(true);
+        updateTimeRange();
     }
 
     protected TmfExperiment(String id, Class<T> type) {
@@ -174,7 +171,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
      */
     @SuppressWarnings("unchecked")
     public TmfExperiment(TmfExperiment<T> other) {
-        super(other.getName() + "(clone)", other.fType); //$NON-NLS-1$
+        super(other.getName() + "(copy)", other.fType); //$NON-NLS-1$
 
         fEpoch = other.fEpoch;
         fIndexPageSize = other.fIndexPageSize;

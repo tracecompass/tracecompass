@@ -174,8 +174,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      */
     protected TmfTrace(String name, Class<T> type, String path, int cacheSize, boolean indexTrace) throws FileNotFoundException {
         super();
-        fTraceName = name;
-        initTrace(name, path, type, cacheSize, indexTrace);
+         initTrace(name, path, type, cacheSize, indexTrace);
     }
 
     @SuppressWarnings("unchecked")
