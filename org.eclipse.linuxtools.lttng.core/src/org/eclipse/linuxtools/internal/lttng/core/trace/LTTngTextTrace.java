@@ -106,22 +106,6 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
     	fCheckpoints = oldTrace.fCheckpoints;
     }
     
-	@Override
-	public LTTngTextTrace copy() {
-		
-		LTTngTextTrace returnedTrace = null;
-    	
-    	try {
-    		returnedTrace = new LTTngTextTrace(this);
-    	}
-    	catch (Exception e) {
-    		System.out.println("ERROR : Could not create LTTngTextTrace copy (createTraceCopy)"); //$NON-NLS-1$
-    		e.printStackTrace(); 
-    	}
-    	
-    	return returnedTrace;
-	}
-    
     private boolean positionToFirstEvent() {
     	
     	boolean isSuccessful = true;

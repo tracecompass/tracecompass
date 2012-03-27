@@ -27,7 +27,6 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
@@ -35,7 +34,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
 
     private static final TmfLocation<Long> NULL_LOCATION = new TmfLocation<Long>((Long) null);
-    private static final int CACHE_SIZE = 100;
+    private static final int DEFAULT_PAGE_SIZE = 100;
 
     private CustomTxtTraceDefinition fDefinition;
     private CustomTxtEventType fEventType;
@@ -52,15 +51,8 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     }
 
     @Override
-    public void initTrace(String name, String path, Class<CustomTxtEvent> eventType, boolean indexTrace) throws FileNotFoundException {
-        super.initTrace(name, path, eventType, CACHE_SIZE, indexTrace);
-    }
-
-    @Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ITmfTrace copy() {
-        // TODO Auto-generated method stub
-        return null;
+    public void initTrace(String name, String path, Class<CustomTxtEvent> eventType, int pageSize) throws FileNotFoundException {
+        super.initTrace(name, path, eventType, (pageSize > 0) ? pageSize : DEFAULT_PAGE_SIZE);
     }
 
     @Override

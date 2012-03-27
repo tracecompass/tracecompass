@@ -21,7 +21,6 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
@@ -69,18 +68,6 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> {
     	fParser = new LTTngEventParserStub();
 //    	indexTrace(true);
     }
-    
-	@Override
-	public ITmfTrace<LttngEvent> copy() {
-		ITmfTrace<LttngEvent> returnedValue = null;
-		try {
-			returnedValue = new LTTngTraceStub(this.getName());
-		}
-		catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		return returnedValue;
-	}
     
     // ========================================================================
     // Accessors

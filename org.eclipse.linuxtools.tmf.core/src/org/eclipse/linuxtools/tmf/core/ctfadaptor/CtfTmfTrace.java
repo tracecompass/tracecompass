@@ -70,7 +70,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
     }
 
     @Override
-    public void initTrace(String name, String path, Class<CtfTmfEvent> eventType)
+    public void initTrace(String name, String path, Class<CtfTmfEvent> eventType, int pageSize)
             throws FileNotFoundException {
         try {
             this.fTrace = new CTFTrace(path);
@@ -96,24 +96,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
     }
 
     @Override
-    public void initTrace(String name, String path,
-            Class<CtfTmfEvent> eventType, int cacheSize)
-            throws FileNotFoundException {
-        this.initTrace(name, path, eventType);
-    }
-
-    @Override
-    public void initTrace(String name, String path,
-            Class<CtfTmfEvent> eventType, boolean indexTrace)
-            throws FileNotFoundException {
-        this.initTrace(name, path, eventType);
-    }
-
-    @Override
-    public void initTrace(String name, String path,
-            Class<CtfTmfEvent> eventType, int cacheSize, boolean indexTrace)
-            throws FileNotFoundException {
-        this.initTrace(name, path, eventType);
+    public void indexTrace(boolean waitForCompletion) {
     }
 
     @Override
@@ -146,12 +129,6 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
         clone.fEndTime = this.fEndTime.clone();
         clone.fTrace = this.fTrace;
         return clone;
-    }
-
-    @Override
-    public ITmfTrace<CtfTmfEvent> copy() {
-        // FIXME not yet implemented
-        return null;
     }
 
     // ------------------------------------------------------------------------
@@ -337,4 +314,5 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
     CTFTrace getCTFTrace() {
         return fTrace;
     }
+
 }

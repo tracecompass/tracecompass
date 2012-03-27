@@ -24,7 +24,6 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
@@ -121,13 +120,6 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     	return clone;
     }
  
-    @Override
-	public ITmfTrace<TmfEvent> copy() {
-		ITmfTrace<TmfEvent> returnedValue = null;
-		returnedValue = clone();
-		return returnedValue;
-	}
-    
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------

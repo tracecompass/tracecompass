@@ -130,7 +130,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                                     throw new PartInitException(Messages.OpenExperimentHandler_NoTraceType);
                                 }
                                 try {
-                                    trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), false);
+                                    trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), 0);
                                 } catch (FileNotFoundException e) {
                                 }
                                 trace.setResource(traceElement.getResource());
@@ -140,7 +140,8 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                             TmfExperiment experiment = new TmfExperiment(TmfEvent.class, experimentElement.getName(), traces, cacheSize);
                             experiment.setBookmarksFile(fFile);
                             fTrace = experiment;
-                            experiment.initTrace(null, null, null, true);
+                            experiment.initTrace(null, null, null, 0);
+                            experiment.indexTrace(true);
                             break;
                         }
                     }
@@ -160,7 +161,8 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             }
                             try {
-                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), true);
+                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), 0);
+                                trace.indexTrace(false);
                             } catch (FileNotFoundException e) {
                             }
                             trace.setResource(traceElement.getResource());
@@ -182,7 +184,8 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             }
                             try {
-                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), true);
+                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), 0);
+                                trace.indexTrace(false);
                             } catch (FileNotFoundException e) {
                             }
                             if (trace instanceof TmfTrace) {
@@ -497,7 +500,8 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                             fTrace = (ITmfTrace<?>) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
                             TmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
                             String path = fFile.getLocationURI().getPath();
-                            fTrace.initTrace(name, path, event.getClass(), true);
+                            fTrace.initTrace(name, path, event.getClass(), 0);
+                            fTrace.indexTrace(false);
                             break;
                         }
                     }

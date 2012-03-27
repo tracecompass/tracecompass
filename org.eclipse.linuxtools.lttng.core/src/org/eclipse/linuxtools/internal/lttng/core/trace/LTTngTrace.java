@@ -116,27 +116,12 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     }
 
     @Override
-    public void initTrace(String name, String path, Class<LttngEvent> eventType) throws FileNotFoundException {
-        initLTTngTrace(name, path, eventType, CHECKPOINT_PAGE_SIZE, false);
+    public void initTrace(String name, String path, Class<LttngEvent> eventType, int pageSize) throws FileNotFoundException {
+        initLTTngTrace(name, path, eventType, pageSize, false);
     }
 
-    @Override
-    public void initTrace(String name, String path, Class<LttngEvent> eventType, int cacheSize) throws FileNotFoundException {
-        initLTTngTrace(name, path, eventType, cacheSize, false);
-    }
-
-    @Override
-    public void initTrace(String name, String path, Class<LttngEvent> eventType, boolean indexTrace) throws FileNotFoundException {
-        initLTTngTrace(name, path, eventType, CHECKPOINT_PAGE_SIZE, indexTrace);
-    }
-
-    @Override
-    public void initTrace(String name, String path, Class<LttngEvent> eventType, int cacheSize, boolean indexTrace) throws FileNotFoundException {
-        initLTTngTrace(name, path, eventType, cacheSize, indexTrace);
-    }
-
-    private synchronized void initLTTngTrace(String name, String path, Class<LttngEvent> eventType, int cacheSize, boolean indexTrace) throws FileNotFoundException {
-        super.initTrace(name, path, eventType, indexTrace);
+    private synchronized void initLTTngTrace(String name, String path, Class<LttngEvent> eventType, int pageSize, boolean indexTrace) throws FileNotFoundException {
+        super.initTrace(name, path, eventType, (pageSize > 0) ? pageSize : CHECKPOINT_PAGE_SIZE);
         try {
             currentJniTrace = JniTraceFactory.getJniTrace(path, traceLibPath, SHOW_LTT_DEBUG_DEFAULT);
         } catch (Exception e) {
@@ -320,7 +305,9 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     public LTTngTrace(String name, String path, String traceLibPath, boolean waitForCompletion, boolean bypassIndexing)
             throws Exception {
         super(name, LttngEvent.class, path, CHECKPOINT_PAGE_SIZE, false);
-        initTrace(name, path, LttngEvent.class, !bypassIndexing);
+        initTrace(name, path, LttngEvent.class, CHECKPOINT_PAGE_SIZE);
+        if (!bypassIndexing)
+            indexTrace(false);
         this.traceLibPath = traceLibPath;
     }
 
@@ -331,20 +318,6 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         this(other.getName(), other.getPath(), other.getTraceLibPath(), false, true);
         this.fCheckpoints = other.fCheckpoints;
         setTimeRange(new TmfTimeRange(new LttngTimestamp(other.getStartTime()), new LttngTimestamp(other.getEndTime())));
-    }
-
-    @Override
-    public LTTngTrace copy() {
-        LTTngTrace returnedTrace = null;
-
-        try {
-            returnedTrace = new LTTngTrace(this);
-        } catch (Exception e) {
-            System.out.println("ERROR : Could not create LTTngTrace copy (createTraceCopy)."); //$NON-NLS-1$
-            e.printStackTrace();
-        }
-
-        return returnedTrace;
     }
 
     @Override

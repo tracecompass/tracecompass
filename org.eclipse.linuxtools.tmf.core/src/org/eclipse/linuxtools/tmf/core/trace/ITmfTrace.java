@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2011 Ericsson
+ * Copyright (c) 2009, 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Francois Chouinard - Updated as per TMF Trace Model 1.0
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.trace;
@@ -24,22 +25,29 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 /**
  * <b><u>ITmfTrace</u></b>
  * <p>
+ * The basic event trace structure in the TMF.
  */
 public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
 
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
+    // Initializers
+    // ------------------------------------------------------------------------
+
     // initTrace variants
-    public void initTrace(String name, String path, Class<T> eventType) throws FileNotFoundException;
+    public void initTrace(String name, String path, Class<T> eventType, int pageSize) throws FileNotFoundException;
 
-    public void initTrace(String name, String path, Class<T> eventType, int cacheSize) throws FileNotFoundException;
-
-    public void initTrace(String name, String path, Class<T> eventType, boolean indexTrace) throws FileNotFoundException;
-
-    public void initTrace(String name, String path, Class<T> eventType, int cacheSize, boolean indexTrace) throws FileNotFoundException;
+    public void indexTrace(boolean waitForCompletion);
 
     // Trace type validation
     public boolean validate(IProject project, String path);
 
-    public ITmfTrace<T> copy();
+    // ------------------------------------------------------------------------
+    // Getters
+    // ------------------------------------------------------------------------
 
     /**
      * @return the trace path
@@ -76,6 +84,10 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
      */
     public long getStreamingInterval();
 
+    // ------------------------------------------------------------------------
+    // Seek operations
+    // ------------------------------------------------------------------------
+
     /**
      * Positions the trace at the first event with the specified timestamp or index (i.e. the nth event in the trace).
      * 
@@ -101,6 +113,30 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
      */
     public ITmfContext seekLocation(double ratio);
 
+    // ------------------------------------------------------------------------
+    // Read operations
+    // ------------------------------------------------------------------------
+
+    /**
+     * Return the event pointed by the supplied context (or null if no event left) and updates the context to the next
+     * event.
+     * 
+     * @return the next event in the stream
+     */
+    public ITmfEvent getNextEvent(ITmfContext context);
+
+    /**
+     * Return the event pointed by the supplied context (or null if no event left) and *does not* update the context.
+     * 
+     * @return the next event in the stream
+     */
+    public ITmfEvent parseEvent(ITmfContext context);
+
+
+    // ------------------------------------------------------------------------
+    // misc
+    // ------------------------------------------------------------------------
+
     /**
      * Returns the ratio corresponding to the specified location.
      * 
@@ -122,21 +158,6 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
     public long getRank(ITmfTimestamp timestamp);
 
     /**
-     * Return the event pointed by the supplied context (or null if no event left) and updates the context to the next
-     * event.
-     * 
-     * @return the next event in the stream
-     */
-    public ITmfEvent getNextEvent(ITmfContext context);
-
-    /**
-     * Return the event pointed by the supplied context (or null if no event left) and *does not* update the context.
-     * 
-     * @return the next event in the stream
-     */
-    public ITmfEvent parseEvent(ITmfContext context);
-
-    /**
      * Set the resource used for persistent properties on this trace
      * @param resource the properties resource
      */
@@ -147,4 +168,5 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
      * @return the properties resource or null if none is set
      */
     public IResource getResource();
+
 }

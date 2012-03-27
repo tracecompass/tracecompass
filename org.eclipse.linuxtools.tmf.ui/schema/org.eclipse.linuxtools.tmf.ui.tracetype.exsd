@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.linuxtools.tmf" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.eclipse.linuxtools.tmf.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.linuxtools.tmf" id="org.eclipse.linuxtools.tmf.tracetype" name="TMF Trace Type"/>
+         <meta.schema plugin="org.eclipse.linuxtools.tmf.ui" id="tracetype" name="TMF Trace Type"/>
       </appinfo>
       <documentation>
          This extension point is used to contribute new trace types to the generic components of the TMF framework.
@@ -93,7 +93,7 @@
                   an optional attribute that is composed of the category ID. The referenced category must be declared in a corresponding category element.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.eclipse.linuxtools.tmf.tracetype/category/@id"/>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.linuxtools.tmf.ui.tracetype/category/@id"/>
                </appinfo>
             </annotation>
          </attribute>

@@ -97,26 +97,11 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     }
 
     @Override
-    public void initTrace(String name, String path, Class<T> eventType) throws FileNotFoundException {
-        initTmfTrace(name, path, eventType, DEFAULT_INDEX_PAGE_SIZE, false);
+    public void initTrace(String name, String path, Class<T> eventType, int pageSize) throws FileNotFoundException {
+        initTmfTrace(name, path, eventType, pageSize, false);
     }
 
-    @Override
-    public void initTrace(String name, String path, Class<T> eventType, int cacheSize) throws FileNotFoundException {
-        initTmfTrace(name, path, eventType, cacheSize, false);
-    }
-
-    @Override
-    public void initTrace(String name, String path, Class<T> eventType, boolean indexTrace) throws FileNotFoundException {
-        initTmfTrace(name, path, eventType, DEFAULT_INDEX_PAGE_SIZE, indexTrace);
-    }
-
-    @Override
-    public void initTrace(String name, String path, Class<T> eventType, int cacheSize, boolean indexTrace) throws FileNotFoundException {
-        initTmfTrace(name, path, eventType, cacheSize, indexTrace);
-    }
-
-    private void initTmfTrace(String name, String path, Class<T> eventType, int cacheSize, boolean indexTrace) throws FileNotFoundException {
+    private void initTmfTrace(String name, String path, Class<T> eventType, int pageSize, boolean indexTrace) throws FileNotFoundException {
         fPath = path;
         if (name != null) {
             fTraceName = name;
@@ -129,7 +114,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
             }
         }
         super.init(fTraceName, eventType);
-        fIndexPageSize = (cacheSize > 0) ? cacheSize : DEFAULT_INDEX_PAGE_SIZE;
+        fIndexPageSize = (pageSize > 0) ? pageSize : DEFAULT_INDEX_PAGE_SIZE;
         if (indexTrace)
             indexTrace(false);
     }
@@ -174,7 +159,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      */
     protected TmfTrace(String name, Class<T> type, String path, int cacheSize, boolean indexTrace) throws FileNotFoundException {
         super();
-         initTrace(name, path, type, cacheSize, indexTrace);
+        initTmfTrace(name, path, type, cacheSize, indexTrace);
     }
 
     @SuppressWarnings("unchecked")
@@ -477,8 +462,9 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * event).
      */
 
+    @Override
     @SuppressWarnings({ "unchecked" })
-    protected void indexTrace(boolean waitForCompletion) {
+    public void indexTrace(boolean waitForCompletion) {
 
         final Job job = new Job("Indexing " + getName() + "...") { //$NON-NLS-1$ //$NON-NLS-2$
             @Override

@@ -45,7 +45,7 @@ public class TmfExperimentContext extends TmfContext {
 	// ------------------------------------------------------------------------
 
 	private ITmfTrace<?>[]  fTraces = new ITmfTrace[0];
-	private TmfContext[] fContexts;
+	private ITmfContext[] fContexts;
 	private ITmfEvent[]   fEvents;
 	private int lastTraceRead;
 
@@ -53,7 +53,7 @@ public class TmfExperimentContext extends TmfContext {
 	// Constructors
 	// ------------------------------------------------------------------------
 
-	public TmfExperimentContext(ITmfTrace<?>[] traces, TmfContext[] contexts) {
+	public TmfExperimentContext(ITmfTrace<?>[] traces, ITmfContext[] contexts) {
 		super();
 		fTraces   = traces;
 		fContexts = contexts;
@@ -88,8 +88,8 @@ public class TmfExperimentContext extends TmfContext {
 		setLastTrace(other.lastTraceRead);
 	}
 
-	private TmfContext[] cloneContexts() {
-		TmfContext[] contexts = new TmfContext[fContexts.length];
+	private ITmfContext[] cloneContexts() {
+		ITmfContext[] contexts = new TmfContext[fContexts.length];
 		for (int i = 0; i < fContexts.length; i++)
 			contexts[i] = fContexts[i].clone();
 		return contexts;

@@ -37,7 +37,6 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
@@ -97,25 +96,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     }
 
     @Override
-    public void initTrace(String name, String path, Class<T> eventType) {
-    }
-
-    @Override
-    public void initTrace(String name, String path, Class<T> eventType, boolean indexTrace) {
-        if (indexTrace) {
-            initializeStreamingMonitor();
-        }
-    }
-
-    @Override
-    public void initTrace(String name, String path, Class<T> eventType, int cacheSize) {
-    }
-
-    @Override
-    public void initTrace(String name, String path, Class<T> eventType, int cacheSize, boolean indexTrace) {
-        if (indexTrace) {
-            initializeStreamingMonitor();
-        }
+    public void initTrace(String name, String path, Class<T> eventType, int pageSize) {
     }
 
     /**
@@ -138,8 +119,8 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         fTimeRange = TmfTimeRange.NULL_RANGE;
 
         if (preIndexExperiment) {
-          indexExperiment(true);
-          updateTimeRange();
+            indexExperiment(true, 0, TmfTimeRange.ETERNITY);
+            updateTimeRange();
         }
     }
 
@@ -164,34 +145,6 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
      */
     public TmfExperiment(Class<T> type, String id, ITmfTrace<T>[] traces, int indexPageSize) {
         this(type, id, traces, TmfTimestamp.ZERO, indexPageSize);
-    }
-
-    /**
-     * Copy constructor
-     * 
-     * @param other
-     */
-    @SuppressWarnings("unchecked")
-    public TmfExperiment(TmfExperiment<T> other) {
-        super(other.getName() + "(copy)", other.fType); //$NON-NLS-1$
-
-        fEpoch = other.fEpoch;
-        fIndexPageSize = other.fIndexPageSize;
-
-        fTraces = new ITmfTrace[other.fTraces.length];
-        for (int trace = 0; trace < other.fTraces.length; trace++) {
-            fTraces[trace] = other.fTraces[trace].copy();
-        }
-
-        fNbEvents = other.fNbEvents;
-        fTimeRange = other.fTimeRange;
-    }
-
-    @Override
-    public TmfExperiment<T> copy() {
-        TmfExperiment<T> experiment = new TmfExperiment<T>(this);
-        TmfSignalManager.deregister(experiment);
-        return experiment;
     }
 
     /**
@@ -831,8 +784,11 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         }
     }
 
-    protected void indexExperiment(boolean waitForCompletion) {
-        indexExperiment(waitForCompletion, 0, TmfTimeRange.ETERNITY);
+    @Override
+    public void indexTrace(boolean waitForCompletion) {
+        if (waitForCompletion) {
+            initializeStreamingMonitor();
+        }
     }
 
     @SuppressWarnings("unchecked")

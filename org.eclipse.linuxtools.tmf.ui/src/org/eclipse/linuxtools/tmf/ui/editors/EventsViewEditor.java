@@ -136,7 +136,7 @@ public class EventsViewEditor extends TmfEditor {
                                     throw new PartInitException(Messages.OpenExperimentHandler_NoTraceType);
                                 }
                                 try {
-                                    trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), false);
+                                    trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), 0);
                                 } catch (FileNotFoundException e) {
                                 }
                                 trace.setResource(traceElement.getResource());
@@ -167,7 +167,7 @@ public class EventsViewEditor extends TmfEditor {
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             }
                             try {
-                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), false);
+                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), 0);
                             } catch (FileNotFoundException e) {
                             }
                             trace.setResource(traceElement.getResource());
@@ -194,7 +194,8 @@ public class EventsViewEditor extends TmfEditor {
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             }
                             try {
-                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), true);
+                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), 0);
+                                trace.indexTrace(false);
                             } catch (FileNotFoundException e) {
                             }
                             if (trace instanceof TmfTrace) {
