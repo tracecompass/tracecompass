@@ -10,7 +10,7 @@
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.util;
+package org.eclipse.linuxtools.tmf.ui.project.model;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.Platform;
 public class TmfTraceType {
 
     // Extension point ID
-    public static final String TMF_TRACE_TYPE_ID = "org.eclipse.linuxtools.tmf.tracetype"; //$NON-NLS-1$
+    public static final String TMF_TRACE_TYPE_ID = "org.eclipse.linuxtools.tmf.ui.tracetype"; //$NON-NLS-1$
 
     // Extension point elements
     public static final String CATEGORY_ELEM = "category"; //$NON-NLS-1$

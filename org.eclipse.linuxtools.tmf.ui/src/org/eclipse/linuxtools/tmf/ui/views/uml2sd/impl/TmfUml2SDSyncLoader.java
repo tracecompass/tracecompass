@@ -165,6 +165,23 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     @TmfSignalHandler
     public void experimentSelected(TmfExperimentSelectedSignal<TmfEvent> signal) {
 
+        final Job job = new Job("Indexing " + getName() + "...") { //$NON-NLS-1$ //$NON-NLS-2$
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+                while (!monitor.isCanceled()) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        return Status.OK_STATUS;
+                    }
+                }
+                monitor.done();
+                return Status.OK_STATUS;
+            }
+        };
+        job.setUser(false);
+        job.schedule();
+
         fLock.lock(); 
         try {
             // Update the trace reference
@@ -255,6 +272,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                         fView.setFrameSync(fFrame);
                     }
                     super.handleCompleted();
+                    job.cancel();
                 }
             };
 
@@ -262,6 +280,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         } finally {
             fLock.unlock();
         }
+    
     }
 
     /**

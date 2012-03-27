@@ -417,7 +417,7 @@
    </extension>
 
    <extension
-         point="org.eclipse.linuxtools.tmf.tracetype">
+         point="org.eclipse.linuxtools.tmf.ui.tracetype">
       <category
             id="org.eclipse.linuxtools.lttng.ui.category.lttng"
             name="%tracetype.category.lttng">
@@ -434,5 +434,5 @@
          </eventsTableType>
       </type>
    </extension>
-
+   
 </plugin>

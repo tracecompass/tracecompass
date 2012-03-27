@@ -2,6 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="org.eclipse.linuxtools.tmf.ui.uml2SDLoader" name="TMF UML 2 Sequence Diagram Loader" schema="schema/org.eclipse.linuxtools.tmf.ui.uml2SDLoader.exsd"/>
+   <extension-point id="org.eclipse.linuxtools.tmf.ui.tracetype" name="Tmf Trace Type" schema="schema/org.eclipse.linuxtools.tmf.ui.tracetype.exsd"/>
 
     <extension
          point="org.eclipse.ui.perspectives">

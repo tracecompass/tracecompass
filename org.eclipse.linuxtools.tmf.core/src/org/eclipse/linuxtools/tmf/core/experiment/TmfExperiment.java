@@ -137,8 +137,10 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         fIndexPageSize = indexPageSize;
         fTimeRange = TmfTimeRange.NULL_RANGE;
 
-        indexExperiment(true);
-        updateTimeRange();
+        if (preIndexExperiment) {
+          indexExperiment(true);
+          updateTimeRange();
+        }
     }
 
     protected TmfExperiment(String id, Class<T> type) {
