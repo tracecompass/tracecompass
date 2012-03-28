@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponentChangedListener;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceControlRoot;
+import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -102,6 +103,8 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
         createContextMenu();
         
         getSite().setSelectionProvider(fTreeViewer);
+        
+        RSECorePlugin.getTheSystemRegistry(); // to load RSE
     }
 
     /*

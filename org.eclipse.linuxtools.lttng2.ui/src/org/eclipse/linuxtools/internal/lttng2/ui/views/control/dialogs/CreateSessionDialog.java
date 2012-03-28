@@ -90,6 +90,7 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
      */
     public CreateSessionDialog(Shell shell) {
         super(shell);
+        setShellStyle(SWT.RESIZE);
     }
 
     // ------------------------------------------------------------------------
@@ -154,8 +155,9 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
         
         // Main dialog panel
         fDialogComposite = new Composite(parent, SWT.NONE);
-        GridLayout layout = new GridLayout(2, true);
-        fDialogComposite.setLayout(layout); 
+        GridLayout layout = new GridLayout(4, true);
+        fDialogComposite.setLayout(layout);
+        fDialogComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         Label sessionNameLabel = new Label(fDialogComposite, SWT.RIGHT);
         sessionNameLabel.setText(Messages.TraceControl_CreateSessionNameLabel);
@@ -168,16 +170,14 @@ public class CreateSessionDialog extends Dialog implements ICreateSessionDialog 
         fSessionPathText.setToolTipText(Messages.TraceControl_CreateSessionPathTooltip);
 
         // layout widgets
-        GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-        fSessionPathText.setText("666.666.666.666"); //$NON-NLS-1$
-        Point minSize = fSessionPathText.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-        data.widthHint = minSize.x + 5;
+        GridData data = new GridData(GridData.FILL_HORIZONTAL);
+        data.horizontalSpan = 3;
         
         fSessionNameText.setLayoutData(data);
         fSessionPathText.setLayoutData(data);
-        
-        fSessionPathText.setText(""); //$NON-NLS-1$
 
+        getShell().setMinimumSize(new Point(300, 150));
+        
         return fDialogComposite;
     }
 

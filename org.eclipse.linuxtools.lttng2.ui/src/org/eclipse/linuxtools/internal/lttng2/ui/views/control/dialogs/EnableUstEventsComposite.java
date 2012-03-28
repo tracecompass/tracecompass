@@ -267,69 +267,77 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         fIsWildcard = fWildcardActivateButton.getSelection();
         fIsLogLevel = fLogLevelActivateButton.getSelection();
         
-        fIsAllTracepoints = fTracepointsViewer.getChecked(fProviderGroup);
-
-        Set<String> set = new HashSet<String>();
-        Object[] checkedElements = fTracepointsViewer.getCheckedElements();
+        // initialize tracepoint fields
+        fIsAllTracepoints = false;
         fSelectedEvents = new ArrayList<String>();
-        for (int i = 0; i < checkedElements.length; i++) {
-            ITraceControlComponent component = (ITraceControlComponent)checkedElements[i];
-            if (!set.contains(component.getName()) && (component instanceof BaseEventComponent)) {
-                set.add(component.getName());
-                fSelectedEvents.add(component.getName());
+        if (fIsTracepoints) {
+            fIsAllTracepoints = fTracepointsViewer.getChecked(fProviderGroup);
+            Set<String> set = new HashSet<String>();
+            Object[] checkedElements = fTracepointsViewer.getCheckedElements();
+            for (int i = 0; i < checkedElements.length; i++) {
+                ITraceControlComponent component = (ITraceControlComponent)checkedElements[i];
+                if (!set.contains(component.getName()) && (component instanceof BaseEventComponent)) {
+                    set.add(component.getName());
+                    fSelectedEvents.add(component.getName());
+                }
             }
         }
 
-        if (fLogLevelButton.getSelection()) {
-            fLogLevelType = LogLevelType.LOGLEVEL;
-        } else if (fLogLevelOnlyButton.getSelection()) {
-            fLogLevelType = LogLevelType.LOGLEVEL_ONLY;
-        } else {
-            fLogLevelType = LogLevelType.LOGLEVEL_NONE;
-        }
-
         // initialize log level event name string
+        fLogLevelType = LogLevelType.LOGLEVEL_NONE;
         fLogLevelEventName = null;
-        String temp = fLogLevelEventNameText.getText();
-        if (!temp.matches("^[\\s]{0,}$") && !temp.matches("^[a-zA-Z0-9\\-\\_]{1,}$")) { //$NON-NLS-1$ //$NON-NLS-2$
-            MessageDialog.openError(getShell(),
-                    Messages.TraceControl_EnableEventsDialogTitle,
-                    Messages.TraceControl_InvalidLogLevelEventNameError + " (" + temp + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$
 
-            return false;
+        if (fIsLogLevel) {
+            if (fLogLevelButton.getSelection()) {
+                fLogLevelType = LogLevelType.LOGLEVEL;
+            } else if (fLogLevelOnlyButton.getSelection()) {
+                fLogLevelType = LogLevelType.LOGLEVEL_ONLY;
+            }
+
+            String temp = fLogLevelEventNameText.getText();
+            if (!temp.matches("^[\\s]{0,}$") && !temp.matches("^[a-zA-Z0-9\\-\\_]{1,}$")) { //$NON-NLS-1$ //$NON-NLS-2$
+                MessageDialog.openError(getShell(),
+                        Messages.TraceControl_EnableEventsDialogTitle,
+                        Messages.TraceControl_InvalidLogLevelEventNameError + " (" + temp + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$
+
+                return false;
+            }
+
+            if(!temp.matches("\\s*")) { //$NON-NLS-1$
+                fLogLevelEventName = temp;
+            }
+
+            TraceLogLevel[] levels = TraceLogLevel.values();
+            int id = fLogLevelCombo.getSelectionIndex();
+
+            if (id < 0) {
+                MessageDialog.openError(getShell(),
+                        Messages.TraceControl_EnableEventsDialogTitle,
+                        Messages.TraceControl_InvalidLogLevel + " (" + temp + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$
+
+                return false;
+            } else {
+                fLogLevel = levels[id];
+            }
         }
 
-        if(!temp.matches("\\s*")) { //$NON-NLS-1$
-          fLogLevelEventName = temp;
-        }
-
-        TraceLogLevel[] levels = TraceLogLevel.values();
-        int id = fLogLevelCombo.getSelectionIndex();
-        if ((id < 0) && fIsLogLevel) {
-            MessageDialog.openError(getShell(),
-                    Messages.TraceControl_EnableEventsDialogTitle,
-                    Messages.TraceControl_InvalidLogLevel + " (" + temp + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$
-
-            return false;
-        } else {
-            fLogLevel = levels[id];
-        }
-
-        // initialize log level event name string
+        // initialize wildcard with the event name string
         fWildcard = null;
-        temp = fWildcardText.getText();
-        if (!temp.matches("^[\\s]{0,}$") && !temp.matches("^[a-zA-Z0-9\\-\\_\\*]{1,}$")) { //$NON-NLS-1$ //$NON-NLS-2$
-            MessageDialog.openError(getShell(),
-                    Messages.TraceControl_EnableEventsDialogTitle,
-                    Messages.TraceControl_InvalidWildcardError + " (" + temp + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$
+        if (fIsWildcard) {
+            String tempWildcard = fWildcardText.getText();
+            if (!tempWildcard.matches("^[\\s]{0,}$") && !tempWildcard.matches("^[a-zA-Z0-9\\-\\_\\*]{1,}$")) { //$NON-NLS-1$ //$NON-NLS-2$
+                MessageDialog.openError(getShell(),
+                        Messages.TraceControl_EnableEventsDialogTitle,
+                        Messages.TraceControl_InvalidWildcardError + " (" + tempWildcard + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$
 
-            return false;
+                return false;
+            }
+
+            if(!tempWildcard.matches("\\s*")) { //$NON-NLS-1$
+                fWildcard = tempWildcard;
+            }
         }
-        
-        if(!temp.matches("\\s*")) { //$NON-NLS-1$
-            fWildcard = temp;
-        }
-        
+
         // validation successful -> call super.okPressed()
         return true;
     }

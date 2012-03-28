@@ -273,53 +273,58 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
         fIsDynamicProbe = fProbeActivateButton.getSelection();
         fIsDynamicFunctionProbe = fFunctionActivateButton.getSelection();
 
-        List<ITraceControlComponent> comps = fProviderGroup.getChildren(KernelProviderComponent.class);
-        fIsAllTracepoints = fTracepointsViewer.getChecked(comps.get(0));
-
-        Object[] checkedElements = fTracepointsViewer.getCheckedElements();
+        // initialize tracepoint fields
+        fIsAllTracepoints = false;
         fSelectedEvents = new ArrayList<String>();
-        for (int i = 0; i < checkedElements.length; i++) {
-            ITraceControlComponent component = (ITraceControlComponent)checkedElements[i];
-            if (component instanceof BaseEventComponent) {
-                fSelectedEvents.add(component.getName());
+
+        if (fIsTracepoints) {
+            List<ITraceControlComponent> comps = fProviderGroup.getChildren(KernelProviderComponent.class);
+            fIsAllTracepoints = fTracepointsViewer.getChecked(comps.get(0));
+
+            Object[] checkedElements = fTracepointsViewer.getCheckedElements();
+            for (int i = 0; i < checkedElements.length; i++) {
+                ITraceControlComponent component = (ITraceControlComponent)checkedElements[i];
+                if (component instanceof BaseEventComponent) {
+                    fSelectedEvents.add(component.getName());
+                }
             }
         }
-        
-        // initialize probe string
-        fProbeEventName = null;
-        fProbeString = null;
-        String temp = fProbeEventNameText.getText();
-        if (!temp.matches("^[\\s]{0,}$") && !temp.matches("^[a-zA-Z0-9\\-\\_]{1,}$")) { //$NON-NLS-1$ //$NON-NLS-2$
-            MessageDialog.openError(getShell(),
-                  Messages.TraceControl_EnableEventsDialogTitle,
-                  Messages.TraceControl_InvalidProbeNameError + " (" + temp + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$
-            
-            return false;
+
+        if (fIsDynamicProbe) {
+            String temp = fProbeEventNameText.getText();
+            if (!temp.matches("^[\\s]{0,}$") && !temp.matches("^[a-zA-Z0-9\\-\\_]{1,}$")) { //$NON-NLS-1$ //$NON-NLS-2$
+                MessageDialog.openError(getShell(),
+                        Messages.TraceControl_EnableEventsDialogTitle,
+                        Messages.TraceControl_InvalidProbeNameError + " (" + temp + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$
+
+                return false;
+            }
+
+            if(!fProbeText.getText().matches("\\s*")) { //$NON-NLS-1$
+                fProbeEventName = temp;
+                // fProbeString will be validated by lttng-tools
+                fProbeString = fProbeText.getText();
+            } 
         }
-        
-        if(!fProbeText.getText().matches("\\s*")) { //$NON-NLS-1$
-            fProbeEventName = temp;
-            // fProbeString will be validated by lttng-tools
-            fProbeString = fProbeText.getText();
-        } 
 
         // initialize function string
         fFunctionEventName = null;
         fFunctionString = null;
+        if (fIsDynamicFunctionProbe) {
+            String functionTemp = fFunctionEventNameText.getText();
+            if (!functionTemp.matches("^[\\s]{0,}$") && !functionTemp.matches("^[a-zA-Z0-9\\-\\_]{1,}$")) { //$NON-NLS-1$ //$NON-NLS-2$
+                MessageDialog.openError(getShell(),
+                        Messages.TraceControl_EnableEventsDialogTitle,
+                        Messages.TraceControl_InvalidProbeNameError + " (" + functionTemp + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$
 
-        temp = fFunctionEventNameText.getText();
-        if (!temp.matches("^[\\s]{0,}$") && !temp.matches("^[a-zA-Z0-9\\-\\_]{1,}$")) { //$NON-NLS-1$ //$NON-NLS-2$
-            MessageDialog.openError(getShell(),
-                  Messages.TraceControl_EnableEventsDialogTitle,
-                  Messages.TraceControl_InvalidProbeNameError + " (" + temp + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$
-            
-            return false;
-        }
+                return false;
+            }
 
-        if(!fFunctionText.getText().matches("\\s*")) { //$NON-NLS-1$
-            fFunctionEventName = temp;
-            // fFunctionString will be validated by lttng-tools
-            fFunctionString = fFunctionText.getText();
+            if(!fFunctionText.getText().matches("\\s*")) { //$NON-NLS-1$
+                fFunctionEventName = functionTemp;
+                // fFunctionString will be validated by lttng-tools
+                fFunctionString = fFunctionText.getText();
+            }
         }
 
         return true;
