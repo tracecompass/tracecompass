@@ -61,16 +61,16 @@ public class StreamInputPacketIndex {
      */
     public void addEntry(StreamInputPacketIndexEntry entry)
             throws CTFReaderException {
-        assert (entry.packetSizeBits != 0);
-        assert (entry.contentSizeBits != 0);
+        assert (entry.getContentSizeBits() != 0);
+        assert (entry.getContentSizeBits() != 0);
 
-        if (entry.timestampBegin > entry.timestampEnd) {
+        if (entry.getTimestampBegin() > entry.getTimestampEnd()) {
             throw new CTFReaderException(
                     "Packet begin timestamp is after end timestamp"); //$NON-NLS-1$
         }
 
         if (!this.entries.isEmpty()) {
-            if (entry.timestampBegin < this.entries.lastElement().timestampBegin) {
+            if (entry.getTimestampBegin() < this.entries.lastElement().getTimestampBegin()) {
                 throw new CTFReaderException(
                         "Packets begin timestamp decreasing"); //$NON-NLS-1$
             }
@@ -121,13 +121,13 @@ public class StreamInputPacketIndex {
                 break;
             }
 
-            if (timestamp < guessEntry.timestampBegin) {
+            if (timestamp < guessEntry.getTimestampBegin()) {
                 /*
                  * If the timestamp if before the begin timestamp, we know that
                  * the packet to return is before the guess.
                  */
                 max = guessI - 1;
-            } else if (timestamp >= guessEntry.timestampBegin) {
+            } else if (timestamp >= guessEntry.getTimestampBegin()) {
                 /*
                  * If the timestamp is after the begin timestamp, we know that
                  * the packet to return is after the guess or is the guess.
@@ -180,13 +180,13 @@ public class StreamInputPacketIndex {
                 break;
             }
 
-            if (index < guessEntry.indexBegin) {
+            if (index < guessEntry.getIndexBegin()) {
                 /*
                  * If the timestamp if before the begin timestamp, we know that
                  * the packet to return is before the guess.
                  */
                 max = guessI - 1;
-            } else if (index >= guessEntry.indexBegin) {
+            } else if (index >= guessEntry.getIndexBegin()) {
                 /*
                  * If the timestamp is after the begin timestamp, we know that
                  * the packet to return is after the guess or is the guess.

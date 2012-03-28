@@ -142,7 +142,8 @@ public class StreamInputReader {
      */
     private void goToNextPacket() {
         if (getPacketIndexIt().hasNext()) {
-            this.packetReader.setCurrentPacket(getPacketIndexIt().next());
+            StreamInputPacketIndexEntry nextPacket = getPacketIndexIt().next();
+            this.packetReader.setCurrentPacket(nextPacket);
         } else {
             this.packetReader.setCurrentPacket(null);
         }
@@ -183,7 +184,7 @@ public class StreamInputReader {
     }
 
 
-    public long seekBeforeIndex(long index)
+    public long seekIndex(long index)
     {
         /*
          * Search in the index for the packet to search in.
@@ -194,9 +195,13 @@ public class StreamInputReader {
          */
         goToNextPacket();
         /*
+         * Read the first packet
+         */
+        readNextEvent();
+        /*
          * get the current index
          */
-        return this.packetReader.getCurrentPacket().indexBegin;
+        return this.packetReader.getCurrentPacket().getIndexBegin();
 
     }
 
@@ -206,7 +211,7 @@ public class StreamInputReader {
          */
         int len = this.streamInput.getIndex().getEntries().size();
         StreamInputPacketIndexEntry entry = this.streamInput.getIndex().getEntries().get(len-1);
-        seek(entry.timestampEnd - 1 );
+        seek(entry.getTimestampEnd() - 1 );
         /*
          * Go until the end of that packet
          */

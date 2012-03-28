@@ -224,8 +224,8 @@ public class StreamInputPacketReader implements IDefinitionScope {
             MappedByteBuffer bb = null;
             try {
                 bb = getStreamInputReader().getStreamInput().getFileChannel().map(
-                        MapMode.READ_ONLY, this.currentPacket.offsetBytes,
-                        (this.currentPacket.packetSizeBits + 7) / 8);
+                        MapMode.READ_ONLY, this.currentPacket.getOffsetBytes(),
+                        (this.currentPacket.getPacketSizeBits() + 7) / 8);
             } catch (IOException e) {
                 /*
                  * The streamInputReader object is already allocated, so this
@@ -258,7 +258,7 @@ public class StreamInputPacketReader implements IDefinitionScope {
              * Use the timestamp begin of the packet as the reference for the
              * timestamp reconstitution.
              */
-            lastTimestamp = currentPacket.timestampBegin;
+            lastTimestamp = currentPacket.getTimestampBegin();
         } else {
             getBitBuffer().setByteBuffer(null);
 
@@ -273,7 +273,7 @@ public class StreamInputPacketReader implements IDefinitionScope {
      */
     public boolean hasMoreEvents() {
         if (currentPacket != null) {
-            return getBitBuffer().position() < currentPacket.contentSizeBits;
+            return getBitBuffer().position() < currentPacket.getContentSizeBits();
         }
         return false;
     }

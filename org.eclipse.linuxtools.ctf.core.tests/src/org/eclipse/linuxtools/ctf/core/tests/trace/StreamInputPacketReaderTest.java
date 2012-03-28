@@ -16,12 +16,14 @@ import org.eclipse.linuxtools.ctf.core.trace.StreamInput;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputPacketIndexEntry;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputPacketReader;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * The class <code>StreamInputPacketReaderTest</code> contains tests for the
  * class <code>{@link StreamInputPacketReader}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -31,7 +33,7 @@ public class StreamInputPacketReaderTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -41,8 +43,8 @@ public class StreamInputPacketReaderTest {
 
     /**
      * Perform pre-test initialization.
-     * 
-     * @throws CTFReaderException 
+     *
+     * @throws CTFReaderException
      */
     @Before
     public void setUp() throws CTFReaderException {
@@ -64,8 +66,8 @@ public class StreamInputPacketReaderTest {
 
     /**
      * Run the StreamInputPacketReader(StreamInputReader) constructor test.
-     * 
-     * @throws CTFReaderException 
+     *
+     * @throws CTFReaderException
      */
     @Test
     public void testStreamInputPacketReader() throws CTFReaderException {
@@ -143,7 +145,7 @@ public class StreamInputPacketReaderTest {
 
     /**
      * Run the EventDefinition readNextEvent() method test.
-     * 
+     *
      * @throws CTFReaderException
      */
     @Test
@@ -161,7 +163,7 @@ public class StreamInputPacketReaderTest {
         fixture.setCurrentPacket(new StreamInputPacketIndexEntry(1L));
         StreamInputPacketIndexEntry currentPacket = new StreamInputPacketIndexEntry(
                 1L);
-        currentPacket.packetSizeBits = 1;
+        currentPacket.setPacketSizeBits(1);
         fixture.setCurrentPacket(currentPacket);
     }
 
@@ -184,8 +186,8 @@ public class StreamInputPacketReaderTest {
         fixture.setCurrentPacket(new StreamInputPacketIndexEntry(1L));
         StreamInputPacketIndexEntry currentPacket = new StreamInputPacketIndexEntry(
                 1L);
-        currentPacket.timestampBegin = 1L;
-        currentPacket.packetSizeBits = 1;
+        currentPacket.setTimestampBegin(1L);
+        currentPacket.setPacketSizeBits(1);
 
         fixture.setCurrentPacket(currentPacket);
     }

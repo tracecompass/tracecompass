@@ -11,7 +11,7 @@ import org.junit.Test;
 /**
  * The class <code>StreamInputPacketIndexEntryTest</code> contains tests for the
  * class <code>{@link StreamInputPacketIndexEntry}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -21,7 +21,7 @@ public class StreamInputPacketIndexEntryTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -67,11 +67,11 @@ public class StreamInputPacketIndexEntryTest {
                 "timestampBegin=1, timestampEnd=1, " + //$NON-NLS-1$
                 "dataOffset=1, packetSize=1, contentSize=1]"; //$NON-NLS-1$
 
-        fixture.contentSizeBits = 1;
-        fixture.dataOffsetBits = 1;
-        fixture.timestampEnd = 1L;
-        fixture.packetSizeBits = 1;
-        fixture.timestampBegin = 1L;
+        fixture.setContentSizeBits(1);
+        fixture.setDataOffsetBits(1);
+        fixture.setTimestampEnd(1L);
+        fixture.setPacketSizeBits(1);
+        fixture.setTimestampBegin(1L);
 
         assertEquals(expectedResult, fixture.toString());
     }

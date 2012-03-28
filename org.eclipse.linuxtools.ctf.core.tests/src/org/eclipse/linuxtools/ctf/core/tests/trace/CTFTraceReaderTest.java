@@ -1,5 +1,6 @@
 package org.eclipse.linuxtools.ctf.core.tests.trace;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -36,7 +37,7 @@ public class CTFTraceReaderTest {
 
     /**
      * Perform pre-test initialization.
-     * @throws CTFReaderException 
+     * @throws CTFReaderException
      */
     @Before
     public void setUp() throws CTFReaderException {
@@ -54,7 +55,7 @@ public class CTFTraceReaderTest {
     /**
      * Run the CTFTraceReader(CTFTrace) constructor test. Open a known good
      * trace.
-     * @throws CTFReaderException 
+     * @throws CTFReaderException
      */
     @Test
     public void testOpen_existing() throws CTFReaderException {
@@ -141,7 +142,7 @@ public class CTFTraceReaderTest {
      *
      * Both trace reader are different objects, so they shouldn't "equals" each
      * other.
-     * @throws CTFReaderException 
+     * @throws CTFReaderException
      */
     @Test
     public void testEquals() throws CTFReaderException {
@@ -198,7 +199,7 @@ public class CTFTraceReaderTest {
     @Test
     public void testGoToLastEvent() throws CTFReaderException {
         fixture.goToLastEvent();
-        long ts1 = fixture.getCurrentEventDef().timestamp;
+        long ts1 = getTimestamp();
         long ts2 = fixture.getEndTime();
         assertTrue(ts1 == ts2);
     }
@@ -278,5 +279,41 @@ public class CTFTraceReaderTest {
         long timestamp = 1L;
         boolean result = fixture.seek(timestamp);
         assertTrue(result);
+    }
+
+
+    /**
+     * Run the boolean seek(long) method test.
+     */
+    @Test
+    public void testSeekIndex() {
+        long rank = 30000L;
+        long first, second = 0, third , fourth;
+        /*
+         * we need to read the trace before seeking
+         */
+        first = getTimestamp();
+        for( int i = 0 ; i < 60000; i++ )
+        {
+            if( i == rank) {
+                second = getTimestamp();
+            }
+            fixture.advance();
+        }
+        boolean result= fixture.seekIndex(0);
+        third = getTimestamp();
+        boolean result2 = fixture.seekIndex(rank);
+        fourth = getTimestamp();
+        assertTrue(result);
+        assertTrue(result2);
+        assertEquals( first , third);
+        assertEquals( second , fourth);
+    }
+
+    /**
+     * @return
+     */
+    private long getTimestamp() {
+        return fixture.getCurrentEventDef().timestamp;
     }
 }

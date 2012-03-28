@@ -23,40 +23,42 @@ public class StreamInputPacketIndexEntry {
     // Attributes
     // ------------------------------------------------------------------------
 
+
+
     /**
      * Offset of the packet in the file, in bytes
      */
-    public long offsetBytes;
+    final private long offsetBytes;
 
     /**
      * Offset of the data in the packet, in bits
      */
-    public int dataOffsetBits = 0;
+    private int dataOffsetBits = 0;
 
     /**
      * Packet size, in bits
      */
-    public int packetSizeBits = 0;
+    private int packetSizeBits = 0;
 
     /**
      * Content size, in bits
      */
-    public int contentSizeBits = 0;
+    private int contentSizeBits = 0;
 
     /**
      * Begin timestamp
      */
-    public long timestampBegin = 0;
+    private long timestampBegin = 0;
 
     /**
      * End timestamp
      */
-    public long timestampEnd = 0;
+    private long timestampEnd = 0;
 
 
-    public long indexBegin = 0;
+    private long indexBegin = -1;
 
-    public long indexEnd = 0;
+    private long indexEnd = -1;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -92,15 +94,123 @@ public class StreamInputPacketIndexEntry {
     boolean includesIndex(long index){
         return (index >= indexBegin) && (index <= indexEnd);
     }
-
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
-        /* Only for debugging, shouldn't be externalized */
-        return "PacketIndexEntry [offset=" + offsetBytes + ", timestampBegin=" //$NON-NLS-1$ //$NON-NLS-2$
-                + Long.toHexString(timestampBegin) + ',' + " timestampEnd=" //$NON-NLS-1$
-                + Long.toHexString(timestampEnd) + ", dataOffset=" //$NON-NLS-1$
-                + dataOffsetBits + ", packetSize=" + packetSizeBits //$NON-NLS-1$
-                + ", contentSize=" + contentSizeBits + ']'; //$NON-NLS-1$
+        return "StreamInputPacketIndexEntry [offsetBytes=" + offsetBytes //$NON-NLS-1$
+                + ", timestampBegin=" + timestampBegin + ", timestampEnd=" //$NON-NLS-1$ //$NON-NLS-2$
+                + timestampEnd + ", indexBegin=" + indexBegin + ", indexEnd=" //$NON-NLS-1$ //$NON-NLS-2$
+                + indexEnd + "]"; //$NON-NLS-1$
     }
 
+    // ------------------------------------------------------------------------
+    // Getters and Setters
+    // ------------------------------------------------------------------------
+
+    /**
+     * @return the offsetBytes
+     */
+    public long getOffsetBytes() {
+        return offsetBytes;
+    }
+
+    /**
+     * @return the dataOffsetBits
+     */
+    public int getDataOffsetBits() {
+        return dataOffsetBits;
+    }
+
+    /**
+     * @param dataOffsetBits the dataOffsetBits to set
+     */
+    public void setDataOffsetBits(int dataOffsetBits) {
+        this.dataOffsetBits = dataOffsetBits;
+    }
+
+    /**
+     * @return the packetSizeBits
+     */
+    public int getPacketSizeBits() {
+        return packetSizeBits;
+    }
+
+    /**
+     * @param packetSizeBits the packetSizeBits to set
+     */
+    public void setPacketSizeBits(int packetSizeBits) {
+        this.packetSizeBits = packetSizeBits;
+    }
+
+    /**
+     * @return the contentSizeBits
+     */
+    public int getContentSizeBits() {
+        return contentSizeBits;
+    }
+
+    /**
+     * @param contentSizeBits the contentSizeBits to set
+     */
+    public void setContentSizeBits(int contentSizeBits) {
+        this.contentSizeBits = contentSizeBits;
+    }
+
+    /**
+     * @return the timestampBegin
+     */
+    public long getTimestampBegin() {
+        return timestampBegin;
+    }
+
+    /**
+     * @param timestampBegin the timestampBegin to set
+     */
+    public void setTimestampBegin(long timestampBegin) {
+        this.timestampBegin = timestampBegin;
+    }
+
+    /**
+     * @return the timestampEnd
+     */
+    public long getTimestampEnd() {
+        return timestampEnd;
+    }
+
+    /**
+     * @param timestampEnd the timestampEnd to set
+     */
+    public void setTimestampEnd(long timestampEnd) {
+        this.timestampEnd = timestampEnd;
+    }
+
+    /**
+     * @return the indexBegin
+     */
+    public long getIndexBegin() {
+        return indexBegin;
+    }
+
+    /**
+     * @param indexBegin the indexBegin to set
+     */
+    public void setIndexBegin(long indexBegin) {
+        this.indexBegin = indexBegin;
+    }
+
+    /**
+     * @return the indexEnd
+     */
+    public long getIndexEnd() {
+        return indexEnd;
+    }
+
+    /**
+     * @param indexEnd the indexEnd to set
+     */
+    public void setIndexEnd(long indexEnd) {
+        this.indexEnd = indexEnd;
+    }
 }

@@ -98,8 +98,7 @@ public class CTFTraceReader {
         this.endTime = this.startTime;
         this.index = 0;
         startIndex = new long[prio.size()];
-        for( int  i = 0; i < prio.size(); i++ )
-        {
+        for (int i = 0; i < prio.size(); i++) {
             startIndex[i] = 0;
         }
     }
@@ -252,8 +251,7 @@ public class CTFTraceReader {
             this.endTime = Math.max(topEnd, this.endTime);
             this.eventCountPerTraceFile[top.getName()]++;
         }
-        if(hasMoreEvents())
-        {
+        if (hasMoreEvents()) {
             /*
              * increment the index
              */
@@ -261,11 +259,11 @@ public class CTFTraceReader {
             StreamInputPacketReader packetReader = top.getPacketReader();
 
             if (packetReader.hasMoreEvents() == false) {
-                int n = this.streamInputReaders.indexOf(packetReader);
+                int n = this.streamInputReaders.indexOf(top);
                 StreamInputPacketIndexEntry currentPacket = packetReader
                         .getCurrentPacket();
-                currentPacket.indexBegin = startIndex[n];
-                currentPacket.indexEnd = index;
+                currentPacket.setIndexBegin(startIndex[n]);
+                currentPacket.setIndexEnd(index);
                 startIndex[n] = index + 1;
             }
         }
@@ -325,41 +323,52 @@ public class CTFTraceReader {
              */
 
         }
-        for (StreamInputReader streamInputReader : this.streamInputReaders  ) {
+        for (StreamInputReader streamInputReader : this.streamInputReaders) {
             if (streamInputReader.getCurrentEvent() != null) {
                 this.prio.add(streamInputReader);
                 index = Math.max(index, streamInputReader.getPacketReader()
-                        .getCurrentPacket().indexBegin + offset);
+                        .getCurrentPacket().getIndexBegin()
+                        + offset);
             }
         }
         return hasMoreEvents();
     }
 
-    public boolean seekIndex( long index )
-    {
+    public boolean seekIndex(long index) {
         this.prio.clear();
-        this.index = index;
-        long tempIndex = Long.MAX_VALUE;
+
+        long tempIndex = Long.MIN_VALUE;
+        long tempTimestamp = Long.MIN_VALUE;
         for (StreamInputReader streamInputReader : this.streamInputReaders) {
             /*
              * Seek the trace reader.
              */
-            tempIndex = Math.min(tempIndex, streamInputReader.seekBeforeIndex(index));
+            final long streamIndex = streamInputReader.seekIndex(index);
+            tempIndex = Math.max(tempIndex, streamIndex);
+            tempTimestamp = Math.max(tempTimestamp, streamInputReader.getCurrentEvent().timestamp);
 
+        }
+        for (StreamInputReader streamInputReader : this.streamInputReaders) {
             /*
              * Add it to the priority queue if there is a current event.
              */
+
             if (streamInputReader.getCurrentEvent() != null) {
                 this.prio.add(streamInputReader);
             }
         }
         /*
-         *  advance for offset
+         * advance for offset
          */
-        for( long pos = tempIndex; (pos < index) && hasMoreEvents(); pos++){
+        while( (prio.peek().getCurrentEvent().timestamp < tempTimestamp) && hasMoreEvents() )
+        {
             this.advance();
         }
-
+        long pos = tempIndex;
+        for (pos = tempIndex; (pos < index) && hasMoreEvents(); pos++) {
+            this.advance();
+        }
+        this.index = pos;
         return hasMoreEvents();
     }
 

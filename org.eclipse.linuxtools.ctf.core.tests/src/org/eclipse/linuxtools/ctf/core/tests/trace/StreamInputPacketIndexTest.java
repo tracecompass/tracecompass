@@ -16,7 +16,7 @@ import org.junit.Test;
 /**
  * The class <code>StreamInputPacketIndexTest</code> contains tests for the
  * class <code>{@link StreamInputPacketIndex}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -27,7 +27,7 @@ public class StreamInputPacketIndexTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -37,7 +37,7 @@ public class StreamInputPacketIndexTest {
 
     /**
      * Perform pre-test initialization.
-     * 
+     *
      * @throws CTFReaderException
      */
     @Before
@@ -66,40 +66,40 @@ public class StreamInputPacketIndexTest {
     /**
      * Run the void addEntry(StreamInputPacketIndexEntry) method test, by
      * specifying only 1 parameter to the entry.
-     * 
+     *
      * @throws CTFReaderException
      */
     @Test
     public void testAddEntry_1param() throws CTFReaderException {
-        entry.packetSizeBits = 0;
+        entry.setPacketSizeBits(0);
         fixture.addEntry(entry);
     }
 
     /**
      * Run the void addEntry(StreamInputPacketIndexEntry) method test by
      * specifying 2 parameters to the entry.
-     * 
+     *
      * @throws CTFReaderException
      */
     @Test
     public void testAddEntry_2params() throws CTFReaderException {
-        entry.packetSizeBits = 1;
-        entry.contentSizeBits = 0;
+        entry.setPacketSizeBits(1);
+        entry.setContentSizeBits(0);
         fixture.addEntry(entry);
     }
 
     /**
      * Run the void addEntry(StreamInputPacketIndexEntry) method test, by
      * specifying all 4 parameters to the entry.
-     * 
+     *
      * @throws CTFReaderException
      */
     @Test
     public void testAddEntry_4params() throws CTFReaderException {
-        entry.timestampBegin = 1L;
-        entry.packetSizeBits = 1;
-        entry.contentSizeBits = 1;
-        entry.timestampEnd = 1L;
+        entry.setTimestampBegin(1L);
+        entry.setPacketSizeBits(1);
+        entry.setContentSizeBits(1);
+        entry.setTimestampEnd(1L);
         fixture.addEntry(entry);
     }
 

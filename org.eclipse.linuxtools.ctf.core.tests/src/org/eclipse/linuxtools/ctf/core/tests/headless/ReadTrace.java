@@ -87,11 +87,13 @@ public class ReadTrace {
             avg += val;
         }
         avg /= benchs.size();
-        System.out.println("Time to read = " + avg + " events/ns");
+        System.out.println("Time to read " + nbEvent + " events = " + avg
+                + " events/ns");
         for (Double val : benchs) {
             System.out.print(val);
             System.out.print(", ");
         }
+        testSeekIndex(trace);
 
         try {
             testSeekIndex(trace);
@@ -113,6 +115,58 @@ public class ReadTrace {
     }
 
     public static void testSeekIndex(CTFTrace trace) throws CTFReaderException {
+        CTFTraceReader fixture = new CTFTraceReader(trace);
+        long rank = 300000L;
+        long timeRank = 4281275394331L;
+        long nearEnd = 4287422858132L;
+        long seekTime_0;
+        long seekIndex_0 = 0;
+        long seekNext_300000 = 0;
+        long seekIndex_300000 = 0;
+        long seekTime_300000 = 0;
+        String cr = "\n"; //$NON-NLS-1$
+        fixture.seek(0);
+        for (int i = 0; i < 100; i++) {
+            fixture.advance();
+        }
+
+        fixture.seek(nearEnd);
+        /*
+         * we need to read the trace before seeking
+         */
+        fixture.seek(0);
+        seekTime_0 = getTimestamp(fixture);
+        for (int i = 0; i < rank; i++) {
+            fixture.advance();
+        }
+        seekNext_300000 = getTimestamp(fixture);
+        fixture.seek(timeRank);
+        seekTime_300000 = getTimestamp(fixture);
+        fixture.seekIndex(0);
+        seekIndex_0 = getTimestamp(fixture);
+
+        fixture.seekIndex(rank);
+        seekIndex_300000 = getTimestamp(fixture);
+        System.out.print(cr);
+        System.out.println("seek(0) " + seekTime_0 + cr + //$NON-NLS-1$
+                "seekIndex(0) " + seekIndex_0 + cr + //$NON-NLS-1$
+                "Next(300000) " + seekNext_300000 + cr + //$NON-NLS-1$
+                "seek(time(300000)) " + seekTime_300000 + cr + //$NON-NLS-1$
+                "seekIndex(300000) " + seekIndex_300000 //$NON-NLS-1$
+        );
+    }
+
+    /**
+     * @return
+     */
+    private static long getTimestamp(CTFTraceReader fixture) {
+        if (fixture.getCurrentEventDef() != null) {
+            return fixture.getCurrentEventDef().timestamp;
+        }
+        return Long.MIN_VALUE;
+    }
+
+    public static void testSeekIndex(CTFTrace trace) {
         CTFTraceReader fixture = new CTFTraceReader(trace);
         long rank = 300000L;
         long timeRank = 4281275394331L;
