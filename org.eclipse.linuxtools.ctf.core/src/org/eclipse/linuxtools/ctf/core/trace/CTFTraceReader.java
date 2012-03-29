@@ -19,7 +19,7 @@ import java.util.Vector;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.internal.ctf.core.Activator;
- 
+
 /**
  * Reads the events of a trace.
  */
@@ -339,14 +339,29 @@ public class CTFTraceReader {
 
         long tempIndex = Long.MIN_VALUE;
         long tempTimestamp = Long.MIN_VALUE;
-        for (StreamInputReader streamInputReader : this.streamInputReaders) {
-            /*
-             * Seek the trace reader.
-             */
-            final long streamIndex = streamInputReader.seekIndex(index);
-            tempIndex = Math.max(tempIndex, streamIndex);
-            tempTimestamp = Math.max(tempTimestamp, streamInputReader.getCurrentEvent().timestamp);
+        try {
+            for (StreamInputReader streamInputReader : this.streamInputReaders) {
+                /*
+                 * Seek the trace reader.
+                 */
+                final long streamIndex = streamInputReader.seekIndex(index);
+                tempIndex = Math.max(tempIndex, streamIndex);
+                tempTimestamp = Math.max(tempTimestamp,
+                        streamInputReader.getCurrentEvent().timestamp);
 
+            }
+        } catch (CTFReaderException e) {
+            /*
+             * Important, if it failed, it's because it's not yet indexed,
+             * so we have to manually advance to the right value.
+             */
+            for (StreamInputReader streamInputReader : this.streamInputReaders) {
+                /*
+                 * Seek the trace reader.
+                 */
+                streamInputReader.seek(0);
+            }
+            tempIndex = 0;
         }
         for (StreamInputReader streamInputReader : this.streamInputReaders) {
             /*
@@ -360,8 +375,8 @@ public class CTFTraceReader {
         /*
          * advance for offset
          */
-        while( (prio.peek().getCurrentEvent().timestamp < tempTimestamp) && hasMoreEvents() )
-        {
+        while ((prio.peek().getCurrentEvent().timestamp < tempTimestamp)
+                && hasMoreEvents()) {
             this.advance();
         }
         long pos = tempIndex;

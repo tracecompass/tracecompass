@@ -93,7 +93,12 @@ public class ReadTrace {
             System.out.print(val);
             System.out.print(", ");
         }
-        testSeekIndex(trace);
+        try {
+            testSeekIndex(trace);
+        } catch (CTFReaderException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         try {
             testSeekIndex(trace);
@@ -166,7 +171,7 @@ public class ReadTrace {
         return Long.MIN_VALUE;
     }
 
-    public static void testSeekIndex(CTFTrace trace) {
+    public static void testSeekIndex(CTFTrace trace) throws CTFReaderException {
         CTFTraceReader fixture = new CTFTraceReader(trace);
         long rank = 300000L;
         long timeRank = 4281275394331L;

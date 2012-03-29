@@ -184,7 +184,7 @@ public class StreamInputReader {
     }
 
 
-    public long seekIndex(long index)
+    public long seekIndex(long index) throws CTFReaderException
     {
         /*
          * Search in the index for the packet to search in.
@@ -201,6 +201,9 @@ public class StreamInputReader {
         /*
          * get the current index
          */
+        if(this.packetReader.getCurrentPacket() == null){
+            throw new CTFReaderException("Current packet null in index seek, did you index your trace yet?");
+        }
         return this.packetReader.getCurrentPacket().getIndexBegin();
 
     }

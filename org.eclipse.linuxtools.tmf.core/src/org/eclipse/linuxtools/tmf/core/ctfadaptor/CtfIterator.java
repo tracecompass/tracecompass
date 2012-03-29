@@ -31,8 +31,8 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
     public CtfIterator(CtfTmfTrace trace, long timestampValue, long rank) {
         super(trace.getCTFTrace());
         this.ctfTmfTrace = trace;
-        this.curLocation = (new CtfLocation(
-                this.getCurrentEvent().getTimestampValue()));
+        this.curLocation = (new CtfLocation(this.getCurrentEvent()
+                .getTimestampValue()));
         if (this.getCurrentEvent().getTimestampValue() != timestampValue) {
             this.seek(timestampValue);
         }
@@ -85,7 +85,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
 
     @Override
     public void setRank(long rank) {
-        seekRank( rank );
+        seekRank(rank);
     }
 
     /*
@@ -96,8 +96,8 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
     @Override
     public CtfIterator clone() {
         CtfIterator clone = null;
-        clone = new CtfIterator(ctfTmfTrace,
-                this.getCurrentEvent().getTimestampValue(), curRank);
+        clone = new CtfIterator(ctfTmfTrace, this.getCurrentEvent()
+                .getTimestampValue(), curRank);
         return clone;
     }
 

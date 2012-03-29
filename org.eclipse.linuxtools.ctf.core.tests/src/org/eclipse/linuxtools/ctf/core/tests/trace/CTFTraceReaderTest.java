@@ -284,9 +284,10 @@ public class CTFTraceReaderTest {
 
     /**
      * Run the boolean seek(long) method test.
+     * @throws CTFReaderException
      */
     @Test
-    public void testSeekIndex() {
+    public void testSeekIndex() throws CTFReaderException {
         long rank = 30000L;
         long first, second = 0, third , fourth;
         /*
