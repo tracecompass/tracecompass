@@ -17,7 +17,7 @@
 				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Importing_Traces_in_a_Project" label="Importing Traces in a Project"></topic>
 				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Drag_and_Drop" label="Drag and Drop"></topic>
 			</topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Events_View_or_Editor" label="Events View or Editor">
+			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Events_View" label="Events View">
 				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Searching_and_Filtering" label="Searching and Filtering">
 					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Searching" label="Searching"></topic>
 					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Perspective.html#Filtering" label="Filtering"></topic>
@@ -56,12 +56,28 @@
 				</topic>
 				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Property_View" label="Property View"></topic>
 			</topic>
-			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#LTTng_Tracer_Control_.28LTTng_Tracer_Toolchain_v2.0_and_later.29" label="LTTng Tracer Control (LTTng Tracer Toolchain v2.0 and later)">
+			<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#LTTng_Tracer_Control_.28LTTng_Tracer_Toolchain_v2.0.29" label="LTTng Tracer Control (LTTng Tracer Toolchain v2.0)">
 				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Control_View" label="Control View">
 					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Creating_a_New_Connection_to_a_Remote_Host" label="Creating a New Connection to a Remote Host"></topic>
 					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Disconnecting_from_a_Remote_Host" label="Disconnecting from a Remote Host"></topic>
 					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Connecting_to_a_Remote_Host" label="Connecting to a Remote Host"></topic>
 					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Deleting_to_a_Remote_Host_Connection" label="Deleting to a Remote Host Connection"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Creating_a_Tracing_Session" label="Creating a Tracing Session"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Creating_Channels_-_General" label="Creating Channels - General"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Creating_Channels_On_Session_Level" label="Creating Channels On Session Level"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Creating_Channels_On_Domain_Level" label="Creating Channels On Domain Level"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_and_Disabling_Channels" label="Enabling and Disabling Channels"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_Events_-_General" label="Enabling Events - General"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_Kernel_Events_On_Session_Level" label="Enabling Kernel Events On Session Level"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_UST_Events_On_Session_Level" label="Enabling UST Events On Session Level"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_Events_On_Domain_Level" label="Enabling Events On Domain Level"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_Events_On_Channel_Level" label="Enabling Events On Channel Level"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_and_Disabling_Events" label="Enabling and Disabling Events"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Enabling_Tracepoint_Events_From_Provider" label="Enabling Tracepoint Events From Provider"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Start_Tracing" label="Start Tracing"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Stop_Tracing" label="Stop Tracing"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Destroying_a_Tracing_Session" label="Destroying a Tracing Session"></topic>
+					<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Refreshing_the_Node_Information" label="Refreshing the Node Information"></topic>
 				</topic>
 				<topic href="Linux_Tools_Project/LTTng/User_Guide/LTTng-Tracer-Control.html#Property_View_2" label="Property View"></topic>
 			</topic>
