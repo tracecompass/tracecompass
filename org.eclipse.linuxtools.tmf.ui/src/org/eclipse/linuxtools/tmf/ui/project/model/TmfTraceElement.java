@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010, 2011 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -27,7 +27,7 @@ import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefin
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlEvent;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefinition;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.ui.IActionFilter;
@@ -170,7 +170,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
         return null;
     }
 
-    public TmfEvent instantiateEvent() {
+    public ITmfEvent instantiateEvent() {
         try {
             if (fTraceTypeId != null) {
                 if (fTraceTypeId.startsWith(CustomTxtTrace.class.getCanonicalName())) {
@@ -188,7 +188,7 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
                     }
                 }
                 IConfigurationElement ce = sfTraceTypeAttributes.get(fTraceTypeId);
-                TmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
+                ITmfEvent event = (ITmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
                 return event;
             }
         } catch (CoreException e) {
@@ -264,17 +264,21 @@ public class TmfTraceElement extends TmfProjectModelElement implements IActionFi
     @Override
     public Object getPropertyValue(Object id) {
 
-        if (sfName.equals(id))
+        if (sfName.equals(id)) {
             return getName();
+        }
 
-        if (sfPath.equals(id))
+        if (sfPath.equals(id)) {
             return getPath().toString();
+        }
 
-        if (sfLocation.equals(id))
+        if (sfLocation.equals(id)) {
             return getLocation().toString();
+        }
 
-        if (sfIsLinked.equals(id))
+        if (sfIsLinked.equals(id)) {
             return Boolean.valueOf(getResource().isLinked()).toString();
+        }
 
         if (sfEventType.equals(id)) {
             if (fTraceTypeId != null) {

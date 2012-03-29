@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010, 2011 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -26,7 +26,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
@@ -73,15 +73,17 @@ public class OpenTraceHandler extends AbstractHandler {
 
         // Check if we are closing down
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null)
+        if (window == null) {
             return false;
+        }
 
         // Get the selection
         IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         IWorkbenchPart part = page.getActivePart();
         ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
-        if (selectionProvider == null)
+        if (selectionProvider == null) {
             return false;
+        }
         ISelection selection = selectionProvider.getSelection();
 
         // Make sure there is only one selection and that it is a trace
@@ -109,8 +111,9 @@ public class OpenTraceHandler extends AbstractHandler {
 
         // Check if we are closing down
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null)
+        if (window == null) {
             return null;
+        }
 
         // Check that the trace is valid
         if (fTrace == null) {
@@ -128,15 +131,15 @@ public class OpenTraceHandler extends AbstractHandler {
         }
 
         ITmfTrace trace = fTrace.instantiateTrace();
-        TmfEvent traceEvent = fTrace.instantiateEvent();
-        if (trace == null || traceEvent == null) {
+        ITmfEvent traceEvent = fTrace.instantiateEvent();
+        if ((trace == null) || (traceEvent == null)) {
             displayErrorMsg(Messages.OpenTraceHandler_NoTraceType);
             return null;
         }
 
         // Get the editor_id from the extension point
         String editorId = fTrace.getEditorId();
-        boolean usesEditor = editorId != null && editorId.length() > 0;
+        boolean usesEditor = (editorId != null) && (editorId.length() > 0);
 
         try {
             trace.initTrace(fTrace.getName(), fTrace.getLocation().getPath(), traceEvent.getClass());
@@ -184,7 +187,7 @@ public class OpenTraceHandler extends AbstractHandler {
                 IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
 
                 IEditorPart editor = activePage.findEditor(new FileEditorInput(file));
-                if (editor != null && editor instanceof IReusableEditor) {
+                if ((editor != null) && (editor instanceof IReusableEditor)) {
                     activePage.reuseEditor((IReusableEditor) editor, editorInput);
                     activePage.activate(editor);
                 } else {
@@ -201,7 +204,7 @@ public class OpenTraceHandler extends AbstractHandler {
             ITmfTrace[] traces = new ITmfTrace[] { trace };
             TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), fTrace.getName(), traces, trace.getIndexPageSize());
             experiment.setBookmarksFile(file);
-    
+
             TmfExperiment.setCurrentExperiment(experiment);
             TmfSignalManager.dispatchSignal(new TmfExperimentSelectedSignal(this, experiment));
             IDE.setDefaultEditor(file, EventsViewEditor.ID);

@@ -1,11 +1,11 @@
 /*******************************************************************************
 * Copyright (c) 2012 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.linuxtools.internal.tmf.ui.project.handlers.Messages;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
@@ -46,7 +47,7 @@ import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.part.EditorPart;
 
 /**
- * 
+ *
  * This editor is used to open a trace in the Events view
  * and set the trace as the current experiment.
  * It intercepts the IGotoMarker adapter and dispatches
@@ -97,7 +98,7 @@ public class EventsViewEditor extends TmfEditor {
                 throw new PartInitException("Invalid IFileEditorInput: " + input); //$NON-NLS-1$
             }
             TmfExperiment currentExperiment = TmfExperiment.getCurrentExperiment();
-            if (currentExperiment != null && fFile.equals(currentExperiment.getBookmarksFile())) {
+            if ((currentExperiment != null) && fFile.equals(currentExperiment.getBookmarksFile())) {
                 fTrace = currentExperiment;
                 super.setSite(site);
                 super.setInput(input);
@@ -128,8 +129,8 @@ public class EventsViewEditor extends TmfEditor {
                             for (int i = 0; i < nbTraces; i++) {
                                 TmfTraceElement traceElement = traceEntries.get(i);
                                 ITmfTrace trace = traceElement.instantiateTrace();
-                                TmfEvent traceEvent = traceElement.instantiateEvent();
-                                if (trace == null || traceEvent == null) {
+                                ITmfEvent traceEvent = traceElement.instantiateEvent();
+                                if ((trace == null) || (traceEvent == null)) {
                                     for (int j = 0; j < i; j++) {
                                         traces[j].dispose();
                                     }
@@ -162,8 +163,8 @@ public class EventsViewEditor extends TmfEditor {
                             TmfTraceElement traceElement = (TmfTraceElement) projectElement;
                             // Instantiate the experiment trace
                             ITmfTrace trace = traceElement.instantiateTrace();
-                            TmfEvent traceEvent = traceElement.instantiateEvent();
-                            if (trace == null || traceEvent == null) {
+                            ITmfEvent traceEvent = traceElement.instantiateEvent();
+                            if ((trace == null) || (traceEvent == null)) {
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             }
                             try {
@@ -189,8 +190,8 @@ public class EventsViewEditor extends TmfEditor {
                             TmfTraceElement traceElement = (TmfTraceElement) projectElement;
                             // Instantiate the experiment trace
                             ITmfTrace trace = traceElement.instantiateTrace();
-                            TmfEvent traceEvent = traceElement.instantiateEvent();
-                            if (trace == null || traceEvent == null) {
+                            ITmfEvent traceEvent = traceElement.instantiateEvent();
+                            if ((trace == null) || (traceEvent == null)) {
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             }
                             try {

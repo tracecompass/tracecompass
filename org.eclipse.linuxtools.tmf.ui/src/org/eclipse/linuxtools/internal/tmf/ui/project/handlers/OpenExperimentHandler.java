@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010, 2011 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
@@ -67,15 +68,17 @@ public class OpenExperimentHandler extends AbstractHandler {
 
         // Check if we are closing down
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null)
+        if (window == null) {
             return false;
+        }
 
         // Get the selection
         IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         IWorkbenchPart part = page.getActivePart();
         ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
-        if (selectionProvider == null)
+        if (selectionProvider == null) {
             return false;
+        }
         ISelection selection = selectionProvider.getSelection();
 
         // Make sure there is only one selection and that it is an experiment
@@ -103,8 +106,9 @@ public class OpenExperimentHandler extends AbstractHandler {
 
         // Check if we are closing down
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null)
+        if (window == null) {
             return false;
+        }
 
         try {
             IFile bookmarksFile = fExperiment.getProject().getExperimentsFolder().getResource().getFile(BOOKMARKS_HIDDEN_FILE);
@@ -131,8 +135,8 @@ public class OpenExperimentHandler extends AbstractHandler {
             for (int i = 0; i < nbTraces; i++) {
                 TmfTraceElement element = traceEntries.get(i);
                 ITmfTrace trace = element.instantiateTrace();
-                TmfEvent traceEvent = element.instantiateEvent();
-                if (trace == null || traceEvent == null) {
+                ITmfEvent traceEvent = element.instantiateEvent();
+                if ((trace == null) || (traceEvent == null)) {
                     displayErrorMsg(Messages.OpenExperimentHandler_NoTraceType);
                     for (int j = 0; j < i; j++) {
                         traces[j].dispose();
@@ -168,10 +172,10 @@ public class OpenExperimentHandler extends AbstractHandler {
                 IEditorInput editorInput = new TmfEditorInput(file, experiment);
                 IWorkbench wb = PlatformUI.getWorkbench();
                 IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
-    
+
                 String editorId = TmfEventsEditor.ID;
                 IEditorPart editor = activePage.findEditor(new FileEditorInput(file));
-                if (editor != null && editor instanceof IReusableEditor) {
+                if ((editor != null) && (editor instanceof IReusableEditor)) {
                     activePage.reuseEditor((IReusableEditor) editor, editorInput);
                     activePage.activate(editor);
                 } else {

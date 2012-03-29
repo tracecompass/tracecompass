@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -34,6 +34,7 @@ import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomEventsTable;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.project.handlers.Messages;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
@@ -70,7 +71,7 @@ import org.osgi.framework.Bundle;
 public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReusableEditor, IPropertyListener, IResourceChangeListener {
 
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.editors.events"; //$NON-NLS-1$
-    
+
     private TmfEventsTable fEventsTable;
     private IFile fFile;
     @SuppressWarnings("rawtypes")
@@ -122,8 +123,8 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                             for (int i = 0; i < nbTraces; i++) {
                                 TmfTraceElement traceElement = traceEntries.get(i);
                                 ITmfTrace trace = traceElement.instantiateTrace();
-                                TmfEvent traceEvent = traceElement.instantiateEvent();
-                                if (trace == null || traceEvent == null) {
+                                ITmfEvent traceEvent = traceElement.instantiateEvent();
+                                if ((trace == null) || (traceEvent == null)) {
                                     for (int j = 0; j < i; j++) {
                                         traces[j].dispose();
                                     }
@@ -156,8 +157,8 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                             TmfTraceElement traceElement = (TmfTraceElement) projectElement;
                             // Instantiate the trace
                             ITmfTrace trace = traceElement.instantiateTrace();
-                            TmfEvent traceEvent = traceElement.instantiateEvent();
-                            if (trace == null || traceEvent == null) {
+                            ITmfEvent traceEvent = traceElement.instantiateEvent();
+                            if ((trace == null) || (traceEvent == null)) {
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             }
                             try {
@@ -179,8 +180,8 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                             TmfTraceElement traceElement = (TmfTraceElement) projectElement;
                             // Instantiate the trace
                             ITmfTrace trace = traceElement.instantiateTrace();
-                            TmfEvent traceEvent = traceElement.instantiateEvent();
-                            if (trace == null || traceEvent == null) {
+                            ITmfEvent traceEvent = traceElement.instantiateEvent();
+                            if ((trace == null) || (traceEvent == null)) {
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             }
                             try {
@@ -286,7 +287,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         }
         return eventsTable;
     }
-    
+
     private TmfEventsTable getEventsTable(Composite parent, int cacheSize) {
         if (fTrace instanceof TmfExperiment) {
             return getExperimentEventsTable((TmfExperiment<?>) fTrace, parent, cacheSize);
@@ -313,7 +314,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                         break;
                     }
                     String eventsTableType = eventsTableTypeCE[0].getAttribute(TmfTraceType.CLASS_ATTR);
-                    if (eventsTableType == null || eventsTableType.length() == 0) {
+                    if ((eventsTableType == null) || (eventsTableType.length() == 0)) {
                         break;
                     }
                     Bundle bundle = Platform.getBundle(ce.getContributor().getName());
@@ -366,7 +367,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                     return null;
                 }
                 String traceType = resource.getPersistentProperty(TmfTraceElement.TRACETYPE);
-                if (commonTraceType != null && !commonTraceType.equals(traceType)) {
+                if ((commonTraceType != null) && !commonTraceType.equals(traceType)) {
                     return null;
                 }
                 commonTraceType = traceType;
@@ -387,7 +388,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                         break;
                     }
                     String eventsTableType = eventsTableTypeCE[0].getAttribute(TmfTraceType.CLASS_ATTR);
-                    if (eventsTableType == null || eventsTableType.length() == 0) {
+                    if ((eventsTableType == null) || (eventsTableType.length() == 0)) {
                         break;
                     }
                     Bundle bundle = Platform.getBundle(ce.getContributor().getName());
@@ -479,12 +480,12 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     public void addBookmark() {
     	fEventsTable.addBookmark(fFile);
     }
-    
+
 
     // ------------------------------------------------------------------------
     // Signal handlers
     // ------------------------------------------------------------------------
-    
+
     @SuppressWarnings("unchecked")
     @TmfSignalHandler
     public void traceParserUpdated(TmfTraceParserUpdatedSignal signal) {
@@ -527,7 +528,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
 
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
-        if (signal.getSource() != this && signal.getTrace().equals(fTrace)) {
+        if ((signal.getSource() != this) && signal.getTrace().equals(fTrace)) {
             getSite().getPage().bringToTop(this);
         }
     }
