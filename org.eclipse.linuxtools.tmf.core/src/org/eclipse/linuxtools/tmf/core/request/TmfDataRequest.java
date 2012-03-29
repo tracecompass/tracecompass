@@ -380,10 +380,17 @@ public abstract class TmfDataRequest<T extends ITmfEvent> implements ITmfDataReq
      * overridden by the application if it needs to handle these conditions.
      */
     @Override
-    public synchronized void handleCompleted() {
-        if (fRequestFailed) {
+    public void handleCompleted() {
+        boolean requestFailed = false;
+        boolean requestCanceled = false;
+        synchronized (this) {
+            requestFailed = fRequestFailed;
+            requestCanceled = fRequestCanceled;
+        }
+
+        if (requestFailed) {
             handleFailure();
-        } else if (fRequestCanceled) {
+        } else if (requestCanceled) {
             handleCancel();
         } else {
             handleSuccess();
