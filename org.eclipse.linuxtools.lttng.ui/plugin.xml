@@ -433,6 +433,13 @@
                class="org.eclipse.linuxtools.internal.lttng.ui.views.events.EventsTable">
          </eventsTableType>
       </type>
+      <type
+            category="org.eclipse.linuxtools.lttng.ui.category.lttng"
+            event_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent"
+            id="org.eclipse.linuxtools.lttng2.traceType.kernel"
+            name="LTTng 2.0 Kernel Type"
+            trace_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace">
+      </type>
    </extension>
    
 </plugin>
