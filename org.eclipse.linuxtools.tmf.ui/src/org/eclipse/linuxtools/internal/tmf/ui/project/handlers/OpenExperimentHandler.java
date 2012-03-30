@@ -140,12 +140,12 @@ public class OpenExperimentHandler extends AbstractHandler {
                     return null;
                 }
                 try {
-                    trace.initTrace(element.getName(), element.getLocation().getPath(), traceEvent.getClass(), 0);
+                    trace.initTrace(element.getName(), element.getLocation().getPath(), traceEvent.getClass());
                 } catch (FileNotFoundException e) {
                     displayErrorMsg(""); //$NON-NLS-1$
                 }
                 trace.setResource(element.getResource());
-                cacheSize = Math.min(cacheSize, trace.getCacheSize());
+                cacheSize = Math.min(cacheSize, trace.getIndexPageSize());
                 String editorId = element.getEditorId();
                 if (editorId == null) {
                     useEditor = false;
@@ -177,7 +177,7 @@ public class OpenExperimentHandler extends AbstractHandler {
                 } else {
                     activePage.openEditor(editorInput, editorId);
                 }
-                experiment.initTrace(null, null, null, 0);
+                experiment.initTrace(null, null, null);
                 experiment.indexTrace(true);
                 IDE.setDefaultEditor(file, editorId);
                 // editor should dispose the experiment on close

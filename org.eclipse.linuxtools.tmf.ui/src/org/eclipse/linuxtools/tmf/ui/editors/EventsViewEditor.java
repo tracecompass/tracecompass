@@ -136,11 +136,11 @@ public class EventsViewEditor extends TmfEditor {
                                     throw new PartInitException(Messages.OpenExperimentHandler_NoTraceType);
                                 }
                                 try {
-                                    trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), 0);
+                                    trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass());
                                 } catch (FileNotFoundException e) {
                                 }
                                 trace.setResource(traceElement.getResource());
-                                cacheSize = Math.min(cacheSize, trace.getCacheSize());
+                                cacheSize = Math.min(cacheSize, trace.getIndexPageSize());
                                 traces[i] = trace;
                             }
                             TmfExperiment experiment = new TmfExperiment(TmfEvent.class, experimentElement.getName(), traces, cacheSize);
@@ -167,12 +167,12 @@ public class EventsViewEditor extends TmfEditor {
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             }
                             try {
-                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), 0);
+                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass());
                             } catch (FileNotFoundException e) {
                             }
                             trace.setResource(traceElement.getResource());
                             ITmfTrace[] traces = new ITmfTrace[] { trace };
-                            TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), traceElement.getName(), traces, trace.getCacheSize());
+                            TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), traceElement.getName(), traces, trace.getIndexPageSize());
                             experiment.setBookmarksFile(fFile);
                             fTrace = experiment;
                             TmfExperiment.setCurrentExperiment(experiment);
@@ -194,7 +194,7 @@ public class EventsViewEditor extends TmfEditor {
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             }
                             try {
-                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), 0);
+                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass());
                                 trace.indexTrace(false);
                             } catch (FileNotFoundException e) {
                             }
@@ -202,7 +202,7 @@ public class EventsViewEditor extends TmfEditor {
                                 ((TmfTrace) trace).setResource(traceElement.getResource());
                             }
                             ITmfTrace[] traces = new ITmfTrace[] { trace };
-                            TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), traceElement.getName(), traces, trace.getCacheSize());
+                            TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), traceElement.getName(), traces, trace.getIndexPageSize());
                             experiment.setBookmarksFile(fFile);
                             fTrace = experiment;
                             TmfExperiment.setCurrentExperiment(experiment);

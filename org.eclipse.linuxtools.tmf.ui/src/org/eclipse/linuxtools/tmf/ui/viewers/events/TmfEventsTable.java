@@ -1062,7 +1062,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 return;
             }
             request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.ETERNITY, (int) fFilterCheckCount,
-                    nbRequested, fTrace.getCacheSize(), ExecutionType.BACKGROUND) {
+                    nbRequested, fTrace.getIndexPageSize(), ExecutionType.BACKGROUND) {
                 @Override
                 public void handleData(TmfEvent event) {
                     super.handleData(event);
@@ -1255,9 +1255,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             boolean wrapped = false;
             while (!monitor.isCanceled() && foundRank == -1 && fTrace != null) {
                 int nbRequested = (direction == Direction.FORWARD ? Integer.MAX_VALUE : Math.min((int) rank + 1,
-                        fTrace.getCacheSize()));
+                        fTrace.getIndexPageSize()));
                 if (direction == Direction.BACKWARD) {
-                    rank = Math.max(0, rank - fTrace.getCacheSize() + 1);
+                    rank = Math.max(0, rank - fTrace.getIndexPageSize() + 1);
                 }
                 request = new TmfDataRequest<TmfEvent>(TmfEvent.class, (int) rank, nbRequested) {
                     long currentRank = rank;

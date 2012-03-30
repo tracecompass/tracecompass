@@ -130,17 +130,17 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                                     throw new PartInitException(Messages.OpenExperimentHandler_NoTraceType);
                                 }
                                 try {
-                                    trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), 0);
+                                    trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass());
                                 } catch (FileNotFoundException e) {
                                 }
                                 trace.setResource(traceElement.getResource());
-                                cacheSize = Math.min(cacheSize, trace.getCacheSize());
+                                cacheSize = Math.min(cacheSize, trace.getIndexPageSize());
                                 traces[i] = trace;
                             }
                             TmfExperiment experiment = new TmfExperiment(TmfEvent.class, experimentElement.getName(), traces, cacheSize);
                             experiment.setBookmarksFile(fFile);
                             fTrace = experiment;
-                            experiment.initTrace(null, null, null, 0);
+                            experiment.initTrace(null, null, null);
                             experiment.indexTrace(true);
                             break;
                         }
@@ -161,7 +161,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             }
                             try {
-                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), 0);
+                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass());
                                 trace.indexTrace(false);
                             } catch (FileNotFoundException e) {
                             }
@@ -184,7 +184,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             }
                             try {
-                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass(), 0);
+                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass());
                                 trace.indexTrace(false);
                             } catch (FileNotFoundException e) {
                             }
@@ -238,7 +238,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             super.setInput(new FileEditorInput(fFile));
             fEventsTable.dispose();
             if (fTrace != null) {
-                fEventsTable = createEventsTable(fParent, fTrace.getCacheSize());
+                fEventsTable = createEventsTable(fParent, fTrace.getIndexPageSize());
                 fEventsTable.setTrace(fTrace, true);
                 fEventsTable.refreshBookmarks(fFile);
                 broadcast(new TmfTraceOpenedSignal(this, fTrace, fFile, fEventsTable));
@@ -254,7 +254,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         fParent = parent;
         if (fTrace != null) {
             setPartName(fTrace.getName());
-            fEventsTable = createEventsTable(parent, fTrace.getCacheSize());
+            fEventsTable = createEventsTable(parent, fTrace.getIndexPageSize());
             fEventsTable.setTrace(fTrace, true);
             fEventsTable.refreshBookmarks(fFile);
             broadcast(new TmfTraceOpenedSignal(this, fTrace, fFile, fEventsTable));
@@ -500,7 +500,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                             fTrace = (ITmfTrace<?>) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
                             TmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
                             String path = fFile.getLocationURI().getPath();
-                            fTrace.initTrace(name, path, event.getClass(), 0);
+                            fTrace.initTrace(name, path, event.getClass());
                             fTrace.indexTrace(false);
                             break;
                         }
@@ -515,7 +515,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             }
             fEventsTable.dispose();
             if (fTrace != null) {
-                fEventsTable = createEventsTable(fParent, fTrace.getCacheSize());
+                fEventsTable = createEventsTable(fParent, fTrace.getIndexPageSize());
                 fEventsTable.setTrace(fTrace, true);
                 broadcast(new TmfTraceOpenedSignal(this, fTrace, fFile, fEventsTable));
             } else {

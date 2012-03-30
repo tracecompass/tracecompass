@@ -97,11 +97,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     }
 
     @Override
-    public void initTrace(String name, String path, Class<T> eventType, int pageSize) throws FileNotFoundException {
-        initTmfTrace(name, path, eventType, pageSize, false);
-    }
-
-    private void initTmfTrace(String name, String path, Class<T> eventType, int pageSize, boolean indexTrace) throws FileNotFoundException {
+    public void initTrace(String name, String path, Class<T> eventType) throws FileNotFoundException {
         fPath = path;
         if (name != null) {
             fTraceName = name;
@@ -114,9 +110,6 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
             }
         }
         super.init(fTraceName, eventType);
-        fIndexPageSize = (pageSize > 0) ? pageSize : DEFAULT_INDEX_PAGE_SIZE;
-        if (indexTrace)
-            indexTrace(false);
     }
 
     @Override
@@ -157,9 +150,12 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @param indexTrace
      * @throws FileNotFoundException
      */
-    protected TmfTrace(String name, Class<T> type, String path, int cacheSize, boolean indexTrace) throws FileNotFoundException {
+    protected TmfTrace(String name, Class<T> type, String path, int indexPageSize, boolean indexTrace) throws FileNotFoundException {
         super();
-        initTmfTrace(name, path, type, cacheSize, indexTrace);
+        initTrace(name, path, type);
+        fIndexPageSize = (indexPageSize >0) ? indexPageSize : DEFAULT_INDEX_PAGE_SIZE;
+        if (indexTrace)
+            indexTrace(false);
     }
 
     @SuppressWarnings("unchecked")
@@ -196,7 +192,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @return the size of the cache
      */
     @Override
-    public int getCacheSize() {
+    public int getIndexPageSize() {
         return fIndexPageSize;
     }
 

@@ -139,7 +139,7 @@ public class OpenTraceHandler extends AbstractHandler {
         boolean usesEditor = editorId != null && editorId.length() > 0;
 
         try {
-            trace.initTrace(fTrace.getName(), fTrace.getLocation().getPath(), traceEvent.getClass(), 0);
+            trace.initTrace(fTrace.getName(), fTrace.getLocation().getPath(), traceEvent.getClass());
             if (usesEditor)
                 trace.indexTrace(false);
         } catch (FileNotFoundException e) {
@@ -199,7 +199,7 @@ public class OpenTraceHandler extends AbstractHandler {
         } else {
             // Create the experiment
             ITmfTrace[] traces = new ITmfTrace[] { trace };
-            TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), fTrace.getName(), traces, trace.getCacheSize());
+            TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), fTrace.getName(), traces, trace.getIndexPageSize());
             experiment.setBookmarksFile(file);
     
             TmfExperiment.setCurrentExperiment(experiment);

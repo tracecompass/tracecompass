@@ -116,12 +116,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     }
 
     @Override
-    public void initTrace(String name, String path, Class<LttngEvent> eventType, int pageSize) throws FileNotFoundException {
-        initLTTngTrace(name, path, eventType, pageSize, false);
-    }
-
-    private synchronized void initLTTngTrace(String name, String path, Class<LttngEvent> eventType, int pageSize, boolean indexTrace) throws FileNotFoundException {
-        super.initTrace(name, path, eventType, (pageSize > 0) ? pageSize : CHECKPOINT_PAGE_SIZE);
+    public synchronized void initTrace(String name, String path, Class<LttngEvent> eventType) throws FileNotFoundException {
+        super.initTrace(name, path, eventType);
         try {
             currentJniTrace = JniTraceFactory.getJniTrace(path, traceLibPath, SHOW_LTT_DEBUG_DEFAULT);
         } catch (Exception e) {
@@ -305,7 +301,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     public LTTngTrace(String name, String path, String traceLibPath, boolean waitForCompletion, boolean bypassIndexing)
             throws Exception {
         super(name, LttngEvent.class, path, CHECKPOINT_PAGE_SIZE, false);
-        initTrace(name, path, LttngEvent.class, CHECKPOINT_PAGE_SIZE);
+        initTrace(name, path, LttngEvent.class);
         if (!bypassIndexing)
             indexTrace(false);
         this.traceLibPath = traceLibPath;
@@ -543,7 +539,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         }
 
         ITmfTimestamp timestamp = null;
-        long index = position / getCacheSize();
+        long index = position / getIndexPageSize();
 
         // Get the timestamp of the closest check point to the given position
         if (fCheckpoints.size() > 0) {
@@ -563,7 +559,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         previousLocation = (LttngLocation) tmpContext.getLocation();
 
         // Ajust the index of the event we found at this check point position
-        Long currentPosition = index * getCacheSize();
+        Long currentPosition = index * getIndexPageSize();
 
         Long lastTimeValueRead = 0L;
 

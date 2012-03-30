@@ -34,7 +34,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
 
     private static final TmfLocation<Long> NULL_LOCATION = new TmfLocation<Long>((Long) null);
-    private static final int DEFAULT_PAGE_SIZE = 100;
+    private static final int DEFAULT_CACHE_SIZE = 100;
 
     private CustomTxtTraceDefinition fDefinition;
     private CustomTxtEventType fEventType;
@@ -44,15 +44,15 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
         fEventType = new CustomTxtEventType(fDefinition);
     }
 
-    public CustomTxtTrace(String name, CustomTxtTraceDefinition definition, String path, int cacheSize) throws FileNotFoundException {
-        super(name, CustomTxtEvent.class, path, cacheSize);
+    public CustomTxtTrace(String name, CustomTxtTraceDefinition definition, String path, int pageSize) throws FileNotFoundException {
+        super(name, CustomTxtEvent.class, path, (pageSize > 0) ? pageSize : DEFAULT_CACHE_SIZE);
         fDefinition = definition;
         fEventType = new CustomTxtEventType(fDefinition);
     }
 
     @Override
-    public void initTrace(String name, String path, Class<CustomTxtEvent> eventType, int pageSize) throws FileNotFoundException {
-        super.initTrace(name, path, eventType, (pageSize > 0) ? pageSize : DEFAULT_PAGE_SIZE);
+    public void initTrace(String name, String path, Class<CustomTxtEvent> eventType) throws FileNotFoundException {
+        super.initTrace(name, path, eventType);
     }
 
     @Override

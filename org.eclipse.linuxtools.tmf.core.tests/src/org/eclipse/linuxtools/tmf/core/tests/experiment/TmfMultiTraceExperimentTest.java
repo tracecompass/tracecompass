@@ -128,7 +128,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     public void testValidateCheckpoints() throws Exception {
 
     	Vector<TmfCheckpoint> checkpoints = fExperiment.getCheckpoints();
-    	int pageSize = fExperiment.getCacheSize();
+    	int pageSize = fExperiment.getIndexPageSize();
 		assertTrue("Checkpoints exist", checkpoints != null);
 
 		// Validate that each checkpoint points to the right event

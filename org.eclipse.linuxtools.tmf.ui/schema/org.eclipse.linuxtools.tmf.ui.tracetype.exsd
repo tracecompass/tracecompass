@@ -90,7 +90,7 @@
          <attribute name="category" type="string">
             <annotation>
                <documentation>
-                  an optional attribute that is composed of the category ID. The referenced category must be declared in a corresponding category element.
+                  An optional attribute that is composed of the category ID. The referenced category must be declared in a corresponding category element.
                </documentation>
                <appinfo>
                   <meta.attribute kind="identifier" basedOn="org.eclipse.linuxtools.tmf.ui.tracetype/category/@id"/>
@@ -110,10 +110,10 @@
          <attribute name="event_type" type="string" use="required">
             <annotation>
                <documentation>
-                  The fully qualified name of a class that extends &lt;samp&gt;TmfEvent&lt;/samp&gt; .
+                  The fully qualified name of a class that implements the &lt;samp&gt;ITmfEvent&lt;/samp&gt;  interface
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.linuxtools.tmf.core.event.TmfEvent:"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.linuxtools.tmf.core.event.ITmfEvent"/>
                </appinfo>
             </annotation>
          </attribute>

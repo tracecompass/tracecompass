@@ -70,7 +70,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
     }
 
     @Override
-    public void initTrace(String name, String path, Class<CtfTmfEvent> eventType, int pageSize)
+    public void initTrace(String name, String path, Class<CtfTmfEvent> eventType)
             throws FileNotFoundException {
         try {
             this.fTrace = new CTFTrace(path);
@@ -154,7 +154,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
     }
 
     @Override
-    public int getCacheSize() {
+    public int getIndexPageSize() {
         return this.fIndexPageSize;
     }
 

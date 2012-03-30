@@ -195,7 +195,7 @@ public class TimeChartEvent implements ITimeEvent {
         }
         
         public void merge(RankRangeList rankRangeList) {
-            long threshold = fParentEntry.getTrace().getCacheSize();
+            long threshold = fParentEntry.getTrace().getIndexPageSize();
             for (RankRange newRange : rankRangeList) {
                 boolean merged = false;
                 for (RankRange oldRange : fRankRangeList) {

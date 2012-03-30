@@ -96,7 +96,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     }
 
     @Override
-    public void initTrace(String name, String path, Class<T> eventType, int pageSize) {
+    public void initTrace(String name, String path, Class<T> eventType) {
     }
 
     /**
@@ -182,7 +182,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     }
 
     @Override
-    public int getCacheSize() {
+    public int getIndexPageSize() {
         return fIndexPageSize;
     }
 

@@ -17,7 +17,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 /**
  * <b><u>ITmfEvent</u></b>
  * <p>
- * The basic event structure in the TMF. In its canonical form, a data item has:
+ * The basic event structure in TMF. In its canonical form, a data item has:
  * <ul>
  * <li> a parent trace
  * <li> a rank (order within the trace)

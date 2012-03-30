@@ -26,7 +26,6 @@ import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 public abstract class CTFTestFiles {
 
     public final static long NANOSECS_PER_SEC = 1000000000L;
-    private final static int PAGE_SIZE = 1000;
 
     /*
      * To run these tests, you will need to download the following trace, at:
@@ -44,7 +43,7 @@ public abstract class CTFTestFiles {
     public static CtfTmfTrace getTestTrace() throws FileNotFoundException {
         if (trace == null) {
             trace = new CtfTmfTrace();
-            trace.initTrace("test-trace2", traceFile, CtfTmfEvent.class, PAGE_SIZE); //$NON-NLS-1$
+            trace.initTrace("test-trace2", traceFile, CtfTmfEvent.class); //$NON-NLS-1$
         }
         return trace;
     }

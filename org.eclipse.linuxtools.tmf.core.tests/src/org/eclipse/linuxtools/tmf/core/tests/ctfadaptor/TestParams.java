@@ -16,8 +16,6 @@ public abstract class TestParams {
     private static final File emptyFile = new File(""); //$NON-NLS-1$
     private static CtfTmfTrace emptyTrace = new CtfTmfTrace();
 
-    private final static int PAGE_SIZE = 1000;
-
     public static File getEmptyFile() {
         return emptyFile;
     }
@@ -29,7 +27,7 @@ public abstract class TestParams {
     public static CtfTmfTrace createTrace() throws FileNotFoundException {
         if ( testTrace1 == null ) {
             testTrace1 = new CtfTmfTrace();
-            testTrace1.initTrace("test-trace", testTracePath1, CtfTmfEvent.class,PAGE_SIZE); //$NON-NLS-1$
+            testTrace1.initTrace("test-trace", testTracePath1, CtfTmfEvent.class); //$NON-NLS-1$
         }
         return testTrace1;
     }

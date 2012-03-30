@@ -25,28 +25,59 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 /**
  * <b><u>ITmfTrace</u></b>
  * <p>
- * The basic event trace structure in the TMF.
+ * The basic event trace structure in TMF.
  */
 public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
 
     // ------------------------------------------------------------------------
-    // Constants
-    // ------------------------------------------------------------------------
-
-    // ------------------------------------------------------------------------
     // Initializers
     // ------------------------------------------------------------------------
+    
+    /**
+     * Initialize a newly instantiated "empty" trace object. This is used to
+     * parameterize an ITmfTrace instantiated with its parameterless constructor.
+     * 
+     * @param name the trace name
+     * @param path the trace path
+     * @param eventType the trace event type
+     * @throws FileNotFoundException
+     */
+    public void initTrace(String name, String path, Class<T> eventType) throws FileNotFoundException;
 
-    // initTrace variants
-    public void initTrace(String name, String path, Class<T> eventType, int pageSize) throws FileNotFoundException;
-
-    public void indexTrace(boolean waitForCompletion);
-
-    // Trace type validation
+    /**
+     * Validate that the trace is of the correct type.
+     * 
+     * @param project the eclipse project
+     * @param path the trace path
+     * 
+     * @return true if trace is valid
+     */
     public boolean validate(IProject project, String path);
 
+    /**
+     * Set the resource used for persistent properties on this trace
+     * 
+     * @param resource the properties resource
+     */
+    public void setResource(IResource resource);
+
+    /**
+     * Get the resource used for persistent properties on this trace
+     * 
+     * @return the properties resource or null if none is set
+     */
+    public IResource getResource();
+
+    /**
+     * Start the trace indexing, optionally wait for the index to be fully
+     * built before returning.
+     * 
+     * @param waitForCompletion 
+     */
+    public void indexTrace(boolean waitForCompletion);
+
     // ------------------------------------------------------------------------
-    // Getters
+    // Basic getters
     // ------------------------------------------------------------------------
 
     /**
@@ -61,22 +92,23 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
     public String getName();
 
     /**
-     * @return the cache size
-     */
-    public int getCacheSize();
-
-    /**
      * @return the number of events in the trace
      */
     public long getNbEvents();
 
     /**
-     * Trace time range accesses
+     * @return the trace time range
      */
     public TmfTimeRange getTimeRange();
 
+    /**
+     * @return the timestamp of the first trace event
+     */
     public ITmfTimestamp getStartTime();
 
+    /**
+     * @return the timestamp of the last trace event
+     */
     public ITmfTimestamp getEndTime();
 
     /**
@@ -84,89 +116,102 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
      */
     public long getStreamingInterval();
 
+    /**
+     * @return the trace index page size
+     */
+    public int getIndexPageSize();
+
     // ------------------------------------------------------------------------
     // Seek operations
     // ------------------------------------------------------------------------
 
     /**
-     * Positions the trace at the first event with the specified timestamp or index (i.e. the nth event in the trace).
+     * Position the trace at the specified location. The null location
+     * is used to indicate that the first trace event. 
      * 
-     * Returns a context which can later be used to read the event.
-     * 
-     * @param location
-     * @return a context object for subsequent reads
+     * @param location the trace specific location (null for 1st event)
+     * @return a context which can later be used to read the corresponding event
      */
     public ITmfContext seekLocation(ITmfLocation<?> location);
 
-    public ITmfContext seekEvent(ITmfTimestamp timestamp);
-
-    public ITmfContext seekEvent(long rank);
-
     /**
-     * Positions the trace at the event located at the specified ratio.
+     * Position the trace at the event located at the specified ratio in the
+     * trace file.
      * 
-     * Returns a context which can later be used to read the event.
+     * The notion of ratio (0.0 <= r <= 1.0) is trace specific and left
+     * voluntarily vague. Typically, it would refer to the event proportional
+     * rank or timestamp in the trace file. 
      * 
-     * @param ratio
-     *            a floating-point number between 0.0 (beginning) and 1.0 (end)
-     * @return a context object for subsequent reads
+     * @param ratio the proportional 'rank' in the trace
+     * @return a context which can later be used to read the corresponding event
      */
     public ITmfContext seekLocation(double ratio);
+
+    /**
+     * Position the trace at the first event with the specified timestamp. If
+     * there is no event with the requested timestamp, a context pointing to
+     * the chronologically next event is returned.
+     * 
+     * @param timestamp the timestamp of desired event
+     * @return a context which can later be used to read the corresponding event
+     */
+    public ITmfContext seekEvent(ITmfTimestamp timestamp);
+
+    /**
+     * Position the trace at the Nth event in the trace.
+     * 
+     * @param rank the event rank
+     * @return a context which can later be used to read the corresponding event
+     */
+    public ITmfContext seekEvent(long rank);
 
     // ------------------------------------------------------------------------
     // Read operations
     // ------------------------------------------------------------------------
 
     /**
-     * Return the event pointed by the supplied context (or null if no event left) and updates the context to the next
-     * event.
+     * Return the event pointed by the supplied context (or null if no event
+     * left) and updates the context to point the next event.
      * 
+     * @param context the read context
      * @return the next event in the stream
      */
     public ITmfEvent getNextEvent(ITmfContext context);
 
     /**
-     * Return the event pointed by the supplied context (or null if no event left) and *does not* update the context.
+     * Return the event pointed by the supplied context (or null if no event
+     * left) and *does not* update the context.
      * 
+     * @param context the read context
      * @return the next event in the stream
      */
     public ITmfEvent parseEvent(ITmfContext context);
 
 
     // ------------------------------------------------------------------------
-    // misc
+    // Location getters
     // ------------------------------------------------------------------------
 
     /**
-     * Returns the ratio corresponding to the specified location.
+     * Returns the ratio (proportion) corresponding to the specified location.
      * 
-     * @param location
-     *            a trace location
+     * @param location a trace specific location
      * @return a floating-point number between 0.0 (beginning) and 1.0 (end)
      */
     public double getLocationRatio(ITmfLocation<?> location);
 
+    /**
+     * @return the curretn trace location
+     */
     public ITmfLocation<?> getCurrentLocation();
 
     /**
-     * Returns the rank of the first event with the requested timestamp. If none, returns the index of the next event
-     * (if any).
+     * Returns the rank of the first event with the requested timestamp.
+     * If none, returns the index of the subsequent event (if any).
      * 
      * @param timestamp the requested event timestamp
      * @return the corresponding event rank
      */
     public long getRank(ITmfTimestamp timestamp);
-
-    /**
-     * Set the resource used for persistent properties on this trace
-     * @param resource the properties resource
-     */
-    public void setResource(IResource resource);
-
-    /**
-     * Get the resource used for persistent properties on this trace
-     * @return the properties resource or null if none is set
-     */
-    public IResource getResource();
 
 }

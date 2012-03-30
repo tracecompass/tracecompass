@@ -196,7 +196,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
                         done = true;
                         break;
                     }
-                    if (context.getRank() % trace.getCacheSize() == 1) {
+                    if (context.getRank() % trace.getIndexPageSize() == 1) {
                         // break for UI refresh
                         break;
                     }
@@ -411,7 +411,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
                     entryIsBookmarked |= event.isBookmarked();
                     entryIsVisible |= event.isVisible();
                     entryIsSearchMatch |= event.isSearchMatch();
-                    if (++fCount % timeAnalysisEntry.getTrace().getCacheSize() == 0) {
+                    if (++fCount % timeAnalysisEntry.getTrace().getIndexPageSize() == 0) {
                         refreshViewer(false);
                     }
                 }

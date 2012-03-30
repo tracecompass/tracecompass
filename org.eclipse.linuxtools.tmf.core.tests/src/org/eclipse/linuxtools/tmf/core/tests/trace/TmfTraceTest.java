@@ -125,7 +125,7 @@ public class TmfTraceTest extends TestCase {
 		assertEquals("getType",      TmfEvent.class, trace.getType());
 		assertEquals("getPath",      testfile.toURI().getPath(), trace.getPath());
 		assertEquals("getName",      TEST_STREAM, trace.getName());
-		assertEquals("getCacheSize", TmfTrace.DEFAULT_INDEX_PAGE_SIZE, trace.getCacheSize());
+		assertEquals("getCacheSize", TmfTrace.DEFAULT_INDEX_PAGE_SIZE, trace.getIndexPageSize());
     }
 
     public void testTmfTraceDefaultCacheSize() throws Exception {
@@ -144,13 +144,13 @@ public class TmfTraceTest extends TestCase {
 		assertEquals("getType",      TmfEvent.class, trace.getType());
 		assertEquals("getPath",      testfile.toURI().getPath(), trace.getPath());
 		assertEquals("getName",      TEST_STREAM, trace.getName());
-		assertEquals("getCacheSize", TmfTrace.DEFAULT_INDEX_PAGE_SIZE, trace.getCacheSize());
+		assertEquals("getCacheSize", TmfTrace.DEFAULT_INDEX_PAGE_SIZE, trace.getIndexPageSize());
     }
 
     public void testTmfTrace() throws Exception {
 		assertEquals("getType",      TmfEvent.class, fTrace.getType());
 		assertEquals("getName",      TEST_STREAM,    fTrace.getName());
-		assertEquals("getCacheSize", BLOCK_SIZE,     fTrace.getCacheSize());
+		assertEquals("getCacheSize", BLOCK_SIZE,     fTrace.getIndexPageSize());
     }
 
     public void testClone() throws Exception {
@@ -158,7 +158,7 @@ public class TmfTraceTest extends TestCase {
 		assertEquals("getType",      TmfEvent.class,        trace.getType());
 		assertEquals("getPath",      fTrace.getPath(),      trace.getPath());
 		assertEquals("getName",      TEST_STREAM,           trace.getName());
-		assertEquals("getCacheSize", BLOCK_SIZE,            trace.getCacheSize());
+		assertEquals("getCacheSize", BLOCK_SIZE,            trace.getIndexPageSize());
 		assertEquals("getTimeRange", fTrace.getTimeRange(), trace.getTimeRange());
     }
 
@@ -216,7 +216,7 @@ public class TmfTraceTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testTmfTraceIndexing() throws Exception {
-        assertEquals("getCacheSize",   BLOCK_SIZE, fTrace.getCacheSize());
+        assertEquals("getCacheSize",   BLOCK_SIZE, fTrace.getIndexPageSize());
         assertEquals("getTraceSize",   NB_EVENTS,  fTrace.getNbEvents());
         assertEquals("getRange-start", 1,          fTrace.getTimeRange().getStartTime().getValue());
         assertEquals("getRange-end",   NB_EVENTS,  fTrace.getTimeRange().getEndTime().getValue());
@@ -224,7 +224,7 @@ public class TmfTraceTest extends TestCase {
         assertEquals("getEndTime",     NB_EVENTS,  fTrace.getEndTime().getValue());
 
     	Vector<TmfCheckpoint> checkpoints = fTrace.getCheckpoints();
-    	int pageSize = fTrace.getCacheSize();
+    	int pageSize = fTrace.getIndexPageSize();
 		assertTrue("Checkpoints exist",  checkpoints != null);
 
 		// Validate that each checkpoint points to the right event
