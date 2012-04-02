@@ -224,7 +224,7 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
     /**
      *  Class containing parameter for the command execution. 
      */
-    protected class Parameter {
+    static protected class Parameter {
         /**
          * Channel component reference.
          */
@@ -234,6 +234,11 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
          */
         final private List<TraceEventComponent> fEvents = new ArrayList<TraceEventComponent>();
         
+        /**
+         * Constructor
+         * @param channel - a channel component
+         * @param events - a list of event components
+         */
         public Parameter(TraceChannelComponent channel, List<TraceEventComponent> events) {
             fChannel = channel;
             fEvents.addAll(events);

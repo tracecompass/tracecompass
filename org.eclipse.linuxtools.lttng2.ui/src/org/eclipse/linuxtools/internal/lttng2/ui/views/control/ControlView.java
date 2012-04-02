@@ -151,13 +151,16 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
                 if (fTreeViewer.getTree().isDisposed()) {
                     return Status.OK_STATUS;
                 }
-                
+
                 fTreeViewer.refresh(component);
 
                 // Change selection needed 
                 final ISelection sel = fTreeViewer.getSelection();
                 fTreeViewer.setSelection(null);
                 fTreeViewer.setSelection(sel);
+
+                // Show component that was changed
+                fTreeViewer.reveal(component);
 
                 return Status.OK_STATUS;
             }
