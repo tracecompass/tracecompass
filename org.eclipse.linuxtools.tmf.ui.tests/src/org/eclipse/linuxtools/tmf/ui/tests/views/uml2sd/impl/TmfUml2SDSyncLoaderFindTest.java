@@ -216,6 +216,8 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
         
         fFacility.getLoader().find(criteria);
         fFacility.waitForJobs(); // find across pages uses a job
+        // to make sure pageRequest has been started before calling waitforCompletion()
+        fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         fFacility.getLoader().waitForCompletion();
         fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
 
@@ -274,6 +276,8 @@ public class TmfUml2SDSyncLoaderFindTest extends TestCase {
         
         fFacility.getLoader().find(criteria);
         fFacility.waitForJobs(); // find across pages uses a job
+        // to make sure pageRequest has been started before calling waitforCompletion()
+        fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY); 
         fFacility.getLoader().waitForCompletion();
         fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         
