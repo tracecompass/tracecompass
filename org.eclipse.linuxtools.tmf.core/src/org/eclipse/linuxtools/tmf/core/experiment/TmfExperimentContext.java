@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
@@ -26,7 +26,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
  * <p>
  * This implies that the "next" event from each trace has already been
  * read and that we at least know its timestamp. This doesn't imply that a
- * full parse of the event content was performed (read: LTTng works like 
+ * full parse of the event content was performed (read: LTTng works like
  * this).
  * <p>
  * The last trace refers to the trace from which the last event was
@@ -37,7 +37,7 @@ public class TmfExperimentContext extends TmfContext {
 	// ------------------------------------------------------------------------
 	// Constants
 	// ------------------------------------------------------------------------
-	
+
 	 public static final int NO_TRACE = -1;
 
 	// ------------------------------------------------------------------------
@@ -46,6 +46,7 @@ public class TmfExperimentContext extends TmfContext {
 
 	private ITmfTrace<?>[]  fTraces = new ITmfTrace[0];
 	private ITmfContext[] fContexts;
+	private final ITmfContext[] fContexts;
 	private ITmfEvent[]   fEvents;
 	private int lastTraceRead;
 
@@ -69,7 +70,7 @@ public class TmfExperimentContext extends TmfContext {
 				rank += contexts[i].getRank();
 			}
 		}
-		
+
 		setLocation(new TmfExperimentLocation(new TmfLocationArray(locations), ranks));
 		setRank(rank);
 		lastTraceRead = NO_TRACE;
@@ -82,16 +83,18 @@ public class TmfExperimentContext extends TmfContext {
 	public TmfExperimentContext(TmfExperimentContext other) {
 		this(other.fTraces, other.cloneContexts());
 		fEvents = other.fEvents;
-		if (other.getLocation() != null)
-			setLocation(other.getLocation().clone());
+		if (other.getLocation() != null) {
+            setLocation(other.getLocation().clone());
+        }
 		setRank(other.getRank());
 		setLastTrace(other.lastTraceRead);
 	}
 
 	private ITmfContext[] cloneContexts() {
-		ITmfContext[] contexts = new TmfContext[fContexts.length];
-		for (int i = 0; i < fContexts.length; i++)
-			contexts[i] = fContexts[i].clone();
+		ITmfContext[] contexts = new ITmfContext[fContexts.length];
+		for (int i = 0; i < fContexts.length; i++) {
+            contexts[i] = fContexts[i].clone();
+        }
 		return contexts;
 	}
 
@@ -127,30 +130,32 @@ public class TmfExperimentContext extends TmfContext {
     public int hashCode() {
 		int result = 17;
     	for (int i = 0; i < fTraces.length; i++) {
-    		result = 37 * result + fTraces[i].hashCode();
-    		result = 37 * result + fContexts[i].hashCode();
+    		result = (37 * result) + fTraces[i].hashCode();
+    		result = (37 * result) + fContexts[i].hashCode();
     	}
     	return result;
     }
- 
+
     @Override
     public boolean equals(Object other) {
-        if (this == other)
+        if (this == other) {
             return true;
-        if (!super.equals(other))
+        }
+        if (!super.equals(other)) {
             return false;
+        }
     	if (!(other instanceof TmfExperimentContext)) {
     		return false;
     	}
     	TmfExperimentContext o = (TmfExperimentContext) other;
     	boolean isEqual = true;
     	int i = 0;
-    	while (isEqual && i < fTraces.length) {
+    	while (isEqual && (i < fTraces.length)) {
     		isEqual &= fTraces[i].equals(o.fTraces[i]);
     		isEqual &= fContexts[i].equals(o.fContexts[i]);
     		i++;
     	}
     	return isEqual;
     }
- 
+
 }
