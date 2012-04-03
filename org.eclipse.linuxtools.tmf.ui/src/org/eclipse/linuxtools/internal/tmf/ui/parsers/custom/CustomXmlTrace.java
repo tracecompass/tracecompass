@@ -58,7 +58,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     }
 
     public CustomXmlTrace(String name, CustomXmlTraceDefinition definition, String path, int pageSize) throws FileNotFoundException {
-        super(name, CustomXmlEvent.class, path, (pageSize > 0) ? pageSize : DEFAULT_CACHE_SIZE);
+        super(name, CustomXmlEvent.class, path, (pageSize > 0) ? pageSize : DEFAULT_CACHE_SIZE, true);
         fDefinition = definition;
         fEventType = new CustomXmlEventType(fDefinition);
         fRecordInputElement = getRecordInputElement(fDefinition.rootInputElement);

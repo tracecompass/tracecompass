@@ -97,8 +97,6 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     
     private String traceLibPath;
 
-    private long fStreamingInterval = 0;
-
     public LTTngTrace() {
     }
 
@@ -235,14 +233,6 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         thread.start();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.trace.TmfTrace#getStreamingInterval()
-     */
-    @Override
-    public long getStreamingInterval() {
-        return fStreamingInterval;
-    }
-
     /**
      * Default Constructor.
      * <p>
@@ -319,42 +309,39 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     @Override
     public synchronized LTTngTrace clone() {
         LTTngTrace clone = null;
+        clone = (LTTngTrace) super.clone();
         try {
-            clone = (LTTngTrace) super.clone();
-            try {
-                clone.currentJniTrace = JniTraceFactory.getJniTrace(getPath(), getTraceLibPath(),
-                        SHOW_LTT_DEBUG_DEFAULT);
-            } catch (JniException e) {
-                // e.printStackTrace();
-            }
-
-            // Export all the event types from the JNI side
-            clone.traceTypes = new HashMap<Integer, LttngEventType>();
-            clone.traceTypeNames = new Vector<Integer>();
-            clone.initialiseEventTypes(clone.currentJniTrace);
-
-            // Verify that all those "default constructor" are safe to use
-            clone.eventTimestamp = new LttngTimestamp();
-            clone.eventSource = ""; //$NON-NLS-1$
-            clone.eventType = new LttngEventType();
-            clone.eventContent = new LttngEventContent(clone.currentLttngEvent);
-            clone.eventReference = getName();
-
-            // Create the skeleton event
-            clone.currentLttngEvent = new LttngEvent(this, clone.eventTimestamp, clone.eventSource, clone.eventType,
-                    clone.eventContent, clone.eventReference, null);
-
-            // Create a new current location
-            clone.previousLocation = new LttngLocation();
-
-            // Set the currentEvent to the eventContent
-            clone.eventContent.setEvent(clone.currentLttngEvent);
-
-            // Set the start time of the trace
-            setTimeRange(new TmfTimeRange(new LttngTimestamp(clone.currentJniTrace.getStartTime().getTime()),
-                    new LttngTimestamp(clone.currentJniTrace.getEndTime().getTime())));
-        } catch (CloneNotSupportedException e) {
+            clone.currentJniTrace = JniTraceFactory.getJniTrace(getPath(), getTraceLibPath(),
+                    SHOW_LTT_DEBUG_DEFAULT);
+        } catch (JniException e) {
+            // e.printStackTrace();
         }
+
+        // Export all the event types from the JNI side
+        clone.traceTypes = new HashMap<Integer, LttngEventType>();
+        clone.traceTypeNames = new Vector<Integer>();
+        clone.initialiseEventTypes(clone.currentJniTrace);
+
+        // Verify that all those "default constructor" are safe to use
+        clone.eventTimestamp = new LttngTimestamp();
+        clone.eventSource = ""; //$NON-NLS-1$
+        clone.eventType = new LttngEventType();
+        clone.eventContent = new LttngEventContent(clone.currentLttngEvent);
+        clone.eventReference = getName();
+
+        // Create the skeleton event
+        clone.currentLttngEvent = new LttngEvent(this, clone.eventTimestamp, clone.eventSource, clone.eventType,
+                clone.eventContent, clone.eventReference, null);
+
+        // Create a new current location
+        clone.previousLocation = new LttngLocation();
+
+        // Set the currentEvent to the eventContent
+        clone.eventContent.setEvent(clone.currentLttngEvent);
+
+        // Set the start time of the trace
+        setTimeRange(new TmfTimeRange(new LttngTimestamp(clone.currentJniTrace.getStartTime().getTime()),
+                new LttngTimestamp(clone.currentJniTrace.getEndTime().getTime())));
 
         return clone;
     }

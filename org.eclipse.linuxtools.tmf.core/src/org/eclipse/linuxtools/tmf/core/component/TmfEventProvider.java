@@ -36,8 +36,8 @@ public abstract class TmfEventProvider<T extends ITmfEvent> extends TmfDataProvi
     }
 
     @Override
-    public void init(String name, Class<T> eventType) {
-        super.init(name, eventType);
+    public void init(String name, Class<T> type) {
+        super.init(name, type);
     }
 
     public TmfEventProvider(String name, Class<T> type) {

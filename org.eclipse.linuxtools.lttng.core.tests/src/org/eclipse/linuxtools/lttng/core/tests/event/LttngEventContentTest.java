@@ -15,6 +15,7 @@ import org.eclipse.linuxtools.internal.lttng.core.event.LttngEventType;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.internal.lttng.core.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.lttng.core.tests.LTTngCoreTestPlugin;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 
@@ -144,7 +145,7 @@ public class LttngEventContentTest extends TestCase {
 		LttngEventContent testContent = null;
     	LTTngTextTrace tmpStream = null;
     	LttngEvent tmpEvent = null;
-    	TmfContext tmpContext = null;
+    	ITmfContext tmpContext = null;
     	
     	// Require an event
     	tmpStream = initializeEventStream();

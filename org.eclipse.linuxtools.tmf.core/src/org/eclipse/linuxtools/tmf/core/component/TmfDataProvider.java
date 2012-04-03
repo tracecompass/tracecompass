@@ -79,9 +79,9 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
         fExecutor = new TmfRequestExecutor();
     }
 
-    public void init(String name, Class<T> dataType) {
+    public void init(String name, Class<T> type) {
         super.init(name);
-        fType = dataType;
+        fType = type;
         fDataQueue = (fQueueSize > 1) ? new LinkedBlockingQueue<T>(fQueueSize) : new SynchronousQueue<T>();
 
         fExecutor = new TmfRequestExecutor();

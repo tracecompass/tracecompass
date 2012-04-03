@@ -114,7 +114,6 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
 			clone = (TmfTraceStub) super.clone();
 	       	clone.fTrace  = new RandomAccessFile(getPath(), "r");
 	       	clone.fParser = new TmfEventParserStub();
-		} catch (CloneNotSupportedException e) {
 		} catch (FileNotFoundException e) {
 		}
     	return clone;

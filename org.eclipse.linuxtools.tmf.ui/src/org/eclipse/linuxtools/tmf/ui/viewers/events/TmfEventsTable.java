@@ -1694,18 +1694,18 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     if (fTrace == null) {
                         return;
                     }
-                    // Verify if event is within the trace range
-                    final ITmfTimestamp timestamp[] = new TmfTimestamp[1];
-                    timestamp[0] = ts; // signal.getCurrentTime();
-                    if (timestamp[0].compareTo(fTrace.getStartTime(), true) == -1) {
-                        timestamp[0] = fTrace.getStartTime();
+
+                    // Verify if the event is within the trace range and adjust if necessary
+                    ITmfTimestamp timestamp = ts;
+                    if (timestamp.compareTo(fTrace.getStartTime(), true) == -1) {
+                        timestamp = fTrace.getStartTime();
                     }
-                    if (timestamp[0].compareTo(fTrace.getEndTime(), true) == 1) {
-                        timestamp[0] = fTrace.getEndTime();
+                    if (timestamp.compareTo(fTrace.getEndTime(), true) == 1) {
+                        timestamp = fTrace.getEndTime();
                     }
 
-                    // Get the rank for the event selection in the table
-                    final long rank = fTrace.getRank(timestamp[0]);
+                    // Get the rank of the selected event in the table
+                    final long rank = fTrace.getRank(timestamp);
                     fSelectedRank = rank;
 
                     fTable.getDisplay().asyncExec(new Runnable() {

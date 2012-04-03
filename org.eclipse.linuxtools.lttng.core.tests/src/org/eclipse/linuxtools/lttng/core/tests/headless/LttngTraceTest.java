@@ -16,6 +16,7 @@ import org.eclipse.linuxtools.internal.lttng.core.event.LttngLocation;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.internal.lttng.core.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.internal.lttng.core.trace.LTTngTrace;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
@@ -48,7 +49,7 @@ public class LttngTraceTest {
         // Work variables
         TmfTrace<LttngEvent> tmptrace = null;
         LttngEvent tmpevent = null;
-        TmfContext tmpContext = null;
+        ITmfContext tmpContext = null;
         Long nbEvent = 0L;
 		
 		try {

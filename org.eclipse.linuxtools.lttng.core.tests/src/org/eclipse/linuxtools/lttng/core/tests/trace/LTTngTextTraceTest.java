@@ -11,6 +11,7 @@ import org.eclipse.linuxtools.internal.lttng.core.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.lttng.core.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 
@@ -145,7 +146,7 @@ public class LTTngTextTraceTest extends TestCase {
 
     public void testSeekEventTimestamp() {
         ITmfEvent tmpEvent = null;
-        TmfContext tmpContext = new TmfContext(null, 0);
+        ITmfContext tmpContext = new TmfContext(null, 0);
         LTTngTextTrace testStream1 = prepareStreamToTest();
 
         // We should be at the beginning of the trace, we will seek at a certain
@@ -176,7 +177,7 @@ public class LTTngTextTraceTest extends TestCase {
 
     public void testSeekEventIndex() {
         ITmfEvent tmpEvent = null;
-        TmfContext tmpContext = new TmfContext(null, 0);
+        ITmfContext tmpContext = new TmfContext(null, 0);
         LTTngTextTrace testStream1 = prepareStreamToTest();
 
         // We should be at the beginning of the trace, we will seek at a certain

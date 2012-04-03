@@ -27,7 +27,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
  * <p>
  * The basic event trace structure in TMF.
  */
-public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
+public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent, Cloneable {
 
     // ------------------------------------------------------------------------
     // Initializers
@@ -39,10 +39,10 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
      * 
      * @param name the trace name
      * @param path the trace path
-     * @param eventType the trace event type
+     * @param type the trace event type
      * @throws FileNotFoundException
      */
-    public void initTrace(String name, String path, Class<T> eventType) throws FileNotFoundException;
+    public void initTrace(String name, String path, Class<T> type) throws FileNotFoundException;
 
     /**
      * Validate that the trace is of the correct type.
@@ -61,21 +61,6 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
      */
     public void setResource(IResource resource);
 
-    /**
-     * Get the resource used for persistent properties on this trace
-     * 
-     * @return the properties resource or null if none is set
-     */
-    public IResource getResource();
-
-    /**
-     * Start the trace indexing, optionally wait for the index to be fully
-     * built before returning.
-     * 
-     * @param waitForCompletion 
-     */
-    public void indexTrace(boolean waitForCompletion);
-
     // ------------------------------------------------------------------------
     // Basic getters
     // ------------------------------------------------------------------------
@@ -86,10 +71,9 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
     public String getPath();
 
     /**
-     * @return the trace name
+     * @return the properties resource or null if none is set
      */
-    @Override
-    public String getName();
+    public IResource getResource();
 
     /**
      * @return the number of events in the trace
@@ -120,6 +104,18 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
      * @return the trace index page size
      */
     public int getIndexPageSize();
+
+    // ------------------------------------------------------------------------
+    // Indexing
+    // ------------------------------------------------------------------------
+
+    /**
+     * Start the trace indexing, optionally wait for the index to be fully
+     * built before returning.
+     * 
+     * @param waitForCompletion true for synchronous indexing
+     */
+    public void indexTrace(boolean waitForCompletion);
 
     // ------------------------------------------------------------------------
     // Seek operations
@@ -189,8 +185,13 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
 
 
     // ------------------------------------------------------------------------
-    // Location getters
+    // Location operations
     // ------------------------------------------------------------------------
+
+    /**
+     * @return the current trace location
+     */
+    public ITmfLocation<?> getCurrentLocation();
 
     /**
      * Returns the ratio (proportion) corresponding to the specified location.
@@ -201,11 +202,6 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
     public double getLocationRatio(ITmfLocation<?> location);
 
     /**
-     * @return the curretn trace location
-     */
-    public ITmfLocation<?> getCurrentLocation();
-
-    /**
      * Returns the rank of the first event with the requested timestamp.
      * If none, returns the index of the subsequent event (if any).
      * 
@@ -214,4 +210,13 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent {
      */
     public long getRank(ITmfTimestamp timestamp);
 
+    // ------------------------------------------------------------------------
+    // Cloneable
+    // ------------------------------------------------------------------------
+
+    /**
+     * @return a clone of the trace
+     */
+    public ITmfTrace<T> clone() throws CloneNotSupportedException;
+    
 }

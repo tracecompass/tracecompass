@@ -68,7 +68,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     // The experiment time range
     protected TmfTimeRange fTimeRange;
 
-    // The experiment reference timestamp (default: Zero)
+    // The experiment reference timestamp (default: ZERO)
     protected ITmfTimestamp fEpoch;
 
     // The experiment index
@@ -89,6 +89,11 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+
+    @Override
+    public TmfExperiment<T> clone() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException();
+    }
 
     @Override
     public boolean validate(IProject project, String path) {
@@ -792,7 +797,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     }
 
     @SuppressWarnings("unchecked")
-    protected void indexExperiment(boolean waitForCompletion, final int index, final TmfTimeRange timeRange) {
+    private void indexExperiment(boolean waitForCompletion, final int index, final TmfTimeRange timeRange) {
 
         synchronized (fCheckpoints) {
             if (fIndexing) {

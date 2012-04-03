@@ -246,7 +246,7 @@ public class TmfTraceTest extends TestCase {
     	int NB_READS = 20;
 
     	// On lower bound, returns the first event (ts = 0)
-    	TmfContext context = fTrace.seekEvent(new TmfTimestamp(0, SCALE, 0));
+    	TmfContext context = (TmfContext) fTrace.seekEvent(new TmfTimestamp(0, SCALE, 0));
     	TmfContext svContext = new TmfContext(context);
 
     	ITmfEvent event = fTrace.parseEvent(context);
@@ -291,7 +291,7 @@ public class TmfTraceTest extends TestCase {
     	int NB_READS = 20;
 
     	// On lower bound, returns the first event (ts = 1)
-    	TmfContext context = fTrace.seekEvent(new TmfTimestamp(0, SCALE, 0));
+    	ITmfContext context = fTrace.seekEvent(new TmfTimestamp(0, SCALE, 0));
 
     	// Read NB_EVENTS
     	ITmfEvent event;
@@ -332,7 +332,7 @@ public class TmfTraceTest extends TestCase {
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
     	// Position trace at event rank 1000
-        TmfContext tmpContext = fTrace.seekEvent(new TmfTimestamp(1001, SCALE, 0));
+        ITmfContext tmpContext = fTrace.seekEvent(new TmfTimestamp(1001, SCALE, 0));
         context = fTrace.seekLocation(tmpContext.getLocation());
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
@@ -361,7 +361,7 @@ public class TmfTraceTest extends TestCase {
     public void testSeekLocationNotOnCacheBoundary() throws Exception {
 
     	// Position trace at event rank 9
-    	TmfContext tmpContext = fTrace.seekEvent(new TmfTimestamp(10, SCALE, 0));
+    	ITmfContext tmpContext = fTrace.seekEvent(new TmfTimestamp(10, SCALE, 0));
         TmfContext context = fTrace.seekLocation(tmpContext.getLocation());
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
@@ -416,8 +416,8 @@ public class TmfTraceTest extends TestCase {
     public void testSeekLocationOutOfScope() throws Exception {
 
     	// Position trace at beginning
-    	TmfContext tmpContext = fTrace.seekLocation(null);
-        TmfContext context = fTrace.seekLocation(tmpContext.getLocation());
+    	ITmfContext tmpContext = fTrace.seekLocation(null);
+        ITmfContext context = fTrace.seekLocation(tmpContext.getLocation());
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
     	
         ITmfEvent event = fTrace.parseEvent(context);
@@ -449,7 +449,7 @@ public class TmfTraceTest extends TestCase {
     public void testSeekEventOnTimestampOnCacheBoundary() throws Exception {
 
     	// Position trace at event rank 0
-    	TmfContext context = fTrace.seekEvent(new TmfTimestamp(1, SCALE, 0));
+    	ITmfContext context = fTrace.seekEvent(new TmfTimestamp(1, SCALE, 0));
         assertEquals("Event rank", 0, context.getRank());
 
         ITmfEvent event = fTrace.parseEvent(context);
@@ -488,7 +488,7 @@ public class TmfTraceTest extends TestCase {
     public void testSeekEventOnTimestampNotOnCacheBoundary() throws Exception {
 
     	// Position trace at event rank 1
-    	TmfContext context = fTrace.seekEvent(new TmfTimestamp(2, SCALE, 0));
+    	ITmfContext context = fTrace.seekEvent(new TmfTimestamp(2, SCALE, 0));
         assertEquals("Event rank", 1, context.getRank());
     	
         ITmfEvent event = fTrace.parseEvent(context);
@@ -551,7 +551,7 @@ public class TmfTraceTest extends TestCase {
     public void testSeekEventOnTimestampOutOfScope() throws Exception {
 
     	// Position trace at beginning
-    	TmfContext context = fTrace.seekEvent(new TmfTimestamp(-1, SCALE, 0));
+    	ITmfContext context = fTrace.seekEvent(new TmfTimestamp(-1, SCALE, 0));
         assertEquals("Event rank", 0, context.getRank());
     	
         ITmfEvent event = fTrace.parseEvent(context);
@@ -582,7 +582,7 @@ public class TmfTraceTest extends TestCase {
     public void testSeekOnRankOnCacheBoundary() throws Exception {
 
     	// On lower bound, returns the first event (ts = 1)
-    	TmfContext context = fTrace.seekEvent(0);
+    	ITmfContext context = fTrace.seekEvent(0);
         assertEquals("Event rank", 0, context.getRank());
     	
         ITmfEvent event = fTrace.parseEvent(context);
@@ -621,7 +621,7 @@ public class TmfTraceTest extends TestCase {
     public void testSeekOnRankNotOnCacheBoundary() throws Exception {
 
     	// Position trace at event rank 9
-    	TmfContext context = fTrace.seekEvent(9);
+    	ITmfContext context = fTrace.seekEvent(9);
         assertEquals("Event rank", 9, context.getRank());
     	
         ITmfEvent event = fTrace.parseEvent(context);
@@ -672,7 +672,7 @@ public class TmfTraceTest extends TestCase {
     public void testSeekEventOnRankOfScope() throws Exception {
 
     	// Position trace at beginning
-    	TmfContext context = fTrace.seekEvent(-1);
+    	ITmfContext context = fTrace.seekEvent(-1);
         assertEquals("Event rank", 0, context.getRank());
     	
         ITmfEvent event = fTrace.parseEvent(context);

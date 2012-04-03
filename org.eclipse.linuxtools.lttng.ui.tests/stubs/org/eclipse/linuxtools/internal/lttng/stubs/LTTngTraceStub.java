@@ -63,7 +63,7 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> {
      * @throws FileNotFoundException
      */
     public LTTngTraceStub(String filename, int cacheSize) throws FileNotFoundException {
-        super(filename, LttngEvent.class, filename, cacheSize);
+        super(filename, LttngEvent.class, filename, cacheSize, true);
         fTrace = new RandomAccessFile(filename, "r");
     	fParser = new LTTngEventParserStub();
 //    	indexTrace(true);

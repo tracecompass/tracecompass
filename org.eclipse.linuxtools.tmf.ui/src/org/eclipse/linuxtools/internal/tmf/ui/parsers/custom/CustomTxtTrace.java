@@ -45,7 +45,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     }
 
     public CustomTxtTrace(String name, CustomTxtTraceDefinition definition, String path, int pageSize) throws FileNotFoundException {
-        super(name, CustomTxtEvent.class, path, (pageSize > 0) ? pageSize : DEFAULT_CACHE_SIZE);
+        super(name, CustomTxtEvent.class, path, (pageSize > 0) ? pageSize : DEFAULT_CACHE_SIZE, true);
         fDefinition = definition;
         fEventType = new CustomTxtEventType(fDefinition);
     }
