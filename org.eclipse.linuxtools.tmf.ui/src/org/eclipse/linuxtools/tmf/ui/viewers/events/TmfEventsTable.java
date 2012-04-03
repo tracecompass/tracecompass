@@ -1383,7 +1383,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     protected ITmfEventField[] extractItemFields(ITmfEvent event) {
         ITmfEventField[] fields = new TmfEventField[0];
         if (event != null) {
-            String timestamp = ((Long) event.getTimestamp().getValue()).toString();
+            String timestamp = event.getTimestamp().toString();
             String source = event.getSource();
             String type = event.getType().getName();
             String reference = event.getReference();

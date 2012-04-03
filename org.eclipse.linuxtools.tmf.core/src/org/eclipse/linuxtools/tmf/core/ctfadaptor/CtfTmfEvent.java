@@ -20,12 +20,11 @@ import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
+import org.eclipse.linuxtools.internal.tmf.core.TmfCorePlugin;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 
 /**
  * <b><u>CTFEvent</u></b>
@@ -41,6 +40,7 @@ public final class CtfTmfEvent implements ITmfEvent {
 
     private static final String NO_STREAM = "No stream"; //$NON-NLS-1$
     private static final String EMPTY_CTF_EVENT_NAME = "Empty CTF event"; //$NON-NLS-1$
+    private static final String CONTEXT_ID = "Ctf Event"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -53,7 +53,7 @@ public final class CtfTmfEvent implements ITmfEvent {
     private final String eventName;
     private final String fileName;
 
-    private final TmfEventField fContent;
+    private final CtfTmfContent fContent;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -91,7 +91,7 @@ public final class CtfTmfEvent implements ITmfEvent {
         this.fileName = top.getStreamInput().getFilename();
 
         /* Read the fields */
-        this.fContent = new TmfEventField(ITmfEventField.ROOT_FIELD_ID,
+        this.fContent = new CtfTmfContent(ITmfEventField.ROOT_FIELD_ID,
                 parseFields(eventDef));
     }
 
@@ -143,14 +143,14 @@ public final class CtfTmfEvent implements ITmfEvent {
         this.fileName = other.fileName;
 
         /* Copy the fields over */
-        this.fContent = other.fContent.clone();
+        this.fContent = (CtfTmfContent) other.fContent.clone();
     }
 
     /**
      * Inner constructor to create "null" events. Don't use this directly, use
      * CTFEvent.getNullEvent();
      */
-    private CtfTmfEvent() {
+    public CtfTmfEvent() {
         this.fTrace = null;
         this.timestamp = -1;
         this.sourceCPU = -1;
@@ -243,21 +243,28 @@ public final class CtfTmfEvent implements ITmfEvent {
     @Override
     public ITmfTimestamp getTimestamp() {
         if (fTimestamp == null) {
-            fTimestamp = new TmfTimestamp(timestamp);
+            fTimestamp = new CtfTmfTimestamp(timestamp, fTrace);
         }
         return fTimestamp;
     }
 
+    String fSource = null;
     @Override
     public String getSource() {
-        // TODO Returns eventName for now
-        return eventName;
+        // TODO Returns CPU for now
+        if(fSource == null) {
+            fSource= Integer.toString(getCPU());
+        }
+        return fSource;
     }
 
+    private CtfTmfEventType type = null;
     @Override
     public ITmfEventType getType() {
-        // TODO Auto-generated method stub
-        return null;
+        if(type == null){
+            type = new CtfTmfEventType(CONTEXT_ID, eventName, fContent);
+        }
+        return type;
     }
 
     @Override
@@ -265,10 +272,13 @@ public final class CtfTmfEvent implements ITmfEvent {
         return fContent;
     }
 
+    String fReference = null;
     @Override
     public String getReference() {
-        // TODO Auto-generated method stub
-        return null;
+        if( fReference == null){
+            fReference = getChannelName();
+        }
+        return fReference;
     }
 
     @Override

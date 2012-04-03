@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
@@ -19,12 +19,12 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 
 public class TmfFilterNode extends TmfFilterTreeNode {
-	
+
 	public static final String NODE_NAME = "FILTER"; //$NON-NLS-1$
 	public static final String NAME_ATTR = "name"; //$NON-NLS-1$
-	
+
 	String fFilterName;
-	
+
 	public TmfFilterNode(String filterName) {
 		super(null);
 		fFilterName = filterName;
@@ -63,9 +63,8 @@ public class TmfFilterNode extends TmfFilterTreeNode {
 	public List<String> getValidChildren() {
 		if (getChildrenCount() == 0) {
 			return super.getValidChildren();
-		} else {
-			return new ArrayList<String>(0); // only one child allowed
 		}
+        return new ArrayList<String>(0); // only one child allowed
 	}
 
 	@Override
@@ -77,7 +76,7 @@ public class TmfFilterNode extends TmfFilterTreeNode {
 		for (int i = 0; i < getChildrenCount(); i++) {
 			ITmfFilterTreeNode node = getChildren()[i];
 			buf.append(node.toString());
-			if (i < getChildrenCount() - 1) {
+			if (i < (getChildrenCount() - 1)) {
 				buf.append(" and "); //$NON-NLS-1$
 			}
 		}

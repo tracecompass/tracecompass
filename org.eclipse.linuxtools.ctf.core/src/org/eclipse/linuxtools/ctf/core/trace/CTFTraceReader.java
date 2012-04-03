@@ -238,7 +238,21 @@ public class CTFTraceReader {
         if (top == null) {
             return false;
         }
-
+        /*
+         * index if needed
+         */
+        if (hasMoreEvents()) {
+            StreamInputPacketReader packetReader = top.getPacketReader();
+            boolean packetHasMoreEvents = packetReader.hasMoreEvents();
+            StreamInputPacketIndexEntry currentPacket = packetReader
+                    .getCurrentPacket();
+            if (!packetHasMoreEvents) {
+                int n = this.streamInputReaders.indexOf(top);
+                currentPacket.setIndexBegin(startIndex[n]);
+                currentPacket.setIndexEnd(index);
+                startIndex[n] = index + 1;
+            }
+        }
         /*
          * Read the next event of this reader.
          */
@@ -250,28 +264,18 @@ public class CTFTraceReader {
             final long topEnd = top.getCurrentEvent().timestamp;
             this.endTime = Math.max(topEnd, this.endTime);
             this.eventCountPerTraceFile[top.getName()]++;
-        }
-        if (hasMoreEvents()) {
             /*
              * increment the index
              */
             index++;
-            StreamInputPacketReader packetReader = top.getPacketReader();
-
-            if (packetReader.hasMoreEvents() == false) {
-                int n = this.streamInputReaders.indexOf(top);
-                StreamInputPacketIndexEntry currentPacket = packetReader
-                        .getCurrentPacket();
-                currentPacket.setIndexBegin(startIndex[n]);
-                currentPacket.setIndexEnd(index);
-                startIndex[n] = index + 1;
-            }
         }
+        boolean hasMoreEvents = hasMoreEvents();
+
         /*
          * If there is no reader in the queue, it means the trace reader reached
          * the end of the trace.
          */
-        return hasMoreEvents();
+        return hasMoreEvents;
     }
 
     /**
@@ -352,8 +356,8 @@ public class CTFTraceReader {
             }
         } catch (CTFReaderException e) {
             /*
-             * Important, if it failed, it's because it's not yet indexed,
-             * so we have to manually advance to the right value.
+             * Important, if it failed, it's because it's not yet indexed, so we
+             * have to manually advance to the right value.
              */
             for (StreamInputReader streamInputReader : this.streamInputReaders) {
                 /*
@@ -372,16 +376,22 @@ public class CTFTraceReader {
                 this.prio.add(streamInputReader);
             }
         }
-        /*
-         * advance for offset
-         */
-        while ((prio.peek().getCurrentEvent().timestamp < tempTimestamp)
-                && hasMoreEvents()) {
-            this.advance();
+        if (tempIndex == Long.MAX_VALUE) {
+            tempIndex = 0;
         }
         long pos = tempIndex;
-        for (pos = tempIndex; (pos < index) && hasMoreEvents(); pos++) {
-            this.advance();
+        if (index > tempIndex) {
+            /*
+             * advance for offset
+             */
+            while ((prio.peek().getCurrentEvent().timestamp < tempTimestamp)
+                    && hasMoreEvents()) {
+                this.advance();
+            }
+
+            for (pos = tempIndex; (pos < index) && hasMoreEvents(); pos++) {
+                this.advance();
+            }
         }
         this.index = pos;
         return hasMoreEvents();

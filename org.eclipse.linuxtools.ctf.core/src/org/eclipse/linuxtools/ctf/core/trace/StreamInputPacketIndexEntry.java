@@ -56,9 +56,9 @@ public class StreamInputPacketIndexEntry {
     private long timestampEnd = 0;
 
 
-    private long indexBegin = -1;
+    private long indexBegin = Long.MAX_VALUE;
 
-    private long indexEnd = -1;
+    private long indexEnd = Long.MAX_VALUE;
 
     // ------------------------------------------------------------------------
     // Constructors

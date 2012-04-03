@@ -83,8 +83,6 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
         // this.fEndTime.clone()));
     }
 
-
-
     @Override
     public void indexTrace(boolean waitForCompletion) {
     }
@@ -237,6 +235,9 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
 
     @Override
     public ITmfContext seekLocation(ITmfLocation<?> location) {
+        if (location == null) {
+            location = new CtfLocation(0L);
+        }
         iterator.setLocation(location);
         return iterator;
     }

@@ -357,6 +357,7 @@ public class StreamInput implements IDefinitionScope {
             packetOffsetBytes += (packetIndex.getPacketSizeBits() + 7) / 8;
 
         }
+        index.getEntries().get(0).setIndexBegin(0L);
     }
 
 }
