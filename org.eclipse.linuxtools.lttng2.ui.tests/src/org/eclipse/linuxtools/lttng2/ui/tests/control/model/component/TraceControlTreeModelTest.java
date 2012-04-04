@@ -39,13 +39,13 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceS
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.UstProviderComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.LTTngControlService;
-import org.eclipse.linuxtools.lttng2.ui.tests.Activator;
 import org.eclipse.rse.core.model.Host;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.internal.core.model.SystemProfile;
 import org.eclipse.swt.graphics.Image;
 import org.junit.After;
 import org.junit.Before;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * The class <code>TraceControlTreeModelTest</code> contains tests for the tree component classes.
@@ -94,7 +94,7 @@ public class TraceControlTreeModelTest extends TestCase {
     @Before
     public void setUp() throws Exception {
         fProxy = new TestRemoteSystemProxy();
-        URL location = FileLocator.find(Activator.getDefault().getBundle(), new Path(TraceControlTestFacility.DIRECTORY + File.separator + TEST_STREAM), null);
+        URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path(TraceControlTestFacility.DIRECTORY + File.separator + TEST_STREAM), null);
         File testfile = new File(FileLocator.toFileURL(location).toURI());
         fTestFile = testfile.getAbsolutePath();
     }

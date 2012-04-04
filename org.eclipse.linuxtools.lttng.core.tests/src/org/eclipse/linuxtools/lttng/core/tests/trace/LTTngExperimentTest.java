@@ -23,11 +23,11 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.internal.lttng.core.trace.LTTngTrace;
-import org.eclipse.linuxtools.lttng.core.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * <b><u>TmfExperimentTest</u></b>
@@ -58,7 +58,7 @@ public class LTTngExperimentTest extends TestCase {
     	if (fTraces == null) {
     		fTraces = new ITmfTrace[1];
     		try {
-				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(path), null);
+				URL location = FileLocator.find(FrameworkUtil.getBundle(LTTngExperimentTest.class), new Path(path), null);
 				File testfile = new File(FileLocator.toFileURL(location).toURI());
 				LTTngTrace trace = new LTTngTrace(testfile.getName(), testfile.getPath(), false);
     			fTraces[0] = trace;

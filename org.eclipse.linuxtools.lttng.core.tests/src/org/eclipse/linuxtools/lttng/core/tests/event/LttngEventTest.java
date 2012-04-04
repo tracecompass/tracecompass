@@ -13,10 +13,10 @@ import org.eclipse.linuxtools.internal.lttng.core.event.LttngEventType;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.internal.lttng.core.trace.LTTngTextTrace;
 import org.eclipse.linuxtools.internal.lttng.core.trace.LTTngTrace;
-import org.eclipse.linuxtools.lttng.core.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
+import org.osgi.framework.FrameworkUtil;
 
 /*
  Functions tested here :
@@ -57,7 +57,7 @@ public class LttngEventTest extends TestCase {
     private LTTngTextTrace initializeEventStream() {
 		if (testStream == null) {
 			try {
-				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(tracepath1), null);
+				URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path(tracepath1), null);
 				File testfile = new File(FileLocator.toFileURL(location).toURI());
 				LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getName(), testfile.getPath(), skipIndexing);
 				testStream = tmpStream;

@@ -38,7 +38,7 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceSessio
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.ChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.LTTngControlService;
-import org.eclipse.linuxtools.lttng2.ui.tests.Activator;
+import org.osgi.framework.FrameworkUtil;
 /**
  * The class <code>LTTngControlServiceTest</code> contains test for the class <code>{@link  LTTngControlService}</code>.
  */
@@ -90,7 +90,7 @@ public class LTTngControlServiceTest extends TestCase {
         super.setUp();
         fShellFactory = CommandShellFactory.getInstance();
 
-        URL location = FileLocator.find(Activator.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
+        URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
         File testfile = new File(FileLocator.toFileURL(location).toURI());
         fTestfile = testfile.getAbsolutePath();
         

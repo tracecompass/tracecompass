@@ -9,10 +9,10 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngLocation;
 import org.eclipse.linuxtools.internal.lttng.core.trace.LTTngTrace;
-import org.eclipse.linuxtools.lttng.core.tests.LTTngCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
+import org.osgi.framework.FrameworkUtil;
 
 /*
  Functions tested here :
@@ -72,7 +72,7 @@ public class LTTngTraceTest extends TestCase {
     private LTTngTrace prepareStreamToTest() {
 		if (testStream == null) {
 			try {
-				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(tracepath1), null);
+				URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path(tracepath1), null);
 				File testfile = new File(FileLocator.toFileURL(location).toURI());
 				LTTngTrace tmpStream = new LTTngTrace(testfile.getName(), testfile.getPath(), false);
 				testStream = tmpStream;
@@ -102,7 +102,7 @@ public class LTTngTraceTest extends TestCase {
         
         // Test constructor with argument on a correct tracepath, skipping indexing
         try {
-            URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(tracepath1), null);
+            URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path(tracepath1), null);
             File testfile = new File(FileLocator.toFileURL(location).toURI());
             new LTTngTrace(testfile.getName(), testfile.getPath(), skipIndexing);
         }

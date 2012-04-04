@@ -24,6 +24,7 @@ import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.osgi.framework.FrameworkUtil;
 
 @SuppressWarnings("nls")
 public abstract class LttngTestPreparation extends TestCase {
@@ -120,7 +121,7 @@ public abstract class LttngTestPreparation extends TestCase {
 	protected LTTngTrace prepareStreamToTest() {
 		if (frealStream == null) {
 			try {
-				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(), new Path(ftracepath_T1),
+				URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path(ftracepath_T1),
 						null);
 				File testfile = new File(FileLocator.toFileURL(location).toURI());
 				LTTngTrace tmpStream = new LTTngTrace(testfile.getName(), testfile.getPath(), false);
@@ -139,7 +140,7 @@ public abstract class LttngTestPreparation extends TestCase {
 	protected LTTngTextTrace prepareTextStreamToTest() {
 		if (ftextStream_T1 == null) {
 			try {
-				URL location = FileLocator.find(LTTngCoreTestPlugin.getPlugin().getBundle(),
+				URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()),
 						new Path(fTextTracepath_T1), null);
 				File testfile = new File(FileLocator.toFileURL(location).toURI());
 				LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getName(), testfile.getPath());

@@ -46,13 +46,13 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.TraceEve
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.TraceProbeEventPropertySource;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.TraceSessionPropertySource;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.UstProviderPropertySource;
-import org.eclipse.linuxtools.lttng2.ui.tests.Activator;
 import org.eclipse.rse.core.model.Host;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.internal.core.model.SystemProfile;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.junit.After;
 import org.junit.Before;
+import org.osgi.framework.FrameworkUtil;
 
 
 /**
@@ -122,7 +122,7 @@ public class TraceControlPropertiesTest extends TestCase {
         
         TestRemoteSystemProxy proxy = new TestRemoteSystemProxy();
 
-        URL location = FileLocator.find(Activator.getDefault().getBundle(), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
+        URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
         File testfile = new File(FileLocator.toFileURL(location).toURI());
         proxy.setTestFile(testfile.getAbsolutePath());
         proxy.setScenario(SCEN_LIST_INFO_TEST);

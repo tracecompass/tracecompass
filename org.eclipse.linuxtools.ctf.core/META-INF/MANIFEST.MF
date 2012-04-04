@@ -16,5 +16,4 @@ Export-Package: org.eclipse.linuxtools.ctf.core.event,
  org.eclipse.linuxtools.ctf.core.event.metadata,
  org.eclipse.linuxtools.ctf.core.event.metadata.exceptions,
  org.eclipse.linuxtools.ctf.core.event.types,
- org.eclipse.linuxtools.ctf.core.trace,
- org.eclipse.linuxtools.internal.ctf.core
+ org.eclipse.linuxtools.ctf.core.trace

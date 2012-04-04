@@ -27,7 +27,6 @@ import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
-import org.eclipse.linuxtools.tmf.ui.tests.TmfUITestPlugin;
 import org.eclipse.linuxtools.tmf.ui.tests.uml2sd.trace.TmfUml2SDTestTrace;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.widgets.Criteria;
@@ -39,6 +38,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  *  Singleton class to facilitate the test cases. Creates UML2SD view and loader objects as well as provides
@@ -123,7 +123,7 @@ public class Uml2SDTestFacility {
         
             try {
                 // Create test trace object
-                URL location = FileLocator.find(TmfUITestPlugin.getDefault().getBundle(), new Path("tracesets/sdEvents"), null); //$NON-NLS-1$
+                URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path("tracesets/sdEvents"), null); //$NON-NLS-1$
                 File test = new File(FileLocator.toFileURL(location).toURI());
                 return new TmfTraceStub(test.getPath(), 500, true, parser);
             } catch (URISyntaxException e) {
