@@ -271,4 +271,22 @@ public class TraceDomainComponent extends TraceControlComponent {
         getControlService().enableLogLevel(getSessionName(), null, eventName, logLevelType, level, monitor);
     }
 
+    /**
+     * Add contexts to given channels and or events
+     * @param contexts - a list of contexts to add
+     * @throws ExecutionException
+     */
+    public void addContexts(List<String> contexts) throws ExecutionException {
+        addContexts(contexts, new NullProgressMonitor());
+    }
+
+    /**
+     * Add contexts to given channels and or events
+     * @param contexts - a list of contexts to add
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void addContexts(List<String> contexts, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().addContexts(getSessionName(), null, null, isKernel(), contexts, monitor);
+    }
 }

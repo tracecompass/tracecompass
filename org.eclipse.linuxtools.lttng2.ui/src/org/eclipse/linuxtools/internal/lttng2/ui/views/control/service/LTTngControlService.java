@@ -98,7 +98,11 @@ public class LTTngControlService implements ILttngControlService {
      * Command to disable a event. 
      */
     private final static String COMMAND_DISABLE_EVENT = CONTROL_COMMAND + " disable-event "; //$NON-NLS-1$
-
+    /**
+     * Command to add a context to channels and/or events
+     */
+    private final static String COMMAND_ADD_CONTEXT = CONTROL_COMMAND + " add-context "; //$NON-NLS-1$
+    
     // Command options constants 
     /**
      * Command line option for output path.
@@ -121,9 +125,17 @@ public class LTTngControlService implements ILttngControlService {
      */
     private final static String OPTION_CHANNEL = " -c ";  //$NON-NLS-1$
     /**
+     * Command line option for specifying a event.
+     */
+    private final static String OPTION_EVENT = " -e ";  //$NON-NLS-1$
+    /**
      * Command line option for specifying all events.
      */
     private final static String OPTION_ALL = " -a ";  //$NON-NLS-1$
+    /**
+     * Command line option for specifying a context.
+     */
+    private final static String OPTION_CONTEXT_TYPE = " -t ";  //$NON-NLS-1$
     /**
      * Command line option for specifying tracepoint events.
      */
@@ -168,6 +180,10 @@ public class LTTngControlService implements ILttngControlService {
      * Optional command line option for configuring a channel's read timer interval.
      */
     private final static String OPTION_READ_TIMER = " --read-timer ";  //$NON-NLS-1$
+    /**
+     * Command line option for printing the help of a specif command 
+     */
+    private final static String OPTION_HELP = " -h ";  //$NON-NLS-1$
     
     // Parsing constants
     /**
@@ -284,6 +300,15 @@ public class LTTngControlService implements ILttngControlService {
      * Pattern to match for session command output for "session name not found".
      */
     private final static Pattern SESSION_NOT_FOUND_ERROR_PATTERN = Pattern.compile("\\s*Error:\\s+Session\\s+name\\s+not\\s+found"); //$NON-NLS-1$
+    /**
+     * Pattern to match introduction line of context list.
+     */
+    private final static Pattern ADD_CONTEXT_HELP_CONTEXTS_INTRO = Pattern.compile("\\s*TYPE can\\s+be\\s+one\\s+of\\s+the\\s+strings\\s+below.*"); //$NON-NLS-1$
+    
+    /**
+     * Pattern to match introduction line of context list.
+     */
+    private final static Pattern ADD_CONTEXT_HELP_CONTEXTS_END_LINE = Pattern.compile("\\s*Example.*"); //$NON-NLS-1$
     
     // ------------------------------------------------------------------------
     // Attributes
@@ -949,7 +974,91 @@ public class LTTngControlService implements ILttngControlService {
             throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
-    
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#getContexts(org.eclipse.core.runtime.IProgressMonitor)
+     */
+    @Override
+    public List<String> getContextList(IProgressMonitor monitor) throws ExecutionException {
+
+        String command = COMMAND_ADD_CONTEXT + OPTION_HELP;
+
+        ICommandResult result = fCommandShell.executeCommand(command, monitor);
+
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+
+        String[] output = result.getOutput(); 
+        
+        List<String> contexts = new ArrayList<String>(0);
+        
+        int index = 0;
+        boolean inList = false;
+        while (index < output.length) {
+            String line = result.getOutput()[index];
+            
+            Matcher startMatcher = ADD_CONTEXT_HELP_CONTEXTS_INTRO.matcher(line);
+            Matcher endMatcher = ADD_CONTEXT_HELP_CONTEXTS_END_LINE.matcher(line);
+
+            if (startMatcher.matches()) {
+                inList = true;
+            } else if (endMatcher.matches()) {
+                break;
+            } else if (inList == true) {
+                String[] tmp = line.split(","); //$NON-NLS-1$
+                for (int i = 0; i < tmp.length; i++) {
+                    contexts.add(tmp[i].trim());
+                }
+            }
+            index++;
+        }
+        return contexts;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#addContexts(java.lang.String, java.lang.String, java.lang.String, boolean, java.util.List, org.eclipse.core.runtime.IProgressMonitor)
+     */
+    @Override
+    public void addContexts(String sessionName, String channelName, String eventName, boolean isKernel, List<String> contextNames, IProgressMonitor monitor) throws ExecutionException {
+        
+        String newSessionName = formatParameter(sessionName);
+        StringBuffer command = new StringBuffer(COMMAND_ADD_CONTEXT);
+
+        command.append(OPTION_SESSION);
+        command.append(newSessionName);
+        
+        if (channelName != null) {
+            command.append(OPTION_CHANNEL);
+            command.append(channelName);
+        }
+
+        if (eventName != null) {
+            command.append(OPTION_EVENT);
+            command.append(eventName);
+        }
+
+        if (isKernel) {
+            command.append(OPTION_KERNEL);
+        } else {
+            command.append(OPTION_UST);
+        }
+        
+        for (Iterator<String> iterator = contextNames.iterator(); iterator.hasNext();) {
+            String context = (String) iterator.next();
+            command.append(OPTION_CONTEXT_TYPE);
+            command.append(context);
+        }
+
+        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
+        
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+    }
+
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
@@ -1238,5 +1347,4 @@ public class LTTngControlService implements ILttngControlService {
         }
         return null;
     }
-    
 }

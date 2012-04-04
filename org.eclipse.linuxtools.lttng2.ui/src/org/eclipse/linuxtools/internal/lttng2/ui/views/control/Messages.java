@@ -58,6 +58,9 @@ final public class Messages extends NLS {
     public static String TraceControl_EnableEventsFailure;
     public static String TraceControl_DisableEventsJob;
     
+    public static String TraceControl_GetContextJob;
+    public static String TraceControl_AddContextJob;
+    
     // Dialogs
     public static String TraceControl_NewDialogTitle;
     public static String TraceControl_NewNodeExistingConnectionGroupName;
@@ -132,6 +135,10 @@ final public class Messages extends NLS {
     public static String TraceControl_InvalidLogLevelEventNameError;
     public static String TraceControl_InvalidLogLevel;
     
+    public static String TraceControl_AddContextDialogTitle;
+    public static String TraceControl_AddContextAvailableContextsLabel;
+    public static String TraceControl_AddContextAvailableContextsTooltip;
+    public static String TraceControl_AddContextAllLabel;
 
     // Tree structure strings
     public static String TraceControl_KernelDomainDisplayName;

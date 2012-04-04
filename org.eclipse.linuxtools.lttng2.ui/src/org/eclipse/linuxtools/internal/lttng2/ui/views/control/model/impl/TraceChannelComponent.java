@@ -359,4 +359,23 @@ public class TraceChannelComponent extends TraceControlComponent {
     public void disableEvent(List<String> eventNames, IProgressMonitor monitor) throws ExecutionException {
         getControlService().disableEvent(getParent().getParent().getName(), getName(), eventNames, isKernel(), monitor);
     }
+    
+    /**
+     * Add contexts to given channels and or events
+     * @param contexts - a list of contexts to add
+     * @throws ExecutionException
+     */
+    public void addContexts(List<String> contexts) throws ExecutionException {
+        addContexts(contexts, new NullProgressMonitor());
+    }
+
+    /**
+     * Add contexts to given channels and or events
+     * @param contexts - a list of contexts to add
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void addContexts(List<String> contexts, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().addContexts(getSessionName(), getName(), null, isKernel(), contexts, monitor);
+    }
 }

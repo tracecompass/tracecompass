@@ -150,7 +150,28 @@
             id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnSession"
             name="%commands.control.enable.eventOnSession">
       </command>
-      
+
+      <command
+            categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
+            description="%commands.control.add.context.description"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.addContextOnDomain"
+            name="%commands.control.add.context">
+      </command>
+
+      <command
+            categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
+            description="%commands.control.add.context.description"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.addContextOnChannel"
+            name="%commands.control.add.context">
+      </command>
+
+      <command
+            categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
+            description="%commands.control.add.context.description"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.addContextOnEvent"
+            name="%commands.control.add.context">
+      </command>
+
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -563,7 +584,6 @@
                </with>
             </visibleWhen>
          </command>
-
          <command
                commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnChannel"
                icon="icons/elcl16/edit.gif"
@@ -587,9 +607,75 @@
                </with>
             </visibleWhen>
          </command>
-
-
-
+         <command
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.addContextOnDomain"
+               icon="icons/elcl16/edit.gif"
+               label="%commands.control.add.context"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <and>
+                     <iterate
+                           operator="or">
+                        <instanceof
+                              value="org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent">
+                        </instanceof>
+                     </iterate>
+                     <count
+                           value="1">
+                     </count>
+                  </and>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.addContextOnChannel"
+               icon="icons/elcl16/edit.gif"
+               label="%commands.control.add.context"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <and>
+                     <iterate
+                           operator="or">
+                        <instanceof
+                              value="org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceChannelComponent">
+                        </instanceof>
+                     </iterate>
+                     <count
+                           value="1">
+                     </count>
+                  </and>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.addContextOnEvent"
+               icon="icons/elcl16/edit.gif"
+               label="%commands.control.add.context"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <and>
+                     <iterate
+                           operator="or">
+                        <instanceof
+                              value="org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceEventComponent">
+                        </instanceof>
+                     </iterate>
+                     <count
+                           value="1">
+                     </count>
+                  </and>
+               </with>
+            </visibleWhen>
+         </command>
       </menuContribution>
       
    </extension>
@@ -884,6 +970,55 @@
             </with>
          </activeWhen>
       </handler>
+      
+      <handler
+            class="org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.AddContextOnDomainHandler"
+            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.addContextOnDomain">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+      </handler>
+
+      <handler
+            class="org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.AddContextOnChannelHandler"
+            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.addContextOnChannel">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceChannelComponent">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+      </handler>
+
+      <handler
+            class="org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.AddContextOnEventHandler"
+            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.addContextOnEvent">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceEventComponent">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+      </handler>
+      
    </extension>
    
     <extension

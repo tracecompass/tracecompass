@@ -178,5 +178,24 @@ public interface ILttngControlService {
      * @throws ExecutionException
      */
     public void disableEvent(String sessionName, String channelName, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException;
+    
+    /**
+     * Gets all available context names to be added to channels/events.
+     * @param monitor
+     * @return the list of available contexts
+     */
+    public List<String> getContextList(IProgressMonitor monitor) throws ExecutionException;
+    
+    /**
+     * Add contexts to given channels and or events
+     * @param sessionName - a session name
+     * @param channelName - a channel name (null for all channels)
+     * @param eventName - a event name (null for all events)
+     * @param isKernel -  a flag for indicating kernel or UST.
+     * @param contexts - a list of name of contexts to add
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void addContexts(String sessionName, String channelName, String eventName, boolean isKernel, List<String> contexts, IProgressMonitor monitor) throws ExecutionException;
 
 }

@@ -11,6 +11,11 @@
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl;
 
+import java.util.List;
+
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IEventInfo;
@@ -183,6 +188,13 @@ public class TraceEventComponent extends TraceControlComponent {
     }
 
     /**
+     * @return session from parent
+     */
+    public TraceSessionComponent getSession() {
+       return ((TraceChannelComponent)getParent()).getSession(); 
+    }
+
+    /**
      * @return channel name from parent
      */
     public String getChannelName() {
@@ -199,4 +211,23 @@ public class TraceEventComponent extends TraceControlComponent {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+    
+    /**
+     * Add contexts to given channels and or events
+     * @param contexts - a list of contexts to add
+     * @throws ExecutionException
+     */
+    public void addContexts(List<String> contexts) throws ExecutionException {
+        addContexts(contexts, new NullProgressMonitor());
+    }
+
+    /**
+     * Add contexts to given channels and or events
+     * @param contexts - a list of contexts to add
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void addContexts(List<String> contexts, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().addContexts(getSessionName(),getChannelName(), getName(), isKernel(), contexts, monitor);
+    }
 }

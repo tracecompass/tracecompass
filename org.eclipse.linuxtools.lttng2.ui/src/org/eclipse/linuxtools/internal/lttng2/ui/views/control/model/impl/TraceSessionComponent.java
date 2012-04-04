@@ -362,4 +362,21 @@ public class TraceSessionComponent extends TraceControlComponent {
     public void enableLogLevel(String eventName, LogLevelType logLevelType, TraceLogLevel level, IProgressMonitor monitor) throws ExecutionException {
         getControlService().enableLogLevel(getName(), null, eventName, logLevelType, level, monitor);
     }
+    
+    /**
+     * Gets all available contexts to be added to channels/events.
+     * @return the list of available contexts
+     */
+    public List<String> getContextList() throws ExecutionException {
+        return getContextList(new NullProgressMonitor());
+    }
+
+    /**
+     * Gets all available contexts to be added to channels/events.
+     * @param monitor
+     * @return the list of available contexts
+     */
+    public List<String> getContextList(IProgressMonitor monitor) throws ExecutionException {
+        return getControlService().getContextList(monitor);
+    }
 }

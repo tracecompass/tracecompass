@@ -43,6 +43,11 @@ final public class TraceControlDialogFactory {
      * The confirmation dialog implementation
      */
     private IConfirmDialog fConfirmDialog;
+    
+    /**
+     * The add context dialog implementation
+     */
+    private IAddContextDialog fAddContextDialog;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -174,6 +179,24 @@ final public class TraceControlDialogFactory {
      */
     public void setConfirmDialog(IConfirmDialog confirmDialog) {
         fConfirmDialog = confirmDialog;
+    }
+    
+    /**
+     * @return the add context dialog implementation
+     */
+    public IAddContextDialog getAddContextDialog() {
+        if (fAddContextDialog == null) {
+            fAddContextDialog = new AddContextDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+        }
+        return fAddContextDialog;
+    }
+    
+    /**
+     * Sets the add context dialog information
+     * @param addContextDialog
+     */
+    public void setAddContextDialog(IAddContextDialog addContextDialog) {
+        fAddContextDialog = addContextDialog;
     }
 }
 
