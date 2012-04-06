@@ -61,8 +61,9 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
         if (NULL_LOCATION.equals(location) || !new File(getPath()).isFile()) {
             return context;
         }
+        BufferedRandomAccessFile raFile = null; 
         try {
-            BufferedRandomAccessFile raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
+			raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
             if (location != null && location.getLocation() instanceof Long) {
                 raFile.seek((Long)location.getLocation());
             }
@@ -90,14 +91,22 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
         } catch (IOException e) {
             e.printStackTrace();
             return context;
+        } finally {
+        	if (raFile != null) {
+        		try {
+					raFile.close();
+				} catch (IOException e) {
+				}
+        	}
         }
         
     }
 
     @Override
     public TmfContext seekLocation(double ratio) {
+    	BufferedRandomAccessFile raFile = null; 
         try {
-            BufferedRandomAccessFile raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
+			raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
             long pos = (long) (ratio * raFile.length());
             while (pos > 0) {
                 raFile.seek(pos - 1);
@@ -114,20 +123,35 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
         } catch (IOException e) {
             e.printStackTrace();
             return new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
+        } finally {
+        	if (raFile != null) {
+        		try {
+					raFile.close();
+				} catch (IOException e) {
+				}
+        	}
         }
     }
 
     @Override
     public double getLocationRatio(ITmfLocation<?> location) {
+    	BufferedRandomAccessFile raFile = null; 
         try {
             if (location.getLocation() instanceof Long) {
-            	BufferedRandomAccessFile raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
+				raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
                 return (double) ((Long) location.getLocation()) / raFile.length();
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+        	if (raFile != null) {
+        		try {
+					raFile.close();
+				} catch (IOException e) {
+				}
+        	}
         }
         return 0;
     }

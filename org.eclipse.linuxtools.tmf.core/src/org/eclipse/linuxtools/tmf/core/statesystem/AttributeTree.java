@@ -135,7 +135,7 @@ final class AttributeTree {
      * @return The total number of bytes written.
      */
     int writeSelf(File file, long pos) {
-        RandomAccessFile raf;
+        RandomAccessFile raf = null;
         int total = 0;
         byte[] curByteArray;
 
@@ -179,6 +179,13 @@ final class AttributeTree {
             raf.close();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+        	if (raf != null) {
+        		try {
+					raf.close();
+				} catch (IOException e) {
+				}
+        	}
         }
         return total;
     }

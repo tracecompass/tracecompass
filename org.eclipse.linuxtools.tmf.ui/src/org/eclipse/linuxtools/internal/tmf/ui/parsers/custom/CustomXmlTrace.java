@@ -106,8 +106,9 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
 
     @Override
     public TmfContext seekLocation(double ratio) {
+    	BufferedRandomAccessFile raFile = null; 
         try {
-            BufferedRandomAccessFile raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
+			raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
             long pos = (long) (ratio * raFile.length());
             while (pos > 0) {
                 raFile.seek(pos - 1);
@@ -124,20 +125,35 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
         } catch (IOException e) {
             e.printStackTrace();
             return new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
+        } finally {
+        	if (raFile != null) {
+        		try {
+					raFile.close();
+				} catch (IOException e) {
+				}
+        	}
         }
     }
 
     @Override
     public double getLocationRatio(ITmfLocation<?> location) {
+    	RandomAccessFile raFile = null; 
         try {
             if (location.getLocation() instanceof Long) {
-                RandomAccessFile raFile = new RandomAccessFile(getPath(), "r"); //$NON-NLS-1$
+				raFile = new RandomAccessFile(getPath(), "r"); //$NON-NLS-1$
                 return (double) ((Long) location.getLocation()) / raFile.length();
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+        	if (raFile != null) {
+        		try {
+					raFile.close();
+				} catch (IOException e) {
+				}
+        	}
         }
         return 0;
     }
