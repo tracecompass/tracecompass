@@ -80,9 +80,7 @@ public final class CtfTmfEvent implements ITmfEvent {
         }
 
         /* Read the base event info */
-        // FIXME restore once the CTF parser with clocks gets merged
-        //Long offset = originTrace.getCTFTrace().getOffset();
-        Long offset = 0L;
+        Long offset = originTrace.getCTFTrace().getOffset();
         this.timestamp = eventDef.timestamp + offset;
         this.sourceCPU = eventDef.getCPU();
         this.typeId = eventDef.getDeclaration().getId();
