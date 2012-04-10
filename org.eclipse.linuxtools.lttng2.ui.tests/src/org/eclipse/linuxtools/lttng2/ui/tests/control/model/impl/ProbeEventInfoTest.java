@@ -123,10 +123,6 @@ public class ProbeEventInfoTest extends TestCase {
     public void testGetAndSetter() {
         ProbeEventInfo fixture = new ProbeEventInfo("event");
         
-        // Make sure that ProbeEventInfo extends EventInfo
-        // -> so we don't need to re-test common parts
-        assertTrue(fixture instanceof EventInfo);
-        
         fixture.setAddress("0xc12344321");
         String result = fixture.getAddress();
 

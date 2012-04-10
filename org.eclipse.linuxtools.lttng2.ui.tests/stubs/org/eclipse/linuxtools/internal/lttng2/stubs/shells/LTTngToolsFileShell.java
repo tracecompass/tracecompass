@@ -88,7 +88,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
      * @param scenariofile - path to scenario file
      * @throws Exception
      */
-    public void loadScenarioFile(String scenariofile) throws Exception {
+    public synchronized void loadScenarioFile(String scenariofile) throws Exception {
         fScenariofile = scenariofile;
         
         // clean up map
@@ -225,7 +225,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
      */
     @SuppressWarnings("nls")
     @Override
-   public ICommandResult executeCommand(String command, IProgressMonitor monitor, boolean checkReturnValue) throws ExecutionException {
+   public synchronized ICommandResult executeCommand(String command, IProgressMonitor monitor, boolean checkReturnValue) throws ExecutionException {
         Map<String, ICommandResult> commands = fScenarioMap.get(fScenario);
 
         Matcher matcher = LTTNG_LIST_SESSION_PATTERN.matcher(command);
@@ -254,6 +254,9 @@ public class LTTngToolsFileShell extends TestCommandShell {
     // Helper methods
     // ------------------------------------------------------------------------
     private boolean isComment(String line) {
+        if (line == null) {
+            throw new RuntimeException("line is null"); //$NON-NLS-1$
+        }
         return line.matches(COMMENT_KEY);
     }
 }

@@ -68,7 +68,7 @@ public class Uml2SDTestFacility {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    public static Uml2SDTestFacility getInstance() {
+    public synchronized static Uml2SDTestFacility getInstance() {
         if (fInstance == null) {
             fInstance = new Uml2SDTestFacility();
             fInstance.init();

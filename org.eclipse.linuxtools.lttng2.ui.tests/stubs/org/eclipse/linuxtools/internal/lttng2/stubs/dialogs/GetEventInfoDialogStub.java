@@ -11,6 +11,8 @@
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.stubs.dialogs;
 
+import java.util.Arrays;
+
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IGetEventInfoDialog;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceChannelComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent;
@@ -38,7 +40,11 @@ public class GetEventInfoDialogStub implements IGetEventInfoDialog {
 
     @Override
     public void setSessions(TraceSessionComponent[] sessions) {
-        fSessions = sessions;
+        if (sessions != null) {
+            fSessions = Arrays.copyOf(sessions, sessions.length);
+            return;
+        }
+        fSessions = null;
     }
 
     @Override

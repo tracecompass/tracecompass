@@ -100,7 +100,6 @@ public class TsfImplProvider extends TmfTimeAnalysisProvider {
 	@Override
 	public String getEventName(ITimeEvent event, boolean upper, boolean extInfo) {
 		String name = "Unknown";
-		name = upper ? name : name;
 		if (event instanceof EventImpl) {
 			EventImpl devent = (EventImpl) event;
 			name = devent.getType().toString();

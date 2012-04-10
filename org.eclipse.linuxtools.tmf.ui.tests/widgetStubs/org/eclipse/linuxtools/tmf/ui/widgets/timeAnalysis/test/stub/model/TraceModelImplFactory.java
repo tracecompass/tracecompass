@@ -61,7 +61,6 @@ public class TraceModelImplFactory {
 			long sTime = i * (long) 1E6;
 			trace = new TraceImpl(i, traceNames[count].name, sTime  , sTime + 20000,
 					traceNames[count].groupName, traceNames[count].classNmme);
-			count = i;
 			create5000Events(trace);
 			traceArr[i] = trace;
 		}
@@ -228,7 +227,7 @@ public class TraceModelImplFactory {
 	// ========================================================================
 	// Inner Class
 	// ========================================================================
-	private class TraceStrings {
+	private static class TraceStrings {
 		public String name = "";
 		public String classNmme = name + " class";
 		public String groupName = "group " + classNmme;

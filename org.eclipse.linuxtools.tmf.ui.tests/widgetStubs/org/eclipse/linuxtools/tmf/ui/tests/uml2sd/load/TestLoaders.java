@@ -42,21 +42,11 @@ public class TestLoaders implements IUml2SDLoader, ISDFindProvider, ISDFilterPro
 
     public SDView v;
     public int page;
-    protected static URL BASIC_URL = null;
-
     private List<GraphNode> findResults = new ArrayList<GraphNode>();
     private Criteria findCriteria;
     private int currentFindIndex = 0;
 
     private Frame savedFrame = null;
-
-    static {
-        try {
-            BASIC_URL = new URL("platform", "localhost", "plugin"); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
-        } catch (Exception E) {
-            System.err.println(E);
-        }
-    }
 
     public TestLoaders() {
         this(""); //$NON-NLS-1$
@@ -422,7 +412,7 @@ public class TestLoaders implements IUml2SDLoader, ISDFindProvider, ISDFilterPro
         return null;
     }
 
-    public class LocalImageImpl implements IImage {
+    public static class LocalImageImpl implements IImage {
         protected Image img;
 
         public LocalImageImpl(String file) {
@@ -439,6 +429,7 @@ public class TestLoaders implements IUml2SDLoader, ISDFindProvider, ISDFilterPro
         public Image getResourceImage(String _name) {
             ImageDescriptor img;
             try {
+                URL BASIC_URL = new URL("platform", "localhost", "plugin");
                 URL url = new URL(BASIC_URL, (new StringBuilder("plugin/org.eclipse.linuxtools.tmf.ui/icons/")).append(_name).toString());
                 img = ImageDescriptor.createFromURL(url);
                 return img.createImage();

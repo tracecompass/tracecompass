@@ -230,7 +230,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 		}
 	}
 
-	class ViewLabelProvider extends LabelProvider {
+	static class ViewLabelProvider extends LabelProvider {
 
 		@Override
 		public String getText(Object obj) {
@@ -247,7 +247,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
 		}
 	}
 
-	class NameSorter extends ViewerSorter {
+	static class NameSorter extends ViewerSorter {
 	}
 
 	// ========================================================================

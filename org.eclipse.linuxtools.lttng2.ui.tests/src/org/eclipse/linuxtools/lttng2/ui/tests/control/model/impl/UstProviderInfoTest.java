@@ -53,7 +53,7 @@ public class UstProviderInfoTest extends TestCase {
         fUstProviderInfo1 = factory.getUstProviderInfo1();
         fUstProviderInfo2 = factory.getUstProviderInfo2();
         fEventInfo1 = factory.getBaseEventInfo1();
-        fEventInfo1 = factory.getBaseEventInfo2();
+        fEventInfo2 = factory.getBaseEventInfo2();
     }
 
     /**
