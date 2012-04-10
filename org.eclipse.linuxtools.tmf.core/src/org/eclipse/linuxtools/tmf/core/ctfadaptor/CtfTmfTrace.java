@@ -57,6 +57,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
         super();
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void initTrace(String name, String path, Class<CtfTmfEvent> eventType)
             throws FileNotFoundException {
@@ -68,7 +69,6 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
              * was not found or was not recognized as a CTF trace. Throw into
              * the new type of exception expected by the rest of TMF.
              */
-            System.err.println("Cannot find file " + path); //$NON-NLS-1$
             throw new FileNotFoundException(e.getMessage());
         }
         this.iterator = new CtfIterator(this, 0, 0);
@@ -83,8 +83,10 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
         // this.fEndTime.clone()));
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void indexTrace(boolean waitForCompletion) {
+        // do nothing
     }
 
     @Override
@@ -97,6 +99,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
         TmfSignalManager.dispatchSignal(signal);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public boolean validate(IProject project, String path) {
         try {
@@ -223,6 +226,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
      * FIXME merge with getNextEvent below once they both use the same parameter
      * type.
      */
+    @SuppressWarnings("unused")
     @Override
     public CtfTmfEvent getNext(ITmfContext context) {
         iterator.advance();
@@ -235,19 +239,21 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
 
     @Override
     public ITmfContext seekLocation(ITmfLocation<?> location) {
-        if (location == null) {
-            location = new CtfLocation(0L);
+        CtfLocation currentLocation = (CtfLocation) location;
+        if (currentLocation == null) {
+            currentLocation = new CtfLocation(0L);
         }
-        iterator.setLocation(location);
+        iterator.setLocation(currentLocation);
         return iterator;
     }
 
     @Override
     public double getLocationRatio(ITmfLocation<?> location) {
-        CtfIterator curLocation = (CtfIterator) location;
-        return ((double) curLocation.getCurrentEvent().getTimestampValue() - curLocation
+        CtfLocation curLocation = (CtfLocation) location;
+        iterator.seek(curLocation.getLocation());
+        return ((double) iterator.getCurrentEvent().getTimestampValue() - iterator
                 .getStartTime())
-                / (curLocation.getEndTime() - curLocation.getStartTime());
+                / (iterator.getEndTime() - iterator.getStartTime());
     }
 
     @Override
@@ -279,12 +285,14 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
         return iterator;
     }
 
+    @SuppressWarnings("unused")
     @Override
-    public CtfTmfEvent getNextEvent(ITmfContext context) {
+    public CtfTmfEvent getNextEvent( ITmfContext context) {
         iterator.advance();
         return iterator.getCurrentEvent();
     }
 
+    @SuppressWarnings("unused")
     @Override
     public CtfTmfEvent parseEvent(ITmfContext context) {
         return iterator.getCurrentEvent();

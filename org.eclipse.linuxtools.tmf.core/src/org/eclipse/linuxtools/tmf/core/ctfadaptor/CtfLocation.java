@@ -8,7 +8,7 @@ public class CtfLocation implements ITmfLocation<Long> {
     public CtfLocation(Long location) {
         setLocation(location);
     }
-    
+
     public CtfLocation(ITmfTimestamp timestamp) {
         setLocation(timestamp.getValue());
     }

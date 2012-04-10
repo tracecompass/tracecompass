@@ -119,6 +119,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
         return curLocation;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void updateRank(int rank) {
         // not needed I think
