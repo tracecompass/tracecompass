@@ -55,7 +55,12 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
     @Override
     public boolean seek(long timestamp) {
         boolean ret = false;
-        ret = super.seek(timestamp);
+        long offsetTimestamp = timestamp - this.getCtfTmfTrace().getCTFTrace().getOffset();
+        if( offsetTimestamp < 0 ) {
+            ret = super.seek(timestamp);
+        } else {
+            ret = super.seek(offsetTimestamp);
+        }
 
         if (ret) {
             curLocation.setLocation(getCurrentEvent().getTimestampValue());
@@ -100,6 +105,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
     public void setLocation(ITmfLocation<?> location) {
         // FIXME alex: isn't there a cleaner way than a cast here?
         this.curLocation = (CtfLocation) location;
+        seek(((CtfLocation)location).getLocation());
     }
 
     @Override
