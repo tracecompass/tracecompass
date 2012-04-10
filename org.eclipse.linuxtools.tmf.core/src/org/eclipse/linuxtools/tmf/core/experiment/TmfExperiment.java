@@ -153,34 +153,6 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     }
 
     /**
-     * Copy constructor
-     *
-     * @param other
-     */
-    @SuppressWarnings("unchecked")
-    public TmfExperiment(TmfExperiment<T> other) {
-        super(other.getName() + "(clone)", other.fType); //$NON-NLS-1$
-
-        fEpoch = other.fEpoch;
-        fIndexPageSize = other.fIndexPageSize;
-
-        fTraces = new ITmfTrace[other.fTraces.length];
-        for (int trace = 0; trace < other.fTraces.length; trace++) {
-            fTraces[trace] = other.fTraces[trace].copy();
-        }
-
-        fNbEvents = other.fNbEvents;
-        fTimeRange = other.fTimeRange;
-    }
-
-    @Override
-    public TmfExperiment<T> copy() {
-        TmfExperiment<T> experiment = new TmfExperiment<T>(this);
-        TmfSignalManager.deregister(experiment);
-        return experiment;
-    }
-
-    /**
      * Clears the experiment
      */
     @Override

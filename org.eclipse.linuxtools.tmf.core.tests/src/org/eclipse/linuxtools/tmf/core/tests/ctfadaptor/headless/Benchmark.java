@@ -12,10 +12,7 @@
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor.headless;
 
 import java.io.FileNotFoundException;
-<<<<<<< HEAD
-=======
 import java.io.IOException;
->>>>>>> fe56c70... Added a headless test
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,7 +50,7 @@ public class Benchmark {
             nbEvent = 0L;
             trace = new CtfTmfTrace();
             try {
-                trace.initTrace("Test", TRACE_PATH, CtfTmfEvent.class, 1);
+                trace.initTrace("Test", TRACE_PATH, CtfTmfEvent.class);
             } catch (FileNotFoundException e) {
                 loops = NUM_LOOPS +1;
                 break;

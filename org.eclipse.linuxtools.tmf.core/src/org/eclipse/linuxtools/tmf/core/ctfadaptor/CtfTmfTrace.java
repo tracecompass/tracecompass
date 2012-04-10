@@ -142,7 +142,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
 
     @Override
     public int getIndexPageSize() {
-        return this.fIndexPageSize;
+        return 50000; //not true, but it works
     }
 
     @Override

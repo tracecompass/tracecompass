@@ -45,7 +45,6 @@ public class TmfExperimentContext extends TmfContext {
 	// ------------------------------------------------------------------------
 
 	private ITmfTrace<?>[]  fTraces = new ITmfTrace[0];
-	private ITmfContext[] fContexts;
 	private final ITmfContext[] fContexts;
 	private ITmfEvent[]   fEvents;
 	private int lastTraceRead;
