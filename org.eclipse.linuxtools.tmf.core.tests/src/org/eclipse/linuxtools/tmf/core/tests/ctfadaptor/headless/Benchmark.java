@@ -12,7 +12,6 @@
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor.headless;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,13 +33,13 @@ public class Benchmark {
 
         // Change this to enable text output
         final boolean USE_TEXT = false;
-
-        try {
-            System.in.read();
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
+//
+//        try {
+//            System.in.read();
+//        } catch (IOException e1) {
+//            // TODO Auto-generated catch block
+//            e1.printStackTrace();
+//        }
         // Work variables
         Long nbEvent = 0L;
         Vector<Double> benchs = new Vector<Double>();
