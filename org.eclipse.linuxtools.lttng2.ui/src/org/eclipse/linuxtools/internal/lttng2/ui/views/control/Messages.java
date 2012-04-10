@@ -47,6 +47,8 @@ final public class Messages extends NLS {
     public static String TraceControl_DestroySessionJob;
     public static String TraceControl_DestroyConfirmationTitle;
     public static String TraceControl_DestroyConfirmationMessage;
+    
+    public static String TraceControl_ImportJob;
 
     public static String TraceControl_StartSessionJob;
     public static String TraceControl_StopSessionJob;
@@ -139,7 +141,25 @@ final public class Messages extends NLS {
     public static String TraceControl_AddContextAvailableContextsLabel;
     public static String TraceControl_AddContextAvailableContextsTooltip;
     public static String TraceControl_AddContextAllLabel;
+    
+    public static String TraceControl_ImportDialogTitle;
+    public static String TraceControl_ImportDialogTracesGroupName;
+    public static String TraceControl_ImportDialogTracesTooltip;
+    public static String TraceControl_ImportDialogProjectsGroupName;
+    public static String TraceControl_ImportDialogProjectsTooltip;
+    public static String TraceControl_ImportDialogOverwriteButtonText;
+    public static String TraceControl_ImportDialogCreationError;
+    public static String TraceControl_ImportDialogNoProjectSelectedError;
+    public static String TraceControl_ImportDialogInvalidTracingProject;
+    public static String TraceControl_ImportDialogNoTraceSelectedError;
 
+    public static String TraceControl_ImportDialogConfirmationTitle;
+    public static String TraceControl_ImportDialogConfirmationOverwriteLabel;
+    public static String TraceControl_ImportDialogConfirmationRenameLabel;
+    public static String TraceControl_ImportDialogConfirmationNewNameLabel;
+    public static String TraceControl_InvalidTraceNameError;
+    public static String TraceControl_ImportDialogTraceAlreadyExistError;
+    
     // Tree structure strings
     public static String TraceControl_KernelDomainDisplayName;
     public static String TraceControl_UstDisplayName;

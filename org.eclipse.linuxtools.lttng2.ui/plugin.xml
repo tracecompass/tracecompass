@@ -80,6 +80,12 @@
       </command>
       <command
             categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
+            description="%commands.control.import.description"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.import"
+            name="%commands.control.import">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
             description="%commands.control.create.channel.description"
             id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.createChannelOnSession"
             name="%commands.control.create.channel">
@@ -172,6 +178,14 @@
             name="%commands.control.add.context">
       </command>
 
+      <command
+            categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
+            description="%commands.control.import.description"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.import"
+            name="%commands.control.import">
+      </command>
+
+
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -228,6 +242,16 @@
                commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.destroySession"
                icon="icons/elcl16/delete_trace.gif"
                label="%commands.control.destroy.session"
+               style="push">
+         </command>
+         <separator
+               name="org.eclipse.linuxtools.internal.lttng2.ui.views.control.toolbar.separator2"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.import"
+               icon="icons/elcl16/import_trace.gif"
+               label="%commands.control.import"
                style="push">
          </command>
          
@@ -381,6 +405,33 @@
          </command>
          <separator
                name="org.eclipse.linuxtools.internal.lttng2.ui.views.control.popup.separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.import"
+               icon="icons/elcl16/import_trace.gif"
+               label="%commands.control.import"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <and>
+                    <iterate
+                         operator="or">
+                         <instanceof
+                               value="org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent">
+                         </instanceof>
+                      </iterate>
+                      <count
+                           value="1">
+                      </count>
+                  </and>   
+               </with>
+            </visibleWhen>
+         </command>
+         <separator
+               name="org.eclipse.linuxtools.internal.lttng2.ui.views.control.popup.separator2"
                visible="true">
          </separator>
          <command
@@ -780,6 +831,26 @@
                         value="org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent">
                   </instanceof>
                </iterate>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.ImportHandler"
+            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.import">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <and>   
+                  <iterate
+                        operator="or">
+                     <instanceof
+                           value="org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent">
+                     </instanceof>
+                  </iterate>
+                  <count
+                        value="1">
+                  </count>
+               </and>
             </with>
          </activeWhen>
       </handler>
