@@ -133,7 +133,7 @@
              id="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.systemType"
              label="%lttng.rse.subsystem.type.name"
              name="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.systemType"
-             subsystemConfigurationIds="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.subsystems.TraceSubSystemConfiguration;org.eclipse.tm.tcf.rse.Processes;org.eclipse.tm.tcf.rse.Shells;org.eclipse.tm.tcf.rse.Files;org.eclipse.tm.tcf.rse.Terminals">
+             subsystemConfigurationIds="org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.subsystems.TraceSubSystemConfiguration;org.eclipse.tcf.rse.Processes;org.eclipse.tcf.rse.Shells;org.eclipse.tcf.rse.Files;org.eclipse.tcf.rse.Terminals">
        </systemType>
     </extension>
      
