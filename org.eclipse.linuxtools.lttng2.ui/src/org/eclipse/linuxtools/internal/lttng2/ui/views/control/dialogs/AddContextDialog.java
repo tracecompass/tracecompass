@@ -175,7 +175,9 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
         Object[] checkedElements = fContextsViewer.getCheckedElements();
         for (int i = 0; i < checkedElements.length; i++) {
             IContextModelComponent component = (IContextModelComponent)checkedElements[i];
-            fSelectedContexts.add(component.getName());
+            if (!Messages.TraceControl_AddContextAllLabel.equals(component.getName())) {
+                fSelectedContexts.add(component.getName());
+            }
         }
         
         // validation successful -> call super.okPressed()

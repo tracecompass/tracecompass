@@ -85,7 +85,8 @@ public class AssignEventHandler extends BaseControlViewHandler {
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
 
-                    StringBuffer errorString = new StringBuffer();
+                    Exception error = null;
+
                     try {
                         List<String> eventNames = new ArrayList<String>();
                         List<BaseEventComponent> events = param.getEvents();
@@ -104,21 +105,14 @@ public class AssignEventHandler extends BaseControlViewHandler {
                         }
 
                     } catch (ExecutionException e) {
-                        errorString.append(e.toString());
-                        errorString.append('\n');
+                        error = e;
                     }
 
-                    // get session configuration in all cases
-                    try {
-                        dialog.getSession().getConfigurationFromNode(monitor);
-                    } catch (ExecutionException e) {
-                        errorString.append(Messages.TraceControl_ListSessionFailure);
-                        errorString.append(": "); //$NON-NLS-1$
-                        errorString.append(e.toString());
-                    } 
+                    // refresh in all cases
+                    refresh(new CommandParameter(dialog.getSession()));
 
-                    if (errorString.length() > 0) {
-                        return new Status(Status.ERROR, Activator.PLUGIN_ID, errorString.toString());
+                    if (error != null) {
+                        return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_EnableEventsFailure, error);
                     }
                     return Status.OK_STATUS;
                 }

@@ -87,7 +87,7 @@ abstract public class ChangeSessionStateHandler extends BaseControlViewHandler {
             final List<TraceSessionComponent> sessions = new ArrayList<TraceSessionComponent>();
             sessions.addAll(fSessions);
 
-            Job job = new Job(Messages.TraceControl_StartSessionJob) {
+            Job job = new Job(Messages.TraceControl_ChangeSessionStateJob) {
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
                     try {
@@ -102,7 +102,7 @@ abstract public class ChangeSessionStateHandler extends BaseControlViewHandler {
                             session.fireComponentChanged(session);
                         }
                     } catch (ExecutionException e) {
-                        return new Status(Status.ERROR, Activator.PLUGIN_ID, e.toString());
+                        return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ChangeSessionStateFailure, e);
                     }  
                     return Status.OK_STATUS;
                 }

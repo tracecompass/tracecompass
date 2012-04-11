@@ -90,7 +90,7 @@ abstract public class ChangeChannelStateHandler extends BaseControlViewHandler {
             Job job = new Job(Messages.TraceControl_ChangeChannelStateJob) {
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
-                    String errorString = null;
+                    Exception error = null;
 
                     TraceSessionComponent session = null;
 
@@ -139,14 +139,14 @@ abstract public class ChangeChannelStateHandler extends BaseControlViewHandler {
                             }
                         }
                     } catch (ExecutionException e) {
-                        errorString = e.toString() + "\n"; //$NON-NLS-1$
+                        error = e;
                     }
 
                     // In all cases notify listeners  
                     session.fireComponentChanged(session);
 
-                    if (errorString != null) {
-                        return new Status(Status.ERROR, Activator.PLUGIN_ID, errorString);
+                    if (error != null) {
+                        return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ChangeChannelStateFailure, error);
                     }
 
                     return Status.OK_STATUS;

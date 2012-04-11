@@ -30,8 +30,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.ControlView;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.ImportFileInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IImportDialog;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.ImportFileInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.TraceControlDialogFactory;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceSessionState;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent;
@@ -102,7 +102,7 @@ public class ImportHandler extends BaseControlViewHandler {
                         }
 
                     } catch (ExecutionException e) {
-                        return new Status(Status.ERROR, Activator.PLUGIN_ID, e.toString());
+                        return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ImportFailure, e);
                     }  
                     return Status.OK_STATUS;
                 }

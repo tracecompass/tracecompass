@@ -91,7 +91,7 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
             Job job = new Job(Messages.TraceControl_ChangeChannelStateJob) {
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
-                    StringBuffer errorString = new StringBuffer();
+                    Exception error = null;
 
                     TraceSessionComponent session = null;
 
@@ -128,8 +128,7 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
                             }
                         }
                     } catch (ExecutionException e) {
-                        errorString.append(e.toString());
-                        errorString.append('\n');
+                        error = e;
                     }
 
                     if (session != null) {
@@ -137,8 +136,8 @@ abstract public class ChangeEventStateHandler extends BaseControlViewHandler {
                         session.fireComponentChanged(session);
                     }
 
-                    if (errorString.length() > 0) {
-                        return new Status(Status.ERROR, Activator.PLUGIN_ID, errorString.toString());
+                    if (error != null) {
+                        return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ChangeEventStateFailure, error);
                     }
 
                     return Status.OK_STATUS;

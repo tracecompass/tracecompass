@@ -14,7 +14,14 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.ControlView;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -61,4 +68,26 @@ abstract public class BaseControlViewHandler extends AbstractHandler {
         }
         return page;
     }
+
+    /**
+     * Refreshes the session information based on given session (in CommandParameter)
+     * @param param - command parameter containing the session to refresh
+     */
+    protected void refresh(final CommandParameter param) {
+        Job job = new Job(Messages.TraceControl_RetrieveNodeConfigurationJob) {
+            
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+                try {
+                    param.getSession().getConfigurationFromNode(monitor);
+                } catch (ExecutionException e) {
+                    return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ListSessionFailure, e);
+                } 
+                return Status.OK_STATUS;
+            }
+        };
+        job.setUser(true);
+        job.schedule();
+    }
+
 }

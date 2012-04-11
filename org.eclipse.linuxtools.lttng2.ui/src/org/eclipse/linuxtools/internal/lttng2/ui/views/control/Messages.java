@@ -43,25 +43,35 @@ final public class Messages extends NLS {
     public static String TraceControl_EclipseCommandFailure;
     public static String TraceControl_NewNodeCreationFailure;
     public static String TraceControl_CreateSessionJob;
+    public static String TraceControl_CreateSessionFailure;
     
     public static String TraceControl_DestroySessionJob;
+    public static String TraceControl_DestroySessionFailure;
     public static String TraceControl_DestroyConfirmationTitle;
     public static String TraceControl_DestroyConfirmationMessage;
     
     public static String TraceControl_ImportJob;
+    public static String TraceControl_ImportFailure;
 
-    public static String TraceControl_StartSessionJob;
-    public static String TraceControl_StopSessionJob;
+    public static String TraceControl_ChangeSessionStateJob;
+    public static String TraceControl_ChangeSessionStateFailure;
 
+    public static String TraceControl_CreateChannelStateJob;
+    public static String TraceControl_CreateChannelStateFailure;
+    
     public static String TraceControl_ChangeChannelStateJob;
+    public static String TraceControl_ChangeChannelStateFailure;
     public static String TraceControl_ChangeEventStateJob;
+    public static String TraceControl_ChangeEventStateFailure;
     
     public static String TraceControl_EnableEventsJob;
     public static String TraceControl_EnableEventsFailure;
     public static String TraceControl_DisableEventsJob;
     
     public static String TraceControl_GetContextJob;
+    public static String TraceControl_GetContextFailure;
     public static String TraceControl_AddContextJob;
+    public static String TraceControl_AddContextFailure;
     
     // Dialogs
     public static String TraceControl_NewDialogTitle;

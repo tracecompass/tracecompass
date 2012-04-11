@@ -129,7 +129,7 @@ abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
             Job job = new Job(Messages.TraceControl_ChangeEventStateJob) {
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
-                    StringBuffer errorString = new StringBuffer();
+                    Exception error = null;
 
                     try {
                         // Enable tracepoint events
@@ -175,21 +175,14 @@ abstract public class BaseEnableEventHandler extends BaseControlViewHandler {
                         }
 
                     } catch (ExecutionException e) {
-                        errorString.append(e.toString());
-                        errorString.append('\n');
+                        error = e;
                     }
 
-                    // get session configuration in all cases
-                    try {
-                        param.getSession().getConfigurationFromNode(monitor);
-                    } catch (ExecutionException e) {
-                        errorString.append(Messages.TraceControl_ListSessionFailure);
-                        errorString.append(": "); //$NON-NLS-1$
-                        errorString.append(e.toString());
-                    } 
+                    // refresh in all cases
+                    refresh(param);
 
-                    if (errorString.length() > 0) {
-                        return new Status(Status.ERROR, Activator.PLUGIN_ID, errorString.toString());
+                    if (error != null) {
+                        return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ChangeEventStateFailure, error);
                     }
                     return Status.OK_STATUS;
                 }

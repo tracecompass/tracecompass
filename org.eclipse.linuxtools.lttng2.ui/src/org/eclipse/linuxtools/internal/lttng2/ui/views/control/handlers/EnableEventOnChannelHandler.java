@@ -21,7 +21,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.ControlView;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.LogLevelType;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceLogLevel;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceSessionState;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceChannelComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent;
@@ -121,7 +120,7 @@ public class EnableEventOnChannelHandler extends BaseEnableEventHandler {
                     // Add only if corresponding TraceSessionComponents is inactive and not destroyed
                     TraceChannelComponent tmpChannel = (TraceChannelComponent) element; 
                     session = tmpChannel.getSession();
-                    if(session.getSessionState() == TraceSessionState.INACTIVE && !session.isDestroyed()) {
+                    if(!session.isDestroyed()) {
                         channel = tmpChannel;
                     }
                 }

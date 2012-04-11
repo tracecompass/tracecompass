@@ -91,7 +91,7 @@ public class DestroySessionHandler extends BaseControlViewHandler {
                         sessionGroup.destroySession(session, monitor);
                     }
                 } catch (ExecutionException e) {
-                    return new Status(Status.ERROR, Activator.PLUGIN_ID, e.toString());
+                    return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_DestroySessionFailure, e);
                 }  
                 return Status.OK_STATUS;
             }

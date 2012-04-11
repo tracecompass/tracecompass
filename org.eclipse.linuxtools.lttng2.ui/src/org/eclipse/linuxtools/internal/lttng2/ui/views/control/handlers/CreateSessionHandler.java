@@ -75,7 +75,7 @@ public class CreateSessionHandler extends BaseControlViewHandler {
                     try {
                         sessionGroup.createSession(sessionName, sessionPath, monitor);
                     } catch (ExecutionException e) {
-                        return new Status(Status.ERROR, Activator.PLUGIN_ID, e.toString());
+                        return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_CreateSessionFailure, e);
                     } 
                     return Status.OK_STATUS;
                 }

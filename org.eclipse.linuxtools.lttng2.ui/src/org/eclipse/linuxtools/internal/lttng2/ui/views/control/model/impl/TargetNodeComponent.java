@@ -259,7 +259,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
            } catch (Exception e) {
                setTargetNodeState(TargetNodeState.DISCONNECTED);
                Activator.getDefault().getLog().log(
-                       new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ConnectionFailure + " (" + getName() + "). \n" + e)); //$NON-NLS-1$ //$NON-NLS-2$
+                       new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ConnectionFailure + " (" + getName() + "). \n", e)); //$NON-NLS-1$ //$NON-NLS-2$
            }
        }
     }
@@ -274,7 +274,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
                 fRemoteProxy.disconnect();
             } catch (Exception e) {
                 Activator.getDefault().getLog().log(
-                        new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_DisconnectionFailure + " (" + getName() + "). \n" + e)); //$NON-NLS-1$ //$NON-NLS-2$
+                        new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_DisconnectionFailure + " (" + getName() + "). \n", e)); //$NON-NLS-1$ //$NON-NLS-2$
             } finally {
                 handleDisconnected();                    
             }
@@ -304,7 +304,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
                     sessionGroup.getSessionsFromNode(monitor);
                 } catch (ExecutionException e) {
                     removeAllChildren();
-                    return new Status(Status.ERROR, Activator.PLUGIN_ID, e.toString());
+                    return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ListSessionFailure, e);
                 } 
 
                 return Status.OK_STATUS;
@@ -345,7 +345,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
             getConfigurationFromNode();
         } catch (ExecutionException e) {
             Activator.getDefault().getLog().log(
-                    new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ListSessionFailure + " (" + getName() + "). \n" + e)); //$NON-NLS-1$ //$NON-NLS-2$
+                    new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ListSessionFailure + " (" + getName() + "). \n", e)); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 

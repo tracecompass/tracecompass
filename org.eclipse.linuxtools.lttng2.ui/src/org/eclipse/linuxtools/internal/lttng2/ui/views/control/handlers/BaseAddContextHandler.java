@@ -90,28 +90,21 @@ abstract public class BaseAddContextHandler extends BaseControlViewHandler {
                         Job addJob = new Job(Messages.TraceControl_AddContextJob) {
                             @Override
                             protected IStatus run(IProgressMonitor monitor) {
-                                StringBuffer errorString = new StringBuffer();
+                                Exception error = null;
 
                                 try {
                                     List<String> contextNames = dialog.getContexts();
                                     addContexts(param, contextNames, monitor);
 
                                 } catch (ExecutionException e) {
-                                    errorString.append(e.toString());
-                                    errorString.append('\n');
+                                    error = e;
                                 }
 
                                 // get session configuration in all cases
-                                try {
-                                    param.getSession().getConfigurationFromNode(monitor);
-                                } catch (ExecutionException e) {
-                                    errorString.append(Messages.TraceControl_ListSessionFailure);
-                                    errorString.append(": "); //$NON-NLS-1$
-                                    errorString.append(e.toString());
-                                } 
-
-                                if (errorString.length() > 0) {
-                                    return new Status(Status.ERROR, Activator.PLUGIN_ID, errorString.toString());
+                                refresh(param);
+                                
+                                if (error != null) {
+                                    return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_AddContextFailure, error);
                                 }
                                 return Status.OK_STATUS;
                             }
@@ -119,7 +112,7 @@ abstract public class BaseAddContextHandler extends BaseControlViewHandler {
                         addJob.setUser(true);
                         addJob.schedule();
                     } catch (ExecutionException e) {
-                        return new Status(Status.ERROR, Activator.PLUGIN_ID, e.toString());
+                        return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_GetContextFailure, e);
                     }
 
                     return Status.OK_STATUS;

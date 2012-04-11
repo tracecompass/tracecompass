@@ -355,7 +355,7 @@ public class ImportDialog extends Dialog implements IImportDialog {
     // ------------------------------------------------------------------------
     // Helper methods and classes
     // ------------------------------------------------------------------------
-    public class FolderContentProvider extends WorkbenchContentProvider {
+    public static class FolderContentProvider extends WorkbenchContentProvider {
         @Override
         public Object[] getChildren(Object o) {
             if (o instanceof IRemoteFile) {

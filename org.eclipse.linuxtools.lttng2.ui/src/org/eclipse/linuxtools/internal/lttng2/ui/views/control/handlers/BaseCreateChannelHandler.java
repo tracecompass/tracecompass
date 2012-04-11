@@ -80,10 +80,10 @@ abstract class BaseCreateChannelHandler extends BaseControlViewHandler {
                 return null;
             }
 
-            Job job = new Job(Messages.TraceControl_ChangeChannelStateJob) {
+            Job job = new Job(Messages.TraceControl_CreateChannelStateJob) {
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
-                    StringBuffer errorString = new StringBuffer();
+                    Exception error = null;
 
                     List<String> channelNames = new ArrayList<String>();                    
                     channelNames.add(dialog.getChannelInfo().getName());
@@ -91,21 +91,14 @@ abstract class BaseCreateChannelHandler extends BaseControlViewHandler {
                     try {
                         enableChannel(param, channelNames, dialog.getChannelInfo(), dialog.isKernel(), monitor);
                     } catch (ExecutionException e) {
-                        errorString.append(e.toString());
-                        errorString.append("\n"); //$NON-NLS-1$
+                        error = e;
                     }
 
-                    // get session configuration in all cases
-                    try {
-                        param.getSession().getConfigurationFromNode(monitor);
-                    } catch (ExecutionException e) {
-                        errorString.append(Messages.TraceControl_ListSessionFailure);
-                        errorString.append(": "); //$NON-NLS-1$
-                        errorString.append(e.toString());
-                    } 
+                    // refresh in all cases
+                    refresh(param);
 
-                    if (errorString.length() > 0) {
-                        return new Status(Status.ERROR, Activator.PLUGIN_ID, errorString.toString());
+                    if (error != null) {
+                        return new Status(Status.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_CreateChannelStateFailure, error);
                     }
                     return Status.OK_STATUS;
                 }
