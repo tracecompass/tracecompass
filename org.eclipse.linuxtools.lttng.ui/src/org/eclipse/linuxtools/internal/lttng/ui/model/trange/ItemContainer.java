@@ -1,6 +1,6 @@
 package org.eclipse.linuxtools.internal.lttng.ui.model.trange;
 
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
+import org.eclipse.linuxtools.internal.lttng.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
 
 public interface ItemContainer<T extends ITmfTimeAnalysisEntry> {
 

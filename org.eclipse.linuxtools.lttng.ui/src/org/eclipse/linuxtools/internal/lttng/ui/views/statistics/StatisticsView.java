@@ -35,6 +35,7 @@ import org.eclipse.linuxtools.internal.lttng.core.state.evProcessor.AbsEventToHa
 import org.eclipse.linuxtools.internal.lttng.core.state.experiment.StateManagerFactory;
 import org.eclipse.linuxtools.internal.lttng.ui.TraceDebug;
 import org.eclipse.linuxtools.internal.lttng.ui.model.trange.ItemContainer;
+import org.eclipse.linuxtools.internal.lttng.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
 import org.eclipse.linuxtools.internal.lttng.ui.views.common.AbsTimeUpdateView;
 import org.eclipse.linuxtools.internal.lttng.ui.views.common.ParamsUpdater;
 import org.eclipse.linuxtools.internal.lttng.ui.views.statistics.evProcessor.StatsTimeCountHandlerFactory;
@@ -49,7 +50,6 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;

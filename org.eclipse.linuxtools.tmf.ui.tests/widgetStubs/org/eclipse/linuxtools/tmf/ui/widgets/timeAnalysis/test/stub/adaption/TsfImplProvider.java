@@ -14,11 +14,11 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.test.stub.adaption;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
 import org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.test.stub.model.EventImpl;
 import org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.test.stub.model.TraceImpl;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TmfTimeAnalysisProvider;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITmfTimeAnalysisEntry;
 
 @SuppressWarnings("nls")
 public class TsfImplProvider extends TmfTimeAnalysisProvider {

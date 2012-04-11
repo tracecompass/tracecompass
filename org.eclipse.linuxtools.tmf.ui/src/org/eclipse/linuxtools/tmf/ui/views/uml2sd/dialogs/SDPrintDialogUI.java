@@ -18,7 +18,6 @@ import java.util.Arrays;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.GridUtil;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.DiagramToolTip;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.NGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget;
@@ -985,7 +984,7 @@ public class SDPrintDialogUI {
 
         if (fShowPrintButton) {
             Composite printerDlg = new Composite(parent, SWT.NONE);
-            data = GridUtil.createHorizontalFill();
+            data = new GridData(SWT.FILL, SWT.DEFAULT, true, false);
             data.horizontalSpan = 6;
             parentLayout = new GridLayout();
             parentLayout.numColumns = 2;
@@ -993,7 +992,7 @@ public class SDPrintDialogUI {
             printerDlg.setLayoutData(data);
 
             Label label = new Label(printerDlg, SWT.NONE);
-            label.setLayoutData(GridUtil.createHorizontalFill());
+            label.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
             fPrinterDialog = new Button(printerDlg, SWT.PUSH);
             fPrinterDialog.setText(SDMessages._115);
 

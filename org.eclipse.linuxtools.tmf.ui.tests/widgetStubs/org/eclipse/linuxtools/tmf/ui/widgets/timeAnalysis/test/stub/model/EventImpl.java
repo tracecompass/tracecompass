@@ -11,8 +11,8 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.test.stub.model;
 
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.TimeEvent;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITmfTimeAnalysisEntry;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeEvent;
 
 public class EventImpl extends TimeEvent {
 	// ========================================================================

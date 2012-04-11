@@ -14,8 +14,8 @@ package org.eclipse.linuxtools.internal.lttng.ui.model.trange;
 import java.util.Iterator;
 import java.util.Vector;
 
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
+import org.eclipse.linuxtools.internal.lttng.ui.viewers.timeAnalysis.model.ITimeEvent;
+import org.eclipse.linuxtools.internal.lttng.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
 
 public class TimeRangeComposite extends TimeRangeComponent implements
 ITmfTimeAnalysisEntry {

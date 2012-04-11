@@ -16,10 +16,10 @@ import java.util.Map;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.widgets.TraceColorScheme;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TmfTimeAnalysisProvider;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITmfTimeAnalysisEntry;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TraceColorScheme;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;

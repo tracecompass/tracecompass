@@ -22,10 +22,10 @@ import org.eclipse.linuxtools.internal.lttng.core.state.StateStrings.IRQMode;
 import org.eclipse.linuxtools.internal.lttng.core.state.StateStrings.ProcessStatus;
 import org.eclipse.linuxtools.internal.lttng.core.state.StateStrings.SoftIRQMode;
 import org.eclipse.linuxtools.internal.lttng.core.state.StateStrings.TrapMode;
+import org.eclipse.linuxtools.internal.lttng.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider;
+import org.eclipse.linuxtools.internal.lttng.ui.viewers.timeAnalysis.model.ITimeEvent;
+import org.eclipse.linuxtools.internal.lttng.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
 import org.eclipse.linuxtools.internal.lttng.ui.views.common.ParamsUpdater;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.TmfTimeAnalysisProvider;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
 
 public class TimeRangeViewerProvider extends TmfTimeAnalysisProvider {
 

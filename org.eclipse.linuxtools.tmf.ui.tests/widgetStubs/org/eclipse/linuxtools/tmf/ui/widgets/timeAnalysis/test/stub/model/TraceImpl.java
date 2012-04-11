@@ -14,8 +14,8 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.test.stub.model;
 import java.util.Iterator;
 import java.util.Vector;
 
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITimeEvent;
-import org.eclipse.linuxtools.tmf.ui.viewers.timeAnalysis.model.ITmfTimeAnalysisEntry;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITmfTimeAnalysisEntry;
 
 @SuppressWarnings("nls")
 public class TraceImpl implements ITmfTimeAnalysisEntry {
