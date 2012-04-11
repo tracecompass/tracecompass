@@ -53,8 +53,8 @@ import org.eclipse.rse.services.clientserver.NamePatternMatcher;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.rse.ui.SystemBasePlugin;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.util.TCFTask;
 
 /**
  * <b><u>TraceSubSystem</u></b>

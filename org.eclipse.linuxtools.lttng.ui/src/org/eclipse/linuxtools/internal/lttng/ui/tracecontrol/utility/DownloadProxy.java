@@ -21,7 +21,7 @@ import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.TraceResour
 import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.config.TraceConfig;
 import org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.subsystems.TraceSubSystem;
 import org.eclipse.rse.ui.SystemBasePlugin;
-import org.eclipse.tm.tcf.protocol.JSON;
+import org.eclipse.tcf.protocol.JSON;
 
 /**
  * <b><u>DownloadProxy</u></b>

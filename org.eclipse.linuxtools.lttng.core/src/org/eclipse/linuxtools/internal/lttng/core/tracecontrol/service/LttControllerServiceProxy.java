@@ -14,10 +14,10 @@
 package org.eclipse.linuxtools.internal.lttng.core.tracecontrol.service;
 
 import org.eclipse.linuxtools.internal.lttng.core.LttngConstants;
-import org.eclipse.tm.tcf.core.Command;
-import org.eclipse.tm.tcf.core.ErrorReport;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IToken;
+import org.eclipse.tcf.core.Command;
+import org.eclipse.tcf.core.ErrorReport;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IToken;
 
 /**
  * <b><u>LttControllerServiceProxy</u></b>

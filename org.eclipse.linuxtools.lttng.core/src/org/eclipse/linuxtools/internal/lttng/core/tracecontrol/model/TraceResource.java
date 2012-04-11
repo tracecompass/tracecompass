@@ -22,8 +22,8 @@ import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.model.config.Trac
 import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.service.ILttControllerService;
 import org.eclipse.rse.core.subsystems.AbstractResource;
 import org.eclipse.rse.core.subsystems.ISubSystem;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.util.TCFTask;
 
 /**
  * <b><u>ProviderResource</u></b>

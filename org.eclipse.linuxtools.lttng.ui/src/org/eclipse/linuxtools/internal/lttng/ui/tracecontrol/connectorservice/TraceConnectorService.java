@@ -32,13 +32,12 @@ import org.eclipse.rse.core.subsystems.CommunicationsEvent;
 import org.eclipse.rse.core.subsystems.ISubSystem;
 import org.eclipse.rse.ui.SystemBasePlugin;
 import org.eclipse.rse.ui.subsystems.StandardConnectorService;
-import org.eclipse.tm.tcf.core.AbstractPeer;
-import org.eclipse.tm.tcf.protocol.IChannel;
-import org.eclipse.tm.tcf.protocol.IChannel.IEventListener;
-import org.eclipse.tm.tcf.protocol.IPeer;
-import org.eclipse.tm.tcf.protocol.IService;
-import org.eclipse.tm.tcf.protocol.Protocol;
-import org.eclipse.tm.tcf.services.ILocator;
+import org.eclipse.tcf.core.AbstractPeer;
+import org.eclipse.tcf.protocol.IChannel;
+import org.eclipse.tcf.protocol.IPeer;
+import org.eclipse.tcf.protocol.IService;
+import org.eclipse.tcf.protocol.Protocol;
+import org.eclipse.tcf.services.ILocator;
 
 /**
  * <b><u>TraceConnectorService</u></b>
@@ -276,7 +275,7 @@ public class TraceConnectorService extends StandardConnectorService {
                         }
                     }
 
-                    final IEventListener listener = new IEventListener() {
+                    final IChannel.IEventListener listener = new IChannel.IEventListener() {
 
                         @Override
                         public void event(String name, byte[] data) {

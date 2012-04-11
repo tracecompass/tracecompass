@@ -27,8 +27,8 @@ import org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.TraceControlConstan
 import org.eclipse.linuxtools.internal.lttng.ui.tracecontrol.subsystems.TraceSubSystem;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.rse.ui.SystemBasePlugin;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.util.TCFTask;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 

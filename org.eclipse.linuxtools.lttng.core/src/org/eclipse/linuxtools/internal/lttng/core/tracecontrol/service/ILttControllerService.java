@@ -14,8 +14,8 @@
 package org.eclipse.linuxtools.internal.lttng.core.tracecontrol.service;
 
 import org.eclipse.linuxtools.internal.lttng.core.LttngConstants;
-import org.eclipse.tm.tcf.protocol.IService;
-import org.eclipse.tm.tcf.protocol.IToken;
+import org.eclipse.tcf.protocol.IService;
+import org.eclipse.tcf.protocol.IToken;
 
 public interface ILttControllerService extends IService {
 

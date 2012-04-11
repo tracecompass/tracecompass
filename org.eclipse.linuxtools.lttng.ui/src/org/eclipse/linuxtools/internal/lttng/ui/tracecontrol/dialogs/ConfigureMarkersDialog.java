@@ -41,8 +41,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.tm.tcf.protocol.IToken;
-import org.eclipse.tm.tcf.util.TCFTask;
+import org.eclipse.tcf.protocol.IToken;
+import org.eclipse.tcf.util.TCFTask;
 
 /**
  * <b><u>ConfigureMarkersDialog</u></b>
