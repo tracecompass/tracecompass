@@ -197,5 +197,12 @@ public interface ILttngControlService {
      * @throws ExecutionException
      */
     public void addContexts(String sessionName, String channelName, String eventName, boolean isKernel, List<String> contexts, IProgressMonitor monitor) throws ExecutionException;
-
+    
+    /**
+     * Executes calibrate command to quantify LTTng overhead.
+     * @param isKernel - a flag for indicating kernel or UST.
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void calibrate(boolean isKernel, IProgressMonitor monitor) throws ExecutionException;
 }
