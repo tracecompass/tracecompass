@@ -8,7 +8,7 @@ import java.util.ListIterator;
 
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputPacketIndex;
-import org.eclipse.linuxtools.ctf.core.trace.StreamInputPacketIndexEntry;
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

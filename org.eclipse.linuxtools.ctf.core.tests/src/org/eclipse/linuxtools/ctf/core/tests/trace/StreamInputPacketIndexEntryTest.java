@@ -3,7 +3,7 @@ package org.eclipse.linuxtools.ctf.core.tests.trace;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.eclipse.linuxtools.ctf.core.trace.StreamInputPacketIndexEntry;
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

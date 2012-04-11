@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.ctf.core.event.types;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 
 /**
  * <b><u>VariantDefinition</u></b>

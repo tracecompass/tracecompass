@@ -10,7 +10,7 @@
  * Contributors: Francis Giraldeau - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.ctf.core.event.metadata;
+package org.eclipse.linuxtools.internal.ctf.core.event.metadata;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,6 +25,7 @@ import java.util.UUID;
 import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.linuxtools.ctf.core.event.CTFClock;
 import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.metadata.DeclarationScope;
 import org.eclipse.linuxtools.ctf.core.event.metadata.exceptions.ParseException;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;

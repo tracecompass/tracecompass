@@ -15,6 +15,8 @@ package org.eclipse.linuxtools.ctf.core.trace;
 import java.util.ListIterator;
 import java.util.Vector;
 
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
+
 /**
  * <b><u>StreamInputPacketIndex</u></b>
  * <p>
