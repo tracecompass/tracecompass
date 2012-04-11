@@ -21,6 +21,6 @@ import org.eclipse.linuxtools.tmf.core.TmfProjectNature;
  */
 public class LTTngProjectNature extends TmfProjectNature {
 
-	public static final String ID = "org.eclipse.linuxtools.internal.lttng.LTTngProjectNature"; //$NON-NLS-1$
+	public static final String ID = "org.eclipse.linuxtools.lttng.LTTngProjectNature"; //$NON-NLS-1$
 
 }
