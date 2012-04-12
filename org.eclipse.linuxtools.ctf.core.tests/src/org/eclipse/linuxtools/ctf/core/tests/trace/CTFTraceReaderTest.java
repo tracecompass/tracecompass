@@ -201,7 +201,8 @@ public class CTFTraceReaderTest {
         fixture.goToLastEvent();
         long ts1 = getTimestamp();
         long ts2 = fixture.getEndTime();
-        assertTrue(ts1 == ts2);
+        // the end time can be later than the last event.
+        assertTrue(ts1 <= ts2);
     }
 
     /**

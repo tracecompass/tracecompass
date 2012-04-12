@@ -28,6 +28,7 @@ public class SequenceDeclarationTest {
 
     private SequenceDeclaration fixture;
 
+    static final String fieldName = "LengthName"; //$NON-NLS-1$
     /**
      * Launch the test.
      *
@@ -40,7 +41,7 @@ public class SequenceDeclarationTest {
 
     @Before
     public void setUp() {
-        fixture = new SequenceDeclaration("", new StringDeclaration()); //$NON-NLS-1$
+        fixture = new SequenceDeclaration(fieldName, new StringDeclaration());
     }
 
     @After
@@ -71,7 +72,7 @@ public class SequenceDeclarationTest {
     public void testCreateDefinition() {
         IntegerDeclaration id = new IntegerDeclaration(8, false, 8,
                 ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, null);
-        String fieldName = "LengthName"; //$NON-NLS-1$
+
         StructDeclaration structDec = new StructDeclaration(0);
         structDec.addField(fieldName, id);
         StructDefinition structDef = new StructDefinition(structDec, null, "x"); //$NON-NLS-1$

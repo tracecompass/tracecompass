@@ -50,9 +50,9 @@ public class StreamInputPacketIndexEntryTest {
      */
     @Test
     public void testStreamInputPacketIndexEntry_1() {
-        String expectedResult = "PacketIndexEntry [offset=1, " + //$NON-NLS-1$
+        String expectedResult = "StreamInputPacketIndexEntry [offsetBytes=1, " + //$NON-NLS-1$
                 "timestampBegin=0, timestampEnd=0, " + //$NON-NLS-1$
-                "dataOffset=0, packetSize=0, contentSize=0]"; //$NON-NLS-1$
+                "indexBegin=9223372036854775807, indexEnd=9223372036854775807]"; //$NON-NLS-1$
 
         assertNotNull(fixture);
         assertEquals(expectedResult, fixture.toString());
@@ -63,9 +63,9 @@ public class StreamInputPacketIndexEntryTest {
      */
     @Test
     public void testToString() {
-        String expectedResult = "PacketIndexEntry [offset=1, " + //$NON-NLS-1$
-                "timestampBegin=1, timestampEnd=1, " + //$NON-NLS-1$
-                "dataOffset=1, packetSize=1, contentSize=1]"; //$NON-NLS-1$
+        String expectedResult = "StreamInputPacketIndexEntry [offsetBytes=1,"+ //$NON-NLS-1$
+                " timestampBegin=1, timestampEnd=1, indexBegin=9223372036854775807,"+ //$NON-NLS-1$
+                " indexEnd=9223372036854775807]"; //$NON-NLS-1$
 
         fixture.setContentSizeBits(1);
         fixture.setDataOffsetBits(1);

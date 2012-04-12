@@ -289,7 +289,6 @@ public class CTFTraceReader {
      */
     public void goToLastEvent() throws CTFReaderException {
 
-        this.seek(0);
         for (StreamInputReader streamInputReader : this.streamInputReaders) {
             /*
              * Seek the trace reader.
@@ -297,7 +296,7 @@ public class CTFTraceReader {
             streamInputReader.goToLastEvent();
         }
         int count = prio.size();
-        for (int i = 0; i < (count); i++) {
+        for (int i = 0; i < (count-1); i++) {
             advance();
         }
     }

@@ -7,21 +7,19 @@ import static org.junit.Assert.assertTrue;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
+import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
-import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.tests.TestParams;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
-import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 import org.junit.After;
 import org.junit.Before;
@@ -37,7 +35,9 @@ import org.junit.Test;
 public class ArrayDefinitionTest {
 
     private CTFTrace trace;
-    private ArrayDefinition fixture;
+    private ArrayDefinition charArrayFixture;
+    private ArrayDefinition stringArrayFixture;
+    private ArrayDefinition longArrayFixture;
 
     /**
      * Launch the test.
@@ -54,34 +54,70 @@ public class ArrayDefinitionTest {
      *
      * structDef shouldn't be null after parsing the CTFTraceReader object, so
      * we can ignore the warning.
-     * 
-     * @throws CTFReaderException 
+     *
+     * @throws CTFReaderException
      */
     @Before
     public void setUp() throws CTFReaderException {
         this.trace = TestParams.createTrace();
 
-        CTFTraceReader tr = new CTFTraceReader(this.trace);
-        String name = ""; //$NON-NLS-1$
-        StructDefinition structDef = null;
-        boolean foundArray = false;
-
-        while (tr.hasMoreEvents() && !foundArray) {
-            tr.advance();
-            EventDefinition ed = tr.getCurrentEventDef();
-            for (String key : ed.fields.getDefinitions().keySet()) {
-                structDef = ed.fields;
-                Definition d = structDef.lookupDefinition(key);
-                if (d instanceof ArrayDefinition) {
-                    foundArray = true;
-                    name = key;
-                    break;
-                }
-            }
-        }
-        fixture = structDef.lookupArray(name);
+        charArrayFixture = createCharArray();
+        stringArrayFixture = createStringArray();
+        longArrayFixture = createLongArray();
     }
 
+    private ArrayDefinition createLongArray() {
+        IntegerDeclaration decl = new IntegerDeclaration(32, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "none"); //$NON-NLS-1$
+        IntegerDefinition[] defs = createIntDefs(10, 32);
+        ArrayDefinition temp = setUpDeclaration(decl, defs);
+        return temp;
+    }
+
+    private ArrayDefinition createCharArray() {
+        IntegerDeclaration decl = new IntegerDeclaration(8, false, 10, ByteOrder.BIG_ENDIAN, Encoding.UTF8, "none"); //$NON-NLS-1$
+        IntegerDefinition[] defs = createIntDefs(4,8);
+        ArrayDefinition temp = setUpDeclaration(decl, defs);
+        return temp;
+    }
+
+
+    /**
+     * @return
+     */
+    private ArrayDefinition createStringArray() {
+        StringDeclaration strDecl = new StringDeclaration();
+        StringDefinition[] defs = createDefs();
+        ArrayDefinition temp = setUpDeclaration(strDecl, defs);
+        return temp;
+    }
+    /**
+     * @param decl
+     * @param defs
+     * @return
+     */
+    private ArrayDefinition setUpDeclaration(IDeclaration decl,
+            Definition[] defs) {
+        ArrayDeclaration ad = new ArrayDeclaration(0, decl);
+        ArrayDefinition temp = new ArrayDefinition(ad , this.trace , "Testx"); //$NON-NLS-1$
+        temp.setDefinitions(defs);
+        return temp;
+    }
+    /**
+     * @param size
+     * @param bits
+     * @return
+     */
+    private IntegerDefinition[] createIntDefs(int size, int bits) {
+        IntegerDefinition[] defs = new IntegerDefinition[size];
+        for (int i = 0; i < size; i++) {
+
+            String content = "test" + i; //$NON-NLS-1$
+            defs[i] = new IntegerDefinition(new IntegerDeclaration(bits, false,
+                    16, ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, content), null, content);
+            defs[i].setValue(i);
+        }
+        return defs;
+    }
     /**
      * Perform post-test clean-up.
      */
@@ -109,7 +145,7 @@ public class ArrayDefinitionTest {
      */
     @Test
     public void testArrayDefinition_baseDeclaration() {
-        ArrayDeclaration declaration = fixture.getDeclaration();
+        ArrayDeclaration declaration = charArrayFixture.getDeclaration();
         String fieldName = ""; //$NON-NLS-1$
 
         ArrayDefinition result = new ArrayDefinition(declaration, this.trace,
@@ -140,8 +176,8 @@ public class ArrayDefinitionTest {
      */
     @Test
     public void testGetDeclaration() {
-        fixture.setDefinitions(new Definition[] {});
-        ArrayDeclaration result = fixture.getDeclaration();
+        charArrayFixture.setDefinitions(new Definition[] {});
+        ArrayDeclaration result = charArrayFixture.getDeclaration();
 
         assertNotNull(result);
     }
@@ -152,7 +188,7 @@ public class ArrayDefinitionTest {
     @Test
     public void testGetElem_noDefs() {
         int i = 0;
-        Definition result = fixture.getElem(i);
+        Definition result = charArrayFixture.getElem(i);
 
         assertNotNull(result);
     }
@@ -163,10 +199,10 @@ public class ArrayDefinitionTest {
     @Test
     public void testGetElem_withDefs() {
         Definition defs[] = createDefs();
-        fixture.setDefinitions(defs);
+        charArrayFixture.setDefinitions(defs);
         int j = 1;
 
-        Definition result = fixture.getElem(j);
+        Definition result = charArrayFixture.getElem(j);
 
         assertNotNull(result);
     }
@@ -176,13 +212,13 @@ public class ArrayDefinitionTest {
      */
     @Test
     public void testIsString_ownDefs() {
-        StringDefinition[] defs = createDefs();
-        fixture.setDefinitions(defs);
 
-        boolean result = fixture.isString();
+        boolean result = stringArrayFixture.isString();
 
         assertFalse(result);
     }
+
+
 
     /**
      * Run the boolean isString() method test.
@@ -196,17 +232,24 @@ public class ArrayDefinitionTest {
                 "Testx"); //$NON-NLS-1$
 
         int size = 4;
-        IntegerDefinition[] defs = new IntegerDefinition[size];
-        for (int i = 0; i < size; i++) {
-
-            String content = "test" + i; //$NON-NLS-1$
-            defs[i] = new IntegerDefinition(new IntegerDeclaration(8, false,
-                    16, ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, content), null, content);
-            defs[i].setValue(i);
-        }
+        int bits = 8;
+        IntegerDefinition[] defs = createIntDefs(size, bits);
 
         ownFixture.setDefinitions(defs);
         boolean result = ownFixture.isString();
+
+        assertTrue(result);
+    }
+
+
+
+    /**
+     * Run the boolean isString() method test.
+     */
+    @Test
+    public void testIsString_emptyDef() {
+        charArrayFixture.setDefinitions(new Definition[] {});
+        boolean result = charArrayFixture.isString();
 
         assertTrue(result);
     }
@@ -215,13 +258,11 @@ public class ArrayDefinitionTest {
      * Run the boolean isString() method test.
      */
     @Test
-    public void testIsString_emptyDef() {
-        fixture.setDefinitions(new Definition[] {});
-        boolean result = fixture.isString();
-
+    public void testIsString_emptyDefStrDecl() {
+        ArrayDefinition ownFixture = createStringArray();
+        boolean result = ownFixture.isString();
         assertFalse(result);
     }
-
     /**
      * Run the void read(BitBuffer) method test.
      */
@@ -229,7 +270,7 @@ public class ArrayDefinitionTest {
     public void testRead_noDefs() {
         BitBuffer input = new BitBuffer(ByteBuffer.allocateDirect(128));
 
-        fixture.read(input);
+        charArrayFixture.read(input);
     }
 
     /**
@@ -237,19 +278,26 @@ public class ArrayDefinitionTest {
      */
     @Test
     public void testRead_withDefs() {
-        fixture.setDefinitions(new Definition[] {});
+        charArrayFixture.setDefinitions(new Definition[] {});
         BitBuffer input = new BitBuffer(java.nio.ByteBuffer.allocateDirect(128));
 
-        fixture.read(input);
+        charArrayFixture.read(input);
     }
 
     /**
      * Run the String toString() method test.
      */
     @Test
-    public void testToString_base() {
-        String result = fixture.toString();
-
+    public void testToString_char() {
+        String result = charArrayFixture.toString();
+        assertNotNull(result);
+    }
+    /**
+     * Run the String toString() method test.
+     */
+    @Test
+    public void testToString_long() {
+        String result = longArrayFixture.toString();
         assertNotNull(result);
     }
 
@@ -257,14 +305,25 @@ public class ArrayDefinitionTest {
      * Run the String toString() method test.
      */
     @Test
+    public void testToString_string() {
+        String result = stringArrayFixture.toString();
+        assertNotNull(result);
+    }
+    /**
+     * Run the String toString() method test.
+     */
+    @Test
     public void testToString_withDefs() {
-        int size = 2;
-        StringDefinition[] defs = new StringDefinition[size];
-        for (int i = 0; i < size; i++) {
-            defs[i] = new StringDefinition(null, null, ("test" + i)); //$NON-NLS-1$
-        }
-        fixture.setDefinitions(defs);
-        String result = fixture.toString();
+        String result = charArrayFixture.toString();
+
+        assertNotNull(result);
+    }
+    /**
+     * Run the String toString() method test.
+     */
+    @Test
+    public void testToStringStringArray() {
+        String result = stringArrayFixture.toString();
 
         assertNotNull(result);
     }

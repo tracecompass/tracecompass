@@ -99,7 +99,7 @@ public class CTFTraceTest {
      * Run the void addStream(Stream) method test.
      *
      * @throws ParseException
-     * @throws CTFReaderException 
+     * @throws CTFReaderException
      */
     @Test
     public void testAddStream() throws ParseException, CTFReaderException {
@@ -313,7 +313,7 @@ public class CTFTraceTest {
     @Test
     public void testGetClock_1() {
         CTFClock result = fixture.getClock();
-        assertNull(result);
+        assertNotNull(result);
     }
 
     /**

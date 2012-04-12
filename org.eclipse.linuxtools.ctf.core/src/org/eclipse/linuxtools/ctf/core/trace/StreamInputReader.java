@@ -46,7 +46,6 @@ public class StreamInputReader {
      */
     private ListIterator<StreamInputPacketIndexEntry> packetIndexIt;
 
-
     /**
      * Reference to the current event of this trace file (iow, the last on that
      * was read, the next one to be returned)
@@ -171,7 +170,7 @@ public class StreamInputReader {
      *            The timestamp to seek to.
      */
     public long seek(long timestamp) {
-        long offset = 0 ;
+        long offset = 0;
         /*
          * Search in the index for the packet to search in.
          */
@@ -192,14 +191,12 @@ public class StreamInputReader {
         while (!done && (this.getCurrentEvent().timestamp < timestamp)) {
             readNextEvent();
             done = (this.getCurrentEvent() == null);
-            offset++ ;
+            offset++;
         }
         return offset;
     }
 
-
-    public long seekIndex(long index) throws CTFReaderException
-    {
+    public long seekIndex(long index) throws CTFReaderException {
         /*
          * Search in the index for the packet to search in.
          */
@@ -215,8 +212,9 @@ public class StreamInputReader {
         /*
          * get the current index
          */
-        if(this.packetReader.getCurrentPacket() == null){
-            throw new CTFReaderException("Current packet null in index seek, did you index your trace yet?");
+        if (this.packetReader.getCurrentPacket() == null) {
+            throw new CTFReaderException(
+                    "Current packet null in index seek, did you index your trace yet?");
         }
         return this.packetReader.getCurrentPacket().getIndexBegin();
 
@@ -227,12 +225,27 @@ public class StreamInputReader {
          * Search in the index for the packet to search in.
          */
         int len = this.streamInput.getIndex().getEntries().size();
-        StreamInputPacketIndexEntry entry = this.streamInput.getIndex().getEntries().get(len-1);
-        seek(entry.getTimestampEnd() - 1 );
+        int back = 0;
+        long desired_timestamp = -1;
+        do {
+            back++;
+            StreamInputPacketIndexEntry entry = this.streamInput.getIndex()
+                    .getEntries().get(len - back);
+            desired_timestamp = entry.getTimestampBegin() + 1;
+            seek(desired_timestamp);
+
+        } while (!this.packetReader.hasMoreEvents());
         /*
          * Go until the end of that packet
          */
+
+        int packet_size = 0;
         while (this.packetReader.hasMoreEvents()) {
+            this.packetReader.readNextEvent();
+            packet_size++;
+        }
+        seek(desired_timestamp);
+        for (int i = 0; i < (packet_size - 1); i++) {
             this.packetReader.readNextEvent();
         }
     }
@@ -254,7 +267,5 @@ public class StreamInputReader {
     public StreamInputPacketReader getPacketReader() {
         return packetReader;
     }
-
-
 
 }
