@@ -12,7 +12,5 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
  org.antlr.runtime;bundle-version="3.2.0",
  org.eclipse.linuxtools.ctf.parser;bundle-version="0.1.0"
 Export-Package: org.eclipse.linuxtools.ctf.core.event,
- org.eclipse.linuxtools.ctf.core.event.metadata,
- org.eclipse.linuxtools.ctf.core.event.metadata.exceptions,
  org.eclipse.linuxtools.ctf.core.event.types,
  org.eclipse.linuxtools.ctf.core.trace

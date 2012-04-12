@@ -10,12 +10,12 @@
  * Contributors: Simon Marchi - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.ctf.core.trace;
+package org.eclipse.linuxtools.internal.ctf.core.trace;
 
 import java.util.ListIterator;
 import java.util.Vector;
 
-import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 
 /**
  * <b><u>StreamInputPacketIndex</u></b>

@@ -17,6 +17,7 @@ import java.util.Comparator;
 
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
 
+
 /**
  * <b><u>StreamInputReaderComparator</u></b>
  * <p>

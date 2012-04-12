@@ -10,10 +10,13 @@
  * Contributors: Simon Marchi - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.ctf.core.trace;
+package org.eclipse.linuxtools.internal.ctf.core.trace;
 
 import java.io.Serializable;
 import java.util.Comparator;
+
+import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
+
 
 /**
  * <b><u>StreamInputReaderTimestampComparator</u></b>

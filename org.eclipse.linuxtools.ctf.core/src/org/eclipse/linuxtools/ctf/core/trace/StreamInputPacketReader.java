@@ -27,6 +27,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDefinition;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
 
 /**
@@ -34,7 +35,7 @@ import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntr
  * <p>
  * Reads the events of a packet of a trace file.
  */
-public class StreamInputPacketReader implements IDefinitionScope {
+class StreamInputPacketReader implements IDefinitionScope {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -109,7 +110,7 @@ public class StreamInputPacketReader implements IDefinitionScope {
         /*
          * Set the BitBuffer's byte order.
          */
-        getBitBuffer().setByteOrder(streamInputReader.getStreamInput().getStream().getTrace().getByteOrder());
+        getBitBuffer().setByteOrder(streamInputReader.getByteOrder());
 
         /*
          * Create definitions needed to read the events.

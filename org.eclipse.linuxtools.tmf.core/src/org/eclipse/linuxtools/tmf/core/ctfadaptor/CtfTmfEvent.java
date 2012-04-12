@@ -19,7 +19,6 @@ import java.util.Map.Entry;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
-import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
@@ -65,7 +64,7 @@ public final class CtfTmfEvent implements ITmfEvent {
      * @param eventDef
      * @param top
      */
-    public CtfTmfEvent(EventDefinition eventDef, StreamInputReader top,
+    public CtfTmfEvent(EventDefinition eventDef, String fileName,
             CtfTmfTrace originTrace) {
         this.fTrace = originTrace;
 
@@ -85,7 +84,7 @@ public final class CtfTmfEvent implements ITmfEvent {
         this.sourceCPU = eventDef.getCPU();
         this.typeId = eventDef.getDeclaration().getId();
         this.eventName = eventDef.getDeclaration().getName();
-        this.fileName = top.getStreamInput().getFilename();
+        this.fileName =  fileName;
 
         /* Read the fields */
         this.fContent = new CtfTmfContent(ITmfEventField.ROOT_FIELD_ID,

@@ -10,7 +10,7 @@
  * Contributors: Simon Marchi - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.ctf.core.trace;
+package org.eclipse.linuxtools.internal.ctf.core.trace;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,8 +24,9 @@ import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+import org.eclipse.linuxtools.ctf.core.trace.Utils;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
-import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
 
 /**
  * <b><u>StreamInput</u></b>
@@ -117,6 +118,7 @@ public class StreamInput implements IDefinitionScope {
     // Operations
     // ------------------------------------------------------------------------
 
+    @SuppressWarnings("unused")
     @Override
     public Definition lookupDefinition(String lookupPath) {
         /* TODO: lookup in different dynamic scopes is not supported yet. */

@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.eclipse.linuxtools.ctf.core.event.CTFClock;
-import org.eclipse.linuxtools.ctf.core.event.metadata.exceptions.ParseException;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
@@ -37,6 +36,9 @@ import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.internal.ctf.core.Activator;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
+import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInput;
 
 /**
  * <b><u>CTFTrace</u></b>
@@ -637,7 +639,7 @@ public class CTFTrace implements IDefinitionScope {
         {
             return 0;
         }
-        return (Long) getClock().getProperty("offset");
+        return (Long) getClock().getProperty("offset"); //$NON-NLS-1$
     }
 
 }

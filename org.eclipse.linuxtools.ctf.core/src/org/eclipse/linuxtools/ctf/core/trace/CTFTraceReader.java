@@ -19,7 +19,10 @@ import java.util.Vector;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.internal.ctf.core.Activator;
+import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInput;
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputReaderTimestampComparator;
 
 /**
  * Reads the events of a trace.
@@ -440,8 +443,7 @@ public class CTFTraceReader {
             int len = (width * this.eventCountPerTraceFile[se.getName()])
                     / numEvents;
 
-            StringBuilder sb = new StringBuilder(se.getStreamInput()
-                    .getFilename() + "\t["); //$NON-NLS-1$
+            StringBuilder sb = new StringBuilder(se.getFilename() + "\t["); //$NON-NLS-1$
 
             for (int i = 0; i < len; i++) {
                 sb.append('+');

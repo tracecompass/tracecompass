@@ -12,10 +12,12 @@
 
 package org.eclipse.linuxtools.ctf.core.trace;
 
+import java.nio.ByteOrder;
 import java.util.ListIterator;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInput;
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
 
 /**
@@ -90,8 +92,8 @@ public class StreamInputReader {
         return this.packetReader.getStreamPacketContextDef();
     }
 
-    public StreamInput getStreamInput() {
-        return this.streamInput;
+    public ByteOrder getByteOrder() {
+        return streamInput.getStream().getTrace().getByteOrder();
     }
 
     public int getName() {
@@ -104,6 +106,17 @@ public class StreamInputReader {
 
     public int getCPU() {
         return this.packetReader.getCPU();
+    }
+
+    public String getFilename() {
+        return streamInput.getFilename();
+    }
+
+    /*
+     * for internal use only
+     */
+    StreamInput getStreamInput() {
+        return streamInput;
     }
 
     // ------------------------------------------------------------------------
@@ -241,5 +254,7 @@ public class StreamInputReader {
     public StreamInputPacketReader getPacketReader() {
         return packetReader;
     }
+
+
 
 }

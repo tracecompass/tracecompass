@@ -29,11 +29,11 @@ import org.antlr.runtime.ANTLRReaderStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
-import org.eclipse.linuxtools.ctf.core.event.metadata.exceptions.ParseException;
 import org.eclipse.linuxtools.ctf.parser.CTFLexer;
 import org.eclipse.linuxtools.ctf.parser.CTFParser;
 import org.eclipse.linuxtools.ctf.parser.CTFParser.parse_return;
 import org.eclipse.linuxtools.internal.ctf.core.event.metadata.IOStructGen;
+import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
 
 /**
  * <b><u>Metadata</u></b>

@@ -13,8 +13,8 @@
 package org.eclipse.linuxtools.ctf.core.event;
 
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
-import org.eclipse.linuxtools.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
+import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
 
 /**
  * <b><u>EventDeclaration</u></b>

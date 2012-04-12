@@ -10,7 +10,7 @@
  * Contributors: Simon Marchi - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.ctf.core.event.metadata.exceptions;
+package org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions;
 
 /**
  * <b><u>ParseException</u></b>

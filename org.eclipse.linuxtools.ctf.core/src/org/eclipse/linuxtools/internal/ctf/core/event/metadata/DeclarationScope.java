@@ -10,15 +10,15 @@
  * Contributors: Simon Marchi    - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.ctf.core.event.metadata;
+package org.eclipse.linuxtools.internal.ctf.core.event.metadata;
 
 import java.util.HashMap;
 
-import org.eclipse.linuxtools.ctf.core.event.metadata.exceptions.ParseException;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
+import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
 
 /**
  * <b><u>DeclarationScope</u></b>
