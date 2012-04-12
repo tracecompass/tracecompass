@@ -30,8 +30,4 @@ public interface ITraceInfo {
      */
     public void setName(String name);
     
-    /** 
-     * @return a formated (readable) String with content.
-     */
-    public String formatString();
 }

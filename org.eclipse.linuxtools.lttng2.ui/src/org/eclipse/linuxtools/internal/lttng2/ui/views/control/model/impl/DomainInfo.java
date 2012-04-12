@@ -116,35 +116,6 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
     
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceInfo#formatString()
-     */
-    @SuppressWarnings("nls")
-    @Override
-    public String formatString() {
-        StringBuffer output = new StringBuffer();
-        //=== Domain: Kernel ===
-        output.append("\n=== Domain: ");
-        output.append(getName());
-        output.append(" ===\n");
-        output.append("\n");
-        // Channels:
-        output.append("Channels:\n");
-        // -------------
-        output.append("-------------");
-        if (fChannels.isEmpty()) {
-            output.append("\nNone");
-        } else {
-            for (Iterator<IChannelInfo> iterator = fChannels.iterator(); iterator.hasNext();) {
-                IChannelInfo channel = (IChannelInfo) iterator.next();
-                output.append(channel.formatString());
-            }
-        }
-        output.append('\n');
-        return output.toString();
-    }
-    
-    /*
-     * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceInfo#hashCode()
      */
     @Override

@@ -247,7 +247,11 @@ public class LTTngToolsFileShell extends TestCommandShell {
 
         String[] output = new String[1];
         output[0] = String.valueOf("Command not found");
-        return new CommandResult(1, output);
+        CommandResult result = new CommandResult(0, null);
+        // For verification of setters of class CommandResult
+        result.setOutput(output);
+        result.setResult(1);
+        return result;
    }
     
     // ------------------------------------------------------------------------

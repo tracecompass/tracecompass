@@ -123,30 +123,7 @@ public class ProbeEventInfo extends EventInfo implements IProbeEventInfo {
     // ------------------------------------------------------------------------
     // Operation
     // ------------------------------------------------------------------------
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceInfo#formatString()
-     */
-   @SuppressWarnings("nls")
-   @Override
-   public String formatString() {
-       StringBuffer output = new StringBuffer();
-       //    name (type: probe) [enabled]");
-       //       address: 
-       output.append(super.formatString());
-       if (fAddress != null) {
-           output.append("\n        addr: ");
-           output.append(fAddress);
-       } else {
-           output.append("\n        offset: ");
-           output.append(fOffset);
-           output.append('\n');
-           output.append("        symbol: ");
-           output.append(fSymbol);
-       }
-       return output.toString();
-   }
-    
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.BaseEventInfo#hashCode()
@@ -224,6 +201,5 @@ public class ProbeEventInfo extends EventInfo implements IProbeEventInfo {
             output.append(")]");
             return output.toString();
     }
-
 
 }

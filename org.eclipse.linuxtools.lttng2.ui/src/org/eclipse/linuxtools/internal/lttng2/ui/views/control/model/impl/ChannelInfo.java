@@ -275,56 +275,6 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
     
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceInfo#formatString()
-     */
-    @SuppressWarnings("nls")
-    @Override
-    public String formatString() {
-        StringBuffer output = new StringBuffer();
-        //- channel0: [enabled]
-        output.append("\n- ");
-        output.append(getName());
-        output.append(": [");
-        output.append(getState().getInName());
-        output.append("]\n");
-        //     Attributes:
-        output.append("\n    Attributes:\n");
-        //     overwrite mode: 0
-        output.append("      overwrite mode: ");
-        output.append(isOverwriteMode() ? "1" : "0");
-        //         subbufers size: 262144
-        output.append("\n      subbufers size: ");
-        output.append(getSubBufferSize());
-        //         number of subbufers: 4
-        output.append("\n      number of subbufers: ");
-        output.append(getNumberOfSubBuffers());
-        //        switch timer interval: 0
-        output.append("\n      switch timer interval: ");
-        output.append(getSwitchTimer());
-        //         read timer interval: 200
-        output.append("\n      read timer interval: ");
-        output.append(getReadTimer());
-        //         output: splice()
-        output.append("\n      output: ");
-        output.append(getOutputType());
-        output.append("\n\n");
-
-        output.append("    Events:");
-        if (fEvents.isEmpty()) {
-            output.append("\n      None");
-        } else {
-            for (Iterator<IEventInfo> iterator = fEvents.iterator(); iterator.hasNext();) {
-                IEventInfo event = (IEventInfo) iterator.next();
-                output.append(event.formatString());
-            }
-        }
-        output.append('\n');
-
-        return output.toString();
-    }
-    
-    /*
-     * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceInfo#hashCode()
      */
     @Override
