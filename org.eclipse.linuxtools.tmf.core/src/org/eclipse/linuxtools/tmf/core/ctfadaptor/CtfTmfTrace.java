@@ -125,6 +125,21 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
     // Accessors
     // ------------------------------------------------------------------------
 
+    public int getNbEnvVars() {
+        return this.fTrace.getEnvironment().size();
+    }
+
+
+    public String[] getEnvNames() {
+        String[] s = new String[getNbEnvVars()];
+        return this.fTrace.getEnvironment().keySet().toArray(s);
+    }
+
+    public String getEnvValue(String key)    {
+        return this.fTrace.getEnvironment().get(key);
+    }
+
+
     /**
      * @return the trace path
      */
@@ -145,7 +160,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
 
     @Override
     public int getIndexPageSize() {
-        return 50000; //not true, but it works
+        return 50000; // not true, but it works
     }
 
     @Override
@@ -287,7 +302,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
 
     @SuppressWarnings("unused")
     @Override
-    public CtfTmfEvent getNextEvent( ITmfContext context) {
+    public CtfTmfEvent getNextEvent(ITmfContext context) {
         iterator.advance();
         return iterator.getCurrentEvent();
     }
@@ -311,5 +326,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
     CTFTrace getCTFTrace() {
         return fTrace;
     }
+
+
 
 }
