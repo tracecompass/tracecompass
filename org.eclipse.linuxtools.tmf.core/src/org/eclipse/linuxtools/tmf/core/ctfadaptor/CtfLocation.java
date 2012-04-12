@@ -15,7 +15,7 @@ public class CtfLocation implements ITmfLocation<Long> {
 
     private Long fTimestamp;
 
-    @Override
+//    @Override
     public void setLocation(Long location) {
         this.fTimestamp = location;
     }

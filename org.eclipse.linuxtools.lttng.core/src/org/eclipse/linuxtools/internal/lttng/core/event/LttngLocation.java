@@ -168,7 +168,7 @@ public class LttngLocation implements ITmfLocation<LttngTimestamp>, Comparable<L
 	// ITmfLocation
 	// ------------------------------------------------------------------------
 
-	@Override
+//	@Override
 	public void setLocation(LttngTimestamp location) {
 		operationTime  = (LttngTimestamp)location;
 	}
