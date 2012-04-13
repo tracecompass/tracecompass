@@ -170,7 +170,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
         TmfEvent event = parseEvent(context);
         if (event != null) {
             updateIndex(savedContext, savedContext.getRank(), event.getTimestamp());
-            context.updateRank(1);
+            context.increaseRank();
         }
         return event;
     }

@@ -420,7 +420,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         ITmfEvent event = getNextEvent(nextEventContext);
         while (event != null && event.getTimestamp().compareTo(timestamp, false) < 0) {
             context.setLocation(nextEventContext.getLocation().clone());
-            context.updateRank(1);
+            context.increaseRank();
             event = getNextEvent(nextEventContext);
         }
 
@@ -554,7 +554,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         if (event != null) {
             updateIndex(context, context.getRank(), event.getTimestamp());
             context.setLocation(getCurrentLocation());
-            context.updateRank(1);
+            context.increaseRank();
             processEvent(event);
         }
         return event;
@@ -565,7 +565,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
             fStartTime = timestamp;
         if (fEndTime.compareTo(timestamp, false) < 0)
             fEndTime = timestamp;
-        if (context.isValidRank()) {
+        if (context.hasValidRank()) {
             if (fNbEvents <= rank)
                 fNbEvents = rank + 1;
             // Build the index as we go along

@@ -25,38 +25,37 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint>, Cloneable {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    
+
     private ITmfTimestamp fTimestamp;
-	private ITmfLocation<? extends Comparable> fLocation;
+    private ITmfLocation<? extends Comparable> fLocation;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
     @SuppressWarnings("unused")
-	private TmfCheckpoint() {
-        fTimestamp = null;
-        fLocation  = null;
+    private TmfCheckpoint() {
     }
 
     /**
      * @param ts the checkpoint timestamp
      * @param location the corresponding trace location
      */
-    public TmfCheckpoint(ITmfTimestamp ts, ITmfLocation<? extends Comparable> location) {
+    public TmfCheckpoint(final ITmfTimestamp ts, final ITmfLocation<? extends Comparable> location) {
         fTimestamp = ts;
         fLocation = location;
     }
 
     /**
      * Deep copy constructor
+     * 
      * @param other the other checkpoint
      */
-    public TmfCheckpoint(TmfCheckpoint other) {
-    	if (other == null)
-    		throw new IllegalArgumentException();
+    public TmfCheckpoint(final TmfCheckpoint other) {
+        if (other == null)
+            throw new IllegalArgumentException();
         fTimestamp = other.fTimestamp.clone();
-        fLocation  = other.fLocation.clone();
+        fLocation = other.fLocation.clone();
     }
 
     // ------------------------------------------------------------------------
@@ -83,48 +82,46 @@ public class TmfCheckpoint implements Comparable<TmfCheckpoint>, Cloneable {
 
     @Override
     public TmfCheckpoint clone() {
-    	TmfCheckpoint result = null;
-		try {
-			result = (TmfCheckpoint) super.clone();
-	    	result.fTimestamp = fTimestamp.clone();
-	    	result.fLocation  = fLocation.clone();
-	    	return result;
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
-		return result;
+        TmfCheckpoint result = null;
+        try {
+            result = (TmfCheckpoint) super.clone();
+            result.fTimestamp = fTimestamp.clone();
+            result.fLocation = fLocation.clone();
+            return result;
+        } catch (final CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
- 
+
     @Override
     public int hashCode() {
-    	return fTimestamp.hashCode();
+        return fTimestamp.hashCode();
     }
- 
+
     @Override
-    public boolean equals(Object other) {
-    	if (!(other instanceof TmfCheckpoint)) {
-    		return false;
-    	}
-    	TmfCheckpoint o = (TmfCheckpoint) other;
-    	return fTimestamp.equals(o.fTimestamp);
+    public boolean equals(final Object other) {
+        if (!(other instanceof TmfCheckpoint))
+            return false;
+        final TmfCheckpoint o = (TmfCheckpoint) other;
+        return fTimestamp.equals(o.fTimestamp);
     }
- 
+
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-    	return "[TmfCheckpoint(" + fTimestamp +  "," + fLocation + ")]";
+        return "[TmfCheckpoint(" + fTimestamp + "," + fLocation + ")]";
     }
- 
+
     // ------------------------------------------------------------------------
     // Comparable
     // ------------------------------------------------------------------------
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public int compareTo(TmfCheckpoint other) {
-    	if (fTimestamp == null || other.fTimestamp == null) {
-    		return fLocation.getLocation().compareTo(other.fLocation.getLocation());
-    	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public int compareTo(final TmfCheckpoint other) {
+        if (fTimestamp == null || other.fTimestamp == null)
+            return fLocation.getLocation().compareTo(other.fLocation.getLocation());
         return fTimestamp.compareTo(other.fTimestamp, false);
     }
 

@@ -217,6 +217,8 @@ public class TmfEventFieldTest extends TestCase {
         assertSame("getValue", fValue1, myField.getValue());
         myField.setValue(fValue2, null);
         assertSame("getValue", fValue2, myField.getValue());
+        myField.setValue(fValue2, new TmfEventField[] { field });
+        assertSame("getValue", fValue2, myField.getValue());
     }
 
     // ------------------------------------------------------------------------

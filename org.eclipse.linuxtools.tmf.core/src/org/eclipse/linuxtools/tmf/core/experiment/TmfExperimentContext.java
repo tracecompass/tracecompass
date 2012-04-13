@@ -21,136 +21,133 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 /**
  * <b><u>TmfExperimentContext</u></b>
  * <p>
- * The experiment keeps track of the next event from each of its traces so
- * it can pick the next one in chronological order.
+ * The experiment keeps track of the next event from each of its traces so it
+ * can pick the next one in chronological order.
  * <p>
- * This implies that the "next" event from each trace has already been
- * read and that we at least know its timestamp. This doesn't imply that a
- * full parse of the event content was performed (read: LTTng works like 
- * this).
+ * This implies that the "next" event from each trace has already been read and
+ * that we at least know its timestamp. This doesn't imply that a full parse of
+ * the event content was performed (read: LTTng works like this).
  * <p>
- * The last trace refers to the trace from which the last event was
- * "consumed" at the experiment level.
+ * The last trace refers to the trace from which the last event was "consumed"
+ * at the experiment level.
  */
 public class TmfExperimentContext extends TmfContext {
 
-	// ------------------------------------------------------------------------
-	// Constants
-	// ------------------------------------------------------------------------
-	
-	 public static final int NO_TRACE = -1;
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
 
-	// ------------------------------------------------------------------------
-	// Attributes
-	// ------------------------------------------------------------------------
+    public static final int NO_TRACE = -1;
 
-	private ITmfTrace<?>[]  fTraces = new ITmfTrace[0];
-	private ITmfContext[] fContexts;
-	private ITmfEvent[]   fEvents;
-	private int lastTraceRead;
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
 
-	// ------------------------------------------------------------------------
-	// Constructors
-	// ------------------------------------------------------------------------
+    private ITmfTrace<?>[] fTraces = new ITmfTrace[0];
+    private final ITmfContext[] fContexts;
+    private final ITmfEvent[] fEvents;
+    private int lastTraceRead;
 
-	public TmfExperimentContext(ITmfTrace<?>[] traces, ITmfContext[] contexts) {
-		super();
-		fTraces   = traces;
-		fContexts = contexts;
-		fEvents   = new ITmfEvent[fTraces.length];
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
 
-		ITmfLocation<?>[] locations = new ITmfLocation[fTraces.length];
-		long[] ranks = new long[fTraces.length];
-		long rank = 0;
-		for (int i = 0; i < fTraces.length; i++) {
-			if (contexts[i] != null) {
-				locations[i] = contexts[i].getLocation();
-				ranks[i] = contexts[i].getRank();
-				rank += contexts[i].getRank();
-			}
-		}
-		
-		setLocation(new TmfExperimentLocation(new TmfLocationArray(locations), ranks));
-		setRank(rank);
-		lastTraceRead = NO_TRACE;
-	}
+    public TmfExperimentContext(final ITmfTrace<?>[] traces, final ITmfContext[] contexts) {
+        super();
+        fTraces = traces;
+        fContexts = contexts;
+        fEvents = new ITmfEvent[fTraces.length];
 
-	public TmfExperimentContext(ITmfTrace<?>[] traces) {
-		this(traces, new TmfContext[traces.length]);
-	}
+        final ITmfLocation<?>[] locations = new ITmfLocation[fTraces.length];
+        final long[] ranks = new long[fTraces.length];
+        long rank = 0;
+        for (int i = 0; i < fTraces.length; i++)
+            if (contexts[i] != null) {
+                locations[i] = contexts[i].getLocation();
+                ranks[i] = contexts[i].getRank();
+                rank += contexts[i].getRank();
+            }
 
-	public TmfExperimentContext(TmfExperimentContext other) {
-		this(other.fTraces, other.cloneContexts());
-		fEvents = other.fEvents;
-		if (other.getLocation() != null)
-			setLocation(other.getLocation().clone());
-		setRank(other.getRank());
-		setLastTrace(other.lastTraceRead);
-	}
+        setLocation(new TmfExperimentLocation(new TmfLocationArray(locations), ranks));
+        setRank(rank);
+        lastTraceRead = NO_TRACE;
+    }
 
-	private ITmfContext[] cloneContexts() {
-		ITmfContext[] contexts = new TmfContext[fContexts.length];
-		for (int i = 0; i < fContexts.length; i++)
-			contexts[i] = fContexts[i].clone();
-		return contexts;
-	}
+    public TmfExperimentContext(final ITmfTrace<?>[] traces) {
+        this(traces, new TmfContext[traces.length]);
+    }
 
-	// ------------------------------------------------------------------------
-	// Accessors
-	// ------------------------------------------------------------------------
+//	public TmfExperimentContext(TmfExperimentContext other) {
+//		this(other.fTraces, other.cloneContexts());
+//		fEvents = other.fEvents;
+//		if (other.getLocation() != null)
+//			setLocation(other.getLocation().clone());
+//		setRank(other.getRank());
+//		setLastTrace(other.lastTraceRead);
+//	}
 
-	public ITmfTrace<?>[] getTraces() {
-		return fTraces;
-	}
+//	private ITmfContext[] cloneContexts() {
+//		ITmfContext[] contexts = new TmfContext[fContexts.length];
+//		for (int i = 0; i < fContexts.length; i++)
+//			contexts[i] = fContexts[i].clone();
+//		return contexts;
+//	}
 
-	public ITmfContext[] getContexts() {
-		return fContexts;
-	}
+    // ------------------------------------------------------------------------
+    // Accessors
+    // ------------------------------------------------------------------------
 
-	public ITmfEvent[] getEvents() {
-		return fEvents;
-	}
+    public ITmfTrace<?>[] getTraces() {
+        return fTraces;
+    }
 
-	public int getLastTrace() {
-		return lastTraceRead;
-	}
+    public ITmfContext[] getContexts() {
+        return fContexts;
+    }
 
-	public void setLastTrace(int newIndex) {
-		lastTraceRead = newIndex;
-	}
+    public ITmfEvent[] getEvents() {
+        return fEvents;
+    }
 
-	// ------------------------------------------------------------------------
-	// Object
-	// ------------------------------------------------------------------------
+    public int getLastTrace() {
+        return lastTraceRead;
+    }
+
+    public void setLastTrace(final int newIndex) {
+        lastTraceRead = newIndex;
+    }
+
+    // ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
 
     @Override
     public int hashCode() {
-		int result = 17;
-    	for (int i = 0; i < fTraces.length; i++) {
-    		result = 37 * result + fTraces[i].hashCode();
-    		result = 37 * result + fContexts[i].hashCode();
-    	}
-    	return result;
+        int result = 17;
+        for (int i = 0; i < fTraces.length; i++) {
+            result = 37 * result + fTraces[i].hashCode();
+            result = 37 * result + fContexts[i].hashCode();
+        }
+        return result;
     }
- 
+
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(final Object other) {
         if (this == other)
             return true;
         if (!super.equals(other))
             return false;
-    	if (!(other instanceof TmfExperimentContext)) {
-    		return false;
-    	}
-    	TmfExperimentContext o = (TmfExperimentContext) other;
-    	boolean isEqual = true;
-    	int i = 0;
-    	while (isEqual && i < fTraces.length) {
-    		isEqual &= fTraces[i].equals(o.fTraces[i]);
-    		isEqual &= fContexts[i].equals(o.fContexts[i]);
-    		i++;
-    	}
-    	return isEqual;
+        if (!(other instanceof TmfExperimentContext))
+            return false;
+        final TmfExperimentContext o = (TmfExperimentContext) other;
+        boolean isEqual = true;
+        int i = 0;
+        while (isEqual && i < fTraces.length) {
+            isEqual &= fTraces[i].equals(o.fTraces[i]);
+            isEqual &= fContexts[i].equals(o.fContexts[i]);
+            i++;
+        }
+        return isEqual;
     }
- 
+
 }

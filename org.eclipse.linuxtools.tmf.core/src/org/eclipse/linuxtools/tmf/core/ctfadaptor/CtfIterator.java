@@ -108,12 +108,12 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
     }
 
     @Override
-    public void updateRank(int rank) {
-        curRank = rank;
+    public void increaseRank() {
+        curRank++;
     }
 
     @Override
-    public boolean isValidRank() {
+    public boolean hasValidRank() {
         return true;
     }
 

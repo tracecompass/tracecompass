@@ -91,7 +91,7 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L> {
             clone = (TmfLocation<L>) super.clone();
             if (fLocation != null) {
                 Class<?> clazz = fLocation.getClass();
-                Method method = clazz.getMethod("clone", new Class[0]);
+                Method method = clazz.getMethod("clone", new Class[0]); //$NON-NLS-1$
                 Object copy = method.invoke(this.fLocation, new Object[0]);
                 clone.fLocation = (L) copy;
             } else {
@@ -142,6 +142,7 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L> {
     }
 
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
         return "TmfLocation [fLocation=" + fLocation + "]";
     }
