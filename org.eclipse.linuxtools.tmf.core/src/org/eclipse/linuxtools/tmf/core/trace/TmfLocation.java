@@ -27,8 +27,11 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L> {
     // Constants
     // ------------------------------------------------------------------------
 
+    /**
+     * The 'null' location
+     */
     static public final TmfLocation<Boolean> NULL_LOCATION = new TmfLocation<Boolean>();
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -51,7 +54,7 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L> {
      * 
      * @param location the trace location
      */
-    public TmfLocation(L location) {
+    public TmfLocation(final L location) {
         fLocation = location;
     }
 
@@ -60,7 +63,7 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L> {
      * 
      * @param other the original location
      */
-    public TmfLocation(TmfLocation<L> location) {
+    public TmfLocation(final TmfLocation<L> location) {
         fLocation = location.fLocation;
     }
 
@@ -90,16 +93,15 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L> {
         try {
             clone = (TmfLocation<L>) super.clone();
             if (fLocation != null) {
-                Class<?> clazz = fLocation.getClass();
-                Method method = clazz.getMethod("clone", new Class[0]); //$NON-NLS-1$
-                Object copy = method.invoke(this.fLocation, new Object[0]);
+                final Class<?> clazz = fLocation.getClass();
+                final Method method = clazz.getMethod("clone", new Class[0]); //$NON-NLS-1$
+                final Object copy = method.invoke(this.fLocation, new Object[0]);
                 clone.fLocation = (L) copy;
-            } else {
+            } else
                 clone.fLocation = null;
-            }
-        } catch (CloneNotSupportedException e) {
-        } catch (NoSuchMethodException e) {
-        } catch (Exception e) {
+        } catch (final CloneNotSupportedException e) {
+        } catch (final NoSuchMethodException e) {
+        } catch (final Exception e) {
             throw new InternalError(e.toString());
         }
         return clone;
@@ -125,14 +127,14 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L> {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
             return false;
         if (getClass() != obj.getClass())
             return false;
-        TmfLocation<L> other = (TmfLocation<L>) obj;
+        final TmfLocation<L> other = (TmfLocation<L>) obj;
         if (fLocation == null) {
             if (other.fLocation != null)
                 return false;

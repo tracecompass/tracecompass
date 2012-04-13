@@ -48,7 +48,7 @@ public class TmfContext implements ITmfContext, Cloneable {
      * 
      * @param location the event location
      */
-    public TmfContext(ITmfLocation<? extends Comparable<?>> location) {
+    public TmfContext(final ITmfLocation<? extends Comparable<?>> location) {
         this(location, UNKNOWN_RANK);
     }
 
@@ -58,7 +58,7 @@ public class TmfContext implements ITmfContext, Cloneable {
      * @param location the event location
      * @param rank the event rank
      */
-    public TmfContext(ITmfLocation<? extends Comparable<?>> location, long rank) {
+    public TmfContext(final ITmfLocation<? extends Comparable<?>> location, final long rank) {
         fLocation = location;
         fRank = rank;
     }
@@ -68,8 +68,11 @@ public class TmfContext implements ITmfContext, Cloneable {
      * 
      * @param context the other context
      */
-    public TmfContext(TmfContext context) {
-        this(context.fLocation, context.fRank);
+    public TmfContext(final TmfContext context) {
+        if (context == null)
+            throw new IllegalArgumentException();
+        fLocation = context.fLocation;
+        fRank = context.fRank;
     }
 
     // ------------------------------------------------------------------------
@@ -84,9 +87,9 @@ public class TmfContext implements ITmfContext, Cloneable {
         TmfContext clone = null;
         try {
             clone = (TmfContext) super.clone();
-            clone.fLocation = fLocation.clone();
+            clone.fLocation = (fLocation != null) ? fLocation.clone() : null;
             clone.fRank = fRank;
-        } catch (CloneNotSupportedException e) {
+        } catch (final CloneNotSupportedException e) {
         }
         return clone;
     }
@@ -107,7 +110,7 @@ public class TmfContext implements ITmfContext, Cloneable {
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfContext#setLocation(org.eclipse.linuxtools.tmf.core.trace.ITmfLocation)
      */
     @Override
-    public void setLocation(ITmfLocation<? extends Comparable<?>> location) {
+    public void setLocation(final ITmfLocation<? extends Comparable<?>> location) {
         fLocation = location;
     }
 
@@ -123,7 +126,7 @@ public class TmfContext implements ITmfContext, Cloneable {
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfContext#setRank(long)
      */
     @Override
-    public void setRank(long rank) {
+    public void setRank(final long rank) {
         fRank = rank;
     }
 
@@ -171,14 +174,14 @@ public class TmfContext implements ITmfContext, Cloneable {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
             return false;
         if (getClass() != obj.getClass())
             return false;
-        TmfContext other = (TmfContext) obj;
+        final TmfContext other = (TmfContext) obj;
         if (fLocation == null) {
             if (other.fLocation != null)
                 return false;

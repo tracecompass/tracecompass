@@ -117,6 +117,19 @@ public class TmfContextTest extends TestCase {
         assertEquals("getRank", fRank3, context3.getRank());
     }
 
+    public void testTmfContextCopy2() {
+        try {
+            new TmfContext((TmfContext) null);
+            fail("Copy constructor: no exception");
+        }
+        catch (final IllegalArgumentException e) {
+            // pass
+        }
+        catch (final Exception e) {
+            fail("Copy constructor: wrong exception");
+        }
+    }
+
     // ------------------------------------------------------------------------
     // equals
     // ------------------------------------------------------------------------
@@ -232,6 +245,13 @@ public class TmfContextTest extends TestCase {
             assertEquals("clone", context1, fContext1);
             assertEquals("clone", context2, fContext2);
             assertEquals("clone", context3, fContext3);
+
+            context1.setLocation(null);
+            final TmfContext context4 = context1.clone();
+            assertEquals("clone", context1, context4);
+            assertNull(context1.getLocation());
+            assertNull(context4.getLocation());
+
         } catch (final InternalError e) {
             fail("clone()");
         }
