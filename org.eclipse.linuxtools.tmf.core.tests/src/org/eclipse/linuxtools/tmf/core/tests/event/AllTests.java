@@ -25,18 +25,18 @@ import org.eclipse.linuxtools.internal.tmf.core.TmfCorePlugin;
 @SuppressWarnings("nls")
 public class AllTests {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test suite for " + TmfCorePlugin.PLUGIN_ID + ".event"); //$NON-NLS-1$;
-		//$JUnit-BEGIN$
-		suite.addTestSuite(TmfTimestampTest.class);
+    public static Test suite() {
+        final TestSuite suite = new TestSuite("Test suite for " + TmfCorePlugin.PLUGIN_ID + ".event"); //$NON-NLS-1$;
+        //$JUnit-BEGIN$
+        suite.addTestSuite(TmfTimestampTest.class);
         suite.addTestSuite(TmfSimpleTimestampTest.class);
-		suite.addTestSuite(TmfTimeRangeTest.class);
-		suite.addTestSuite(TmfEventFieldTest.class);
+        suite.addTestSuite(TmfTimeRangeTest.class);
+        suite.addTestSuite(TmfEventFieldTest.class);
         suite.addTestSuite(TmfEventTypeTest.class);
-		suite.addTestSuite(TmfEventTest.class);
+        suite.addTestSuite(TmfEventTest.class);
         suite.addTestSuite(TmfEventTypeManagerTest.class);
-		//$JUnit-END$
-		return suite;
-	}
+        //$JUnit-END$
+        return suite;
+    }
 
 }

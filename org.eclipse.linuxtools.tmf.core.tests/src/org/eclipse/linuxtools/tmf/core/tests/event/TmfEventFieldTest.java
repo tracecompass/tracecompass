@@ -36,9 +36,9 @@ public class TmfEventFieldTest extends TestCase {
     private final Object fValue1 = "Value";
     private final Object fValue2 = Integer.valueOf(10);
 
-    private TmfEventField fField1 = new TmfEventField(fFieldName1, fValue1);
-    private TmfEventField fField2 = new TmfEventField(fFieldName2, fValue2, null);
-    private TmfEventField fField3 = new TmfEventField(fFieldName1, fValue2, null);
+    private final TmfEventField fField1 = new TmfEventField(fFieldName1, fValue1);
+    private final TmfEventField fField2 = new TmfEventField(fFieldName2, fValue2, null);
+    private final TmfEventField fField3 = new TmfEventField(fFieldName1, fValue2, null);
 
     private final String fStructRootFieldName = "Root-S";
     private final String[] fStructFieldNames = new String[] { fFieldName1, fFieldName2 };
@@ -60,7 +60,7 @@ public class TmfEventFieldTest extends TestCase {
     /**
      * @param name the test name
      */
-    public TmfEventFieldTest(String name) {
+    public TmfEventFieldTest(final String name) {
         super(name);
     }
 
@@ -98,7 +98,7 @@ public class TmfEventFieldTest extends TestCase {
         assertSame("getField(index)", fStructTerminalField1, fStructRootField.getField(0));
         assertSame("getField(index)", fStructTerminalField2, fStructRootField.getField(1));
 
-        String[] names = fStructRootField.getFieldNames();
+        final String[] names = fStructRootField.getFieldNames();
         assertEquals("getFieldNames length", 2, names.length);
         for (int i = 0; i < names.length; i++) {
             assertSame("getFieldNames", fStructFieldNames[i], names[i]);
@@ -135,7 +135,7 @@ public class TmfEventFieldTest extends TestCase {
         assertSame("getField(index)", fField1, fRootField.getField(0));
         assertSame("getField(index)", fField2, fRootField.getField(1));
 
-        String[] names = fRootField.getFieldNames();
+        final String[] names = fRootField.getFieldNames();
         assertEquals("getFieldNames length", 2, names.length);
         for (int i = 0; i < names.length; i++) {
             assertSame("getFieldNames", fFieldNames[i], names[i]);
@@ -149,12 +149,12 @@ public class TmfEventFieldTest extends TestCase {
         try {
             new TmfEventField(null, fValue1, null);
             fail("Invalid (null) field name");
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
         }
     }
 
     public void testTerminalCopyConstructor() {
-        TmfEventField copy = new TmfEventField(fField1);
+        final TmfEventField copy = new TmfEventField(fField1);
         assertSame("getName", fFieldName1, copy.getName());
         assertSame("getValue", fValue1, copy.getValue());
         assertNull("getFields", copy.getFields());
@@ -173,7 +173,7 @@ public class TmfEventFieldTest extends TestCase {
         assertSame("getField(index)", fField1, fRootField.getField(0));
         assertSame("getField(index)", fField2, fRootField.getField(1));
 
-        String[] names = fRootField.getFieldNames();
+        final String[] names = fRootField.getFieldNames();
         assertEquals("getFieldNames length", 2, names.length);
         for (int i = 0; i < names.length; i++) {
             assertSame("getFieldNames", fFieldNames[i], names[i]);
@@ -186,7 +186,7 @@ public class TmfEventFieldTest extends TestCase {
         try {
             new TmfEventField(null);
             fail("TmfEventField: null arguemnt");
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
         }
     }
 
@@ -196,24 +196,24 @@ public class TmfEventFieldTest extends TestCase {
 
     private static class MyField extends TmfEventField {
 
-        public MyField(String id, Object value) {
+        public MyField(final String id, final Object value) {
             super(id, value);
         }
 
-        public MyField(TmfEventField field) {
+        public MyField(final TmfEventField field) {
             super(field);
         }
 
         @Override
-        public void setValue(Object value, ITmfEventField[] subfields) {
+        public void setValue(final Object value, final ITmfEventField[] subfields) {
             super.setValue(value, subfields);
         }
     }
 
     public void testSetValue() {
-        TmfEventField field = new TmfEventField(fFieldName1, fValue1, null);
+        final TmfEventField field = new TmfEventField(fFieldName1, fValue1, null);
 
-        MyField myField = new MyField(field);
+        final MyField myField = new MyField(field);
         assertSame("getValue", fValue1, myField.getValue());
         myField.setValue(fValue2, null);
         assertSame("getValue", fValue2, myField.getValue());
@@ -286,11 +286,11 @@ public class TmfEventFieldTest extends TestCase {
     }
 
     public void testEqualsSymmetry() throws Exception {
-        TmfEventField copy0 = new TmfEventField(fField1);
+        final TmfEventField copy0 = new TmfEventField(fField1);
         assertTrue("equals", fField1.equals(copy0));
         assertTrue("equals", copy0.equals(fField1));
-        
-        TmfEventField copy3 = new TmfEventField(fField2);
+
+        final TmfEventField copy3 = new TmfEventField(fField2);
         assertTrue("equals", fField2.equals(copy3));
         assertTrue("equals", copy3.equals(fField2));
     }
@@ -328,7 +328,7 @@ public class TmfEventFieldTest extends TestCase {
     }
 
     public void testNonEqualValues() throws Exception {
-        TmfEventField copy1 = new TmfEventField(fFieldName1, fValue1);
+        final TmfEventField copy1 = new TmfEventField(fFieldName1, fValue1);
         TmfEventField copy2 = new TmfEventField(fFieldName1, fValue1);
         assertTrue("equals", copy1.equals(copy2));
         assertTrue("equals", copy2.equals(copy1));
@@ -354,11 +354,11 @@ public class TmfEventFieldTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testToString() {
-        String expected1 = "TmfEventField [fFieldId=" + fFieldName1 + ", fValue=" + fValue1.toString() + "]";
+        final String expected1 = "TmfEventField [fFieldId=" + fFieldName1 + ", fValue=" + fValue1.toString() + "]";
         TmfEventField field = new TmfEventField(fFieldName1, fValue1, null);
         assertEquals("toString", expected1, field.toString());
 
-        String expected2 = "TmfEventField [fFieldId=" + fFieldName1 + ", fValue=" + fValue2.toString() + "]";
+        final String expected2 = "TmfEventField [fFieldId=" + fFieldName1 + ", fValue=" + fValue2.toString() + "]";
         field = new TmfEventField(fFieldName1, fValue2, null);
         assertEquals("toString", expected2, field.toString());
     }

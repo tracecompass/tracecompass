@@ -38,74 +38,72 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider<TmfSynthetic
     public static final int NB_EVENTS  = 1000;
 
     public TmfSyntheticEventProviderStub() {
-		super("TmfSyntheticEventProviderStub", TmfSyntheticEventStub.class);
-	}
+        super("TmfSyntheticEventProviderStub", TmfSyntheticEventStub.class);
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public ITmfContext armRequest(final ITmfDataRequest<TmfSyntheticEventStub> request) {
+    @SuppressWarnings("unchecked")
+    @Override
+    public ITmfContext armRequest(final ITmfDataRequest<TmfSyntheticEventStub> request) {
 
-		// Get the TmfSyntheticEventStub provider
-		ITmfDataProvider<TmfEvent>[] eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfEventProviderStub.class);
-		ITmfDataProvider<TmfEvent> provider = eventProviders[0];
+        // Get the TmfSyntheticEventStub provider
+        final ITmfDataProvider<TmfEvent>[] eventProviders = (ITmfDataProvider<TmfEvent>[]) TmfProviderManager.getProviders(TmfEvent.class, TmfEventProviderStub.class);
+        final ITmfDataProvider<TmfEvent> provider = eventProviders[0];
 
-		// make sure we have the right type of request
-		if (!(request instanceof ITmfEventRequest<?>)) {
-			request.cancel();
-			return null;
-		}
+        // make sure we have the right type of request
+        if (!(request instanceof ITmfEventRequest<?>)) {
+            request.cancel();
+            return null;
+        }
 
-		TmfEventRequest<TmfSyntheticEventStub> eventRequest = (TmfEventRequest<TmfSyntheticEventStub>) request;
-        TmfTimeRange range = eventRequest.getRange();
+        final TmfEventRequest<TmfSyntheticEventStub> eventRequest = (TmfEventRequest<TmfSyntheticEventStub>) request;
+        final TmfTimeRange range = eventRequest.getRange();
         final TmfEventRequest<TmfEvent> subRequest =
-        	new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
-        		@Override
-        		public void handleData(TmfEvent event) {
-            		super.handleData(event);
-        			if (event != null)
-        				handleIncomingData(event);
-        			else
-        				request.done();
-        		}
-        	};
+                new TmfEventRequest<TmfEvent>(TmfEvent.class, range, NB_EVENTS, BLOCK_SIZE) {
+            @Override
+            public void handleData(final TmfEvent event) {
+                super.handleData(event);
+                if (event != null)
+                    handleIncomingData(event);
+                else
+                    request.done();
+            }
+        };
         provider.sendRequest(subRequest);
 
         // Return a dummy context
         return new TmfContext();
-	}
+    }
 
-	// Queue 2 synthetic events per base event
-	private void handleIncomingData(TmfEvent e) {
-		queueResult(new TmfSyntheticEventStub(e));
-		queueResult(new TmfSyntheticEventStub(e));
-	}
+    // Queue 2 synthetic events per base event
+    private void handleIncomingData(final TmfEvent e) {
+        queueResult(new TmfSyntheticEventStub(e));
+        queueResult(new TmfSyntheticEventStub(e));
+    }
 
-	private static final int TIMEOUT = 10000;
+    private static final int TIMEOUT = 10000;
 
-	@Override
-	public TmfSyntheticEventStub getNext(ITmfContext context) {
-		TmfSyntheticEventStub data = null;
-		try {
-			data = fDataQueue.poll(TIMEOUT, TimeUnit.MILLISECONDS);
-			if (data == null) {
-				throw new InterruptedException();
-			}
-		}
-		catch (InterruptedException e) {
-		}
-		return data;
-	}
+    @Override
+    public TmfSyntheticEventStub getNext(final ITmfContext context) {
+        TmfSyntheticEventStub data = null;
+        try {
+            data = fDataQueue.poll(TIMEOUT, TimeUnit.MILLISECONDS);
+            if (data == null)
+                throw new InterruptedException();
+        }
+        catch (final InterruptedException e) {
+        }
+        return data;
+    }
 
-	public void queueResult(TmfSyntheticEventStub data) {
-		boolean ok = false;
-		try {
-			ok = fDataQueue.offer(data, TIMEOUT, TimeUnit.MILLISECONDS);
-			if (!ok) {
-				throw new InterruptedException();
-			}
-		}
-		catch (InterruptedException e) {
-		}
-	}
+    public void queueResult(final TmfSyntheticEventStub data) {
+        boolean ok = false;
+        try {
+            ok = fDataQueue.offer(data, TIMEOUT, TimeUnit.MILLISECONDS);
+            if (!ok)
+                throw new InterruptedException();
+        }
+        catch (final InterruptedException e) {
+        }
+    }
 
 }

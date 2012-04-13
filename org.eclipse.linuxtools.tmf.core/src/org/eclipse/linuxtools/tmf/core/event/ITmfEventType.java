@@ -27,15 +27,15 @@ public interface ITmfEventType extends Cloneable {
     // ------------------------------------------------------------------------
 
     /**
-     * The default event type content 
+     * The default event type content
      */
     public static final String DEFAULT_CONTEXT_ID = "TmfContext"; //$NON-NLS-1$
 
     /**
-     * The default event type name 
+     * The default event type name
      */
     public static final String DEFAULT_TYPE_ID = "TmfType"; //$NON-NLS-1$
-    
+
     // ------------------------------------------------------------------------
     // Getters
     // ------------------------------------------------------------------------

@@ -39,41 +39,40 @@ public class CreateTestFiles {
     // Constants
     // ========================================================================
 
-	private static final String DIRECTORY = "testfiles";
-//	private static final String FILE_NAMES[] = { "Test-10", "Test-1K", "Test-10K", "Test-100K" };
-//    private static final int    FILE_SIZES[] = {       10 ,     1000 ,     10000 ,     100000  };
-	private static final String FILE_NAMES[] = { "Test-10K" };
+    private static final String DIRECTORY = "testfiles";
+    //	private static final String FILE_NAMES[] = { "Test-10", "Test-1K", "Test-10K", "Test-100K" };
+    //    private static final int    FILE_SIZES[] = {       10 ,     1000 ,     10000 ,     100000  };
+    private static final String FILE_NAMES[] = { "Test-10K" };
     private static final int    FILE_SIZES[] = {     10000  };
 
-    private static final int NB_SOURCES = 15;  
-    private static final int NB_TYPES   =  7;  
+    private static final int NB_SOURCES = 15;
+    private static final int NB_TYPES   =  7;
 
     // ========================================================================
     // Constructors
     // ========================================================================
 
-   /**
+    /**
      * @param args
      */
-    public static void main(String[] args) {
-        
+    public static void main(final String[] args) {
+
         try {
             System.out.println("Creating test files in directory: " + new File(".").getCanonicalPath() + File.separator + DIRECTORY);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
 
-        for (int i = 0; i < FILE_SIZES.length; i++) {
+        for (int i = 0; i < FILE_SIZES.length; i++)
             try {
-            	createTestFile("testfiles" + File.separator + "O-" + FILE_NAMES[i], FILE_SIZES[i], true,  true);
-            	createTestFile("testfiles" + File.separator + "E-" + FILE_NAMES[i], FILE_SIZES[i], true,  false);
+                createTestFile("testfiles" + File.separator + "O-" + FILE_NAMES[i], FILE_SIZES[i], true,  true);
+                createTestFile("testfiles" + File.separator + "E-" + FILE_NAMES[i], FILE_SIZES[i], true,  false);
                 createTestFile("testfiles" + File.separator + "R-" + FILE_NAMES[i], FILE_SIZES[i], false, false);
-            } catch (FileNotFoundException e) {
-            } catch (IOException e) {
+            } catch (final FileNotFoundException e) {
+            } catch (final IOException e) {
             }
-        }
 
-		System.out.println("Done.");
+        System.out.println("Done.");
     }
 
     // ========================================================================
@@ -87,24 +86,23 @@ public class CreateTestFiles {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    private static void createTestFile(String file, int size, boolean monotonic, boolean odd) throws FileNotFoundException, IOException {
+    private static void createTestFile(final String file, final int size, final boolean monotonic, final boolean odd) throws FileNotFoundException, IOException {
         DataOutputStream out;
         System.out.println("Creating " + file);
         out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
 
-        Random generator = new Random(19580427 + size);
+        final Random generator = new Random(19580427 + size);
         long ts = (monotonic && odd) ? -1 : 0;
         for (int i = 0; i < size; i++) {
             ts += monotonic ? 2 : generator.nextInt(10);
-            int sourceIndex = i % NB_SOURCES;
-            int typeIndex   = i % NB_TYPES;
+            final int sourceIndex = i % NB_SOURCES;
+            final int typeIndex   = i % NB_TYPES;
             out.writeLong(ts);                      // Timestamp
             out.writeUTF("Source-" + sourceIndex);  // Source
             out.writeUTF("Type-"   + typeIndex);    // Type
             out.writeInt(i + 1);                    // Reference (event #)
-            for (int j = 0; j < typeIndex; j++) {
+            for (int j = 0; j < typeIndex; j++)
                 out.writeUTF("Field-" + sourceIndex + "-" + j);
-            }
         }
         out.flush();
         out.close();

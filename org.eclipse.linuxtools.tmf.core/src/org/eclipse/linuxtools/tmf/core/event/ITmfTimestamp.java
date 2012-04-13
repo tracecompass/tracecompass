@@ -74,7 +74,7 @@ public interface ITmfTimestamp extends Cloneable, Comparable<ITmfTimestamp> {
     public int compareTo(ITmfTimestamp ts, boolean withinPrecision);
 
     /**
-     * Returns the difference between [this] and [ts] as a timestamp 
+     * Returns the difference between [this] and [ts] as a timestamp
      * 
      * @param ts the other timestamp
      * @return the time difference (this - other) as an ITmfTimestamp
@@ -89,7 +89,7 @@ public interface ITmfTimestamp extends Cloneable, Comparable<ITmfTimestamp> {
      * @return a clone of the timestamp
      */
     public ITmfTimestamp clone();
-    
+
     // ------------------------------------------------------------------------
     // Comparable
     // ------------------------------------------------------------------------

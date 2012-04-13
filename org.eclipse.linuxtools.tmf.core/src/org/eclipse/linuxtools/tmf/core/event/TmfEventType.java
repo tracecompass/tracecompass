@@ -25,20 +25,20 @@ public class TmfEventType implements ITmfEventType {
     // Attributes
     // ------------------------------------------------------------------------
 
-	private String fContext;
-	private String fTypeId;
-	private ITmfEventField fRootField;
+    private String fContext;
+    private String fTypeId;
+    private ITmfEventField fRootField;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
-	/**
-	 * Default constructor
-	 */
-	public TmfEventType() {
-		this(DEFAULT_CONTEXT_ID, DEFAULT_TYPE_ID, null);
-	}
+    /**
+     * Default constructor
+     */
+    public TmfEventType() {
+        this(DEFAULT_CONTEXT_ID, DEFAULT_TYPE_ID, null);
+    }
 
     /**
      * Full constructor
@@ -47,7 +47,7 @@ public class TmfEventType implements ITmfEventType {
      * @param typeId the type name
      * @param root the root field
      */
-    public TmfEventType(String context, String typeId, ITmfEventField root) {
+    public TmfEventType(final String context, final String typeId, final ITmfEventField root) {
         if (context == null || typeId == null)
             throw new IllegalArgumentException();
         fContext = context;
@@ -58,18 +58,18 @@ public class TmfEventType implements ITmfEventType {
         TmfEventTypeManager.getInstance().add(context, this);
     }
 
-	/**
-	 * Copy constructor
-	 * 
-	 * @param type the other type
-	 */
-	public TmfEventType(ITmfEventType type) {
-    	if (type == null)
-    		throw new IllegalArgumentException();
-    	fContext = type.getContext();
-		fTypeId  = type.getName();
-		fRootField = type.getRootField();
-	}
+    /**
+     * Copy constructor
+     * 
+     * @param type the other type
+     */
+    public TmfEventType(final ITmfEventType type) {
+        if (type == null)
+            throw new IllegalArgumentException();
+        fContext = type.getContext();
+        fTypeId  = type.getName();
+        fRootField = type.getRootField();
+    }
 
     // ------------------------------------------------------------------------
     // ITmfEventType
@@ -79,9 +79,9 @@ public class TmfEventType implements ITmfEventType {
      * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventType#getContext()
      */
     @Override
-	public String getContext() {
-		return fContext;
-	}
+    public String getContext() {
+        return fContext;
+    }
 
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventType#getName()
@@ -111,7 +111,7 @@ public class TmfEventType implements ITmfEventType {
      * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventType#getFieldName(int)
      */
     @Override
-    public String getFieldName(int index) {
+    public String getFieldName(final int index) {
         return (fRootField != null) ? fRootField.getFieldName(index) : null;
     }
 
@@ -131,7 +131,7 @@ public class TmfEventType implements ITmfEventType {
             clone.fTypeId = fTypeId;
             clone.fRootField = (fRootField != null) ? fRootField.clone() : null;
         }
-        catch (CloneNotSupportedException e) {
+        catch (final CloneNotSupportedException e) {
         }
         return clone;
     }
@@ -156,14 +156,14 @@ public class TmfEventType implements ITmfEventType {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
             return false;
         if (!(obj instanceof TmfEventType))
             return false;
-        TmfEventType other = (TmfEventType) obj;
+        final TmfEventType other = (TmfEventType) obj;
         if (!fContext.equals(other.fContext))
             return false;
         if (!fTypeId.equals(other.fTypeId))

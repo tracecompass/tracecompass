@@ -28,19 +28,19 @@ public class TmfTimestamp implements ITmfTimestamp {
     /**
      * The beginning of time
      */
-    public static final ITmfTimestamp BIG_BANG = 
+    public static final ITmfTimestamp BIG_BANG =
             new TmfTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE, 0);
 
     /**
      * The end of time
      */
-    public static final ITmfTimestamp BIG_CRUNCH = 
+    public static final ITmfTimestamp BIG_CRUNCH =
             new TmfTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE, 0);
-    
+
     /**
      * Zero
      */
-    public static final ITmfTimestamp ZERO = 
+    public static final ITmfTimestamp ZERO =
             new TmfTimestamp(0, 0, 0);
 
     // ------------------------------------------------------------------------
@@ -78,7 +78,7 @@ public class TmfTimestamp implements ITmfTimestamp {
      *
      * @param value the timestamp value
      */
-    public TmfTimestamp(long value) {
+    public TmfTimestamp(final long value) {
         this(value, 0, 0);
     }
 
@@ -88,7 +88,7 @@ public class TmfTimestamp implements ITmfTimestamp {
      * @param value the timestamp value
      * @param scale the timestamp scale
      */
-    public TmfTimestamp(long value, int scale) {
+    public TmfTimestamp(final long value, final int scale) {
         this(value, scale, 0);
     }
 
@@ -99,7 +99,7 @@ public class TmfTimestamp implements ITmfTimestamp {
      * @param scale the timestamp scale
      * @param precision the timestamp precision
      */
-    public TmfTimestamp(long value, int scale, int precision) {
+    public TmfTimestamp(final long value, final int scale, final int precision) {
         fValue = value;
         fScale = scale;
         fPrecision = Math.abs(precision);
@@ -110,7 +110,7 @@ public class TmfTimestamp implements ITmfTimestamp {
      * 
      * @param timestamp the timestamp to copy
      */
-    public TmfTimestamp(ITmfTimestamp timestamp) {
+    public TmfTimestamp(final ITmfTimestamp timestamp) {
         if (timestamp == null)
             throw new IllegalArgumentException();
         fValue = timestamp.getValue();
@@ -172,7 +172,7 @@ public class TmfTimestamp implements ITmfTimestamp {
      * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#normalize(long, int)
      */
     @Override
-    public ITmfTimestamp normalize(long offset, int scale) throws ArithmeticException {
+    public ITmfTimestamp normalize(final long offset, final int scale) throws ArithmeticException {
 
         long value = fValue;
         int precision = fPrecision;
@@ -183,12 +183,11 @@ public class TmfTimestamp implements ITmfTimestamp {
 
         // First, scale the timestamp
         if (fScale != scale) {
-            int scaleDiff = Math.abs(fScale - scale);
-            if (scaleDiff >= scalingFactors.length) {
+            final int scaleDiff = Math.abs(fScale - scale);
+            if (scaleDiff >= scalingFactors.length)
                 throw new ArithmeticException("Scaling exception"); //$NON-NLS-1$
-            }
 
-            long scalingFactor = scalingFactors[scaleDiff];
+            final long scalingFactor = scalingFactors[scaleDiff];
             if (scale < fScale) {
                 value *= scalingFactor;
                 precision *= scalingFactor;
@@ -199,11 +198,10 @@ public class TmfTimestamp implements ITmfTimestamp {
         }
 
         // Then, apply the offset
-        if (offset < 0) {
+        if (offset < 0)
             value = (value < Long.MIN_VALUE - offset) ? Long.MIN_VALUE : value + offset;
-        } else {
+        else
             value = (value > Long.MAX_VALUE - offset) ? Long.MAX_VALUE : value + offset;
-        }
 
         return new TmfTimestamp(value, scale, precision);
     }
@@ -212,7 +210,7 @@ public class TmfTimestamp implements ITmfTimestamp {
      * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#compareTo(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp, boolean)
      */
     @Override
-    public int compareTo(ITmfTimestamp ts, boolean withinPrecision) {
+    public int compareTo(final ITmfTimestamp ts, final boolean withinPrecision) {
 
         // Check the corner cases (we can't use equals() because it uses compareTo()...)
         if (this == ts || (fValue == ts.getValue() && fScale == ts.getScale()))
@@ -221,20 +219,19 @@ public class TmfTimestamp implements ITmfTimestamp {
             return -1;
         if ((fValue == BIG_CRUNCH.getValue() && fScale == BIG_CRUNCH.getScale()) || (ts.getValue() == BIG_BANG.getValue() && ts.getScale() == BIG_BANG.getScale()))
             return 1;
-        
+
         try {
-            ITmfTimestamp nts = ts.normalize(0, fScale);
-            long delta = fValue - nts.getValue();
-            if ((delta == 0) || (withinPrecision && (Math.abs(delta) <= (fPrecision + nts.getPrecision())))) {
+            final ITmfTimestamp nts = ts.normalize(0, fScale);
+            final long delta = fValue - nts.getValue();
+            if ((delta == 0) || (withinPrecision && (Math.abs(delta) <= (fPrecision + nts.getPrecision()))))
                 return 0;
-            }
             return (delta > 0) ? 1 : -1;
         }
-        catch (ArithmeticException e) {
+        catch (final ArithmeticException e) {
             // Scaling error. We can figure it out nonetheless.
 
             // First, look at the sign of the mantissa
-            long value = ts.getValue();
+            final long value = ts.getValue();
             if (fValue == 0 && value == 0)
                 return 0;
             if (fValue  < 0 && value >= 0)
@@ -243,8 +240,8 @@ public class TmfTimestamp implements ITmfTimestamp {
                 return 1;
 
             // Otherwise, just compare the scales
-            int scale = ts.getScale();
-            return (fScale > scale) ? (fValue >= 0) ? 1 : -1 : (fValue >= 0) ? -1 : 1;  
+            final int scale = ts.getScale();
+            return (fScale > scale) ? (fValue >= 0) ? 1 : -1 : (fValue >= 0) ? -1 : 1;
         }
     }
 
@@ -252,9 +249,9 @@ public class TmfTimestamp implements ITmfTimestamp {
      * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#getDelta(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp)
      */
     @Override
-    public ITmfTimestamp getDelta(ITmfTimestamp ts) {
-        ITmfTimestamp nts = ts.normalize(0, fScale);
-        long value = fValue - nts.getValue();
+    public ITmfTimestamp getDelta(final ITmfTimestamp ts) {
+        final ITmfTimestamp nts = ts.normalize(0, fScale);
+        final long value = fValue - nts.getValue();
         return new TmfTimestamp(value, fScale, fPrecision + nts.getPrecision());
     }
 
@@ -273,7 +270,7 @@ public class TmfTimestamp implements ITmfTimestamp {
             clone.fValue = fValue;
             clone.fScale = fScale;
             clone.fPrecision = fPrecision;
-        } catch (CloneNotSupportedException e) {
+        } catch (final CloneNotSupportedException e) {
         }
         return clone;
     }
@@ -286,7 +283,7 @@ public class TmfTimestamp implements ITmfTimestamp {
      * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#compareTo(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp)
      */
     @Override
-    public int compareTo(ITmfTimestamp ts) {
+    public int compareTo(final ITmfTimestamp ts) {
         return compareTo(ts, false);
     }
 
@@ -311,14 +308,14 @@ public class TmfTimestamp implements ITmfTimestamp {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(final Object other) {
         if (this == other)
             return true;
         if (other == null)
             return false;
         if (!(other instanceof TmfTimestamp))
             return false;
-        TmfTimestamp ts = (TmfTimestamp) other;
+        final TmfTimestamp ts = (TmfTimestamp) other;
         return compareTo(ts, false) == 0;
     }
 

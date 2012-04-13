@@ -52,8 +52,8 @@ public class TmfEvent implements ITmfEvent {
     /**
      * Constructor - no rank
      */
-    public TmfEvent(ITmfTrace<? extends ITmfEvent> trace, ITmfTimestamp timestamp, String source,
-            ITmfEventType type, ITmfEventField content, String reference)
+    public TmfEvent(final ITmfTrace<? extends ITmfEvent> trace, final ITmfTimestamp timestamp, final String source,
+            final ITmfEventType type, final ITmfEventField content, final String reference)
     {
         this(trace, -1, timestamp, source, type, content, reference);
     }
@@ -61,8 +61,8 @@ public class TmfEvent implements ITmfEvent {
     /**
      * Constructor - no rank, no content
      */
-    public TmfEvent(ITmfTrace<? extends ITmfEvent> trace, ITmfTimestamp timestamp, String source,
-            ITmfEventType type, String reference)
+    public TmfEvent(final ITmfTrace<? extends ITmfEvent> trace, final ITmfTimestamp timestamp, final String source,
+            final ITmfEventType type, final String reference)
     {
         this(trace, -1, timestamp, source, type, null, reference);
     }
@@ -70,7 +70,7 @@ public class TmfEvent implements ITmfEvent {
     /**
      * Constructor - no rank, no content, no trace
      */
-    public TmfEvent(ITmfTimestamp timestamp, String source, ITmfEventType type, String reference)
+    public TmfEvent(final ITmfTimestamp timestamp, final String source, final ITmfEventType type, final String reference)
     {
         this(null, -1, timestamp, source, type, null, reference);
     }
@@ -86,8 +86,8 @@ public class TmfEvent implements ITmfEvent {
      * @param content the event content (payload)
      * @param reference the event reference
      */
-    public TmfEvent(ITmfTrace<? extends ITmfEvent> trace, long rank, ITmfTimestamp timestamp, String source,
-                    ITmfEventType type, ITmfEventField content, String reference)
+    public TmfEvent(final ITmfTrace<? extends ITmfEvent> trace, final long rank, final ITmfTimestamp timestamp, final String source,
+            final ITmfEventType type, final ITmfEventField content, final String reference)
     {
         fTrace = trace;
         fRank = rank;
@@ -103,7 +103,7 @@ public class TmfEvent implements ITmfEvent {
      * 
      * @param event the original event
      */
-    public TmfEvent(ITmfEvent event) {
+    public TmfEvent(final ITmfEvent event) {
         if (event == null)
             throw new IllegalArgumentException();
         fTrace = event.getTrace();
@@ -182,49 +182,49 @@ public class TmfEvent implements ITmfEvent {
     /**
      * @param trace the new event trace
      */
-    protected void setTrace(ITmfTrace<? extends ITmfEvent> trace) {
+    protected void setTrace(final ITmfTrace<? extends ITmfEvent> trace) {
         fTrace = trace;
     }
 
     /**
      * @param rank the new event rank
      */
-    protected void setRank(long rank) {
+    protected void setRank(final long rank) {
         fRank = rank;
     }
 
     /**
      * @param timestamp the new event timestamp
      */
-    protected void setTimestamp(ITmfTimestamp timestamp) {
+    protected void setTimestamp(final ITmfTimestamp timestamp) {
         fTimestamp = timestamp;
     }
 
     /**
      * @param source the new event source
      */
-    protected void setSource(String source) {
+    protected void setSource(final String source) {
         fSource = source;
     }
 
     /**
      * @param type the new event type
      */
-    protected void setType(ITmfEventType type) {
+    protected void setType(final ITmfEventType type) {
         fType = type;
     }
 
     /**
      * @param content the event new content
      */
-    protected void setContent(ITmfEventField content) {
+    protected void setContent(final ITmfEventField content) {
         fContent = content;
     }
 
     /**
      * @param reference the new event reference
      */
-    protected void setReference(String reference) {
+    protected void setReference(final String reference) {
         fReference = reference;
     }
 
@@ -247,7 +247,7 @@ public class TmfEvent implements ITmfEvent {
             clone.fType = fType != null ? fType.clone() : null;
             clone.fContent = fContent != null ? fContent.clone() : null;
             clone.fReference = fReference;
-        } catch (CloneNotSupportedException e) {
+        } catch (final CloneNotSupportedException e) {
         }
         return clone;
     }
@@ -277,14 +277,14 @@ public class TmfEvent implements ITmfEvent {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
             return false;
         if (!(obj instanceof TmfEvent))
             return false;
-        TmfEvent other = (TmfEvent) obj;
+        final TmfEvent other = (TmfEvent) obj;
         if (fTrace == null) {
             if (other.fTrace != null)
                 return false;
@@ -327,8 +327,8 @@ public class TmfEvent implements ITmfEvent {
     @SuppressWarnings("nls")
     public String toString() {
         return "TmfEvent [fTimestamp=" + fTimestamp + ", fTrace=" + fTrace + ", fRank=" + fRank
-                        + ", fSource=" + fSource + ", fType=" + fType + ", fContent=" + fContent
-                        + ", fReference=" + fReference + "]";
+                + ", fSource=" + fSource + ", fType=" + fType + ", fContent=" + fContent
+                + ", fReference=" + fReference + "]";
     }
 
 }

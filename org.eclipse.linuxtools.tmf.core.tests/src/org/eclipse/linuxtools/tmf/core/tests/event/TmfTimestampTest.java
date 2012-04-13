@@ -26,39 +26,39 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 @SuppressWarnings("nls")
 public class TmfTimestampTest extends TestCase {
 
-	// ------------------------------------------------------------------------
-	// Variables
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // Variables
+    // ------------------------------------------------------------------------
 
-	private final ITmfTimestamp ts0 = new TmfTimestamp();
-	private final ITmfTimestamp ts1 = new TmfTimestamp(12345);
-	private final ITmfTimestamp ts2 = new TmfTimestamp(12345, -1);
-	private final ITmfTimestamp ts3 = new TmfTimestamp(12345, 2, 5);
+    private final ITmfTimestamp ts0 = new TmfTimestamp();
+    private final ITmfTimestamp ts1 = new TmfTimestamp(12345);
+    private final ITmfTimestamp ts2 = new TmfTimestamp(12345, -1);
+    private final ITmfTimestamp ts3 = new TmfTimestamp(12345, 2, 5);
 
-	// ------------------------------------------------------------------------
-	// Housekeping
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // Housekeping
+    // ------------------------------------------------------------------------
 
-	/**
-	 * @param name the test name
-	 */
-	public TmfTimestampTest(String name) {
-		super(name);
-	}
+    /**
+     * @param name the test name
+     */
+    public TmfTimestampTest(final String name) {
+        super(name);
+    }
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+    }
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+    }
 
-	// ------------------------------------------------------------------------
-	// Constructors
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
 
     public void testDefaultConstructor() throws Exception {
         assertEquals("getValue", 0, ts0.getValue());
@@ -85,8 +85,8 @@ public class TmfTimestampTest extends TestCase {
     }
 
     public void testCopyConstructor() throws Exception {
-        ITmfTimestamp ts = new TmfTimestamp(12345, 2, 5);
-        ITmfTimestamp copy = new TmfTimestamp(ts);
+        final ITmfTimestamp ts = new TmfTimestamp(12345, 2, 5);
+        final ITmfTimestamp copy = new TmfTimestamp(ts);
 
         assertEquals("getValue", ts.getValue(), copy.getValue());
         assertEquals("getscale", ts.getScale(), copy.getScale());
@@ -101,26 +101,26 @@ public class TmfTimestampTest extends TestCase {
         try {
             new TmfTimestamp(null);
             fail("TmfTimestamp: null argument");
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
         }
     }
 
     public void testCopyConstructorBigBang() throws Exception {
-        ITmfTimestamp ts = new TmfTimestamp(TmfTimestamp.BIG_BANG);
+        final ITmfTimestamp ts = new TmfTimestamp(TmfTimestamp.BIG_BANG);
         assertEquals("getValue", TmfTimestamp.BIG_BANG.getValue(), ts.getValue());
         assertEquals("getscale", TmfTimestamp.BIG_BANG.getScale(), ts.getScale());
         assertEquals("getPrecision", TmfTimestamp.BIG_BANG.getPrecision(), ts.getPrecision());
     }
 
     public void testCopyConstructorBigCrunch() throws Exception {
-        ITmfTimestamp ts = new TmfTimestamp(TmfTimestamp.BIG_CRUNCH);
+        final ITmfTimestamp ts = new TmfTimestamp(TmfTimestamp.BIG_CRUNCH);
         assertEquals("getValue", TmfTimestamp.BIG_CRUNCH.getValue(), ts.getValue());
         assertEquals("getscale", TmfTimestamp.BIG_CRUNCH.getScale(), ts.getScale());
         assertEquals("getPrecision", TmfTimestamp.BIG_CRUNCH.getPrecision(), ts.getPrecision());
     }
 
     public void testCopyConstructorZero() throws Exception {
-        ITmfTimestamp ts = new TmfTimestamp(TmfTimestamp.ZERO);
+        final ITmfTimestamp ts = new TmfTimestamp(TmfTimestamp.ZERO);
         assertEquals("getValue", TmfTimestamp.ZERO.getValue(), ts.getValue());
         assertEquals("getscale", TmfTimestamp.ZERO.getScale(), ts.getScale());
         assertEquals("getPrecision", TmfTimestamp.ZERO.getPrecision(), ts.getPrecision());
@@ -133,7 +133,7 @@ public class TmfTimestampTest extends TestCase {
     public static class MyTimestamp extends TmfTimestamp {
 
         @Override
-        public boolean equals(Object other) {
+        public boolean equals(final Object other) {
             return super.equals(other);
         }
 
@@ -144,7 +144,7 @@ public class TmfTimestampTest extends TestCase {
     }
 
     public void testClone() throws Exception {
-        ITmfTimestamp clone = ts0.clone();
+        final ITmfTimestamp clone = ts0.clone();
 
         assertTrue("clone", ts0.clone().equals(ts0));
         assertTrue("clone", clone.clone().equals(clone));
@@ -154,8 +154,8 @@ public class TmfTimestampTest extends TestCase {
     }
 
     public void testClone2() throws Exception {
-        MyTimestamp timestamp = new MyTimestamp();
-        MyTimestamp clone = timestamp.clone();
+        final MyTimestamp timestamp = new MyTimestamp();
+        final MyTimestamp clone = timestamp.clone();
 
         assertTrue("clone", timestamp.clone().equals(timestamp));
         assertTrue("clone", clone.clone().equals(clone));
@@ -169,9 +169,9 @@ public class TmfTimestampTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testHashCode() throws Exception {
-        ITmfTimestamp ts0copy = new TmfTimestamp(ts0);
-        ITmfTimestamp ts1copy = new TmfTimestamp(ts1);
-        ITmfTimestamp ts2copy = new TmfTimestamp(ts2);
+        final ITmfTimestamp ts0copy = new TmfTimestamp(ts0);
+        final ITmfTimestamp ts1copy = new TmfTimestamp(ts1);
+        final ITmfTimestamp ts2copy = new TmfTimestamp(ts2);
 
         assertTrue("hashCode", ts0.hashCode() == ts0copy.hashCode());
         assertTrue("hashCode", ts1.hashCode() == ts1copy.hashCode());
@@ -179,7 +179,7 @@ public class TmfTimestampTest extends TestCase {
 
         assertTrue("hashCode", ts0.hashCode() != ts1.hashCode());
     }
-    
+
     // ------------------------------------------------------------------------
     // equals
     // ------------------------------------------------------------------------
@@ -193,34 +193,34 @@ public class TmfTimestampTest extends TestCase {
     }
 
     public void testEqualsSymmetry() throws Exception {
-        ITmfTimestamp ts0copy = new TmfTimestamp(ts0);
+        final ITmfTimestamp ts0copy = new TmfTimestamp(ts0);
         assertTrue("equals", ts0.equals(ts0copy));
         assertTrue("equals", ts0copy.equals(ts0));
 
-        ITmfTimestamp ts1copy = new TmfTimestamp(ts1);
+        final ITmfTimestamp ts1copy = new TmfTimestamp(ts1);
         assertTrue("equals", ts1.equals(ts1copy));
         assertTrue("equals", ts1copy.equals(ts1));
 
-        ITmfTimestamp ts2copy = new TmfTimestamp(ts2);
+        final ITmfTimestamp ts2copy = new TmfTimestamp(ts2);
         assertTrue("equals", ts2.equals(ts2copy));
         assertTrue("equals", ts2copy.equals(ts2));
     }
 
     public void testEqualsTransivity() throws Exception {
-        ITmfTimestamp ts0copy1 = new TmfTimestamp(ts0);
-        ITmfTimestamp ts0copy2 = new TmfTimestamp(ts0copy1);
+        final ITmfTimestamp ts0copy1 = new TmfTimestamp(ts0);
+        final ITmfTimestamp ts0copy2 = new TmfTimestamp(ts0copy1);
         assertTrue("equals", ts0.equals(ts0copy1));
         assertTrue("equals", ts0copy1.equals(ts0copy2));
         assertTrue("equals", ts0.equals(ts0copy2));
 
-        ITmfTimestamp ts1copy1 = new TmfTimestamp(ts1);
-        ITmfTimestamp ts1copy2 = new TmfTimestamp(ts1copy1);
+        final ITmfTimestamp ts1copy1 = new TmfTimestamp(ts1);
+        final ITmfTimestamp ts1copy2 = new TmfTimestamp(ts1copy1);
         assertTrue("equals", ts1.equals(ts1copy1));
         assertTrue("equals", ts1copy1.equals(ts1copy2));
         assertTrue("equals", ts1.equals(ts1copy2));
 
-        ITmfTimestamp ts2copy1 = new TmfTimestamp(ts2);
-        ITmfTimestamp ts2copy2 = new TmfTimestamp(ts2copy1);
+        final ITmfTimestamp ts2copy1 = new TmfTimestamp(ts2);
+        final ITmfTimestamp ts2copy2 = new TmfTimestamp(ts2copy1);
         assertTrue("equals", ts2.equals(ts2copy1));
         assertTrue("equals", ts2copy1.equals(ts2copy2));
         assertTrue("equals", ts2.equals(ts2copy2));
@@ -234,7 +234,7 @@ public class TmfTimestampTest extends TestCase {
     public void testEqualsNonTimestamp() throws Exception {
         assertFalse("equals", ts0.equals(ts0.toString()));
     }
-    
+
     // ------------------------------------------------------------------------
     // toString
     // ------------------------------------------------------------------------
@@ -273,7 +273,7 @@ public class TmfTimestampTest extends TestCase {
     }
 
     public void testNormalizeOffsetLowerLimits() throws Exception {
-        ITmfTimestamp ref = new TmfTimestamp(Long.MIN_VALUE + 5);
+        final ITmfTimestamp ref = new TmfTimestamp(Long.MIN_VALUE + 5);
 
         ITmfTimestamp ts = ref.normalize(-4, 0);
         assertEquals("getValue", Long.MIN_VALUE + 1, ts.getValue());
@@ -292,7 +292,7 @@ public class TmfTimestampTest extends TestCase {
     }
 
     public void testNormalizeOffsetUpperLimits() throws Exception {
-        ITmfTimestamp ref = new TmfTimestamp(Long.MAX_VALUE - 5);
+        final ITmfTimestamp ref = new TmfTimestamp(Long.MAX_VALUE - 5);
 
         ITmfTimestamp ts = ref.normalize(4, 0);
         assertEquals("getValue", Long.MAX_VALUE - 1, ts.getValue());
@@ -323,13 +323,13 @@ public class TmfTimestampTest extends TestCase {
     }
 
     public void testNormalizedScaleLimits() throws Exception {
-        int MAX_SCALE_DIFF = 19;
+        final int MAX_SCALE_DIFF = 19;
 
         // Test below limit
         try {
             ts1.normalize(0, +MAX_SCALE_DIFF - 1);
             ts1.normalize(0, -MAX_SCALE_DIFF + 1);
-        } catch (ArithmeticException e) {
+        } catch (final ArithmeticException e) {
             fail("normalize: scale error");
         }
 
@@ -339,7 +339,7 @@ public class TmfTimestampTest extends TestCase {
             fail("normalize: scale error");
             ts1.normalize(0, -MAX_SCALE_DIFF);
             fail("normalize: scale error");
-        } catch (ArithmeticException e) {
+        } catch (final ArithmeticException e) {
         }
 
         // Test over limit
@@ -348,19 +348,19 @@ public class TmfTimestampTest extends TestCase {
             fail("normalize: scale error");
             ts1.normalize(0, -MAX_SCALE_DIFF - 1);
             fail("normalize: scale error");
-        } catch (ArithmeticException e) {
+        } catch (final ArithmeticException e) {
         }
     }
 
     public void testNormalizeOffsetAndScaleTrivial() throws Exception {
-        ITmfTimestamp ts = ts0.normalize(0, 0);
+        final ITmfTimestamp ts = ts0.normalize(0, 0);
         assertEquals("getValue", 0, ts.getValue());
         assertEquals("getscale", 0, ts.getScale());
         assertEquals("getPrecision", 0, ts.getPrecision());
     }
 
     public void testNormalizeOffsetAndScale() throws Exception {
-        int SCALE = 12;
+        final int SCALE = 12;
 
         ITmfTimestamp ts = ts0.normalize(0, SCALE);
         assertEquals("getValue", 0, ts.getValue());
@@ -406,16 +406,16 @@ public class TmfTimestampTest extends TestCase {
         assertEquals("getscale", SCALE, ts.getScale());
         assertEquals("getPrecision", 0, ts.getPrecision());
     }
-    
+
     // ------------------------------------------------------------------------
     // compareTo
     // ------------------------------------------------------------------------
 
     public void testBasicCompareTo() throws Exception {
-        ITmfTimestamp ts1 = new TmfTimestamp(900, 0, 50);
-        ITmfTimestamp ts2 = new TmfTimestamp(1000, 0, 50);
-        ITmfTimestamp ts3 = new TmfTimestamp(1100, 0, 50);
-        ITmfTimestamp ts4 = new TmfTimestamp(1000, 0, 75);
+        final ITmfTimestamp ts1 = new TmfTimestamp(900, 0, 50);
+        final ITmfTimestamp ts2 = new TmfTimestamp(1000, 0, 50);
+        final ITmfTimestamp ts3 = new TmfTimestamp(1100, 0, 50);
+        final ITmfTimestamp ts4 = new TmfTimestamp(1000, 0, 75);
 
         assertTrue(ts1.compareTo(ts1) == 0);
 
@@ -433,10 +433,10 @@ public class TmfTimestampTest extends TestCase {
     }
 
     public void testCompareToCornerCases1() throws Exception {
-        ITmfTimestamp ts0a = new TmfTimestamp(ts0);
-        ITmfTimestamp ts0b = new TmfTimestamp(ts0.getValue(), ts0.getScale() + 1);
-        ITmfTimestamp ts0c = new TmfTimestamp(ts0.getValue() + 1, ts0.getScale());
-        ITmfTimestamp ts0d = new TmfTimestamp(ts0.getValue() + 1, ts0.getScale() + 1);
+        final ITmfTimestamp ts0a = new TmfTimestamp(ts0);
+        final ITmfTimestamp ts0b = new TmfTimestamp(ts0.getValue(), ts0.getScale() + 1);
+        final ITmfTimestamp ts0c = new TmfTimestamp(ts0.getValue() + 1, ts0.getScale());
+        final ITmfTimestamp ts0d = new TmfTimestamp(ts0.getValue() + 1, ts0.getScale() + 1);
 
         assertTrue("compareTo", ts0.compareTo(ts0, false) == 0);
         assertTrue("compareTo", ts0.compareTo(ts0a, false) == 0);
@@ -446,9 +446,9 @@ public class TmfTimestampTest extends TestCase {
     }
 
     public void testCompareToCornerCases2() throws Exception {
-        ITmfTimestamp ts0a = new TmfTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE - 1);
-        ITmfTimestamp ts0b = new TmfTimestamp(0, Integer.MAX_VALUE);
-        ITmfTimestamp ts0c = new TmfTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE);
+        final ITmfTimestamp ts0a = new TmfTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE - 1);
+        final ITmfTimestamp ts0b = new TmfTimestamp(0, Integer.MAX_VALUE);
+        final ITmfTimestamp ts0c = new TmfTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE);
 
         assertTrue("compareTo", ts0a.compareTo(ts0b, false)== 1);
         assertTrue("compareTo", ts0a.compareTo(ts0c, false)== -1);
@@ -461,9 +461,9 @@ public class TmfTimestampTest extends TestCase {
     }
 
     public void testCompareToCornerCases3() throws Exception {
-        ITmfTimestamp ts0a = new TmfTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE - 1);
-        ITmfTimestamp ts0b = new TmfTimestamp(0, Integer.MAX_VALUE);
-        ITmfTimestamp ts0c = new TmfTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE);
+        final ITmfTimestamp ts0a = new TmfTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE - 1);
+        final ITmfTimestamp ts0b = new TmfTimestamp(0, Integer.MAX_VALUE);
+        final ITmfTimestamp ts0c = new TmfTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE);
 
         assertTrue("compareTo", ts0a.compareTo(ts0b, false)== -1);
         assertTrue("compareTo", ts0a.compareTo(ts0c, false)== 1);
@@ -476,10 +476,10 @@ public class TmfTimestampTest extends TestCase {
     }
 
     public void testCompareToSameScale() throws Exception {
-        ITmfTimestamp ts1 = new TmfTimestamp(900, 0, 50);
-        ITmfTimestamp ts2 = new TmfTimestamp(1000, 0, 50);
-        ITmfTimestamp ts3 = new TmfTimestamp(1100, 0, 50);
-        ITmfTimestamp ts4 = new TmfTimestamp(1000, 0, 75);
+        final ITmfTimestamp ts1 = new TmfTimestamp(900, 0, 50);
+        final ITmfTimestamp ts2 = new TmfTimestamp(1000, 0, 50);
+        final ITmfTimestamp ts3 = new TmfTimestamp(1100, 0, 50);
+        final ITmfTimestamp ts4 = new TmfTimestamp(1000, 0, 75);
 
         assertTrue(ts1.compareTo(ts1, false) == 0);
 
@@ -497,10 +497,10 @@ public class TmfTimestampTest extends TestCase {
     }
 
     public void testCompareToDifferentScale() throws Exception {
-        ITmfTimestamp ts1 = new TmfTimestamp(9000, -1, 50);
-        ITmfTimestamp ts2 = new TmfTimestamp(1000, 0, 50);
-        ITmfTimestamp ts3 = new TmfTimestamp(110, 1, 50);
-        ITmfTimestamp ts4 = new TmfTimestamp(1, 3, 75);
+        final ITmfTimestamp ts1 = new TmfTimestamp(9000, -1, 50);
+        final ITmfTimestamp ts2 = new TmfTimestamp(1000, 0, 50);
+        final ITmfTimestamp ts3 = new TmfTimestamp(110, 1, 50);
+        final ITmfTimestamp ts4 = new TmfTimestamp(1, 3, 75);
 
         assertTrue("CompareTo", ts1.compareTo(ts1, false) == 0);
 
@@ -518,10 +518,10 @@ public class TmfTimestampTest extends TestCase {
     }
 
     public void testCompareToWithinPrecision() throws Exception {
-        ITmfTimestamp ts1 = new TmfTimestamp(900, 0, 50);
-        ITmfTimestamp ts2 = new TmfTimestamp(1000, 0, 50);
-        ITmfTimestamp ts3 = new TmfTimestamp(1100, 0, 50);
-        ITmfTimestamp ts4 = new TmfTimestamp(1000, 0, 75);
+        final ITmfTimestamp ts1 = new TmfTimestamp(900, 0, 50);
+        final ITmfTimestamp ts2 = new TmfTimestamp(1000, 0, 50);
+        final ITmfTimestamp ts3 = new TmfTimestamp(1100, 0, 50);
+        final ITmfTimestamp ts4 = new TmfTimestamp(1000, 0, 75);
 
         assertTrue("CompareTo", ts1.compareTo(ts1, true) == 0);
 
@@ -539,10 +539,10 @@ public class TmfTimestampTest extends TestCase {
     }
 
     public void testCompareToLargeScale1() throws Exception {
-        ITmfTimestamp ts1 = new TmfTimestamp(-1, 100);
-        ITmfTimestamp ts2 = new TmfTimestamp(-1000, -100);
-        ITmfTimestamp ts3 = new TmfTimestamp(1, 100);
-        ITmfTimestamp ts4 = new TmfTimestamp(1000, -100);
+        final ITmfTimestamp ts1 = new TmfTimestamp(-1, 100);
+        final ITmfTimestamp ts2 = new TmfTimestamp(-1000, -100);
+        final ITmfTimestamp ts3 = new TmfTimestamp(1, 100);
+        final ITmfTimestamp ts4 = new TmfTimestamp(1000, -100);
 
         assertTrue("CompareTo", ts1.compareTo(ts2, false) < 0);
         assertTrue("CompareTo", ts1.compareTo(ts3, false) < 0);
@@ -562,8 +562,8 @@ public class TmfTimestampTest extends TestCase {
     }
 
     public void testCompareToLargeScale2() throws Exception {
-        ITmfTimestamp ts0a = new TmfTimestamp(0, Integer.MAX_VALUE);
-        ITmfTimestamp ts0b = new TmfTimestamp(1, Integer.MAX_VALUE);
+        final ITmfTimestamp ts0a = new TmfTimestamp(0, Integer.MAX_VALUE);
+        final ITmfTimestamp ts0b = new TmfTimestamp(1, Integer.MAX_VALUE);
 
         assertTrue("CompareTo", ts0a.compareTo(ts0, false) == 0);
         assertTrue("CompareTo", ts0.compareTo(ts0a, false) == 0);
@@ -575,7 +575,7 @@ public class TmfTimestampTest extends TestCase {
     // ------------------------------------------------------------------------
     // getDelta
     // ------------------------------------------------------------------------
-    
+
     public void testDelta() throws Exception {
         // Delta for same scale and precision (delta > 0)
         ITmfTimestamp ts0 = new TmfTimestamp(10, 9);

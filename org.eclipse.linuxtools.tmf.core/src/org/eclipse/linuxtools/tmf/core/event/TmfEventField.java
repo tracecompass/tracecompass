@@ -36,7 +36,7 @@ public class TmfEventField implements ITmfEventField {
 
     private String[] fFieldNames;
     private Map<String, ITmfEventField> fNameMapping;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -54,7 +54,7 @@ public class TmfEventField implements ITmfEventField {
      * @param name the event field id
      * @param fields the list of subfields
      */
-    public TmfEventField(String name, ITmfEventField[] fields) {
+    public TmfEventField(final String name, final ITmfEventField[] fields) {
         this(name, null, fields);
     }
 
@@ -64,7 +64,7 @@ public class TmfEventField implements ITmfEventField {
      * @param name the event field id
      * @param value the event field value
      */
-    public TmfEventField(String name, Object value) {
+    public TmfEventField(final String name, final Object value) {
         this(name, value, null);
     }
 
@@ -75,10 +75,9 @@ public class TmfEventField implements ITmfEventField {
      * @param value the event field value
      * @param fields the list of subfields
      */
-    public TmfEventField(String name, Object value, ITmfEventField[] fields) {
-        if (name == null) {
+    public TmfEventField(final String name, final Object value, final ITmfEventField[] fields) {
+        if (name == null)
             throw new IllegalArgumentException();
-        }
         fName = name;
         fValue = value;
         fFields = (fields != null) ? Arrays.copyOf(fields, fields.length) : null;
@@ -90,13 +89,13 @@ public class TmfEventField implements ITmfEventField {
      * 
      * @param field the other event field
      */
-    public TmfEventField(TmfEventField field) {
-    	if (field == null)
-    		throw new IllegalArgumentException();
-    	fName = field.fName;
-		fValue = field.fValue;
-		fFields = field.fFields;
-		fFieldNames = field.fFieldNames;
+    public TmfEventField(final TmfEventField field) {
+        if (field == null)
+            throw new IllegalArgumentException();
+        fName = field.fName;
+        fValue = field.fValue;
+        fFields = field.fFields;
+        fFieldNames = field.fFieldNames;
         populateStructs();
     }
 
@@ -132,11 +131,10 @@ public class TmfEventField implements ITmfEventField {
      * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getFieldName(int)
      */
     @Override
-    public String getFieldName(int index) {
-        ITmfEventField field = getField(index);
-        if (field != null) {
+    public String getFieldName(final int index) {
+        final ITmfEventField field = getField(index);
+        if (field != null)
             return field.getName();
-        }
         return null;
     }
 
@@ -152,7 +150,7 @@ public class TmfEventField implements ITmfEventField {
      * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getField(java.lang.String)
      */
     @Override
-    public ITmfEventField getField(String name) {
+    public ITmfEventField getField(final String name) {
         return fNameMapping.get(name);
     }
 
@@ -160,7 +158,7 @@ public class TmfEventField implements ITmfEventField {
      * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getField(int)
      */
     @Override
-    public ITmfEventField getField(int index) {
+    public ITmfEventField getField(final int index) {
         if (fFields != null && index >= 0 && index < fFields.length)
             return fFields[index];
         return null;
@@ -174,7 +172,7 @@ public class TmfEventField implements ITmfEventField {
      * @param value new field raw value
      * @param fields the corresponding fields
      */
-    protected void setValue(Object value, ITmfEventField[] fields) {
+    protected void setValue(final Object value, final ITmfEventField[] fields) {
         fValue = value;
         fFields = (fields != null) ? Arrays.copyOf(fields, fields.length) : null;
         populateStructs();
@@ -190,12 +188,11 @@ public class TmfEventField implements ITmfEventField {
      * @param labels the list of labels
      * @return the (flat) root list
      */
-    public final static ITmfEventField makeRoot(String[] labels) {
-        ITmfEventField[] fields = new ITmfEventField[labels.length];
-        for (int i = 0; i < labels.length; i++) {
+    public final static ITmfEventField makeRoot(final String[] labels) {
+        final ITmfEventField[] fields = new ITmfEventField[labels.length];
+        for (int i = 0; i < labels.length; i++)
             fields[i] = new TmfEventField(labels[i], null);
-        }
-        ITmfEventField rootField = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, fields);
+        final ITmfEventField rootField = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, fields);
         return rootField;
     }
 
@@ -203,11 +200,11 @@ public class TmfEventField implements ITmfEventField {
      * Populate the subfield names and the name map
      */
     private void populateStructs() {
-        int nbFields = (fFields != null) ? fFields.length : 0;
+        final int nbFields = (fFields != null) ? fFields.length : 0;
         fFieldNames = new String[nbFields];
         fNameMapping = new HashMap<String, ITmfEventField>();
         for (int i = 0; i < nbFields; i++) {
-            String name = fFields[i].getName();
+            final String name = fFields[i].getName();
             fFieldNames[i] = name;
             fNameMapping.put(name, fFields[i]);
         }
@@ -229,7 +226,7 @@ public class TmfEventField implements ITmfEventField {
             clone.fValue = fValue;
             clone.fFields = (fFields != null) ? fFields.clone() : null;
             clone.populateStructs();
-        } catch (CloneNotSupportedException e) {
+        } catch (final CloneNotSupportedException e) {
         }
         return clone;
     }
@@ -254,14 +251,14 @@ public class TmfEventField implements ITmfEventField {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
             return false;
         if (!(obj instanceof TmfEventField))
             return false;
-        TmfEventField other = (TmfEventField) obj;
+        final TmfEventField other = (TmfEventField) obj;
         if (!fName.equals(other.fName))
             return false;
         if (fValue == null) {

@@ -39,7 +39,7 @@ public class TmfEventTypeTest extends TestCase {
 
     private final String fLabel0 = "label1";
     private final String fLabel1 = "label2";
-    
+
     private final String[] fLabels0 = new String[] { };
     private final String[] fLabels1 = new String[] { fLabel0, fLabel1 };
     private final String[] fLabels2 = new String[] { fLabel1, fLabel0, fLabel1 };
@@ -56,7 +56,7 @@ public class TmfEventTypeTest extends TestCase {
     /**
      * @param name the test name
      */
-    public TmfEventTypeTest(String name) {
+    public TmfEventTypeTest(final String name) {
         super(name);
     }
 
@@ -75,7 +75,7 @@ public class TmfEventTypeTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testDefaultConstructor() {
-        ITmfEventType type = new TmfEventType();
+        final ITmfEventType type = new TmfEventType();
         assertEquals("getContext", TmfEventType.DEFAULT_CONTEXT_ID, type.getContext());
         assertEquals("getName", TmfEventType.DEFAULT_TYPE_ID, type.getName());
         assertNull("getRootField", type.getRootField());
@@ -84,37 +84,34 @@ public class TmfEventTypeTest extends TestCase {
     }
 
     public void testFullConstructor() {
-        ITmfEventType type0 = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels0));
+        final ITmfEventType type0 = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels0));
         assertEquals("getContext", fContext1, type0.getContext());
         assertEquals("getName", fTypeId1, type0.getName());
         assertEquals("getRootField", TmfEventField.makeRoot(fLabels0), type0.getRootField());
-        String[] labels0 = type0.getFieldNames();
+        final String[] labels0 = type0.getFieldNames();
         assertEquals("getFieldNames length", fLabels0.length, labels0.length);
-        for (int i = 0; i < labels0.length; i++) {
+        for (int i = 0; i < labels0.length; i++)
             assertEquals("getFieldNames", fLabels0[i], labels0[i]);
-        }
         assertNull("getFieldName", type0.getFieldName(labels0.length));
 
-        ITmfEventType type1 = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels1));
+        final ITmfEventType type1 = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels1));
         assertEquals("getContext", fContext1, type1.getContext());
         assertEquals("getName", fTypeId1, type1.getName());
         assertEquals("getRootField", TmfEventField.makeRoot(fLabels1), type1.getRootField());
-        String[] labels1 = type1.getFieldNames();
+        final String[] labels1 = type1.getFieldNames();
         assertEquals("getFieldNames length", fLabels1.length, labels1.length);
-        for (int i = 0; i < labels1.length; i++) {
+        for (int i = 0; i < labels1.length; i++)
             assertEquals("getFieldNames", fLabels1[i], labels1[i]);
-        }
         assertNull("getFieldName", type1.getFieldName(labels1.length));
 
-        ITmfEventType type2 = new TmfEventType(fContext2, fTypeId2, TmfEventField.makeRoot(fLabels2));
+        final ITmfEventType type2 = new TmfEventType(fContext2, fTypeId2, TmfEventField.makeRoot(fLabels2));
         assertEquals("getContext", fContext2, type2.getContext());
         assertEquals("getName", fTypeId2, type2.getName());
         assertEquals("getRootField", TmfEventField.makeRoot(fLabels2), type2.getRootField());
-        String[] labels2 = type2.getFieldNames();
+        final String[] labels2 = type2.getFieldNames();
         assertEquals("getFieldNames length", fLabels2.length, labels2.length);
-        for (int i = 0; i < labels2.length; i++) {
+        for (int i = 0; i < labels2.length; i++)
             assertEquals("getFieldNames", fLabels2[i], labels2[i]);
-        }
         assertNull("getFieldName", type2.getFieldName(labels2.length));
     }
 
@@ -122,28 +119,27 @@ public class TmfEventTypeTest extends TestCase {
         try {
             new TmfEventType(null, fTypeId1, null);
             fail("TmfEventType: null context");
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
         }
 
         try {
             new TmfEventType(fContext1, null, null);
             fail("TmfEventType: null type");
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
         }
     }
 
     public void testCopyConstructor() {
-        TmfEventType original = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels1));
-        TmfEventType copy = new TmfEventType(original);
+        final TmfEventType original = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels1));
+        final TmfEventType copy = new TmfEventType(original);
 
         assertEquals("getContext", fContext1, copy.getContext());
         assertEquals("getName", fTypeId1, copy.getName());
         assertEquals("getRootField", TmfEventField.makeRoot(fLabels1), copy.getRootField());
-        String[] labels1 = copy.getFieldNames();
+        final String[] labels1 = copy.getFieldNames();
         assertEquals("getFieldNames length", fLabels1.length, labels1.length);
-        for (int i = 0; i < labels1.length; i++) {
+        for (int i = 0; i < labels1.length; i++)
             assertEquals("getFieldNames", fLabels1[i], labels1[i]);
-        }
         assertNull("getFieldName", copy.getFieldName(labels1.length));
     }
 
@@ -151,7 +147,7 @@ public class TmfEventTypeTest extends TestCase {
         try {
             new TmfEventType(null);
             fail("TmfEventType: null argument");
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
         }
     }
 
@@ -162,7 +158,7 @@ public class TmfEventTypeTest extends TestCase {
     public static class MyEventType extends TmfEventType {
 
         @Override
-        public boolean equals(Object other) {
+        public boolean equals(final Object other) {
             return super.equals(other);
         }
 
@@ -173,7 +169,7 @@ public class TmfEventTypeTest extends TestCase {
     }
 
     public void testClone() throws Exception {
-        ITmfEventType clone = fType1.clone();
+        final ITmfEventType clone = fType1.clone();
 
         assertTrue("clone", fType1.clone().equals(fType1));
         assertTrue("clone", clone.clone().equals(clone));
@@ -183,8 +179,8 @@ public class TmfEventTypeTest extends TestCase {
     }
 
     public void testClone2() throws Exception {
-        ITmfEventType type = new TmfEventType();
-        ITmfEventType clone = type.clone();
+        final ITmfEventType type = new TmfEventType();
+        final ITmfEventType clone = type.clone();
 
         assertTrue("clone", type.clone().equals(type));
         assertTrue("clone", clone.clone().equals(clone));
@@ -198,7 +194,7 @@ public class TmfEventTypeTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testHashCode() throws Exception {
-        TmfEventType copy1 = new TmfEventType(fType0);
+        final TmfEventType copy1 = new TmfEventType(fType0);
 
         assertTrue("hashCode", fType0.hashCode() == copy1.hashCode());
         assertTrue("hashCode", fType0.hashCode() != fType3.hashCode());
@@ -217,15 +213,15 @@ public class TmfEventTypeTest extends TestCase {
     }
 
     public void testEqualsSymmetry() throws Exception {
-        TmfEventType copy0 = new TmfEventType(fType0);
+        final TmfEventType copy0 = new TmfEventType(fType0);
         assertTrue("equals", fType0.equals(copy0));
         assertTrue("equals", copy0.equals(fType0));
-        
-        TmfEventType copy1 = new TmfEventType(fType1);
+
+        final TmfEventType copy1 = new TmfEventType(fType1);
         assertTrue("equals", fType1.equals(copy1));
         assertTrue("equals", copy1.equals(fType1));
-        
-        TmfEventType copy2 = new TmfEventType(fType2);
+
+        final TmfEventType copy2 = new TmfEventType(fType2);
         assertTrue("equals", fType2.equals(copy2));
         assertTrue("equals", copy2.equals(fType2));
     }
@@ -261,23 +257,23 @@ public class TmfEventTypeTest extends TestCase {
         assertFalse("equals", fType2.equals(fType3));
         assertFalse("equals", fType3.equals(fType0));
     }
-    
+
     public void testNonEqualsClasses() throws Exception {
         assertFalse("equals", fType1.equals(fLabels1));
     }
-    
+
     // ------------------------------------------------------------------------
     // toString
     // ------------------------------------------------------------------------
 
     public void testToString() {
-        String expected1 = "TmfEventType [fContext=" + TmfEventType.DEFAULT_CONTEXT_ID +
-               ", fTypeId=" + TmfEventType.DEFAULT_TYPE_ID + "]";
-        TmfEventType type1 = new TmfEventType();
+        final String expected1 = "TmfEventType [fContext=" + TmfEventType.DEFAULT_CONTEXT_ID +
+                ", fTypeId=" + TmfEventType.DEFAULT_TYPE_ID + "]";
+        final TmfEventType type1 = new TmfEventType();
         assertEquals("toString", expected1, type1.toString());
 
-        String expected2 = "TmfEventType [fContext=" + fContext1 + ", fTypeId=" + fTypeId1 + "]";
-        TmfEventType type2 = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels1));
+        final String expected2 = "TmfEventType [fContext=" + fContext1 + ", fTypeId=" + fTypeId1 + "]";
+        final TmfEventType type2 = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels1));
         assertEquals("toString", expected2, type2.toString());
     }
 

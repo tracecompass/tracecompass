@@ -32,7 +32,7 @@ public final class TmfEventTypeManager {
     private static TmfEventTypeManager fEventTypeManager = null;
 
     // The available types, per context
-    private HashMap<String, HashMap<String, ITmfEventType>> fEventTypes; 
+    private final HashMap<String, HashMap<String, ITmfEventType>> fEventTypes;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -49,9 +49,8 @@ public final class TmfEventTypeManager {
      * @return the TmfEventTypeManager singleton
      */
     public static synchronized TmfEventTypeManager getInstance() {
-        if (fEventTypeManager == null) {
+        if (fEventTypeManager == null)
             fEventTypeManager = new TmfEventTypeManager();
-        }
         return fEventTypeManager;
     }
 
@@ -65,11 +64,10 @@ public final class TmfEventTypeManager {
      * @param context the target context
      * @param type the type to add
      */
-    public synchronized void add(String context, ITmfEventType type) {
+    public synchronized void add(final String context, final ITmfEventType type) {
         HashMap<String, ITmfEventType> types = fEventTypes.get(context);
-        if (types == null) {
+        if (types == null)
             types = new HashMap<String, ITmfEventType>();
-        }
         types.put(type.getName(), type);
         fEventTypes.put(context, types);
     }
@@ -89,11 +87,10 @@ public final class TmfEventTypeManager {
      * @param context the context to look into
      * @return the list of types defined for that context
      */
-    public synchronized ITmfEventType[] getTypes(String context) {
-        HashMap<String, ITmfEventType> types = fEventTypes.get(context);
-        if (types != null) {
+    public synchronized ITmfEventType[] getTypes(final String context) {
+        final HashMap<String, ITmfEventType> types = fEventTypes.get(context);
+        if (types != null)
             return types.values().toArray(new ITmfEventType[types.size()]);
-        }
         return null;
     }
 
@@ -104,11 +101,10 @@ public final class TmfEventTypeManager {
      * @param typeId the type ID
      * @return the corresponding type
      */
-    public synchronized ITmfEventType getType(String context, String typeId) {
-        HashMap<String, ITmfEventType> types = fEventTypes.get(context);
-        if (types != null) {
+    public synchronized ITmfEventType getType(final String context, final String typeId) {
+        final HashMap<String, ITmfEventType> types = fEventTypes.get(context);
+        if (types != null)
             return types.get(typeId);
-        }
         return null;
     }
 
@@ -117,7 +113,7 @@ public final class TmfEventTypeManager {
      * 
      * @param context the context to remove
      */
-    public synchronized void clear(String context) {
+    public synchronized void clear(final String context) {
         fEventTypes.remove(context);
     }
 

@@ -22,11 +22,11 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 public class TmfSyntheticEventStub extends TmfEvent {
 
 
-	public TmfSyntheticEventStub(TmfEvent event) {
-		super(event);
-	}
-	public TmfSyntheticEventStub(TmfSyntheticEventStub other) {
-		super(other);
-	}
+    public TmfSyntheticEventStub(final TmfEvent event) {
+        super(event);
+    }
+    public TmfSyntheticEventStub(final TmfSyntheticEventStub other) {
+        super(other);
+    }
 
 }

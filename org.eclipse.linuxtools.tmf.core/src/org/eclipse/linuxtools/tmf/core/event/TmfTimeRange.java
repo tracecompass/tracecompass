@@ -28,13 +28,13 @@ public final class TmfTimeRange implements Cloneable {
      * The full possible time range
      */
     public static final TmfTimeRange ETERNITY =
-        new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
+            new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
 
     /**
      * The null time range
      */
     public static final TmfTimeRange NULL_RANGE =
-        new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_BANG);
+            new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_BANG);
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -60,10 +60,9 @@ public final class TmfTimeRange implements Cloneable {
      * @param startTime start of the time range
      * @param endTime end of the time range
      */
-    public TmfTimeRange(ITmfTimestamp startTime, ITmfTimestamp endTime) {
-        if (startTime == null || endTime == null) {
+    public TmfTimeRange(final ITmfTimestamp startTime, final ITmfTimestamp endTime) {
+        if (startTime == null || endTime == null)
             throw new IllegalArgumentException();
-        }
         fStartTime = startTime;
         fEndTime = endTime;
     }
@@ -73,10 +72,9 @@ public final class TmfTimeRange implements Cloneable {
      * 
      * @param range the other time range
      */
-    public TmfTimeRange(TmfTimeRange range) {
-        if (range == null) {
+    public TmfTimeRange(final TmfTimeRange range) {
+        if (range == null)
             throw new IllegalArgumentException();
-        }
         fStartTime = range.getStartTime();
         fEndTime = range.getEndTime();
     }
@@ -109,7 +107,7 @@ public final class TmfTimeRange implements Cloneable {
      * @param ts the timestamp to check
      * @return true if [startTime] <= [ts] <= [endTime]
      */
-    public boolean contains(ITmfTimestamp ts) {
+    public boolean contains(final ITmfTimestamp ts) {
         // Zero acts as a "universal donor" timestamp
         if (ts.equals(TmfTimestamp.ZERO))
             return true;
@@ -122,9 +120,9 @@ public final class TmfTimeRange implements Cloneable {
      * @param range the other time range
      * @return true if [range] is fully contained
      */
-    public boolean contains(TmfTimeRange range) {
-        ITmfTimestamp startTime = range.getStartTime();
-        ITmfTimestamp endTime = range.getEndTime();
+    public boolean contains(final TmfTimeRange range) {
+        final ITmfTimestamp startTime = range.getStartTime();
+        final ITmfTimestamp endTime = range.getEndTime();
         return (fStartTime.compareTo(startTime, true) <= 0) && (fEndTime.compareTo(endTime, true) >= 0);
     }
 
@@ -138,12 +136,12 @@ public final class TmfTimeRange implements Cloneable {
      * @param range the other time range
      * @return the intersection time range, or null if no intersection exists
      */
-    public TmfTimeRange getIntersection(TmfTimeRange range) {
+    public TmfTimeRange getIntersection(final TmfTimeRange range) {
         if (fStartTime.compareTo(range.fEndTime, true) > 0 || fEndTime.compareTo(range.fStartTime, true) < 0)
             return null; // no intersection
 
         return new TmfTimeRange(fStartTime.compareTo(range.fStartTime, true) < 0 ? range.fStartTime
-                        : fStartTime, fEndTime.compareTo(range.fEndTime, true) > 0 ? range.fEndTime
+                : fStartTime, fEndTime.compareTo(range.fEndTime, true) > 0 ? range.fEndTime
                         : fEndTime);
     }
 
@@ -162,7 +160,7 @@ public final class TmfTimeRange implements Cloneable {
             clone.fStartTime = fStartTime.clone();
             clone.fEndTime = fEndTime.clone();
         }
-        catch (CloneNotSupportedException e) {
+        catch (final CloneNotSupportedException e) {
         }
         return clone;
     }
@@ -187,14 +185,14 @@ public final class TmfTimeRange implements Cloneable {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
             return false;
         if (!(obj instanceof TmfTimeRange))
             return false;
-        TmfTimeRange other = (TmfTimeRange) obj;
+        final TmfTimeRange other = (TmfTimeRange) obj;
         if (!fEndTime.equals(other.fEndTime))
             return false;
         if (!fStartTime.equals(other.fStartTime))

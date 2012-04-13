@@ -47,8 +47,8 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     private ITmfEventParser<TmfEvent> fParser;
 
     // The synchronization lock
-    private ReentrantLock fLock = new ReentrantLock();
-    
+    private final ReentrantLock fLock = new ReentrantLock();
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -57,7 +57,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * @param path
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(String path) throws FileNotFoundException {
+    public TmfTraceStub(final String path) throws FileNotFoundException {
         this(path, DEFAULT_INDEX_PAGE_SIZE, false);
     }
 
@@ -66,7 +66,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * @param cacheSize
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(String path, int cacheSize) throws FileNotFoundException {
+    public TmfTraceStub(final String path, final int cacheSize) throws FileNotFoundException {
         this(path, cacheSize, false);
     }
 
@@ -75,23 +75,23 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * @param waitForCompletion
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(String path, boolean waitForCompletion) throws FileNotFoundException {
+    public TmfTraceStub(final String path, final boolean waitForCompletion) throws FileNotFoundException {
         this(path, DEFAULT_INDEX_PAGE_SIZE, waitForCompletion);
     }
-    
+
     /**
      * @param path
      * @param cacheSize
      * @param waitForCompletion
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(String path, int cacheSize, boolean waitForCompletion) throws FileNotFoundException {
+    public TmfTraceStub(final String path, final int cacheSize, final boolean waitForCompletion) throws FileNotFoundException {
         super(null, TmfEvent.class, path, cacheSize, false);
         fTrace = new RandomAccessFile(path, "r");
         fParser = new TmfEventParserStub();
     }
 
-    
+
     /**
      * @param path
      * @param cacheSize
@@ -99,26 +99,26 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * @param parser
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(String path, int cacheSize, boolean waitForCompletion, ITmfEventParser<TmfEvent> parser) throws FileNotFoundException {
+    public TmfTraceStub(final String path, final int cacheSize, final boolean waitForCompletion, final ITmfEventParser<TmfEvent> parser) throws FileNotFoundException {
         super(path, TmfEvent.class, path, cacheSize, false);
         fTrace = new RandomAccessFile(path, "r");
         fParser = parser;
     }
-    
+
     /**
      */
     @Override
-	public TmfTraceStub clone() {
-    	TmfTraceStub clone = null;
-   		try {
-			clone = (TmfTraceStub) super.clone();
-	       	clone.fTrace  = new RandomAccessFile(getPath(), "r");
-	       	clone.fParser = new TmfEventParserStub();
-		} catch (FileNotFoundException e) {
-		}
-    	return clone;
+    public TmfTraceStub clone() {
+        TmfTraceStub clone = null;
+        try {
+            clone = (TmfTraceStub) super.clone();
+            clone.fTrace  = new RandomAccessFile(getPath(), "r");
+            clone.fParser = new TmfEventParserStub();
+        } catch (final FileNotFoundException e) {
+        }
+        return clone;
     }
- 
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -131,10 +131,10 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     // Operators
     // ------------------------------------------------------------------------
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public TmfContext seekLocation(ITmfLocation<?> location) {
-	    fLock.lock();
+    @Override
+    @SuppressWarnings("unchecked")
+    public TmfContext seekLocation(final ITmfLocation<?> location) {
+        fLock.lock();
         try {
             if (fTrace != null) {
                 // Position the trace at the requested location and
@@ -145,52 +145,49 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
                     loc = ((TmfLocation<Long>) location).getLocation();
                     rank = ITmfContext.UNKNOWN_RANK;
                 }
-                if (loc != fTrace.getFilePointer()) {
+                if (loc != fTrace.getFilePointer())
                     fTrace.seek(loc);
-                }
-                TmfContext context = new TmfContext(getCurrentLocation(), rank);
+                final TmfContext context = new TmfContext(getCurrentLocation(), rank);
                 return context;
             }
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
         finally{
             fLock.unlock();
         }
-		return null;
+        return null;
     }
 
 
-	@Override
-    public TmfContext seekLocation(double ratio) {
-	    fLock.lock();
+    @Override
+    public TmfContext seekLocation(final double ratio) {
+        fLock.lock();
         try {
             if (fTrace != null) {
-                ITmfLocation<?> location = new TmfLocation<Long>(Long.valueOf((long) (ratio * fTrace.length())));
-                TmfContext context = seekLocation(location);
+                final ITmfLocation<?> location = new TmfLocation<Long>(Long.valueOf((long) (ratio * fTrace.length())));
+                final TmfContext context = seekLocation(location);
                 context.setRank(ITmfContext.UNKNOWN_RANK);
                 return context;
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         } finally {
             fLock.unlock();
         }
-        
+
         return null;
     }
 
     @Override
     @SuppressWarnings("rawtypes")
-    public double getLocationRatio(ITmfLocation location) {
+    public double getLocationRatio(final ITmfLocation location) {
         fLock.lock();
         try {
-            if (fTrace != null) {
-                if (location.getLocation() instanceof Long) {
+            if (fTrace != null)
+                if (location.getLocation() instanceof Long)
                     return (double) ((Long) location.getLocation()) / fTrace.length();
-                }
-            }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         } finally {
             fLock.unlock();
@@ -199,13 +196,12 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     }
 
     @Override
-	public TmfLocation<Long> getCurrentLocation() {
+    public TmfLocation<Long> getCurrentLocation() {
         fLock.lock();
         try {
-            if (fTrace != null) {
+            if (fTrace != null)
                 return new TmfLocation<Long>(fTrace.getFilePointer());
-            }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         } finally {
             fLock.unlock();
@@ -213,53 +209,53 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
         return null;
     }
 
-	@Override
-	public ITmfEvent parseEvent(ITmfContext context) {
-	    fLock.lock();
-       	try {
-   			// parseNextEvent will update the context
-       	    if (fTrace != null) {
-       	        ITmfEvent event = fParser.parseNextEvent(this, context.clone());
-       	        return event;
-       	    }
-       	}
-       	catch (IOException e) {
-       		e.printStackTrace();
-       	} finally {
-       	    fLock.unlock();
-       	}
-       	return null;
-	}
-
-	@Override
-	public void setTimeRange(TmfTimeRange range) {
-    	super.setTimeRange(range);
+    @Override
+    public ITmfEvent parseEvent(final ITmfContext context) {
+        fLock.lock();
+        try {
+            // parseNextEvent will update the context
+            if (fTrace != null) {
+                final ITmfEvent event = fParser.parseNextEvent(this, context.clone());
+                return event;
+            }
+        }
+        catch (final IOException e) {
+            e.printStackTrace();
+        } finally {
+            fLock.unlock();
+        }
+        return null;
     }
 
-	@Override
-	public void setStartTime(ITmfTimestamp startTime) {
-    	super.setStartTime(startTime);
+    @Override
+    public void setTimeRange(final TmfTimeRange range) {
+        super.setTimeRange(range);
     }
 
-	@Override
-	public void setEndTime(ITmfTimestamp endTime) {
-    	super.setEndTime(endTime);
+    @Override
+    public void setStartTime(final ITmfTimestamp startTime) {
+        super.setStartTime(startTime);
     }
-	
-	@Override
-	public void dispose() {
-	    fLock.lock();
-	    try {
-	        if (fTrace != null) {
-	            fTrace.close();
-	            fTrace = null;
-	        }
-	    } catch (IOException e) {
-	        // Ignore
-	    } finally {
-	        fLock.unlock();  
-	    }
-	    super.dispose();
-	}
+
+    @Override
+    public void setEndTime(final ITmfTimestamp endTime) {
+        super.setEndTime(endTime);
+    }
+
+    @Override
+    public void dispose() {
+        fLock.lock();
+        try {
+            if (fTrace != null) {
+                fTrace.close();
+                fTrace = null;
+            }
+        } catch (final IOException e) {
+            // Ignore
+        } finally {
+            fLock.unlock();
+        }
+        super.dispose();
+    }
 
 }

@@ -26,38 +26,38 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 @SuppressWarnings("nls")
 public class TmfSimpleTimestampTest extends TestCase {
 
-	// ------------------------------------------------------------------------
-	// Variables
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // Variables
+    // ------------------------------------------------------------------------
 
-	private final ITmfTimestamp ts0 = new TmfSimpleTimestamp();
-	private final ITmfTimestamp ts1 = new TmfSimpleTimestamp(12345);
+    private final ITmfTimestamp ts0 = new TmfSimpleTimestamp();
+    private final ITmfTimestamp ts1 = new TmfSimpleTimestamp(12345);
     private final ITmfTimestamp ts2 = new TmfSimpleTimestamp(-1234);
 
-	// ------------------------------------------------------------------------
-	// Housekeping
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // Housekeping
+    // ------------------------------------------------------------------------
 
-	/**
-	 * @param name the test name
-	 */
-	public TmfSimpleTimestampTest(String name) {
-		super(name);
-	}
+    /**
+     * @param name the test name
+     */
+    public TmfSimpleTimestampTest(final String name) {
+        super(name);
+    }
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+    }
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+    }
 
-	// ------------------------------------------------------------------------
-	// Constructors
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
 
     public void testDefaultConstructor() throws Exception {
         assertEquals("getValue", 0, ts0.getValue());
@@ -72,7 +72,7 @@ public class TmfSimpleTimestampTest extends TestCase {
     }
 
     public void testCopyConstructor() throws Exception {
-        ITmfTimestamp copy = new TmfSimpleTimestamp(ts1);
+        final ITmfTimestamp copy = new TmfSimpleTimestamp(ts1);
 
         assertEquals("getValue", ts1.getValue(), copy.getValue());
         assertEquals("getscale", ts1.getScale(), copy.getScale());
@@ -84,25 +84,25 @@ public class TmfSimpleTimestampTest extends TestCase {
     }
 
     public void testCopyBadTimestamp() throws Exception {
-        ITmfTimestamp ts0a = new TmfTimestamp(0, 1, 0);
-        ITmfTimestamp ts0b = new TmfTimestamp(0, 0, 1);
+        final ITmfTimestamp ts0a = new TmfTimestamp(0, 1, 0);
+        final ITmfTimestamp ts0b = new TmfTimestamp(0, 0, 1);
 
         try {
             new TmfSimpleTimestamp(null);
             fail("TmfSimpleTimestamp: null argument");
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
         }
 
         try {
             new TmfSimpleTimestamp(ts0a);
             fail("TmfSimpleTimestamp: bad scale");
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
         }
 
         try {
             new TmfSimpleTimestamp(ts0b);
             fail("TmfSimpleTimestamp: bad precision");
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
         }
     }
 
@@ -113,7 +113,7 @@ public class TmfSimpleTimestampTest extends TestCase {
     public static class MyTimestamp extends TmfSimpleTimestamp {
 
         @Override
-        public boolean equals(Object other) {
+        public boolean equals(final Object other) {
             return super.equals(other);
         }
 
@@ -124,7 +124,7 @@ public class TmfSimpleTimestampTest extends TestCase {
     }
 
     public void testClone() throws Exception {
-        ITmfTimestamp clone = ts0.clone();
+        final ITmfTimestamp clone = ts0.clone();
 
         assertTrue("clone", ts0.clone().equals(ts0));
         assertTrue("clone", clone.clone().equals(clone));
@@ -134,8 +134,8 @@ public class TmfSimpleTimestampTest extends TestCase {
     }
 
     public void testClone2() throws Exception {
-        MyTimestamp timestamp = new MyTimestamp();
-        MyTimestamp clone = timestamp.clone();
+        final MyTimestamp timestamp = new MyTimestamp();
+        final MyTimestamp clone = timestamp.clone();
 
         assertTrue("clone", timestamp.clone().equals(timestamp));
         assertTrue("clone", clone.clone().equals(clone));
@@ -164,24 +164,24 @@ public class TmfSimpleTimestampTest extends TestCase {
     }
 
     public void testEqualsSymmetry() throws Exception {
-        ITmfTimestamp ts0copy = new TmfSimpleTimestamp(ts0);
+        final ITmfTimestamp ts0copy = new TmfSimpleTimestamp(ts0);
         assertTrue("equals", ts0.equals(ts0copy));
         assertTrue("equals", ts0copy.equals(ts0));
 
-        ITmfTimestamp ts1copy = new TmfSimpleTimestamp(ts1);
+        final ITmfTimestamp ts1copy = new TmfSimpleTimestamp(ts1);
         assertTrue("equals", ts1.equals(ts1copy));
         assertTrue("equals", ts1copy.equals(ts1));
     }
 
     public void testEqualsTransivity() throws Exception {
-        ITmfTimestamp ts0copy1 = new TmfSimpleTimestamp(ts0);
-        ITmfTimestamp ts0copy2 = new TmfSimpleTimestamp(ts0copy1);
+        final ITmfTimestamp ts0copy1 = new TmfSimpleTimestamp(ts0);
+        final ITmfTimestamp ts0copy2 = new TmfSimpleTimestamp(ts0copy1);
         assertTrue("equals", ts0.equals(ts0copy1));
         assertTrue("equals", ts0copy1.equals(ts0copy2));
         assertTrue("equals", ts0.equals(ts0copy2));
 
-        ITmfTimestamp ts1copy1 = new TmfSimpleTimestamp(ts1);
-        ITmfTimestamp ts1copy2 = new TmfSimpleTimestamp(ts1copy1);
+        final ITmfTimestamp ts1copy1 = new TmfSimpleTimestamp(ts1);
+        final ITmfTimestamp ts1copy2 = new TmfSimpleTimestamp(ts1copy1);
         assertTrue("equals", ts1.equals(ts1copy1));
         assertTrue("equals", ts1copy1.equals(ts1copy2));
         assertTrue("equals", ts1.equals(ts1copy2));
@@ -212,9 +212,9 @@ public class TmfSimpleTimestampTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testHashCode() throws Exception {
-        ITmfTimestamp ts0copy = new TmfTimestamp(ts0);
-        ITmfTimestamp ts1copy = new TmfTimestamp(ts1);
-        ITmfTimestamp ts2copy = new TmfTimestamp(ts2);
+        final ITmfTimestamp ts0copy = new TmfTimestamp(ts0);
+        final ITmfTimestamp ts1copy = new TmfTimestamp(ts1);
+        final ITmfTimestamp ts2copy = new TmfTimestamp(ts2);
 
         assertTrue("hashCode", ts0.hashCode() == ts0copy.hashCode());
         assertTrue("hashCode", ts1.hashCode() == ts1copy.hashCode());
@@ -276,9 +276,9 @@ public class TmfSimpleTimestampTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testBasicCompareTo() throws Exception {
-        ITmfTimestamp ts1 = new TmfSimpleTimestamp(900);
-        ITmfTimestamp ts2 = new TmfSimpleTimestamp(1000);
-        ITmfTimestamp ts3 = new TmfSimpleTimestamp(1100);
+        final ITmfTimestamp ts1 = new TmfSimpleTimestamp(900);
+        final ITmfTimestamp ts2 = new TmfSimpleTimestamp(1000);
+        final ITmfTimestamp ts3 = new TmfSimpleTimestamp(1100);
 
         assertTrue(ts1.compareTo(ts1) == 0);
 
@@ -293,9 +293,9 @@ public class TmfSimpleTimestampTest extends TestCase {
     }
 
     public void testCompareTo() throws Exception {
-        ITmfTimestamp ts0a = new TmfTimestamp(0, 2, 0);
-        ITmfTimestamp ts1a = new TmfTimestamp(123450, -1);
-        ITmfTimestamp ts2a = new TmfTimestamp(-12340, -1);
+        final ITmfTimestamp ts0a = new TmfTimestamp(0, 2, 0);
+        final ITmfTimestamp ts1a = new TmfTimestamp(123450, -1);
+        final ITmfTimestamp ts2a = new TmfTimestamp(-12340, -1);
 
         assertTrue(ts1.compareTo(ts1) == 0);
 
@@ -307,7 +307,7 @@ public class TmfSimpleTimestampTest extends TestCase {
     // ------------------------------------------------------------------------
     // getDelta
     // ------------------------------------------------------------------------
-    
+
     public void testDelta() throws Exception {
         // Delta for same scale and precision (delta > 0)
         TmfTimestamp ts0 = new TmfSimpleTimestamp(10);
@@ -328,11 +328,11 @@ public class TmfSimpleTimestampTest extends TestCase {
 
     public void testDelta2() throws Exception {
         // Delta for different scale and same precision (delta > 0)
-        TmfTimestamp ts0 = new TmfSimpleTimestamp(10);
-        TmfTimestamp ts1 = new TmfTimestamp(1, 1);
-        TmfTimestamp exp = new TmfTimestamp(0, 0);
+        final TmfTimestamp ts0 = new TmfSimpleTimestamp(10);
+        final TmfTimestamp ts1 = new TmfTimestamp(1, 1);
+        final TmfTimestamp exp = new TmfTimestamp(0, 0);
 
-        ITmfTimestamp delta = ts0.getDelta(ts1);
+        final ITmfTimestamp delta = ts0.getDelta(ts1);
         assertEquals("getDelta", 0, delta.compareTo(exp, false));
     }
 

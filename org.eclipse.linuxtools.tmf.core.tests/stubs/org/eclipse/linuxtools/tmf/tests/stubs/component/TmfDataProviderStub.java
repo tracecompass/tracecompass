@@ -40,42 +40,42 @@ public class TmfDataProviderStub extends TmfDataProvider<TmfEvent> {
 
     private TmfTraceStub fTrace;
 
-    public TmfDataProviderStub(String path) throws IOException {
-    	super("TmfDataProviderStub", TmfEvent.class);
-        URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
-		try {
-			File test = new File(FileLocator.toFileURL(location).toURI());
-			fTrace = new TmfTraceStub(test.getPath(), true);
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
+    public TmfDataProviderStub(final String path) throws IOException {
+        super("TmfDataProviderStub", TmfEvent.class);
+        final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
+        try {
+            final File test = new File(FileLocator.toFileURL(location).toURI());
+            fTrace = new TmfTraceStub(test.getPath(), true);
+        } catch (final URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     public TmfDataProviderStub() throws IOException {
-    	this(DIRECTORY + File.separator + TEST_STREAM);
+        this(DIRECTORY + File.separator + TEST_STREAM);
     }
-    
+
     // ------------------------------------------------------------------------
     // TmfProvider
     // ------------------------------------------------------------------------
 
-	@Override
-	public ITmfContext armRequest(ITmfDataRequest<TmfEvent> request) {
-		if (request instanceof ITmfEventRequest<?>) {
-			ITmfContext context = fTrace.seekEvent(((ITmfEventRequest<?>) request).getRange().getStartTime());
-			return context;
-		}
-		return null;
-	}
+    @Override
+    public ITmfContext armRequest(final ITmfDataRequest<TmfEvent> request) {
+        if (request instanceof ITmfEventRequest<?>) {
+            final ITmfContext context = fTrace.seekEvent(((ITmfEventRequest<?>) request).getRange().getStartTime());
+            return context;
+        }
+        return null;
+    }
 
-	@Override
-	public TmfEvent getNext(ITmfContext context) {
-		return fTrace.getNext(context);
-	}
+    @Override
+    public TmfEvent getNext(final ITmfContext context) {
+        return fTrace.getNext(context);
+    }
 
-	@Override
-	public boolean isCompleted(ITmfDataRequest<TmfEvent> request, TmfEvent data, int nbRead) {
-		return false;
-	}
+    @Override
+    public boolean isCompleted(final ITmfDataRequest<TmfEvent> request, final TmfEvent data, final int nbRead) {
+        return false;
+    }
 
 }

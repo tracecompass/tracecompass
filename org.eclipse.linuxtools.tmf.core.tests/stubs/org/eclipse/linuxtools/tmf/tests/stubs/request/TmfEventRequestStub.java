@@ -26,16 +26,16 @@ public class TmfEventRequestStub<T extends TmfEvent> extends TmfEventRequest<T> 
     /**
      * @param dataType
      */
-    public TmfEventRequestStub(Class<T> dataType) {
-    	super(dataType);
+    public TmfEventRequestStub(final Class<T> dataType) {
+        super(dataType);
     }
 
     /**
      * @param dataType
      * @param range
      */
-    public TmfEventRequestStub(Class<T> dataType, TmfTimeRange range) {
-    	super(dataType, range);
+    public TmfEventRequestStub(final Class<T> dataType, final TmfTimeRange range) {
+        super(dataType, range);
     }
 
     /**
@@ -43,25 +43,25 @@ public class TmfEventRequestStub<T extends TmfEvent> extends TmfEventRequest<T> 
      * @param range
      * @param nbRequested
      */
-    public TmfEventRequestStub(Class<T> dataType, TmfTimeRange range, int nbRequested) {
-    	super(dataType, range, nbRequested);
+    public TmfEventRequestStub(final Class<T> dataType, final TmfTimeRange range, final int nbRequested) {
+        super(dataType, range, nbRequested);
     }
-    
+
     /**
      * @param dataType
      * @param range
      * @param nbRequested
      * @param blockSize
      */
-    public TmfEventRequestStub(Class<T> dataType, TmfTimeRange range, int nbRequested, int blockSize) {
-    	super(dataType, range, nbRequested, blockSize);
+    public TmfEventRequestStub(final Class<T> dataType, final TmfTimeRange range, final int nbRequested, final int blockSize) {
+        super(dataType, range, nbRequested, blockSize);
     }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.tmf.core.request.TmfDataRequest#handleData(org.eclipse.linuxtools.tmf.core.event.ITmfEvent)
-	 */
-	@Override
-	public void handleData(T data) {
-		super.handleData(data);
-	}
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.request.TmfDataRequest#handleData(org.eclipse.linuxtools.tmf.core.event.ITmfEvent)
+     */
+    @Override
+    public void handleData(final T data) {
+        super.handleData(data);
+    }
 }

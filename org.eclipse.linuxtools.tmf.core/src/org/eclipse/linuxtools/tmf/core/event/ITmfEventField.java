@@ -28,7 +28,7 @@ public interface ITmfEventField extends Cloneable {
      * The root field id (the main container)
      */
     public static final String ROOT_FIELD_ID = ":root:"; //$NON-NLS-1$
-    
+
     // ------------------------------------------------------------------------
     // Getters
     // ------------------------------------------------------------------------

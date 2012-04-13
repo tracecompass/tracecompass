@@ -46,7 +46,7 @@ public class TmfEventTypeManagerTest extends TestCase {
 
     private final String fLabel0 = "label1";
     private final String fLabel1 = "label2";
-    
+
     private final String[] fLabels0 = new String[] { };
     private final String[] fLabels1 = new String[] { fLabel0, fLabel1 };
     private final String[] fLabels2 = new String[] { fLabel1, fLabel0, fLabel1 };
@@ -63,7 +63,7 @@ public class TmfEventTypeManagerTest extends TestCase {
     /**
      * @param name the test name
      */
-    public TmfEventTypeManagerTest(String name) {
+    public TmfEventTypeManagerTest(final String name) {
         super(name);
     }
 
@@ -88,7 +88,7 @@ public class TmfEventTypeManagerTest extends TestCase {
         fInstance.add(fContext2, fType2);
         fInstance.add(fContext2, fType3);
 
-        String[] contexts = fInstance.getContexts();
+        final String[] contexts = fInstance.getContexts();
         Arrays.sort(contexts);
         assertEquals("getContexts", 2, contexts.length);
         assertEquals("getContexts", fContext1, contexts[0]);
@@ -104,18 +104,18 @@ public class TmfEventTypeManagerTest extends TestCase {
 
         ITmfEventType[] types = fInstance.getTypes(fContext1);
         assertEquals("getTypes", 2, types.length);
-        if (fType0 == types[0]) {
+        if (fType0 == types[0])
             assertSame("getTypes", fType1, types[1]);
-        } else {
+        else {
             assertSame("getTypes", fType0, types[1]);
             assertSame("getTypes", fType1, types[0]);
         }
 
         types = fInstance.getTypes(fContext2);
         assertEquals("getTypes", 2, types.length);
-        if (fType2 == types[0]) {
+        if (fType2 == types[0])
             assertSame("getTypes", fType3, types[1]);
-        } else {
+        else {
             assertSame("getTypes", fType2, types[1]);
             assertSame("getTypes", fType3, types[0]);
         }
@@ -168,7 +168,7 @@ public class TmfEventTypeManagerTest extends TestCase {
 
         fInstance.clear(fContext1);
 
-        String[] contexts = fInstance.getContexts();
+        final String[] contexts = fInstance.getContexts();
         assertEquals("clear context", 1, contexts.length);
         assertEquals("clear context", fContext2, contexts[0]);
 
@@ -182,9 +182,9 @@ public class TmfEventTypeManagerTest extends TestCase {
 
         types = fInstance.getTypes(fContext2);
         assertEquals("clear context", 2, types.length);
-        if (fType2 == types[0]) {
+        if (fType2 == types[0])
             assertSame("clear context", fType3, types[1]);
-        } else {
+        else {
             assertSame("clear context", fType2, types[1]);
             assertSame("clear context", fType3, types[0]);
         }
@@ -194,11 +194,11 @@ public class TmfEventTypeManagerTest extends TestCase {
         fInstance.clear();
         fInstance.add(fContext1, fType0);
 
-        String[] contexts = fInstance.getContexts();
+        final String[] contexts = fInstance.getContexts();
         assertEquals("add", 1, contexts.length);
         assertEquals("add", fContext1, contexts[0]);
 
-        ITmfEventType[] types = fInstance.getTypes(contexts[0]);
+        final ITmfEventType[] types = fInstance.getTypes(contexts[0]);
         assertEquals("add", 1, types.length);
         assertSame("add", fType0, types[0]);
 
@@ -216,7 +216,7 @@ public class TmfEventTypeManagerTest extends TestCase {
         fInstance.add(fContext2, fType2);
         fInstance.add(fContext2, fType3);
 
-        String[] contexts = fInstance.getContexts();
+        final String[] contexts = fInstance.getContexts();
         Arrays.sort(contexts);
         assertEquals("add", 2, contexts.length);
         assertEquals("add", fContext1, contexts[0]);
@@ -224,18 +224,18 @@ public class TmfEventTypeManagerTest extends TestCase {
 
         ITmfEventType[] types = fInstance.getTypes(fContext1);
         assertEquals("add", 2, types.length);
-        if (fType0 == types[0]) {
+        if (fType0 == types[0])
             assertSame("add", fType1, types[1]);
-        } else {
+        else {
             assertSame("add", fType0, types[1]);
             assertSame("add", fType1, types[0]);
         }
 
         types = fInstance.getTypes(fContext2);
         assertEquals("add", 2, types.length);
-        if (fType2 == types[0]) {
+        if (fType2 == types[0])
             assertSame("add", fType3, types[1]);
-        } else {
+        else {
             assertSame("add", fType2, types[1]);
             assertSame("add", fType3, types[0]);
         }

@@ -37,7 +37,7 @@ public interface ITmfEvent extends Cloneable {
     // ------------------------------------------------------------------------
 
     /**
-     * Pre-defined event attributes 
+     * Pre-defined event attributes
      */
     public static final String EVENT_FIELD_TIMESTAMP = ":timestamp:"; //$NON-NLS-1$
     public static final String EVENT_FIELD_SOURCE    = ":source:";    //$NON-NLS-1$
@@ -92,5 +92,5 @@ public interface ITmfEvent extends Cloneable {
      * @return a clone of the event
      */
     public ITmfEvent clone();
-    
+
 }

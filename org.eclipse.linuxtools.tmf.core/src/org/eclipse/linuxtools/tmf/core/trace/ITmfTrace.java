@@ -32,7 +32,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent, Cloneable
     // ------------------------------------------------------------------------
     // Initializers
     // ------------------------------------------------------------------------
-    
+
     /**
      * Initialize a newly instantiated "empty" trace object. This is used to
      * parameterize an ITmfTrace instantiated with its parameterless constructor.
@@ -123,7 +123,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent, Cloneable
 
     /**
      * Position the trace at the specified location. The null location
-     * is used to indicate that the first trace event. 
+     * is used to indicate that the first trace event.
      * 
      * @param location the trace specific location (null for 1st event)
      * @return a context which can later be used to read the corresponding event
@@ -136,7 +136,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent, Cloneable
      * 
      * The notion of ratio (0.0 <= r <= 1.0) is trace specific and left
      * voluntarily vague. Typically, it would refer to the event proportional
-     * rank or timestamp in the trace file. 
+     * rank or timestamp in the trace file.
      * 
      * @param ratio the proportional 'rank' in the trace
      * @return a context which can later be used to read the corresponding event
@@ -218,5 +218,5 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent, Cloneable
      * @return a clone of the trace
      */
     public ITmfTrace<T> clone() throws CloneNotSupportedException;
-    
+
 }

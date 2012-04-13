@@ -35,7 +35,7 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
      *
      * @param value the timestamp value
      */
-    public TmfSimpleTimestamp(long value) {
+    public TmfSimpleTimestamp(final long value) {
         super(value, 0, 0);
     }
 
@@ -44,7 +44,7 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
      * 
      * @param timestamp the timestamp to copy
      */
-    public TmfSimpleTimestamp(ITmfTimestamp timestamp) {
+    public TmfSimpleTimestamp(final ITmfTimestamp timestamp) {
         if (timestamp == null || timestamp.getScale() != 0 || timestamp.getPrecision() != 0)
             throw new IllegalArgumentException();
         fValue = timestamp.getValue();
@@ -60,10 +60,9 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
      * @see org.eclipse.linuxtools.tmf.core.event.TmfTimestamp#normalize(long, int)
      */
     @Override
-    public ITmfTimestamp normalize(long offset, int scale) throws ArithmeticException {
-        if (scale == 0) {
+    public ITmfTimestamp normalize(final long offset, final int scale) throws ArithmeticException {
+        if (scale == 0)
             return new TmfSimpleTimestamp(fValue + offset);
-        }
         return super.normalize(offset, scale);
     }
 
@@ -71,9 +70,9 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
      * @see org.eclipse.linuxtools.tmf.core.event.TmfTimestamp#compareTo(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp, boolean)
      */
     @Override
-    public int compareTo(ITmfTimestamp ts, boolean withinPrecision) {
+    public int compareTo(final ITmfTimestamp ts, final boolean withinPrecision) {
         if (ts instanceof TmfSimpleTimestamp) {
-            long delta = fValue - ts.getValue();
+            final long delta = fValue - ts.getValue();
             return (delta == 0) ? 0 : (delta > 0) ? 1 : -1;
         }
         return super.compareTo(ts, withinPrecision);
@@ -83,10 +82,9 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
      * @see org.eclipse.linuxtools.tmf.core.event.TmfTimestamp#getDelta(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp)
      */
     @Override
-    public ITmfTimestamp getDelta(ITmfTimestamp ts) {
-        if (ts instanceof TmfSimpleTimestamp) {
+    public ITmfTimestamp getDelta(final ITmfTimestamp ts) {
+        if (ts instanceof TmfSimpleTimestamp)
             return new TmfSimpleTimestamp(fValue - ts.getValue());
-        }
         return super.getDelta(ts);
     }
 
@@ -118,14 +116,14 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
      * @see org.eclipse.linuxtools.tmf.core.event.TmfTimestamp#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(final Object other) {
         if (this == other)
             return true;
         if (other == null)
             return false;
         if (!(other instanceof TmfSimpleTimestamp))
             return super.equals(other);
-        TmfSimpleTimestamp ts = (TmfSimpleTimestamp) other;
+        final TmfSimpleTimestamp ts = (TmfSimpleTimestamp) other;
 
         return compareTo(ts, false) == 0;
     }
