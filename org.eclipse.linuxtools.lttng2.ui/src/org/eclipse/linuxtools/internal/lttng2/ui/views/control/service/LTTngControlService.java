@@ -102,7 +102,11 @@ public class LTTngControlService implements ILttngControlService {
      * Command to add a context to channels and/or events
      */
     private final static String COMMAND_ADD_CONTEXT = CONTROL_COMMAND + " add-context "; //$NON-NLS-1$
-    
+    /**
+     * Command to execute calibrate command to quantify LTTng overhead
+     */
+    private final static String COMMAND_CALIBRATE = CONTROL_COMMAND + " calibrate "; //$NON-NLS-1$
+
     // Command options constants 
     /**
      * Command line option for output path.
@@ -1059,6 +1063,33 @@ public class LTTngControlService implements ILttngControlService {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#calibrate(boolean, org.eclipse.core.runtime.IProgressMonitor)
+     */
+    @Override
+    public void calibrate(boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
+//        String newSessionName = formatParameter(sessionName);
+        StringBuffer command = new StringBuffer(COMMAND_CALIBRATE);
+//
+//        command.append(OPTION_SESSION);
+//        command.append(newSessionName);
+
+        if (isKernel) {
+            command.append(OPTION_KERNEL);
+        } else {
+            command.append(OPTION_UST);
+        }
+
+        command.append(OPTION_FUNCTION_PROBE);
+
+        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
+
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
+        }        
+    }
+    
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------

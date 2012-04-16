@@ -31,6 +31,7 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.BaseEv
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.KernelProviderComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TargetNodeComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceChannelComponent;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceEventComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceProbeEventComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceProviderGroup;
@@ -59,6 +60,7 @@ public class TraceControlTreeModelTest extends TestCase {
 
     private static final String TEST_STREAM = "ListInfoTest.cfg";
     private static final String SCEN_LIST_INFO_TEST = "ListInfoTest";
+    private static final String TARGET_NODE_NAME = "myNode";
     
     // ------------------------------------------------------------------------
     // Test data
@@ -127,7 +129,7 @@ public class TraceControlTreeModelTest extends TestCase {
         IHost host = new Host(new SystemProfile("myProfile", true));
         host.setHostName("127.0.0.1");
 
-        TargetNodeComponent node = new TargetNodeComponent("myNode", root, host, fProxy);
+        TargetNodeComponent node = new TargetNodeComponent(TARGET_NODE_NAME, root, host, fProxy);
 
         root.addChild(node);
         node.connect();
@@ -290,6 +292,9 @@ public class TraceControlTreeModelTest extends TestCase {
         assertNotNull(channels);
         assertEquals(2, channels.length);
 
+        // Verify setters and setters
+        verifyDomainGettersSetters((TraceDomainComponent) domains[0]);
+        
         // ------------------------------------------------------------------------
         // Verify Kernel's channel0
         // ------------------------------------------------------------------------
@@ -336,6 +341,9 @@ public class TraceControlTreeModelTest extends TestCase {
         assertEquals("0xc0101340", probeEvent.getAddress());
         assertNull(probeEvent.getOffset());
         assertNull(probeEvent.getSymbol());
+
+        // verify getters and setter
+        verifyProbeEventGettersSetters(probeEvent);
 
         probeEvent = (TraceProbeEventComponent) channel0Events[3];
         assertEquals("myevent0", probeEvent.getName());
@@ -472,11 +480,44 @@ public class TraceControlTreeModelTest extends TestCase {
         assertNotNull(activeImage);
         assertNotSame(activeImage, inactiveImage);
 
+        ITraceControlComponent[] children = session.getChildren();
+        TraceDomainComponent[] domains = session.getDomains();
+
+        assertEquals(children.length, domains.length);
+
+        for (int i = 0; i < domains.length; i++) {
+            assertEquals(domains[i].getName(), children[i].getName());
+        }
         
         // restore original values      
         session.setName(name);
         session.setSessionPath(origPath);
         session.setSessionState(origState);
+    }
+    
+    private void verifyDomainGettersSetters(TraceDomainComponent domain) {
+        // save original values
+        boolean isKernel = domain.isKernel();
+
+        domain.setIsKernel(false);
+        assertFalse(domain.isKernel());
+        domain.setIsKernel(true);
+        assertTrue(domain.isKernel());
+
+        ITraceControlComponent[] children = domain.getChildren();
+        TraceChannelComponent[] channels = domain.getChannels();
+
+        assertEquals(children.length, channels.length);
+
+        for (int i = 0; i < channels.length; i++) {
+            assertEquals(channels[i].getName(), children[i].getName());
+        }
+
+        String nodeName = domain.getTargetNode().getName();
+        assertEquals(TARGET_NODE_NAME, nodeName);
+
+        // restore original values
+        domain.setIsKernel(isKernel);
     }
 
     private void verifyBaseEventGettersSetters(BaseEventComponent event) {
@@ -544,6 +585,28 @@ public class TraceControlTreeModelTest extends TestCase {
         event.setLogLevel(level);
         event.setEventType(type);
         event.setState(state);
+    }
+    
+    private void verifyProbeEventGettersSetters(TraceProbeEventComponent event) {
+        // save original values
+        String address = event.getAddress();
+        String offset = event.getOffset();
+        String symbol = event.getSymbol();
+        
+        // test cases
+        event.setAddress("0xffff1234");
+        assertEquals("0xffff1234", event.getAddress());
+        
+        event.setOffset("0x1234");
+        assertEquals("0x1234", event.getOffset());
+        
+        event.setSymbol("init");
+        assertEquals("init", event.getSymbol());
+        
+        // restore original values
+        event.setAddress(address);
+        event.setOffset(offset);
+        event.setSymbol(symbol);
     }
     
     private void verifyChannelGettersSetters(TraceChannelComponent channel) {

@@ -157,30 +157,6 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
     
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceInfo#formatString()
-     */
-    @SuppressWarnings("nls")
-    @Override
-    public String formatString() {
-        StringBuffer output = new StringBuffer();
-        //    ust_tests_hello:tptest_sighandler (loglevel: TRACE_DEBUG_MODULE (10)) (type: tracepoint)");
-        output.append("\n      ");
-        output.append(getName());
-        if (fLogLevel != TraceLogLevel.LEVEL_UNKNOWN) {
-            output.append(" (loglevel: ");
-            output.append(fLogLevel.getInName());
-            output.append(" (");
-            output.append(fLogLevel.ordinal());
-            output.append("))");
-        }
-        output.append(" (type: ");
-        output.append(fEventType.getInName());
-        output.append(')');
-        return output.toString();
-    }
-    
-    /*
-     * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceInfo#hashCode()
      */
     @Override

@@ -14,7 +14,10 @@ package org.eclipse.linuxtools.lttng2.ui.tests.control.service;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -62,6 +65,9 @@ public class LTTngControlServiceTest extends TestCase {
     private static final String SCEN_DESTROY_SESSION1 = "DestroySession1";
     private static final String SCEN_CHANNEL_HANDLING = "ChannelHandling";
     private static final String SCEN_EVENT_HANDLING = "EventHandling";
+    private static final String SCEN_CONTEXT_HANDLING = "ContextHandling";
+    private static final String SCEN_CONTEXT_ERROR_HANDLING = "ContextErrorHandling";
+    private static final String SCEN_CALIBRATE_HANDLING = "CalibrateHandling";
 
     // ------------------------------------------------------------------------
     // Test data
@@ -652,6 +658,93 @@ public class LTTngControlServiceTest extends TestCase {
         } catch (ExecutionException e) {
             fail(e.toString());
         }
+    }
+    
+    public void testAddContext() {
+        try {
+            // 1) session name, channel = null, 3 event names, kernel
+            String sessionName = "mysession2";
+            String channelName = "mychannel";
+            String eventName = "ust_tests_hello:tptest_sighandler";
+            List<String> contexts = new ArrayList<String>();
+            contexts.add("prio");
+            contexts.add("pid");
+
+            fShell.setScenario(SCEN_CONTEXT_HANDLING);
+
+            List<String> availContexts = fService.getContextList(new NullProgressMonitor());
+            assertNotNull(availContexts);
+            assertEquals(12, availContexts.size());
+
+            // A very "hard-coded" way to verify but it works ...  
+            Set<String> expectedContexts = new HashSet<String>();
+            expectedContexts.add("pid");
+            expectedContexts.add("procname");
+            expectedContexts.add("prio");
+            expectedContexts.add("nice");
+            expectedContexts.add("vpid");
+            expectedContexts.add("tid");
+            expectedContexts.add("pthread_id");
+            expectedContexts.add("vtid");
+            expectedContexts.add("ppid");
+            expectedContexts.add("vppid");
+            expectedContexts.add("perf:cpu-cycles");
+            expectedContexts.add("perf:cycles");
+            
+            assertTrue(expectedContexts.containsAll(availContexts));
+            
+            // 1) session name, channel = null, event name, loglevel-only, TRACE_DEBUG
+            fService.addContexts(sessionName, channelName, eventName, false, contexts, new NullProgressMonitor());
+
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+
+    public void testAddContextFailure() {
+
+        // 1) session name, channel = null, 3 event names, kernel
+        String sessionName = "mysession2";
+        String channelName = "mychannel";
+        String eventName = "ust_tests_hello:tptest_sighandler";
+        List<String> contexts = new ArrayList<String>();
+        contexts.add("prio");
+        contexts.add("pid");
+        fShell.setScenario(SCEN_CONTEXT_ERROR_HANDLING);
+        try {
+            fService.getContextList(new NullProgressMonitor());
+            fail("No exeption generated");
+        } catch (ExecutionException e) {
+            // success
+        } 
+        try {
+            // 1) session name, channel = null, event name, loglevel-only, TRACE_DEBUG
+            fService.addContexts(sessionName, channelName, eventName, false, contexts, new NullProgressMonitor());
+            fail("No exeption generated");
+        } catch (ExecutionException e) {
+            // success
+        } 
+    }
+
+    public void testCalibrate() {
+        try {
+            fShell.setScenario(SCEN_CALIBRATE_HANDLING);
+            fService.calibrate(true, new NullProgressMonitor());
+
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+
+    public void testCalibrateFailure() {
+
+        try {
+            fShell.setScenario(SCEN_CALIBRATE_HANDLING);
+            fService.calibrate(false, new NullProgressMonitor());
+            fail("No exeption generated");
+        } catch (ExecutionException e) {
+            // success
+        } 
     }
     
 }

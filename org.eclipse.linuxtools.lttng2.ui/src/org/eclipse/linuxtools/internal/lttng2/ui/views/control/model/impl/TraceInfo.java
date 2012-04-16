@@ -79,15 +79,6 @@ public class TraceInfo implements ITraceInfo {
     
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceInfo#formatString()
-     */
-    @Override
-    public String formatString() {
-        return toString();
-    }
-    
-    /*
-     * (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
     @Override

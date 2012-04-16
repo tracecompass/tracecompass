@@ -122,30 +122,7 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-    
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceInfo#formatString()
-     */
-    @SuppressWarnings("nls")
-    @Override
-    public String formatString() {
-        StringBuffer output = new StringBuffer();
-        //PID: 9379 - Name: /home/user/git/lttng-ust/tests/hello.cxx/.libs/lt-hello
-        output.append("\nPID: ");
-        output.append(fPid);
-        output.append(" - Name: ");
-        output.append(getName());
-        for (Iterator<IBaseEventInfo> iterator = fEvents.iterator(); iterator.hasNext();) {
-            IBaseEventInfo event = (IBaseEventInfo) iterator.next();
-            output.append(event.formatString());
-        }
-        output.append("\n");
 
-        return output.toString();
-    }
-
-    
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceInfo#hashCode()

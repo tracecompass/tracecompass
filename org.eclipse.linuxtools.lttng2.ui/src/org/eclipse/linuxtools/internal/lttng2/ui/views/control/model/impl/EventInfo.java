@@ -74,22 +74,6 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceInfo#formatString()
-     */
-    @SuppressWarnings("nls")
-    @Override
-    public String formatString() {
-        StringBuffer output = new StringBuffer();
-        //    ust_tests_hello:tptest_sighandler (loglevel: TRACE_DEBUG_MODULE (10)) (type: tracepoint) [enabled]");
-        output.append(super.formatString());
-        output.append(" [");
-        output.append(fState.getInName());
-        output.append(']');
-        return output.toString();
-    }
-
-    /*
-     * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IEventInfo#setState(java.lang.String)
      */
     @Override

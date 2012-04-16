@@ -289,4 +289,21 @@ public class TraceDomainComponent extends TraceControlComponent {
     public void addContexts(List<String> contexts, IProgressMonitor monitor) throws ExecutionException {
         getControlService().addContexts(getSessionName(), null, null, isKernel(), contexts, monitor);
     }
+
+    /**
+     * Executes calibrate command to quantify LTTng overhead.
+     * @throws ExecutionException
+     */
+    public void calibrate() throws ExecutionException {
+        calibrate(new NullProgressMonitor());
+    }
+
+    /**
+     * Executes calibrate command to quantify LTTng overhead.
+     * @param monitor - a progress monitor
+     * @throws ExecutionException
+     */
+    public void calibrate(IProgressMonitor monitor) throws ExecutionException {
+        getControlService().calibrate(isKernel(), monitor);
+    }
 }

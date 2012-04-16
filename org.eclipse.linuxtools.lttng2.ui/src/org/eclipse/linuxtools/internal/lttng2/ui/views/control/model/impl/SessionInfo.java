@@ -158,33 +158,6 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
     public void addDomain(IDomainInfo domainInfo) {
         fDomains.add(domainInfo);
     }
-
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceInfo#formatString()
-     */
-    @Override
-    @SuppressWarnings("nls")
-    public String formatString() {
-        StringBuffer output = new StringBuffer();
-        // Tracing session mysession: [active]
-        output.append("Tracing session ");
-        output.append(getName());
-        output.append(": [");
-        output.append(getSessionState().getInName());
-        output.append("]\n");
-        
-        //    Trace path: /home/user/lttng-traces/mysession-20120129-084256
-        output.append("    Trace path: ");
-        output.append(getSessionPath());
-        output.append('\n');
-        
-        for (Iterator<IDomainInfo> iterator = fDomains.iterator(); iterator.hasNext();) {
-            IDomainInfo domain = (IDomainInfo) iterator.next();
-            output.append(domain.formatString());
-        }
-        return output.toString();
-    }
     
     /*
      * (non-Javadoc)

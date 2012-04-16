@@ -49,7 +49,7 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
     /**
      * The icon file for this dialog box.
      */
-    public static final String ADD_CONTEXT_ICON_FILE = "icons/elcl16/edit.gif"; //$NON-NLS-1$ 
+    public static final String ADD_CONTEXT_ICON_FILE = "icons/elcl16/add-context.gif"; //$NON-NLS-1$ 
 
     // ------------------------------------------------------------------------
     // Attributes

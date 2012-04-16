@@ -22,6 +22,7 @@ import junit.framework.TestSuite;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.linuxtools.internal.lttng2.stubs.dialogs.AddContextDialogStub;
 import org.eclipse.linuxtools.internal.lttng2.stubs.dialogs.CreateChannelDialogStub;
 import org.eclipse.linuxtools.internal.lttng2.stubs.dialogs.CreateSessionDialogStub;
 import org.eclipse.linuxtools.internal.lttng2.stubs.dialogs.DestroyConfirmDialogStub;
@@ -49,7 +50,7 @@ import org.junit.Before;
 import org.osgi.framework.FrameworkUtil;
 
 /**
- * The class <code>TraceControlKernelSessionTests</code> contains UST session/channel/event
+ * The class <code>TraceControlKernelSessionTests</code> contains Kernel session/channel/event
  * handling test cases.
  */
 
@@ -689,6 +690,85 @@ public class TraceControlKernelSessionTests extends TestCase {
         assertEquals("0x2000", probeEvent.getOffset());
         assertNull(null, probeEvent.getAddress());
         assertEquals("create_dev", probeEvent.getSymbol());
+
+        // ------------------------------------------------------------------------
+        // Add Context on domain  
+        // ------------------------------------------------------------------------
+        // Get Kernel domain component instance
+        domains = session.getChildren();
+        assertNotNull(domains);
+        assertEquals(1, domains.length);
+
+        AddContextDialogStub addContextStub = new AddContextDialogStub();
+        List<String> contexts = new ArrayList<String>();
+        contexts.add("prio");
+        contexts.add("perf:branch-misses");
+        contexts.add("perf:cache-misses");
+        addContextStub.setContexts(contexts);
+        TraceControlDialogFactory.getInstance().setAddContextDialog(addContextStub);
+        
+        fFacility.executeCommand(domains[0], "addContextOnDomain");
+        // Currently there is nothing to verify because the list commands don't show any context information
+        // However, the execution of the command make sure that the correct service command line is build and executed.
+
+        // ------------------------------------------------------------------------
+        // Add Context on channel  
+        // ------------------------------------------------------------------------
+
+        // Get Kernel domain component instance
+        domains = session.getChildren();
+        assertNotNull(domains);
+        assertEquals(1, domains.length);
+
+        //Verify that channel was created with correct data
+        channels =  domains[0].getChildren();
+        channel = (TraceChannelComponent) channels[0]; 
+        
+        try {
+            // The setContext() verifies that the contexts set are part of the available contexts
+            // The available contexts are set by the command handler addContextOnDomain above.
+            // So we indirectly test here that the parsing and setting of available contexts were
+            // done correctly above.
+            addContextStub.setContexts(contexts);
+        } catch (IllegalArgumentException e) {
+            fail("Exception caught - unknown context");
+        }
+
+        fFacility.executeCommand(channel, "addContextOnChannel");
+        // Currently there is nothing to verify because the list commands don't show any context information
+        // However, the execution of the command make sure that the correct service command line is build and executed.
+        
+        // ------------------------------------------------------------------------
+        // Add Context on event  
+        // ------------------------------------------------------------------------
+        // Get Kernel domain component instance
+        domains = session.getChildren();
+        assertNotNull(domains);
+        assertEquals(1, domains.length);
+
+        //Verify that channel was created with correct data
+        channels =  domains[0].getChildren();
+        channel = (TraceChannelComponent) channels[2]; 
+        
+        channel0Events = channel.getChildren();
+
+        event = (TraceEventComponent) channel0Events[6];
+        
+        fFacility.executeCommand(event, "addContextOnEvent");
+        // Currently there is nothing to verify because the list commands don't show any context information
+        // However, the execution of the command make sure that the correct service command line is build and executed.        
+
+        // ------------------------------------------------------------------------
+        // Calibrate  
+        // ------------------------------------------------------------------------
+        // Get Kernel domain component instance
+        domains = session.getChildren();
+        assertNotNull(domains);
+        assertEquals(1, domains.length);
+        
+        fFacility.executeCommand(domains[0], "calibrate");
+        // There is nothing to verify here. 
+        // However, the execution of the command make sure that the correct service command line is build and executed.
         
         // ------------------------------------------------------------------------
         // refresh 
@@ -707,7 +787,7 @@ public class TraceControlKernelSessionTests extends TestCase {
         fProxy.setScenario(TraceControlTestFacility.SCEN_SCENARIO_SESSION_HANDLING);
         
         session = (TraceSessionComponent)groups[1].getChildren()[0];
-        
+
         // ------------------------------------------------------------------------
         // start session 
         // ------------------------------------------------------------------------

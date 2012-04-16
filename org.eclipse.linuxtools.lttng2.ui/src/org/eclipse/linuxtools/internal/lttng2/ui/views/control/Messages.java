@@ -70,8 +70,12 @@ final public class Messages extends NLS {
     
     public static String TraceControl_GetContextJob;
     public static String TraceControl_GetContextFailure;
+    
     public static String TraceControl_AddContextJob;
     public static String TraceControl_AddContextFailure;
+    
+    public static String TraceControl_AddCalibrateJob;
+    public static String TraceControl_AddCalibrateFailure;
     
     // Dialogs
     public static String TraceControl_NewDialogTitle;
