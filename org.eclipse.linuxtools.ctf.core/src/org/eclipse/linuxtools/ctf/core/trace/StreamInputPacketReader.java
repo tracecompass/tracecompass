@@ -19,7 +19,6 @@ import java.util.HashMap;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
-import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
@@ -27,13 +26,16 @@ import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDefinition;
+import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
 
 /**
  * <b><u>StreamInputPacketReader</u></b>
  * <p>
  * Reads the events of a packet of a trace file.
  */
-public class StreamInputPacketReader implements IDefinitionScope {
+class StreamInputPacketReader implements IDefinitionScope {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -108,7 +110,7 @@ public class StreamInputPacketReader implements IDefinitionScope {
         /*
          * Set the BitBuffer's byte order.
          */
-        getBitBuffer().setByteOrder(streamInputReader.getStreamInput().getStream().getTrace().getByteOrder());
+        getBitBuffer().setByteOrder(streamInputReader.getByteOrder());
 
         /*
          * Create definitions needed to read the events.
@@ -224,8 +226,8 @@ public class StreamInputPacketReader implements IDefinitionScope {
             MappedByteBuffer bb = null;
             try {
                 bb = getStreamInputReader().getStreamInput().getFileChannel().map(
-                        MapMode.READ_ONLY, this.currentPacket.offsetBytes,
-                        (this.currentPacket.packetSizeBits + 7) / 8);
+                        MapMode.READ_ONLY, this.currentPacket.getOffsetBytes(),
+                        (this.currentPacket.getPacketSizeBits() + 7) / 8);
             } catch (IOException e) {
                 /*
                  * The streamInputReader object is already allocated, so this
@@ -258,7 +260,7 @@ public class StreamInputPacketReader implements IDefinitionScope {
              * Use the timestamp begin of the packet as the reference for the
              * timestamp reconstitution.
              */
-            lastTimestamp = currentPacket.timestampBegin;
+            lastTimestamp = currentPacket.getTimestampBegin();
         } else {
             getBitBuffer().setByteBuffer(null);
 
@@ -273,7 +275,7 @@ public class StreamInputPacketReader implements IDefinitionScope {
      */
     public boolean hasMoreEvents() {
         if (currentPacket != null) {
-            return getBitBuffer().position() < currentPacket.contentSizeBits;
+            return getBitBuffer().position() < currentPacket.getContentSizeBits();
         }
         return false;
     }

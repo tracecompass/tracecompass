@@ -12,8 +12,8 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
-import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 
 /**
  * <b><u>SequenceDefinition</u></b>
@@ -37,17 +37,17 @@ public class SequenceDefinition extends Definition {
             IDefinitionScope definitionScope, String fieldName) throws CTFReaderException {
         super(definitionScope, fieldName);
         Definition lenDef = null;
-        
+
         this.declaration = declaration;
 
         if (definitionScope != null) {
             lenDef = definitionScope.lookupDefinition(declaration.getLengthName());
         }
 
-         if (lenDef == null) { 
+         if (lenDef == null) {
              throw new CTFReaderException("Sequence length field not found"); //$NON-NLS-1$
          }
-        
+
          if (!(lenDef instanceof IntegerDefinition)) {
              throw new CTFReaderException("Sequence length field not integer"); //$NON-NLS-1$
          }

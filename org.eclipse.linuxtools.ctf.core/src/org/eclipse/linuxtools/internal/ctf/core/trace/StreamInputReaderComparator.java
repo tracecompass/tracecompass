@@ -10,24 +10,27 @@
  * Contributors: Simon Marchi - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.ctf.core.trace;
+package org.eclipse.linuxtools.internal.ctf.core.trace;
 
 import java.io.Serializable;
 import java.util.Comparator;
 
+import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
+
+
 /**
- * <b><u>StreamInputReaderTimestampComparator</u></b>
+ * <b><u>StreamInputReaderComparator</u></b>
  * <p>
- * Compares two StreamInputReader by their timestamp (smaller comes before).
+ * TODO Implement me. Please.
  */
-public class StreamInputReaderTimestampComparator implements
+public class StreamInputReaderComparator implements
         Comparator<StreamInputReader>, Serializable {
 
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
 
-    private static final long serialVersionUID = 1066434959451875045L;
+    private static final long serialVersionUID = 7477206132343139753L;
 
     // ------------------------------------------------------------------------
     // Operations
@@ -36,12 +39,6 @@ public class StreamInputReaderTimestampComparator implements
     @Override
     public int compare(StreamInputReader a, StreamInputReader b) {
         // TODO: use unsigned comparison to avoid sign errors if needed
-        if (a.getCurrentEvent() == null) {
-            return 0;
-        }
-        if (b.getCurrentEvent() == null) {
-            return 0;
-        }
         long ta = a.getCurrentEvent().timestamp;
         long tb = b.getCurrentEvent().timestamp;
 

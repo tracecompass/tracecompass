@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
-import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 
 /**
  * <b><u>Definition</u></b>

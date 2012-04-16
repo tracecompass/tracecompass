@@ -19,6 +19,11 @@ import java.util.Vector;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.internal.ctf.core.Activator;
+import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInput;
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputReaderTimestampComparator;
+
 /**
  * Reads the events of a trace.
  */
@@ -59,6 +64,13 @@ public class CTFTraceReader {
      */
     private long endTime;
 
+    /**
+     * Current event index
+     */
+    private long index;
+
+    private final long startIndex[];
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -88,6 +100,11 @@ public class CTFTraceReader {
          */
         this.startTime = prio.peek().getCurrentEvent().timestamp;
         this.endTime = this.startTime;
+        this.index = 0;
+        startIndex = new long[prio.size()];
+        for (int i = 0; i < prio.size(); i++) {
+            startIndex[i] = 0;
+        }
     }
 
     /**
@@ -113,6 +130,13 @@ public class CTFTraceReader {
      */
     public long getStartTime() {
         return this.startTime;
+    }
+
+    /**
+     * @return the index
+     */
+    public long getIndex() {
+        return index;
     }
 
     // ------------------------------------------------------------------------
@@ -193,7 +217,7 @@ public class CTFTraceReader {
      *         of the trace.
      */
     public EventDefinition getCurrentEventDef() {
-        StreamInputReader top = this.prio.peek();
+        StreamInputReader top = getTopStream();
 
         return (top != null) ? top.getCurrentEvent() : null;
     }
@@ -205,6 +229,9 @@ public class CTFTraceReader {
      */
     public boolean advance() {
         /*
+         * Index the
+         */
+        /*
          * Remove the reader from the top of the priority queue.
          */
         StreamInputReader top = this.prio.poll();
@@ -215,7 +242,21 @@ public class CTFTraceReader {
         if (top == null) {
             return false;
         }
-
+        /*
+         * index if needed
+         */
+        if (hasMoreEvents()) {
+            StreamInputPacketReader packetReader = top.getPacketReader();
+            boolean packetHasMoreEvents = packetReader.hasMoreEvents();
+            StreamInputPacketIndexEntry currentPacket = packetReader
+                    .getCurrentPacket();
+            if (!packetHasMoreEvents) {
+                int n = this.streamInputReaders.indexOf(top);
+                currentPacket.setIndexBegin(startIndex[n]);
+                currentPacket.setIndexEnd(index);
+                startIndex[n] = index + 1;
+            }
+        }
         /*
          * Read the next event of this reader.
          */
@@ -227,13 +268,18 @@ public class CTFTraceReader {
             final long topEnd = top.getCurrentEvent().timestamp;
             this.endTime = Math.max(topEnd, this.endTime);
             this.eventCountPerTraceFile[top.getName()]++;
+            /*
+             * increment the index
+             */
+            index++;
         }
+        boolean hasMoreEvents = hasMoreEvents();
 
         /*
          * If there is no reader in the queue, it means the trace reader reached
          * the end of the trace.
          */
-        return hasMoreEvents();
+        return hasMoreEvents;
     }
 
     /**
@@ -243,7 +289,6 @@ public class CTFTraceReader {
      */
     public void goToLastEvent() throws CTFReaderException {
 
-        this.seek(0);
         for (StreamInputReader streamInputReader : this.streamInputReaders) {
             /*
              * Seek the trace reader.
@@ -251,7 +296,7 @@ public class CTFTraceReader {
             streamInputReader.goToLastEvent();
         }
         int count = prio.size();
-        for (int i = 0; i < (count); i++) {
+        for (int i = 0; i < (count-1); i++) {
             advance();
         }
     }
@@ -272,22 +317,91 @@ public class CTFTraceReader {
          * Remove all the trace readers from the priority queue
          */
         this.prio.clear();
-
+        index = 0;
+        long offset = 0;
         for (StreamInputReader streamInputReader : this.streamInputReaders) {
             /*
              * Seek the trace reader.
              */
-            streamInputReader.seek(timestamp);
+            offset += streamInputReader.seek(timestamp);
 
             /*
              * Add it to the priority queue if there is a current event.
              */
+
+        }
+        for (StreamInputReader streamInputReader : this.streamInputReaders) {
+            if (streamInputReader.getCurrentEvent() != null) {
+                this.prio.add(streamInputReader);
+                index = Math.max(index, streamInputReader.getPacketReader()
+                        .getCurrentPacket().getIndexBegin()
+                        + offset);
+            }
+        }
+        return hasMoreEvents();
+    }
+
+    public boolean seekIndex(long index) {
+        this.prio.clear();
+
+        long tempIndex = Long.MIN_VALUE;
+        long tempTimestamp = Long.MIN_VALUE;
+        try {
+            for (StreamInputReader streamInputReader : this.streamInputReaders) {
+                /*
+                 * Seek the trace reader.
+                 */
+                final long streamIndex = streamInputReader.seekIndex(index);
+                tempIndex = Math.max(tempIndex, streamIndex);
+                tempTimestamp = Math.max(tempTimestamp,
+                        streamInputReader.getCurrentEvent().timestamp);
+
+            }
+        } catch (CTFReaderException e) {
+            /*
+             * Important, if it failed, it's because it's not yet indexed, so we
+             * have to manually advance to the right value.
+             */
+            for (StreamInputReader streamInputReader : this.streamInputReaders) {
+                /*
+                 * Seek the trace reader.
+                 */
+                streamInputReader.seek(0);
+            }
+            tempIndex = 0;
+        }
+        for (StreamInputReader streamInputReader : this.streamInputReaders) {
+            /*
+             * Add it to the priority queue if there is a current event.
+             */
+
             if (streamInputReader.getCurrentEvent() != null) {
                 this.prio.add(streamInputReader);
             }
         }
+        if (tempIndex == Long.MAX_VALUE) {
+            tempIndex = 0;
+        }
+        long pos = tempIndex;
+        if (index > tempIndex) {
+            /*
+             * advance for offset
+             */
+            while ((prio.peek().getCurrentEvent().timestamp < tempTimestamp)
+                    && hasMoreEvents()) {
+                this.advance();
+            }
 
+            for (pos = tempIndex; (pos < index) && hasMoreEvents(); pos++) {
+                this.advance();
+            }
+        }
+        this.index = pos;
         return hasMoreEvents();
+    }
+
+    public StreamInputReader getTopStream() {
+        return this.prio.peek();
     }
 
     /**
@@ -328,8 +442,7 @@ public class CTFTraceReader {
             int len = (width * this.eventCountPerTraceFile[se.getName()])
                     / numEvents;
 
-            StringBuilder sb = new StringBuilder(
-                    se.getStreamInput().getFilename() + "\t["); //$NON-NLS-1$
+            StringBuilder sb = new StringBuilder(se.getFilename() + "\t["); //$NON-NLS-1$
 
             for (int i = 0; i < len; i++) {
                 sb.append('+');
@@ -355,8 +468,8 @@ public class CTFTraceReader {
         result = (prime * result) + (int) (endTime ^ (endTime >>> 32));
         result = (prime * result) + (int) (startTime ^ (startTime >>> 32));
         result = (prime * result)
-                + ((streamInputReaders == null) ? 0
-                        : streamInputReaders.hashCode());
+                + ((streamInputReaders == null) ? 0 : streamInputReaders
+                        .hashCode());
         result = (prime * result) + ((trace == null) ? 0 : trace.hashCode());
         return result;
     }

@@ -6,7 +6,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 
 public class CtfIterator extends CTFTraceReader implements ITmfContext,
-        Comparable<CtfIterator> {
+Comparable<CtfIterator> {
 
     private final CtfTmfTrace ctfTmfTrace;
 
@@ -19,7 +19,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
      *
      * @param trace
      */
-    public CtfIterator(CtfTmfTrace trace) {
+    public CtfIterator(final CtfTmfTrace trace) {
         super(trace.getCTFTrace());
         this.ctfTmfTrace = trace;
 
@@ -28,14 +28,13 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
         this.curRank = 0;
     }
 
-    public CtfIterator(CtfTmfTrace trace, long timestampValue, long rank) {
+    public CtfIterator(final CtfTmfTrace trace, final long timestampValue, final long rank) {
         super(trace.getCTFTrace());
         this.ctfTmfTrace = trace;
-        this.curLocation = (new CtfLocation(
-                this.getCurrentEvent().getTimestampValue()));
-        if (this.getCurrentEvent().getTimestampValue() != timestampValue) {
+        this.curLocation = (new CtfLocation(this.getCurrentEvent()
+                .getTimestampValue()));
+        if (this.getCurrentEvent().getTimestampValue() != timestampValue)
             this.seek(timestampValue);
-        }
 
         this.curRank = rank;
     }
@@ -45,36 +44,43 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
     }
 
     public CtfTmfEvent getCurrentEvent() {
-        StreamInputReader top = super.prio.peek();
-        if (top != null) {
-            return new CtfTmfEvent(top.getCurrentEvent(), top, ctfTmfTrace);
-        }
+        final StreamInputReader top = super.prio.peek();
+        if (top != null)
+            return new CtfTmfEvent(top.getCurrentEvent(), top.getFilename(), ctfTmfTrace);
         return null;
     }
 
     @Override
-    public boolean seek(long timestamp) {
+    public boolean seek(final long timestamp) {
         boolean ret = false;
-        ret = super.seek(timestamp);
+        final long offsetTimestamp = timestamp - this.getCtfTmfTrace().getCTFTrace().getOffset();
+        if( offsetTimestamp < 0 )
+            ret = super.seek(timestamp);
+        else
+            ret = super.seek(offsetTimestamp);
 
-        if (ret) {
+        if (ret)
             curLocation.setLocation(getCurrentEvent().getTimestampValue());
-        }
+        return ret;
+    }
+
+    public boolean seekRank(final long rank) {
+        boolean ret = false;
+        ret = super.seekIndex(rank);
+
+        if (ret)
+            curLocation.setLocation(getCurrentEvent().getTimestampValue());
         return ret;
     }
 
     @Override
     public long getRank() {
-        final CtfTmfEvent current = getCurrentEvent();
-        if (current != null) {
-            return getCurrentEvent().getRank();
-        }
-        return 0;
+        return super.getIndex();
     }
 
     @Override
-    public void setRank(long rank) {
-        // FIXME NYI
+    public void setRank(final long rank) {
+        seekRank(rank);
     }
 
     /*
@@ -85,8 +91,8 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
     @Override
     public CtfIterator clone() {
         CtfIterator clone = null;
-        clone = new CtfIterator(ctfTmfTrace,
-                this.getCurrentEvent().getTimestampValue(), curRank);
+        clone = new CtfIterator(ctfTmfTrace, this.getCurrentEvent()
+                .getTimestampValue(), curRank);
         return clone;
     }
 
@@ -97,9 +103,10 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
     }
 
     @Override
-    public void setLocation(ITmfLocation<?> location) {
+    public void setLocation(final ITmfLocation<?> location) {
         // FIXME alex: isn't there a cleaner way than a cast here?
         this.curLocation = (CtfLocation) location;
+        seek(((CtfLocation)location).getLocation());
     }
 
     @Override
@@ -107,6 +114,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
         return curLocation;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void increaseRank() {
         curRank++;
@@ -114,7 +122,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
 
     @Override
     public boolean hasValidRank() {
-        return true;
+        return (getRank() > -1);
     }
 
     @Override
@@ -123,12 +131,11 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
     }
 
     @Override
-    public int compareTo(CtfIterator o) {
-        if (this.getRank() < o.getRank()) {
+    public int compareTo(final CtfIterator o) {
+        if (this.getRank() < o.getRank())
             return -1;
-        } else if (this.getRank() > o.getRank()) {
+        else if (this.getRank() > o.getRank())
             return 1;
-        }
         return 0;
     }
 

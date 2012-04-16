@@ -7,7 +7,6 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
-import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDefinition;
@@ -21,7 +20,7 @@ import org.eclipse.linuxtools.ctf.core.tests.TestParams;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
-
+import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +28,7 @@ import org.junit.Test;
 /**
  * The class <code>StructDefinitionTest</code> contains tests for the class
  * <code>{@link StructDefinition}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -41,7 +40,7 @@ public class StructDefinitionTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -51,8 +50,8 @@ public class StructDefinitionTest {
 
     /**
      * Perform pre-test initialization.
-     * 
-     * @throws CTFReaderException 
+     *
+     * @throws CTFReaderException
      */
     @Before
     public void setUp() throws CTFReaderException {
@@ -104,7 +103,7 @@ public class StructDefinitionTest {
      */
     @Test
     public void testLookupDefinition() {
-        String lookupPath = "id"; //$NON-NLS-1$
+        String lookupPath = "args"; //$NON-NLS-1$
         Definition result = fixture.lookupDefinition(lookupPath);
 
         assertNotNull(result);
@@ -127,7 +126,7 @@ public class StructDefinitionTest {
      */
     @Test
     public void testLookupInteger_1() {
-        String name = "id"; //$NON-NLS-1$
+        String name = "_args"; //$NON-NLS-1$
         IntegerDefinition result = fixture.lookupInteger(name);
 
         assertNotNull(result);

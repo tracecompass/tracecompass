@@ -12,10 +12,13 @@
 
 package org.eclipse.linuxtools.ctf.core.trace;
 
+import java.nio.ByteOrder;
 import java.util.ListIterator;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInput;
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
 
 /**
  * <b><u>StreamInputReader</u></b>
@@ -88,8 +91,8 @@ public class StreamInputReader {
         return this.packetReader.getStreamPacketContextDef();
     }
 
-    public StreamInput getStreamInput() {
-        return this.streamInput;
+    public ByteOrder getByteOrder() {
+        return streamInput.getStream().getTrace().getByteOrder();
     }
 
     public int getName() {
@@ -102,6 +105,17 @@ public class StreamInputReader {
 
     public int getCPU() {
         return this.packetReader.getCPU();
+    }
+
+    public String getFilename() {
+        return streamInput.getFilename();
+    }
+
+    /*
+     * for internal use only
+     */
+    StreamInput getStreamInput() {
+        return streamInput;
     }
 
     // ------------------------------------------------------------------------
@@ -140,8 +154,9 @@ public class StreamInputReader {
      * Change the current packet of the packet reader to the next one.
      */
     private void goToNextPacket() {
-        if (this.packetIndexIt.hasNext()) {
-            this.packetReader.setCurrentPacket(this.packetIndexIt.next());
+        if (getPacketIndexIt().hasNext()) {
+            StreamInputPacketIndexEntry nextPacket = getPacketIndexIt().next();
+            this.packetReader.setCurrentPacket(nextPacket);
         } else {
             this.packetReader.setCurrentPacket(null);
         }
@@ -154,7 +169,8 @@ public class StreamInputReader {
      * @param timestamp
      *            The timestamp to seek to.
      */
-    public void seek(long timestamp) {
+    public long seek(long timestamp) {
+        long offset = 0;
         /*
          * Search in the index for the packet to search in.
          */
@@ -175,24 +191,81 @@ public class StreamInputReader {
         while (!done && (this.getCurrentEvent().timestamp < timestamp)) {
             readNextEvent();
             done = (this.getCurrentEvent() == null);
+            offset++;
         }
+        return offset;
+    }
+
+    public long seekIndex(long index) throws CTFReaderException {
+        /*
+         * Search in the index for the packet to search in.
+         */
+        this.packetIndexIt = this.streamInput.getIndex().searchIndex(index);
+        /*
+         * Switch to this packet.
+         */
+        goToNextPacket();
+        /*
+         * Read the first packet
+         */
+        readNextEvent();
+        /*
+         * get the current index
+         */
+        if (this.packetReader.getCurrentPacket() == null) {
+            throw new CTFReaderException(
+                    "Current packet null in index seek, did you index your trace yet?");
+        }
+        return this.packetReader.getCurrentPacket().getIndexBegin();
+
     }
 
     public void goToLastEvent() throws CTFReaderException {
         /*
          * Search in the index for the packet to search in.
          */
-        this.packetIndexIt = this.streamInput.getIndex().search(Long.MAX_VALUE);
+        int len = this.streamInput.getIndex().getEntries().size();
+        int back = 0;
+        long desired_timestamp = -1;
+        do {
+            back++;
+            StreamInputPacketIndexEntry entry = this.streamInput.getIndex()
+                    .getEntries().get(len - back);
+            desired_timestamp = entry.getTimestampBegin() + 1;
+            seek(desired_timestamp);
+
+        } while (!this.packetReader.hasMoreEvents());
         /*
          * Go until the end of that packet
          */
+
+        int packet_size = 0;
         while (this.packetReader.hasMoreEvents()) {
+            this.packetReader.readNextEvent();
+            packet_size++;
+        }
+        seek(desired_timestamp);
+        for (int i = 0; i < (packet_size - 1); i++) {
             this.packetReader.readNextEvent();
         }
     }
 
     public void setCurrentEvent(EventDefinition currentEvent) {
         this.currentEvent = currentEvent;
+    }
+
+    /**
+     * @return the packetIndexIt
+     */
+    private ListIterator<StreamInputPacketIndexEntry> getPacketIndexIt() {
+        return packetIndexIt;
+    }
+
+    /**
+     * @return the packetReader
+     */
+    public StreamInputPacketReader getPacketReader() {
+        return packetReader;
     }
 
 }

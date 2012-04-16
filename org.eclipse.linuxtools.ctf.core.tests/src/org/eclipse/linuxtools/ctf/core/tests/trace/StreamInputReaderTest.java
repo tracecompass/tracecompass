@@ -13,9 +13,9 @@ import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.tests.TestParams;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
-import org.eclipse.linuxtools.ctf.core.trace.Stream;
-import org.eclipse.linuxtools.ctf.core.trace.StreamInput;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
+import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInput;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +23,7 @@ import org.junit.Test;
 /**
  * The class <code>StreamInputReaderTest</code> contains tests for the class
  * <code>{@link StreamInputReader}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -33,7 +33,7 @@ public class StreamInputReaderTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -43,8 +43,8 @@ public class StreamInputReaderTest {
 
     /**
      * Perform pre-test initialization.
-     * 
-     * @throws CTFReaderException 
+     *
+     * @throws CTFReaderException
      */
     @Before
     public void setUp() throws CTFReaderException {
@@ -92,7 +92,7 @@ public class StreamInputReaderTest {
     /**
      * Run the StreamInputReader(StreamInput) constructor test, with an invalid
      * trace.
-     * 
+     *
      * @throws CTFReaderException
      */
     @Test(expected = CTFReaderException.class)
@@ -141,17 +141,8 @@ public class StreamInputReaderTest {
     }
 
     /**
-     * Run the StreamInput getStreamInput() method test.
-     */
-    @Test
-    public void testGetStreamInput() {
-        StreamInput result = fixture.getStreamInput();
-        assertNotNull(result);
-    }
-
-    /**
      * Run the void goToLastEvent() method test.
-     * 
+     *
      * @throws CTFReaderException
      */
     @Test
@@ -180,8 +171,8 @@ public class StreamInputReaderTest {
     /**
      * Run the seek test. Seek by passing an EventDefinition to which we've
      * given the timestamp we want.
-     * 
-     * @throws CTFReaderException 
+     *
+     * @throws CTFReaderException
      */
     @Test
     public void testSeek_eventDefinition() throws CTFReaderException {

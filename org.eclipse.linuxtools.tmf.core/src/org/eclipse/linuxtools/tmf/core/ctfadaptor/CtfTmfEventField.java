@@ -138,7 +138,7 @@ public abstract class CtfTmfEventField implements ITmfEventField {
 
     /**
      * Return the int representing this field's value type
-     * 
+     *
      * @return the field type
      */
     public abstract int getFieldType();
@@ -146,7 +146,7 @@ public abstract class CtfTmfEventField implements ITmfEventField {
     /**
      * Return this field's value. You can cast it to the correct type depending
      * on what getFieldType says.
-     * 
+     *
      * @return the field value
      */
     @Override
@@ -155,7 +155,7 @@ public abstract class CtfTmfEventField implements ITmfEventField {
     /**
      * Other methods defined by ITmfEventField, but not used here: the CTF
      *       fields do not have sub-fields (yet!)
-     * 
+     *
      * @return the field names
      */
     @Override
@@ -163,6 +163,7 @@ public abstract class CtfTmfEventField implements ITmfEventField {
         return null;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public String getFieldName(int index) {
         return null;
@@ -173,11 +174,13 @@ public abstract class CtfTmfEventField implements ITmfEventField {
         return null;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public ITmfEventField getField(String fieldName) {
         return null;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public ITmfEventField getField(int index) {
         return null;
@@ -212,7 +215,7 @@ final class CTFIntegerField extends CtfTmfEventField {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override
@@ -245,7 +248,7 @@ final class CTFStringField extends CtfTmfEventField {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override

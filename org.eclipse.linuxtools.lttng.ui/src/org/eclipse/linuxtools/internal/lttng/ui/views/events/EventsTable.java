@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009, 2010, 2011 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Aligned columns with domain terminology
@@ -15,7 +15,6 @@ package org.eclipse.linuxtools.internal.lttng.ui.views.events;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.linuxtools.tmf.ui.widgets.ColumnData;
@@ -64,7 +63,7 @@ public class EventsTable extends TmfEventsTable {
      * @return
      */
     @Override
-    protected ITmfEventField[] extractItemFields(TmfEvent event) {
+    protected ITmfEventField[] extractItemFields(ITmfEvent event) {
         ITmfEventField[] fields = new TmfEventField[0];
         if (event != null) {
             fields = new TmfEventField[] {

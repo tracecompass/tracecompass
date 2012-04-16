@@ -7,10 +7,10 @@ import java.nio.channels.FileChannel;
 
 import org.eclipse.linuxtools.ctf.core.tests.TestParams;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
-import org.eclipse.linuxtools.ctf.core.trace.Stream;
-import org.eclipse.linuxtools.ctf.core.trace.StreamInput;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
-import org.eclipse.linuxtools.ctf.core.trace.StreamInputReaderTimestampComparator;
+import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInput;
+import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputReaderTimestampComparator;
 import org.junit.*;
 
 /**

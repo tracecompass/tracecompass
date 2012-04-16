@@ -3,6 +3,7 @@ package org.eclipse.linuxtools.internal.tmf.core;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.linuxtools.tmf.core.component.ITmfComponent;
@@ -27,7 +28,7 @@ public class Tracer {
     static Boolean EVENT = Boolean.FALSE;
 
     private static String LOGNAME = "trace.log";
-    private static BufferedWriter fTraceLog = null;
+    private static BufferedWriter fTraceLog = new BufferedWriter(new OutputStreamWriter(System.out));
 
     private static BufferedWriter openLogFile(String filename) {
         BufferedWriter outfile = null;
@@ -93,8 +94,9 @@ public class Tracer {
     }
 
     public static void stop() {
-        if (fTraceLog == null)
+        if (fTraceLog == null) {
             return;
+        }
 
         try {
             fTraceLog.close();

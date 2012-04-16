@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2011 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  ******************************************************************************/
@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -27,34 +27,34 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 public class TmfEventsCache {
 
 	public static class CachedEvent {
-		TmfEvent event;
+		ITmfEvent event;
 		long rank;
 
-		public CachedEvent (TmfEvent event, long rank) {
-			this.event = event;
+		public CachedEvent (ITmfEvent iTmfEvent, long rank) {
+			this.event = iTmfEvent;
 			this.rank = rank;
 		}
 	}
 
-    private CachedEvent[] fCache;
+    private final CachedEvent[] fCache;
     private int fCacheStartIndex = 0;
     private int fCacheEndIndex   = 0;
 
     private ITmfTrace<?> fTrace;
-    private TmfEventsTable fTable;
+    private final TmfEventsTable fTable;
     private ITmfFilter fFilter;
-    private ArrayList<Integer> fFilterIndex = new ArrayList<Integer>(); // contains the event rank at each 'cache size' filtered events
+    private final ArrayList<Integer> fFilterIndex = new ArrayList<Integer>(); // contains the event rank at each 'cache size' filtered events
 
     public TmfEventsCache(int cacheSize, TmfEventsTable table) {
     	fCache = new CachedEvent[cacheSize];
     	fTable = table;
     }
-    
+
     public void setTrace(ITmfTrace<?> trace) {
     	fTrace = trace;
     	clear();
     }
-    
+
     public synchronized void clear() {
     	fCacheStartIndex = 0;
     	fCacheEndIndex = 0;
@@ -65,12 +65,12 @@ public class TmfEventsCache {
     	fFilter = filter;
     	clear();
     }
-    
+
     public void clearFilter() {
     	fFilter = null;
     	clear();
     }
-    
+
     public synchronized CachedEvent getEvent(int index) {
         if ((index >= fCacheStartIndex) && (index < fCacheEndIndex)) {
             int i = index - fCacheStartIndex;
@@ -87,8 +87,8 @@ public class TmfEventsCache {
         }
     	return null;
     }
-    
-    public synchronized void storeEvent(TmfEvent event, long rank, int index) {
+
+    public synchronized void storeEvent(ITmfEvent event, long rank, int index) {
     	if (fCacheStartIndex == fCacheEndIndex) {
     		fCacheStartIndex = index;
     		fCacheEndIndex = index;
@@ -100,28 +100,28 @@ public class TmfEventsCache {
     			fCacheEndIndex++;
     		}
     	}
-    	if (fFilter != null && index % fCache.length == 0) {
+    	if ((fFilter != null) && ((index % fCache.length) == 0)) {
     		int i = index / fCache.length;
     		fFilterIndex.add(i, Integer.valueOf((int) rank));
     	}
     }
-    
+
     @SuppressWarnings("unchecked")
     public synchronized int getFilteredEventIndex(final long rank) {
     	int current;
     	int startRank;
-    	TmfDataRequest<TmfEvent> request;
+    	TmfDataRequest<ITmfEvent> request;
     	synchronized (this) {
     		int start = 0;
     		int end = fFilterIndex.size();
-    		
-    		if (fCacheEndIndex - fCacheStartIndex > 1) {
+
+    		if ((fCacheEndIndex - fCacheStartIndex) > 1) {
     			if (rank < fCache[0].rank) {
-    				end = fCacheStartIndex / fCache.length + 1;
+    				end = (fCacheStartIndex / fCache.length) + 1;
     			} else if (rank > fCache[fCacheEndIndex - fCacheStartIndex - 1].rank) {
     				start = fCacheEndIndex / fCache.length;
     			} else {
-    				for (int i = 0; i < fCacheEndIndex - fCacheStartIndex; i++) {
+    				for (int i = 0; i < (fCacheEndIndex - fCacheStartIndex); i++) {
     					if (fCache[i].rank >= rank) {
     						return fCacheStartIndex + i;
     					}
@@ -129,7 +129,7 @@ public class TmfEventsCache {
     				return fCacheEndIndex;
     			}
     		}
-    		
+
     		current = (start + end) / 2;
     		while (current != start) {
     			if (rank < fFilterIndex.get(current)) {
@@ -142,23 +142,25 @@ public class TmfEventsCache {
     		}
     		startRank = fFilterIndex.get(current);
     	}
-    	
+
     	final int index = current * fCache.length;
-    	
-    	class DataRequest<T extends TmfEvent> extends TmfDataRequest<T> {
+
+    	class DataRequest<T extends ITmfEvent> extends TmfDataRequest<T> {
     		int fRank;
     		int fIndex;
-    		
+
     		DataRequest(Class<T> dataType, int start, int nbRequested) {
     			super(dataType, start, nbRequested);
     			fRank = start;
     			fIndex = index;
     		}
-    		
+
 			@Override
 			public void handleData(T event) {
 				super.handleData(event);
-				if (isCancelled()) return;
+				if (isCancelled()) {
+                    return;
+                }
 				if (fRank >= rank) {
 					cancel();
 					return;
@@ -173,21 +175,21 @@ public class TmfEventsCache {
 	            return fIndex;
             }
     	}
-    	
-    	request = new DataRequest<TmfEvent>(TmfEvent.class, startRank, TmfDataRequest.ALL_DATA);
-		((ITmfDataProvider<TmfEvent>) fTrace).sendRequest(request);
+
+    	request = new DataRequest<ITmfEvent>(ITmfEvent.class, startRank, TmfDataRequest.ALL_DATA);
+		((ITmfDataProvider<ITmfEvent>) fTrace).sendRequest(request);
 		try {
 			request.waitForCompletion();
-			return ((DataRequest<TmfEvent>) request).getFilteredIndex();
+			return ((DataRequest<ITmfEvent>) request).getFilteredIndex();
 		} catch (InterruptedException e) {
 		}
     	return 0;
     }
-    
+
     // ------------------------------------------------------------------------
     // Event cache population
     // ------------------------------------------------------------------------
-    
+
     // The event fetching job
     private Job job;
     private synchronized void populateCache(final int index) {
@@ -196,14 +198,14 @@ public class TmfEventsCache {
          * 1. The job must exist
          * 2. It must be running (i.e. not completed)
          * 3. The requested index must be within the cache range
-         * 
+         *
          * If the job meets these conditions, we simply exit.
          * Otherwise, we create a new job but we might have to cancel
          * an existing job for an obsolete range.
          */
         if (job != null) {
             if (job.getState() != Job.NONE) {
-                if (index >= fCacheStartIndex && index < (fCacheStartIndex + fCache.length)) {
+                if ((index >= fCacheStartIndex) && (index < (fCacheStartIndex + fCache.length))) {
                     return;
                 }
                 // The new index is out of the requested range
@@ -211,7 +213,7 @@ public class TmfEventsCache {
                 job.cancel();
             }
         }
-        
+
         fCacheStartIndex = index;
         fCacheEndIndex   = index;
 
@@ -233,12 +235,12 @@ public class TmfEventsCache {
             			skipCount = index - (i * fCache.length);
             		}
             	}
-            	
-                TmfDataRequest<TmfEvent> request = new TmfDataRequest<TmfEvent>(TmfEvent.class, startIndex, nbRequested) {
+
+                TmfDataRequest<ITmfEvent> request = new TmfDataRequest<ITmfEvent>(ITmfEvent.class, startIndex, nbRequested) {
                     private int count = 0;
                     private long rank = startIndex;
                     @Override
-                    public void handleData(TmfEvent event) {
+                    public void handleData(ITmfEvent event) {
                         // If the job is canceled, cancel the request so waitForCompletion() will unlock
                         if (monitor.isCanceled()) {
                             cancel();
@@ -246,7 +248,7 @@ public class TmfEventsCache {
                         }
                         super.handleData(event);
                         if (event != null) {
-                        	if ((fFilter == null || fFilter.matches(event)) && skipCount-- <= 0) {
+                        	if (((fFilter == null) || fFilter.matches(event)) && (skipCount-- <= 0)) {
                         		synchronized (TmfEventsCache.this) {
                         			fCache[count] = new CachedEvent(event.clone(), rank);
                         			count++;
@@ -259,14 +261,14 @@ public class TmfEventsCache {
                         }
                         if (count >= fCache.length) {
                         	cancel();
-                        } else if (fFilter != null && count >= fTable.getTable().getItemCount() - 3) { // -1 for header row, -2 for top and bottom filter status rows
+                        } else if ((fFilter != null) && (count >= (fTable.getTable().getItemCount() - 3))) { // -1 for header row, -2 for top and bottom filter status rows
                         	cancel();
                         }
                         rank++;
                     }
                 };
 
-                ((ITmfDataProvider<TmfEvent>) fTrace).sendRequest(request);
+                ((ITmfDataProvider<ITmfEvent>) fTrace).sendRequest(request);
                 try {
                     request.waitForCompletion();
                 } catch (InterruptedException e) {
@@ -274,7 +276,7 @@ public class TmfEventsCache {
                 }
 
                 fTable.cacheUpdated(true);
-                
+
                 // Flag the UI thread that the cache is ready
                 if (monitor.isCanceled()) {
                 	return Status.CANCEL_STATUS;

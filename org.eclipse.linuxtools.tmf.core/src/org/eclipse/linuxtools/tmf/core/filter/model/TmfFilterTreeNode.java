@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2010 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *   Yuriy Vashchuk (yvashchuk@gmail.com) - Initial API and implementation
  *   Patrick Tasse - Refactoring
@@ -27,7 +27,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
  * <p>
  */
 public abstract class TmfFilterTreeNode implements ITmfFilterTreeNode, Cloneable {
-	
+
 	private static final String[] VALID_CHILDREN = {
 		TmfFilterEventTypeNode.NODE_NAME,
 		TmfFilterAndNode.NODE_NAME,
@@ -37,7 +37,7 @@ public abstract class TmfFilterTreeNode implements ITmfFilterTreeNode, Cloneable
 		TmfFilterMatchesNode.NODE_NAME,
 		TmfFilterCompareNode.NODE_NAME
 	};
-	
+
 	private ITmfFilterTreeNode parent = null;
 	private ArrayList<ITmfFilterTreeNode> children = new ArrayList<ITmfFilterTreeNode>();
 
@@ -46,7 +46,7 @@ public abstract class TmfFilterTreeNode implements ITmfFilterTreeNode, Cloneable
     		parent.addChild(this);
     	}
     }
-    
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.tmf.filter.model.ITmfFilterTreeNode#getParent()
 	 */
@@ -144,7 +144,7 @@ public abstract class TmfFilterTreeNode implements ITmfFilterTreeNode, Cloneable
 		this.parent = parent;
 	}
 
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.tmf.filter.model.ITmfFilterTreeNode#matches(org.eclipse.linuxtools.tmf.event.TmfEvent)
 	 */
@@ -166,7 +166,7 @@ public abstract class TmfFilterTreeNode implements ITmfFilterTreeNode, Cloneable
             value = event.getType().getName();
         }
         else if (ITmfEvent.EVENT_FIELD_TIMESTAMP.equals(field)) {
-            value = ((Long) event.getTimestamp().getValue()).toString();
+            value = event.getTimestamp().toString();
         }
         else if (ITmfEvent.EVENT_FIELD_SOURCE.equals(field)) {
             value = event.getSource();
@@ -182,7 +182,7 @@ public abstract class TmfFilterTreeNode implements ITmfFilterTreeNode, Cloneable
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.linuxtools.tmf.filter.model.ITmfFilterTreeNode#getValidChildren()
-	 * 
+	 *
 	 * By default, all node types are valid children. Override if different.
 	 */
 	@Override

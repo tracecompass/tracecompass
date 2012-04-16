@@ -10,11 +10,12 @@
  * Contributors: Simon Marchi - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.ctf.core.trace;
+package org.eclipse.linuxtools.internal.ctf.core.trace;
 
-import java.util.Collection;
 import java.util.ListIterator;
 import java.util.Vector;
+
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 
 /**
  * <b><u>StreamInputPacketIndex</u></b>
@@ -37,7 +38,7 @@ public class StreamInputPacketIndex {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
-    public Collection<StreamInputPacketIndexEntry> getEntries() {
+    public Vector<StreamInputPacketIndexEntry> getEntries() {
         return this.entries;
     }
 
@@ -62,16 +63,16 @@ public class StreamInputPacketIndex {
      */
     public void addEntry(StreamInputPacketIndexEntry entry)
             throws CTFReaderException {
-        assert (entry.packetSizeBits != 0);
-        assert (entry.contentSizeBits != 0);
+        assert (entry.getContentSizeBits() != 0);
+        assert (entry.getContentSizeBits() != 0);
 
-        if (entry.timestampBegin > entry.timestampEnd) {
+        if (entry.getTimestampBegin() > entry.getTimestampEnd()) {
             throw new CTFReaderException(
                     "Packet begin timestamp is after end timestamp"); //$NON-NLS-1$
         }
 
         if (!this.entries.isEmpty()) {
-            if (entry.timestampBegin < this.entries.lastElement().timestampBegin) {
+            if (entry.getTimestampBegin() < this.entries.lastElement().getTimestampBegin()) {
                 throw new CTFReaderException(
                         "Packets begin timestamp decreasing"); //$NON-NLS-1$
             }
@@ -122,13 +123,13 @@ public class StreamInputPacketIndex {
                 break;
             }
 
-            if (timestamp < guessEntry.timestampBegin) {
+            if (timestamp < guessEntry.getTimestampBegin()) {
                 /*
                  * If the timestamp if before the begin timestamp, we know that
                  * the packet to return is before the guess.
                  */
                 max = guessI - 1;
-            } else if (timestamp >= guessEntry.timestampBegin) {
+            } else if (timestamp >= guessEntry.getTimestampBegin()) {
                 /*
                  * If the timestamp is after the begin timestamp, we know that
                  * the packet to return is after the guess or is the guess.
@@ -139,5 +140,63 @@ public class StreamInputPacketIndex {
 
         return this.entries.listIterator(guessI);
     }
+    /**
+     * Given a rank, this methods returns the first PacketIndexEntry that
+     * could include the rank, that is the last packet with a begin
+     * rank smaller than the given rank.
+     *
+     * @param index
+     *            The rank to look for.
+     * @return The StreamInputPacketEntry that corresponds to the packet that
+     *         includes the given timestamp.
+     */
+    public ListIterator<StreamInputPacketIndexEntry> searchIndex(final long index) {
+        /*
+         * Start with min and max covering all the elements.
+         */
+        int max = this.entries.size() - 1;
+        int min = 0;
 
+        int guessI;
+        StreamInputPacketIndexEntry guessEntry = null;
+
+        if (index < 0) {
+            throw new IllegalArgumentException("rank is negative"); //$NON-NLS-1$
+        }
+
+        for (;;) {
+            /*
+             * Guess in the middle of min and max. The +1 is so that in case
+             * (min + 1 == max), we choose the packet at the subscript "max"
+             * instead of the one at "min". Otherwise, it would give an infinite
+             * loop.
+             */
+            guessI = (max + min + 1) / 2;
+            guessEntry = this.entries.get(guessI);
+
+            /*
+             * If we reached the point where we focus on a single packet, our
+             * search is done.
+             */
+            if (min == max) {
+                break;
+            }
+
+            if (index < guessEntry.getIndexBegin()) {
+                /*
+                 * If the timestamp if before the begin timestamp, we know that
+                 * the packet to return is before the guess.
+                 */
+                max = guessI - 1;
+            } else if (index >= guessEntry.getIndexBegin()) {
+                /*
+                 * If the timestamp is after the begin timestamp, we know that
+                 * the packet to return is after the guess or is the guess.
+                 */
+                min = guessI;
+            }
+        }
+
+        return this.entries.listIterator(guessI);
+    }
 }

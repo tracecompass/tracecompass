@@ -10,7 +10,7 @@
  * Contributors: Francis Giraldeau - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.ctf.core.event.metadata;
+package org.eclipse.linuxtools.internal.ctf.core.event.metadata;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,7 +25,6 @@ import java.util.UUID;
 import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.linuxtools.ctf.core.event.CTFClock;
 import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
-import org.eclipse.linuxtools.ctf.core.event.metadata.exceptions.ParseException;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDeclaration;
@@ -36,9 +35,10 @@ import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
-import org.eclipse.linuxtools.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.ctf.parser.CTFParser;
 import org.eclipse.linuxtools.internal.ctf.core.Activator;
+import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
+import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
 
 /*
  * Asserts throughout this class denote the assumptions we can make because of

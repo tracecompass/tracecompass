@@ -10,7 +10,7 @@
  * Contributors: Francis Giraldeau - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.ctf.core.event.io;
+package org.eclipse.linuxtools.internal.ctf.core.event.io;
 
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;

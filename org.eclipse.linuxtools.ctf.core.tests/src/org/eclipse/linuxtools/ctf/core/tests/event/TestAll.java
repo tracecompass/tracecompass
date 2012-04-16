@@ -13,7 +13,9 @@ import org.junit.runners.Suite;
  * @version $Revision: 1.0 $
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ })
+@Suite.SuiteClasses({
+    org.eclipse.linuxtools.ctf.core.tests.event.CTFEventFieldTest.class,
+})
 public class TestAll {
 
     /**
@@ -22,7 +24,7 @@ public class TestAll {
      * @param args
      *            the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         JUnitCore.runClasses(new Class[] { TestAll.class });
     }
 }
