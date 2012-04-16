@@ -128,6 +128,75 @@ public class TmfCheckpointTest extends TestCase {
     }
 
     // ------------------------------------------------------------------------
+    // compareTo
+    // ------------------------------------------------------------------------
+
+    public void testCompareTo() {
+        assertEquals("compareTo",  0, fCheckpoint1.compareTo(fCheckpoint1));
+        assertEquals("compareTo",  1, fCheckpoint1.compareTo(fCheckpoint2));
+        assertEquals("compareTo", -1, fCheckpoint1.compareTo(fCheckpoint3));
+
+        assertEquals("compareTo", -1, fCheckpoint2.compareTo(fCheckpoint1));
+        assertEquals("compareTo",  0, fCheckpoint2.compareTo(fCheckpoint2));
+        assertEquals("compareTo", -1, fCheckpoint2.compareTo(fCheckpoint3));
+
+        assertEquals("compareTo",  1, fCheckpoint3.compareTo(fCheckpoint1));
+        assertEquals("compareTo",  1, fCheckpoint3.compareTo(fCheckpoint2));
+        assertEquals("compareTo",  0, fCheckpoint3.compareTo(fCheckpoint3));
+    }
+
+    public void testCompareToNull() {
+        final TmfCheckpoint checkpoint1 = new TmfCheckpoint(null, fLocation1);
+        final TmfCheckpoint checkpoint2 = new TmfCheckpoint(null, fLocation2);
+        final TmfCheckpoint checkpoint3 = new TmfCheckpoint(null, fLocation3);
+        final TmfCheckpoint checkpoint4 = new TmfCheckpoint(null, fLocation1);
+
+        // Test the various 'null' vs. '!null' combinations
+        assertEquals("compareTo",  0, checkpoint1.compareTo(fCheckpoint1));
+        assertEquals("compareTo",  0, fCheckpoint1.compareTo(checkpoint1));
+        assertEquals("compareTo", -1, checkpoint1.compareTo(fCheckpoint2));
+        assertEquals("compareTo",  1, fCheckpoint2.compareTo(checkpoint1));
+        assertEquals("compareTo", -1, checkpoint1.compareTo(fCheckpoint3));
+        assertEquals("compareTo",  1, fCheckpoint3.compareTo(checkpoint1));
+
+        // Test the 'null' vs. 'null' combinations
+        assertEquals("compareTo",  0, checkpoint1.compareTo(checkpoint4));
+        assertEquals("compareTo",  0, checkpoint4.compareTo(checkpoint1));
+        assertEquals("compareTo", -1, checkpoint1.compareTo(checkpoint2));
+        assertEquals("compareTo",  1, checkpoint2.compareTo(checkpoint1));
+        assertEquals("compareTo", -1, checkpoint1.compareTo(checkpoint3));
+        assertEquals("compareTo",  1, checkpoint3.compareTo(checkpoint1));
+    }
+
+    // ------------------------------------------------------------------------
+    // hashCode
+    // ------------------------------------------------------------------------
+
+    public void testHashCode() throws Exception {
+        final TmfCheckpoint checkpoint1 = new TmfCheckpoint(fCheckpoint1);
+        final TmfCheckpoint checkpoint2 = new TmfCheckpoint(fCheckpoint2);
+
+        assertTrue("hashCode", fCheckpoint1.hashCode() == checkpoint1.hashCode());
+        assertTrue("hashCode", fCheckpoint2.hashCode() == checkpoint2.hashCode());
+
+        assertTrue("hashCode", fCheckpoint1.hashCode() != checkpoint2.hashCode());
+        assertTrue("hashCode", fCheckpoint2.hashCode() != checkpoint1.hashCode());
+    }
+
+    public void testHashCodeNull() throws Exception {
+        final TmfCheckpoint checkpoint1 = new TmfCheckpoint(null, fLocation1);
+        final TmfCheckpoint checkpoint2 = new TmfCheckpoint(fTimestamp1, null);
+        final TmfCheckpoint checkpoint3 = new TmfCheckpoint(checkpoint1);
+        final TmfCheckpoint checkpoint4 = new TmfCheckpoint(checkpoint2);
+
+        assertTrue("hashCode", fCheckpoint1.hashCode() != checkpoint1.hashCode());
+        assertTrue("hashCode", fCheckpoint1.hashCode() != checkpoint2.hashCode());
+
+        assertTrue("hashCode", checkpoint1.hashCode() == checkpoint3.hashCode());
+        assertTrue("hashCode", checkpoint2.hashCode() == checkpoint4.hashCode());
+    }
+
+    // ------------------------------------------------------------------------
     // equals
     // ------------------------------------------------------------------------
 
@@ -166,21 +235,6 @@ public class TmfCheckpointTest extends TestCase {
     }
 
     // ------------------------------------------------------------------------
-    // hashCode
-    // ------------------------------------------------------------------------
-
-    public void testHashCode() throws Exception {
-        final TmfCheckpoint checkpoint1 = new TmfCheckpoint(fCheckpoint1);
-        final TmfCheckpoint checkpoint2 = new TmfCheckpoint(fCheckpoint2);
-
-        assertTrue("hashCode", fCheckpoint1.hashCode() == checkpoint1.hashCode());
-        assertTrue("hashCode", fCheckpoint2.hashCode() == checkpoint2.hashCode());
-
-        assertTrue("hashCode", fCheckpoint1.hashCode() != checkpoint2.hashCode());
-        assertTrue("hashCode", fCheckpoint2.hashCode() != checkpoint1.hashCode());
-    }
-
-    // ------------------------------------------------------------------------
     // toString
     // ------------------------------------------------------------------------
 
@@ -195,24 +249,6 @@ public class TmfCheckpointTest extends TestCase {
         assertEquals("toString", expected1, fCheckpoint1.toString());
         assertEquals("toString", expected2, fCheckpoint2.toString());
         assertEquals("toString", expected3, fCheckpoint3.toString());
-    }
-
-    // ------------------------------------------------------------------------
-    // compareTo
-    // ------------------------------------------------------------------------
-
-    public void testCompareTo() {
-        assertEquals("compareTo",  0, fCheckpoint1.compareTo(fCheckpoint1));
-        assertEquals("compareTo",  1, fCheckpoint1.compareTo(fCheckpoint2));
-        assertEquals("compareTo", -1, fCheckpoint1.compareTo(fCheckpoint3));
-
-        assertEquals("compareTo", -1, fCheckpoint2.compareTo(fCheckpoint1));
-        assertEquals("compareTo",  0, fCheckpoint2.compareTo(fCheckpoint2));
-        assertEquals("compareTo", -1, fCheckpoint2.compareTo(fCheckpoint3));
-
-        assertEquals("compareTo",  1, fCheckpoint3.compareTo(fCheckpoint1));
-        assertEquals("compareTo",  1, fCheckpoint3.compareTo(fCheckpoint2));
-        assertEquals("compareTo",  0, fCheckpoint3.compareTo(fCheckpoint3));
     }
 
 }

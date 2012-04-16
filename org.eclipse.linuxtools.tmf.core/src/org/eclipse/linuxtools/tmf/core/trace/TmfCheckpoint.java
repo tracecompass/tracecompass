@@ -109,8 +109,8 @@ public class TmfCheckpoint implements ITmfCheckpoint {
     // Comparable
     // ------------------------------------------------------------------------
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public int compareTo(final ITmfCheckpoint other) {
         if (fTimestamp == null || other.getTimestamp() == null) {
             final Comparable location1 = fLocation.getLocation();
