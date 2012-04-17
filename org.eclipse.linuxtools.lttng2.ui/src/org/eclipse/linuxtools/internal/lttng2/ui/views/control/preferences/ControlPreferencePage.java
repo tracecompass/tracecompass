@@ -1,0 +1,161 @@
+/**********************************************************************
+ * Copyright (c) 2012 Ericsson
+ * 
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: 
+ *   Bernd Hufmann - Initial API and implementation
+ **********************************************************************/
+package org.eclipse.linuxtools.internal.lttng2.ui.views.control.preferences;
+
+import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.FieldEditor;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.RadioGroupFieldEditor;
+import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.logging.ControlCommandLogger;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferencePage;
+
+/**
+ * <b><u>ControlPreferencePage</u></b>
+ * <p>
+ * Preference page implementation for configuring LTTng tracer control preferences.
+ * </p>
+ */
+public class ControlPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+    RadioGroupFieldEditor fVerboseLevel;
+    BooleanFieldEditor  fIsAppend;
+    
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
+    public ControlPreferencePage() {
+        super(FieldEditorPreferencePage.GRID);
+
+        // Set the preference store for the preference page.
+        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+        setPreferenceStore(store);
+    }
+    
+    // ------------------------------------------------------------------------
+    // Operations
+    // ------------------------------------------------------------------------
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+     */
+    @Override
+    public void init(IWorkbench workbench) {
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.preference.FieldEditorPreferencePage#createFieldEditors()
+     */
+    @Override
+    protected void createFieldEditors() {
+
+        StringFieldEditor tracingGroup = new StringFieldEditor(ControlPreferences.TRACE_CONTROL_TRACING_GROUP_PREF, Messages.TraceControl_TracingGroupPreference, getFieldEditorParent());
+        addField(tracingGroup);
+
+        BooleanFieldEditor logCommand = new BooleanFieldEditor(ControlPreferences.TRACE_CONTROL_LOG_COMMANDS_PREF, Messages.TraceControl_LoggingPreference, getFieldEditorParent());
+        addField(logCommand);
+
+        StringFieldEditor logfile = new StringFieldEditor(ControlPreferences.TRACE_CONTROL_LOG_FILE_PATH_PREF, Messages.TraceControl_LogfilePath, getFieldEditorParent());
+        addField(logfile);
+        
+        fIsAppend = new BooleanFieldEditor(ControlPreferences.TRACE_CONTROL_LOG_APPEND_PREF, Messages.TraceControl_AppendLogfilePreference, getFieldEditorParent());
+        addField(fIsAppend);
+
+        fVerboseLevel = new RadioGroupFieldEditor (
+                ControlPreferences.TRACE_CONTROL_VERBOSE_LEVEL_PREF,
+                Messages.TraceControl_VerboseLevelsPreference,
+                4,
+                new String[][] {
+                    {
+                        Messages.TraceControl_VerboseLevelNonePreference,
+                        ControlPreferences.TRACE_CONTROL_VERBOSE_LEVEL_NONE,
+                    },
+                    {
+                        Messages.TraceControl_VerboseLevelVerbosePreference, 
+                        ControlPreferences.TRACE_CONTROL_VERBOSE_LEVEL_VERBOSE
+                    },
+                    {
+                        Messages.TraceControl_VerboseLevelVeryVerbosePreference, 
+                        ControlPreferences.TRACE_CONTROL_VERBOSE_LEVEL_V_VERBOSE
+                    },
+                    {
+                        Messages.TraceControl_VerboseLevelVeryVeryVerbosePreference, 
+                        ControlPreferences.TRACE_CONTROL_VERBOSE_LEVEL_V_V_VERBOSE
+                    }
+                },
+                getFieldEditorParent(),
+                true);
+
+        addField(fVerboseLevel);
+
+        Boolean enabled = ControlPreferences.getInstance().isLoggingEnabled();
+        fVerboseLevel.setEnabled(enabled, getFieldEditorParent());
+        fIsAppend.setEnabled(enabled, getFieldEditorParent());
+        logfile.setEnabled(false, getFieldEditorParent());
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.preference.FieldEditorPreferencePage#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        
+        if (event.getProperty().equals(FieldEditor.VALUE)) {
+            if (event.getSource() instanceof FieldEditor) {
+                FieldEditor editor = (FieldEditor) event.getSource();
+                if (editor.getPreferenceName().equals(ControlPreferences.TRACE_CONTROL_LOG_COMMANDS_PREF)) {
+                    Boolean enabled = (Boolean)event.getNewValue();
+                    fVerboseLevel.setEnabled(enabled, getFieldEditorParent());
+                    fIsAppend.setEnabled(enabled, getFieldEditorParent());
+                }
+            }
+        }
+        super.propertyChange(event);
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.preference.FieldEditorPreferencePage#performDefaults()
+     */
+    @Override
+    protected void performDefaults() {
+        super.performDefaults();
+        fVerboseLevel.setEnabled(false, getFieldEditorParent());
+        fIsAppend.setEnabled(false, getFieldEditorParent());
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.preference.FieldEditorPreferencePage#performOk()
+     */
+    @Override
+    public boolean performOk() {
+        boolean ret =  super.performOk();
+        // open or close log file
+        if (ControlPreferences.getInstance().isLoggingEnabled()) {
+            ControlCommandLogger.init(ControlPreferences.TRACE_CONTROL_LOG_FILENAME, ControlPreferences.getInstance().isAppend());
+        } else {
+            ControlCommandLogger.close();
+        }
+        return ret;
+    }
+}

@@ -235,7 +235,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     /**
      * Returns the rank of the first event with the requested timestamp. If
      * none, returns the index of the next event (if any).
-     * 
+     *
      * @param timestamp the event timestamp
      * @return the corresponding event rank
      */
@@ -266,8 +266,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
      * Update the global time range
      */
     protected void updateTimeRange() {
-        ITmfTimestamp startTime = fTimeRange != TmfTimeRange.NULL_RANGE ? fTimeRange.getStartTime()
-                : TmfTimestamp.BIG_CRUNCH;
+        ITmfTimestamp startTime = fTimeRange != TmfTimeRange.NULL_RANGE ? fTimeRange.getStartTime() : TmfTimestamp.BIG_CRUNCH;
         ITmfTimestamp endTime = fTimeRange != TmfTimeRange.NULL_RANGE ? fTimeRange.getEndTime() : TmfTimestamp.BIG_BANG;
 
         for (final ITmfTrace<T> trace : fTraces) {
@@ -284,6 +283,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     // ------------------------------------------------------------------------
     // TmfProvider
     // ------------------------------------------------------------------------
+
     @Override
     public ITmfContext armRequest(final ITmfDataRequest<T> request) {
         //		Tracer.trace("Ctx: Arming request - start");
@@ -305,8 +305,8 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         return context;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public T getNext(final ITmfContext context) {
         if (context instanceof TmfExperimentContext)
             return (T) getNextEvent(context);
@@ -368,8 +368,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         return context;
     }
 
-    /*
-     * (non-Javadoc)
+    /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#seekEvent(org.eclipse.linuxtools .tmf.event.TmfTimestamp)
      */
     @Override
@@ -418,9 +417,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         return context;
     }
 
-    /*
-     * (non-Javadoc)
-     *
+    /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#seekEvent(long)
      */
     @Override
@@ -481,7 +478,6 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     }
 
     //	private void dumpContext(TmfExperimentContext context, boolean isBefore) {
-
     //		TmfContext context0 = context.getContexts()[0];
     //		TmfEvent   event0   = context.getEvents()[0];
     //		TmfExperimentLocation location0 = (TmfExperimentLocation) context.getLocation();
@@ -639,9 +635,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         return event;
     }
 
-    /*
-     * (non-Javadoc)
-     *
+    /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
     @Override
@@ -669,7 +663,6 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
 
             // Broadcast in separate thread to prevent deadlock
             new Thread() {
-
                 @Override
                 public void run() {
                     broadcast(signal);
@@ -678,10 +671,9 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
             return;
         }
 
-        final Thread thread = new Thread("Streaming Monitor for experiment " + getName()) { //$NON-NLS-1$
-
-            ITmfTimestamp safeTimestamp = null;
-            TmfTimeRange timeRange = null;
+        final Thread thread = new Thread("Streaming Monitor for experiment " + getName()) { ////$NON-NLS-1$
+            private ITmfTimestamp safeTimestamp = null;
+            private TmfTimeRange timeRange = null;
 
             @Override
             public void run() {
@@ -702,8 +694,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
                         safeTimestamp = endTimestamp;
                         if (timeRange != null) {
                             final TmfExperimentRangeUpdatedSignal signal =
-                                    new TmfExperimentRangeUpdatedSignal(TmfExperiment.this, TmfExperiment.this,
-                                            timeRange);
+                                    new TmfExperimentRangeUpdatedSignal(TmfExperiment.this, TmfExperiment.this, timeRange);
                             broadcast(signal);
                         }
                     }
@@ -824,9 +815,9 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
                     if (startTime == null)
                         startTime = ts.clone();
                     lastTime = ts.clone();
-                    if ((getNbRead() % fIndexPageSize) == 1 && getNbRead() != 1)
-                        updateExperiment();
                 }
+                if ((getNbRead() % fIndexPageSize) == 1 && getNbRead() != 1)
+                    updateExperiment();
             }
 
             @Override

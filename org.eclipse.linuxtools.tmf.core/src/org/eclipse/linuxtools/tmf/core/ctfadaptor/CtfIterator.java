@@ -114,7 +114,6 @@ Comparable<CtfIterator> {
         return curLocation;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void increaseRank() {
         curRank++;
@@ -122,7 +121,7 @@ Comparable<CtfIterator> {
 
     @Override
     public boolean hasValidRank() {
-        return (getRank() > -1);
+        return (getRank() >= 0);
     }
 
     @Override

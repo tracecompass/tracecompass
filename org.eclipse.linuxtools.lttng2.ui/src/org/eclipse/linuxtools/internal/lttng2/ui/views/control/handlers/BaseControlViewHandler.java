@@ -41,7 +41,7 @@ abstract public class BaseControlViewHandler extends AbstractHandler {
     /**
      * The synchronization lock.
      */
-    protected ReentrantLock fLock = new ReentrantLock();
+    final protected ReentrantLock fLock = new ReentrantLock();
     
     // ------------------------------------------------------------------------
     // Operations

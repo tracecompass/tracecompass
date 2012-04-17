@@ -21,6 +21,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.logging.ControlCommandLogger;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IBaseEventInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IDomainInfo;
@@ -38,6 +39,7 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.EventI
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.ProbeEventInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.SessionInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.UstProviderInfo;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.preferences.ControlPreferences;
 
 /**
  * <b><u>LTTngControlService</u></b>
@@ -57,7 +59,7 @@ public class LTTngControlService implements ILttngControlService {
     /**
      * Command: lttng list.
      */
-    private final static String COMMAND_LIST = CONTROL_COMMAND + " list "; //$NON-NLS-1$
+    private final static String COMMAND_LIST = " list "; //$NON-NLS-1$
     /**
      * Command to list kernel tracer information.
      */
@@ -69,45 +71,61 @@ public class LTTngControlService implements ILttngControlService {
     /**
      * Command to create a session. 
      */
-    private final static String COMMAND_CREATE_SESSION = CONTROL_COMMAND + " create "; //$NON-NLS-1$
+    private final static String COMMAND_CREATE_SESSION = " create "; //$NON-NLS-1$
     /**
      * Command to destroy a session. 
      */
-    private final static String COMMAND_DESTROY_SESSION = CONTROL_COMMAND + " destroy "; //$NON-NLS-1$
+    private final static String COMMAND_DESTROY_SESSION = " destroy "; //$NON-NLS-1$
     /**
      * Command to destroy a session. 
      */
-    private final static String COMMAND_START_SESSION = CONTROL_COMMAND + " start "; //$NON-NLS-1$
+    private final static String COMMAND_START_SESSION = " start "; //$NON-NLS-1$
     /**
      * Command to destroy a session. 
      */
-    private final static String COMMAND_STOP_SESSION = CONTROL_COMMAND + " stop "; //$NON-NLS-1$
+    private final static String COMMAND_STOP_SESSION = " stop "; //$NON-NLS-1$
     /**
      * Command to enable a channel. 
      */
-    private final static String COMMAND_ENABLE_CHANNEL = CONTROL_COMMAND + " enable-channel "; //$NON-NLS-1$
+    private final static String COMMAND_ENABLE_CHANNEL = " enable-channel "; //$NON-NLS-1$
     /**
      * Command to disable a channel. 
      */
-    private final static String COMMAND_DISABLE_CHANNEL = CONTROL_COMMAND + " disable-channel "; //$NON-NLS-1$
+    private final static String COMMAND_DISABLE_CHANNEL = " disable-channel "; //$NON-NLS-1$
     /**
      * Command to enable a event. 
      */
-    private final static String COMMAND_ENABLE_EVENT = CONTROL_COMMAND + " enable-event "; //$NON-NLS-1$
+    private final static String COMMAND_ENABLE_EVENT = " enable-event "; //$NON-NLS-1$
     /**
      * Command to disable a event. 
      */
-    private final static String COMMAND_DISABLE_EVENT = CONTROL_COMMAND + " disable-event "; //$NON-NLS-1$
+    private final static String COMMAND_DISABLE_EVENT = " disable-event "; //$NON-NLS-1$
     /**
      * Command to add a context to channels and/or events
      */
-    private final static String COMMAND_ADD_CONTEXT = CONTROL_COMMAND + " add-context "; //$NON-NLS-1$
+    private final static String COMMAND_ADD_CONTEXT = " add-context "; //$NON-NLS-1$
     /**
      * Command to execute calibrate command to quantify LTTng overhead
      */
-    private final static String COMMAND_CALIBRATE = CONTROL_COMMAND + " calibrate "; //$NON-NLS-1$
+    private final static String COMMAND_CALIBRATE = " calibrate "; //$NON-NLS-1$
 
-    // Command options constants 
+    // Command options constants
+    /**
+     * Command line option to add tracing group of user.
+     */
+    private final static String OPTION_TRACING_GROUP = " -g ";  //$NON-NLS-1$
+    /**
+     * Command line option for verbose output.
+     */
+    private final static String OPTION_VERBOSE = " -v ";  //$NON-NLS-1$
+    /**
+     * Command line option for verbose output.
+     */
+    private final static String OPTION_VERY_VERBOSE = " -vv ";  //$NON-NLS-1$
+    /**
+     * Command line option for verbose output.
+     */
+    private final static String OPTION_VERY_VERY_VERBOSE = " -vvv ";  //$NON-NLS-1$
     /**
      * Command line option for output path.
      */
@@ -349,13 +367,9 @@ public class LTTngControlService implements ILttngControlService {
      */
     @Override
     public String[] getSessionNames(IProgressMonitor monitor) throws ExecutionException {
+        StringBuffer command = createCommand(COMMAND_LIST);
 
-        String command = COMMAND_LIST;
-        ICommandResult result = fCommandShell.executeCommand(command, monitor);
-
-        if (isError(result)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+        ICommandResult result = executeCommand(command.toString(), monitor);
 
         // Output:
         // Available tracing sessions:
@@ -388,13 +402,8 @@ public class LTTngControlService implements ILttngControlService {
      */
     @Override
     public ISessionInfo getSession(String sessionName, IProgressMonitor monitor) throws ExecutionException {
-        
-        String command = COMMAND_LIST + sessionName;
-        ICommandResult result = fCommandShell.executeCommand(command, monitor);
-
-        if (isError(result)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+        StringBuffer command = createCommand(COMMAND_LIST, sessionName);
+        ICommandResult result = executeCommand(command.toString(), monitor);
 
         int index = 0;
 
@@ -472,11 +481,8 @@ public class LTTngControlService implements ILttngControlService {
      */
     @Override
     public List<IBaseEventInfo> getKernelProvider(IProgressMonitor monitor) throws ExecutionException {
-        String command = COMMAND_LIST_KERNEL;
-        ICommandResult result = fCommandShell.executeCommand(command, monitor);
-        if (isError(result)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+        StringBuffer command = createCommand(COMMAND_LIST_KERNEL);
+        ICommandResult result = executeCommand(command.toString(), monitor);
 
         // Kernel events:
         // -------------
@@ -507,12 +513,9 @@ public class LTTngControlService implements ILttngControlService {
      */
     @Override
     public List<IUstProviderInfo> getUstProvider(IProgressMonitor monitor) throws ExecutionException {
-        String command = COMMAND_LIST_UST;
-        ICommandResult result = fCommandShell.executeCommand(command, monitor);
+        StringBuffer command = createCommand(COMMAND_LIST_UST);
 
-        if (isError(result)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+        ICommandResult result = executeCommand(command.toString(), monitor);
 
         // UST events:
         // -------------
@@ -563,20 +566,15 @@ public class LTTngControlService implements ILttngControlService {
         String newName = formatParameter(sessionName);
         String newPath = formatParameter(sessionPath);
 
-        StringBuffer command = new StringBuffer(); 
-        command.append(COMMAND_CREATE_SESSION);
-        command.append(newName);
+        StringBuffer command = createCommand(COMMAND_CREATE_SESSION, newName);
 
         if (newPath != null && !"".equals(newPath)) { //$NON-NLS-1$
             command.append(OPTION_OUTPUT_PATH);
             command.append(newPath);
         }
 
-        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
-        
-        if (isError(result)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+        ICommandResult result = executeCommand(command.toString(), monitor);
+
         //Session myssession2 created.
         //Traces will be written in /home/user/lttng-traces/myssession2-20120209-095418
         String[] output = result.getOutput();
@@ -590,8 +588,8 @@ public class LTTngControlService implements ILttngControlService {
         } else {
             // Output format not expected
             throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + //$NON-NLS-1$ //$NON-NLS-2$ 
-                    Messages.TraceControl_UnexpectedCommnadOutputFormat + ":\n" + //$NON-NLS-1$ 
-                    formatOutput(result.getOutput())); 
+                    Messages.TraceControl_UnexpectedCommandOutputFormat + ":\n" + //$NON-NLS-1$ 
+                    formatOutput(result)); 
         }
 
         if ((name == null) || (!name.equals(sessionName))) {
@@ -609,8 +607,8 @@ public class LTTngControlService implements ILttngControlService {
         } else {
             // Output format not expected
             throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + //$NON-NLS-1$ //$NON-NLS-2$ 
-                    Messages.TraceControl_UnexpectedCommnadOutputFormat + ":\n" + //$NON-NLS-1$ 
-                    formatOutput(result.getOutput())); 
+                    Messages.TraceControl_UnexpectedCommandOutputFormat + ":\n" + //$NON-NLS-1$ 
+                    formatOutput(result)); 
         }
 
         if ((path == null) || ((sessionPath != null) && (!path.contains(sessionPath)))) {
@@ -628,13 +626,14 @@ public class LTTngControlService implements ILttngControlService {
     @Override
     public void destroySession(String sessionName, IProgressMonitor monitor) throws ExecutionException {
         String newName = formatParameter(sessionName);
-        String command = COMMAND_DESTROY_SESSION + newName;
 
-        ICommandResult result = fCommandShell.executeCommand(command, monitor);
+        StringBuffer command = createCommand(COMMAND_DESTROY_SESSION, newName);
+
+        ICommandResult result = executeCommand(command.toString(), monitor, false);
         String[] output = result.getOutput();
         
         if (isError(result) && ((output == null) || (!SESSION_NOT_FOUND_ERROR_PATTERN.matcher(output[0]).matches()))) {
-                throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
+                throw new ExecutionException(Messages.TraceControl_CommandError + " " + command.toString() + "\n" + formatOutput(result)); //$NON-NLS-1$ //$NON-NLS-2$
        }
         //Session <sessionName> destroyed
     }
@@ -648,13 +647,10 @@ public class LTTngControlService implements ILttngControlService {
 
         String newSessionName = formatParameter(sessionName);
 
-        String command = COMMAND_START_SESSION + newSessionName;
+        StringBuffer command = createCommand(COMMAND_START_SESSION, newSessionName);
 
-        ICommandResult result = fCommandShell.executeCommand(command, monitor);
+        executeCommand(command.toString(), monitor);
 
-        if (isError(result)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-        }
         //Session <sessionName> started
     }
 
@@ -665,13 +661,10 @@ public class LTTngControlService implements ILttngControlService {
     @Override
     public void stopSession(String sessionName, IProgressMonitor monitor) throws ExecutionException {
         String newSessionName = formatParameter(sessionName);
-        String command = COMMAND_STOP_SESSION + newSessionName;
+        StringBuffer command = createCommand(COMMAND_STOP_SESSION, newSessionName);
 
-        ICommandResult result = fCommandShell.executeCommand(command, monitor);
+        executeCommand(command.toString(), monitor);
 
-        if (isError(result)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-        }
         //Session <sessionName> stopped
         
     }
@@ -688,9 +681,7 @@ public class LTTngControlService implements ILttngControlService {
             return;
         }
 
-        String newSessionName = formatParameter(sessionName);
-        
-        StringBuffer command = new StringBuffer(COMMAND_ENABLE_CHANNEL);
+        StringBuffer command = createCommand(COMMAND_ENABLE_CHANNEL);
 
         for (Iterator<String> iterator = channelNames.iterator(); iterator.hasNext();) {
             String channel = (String) iterator.next();
@@ -706,6 +697,7 @@ public class LTTngControlService implements ILttngControlService {
             command.append(OPTION_UST);
         }
 
+        String newSessionName = formatParameter(sessionName);
         command.append(OPTION_SESSION);
         command.append(newSessionName);
 
@@ -735,11 +727,8 @@ public class LTTngControlService implements ILttngControlService {
             command.append(String.valueOf(info.getReadTimer()));
         } 
 
-        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
+        executeCommand(command.toString(), monitor);
         
-        if (isError(result)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-        }
     }
 
     /*
@@ -754,9 +743,7 @@ public class LTTngControlService implements ILttngControlService {
             return;
         }
 
-        String newSessionName = formatParameter(sessionName);
-        
-        StringBuffer command = new StringBuffer(COMMAND_DISABLE_CHANNEL);
+        StringBuffer command = createCommand(COMMAND_DISABLE_CHANNEL);
 
         for (Iterator<String> iterator = channelNames.iterator(); iterator.hasNext();) {
             String channel = (String) iterator.next();
@@ -772,16 +759,13 @@ public class LTTngControlService implements ILttngControlService {
             command.append(OPTION_UST);
         }
 
+        String newSessionName = formatParameter(sessionName);
         command.append(OPTION_SESSION);
         command.append(newSessionName);
 
-        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
-        
-        if (isError(result)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+        executeCommand(command.toString(), monitor);
     }
-
+    
     /*
      * (non-Javadoc)
      * @see org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService#enableEvent(java.lang.String, java.lang.String, java.util.List, boolean, org.eclipse.core.runtime.IProgressMonitor)
@@ -789,9 +773,7 @@ public class LTTngControlService implements ILttngControlService {
     @Override
     public void enableEvents(String sessionName, String channelName, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
 
-        String newSessionName = formatParameter(sessionName);
-        
-        StringBuffer command = new StringBuffer(COMMAND_ENABLE_EVENT);
+        StringBuffer command = createCommand(COMMAND_ENABLE_EVENT);
 
         if (eventNames == null || eventNames.isEmpty()) {
             command.append(OPTION_ALL);
@@ -812,6 +794,8 @@ public class LTTngControlService implements ILttngControlService {
             command.append(OPTION_UST);
         }
 
+        String newSessionName = formatParameter(sessionName);
+
         command.append(OPTION_SESSION);
         command.append(newSessionName);
 
@@ -822,11 +806,8 @@ public class LTTngControlService implements ILttngControlService {
         
         command.append(OPTION_TRACEPOINT);
         
-        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
+        executeCommand(command.toString(), monitor);
         
-        if (isError(result)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-        }
     }
 
     /*
@@ -835,12 +816,13 @@ public class LTTngControlService implements ILttngControlService {
      */
     @Override
     public void enableSyscalls(String sessionName, String channelName, IProgressMonitor monitor) throws ExecutionException {
-        String newSessionName = formatParameter(sessionName);
-        
-        StringBuffer command = new StringBuffer(COMMAND_ENABLE_EVENT);
+
+        StringBuffer command = createCommand(COMMAND_ENABLE_EVENT);
 
         command.append(OPTION_ALL);
         command.append(OPTION_KERNEL);
+
+        String newSessionName = formatParameter(sessionName);
 
         command.append(OPTION_SESSION);
         command.append(newSessionName);
@@ -852,11 +834,7 @@ public class LTTngControlService implements ILttngControlService {
         
         command.append(OPTION_SYSCALL);
         
-        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
-        
-        if (isError(result)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-        }        
+        executeCommand(command.toString(), monitor);
     }
     
     /*
@@ -865,13 +843,12 @@ public class LTTngControlService implements ILttngControlService {
      */
     @Override
     public void enableProbe(String sessionName, String channelName, String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException {
-        String newSessionName = formatParameter(sessionName);
-        
-        StringBuffer command = new StringBuffer(COMMAND_ENABLE_EVENT);
+        StringBuffer command = createCommand(COMMAND_ENABLE_EVENT);
 
         command.append(eventName);
         command.append(OPTION_KERNEL);
 
+        String newSessionName = formatParameter(sessionName);
         command.append(OPTION_SESSION);
         command.append(newSessionName);
 
@@ -887,11 +864,7 @@ public class LTTngControlService implements ILttngControlService {
         
         command.append(probe);
         
-        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
-        
-        if (isError(result)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-        }        
+        executeCommand(command.toString(), monitor);
     }
 
     /*
@@ -900,13 +873,12 @@ public class LTTngControlService implements ILttngControlService {
      */
     @Override
     public void enableLogLevel(String sessionName, String channelName, String eventName, LogLevelType logLevelType, TraceLogLevel level, IProgressMonitor monitor) throws ExecutionException {
-        String newSessionName = formatParameter(sessionName);
-        
-        StringBuffer command = new StringBuffer(COMMAND_ENABLE_EVENT);
+        StringBuffer command = createCommand(COMMAND_ENABLE_EVENT);
 
         command.append(eventName);
         command.append(OPTION_UST);
 
+        String newSessionName = formatParameter(sessionName);
         command.append(OPTION_SESSION);
         command.append(newSessionName);
 
@@ -925,11 +897,8 @@ public class LTTngControlService implements ILttngControlService {
         }
         command.append(level.getInName());
         
-        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
+        executeCommand(command.toString(), monitor);
         
-        if (isError(result)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-        }
     }
 
     /*
@@ -938,9 +907,8 @@ public class LTTngControlService implements ILttngControlService {
      */
     @Override
     public void disableEvent(String sessionName, String channelName, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
-        String newSessionName = formatParameter(sessionName);
+        StringBuffer command = createCommand(COMMAND_DISABLE_EVENT);
 
-        StringBuffer command = new StringBuffer(COMMAND_DISABLE_EVENT);
         if (eventNames == null) {
             command.append(OPTION_ALL);
         } else {
@@ -964,6 +932,7 @@ public class LTTngControlService implements ILttngControlService {
             command.append(OPTION_UST);
         }
 
+        String newSessionName = formatParameter(sessionName);
         command.append(OPTION_SESSION);
         command.append(newSessionName);
 
@@ -972,11 +941,7 @@ public class LTTngControlService implements ILttngControlService {
             command.append(channelName);
         }
 
-        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
-        
-        if (isError(result)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+        executeCommand(command.toString(), monitor);
     }
 
     /*
@@ -986,13 +951,9 @@ public class LTTngControlService implements ILttngControlService {
     @Override
     public List<String> getContextList(IProgressMonitor monitor) throws ExecutionException {
 
-        String command = COMMAND_ADD_CONTEXT + OPTION_HELP;
+        StringBuffer command = createCommand(COMMAND_ADD_CONTEXT, OPTION_HELP);
 
-        ICommandResult result = fCommandShell.executeCommand(command, monitor);
-
-        if (isError(result)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+        ICommandResult result = executeCommand(command.toString(), monitor);
 
         String[] output = result.getOutput(); 
         
@@ -1027,10 +988,9 @@ public class LTTngControlService implements ILttngControlService {
      */
     @Override
     public void addContexts(String sessionName, String channelName, String eventName, boolean isKernel, List<String> contextNames, IProgressMonitor monitor) throws ExecutionException {
-        
-        String newSessionName = formatParameter(sessionName);
-        StringBuffer command = new StringBuffer(COMMAND_ADD_CONTEXT);
+        StringBuffer command = createCommand(COMMAND_ADD_CONTEXT);
 
+        String newSessionName = formatParameter(sessionName);
         command.append(OPTION_SESSION);
         command.append(newSessionName);
         
@@ -1056,11 +1016,8 @@ public class LTTngControlService implements ILttngControlService {
             command.append(context);
         }
 
-        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
+        executeCommand(command.toString(), monitor);
         
-        if (isError(result)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-        }
     }
 
     /*
@@ -1070,7 +1027,7 @@ public class LTTngControlService implements ILttngControlService {
     @Override
     public void calibrate(boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
 //        String newSessionName = formatParameter(sessionName);
-        StringBuffer command = new StringBuffer(COMMAND_CALIBRATE);
+        StringBuffer command = createCommand(COMMAND_CALIBRATE);
 //
 //        command.append(OPTION_SESSION);
 //        command.append(newSessionName);
@@ -1083,11 +1040,7 @@ public class LTTngControlService implements ILttngControlService {
 
         command.append(OPTION_FUNCTION_PROBE);
 
-        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
-
-        if (isError(result)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command + "\n" + formatOutput(result.getOutput())); //$NON-NLS-1$ //$NON-NLS-2$
-        }        
+        executeCommand(command.toString(), monitor);
     }
     
     // ------------------------------------------------------------------------
@@ -1114,12 +1067,15 @@ public class LTTngControlService implements ILttngControlService {
      *            - output array
      * @return - the formatted output
      */
-    private String formatOutput(String[] output) {
-        if (output == null || output.length == 0) {
+    private String formatOutput(ICommandResult result) {
+        if ((result == null) || result.getOutput() == null || result.getOutput().length == 0) {
             return ""; //$NON-NLS-1$
         }
-
+        String[] output = result.getOutput();
         StringBuffer ret = new StringBuffer();
+        ret.append("Return Value: "); //$NON-NLS-1$
+        ret.append(result.getResult());
+        ret.append("\n"); //$NON-NLS-1$
         for (int i = 0; i < output.length; i++) {
             ret.append(output[i] + "\n"); //$NON-NLS-1$
         }
@@ -1377,5 +1333,88 @@ public class LTTngControlService implements ILttngControlService {
             return newString.toString();
         }
         return null;
+    }
+
+    /**
+     * @param strings array of string that makes up a command line
+     * @return string buffer with created command line
+     */
+    private StringBuffer createCommand(String... strings) {
+        StringBuffer command = new StringBuffer();
+        command.append(CONTROL_COMMAND);
+        command.append(getTracingGroupOption());
+        command.append(getVerboseOption());
+        for (String string : strings) {
+            command.append(string);
+        }
+        return command;
+    }
+
+    /**
+     * @return the tracing group option if configured in the preferences
+     */
+    private String getTracingGroupOption() {
+        if (!ControlPreferences.getInstance().isDefaultTracingGroup() && !ControlPreferences.getInstance().getTracingGroup().equals("")) { //$NON-NLS-1$
+            return OPTION_TRACING_GROUP + ControlPreferences.getInstance().getTracingGroup();
+        }
+        return ""; //$NON-NLS-1$
+    }
+
+    /**
+     * @return the verbose option as configured in the preferences
+     */
+    private String getVerboseOption() {
+        if (ControlPreferences.getInstance().isLoggingEnabled()) {
+            String level = ControlPreferences.getInstance().getVerboseLevel();
+            if (ControlPreferences.TRACE_CONTROL_VERBOSE_LEVEL_VERBOSE.equals(level)) {
+                return OPTION_VERBOSE;
+            }
+            if (ControlPreferences.TRACE_CONTROL_VERBOSE_LEVEL_V_VERBOSE.equals(level)) {
+                return OPTION_VERY_VERBOSE;
+            } 
+            if (ControlPreferences.TRACE_CONTROL_VERBOSE_LEVEL_V_V_VERBOSE.equals(level)) {
+                return OPTION_VERY_VERY_VERBOSE;
+            }
+        }
+        return ""; //$NON-NLS-1$
+    }
+
+    /**
+     * Method that logs the command and command result if logging is enabled as well as forwards
+     * the command execution to the shell.
+     * @param command - the command to execute
+     * @param monitor - a progress monitor
+     * @return the command result
+     * @throws ExecutionException
+     */
+    private ICommandResult executeCommand(String command, IProgressMonitor monitor) throws ExecutionException {
+        return executeCommand(command, monitor, true);
+    }
+    
+    /**
+     * Method that logs the command and command result if logging is enabled as well as forwards
+     * the command execution to the shell.
+     * @param command - the command to execute
+     * @param monitor - a progress monitor
+     * @param - checkForError - true to verify command result, else false
+     * @return the command result
+     * @throws ExecutionException in case of error result
+     */
+    private ICommandResult executeCommand(String command, IProgressMonitor monitor, boolean checkForError) throws ExecutionException {
+        if (ControlPreferences.getInstance().isLoggingEnabled()) {
+            ControlCommandLogger.log(command);
+        }
+
+        ICommandResult result = fCommandShell.executeCommand(command.toString(), monitor);
+        
+        if (ControlPreferences.getInstance().isLoggingEnabled()) {
+            ControlCommandLogger.log(formatOutput(result));
+        }
+
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + command.toString() + "\n" + formatOutput(result)); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        
+        return result;
     }
 }

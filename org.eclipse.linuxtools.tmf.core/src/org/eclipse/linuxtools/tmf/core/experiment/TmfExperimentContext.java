@@ -24,16 +24,10 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
  * The experiment keeps track of the next event from each of its traces so it
  * can pick the next one in chronological order.
  * <p>
-<<<<<<< HEAD
- * This implies that the "next" event from each trace has already been read and
- * that we at least know its timestamp. This doesn't imply that a full parse of
- * the event content was performed (read: LTTng works like this).
-=======
  * This implies that the "next" event from each trace has already been
  * read and that we at least know its timestamp. This doesn't imply that a
  * full parse of the event content was performed (read: LTTng works like
  * this).
->>>>>>> refs/heads/master
  * <p>
  * The last trace refers to the trace from which the last event was "consumed"
  * at the experiment level.
@@ -64,7 +58,6 @@ public class TmfExperimentContext extends TmfContext {
         fTraces = traces;
         fContexts = contexts;
         fEvents = new ITmfEvent[fTraces.length];
-
         final ITmfLocation<?>[] locations = new ITmfLocation[fTraces.length];
         final long[] ranks = new long[fTraces.length];
         long rank = 0;
@@ -166,7 +159,7 @@ public class TmfExperimentContext extends TmfContext {
         final TmfExperimentContext o = (TmfExperimentContext) other;
         boolean isEqual = true;
         int i = 0;
-        while (isEqual && i < fTraces.length) {
+        while (isEqual && (i < fTraces.length)) {
             isEqual &= fTraces[i].equals(o.fTraces[i]);
             isEqual &= fContexts[i].equals(o.fContexts[i]);
             i++;

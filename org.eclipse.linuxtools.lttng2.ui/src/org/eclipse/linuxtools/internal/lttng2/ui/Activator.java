@@ -16,6 +16,7 @@ import java.net.URL;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.preferences.ControlPreferences;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -73,6 +74,7 @@ public class Activator extends AbstractUIPlugin {
     public void start(BundleContext context) throws Exception {
         super.start(context);
         plugin = this;
+        ControlPreferences.getInstance().init();
     }
 
     /* (non-Javadoc)
@@ -80,6 +82,7 @@ public class Activator extends AbstractUIPlugin {
      */
     @Override
     public void stop(BundleContext context) throws Exception {
+        ControlPreferences.getInstance().dispose();
         plugin = null;
         super.stop(context);
     }
