@@ -28,7 +28,6 @@ import org.eclipse.linuxtools.internal.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.internal.lttng.core.exceptions.LttngException;
 import org.eclipse.linuxtools.internal.lttng.core.tracecontrol.utility.LiveTraceManager;
 import org.eclipse.linuxtools.internal.lttng.jni.common.JniTime;
-import org.eclipse.linuxtools.internal.lttng.jni.exception.JniException;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.lttng.jni.JniMarker;
 import org.eclipse.linuxtools.lttng.jni.JniTrace;
@@ -287,7 +286,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      */
     public LTTngTrace(final String name, final String path, final String traceLibPath, final boolean waitForCompletion,
             final boolean bypassIndexing)
-            throws Exception {
+                    throws Exception {
         super(name, LttngEvent.class, path, CHECKPOINT_PAGE_SIZE, false);
         initTrace(name, path, LttngEvent.class);
         if (!bypassIndexing)
@@ -304,45 +303,45 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         setTimeRange(new TmfTimeRange(new LttngTimestamp(other.getStartTime()), new LttngTimestamp(other.getEndTime())));
     }
 
-    @Override
-    public synchronized LTTngTrace clone() {
-        LTTngTrace clone = null;
-        clone = (LTTngTrace) super.clone();
-        try {
-            clone.currentJniTrace = JniTraceFactory.getJniTrace(getPath(), getTraceLibPath(),
-                    SHOW_LTT_DEBUG_DEFAULT);
-        } catch (final JniException e) {
-            // e.printStackTrace();
-        }
-
-        // Export all the event types from the JNI side
-        clone.traceTypes = new HashMap<Integer, LttngEventType>();
-        clone.traceTypeNames = new Vector<Integer>();
-        clone.initialiseEventTypes(clone.currentJniTrace);
-
-        // Verify that all those "default constructor" are safe to use
-        clone.eventTimestamp = new LttngTimestamp();
-        clone.eventSource = ""; //$NON-NLS-1$
-        clone.eventType = new LttngEventType();
-        clone.eventContent = new LttngEventContent(clone.currentLttngEvent);
-        clone.eventReference = getName();
-
-        // Create the skeleton event
-        clone.currentLttngEvent = new LttngEvent(this, clone.eventTimestamp, clone.eventSource, clone.eventType,
-                clone.eventContent, clone.eventReference, null);
-
-        // Create a new current location
-        clone.previousLocation = new LttngLocation();
-
-        // Set the currentEvent to the eventContent
-        clone.eventContent.setEvent(clone.currentLttngEvent);
-
-        // Set the start time of the trace
-        setTimeRange(new TmfTimeRange(new LttngTimestamp(clone.currentJniTrace.getStartTime().getTime()),
-                new LttngTimestamp(clone.currentJniTrace.getEndTime().getTime())));
-
-        return clone;
-    }
+    //    @Override
+    //    public synchronized LTTngTrace clone() {
+    //        LTTngTrace clone = null;
+    //        clone = (LTTngTrace) super.clone();
+    //        try {
+    //            clone.currentJniTrace = JniTraceFactory.getJniTrace(getPath(), getTraceLibPath(),
+    //                    SHOW_LTT_DEBUG_DEFAULT);
+    //        } catch (final JniException e) {
+    //            // e.printStackTrace();
+    //        }
+    //
+    //        // Export all the event types from the JNI side
+    //        clone.traceTypes = new HashMap<Integer, LttngEventType>();
+    //        clone.traceTypeNames = new Vector<Integer>();
+    //        clone.initialiseEventTypes(clone.currentJniTrace);
+    //
+    //        // Verify that all those "default constructor" are safe to use
+    //        clone.eventTimestamp = new LttngTimestamp();
+    //        clone.eventSource = ""; //$NON-NLS-1$
+    //        clone.eventType = new LttngEventType();
+    //        clone.eventContent = new LttngEventContent(clone.currentLttngEvent);
+    //        clone.eventReference = getName();
+    //
+    //        // Create the skeleton event
+    //        clone.currentLttngEvent = new LttngEvent(this, clone.eventTimestamp, clone.eventSource, clone.eventType,
+    //                clone.eventContent, clone.eventReference, null);
+    //
+    //        // Create a new current location
+    //        clone.previousLocation = new LttngLocation();
+    //
+    //        // Set the currentEvent to the eventContent
+    //        clone.eventContent.setEvent(clone.currentLttngEvent);
+    //
+    //        // Set the start time of the trace
+    //        setTimeRange(new TmfTimeRange(new LttngTimestamp(clone.currentJniTrace.getStartTime().getTime()),
+    //                new LttngTimestamp(clone.currentJniTrace.getEndTime().getTime())));
+    //
+    //        return clone;
+    //    }
 
     public String getTraceLibPath() {
         return traceLibPath;
@@ -664,26 +663,26 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         context.increaseRank();
     }
 
-//    protected void updateIndex(TmfContext context, long rank, ITmfTimestamp timestamp) {
-//
-//        if (getStartTime().compareTo(timestamp, false) > 0)
-//            setStartTime(timestamp);
-//        if (getEndTime().compareTo(timestamp, false) < 0)
-//            setEndTime(timestamp);
-//        if (rank != ITmfContext.UNKNOWN_RANK) {
-//            if (fNbEvents <= rank)
-//                fNbEvents = rank + 1;
-//            // Build the index as we go along
-//            if ((rank % fIndexPageSize) == 0) {
-//                // Determine the table position
-//                long position = rank / fIndexPageSize;
-//                // Add new entry at proper location (if empty)
-//                if (fCheckpoints.size() == position) {
-//                    addCheckPoint(context, timestamp);
-//                }
-//            }
-//        }
-//    }
+    //    protected void updateIndex(TmfContext context, long rank, ITmfTimestamp timestamp) {
+    //
+    //        if (getStartTime().compareTo(timestamp, false) > 0)
+    //            setStartTime(timestamp);
+    //        if (getEndTime().compareTo(timestamp, false) < 0)
+    //            setEndTime(timestamp);
+    //        if (rank != ITmfContext.UNKNOWN_RANK) {
+    //            if (fNbEvents <= rank)
+    //                fNbEvents = rank + 1;
+    //            // Build the index as we go along
+    //            if ((rank % fIndexPageSize) == 0) {
+    //                // Determine the table position
+    //                long position = rank / fIndexPageSize;
+    //                // Add new entry at proper location (if empty)
+    //                if (fCheckpoints.size() == position) {
+    //                    addCheckPoint(context, timestamp);
+    //                }
+    //            }
+    //        }
+    //    }
 
     // this method was extracted for profiling purposes
     private synchronized LttngEvent readNextEvent(final LttngLocation curLocation) {

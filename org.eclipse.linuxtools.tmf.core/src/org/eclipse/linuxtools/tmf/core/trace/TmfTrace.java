@@ -145,30 +145,30 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         indexTrace(false);
     }
 
-    // ------------------------------------------------------------------------
-    // Cloneable
-    // ------------------------------------------------------------------------
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#clone()
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public TmfTrace<T> clone() {
-        TmfTrace<T> clone = null;
-        try {
-            clone = (TmfTrace<T>) super.clone();
-            //            clone.fTrace = fTrace;
-            //            clone.fRank = fRank;
-            //            clone.fTimestamp = fTimestamp != null ? fTimestamp.clone() : null;
-            //            clone.fSource = fSource;
-            //            clone.fType = fType != null ? fType.clone() : null;
-            //            clone.fContent = fContent != null ? fContent.clone() : null;
-            //            clone.fReference = fReference;
-        } catch (final CloneNotSupportedException e) {
-        }
-        return clone;
-    }
+    //    // ------------------------------------------------------------------------
+    //    // Cloneable
+    //    // ------------------------------------------------------------------------
+    //
+    //    /* (non-Javadoc)
+    //     * @see java.lang.Object#clone()
+    //     */
+    //    @Override
+    //    @SuppressWarnings("unchecked")
+    //    public TmfTrace<T> clone() {
+    //        TmfTrace<T> clone = null;
+    //        try {
+    //            clone = (TmfTrace<T>) super.clone();
+    //            //            clone.fTrace = fTrace;
+    //            //            clone.fRank = fRank;
+    //            //            clone.fTimestamp = fTimestamp != null ? fTimestamp.clone() : null;
+    //            //            clone.fSource = fSource;
+    //            //            clone.fType = fType != null ? fType.clone() : null;
+    //            //            clone.fContent = fContent != null ? fContent.clone() : null;
+    //            //            clone.fReference = fReference;
+    //        } catch (final CloneNotSupportedException e) {
+    //        }
+    //        return clone;
+    //    }
 
     // ------------------------------------------------------------------------
     // ITmfTrace - initializers

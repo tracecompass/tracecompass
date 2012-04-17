@@ -17,7 +17,7 @@ import java.io.FileNotFoundException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.linuxtools.tmf.core.component.ITmfComponent;
+import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
@@ -25,9 +25,60 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 /**
  * <b><u>ITmfTrace</u></b>
  * <p>
- * The basic event trace structure in TMF.
+ * The event stream structure in TMF. In its basic form, a trace has:
+ * <ul>
+ * <li> the associated Eclipse resource
+ * <li> the path to its location on the file system
+ * <li> the type of the events it contains
+ * <li> the number of events it contains
+ * <li> the time range (span) of the events it contains
+ * </ul>
+ * Concrete ITmfTrace classes have to provide a parameter-less constructor and
+ * an initialization method (initTace())if they are to be opened from the
+ * Project View. Also, a validation (validate()) method has to be provided to
+ * ensure that the trace is of the correct type.
+ * <p>
+ * A trace can be accessed simultaneously from multiple threads by various
+ * application components. To avoid obvious multi-threading issues, the trace
+ * uses an ITmfContext as a synchronization aid for its read operations.
+ * <p>
+ * A proper ITmfContext can be obtained by performing a seek operation on the
+ * trace. Seek operations can be performed for a particular event (by rank or
+ * timestamp) or for a plain trace location.
+ * <p>
+ * <b>Example 1</b>: Read a whole trace
+ * <pre>
+ * ITmfContext context = trace.seekLocationt(null);
+ * ITmfEvent event = trace.getEvent(context);
+ * while (event != null) {
+ *     // Do something ...
+ *     event = trace.getEvent(context);
+ * }
+ * </pre>
+ * <b>Example 2</b>: Process 50 events starting from the 1000th event
+ * <pre>
+ * int nbEventsRead = 0;
+ * ITmfContext context = trace.seekEvent(1000);
+ * ITmfEvent event = trace.getEvent(context);
+ * while (event != null && nbEventsRead < 50) {
+ *     nbEventsRead++;
+ *     // Do something ...
+ *     event = trace.getEvent(context);
+ * }
+ * </pre>
+ * <b>Example 3</b>: Process the events between 2 timestamps (inclusive)
+ * <pre>
+ * ITmfTimestamp startTime = ...;
+ * ITmfTimestamp endTime = ...;
+ * ITmfContext context = trace.seekEvent(startTime);
+ * ITmfEvent event = trace.getEvent(context);
+ * while (event != null && event.getTimestamp().compareTo(endTime) <= 0) {
+ *     // Do something ...
+ *     event = trace.getEvent(context);
+ * }
+ * </pre>
  */
-public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent, Cloneable {
+public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
 
     // ------------------------------------------------------------------------
     // Initializers
@@ -210,13 +261,13 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfComponent, Cloneable
      */
     public long getRank(ITmfTimestamp timestamp);
 
-    // ------------------------------------------------------------------------
-    // Cloneable
-    // ------------------------------------------------------------------------
-
-    /**
-     * @return a clone of the trace
-     */
-    public ITmfTrace<T> clone() throws CloneNotSupportedException;
+    //    // ------------------------------------------------------------------------
+    //    // Cloneable
+    //    // ------------------------------------------------------------------------
+    //
+    //    /**
+    //     * @return a clone of the trace
+    //     */
+    //    public ITmfTrace<T> clone() throws CloneNotSupportedException;
 
 }

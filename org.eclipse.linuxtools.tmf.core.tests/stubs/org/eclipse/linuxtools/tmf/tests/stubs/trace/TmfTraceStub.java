@@ -44,7 +44,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     private RandomAccessFile fTrace;
 
     // The associated event parser
-    private ITmfEventParser<TmfEvent> fParser;
+    private final ITmfEventParser<TmfEvent> fParser;
 
     // The synchronization lock
     private final ReentrantLock fLock = new ReentrantLock();
@@ -106,18 +106,28 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     }
 
     /**
+     * Copy constructor
      */
-    @Override
-    public TmfTraceStub clone() {
-        TmfTraceStub clone = null;
-        try {
-            clone = (TmfTraceStub) super.clone();
-            clone.fTrace  = new RandomAccessFile(getPath(), "r");
-            clone.fParser = new TmfEventParserStub();
-        } catch (final FileNotFoundException e) {
-        }
-        return clone;
+    public TmfTraceStub(final TmfTraceStub trace) throws FileNotFoundException {
+        super(trace.getPath(), TmfEvent.class, trace.getPath(), trace.getIndexPageSize(), false);
+        fTrace = new RandomAccessFile(trace.getPath(), "r");
+        fParser = trace.fParser;
+        trace.indexTrace(true);
     }
+
+    //    /**
+    //     */
+    //    @Override
+    //    public TmfTraceStub clone() {
+    //        TmfTraceStub clone = null;
+    //        try {
+    //            clone = (TmfTraceStub) super.clone();
+    //            clone.fTrace  = new RandomAccessFile(getPath(), "r");
+    //            clone.fParser = new TmfEventParserStub();
+    //        } catch (final FileNotFoundException e) {
+    //        }
+    //        return clone;
+    //    }
 
     // ------------------------------------------------------------------------
     // Accessors

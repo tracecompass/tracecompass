@@ -20,16 +20,16 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
  * <p>
  * TODO: Implement me. Please.
  */
-public interface ITmfDataProvider<T extends ITmfEvent> {
+public interface ITmfDataProvider<T extends ITmfEvent> extends ITmfComponent {
 
     /**
      * Queues the request for processing.
      * 
      * If the request can't be serviced, it will fail (i.e. isFailed() will be set).
      * 
-	 * @param request The request to process
-	 */
-	public void sendRequest(ITmfDataRequest<T> request);
-	public void fireRequest();
-	public void notifyPendingRequest(boolean isIncrement);
+     * @param request The request to process
+     */
+    public void sendRequest(ITmfDataRequest<T> request);
+    public void fireRequest();
+    public void notifyPendingRequest(boolean isIncrement);
 }
