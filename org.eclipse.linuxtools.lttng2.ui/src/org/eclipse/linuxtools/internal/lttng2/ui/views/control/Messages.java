@@ -33,7 +33,7 @@ final public class Messages extends NLS {
 
     public static String TraceControl_CommandShellError;
     public static String TraceControl_CommandError;
-    public static String TraceControl_UnexpectedCommnadOutputFormat;
+    public static String TraceControl_UnexpectedCommandOutputFormat;
     public static String TraceControl_UnexpectedNameError;
     public static String TraceControl_UnexpectedPathError;
     
@@ -208,6 +208,18 @@ final public class Messages extends NLS {
     public static String TraceControl_ProbeAddressPropertyName;
     public static String TraceControl_ProbeOffsetPropertyName;
     public static String TraceControl_ProbeSymbolPropertyName;
+    
+    // Preferences
+    public static String TraceControl_TracingGroupPreference;
+    public static String TraceControl_LoggingPreference;
+    public static String TraceControl_LogfilePath;
+    public static String TraceControl_AppendLogfilePreference;
+     
+    public static String TraceControl_VerboseLevelsPreference;
+    public static String TraceControl_VerboseLevelNonePreference;
+    public static String TraceControl_VerboseLevelVerbosePreference;
+    public static String TraceControl_VerboseLevelVeryVerbosePreference;
+    public static String TraceControl_VerboseLevelVeryVeryVerbosePreference;
     
     static {
         // initialize resource bundle

@@ -1138,7 +1138,7 @@
       </handler>
       
    </extension>
-   
+
     <extension
           point="org.eclipse.rse.core.systemTypes">
        <systemType
@@ -1151,6 +1151,22 @@
              subsystemConfigurationIds="ssh.shells;ssh.files;ssh.terminals;processes.shell.linux">
        </systemType>
     </extension>
+
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.linuxtools.tmf.ui.TmfTracingPreferences"
+            class="org.eclipse.linuxtools.internal.lttng2.ui.views.control.preferences.ControlPreferencePage"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.views.control.preferences"
+            name="%preference.page.control.name">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.linuxtools.internal.lttng2.ui.views.control.preferences.ControlPreferenceInitializer">
+      </initializer>
+   </extension>
    
    
 </plugin>
