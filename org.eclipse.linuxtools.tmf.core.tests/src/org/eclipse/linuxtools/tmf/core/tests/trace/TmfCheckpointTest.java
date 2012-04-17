@@ -229,9 +229,29 @@ public class TmfCheckpointTest extends TestCase {
         assertTrue("equals", checkpoint1.equals(checkpoint3));
     }
 
-    public void testEqualsNull() throws Exception {
-        assertTrue("equals", !fCheckpoint1.equals(null));
-        assertTrue("equals", !fCheckpoint2.equals(null));
+    public void testNotEqual() throws Exception {
+        // Various checkpoints
+        final TmfCheckpoint checkpoint1 = new TmfCheckpoint(fTimestamp1, fLocation1);
+        final TmfCheckpoint checkpoint2 = new TmfCheckpoint(fTimestamp2, fLocation1);
+        final TmfCheckpoint checkpoint3 = new TmfCheckpoint(fTimestamp1, fLocation2);
+        final TmfCheckpoint checkpoint4 = new TmfCheckpoint(fTimestamp1, null);
+        final TmfCheckpoint checkpoint5 = new TmfCheckpoint(null, fLocation1);
+
+        // Null check
+        assertFalse("equals", checkpoint1.equals(null));
+
+        // Different types
+        assertFalse("equals", checkpoint1.equals(new TmfTimestamp()));
+
+        // Null locations/location
+        assertFalse("equals", checkpoint1.equals(checkpoint4));
+        assertFalse("equals", checkpoint1.equals(checkpoint5));
+        assertFalse("equals", checkpoint4.equals(checkpoint1));
+        assertFalse("equals", checkpoint5.equals(checkpoint1));
+
+        // Different locations/location
+        assertFalse("equals", checkpoint1.equals(checkpoint2));
+        assertFalse("equals", checkpoint1.equals(checkpoint3));
     }
 
     // ------------------------------------------------------------------------

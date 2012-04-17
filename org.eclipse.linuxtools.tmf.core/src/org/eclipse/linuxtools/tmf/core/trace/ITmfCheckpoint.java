@@ -51,8 +51,6 @@ public interface ITmfCheckpoint extends Cloneable, Comparable<ITmfCheckpoint> {
 
     /* (non-Javadoc)
      * @see java.lang.Comparable#compareTo(java.lang.Object)
-     * 
-     * 
      */
     @Override
     public int compareTo(ITmfCheckpoint checkpoint);
