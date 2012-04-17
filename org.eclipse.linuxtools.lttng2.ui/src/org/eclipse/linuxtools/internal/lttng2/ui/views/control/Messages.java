@@ -37,6 +37,9 @@ final public class Messages extends NLS {
     public static String TraceControl_UnexpectedNameError;
     public static String TraceControl_UnexpectedPathError;
     
+    public static String TraceControl_UnsupportedVersionError;
+    public static String TraceControl_GettingVersionError;
+    
     // Commands
     public static String TraceControl_RetrieveNodeConfigurationJob;
     public static String TraceControl_ListSessionFailure;

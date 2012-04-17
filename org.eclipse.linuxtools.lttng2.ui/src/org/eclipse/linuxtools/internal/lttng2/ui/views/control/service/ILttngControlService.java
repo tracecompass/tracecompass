@@ -29,6 +29,12 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceLogLev
 * </p>
 */
 public interface ILttngControlService {
+
+    /**
+     * @return the version string.
+     */
+    public String getVersion();
+
     /**
      * Retrieves the existing sessions names from the node.
      * @param monitor - a progress monitor
