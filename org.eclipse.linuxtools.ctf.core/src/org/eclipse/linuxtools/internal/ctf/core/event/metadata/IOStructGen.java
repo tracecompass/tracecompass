@@ -28,6 +28,7 @@ import org.eclipse.linuxtools.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.types.FloatDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.SequenceDeclaration;
@@ -36,7 +37,6 @@ import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.parser.CTFParser;
-import org.eclipse.linuxtools.internal.ctf.core.Activator;
 import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
 import org.eclipse.linuxtools.internal.ctf.core.trace.Stream;
 
@@ -720,7 +720,11 @@ public class IOStructGen {
              */
             final StructDeclaration fields = (StructDeclaration) fieldsDecl;
             event.setFields(fields);
+        }
+        else if (left.equals("loglevel")){ //$NON-NLS-1$
 
+            long logLevel = parseUnaryInteger((CommonTree) rightNode.getChild(0)) ;
+            event.setLogLevel(logLevel);
         } else {
             throw new ParseException("Unknown event attribute : " + left); //$NON-NLS-1$
         }
@@ -1132,9 +1136,10 @@ public class IOStructGen {
 
         switch (firstChild.getType()) {
         case CTFParser.FLOATING_POINT:
-            Activator
-                    .getDefault()
-                    .log("parseTypeSpecifierList: floating_point not implemented yet"); //$NON-NLS-1$
+//            Activator
+//                    .getDefault()
+//                    .log("parseTypeSpecifierList: floating_point not implemented yet"); //$NON-NLS-1$
+            declaration = parseFloat(firstChild);
             break;
         case CTFParser.INTEGER:
             declaration = parseInteger(firstChild);
@@ -1172,6 +1177,90 @@ public class IOStructGen {
 
         assert (declaration != null);
         return declaration;
+    }
+
+    private IDeclaration parseFloat(CommonTree floatingPoint) throws ParseException {
+        assert (floatingPoint.getType() == CTFParser.INTEGER);
+
+        List<CommonTree> children = floatingPoint.getChildren();
+
+        /*
+         * If the integer has no attributes, then it is missing the size
+         * attribute which is required
+         */
+        if (children == null) {
+            throw new ParseException("float: missing size attribute"); //$NON-NLS-1$
+        }
+
+        /* The return value */
+        FloatDeclaration floatDeclaration = null;
+        ByteOrder byteOrder = trace.getByteOrder();
+        long alignment = 0;
+        int base = 2;
+        int exponent = 8;
+        int mantissa = 24;
+
+        Encoding encoding = Encoding.NONE;
+
+        /* Iterate on all integer children */
+        for (CommonTree child : children) {
+            switch (child.getType()) {
+            case CTFParser.CTF_EXPRESSION_VAL:
+                /*
+                 * An assignment expression must have 2 children, left and right
+                 */
+                assert (child.getChildCount() == 2);
+
+                CommonTree leftNode = (CommonTree) child.getChild(0);
+                assert (leftNode.getType() == CTFParser.CTF_LEFT);
+                CommonTree rightNode = (CommonTree) child.getChild(1);
+                assert (rightNode.getType() == CTFParser.CTF_RIGHT);
+
+                List<CommonTree> leftStrings = leftNode.getChildren();
+                assert (leftStrings != null);
+
+                if (!isUnaryString(leftStrings.get(0))) {
+                    throw new ParseException(
+                            "Left side of ctf expression must be a string"); //$NON-NLS-1$
+                }
+                String left = concatenateUnaryStrings(leftStrings);
+
+                if (left.equals("exp_dig")) { //$NON-NLS-1$
+                    exponent = (int) parseUnaryInteger((CommonTree) rightNode.getChild(0));
+                } else if (left.equals("byte_order")) { //$NON-NLS-1$
+                    byteOrder = getByteOrder(rightNode);
+                } else if (left.equals("mant_dig")) { //$NON-NLS-1$
+                    mantissa = (int) parseUnaryInteger((CommonTree) rightNode.getChild(0));
+                } else if (left.equals("align")) { //$NON-NLS-1$
+                    alignment = getAlignment(rightNode);
+                } else {
+                    throw new ParseException("Float: unknown attribute " + left); //$NON-NLS-1$
+                }
+
+                break;
+            default:
+                childTypeError(child);
+                break;
+            }
+        }
+        int size = mantissa + exponent;
+        if (size == 0) {
+            throw new ParseException("Float missing size attribute"); //$NON-NLS-1$
+        }
+
+        if (alignment == 0) {
+            if ((size % 8) == 0) {
+                alignment = 1;
+            } else {
+                alignment = 8;
+            }
+        }
+
+        floatDeclaration = new FloatDeclaration(exponent, mantissa, byteOrder, encoding);
+
+        assert (floatDeclaration != null);
+        return floatDeclaration;
+
     }
 
     /**

@@ -52,6 +52,11 @@ public class EventDeclaration {
      */
     private Stream stream = null;
 
+    /**
+     * Loglevel of an event
+     */
+    private long logLevel;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -139,6 +144,14 @@ public class EventDeclaration {
 
     public boolean streamIsSet() {
         return stream != null;
+    }
+
+    public long getLogLevel() {
+        return logLevel;
+    }
+
+    public void setLogLevel( long level){
+        logLevel = level;
     }
 
     // ------------------------------------------------------------------------
