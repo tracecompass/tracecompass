@@ -86,14 +86,18 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
 
     /**
      * Initialize a newly instantiated "empty" trace object. This is used to
-     * parameterize an ITmfTrace instantiated with its parameterless constructor.
+     * properly parameterize an ITmfTrace instantiated with its parameterless
+     * constructor.
      * 
-     * @param name the trace name
+     * Typically, the parameterless constructor will provide the block size
+     * and its associated parser and indexer.
+     * 
+     * @param resource the trace resource
      * @param path the trace path
      * @param type the trace event type
      * @throws FileNotFoundException
      */
-    public void initTrace(String name, String path, Class<T> type) throws FileNotFoundException;
+    public void initTrace(IResource resource, String path, Class<T> type) throws FileNotFoundException;
 
     /**
      * Validate that the trace is of the correct type.
@@ -105,26 +109,28 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      */
     public boolean validate(IProject project, String path);
 
-    /**
-     * Set the resource used for persistent properties on this trace
-     * 
-     * @param resource the properties resource
-     */
-    public void setResource(IResource resource);
-
     // ------------------------------------------------------------------------
     // Basic getters
     // ------------------------------------------------------------------------
+
+    /**
+     * @return the trace event type
+     */
+    public Class<T> getType();
+
+    /**
+     * @return the associated trace resource
+     */
+    public IResource getResource();
 
     /**
      * @return the trace path
      */
     public String getPath();
 
-    /**
-     * @return the properties resource or null if none is set
-     */
-    public IResource getResource();
+    // ------------------------------------------------------------------------
+    // Trace characteristics getters
+    // ------------------------------------------------------------------------
 
     /**
      * @return the number of events in the trace
@@ -146,36 +152,36 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      */
     public ITmfTimestamp getEndTime();
 
-    /**
-     * @return the streaming interval in ms (0 if not streaming)
-     */
-    public long getStreamingInterval();
-
-    /**
-     * @return the trace index page size
-     */
-    public int getIndexPageSize();
-
     // ------------------------------------------------------------------------
-    // Indexing
+    // Trace positioning getters
     // ------------------------------------------------------------------------
 
     /**
-     * Start the trace indexing, optionally wait for the index to be fully
-     * built before returning.
+     * @return the current trace location
+     */
+    public ITmfLocation<?> getCurrentLocation();
+
+    /**
+     * Returns the ratio (proportion) corresponding to the specified location.
      * 
-     * @param waitForCompletion true for synchronous indexing
+     * @param location a trace specific location
+     * @return a floating-point number between 0.0 (beginning) and 1.0 (end)
      */
-    public void indexTrace(boolean waitForCompletion);
+    public double getLocationRatio(ITmfLocation<?> location);
 
     // ------------------------------------------------------------------------
-    // Seek operations
+    // Seek operations (returning a reading context)
     // ------------------------------------------------------------------------
 
     /**
      * Position the trace at the specified location. The null location
-     * is used to indicate that the first trace event.
-     * 
+     * is used to indicate that the first trace event is requested.
+     * <p>
+     * <ul>
+     * <li> a <b>null</b> location returns the context of the first event
+     * <li> an invalid location, including beyond the last event, returns a null context
+     * </ul>
+     * <p>
      * @param location the trace specific location (null for 1st event)
      * @return a context which can later be used to read the corresponding event
      */
@@ -187,7 +193,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * 
      * The notion of ratio (0.0 <= r <= 1.0) is trace specific and left
      * voluntarily vague. Typically, it would refer to the event proportional
-     * rank or timestamp in the trace file.
+     * rank (arguably more intuitive) or timestamp in the trace file.
      * 
      * @param ratio the proportional 'rank' in the trace
      * @return a context which can later be used to read the corresponding event
@@ -205,7 +211,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
     public ITmfContext seekEvent(ITmfTimestamp timestamp);
 
     /**
-     * Position the trace at the Nth event in the trace.
+     * Position the trace at the 'rank'th event in the trace.
      * 
      * @param rank the event rank
      * @return a context which can later be used to read the corresponding event
@@ -213,15 +219,15 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
     public ITmfContext seekEvent(long rank);
 
     // ------------------------------------------------------------------------
-    // Read operations
+    // Read operations (returning an actual event)
     // ------------------------------------------------------------------------
 
     /**
      * Return the event pointed by the supplied context (or null if no event
      * left) and updates the context to point the next event.
      * 
-     * @param context the read context
-     * @return the next event in the stream
+     * @param context the read context (will be updated)
+     * @return the event pointed to by the context
      */
     public ITmfEvent getNextEvent(ITmfContext context);
 
@@ -234,40 +240,30 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      */
     public ITmfEvent parseEvent(ITmfContext context);
 
+    // ------------------------------------------------------------------------
+    // Indexing
+    // ------------------------------------------------------------------------
+
+    /**
+     * Start the trace indexing, optionally wait for the index to be fully
+     * built before returning.
+     *
+     * @param waitForCompletion true for synchronous indexing
+     */
+    public void indexTrace(boolean waitForCompletion);
+
 
     // ------------------------------------------------------------------------
-    // Location operations
     // ------------------------------------------------------------------------
 
     /**
-     * @return the current trace location
+     * @return the trace index page size
      */
-    public ITmfLocation<?> getCurrentLocation();
+    public int getIndexPageSize();
 
     /**
-     * Returns the ratio (proportion) corresponding to the specified location.
-     * 
-     * @param location a trace specific location
-     * @return a floating-point number between 0.0 (beginning) and 1.0 (end)
+     * @return the streaming interval in ms (0 if not a streaming trace)
      */
-    public double getLocationRatio(ITmfLocation<?> location);
-
-    /**
-     * Returns the rank of the first event with the requested timestamp.
-     * If none, returns the index of the subsequent event (if any).
-     * 
-     * @param timestamp the requested event timestamp
-     * @return the corresponding event rank
-     */
-    public long getRank(ITmfTimestamp timestamp);
-
-    //    // ------------------------------------------------------------------------
-    //    // Cloneable
-    //    // ------------------------------------------------------------------------
-    //
-    //    /**
-    //     * @return a clone of the trace
-    //     */
-    //    public ITmfTrace<T> clone() throws CloneNotSupportedException;
+    public long getStreamingInterval();
 
 }

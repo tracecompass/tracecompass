@@ -18,8 +18,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
-public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
-        ITmfTrace<CtfTmfEvent> {
+public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTrace<CtfTmfEvent> {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -57,13 +56,13 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
         super();
     }
 
-    @SuppressWarnings("unused")
     @Override
-    public void initTrace(String name, String path, Class<CtfTmfEvent> eventType)
+    public void initTrace(final IResource resource, final String path, final Class<CtfTmfEvent> eventType)
             throws FileNotFoundException {
+        this.fResource = resource;
         try {
             this.fTrace = new CTFTrace(path);
-        } catch (CTFReaderException e) {
+        } catch (final CTFReaderException e) {
             /*
              * If it failed at the init(), we can assume it's because the file
              * was not found or was not recognized as a CTF trace. Throw into
@@ -83,9 +82,8 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
         // this.fEndTime.clone()));
     }
 
-    @SuppressWarnings("unused")
     @Override
-    public void indexTrace(boolean waitForCompletion) {
+    public void indexTrace(final boolean waitForCompletion) {
         // do nothing
     }
 
@@ -95,17 +93,16 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
     }
 
     @Override
-    public void broadcast(TmfSignal signal) {
+    public void broadcast(final TmfSignal signal) {
         TmfSignalManager.dispatchSignal(signal);
     }
 
-    @SuppressWarnings("unused")
     @Override
-    public boolean validate(IProject project, String path) {
+    public boolean validate(final IProject project, final String path) {
         try {
             final CTFTrace temp = new CTFTrace(path);
             return temp.majortIsSet(); // random test
-        } catch (CTFReaderException e) {
+        } catch (final CTFReaderException e) {
             /* Nope, not a CTF trace we can read */
             return false;
         }
@@ -125,17 +122,25 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
     // Accessors
     // ------------------------------------------------------------------------
 
+    /**
+     * @return the trace path
+     */
+    @Override
+    public Class<CtfTmfEvent> getType() {
+        return fType;
+    }
+
     public int getNbEnvVars() {
         return this.fTrace.getEnvironment().size();
     }
 
 
     public String[] getEnvNames() {
-        String[] s = new String[getNbEnvVars()];
+        final String[] s = new String[getNbEnvVars()];
         return this.fTrace.getEnvironment().keySet().toArray(s);
     }
 
-    public String getEnvValue(String key)    {
+    public String getEnvValue(final String key)    {
         return this.fTrace.getEnvironment().get(key);
     }
 
@@ -150,11 +155,10 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
 
     @Override
     public String getName() {
-        String temp[] = this.fTrace.getPath().split(
+        final String temp[] = this.fTrace.getPath().split(
                 System.getProperty("file.separator")); //$NON-NLS-1$
-        if (temp.length > 2) {
+        if (temp.length > 2)
             return temp[temp.length - 1];
-        }
         return temp[0];
     }
 
@@ -188,26 +192,20 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
         return iterator.getLocation();
     }
 
-    @Override
-    public long getRank(ITmfTimestamp timestamp) {
-        ITmfContext context = seekEvent(timestamp);
-        return context.getRank();
-    }
-
     // ------------------------------------------------------------------------
     // Operators
     // ------------------------------------------------------------------------
 
-    protected void setTimeRange(TmfTimeRange range) {
+    protected void setTimeRange(final TmfTimeRange range) {
         this.fStartTime = range.getStartTime();
         this.fEndTime = range.getEndTime();
     }
 
-    protected void setStartTime(ITmfTimestamp startTime) {
+    protected void setStartTime(final ITmfTimestamp startTime) {
         this.fStartTime = startTime;
     }
 
-    protected void setEndTime(ITmfTimestamp endTime) {
+    protected void setEndTime(final ITmfTimestamp endTime) {
         this.fEndTime = endTime;
     }
 
@@ -216,16 +214,16 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
     // ------------------------------------------------------------------------
 
     @Override
-    public ITmfContext armRequest(ITmfDataRequest<CtfTmfEvent> request) {
+    public ITmfContext armRequest(final ITmfDataRequest<CtfTmfEvent> request) {
         if ((request instanceof ITmfEventRequest<?>)
                 && !TmfTimestamp.BIG_BANG
-                        .equals(((ITmfEventRequest<CtfTmfEvent>) request)
-                                .getRange().getStartTime())
-                && (request.getIndex() == 0)) {
-            ITmfContext context = seekEvent(((ITmfEventRequest<CtfTmfEvent>) request)
+                .equals(((ITmfEventRequest<CtfTmfEvent>) request)
+                        .getRange().getStartTime())
+                        && (request.getIndex() == 0)) {
+            final ITmfContext context = seekEvent(((ITmfEventRequest<CtfTmfEvent>) request)
                     .getRange().getStartTime());
             ((ITmfEventRequest<CtfTmfEvent>) request)
-                    .setStartIndex((int) context.getRank());
+            .setStartIndex((int) context.getRank());
             return context;
         }
         return seekEvent(request.getIndex());
@@ -241,9 +239,8 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
      * FIXME merge with getNextEvent below once they both use the same parameter
      * type.
      */
-    @SuppressWarnings("unused")
     @Override
-    public CtfTmfEvent getNext(ITmfContext context) {
+    public CtfTmfEvent getNext(final ITmfContext context) {
         iterator.advance();
         return iterator.getCurrentEvent();
     }
@@ -253,18 +250,17 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
     // ------------------------------------------------------------------------
 
     @Override
-    public ITmfContext seekLocation(ITmfLocation<?> location) {
+    public ITmfContext seekLocation(final ITmfLocation<?> location) {
         CtfLocation currentLocation = (CtfLocation) location;
-        if (currentLocation == null) {
+        if (currentLocation == null)
             currentLocation = new CtfLocation(0L);
-        }
         iterator.setLocation(currentLocation);
         return iterator;
     }
 
     @Override
-    public double getLocationRatio(ITmfLocation<?> location) {
-        CtfLocation curLocation = (CtfLocation) location;
+    public double getLocationRatio(final ITmfLocation<?> location) {
+        final CtfLocation curLocation = (CtfLocation) location;
         iterator.seek(curLocation.getLocation());
         return ((double) iterator.getCurrentEvent().getTimestampValue() - iterator
                 .getStartTime())
@@ -277,7 +273,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
     }
 
     @Override
-    public ITmfContext seekEvent(ITmfTimestamp timestamp) {
+    public ITmfContext seekEvent(final ITmfTimestamp timestamp) {
         iterator.seek(timestamp.getValue());
         return iterator;
     }
@@ -286,7 +282,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
      * Seek by rank
      */
     @Override
-    public ITmfContext seekEvent(long rank) {
+    public ITmfContext seekEvent(final long rank) {
         iterator.setRank(rank);
         return iterator;
     }
@@ -295,32 +291,25 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements
      * Seek rank ratio
      */
     @Override
-    public ITmfContext seekLocation(double ratio) {
+    public ITmfContext seekLocation(final double ratio) {
         iterator.seek((long) (this.fNbEvents * ratio));
         return iterator;
     }
 
-    @SuppressWarnings("unused")
     @Override
-    public CtfTmfEvent getNextEvent(ITmfContext context) {
+    public CtfTmfEvent getNextEvent(final ITmfContext context) {
         iterator.advance();
         return iterator.getCurrentEvent();
     }
 
-    @SuppressWarnings("unused")
     @Override
-    public CtfTmfEvent parseEvent(ITmfContext context) {
+    public CtfTmfEvent parseEvent(final ITmfContext context) {
         return iterator.getCurrentEvent();
     }
 
     @Override
     public IResource getResource() {
         return this.fResource;
-    }
-
-    @Override
-    public void setResource(IResource fResource) {
-        this.fResource = fResource;
     }
 
     CTFTrace getCTFTrace() {

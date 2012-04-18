@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefinition.InputLine;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -36,42 +37,40 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     private static final TmfLocation<Long> NULL_LOCATION = new TmfLocation<Long>((Long) null);
     private static final int DEFAULT_CACHE_SIZE = 100;
 
-    private CustomTxtTraceDefinition fDefinition;
-    private CustomTxtEventType fEventType;
+    private final CustomTxtTraceDefinition fDefinition;
+    private final CustomTxtEventType fEventType;
 
-    public CustomTxtTrace(CustomTxtTraceDefinition definition) {
+    public CustomTxtTrace(final CustomTxtTraceDefinition definition) {
         fDefinition = definition;
         fEventType = new CustomTxtEventType(fDefinition);
     }
 
-    public CustomTxtTrace(String name, CustomTxtTraceDefinition definition, String path, int pageSize) throws FileNotFoundException {
-        super(name, CustomTxtEvent.class, path, (pageSize > 0) ? pageSize : DEFAULT_CACHE_SIZE, true);
+    public CustomTxtTrace(final IResource resource, final CustomTxtTraceDefinition definition, final String path, final int pageSize) throws FileNotFoundException {
+        super(resource, CustomTxtEvent.class, path, (pageSize > 0) ? pageSize : DEFAULT_CACHE_SIZE, true);
         fDefinition = definition;
         fEventType = new CustomTxtEventType(fDefinition);
     }
 
     @Override
-    public void initTrace(String name, String path, Class<CustomTxtEvent> eventType) throws FileNotFoundException {
-        super.initTrace(name, path, eventType);
+    public void initTrace(final IResource resource, final String path, final Class<CustomTxtEvent> eventType) throws FileNotFoundException {
+        super.initTrace(resource, path, eventType);
     }
 
     @Override
-    public TmfContext seekLocation(ITmfLocation<?> location) {
-        CustomTxtTraceContext context = new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
-        if (NULL_LOCATION.equals(location) || !new File(getPath()).isFile()) {
+    public TmfContext seekLocation(final ITmfLocation<?> location) {
+        final CustomTxtTraceContext context = new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
+        if (NULL_LOCATION.equals(location) || !new File(getPath()).isFile())
             return context;
-        }
-        BufferedRandomAccessFile raFile = null; 
+        BufferedRandomAccessFile raFile = null;
         try {
-			raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
-            if (location != null && location.getLocation() instanceof Long) {
+            raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
+            if (location != null && location.getLocation() instanceof Long)
                 raFile.seek((Long)location.getLocation());
-            }
             String line;
             long rawPos = raFile.getFilePointer();
             while ((line = raFile.getNextLine()) != null) {
-                for (InputLine input : getFirstLines()) {
-                    Matcher matcher = input.getPattern().matcher(line);
+                for (final InputLine input : getFirstLines()) {
+                    final Matcher matcher = input.getPattern().matcher(line);
                     if (matcher.find()) {
                         context.setLocation(new TmfLocation<Long>(rawPos));
                         context.raFile = raFile;
@@ -85,73 +84,70 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
                 rawPos = raFile.getFilePointer();
             }
             return context;
-        } catch (FileNotFoundException e) {
+        } catch (final FileNotFoundException e) {
             e.printStackTrace();
             return context;
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
             return context;
         } finally {
-        	if (raFile != null) {
-        		try {
-					raFile.close();
-				} catch (IOException e) {
-				}
-        	}
+            if (raFile != null)
+                try {
+                    raFile.close();
+                } catch (final IOException e) {
+                }
         }
-        
+
     }
 
     @Override
-    public TmfContext seekLocation(double ratio) {
-    	BufferedRandomAccessFile raFile = null; 
+    public TmfContext seekLocation(final double ratio) {
+        BufferedRandomAccessFile raFile = null;
         try {
-			raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
+            raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
             long pos = (long) (ratio * raFile.length());
             while (pos > 0) {
                 raFile.seek(pos - 1);
                 if (raFile.read() == '\n') break;
                 pos--;
             }
-            ITmfLocation<?> location = new TmfLocation<Long>(pos);
-            TmfContext context = seekLocation(location);
+            final ITmfLocation<?> location = new TmfLocation<Long>(pos);
+            final TmfContext context = seekLocation(location);
             context.setRank(ITmfContext.UNKNOWN_RANK);
             return context;
-        } catch (FileNotFoundException e) {
+        } catch (final FileNotFoundException e) {
             e.printStackTrace();
             return new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
             return new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
         } finally {
-        	if (raFile != null) {
-        		try {
-					raFile.close();
-				} catch (IOException e) {
-				}
-        	}
+            if (raFile != null)
+                try {
+                    raFile.close();
+                } catch (final IOException e) {
+                }
         }
     }
 
     @Override
-    public double getLocationRatio(ITmfLocation<?> location) {
-    	BufferedRandomAccessFile raFile = null; 
+    public double getLocationRatio(final ITmfLocation<?> location) {
+        BufferedRandomAccessFile raFile = null;
         try {
             if (location.getLocation() instanceof Long) {
-				raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
+                raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
                 return (double) ((Long) location.getLocation()) / raFile.length();
             }
-        } catch (FileNotFoundException e) {
+        } catch (final FileNotFoundException e) {
             e.printStackTrace();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         } finally {
-        	if (raFile != null) {
-        		try {
-					raFile.close();
-				} catch (IOException e) {
-				}
-        	}
+            if (raFile != null)
+                try {
+                    raFile.close();
+                } catch (final IOException e) {
+                }
         }
         return 0;
     }
@@ -163,9 +159,9 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     }
 
     @Override
-    public synchronized TmfEvent getNextEvent(ITmfContext context) {
-        ITmfContext savedContext = context.clone();
-        TmfEvent event = parseEvent(context);
+    public synchronized TmfEvent getNextEvent(final ITmfContext context) {
+        final ITmfContext savedContext = context.clone();
+        final TmfEvent event = parseEvent(context);
         if (event != null) {
             updateIndex(savedContext, savedContext.getRank(), event.getTimestamp());
             context.increaseRank();
@@ -174,37 +170,34 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     }
 
     @Override
-    public TmfEvent parseEvent(ITmfContext tmfContext) {
-        if (!(tmfContext instanceof CustomTxtTraceContext)) {
+    public TmfEvent parseEvent(final ITmfContext tmfContext) {
+        if (!(tmfContext instanceof CustomTxtTraceContext))
             return null;
-        }
-        
-        CustomTxtTraceContext context = (CustomTxtTraceContext) tmfContext;
-        if (!(context.getLocation().getLocation() instanceof Long) || NULL_LOCATION.equals(context.getLocation())) {
+
+        final CustomTxtTraceContext context = (CustomTxtTraceContext) tmfContext;
+        if (!(context.getLocation().getLocation() instanceof Long) || NULL_LOCATION.equals(context.getLocation()))
             return null;
-        }
 
         CustomTxtEvent event = parseFirstLine(context);
 
-        HashMap<InputLine, Integer> countMap = new HashMap<InputLine, Integer>();
+        final HashMap<InputLine, Integer> countMap = new HashMap<InputLine, Integer>();
         InputLine currentInput = null;
         if (context.inputLine.childrenInputs != null && context.inputLine.childrenInputs.size() > 0) {
             currentInput = context.inputLine.childrenInputs.get(0);
             countMap.put(currentInput, 0);
         }
-        
+
         synchronized (context.raFile) {
             try {
-                if (context.raFile.getFilePointer() != context.nextLineLocation) {
+                if (context.raFile.getFilePointer() != context.nextLineLocation)
                     context.raFile.seek(context.nextLineLocation);
-                }
                 String line;
                 long rawPos = context.raFile.getFilePointer();
                 while ((line = context.raFile.getNextLine()) != null) {
                     boolean processed = false;
-                    if (currentInput == null) {
-                        for (InputLine input : getFirstLines()) {
-                            Matcher matcher = input.getPattern().matcher(line);
+                    if (currentInput == null)
+                        for (final InputLine input : getFirstLines()) {
+                            final Matcher matcher = input.getPattern().matcher(line);
                             if (matcher.find()) {
                                 context.setLocation(new TmfLocation<Long>(rawPos));
                                 context.firstLineMatcher = matcher;
@@ -214,12 +207,12 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
                                 return event;
                             }
                         }
-                    } else {
+                    else {
                         if (countMap.get(currentInput) >= currentInput.getMinCount()) {
-                            List<InputLine> nextInputs = currentInput.getNextInputs(countMap);
-                            if (nextInputs.size() == 0 || nextInputs.get(nextInputs.size() - 1).getMinCount() == 0) {
-                                for (InputLine input : getFirstLines()) {
-                                    Matcher matcher = input.getPattern().matcher(line);
+                            final List<InputLine> nextInputs = currentInput.getNextInputs(countMap);
+                            if (nextInputs.size() == 0 || nextInputs.get(nextInputs.size() - 1).getMinCount() == 0)
+                                for (final InputLine input : getFirstLines()) {
+                                    final Matcher matcher = input.getPattern().matcher(line);
                                     if (matcher.find()) {
                                         context.setLocation(new TmfLocation<Long>(rawPos));
                                         context.firstLineMatcher = matcher;
@@ -229,93 +222,76 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
                                         return event;
                                     }
                                 }
-                            }
-                            for (InputLine input : nextInputs) {
-                                Matcher matcher = input.getPattern().matcher(line);
+                            for (final InputLine input : nextInputs) {
+                                final Matcher matcher = input.getPattern().matcher(line);
                                 if (matcher.find()) {
                                     event.processGroups(input, matcher);
                                     currentInput = input;
-                                    if (countMap.get(currentInput) == null) {
+                                    if (countMap.get(currentInput) == null)
                                         countMap.put(currentInput, 1);
-                                    } else {
+                                    else
                                         countMap.put(currentInput, countMap.get(currentInput) + 1);
-                                    }
                                     Iterator<InputLine> iter = countMap.keySet().iterator();
                                     while (iter.hasNext()) {
-                                        InputLine inputLine = iter.next();
-                                        if (inputLine.level > currentInput.level) {
+                                        final InputLine inputLine = iter.next();
+                                        if (inputLine.level > currentInput.level)
                                             iter.remove();
-                                        }
                                     }
                                     if (currentInput.childrenInputs != null && currentInput.childrenInputs.size() > 0) {
                                         currentInput = currentInput.childrenInputs.get(0);
                                         countMap.put(currentInput, 0);
-                                    } else {
-                                        if (countMap.get(currentInput) >= currentInput.getMaxCount()) {
-                                            if (currentInput.getNextInputs(countMap).size() > 0) {
-                                                currentInput = currentInput.getNextInputs(countMap).get(0);
-                                                if (countMap.get(currentInput) == null) {
-                                                    countMap.put(currentInput, 0);
-                                                }
-                                                iter = countMap.keySet().iterator();
-                                                while (iter.hasNext()) {
-                                                    InputLine inputLine = iter.next();
-                                                    if (inputLine.level > currentInput.level) {
-                                                        iter.remove();
-                                                    }
-                                                }
-                                            } else {
-                                                currentInput = null;
+                                    } else if (countMap.get(currentInput) >= currentInput.getMaxCount())
+                                        if (currentInput.getNextInputs(countMap).size() > 0) {
+                                            currentInput = currentInput.getNextInputs(countMap).get(0);
+                                            if (countMap.get(currentInput) == null)
+                                                countMap.put(currentInput, 0);
+                                            iter = countMap.keySet().iterator();
+                                            while (iter.hasNext()) {
+                                                final InputLine inputLine = iter.next();
+                                                if (inputLine.level > currentInput.level)
+                                                    iter.remove();
                                             }
-                                        }
-                                    }
+                                        } else
+                                            currentInput = null;
                                     processed = true;
                                     break;
                                 }
                             }
                         }
                         if (! processed) {
-                            Matcher matcher = currentInput.getPattern().matcher(line);
+                            final Matcher matcher = currentInput.getPattern().matcher(line);
                             if (matcher.find()) {
                                 event.processGroups(currentInput, matcher);
                                 countMap.put(currentInput, countMap.get(currentInput) + 1);
                                 if (currentInput.childrenInputs != null && currentInput.childrenInputs.size() > 0) {
                                     currentInput = currentInput.childrenInputs.get(0);
                                     countMap.put(currentInput, 0);
-                                } else {
-                                    if (countMap.get(currentInput) >= currentInput.getMaxCount()) {
-                                        if (currentInput.getNextInputs(countMap).size() > 0) {
-                                            currentInput = currentInput.getNextInputs(countMap).get(0);
-                                            if (countMap.get(currentInput) == null) {
-                                                countMap.put(currentInput, 0);
-                                            }
-                                            Iterator<InputLine> iter = countMap.keySet().iterator();
-                                            while (iter.hasNext()) {
-                                                InputLine inputLine = iter.next();
-                                                if (inputLine.level > currentInput.level) {
-                                                    iter.remove();
-                                                }
-                                            }
-                                        } else {
-                                            currentInput = null;
+                                } else if (countMap.get(currentInput) >= currentInput.getMaxCount())
+                                    if (currentInput.getNextInputs(countMap).size() > 0) {
+                                        currentInput = currentInput.getNextInputs(countMap).get(0);
+                                        if (countMap.get(currentInput) == null)
+                                            countMap.put(currentInput, 0);
+                                        final Iterator<InputLine> iter = countMap.keySet().iterator();
+                                        while (iter.hasNext()) {
+                                            final InputLine inputLine = iter.next();
+                                            if (inputLine.level > currentInput.level)
+                                                iter.remove();
                                         }
-                                    }
-                                }
+                                    } else
+                                        currentInput = null;
                             }
                             ((StringBuffer) event.getContent().getValue()).append("\n").append(line); //$NON-NLS-1$
                         }
                     }
                     rawPos = context.raFile.getFilePointer();
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 e.printStackTrace();
             }
         }
-        for(Entry<InputLine, Integer> entry : countMap.entrySet()) {
-            if (entry.getValue() < entry.getKey().getMinCount()) {
+        for(final Entry<InputLine, Integer> entry : countMap.entrySet())
+            if (entry.getValue() < entry.getKey().getMinCount())
                 event = null;
-            }
-        }
         context.setLocation(NULL_LOCATION);
         return event;
     }
@@ -323,14 +299,14 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     public List<InputLine> getFirstLines() {
         return fDefinition.inputs;
     }
-    
-    public CustomTxtEvent parseFirstLine(CustomTxtTraceContext context) {
-        CustomTxtEvent event = new CustomTxtEvent(fDefinition, this, (TmfTimestamp) TmfTimestamp.ZERO, "", fEventType, ""); //$NON-NLS-1$ //$NON-NLS-2$
+
+    public CustomTxtEvent parseFirstLine(final CustomTxtTraceContext context) {
+        final CustomTxtEvent event = new CustomTxtEvent(fDefinition, this, TmfTimestamp.ZERO, "", fEventType, ""); //$NON-NLS-1$ //$NON-NLS-2$
         event.processGroups(context.inputLine, context.firstLineMatcher);
         event.setContent(new CustomEventContent(event, context.firstLine));
         return event;
     }
-    
+
     public CustomTraceDefinition getDefinition() {
         return fDefinition;
     }

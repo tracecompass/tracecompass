@@ -43,7 +43,7 @@ public abstract class CTFTestFiles {
     public static CtfTmfTrace getTestTrace() throws FileNotFoundException {
         if (trace == null) {
             trace = new CtfTmfTrace();
-            trace.initTrace("test-trace2", traceFile, CtfTmfEvent.class); //$NON-NLS-1$
+            trace.initTrace(null, traceFile, CtfTmfEvent.class);
         }
         return trace;
     }

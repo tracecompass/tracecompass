@@ -102,7 +102,8 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     }
 
     @Override
-    public void initTrace(final String name, final String path, final Class<T> eventType) {
+    public void initTrace(final IResource resource, final String path, final Class<T> eventType) {
+        fResource = resource;
     }
 
     /**
@@ -182,6 +183,11 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     // ------------------------------------------------------------------------
 
     @Override
+    public Class<T> getType() {
+        return fType;
+    }
+
+    @Override
     public long getNbEvents() {
         return fNbEvents;
     }
@@ -230,19 +236,6 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
 
     public ITmfTrace<T>[] getTraces() {
         return fTraces;
-    }
-
-    /**
-     * Returns the rank of the first event with the requested timestamp. If
-     * none, returns the index of the next event (if any).
-     *
-     * @param timestamp the event timestamp
-     * @return the corresponding event rank
-     */
-    @Override
-    public long getRank(final ITmfTimestamp timestamp) {
-        final TmfExperimentContext context = seekEvent(timestamp);
-        return context.getRank();
     }
 
     /**
@@ -960,18 +953,6 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
      */
     public IFile getBookmarksFile() {
         return fBookmarksFile;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#setResource(org.eclipse
-     * .core.resources.IResource)
-     */
-    @Override
-    public void setResource(final IResource resource) {
-        fResource = resource;
     }
 
     /*

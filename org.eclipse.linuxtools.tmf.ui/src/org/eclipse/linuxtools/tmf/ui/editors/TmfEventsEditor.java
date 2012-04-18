@@ -79,7 +79,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     private Composite fParent;
 
     @Override
-    public void doSave(IProgressMonitor monitor) {
+    public void doSave(final IProgressMonitor monitor) {
     }
 
     @Override
@@ -88,57 +88,52 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+    public void init(final IEditorSite site, IEditorInput input) throws PartInitException {
         if (input instanceof TmfEditorInput) {
             fFile = ((TmfEditorInput) input).getFile();
             fTrace = ((TmfEditorInput) input).getTrace();
             input = new FileEditorInput(fFile);
         } else if (input instanceof IFileEditorInput) {
             fFile = ((IFileEditorInput) input).getFile();
-            if (fFile == null) {
+            if (fFile == null)
                 throw new PartInitException("Invalid IFileEditorInput: " + input); //$NON-NLS-1$
-            }
             try {
-                String traceTypeId = fFile.getPersistentProperty(TmfTraceElement.TRACETYPE);
-                if (traceTypeId == null) {
+                final String traceTypeId = fFile.getPersistentProperty(TmfTraceElement.TRACETYPE);
+                if (traceTypeId == null)
                     throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
-                }
                 if (traceTypeId.equals(TmfExperiment.class.getCanonicalName())) {
                     // Special case: experiment bookmark resource
-                    TmfNavigatorContentProvider ncp = new TmfNavigatorContentProvider();
+                    final TmfNavigatorContentProvider ncp = new TmfNavigatorContentProvider();
                     ncp.getChildren(fFile.getProject()); // force the model to be populated
-                    TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject());
-                    if (project == null) {
+                    final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject());
+                    if (project == null)
                         throw new PartInitException(Messages.OpenExperimentHandler_NoTraceType);
-                    }
-                    for (ITmfProjectModelElement projectElement : project.getExperimentsFolder().getChildren()) {
-                        String traceName = fFile.getParent().getName();
+                    for (final ITmfProjectModelElement projectElement : project.getExperimentsFolder().getChildren()) {
+                        final String traceName = fFile.getParent().getName();
                         if (projectElement.getName().equals(traceName)) {
-                            TmfExperimentElement experimentElement = (TmfExperimentElement) projectElement;
+                            final TmfExperimentElement experimentElement = (TmfExperimentElement) projectElement;
                             // Instantiate the experiment's traces
-                            List<TmfTraceElement> traceEntries = experimentElement.getTraces();
-                            int nbTraces = traceEntries.size();
+                            final List<TmfTraceElement> traceEntries = experimentElement.getTraces();
+                            final int nbTraces = traceEntries.size();
                             int cacheSize = Integer.MAX_VALUE;
-                            ITmfTrace<?>[] traces = new ITmfTrace[nbTraces];
+                            final ITmfTrace<?>[] traces = new ITmfTrace[nbTraces];
                             for (int i = 0; i < nbTraces; i++) {
-                                TmfTraceElement traceElement = traceEntries.get(i);
-                                ITmfTrace trace = traceElement.instantiateTrace();
-                                ITmfEvent traceEvent = traceElement.instantiateEvent();
+                                final TmfTraceElement traceElement = traceEntries.get(i);
+                                final ITmfTrace trace = traceElement.instantiateTrace();
+                                final ITmfEvent traceEvent = traceElement.instantiateEvent();
                                 if ((trace == null) || (traceEvent == null)) {
-                                    for (int j = 0; j < i; j++) {
+                                    for (int j = 0; j < i; j++)
                                         traces[j].dispose();
-                                    }
                                     throw new PartInitException(Messages.OpenExperimentHandler_NoTraceType);
                                 }
                                 try {
-                                    trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass());
-                                } catch (FileNotFoundException e) {
+                                    trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
+                                } catch (final FileNotFoundException e) {
                                 }
-                                trace.setResource(traceElement.getResource());
                                 cacheSize = Math.min(cacheSize, trace.getIndexPageSize());
                                 traces[i] = trace;
                             }
-                            TmfExperiment experiment = new TmfExperiment(TmfEvent.class, experimentElement.getName(), traces, cacheSize);
+                            final TmfExperiment experiment = new TmfExperiment(TmfEvent.class, experimentElement.getName(), traces, cacheSize);
                             experiment.setBookmarksFile(fFile);
                             fTrace = experiment;
                             experiment.initTrace(null, null, null);
@@ -148,68 +143,59 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                     }
                 } else if (traceTypeId.equals(TmfTrace.class.getCanonicalName())) {
                     // Special case: trace bookmark resource
-                    TmfNavigatorContentProvider ncp = new TmfNavigatorContentProvider();
+                    final TmfNavigatorContentProvider ncp = new TmfNavigatorContentProvider();
                     ncp.getChildren(fFile.getProject()); // force the model to be populated
-                    TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject());
-                    for (ITmfProjectModelElement projectElement : project.getTracesFolder().getChildren()) {
-                        String traceName = fFile.getParent().getName();
+                    final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject());
+                    for (final ITmfProjectModelElement projectElement : project.getTracesFolder().getChildren()) {
+                        final String traceName = fFile.getParent().getName();
                         if (projectElement.getName().equals(traceName)) {
-                            TmfTraceElement traceElement = (TmfTraceElement) projectElement;
+                            final TmfTraceElement traceElement = (TmfTraceElement) projectElement;
                             // Instantiate the trace
-                            ITmfTrace trace = traceElement.instantiateTrace();
-                            ITmfEvent traceEvent = traceElement.instantiateEvent();
-                            if ((trace == null) || (traceEvent == null)) {
+                            final ITmfTrace trace = traceElement.instantiateTrace();
+                            final ITmfEvent traceEvent = traceElement.instantiateEvent();
+                            if ((trace == null) || (traceEvent == null))
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
-                            }
                             try {
-                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass());
+                                trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
                                 trace.indexTrace(false);
-                            } catch (FileNotFoundException e) {
+                            } catch (final FileNotFoundException e) {
                             }
-                            trace.setResource(traceElement.getResource());
                             fTrace = trace;
                             break;
                         }
                     }
                 } else {
-                    TmfNavigatorContentProvider ncp = new TmfNavigatorContentProvider();
+                    final TmfNavigatorContentProvider ncp = new TmfNavigatorContentProvider();
                     ncp.getChildren(fFile.getProject()); // force the model to be populated
-                    TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject());
-                    for (ITmfProjectModelElement projectElement : project.getTracesFolder().getChildren()) {
+                    final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject());
+                    for (final ITmfProjectModelElement projectElement : project.getTracesFolder().getChildren())
                         if (projectElement.getResource().equals(fFile)) {
-                            TmfTraceElement traceElement = (TmfTraceElement) projectElement;
+                            final TmfTraceElement traceElement = (TmfTraceElement) projectElement;
                             // Instantiate the trace
-                            ITmfTrace trace = traceElement.instantiateTrace();
-                            ITmfEvent traceEvent = traceElement.instantiateEvent();
-                            if ((trace == null) || (traceEvent == null)) {
+                            final ITmfTrace trace = traceElement.instantiateTrace();
+                            final ITmfEvent traceEvent = traceElement.instantiateEvent();
+                            if ((trace == null) || (traceEvent == null))
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
-                            }
                             try {
-                                trace.initTrace(traceElement.getName(), traceElement.getLocation().getPath(), traceEvent.getClass());
+                                trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
                                 trace.indexTrace(false);
-                            } catch (FileNotFoundException e) {
-                            }
-                            if (trace instanceof TmfTrace) {
-                                ((TmfTrace) trace).setResource(traceElement.getResource());
+                            } catch (final FileNotFoundException e) {
                             }
                             fTrace = trace;
                             break;
                         }
-                    }
                 }
-            } catch (InvalidRegistryObjectException e) {
+            } catch (final InvalidRegistryObjectException e) {
                 e.printStackTrace();
-            } catch (PartInitException e) {
+            } catch (final PartInitException e) {
                 throw e;
-            } catch (CoreException e) {
+            } catch (final CoreException e) {
                 e.printStackTrace();
             }
-        } else {
+        } else
             throw new PartInitException("Invalid IEditorInput: " + input.getClass()); //$NON-NLS-1$
-        }
-        if (fTrace == null) {
+        if (fTrace == null)
             throw new PartInitException("Invalid IEditorInput: " + fFile.getName()); //$NON-NLS-1$
-        }
         super.setSite(site);
         super.setInput(input);
     }
@@ -225,13 +211,13 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     }
 
     @Override
-    public void setInput(IEditorInput input) {
+    public void setInput(final IEditorInput input) {
         super.setInput(input);
         firePropertyChange(IEditorPart.PROP_INPUT);
     }
 
     @Override
-	public void propertyChanged(Object source, int propId) {
+    public void propertyChanged(final Object source, final int propId) {
         if (propId == IEditorPart.PROP_INPUT) {
             broadcast(new TmfTraceClosedSignal(this, fTrace));
             fFile = ((TmfEditorInput) getEditorInput()).getFile();
@@ -243,15 +229,14 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                 fEventsTable.setTrace(fTrace, true);
                 fEventsTable.refreshBookmarks(fFile);
                 broadcast(new TmfTraceOpenedSignal(this, fTrace, fFile, fEventsTable));
-            } else {
+            } else
                 fEventsTable = new TmfEventsTable(fParent, 0);
-            }
             fParent.layout();
         }
     }
 
     @Override
-    public void createPartControl(Composite parent) {
+    public void createPartControl(final Composite parent) {
         fParent = parent;
         if (fTrace != null) {
             setPartName(fTrace.getName());
@@ -269,80 +254,69 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
 
     @Override
     public void dispose() {
-    	ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
-    	removePropertyListener(this);
-        if (fTrace != null) {
+        ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
+        removePropertyListener(this);
+        if (fTrace != null)
             broadcast(new TmfTraceClosedSignal(this, fTrace));
-        }
-        if (fEventsTable != null) {
+        if (fEventsTable != null)
             fEventsTable.dispose();
-        }
         super.dispose();
     }
 
-    protected TmfEventsTable createEventsTable(Composite parent, int cacheSize) {
+    protected TmfEventsTable createEventsTable(final Composite parent, final int cacheSize) {
         TmfEventsTable eventsTable = getEventsTable(parent, cacheSize);
-        if (eventsTable == null) {
+        if (eventsTable == null)
             eventsTable = new TmfEventsTable(parent, cacheSize);
-        }
         return eventsTable;
     }
 
-    private TmfEventsTable getEventsTable(Composite parent, int cacheSize) {
-        if (fTrace instanceof TmfExperiment) {
+    private TmfEventsTable getEventsTable(final Composite parent, final int cacheSize) {
+        if (fTrace instanceof TmfExperiment)
             return getExperimentEventsTable((TmfExperiment<?>) fTrace, parent, cacheSize);
-        }
         TmfEventsTable eventsTable = null;
         try {
-            if (fTrace.getResource() == null) {
+            if (fTrace.getResource() == null)
                 return null;
-            }
-            String traceType = fTrace.getResource().getPersistentProperty(TmfTraceElement.TRACETYPE);
-            if (traceType == null) {
+            final String traceType = fTrace.getResource().getPersistentProperty(TmfTraceElement.TRACETYPE);
+            if (traceType == null)
                 return null;
-            }
-            if (traceType.startsWith(CustomTxtTrace.class.getCanonicalName())) {
+            if (traceType.startsWith(CustomTxtTrace.class.getCanonicalName()))
                 return new CustomEventsTable(((CustomTxtTrace) fTrace).getDefinition(), parent, cacheSize);
-            }
-            if (traceType.startsWith(CustomXmlTrace.class.getCanonicalName())) {
+            if (traceType.startsWith(CustomXmlTrace.class.getCanonicalName()))
                 return new CustomEventsTable(((CustomXmlTrace) fTrace).getDefinition(), parent, cacheSize);
-            }
-            for (IConfigurationElement ce : TmfTraceType.getTypeElements()) {
+            for (final IConfigurationElement ce : TmfTraceType.getTypeElements())
                 if (ce.getAttribute(TmfTraceType.ID_ATTR).equals(traceType)) {
-                    IConfigurationElement[] eventsTableTypeCE = ce.getChildren(TmfTraceType.EVENTS_TABLE_TYPE_ELEM);
-                    if (eventsTableTypeCE.length != 1) {
+                    final IConfigurationElement[] eventsTableTypeCE = ce.getChildren(TmfTraceType.EVENTS_TABLE_TYPE_ELEM);
+                    if (eventsTableTypeCE.length != 1)
                         break;
-                    }
-                    String eventsTableType = eventsTableTypeCE[0].getAttribute(TmfTraceType.CLASS_ATTR);
-                    if ((eventsTableType == null) || (eventsTableType.length() == 0)) {
+                    final String eventsTableType = eventsTableTypeCE[0].getAttribute(TmfTraceType.CLASS_ATTR);
+                    if ((eventsTableType == null) || (eventsTableType.length() == 0))
                         break;
-                    }
-                    Bundle bundle = Platform.getBundle(ce.getContributor().getName());
-                    Class<?> c = bundle.loadClass(eventsTableType);
-                    Class<?>[] constructorArgs = new Class[] { Composite.class, int.class };
-                    Constructor<?> constructor = c.getConstructor(constructorArgs);
-                    Object[] args = new Object[] { parent, cacheSize };
+                    final Bundle bundle = Platform.getBundle(ce.getContributor().getName());
+                    final Class<?> c = bundle.loadClass(eventsTableType);
+                    final Class<?>[] constructorArgs = new Class[] { Composite.class, int.class };
+                    final Constructor<?> constructor = c.getConstructor(constructorArgs);
+                    final Object[] args = new Object[] { parent, cacheSize };
                     eventsTable = (TmfEventsTable) constructor.newInstance(args);
                     break;
                 }
-            }
-        } catch (InvalidRegistryObjectException e) {
+        } catch (final InvalidRegistryObjectException e) {
             e.printStackTrace();
-        } catch (CoreException e) {
+        } catch (final CoreException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (final ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (SecurityException e) {
+        } catch (final SecurityException e) {
             e.printStackTrace();
-        } catch (NoSuchMethodException e) {
+        } catch (final NoSuchMethodException e) {
             e.printStackTrace();
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
             e.printStackTrace();
-        } catch (InstantiationException e) {
+        } catch (final InstantiationException e) {
             e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (final IllegalAccessException e) {
             e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (final InvocationTargetException e) {
             e.printStackTrace();
         }
         return eventsTable;
@@ -357,102 +331,92 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
      * @param cacheSize the event table cache size
      * @return an events table of the appropriate type
      */
-    private TmfEventsTable getExperimentEventsTable(TmfExperiment<?> experiment, Composite parent, int cacheSize) {
+    private TmfEventsTable getExperimentEventsTable(final TmfExperiment<?> experiment, final Composite parent, final int cacheSize) {
         TmfEventsTable eventsTable = null;
         String commonTraceType = null;
         try {
-            for (ITmfTrace<?> trace : experiment.getTraces()) {
-                IResource resource = trace.getResource();
-                if (resource == null) {
+            for (final ITmfTrace<?> trace : experiment.getTraces()) {
+                final IResource resource = trace.getResource();
+                if (resource == null)
                     return null;
-                }
-                String traceType = resource.getPersistentProperty(TmfTraceElement.TRACETYPE);
-                if ((commonTraceType != null) && !commonTraceType.equals(traceType)) {
+                final String traceType = resource.getPersistentProperty(TmfTraceElement.TRACETYPE);
+                if ((commonTraceType != null) && !commonTraceType.equals(traceType))
                     return null;
-                }
                 commonTraceType = traceType;
             }
-            if (commonTraceType == null) {
+            if (commonTraceType == null)
                 return null;
-            }
-            if (commonTraceType.startsWith(CustomTxtTrace.class.getCanonicalName())) {
+            if (commonTraceType.startsWith(CustomTxtTrace.class.getCanonicalName()))
                 return new CustomEventsTable(((CustomTxtTrace) experiment.getTraces()[0]).getDefinition(), parent, cacheSize);
-            }
-            if (commonTraceType.startsWith(CustomXmlTrace.class.getCanonicalName())) {
+            if (commonTraceType.startsWith(CustomXmlTrace.class.getCanonicalName()))
                 return new CustomEventsTable(((CustomXmlTrace) experiment.getTraces()[0]).getDefinition(), parent, cacheSize);
-            }
-            for (IConfigurationElement ce : TmfTraceType.getTypeElements()) {
+            for (final IConfigurationElement ce : TmfTraceType.getTypeElements())
                 if (ce.getAttribute(TmfTraceType.ID_ATTR).equals(commonTraceType)) {
-                    IConfigurationElement[] eventsTableTypeCE = ce.getChildren(TmfTraceType.EVENTS_TABLE_TYPE_ELEM);
-                    if (eventsTableTypeCE.length != 1) {
+                    final IConfigurationElement[] eventsTableTypeCE = ce.getChildren(TmfTraceType.EVENTS_TABLE_TYPE_ELEM);
+                    if (eventsTableTypeCE.length != 1)
                         break;
-                    }
-                    String eventsTableType = eventsTableTypeCE[0].getAttribute(TmfTraceType.CLASS_ATTR);
-                    if ((eventsTableType == null) || (eventsTableType.length() == 0)) {
+                    final String eventsTableType = eventsTableTypeCE[0].getAttribute(TmfTraceType.CLASS_ATTR);
+                    if ((eventsTableType == null) || (eventsTableType.length() == 0))
                         break;
-                    }
-                    Bundle bundle = Platform.getBundle(ce.getContributor().getName());
-                    Class<?> c = bundle.loadClass(eventsTableType);
-                    Class<?>[] constructorArgs = new Class[] { Composite.class, int.class };
-                    Constructor<?> constructor = c.getConstructor(constructorArgs);
-                    Object[] args = new Object[] { parent, cacheSize };
+                    final Bundle bundle = Platform.getBundle(ce.getContributor().getName());
+                    final Class<?> c = bundle.loadClass(eventsTableType);
+                    final Class<?>[] constructorArgs = new Class[] { Composite.class, int.class };
+                    final Constructor<?> constructor = c.getConstructor(constructorArgs);
+                    final Object[] args = new Object[] { parent, cacheSize };
                     eventsTable = (TmfEventsTable) constructor.newInstance(args);
                     break;
                 }
-            }
-        } catch (CoreException e) {
+        } catch (final CoreException e) {
             e.printStackTrace();
-        } catch (InvalidRegistryObjectException e) {
+        } catch (final InvalidRegistryObjectException e) {
             e.printStackTrace();
-        } catch (SecurityException e) {
+        } catch (final SecurityException e) {
             e.printStackTrace();
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (final ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (NoSuchMethodException e) {
+        } catch (final NoSuchMethodException e) {
             e.printStackTrace();
-        } catch (InstantiationException e) {
+        } catch (final InstantiationException e) {
             e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (final IllegalAccessException e) {
             e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (final InvocationTargetException e) {
             e.printStackTrace();
         }
         return eventsTable;
     }
 
     @Override
-	public ITmfTrace<?> getTrace() {
+    public ITmfTrace<?> getTrace() {
         return fTrace;
     }
 
     @Override
     public IFile getBookmarksFile() {
-    	return fFile;
+        return fFile;
     }
 
     @Override
     public void setFocus() {
         fEventsTable.setFocus();
-        if (fTrace != null) {
+        if (fTrace != null)
             broadcast(new TmfTraceSelectedSignal(this, fTrace));
-        }
     }
 
     @Override
     @SuppressWarnings("rawtypes")
-    public Object getAdapter(Class adapter) {
-    	if (IGotoMarker.class.equals(adapter)) {
-    		return fEventsTable;
-    	}
-    	return super.getAdapter(adapter);
+    public Object getAdapter(final Class adapter) {
+        if (IGotoMarker.class.equals(adapter))
+            return fEventsTable;
+        return super.getAdapter(adapter);
     }
 
     @Override
-    public void resourceChanged(IResourceChangeEvent event) {
-        for (IMarkerDelta delta : event.findMarkerDeltas(IMarker.BOOKMARK, false)) {
-            if (delta.getResource().equals(fFile)) {
+    public void resourceChanged(final IResourceChangeEvent event) {
+        for (final IMarkerDelta delta : event.findMarkerDeltas(IMarker.BOOKMARK, false))
+            if (delta.getResource().equals(fFile))
                 if (delta.getKind() == IResourceDelta.REMOVED) {
                     final IMarker bookmark = delta.getMarker();
                     Display.getDefault().asyncExec(new Runnable() {
@@ -461,16 +425,13 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                             fEventsTable.removeBookmark(bookmark);
                         }
                     });
-                } else if (delta.getKind() == IResourceDelta.CHANGED) {
+                } else if (delta.getKind() == IResourceDelta.CHANGED)
                     Display.getDefault().asyncExec(new Runnable() {
                         @Override
                         public void run() {
                             fEventsTable.getTable().refresh();
                         }
                     });
-                }
-            }
-        }
     }
 
     // ------------------------------------------------------------------------
@@ -478,7 +439,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     // ------------------------------------------------------------------------
 
     public void addBookmark() {
-    	fEventsTable.addBookmark(fFile);
+        fEventsTable.addBookmark(fFile);
     }
 
 
@@ -488,30 +449,28 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
 
     @SuppressWarnings("unchecked")
     @TmfSignalHandler
-    public void traceParserUpdated(TmfTraceParserUpdatedSignal signal) {
+    public void traceParserUpdated(final TmfTraceParserUpdatedSignal signal) {
         if (signal.getTraceResource().equals(fFile)) {
             broadcast(new TmfTraceClosedSignal(this, fTrace));
             try {
-                String name = fTrace.getName();
+                fTrace.getName();
                 fTrace = null;
-                String traceTypeId = fFile.getPersistentProperty(TmfTraceElement.TRACETYPE);
-                if (traceTypeId != null) {
-                    for (IConfigurationElement ce : TmfTraceType.getTypeElements()) {
+                final String traceTypeId = fFile.getPersistentProperty(TmfTraceElement.TRACETYPE);
+                if (traceTypeId != null)
+                    for (final IConfigurationElement ce : TmfTraceType.getTypeElements())
                         if (traceTypeId.equals(ce.getAttribute(TmfTraceType.ID_ATTR))) {
                             fTrace = (ITmfTrace<?>) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
-                            TmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
-                            String path = fFile.getLocationURI().getPath();
-                            fTrace.initTrace(name, path, event.getClass());
+                            final TmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
+                            final String path = fFile.getLocationURI().getPath();
+                            fTrace.initTrace(null, path, event.getClass());
                             fTrace.indexTrace(false);
                             break;
                         }
-                    }
-                }
-            } catch (InvalidRegistryObjectException e) {
+            } catch (final InvalidRegistryObjectException e) {
                 e.printStackTrace();
-            } catch (FileNotFoundException e) {
+            } catch (final FileNotFoundException e) {
                 e.printStackTrace();
-            } catch (CoreException e) {
+            } catch (final CoreException e) {
                 e.printStackTrace();
             }
             fEventsTable.dispose();
@@ -519,18 +478,16 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                 fEventsTable = createEventsTable(fParent, fTrace.getIndexPageSize());
                 fEventsTable.setTrace(fTrace, true);
                 broadcast(new TmfTraceOpenedSignal(this, fTrace, fFile, fEventsTable));
-            } else {
+            } else
                 fEventsTable = new TmfEventsTable(fParent, 0);
-            }
             fParent.layout();
         }
     }
 
     @TmfSignalHandler
-    public void traceSelected(TmfTraceSelectedSignal signal) {
-        if ((signal.getSource() != this) && signal.getTrace().equals(fTrace)) {
+    public void traceSelected(final TmfTraceSelectedSignal signal) {
+        if ((signal.getSource() != this) && signal.getTrace().equals(fTrace))
             getSite().getPage().bringToTop(this);
-        }
     }
 
 }

@@ -28,7 +28,7 @@ public class Benchmark {
      * @param args
      */
     @SuppressWarnings("nls")
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         final String TRACE_PATH = "../org.eclipse.linuxtools.ctf.core.tests/Tests/traces/trace20m1";
         final int NUM_LOOPS = 100;
 
@@ -37,34 +37,34 @@ public class Benchmark {
 
         try {
             System.in.read();
-        } catch (IOException e1) {
+        } catch (final IOException e1) {
             e1.printStackTrace();
         }
         // Work variables
         Long nbEvent = 0L;
-        Vector<Double> benchs = new Vector<Double>();
+        final Vector<Double> benchs = new Vector<Double>();
         CtfTmfTrace trace = null;
         long start, stop;
         for (int loops = 0; loops < NUM_LOOPS; loops++) {
             nbEvent = 0L;
             trace = new CtfTmfTrace();
             try {
-                trace.initTrace("Test", TRACE_PATH, CtfTmfEvent.class);
-            } catch (FileNotFoundException e) {
+                trace.initTrace(null, TRACE_PATH, CtfTmfEvent.class);
+            } catch (final FileNotFoundException e) {
                 loops = NUM_LOOPS +1;
                 break;
             }
 
             start = System.nanoTime();
             if (nbEvent != -1) {
-                CtfIterator traceReader = (CtfIterator) trace.seekEvent(0);
+                final CtfIterator traceReader = (CtfIterator) trace.seekEvent(0);
 
                 start = System.nanoTime();
                 CtfTmfEvent current = traceReader.getCurrentEvent();
                 while (current != null) {
                     nbEvent++;
                     if (USE_TEXT) {
-                        String output = formatDate(current.getTimestampValue());
+                        final String output = formatDate(current.getTimestampValue());
                         System.out.println("Event " + traceReader.getRank() + " Time "
                                 + output + " type " + current.getSource()
                                 + " on CPU " + current.getCPU());
@@ -75,17 +75,16 @@ public class Benchmark {
             }
             stop = System.nanoTime();
             System.out.print('.');
-            double time = (stop - start) / (double) nbEvent;
+            final double time = (stop - start) / (double) nbEvent;
             benchs.add(time);
         }
         System.out.println("");
         double avg = 0;
-        for (Double val : benchs) {
+        for (final Double val : benchs)
             avg += val;
-        }
         avg /= benchs.size();
         System.out.println("Time to read = " + avg + " events/ns");
-        for (Double val : benchs) {
+        for (final Double val : benchs) {
             System.out.print(val);
             System.out.print(", ");
         }
@@ -97,10 +96,10 @@ public class Benchmark {
      *            the timestamp in UTC to convert to nanoseconds.
      * @return formatted string.
      */
-    private static String formatDate(long timestamp) {
-        Date d = new Date(timestamp / 1000000);
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss."); //$NON-NLS-1$
-        String output = df.format(d) + (timestamp % 1000000000);
+    private static String formatDate(final long timestamp) {
+        final Date d = new Date(timestamp / 1000000);
+        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss."); //$NON-NLS-1$
+        final String output = df.format(d) + (timestamp % 1000000000);
         return output;
     }
 

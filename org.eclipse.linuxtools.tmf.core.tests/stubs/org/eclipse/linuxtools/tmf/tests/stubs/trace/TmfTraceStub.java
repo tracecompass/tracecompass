@@ -100,7 +100,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * @throws FileNotFoundException
      */
     public TmfTraceStub(final String path, final int cacheSize, final boolean waitForCompletion, final ITmfEventParser<TmfEvent> parser) throws FileNotFoundException {
-        super(path, TmfEvent.class, path, cacheSize, false);
+        super(null, TmfEvent.class, path, cacheSize, false);
         fTrace = new RandomAccessFile(path, "r");
         fParser = parser;
     }
@@ -109,10 +109,11 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * Copy constructor
      */
     public TmfTraceStub(final TmfTraceStub trace) throws FileNotFoundException {
-        super(trace.getPath(), TmfEvent.class, trace.getPath(), trace.getIndexPageSize(), false);
-        fTrace = new RandomAccessFile(trace.getPath(), "r");
-        fParser = trace.fParser;
-        trace.indexTrace(true);
+        super(trace.getResource(), TmfEvent.class, trace.getPath(), trace.getIndexPageSize(), false);
+        fTrace = new RandomAccessFile(getPath(), "r");
+        fParser = new TmfEventParserStub();
+        // This is really not pretty (the object is not constructed yet...)
+        indexTrace(true);
     }
 
     //    /**

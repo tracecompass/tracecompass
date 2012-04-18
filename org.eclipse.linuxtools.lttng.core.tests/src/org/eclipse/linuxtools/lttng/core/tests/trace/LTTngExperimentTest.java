@@ -54,63 +54,62 @@ public class LTTngExperimentTest extends TestCase {
     // ------------------------------------------------------------------------
 
     @SuppressWarnings("unchecked")
-    private synchronized static ITmfTrace<LttngEvent>[] setupTrace(String path) {
-    	if (fTraces == null) {
-    		fTraces = new ITmfTrace[1];
-    		try {
-				URL location = FileLocator.find(FrameworkUtil.getBundle(LTTngExperimentTest.class), new Path(path), null);
-				File testfile = new File(FileLocator.toFileURL(location).toURI());
-				LTTngTrace trace = new LTTngTrace(testfile.getName(), testfile.getPath(), false);
-    			fTraces[0] = trace;
-    		} catch (URISyntaxException e) {
-    			e.printStackTrace();
-    		} catch (IOException e) {
-    			e.printStackTrace();
-    		} catch (Exception e) {
-				e.printStackTrace();
-			}
-    	}
-    	return fTraces;
+    private synchronized static ITmfTrace<LttngEvent>[] setupTrace(final String path) {
+        if (fTraces == null) {
+            fTraces = new ITmfTrace[1];
+            try {
+                final URL location = FileLocator.find(FrameworkUtil.getBundle(LTTngExperimentTest.class), new Path(path), null);
+                final File testfile = new File(FileLocator.toFileURL(location).toURI());
+                final LTTngTrace trace = new LTTngTrace(null, testfile.getPath(), false);
+                fTraces[0] = trace;
+            } catch (final URISyntaxException e) {
+                e.printStackTrace();
+            } catch (final IOException e) {
+                e.printStackTrace();
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return fTraces;
     }
 
     private synchronized static void setupExperiment() {
-    	if (fExperiment == null) {
-    		fExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class, EXPERIMENT, fTraces, TmfTimestamp.ZERO, 1000, true);
-    	}
+        if (fExperiment == null)
+            fExperiment = new TmfExperiment<LttngEvent>(LttngEvent.class, EXPERIMENT, fTraces, TmfTimestamp.ZERO, 1000, true);
     }
 
-	public LTTngExperimentTest(String name) throws Exception {
-		super(name);
-	}
+    public LTTngExperimentTest(final String name) throws Exception {
+        super(name);
+    }
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		setupTrace(DIRECTORY + File.separator + TEST_STREAM);
-		setupExperiment();
-	}
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        setupTrace(DIRECTORY + File.separator + TEST_STREAM);
+        setupExperiment();
+    }
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+    }
 
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
 
-	public void testBasicTmfExperimentConstructor() {
+    public void testBasicTmfExperimentConstructor() {
 
-		assertEquals("GetId", EXPERIMENT, fExperiment.getName());
+        assertEquals("GetId", EXPERIMENT, fExperiment.getName());
         assertEquals("GetEpoch", TmfTimestamp.ZERO, fExperiment.getEpoch());
         assertEquals("GetNbEvents", NB_EVENTS, fExperiment.getNbEvents());
 
-        long nbTraceEvents = fExperiment.getTraces()[0].getNbEvents();
+        final long nbTraceEvents = fExperiment.getTraces()[0].getNbEvents();
         assertEquals("GetNbEvents", NB_EVENTS, nbTraceEvents);
 
-        TmfTimeRange timeRange = fExperiment.getTimeRange();
+        final TmfTimeRange timeRange = fExperiment.getTimeRange();
         assertTrue("getStartTime", fStartTime.equals(timeRange.getStartTime()));
         assertTrue("getEndTime",   fEndTime.equals(timeRange.getEndTime()));
-	}
+    }
 
 }

@@ -39,17 +39,16 @@ public class LttngTimestampTest extends TestCase {
     private static LTTngTextTrace testStream = null;
 
     private LTTngTextTrace initializeEventStream() {
-        if (testStream == null) {
+        if (testStream == null)
             try {
-                URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path(tracepath1), null);
-                File testfile = new File(FileLocator.toFileURL(location).toURI());
-                LTTngTextTrace tmpStream = new LTTngTextTrace(testfile.getName(), testfile.getPath(), skipIndexing);
+                final URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path(tracepath1), null);
+                final File testfile = new File(FileLocator.toFileURL(location).toURI());
+                final LTTngTextTrace tmpStream = new LTTngTextTrace(null, testfile.getPath(), skipIndexing);
                 testStream = tmpStream;
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 System.out.println("ERROR : Could not open " + tracepath1);
                 testStream = null;
             }
-        }
         return testStream;
     }
 
@@ -58,9 +57,9 @@ public class LttngTimestampTest extends TestCase {
 
         // This trace should be valid
         try {
-            LTTngTextTrace tmpStream = initializeEventStream();
+            final LTTngTextTrace tmpStream = initializeEventStream();
             tmpTime = (LttngTimestamp) tmpStream.getNextEvent(new TmfContext(null, 0)).getTimestamp();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             fail("ERROR : Failed to get reference!");
         }
 
@@ -73,14 +72,14 @@ public class LttngTimestampTest extends TestCase {
         // Default construction with no argument
         try {
             tmpTime = new LttngTimestamp();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             fail("Construction failed!");
         }
 
         // Default construction with good argument
         try {
             tmpTime = new LttngTimestamp(1);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             fail("Construction failed!");
         }
 
@@ -88,13 +87,13 @@ public class LttngTimestampTest extends TestCase {
         try {
             tmpTime = new LttngTimestamp(1);
             new LttngTimestamp(tmpTime);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             fail("Construction failed!");
         }
     }
 
     public void testGetter() {
-        LttngTimestamp tmpTime = prepareToTest();
+        final LttngTimestamp tmpTime = prepareToTest();
 
         assertEquals("Time in second is wrong", firstEventTimeSecond, tmpTime.getSeconds());
         assertEquals("Time in nano second is wrong", firstEventTimeNano, tmpTime.getNanoSeconds());
@@ -103,7 +102,7 @@ public class LttngTimestampTest extends TestCase {
     }
 
     public void testSetter() {
-        LttngTimestamp tmpTime = prepareToTest();
+        final LttngTimestamp tmpTime = prepareToTest();
 
         // We will set a time and we will make sure the set is working then
         tmpTime.setValue(1);
@@ -111,7 +110,7 @@ public class LttngTimestampTest extends TestCase {
     }
 
     public void testToString() {
-        LttngTimestamp tmpTime = prepareToTest();
+        final LttngTimestamp tmpTime = prepareToTest();
 
         // Just make sure toString() does not return null or the java reference
         assertNotSame("toString returned null", null, tmpTime.toString());
@@ -120,26 +119,26 @@ public class LttngTimestampTest extends TestCase {
 
     // Better test...
     public void testToString2() {
-        LttngTimestamp ts1 = new LttngTimestamp(2064357056377L);
-        String expectedTS1 = "2064.357056377";
+        final LttngTimestamp ts1 = new LttngTimestamp(2064357056377L);
+        final String expectedTS1 = "2064.357056377";
 
-        LttngTimestamp ts2 = new LttngTimestamp(1L);
-        String expectedTS2 = "0.000000001";
+        final LttngTimestamp ts2 = new LttngTimestamp(1L);
+        final String expectedTS2 = "0.000000001";
 
-        LttngTimestamp ts3 = new LttngTimestamp(123456789L);
-        String expectedTS3 = "0.123456789";
+        final LttngTimestamp ts3 = new LttngTimestamp(123456789L);
+        final String expectedTS3 = "0.123456789";
 
-        LttngTimestamp ts4 = new LttngTimestamp(1234567890L);
-        String expectedTS4 = "1.234567890";
+        final LttngTimestamp ts4 = new LttngTimestamp(1234567890L);
+        final String expectedTS4 = "1.234567890";
 
         assertEquals("toString()", expectedTS1, ts1.toString());
         assertEquals("toString()", expectedTS2, ts2.toString());
         assertEquals("toString()", expectedTS3, ts3.toString());
         assertEquals("toString()", expectedTS4, ts4.toString());
-        
-        LttngTimestamp ts5 = new LttngTimestamp(2234567890L);
-        LttngTimestamp delta = ts4.getDelta(ts5);
-        String expectedDelta = "-1.000000000";
+
+        final LttngTimestamp ts5 = new LttngTimestamp(2234567890L);
+        final LttngTimestamp delta = ts4.getDelta(ts5);
+        final String expectedDelta = "-1.000000000";
         assertEquals("toString()", expectedDelta, delta.toString());
     }
 }

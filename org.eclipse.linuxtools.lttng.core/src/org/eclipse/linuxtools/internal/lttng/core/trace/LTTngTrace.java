@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.internal.lttng.core.TraceHelper;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEventContent;
@@ -113,9 +114,9 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     }
 
     @Override
-    public synchronized void initTrace(final String name, final String path, final Class<LttngEvent> eventType)
+    public synchronized void initTrace(final IResource resource, final String path, final Class<LttngEvent> eventType)
             throws FileNotFoundException {
-        super.initTrace(name, path, eventType);
+        super.initTrace(resource, path, eventType);
         try {
             currentJniTrace = JniTraceFactory.getJniTrace(path, traceLibPath, SHOW_LTT_DEBUG_DEFAULT);
         } catch (final Exception e) {
@@ -244,9 +245,9 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * @exception Exception (most likely LTTngTraceException or
      *                FileNotFoundException)
      */
-    public LTTngTrace(final String name, final String path) throws Exception {
+    public LTTngTrace(final IResource resource, final String path) throws Exception {
         // Call with "wait for completion" true and "skip indexing" false
-        this(name, path, null, true, false);
+        this(resource, path, null, true, false);
     }
 
     /**
@@ -261,9 +262,9 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * @exception Exception (most likely LTTngTraceException or
      *                FileNotFoundException)
      */
-    public LTTngTrace(final String name, final String path, final boolean waitForCompletion) throws Exception {
+    public LTTngTrace(final IResource resource, final String path, final boolean waitForCompletion) throws Exception {
         // Call with "skip indexing" false
-        this(name, path, null, waitForCompletion, true);
+        this(resource, path, null, waitForCompletion, true);
     }
 
     /**
@@ -284,11 +285,11 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      *                FileNotFoundException)
      * 
      */
-    public LTTngTrace(final String name, final String path, final String traceLibPath, final boolean waitForCompletion,
+    public LTTngTrace(final IResource resource, final String path, final String traceLibPath, final boolean waitForCompletion,
             final boolean bypassIndexing)
                     throws Exception {
-        super(name, LttngEvent.class, path, CHECKPOINT_PAGE_SIZE, false);
-        initTrace(name, path, LttngEvent.class);
+        super(resource, LttngEvent.class, path, CHECKPOINT_PAGE_SIZE, false);
+        initTrace(resource, path, LttngEvent.class);
         if (!bypassIndexing)
             indexTrace(false);
         this.traceLibPath = traceLibPath;
@@ -298,7 +299,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * Copy constructor is forbidden for LttngEvenmStream
      */
     public LTTngTrace(final LTTngTrace other) throws Exception {
-        this(other.getName(), other.getPath(), other.getTraceLibPath(), false, true);
+        this(other.getResource(), other.getPath(), other.getTraceLibPath(), false, true);
         this.fCheckpoints = other.fCheckpoints;
         setTimeRange(new TmfTimeRange(new LttngTimestamp(other.getStartTime()), new LttngTimestamp(other.getEndTime())));
     }

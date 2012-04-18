@@ -72,29 +72,26 @@ public class OpenTraceHandler extends AbstractHandler {
     public boolean isEnabled() {
 
         // Check if we are closing down
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null) {
+        final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        if (window == null)
             return false;
-        }
 
         // Get the selection
-        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-        IWorkbenchPart part = page.getActivePart();
-        ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
-        if (selectionProvider == null) {
+        final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        final IWorkbenchPart part = page.getActivePart();
+        final ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
+        if (selectionProvider == null)
             return false;
-        }
-        ISelection selection = selectionProvider.getSelection();
+        final ISelection selection = selectionProvider.getSelection();
 
         // Make sure there is only one selection and that it is a trace
         fTrace = null;
         if (selection instanceof TreeSelection) {
-            TreeSelection sel = (TreeSelection) selection;
+            final TreeSelection sel = (TreeSelection) selection;
             // There should be only one item selected as per the plugin.xml
-            Object element = sel.getFirstElement();
-            if (element instanceof TmfTraceElement) {
+            final Object element = sel.getFirstElement();
+            if (element instanceof TmfTraceElement)
                 fTrace = (TmfTraceElement) element;
-            }
         }
 
         // We only enable opening from the Traces folder for now
@@ -107,102 +104,93 @@ public class OpenTraceHandler extends AbstractHandler {
 
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public Object execute(ExecutionEvent event) throws ExecutionException {
+    public Object execute(final ExecutionEvent event) throws ExecutionException {
 
         // Check if we are closing down
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window == null) {
+        final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        if (window == null)
             return null;
-        }
 
         // Check that the trace is valid
-        if (fTrace == null) {
+        if (fTrace == null)
             return null;
-        }
 
         // If trace is under an experiment, use the original trace from the traces folder
-        if (fTrace.getParent() instanceof TmfExperimentElement) {
-            for (TmfTraceElement trace : fTrace.getProject().getTracesFolder().getTraces()) {
+        if (fTrace.getParent() instanceof TmfExperimentElement)
+            for (final TmfTraceElement trace : fTrace.getProject().getTracesFolder().getTraces())
                 if (trace.getName().equals(fTrace.getName())) {
                     fTrace = trace;
                     break;
                 }
-            }
-        }
 
-        ITmfTrace trace = fTrace.instantiateTrace();
-        ITmfEvent traceEvent = fTrace.instantiateEvent();
+        final ITmfTrace trace = fTrace.instantiateTrace();
+        final ITmfEvent traceEvent = fTrace.instantiateEvent();
         if ((trace == null) || (traceEvent == null)) {
             displayErrorMsg(Messages.OpenTraceHandler_NoTraceType);
             return null;
         }
 
         // Get the editor_id from the extension point
-        String editorId = fTrace.getEditorId();
-        boolean usesEditor = (editorId != null) && (editorId.length() > 0);
+        final String editorId = fTrace.getEditorId();
+        final boolean usesEditor = (editorId != null) && (editorId.length() > 0);
 
         try {
-            trace.initTrace(fTrace.getName(), fTrace.getLocation().getPath(), traceEvent.getClass());
+            trace.initTrace(fTrace.getResource(), fTrace.getLocation().getPath(), traceEvent.getClass());
             if (usesEditor)
                 trace.indexTrace(false);
-        } catch (FileNotFoundException e) {
+        } catch (final FileNotFoundException e) {
             displayErrorMsg(Messages.OpenTraceHandler_NoTrace);
             return null;
         }
-        trace.setResource(fTrace.getResource());
 
-        IResource resource = fTrace.getResource();
+        final IResource resource = fTrace.getResource();
         IFile file = null;
-        if (resource instanceof IFile) {
+        if (resource instanceof IFile)
             file = (IFile) resource;
-        } else if (resource instanceof IFolder){
+        else if (resource instanceof IFolder)
             try {
-                IFile bookmarksFile = fTrace.getProject().getTracesFolder().getResource().getFile(BOOKMARKS_HIDDEN_FILE);
+                final IFile bookmarksFile = fTrace.getProject().getTracesFolder().getResource().getFile(BOOKMARKS_HIDDEN_FILE);
                 if (!bookmarksFile.exists()) {
-                    InputStream source = new ByteArrayInputStream(new byte[0]);
+                    final InputStream source = new ByteArrayInputStream(new byte[0]);
                     bookmarksFile.create(source, true, null);
                 }
                 bookmarksFile.setHidden(true);
 
-                IFolder folder = (IFolder) resource;
+                final IFolder folder = (IFolder) resource;
                 file = folder.getFile(fTrace.getName() + '_');
-                if (!file.exists()) {
+                if (!file.exists())
                     file.createLink(bookmarksFile.getLocation(), IResource.REPLACE, null);
-                }
                 file.setHidden(true);
-                if (usesEditor) {
+                if (usesEditor)
                     file.setPersistentProperty(TmfTraceElement.TRACETYPE, fTrace.getTraceType());
-                } else {
+                else
                     file.setPersistentProperty(TmfTraceElement.TRACETYPE, TmfTrace.class.getCanonicalName());
-                }
-            } catch (CoreException e) {
+            } catch (final CoreException e) {
                 e.printStackTrace();
             }
-        }
 
-        if (usesEditor) {
+        if (usesEditor)
             try {
-                IEditorInput editorInput = new TmfEditorInput(file, trace);
-                IWorkbench wb = PlatformUI.getWorkbench();
-                IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+                final IEditorInput editorInput = new TmfEditorInput(file, trace);
+                final IWorkbench wb = PlatformUI.getWorkbench();
+                final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
 
-                IEditorPart editor = activePage.findEditor(new FileEditorInput(file));
+                final IEditorPart editor = activePage.findEditor(new FileEditorInput(file));
                 if ((editor != null) && (editor instanceof IReusableEditor)) {
                     activePage.reuseEditor((IReusableEditor) editor, editorInput);
                     activePage.activate(editor);
                 } else {
                     activePage.openEditor(editorInput, editorId);
-                    if (resource instanceof IFile) {
+                    if (resource instanceof IFile)
                         IDE.setDefaultEditor((IFile) resource, editorId);
-                    }
                 }
-            } catch (PartInitException e) {
+            } catch (final PartInitException e) {
                 e.printStackTrace();
             }
-        } else {
+        else {
             // Create the experiment
-            ITmfTrace[] traces = new ITmfTrace[] { trace };
-            TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), fTrace.getName(), traces, trace.getIndexPageSize());
+            final ITmfTrace[] traces = new ITmfTrace[] { trace };
+            final TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), fTrace.getName(), traces, trace.getIndexPageSize());
             experiment.setBookmarksFile(file);
 
             TmfExperiment.setCurrentExperiment(experiment);
@@ -212,8 +200,8 @@ public class OpenTraceHandler extends AbstractHandler {
         return null;
     }
 
-    private void displayErrorMsg(String errorMsg) {
-        MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+    private void displayErrorMsg(final String errorMsg) {
+        final MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
         mb.setText(Messages.OpenTraceHandler_Title);
         mb.setMessage(errorMsg);
         mb.open();
