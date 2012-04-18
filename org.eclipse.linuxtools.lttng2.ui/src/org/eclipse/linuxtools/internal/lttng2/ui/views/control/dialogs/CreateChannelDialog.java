@@ -61,6 +61,10 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelDialog 
      */
     private Text fChannelNameText = null;
     /**
+     * The discard mode of the channel.
+     */
+    private Button fDiscardModeButton = null;
+    /**
      * The overwrite mode of the channel.
      */
     private Button fOverwriteModeButton = null;
@@ -222,10 +226,20 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelDialog 
         fReadTimerText.setToolTipText(Messages.TraceControl_EnableChannelReadTimerTooltip);
         fReadTimerText.addVerifyListener(fVerifyListener);
 
-        fOverwriteModeButton = new Button(fDialogComposite, SWT.CHECK);
-        fOverwriteModeButton.setText(Messages.TraceControl_OverwriteModePropertyName);
+        Group discardModeGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
+        discardModeGroup.setText(Messages.TraceControl_EnableChannelDiscardModeGroupName);
+        layout = new GridLayout(2, true);
+        discardModeGroup.setLayout(layout); 
+
+        fDiscardModeButton = new  Button(discardModeGroup, SWT.RADIO);
+        fDiscardModeButton.setText(Messages.TraceControl_EnableChannelDiscardModeLabel);
+        fDiscardModeButton.setToolTipText(Messages.TraceControl_EnableChannelDiscardModeTooltip);
+        fDiscardModeButton.setSelection(true);
+        
+        fOverwriteModeButton = new Button(discardModeGroup, SWT.RADIO);
+        fOverwriteModeButton.setText(Messages.TraceControl_EnableChannelOverwriteModeLabel);
         fOverwriteModeButton.setToolTipText(Messages.TraceControl_EnableChannelOverwriteModeTooltip);
-        new Label(fDialogComposite, SWT.RIGHT);
+        fOverwriteModeButton.setSelection(false);
 
         fDomainGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
         fDomainGroup.setText(Messages.TraceControl_DomainDisplayName);
@@ -246,6 +260,13 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelDialog 
 
         // layout widgets
         GridData data = new GridData(GridData.FILL, GridData.CENTER, false, false, 2, 1);
+        discardModeGroup.setLayoutData(data);
+        data = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
+        fDiscardModeButton.setLayoutData(data);
+        data = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
+        fOverwriteModeButton.setLayoutData(data);
+        
+        data = new GridData(GridData.FILL, GridData.CENTER, false, false, 2, 1);
         fDomainGroup.setLayoutData(data);
 
         data = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);

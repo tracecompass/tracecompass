@@ -152,7 +152,7 @@ public class ControlPreferencePage extends FieldEditorPreferencePage implements 
         boolean ret =  super.performOk();
         // open or close log file
         if (ControlPreferences.getInstance().isLoggingEnabled()) {
-            ControlCommandLogger.init(ControlPreferences.TRACE_CONTROL_LOG_FILENAME, ControlPreferences.getInstance().isAppend());
+            ControlCommandLogger.init(ControlPreferences.getInstance().getLogfilePath(), ControlPreferences.getInstance().isAppend());
         } else {
             ControlCommandLogger.close();
         }

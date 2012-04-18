@@ -150,7 +150,7 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
         fContextsViewer.setInput(fContextModel);
         fContextsViewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
         
-        getShell().setMinimumSize(new Point(500, 650));
+        getShell().setMinimumSize(new Point(500, 450));
         
         return fDialogComposite;
     }

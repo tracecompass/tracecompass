@@ -12,13 +12,9 @@
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.logging;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
@@ -102,21 +98,14 @@ public class ControlCommandLogger {
      * @return the buffer writer class or null if not successful
      */
     private static BufferedWriter openLogFile(String filename, boolean append) {
-        IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        IPath newFile = root.getLocation().append(filename);
-        File file = newFile.toFile();
         BufferedWriter outfile = null;
         try {
-            if (!file.exists()) {
-                file.createNewFile();
-                file.setWritable(true, false);
-            }
-            outfile = new BufferedWriter(new FileWriter(file, append));
+            outfile = new BufferedWriter(new FileWriter(filename, append));
         } catch (IOException e) {
             Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, 
-                    "Can't open log file for logging of tracer control commands", e)); //$NON-NLS-1$
+                    "Can't open log file for logging of tracer control commands: " + filename, e)); //$NON-NLS-1$
         }
         return outfile;
     }
-
 }
+
