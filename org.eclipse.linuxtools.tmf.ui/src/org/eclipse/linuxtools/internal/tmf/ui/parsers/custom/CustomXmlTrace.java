@@ -59,7 +59,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     }
 
     public CustomXmlTrace(final IResource resource, final CustomXmlTraceDefinition definition, final String path, final int pageSize) throws FileNotFoundException {
-        super(null, CustomXmlEvent.class, path, (pageSize > 0) ? pageSize : DEFAULT_CACHE_SIZE, true);
+        super(null, CustomXmlEvent.class, path, (pageSize > 0) ? pageSize : DEFAULT_CACHE_SIZE);
         fDefinition = definition;
         fEventType = new CustomXmlEventType(fDefinition);
         fRecordInputElement = getRecordInputElement(fDefinition.rootInputElement);
@@ -77,8 +77,9 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
             return context;
         try {
             context.raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
-            if (location != null && location.getLocation() instanceof Long)
+            if (location != null && location.getLocation() instanceof Long) {
                 context.raFile.seek((Long)location.getLocation());
+            }
 
             String line;
             final String recordElementStart = "<" + fRecordInputElement.elementName; //$NON-NLS-1$
@@ -111,7 +112,9 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
             long pos = (long) (ratio * raFile.length());
             while (pos > 0) {
                 raFile.seek(pos - 1);
-                if (raFile.read() == '\n') break;
+                if (raFile.read() == '\n') {
+                    break;
+                }
                 pos--;
             }
             final ITmfLocation<?> location = new TmfLocation<Long>(pos);
@@ -125,11 +128,12 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
             e.printStackTrace();
             return new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
         } finally {
-            if (raFile != null)
+            if (raFile != null) {
                 try {
                     raFile.close();
                 } catch (final IOException e) {
                 }
+            }
         }
     }
 
@@ -146,11 +150,12 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
         } catch (final IOException e) {
             e.printStackTrace();
         } finally {
-            if (raFile != null)
+            if (raFile != null) {
                 try {
                     raFile.close();
                 } catch (final IOException e) {
                 }
+            }
         }
         return 0;
     }
@@ -185,7 +190,9 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
             CustomXmlEvent event = null;
             try {
                 if (context.raFile.getFilePointer() != (Long)context.getLocation().getLocation() + 1)
+                {
                     context.raFile.seek((Long)context.getLocation().getLocation() + 1); // +1 is for the <
+                }
                 final StringBuffer elementBuffer = new StringBuffer("<"); //$NON-NLS-1$
                 readElement(elementBuffer, context.raFile);
                 final Element element = parseElementBuffer(elementBuffer);
@@ -261,23 +268,25 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
                 numRead++;
                 final char c = (char)i;
                 buffer.append(c);
-                if (c == '"')
+                if (c == '"') {
                     readQuote(buffer, raFile, '"');
-                else if (c == '\'')
+                } else if (c == '\'') {
                     readQuote(buffer, raFile, '\'');
-                else if (c == '<')
+                } else if (c == '<') {
                     readElement(buffer, raFile);
-                else if (c == '/' && numRead == 1)
+                } else if (c == '/' && numRead == 1) {
                     break; // found "</"
-                else if (c == '-' && numRead == 3 && buffer.substring(buffer.length() - 3, buffer.length() - 1).equals("!-")) //$NON-NLS-1$
+                } else if (c == '-' && numRead == 3 && buffer.substring(buffer.length() - 3, buffer.length() - 1).equals("!-")) {
                     readComment(buffer, raFile); // found "<!--"
-                else if (i == '>')
-                    if (buffer.charAt(buffer.length() - 2) == '/')
+                } else if (i == '>')
+                    if (buffer.charAt(buffer.length() - 2) == '/') {
                         break; // found "/>"
-                    else if (startTagClosed)
+                    } else if (startTagClosed) {
                         break; // found "<...>...</...>"
-                    else
+                    }
+                    else {
                         startTagClosed = true; // found "<...>"
+                    }
             }
             return;
         } catch (final IOException e) {
@@ -292,7 +301,9 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
                 final char c = (char)i;
                 buffer.append(c);
                 if (c == eq)
+                {
                     break; // found matching end-quote
+                }
             }
             return;
         } catch (final IOException e) {
@@ -308,8 +319,10 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
                 numRead++;
                 final char c = (char)i;
                 buffer.append(c);
-                if (c == '>' && numRead >= 2 && buffer.substring(buffer.length() - 3, buffer.length() - 1).equals("--")) //$NON-NLS-1$
+                if (c == '>' && numRead >= 2 && buffer.substring(buffer.length() - 3, buffer.length() - 1).equals("--"))
+                {
                     break; // found "-->"
+                }
             }
             return;
         } catch (final IOException e) {
@@ -323,24 +336,26 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
         for (int i = 0; i < nodeList.getLength(); i++) {
             final Node node = nodeList.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
-                if (separator == null)
+                if (separator == null) {
                     separator = " | "; //$NON-NLS-1$
-                else
+                } else {
                     buffer.append(separator);
+                }
                 final Element element = (Element) node;
-                if (element.hasChildNodes() == false)
+                if (element.hasChildNodes() == false) {
                     buffer.append(element.getNodeName());
-                else if (element.getChildNodes().getLength() == 1 && element.getFirstChild().getNodeType() == Node.TEXT_NODE)
+                } else if (element.getChildNodes().getLength() == 1 && element.getFirstChild().getNodeType() == Node.TEXT_NODE) {
                     buffer.append(element.getNodeName() + ":" + element.getFirstChild().getNodeValue().trim()); //$NON-NLS-1$
-                else {
+                } else {
                     buffer.append(element.getNodeName());
                     buffer.append(" [ "); //$NON-NLS-1$
                     parseElement(element, buffer);
                     buffer.append(" ]"); //$NON-NLS-1$
                 }
             } else if (node.getNodeType() == Node.TEXT_NODE)
-                if (node.getNodeValue().trim().length() != 0)
+                if (node.getNodeValue().trim().length() != 0) {
                     buffer.append(node.getNodeValue().trim());
+                }
         }
         return buffer;
     }
@@ -348,12 +363,13 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     public InputElement getRecordInputElement(final InputElement inputElement) {
         if (inputElement.logEntry)
             return inputElement;
-        else if (inputElement.childElements != null)
+        else if (inputElement.childElements != null) {
             for (final InputElement childInputElement : inputElement.childElements) {
                 final InputElement recordInputElement = getRecordInputElement(childInputElement);
                 if (recordInputElement != null)
                     return recordInputElement;
             }
+        }
         return null;
     }
 
@@ -365,22 +381,27 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     }
 
     private void parseElement(final Element element, final CustomXmlEvent event, final InputElement inputElement) {
-        if (inputElement.inputName != null && !inputElement.inputName.equals(CustomXmlTraceDefinition.TAG_IGNORE))
+        if (inputElement.inputName != null && !inputElement.inputName.equals(CustomXmlTraceDefinition.TAG_IGNORE)) {
             event.parseInput(parseElement(element, new StringBuffer()).toString(), inputElement.inputName, inputElement.inputAction, inputElement.inputFormat);
-        if (inputElement.attributes != null)
-            for (final InputAttribute attribute : inputElement.attributes)
+        }
+        if (inputElement.attributes != null) {
+            for (final InputAttribute attribute : inputElement.attributes) {
                 event.parseInput(element.getAttribute(attribute.attributeName), attribute.inputName, attribute.inputAction, attribute.inputFormat);
+            }
+        }
         final NodeList childNodes = element.getChildNodes();
-        if (inputElement.childElements != null)
+        if (inputElement.childElements != null) {
             for (int i = 0; i < childNodes.getLength(); i++) {
                 final Node node = childNodes.item(i);
-                if (node instanceof Element)
+                if (node instanceof Element) {
                     for (final InputElement child : inputElement.childElements)
                         if (node.getNodeName().equals(child.elementName)) {
                             parseElement((Element) node, event, child);
                             break;
                         }
+                }
             }
+        }
         return;
     }
 

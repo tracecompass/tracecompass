@@ -137,7 +137,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                             experiment.setBookmarksFile(fFile);
                             fTrace = experiment;
                             experiment.initTrace(null, null, null);
-                            experiment.indexTrace(true);
                             break;
                         }
                     }
@@ -157,7 +156,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             try {
                                 trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
-                                trace.indexTrace(false);
                             } catch (final FileNotFoundException e) {
                             }
                             fTrace = trace;
@@ -178,7 +176,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             try {
                                 trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
-                                trace.indexTrace(false);
                             } catch (final FileNotFoundException e) {
                             }
                             fTrace = trace;
@@ -463,7 +460,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                             final TmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
                             final String path = fFile.getLocationURI().getPath();
                             fTrace.initTrace(null, path, event.getClass());
-                            fTrace.indexTrace(false);
                             break;
                         }
             } catch (final InvalidRegistryObjectException e) {

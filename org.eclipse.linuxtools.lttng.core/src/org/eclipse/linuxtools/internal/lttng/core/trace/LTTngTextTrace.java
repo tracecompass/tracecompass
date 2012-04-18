@@ -57,7 +57,8 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
     }
 
     public LTTngTextTrace(final IResource resource, final String path, final boolean skipIndexing) throws Exception {
-        super(null, LttngEvent.class, path, 1, !skipIndexing);
+        //      super(null, LttngEvent.class, path, 1, !skipIndexing);
+        super(null, LttngEvent.class, path, 1);
 
         tracepath = path;
         traceTypes      = new HashMap<String, LttngEventType>();

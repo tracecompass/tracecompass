@@ -136,8 +136,6 @@ public class OpenTraceHandler extends AbstractHandler {
 
         try {
             trace.initTrace(fTrace.getResource(), fTrace.getLocation().getPath(), traceEvent.getClass());
-            if (usesEditor)
-                trace.indexTrace(false);
         } catch (final FileNotFoundException e) {
             displayErrorMsg(Messages.OpenTraceHandler_NoTrace);
             return null;

@@ -190,7 +190,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
     /**
      * Position the trace at the event located at the specified ratio in the
      * trace file.
-     * 
+     * <p>
      * The notion of ratio (0.0 <= r <= 1.0) is trace specific and left
      * voluntarily vague. Typically, it would refer to the event proportional
      * rank (arguably more intuitive) or timestamp in the trace file.
@@ -203,7 +203,13 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
     /**
      * Position the trace at the first event with the specified timestamp. If
      * there is no event with the requested timestamp, a context pointing to
-     * the chronologically next event is returned.
+     * the next chronological event is returned.
+     * <p>
+     * A null timestamp is interpreted as seeking for the first event of the
+     * trace.
+     * <p>
+     * If the requested timestamp is beyond the last trace event, the context
+     * returned will yield a null event if used in a subsequent read.
      * 
      * @param timestamp the timestamp of desired event
      * @return a context which can later be used to read the corresponding event
@@ -212,6 +218,9 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
 
     /**
      * Position the trace at the 'rank'th event in the trace.
+     * <p>
+     * If the requested rank is beyond the last trace event, the context
+     * returned will yield a null event if used in a subsequent read.
      * 
      * @param rank the event rank
      * @return a context which can later be used to read the corresponding event
@@ -239,19 +248,6 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * @return the next event in the stream
      */
     public ITmfEvent parseEvent(ITmfContext context);
-
-    // ------------------------------------------------------------------------
-    // Indexing
-    // ------------------------------------------------------------------------
-
-    /**
-     * Start the trace indexing, optionally wait for the index to be fully
-     * built before returning.
-     *
-     * @param waitForCompletion true for synchronous indexing
-     */
-    public void indexTrace(boolean waitForCompletion);
-
 
     // ------------------------------------------------------------------------
     // ------------------------------------------------------------------------

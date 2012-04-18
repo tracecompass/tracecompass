@@ -116,7 +116,13 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     @Override
     public synchronized void initTrace(final IResource resource, final String path, final Class<LttngEvent> eventType)
             throws FileNotFoundException {
-        super.initTrace(resource, path, eventType);
+        super.initialize(resource, path, eventType);
+        initialize(resource, path, eventType);
+    }
+
+    @Override
+    protected synchronized void initialize(final IResource resource, final String path, final Class<LttngEvent> eventType)
+            throws FileNotFoundException {
         try {
             currentJniTrace = JniTraceFactory.getJniTrace(path, traceLibPath, SHOW_LTT_DEBUG_DEFAULT);
         } catch (final Exception e) {
@@ -288,8 +294,9 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     public LTTngTrace(final IResource resource, final String path, final String traceLibPath, final boolean waitForCompletion,
             final boolean bypassIndexing)
                     throws Exception {
-        super(resource, LttngEvent.class, path, CHECKPOINT_PAGE_SIZE, false);
-        initTrace(resource, path, LttngEvent.class);
+        //        super(resource, LttngEvent.class, path, CHECKPOINT_PAGE_SIZE, false);
+        super(resource, LttngEvent.class, path, CHECKPOINT_PAGE_SIZE);
+        initialize(resource, path, LttngEvent.class);
         if (!bypassIndexing)
             indexTrace(false);
         this.traceLibPath = traceLibPath;

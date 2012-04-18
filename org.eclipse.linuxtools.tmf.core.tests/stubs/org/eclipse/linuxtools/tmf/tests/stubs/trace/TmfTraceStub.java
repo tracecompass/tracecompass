@@ -86,7 +86,8 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * @throws FileNotFoundException
      */
     public TmfTraceStub(final String path, final int cacheSize, final boolean waitForCompletion) throws FileNotFoundException {
-        super(null, TmfEvent.class, path, cacheSize, false);
+        //      super(null, TmfEvent.class, path, cacheSize, false);
+        super(null, TmfEvent.class, path, cacheSize);
         fTrace = new RandomAccessFile(path, "r");
         fParser = new TmfEventParserStub();
     }
@@ -100,7 +101,8 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * @throws FileNotFoundException
      */
     public TmfTraceStub(final String path, final int cacheSize, final boolean waitForCompletion, final ITmfEventParser<TmfEvent> parser) throws FileNotFoundException {
-        super(null, TmfEvent.class, path, cacheSize, false);
+        //        super(null, TmfEvent.class, path, cacheSize, false);
+        super(null, TmfEvent.class, path, cacheSize);
         fTrace = new RandomAccessFile(path, "r");
         fParser = parser;
     }
@@ -109,7 +111,8 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * Copy constructor
      */
     public TmfTraceStub(final TmfTraceStub trace) throws FileNotFoundException {
-        super(trace.getResource(), TmfEvent.class, trace.getPath(), trace.getIndexPageSize(), false);
+        //        super(trace.getResource(), TmfEvent.class, trace.getPath(), trace.getIndexPageSize(), false);
+        super(trace.getResource(), TmfEvent.class, trace.getPath(), trace.getIndexPageSize());
         fTrace = new RandomAccessFile(getPath(), "r");
         fParser = new TmfEventParserStub();
         // This is really not pretty (the object is not constructed yet...)
@@ -145,23 +148,29 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     @Override
     @SuppressWarnings("unchecked")
     public TmfContext seekLocation(final ITmfLocation<?> location) {
-        fLock.lock();
         try {
-            if (fTrace != null) {
-                // Position the trace at the requested location and
-                // returns the corresponding context
-                long loc  = 0;
-                long rank = 0;
-                if (location != null) {
-                    loc = ((TmfLocation<Long>) location).getLocation();
-                    rank = ITmfContext.UNKNOWN_RANK;
+            fLock.lock();
+            try {
+                if (fTrace != null) {
+                    // Position the trace at the requested location and
+                    // returns the corresponding context
+                    long loc  = 0;
+                    long rank = 0;
+                    if (location != null) {
+                        loc = ((TmfLocation<Long>) location).getLocation();
+                        rank = ITmfContext.UNKNOWN_RANK;
+                    }
+                    if (loc != fTrace.getFilePointer())
+                        fTrace.seek(loc);
+                    final TmfContext context = new TmfContext(getCurrentLocation(), rank);
+                    return context;
                 }
-                if (loc != fTrace.getFilePointer())
-                    fTrace.seek(loc);
-                final TmfContext context = new TmfContext(getCurrentLocation(), rank);
-                return context;
+            } catch (final IOException e) {
+                e.printStackTrace();
+            } catch (final NullPointerException e) {
+                e.printStackTrace();
             }
-        } catch (final IOException e) {
+        } catch (final NullPointerException e) {
             e.printStackTrace();
         }
         finally{

@@ -750,12 +750,6 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         }
     }
 
-    @Override
-    public void indexTrace(final boolean waitForCompletion) {
-        if (waitForCompletion)
-            initializeStreamingMonitor();
-    }
-
     @SuppressWarnings("unchecked")
     private void indexExperiment(final boolean waitForCompletion, final int index, final TmfTimeRange timeRange) {
 

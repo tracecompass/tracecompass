@@ -46,7 +46,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
     }
 
     public CustomTxtTrace(final IResource resource, final CustomTxtTraceDefinition definition, final String path, final int pageSize) throws FileNotFoundException {
-        super(resource, CustomTxtEvent.class, path, (pageSize > 0) ? pageSize : DEFAULT_CACHE_SIZE, true);
+        super(resource, CustomTxtEvent.class, path, (pageSize > 0) ? pageSize : DEFAULT_CACHE_SIZE);
         fDefinition = definition;
         fEventType = new CustomTxtEventType(fDefinition);
     }
@@ -64,8 +64,9 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
         BufferedRandomAccessFile raFile = null;
         try {
             raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
-            if (location != null && location.getLocation() instanceof Long)
+            if (location != null && location.getLocation() instanceof Long) {
                 raFile.seek((Long)location.getLocation());
+            }
             String line;
             long rawPos = raFile.getFilePointer();
             while ((line = raFile.getNextLine()) != null) {
@@ -91,11 +92,12 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
             e.printStackTrace();
             return context;
         } finally {
-            if (raFile != null)
+            if (raFile != null) {
                 try {
                     raFile.close();
                 } catch (final IOException e) {
                 }
+            }
         }
 
     }
@@ -108,7 +110,9 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
             long pos = (long) (ratio * raFile.length());
             while (pos > 0) {
                 raFile.seek(pos - 1);
-                if (raFile.read() == '\n') break;
+                if (raFile.read() == '\n') {
+                    break;
+                }
                 pos--;
             }
             final ITmfLocation<?> location = new TmfLocation<Long>(pos);
@@ -122,11 +126,12 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
             e.printStackTrace();
             return new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
         } finally {
-            if (raFile != null)
+            if (raFile != null) {
                 try {
                     raFile.close();
                 } catch (final IOException e) {
                 }
+            }
         }
     }
 
@@ -143,11 +148,12 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
         } catch (final IOException e) {
             e.printStackTrace();
         } finally {
-            if (raFile != null)
+            if (raFile != null) {
                 try {
                     raFile.close();
                 } catch (final IOException e) {
                 }
+            }
         }
         return 0;
     }
@@ -189,13 +195,14 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
 
         synchronized (context.raFile) {
             try {
-                if (context.raFile.getFilePointer() != context.nextLineLocation)
+                if (context.raFile.getFilePointer() != context.nextLineLocation) {
                     context.raFile.seek(context.nextLineLocation);
+                }
                 String line;
                 long rawPos = context.raFile.getFilePointer();
                 while ((line = context.raFile.getNextLine()) != null) {
                     boolean processed = false;
-                    if (currentInput == null)
+                    if (currentInput == null) {
                         for (final InputLine input : getFirstLines()) {
                             final Matcher matcher = input.getPattern().matcher(line);
                             if (matcher.find()) {
@@ -207,10 +214,10 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
                                 return event;
                             }
                         }
-                    else {
+                    } else {
                         if (countMap.get(currentInput) >= currentInput.getMinCount()) {
                             final List<InputLine> nextInputs = currentInput.getNextInputs(countMap);
-                            if (nextInputs.size() == 0 || nextInputs.get(nextInputs.size() - 1).getMinCount() == 0)
+                            if (nextInputs.size() == 0 || nextInputs.get(nextInputs.size() - 1).getMinCount() == 0) {
                                 for (final InputLine input : getFirstLines()) {
                                     final Matcher matcher = input.getPattern().matcher(line);
                                     if (matcher.find()) {
@@ -222,20 +229,23 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
                                         return event;
                                     }
                                 }
+                            }
                             for (final InputLine input : nextInputs) {
                                 final Matcher matcher = input.getPattern().matcher(line);
                                 if (matcher.find()) {
                                     event.processGroups(input, matcher);
                                     currentInput = input;
-                                    if (countMap.get(currentInput) == null)
+                                    if (countMap.get(currentInput) == null) {
                                         countMap.put(currentInput, 1);
-                                    else
+                                    } else {
                                         countMap.put(currentInput, countMap.get(currentInput) + 1);
+                                    }
                                     Iterator<InputLine> iter = countMap.keySet().iterator();
                                     while (iter.hasNext()) {
                                         final InputLine inputLine = iter.next();
-                                        if (inputLine.level > currentInput.level)
+                                        if (inputLine.level > currentInput.level) {
                                             iter.remove();
+                                        }
                                     }
                                     if (currentInput.childrenInputs != null && currentInput.childrenInputs.size() > 0) {
                                         currentInput = currentInput.childrenInputs.get(0);
@@ -243,16 +253,19 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
                                     } else if (countMap.get(currentInput) >= currentInput.getMaxCount())
                                         if (currentInput.getNextInputs(countMap).size() > 0) {
                                             currentInput = currentInput.getNextInputs(countMap).get(0);
-                                            if (countMap.get(currentInput) == null)
+                                            if (countMap.get(currentInput) == null) {
                                                 countMap.put(currentInput, 0);
+                                            }
                                             iter = countMap.keySet().iterator();
                                             while (iter.hasNext()) {
                                                 final InputLine inputLine = iter.next();
-                                                if (inputLine.level > currentInput.level)
+                                                if (inputLine.level > currentInput.level) {
                                                     iter.remove();
+                                                }
                                             }
-                                        } else
+                                        } else {
                                             currentInput = null;
+                                        }
                                     processed = true;
                                     break;
                                 }
@@ -269,16 +282,19 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
                                 } else if (countMap.get(currentInput) >= currentInput.getMaxCount())
                                     if (currentInput.getNextInputs(countMap).size() > 0) {
                                         currentInput = currentInput.getNextInputs(countMap).get(0);
-                                        if (countMap.get(currentInput) == null)
+                                        if (countMap.get(currentInput) == null) {
                                             countMap.put(currentInput, 0);
+                                        }
                                         final Iterator<InputLine> iter = countMap.keySet().iterator();
                                         while (iter.hasNext()) {
                                             final InputLine inputLine = iter.next();
-                                            if (inputLine.level > currentInput.level)
+                                            if (inputLine.level > currentInput.level) {
                                                 iter.remove();
+                                            }
                                         }
-                                    } else
+                                    } else {
                                         currentInput = null;
+                                    }
                             }
                             ((StringBuffer) event.getContent().getValue()).append("\n").append(line); //$NON-NLS-1$
                         }
@@ -290,8 +306,9 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> {
             }
         }
         for(final Entry<InputLine, Integer> entry : countMap.entrySet())
-            if (entry.getValue() < entry.getKey().getMinCount())
+            if (entry.getValue() < entry.getKey().getMinCount()) {
                 event = null;
+            }
         context.setLocation(NULL_LOCATION);
         return event;
     }

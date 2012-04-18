@@ -172,7 +172,6 @@ public class OpenExperimentHandler extends AbstractHandler {
                 } else
                     activePage.openEditor(editorInput, editorId);
                 experiment.initTrace(null, null, null);
-                experiment.indexTrace(true);
                 IDE.setDefaultEditor(file, editorId);
                 // editor should dispose the experiment on close
             } else {

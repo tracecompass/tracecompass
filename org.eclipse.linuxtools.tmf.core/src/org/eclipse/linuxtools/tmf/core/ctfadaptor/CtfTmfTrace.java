@@ -83,11 +83,6 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
     }
 
     @Override
-    public void indexTrace(final boolean waitForCompletion) {
-        // do nothing
-    }
-
-    @Override
     public void dispose() {
         TmfSignalManager.deregister(this);
     }

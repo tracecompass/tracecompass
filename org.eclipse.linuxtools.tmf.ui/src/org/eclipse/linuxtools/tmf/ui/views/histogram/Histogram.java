@@ -85,7 +85,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     // Timestamp scale (nanosecond)
     public static final byte TIME_SCALE = -9;
-    
+
     public static final int HISTOGRAM_BAR_WIDTH = 1;
 
     // ------------------------------------------------------------------------
@@ -114,7 +114,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // Construction
     // ------------------------------------------------------------------------
 
-    public Histogram(TmfView view, Composite parent) {
+    public Histogram(final TmfView view, final Composite parent) {
         fParentView = view;
 
         createWidget(parent);
@@ -134,7 +134,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         fDataModel.removeHistogramListener(this);
     }
 
-    private void createWidget(Composite parent) {
+    private void createWidget(final Composite parent) {
 
         final Color labelColor = parent.getBackground();
         final Font fFont = adjustFont(parent);
@@ -145,7 +145,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         // Define the histogram
         // --------------------------------------------------------------------
 
-        GridLayout gridLayout = new GridLayout();
+        final GridLayout gridLayout = new GridLayout();
         gridLayout.numColumns = 3;
         gridLayout.marginHeight = 0;
         gridLayout.marginWidth = 0;
@@ -154,7 +154,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         gridLayout.verticalSpacing = 0;
         gridLayout.marginLeft = 0;
         gridLayout.marginRight = 0;
-        Composite composite = new Composite(parent, SWT.FILL);
+        final Composite composite = new Composite(parent, SWT.FILL);
         composite.setLayout(gridLayout);
 
         // Use all the horizontal space
@@ -200,7 +200,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         gridData = new GridData(initalWidth, SWT.DEFAULT);
         gridData.horizontalAlignment = SWT.RIGHT;
         gridData.verticalAlignment = SWT.BOTTOM;
-        Text dummyText = new Text(composite, SWT.READ_ONLY);
+        final Text dummyText = new Text(composite, SWT.READ_ONLY);
         dummyText.setFont(fFont);
         dummyText.setBackground(labelColor);
         dummyText.setEditable(false);
@@ -228,11 +228,11 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         fTimeRangeEndText.setLayoutData(gridData);
     }
 
-    private Font adjustFont(Composite composite) {
+    private Font adjustFont(final Composite composite) {
         // Reduce font size for a more pleasing rendering
-        int fontSizeAdjustment = -2;
-        Font font = composite.getFont();
-        FontData fontData = font.getFontData()[0];
+        final int fontSizeAdjustment = -2;
+        final Font font = composite.getFont();
+        final FontData fontData = font.getFontData()[0];
         return new Font(font.getDevice(), fontData.getName(), fontData.getHeight() + fontSizeAdjustment, fontData.getStyle());
     }
 
@@ -251,7 +251,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     public long getTimeLimit() {
         return fDataModel.getTimeLimit();
     }
-    
+
     public HistogramDataModel getDataModel() {
         return fDataModel;
     }
@@ -274,7 +274,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      * 
      * @param timestamp
      */
-    public void countEvent(long eventCount, long timestamp) {
+    public void countEvent(final long eventCount, final long timestamp) {
         fDataModel.countEvent(eventCount, timestamp);
     }
 
@@ -283,7 +283,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      * 
      * @param timestamp
      */
-    public void setCurrentEvent(long timestamp) {
+    public void setCurrentEvent(final long timestamp) {
         fCurrentEventTime = (timestamp > 0) ? timestamp : 0;
         fDataModel.setCurrentEventNotifyListeners(timestamp);
     }
@@ -294,11 +294,11 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      * @param offset offset from the left on the histogram
      * @return the start timestamp of the corresponding bucket
      */
-    public synchronized long getTimestamp(int offset) {
+    public synchronized long getTimestamp(final int offset) {
         assert offset > 0 && offset < fScaledData.fWidth;
         try {
             return fDataModel.getFirstBucketTime() + fScaledData.fBucketDuration * offset;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return 0; // TODO: Fix that racing condition (NPE)
         }
     }
@@ -309,7 +309,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      * @param timestamp the timestamp
      * @return the offset of the corresponding bucket (-1 if invalid)
      */
-    public synchronized int getOffset(long timestamp) {
+    public synchronized int getOffset(final long timestamp) {
         if (timestamp < fDataModel.getFirstBucketTime() || timestamp > fDataModel.getEndTime())
             return -1;
         return (int) ((timestamp - fDataModel.getFirstBucketTime()) / fScaledData.fBucketDuration);
@@ -320,7 +320,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      * 
      * @param keyCode the SWT key code
      */
-    protected void moveCursor(int keyCode) {
+    protected void moveCursor(final int keyCode) {
 
         if (fScaledData.fCurrentBucket == HistogramScaledData.OUT_OF_RANGE_BUCKET)
             return;
@@ -372,29 +372,30 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      */
     @Override
     public void modelUpdated() {
-        if (!fCanvas.isDisposed() && fCanvas.getDisplay() != null) {
+        if (!fCanvas.isDisposed() && fCanvas.getDisplay() != null)
             fCanvas.getDisplay().asyncExec(new Runnable() {
                 @Override
                 public void run() {
                     if (!fCanvas.isDisposed()) {
                         // Retrieve and normalize the data
-                        int canvasWidth = fCanvas.getBounds().width;
-                        int canvasHeight = fCanvas.getBounds().height;
+                        final int canvasWidth = fCanvas.getBounds().width;
+                        final int canvasHeight = fCanvas.getBounds().height;
                         if (canvasWidth <= 0 || canvasHeight <= 0)
                             return;
                         fDataModel.setCurrentEvent(fCurrentEventTime);
                         fScaledData = fDataModel.scaleTo(canvasWidth, canvasHeight, HISTOGRAM_BAR_WIDTH);
-                        fCanvas.redraw();
-                        // Display histogram and update X-,Y-axis labels
-                        fTimeRangeStartText.setText(HistogramUtils.nanosecondsToString(fDataModel.getFirstBucketTime()));
-                        fTimeRangeEndText.setText(HistogramUtils.nanosecondsToString(fDataModel.getEndTime()));
-                        fMaxNbEventsText.setText(Long.toString(fScaledData.fMaxValue));
-                        // The Y-axis area might need to be re-sized
-                        fMaxNbEventsText.getParent().layout();
+                        if (fScaledData != null) {
+                            fCanvas.redraw();
+                            // Display histogram and update X-,Y-axis labels
+                            fTimeRangeStartText.setText(HistogramUtils.nanosecondsToString(fDataModel.getFirstBucketTime()));
+                            fTimeRangeEndText.setText(HistogramUtils.nanosecondsToString(fDataModel.getEndTime()));
+                            fMaxNbEventsText.setText(Long.toString(fScaledData.fMaxValue));
+                            // The Y-axis area might need to be re-sized
+                            fMaxNbEventsText.getParent().layout();
+                        }
                     }
                 }
             });
-        }
     }
 
     // ------------------------------------------------------------------------
@@ -402,7 +403,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // ------------------------------------------------------------------------
 
     private void updateCurrentEventTime() {
-        long bucketStartTime = getTimestamp(fScaledData.fCurrentBucket);
+        final long bucketStartTime = getTimestamp(fScaledData.fCurrentBucket);
         ((HistogramView) fParentView).updateCurrentEventTime(bucketStartTime);
     }
 
@@ -413,11 +414,11 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     protected final String IMAGE_KEY = "double-buffer-image"; //$NON-NLS-1$
 
     @Override
-    public void paintControl(PaintEvent event) {
+    public void paintControl(final PaintEvent event) {
 
         // Get the geometry
-        int canvasWidth = fCanvas.getBounds().width;
-        int canvasHeight = fCanvas.getBounds().height;
+        final int canvasWidth = fCanvas.getBounds().width;
+        final int canvasHeight = fCanvas.getBounds().height;
 
         // Make sure we have something to draw upon
         if (canvasWidth <= 0 || canvasHeight <= 0)
@@ -431,23 +432,23 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         }
 
         // Draw the histogram on its canvas
-        GC imageGC = new GC(image);
+        final GC imageGC = new GC(image);
         formatImage(imageGC, image);
         event.gc.drawImage(image, 0, 0);
         imageGC.dispose();
     }
 
-    private void formatImage(GC imageGC, Image image) {
+    private void formatImage(final GC imageGC, final Image image) {
 
         if (fScaledData == null)
             return;
 
-        HistogramScaledData scaledData = new HistogramScaledData(fScaledData);
+        final HistogramScaledData scaledData = new HistogramScaledData(fScaledData);
 
         try {
             // Get drawing boundaries
-            int width = image.getBounds().width;
-            int height = image.getBounds().height;
+            final int width = image.getBounds().width;
+            final int height = image.getBounds().height;
 
             // Clear the drawing area
             imageGC.setBackground(fBackgroundColor);
@@ -455,17 +456,16 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
             // Draw the histogram bars
             imageGC.setBackground(fHistoBarColor);
-            int limit = width < scaledData.fWidth ? width : scaledData.fWidth;
+            final int limit = width < scaledData.fWidth ? width : scaledData.fWidth;
             for (int i = 1; i < limit; i++) {
-                int value = (int) (scaledData.fData[i] * scaledData.fScalingFactor);
+                final int value = (int) (scaledData.fData[i] * scaledData.fScalingFactor);
                 imageGC.fillRectangle(i, height - value, 1, value);
             }
 
             // Draw the current event bar
-            int currentBucket = scaledData.fCurrentBucket;
-            if (currentBucket >= 0 && currentBucket < limit) {
+            final int currentBucket = scaledData.fCurrentBucket;
+            if (currentBucket >= 0 && currentBucket < limit)
                 drawDelimiter(imageGC, fCurrentEventColor, height, currentBucket);
-            }
 
             // Add a dashed line as a delimiter (at the right of the last bar)
             int lastEventIndex = limit - 1;
@@ -473,14 +473,14 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                 lastEventIndex--;
             lastEventIndex += (lastEventIndex < limit - 1) ? 1 : 0;
             drawDelimiter(imageGC, fLastEventColor, height, lastEventIndex);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // Do nothing
         }
     }
 
-    private void drawDelimiter(GC imageGC, Color color, int height, int index) {
+    private void drawDelimiter(final GC imageGC, final Color color, final int height, final int index) {
         imageGC.setBackground(color);
-        int dash = height / 4;
+        final int dash = height / 4;
         imageGC.fillRectangle(index, 0 * dash, 1, dash - 1);
         imageGC.fillRectangle(index, 1 * dash, 1, dash - 1);
         imageGC.fillRectangle(index, 2 * dash, 1, dash - 1);
@@ -492,12 +492,12 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // ------------------------------------------------------------------------
 
     @Override
-    public void keyPressed(KeyEvent event) {
+    public void keyPressed(final KeyEvent event) {
         moveCursor(event.keyCode);
     }
 
     @Override
-    public void keyReleased(KeyEvent event) {
+    public void keyReleased(final KeyEvent event) {
     }
 
     // ------------------------------------------------------------------------
@@ -505,11 +505,11 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // ------------------------------------------------------------------------
 
     @Override
-    public void mouseDoubleClick(MouseEvent event) {
+    public void mouseDoubleClick(final MouseEvent event) {
     }
 
     @Override
-    public void mouseDown(MouseEvent event) {
+    public void mouseDown(final MouseEvent event) {
         if (fDataModel.getNbEvents() > 0 && fScaledData.fLastBucket >= event.x) {
             fScaledData.fCurrentBucket = event.x;
             updateCurrentEventTime();
@@ -517,7 +517,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     }
 
     @Override
-    public void mouseUp(MouseEvent event) {
+    public void mouseUp(final MouseEvent event) {
     }
 
     // ------------------------------------------------------------------------
@@ -525,31 +525,30 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // ------------------------------------------------------------------------
 
     @Override
-    public void mouseEnter(MouseEvent event) {
+    public void mouseEnter(final MouseEvent event) {
     }
 
     @Override
-    public void mouseExit(MouseEvent event) {
+    public void mouseExit(final MouseEvent event) {
     }
 
     @Override
-    public void mouseHover(MouseEvent event) {
+    public void mouseHover(final MouseEvent event) {
         if (fDataModel.getNbEvents() > 0 && fScaledData != null && fScaledData.fLastBucket >= event.x) {
-            String tooltip = formatToolTipLabel(event.x);
+            final String tooltip = formatToolTipLabel(event.x);
             fCanvas.setToolTipText(tooltip);
         }
     }
 
-    private String formatToolTipLabel(int index) {
+    private String formatToolTipLabel(final int index) {
         long startTime = fScaledData.getBucketStartTime(fScaledData.fCurrentBucket);
-        // negative values are possible if time values came into the model in decreasing order 
-        if (startTime < 0) {
+        // negative values are possible if time values came into the model in decreasing order
+        if (startTime < 0)
             startTime = 0;
-        }
-        long endTime = fScaledData.getBucketEndTime(fScaledData.fCurrentBucket);
-        int nbEvents = (index >= 0) ? fScaledData.fData[index] : 0;
+        final long endTime = fScaledData.getBucketEndTime(fScaledData.fCurrentBucket);
+        final int nbEvents = (index >= 0) ? fScaledData.fData[index] : 0;
 
-        StringBuffer buffer = new StringBuffer();
+        final StringBuffer buffer = new StringBuffer();
         buffer.append("Range = ["); //$NON-NLS-1$
         buffer.append(HistogramUtils.nanosecondsToString(startTime));
         buffer.append(","); //$NON-NLS-1$
@@ -565,12 +564,12 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // ------------------------------------------------------------------------
 
     @Override
-    public void controlMoved(ControlEvent event) {
+    public void controlMoved(final ControlEvent event) {
         fDataModel.complete();
     }
 
     @Override
-    public void controlResized(ControlEvent event) {
+    public void controlResized(final ControlEvent event) {
         fDataModel.complete();
     }
 }

@@ -188,7 +188,6 @@ public class EventsViewEditor extends TmfEditor {
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             try {
                                 trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
-                                trace.indexTrace(false);
                             } catch (final FileNotFoundException e) {
                             }
                             final ITmfTrace[] traces = new ITmfTrace[] { trace };
