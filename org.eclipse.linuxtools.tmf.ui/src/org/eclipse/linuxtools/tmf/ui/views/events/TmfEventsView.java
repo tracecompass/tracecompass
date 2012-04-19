@@ -108,7 +108,7 @@ public class TmfEventsView extends TmfView {
         if (fExperiment == null) {
             return new TmfEventsTable(parent, DEFAULT_CACHE_SIZE);
         }
-        int cacheSize = fExperiment.getIndexPageSize();
+        int cacheSize = fExperiment.getCacheSize();
         String commonTraceType = null;
         try {
             for (ITmfTrace<?> trace : fExperiment.getTraces()) {

@@ -66,11 +66,11 @@ public class TmfMultiTraceExperimentTest extends TestCase {
             try {
                 URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path1), null);
                 File test = new File(FileLocator.toFileURL(location).toURI());
-                final TmfTraceStub trace1 = new TmfTraceStub(test.getPath(), true);
+                final TmfTraceStub trace1 = new TmfTraceStub(test.getPath(), 0, true);
                 fTraces[0] = trace1;
                 location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path2), null);
                 test = new File(FileLocator.toFileURL(location).toURI());
-                final TmfTraceStub trace2 = new TmfTraceStub(test.getPath(), true);
+                final TmfTraceStub trace2 = new TmfTraceStub(test.getPath(), 0, true);
                 fTraces[1] = trace2;
             } catch (final URISyntaxException e) {
                 e.printStackTrace();
@@ -84,8 +84,9 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     @SuppressWarnings("unchecked")
     private synchronized static void setupExperiment() {
         synchronized (TmfMultiTraceExperimentTest.class) {
-            if (fExperiment == null)
+            if (fExperiment == null) {
                 fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, (ITmfTrace<TmfEvent>[]) fTraces, TmfTimestamp.ZERO, BLOCK_SIZE, true);
+            }
         }
     }
 
@@ -127,7 +128,7 @@ public class TmfMultiTraceExperimentTest extends TestCase {
     public void testValidateCheckpoints() throws Exception {
 
         final Vector<TmfCheckpoint> checkpoints = fExperiment.getCheckpoints();
-        final int pageSize = fExperiment.getIndexPageSize();
+        final int pageSize = fExperiment.getCacheSize();
         assertTrue("Checkpoints exist", checkpoints != null);
 
         // Validate that each checkpoint points to the right event
@@ -583,8 +584,9 @@ public class TmfMultiTraceExperimentTest extends TestCase {
 
         // Ensure that we have distinct events.
         // Don't go overboard: we are not validating the stub!
-        for (int i = 0; i < nbEvents; i++)
+        for (int i = 0; i < nbEvents; i++) {
             assertEquals("Distinct events", i+1, requestedEvents.get(i).getTimestamp().getValue());
+        }
     }
 
     public void testProcessRequestForNbEvents2() throws Exception {
@@ -610,8 +612,9 @@ public class TmfMultiTraceExperimentTest extends TestCase {
 
         // Ensure that we have distinct events.
         // Don't go overboard: we are not validating the stub!
-        for (int i = 0; i < nbEvents; i++)
+        for (int i = 0; i < nbEvents; i++) {
             assertEquals("Distinct events", i+1, requestedEvents.get(i).getTimestamp().getValue());
+        }
     }
 
     public void testProcessRequestForAllEvents() throws Exception {
@@ -638,8 +641,9 @@ public class TmfMultiTraceExperimentTest extends TestCase {
 
         // Ensure that we have distinct events.
         // Don't go overboard: we are not validating the stub!
-        for (int i = 0; i < nbExpectedEvents; i++)
+        for (int i = 0; i < nbExpectedEvents; i++) {
             assertEquals("Distinct events", i+1, requestedEvents.get(i).getTimestamp().getValue());
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -659,13 +663,15 @@ public class TmfMultiTraceExperimentTest extends TestCase {
             public void handleData(final TmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
-                if (++nbRead == blockSize)
+                if (++nbRead == blockSize) {
                     cancel();
+                }
             }
             @Override
             public void handleCancel() {
-                if (requestedEvents.size() < blockSize)
+                if (requestedEvents.size() < blockSize) {
                     System.out.println("aie");
+                }
             }
         };
         fExperiment.sendRequest(request);

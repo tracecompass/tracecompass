@@ -128,6 +128,11 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      */
     public String getPath();
 
+    /**
+     * @return the trace cache size
+     */
+    public int getCacheSize();
+
     // ------------------------------------------------------------------------
     // Trace characteristics getters
     // ------------------------------------------------------------------------
@@ -251,11 +256,6 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
 
     // ------------------------------------------------------------------------
     // ------------------------------------------------------------------------
-
-    /**
-     * @return the trace index page size
-     */
-    public int getIndexPageSize();
 
     /**
      * @return the streaming interval in ms (0 if not a streaming trace)

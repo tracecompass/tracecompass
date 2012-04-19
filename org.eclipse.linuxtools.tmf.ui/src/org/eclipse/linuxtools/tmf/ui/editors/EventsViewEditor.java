@@ -136,7 +136,7 @@ public class EventsViewEditor extends TmfEditor {
                                     trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
                                 } catch (final FileNotFoundException e) {
                                 }
-                                cacheSize = Math.min(cacheSize, trace.getIndexPageSize());
+                                cacheSize = Math.min(cacheSize, trace.getCacheSize());
                                 traces[i] = trace;
                             }
                             final TmfExperiment experiment = new TmfExperiment(TmfEvent.class, experimentElement.getName(), traces, cacheSize);
@@ -166,7 +166,7 @@ public class EventsViewEditor extends TmfEditor {
                             } catch (final FileNotFoundException e) {
                             }
                             final ITmfTrace[] traces = new ITmfTrace[] { trace };
-                            final TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), traceElement.getName(), traces, trace.getIndexPageSize());
+                            final TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), traceElement.getName(), traces, trace.getCacheSize());
                             experiment.setBookmarksFile(fFile);
                             fTrace = experiment;
                             TmfExperiment.setCurrentExperiment(experiment);
@@ -191,7 +191,7 @@ public class EventsViewEditor extends TmfEditor {
                             } catch (final FileNotFoundException e) {
                             }
                             final ITmfTrace[] traces = new ITmfTrace[] { trace };
-                            final TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), traceElement.getName(), traces, trace.getIndexPageSize());
+                            final TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), traceElement.getName(), traces, trace.getCacheSize());
                             experiment.setBookmarksFile(fFile);
                             fTrace = experiment;
                             TmfExperiment.setCurrentExperiment(experiment);

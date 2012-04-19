@@ -65,7 +65,7 @@ public class TmfExperimentTest extends TestCase {
             try {
                 final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
                 final File test = new File(FileLocator.toFileURL(location).toURI());
-                final TmfTraceStub trace = new TmfTraceStub(test.getPath(), true);
+                final TmfTraceStub trace = new TmfTraceStub(test.getPath(), 0, true);
                 fTraces[0] = trace;
             } catch (final URISyntaxException e) {
                 e.printStackTrace();
@@ -78,8 +78,9 @@ public class TmfExperimentTest extends TestCase {
 
     @SuppressWarnings("unchecked")
     private synchronized static void setupExperiment() {
-        if (fExperiment == null)
+        if (fExperiment == null) {
             fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, EXPERIMENT, (ITmfTrace<TmfEvent>[]) fTraces, TmfTimestamp.ZERO, 1000, true);
+        }
     }
 
     public TmfExperimentTest(final String name) throws Exception {
@@ -123,7 +124,7 @@ public class TmfExperimentTest extends TestCase {
     public void testValidateCheckpoints() throws Exception {
 
         final Vector<TmfCheckpoint> checkpoints = fExperiment.getCheckpoints();
-        final int pageSize = fExperiment.getIndexPageSize();
+        final int pageSize = fExperiment.getCacheSize();
         assertTrue("Checkpoints exist", checkpoints != null);
 
         // Validate that each checkpoint points to the right event
@@ -579,8 +580,9 @@ public class TmfExperimentTest extends TestCase {
 
         // Ensure that we have distinct events.
         // Don't go overboard: we are not validating the stub!
-        for (int i = 0; i < nbEvents; i++)
+        for (int i = 0; i < nbEvents; i++) {
             assertEquals("Distinct events", i+1, requestedEvents.get(i).getTimestamp().getValue());
+        }
     }
 
     public void testProcessRequestForNbEvents2() throws Exception {
@@ -606,8 +608,9 @@ public class TmfExperimentTest extends TestCase {
 
         // Ensure that we have distinct events.
         // Don't go overboard: we are not validating the stub!
-        for (int i = 0; i < nbEvents; i++)
+        for (int i = 0; i < nbEvents; i++) {
             assertEquals("Distinct events", i+1, requestedEvents.get(i).getTimestamp().getValue());
+        }
     }
 
     public void testProcessRequestForAllEvents() throws Exception {
@@ -634,8 +637,9 @@ public class TmfExperimentTest extends TestCase {
 
         // Ensure that we have distinct events.
         // Don't go overboard: we are not validating the stub!
-        for (int i = 0; i < nbExpectedEvents; i++)
+        for (int i = 0; i < nbExpectedEvents; i++) {
             assertEquals("Distinct events", i+1, requestedEvents.get(i).getTimestamp().getValue());
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -655,13 +659,15 @@ public class TmfExperimentTest extends TestCase {
             public void handleData(final TmfEvent event) {
                 super.handleData(event);
                 requestedEvents.add(event);
-                if (++nbRead == blockSize)
+                if (++nbRead == blockSize) {
                     cancel();
+                }
             }
             @Override
             public void handleCancel() {
-                if (requestedEvents.size() < blockSize)
+                if (requestedEvents.size() < blockSize) {
                     System.out.println("aie");
+                }
             }
         };
         fExperiment.sendRequest(request);

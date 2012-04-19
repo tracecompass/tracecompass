@@ -297,8 +297,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         //        super(resource, LttngEvent.class, path, CHECKPOINT_PAGE_SIZE, false);
         super(resource, LttngEvent.class, path, CHECKPOINT_PAGE_SIZE);
         initialize(resource, path, LttngEvent.class);
-        if (!bypassIndexing)
-            indexTrace(false);
+//        if (!bypassIndexing)
+//            indexTrace(false);
         this.traceLibPath = traceLibPath;
     }
 
@@ -527,7 +527,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
             System.out.println("seekEvent(rank) rank -> " + rank); //$NON-NLS-1$
 
         ITmfTimestamp timestamp = null;
-        long index = rank / getIndexPageSize();
+        long index = rank / getCacheSize();
 
         // Get the timestamp of the closest check point to the given position
         if (fCheckpoints.size() > 0) {
@@ -539,11 +539,11 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
 
         // Seek to the found time
         final TmfContext tmpContext = seekEvent(timestamp);
-        tmpContext.setRank((index + 1) * fIndexPageSize);
+        tmpContext.setRank((index + 1) * fCacheSize);
         previousLocation = (LttngLocation) tmpContext.getLocation();
 
         // Ajust the index of the event we found at this check point position
-        Long currentPosition = index * getIndexPageSize();
+        Long currentPosition = index * getCacheSize();
 
         Long lastTimeValueRead = 0L;
 

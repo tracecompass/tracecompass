@@ -1013,7 +1013,7 @@ ITmfEventsFilterProvider {
             if (nbRequested <= 0)
                 return;
             request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.ETERNITY, (int) fFilterCheckCount,
-                    nbRequested, fTrace.getIndexPageSize(), ExecutionType.BACKGROUND) {
+                    nbRequested, fTrace.getCacheSize(), ExecutionType.BACKGROUND) {
                 @Override
                 public void handleData(final TmfEvent event) {
                     super.handleData(event);
@@ -1189,9 +1189,9 @@ ITmfEventsFilterProvider {
             boolean wrapped = false;
             while (!monitor.isCanceled() && (foundRank == -1) && (fTrace != null)) {
                 int nbRequested = (direction == Direction.FORWARD ? Integer.MAX_VALUE : Math.min((int) rank + 1,
-                        fTrace.getIndexPageSize()));
+                        fTrace.getCacheSize()));
                 if (direction == Direction.BACKWARD)
-                    rank = Math.max(0, rank - fTrace.getIndexPageSize() + 1);
+                    rank = Math.max(0, rank - fTrace.getCacheSize() + 1);
                 request = new TmfDataRequest<TmfEvent>(TmfEvent.class, (int) rank, nbRequested) {
                     long currentRank = rank;
 

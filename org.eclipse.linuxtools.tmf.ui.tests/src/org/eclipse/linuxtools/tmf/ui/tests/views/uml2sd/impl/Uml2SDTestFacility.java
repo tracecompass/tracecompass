@@ -42,23 +42,23 @@ import org.osgi.framework.FrameworkUtil;
 
 /**
  *  Singleton class to facilitate the test cases. Creates UML2SD view and loader objects as well as provides
- *  utility methods for interacting with the loader/view.  
+ *  utility methods for interacting with the loader/view.
  */
 public class Uml2SDTestFacility {
-    
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
     private static Uml2SDTestFacility fInstance = null;
-    
+
     private TmfUml2SDSyncLoader fLoader;
     private SDView fSdView;
     private TmfTraceStub fTrace = null;
     private TmfUml2SDTestTrace    fParser = null;
     private TmfExperiment<TmfEvent> fExperiment = null;
-    
+
     private boolean fIsInitialized = false;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -80,12 +80,12 @@ public class Uml2SDTestFacility {
      * Initial the test facility.
      */
     public void init() {
-        
+
         if (!fIsInitialized) {
 
             fParser = new TmfUml2SDTestTrace();
             fTrace = setupTrace(fParser);
-            
+
             IViewPart view;
             try {
                 // Remove welcome view to avoid interference during test execution
@@ -93,19 +93,19 @@ public class Uml2SDTestFacility {
                         .getActiveWorkbenchWindow()
                         .getActivePage()
                         .findView("org.eclipse.ui.internal.introview"); //$NON-NLS-1$
-                
+
                 if (view != null) {
                     PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow()
-                    .getActivePage().hideView(view); 
+                    .getActivePage().hideView(view);
                 }
-                
+
                 view = PlatformUI.getWorkbench()
-                                 .getActiveWorkbenchWindow()
-                                 .getActivePage()
-                                 .showView("org.eclipse.linuxtools.tmf.ui.tmfUml2SDSyncView"); //$NON-NLS-1$
-                
-            } catch (PartInitException e) {
+                        .getActiveWorkbenchWindow()
+                        .getActivePage()
+                        .showView("org.eclipse.linuxtools.tmf.ui.tmfUml2SDSyncView"); //$NON-NLS-1$
+
+            } catch (final PartInitException e) {
                 throw new RuntimeException(e);
             }
 
@@ -118,23 +118,23 @@ public class Uml2SDTestFacility {
         }
     }
 
-    
-    private TmfTraceStub setupTrace(ITmfEventParser<TmfEvent> parser) {
-        
-            try {
-                // Create test trace object
-                URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path("tracesets/sdEvents"), null); //$NON-NLS-1$
-                File test = new File(FileLocator.toFileURL(location).toURI());
-                return new TmfTraceStub(test.getPath(), 500, true, parser);
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
+
+    private TmfTraceStub setupTrace(final ITmfEventParser<TmfEvent> parser) {
+
+        try {
+            // Create test trace object
+            final URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path("tracesets/sdEvents"), null); //$NON-NLS-1$
+            final File test = new File(FileLocator.toFileURL(location).toURI());
+            return new TmfTraceStub(test.getPath(), 500, true, parser, null);
+        } catch (final URISyntaxException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
-    
+
     /**
      * Dispose the resource
      */
@@ -149,15 +149,15 @@ public class Uml2SDTestFacility {
             fIsInitialized = false;
         }
     }
-    
+
     /**
-     * Sleeps current thread or GUI thread for a given time. 
+     * Sleeps current thread or GUI thread for a given time.
      * @param waitTimeMillis
      */
-    public void delay(long waitTimeMillis) {
-        Display display = Display.getCurrent();
+    public void delay(final long waitTimeMillis) {
+        final Display display = Display.getCurrent();
         if (display != null) {
-            long endTimeMillis = System.currentTimeMillis() + waitTimeMillis;
+            final long endTimeMillis = System.currentTimeMillis() + waitTimeMillis;
             while(System.currentTimeMillis() < endTimeMillis) {
                 if (!display.readAndDispatch()) {
                     display.sleep();
@@ -167,7 +167,7 @@ public class Uml2SDTestFacility {
         } else {
             try {
                 Thread.sleep(waitTimeMillis);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 // Ignored
             }
         }
@@ -216,7 +216,7 @@ public class Uml2SDTestFacility {
     public TmfExperiment<TmfEvent> getExperiment() {
         return fExperiment;
     }
-    
+
     /**
      * Go to next page;
      */
@@ -234,7 +234,7 @@ public class Uml2SDTestFacility {
         fLoader.waitForCompletion();
         delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
     }
-    
+
     /**
      * Go to last page.
      */
@@ -252,32 +252,32 @@ public class Uml2SDTestFacility {
         fLoader.waitForCompletion();
         delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
     }
-    
+
     /**
      * @param page number to set
      */
-    public void setPage(int page) {
+    public void setPage(final int page) {
         fLoader.pageNumberChanged(page);;
         fLoader.waitForCompletion();
         delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
     }
-    
+
     /**
      * @see org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.impl.selectExperiment(boolean)
      */
     public void selectExperiment() {
         this.selectExperiment(true);
     }
-    
+
     /**
-     * Selects the experiment. 
+     * Selects the experiment.
      * @param wait true to wait for indexing to finish else false
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public void selectExperiment(boolean wait) {
+    public void selectExperiment(final boolean wait) {
         fTrace = setupTrace(fParser);
 
-        ITmfTrace traces[] = new ITmfTrace[1];
+        final ITmfTrace traces[] = new ITmfTrace[1];
         traces[0] = fTrace;
         fExperiment = new TmfExperiment<TmfEvent>(TmfEvent.class, "TestExperiment", traces); //$NON-NLS-1$
         fTrace.broadcast(new TmfExperimentSelectedSignal<TmfEvent>(this, fExperiment));
@@ -289,7 +289,7 @@ public class Uml2SDTestFacility {
             delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         }
     }
-    
+
     /**
      * Disposes the experiment.
      */
@@ -297,18 +297,18 @@ public class Uml2SDTestFacility {
         fExperiment.dispose();
         delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
     }
-    
+
     /**
-     * Creates some global filter criteria and saves them to disk. 
+     * Creates some global filter criteria and saves them to disk.
      */
     public void createFilterCriteria() {
         // Create Filter Criteria and save tme
-        List<FilterCriteria> filterToSave = new ArrayList<FilterCriteria>();
+        final List<FilterCriteria> filterToSave = new ArrayList<FilterCriteria>();
         Criteria criteria = new Criteria();
         criteria.setLifeLineSelected(true);
         criteria.setExpression(IUml2SDTestConstants.FIRST_PLAYER_NAME);
         filterToSave.add(new FilterCriteria(criteria, true, false));
-        
+
         criteria = new Criteria();
         criteria.setSyncMessageSelected(true);
         criteria.setExpression("BALL_.*"); //$NON-NLS-1$

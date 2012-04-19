@@ -158,7 +158,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
     }
 
     @Override
-    public int getIndexPageSize() {
+    public int getCacheSize() {
         return 50000; // not true, but it works
     }
 

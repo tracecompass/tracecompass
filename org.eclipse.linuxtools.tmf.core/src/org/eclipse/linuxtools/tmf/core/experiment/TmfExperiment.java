@@ -193,7 +193,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     }
 
     @Override
-    public int getIndexPageSize() {
+    public int getCacheSize() {
         return fIndexPageSize;
     }
 

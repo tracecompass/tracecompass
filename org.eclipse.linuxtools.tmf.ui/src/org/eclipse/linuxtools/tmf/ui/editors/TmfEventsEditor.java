@@ -130,7 +130,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                                     trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
                                 } catch (final FileNotFoundException e) {
                                 }
-                                cacheSize = Math.min(cacheSize, trace.getIndexPageSize());
+                                cacheSize = Math.min(cacheSize, trace.getCacheSize());
                                 traces[i] = trace;
                             }
                             final TmfExperiment experiment = new TmfExperiment(TmfEvent.class, experimentElement.getName(), traces, cacheSize);
@@ -222,7 +222,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             super.setInput(new FileEditorInput(fFile));
             fEventsTable.dispose();
             if (fTrace != null) {
-                fEventsTable = createEventsTable(fParent, fTrace.getIndexPageSize());
+                fEventsTable = createEventsTable(fParent, fTrace.getCacheSize());
                 fEventsTable.setTrace(fTrace, true);
                 fEventsTable.refreshBookmarks(fFile);
                 broadcast(new TmfTraceOpenedSignal(this, fTrace, fFile, fEventsTable));
@@ -237,7 +237,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         fParent = parent;
         if (fTrace != null) {
             setPartName(fTrace.getName());
-            fEventsTable = createEventsTable(parent, fTrace.getIndexPageSize());
+            fEventsTable = createEventsTable(parent, fTrace.getCacheSize());
             fEventsTable.setTrace(fTrace, true);
             fEventsTable.refreshBookmarks(fFile);
             broadcast(new TmfTraceOpenedSignal(this, fTrace, fFile, fEventsTable));
@@ -471,7 +471,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             }
             fEventsTable.dispose();
             if (fTrace != null) {
-                fEventsTable = createEventsTable(fParent, fTrace.getIndexPageSize());
+                fEventsTable = createEventsTable(fParent, fTrace.getCacheSize());
                 fEventsTable.setTrace(fTrace, true);
                 broadcast(new TmfTraceOpenedSignal(this, fTrace, fFile, fEventsTable));
             } else

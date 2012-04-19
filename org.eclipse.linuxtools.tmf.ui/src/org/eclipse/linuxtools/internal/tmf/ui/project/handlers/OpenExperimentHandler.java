@@ -142,7 +142,7 @@ public class OpenExperimentHandler extends AbstractHandler {
                 } catch (final FileNotFoundException e) {
                     displayErrorMsg(""); //$NON-NLS-1$
                 }
-                cacheSize = Math.min(cacheSize, trace.getIndexPageSize());
+                cacheSize = Math.min(cacheSize, trace.getCacheSize());
                 final String editorId = element.getEditorId();
                 if (editorId == null) {
                     useEditor = false;

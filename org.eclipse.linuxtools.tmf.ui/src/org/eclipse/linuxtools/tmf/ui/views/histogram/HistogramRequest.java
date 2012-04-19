@@ -38,7 +38,7 @@ public class HistogramRequest extends TmfEventRequest<ITmfEvent> {
     // ------------------------------------------------------------------------
 
     public HistogramRequest(HistogramDataModel histogram, TmfTimeRange range, int rank, int nbEvents, ITmfDataRequest.ExecutionType execType) {
-        super(ITmfEvent.class, range, rank, nbEvents, TmfTrace.DEFAULT_INDEX_PAGE_SIZE, execType);
+        super(ITmfEvent.class, range, rank, nbEvents, TmfTrace.DEFAULT_TRACE_CACHE_SIZE, execType);
         fHistogram = histogram;
     }
 

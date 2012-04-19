@@ -75,7 +75,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
         if ( positionToFirstEvent() == false )
             throw new IOException("Fail to position to the beginning of the trace"); //$NON-NLS-1$
         else {
-            fIndexPageSize = 1000;
+            fCacheSize = 1000;
 
             // Skip indexing if asked
             //        	if ( skipIndexing == true ) {

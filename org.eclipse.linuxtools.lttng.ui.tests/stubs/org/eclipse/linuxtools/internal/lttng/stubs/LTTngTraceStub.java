@@ -54,7 +54,7 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> {
      * @throws FileNotFoundException
      */
     public LTTngTraceStub(final IResource resource) throws FileNotFoundException {
-        this(resource, DEFAULT_INDEX_PAGE_SIZE);
+        this(resource, DEFAULT_TRACE_CACHE_SIZE);
     }
 
     /**
@@ -68,7 +68,10 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> {
         super(resource, LttngEvent.class, resource.getName(), cacheSize);
         fTrace = new RandomAccessFile(resource.getName(), "r");
         fParser = new LTTngEventParserStub();
-        indexTrace(true);
+    }
+
+    public void indexTrace() {
+        fIndexer.buildIndex(true);
     }
 
     // ========================================================================

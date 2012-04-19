@@ -188,7 +188,7 @@ public class OpenTraceHandler extends AbstractHandler {
         else {
             // Create the experiment
             final ITmfTrace[] traces = new ITmfTrace[] { trace };
-            final TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), fTrace.getName(), traces, trace.getIndexPageSize());
+            final TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), fTrace.getName(), traces, trace.getCacheSize());
             experiment.setBookmarksFile(file);
 
             TmfExperiment.setCurrentExperiment(experiment);
