@@ -61,6 +61,10 @@ public class StructDeclaration implements IDeclaration {
         return this.fieldsList;
     }
 
+    @Override
+    public long getAlignment() {
+        return getMinAlign();
+    }
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

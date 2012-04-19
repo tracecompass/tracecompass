@@ -71,7 +71,7 @@ public class SequenceDeclarationTest {
     @Test
     public void testCreateDefinition() {
         IntegerDeclaration id = new IntegerDeclaration(8, false, 8,
-                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, null);
+                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, null, 32);
 
         StructDeclaration structDec = new StructDeclaration(0);
         structDec.addField(fieldName, id);

@@ -67,14 +67,14 @@ public class ArrayDefinitionTest {
     }
 
     private ArrayDefinition createLongArray() {
-        IntegerDeclaration decl = new IntegerDeclaration(32, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "none"); //$NON-NLS-1$
+        IntegerDeclaration decl = new IntegerDeclaration(32, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "none",8); //$NON-NLS-1$
         IntegerDefinition[] defs = createIntDefs(10, 32);
         ArrayDefinition temp = setUpDeclaration(decl, defs);
         return temp;
     }
 
     private ArrayDefinition createCharArray() {
-        IntegerDeclaration decl = new IntegerDeclaration(8, false, 10, ByteOrder.BIG_ENDIAN, Encoding.UTF8, "none"); //$NON-NLS-1$
+        IntegerDeclaration decl = new IntegerDeclaration(8, false, 10, ByteOrder.BIG_ENDIAN, Encoding.UTF8, "none",8); //$NON-NLS-1$
         IntegerDefinition[] defs = createIntDefs(4,8);
         ArrayDefinition temp = setUpDeclaration(decl, defs);
         return temp;
@@ -113,7 +113,7 @@ public class ArrayDefinitionTest {
 
             String content = "test" + i; //$NON-NLS-1$
             defs[i] = new IntegerDefinition(new IntegerDeclaration(bits, false,
-                    16, ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, content), null, content);
+                    16, ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, content, 24), null, content);
             defs[i].setValue(i);
         }
         return defs;
@@ -226,7 +226,7 @@ public class ArrayDefinitionTest {
     @Test
     public void testIsString_complex() {
         final IntegerDeclaration id = new IntegerDeclaration(8, false, 16,
-                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, null);
+                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, null, 8);
         ArrayDeclaration ad = new ArrayDeclaration(0, id);
         ArrayDefinition ownFixture = new ArrayDefinition(ad, this.trace,
                 "Testx"); //$NON-NLS-1$

@@ -43,6 +43,10 @@ public class EnumDeclaration implements IDeclaration {
         return containerType;
     }
 
+    @Override
+    public long getAlignment() {
+        return this.getContainerType().getAlignment();
+    }
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -136,5 +140,6 @@ public class EnumDeclaration implements IDeclaration {
         /* Only used for debugging */
         return "[declaration] enum[" + Integer.toHexString(hashCode()) + ']'; //$NON-NLS-1$
     }
+
 
 }

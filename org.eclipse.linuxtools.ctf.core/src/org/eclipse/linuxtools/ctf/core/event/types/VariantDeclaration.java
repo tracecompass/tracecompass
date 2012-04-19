@@ -24,6 +24,7 @@ public class VariantDeclaration implements IDeclaration {
     // ------------------------------------------------------------------------
 
     private String tag = null;
+    private long alignment;
     private final HashMap<String, IDeclaration> fields = new HashMap<String, IDeclaration>();
 
     // ------------------------------------------------------------------------
@@ -57,6 +58,10 @@ public class VariantDeclaration implements IDeclaration {
         return this.fields;
     }
 
+    @Override
+    public long getAlignment() {
+        return alignment;
+    }
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -69,6 +74,7 @@ public class VariantDeclaration implements IDeclaration {
 
     public void addField(String fieldTag, IDeclaration declaration) {
         fields.put(fieldTag, declaration);
+        alignment = Math.max(alignment, declaration.getAlignment());
     }
 
     @Override

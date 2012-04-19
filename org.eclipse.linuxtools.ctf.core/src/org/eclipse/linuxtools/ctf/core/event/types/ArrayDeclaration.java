@@ -45,6 +45,11 @@ public class ArrayDeclaration implements IDeclaration {
         return length;
     }
 
+    @Override
+    public long getAlignment() {
+        long retVal = this.getElementType().getAlignment();
+        return retVal;
+    }
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

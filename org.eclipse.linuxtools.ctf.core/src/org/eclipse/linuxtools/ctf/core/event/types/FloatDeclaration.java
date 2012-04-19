@@ -8,6 +8,7 @@
  *
  * Contributors: Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.linuxtools.ctf.core.event.types;
 
 import java.nio.ByteOrder;
@@ -23,25 +24,25 @@ public class FloatDeclaration implements IDeclaration {
     private final int exp;
     private final ByteOrder byteOrder;
     private final Encoding encoding;
+    private final long alignment;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
     public FloatDeclaration(int exponent, int mantissa, ByteOrder byteOrder,
-            Encoding encoding) {
+            Encoding encoding, long alignment) {
         mant = mantissa;
         exp = exponent;
         this.byteOrder = byteOrder;
         this.encoding = encoding;
+        this.alignment = alignment;
 
     }
 
     // ------------------------------------------------------------------------
     // Gettters/Setters/Predicates
     // ------------------------------------------------------------------------
-
-
 
     /**
      * @return the mant
@@ -69,6 +70,10 @@ public class FloatDeclaration implements IDeclaration {
      */
     public Encoding getEncoding() {
         return encoding;
+    }
+
+    public long getAlignment() {
+        return alignment;
     }
 
     // ------------------------------------------------------------------------

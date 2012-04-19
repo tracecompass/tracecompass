@@ -51,8 +51,8 @@ public class VariantDefinitionTest {
      * Perform pre-test initialization.
      *
      * Not sure it needs to be that complicated, oh well...
-     * 
-     * @throws CTFReaderException 
+     *
+     * @throws CTFReaderException
      */
     @Before
     public void setUp() throws CTFReaderException {
@@ -76,7 +76,7 @@ public class VariantDefinitionTest {
         sDef2 = new StructDefinition(new StructDeclaration(1L), vDef2, fName);
 
         eDef = new EnumDefinition(new EnumDeclaration(new IntegerDeclaration(1,
-                true, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, fName)), sDef2, fName);
+                true, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, fName, 8)), sDef2, fName);
 
         fixture = new VariantDefinition(vDecl1, sDef1, fName);
         fixture.setTagDefinition(eDef);
@@ -93,8 +93,8 @@ public class VariantDefinitionTest {
 
     /**
      * Run the VariantDefinition(VariantDeclaration,DefinitionScope,String)
-     * 
-     * @throws CTFReaderException 
+     *
+     * @throws CTFReaderException
      */
     @Test
     public void testVariantDefinition() throws CTFReaderException {
@@ -276,8 +276,8 @@ public class VariantDefinitionTest {
 
     /**
      * Run the void setTagDefinition(EnumDefinition) method test.
-     * 
-     * @throws CTFReaderException 
+     *
+     * @throws CTFReaderException
      */
     @Test
     public void testSetTagDefinition() throws CTFReaderException {
@@ -293,7 +293,7 @@ public class VariantDefinitionTest {
         structDef = new StructDefinition(new StructDeclaration(1L), vDef, fName);
         tagDefinition = new EnumDefinition(new EnumDeclaration(
                 new IntegerDeclaration(1, true, 1, ByteOrder.BIG_ENDIAN,
-                        Encoding.ASCII, fName)), structDef, fName);
+                        Encoding.ASCII, fName, 8)), structDef, fName);
 
         fixture.setTagDefinition(tagDefinition);
     }

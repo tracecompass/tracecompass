@@ -43,7 +43,7 @@ public class SequenceDefinitionTest {
 
     /**
      * Perform pre-test initialization.
-     * @throws CTFReaderException 
+     * @throws CTFReaderException
      */
     @Before
     public void setUp() throws CTFReaderException {
@@ -51,7 +51,7 @@ public class SequenceDefinitionTest {
         StructDefinition structDef;
 
         IntegerDeclaration id = new IntegerDeclaration(8, false, 8,
-                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, null);
+                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, null, 8);
         String lengthName = "LengthName"; //$NON-NLS-1$
         structDec = new StructDeclaration(0);
         structDec.addField(lengthName, id);
@@ -83,7 +83,7 @@ public class SequenceDefinitionTest {
 
         int len = 32;
         IntegerDeclaration id = new IntegerDeclaration(len, false, len,
-                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, null);
+                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, null,8);
         String lengthName = "LengthName"; //$NON-NLS-1$
         structDec = new StructDeclaration(0);
         structDec.addField(lengthName, id);

@@ -44,7 +44,7 @@ public class EnumDefinitionTest {
     public void setUp() {
         EnumDeclaration declaration = new EnumDeclaration(
                 new IntegerDeclaration(1, true, 1, ByteOrder.BIG_ENDIAN,
-                        Encoding.ASCII, null));
+                        Encoding.ASCII, null, 8));
         String fieldName = ""; //$NON-NLS-1$
 
         fixture = new EnumDefinition(declaration, null, fieldName);

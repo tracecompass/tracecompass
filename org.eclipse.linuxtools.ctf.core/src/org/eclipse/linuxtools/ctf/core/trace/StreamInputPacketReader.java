@@ -294,7 +294,7 @@ class StreamInputPacketReader implements IDefinitionScope {
         long timestamp = 0;
 
         /*
-         * Read thestream event header.
+         * Read the stream event header.
          */
         if (getStreamEventHeaderDef() != null) {
             getStreamEventHeaderDef().read(getBitBuffer());
@@ -367,6 +367,11 @@ class StreamInputPacketReader implements IDefinitionScope {
          * Read the event fields.
          */
         if (eventDef.fields != null) {
+            int pos = getBitBuffer().position();
+            int minAlign = (int) eventDef.fields.getDeclaration().getMinAlign();
+            int offset = pos % minAlign;
+            pos += (minAlign - offset)%minAlign;
+            getBitBuffer().position(pos);
             eventDef.fields.read(getBitBuffer());
         }
 

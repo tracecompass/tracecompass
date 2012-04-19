@@ -29,10 +29,10 @@ public class ReadTrace {
      */
     @SuppressWarnings("nls")
     public static void main(String[] args) {
-        final String TRACE_PATH = "Tests/traces/trace20m1";
+        final String TRACE_PATH = "/home/ematkho/lttng-traces/lt-hello-4175-20120405-092230";
 
         // Change this to enable text output
-        final boolean USE_TEXT = false;
+        final boolean USE_TEXT = true;
 
         final int LOOP_COUNT = 1;
 
@@ -70,7 +70,7 @@ public class ReadTrace {
                                 + trace.getOffset());
                         System.out.println(traceReader.getIndex() + ", "
                                 + output + ", " + ed.getDeclaration().getName()
-                                + ", " + ed.getCPU());
+                                + ", " + ed.getCPU() + ed.getFields().toString()) ;
                     }
 
                     traceReader.advance();

@@ -23,26 +23,27 @@ public class IntegerDeclaration implements IDeclaration {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private int length;
-    private boolean signed;
-    private int base;
-    private ByteOrder byteOrder;
-    private Encoding encoding;
-    @SuppressWarnings("unused")
-    private final String clock;
+    final private int length;
+    final private boolean signed;
+    final private int base;
+    final private ByteOrder byteOrder;
+    final private Encoding encoding;
+    final private long alignment;
+    final private String clock;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
     public IntegerDeclaration(int len, boolean signed, int base,
-            ByteOrder byteOrder, Encoding encoding, String clock) {
+            ByteOrder byteOrder, Encoding encoding, String clock, long alignment) {
         this.length = len;
         this.signed = signed;
         this.base = base;
         this.byteOrder = byteOrder;
         this.encoding = encoding;
         this.clock = clock;
+        this.alignment = alignment;
     }
 
     // ------------------------------------------------------------------------
@@ -53,39 +54,19 @@ public class IntegerDeclaration implements IDeclaration {
         return signed;
     }
 
-    public void setSigned(boolean signed) {
-        this.signed = signed;
-    }
-
     public int getBase() {
         return base;
-    }
-
-    public void setBase(int base) {
-        this.base = base;
     }
 
     public ByteOrder getByteOrder() {
         return byteOrder;
     }
 
-    public void setByteOrder(ByteOrder byteOrder) {
-        this.byteOrder = byteOrder;
-    }
-
     public Encoding getEncoding() {
         return encoding;
     }
 
-    public void setEncoding(Encoding encoding) {
-        this.encoding = encoding;
-    }
-
-    public void setLength(int length) {
-        this.length = length;
-    }
-
-    public boolean isCharacter() {
+   public boolean isCharacter() {
         return (length == 8) && (encoding != Encoding.NONE);
     }
 
@@ -93,6 +74,13 @@ public class IntegerDeclaration implements IDeclaration {
         return length;
     }
 
+    public long getAlignment(){
+        return alignment;
+    }
+
+    public String getClock(){
+        return clock;
+    }
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

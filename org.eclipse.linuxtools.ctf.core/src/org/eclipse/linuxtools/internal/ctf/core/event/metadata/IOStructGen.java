@@ -1256,7 +1256,7 @@ public class IOStructGen {
             }
         }
 
-        floatDeclaration = new FloatDeclaration(exponent, mantissa, byteOrder, encoding);
+        floatDeclaration = new FloatDeclaration(exponent, mantissa, byteOrder, encoding, alignment);
 
         assert (floatDeclaration != null);
         return floatDeclaration;
@@ -1387,7 +1387,7 @@ public class IOStructGen {
         }
 
         integerDeclaration = new IntegerDeclaration((int) size, signed, base,
-                byteOrder, encoding, clock);
+                byteOrder, encoding, clock, alignment);
 
         assert (integerDeclaration != null);
         return integerDeclaration;
@@ -1551,6 +1551,12 @@ public class IOStructGen {
 
             /* Parse the body */
             parseStructBody(structBody, structDeclaration);
+            long maxFieldAlign = -1;
+            for( IDeclaration field : structDeclaration.getFields().values())
+            {
+                maxFieldAlign = Math.max(maxFieldAlign, field.getAlignment());
+            }
+            structDeclaration.setMinAlign(maxFieldAlign);
 
             /* If struct has name, add it to the current scope. */
             if (hasName) {

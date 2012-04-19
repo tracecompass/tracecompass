@@ -50,6 +50,10 @@ public class StringDeclaration implements IDeclaration {
         this.encoding = encoding;
     }
 
+    @Override
+    public long getAlignment() {
+        return 8; //FIXME: should be the elementtype.
+    }
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

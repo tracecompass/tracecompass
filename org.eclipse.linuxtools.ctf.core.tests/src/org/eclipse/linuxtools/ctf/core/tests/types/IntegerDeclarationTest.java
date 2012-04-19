@@ -38,7 +38,7 @@ public class IntegerDeclarationTest {
     @Before
     public void setUp() {
         fixture = new IntegerDeclaration(1, true, 1, ByteOrder.BIG_ENDIAN,
-                Encoding.ASCII, null);
+                Encoding.ASCII, null, 32);
     }
 
     /**
@@ -62,7 +62,7 @@ public class IntegerDeclarationTest {
         Encoding encoding = Encoding.ASCII;
 
         IntegerDeclaration result = new IntegerDeclaration(len, signed, base,
-                byteOrder, encoding, null);
+                byteOrder, encoding, null, 16);
 
         assertNotNull(result);
         assertEquals(1, result.getBase());
@@ -129,7 +129,7 @@ public class IntegerDeclarationTest {
     @Test
     public void testIsCharacter_8bytes() {
         IntegerDeclaration fixture8 = new IntegerDeclaration(8, true, 1,
-                ByteOrder.BIG_ENDIAN, Encoding.ASCII, null);
+                ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 8);
 
         boolean result = fixture8.isCharacter();
         assertEquals(true, result);
@@ -150,56 +150,12 @@ public class IntegerDeclarationTest {
     @Test
     public void testIsSigned_unsigned() {
         IntegerDeclaration fixture_unsigned = new IntegerDeclaration(1, false,
-                1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, null);
+                1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 8);
 
         boolean result = fixture_unsigned.isSigned();
         assertEquals(false, result);
     }
 
-    /**
-     * Run the void setBase(int) method test.
-     */
-    @Test
-    public void testSetBase() {
-        int base = 1;
-        fixture.setBase(base);
-    }
-
-    /**
-     * Run the void setByteOrder(ByteOrder) method test.
-     */
-    @Test
-    public void testSetByteOrder() {
-        ByteOrder byteOrder = ByteOrder.BIG_ENDIAN;
-        fixture.setByteOrder(byteOrder);
-    }
-
-    /**
-     * Run the void setEncoding(Encoding) method test.
-     */
-    @Test
-    public void testSetEncoding() {
-        Encoding encoding = Encoding.ASCII;
-        fixture.setEncoding(encoding);
-    }
-
-    /**
-     * Run the void setLength(int) method test.
-     */
-    @Test
-    public void testSetLength() {
-        int length = 1;
-        fixture.setLength(length);
-    }
-
-    /**
-     * Run the void setSigned(boolean) method test.
-     */
-    @Test
-    public void testSetSigned() {
-        boolean signed = true;
-        fixture.setSigned(signed);
-    }
 
     /**
      * Run the String toString() method test.

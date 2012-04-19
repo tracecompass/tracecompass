@@ -19,4 +19,6 @@ public interface IDeclaration {
 
     public Definition createDefinition(IDefinitionScope definitionScope,
             String fieldName);
+
+    public long getAlignment();
 }

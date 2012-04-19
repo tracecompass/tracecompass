@@ -47,6 +47,10 @@ public class SequenceDeclaration implements IDeclaration {
         return lengthName;
     }
 
+    @Override
+    public long getAlignment() {
+        return getElementType().getAlignment();
+    }
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
