@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
+import org.eclipse.linuxtools.ctf.core.event.types.FloatDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.SequenceDeclaration;
@@ -109,8 +110,11 @@ public abstract class CtfTmfEventField implements ITmfEventField {
                 field = new CTFIntegerArrayField(values, fieldName);
             }
             /* Add other Sequence types here */
+        } else if (fieldDef instanceof FloatDefinition){
+            FloatDefinition floatDef = (FloatDefinition) fieldDef;
+            field = new CTFFloatField( floatDef.getValue(), fieldName);
         }
-        /* Add other field types here */
+
 
         return field;
     }
@@ -290,4 +294,28 @@ final class CTFIntegerArrayField extends CtfTmfEventField {
     }
 }
 
+final class CTFFloatField extends CtfTmfEventField {
+
+    Double value;
+    protected CTFFloatField(double value ,String name) {
+        super(name);
+        this.value = value;
+    }
+
+    @Override
+    public int getFieldType() {
+        return 3;
+    }
+
+    @Override
+    public Object getValue() {
+        return this.value;
+    }
+
+    @Override
+    public String toString(){
+        return name + '=' + value;
+    }
+
+}
 /* Implement other possible fields types here... */
