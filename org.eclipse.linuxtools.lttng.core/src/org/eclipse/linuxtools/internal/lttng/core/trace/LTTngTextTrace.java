@@ -27,7 +27,6 @@ import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
-import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpoint;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
@@ -58,7 +57,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
 
     public LTTngTextTrace(final IResource resource, final String path, final boolean skipIndexing) throws Exception {
         //      super(null, LttngEvent.class, path, 1, !skipIndexing);
-        super(null, LttngEvent.class, path, 1);
+        super(null, LttngEvent.class, path, 1000);
 
         tracepath = path;
         traceTypes      = new HashMap<String, LttngEventType>();
@@ -75,11 +74,13 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
         if ( positionToFirstEvent() == false )
             throw new IOException("Fail to position to the beginning of the trace"); //$NON-NLS-1$
         else {
-            fCacheSize = 1000;
+//            fCacheSize = 1000;
 
             // Skip indexing if asked
             //        	if ( skipIndexing == true ) {
-            fCheckpoints.add(new TmfCheckpoint(new LttngTimestamp(0L), new TmfLocation<Long>(0L)));
+//            fCheckpoints.add(new TmfCheckpoint(new LttngTimestamp(0L), new TmfLocation<Long>(0L)));
+            ITmfContext context = new TmfContext(new TmfLocation<Long>(0L), 0);
+            fIndexer.updateIndex(context, new LttngTimestamp(0L));
             //        	}
             //        	else {
             //        		indexTrace(true);
@@ -104,7 +105,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
 
         // *** VERIFY ***
         // Is this safe?
-        fCheckpoints = oldTrace.fCheckpoints;
+//        fCheckpoints = oldTrace.fCheckpoints;
     }
 
     private boolean positionToFirstEvent() {

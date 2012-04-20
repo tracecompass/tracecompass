@@ -171,7 +171,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
         final ITmfContext savedContext = context.clone();
         final TmfEvent event = parseEvent(context);
         if (event != null) {
-            updateIndex(savedContext, savedContext.getRank(), event.getTimestamp());
+            updateAttributes(savedContext, event.getTimestamp());
             context.increaseRank();
         }
         return event;

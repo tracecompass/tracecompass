@@ -29,6 +29,13 @@ package org.eclipse.linuxtools.tmf.core.event;
  * <li>[precision] indicates the error on the value (useful for comparing
  * timestamps in different scales). Default: 0.
  * </ul>
+ * 
+ * @since 1.0
+ * @version 1.0
+ * @author Francois Chouinard
+ * @see TmfTimestamp
+ * @see TmfSimpleTimestamp
+ * @see TmfTimeRange
  */
 public interface ITmfTimestamp extends Cloneable, Comparable<ITmfTimestamp> {
 

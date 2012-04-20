@@ -307,7 +307,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      */
     public LTTngTrace(final LTTngTrace other) throws Exception {
         this(other.getResource(), other.getPath(), other.getTraceLibPath(), false, true);
-        this.fCheckpoints = other.fCheckpoints;
+//        this.fCheckpoints = other.fCheckpoints;
         setTimeRange(new TmfTimeRange(new LttngTimestamp(other.getStartTime()), new LttngTimestamp(other.getEndTime())));
     }
 
@@ -526,16 +526,22 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         if (PRINT_DEBUG)
             System.out.println("seekEvent(rank) rank -> " + rank); //$NON-NLS-1$
 
-        ITmfTimestamp timestamp = null;
-        long index = rank / getCacheSize();
+//        ITmfTimestamp timestamp = null;
+//        long index = rank / getCacheSize();
+//
+//        // Get the timestamp of the closest check point to the given position
+//        if (fCheckpoints.size() > 0) {
+//            if (index >= fCheckpoints.size())
+//                index = fCheckpoints.size() - 1;
+//            timestamp = fCheckpoints.elementAt((int) index).getTimestamp();
+//        } else
+//            timestamp = getStartTime();
 
-        // Get the timestamp of the closest check point to the given position
-        if (fCheckpoints.size() > 0) {
-            if (index >= fCheckpoints.size())
-                index = fCheckpoints.size() - 1;
-            timestamp = fCheckpoints.elementAt((int) index).getTimestamp();
-        } else
-            timestamp = getStartTime();
+        // Position the trace at the checkpoint
+        final ITmfContext checkpointContext = fIndexer.seekIndex(rank);
+        LttngLocation location = (LttngLocation) checkpointContext.getLocation();
+        ITmfTimestamp timestamp = location.getLocation();
+        long index = rank / getCacheSize();
 
         // Seek to the found time
         final TmfContext tmpContext = seekEvent(timestamp);
@@ -667,7 +673,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         // long eventTime = eventTimestamp.getValue();
         previousLocation.setOperationTime(eventTimestamp.getValue());
         curLocation.setOperationTime(eventTimestamp.getValue());
-        updateIndex(context, context.getRank(), eventTimestamp);
+        updateAttributes(context, eventTimestamp);
         context.increaseRank();
     }
 
@@ -1011,24 +1017,24 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
             return -1;
     }
 
-    /**
-     * Print the content of the checkpoint vector.
-     * <p>
-     * 
-     * This is intended for debug purpose only.
-     */
-    public void printCheckpointsVector() {
-        System.out.println("StartTime : " //$NON-NLS-1$
-                + getTimeRange().getStartTime().getValue());
-        System.out.println("EndTime   : " //$NON-NLS-1$
-                + getTimeRange().getEndTime().getValue());
-
-        for (int pos = 0; pos < fCheckpoints.size(); pos++) {
-            System.out.print(pos + ": " + "\t"); //$NON-NLS-1$ //$NON-NLS-2$
-            System.out.print(fCheckpoints.get(pos).getTimestamp() + "\t"); //$NON-NLS-1$
-            System.out.println(fCheckpoints.get(pos).getLocation());
-        }
-    }
+//    /**
+//     * Print the content of the checkpoint vector.
+//     * <p>
+//     * 
+//     * This is intended for debug purpose only.
+//     */
+//    public void printCheckpointsVector() {
+//        System.out.println("StartTime : " //$NON-NLS-1$
+//                + getTimeRange().getStartTime().getValue());
+//        System.out.println("EndTime   : " //$NON-NLS-1$
+//                + getTimeRange().getEndTime().getValue());
+//
+//        for (int pos = 0; pos < fCheckpoints.size(); pos++) {
+//            System.out.print(pos + ": " + "\t"); //$NON-NLS-1$ //$NON-NLS-2$
+//            System.out.print(fCheckpoints.get(pos).getTimestamp() + "\t"); //$NON-NLS-1$
+//            System.out.println(fCheckpoints.get(pos).getLocation());
+//        }
+//    }
 
     @Override
     public synchronized void dispose() {

@@ -376,13 +376,21 @@ public abstract class TmfDataProvider<T extends ITmfEvent> extends TmfComponent 
     }
 
     /**
-     * Initialize the provider based on the request. The context is provider specific and will be updated by getNext().
+     * Initialize the provider based on the request. The context is provider
+     * specific and will be updated by getNext().
      * 
      * @param request
      * @return an application specific context; null if request can't be serviced
      */
     public abstract ITmfContext armRequest(ITmfDataRequest<T> request);
 
+    /**
+     * Return the next event based on the context supplied. The context
+     * will be updated for the subsequent read.
+     * 
+     * @param context the trace read context (updated)
+     * @return the event referred to by context
+     */
     public abstract T getNext(ITmfContext context);
 
     /**

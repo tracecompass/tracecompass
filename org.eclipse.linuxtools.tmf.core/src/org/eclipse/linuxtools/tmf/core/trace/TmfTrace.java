@@ -15,7 +15,6 @@ package org.eclipse.linuxtools.tmf.core.trace;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Vector;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -62,7 +61,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     protected int fCacheSize = DEFAULT_TRACE_CACHE_SIZE;
 
     // The set of event stream checkpoints
-    protected Vector<TmfCheckpoint> fCheckpoints = new Vector<TmfCheckpoint>();
+//    protected Vector<TmfCheckpoint> fCheckpoints = new Vector<TmfCheckpoint>();
 
     // The number of events collected
     protected long fNbEvents = 0;
@@ -137,7 +136,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         super();
         fCacheSize = (cacheSize > 0) ? cacheSize : DEFAULT_TRACE_CACHE_SIZE;
         fStreamingInterval = interval;
-        fIndexer = (indexer != null) ? indexer : new TmfTraceIndexer(this);
+        fIndexer = (indexer != null) ? indexer : new TmfTraceIndexer(this, fCacheSize);
         initialize(resource, path, type);
     }
 
@@ -383,6 +382,16 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     // ------------------------------------------------------------------------
 
     /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#parseEvent(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
+     */
+    @Override
+    public synchronized ITmfEvent parseEvent(final ITmfContext context) {
+        final ITmfContext tmpContext = context.clone();
+        final ITmfEvent event = getNextEvent(tmpContext);
+        return event;
+    }
+
+    /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getNextEvent(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
      */
     @Override
@@ -390,7 +399,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         // parseEvent() does not update the context
         final ITmfEvent event = parseEvent(context);
         if (event != null) {
-            updateIndex(context, context.getRank(), event.getTimestamp());
+            updateAttributes(context, event.getTimestamp());
             context.setLocation(getCurrentLocation());
             context.increaseRank();
             processEvent(event);
@@ -399,16 +408,23 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     }
 
     /**
-     * Hook for special processing by the concrete class (called by
-     * getNextEvent())
+     * Hook for special event processing by the concrete class
+     * (called by TmfTrace.getNextEvent())
      * 
-     * @param event
+     * @param event the event
      */
     protected void processEvent(final ITmfEvent event) {
-        // Do nothing by default
+        // Do nothing
     }
 
-    protected synchronized void updateIndex(final ITmfContext context, final long rank, final ITmfTimestamp timestamp) {
+    /**
+     * Update the trace attributes
+     * 
+     * @param context the current trace context
+     * @param rank
+     * @param timestamp
+     */
+    protected synchronized void updateAttributes(final ITmfContext context, final ITmfTimestamp timestamp) {
         if (fStartTime.compareTo(timestamp, false) > 0) {
             fStartTime = timestamp;
         }
@@ -416,27 +432,21 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
             fEndTime = timestamp;
         }
         if (context.hasValidRank()) {
+            long rank = context.getRank();
             if (fNbEvents <= rank) {
                 fNbEvents = rank + 1;
             }
-            // Build the index as we go along
-            if ((rank % fCacheSize) == 0) {
-                // Determine the table position
-                final long position = rank / fCacheSize;
-                // Add new entry at proper location (if empty)
-                if (fCheckpoints.size() == position) {
-                    final ITmfLocation<?> location = context.getLocation().clone();
-                    fCheckpoints.add(new TmfCheckpoint(timestamp.clone(), location));
-                    // System.out.println(getName() + "[" + (fCheckpoints.size() + "] " + timestamp + ", " + location.toString());
-                }
-            }
+            fIndexer.updateIndex(context, timestamp);
         }
     }
 
     // ------------------------------------------------------------------------
-    // TmfProvider
+    // TmfDataProvider
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.component.TmfDataProvider#armRequest(org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest)
+     */
     @Override
     public ITmfContext armRequest(final ITmfDataRequest<T> request) {
         if (request instanceof ITmfEventRequest<?>
@@ -450,12 +460,8 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         return seekEvent(request.getIndex());
     }
 
-    /**
-     * Return the next piece of data based on the context supplied. The context
-     * would typically be updated for the subsequent read.
-     * 
-     * @param context
-     * @return the event referred to by context
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.component.TmfDataProvider#getNext(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -470,6 +476,9 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     // toString
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     @SuppressWarnings("nls")
     public String toString() {

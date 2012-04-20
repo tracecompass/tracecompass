@@ -34,10 +34,9 @@ public interface ITmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> {
      * Adds an entry to the trace index. 
      * 
      * @param context
-     * @param rank
      * @param timestamp
      */
-    public void updateIndex(ITmfContext context, long rank, ITmfTimestamp timestamp);
+    public void updateIndex(ITmfContext context, ITmfTimestamp timestamp);
     
     /**
      * Returns the context of the checkpoint immediately preceding the requested

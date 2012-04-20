@@ -46,24 +46,24 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
  * trace. Seek operations can be performed for a particular event (by rank or
  * timestamp) or for a plain trace location.
  * <p>
- * <b>Example 1</b>: Read a whole trace
+ * <b>Example 1</b>: Process a whole trace
  * <pre>
  * ITmfContext context = trace.seekLocationt(null);
- * ITmfEvent event = trace.getEvent(context);
+ * ITmfEvent event = trace.getNextEvent(context);
  * while (event != null) {
- *     // Do something ...
- *     event = trace.getEvent(context);
+ *     processEvent(event);
+ *     event = trace.getNextEvent(context);
  * }
  * </pre>
  * <b>Example 2</b>: Process 50 events starting from the 1000th event
  * <pre>
  * int nbEventsRead = 0;
  * ITmfContext context = trace.seekEvent(1000);
- * ITmfEvent event = trace.getEvent(context);
+ * ITmfEvent event = trace.getNextEvent(context);
  * while (event != null && nbEventsRead < 50) {
  *     nbEventsRead++;
- *     // Do something ...
- *     event = trace.getEvent(context);
+ *     processEvent(event);
+ *     event = trace.getNextEvent(context);
  * }
  * </pre>
  * <b>Example 3</b>: Process the events between 2 timestamps (inclusive)
@@ -71,12 +71,38 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
  * ITmfTimestamp startTime = ...;
  * ITmfTimestamp endTime = ...;
  * ITmfContext context = trace.seekEvent(startTime);
- * ITmfEvent event = trace.getEvent(context);
+ * ITmfEvent event = trace.getNextEvent(context);
  * while (event != null && event.getTimestamp().compareTo(endTime) <= 0) {
- *     // Do something ...
- *     event = trace.getEvent(context);
+ *     processEvent(event);
+ *     event = trace.getNextEvent(context);
  * }
  * </pre>
+ * A trace is also an event provider so it can process event requests
+ * asynchronously (and coalesce compatible requests).
+ * <p>
+ * </pre>
+ * <b>Example 4</b>: Process a whole trace
+ * <pre>
+ * ITmfRequest request = new TmfEventRequest&lt;MyEventType&gt;(MyEventType.class) {
+ *     &#64;Override
+ *     public void handleData(MyEventType event) {
+ *         super.handleData(event);
+ *         processEvent(event);
+ *     }
+ *     &#64;Override
+ *     public void handleCompleted() {
+ *         finish();
+ *         super.handleCompleted();
+ *     }
+ * };
+ * fTrace.handleRequest(request);
+ * if (youWant) {
+ *     request.waitForCompletion();
+ * } 
+ * </pre>
+ * @see ITmfEvent
+ * @see ITmfEventProvider
+ * @see ITmfRequest
  */
 public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
 
@@ -88,7 +114,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * Initialize a newly instantiated "empty" trace object. This is used to
      * properly parameterize an ITmfTrace instantiated with its parameterless
      * constructor.
-     * 
+     * <p>
      * Typically, the parameterless constructor will provide the block size
      * and its associated parser and indexer.
      * 

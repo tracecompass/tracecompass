@@ -29,6 +29,11 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * For convenience, a free-form reference field is also provided. It could be
  * used as e.g. a location marker (filename:lineno) to indicate where the event
  * was generated.
+ * 
+ * @see ITmfTimestamp
+ * @see ITmfEventType
+ * @see ITmfEvetnField
+ * @see TmfEvent
  */
 public interface ITmfEvent extends Cloneable {
 

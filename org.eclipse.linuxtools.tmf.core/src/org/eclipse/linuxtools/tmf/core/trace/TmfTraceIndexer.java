@@ -130,7 +130,7 @@ public class TmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> implements ITmfTrac
         // updated as we go by getNextEvent().
         final ITmfEventRequest<ITmfEvent> request = new TmfEventRequest<ITmfEvent>(ITmfEvent.class, TmfTimeRange.ETERNITY,
                 TmfDataRequest.ALL_DATA, fCheckpointInterval, ITmfDataRequest.ExecutionType.BACKGROUND)
-                {
+        {
             ITmfTimestamp startTime = null;
             ITmfTimestamp lastTime = null;
 
@@ -167,16 +167,16 @@ public class TmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> implements ITmfTrac
                     notifyListeners(startTime, lastTime);
                 }
             }
-                };
+        };
 
-                // Submit the request and wait for completion if required
-                fTrace.sendRequest(request);
-                if (waitForCompletion) {
-                    try {
-                        request.waitForCompletion();
-                    } catch (final InterruptedException e) {
-                    }
-                }
+        // Submit the request and wait for completion if required
+        fTrace.sendRequest(request);
+        if (waitForCompletion) {
+            try {
+                request.waitForCompletion();
+            } catch (final InterruptedException e) {
+            }
+        }
     }
 
     private void notifyListeners(final ITmfTimestamp startTime, final ITmfTimestamp endTime) {
@@ -187,8 +187,12 @@ public class TmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> implements ITmfTrac
     // ITmfTraceIndexer - updateIndex
     // ------------------------------------------------------------------------
 
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTraceIndexer#updateIndex(org.eclipse.linuxtools.tmf.core.trace.ITmfContext, org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp)
+     */
     @Override
-    public void updateIndex(final ITmfContext context, final long rank, final ITmfTimestamp timestamp) {
+    public synchronized void updateIndex(final ITmfContext context, final ITmfTimestamp timestamp) {
+        final long rank = context.getRank();
         if ((rank % fCheckpointInterval) == 0) {
             // Determine the table position
             final long position = rank / fCheckpointInterval;
@@ -196,7 +200,6 @@ public class TmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> implements ITmfTrac
             if (fTraceIndex.size() == position) {
                 final ITmfLocation<?> location = context.getLocation().clone();
                 fTraceIndex.add(new TmfCheckpoint(timestamp.clone(), location));
-                // System.out.println(getName() + "[" + (fCheckpoints.size() - 1) + "] " + timestamp + ", " + location.toString());
             }
         }
     }
