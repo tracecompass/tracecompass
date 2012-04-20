@@ -212,6 +212,9 @@ public class TmfTimestamp implements ITmfTimestamp {
     @Override
     public int compareTo(final ITmfTimestamp ts, final boolean withinPrecision) {
 
+        if (ts == null)
+            return 1;
+
         // Check the corner cases (we can't use equals() because it uses compareTo()...)
         if (this == ts || (fValue == ts.getValue() && fScale == ts.getScale()))
             return 0;

@@ -86,6 +86,17 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * @param cacheSize
      * @throws FileNotFoundException
      */
+    public TmfTraceStub(final String path, final int cacheSize, final long interval) throws FileNotFoundException {
+        super(null, TmfEvent.class, path, cacheSize, interval);
+        fTrace = new RandomAccessFile(path, "r");
+        fParser = new TmfEventParserStub();
+    }
+
+    /**
+     * @param path
+     * @param cacheSize
+     * @throws FileNotFoundException
+     */
     public TmfTraceStub(final String path, final int cacheSize, final ITmfTraceIndexer<?> indexer) throws FileNotFoundException {
         this(path, cacheSize, false, null, indexer);
     }
@@ -106,7 +117,6 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * @throws FileNotFoundException
      */
     public TmfTraceStub(final String path, final int cacheSize, final boolean waitForCompletion) throws FileNotFoundException {
-        //        this(path, cacheSize, waitForCompletion, null);
         super(null, TmfEvent.class, path, cacheSize);
         fTrace = new RandomAccessFile(path, "r");
         fParser = new TmfEventParserStub();
@@ -119,7 +129,6 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
      * @throws FileNotFoundException
      */
     public TmfTraceStub(final IResource resource,  final String path, final int cacheSize, final boolean waitForCompletion) throws FileNotFoundException {
-        //        this(path, cacheSize, waitForCompletion, null);
         super(resource, TmfEvent.class, path, cacheSize);
         fTrace = new RandomAccessFile(path, "r");
         fParser = new TmfEventParserStub();
@@ -157,6 +166,11 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
         fTrace = new RandomAccessFile(path, "r");
         fParser = new TmfEventParserStub();
         super.initTrace(resource, path, type);
+    }
+
+    @Override
+    public void initialize(final IResource resource, final String path, final Class<TmfEvent> type) throws FileNotFoundException {
+        super.initialize(resource, path, type);
     }
 
     // ------------------------------------------------------------------------
@@ -287,6 +301,11 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> {
     @Override
     public void setEndTime(final ITmfTimestamp endTime) {
         super.setEndTime(endTime);
+    }
+
+    @Override
+    public void setStreamingInterval(final long interval) {
+        super.setStreamingInterval(interval);
     }
 
     @Override

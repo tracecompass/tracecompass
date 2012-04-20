@@ -441,7 +441,7 @@ public class TmfTimestampTest extends TestCase {
         assertTrue("compareTo", ts0.compareTo(ts0, false) == 0);
         assertTrue("compareTo", ts0.compareTo(ts0a, false) == 0);
         assertTrue("compareTo", ts0.compareTo(ts0b, false) == 0);
-        assertTrue("compareTo", ts0.compareTo(ts0c, false)== -1);
+        assertTrue("compareTo", ts0.compareTo(ts0c, false) == -1);
         assertTrue("compareTo", ts0.compareTo(ts0d, false) == -1);
     }
 
@@ -450,14 +450,14 @@ public class TmfTimestampTest extends TestCase {
         final ITmfTimestamp ts0b = new TmfTimestamp(0, Integer.MAX_VALUE);
         final ITmfTimestamp ts0c = new TmfTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE);
 
-        assertTrue("compareTo", ts0a.compareTo(ts0b, false)== 1);
-        assertTrue("compareTo", ts0a.compareTo(ts0c, false)== -1);
+        assertTrue("compareTo", ts0a.compareTo(ts0b, false) == 1);
+        assertTrue("compareTo", ts0a.compareTo(ts0c, false) == -1);
 
-        assertTrue("compareTo", ts0b.compareTo(ts0a, false)== -1);
-        assertTrue("compareTo", ts0b.compareTo(ts0c, false)== -1);
+        assertTrue("compareTo", ts0b.compareTo(ts0a, false) == -1);
+        assertTrue("compareTo", ts0b.compareTo(ts0c, false) == -1);
 
-        assertTrue("compareTo", ts0c.compareTo(ts0a, false)== 1);
-        assertTrue("compareTo", ts0c.compareTo(ts0b, false)== 1);
+        assertTrue("compareTo", ts0c.compareTo(ts0a, false) == 1);
+        assertTrue("compareTo", ts0c.compareTo(ts0b, false) == 1);
     }
 
     public void testCompareToCornerCases3() throws Exception {
@@ -465,14 +465,19 @@ public class TmfTimestampTest extends TestCase {
         final ITmfTimestamp ts0b = new TmfTimestamp(0, Integer.MAX_VALUE);
         final ITmfTimestamp ts0c = new TmfTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE);
 
-        assertTrue("compareTo", ts0a.compareTo(ts0b, false)== -1);
-        assertTrue("compareTo", ts0a.compareTo(ts0c, false)== 1);
+        assertTrue("compareTo", ts0a.compareTo(ts0b, false) == -1);
+        assertTrue("compareTo", ts0a.compareTo(ts0c, false) == 1);
 
-        assertTrue("compareTo", ts0b.compareTo(ts0a, false)== 1);
-        assertTrue("compareTo", ts0b.compareTo(ts0c, false)== 1);
+        assertTrue("compareTo", ts0b.compareTo(ts0a, false) == 1);
+        assertTrue("compareTo", ts0b.compareTo(ts0c, false) == 1);
 
-        assertTrue("compareTo", ts0c.compareTo(ts0a, false)== -1);
-        assertTrue("compareTo", ts0c.compareTo(ts0b, false)== -1);
+        assertTrue("compareTo", ts0c.compareTo(ts0a, false) == -1);
+        assertTrue("compareTo", ts0c.compareTo(ts0b, false) == -1);
+    }
+
+    public void testCompareToCornerCases4() throws Exception {
+        assertTrue("compareTo", ts0.compareTo(null, false) == 1);
+        assertTrue("compareTo", ts0.compareTo(null, true) == 1);
     }
 
     public void testCompareToSameScale() throws Exception {

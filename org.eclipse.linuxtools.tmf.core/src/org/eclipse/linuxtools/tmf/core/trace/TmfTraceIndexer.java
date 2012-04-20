@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
-import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfDataRequest;
@@ -92,7 +91,7 @@ public class TmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> implements ITmfTrac
     }
 
     // ------------------------------------------------------------------------
-    // ITmfTraceIndexer
+    // ITmfTraceIndexer - buildIndex
     // ------------------------------------------------------------------------
 
     /* (non-Javadoc)
@@ -180,73 +179,13 @@ public class TmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> implements ITmfTrac
                 }
     }
 
-
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTraceIndexer#seekIndex(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp)
-     */
-    @Override
-    public ITmfContext seekIndex(final ITmfTimestamp timestamp) {
-        // Adjust the timestamp if needed
-        ITmfTimestamp ts = timestamp;
-        if (ts == null) {
-            ts = TmfTimestamp.BIG_BANG;
-        }
-
-        // First, find the right checkpoint
-        int index = Collections.binarySearch(fTraceIndex, new TmfCheckpoint(ts, null));
-
-        // In the very likely case that the checkpoint was not found, bsearch
-        // returns its negated would-be location (not an offset...). From that
-        // index, we can then position the stream and get figure out the context.
-        if (index < 0) {
-            index = Math.max(0, -(index + 2));
-        }
-
-        // Position the trace at the checkpoint
-        ITmfLocation<?> location;
-        synchronized (fTraceIndex) {
-            if (!fTraceIndex.isEmpty()) {
-                if (index >= fTraceIndex.size()) {
-                    index = fTraceIndex.size() - 1;
-                }
-                location = fTraceIndex.elementAt(index).getLocation();
-            } else {
-                location = null;
-            }
-        }
-        final ITmfContext context = fTrace.seekLocation(location);
-        context.setRank(index * fCheckpointInterval);
-
-        return context;
-    }
-
-    @Override
-    public ITmfContext seekIndex(final long rank) {
-
-        // Position the stream at the previous checkpoint
-        int index = (int) rank / fCheckpointInterval;
-        ITmfLocation<?> location;
-        synchronized (fTraceIndex) {
-            if (fTraceIndex.isEmpty()) {
-                location = null;
-            } else {
-                if (index >= fTraceIndex.size()) {
-                    index = fTraceIndex.size() - 1;
-                }
-                location = fTraceIndex.elementAt(index).getLocation();
-            }
-        }
-
-        final ITmfContext context = fTrace.seekLocation(location);
-        final long pos = index * fCheckpointInterval;
-        context.setRank(pos);
-
-        return context;
-    }
-
     private void notifyListeners(final ITmfTimestamp startTime, final ITmfTimestamp endTime) {
         fTrace.broadcast(new TmfTraceUpdatedSignal(fTrace, fTrace, new TmfTimeRange(startTime, endTime)));
     }
+
+    // ------------------------------------------------------------------------
+    // ITmfTraceIndexer - updateIndex
+    // ------------------------------------------------------------------------
 
     @Override
     public void updateIndex(final ITmfContext context, final long rank, final ITmfTimestamp timestamp) {
@@ -260,6 +199,74 @@ public class TmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> implements ITmfTrac
                 // System.out.println(getName() + "[" + (fCheckpoints.size() - 1) + "] " + timestamp + ", " + location.toString());
             }
         }
+    }
+
+    // ------------------------------------------------------------------------
+    // ITmfTraceIndexer - seekIndex
+    // ------------------------------------------------------------------------
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTraceIndexer#seekIndex(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp)
+     */
+    @Override
+    public synchronized ITmfContext seekIndex(final ITmfTimestamp timestamp) {
+
+        // A null timestamp indicates to seek the first event
+        if (timestamp == null)
+            return fTrace.seekLocation(null);
+
+        // Find the checkpoint at or before the requested timestamp.
+        // In the very likely event that the timestamp is not at a checkpoint
+        // boundary, bsearch will return index = (- (insertion point + 1)).
+        // It is then trivial to compute the index of the previous checkpoint.
+        int index = Collections.binarySearch(fTraceIndex, new TmfCheckpoint(timestamp, null));
+        if (index < 0) {
+            index = Math.max(0, -(index + 2));
+        }
+
+        // Position the trace at the checkpoint
+        return seekCheckpoint(index);
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTraceIndexer#seekIndex(long)
+     */
+    @Override
+    public ITmfContext seekIndex(final long rank) {
+
+      // A rank <= 0 indicates to seek the first event
+      if (rank <= 0)
+          return fTrace.seekLocation(null);
+
+      // Find the checkpoint at or before the requested rank.
+      final int index = (int) rank / fCheckpointInterval;
+
+      // Position the trace at the checkpoint
+      return seekCheckpoint(index);
+    }
+
+    /**
+     * Position the trace at the given checkpoint
+     * 
+     * @param index
+     *            the checkpoint index
+     * @return the corresponding context
+     */
+    private ITmfContext seekCheckpoint(int index) {
+        ITmfLocation<?> location;
+        synchronized (fTraceIndex) {
+            if (!fTraceIndex.isEmpty()) {
+                if (index >= fTraceIndex.size()) {
+                    index = fTraceIndex.size() - 1;
+                }
+                location = fTraceIndex.elementAt(index).getLocation();
+            } else {
+                location = null;
+            }
+        }
+        final ITmfContext context = fTrace.seekLocation(location);
+        context.setRank(index * fCheckpointInterval);
+        return context;
     }
 
 }
