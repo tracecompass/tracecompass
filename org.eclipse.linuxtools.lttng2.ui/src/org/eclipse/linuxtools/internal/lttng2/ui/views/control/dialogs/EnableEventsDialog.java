@@ -48,7 +48,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
     /**
      * The icon file for this dialog box.
      */
-    public static final String ENABLE_EVENT_ICON_FILE = "icons/elcl16/enable.gif"; //$NON-NLS-1$ 
+    public static final String ENABLE_EVENT_ICON_FILE = "icons/elcl16/enable_event.gif"; //$NON-NLS-1$ 
 
     // ------------------------------------------------------------------------
     // Attributes

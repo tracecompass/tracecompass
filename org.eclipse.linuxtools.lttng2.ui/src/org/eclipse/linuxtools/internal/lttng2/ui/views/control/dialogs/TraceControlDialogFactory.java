@@ -20,9 +20,9 @@ final public class TraceControlDialogFactory {
     private INewConnectionDialog fNewConnectionDialog;
     
     /**
-     * The create channel dialog (on domain level)
+     * The enable channel dialog
      */
-    private ICreateChannelDialog fCreateChannelDialog;
+    private IEnableChannelDialog fEnableChannelDialog;
     
     /**
      * The create session dialog.
@@ -102,21 +102,21 @@ final public class TraceControlDialogFactory {
     }
     
     /**
-     * @return create channel dialog (on domain level)
+     * @return enable channel dialog
      */
-    public ICreateChannelDialog getCreateChannelDialog() {
-        if (fCreateChannelDialog == null) {
-            fCreateChannelDialog = new CreateChannelDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+    public IEnableChannelDialog getEnableChannelDialog() {
+        if (fEnableChannelDialog == null) {
+            fEnableChannelDialog = new EnableChannelDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
         }
-        return fCreateChannelDialog;
+        return fEnableChannelDialog;
     }
 
     /**
-     * Sets a create channel dialog implementation (on domain level).
-     * @param createChannelDialog - a create channel dialog implementation
+     * Sets a enable channel dialog implementation.
+     * @param createEnableDialog - a create channel dialog implementation
      */
-    public void setCreateChannelDialog(ICreateChannelDialog createChannelDialog) {
-        fCreateChannelDialog = createChannelDialog;
+    public void setEnableChannelDialog(IEnableChannelDialog createEnableDialog) {
+        fEnableChannelDialog = createEnableDialog;
     }
     
     /**

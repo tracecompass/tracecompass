@@ -47,7 +47,7 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
     /**
      * The icon file for this dialog box.
      */
-    public static final String TARGET_NEW_CONNECTION_ICON_FILE = "icons/elcl16/enable.gif"; //$NON-NLS-1$ 
+    public static final String TARGET_NEW_CONNECTION_ICON_FILE = "icons/elcl16/enable_event.gif"; //$NON-NLS-1$ 
 
     // ------------------------------------------------------------------------
     // Attributes

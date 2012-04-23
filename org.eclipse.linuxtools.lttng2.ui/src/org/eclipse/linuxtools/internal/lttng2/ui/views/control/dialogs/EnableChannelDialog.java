@@ -22,7 +22,6 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceD
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -34,12 +33,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * <b><u>CreateChannelDialog</u></b>
+ * <b><u>EnableChannelDialog</u></b>
  * <p>
- * Dialog box for collecting channel creation information.
+ * Dialog box for collecting channel information when enabling a channel (which will be created).
  * </p>
  */
-public class CreateChannelDialog extends Dialog implements ICreateChannelDialog {
+public class EnableChannelDialog extends Dialog implements IEnableChannelDialog {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -122,7 +121,7 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelDialog 
      * Constructor
      * @param shell - a shell for the display of the dialog
      */
-    public CreateChannelDialog(Shell shell) {
+    public EnableChannelDialog(Shell shell) {
        super(shell);
        fIsKernel = true;
 
@@ -134,6 +133,7 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelDialog 
                 e.doit = e.text.matches("[0-9]*"); //$NON-NLS-1$
             }
         };
+        setShellStyle(SWT.RESIZE);
     }
 
     // ------------------------------------------------------------------------
@@ -194,7 +194,7 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelDialog 
         
         // Main dialog panel
         fDialogComposite = new Composite(parent, SWT.NONE);
-        GridLayout layout = new GridLayout(2, true);
+        GridLayout layout = new GridLayout(3, true);
         fDialogComposite.setLayout(layout); 
 
         Label channelNameLabel = new Label(fDialogComposite, SWT.RIGHT);
@@ -259,14 +259,14 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelDialog 
         }
 
         // layout widgets
-        GridData data = new GridData(GridData.FILL, GridData.CENTER, false, false, 2, 1);
+        GridData data = new GridData(GridData.FILL, GridData.CENTER, false, false, 3, 1);
         discardModeGroup.setLayoutData(data);
         data = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
         fDiscardModeButton.setLayoutData(data);
         data = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
         fOverwriteModeButton.setLayoutData(data);
         
-        data = new GridData(GridData.FILL, GridData.CENTER, false, false, 2, 1);
+        data = new GridData(GridData.FILL, GridData.CENTER, false, false, 3, 1);
         fDomainGroup.setLayoutData(data);
 
         data = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
@@ -274,18 +274,14 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelDialog 
         data = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
         fUstButton.setLayoutData(data);
         
-        data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-        fSubBufferSizeText.setText("666.666.666.666"); //$NON-NLS-1$
-        Point minSize = fSubBufferSizeText.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-        data.widthHint = minSize.x + 5;
+        data = new GridData(GridData.FILL_HORIZONTAL);
+        data.horizontalSpan = 2;
 
         fChannelNameText.setLayoutData(data);
         fSubBufferSizeText.setLayoutData(data);
         fNumberOfSubBuffersText.setLayoutData(data);
         fSwitchTimerText.setLayoutData(data);
         fReadTimerText.setLayoutData(data);
-
-        fSubBufferSizeText.setText(""); //$NON-NLS-1$
 
         setDefaults();
 

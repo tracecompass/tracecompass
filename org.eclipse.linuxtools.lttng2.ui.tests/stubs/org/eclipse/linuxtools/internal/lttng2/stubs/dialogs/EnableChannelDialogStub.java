@@ -11,7 +11,7 @@
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.stubs.dialogs;
 
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.ICreateChannelDialog;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableChannelDialog;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.ChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent;
@@ -19,7 +19,7 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceD
 /**
  * Create channel dialog stub implementation. 
  */
-public class CreateChannelDialogStub implements ICreateChannelDialog {
+public class EnableChannelDialogStub implements IEnableChannelDialog {
     
     // ------------------------------------------------------------------------
     // Attributes
@@ -31,7 +31,7 @@ public class CreateChannelDialogStub implements ICreateChannelDialog {
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
-    public CreateChannelDialogStub() {
+    public EnableChannelDialogStub() {
         fChannelInfo = new ChannelInfo("mychannel"); //$NON-NLS-1$
         fChannelInfo.setNumberOfSubBuffers(4);
         fChannelInfo.setOverwriteMode(true);

@@ -23,7 +23,7 @@ import junit.framework.TestSuite;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.lttng2.stubs.dialogs.AddContextDialogStub;
-import org.eclipse.linuxtools.internal.lttng2.stubs.dialogs.CreateChannelDialogStub;
+import org.eclipse.linuxtools.internal.lttng2.stubs.dialogs.EnableChannelDialogStub;
 import org.eclipse.linuxtools.internal.lttng2.stubs.dialogs.CreateSessionDialogStub;
 import org.eclipse.linuxtools.internal.lttng2.stubs.dialogs.DestroyConfirmDialogStub;
 import org.eclipse.linuxtools.internal.lttng2.stubs.dialogs.EnableEventsDialogStub;
@@ -173,13 +173,13 @@ public class TraceControlKernelSessionTests extends TestCase {
         fProxy.setScenario(SCEN_SCENARIO3_TEST);
         
         // ------------------------------------------------------------------------
-        // Create channel on session
+        // Enable channel on session
         // ------------------------------------------------------------------------
-        CreateChannelDialogStub channelStub = new CreateChannelDialogStub();
+        EnableChannelDialogStub channelStub = new EnableChannelDialogStub();
         channelStub.setIsKernel(true);
-        TraceControlDialogFactory.getInstance().setCreateChannelDialog(channelStub);
+        TraceControlDialogFactory.getInstance().setEnableChannelDialog(channelStub);
 
-        fFacility.executeCommand(session, "createChannelOnSession");
+        fFacility.executeCommand(session, "enableChannelOnSession");
         
         // Verify that Kernel domain was created
         ITraceControlComponent[] domains = session.getChildren();
@@ -216,7 +216,7 @@ public class TraceControlKernelSessionTests extends TestCase {
         info.setReadTimer(200);
         channelStub.setChannelInfo(info);
         
-        fFacility.executeCommand(domains[0], "createChannelOnDomain");
+        fFacility.executeCommand(domains[0], "enableChannelOnDomain");
         
         // Get Kernel domain component instance
         domains = session.getChildren();
