@@ -47,7 +47,7 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
     /**
      * The icon file for this dialog box.
      */
-    public static final String TARGET_NEW_CONNECTION_ICON_FILE = "icons/elcl16/edit.gif"; //$NON-NLS-1$ 
+    public static final String TARGET_NEW_CONNECTION_ICON_FILE = "icons/elcl16/enable.gif"; //$NON-NLS-1$ 
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -251,6 +251,7 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
      */
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
+        createButton(parent, IDialogConstants.CANCEL_ID, "&Cancel", true); //$NON-NLS-1$
         createButton(parent, IDialogConstants.OK_ID, "&Ok", true); //$NON-NLS-1$
     }
 

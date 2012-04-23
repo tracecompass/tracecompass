@@ -473,7 +473,7 @@
          </command>
          <command
                commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnSession"
-               icon="icons/elcl16/edit.gif"
+               icon="icons/elcl16/enable.gif"
                label="%commands.control.enable.eventOnDomain"
                style="push">
             <visibleWhen
@@ -527,7 +527,7 @@
          </command>
          <command
                commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnDomain"
-               icon="icons/elcl16/edit.gif"
+               icon="icons/elcl16/enable.gif"
                label="%commands.control.enable.eventOnDomain"
                style="push">
             <visibleWhen
@@ -643,7 +643,7 @@
          </command>
          <command
                commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnChannel"
-               icon="icons/elcl16/edit.gif"
+               icon="icons/elcl16/enable.gif"
                label="%commands.control.enable.eventOnChannel"
                style="push">
             <visibleWhen
