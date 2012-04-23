@@ -324,10 +324,10 @@
 			<img border="0" src="images/LTTngTraceProperties.png"/>
 		</p>
 		<h2 id="LTTng_Tracer_Control_.28LTTng_Tracer_Toolchain_v2.0.29">LTTng Tracer Control (LTTng Tracer Toolchain v2.0)</h2>
-		<p>
-			<b>Note: This feature is not available yet but will be delivered soon.</b>
+		<p>The LTTng Tracer Control in Eclipse for the LTTng Tracer toolchain version v2.0 (or later) is done using SSH and requires an SSH server to be running on the remote host. For the SSH connection the SSH implementation of RSE is used. For that a new System Type was defined using the corressponding RSE extension. The functions to control the LTTng tracer (e.g. start and stop), either locally or remotely, are available from a dedicated Control View. </p>
+		<p>In the following sections the LTTng 2.0 tracer control integration in Eclipse is described. Please refer to the LTTng 2.0 tracer control command line manual for more details and descriptions about all commands and their command line parameters 
+			<a href="References.html#References">References</a>. 
 		</p>
-		<p>The LTTng Tracer Control in Eclipse for the LTTng Tracer toolchain version v2.0 (or later) is done using SSH and requires an SSH server to be running on the remote host. For the SSH connection the SSH implementation of RSE is used. For that a new System Type was defined using the corressponding RSE extension. The functions to control the LTTng tracer (e.g. start and stop), either locally or remotely, are available from a dedicated Control View.</p>
 		<h3 id="Control_View">Control View</h3>
 		<p>To open the Control View, select '
 			<i>Window-&gt;Show View-&gt;Other...-&gt;LTTng-&gt;Control View</i>. 
@@ -447,7 +447,7 @@
 		<h4 id="Creating_a_Tracing_Session">Creating a Tracing Session</h4>
 		<p>To create a tracing session, select the tree node 
 			<b>Sessions</b> and press the right mouse button. Then select the 
-			<b>Create Session</b> button of the context-sensitive menu.
+			<b>Create Session...</b> button of the context-sensitive menu.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2CreateSessionAction.png"/>
@@ -462,11 +462,11 @@
 			<b>Ok</b>. Upon successful operation a new session will be created and added under the tree node 
 			<b>Sessions</b>.
 		</p>
-		<h4 id="Creating_Channels_-_General">Creating Channels - General</h4>
-		<p>Creating channels can be done using a session tree node when the domain hasn't be created in the session or, alternatively on a domain tree node of a session in case the domain is already available.  </p>
-		<h4 id="Creating_Channels_On_Session_Level">Creating Channels On Session Level</h4>
-		<p>To create a channel, select the tree node of the relevant session and press the right mouse button. Then select the 
-			<b>Create Channel</b> button of the context-sensitive menu. 
+		<h4 id="Enabling_Channels_-_General">Enabling Channels - General</h4>
+		<p>Enabling channels can be done using a session tree node when the domain hasn't be created in the session or, alternatively on a domain tree node of a session in case the domain is already available.  </p>
+		<h4 id="Enabling_Channels_On_Session_Level">Enabling Channels On Session Level</h4>
+		<p>To enable a channel, select the tree node of the relevant session and press the right mouse button. Then select the 
+			<b>Enable Channel...</b> button of the context-sensitive menu. 
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2CreateChannelAction.png"/>
@@ -506,21 +506,21 @@
 			</li>
 		</ul>
 		<p>Upon successful operation, the requested domain will be created under the session tree node as well as the requested channel will be added under the domain. The channel will be 
-			<b>ENABLED</b>. 
+			<b>ENABLED</b>.
 		</p>
-		<h4 id="Creating_Channels_On_Domain_Level">Creating Channels On Domain Level</h4>
-		<p>Once a domain is available, channels can be created directly using the domain. To create a channel under an existing domain, select the tree node of the relevant domain and press the right mouse button. Then select the 
-			<b>Create Channel</b> button of the context-sensitive menu.
+		<h4 id="Enabling_Channels_On_Domain_Level">Enabling Channels On Domain Level</h4>
+		<p>Once a domain is available, channels can be enabled directly using the domain. To enable a channel under an existing domain, select the tree node of the relevant domain and press the right mouse button. Then select the 
+			<b>Enable Channel...</b> button of the context-sensitive menu.
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2CreateChannelOnDomainAction.png"/>
 		</p>
-		<p>The channel creation dialog box will open for entering information about the channel to be created. Note that the domain is pre-selected and cannot be changed.</p>
+		<p>The dialog box for enabling channel will open for entering information about the channel to be created. Note that the domain is pre-selected and cannot be changed.</p>
 		<p>
 			<img border="0" src="images/LTTng2CreateChannelOnDomainDialog.png"/>
 		</p>
 		<p>Fill the relevant information and press 
-			<b>Ok</b>. 
+			<b>Ok</b>.
 		</p>
 		<h4 id="Enabling_and_Disabling_Channels">Enabling and Disabling Channels</h4>
 		<p>To disable one or more enabled channels, select the tree nodes of the relevant channels and press the right mouse button. Then select the 
@@ -547,7 +547,7 @@
 		</p>
 		<h4 id="Enabling_Kernel_Events_On_Session_Level">Enabling Kernel Events On Session Level</h4>
 		<p>To enable events, select the tree node of the relevant session and press the right mouse button. Then select the 
-			<b>Enable Event (default channel)</b> button of the context-sensitive menu. 
+			<b>Enable Event (default channel)...</b> button of the context-sensitive menu. 
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2EventOnSessionAction.png"/>
@@ -623,7 +623,7 @@
 			<b>Ok</b>. Note that the funtion probe can be an address, symbol or a symbol+offset where the address and offset can be octal (0NNN...), decimal (NNN...) or hexadecimal (0xNNN...).
 		</p>
 		<p>
-			<img border="0" src="images/LTTng2ProbeEventDialog.png"/>
+			<img border="0" src="images/LTTng2FunctionEventDialog.png"/>
 		</p>
 		<p>Upon successful operation, the dynamic function probe event with the given name and event type 
 			<b>PROBE</b> will be added under the default channel (channel0). If necessary the domain 
@@ -704,7 +704,7 @@
 		</p>
 		<h4 id="Enabling_Events_On_Domain_Level">Enabling Events On Domain Level</h4>
 		<p>Kernel events can also be enabled on the domain level. For that select the relevant domain tree node, click the right mouse button and the select 
-			<b>Enable Event (default channel)</b>. A new dialog box will open for providing information about the events to be enabled. Depending on the domain, 
+			<b>Enable Event (default channel)...</b>. A new dialog box will open for providing information about the events to be enabled. Depending on the domain, 
 			<b>Kernel</b> or 
 			<b>UST global</b>, the domain specifc fields are shown and the domain selector is preselected and read-only.  
 		</p>
@@ -718,15 +718,15 @@
 			<a href="LTTng-Tracer-Control.html#Enabling_UST_Events_On_Session_Level">Enabling UST Events On Session Level</a>.
 		</p>
 		<p>When enabling events on the domain level, the events will be add to the default channel 
-			<b>channel0</b>. This channel will be created by on the server side if neccessary. 
+			<b>channel0</b>. This channel will be created by on the server side if neccessary.
 		</p>
 		<h4 id="Enabling_Events_On_Channel_Level">Enabling Events On Channel Level</h4>
 		<p>Kernel events can also be enabled on the channel level. If necessary, create a channel as described in sections 
-			<a href="LTTng-Tracer-Control.html#Creating_Channels_On_Session_Level">Creating Channels On Session Level</a> or 
-			<a href="LTTng-Tracer-Control.html#Creating_Channels_On_Domain_Level">Creating Channels On Domain Level</a>.   
+			<a href="LTTng-Tracer-Control.html#Enabling_Channels_On_Session_Level">Creating Channels On Session Level</a> or 
+			<a href="LTTng-Tracer-Control.html#Enabling_Channels_On_Domain_Level">Creating Channels On Domain Level</a>.   
 		</p>
 		<p>Then select the relevant channel tree node, click the right mouse button and the select 
-			<b>Enable Event</b>. A new dialog box will open for providing information about the events to be enabled. Depending on the domain, 
+			<b>Enable Event...</b>. A new dialog box will open for providing information about the events to be enabled. Depending on the domain, 
 			<b>Kernel</b> or 
 			<b>UST global</b>, the domain specifc fields are shown and the domain selector is preselected and read-only.  
 		</p>
@@ -739,7 +739,7 @@
 			<b>UST global</b> 
 			<a href="LTTng-Tracer-Control.html#Enabling_UST_Events_On_Session_Level">Enabling UST Events On Session Level</a>.
 		</p>
-		<p>When enabling events on the channel level, the events will be add to the selected channel. </p>
+		<p>When enabling events on the channel level, the events will be add to the selected channel.</p>
 		<h4 id="Enabling_and_Disabling_Events">Enabling and Disabling Events</h4>
 		<p>To disable one or more enabled events, select the tree nodes of the relevant events and click the right mouse button. Then select 
 			<b>Disable Event</b> menu item in the context-sensitive menu. 
@@ -768,12 +768,12 @@
 			<b>Tracepoint</b> directly from the providers and assign the enabled event to a session and channel. Before doing that a session has to be created as described in section 
 			<a href="LTTng-Tracer-Control.html#Creating_a_Tracing_Session">Creating a Tracing Session</a>. Also, if other than default channel 
 			<b>channel0</b> is required, create a channel as described in sections 
-			<a href="LTTng-Tracer-Control.html#Creating_Channels_On_Session_Level">Creating Channels On Session Level</a> or 
-			<a href="LTTng-Tracer-Control.html#Creating_Channels_On_Domain_Level">Creating Channels On Domain Level</a>. 
+			<a href="LTTng-Tracer-Control.html#Enabling_Channels_On_Session_Level">Creating Channels On Session Level</a> or 
+			<a href="LTTng-Tracer-Control.html#Enabling_Channels_On_Domain_Level">Creating Channels On Domain Level</a>. 
 		</p>
 		<p>To assign tracepoint events to a session and channel, select the events to be enabled under the provider (e.g. provider 
-			<b>Kernel</b>, click right mouse button and then select 
-			<b>Enable Event</b> menu item from the context sesitive menu. 
+			<b>Kernel</b>), click right mouse button and then select 
+			<b>Enable Event...</b> menu item from the context sesitive menu. 
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2AssignEventAction.png"/>
@@ -791,6 +791,42 @@
 		</p>
 		<p>
 			<img border="0" src="images/LTTng2AssignedEvents.png"/>
+		</p>
+		<h4 id="Adding_Contexts_to_Channels_and_Events_of_a_Domain">Adding Contexts to Channels and Events of a Domain</h4>
+		<p>It is possible to add contexts to channels and events. Adding contexts on channels and events from the domain level, will enable the specified contexts to all channels of the domain and all their events. To add contexts on the domain level, select a domain, click right mouse button on a domain tree node (e.g. provider 
+			<b>Kernel</b>) and select the menu item 
+			<b>Add Context...</b> from the context-sensitive menu.
+		</p>
+		<p>
+			<img border="0" src="images/LTTng2AddContextOnDomainAction.png"/>
+		</p>
+		<p>A new display will open for selecting one or more contexts to add.</p>
+		<p>
+			<img border="0" src="images/LTTng2AddContextDialog.png"/>
+		</p>
+		<p>The tree shows all avaiable context that can be added. Select one or more context and the press 
+			<b>Ok</b>. Upon successful operation, the selected context will be added to all channels and their events of the selected domain. 
+		</p>
+		<h4 id="Adding_Contexts_to_All_Events_of_a_Channel">Adding Contexts to All Events of a Channel</h4>
+		<p>Adding contexts on channels and events from the channel level, will enable the specified contexts to all events of the selected channel. To add contexts on the channel level, select a channel, click right mouse button on a channel tree node and select the menu item 
+			<b>Add Context...</b> from the context-sensitive menu. 
+		</p>
+		<p>
+			<img border="0" src="images/LTTng2AddContextOnChannelAction.png"/>
+		</p>
+		<p>A new display will open for selecting one or more contexts to add. Select one or more contexts as described in chapter 
+			<a href="LTTng-Tracer-Control.html#Adding_Contexts_to_Channels_and_Events_of_a_Domain">Adding Contexts to Channels and Events of a Domain</a>. Upon successful operation, the selected context will be added to all channels and their events of the selected domain. 
+			<b>Note</b> that the LTTng 2.0 tracer control on the remote host doesn't provide a way to retrieve added contexts. Hence it's not possible to display the context information in the GUI.
+		</p>
+		<h4 id="Adding_Contexts_to_a_Event_of_a_Specific_Channel">Adding Contexts to a Event of a Specific Channel</h4>
+		<p>Adding contexts to a event of a channel, select an event of a channel, click right mouse button on the corresponding event tree node and select the menu item 
+			<b>Add Context...</b> from the context-sensitive menu.
+		</p>
+		<p>
+			<img border="0" src="images/LTTng2AddContextToEventsAction.png"/>
+		</p>
+		<p>A new display will open for selecting one or more contexts to add. Select one or more contexts as described in chapter 
+			<a href="LTTng-Tracer-Control.html#Adding_Contexts_to_Channels_and_Events_of_a_Domain">Adding Contexts to Channels and Events of a Domain</a>. Upon successful operation, the selected context will be added to the selected event. 
 		</p>
 		<h4 id="Start_Tracing">Start Tracing</h4>
 		<p>To start tracing, select one or more sessions to start in the Control View and press the 
@@ -817,7 +853,7 @@
 		<h4 id="Destroying_a_Tracing_Session">Destroying a Tracing Session</h4>
 		<p>To destroy a tracing session, select one or more sessions to destroy in the Control View and press the 
 			<b>Destroy</b> button. Alternatively, click the right mouse button on the session tree node. A context-sensitive menu will show. Then select the 
-			<b>Destroy</b> menu item. Note that the session has to be 
+			<b>Destroy...</b> menu item. Note that the session has to be 
 			<b>INACTIVE</b> for this operation. 
 		</p>
 		<p>
@@ -840,6 +876,53 @@
 			<img border="0" src="images/LTTng2RefreshAction.png"/>
 		</p>
 		<p>Upon successful operation, the tree in the Control View will be refreshed with the remote host configuration.</p>
+		<h4 id="Quantifing_LTTng_overhead_.28Calibrate.29">Quantifing LTTng overhead (Calibrate)</h4>
+		<p>The LTTng calibrate command can be used to find out the combined average overhead of the LTTng tracer and the instrumentation mechanisms used. For now, the only calibration implemented is that of the kernel function
+			instrumentation (kretprobes). To run the calibrate command, select the a domain (e.g. 
+			<b>Kernel</b>), click the right mouse button on the domain tree node. A context-sensitive menu will show. Select the 
+			<b>Calibrate</b> menu item.
+		</p>
+		<p>
+			<img border="0" src="images/LTTng2CalibrateAction.png"/>
+		</p>
+		<p>Upon successfull operation, the calibrate command is executed and relevant information is stored in the trace. Note: that the trace has to be active so that to command as any effect.</p>
+		<h4 id="Importing_Session_Traces_to_a_Tracing_Project">Importing Session Traces to a Tracing Project</h4>
+		<p>To import traces from a tracing session, select the relevant session and click on the 
+			<b>Import</b> Button. Alternativly, click the right mouse button on the session tree node and select the menu item 
+			<b>Import...</b> from the context-sensitive menu. 
+		</p>
+		<p>
+			<img border="0" src="images/LTTng2ImportAction.png"/>
+		</p>
+		<p>A new display will open for selecting the traces to import.</p>
+		<p>
+			<img border="0" src="images/LTTng2ImportDialog.png"/>
+		</p>
+		<p>Select the trace to be imported by selecting the relevant traces in the tree viewer, select a tracing project from the 
+			<b>Available Projects</b> combo box and select the Overwrite button (
+			<b>Overwrite existing trace without warning</b>) if required. Then press button 
+			<b>Ok</b>. Upon successful import operation the the selected traces will be stored in the 
+			<b>Traces</b> directory of the specified tracing project. From the 
+			<b>Project Explorer</b> view, the trace can be analysed further. 
+		</p>
+		<p>
+			<b>Note</b>: If the overwrite button (
+			<b>Overwrite existing trace without warning</b>) was not selected and a trace with the same name of a trace to be imported already exists in the project, then a new confirmation dialog box will open.
+		</p>
+		<p>
+			<img border="0" src="images/LTTng2ImportOverwriteConfirmationDialog.png"/>
+		</p>
+		<p>To Overwrite select the 
+			<b>Overwrite</b> Button and press 
+			<b>Ok</b>.
+		</p>
+		<p>If the existing trace should not be overwritten select, then select the 
+			<b>Rename</b> option of the confirmation dialog box above, enter a new name and then press 
+			<b>Ok</b>.
+		</p>
+		<p>
+			<img border="0" src="images/LTTng2ImportRenameDialog.png"/>
+		</p>
 		<h3 id="Property_View_2">Property View</h3>
 		<p>The Control View provides property information of selected tree component. Depending on the selected tree component different properties are displayed in the property view. For example, when selecting the node level the property view will be filled as follewed:</p>
 		<p>
@@ -941,8 +1024,8 @@
 					</li>
 					<li>
 						<b>Overwrite Mode</b>: The channel overwrite mode (
-						<b>true</b> or 
-						<b>false</b>)
+						<b>true</b> for overwrite mode, 
+						<b>false</b> for discard)
 					</li>
 					<li>
 						<b>Read Timer Interval</b>: The read timer interval.
@@ -982,7 +1065,38 @@
 					</li>
 				</ul>
 			</li>
-		</ul><hr/>
+		</ul>
+		<h3 id="LTTng_Trace_Control_Preferences">LTTng Trace Control Preferences</h3>
+		<p>Serveral LTTng 2.0 tracer control preferences exists which can be configured. To configure these preferences, select 
+			<b>Window-&gt;Preferences</b> from the top level menu. The preference display will open. Then select 
+			<b>Tracing-&gt;LTTng Tracer Control Preferences</b>. This preferences page allows the user to specify the tracing group of the user and allows the user to configure the logging of LTTng 2.0 tracer control commands and results to a file.
+		</p>
+		<p>
+			<img border="0" src="images/LTTng2Preferences.png"/>
+		</p>
+		<p>To change the tracing group of the user which will be specified on each command line, enter the new group name in the 
+			<b>Tracing Group</b> text field and click ok. The default tracing group is 
+			<b>tracing</b> and can be restored by pressing the 
+			<b>Restore Defaults</b> button. 
+		</p>
+		<p>
+			<img border="0" src="images/LTTng2PreferencesGroup.png"/>
+		</p>
+		<p>To configure logging of trace control commands and the corresponding command result to a file, selected the button  
+			<b>Logging</b>. To append to an existing log file, select the 
+			<b>Append</b> button. Deselect the 
+			<b>Append</b> button to overwrite any existing log file. It's possible to specify a verbose level. There are 3 levels with inceasing verbosity from 
+			<b>Level 1</b> to 
+			<b>Level 3</b>. To change the verbosity level, select the relevant level or select 
+			<b>None</b>. If 
+			<b>None</b> is selected only commands and command results are logged. Then press on button 
+			<b>Ok</b>. The log file will be stored in the users home directory with the name 
+			<i>lttng_tracer_control.log</i>. The name and location cannot be changed. To reset to default preferences, click on the button 
+			<b>Restore Defaults</b>.
+		</p>
+		<p>
+			<img border="0" src="images/LTTng2PreferencesLogging.png"/>
+		</p><hr/>
 		<table class="navigation" style="width: 100%;" border="0" summary="navigation">
 			<tr>
 				<td style="width: 20%" align="left">
