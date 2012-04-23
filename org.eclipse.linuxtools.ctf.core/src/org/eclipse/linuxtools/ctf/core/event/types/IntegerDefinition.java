@@ -61,6 +61,9 @@ public class IntegerDefinition extends Definition {
 
     @Override
     public void read(BitBuffer input) {
+        int align = (int) declaration.getAlignment();
+        int pos = input.position() + ((align-(input.position() % align))%align);
+        input.position(pos);
         boolean signed = declaration.isSigned();
         int length = declaration.getLength();
         long bits = 0;

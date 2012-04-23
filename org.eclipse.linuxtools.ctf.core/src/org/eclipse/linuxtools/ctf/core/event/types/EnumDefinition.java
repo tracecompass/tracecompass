@@ -67,6 +67,9 @@ public class EnumDefinition extends Definition {
 
     @Override
     public void read(BitBuffer input) {
+        int align = (int) declaration.getAlignment();
+        int pos = input.position() + ((align-(input.position() % align))%align);
+        input.position(pos);
         integerValue.read(input);
         long val = integerValue.getValue();
 

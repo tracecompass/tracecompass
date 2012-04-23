@@ -353,8 +353,23 @@ public class CTFTraceReader {
                  */
                 final long streamIndex = streamInputReader.seekIndex(index);
                 tempIndex = Math.max(tempIndex, streamIndex);
-                tempTimestamp = Math.max(tempTimestamp,
-                        streamInputReader.getCurrentEvent().timestamp);
+                EventDefinition currentEvent = streamInputReader.getCurrentEvent();
+                /*
+                 * Maybe we're at the beginning of a trace.
+                 */
+                if( currentEvent == null ){
+                    streamInputReader.readNextEvent();
+                    currentEvent = streamInputReader.getCurrentEvent();
+                }
+                if( currentEvent != null ) {
+                    tempTimestamp = Math.max(tempTimestamp,
+                            currentEvent.timestamp);
+                } else {
+                    /*
+                     * probably beyond the last event
+                     */
+                    tempIndex = goToZero();
+                }
 
             }
         } catch (CTFReaderException e) {
@@ -362,13 +377,7 @@ public class CTFTraceReader {
              * Important, if it failed, it's because it's not yet indexed, so we
              * have to manually advance to the right value.
              */
-            for (StreamInputReader streamInputReader : this.streamInputReaders) {
-                /*
-                 * Seek the trace reader.
-                 */
-                streamInputReader.seek(0);
-            }
-            tempIndex = 0;
+            tempIndex = goToZero();
         }
         for (StreamInputReader streamInputReader : this.streamInputReaders) {
             /*
@@ -398,6 +407,22 @@ public class CTFTraceReader {
         }
         this.fIndex = pos;
         return hasMoreEvents();
+    }
+
+    /**
+     * Go to the first entry of a trace
+     * @return 0, the first index.
+     */
+    private long goToZero() {
+        long tempIndex;
+        for (StreamInputReader streamInputReader : this.streamInputReaders) {
+            /*
+             * Seek the trace reader.
+             */
+            streamInputReader.seek(0);
+        }
+        tempIndex = 0;
+        return tempIndex;
     }
 
     public StreamInputReader getTopStream() {

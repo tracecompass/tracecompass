@@ -1545,18 +1545,11 @@ public class IOStructGen {
                 throw new ParseException("struct " + structName //$NON-NLS-1$
                         + " already defined."); //$NON-NLS-1$
             }
-
             /* Create the declaration */
             structDeclaration = new StructDeclaration(structAlign);
 
             /* Parse the body */
             parseStructBody(structBody, structDeclaration);
-            long maxFieldAlign = -1;
-            for( IDeclaration field : structDeclaration.getFields().values())
-            {
-                maxFieldAlign = Math.max(maxFieldAlign, field.getAlignment());
-            }
-            structDeclaration.setMinAlign(maxFieldAlign);
 
             /* If struct has name, add it to the current scope. */
             if (hasName) {

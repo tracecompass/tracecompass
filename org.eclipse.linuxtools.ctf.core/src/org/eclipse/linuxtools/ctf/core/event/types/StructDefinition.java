@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.ctf.core.event.types;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.ListIterator;
 
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
@@ -71,10 +72,13 @@ public class StructDefinition extends Definition implements IDefinitionScope {
 
     @Override
     public void read(BitBuffer input) {
-        for (String fName : declaration.getFieldsList()) {
+        final int align = (int) declaration.getAlignment();
+        int pos = input.position() + ((align-(input.position() % align))%align);
+        input.position(pos);
+        final List<String> fieldList = declaration.getFieldsList();
+        for (String fName : fieldList) {
             Definition def = definitions.get(fName);
             assert (def != null);
-
             def.read(input);
         }
     }

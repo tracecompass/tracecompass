@@ -289,20 +289,22 @@ class StreamInputPacketReader implements IDefinitionScope {
      */
     public EventDefinition readNextEvent() throws CTFReaderException {
         /* WARNING: This is very LTTng-specific. */
-
         Long eventID = null;
         long timestamp = 0;
 
+        StructDefinition sehd = getStreamEventHeaderDef(); // acronym for a long variable name
+        BitBuffer currentBitBuffer = getBitBuffer();
         /*
          * Read the stream event header.
          */
-        if (getStreamEventHeaderDef() != null) {
-            getStreamEventHeaderDef().read(getBitBuffer());
+
+        if (sehd != null) {
+            sehd.read(currentBitBuffer);
 
             /*
              * Check for an event id.
              */
-            EnumDefinition idEnumDef = (EnumDefinition) getStreamEventHeaderDef().lookupDefinition("id"); //$NON-NLS-1$
+            EnumDefinition idEnumDef = (EnumDefinition) sehd.lookupDefinition("id"); //$NON-NLS-1$
             assert (idEnumDef != null);
 
             eventID = idEnumDef.getIntegerValue();
@@ -310,7 +312,7 @@ class StreamInputPacketReader implements IDefinitionScope {
             /*
              * Check for the variant v.
              */
-            VariantDefinition variantDef = (VariantDefinition) getStreamEventHeaderDef().lookupDefinition("v"); //$NON-NLS-1$
+            VariantDefinition variantDef = (VariantDefinition) sehd.lookupDefinition("v"); //$NON-NLS-1$
             assert (variantDef != null);
 
             /*
@@ -326,7 +328,6 @@ class StreamInputPacketReader implements IDefinitionScope {
             IntegerDefinition idIntegerDef = (IntegerDefinition) variantCurrentField.lookupDefinition("id"); //$NON-NLS-1$
             if (idIntegerDef != null) {
                 eventID = idIntegerDef.getValue();
-
             }
 
             /*
@@ -345,7 +346,7 @@ class StreamInputPacketReader implements IDefinitionScope {
          * Read the stream event context.
          */
         if (getStreamEventContextDef() != null) {
-            getStreamEventContextDef().read(getBitBuffer());
+            getStreamEventContextDef().read(currentBitBuffer);
         }
 
         /*
@@ -360,19 +361,14 @@ class StreamInputPacketReader implements IDefinitionScope {
          * Read the event context.
          */
         if (eventDef.context != null) {
-            eventDef.context.read(getBitBuffer());
+            eventDef.context.read(currentBitBuffer);
         }
 
         /*
          * Read the event fields.
          */
         if (eventDef.fields != null) {
-            int pos = getBitBuffer().position();
-            int minAlign = (int) eventDef.fields.getDeclaration().getMinAlign();
-            int offset = pos % minAlign;
-            pos += (minAlign - offset)%minAlign;
-            getBitBuffer().position(pos);
-            eventDef.fields.read(getBitBuffer());
+            eventDef.fields.read(currentBitBuffer);
         }
 
         /*

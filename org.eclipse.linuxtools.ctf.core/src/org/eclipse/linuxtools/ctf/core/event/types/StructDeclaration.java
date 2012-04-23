@@ -27,26 +27,22 @@ public class StructDeclaration implements IDeclaration {
 
     private final HashMap<String, IDeclaration> fields = new HashMap<String, IDeclaration>();
     private final List<String> fieldsList = new LinkedList<String>();
-    private long minAlign;
+    private long maxAlign;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
-    public StructDeclaration(long minAlign) {
-        this.minAlign = minAlign;
+    public StructDeclaration(long align) {
+        this.maxAlign = Math.max(align, 1);
     }
 
     // ------------------------------------------------------------------------
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
-    public long getMinAlign() {
-        return this.minAlign;
-    }
-
-    public void setMinAlign(long minAlign) {
-        this.minAlign = minAlign;
+    public long getMaxAlign() {
+        return maxAlign;
     }
 
     public boolean hasField(String name) {
@@ -63,7 +59,7 @@ public class StructDeclaration implements IDeclaration {
 
     @Override
     public long getAlignment() {
-        return getMinAlign();
+        return this.maxAlign;
     }
     // ------------------------------------------------------------------------
     // Operations
@@ -76,10 +72,13 @@ public class StructDeclaration implements IDeclaration {
     }
 
     public void addField(String name, IDeclaration declaration) {
-        // TODO: update the minAlign to be the max of minAlign and the align
-        // value of the new field.
         this.fields.put(name, declaration);
         this.fieldsList.add(name);
+        maxAlign = Math.max(maxAlign, declaration.getAlignment());
+        if( maxAlign == 1 )
+        {
+            maxAlign =1;
+        }
     }
 
     @Override
