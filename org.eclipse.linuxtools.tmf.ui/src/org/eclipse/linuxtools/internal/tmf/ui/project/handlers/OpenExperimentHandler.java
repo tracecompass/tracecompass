@@ -27,7 +27,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
@@ -165,7 +164,7 @@ public class OpenExperimentHandler extends AbstractHandler {
             }
 
             // Create the experiment
-            TmfExperiment experiment = new TmfExperiment(TmfEvent.class, fExperiment.getName(), traces, cacheSize);
+            TmfExperiment experiment = new TmfExperiment(ITmfEvent.class, fExperiment.getName(), traces, cacheSize);
             experiment.setBookmarksFile(file);
 
             if (useEditor) {

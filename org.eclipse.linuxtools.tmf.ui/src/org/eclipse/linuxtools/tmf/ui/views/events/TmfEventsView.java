@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomEventsTable;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTrace;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentDisposedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
@@ -81,9 +81,9 @@ public class TmfEventsView extends TmfView {
         fTitlePrefix = getTitle();
         
         // If an experiment is already selected, update the table
-        TmfExperiment<TmfEvent> experiment = (TmfExperiment<TmfEvent>) TmfExperiment.getCurrentExperiment();
+        TmfExperiment<ITmfEvent> experiment = (TmfExperiment<ITmfEvent>) TmfExperiment.getCurrentExperiment();
         if (experiment != null) {
-            experimentSelected(new TmfExperimentSelectedSignal<TmfEvent>(this, experiment));
+            experimentSelected(new TmfExperimentSelectedSignal<ITmfEvent>(this, experiment));
         } else {
             fEventsTable = createEventsTable(parent);
         }
@@ -206,9 +206,9 @@ public class TmfEventsView extends TmfView {
     
 	@SuppressWarnings("unchecked")
     @TmfSignalHandler
-    public void experimentSelected(TmfExperimentSelectedSignal<TmfEvent> signal) {
+    public void experimentSelected(TmfExperimentSelectedSignal<ITmfEvent> signal) {
         // Update the trace reference
-        TmfExperiment<TmfEvent> exp = (TmfExperiment<TmfEvent>) signal.getExperiment();
+        TmfExperiment<ITmfEvent> exp = (TmfExperiment<ITmfEvent>) signal.getExperiment();
         if (!exp.equals(fExperiment)) {
             fExperiment = exp;
             setPartName(fTitlePrefix + " - " + fExperiment.getName()); //$NON-NLS-1$
@@ -224,9 +224,9 @@ public class TmfEventsView extends TmfView {
 
 	@SuppressWarnings("unchecked")
 	@TmfSignalHandler
-	public void experimentDisposed(TmfExperimentDisposedSignal<TmfEvent> signal) {
+	public void experimentDisposed(TmfExperimentDisposedSignal<ITmfEvent> signal) {
 		// Clear the trace reference
-		TmfExperiment<TmfEvent> experiment = (TmfExperiment<TmfEvent>) signal.getExperiment();
+		TmfExperiment<ITmfEvent> experiment = (TmfExperiment<ITmfEvent>) signal.getExperiment();
 		if (experiment.equals(fExperiment)) {
 			fEventsTable.setTrace(null, false);
 
