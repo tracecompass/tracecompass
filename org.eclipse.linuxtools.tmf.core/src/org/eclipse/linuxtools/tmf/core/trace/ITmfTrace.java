@@ -276,15 +276,6 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      */
     public ITmfEvent readEvent(ITmfContext context);
 
-//    /**
-//     * Return the event pointed by the supplied context (or null if no event
-//     * left) and *does not* update the context.
-//     * 
-//     * @param context the read context
-//     * @return the next event in the stream
-//     */
-//    public ITmfEvent parseEvent(ITmfContext context);
-
     // ------------------------------------------------------------------------
     //
     // ------------------------------------------------------------------------
