@@ -12,10 +12,9 @@
 
 package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
 
-import java.io.FileNotFoundException;
-
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 
 /**
  * Definitions used by all tests using CTF trace files
@@ -40,7 +39,7 @@ public abstract class CTFTestFiles {
 
     public static CtfTmfTrace trace = null;
 
-    public static CtfTmfTrace getTestTrace() throws FileNotFoundException {
+    public static CtfTmfTrace getTestTrace() throws TmfTraceException {
         if (trace == null) {
             trace = new CtfTmfTrace();
             trace.initTrace(null, traceFile, CtfTmfEvent.class);

@@ -179,7 +179,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
                 }
                 while (true) {
                     long rank = context.getRank();
-                    ITmfEvent event = trace.readEvent(context);
+                    ITmfEvent event = trace.readNextEvent(context);
                     if (event == null) {
                         done = true;
                         break;
@@ -447,7 +447,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
                         if (interrupted)
                             return;
                         long rank = fContext.getRank();
-                        ITmfEvent event = trace.readEvent(fContext);
+                        ITmfEvent event = trace.readNextEvent(fContext);
                         if (event == null) {
                             break;
                         }

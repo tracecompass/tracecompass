@@ -1,7 +1,6 @@
 package org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,6 +14,7 @@ import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomEventsTable;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefinition;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -203,7 +203,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
             previewTable = new CustomEventsTable(definition, tableContainer, CACHE_SIZE);
             previewTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
             previewTable.setTrace(trace, true);
-        } catch (final FileNotFoundException e) {
+        } catch (final TmfTraceException e) {
             e.printStackTrace();
         } catch (final IOException e) {
             e.printStackTrace();

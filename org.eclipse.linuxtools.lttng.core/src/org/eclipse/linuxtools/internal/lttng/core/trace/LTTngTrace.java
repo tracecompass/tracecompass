@@ -13,7 +13,6 @@
 
 package org.eclipse.linuxtools.internal.lttng.core.trace;
 
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
@@ -38,6 +37,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
@@ -116,18 +116,19 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
 
     @Override
     public synchronized void initTrace(final IResource resource, final String path, final Class<LttngEvent> eventType)
-            throws FileNotFoundException {
+            throws TmfTraceException {
         super.initialize(resource, path, eventType);
         initialize(resource, path, eventType);
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     protected synchronized void initialize(final IResource resource, final String path, final Class<LttngEvent> eventType)
-            throws FileNotFoundException {
+            throws TmfTraceException {
         try {
             currentJniTrace = JniTraceFactory.getJniTrace(path, traceLibPath, SHOW_LTT_DEBUG_DEFAULT);
         } catch (final Exception e) {
-            throw new FileNotFoundException(e.getMessage());
+            throw new TmfTraceException(e.getMessage());
         }
 
         // Export all the event types from the JNI side
@@ -153,7 +154,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         eventContent.setEvent(currentLttngEvent);
 
         fParser = (ITmfEventParser) this;
-        
+        fCacheSize = CHECKPOINT_PAGE_SIZE;
+ 
         // // Bypass indexing if asked
         // if ( bypassIndexing == false ) {
         // indexTrace(true);
@@ -172,7 +174,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
                 || (!jniTrace.isLiveTraceSupported() || !LiveTraceManager.isLiveTrace(jniTrace.getTracepath()))) {
             // Set the time range of the trace
             final TmfContext context = seekEvent(0);
-            final LttngEvent event = readEvent(context);
+            final LttngEvent event = readNextEvent(context);
             final LttngTimestamp startTime = new LttngTimestamp(event.getTimestamp());
             final LttngTimestamp endTime = new LttngTimestamp(currentJniTrace.getEndTime().getTime());
             setTimeRange(new TmfTimeRange(startTime, endTime));
@@ -183,7 +185,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
 
         // Set the time range of the trace
         final TmfContext context = seekEvent(0);
-        final LttngEvent event = readEvent(context);
+        final LttngEvent event = readNextEvent(context);
         setEndTime(TmfTimestamp.BIG_BANG);
         final long startTime = event != null ? event.getTimestamp().getValue() : TmfTimestamp.BIG_BANG.getValue();
         fStreamingInterval = LTTNG_STREAMING_INTERVAL;
@@ -471,7 +473,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         // If the location is marked with the read next flag
         // then it is pointing to the next event following the operation time
         if (curLocation.isLastOperationReadNext())
-            readEvent(context);
+            readNextEvent(context);
 
         return context;
     }
@@ -616,7 +618,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
     public int nbEventsRead = 0;
 
     @Override
-    public synchronized LttngEvent readEvent(final ITmfContext context) {
+    public synchronized LttngEvent readNextEvent(final ITmfContext context) {
 
         if (PRINT_DEBUG)
             System.out.println("getNextEvent(context) context.getLocation() -> " //$NON-NLS-1$

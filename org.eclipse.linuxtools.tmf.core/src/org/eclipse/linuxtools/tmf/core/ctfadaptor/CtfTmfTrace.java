@@ -1,7 +1,5 @@
 package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 
-import java.io.FileNotFoundException;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
@@ -10,6 +8,7 @@ import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
@@ -58,7 +57,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
 
     @Override
     public void initTrace(final IResource resource, final String path, final Class<CtfTmfEvent> eventType)
-            throws FileNotFoundException {
+            throws TmfTraceException {
         this.fResource = resource;
         try {
             this.fTrace = new CTFTrace(path);
@@ -68,7 +67,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
              * was not found or was not recognized as a CTF trace. Throw into
              * the new type of exception expected by the rest of TMF.
              */
-            throw new FileNotFoundException(e.getMessage());
+            throw new TmfTraceException(e.getMessage());
         }
         this.iterator = new CtfIterator(this, 0, 0);
         setStartTime(iterator.getCurrentEvent().getTimestamp());
@@ -292,7 +291,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
     }
 
     @Override
-    public CtfTmfEvent readEvent(final ITmfContext context) {
+    public CtfTmfEvent readNextEvent(final ITmfContext context) {
         iterator.advance();
         return iterator.getCurrentEvent();
     }

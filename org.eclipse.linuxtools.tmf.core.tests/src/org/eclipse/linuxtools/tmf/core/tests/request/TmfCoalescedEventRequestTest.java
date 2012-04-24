@@ -27,6 +27,7 @@ import org.eclipse.linuxtools.tmf.core.component.TmfProviderManager;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.TmfCoalescedDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfCoalescedEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
@@ -403,8 +404,10 @@ public class TmfCoalescedEventRequestTest extends TestCase {
     	        URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
     	        File test = new File(FileLocator.toFileURL(location).toURI());
     	        fTrace = new TmfTraceStub(test.getPath(), 500);
-    		} catch (URISyntaxException e) {
+    		} catch (TmfTraceException e) {
     			e.printStackTrace();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
     		} catch (IOException e) {
     			e.printStackTrace();
     		}

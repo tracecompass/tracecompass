@@ -56,7 +56,7 @@ public class LttngEventFieldTest extends TestCase {
         // This trace should be valid
         try {
             final LTTngTextTrace tmpStream = initializeEventStream();
-            tmpField = (LttngEventField)tmpStream.readEvent( new TmfContext(new TmfLocation<Long>(0L), 0) ).getContent().getField(0);
+            tmpField = (LttngEventField)tmpStream.readNextEvent( new TmfContext(new TmfLocation<Long>(0L), 0) ).getContent().getField(0);
         }
         catch (final Exception e) {
             fail("ERROR : Failed to get field!");
@@ -94,7 +94,7 @@ public class LttngEventFieldTest extends TestCase {
 
         LttngEventField testField = null;
         //        try {
-        testField = (LttngEventField) tmpStream.readEvent( new TmfContext(new TmfLocation<Long>(0L), 0) ).getContent().getField(0);
+        testField = (LttngEventField) tmpStream.readNextEvent( new TmfContext(new TmfLocation<Long>(0L), 0) ).getContent().getField(0);
         //        } catch (TmfNoSuchFieldException e) {
         //            e.printStackTrace();
         //        }

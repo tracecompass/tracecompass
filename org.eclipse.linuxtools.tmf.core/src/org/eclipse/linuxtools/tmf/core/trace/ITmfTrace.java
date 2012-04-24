@@ -13,14 +13,13 @@
 
 package org.eclipse.linuxtools.tmf.core.trace;
 
-import java.io.FileNotFoundException;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 
 /**
@@ -50,21 +49,21 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
  * <b>Example 1</b>: Process a whole trace
  * <pre>
  * ITmfContext context = trace.seekEvent(0);
- * ITmfEvent event = trace.getEvent(context);
+ * ITmfEvent event = trace.readEvent(context);
  * while (event != null) {
  *     processEvent(event);
- *     event = trace.getEvent(context);
+ *     event = trace.readEvent(context);
  * }
  * </pre>
  * <b>Example 2</b>: Process 50 events starting from the 1000th event
  * <pre>
  * int nbEventsRead = 0;
  * ITmfContext context = trace.seekEvent(1000);
- * ITmfEvent event = trace.getEvent(context);
+ * ITmfEvent event = trace.readEvent(context);
  * while (event != null && nbEventsRead < 50) {
  *     nbEventsRead++;
  *     processEvent(event);
- *     event = trace.getEvent(context);
+ *     event = trace.readEvent(context);
  * }
  * </pre>
  * <b>Example 3</b>: Process the events between 2 timestamps (inclusive)
@@ -72,10 +71,10 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
  * ITmfTimestamp startTime = ...;
  * ITmfTimestamp endTime = ...;
  * ITmfContext context = trace.seekEvent(startTime);
- * ITmfEvent event = trace.getEvent(context);
+ * ITmfEvent event = trace.readEvent(context);
  * while (event != null && event.getTimestamp().compareTo(endTime) <= 0) {
  *     processEvent(event);
- *     event = trace.getEvent(context);
+ *     event = trace.readEvent(context);
  * }
  * </pre>
  * A trace is also an event provider so it can process event requests
@@ -123,9 +122,9 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * @param resource the trace resource
      * @param path the trace path
      * @param type the trace event type
-     * @throws FileNotFoundException
+     * @throws TmfTraceException
      */
-    public void initTrace(IResource resource, String path, Class<T> type) throws FileNotFoundException;
+    public void initTrace(IResource resource, String path, Class<T> type) throws TmfTraceException;
 
     /**
      * Validate that the trace is of the correct type.
@@ -279,6 +278,6 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * @param context the read context (will be updated)
      * @return the event pointed to by the context
      */
-    public ITmfEvent readEvent(ITmfContext context);
+    public ITmfEvent readNextEvent(ITmfContext context);
 
 }

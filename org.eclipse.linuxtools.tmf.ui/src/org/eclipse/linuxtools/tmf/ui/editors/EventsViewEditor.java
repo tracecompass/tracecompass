@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.ui.editors;
 
-import java.io.FileNotFoundException;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -22,6 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.linuxtools.internal.tmf.ui.project.handlers.Messages;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
@@ -133,7 +133,7 @@ public class EventsViewEditor extends TmfEditor {
                                 }
                                 try {
                                     trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
-                                } catch (final FileNotFoundException e) {
+                                } catch (final TmfTraceException e) {
                                 }
                                 cacheSize = Math.min(cacheSize, trace.getCacheSize());
                                 traces[i] = trace;
@@ -162,7 +162,7 @@ public class EventsViewEditor extends TmfEditor {
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             try {
                                 trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
-                            } catch (final FileNotFoundException e) {
+                            } catch (final TmfTraceException e) {
                             }
                             final ITmfTrace[] traces = new ITmfTrace[] { trace };
                             final TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), traceElement.getName(), traces, trace.getCacheSize());
@@ -187,7 +187,7 @@ public class EventsViewEditor extends TmfEditor {
                                 throw new PartInitException(Messages.OpenTraceHandler_NoTraceType);
                             try {
                                 trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
-                            } catch (final FileNotFoundException e) {
+                            } catch (final TmfTraceException e) {
                             }
                             final ITmfTrace[] traces = new ITmfTrace[] { trace };
                             final TmfExperiment experiment = new TmfExperiment(traceEvent.getClass(), traceElement.getName(), traces, trace.getCacheSize());

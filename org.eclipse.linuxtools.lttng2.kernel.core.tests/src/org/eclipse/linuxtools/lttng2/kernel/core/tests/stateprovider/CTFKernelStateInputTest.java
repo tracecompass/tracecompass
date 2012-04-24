@@ -12,16 +12,15 @@
 
 package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.io.FileNotFoundException;
-
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CTFKernelStateInput;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.statesystem.StateSystem;
+import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateChangeInput;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.eclipse.linuxtools.tmf.core.statesystem.StateSystem;
-import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateChangeInput;
-import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CTFKernelStateInput;
 
 /**
  * Tests for the LTTng 2.0 kernel state provider
@@ -34,7 +33,7 @@ public class CTFKernelStateInputTest {
     protected static IStateChangeInput input;
 
     @BeforeClass
-    public static void initialize() throws FileNotFoundException {
+    public static void initialize() throws TmfTraceException {
         input = new CTFKernelStateInput(CTFTestFiles.getTestTrace());
 
     }

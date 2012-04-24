@@ -24,6 +24,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 
@@ -57,7 +58,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     /**
      * The default trace cache size
      */
-    public static final int DEFAULT_TRACE_CACHE_SIZE = 50000;
+    public static final int DEFAULT_TRACE_CACHE_SIZE = 10000;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -121,7 +122,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @param cacheSize the trace cache size
      * @throws FileNotFoundException
      */
-    protected TmfTrace(final IResource resource, final Class<T> type, final String path, final int cacheSize) throws FileNotFoundException {
+    protected TmfTrace(final IResource resource, final Class<T> type, final String path, final int cacheSize) throws TmfTraceException {
         this(resource, type, path, cacheSize, 0, null);
     }
 
@@ -136,7 +137,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @param interval the trace streaming interval
      * @throws FileNotFoundException
      */
-    protected TmfTrace(final IResource resource, final Class<T> type, final String path, final int cacheSize, final long interval) throws FileNotFoundException {
+    protected TmfTrace(final IResource resource, final Class<T> type, final String path, final int cacheSize, final long interval) throws TmfTraceException {
         this(resource, type, path, cacheSize, interval, null);
     }
 
@@ -152,7 +153,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @throws FileNotFoundException
      */
     protected TmfTrace(final IResource resource, final Class<T> type, final String path, final int cacheSize,
-            final long interval, final ITmfTraceIndexer<?> indexer) throws FileNotFoundException {
+            final long interval, final ITmfTraceIndexer<?> indexer) throws TmfTraceException {
         this(resource, type, path, cacheSize, interval, null, null);
     }
 
@@ -169,7 +170,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected TmfTrace(final IResource resource, final Class<T> type, final String path, final int cacheSize,
-            final long interval, final ITmfTraceIndexer<?> indexer, final ITmfEventParser<ITmfEvent> parser) throws FileNotFoundException {
+            final long interval, final ITmfTraceIndexer<?> indexer, final ITmfEventParser<ITmfEvent> parser) throws TmfTraceException {
         super();
         fCacheSize = (cacheSize > 0) ? cacheSize : DEFAULT_TRACE_CACHE_SIZE;
         fStreamingInterval = interval;
@@ -184,7 +185,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @param trace the original trace
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public TmfTrace(final TmfTrace<T> trace) throws FileNotFoundException {
+    public TmfTrace(final TmfTrace<T> trace) throws TmfTraceException {
         super();
         if (trace == null)
             throw new IllegalArgumentException();
@@ -203,7 +204,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#initTrace(org.eclipse.core.resources.IResource, java.lang.String, java.lang.Class)
      */
     @Override
-    public void initTrace(final IResource resource, final String path, final Class<T> type) throws FileNotFoundException {
+    public void initTrace(final IResource resource, final String path, final Class<T> type) throws TmfTraceException {
         initialize(resource, path, type);
         fIndexer.buildIndex(false);
     }
@@ -217,9 +218,9 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * 
      * @throws FileNotFoundException
      */
-    protected void initialize(final IResource resource, final String path, final Class<T> type) throws FileNotFoundException {
+    protected void initialize(final IResource resource, final String path, final Class<T> type) throws TmfTraceException {
         if (path == null)
-            throw new FileNotFoundException();
+            throw new TmfTraceException("Invalid trace path"); //$NON-NLS-1$
         fPath = path;
         fResource = resource;
         String traceName = (resource != null) ? resource.getName() : null;
@@ -228,6 +229,8 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
             final int sep = path.lastIndexOf(Path.SEPARATOR);
             traceName = (sep >= 0) ? path.substring(sep + 1) : path;
         }
+        if (fParser == null && !(this instanceof ITmfEventParser))
+            throw new TmfTraceException("Invalid trace parser"); //$NON-NLS-1$
         super.init(traceName, type);
     }
 
@@ -384,9 +387,9 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         // And locate the requested event context
         long pos = context.getRank();
         if (pos < rank) {
-            ITmfEvent event = readEvent(context);
+            ITmfEvent event = readNextEvent(context);
             while (event != null && ++pos < rank) {
-                event = readEvent(context);
+                event = readNextEvent(context);
             }
         }
         return context;
@@ -407,11 +410,11 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
         // And locate the requested event context
         final ITmfContext nextEventContext = context.clone(); // Must use clone() to get the right subtype...
-        ITmfEvent event = readEvent(nextEventContext);
+        ITmfEvent event = readNextEvent(nextEventContext);
         while (event != null && event.getTimestamp().compareTo(timestamp, false) < 0) {
             context.setLocation(nextEventContext.getLocation().clone());
             context.increaseRank();
-            event = readEvent(nextEventContext);
+            event = readNextEvent(nextEventContext);
         }
         return context;
     }
@@ -421,10 +424,10 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     // ------------------------------------------------------------------------
 
     /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#readEvent(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#readNextEvent(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
      */
     @Override
-    public synchronized ITmfEvent readEvent(final ITmfContext context) {
+    public synchronized ITmfEvent readNextEvent(final ITmfContext context) {
         // parseEvent() does not update the context
         final ITmfEvent event = fParser.parseEvent(context);
         if (event != null) {
@@ -496,7 +499,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     @SuppressWarnings("unchecked")
     public T getNext(final ITmfContext context) {
         if (context instanceof TmfContext)
-            return (T) readEvent(context);
+            return (T) readNextEvent(context);
         return null;
     }
 

@@ -22,6 +22,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
@@ -68,7 +69,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
      * @param path
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(final String path) throws FileNotFoundException {
+    public TmfTraceStub(final String path) throws TmfTraceException {
         this(path, DEFAULT_TRACE_CACHE_SIZE, false);
     }
 
@@ -77,7 +78,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
      * @param cacheSize
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(final String path, final int cacheSize) throws FileNotFoundException {
+    public TmfTraceStub(final String path, final int cacheSize) throws TmfTraceException {
         this(path, cacheSize, false);
     }
 
@@ -86,9 +87,13 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
      * @param cacheSize
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(final String path, final int cacheSize, final long interval) throws FileNotFoundException {
+    public TmfTraceStub(final String path, final int cacheSize, final long interval) throws TmfTraceException {
         super(null, TmfEvent.class, path, cacheSize, interval);
-        fTrace = new RandomAccessFile(path, "r");
+        try {
+            fTrace = new RandomAccessFile(path, "r");
+        } catch (FileNotFoundException e) {
+            throw new TmfTraceException(e.getMessage());
+        }
         fParser = new TmfEventParserStub(this);
     }
 
@@ -97,7 +102,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
      * @param cacheSize
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(final String path, final int cacheSize, final ITmfTraceIndexer<?> indexer) throws FileNotFoundException {
+    public TmfTraceStub(final String path, final int cacheSize, final ITmfTraceIndexer<?> indexer) throws TmfTraceException {
         this(path, cacheSize, false, null, indexer);
     }
 
@@ -106,7 +111,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
      * @param waitForCompletion
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(final String path, final boolean waitForCompletion) throws FileNotFoundException {
+    public TmfTraceStub(final String path, final boolean waitForCompletion) throws TmfTraceException {
         this(path, DEFAULT_TRACE_CACHE_SIZE, waitForCompletion);
     }
 
@@ -116,9 +121,13 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
      * @param waitForCompletion
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(final String path, final int cacheSize, final boolean waitForCompletion) throws FileNotFoundException {
+    public TmfTraceStub(final String path, final int cacheSize, final boolean waitForCompletion) throws TmfTraceException {
         super(null, TmfEvent.class, path, cacheSize);
-        fTrace = new RandomAccessFile(path, "r");
+        try {
+            fTrace = new RandomAccessFile(path, "r");
+        } catch (FileNotFoundException e) {
+            throw new TmfTraceException(e.getMessage());
+        }
         fParser = new TmfEventParserStub(this);
     }
 
@@ -128,9 +137,13 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
      * @param waitForCompletion
      * @throws FileNotFoundException
      */
-    public TmfTraceStub(final IResource resource,  final String path, final int cacheSize, final boolean waitForCompletion) throws FileNotFoundException {
+    public TmfTraceStub(final IResource resource,  final String path, final int cacheSize, final boolean waitForCompletion) throws TmfTraceException {
         super(resource, TmfEvent.class, path, cacheSize);
-        fTrace = new RandomAccessFile(path, "r");
+        try {
+            fTrace = new RandomAccessFile(path, "r");
+        } catch (FileNotFoundException e) {
+            throw new TmfTraceException(e.getMessage());
+        }
         fParser = new TmfEventParserStub(this);
     }
 
@@ -143,18 +156,26 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
      */
     @SuppressWarnings("unchecked")
     public TmfTraceStub(final String path, final int cacheSize, final boolean waitForCompletion,
-            final ITmfEventParser<TmfEvent> parser, final ITmfTraceIndexer<?> indexer) throws FileNotFoundException {
+            final ITmfEventParser<TmfEvent> parser, final ITmfTraceIndexer<?> indexer) throws TmfTraceException {
         super(null, TmfEvent.class, path, cacheSize, 0, indexer);
-        fTrace = new RandomAccessFile(path, "r");
+        try {
+            fTrace = new RandomAccessFile(path, "r");
+        } catch (FileNotFoundException e) {
+            throw new TmfTraceException(e.getMessage());
+        }
         fParser = (ITmfEventParser<ITmfEvent>) ((parser != null) ? parser : new TmfEventParserStub(this));
     }
 
     /**
      * Copy constructor
      */
-    public TmfTraceStub(final TmfTraceStub trace) throws FileNotFoundException {
+    public TmfTraceStub(final TmfTraceStub trace) throws TmfTraceException {
         super(trace);
-        fTrace = new RandomAccessFile(getPath(), "r");
+        try {
+            fTrace = new RandomAccessFile(getPath(), "r");
+        } catch (FileNotFoundException e) {
+            throw new TmfTraceException(e.getMessage());
+        }
         fParser = new TmfEventParserStub(this);
     }
 
@@ -163,14 +184,18 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
     }
 
     @Override
-    public void initTrace(final IResource resource, final String path, final Class<TmfEvent> type) throws FileNotFoundException {
-        fTrace = new RandomAccessFile(path, "r");
+    public void initTrace(final IResource resource, final String path, final Class<TmfEvent> type) throws TmfTraceException {
+        try {
+            fTrace = new RandomAccessFile(path, "r");
+        } catch (FileNotFoundException e) {
+            throw new TmfTraceException(e.getMessage());
+        }
         fParser = new TmfEventParserStub(this);
         super.initTrace(resource, path, type);
     }
 
     @Override
-    public void initialize(final IResource resource, final String path, final Class<TmfEvent> type) throws FileNotFoundException {
+    public void initialize(final IResource resource, final String path, final Class<TmfEvent> type) throws TmfTraceException {
         super.initialize(resource, path, type);
     }
 

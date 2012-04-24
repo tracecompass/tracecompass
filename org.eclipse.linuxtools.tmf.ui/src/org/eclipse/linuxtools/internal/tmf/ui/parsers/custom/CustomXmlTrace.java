@@ -27,6 +27,7 @@ import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefin
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefinition.InputElement;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
@@ -59,7 +60,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
         fRecordInputElement = getRecordInputElement(fDefinition.rootInputElement);
     }
 
-    public CustomXmlTrace(final IResource resource, final CustomXmlTraceDefinition definition, final String path, final int pageSize) throws FileNotFoundException {
+    public CustomXmlTrace(final IResource resource, final CustomXmlTraceDefinition definition, final String path, final int pageSize) throws TmfTraceException {
         super(null, CustomXmlEvent.class, path, (pageSize > 0) ? pageSize : DEFAULT_CACHE_SIZE);
         fDefinition = definition;
         fEventType = new CustomXmlEventType(fDefinition);
@@ -67,7 +68,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
     }
 
     @Override
-    public void initTrace(final IResource resource, final String path, final Class<CustomXmlEvent> eventType) throws FileNotFoundException {
+    public void initTrace(final IResource resource, final String path, final Class<CustomXmlEvent> eventType) throws TmfTraceException {
         super.initTrace(resource, path, eventType);
     }
 
@@ -168,7 +169,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
     }
 
     @Override
-    public synchronized TmfEvent readEvent(final ITmfContext context) {
+    public synchronized TmfEvent readNextEvent(final ITmfContext context) {
         final ITmfContext savedContext = context.clone();
         final TmfEvent event = parseEvent(context);
         if (event != null) {

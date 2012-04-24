@@ -1,6 +1,8 @@
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.FileNotFoundException;
 
@@ -8,6 +10,7 @@ import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +42,7 @@ public class CtfTmfEventTest {
      * @throws FileNotFoundException 
      */
     @Before
-    public void setUp() throws FileNotFoundException {
+    public void setUp() throws TmfTraceException {
         CtfTmfTrace trace = TestParams.createTrace();
         CtfIterator tr = new CtfIterator(trace);
         tr.advance();

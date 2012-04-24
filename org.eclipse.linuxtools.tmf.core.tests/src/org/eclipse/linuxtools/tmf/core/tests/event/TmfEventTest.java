@@ -30,6 +30,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
@@ -114,6 +115,8 @@ public class TmfEventTest extends TestCase {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
             final File test = new File(FileLocator.toFileURL(location).toURI());
             trace = new TmfTraceStub(test.toURI().getPath(), 500, false);
+        } catch (final TmfTraceException e) {
+            e.printStackTrace();
         } catch (final URISyntaxException e) {
             e.printStackTrace();
         } catch (final IOException e) {
@@ -274,6 +277,8 @@ public class TmfEventTest extends TestCase {
             final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(fTracePath), null);
             final File test = new File(FileLocator.toFileURL(location).toURI());
             trace = new TmfTraceStub(test.toURI().getPath(), 500, false);
+        } catch (final TmfTraceException e) {
+            e.printStackTrace();
         } catch (final URISyntaxException e) {
             e.printStackTrace();
         } catch (final IOException e) {

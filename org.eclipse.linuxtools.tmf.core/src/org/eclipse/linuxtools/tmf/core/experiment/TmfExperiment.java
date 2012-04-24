@@ -247,7 +247,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
      */
     public ITmfTimestamp getTimestamp(final int index) {
         final TmfExperimentContext context = seekEvent(index);
-        final ITmfEvent event = readEvent(context);
+        final ITmfEvent event = readNextEvent(context);
         return (event != null) ? event.getTimestamp() : null;
     }
 
@@ -302,7 +302,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     @SuppressWarnings("unchecked")
     public T getNext(final ITmfContext context) {
         if (context instanceof TmfExperimentContext)
-            return (T) readEvent(context);
+            return (T) readNextEvent(context);
         return null;
     }
 
@@ -346,7 +346,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
              * ourselves higher up.
              */
             expLocation.getLocation().locations[i] = context.getContexts()[i].getLocation().clone();
-            context.getEvents()[i] = fTraces[i].readEvent(context.getContexts()[i]);
+            context.getEvents()[i] = fTraces[i].readNextEvent(context.getContexts()[i]);
         }
 
         // Tracer.trace("Ctx: SeekLocation - done");
@@ -398,7 +398,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         // And locate the event
         ITmfEvent event = parseEvent(context);
         while ((event != null) && (event.getTimestamp().compareTo(timestamp, false) < 0)) {
-            readEvent(context);
+            readNextEvent(context);
             event = parseEvent(context);
         }
 
@@ -438,7 +438,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         ITmfEvent event = parseEvent(context);
         long pos = context.getRank();
         while ((event != null) && (pos++ < rank)) {
-            readEvent(context);
+            readNextEvent(context);
             event = parseEvent(context);
         }
 
@@ -494,7 +494,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
      * @return the next event
      */
     @Override
-    public synchronized ITmfEvent readEvent(final ITmfContext context) {
+    public synchronized ITmfEvent readNextEvent(final ITmfContext context) {
 
         // Validate the context
         if (!(context instanceof TmfExperimentContext))
@@ -512,7 +512,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         final int lastTrace = expContext.getLastTrace();
         if (lastTrace != TmfExperimentContext.NO_TRACE) {
             final ITmfContext traceContext = expContext.getContexts()[lastTrace];
-            expContext.getEvents()[lastTrace] = expContext.getTraces()[lastTrace].readEvent(traceContext);
+            expContext.getEvents()[lastTrace] = expContext.getTraces()[lastTrace].readNextEvent(traceContext);
             expContext.setLastTrace(TmfExperimentContext.NO_TRACE);
         }
 
@@ -602,7 +602,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         final int lastTrace = expContext.getLastTrace();
         if (lastTrace != TmfExperimentContext.NO_TRACE) {
             final ITmfContext traceContext = expContext.getContexts()[lastTrace];
-            expContext.getEvents()[lastTrace] = expContext.getTraces()[lastTrace].readEvent(traceContext);
+            expContext.getEvents()[lastTrace] = expContext.getTraces()[lastTrace].readNextEvent(traceContext);
             expContext.setLastTrace(TmfExperimentContext.NO_TRACE);
             fExperimentContext = (TmfExperimentContext) context;
         }

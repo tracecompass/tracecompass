@@ -13,7 +13,6 @@
 package org.eclipse.linuxtools.internal.tmf.ui.project.handlers;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -27,6 +26,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
@@ -138,7 +138,7 @@ public class OpenExperimentHandler extends AbstractHandler {
                 }
                 try {
                     trace.initTrace(element.getResource(), element.getLocation().getPath(), traceEvent.getClass());
-                } catch (final FileNotFoundException e) {
+                } catch (final TmfTraceException e) {
                     displayErrorMsg(""); //$NON-NLS-1$
                 }
                 cacheSize = Math.min(cacheSize, trace.getCacheSize());

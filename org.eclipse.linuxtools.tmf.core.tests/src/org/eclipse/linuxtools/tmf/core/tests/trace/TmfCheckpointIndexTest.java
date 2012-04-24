@@ -14,7 +14,6 @@
 package org.eclipse.linuxtools.tmf.core.tests.trace;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -25,6 +24,7 @@ import junit.framework.TestCase;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfCheckpoint;
@@ -86,7 +86,7 @@ public class TmfCheckpointIndexTest extends TestCase {
     }
 
     private class TestTrace extends TmfTraceStub {
-        public TestTrace(String path, int blockSize) throws FileNotFoundException {
+        public TestTrace(String path, int blockSize) throws TmfTraceException {
             super(path, blockSize);
             fIndexer = new TestIndexer(this);
         }
@@ -106,6 +106,8 @@ public class TmfCheckpointIndexTest extends TestCase {
                 final File test = new File(FileLocator.toFileURL(location).toURI());
                 fTrace = new TestTrace(test.toURI().getPath(), BLOCK_SIZE);
                 fTrace.indexTrace();
+            } catch (final TmfTraceException e) {
+                e.printStackTrace();
             } catch (final URISyntaxException e) {
                 e.printStackTrace();
             } catch (final IOException e) {

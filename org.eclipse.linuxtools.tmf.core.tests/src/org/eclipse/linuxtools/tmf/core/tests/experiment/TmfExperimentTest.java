@@ -26,6 +26,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperimentContext;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
@@ -67,6 +68,8 @@ public class TmfExperimentTest extends TestCase {
                 final File test = new File(FileLocator.toFileURL(location).toURI());
                 final TmfTraceStub trace = new TmfTraceStub(test.getPath(), 0, true);
                 fTraces[0] = trace;
+            } catch (final TmfTraceException e) {
+                e.printStackTrace();
             } catch (final URISyntaxException e) {
                 e.printStackTrace();
             } catch (final IOException e) {
@@ -151,11 +154,11 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 0, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 1, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 2, event.getTimestamp().getValue());
         assertEquals("Event rank", 2, context.getRank());
 
@@ -168,11 +171,11 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 1001, event.getTimestamp().getValue());
         assertEquals("Event rank", 1000, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 1001, event.getTimestamp().getValue());
         assertEquals("Event rank", 1001, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 1002, event.getTimestamp().getValue());
         assertEquals("Event rank", 1002, context.getRank());
 
@@ -185,11 +188,11 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 4001, event.getTimestamp().getValue());
         assertEquals("Event rank", 4000, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 4001, event.getTimestamp().getValue());
         assertEquals("Event rank", 4001, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 4002, event.getTimestamp().getValue());
         assertEquals("Event rank", 4002, context.getRank());
     }
@@ -205,7 +208,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 10, event.getTimestamp().getValue());
         assertEquals("Event rank", 9, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 10, event.getTimestamp().getValue());
         assertEquals("Event rank", 10, context.getRank());
 
@@ -218,7 +221,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 1000, event.getTimestamp().getValue());
         assertEquals("Event rank", 999, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 1000, event.getTimestamp().getValue());
         assertEquals("Event rank", 1000, context.getRank());
 
@@ -231,7 +234,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 1002, event.getTimestamp().getValue());
         assertEquals("Event rank", 1001, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 1002, event.getTimestamp().getValue());
         assertEquals("Event rank", 1002, context.getRank());
 
@@ -244,7 +247,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 4501, event.getTimestamp().getValue());
         assertEquals("Event rank", 4500, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 4501, event.getTimestamp().getValue());
         assertEquals("Event rank", 4501, context.getRank());
     }
@@ -260,7 +263,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 0, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 1, context.getRank());
 
@@ -284,7 +287,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 0, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 1, context.getRank());
 
@@ -296,7 +299,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 1001, event.getTimestamp().getValue());
         assertEquals("Event rank", 1000, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 1001, event.getTimestamp().getValue());
         assertEquals("Event rank", 1001, context.getRank());
 
@@ -308,7 +311,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 4001, event.getTimestamp().getValue());
         assertEquals("Event rank", 4000, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 4001, event.getTimestamp().getValue());
         assertEquals("Event rank", 4001, context.getRank());
     }
@@ -323,7 +326,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 2, event.getTimestamp().getValue());
         assertEquals("Event rank", 1, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 2, event.getTimestamp().getValue());
         assertEquals("Event rank", 2, context.getRank());
 
@@ -335,7 +338,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 10, event.getTimestamp().getValue());
         assertEquals("Event rank", 9, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 10, event.getTimestamp().getValue());
         assertEquals("Event rank", 10, context.getRank());
 
@@ -347,7 +350,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 1000, event.getTimestamp().getValue());
         assertEquals("Event rank", 999, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 1000, event.getTimestamp().getValue());
         assertEquals("Event rank", 1000, context.getRank());
 
@@ -359,7 +362,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 1002, event.getTimestamp().getValue());
         assertEquals("Event rank", 1001, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 1002, event.getTimestamp().getValue());
         assertEquals("Event rank", 1002, context.getRank());
 
@@ -371,7 +374,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 4501, event.getTimestamp().getValue());
         assertEquals("Event rank", 4500, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 4501, event.getTimestamp().getValue());
         assertEquals("Event rank", 4501, context.getRank());
     }
@@ -386,7 +389,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 0, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 1, context.getRank());
 
@@ -410,7 +413,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 0, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 1, context.getRank());
 
@@ -422,7 +425,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 1001, event.getTimestamp().getValue());
         assertEquals("Event rank", 1000, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 1001, event.getTimestamp().getValue());
         assertEquals("Event rank", 1001, context.getRank());
 
@@ -434,7 +437,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 4001, event.getTimestamp().getValue());
         assertEquals("Event rank", 4000, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 4001, event.getTimestamp().getValue());
         assertEquals("Event rank", 4001, context.getRank());
     }
@@ -449,7 +452,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 10, event.getTimestamp().getValue());
         assertEquals("Event rank", 9, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 10, event.getTimestamp().getValue());
         assertEquals("Event rank", 10, context.getRank());
 
@@ -461,7 +464,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 1000, event.getTimestamp().getValue());
         assertEquals("Event rank", 999, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 1000, event.getTimestamp().getValue());
         assertEquals("Event rank", 1000, context.getRank());
 
@@ -473,7 +476,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 1002, event.getTimestamp().getValue());
         assertEquals("Event rank", 1001, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 1002, event.getTimestamp().getValue());
         assertEquals("Event rank", 1002, context.getRank());
 
@@ -485,7 +488,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 4501, event.getTimestamp().getValue());
         assertEquals("Event rank", 4500, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 4501, event.getTimestamp().getValue());
         assertEquals("Event rank", 4501, context.getRank());
     }
@@ -500,7 +503,7 @@ public class TmfExperimentTest extends TestCase {
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 0, context.getRank());
 
-        event = fExperiment.readEvent(context);
+        event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
         assertEquals("Event rank", 1, context.getRank());
 
@@ -525,7 +528,7 @@ public class TmfExperimentTest extends TestCase {
         // Read NB_EVENTS
         ITmfEvent event = null;;
         for (int i = 0; i < NB_READS; i++) {
-            event = fExperiment.readEvent(context);
+            event = fExperiment.readNextEvent(context);
             assertEquals("Event timestamp", i + 1, event.getTimestamp().getValue());
             assertEquals("Event rank", i + 1, context.getRank());
         }
@@ -544,11 +547,11 @@ public class TmfExperimentTest extends TestCase {
 
         // On lower bound, returns the first event (ts = 0)
         final TmfContext context = fExperiment.seekEvent(new TmfTimestamp(0, SCALE, 0));
-        ITmfEvent event = fExperiment.readEvent(context);
+        ITmfEvent event = fExperiment.readNextEvent(context);
         assertEquals("Event timestamp", 1, event.getTimestamp().getValue());
 
         for (int i = 2; i < 20; i++) {
-            event = fExperiment.readEvent(context);
+            event = fExperiment.readNextEvent(context);
             assertEquals("Event timestamp", i, event.getTimestamp().getValue());
         }
     }

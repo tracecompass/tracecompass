@@ -91,7 +91,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventPar
             final Long endTime = currentLttngEvent.getTimestamp().getValue();
             positionToFirstEvent();
 
-            readEvent(new TmfContext(null, 0));
+            readNextEvent(new TmfContext(null, 0));
             final Long starTime = currentLttngEvent.getTimestamp().getValue();
             positionToFirstEvent();
 

@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
@@ -127,6 +128,9 @@ public class Uml2SDTestFacility {
             final URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path("tracesets/sdEvents"), null); //$NON-NLS-1$
             final File test = new File(FileLocator.toFileURL(location).toURI());
             return new TmfTraceStub(test.getPath(), 500, true, parser, null);
+        } catch (final TmfTraceException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         } catch (final URISyntaxException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

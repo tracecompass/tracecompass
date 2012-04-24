@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.tmf.core.tests.ctfadaptor.headless;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -21,6 +20,7 @@ import java.util.Vector;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 
 public class Benchmark {
 
@@ -50,7 +50,7 @@ public class Benchmark {
             trace = new CtfTmfTrace();
             try {
                 trace.initTrace(null, TRACE_PATH, CtfTmfEvent.class);
-            } catch (final FileNotFoundException e) {
+            } catch (final TmfTraceException e) {
                 loops = NUM_LOOPS +1;
                 break;
             }

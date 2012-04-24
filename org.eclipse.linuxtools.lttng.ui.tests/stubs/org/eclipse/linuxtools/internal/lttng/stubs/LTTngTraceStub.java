@@ -19,6 +19,7 @@ import java.io.RandomAccessFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
@@ -53,7 +54,7 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> implements ITmfEventPar
      * @param parser
      * @throws FileNotFoundException
      */
-    public LTTngTraceStub(final IResource resource) throws FileNotFoundException {
+    public LTTngTraceStub(final IResource resource) throws TmfTraceException {
         this(resource, DEFAULT_TRACE_CACHE_SIZE);
     }
 
@@ -63,10 +64,14 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> implements ITmfEventPar
      * @param cacheSize
      * @throws FileNotFoundException
      */
-    public LTTngTraceStub(final IResource resource, final int cacheSize) throws FileNotFoundException {
+    public LTTngTraceStub(final IResource resource, final int cacheSize) throws TmfTraceException {
         //      super(resource, LttngEvent.class, resource.getName(), cacheSize, true);
         super(resource, LttngEvent.class, resource.getName(), cacheSize);
-        fTrace = new RandomAccessFile(resource.getName(), "r");
+        try {
+            fTrace = new RandomAccessFile(resource.getName(), "r");
+        } catch (FileNotFoundException e) {
+            throw new TmfTraceException(e.getMessage());
+        }
         fParser = new LTTngEventParserStub();
     }
 

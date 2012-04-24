@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
@@ -46,6 +47,8 @@ public class TmfEventProviderStub extends TmfEventProvider<TmfEvent> {
         try {
             final File test = new File(FileLocator.toFileURL(location).toURI());
             fTrace = new TmfTraceStub(test.getPath(), 0, true);
+        } catch (final TmfTraceException e) {
+            e.printStackTrace();
         } catch (final URISyntaxException e) {
             e.printStackTrace();
         }
