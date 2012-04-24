@@ -15,7 +15,6 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -41,6 +40,7 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceSessio
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.ChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.LTTngControlService;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.LTTngControlServiceFactory;
 import org.osgi.framework.FrameworkUtil;
 /**
  * The class <code>LTTngControlServiceTest</code> contains test for the class <code>{@link  LTTngControlService}</code>.
@@ -52,6 +52,9 @@ public class LTTngControlServiceTest extends TestCase {
     private static final String TEST_STREAM = "LTTngServiceTest.cfg";
     
     private static final String SCEN_LTTNG_NOT_INSTALLED = "LttngNotInstalled";
+    private static final String SCEN_LTTNG_VERSION = "LttngVersion";
+    private static final String SCEN_LTTNG_UNSUPPORTED_VERSION = "LttngUnsupportedVersion";
+    private static final String SCEN_LTTNG_NO_VERSION = "LttngNoVersion";
     private static final String SCEN_NO_SESSION_AVAILABLE = "NoSessionAvailable";
     private static final String SCEN_GET_SESSION_NAMES1 = "GetSessionNames1";
     private static final String SCEN_GET_SESSION_NAME_NOT_EXIST = "GetSessionNameNotExist";
@@ -119,7 +122,38 @@ public class LTTngControlServiceTest extends TestCase {
     // Test Cases
     // ------------------------------------------------------------------------
     
-    public void testGetSessionNames() {
+    public void testVersion() {
+        try {
+            fShell.setScenario(SCEN_LTTNG_VERSION);
+            ILttngControlService service = LTTngControlServiceFactory.getInstance().getLttngControlService(fShell); 
+            assertNotNull(service);
+            assertEquals("2.0.0", service.getVersion());
+        } catch (ExecutionException e) {
+            fail("Exeption thrown " + e);
+        }
+    }
+    
+    public void testUnsupportedVersion() {
+        try {
+            fShell.setScenario(SCEN_LTTNG_UNSUPPORTED_VERSION);
+            LTTngControlServiceFactory.getInstance().getLttngControlService(fShell); 
+            fail("No exeption thrown");
+        } catch (ExecutionException e) {
+            // success
+        }
+    }
+
+    public void testNoVersion() {
+        try {
+            fShell.setScenario(SCEN_LTTNG_NO_VERSION);
+            LTTngControlServiceFactory.getInstance().getLttngControlService(fShell); 
+            fail("No exeption thrown");
+        } catch (ExecutionException e) {
+            // success
+        }
+    }
+
+    public void testLttngNotInstalled() {
         try {
             fShell.setScenario(SCEN_LTTNG_NOT_INSTALLED);
             fService.getSessionNames(new NullProgressMonitor());

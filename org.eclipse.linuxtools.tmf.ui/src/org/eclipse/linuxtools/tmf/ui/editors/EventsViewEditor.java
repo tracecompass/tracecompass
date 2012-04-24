@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.linuxtools.internal.tmf.ui.project.handlers.Messages;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
@@ -139,7 +138,7 @@ public class EventsViewEditor extends TmfEditor {
                                 cacheSize = Math.min(cacheSize, trace.getCacheSize());
                                 traces[i] = trace;
                             }
-                            final TmfExperiment experiment = new TmfExperiment(TmfEvent.class, experimentElement.getName(), traces, cacheSize);
+                            final TmfExperiment experiment = new TmfExperiment(ITmfEvent.class, experimentElement.getName(), traces, cacheSize);
                             experiment.setBookmarksFile(fFile);
                             fTrace = experiment;
                             TmfExperiment.setCurrentExperiment(experiment);

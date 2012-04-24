@@ -57,7 +57,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     /**
      * The default trace cache size
      */
-    public static final int DEFAULT_TRACE_CACHE_SIZE = 1000;
+    public static final int DEFAULT_TRACE_CACHE_SIZE = 50000;
 
     // ------------------------------------------------------------------------
     // Attributes

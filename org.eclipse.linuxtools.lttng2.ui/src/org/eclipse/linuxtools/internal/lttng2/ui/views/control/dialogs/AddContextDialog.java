@@ -150,7 +150,7 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
         fContextsViewer.setInput(fContextModel);
         fContextsViewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
         
-        getShell().setMinimumSize(new Point(500, 650));
+        getShell().setMinimumSize(new Point(500, 450));
         
         return fDialogComposite;
     }
@@ -161,6 +161,7 @@ public class AddContextDialog extends Dialog implements IAddContextDialog  {
      */
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
+        createButton(parent, IDialogConstants.CANCEL_ID, "&Cancel", true); //$NON-NLS-1$
         createButton(parent, IDialogConstants.OK_ID, "&Ok", true); //$NON-NLS-1$
     }
 

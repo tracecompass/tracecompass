@@ -11,8 +11,8 @@
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.core.uml2sd;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 
 /**
  * <b><u>TmfSyncSequenceDiagramEvent</u></b>
@@ -33,7 +33,7 @@ public class TmfSyncSequenceDiagramEvent implements ITmfSyncSequenceDiagramEvent
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------    
-    public TmfSyncSequenceDiagramEvent(TmfEvent startEvent, String sender, String receiver, String name) {
+    public TmfSyncSequenceDiagramEvent(ITmfEvent startEvent, String sender, String receiver, String name) {
 
         if (startEvent == null || sender == null || receiver == null || name == null) {
             throw new IllegalArgumentException("TmfSyncSequenceDiagramEvent constructor: " +  //$NON-NLS-1$

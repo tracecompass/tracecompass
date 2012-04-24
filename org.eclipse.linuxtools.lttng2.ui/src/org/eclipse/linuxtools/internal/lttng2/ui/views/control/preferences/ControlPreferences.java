@@ -11,6 +11,8 @@
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.preferences;
 
+import java.io.File;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.logging.ControlCommandLogger;
@@ -26,7 +28,7 @@ public class ControlPreferences {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    public static final String TRACE_CONTROL_LOG_FILENAME = "lttng_control.log"; //$NON-NLS-1$
+    public static final String TRACE_CONTROL_LOG_FILENAME = "lttng_tracer_control.log"; //$NON-NLS-1$
 
     // Preference strings
     public static final String TRACE_CONTROL_TRACING_GROUP_PREF = "trace.control.tracing.group"; //$NON-NLS-1$
@@ -40,7 +42,7 @@ public class ControlPreferences {
     public static final String TRACE_CONTROL_VERBOSE_LEVEL_V_V_VERBOSE = "trace.control.verbose.level.vvv"; //$NON-NLS-1$
 
     public static final String TRACE_CONTROL_DEFAULT_TRACING_GROUP = "tracing"; //$NON-NLS-1$    
-    public static final String TRACE_CONTROL_DEFAULT_LOG_PATH = "${workspace_loc}/" + TRACE_CONTROL_LOG_FILENAME; //$NON-NLS-1$
+    public static final String TRACE_CONTROL_DEFAULT_LOG_PATH = System.getProperty("user.home") + File.separator + TRACE_CONTROL_LOG_FILENAME; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -106,6 +108,13 @@ public class ControlPreferences {
         return getPreferenceStore().getString(TRACE_CONTROL_VERBOSE_LEVEL_PREF);
     }
     
+    /**
+     * @return absolute log file path
+     */
+    public String getLogfilePath() {
+        return getPreferenceStore().getString(TRACE_CONTROL_LOG_FILE_PATH_PREF);
+    }
+    
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -114,7 +123,7 @@ public class ControlPreferences {
      */
     public void init() {
         if (getPreferenceStore().getBoolean(ControlPreferences.TRACE_CONTROL_LOG_COMMANDS_PREF)) {
-            ControlCommandLogger.init(ControlPreferences.TRACE_CONTROL_LOG_FILENAME, isAppend());
+            ControlCommandLogger.init(getLogfilePath(), isAppend());
         } 
     }
 

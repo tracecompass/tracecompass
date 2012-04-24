@@ -86,15 +86,15 @@
       </command>
       <command
             categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
-            description="%commands.control.create.channel.description"
-            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.createChannelOnSession"
-            name="%commands.control.create.channel">
+            description="%commands.control.enable.channelOnSession.description"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableChannelOnSession"
+            name="%commands.control.enable.channelOnSession">
       </command>
       <command
             categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
-            description="%commands.control.create.channel.description"
-            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.createChannelOnDomain"
-            name="%commands.control.create.channel">
+            description="%commands.control.enable.channelOnDomain.description"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableChannelOnDomain"
+            name="%commands.control.enable.channelOnDomain">
       </command>
       <command
             categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
@@ -441,9 +441,9 @@
                visible="true">
          </separator>
          <command
-               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.createChannelOnSession"
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableChannelOnSession"
                icon="icons/elcl16/add_button.gif"
-               label="%commands.control.create.channel"
+               label="%commands.control.enable.channelOnSession"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -473,7 +473,7 @@
          </command>
          <command
                commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnSession"
-               icon="icons/elcl16/edit.gif"
+               icon="icons/obj16/event_enabled.gif"
                label="%commands.control.enable.eventOnDomain"
                style="push">
             <visibleWhen
@@ -495,9 +495,9 @@
             </visibleWhen>
          </command>
          <command
-               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.createChannelOnDomain"
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableChannelOnDomain"
                icon="icons/elcl16/add_button.gif"
-               label="%commands.control.create.channel"
+               label="%commands.control.enable.channelOnDomain"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -527,7 +527,7 @@
          </command>
          <command
                commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnDomain"
-               icon="icons/elcl16/edit.gif"
+               icon="icons/elcl16/enable_event.gif"
                label="%commands.control.enable.eventOnDomain"
                style="push">
             <visibleWhen
@@ -587,7 +587,7 @@
 
          <command
                commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.assign.event"
-               icon="icons/elcl16/enable.gif"
+               icon="icons/elcl16/enable_event.gif"
                label="%commands.control.assign.event"
                style="push">
             <visibleWhen
@@ -606,7 +606,7 @@
 
          <command
                commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEvent"
-               icon="icons/elcl16/enable.gif"
+               icon="icons/elcl16/enable_event.gif"
                label="%commands.control.enable.event"
                style="push">
             <visibleWhen
@@ -625,7 +625,7 @@
 
          <command
                commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.disableEvent"
-               icon="icons/elcl16/disable.gif"
+               icon="icons/elcl16/disable_event.gif"
                label="%commands.control.disable.event"
                style="push">
             <visibleWhen
@@ -643,7 +643,7 @@
          </command>
          <command
                commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnChannel"
-               icon="icons/elcl16/edit.gif"
+               icon="icons/elcl16/enable_event.gif"
                label="%commands.control.enable.eventOnChannel"
                style="push">
             <visibleWhen
@@ -886,8 +886,8 @@
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CreateChannelOnSessionHandler"
-            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.createChannelOnSession">
+            class="org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.EnableChannelOnSessionHandler"
+            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableChannelOnSession">
          <activeWhen>
             <with
                   variable="selection">
@@ -901,8 +901,8 @@
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.CreateChannelOnDomainHandler"
-            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.createChannelOnDomain">
+            class="org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers.EnableChannelOnDomainHandler"
+            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableChannelOnDomain">
          <activeWhen>
             <with
                   variable="selection">

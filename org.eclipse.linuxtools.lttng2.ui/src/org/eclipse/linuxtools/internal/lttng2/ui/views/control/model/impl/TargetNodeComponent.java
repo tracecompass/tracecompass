@@ -27,7 +27,7 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.IRemoteSys
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.RemoteSystemProxy;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ICommandShell;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.LTTngControlService;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.LTTngControlServiceFactory;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.model.IRSECallback;
 import org.eclipse.rse.core.subsystems.CommunicationsEvent;
@@ -331,7 +331,7 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
             fShell = fRemoteProxy.createCommandShell();
             fRemoteProxy.addCommunicationListener(this);
         }
-        fService = new LTTngControlService(fShell);
+        fService = LTTngControlServiceFactory.getInstance().getLttngControlService(fShell);
         return fService;
     }
 

@@ -133,7 +133,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                                 cacheSize = Math.min(cacheSize, trace.getCacheSize());
                                 traces[i] = trace;
                             }
-                            final TmfExperiment experiment = new TmfExperiment(TmfEvent.class, experimentElement.getName(), traces, cacheSize);
+                            final TmfExperiment experiment = new TmfExperiment(ITmfEvent.class, experimentElement.getName(), traces, cacheSize);
                             experiment.setBookmarksFile(fFile);
                             fTrace = experiment;
                             experiment.initTrace(null, null, null);
@@ -457,7 +457,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                     for (final IConfigurationElement ce : TmfTraceType.getTypeElements())
                         if (traceTypeId.equals(ce.getAttribute(TmfTraceType.ID_ATTR))) {
                             fTrace = (ITmfTrace<?>) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
-                            final TmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
+                            final ITmfEvent event = (TmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
                             final String path = fFile.getLocationURI().getPath();
                             fTrace.initTrace(null, path, event.getClass());
                             break;

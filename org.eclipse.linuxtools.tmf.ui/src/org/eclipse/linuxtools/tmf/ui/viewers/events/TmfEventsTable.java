@@ -50,7 +50,6 @@ import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
@@ -994,7 +993,7 @@ ITmfEventsFilterProvider {
 
     protected class FilterThread extends Thread {
         private final ITmfFilterTreeNode filter;
-        private TmfEventRequest<TmfEvent> request;
+        private TmfEventRequest<ITmfEvent> request;
         private boolean refreshBusy = false;
         private boolean refreshPending = false;
         private final Object syncObj = new Object();
@@ -1012,10 +1011,10 @@ ITmfEventsFilterProvider {
             final int nbRequested = (int) (fTrace.getNbEvents() - fFilterCheckCount);
             if (nbRequested <= 0)
                 return;
-            request = new TmfEventRequest<TmfEvent>(TmfEvent.class, TmfTimeRange.ETERNITY, (int) fFilterCheckCount,
+            request = new TmfEventRequest<ITmfEvent>(ITmfEvent.class, TmfTimeRange.ETERNITY, (int) fFilterCheckCount,
                     nbRequested, fTrace.getCacheSize(), ExecutionType.BACKGROUND) {
                 @Override
-                public void handleData(final TmfEvent event) {
+                public void handleData(final ITmfEvent event) {
                     super.handleData(event);
                     if (request.isCancelled())
                         return;
@@ -1030,7 +1029,7 @@ ITmfEventsFilterProvider {
                     fFilterCheckCount++;
                 }
             };
-            ((ITmfDataProvider<TmfEvent>) fTrace).sendRequest(request);
+            ((ITmfDataProvider<ITmfEvent>) fTrace).sendRequest(request);
             try {
                 request.waitForCompletion();
             } catch (final InterruptedException e) {
@@ -1134,7 +1133,7 @@ ITmfEventsFilterProvider {
         protected int direction;
         protected long rank;
         protected long foundRank = -1;
-        protected TmfDataRequest<TmfEvent> request;
+        protected TmfDataRequest<ITmfEvent> request;
 
         public SearchThread(final ITmfFilterTreeNode searchFilter, final ITmfFilterTreeNode eventFilter, final int startIndex,
                 final long currentRank, final int direction) {
@@ -1188,15 +1187,15 @@ ITmfEventsFilterProvider {
             final int startRank = (int) rank;
             boolean wrapped = false;
             while (!monitor.isCanceled() && (foundRank == -1) && (fTrace != null)) {
-                int nbRequested = (direction == Direction.FORWARD ? Integer.MAX_VALUE : Math.min((int) rank + 1,
-                        fTrace.getCacheSize()));
-                if (direction == Direction.BACKWARD)
+                int nbRequested = (direction == Direction.FORWARD ? Integer.MAX_VALUE : Math.min((int) rank + 1, fTrace.getCacheSize()));
+                if (direction == Direction.BACKWARD) {
                     rank = Math.max(0, rank - fTrace.getCacheSize() + 1);
-                request = new TmfDataRequest<TmfEvent>(TmfEvent.class, (int) rank, nbRequested) {
+                }
+                request = new TmfDataRequest<ITmfEvent>(ITmfEvent.class, (int) rank, nbRequested) {
                     long currentRank = rank;
 
                     @Override
-                    public void handleData(final TmfEvent event) {
+                    public void handleData(final ITmfEvent event) {
                         super.handleData(event);
                         if (searchFilter.matches(event) && ((eventFilter == null) || eventFilter.matches(event))) {
                             foundRank = currentRank;
@@ -1208,7 +1207,7 @@ ITmfEventsFilterProvider {
                         currentRank++;
                     }
                 };
-                ((ITmfDataProvider<TmfEvent>) fTrace).sendRequest(request);
+                ((ITmfDataProvider<ITmfEvent>) fTrace).sendRequest(request);
                 try {
                     request.waitForCompletion();
                     if (request.isCancelled())
@@ -1589,13 +1588,13 @@ ITmfEventsFilterProvider {
             // do the work to select the actual event with the timestamp specified in the signal. This procedure
             // prevents
             // the method fTrace.getRank() from interfering and delaying ongoing requests.
-            final TmfDataRequest<TmfEvent> subRequest = new TmfDataRequest<TmfEvent>(TmfEvent.class, 0, 1,
+            final TmfDataRequest<ITmfEvent> subRequest = new TmfDataRequest<ITmfEvent>(ITmfEvent.class, 0, 1,
                     ExecutionType.FOREGROUND) {
 
                 TmfTimestamp ts = new TmfTimestamp(signal.getCurrentTime());
 
                 @Override
-                public void handleData(final TmfEvent event) {
+                public void handleData(final ITmfEvent event) {
                     super.handleData(event);
                 }
 
@@ -1636,7 +1635,7 @@ ITmfEventsFilterProvider {
                 }
             };
 
-            ((ITmfDataProvider<TmfEvent>) fTrace).sendRequest(subRequest);
+            ((ITmfDataProvider<ITmfEvent>) fTrace).sendRequest(subRequest);
         }
     }
 

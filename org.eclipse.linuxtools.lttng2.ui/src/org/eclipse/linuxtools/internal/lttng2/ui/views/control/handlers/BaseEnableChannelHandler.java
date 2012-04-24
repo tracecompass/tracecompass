@@ -23,18 +23,18 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.window.Window;
 import org.eclipse.linuxtools.internal.lttng2.ui.Activator;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.ICreateChannelDialog;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.IEnableChannelDialog;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.TraceControlDialogFactory;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent;
 
 /**
- * <b><u>BaseCreateChannelHandler</u></b>
+ * <b><u>BaseEnableChannelHandler</u></b>
  * <p>
- * Base implementation of aCommand handler implementation to create a trace channel.  
+ * Base implementation of a command handler to enable a trace channel.  
  * </p>
  */
-abstract class BaseCreateChannelHandler extends BaseControlViewHandler {
+abstract class BaseEnableChannelHandler extends BaseControlViewHandler {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -73,7 +73,7 @@ abstract class BaseCreateChannelHandler extends BaseControlViewHandler {
         try {
             final CommandParameter param = fParam.clone();
 
-            final ICreateChannelDialog dialog =  TraceControlDialogFactory.getInstance().getCreateChannelDialog();
+            final IEnableChannelDialog dialog =  TraceControlDialogFactory.getInstance().getEnableChannelDialog();
             dialog.setDomainComponent(getDomain(param));
 
             if (dialog.open() != Window.OK) {

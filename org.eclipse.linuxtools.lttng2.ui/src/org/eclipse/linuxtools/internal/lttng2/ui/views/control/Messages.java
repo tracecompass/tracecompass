@@ -37,6 +37,9 @@ final public class Messages extends NLS {
     public static String TraceControl_UnexpectedNameError;
     public static String TraceControl_UnexpectedPathError;
     
+    public static String TraceControl_UnsupportedVersionError;
+    public static String TraceControl_GettingVersionError;
+    
     // Commands
     public static String TraceControl_RetrieveNodeConfigurationJob;
     public static String TraceControl_ListSessionFailure;
@@ -107,6 +110,10 @@ final public class Messages extends NLS {
     public static String TraceControl_EnableChannelSwitchTimerTooltip;
     public static String TraceControl_EnableChannelReadTimerTooltip;
     public static String TraceControl_EnableChannelOutputTypeTooltip;
+    public static String TraceControl_EnableChannelDiscardModeGroupName;
+    public static String TraceControl_EnableChannelDiscardModeLabel;
+    public static String TraceControl_EnableChannelDiscardModeTooltip;
+    public static String TraceControl_EnableChannelOverwriteModeLabel;
     public static String TraceControl_EnableChannelOverwriteModeTooltip;
     
     public static String TraceControl_InvalidChannelNameError;

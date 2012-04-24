@@ -11,8 +11,8 @@
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.core.uml2sd;
 
+import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 
 /**
  * <b><u>TmfAsyncSequenceDiagramEvent</u></b>
@@ -31,7 +31,7 @@ public class TmfAsyncSequenceDiagramEvent extends TmfSyncSequenceDiagramEvent im
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------    
-    public TmfAsyncSequenceDiagramEvent(TmfEvent startEvent, TmfEvent endEvent, String sender, String receiver, String name) {
+    public TmfAsyncSequenceDiagramEvent(ITmfEvent startEvent, ITmfEvent endEvent, String sender, String receiver, String name) {
         super(startEvent, sender, receiver, name);
         
         if (endEvent == null) {

@@ -15,12 +15,12 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IChannelInf
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceDomainComponent;
 
 /**
- * <b><u>ICreateChannelDialog</u></b>
+ * <b><u>IEnableChannelDialog</u></b>
  * <p>
- * Interface for the create channel dialog when domain is known.
+ * Interface for the enable channel dialog when domain is known.
  * </p>
  */
-public interface ICreateChannelDialog {
+public interface IEnableChannelDialog {
     
     // ------------------------------------------------------------------------
     // Accessors

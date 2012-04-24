@@ -26,16 +26,19 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceS
 import org.eclipse.ui.IWorkbenchPage;
 
 /**
- * <b><u>CreateChannelOnSessionHandler</u></b>
+ * <b><u>EnableChannelOnDomainHandler</u></b>
  * <p>
- * Command handler implementation to create a trace channel for unknown domain 
- * (on session level).
+ * Command handler implementation to enable a trace channel for known domain.
  * </p>
  */
-public class CreateChannelOnSessionHandler extends BaseCreateChannelHandler {
+public class EnableChannelOnDomainHandler extends BaseEnableChannelHandler {
 
     // ------------------------------------------------------------------------
     // Attributes
+    // ------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
+    // Operations
     // ------------------------------------------------------------------------
     /*
      * (non-Javadoc)
@@ -43,7 +46,9 @@ public class CreateChannelOnSessionHandler extends BaseCreateChannelHandler {
      */
     @Override
     public void enableChannel(CommandParameter param, List<String> channelNames, IChannelInfo info, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
-        param.getSession().enableChannels(channelNames, info, isKernel, monitor);
+        if (param instanceof DomainCommandParameter) {
+            ((DomainCommandParameter)param).getDomain().enableChannels(channelNames, info, monitor);
+        }
     }
     
     /*
@@ -52,12 +57,11 @@ public class CreateChannelOnSessionHandler extends BaseCreateChannelHandler {
      */
     @Override
     public TraceDomainComponent getDomain(CommandParameter param) {
+        if (param instanceof DomainCommandParameter) {
+            return ((DomainCommandParameter)param).getDomain();
+        }
         return null;
     }
-
-    // ------------------------------------------------------------------------
-    // Operations
-    // ------------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -65,35 +69,41 @@ public class CreateChannelOnSessionHandler extends BaseCreateChannelHandler {
      */
     @Override
     public boolean isEnabled() {
+        
         // Get workbench page for the Control View
         IWorkbenchPage page = getWorkbenchPage();
         if (page == null) {
             return false;
         }
-
+        
+        TraceDomainComponent domain = null;
         TraceSessionComponent session = null;
-        // Check if one session is selected
+        
+        // Check if one domain is selected
         ISelection selection = page.getSelection(ControlView.ID);
         if (selection instanceof StructuredSelection) {
             StructuredSelection structered = ((StructuredSelection) selection);
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
                 Object element = (Object) iterator.next();
-                if (element instanceof TraceSessionComponent) {
-                    // Add only TraceSessionComponents that are inactive and not destroyed
-                    TraceSessionComponent tmpSession = (TraceSessionComponent) element;
-                    if ((tmpSession.getSessionState() == TraceSessionState.INACTIVE) && (!tmpSession.isDestroyed())) {
-                        session = tmpSession;
+                if (element instanceof TraceDomainComponent) {
+                    TraceDomainComponent tmpDomain = (TraceDomainComponent) element;
+                    session = (TraceSessionComponent) tmpDomain.getParent();
+                    
+                    // Add only TraceDomainComponent whose TraceSessionComponent parent is inactive and not destroyed
+                    if ((session.getSessionState() == TraceSessionState.INACTIVE) && (!session.isDestroyed())) {
+                        domain = tmpDomain;
                     }
                 }
             }
         }
-        boolean isEnabled = session != null;
+        
+        boolean isEnabled = domain != null;
         
         fLock.lock();
         try {
             fParam = null;
             if (isEnabled) {
-                fParam = new CommandParameter(session);
+                fParam = new DomainCommandParameter(session, domain);
             }
         } finally {
             fLock.unlock();
@@ -101,4 +111,5 @@ public class CreateChannelOnSessionHandler extends BaseCreateChannelHandler {
         
         return isEnabled;
     }
+    
 }

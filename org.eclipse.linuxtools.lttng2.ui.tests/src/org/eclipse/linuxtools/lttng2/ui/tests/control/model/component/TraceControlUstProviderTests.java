@@ -20,7 +20,7 @@ import junit.framework.TestSuite;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.linuxtools.internal.lttng2.stubs.dialogs.CreateChannelDialogStub;
+import org.eclipse.linuxtools.internal.lttng2.stubs.dialogs.EnableChannelDialogStub;
 import org.eclipse.linuxtools.internal.lttng2.stubs.dialogs.CreateSessionDialogStub;
 import org.eclipse.linuxtools.internal.lttng2.stubs.dialogs.DestroyConfirmDialogStub;
 import org.eclipse.linuxtools.internal.lttng2.stubs.dialogs.GetEventInfoDialogStub;
@@ -183,18 +183,18 @@ public class TraceControlUstProviderTests extends TestCase {
         assertEquals(TraceSessionState.INACTIVE, session.getSessionState());
         
         // ------------------------------------------------------------------------
-        // Create Channel on UST global domain
+        // Enable Channel on UST global domain
         // ------------------------------------------------------------------------
         fProxy.setScenario(SCEN_SCENARIO2_TEST);
-        CreateChannelDialogStub channelDialogStub = new CreateChannelDialogStub();
+        EnableChannelDialogStub channelDialogStub = new EnableChannelDialogStub();
         channelDialogStub.setIsKernel(false);
         channelDialogStub.getChannelInfo().setOverwriteMode(false);
         channelDialogStub.getChannelInfo().setSwitchTimer(200);
         channelDialogStub.getChannelInfo().setReadTimer(100);
         channelDialogStub.getChannelInfo().setNumberOfSubBuffers(2);
-        TraceControlDialogFactory.getInstance().setCreateChannelDialog(channelDialogStub);
+        TraceControlDialogFactory.getInstance().setEnableChannelDialog(channelDialogStub);
 
-        fFacility.executeCommand(session, "createChannelOnSession");
+        fFacility.executeCommand(session, "enableChannelOnSession");
         
         // Verify that UST domain was created
         ITraceControlComponent[] domains = session.getChildren();

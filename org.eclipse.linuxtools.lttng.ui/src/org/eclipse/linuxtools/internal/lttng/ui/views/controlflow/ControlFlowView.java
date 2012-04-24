@@ -912,7 +912,9 @@ public class ControlFlowView extends AbsTimeUpdateView implements
                 Display.getDefault().asyncExec(new Runnable() {
                     @Override
                     public void run() {
-                        tsfviewer.setTimeBounds(range.getStartTime().getValue(), range.getEndTime().getValue());
+                        if ((tsfviewer != null) && (!tsfviewer.getControl().isDisposed())) {
+                            tsfviewer.setTimeBounds(range.getStartTime().getValue(), range.getEndTime().getValue());
+                        }
                     }});
             }
         }

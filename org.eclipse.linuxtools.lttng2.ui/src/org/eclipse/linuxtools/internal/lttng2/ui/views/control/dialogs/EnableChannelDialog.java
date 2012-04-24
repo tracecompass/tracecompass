@@ -22,7 +22,6 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceD
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -34,12 +33,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * <b><u>CreateChannelDialog</u></b>
+ * <b><u>EnableChannelDialog</u></b>
  * <p>
- * Dialog box for collecting channel creation information.
+ * Dialog box for collecting channel information when enabling a channel (which will be created).
  * </p>
  */
-public class CreateChannelDialog extends Dialog implements ICreateChannelDialog {
+public class EnableChannelDialog extends Dialog implements IEnableChannelDialog {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -47,7 +46,7 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelDialog 
     /**
      * The icon file for this dialog box.
      */
-    public static final String ENABLE_CHANNEL_ICON_FILE = "icons/elcl16/edit.gif"; //$NON-NLS-1$ 
+    public static final String ENABLE_CHANNEL_ICON_FILE = "icons/elcl16/add_button.gif"; //$NON-NLS-1$ 
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -60,6 +59,10 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelDialog 
      * The text widget for the channel name
      */
     private Text fChannelNameText = null;
+    /**
+     * The discard mode of the channel.
+     */
+    private Button fDiscardModeButton = null;
     /**
      * The overwrite mode of the channel.
      */
@@ -118,7 +121,7 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelDialog 
      * Constructor
      * @param shell - a shell for the display of the dialog
      */
-    public CreateChannelDialog(Shell shell) {
+    public EnableChannelDialog(Shell shell) {
        super(shell);
        fIsKernel = true;
 
@@ -130,6 +133,7 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelDialog 
                 e.doit = e.text.matches("[0-9]*"); //$NON-NLS-1$
             }
         };
+        setShellStyle(SWT.RESIZE);
     }
 
     // ------------------------------------------------------------------------
@@ -190,7 +194,7 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelDialog 
         
         // Main dialog panel
         fDialogComposite = new Composite(parent, SWT.NONE);
-        GridLayout layout = new GridLayout(2, true);
+        GridLayout layout = new GridLayout(3, true);
         fDialogComposite.setLayout(layout); 
 
         Label channelNameLabel = new Label(fDialogComposite, SWT.RIGHT);
@@ -222,10 +226,20 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelDialog 
         fReadTimerText.setToolTipText(Messages.TraceControl_EnableChannelReadTimerTooltip);
         fReadTimerText.addVerifyListener(fVerifyListener);
 
-        fOverwriteModeButton = new Button(fDialogComposite, SWT.CHECK);
-        fOverwriteModeButton.setText(Messages.TraceControl_OverwriteModePropertyName);
+        Group discardModeGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
+        discardModeGroup.setText(Messages.TraceControl_EnableChannelDiscardModeGroupName);
+        layout = new GridLayout(2, true);
+        discardModeGroup.setLayout(layout); 
+
+        fDiscardModeButton = new  Button(discardModeGroup, SWT.RADIO);
+        fDiscardModeButton.setText(Messages.TraceControl_EnableChannelDiscardModeLabel);
+        fDiscardModeButton.setToolTipText(Messages.TraceControl_EnableChannelDiscardModeTooltip);
+        fDiscardModeButton.setSelection(true);
+        
+        fOverwriteModeButton = new Button(discardModeGroup, SWT.RADIO);
+        fOverwriteModeButton.setText(Messages.TraceControl_EnableChannelOverwriteModeLabel);
         fOverwriteModeButton.setToolTipText(Messages.TraceControl_EnableChannelOverwriteModeTooltip);
-        new Label(fDialogComposite, SWT.RIGHT);
+        fOverwriteModeButton.setSelection(false);
 
         fDomainGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
         fDomainGroup.setText(Messages.TraceControl_DomainDisplayName);
@@ -245,7 +259,14 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelDialog 
         }
 
         // layout widgets
-        GridData data = new GridData(GridData.FILL, GridData.CENTER, false, false, 2, 1);
+        GridData data = new GridData(GridData.FILL, GridData.CENTER, false, false, 3, 1);
+        discardModeGroup.setLayoutData(data);
+        data = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
+        fDiscardModeButton.setLayoutData(data);
+        data = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
+        fOverwriteModeButton.setLayoutData(data);
+        
+        data = new GridData(GridData.FILL, GridData.CENTER, false, false, 3, 1);
         fDomainGroup.setLayoutData(data);
 
         data = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
@@ -253,18 +274,14 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelDialog 
         data = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
         fUstButton.setLayoutData(data);
         
-        data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-        fSubBufferSizeText.setText("666.666.666.666"); //$NON-NLS-1$
-        Point minSize = fSubBufferSizeText.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-        data.widthHint = minSize.x + 5;
+        data = new GridData(GridData.FILL_HORIZONTAL);
+        data.horizontalSpan = 2;
 
         fChannelNameText.setLayoutData(data);
         fSubBufferSizeText.setLayoutData(data);
         fNumberOfSubBuffersText.setLayoutData(data);
         fSwitchTimerText.setLayoutData(data);
         fReadTimerText.setLayoutData(data);
-
-        fSubBufferSizeText.setText(""); //$NON-NLS-1$
 
         setDefaults();
 
@@ -277,7 +294,8 @@ public class CreateChannelDialog extends Dialog implements ICreateChannelDialog 
      */
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
-        createButton(parent, IDialogConstants.DETAILS_ID, "Default", true); //$NON-NLS-1$
+        createButton(parent, IDialogConstants.DETAILS_ID, "&Default", true); //$NON-NLS-1$
+        createButton(parent, IDialogConstants.CANCEL_ID, "&Cancel", true); //$NON-NLS-1$
         createButton(parent, IDialogConstants.OK_ID, "&Ok", true); //$NON-NLS-1$
     }
 
