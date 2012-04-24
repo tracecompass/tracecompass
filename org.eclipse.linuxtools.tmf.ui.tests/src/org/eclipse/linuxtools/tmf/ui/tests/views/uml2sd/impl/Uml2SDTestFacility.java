@@ -23,8 +23,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.experiment.TmfExperiment;
-import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.signal.TmfExperimentSelectedSignal;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 import org.eclipse.linuxtools.tmf.ui.tests.uml2sd.trace.TmfUml2SDTestTrace;
@@ -85,6 +85,7 @@ public class Uml2SDTestFacility {
 
             fParser = new TmfUml2SDTestTrace();
             fTrace = setupTrace(fParser);
+            fParser.setTrace(fTrace);
 
             IViewPart view;
             try {
@@ -275,7 +276,11 @@ public class Uml2SDTestFacility {
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void selectExperiment(final boolean wait) {
+        fParser = new TmfUml2SDTestTrace();
         fTrace = setupTrace(fParser);
+        fParser.setTrace(fTrace);
+
+//        fTrace = setupTrace(fParser);
 
         final ITmfTrace traces[] = new ITmfTrace[1];
         traces[0] = fTrace;

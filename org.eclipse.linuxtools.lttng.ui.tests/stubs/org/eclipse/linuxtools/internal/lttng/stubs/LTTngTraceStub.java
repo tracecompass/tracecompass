@@ -19,8 +19,8 @@ import java.io.RandomAccessFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
@@ -32,7 +32,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
  * Dummy test trace. Use in conjunction with LTTngEventParserStub.
  */
 @SuppressWarnings("nls")
-public class LTTngTraceStub extends TmfTrace<LttngEvent> {
+public class LTTngTraceStub extends TmfTrace<LttngEvent> implements ITmfEventParser<LttngEvent> {
 
     // ========================================================================
     // Attributes
@@ -91,7 +91,7 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public TmfContext seekLocation(final ITmfLocation<?> location) {
+    public TmfContext seekEvent(final ITmfLocation<?> location) {
         TmfContext context = null;
         try {
             synchronized(fTrace) {
@@ -109,7 +109,7 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> {
     }
 
     @Override
-    public TmfContext seekLocation(final double ratio) {
+    public TmfContext seekEvent(final double ratio) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -139,18 +139,18 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> {
      */
     @Override
     public ITmfEvent parseEvent(final ITmfContext context) {
-        try {
+//        try {
             // paserNextEvent updates the context
-            final LttngEvent event = (LttngEvent) fParser.parseNextEvent(this, context);
+            final LttngEvent event = (LttngEvent) fParser.parseEvent(context);
             //   			if (event != null) {
             //   				context.setTimestamp(event.getTimestamp());
             //   			}
             return event;
-        }
-        catch (final IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+//        }
+//        catch (final IOException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
     }
 
     /* (non-Javadoc)

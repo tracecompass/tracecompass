@@ -334,7 +334,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     }
     
     private void setTopPosition(double ratio) {
-        fBottomContext = fTrace.seekLocation(ratio);
+        fBottomContext = fTrace.seekEvent(ratio);
         if (fBottomContext == null) {
             return;
         }
@@ -382,13 +382,13 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 while (fTopLineIndex < 0) {
                     ITmfLocation<?> endLocation = fLines.get(0).location;
                     firstRatio = Math.max(0, firstRatio - delta);
-                    ITmfContext context = fTrace.seekLocation(firstRatio);
+                    ITmfContext context = fTrace.seekEvent(firstRatio);
                     ITmfLocation<?> location;
                     int index = 0;
                     long rank = 0;
                     while (!context.getLocation().equals(endLocation)) {
                         location = context.getLocation().clone();
-                        ITmfEvent event = fTrace.getNextEvent(context);
+                        ITmfEvent event = fTrace.readEvent(context);
                         if (event == null) {
                         	break;
                         }
@@ -427,8 +427,8 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 	                fBottomContext = fTrace.seekEvent(0);
 	            } else {
                     //fBottomContext = fTrace.seekEvent(fLines.get(fLines.size() - 1).rank + 1);
-	                fBottomContext = fTrace.seekLocation(fLines.get(fLines.size() - 1).location);
-	                fTrace.getNextEvent(fBottomContext);
+	                fBottomContext = fTrace.seekEvent(fLines.get(fLines.size() - 1).location);
+	                fTrace.readEvent(fBottomContext);
 	            }
 	            if (fBottomContext == null) {
 	                break;
@@ -436,7 +436,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 	        }
             long rank = fBottomContext.getRank();
             ITmfLocation<?> location = fBottomContext.getLocation() != null ? fBottomContext.getLocation().clone() : null;
-            ITmfEvent event = fTrace.getNextEvent(fBottomContext);
+            ITmfEvent event = fTrace.readEvent(fBottomContext);
             if (event == null) {
                 break;
             }

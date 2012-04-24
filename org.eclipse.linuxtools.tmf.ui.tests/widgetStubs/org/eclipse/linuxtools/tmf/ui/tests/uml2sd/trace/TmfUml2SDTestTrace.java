@@ -20,23 +20,36 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.parser.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 
 public class TmfUml2SDTestTrace implements ITmfEventParser<TmfEvent> {
     
+    ITmfTrace<TmfEvent> fEventStream;
+
+    public TmfUml2SDTestTrace() {
+    }
+
+    public TmfUml2SDTestTrace(ITmfTrace<TmfEvent> eventStream) {
+        fEventStream = eventStream;
+    }
+
+    public void setTrace(ITmfTrace<TmfEvent> eventStream) {
+        fEventStream = eventStream;
+    }
+
     @Override
     @SuppressWarnings({ "unchecked", "nls" })    
-    public TmfEvent parseNextEvent(ITmfTrace<TmfEvent> eventStream, ITmfContext context) throws IOException {
-        if (! (eventStream instanceof TmfTraceStub)) {
+    public TmfEvent parseEvent(ITmfContext context) {
+        if (! (fEventStream instanceof TmfTraceStub)) {
             return null;
         }
 
         // Highly inefficient...
-        RandomAccessFile stream = ((TmfTraceStub) eventStream).getStream();
+        RandomAccessFile stream = ((TmfTraceStub) fEventStream).getStream();
 
 //        String name = eventStream.getName();
 //        name = name.substring(name.lastIndexOf('/') + 1);
@@ -44,9 +57,10 @@ public class TmfUml2SDTestTrace implements ITmfEventParser<TmfEvent> {
         long location = 0;
         if (context != null)
             location = ((TmfLocation<Long>) (context.getLocation())).getLocation();
-        stream.seek(location);
 
         try {
+            stream.seek(location);
+
             long ts        = stream.readLong();
             String source  = stream.readUTF();
             String type    = stream.readUTF();
@@ -72,10 +86,11 @@ public class TmfUml2SDTestTrace implements ITmfEventParser<TmfEvent> {
             fields[2] = new TmfEventField("signal", signal);
             
             ITmfEventField tmfContent = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, content, fields);
-            TmfEvent tmfEvent = new TmfEvent(eventStream, new TmfTimestamp(ts, -9), source, tmfEventType, tmfContent, reference);
+            TmfEvent tmfEvent = new TmfEvent(fEventStream, new TmfTimestamp(ts, -9), source, tmfEventType, tmfContent, reference);
 
             return tmfEvent;
-        } catch (EOFException e) {
+        } catch (final EOFException e) {
+        } catch (final IOException e) {
         }
         return null;
     }

@@ -23,7 +23,6 @@ Export-Package: org.eclipse.linuxtools.internal.tmf.core;x-friends:="org.eclipse
  org.eclipse.linuxtools.tmf.core.filter.xml,
  org.eclipse.linuxtools.tmf.core.interval,
  org.eclipse.linuxtools.tmf.core.io,
- org.eclipse.linuxtools.tmf.core.parser,
  org.eclipse.linuxtools.tmf.core.request,
  org.eclipse.linuxtools.tmf.core.signal,
  org.eclipse.linuxtools.tmf.core.statesystem,

@@ -115,6 +115,20 @@ public abstract class TmfEventRequest<T extends ITmfEvent> extends TmfDataReques
     }
 
     /**
+     * Request 'n' events of a given type for the given time range (high priority).
+     * Events are returned in blocks of the given size.
+     * 
+     * @param dataType the requested data type
+     * @param range the time range of the requested events
+     * @param index the index of the first event to retrieve
+     * @param nbRequested the number of events requested
+     * @param blockSize the number of events per block
+     */
+    public TmfEventRequest(Class<T> dataType, TmfTimeRange range, int index, int nbRequested, int blockSize) {
+        this(dataType, range, index, nbRequested, blockSize, ExecutionType.FOREGROUND);
+    }
+
+    /**
      * Request 'n' events of a given type for the given time range (given priority).
      * Events are returned in blocks of the given size.
      * 

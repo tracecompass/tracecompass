@@ -26,12 +26,13 @@ import org.eclipse.linuxtools.internal.lttng.core.event.LttngTimestamp;
 import org.eclipse.linuxtools.lttng.jni.JniEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 
-public class LTTngTextTrace extends TmfTrace<LttngEvent> {
+public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<LttngEvent> {
     private LttngTimestamp                  eventTimestamp   = null;
     private String                          eventSource      = null;
     private LttngEventType                  eventType        = null;
@@ -81,6 +82,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
 //            fCheckpoints.add(new TmfCheckpoint(new LttngTimestamp(0L), new TmfLocation<Long>(0L)));
             ITmfContext context = new TmfContext(new TmfLocation<Long>(0L), 0);
             fIndexer.updateIndex(context, new LttngTimestamp(0L));
+            fParser = (ITmfEventParser) this;
             //        	}
             //        	else {
             //        		indexTrace(true);
@@ -89,7 +91,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
             final Long endTime = currentLttngEvent.getTimestamp().getValue();
             positionToFirstEvent();
 
-            getNextEvent(new TmfContext(null, 0));
+            readEvent(new TmfContext(null, 0));
             final Long starTime = currentLttngEvent.getTimestamp().getValue();
             positionToFirstEvent();
 
@@ -160,7 +162,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public TmfContext seekLocation(ITmfLocation<?> location) {
+    public TmfContext seekEvent(ITmfLocation<?> location) {
         if (location == null)
             location = new TmfLocation<Long>(0L);
 
@@ -173,7 +175,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
     }
 
     @Override
-    public TmfContext seekLocation(final double ratio) {
+    public TmfContext seekEvent(final double ratio) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -407,7 +409,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> {
 
     @Override
     public LttngEvent parseEvent(ITmfContext context) {
-        context = seekLocation(context.getLocation());
+        context = seekEvent(context.getLocation());
         return parseMyNextEvent(context);
 
     }

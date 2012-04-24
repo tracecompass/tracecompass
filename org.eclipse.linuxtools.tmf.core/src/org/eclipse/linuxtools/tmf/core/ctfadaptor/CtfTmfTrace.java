@@ -245,7 +245,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
     // ------------------------------------------------------------------------
 
     @Override
-    public ITmfContext seekLocation(final ITmfLocation<?> location) {
+    public ITmfContext seekEvent(final ITmfLocation<?> location) {
         CtfLocation currentLocation = (CtfLocation) location;
         if (currentLocation == null)
             currentLocation = new CtfLocation(0L);
@@ -286,21 +286,21 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
      * Seek rank ratio
      */
     @Override
-    public ITmfContext seekLocation(final double ratio) {
+    public ITmfContext seekEvent(final double ratio) {
         iterator.seek((long) (this.fNbEvents * ratio));
         return iterator;
     }
 
     @Override
-    public CtfTmfEvent getNextEvent(final ITmfContext context) {
+    public CtfTmfEvent readEvent(final ITmfContext context) {
         iterator.advance();
         return iterator.getCurrentEvent();
     }
 
-    @Override
-    public CtfTmfEvent parseEvent(final ITmfContext context) {
-        return iterator.getCurrentEvent();
-    }
+//    @Override
+//    public CtfTmfEvent parseEvent(final ITmfContext context) {
+//        return iterator.getCurrentEvent();
+//    }
 
     @Override
     public IResource getResource() {

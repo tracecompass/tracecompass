@@ -42,7 +42,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
  * Locating a specific checkpoint is trivial for both rank (rank % interval) and
  * timestamp (bsearch in the array).
  */
-public class TmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> implements ITmfTraceIndexer<T> {
+public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITmfTraceIndexer<T> {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -74,7 +74,7 @@ public class TmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> implements ITmfTrac
      * 
      * @param trace the trace to index
      */
-    public TmfTraceIndexer(final ITmfTrace<ITmfEvent> trace) {
+    public TmfCheckpointIndexer(final ITmfTrace<ITmfEvent> trace) {
         this(trace, TmfTrace.DEFAULT_BLOCK_SIZE);
     }
 
@@ -84,7 +84,7 @@ public class TmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> implements ITmfTrac
      * @param trace the trace to index
      * @param interval the checkpoints interval
      */
-    public TmfTraceIndexer(final ITmfTrace<ITmfEvent> trace, final int interval) {
+    public TmfCheckpointIndexer(final ITmfTrace<ITmfEvent> trace, final int interval) {
         fTrace = trace;
         fCheckpointInterval = interval;
         fTraceIndex = new Vector<TmfCheckpoint>();
@@ -164,7 +164,7 @@ public class TmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> implements ITmfTrac
 
             private void updateTraceStatus() {
                 if (getNbRead() != 0) {
-                    notifyListeners(startTime, lastTime);
+                    signalNewTimeRange(startTime, lastTime);
                 }
             }
         };
@@ -179,7 +179,13 @@ public class TmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> implements ITmfTrac
         }
     }
 
-    private void notifyListeners(final ITmfTimestamp startTime, final ITmfTimestamp endTime) {
+    /**
+     * Notify the interested parties that the trace time range has changed
+     * 
+     * @param startTime the new start time
+     * @param endTime the new end time
+     */
+    private void signalNewTimeRange(final ITmfTimestamp startTime, final ITmfTimestamp endTime) {
         fTrace.broadcast(new TmfTraceUpdatedSignal(fTrace, fTrace, new TmfTimeRange(startTime, endTime)));
     }
 
@@ -216,7 +222,7 @@ public class TmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> implements ITmfTrac
 
         // A null timestamp indicates to seek the first event
         if (timestamp == null)
-            return fTrace.seekLocation(null);
+            return fTrace.seekEvent(0);
 
         // Find the checkpoint at or before the requested timestamp.
         // In the very likely event that the timestamp is not at a checkpoint
@@ -237,9 +243,9 @@ public class TmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> implements ITmfTrac
     @Override
     public ITmfContext seekIndex(final long rank) {
 
-      // A rank <= 0 indicates to seek the first event
-      if (rank <= 0)
-          return fTrace.seekLocation(null);
+      // A rank < 0 indicates to seek the first event
+      if (rank < 0)
+          return fTrace.seekEvent(0);
 
       // Find the checkpoint at or before the requested rank.
       final int index = (int) rank / fCheckpointInterval;
@@ -267,7 +273,7 @@ public class TmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> implements ITmfTrac
                 location = null;
             }
         }
-        final ITmfContext context = fTrace.seekLocation(location);
+        final ITmfContext context = fTrace.seekEvent(location);
         context.setRank(index * fCheckpointInterval);
         return context;
     }

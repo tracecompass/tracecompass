@@ -43,6 +43,7 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest.ExecutionType;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
@@ -63,7 +64,7 @@ class LTTngTraceException extends LttngException {
  * LTTng trace implementation. It accesses the C trace handling library
  * (seeking, reading and parsing) through the JNI component.
  */
-public class LTTngTrace extends TmfTrace<LttngEvent> {
+public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<LttngEvent> {
 
     public final static boolean PRINT_DEBUG = false;
     public final static boolean UNIQUE_EVENT = true;
@@ -151,6 +152,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         // Set the currentEvent to the eventContent
         eventContent.setEvent(currentLttngEvent);
 
+        fParser = (ITmfEventParser) this;
+        
         // // Bypass indexing if asked
         // if ( bypassIndexing == false ) {
         // indexTrace(true);
@@ -168,8 +171,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         if (jniTrace == null
                 || (!jniTrace.isLiveTraceSupported() || !LiveTraceManager.isLiveTrace(jniTrace.getTracepath()))) {
             // Set the time range of the trace
-            final TmfContext context = seekLocation(null);
-            final LttngEvent event = getNextEvent(context);
+            final TmfContext context = seekEvent(0);
+            final LttngEvent event = readEvent(context);
             final LttngTimestamp startTime = new LttngTimestamp(event.getTimestamp());
             final LttngTimestamp endTime = new LttngTimestamp(currentJniTrace.getEndTime().getTime());
             setTimeRange(new TmfTimeRange(startTime, endTime));
@@ -179,8 +182,8 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         }
 
         // Set the time range of the trace
-        final TmfContext context = seekLocation(null);
-        final LttngEvent event = getNextEvent(context);
+        final TmfContext context = seekEvent(0);
+        final LttngEvent event = readEvent(context);
         setEndTime(TmfTimestamp.BIG_BANG);
         final long startTime = event != null ? event.getTimestamp().getValue() : TmfTimestamp.BIG_BANG.getValue();
         fStreamingInterval = LTTNG_STREAMING_INTERVAL;
@@ -440,7 +443,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
      * @see org.eclipse.linuxtools.tmf.core.trace.TmfContext
      */
     @Override
-    public synchronized TmfContext seekLocation(final ITmfLocation<?> location) {
+    public synchronized TmfContext seekEvent(final ITmfLocation<?> location) {
 
         // // [lmcfrch]
         // lastTime = 0;
@@ -468,7 +471,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
         // If the location is marked with the read next flag
         // then it is pointing to the next event following the operation time
         if (curLocation.isLastOperationReadNext())
-            getNextEvent(context);
+            readEvent(context);
 
         return context;
     }
@@ -584,7 +587,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     }
 
     @Override
-    public TmfContext seekLocation(final double ratio) {
+    public TmfContext seekEvent(final double ratio) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -613,7 +616,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> {
     public int nbEventsRead = 0;
 
     @Override
-    public synchronized LttngEvent getNextEvent(final ITmfContext context) {
+    public synchronized LttngEvent readEvent(final ITmfContext context) {
 
         if (PRINT_DEBUG)
             System.out.println("getNextEvent(context) context.getLocation() -> " //$NON-NLS-1$

@@ -59,7 +59,7 @@ public class LttngEventTypeTest extends TestCase {
         // This trace should be valid
         try {
             final LTTngTextTrace tmpStream = initializeEventStream();
-            tmpEventType = (LttngEventType)tmpStream.getNextEvent( new TmfContext(null, 0) ).getType();
+            tmpEventType = (LttngEventType)tmpStream.readEvent( new TmfContext(null, 0) ).getType();
         }
         catch (final Exception e) {
             fail("ERROR : Failed to get reference!");

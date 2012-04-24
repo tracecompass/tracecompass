@@ -21,22 +21,23 @@ import org.eclipse.linuxtools.tmf.core.component.ITmfDataProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 
 /**
  * <b><u>ITmfTrace</u></b>
  * <p>
  * The event stream structure in TMF. In its basic form, a trace has:
  * <ul>
- * <li> the associated Eclipse resource
- * <li> the path to its location on the file system
+ * <li> an associated Eclipse resource
+ * <li> a path to its location on the file system
  * <li> the type of the events it contains
  * <li> the number of events it contains
  * <li> the time range (span) of the events it contains
  * </ul>
  * Concrete ITmfTrace classes have to provide a parameter-less constructor and
- * an initialization method (initTace())if they are to be opened from the
- * Project View. Also, a validation (validate()) method has to be provided to
- * ensure that the trace is of the correct type.
+ * an initialization method (<i>initTrace</i>) if they are to be opened from
+ * the Project View. Also, a validation method (<i>validate</i>) has to be 
+ * provided to ensure that the trace is of the correct type.
  * <p>
  * A trace can be accessed simultaneously from multiple threads by various
  * application components. To avoid obvious multi-threading issues, the trace
@@ -48,22 +49,22 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
  * <p>
  * <b>Example 1</b>: Process a whole trace
  * <pre>
- * ITmfContext context = trace.seekLocationt(null);
- * ITmfEvent event = trace.getNextEvent(context);
+ * ITmfContext context = trace.seekEvent(0);
+ * ITmfEvent event = trace.getEvent(context);
  * while (event != null) {
  *     processEvent(event);
- *     event = trace.getNextEvent(context);
+ *     event = trace.getEvent(context);
  * }
  * </pre>
  * <b>Example 2</b>: Process 50 events starting from the 1000th event
  * <pre>
  * int nbEventsRead = 0;
  * ITmfContext context = trace.seekEvent(1000);
- * ITmfEvent event = trace.getNextEvent(context);
+ * ITmfEvent event = trace.getEvent(context);
  * while (event != null && nbEventsRead < 50) {
  *     nbEventsRead++;
  *     processEvent(event);
- *     event = trace.getNextEvent(context);
+ *     event = trace.getEvent(context);
  * }
  * </pre>
  * <b>Example 3</b>: Process the events between 2 timestamps (inclusive)
@@ -71,17 +72,17 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
  * ITmfTimestamp startTime = ...;
  * ITmfTimestamp endTime = ...;
  * ITmfContext context = trace.seekEvent(startTime);
- * ITmfEvent event = trace.getNextEvent(context);
+ * ITmfEvent event = trace.getEvent(context);
  * while (event != null && event.getTimestamp().compareTo(endTime) <= 0) {
  *     processEvent(event);
- *     event = trace.getNextEvent(context);
+ *     event = trace.getEvent(context);
  * }
  * </pre>
  * A trace is also an event provider so it can process event requests
- * asynchronously (and coalesce compatible requests).
+ * asynchronously (and coalesce compatible, concurrent requests).
  * <p>
  * </pre>
- * <b>Example 4</b>: Process a whole trace
+ * <b>Example 4</b>: Process a whole trace (see ITmfEventRequest for variants)
  * <pre>
  * ITmfRequest request = new TmfEventRequest&lt;MyEventType&gt;(MyEventType.class) {
  *     &#64;Override
@@ -95,6 +96,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
  *         super.handleCompleted();
  *     }
  * };
+ * 
  * fTrace.handleRequest(request);
  * if (youWant) {
  *     request.waitForCompletion();
@@ -102,7 +104,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
  * </pre>
  * @see ITmfEvent
  * @see ITmfEventProvider
- * @see ITmfRequest
+ * @see ITmfEventRequest
  */
 public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
 
@@ -201,35 +203,36 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
     public double getLocationRatio(ITmfLocation<?> location);
 
     // ------------------------------------------------------------------------
-    // Seek operations (returning a reading context)
+    // SeekEvent operations (returning a trace context)
     // ------------------------------------------------------------------------
 
     /**
-     * Position the trace at the specified location. The null location
-     * is used to indicate that the first trace event is requested.
+     * Position the trace at the specified (trace specific) location.
      * <p>
-     * <ul>
-     * <li> a <b>null</b> location returns the context of the first event
-     * <li> an invalid location, including beyond the last event, returns a null context
-     * </ul>
+     * A null location is interpreted as seeking for the first event of the
+     * trace.
      * <p>
-     * @param location the trace specific location (null for 1st event)
+     * If not null, the location requested must be valid otherwise the returned
+     * context is undefined (up to the implementation to recover if possible).
+     * <p>
+     * @param location the trace specific location
      * @return a context which can later be used to read the corresponding event
      */
-    public ITmfContext seekLocation(ITmfLocation<?> location);
+    public ITmfContext seekEvent(ITmfLocation<?> location);
 
     /**
-     * Position the trace at the event located at the specified ratio in the
-     * trace file.
+     * Position the trace at the 'rank'th event in the trace.
      * <p>
-     * The notion of ratio (0.0 <= r <= 1.0) is trace specific and left
-     * voluntarily vague. Typically, it would refer to the event proportional
-     * rank (arguably more intuitive) or timestamp in the trace file.
+     * A rank <= 0 is interpreted as seeking for the first event of the
+     * trace.
+     * <p>
+     * If the requested rank is beyond the last trace event, the context
+     * returned will yield a null event if used in a subsequent read.
      * 
-     * @param ratio the proportional 'rank' in the trace
+     * @param rank the event rank
      * @return a context which can later be used to read the corresponding event
      */
-    public ITmfContext seekLocation(double ratio);
+    public ITmfContext seekEvent(long rank);
 
     /**
      * Position the trace at the first event with the specified timestamp. If
@@ -248,15 +251,17 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
     public ITmfContext seekEvent(ITmfTimestamp timestamp);
 
     /**
-     * Position the trace at the 'rank'th event in the trace.
+     * Position the trace at the event located at the specified ratio in the
+     * trace file.
      * <p>
-     * If the requested rank is beyond the last trace event, the context
-     * returned will yield a null event if used in a subsequent read.
+     * The notion of ratio (0.0 <= r <= 1.0) is trace specific and left
+     * voluntarily vague. Typically, it would refer to the event proportional
+     * rank (arguably more intuitive) or timestamp in the trace file.
      * 
-     * @param rank the event rank
+     * @param ratio the proportional 'rank' in the trace
      * @return a context which can later be used to read the corresponding event
      */
-    public ITmfContext seekEvent(long rank);
+    public ITmfContext seekEvent(double ratio);
 
     // ------------------------------------------------------------------------
     // Read operations (returning an actual event)
@@ -269,18 +274,19 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * @param context the read context (will be updated)
      * @return the event pointed to by the context
      */
-    public ITmfEvent getNextEvent(ITmfContext context);
+    public ITmfEvent readEvent(ITmfContext context);
 
-    /**
-     * Return the event pointed by the supplied context (or null if no event
-     * left) and *does not* update the context.
-     * 
-     * @param context the read context
-     * @return the next event in the stream
-     */
-    public ITmfEvent parseEvent(ITmfContext context);
+//    /**
+//     * Return the event pointed by the supplied context (or null if no event
+//     * left) and *does not* update the context.
+//     * 
+//     * @param context the read context
+//     * @return the next event in the stream
+//     */
+//    public ITmfEvent parseEvent(ITmfContext context);
 
     // ------------------------------------------------------------------------
+    //
     // ------------------------------------------------------------------------
 
     /**

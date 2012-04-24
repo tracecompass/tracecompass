@@ -56,14 +56,13 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     private String fPath;
 
     /**
-     * The cache page size AND trace checkpoints interval
+     * The cache page size
      */
     protected int fCacheSize = DEFAULT_TRACE_CACHE_SIZE;
 
-    // The set of event stream checkpoints
-//    protected Vector<TmfCheckpoint> fCheckpoints = new Vector<TmfCheckpoint>();
-
-    // The number of events collected
+    /**
+     * The number of events collected so far
+     */
     protected long fNbEvents = 0;
 
     // The time span of the event stream
@@ -80,6 +79,11 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      */
     protected ITmfTraceIndexer<ITmfTrace<ITmfEvent>> fIndexer;
 
+    /**
+     * The trace parser
+     */
+    protected ITmfEventParser<ITmfEvent> fParser;
+
     // ------------------------------------------------------------------------
     // Construction
     // ------------------------------------------------------------------------
@@ -90,7 +94,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public TmfTrace() {
         super();
-        fIndexer = new TmfTraceIndexer(this);
+        fIndexer = new TmfCheckpointIndexer(this);
     }
 
     /**
@@ -136,7 +140,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         super();
         fCacheSize = (cacheSize > 0) ? cacheSize : DEFAULT_TRACE_CACHE_SIZE;
         fStreamingInterval = interval;
-        fIndexer = (indexer != null) ? indexer : new TmfTraceIndexer(this, fCacheSize);
+        fIndexer = (indexer != null) ? indexer : new TmfCheckpointIndexer(this, fCacheSize);
         initialize(resource, path, type);
     }
 
@@ -152,8 +156,21 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
             throw new IllegalArgumentException();
         fCacheSize = trace.getCacheSize();
         fStreamingInterval = trace.getStreamingInterval();
-        fIndexer = new TmfTraceIndexer(this);
+        fIndexer = new TmfCheckpointIndexer(this);
         initialize(trace.getResource(), trace.getPath(), trace.getType());
+    }
+
+    // ------------------------------------------------------------------------
+    // ITmfTrace - Initializers
+    // ------------------------------------------------------------------------
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#initTrace(org.eclipse.core.resources.IResource, java.lang.String, java.lang.Class)
+     */
+    @Override
+    public void initTrace(final IResource resource, final String path, final Class<T> type) throws FileNotFoundException {
+        initialize(resource, path, type);
+        fIndexer.buildIndex(false);
     }
 
     /**
@@ -177,19 +194,6 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
             traceName = (sep >= 0) ? path.substring(sep + 1) : path;
         }
         super.init(traceName, type);
-    }
-
-    // ------------------------------------------------------------------------
-    // ITmfTrace - Initializers
-    // ------------------------------------------------------------------------
-
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#initTrace(org.eclipse.core.resources.IResource, java.lang.String, java.lang.Class)
-     */
-    @Override
-    public void initTrace(final IResource resource, final String path, final Class<T> type) throws FileNotFoundException {
-        initialize(resource, path, type);
-        fIndexer.buildIndex(false);
     }
 
     /* (non-Javadoc)
@@ -326,32 +330,8 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     }
 
     // ------------------------------------------------------------------------
-    // ITmfTrace - Seek operations (returning a reading context)
+    // ITmfTrace - SeekEvent operations (returning a trace context)
     // ------------------------------------------------------------------------
-
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#seekEvent(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp)
-     */
-    @Override
-    public synchronized ITmfContext seekEvent(final ITmfTimestamp timestamp) {
-
-        // A null timestamp indicates to seek the first event
-        if (timestamp == null)
-            return seekLocation(null);
-
-        // Position the trace at the checkpoint
-        final ITmfContext context = fIndexer.seekIndex(timestamp);
-
-        // And locate the requested event context
-        final ITmfContext nextEventContext = context.clone(); // Must use clone() to get the right subtype...
-        ITmfEvent event = getNextEvent(nextEventContext);
-        while (event != null && event.getTimestamp().compareTo(timestamp, false) < 0) {
-            context.setLocation(nextEventContext.getLocation().clone());
-            context.increaseRank();
-            event = getNextEvent(nextEventContext);
-        }
-        return context;
-    }
 
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#seekEvent(long)
@@ -361,7 +341,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
         // A rank <= 0 indicates to seek the first event
         if (rank <= 0)
-            return seekLocation(null);
+            return seekEvent((ITmfLocation<?>) null);
 
         // Position the trace at the checkpoint
         final ITmfContext context = fIndexer.seekIndex(rank);
@@ -369,10 +349,34 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         // And locate the requested event context
         long pos = context.getRank();
         if (pos < rank) {
-            ITmfEvent event = getNextEvent(context);
+            ITmfEvent event = readEvent(context);
             while (event != null && ++pos < rank) {
-                event = getNextEvent(context);
+                event = readEvent(context);
             }
+        }
+        return context;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#seekEvent(org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp)
+     */
+    @Override
+    public synchronized ITmfContext seekEvent(final ITmfTimestamp timestamp) {
+
+        // A null timestamp indicates to seek the first event
+        if (timestamp == null)
+            return seekEvent(0);
+
+        // Position the trace at the checkpoint
+        final ITmfContext context = fIndexer.seekIndex(timestamp);
+
+        // And locate the requested event context
+        final ITmfContext nextEventContext = context.clone(); // Must use clone() to get the right subtype...
+        ITmfEvent event = readEvent(nextEventContext);
+        while (event != null && event.getTimestamp().compareTo(timestamp, false) < 0) {
+            context.setLocation(nextEventContext.getLocation().clone());
+            context.increaseRank();
+            event = readEvent(nextEventContext);
         }
         return context;
     }
@@ -382,22 +386,12 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     // ------------------------------------------------------------------------
 
     /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#parseEvent(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#readEvent(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
      */
     @Override
-    public synchronized ITmfEvent parseEvent(final ITmfContext context) {
-        final ITmfContext tmpContext = context.clone();
-        final ITmfEvent event = getNextEvent(tmpContext);
-        return event;
-    }
-
-    /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getNextEvent(org.eclipse.linuxtools.tmf.core.trace.ITmfContext)
-     */
-    @Override
-    public synchronized ITmfEvent getNextEvent(final ITmfContext context) {
+    public synchronized ITmfEvent readEvent(final ITmfContext context) {
         // parseEvent() does not update the context
-        final ITmfEvent event = parseEvent(context);
+        final ITmfEvent event = fParser.parseEvent(context);
         if (event != null) {
             updateAttributes(context, event.getTimestamp());
             context.setLocation(getCurrentLocation());
@@ -409,7 +403,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
 
     /**
      * Hook for special event processing by the concrete class
-     * (called by TmfTrace.getNextEvent())
+     * (called by TmfTrace.getEvent())
      * 
      * @param event the event
      */
@@ -467,7 +461,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     @SuppressWarnings("unchecked")
     public T getNext(final ITmfContext context) {
         if (context instanceof TmfContext)
-            return (T) getNextEvent(context);
+            return (T) readEvent(context);
         return null;
     }
 

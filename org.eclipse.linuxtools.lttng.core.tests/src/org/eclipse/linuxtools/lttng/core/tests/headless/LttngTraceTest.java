@@ -67,10 +67,10 @@ public class LttngTraceTest {
 
                 // Seek to the beginning of the trace
                 tmpContext = tmptrace.seekEvent( tmpTime  );
-                tmpevent = (LttngEvent)tmptrace.getNextEvent(tmpContext);
+                tmpevent = (LttngEvent)tmptrace.readEvent(tmpContext);
 
                 while ( tmpevent != null ) {
-                    tmpevent = (LttngEvent)tmptrace.getNextEvent(tmpContext);
+                    tmpevent = (LttngEvent)tmptrace.readEvent(tmpContext);
 
                     // Parse the events if it was asked
                     if ( (tmpevent != null) && (PARSE_EVENTS) )

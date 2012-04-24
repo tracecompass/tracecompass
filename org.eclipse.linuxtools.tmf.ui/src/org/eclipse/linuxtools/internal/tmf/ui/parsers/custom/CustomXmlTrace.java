@@ -29,6 +29,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfLocation;
@@ -43,7 +44,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
+public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEventParser<CustomXmlEvent> {
 
     private static final TmfLocation<Long> NULL_LOCATION = new TmfLocation<Long>((Long) null);
     private static final int DEFAULT_CACHE_SIZE = 100;
@@ -71,7 +72,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     }
 
     @Override
-    public TmfContext seekLocation(final ITmfLocation<?> location) {
+    public TmfContext seekEvent(final ITmfLocation<?> location) {
         final CustomXmlTraceContext context = new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
         if (NULL_LOCATION.equals(location) || !new File(getPath()).isFile())
             return context;
@@ -105,7 +106,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     }
 
     @Override
-    public TmfContext seekLocation(final double ratio) {
+    public TmfContext seekEvent(final double ratio) {
         BufferedRandomAccessFile raFile = null;
         try {
             raFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
@@ -118,7 +119,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
                 pos--;
             }
             final ITmfLocation<?> location = new TmfLocation<Long>(pos);
-            final TmfContext context = seekLocation(location);
+            final TmfContext context = seekEvent(location);
             context.setRank(ITmfContext.UNKNOWN_RANK);
             return context;
         } catch (final FileNotFoundException e) {
@@ -167,7 +168,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> {
     }
 
     @Override
-    public synchronized TmfEvent getNextEvent(final ITmfContext context) {
+    public synchronized TmfEvent readEvent(final ITmfContext context) {
         final ITmfContext savedContext = context.clone();
         final TmfEvent event = parseEvent(context);
         if (event != null) {

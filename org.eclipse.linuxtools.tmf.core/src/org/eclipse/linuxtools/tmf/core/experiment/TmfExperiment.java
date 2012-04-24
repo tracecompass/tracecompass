@@ -247,7 +247,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
      */
     public ITmfTimestamp getTimestamp(final int index) {
         final TmfExperimentContext context = seekEvent(index);
-        final ITmfEvent event = getNextEvent(context);
+        final ITmfEvent event = readEvent(context);
         return (event != null) ? event.getTimestamp() : null;
     }
 
@@ -302,7 +302,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     @SuppressWarnings("unchecked")
     public T getNext(final ITmfContext context) {
         if (context instanceof TmfExperimentContext)
-            return (T) getNextEvent(context);
+            return (T) readEvent(context);
         return null;
     }
 
@@ -313,7 +313,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     // Returns a brand new context based on the location provided
     // and initializes the event queues
     @Override
-    public synchronized TmfExperimentContext seekLocation(final ITmfLocation<?> location) {
+    public synchronized TmfExperimentContext seekEvent(final ITmfLocation<?> location) {
         // Validate the location
         if (location != null && !(location instanceof TmfExperimentLocation))
             return null; // Throw an exception?
@@ -336,7 +336,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
             final long traceRank = expLocation.getRanks()[i];
 
             // Set the corresponding sub-context
-            context.getContexts()[i] = fTraces[i].seekLocation(traceLocation);
+            context.getContexts()[i] = fTraces[i].seekEvent(traceLocation);
             context.getContexts()[i].setRank(traceRank);
             rank += traceRank;
 
@@ -346,7 +346,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
              * ourselves higher up.
              */
             expLocation.getLocation().locations[i] = context.getContexts()[i].getLocation().clone();
-            context.getEvents()[i] = fTraces[i].getNextEvent(context.getContexts()[i]);
+            context.getEvents()[i] = fTraces[i].readEvent(context.getContexts()[i]);
         }
 
         // Tracer.trace("Ctx: SeekLocation - done");
@@ -392,13 +392,13 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
                 location = null;
         }
 
-        final TmfExperimentContext context = seekLocation(location);
+        final TmfExperimentContext context = seekEvent(location);
         context.setRank((long) index * fIndexPageSize);
 
         // And locate the event
         ITmfEvent event = parseEvent(context);
         while ((event != null) && (event.getTimestamp().compareTo(timestamp, false) < 0)) {
-            getNextEvent(context);
+            readEvent(context);
             event = parseEvent(context);
         }
 
@@ -431,14 +431,14 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
             }
         }
 
-        final TmfExperimentContext context = seekLocation(location);
+        final TmfExperimentContext context = seekEvent(location);
         context.setRank((long) index * fIndexPageSize);
 
         // And locate the event
         ITmfEvent event = parseEvent(context);
         long pos = context.getRank();
         while ((event != null) && (pos++ < rank)) {
-            getNextEvent(context);
+            readEvent(context);
             event = parseEvent(context);
         }
 
@@ -451,7 +451,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     }
 
     @Override
-    public TmfContext seekLocation(final double ratio) {
+    public TmfContext seekEvent(final double ratio) {
         final TmfContext context = seekEvent((long) (ratio * getNbEvents()));
         return context;
     }
@@ -459,7 +459,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     @Override
     public double getLocationRatio(final ITmfLocation<?> location) {
         if (location instanceof TmfExperimentLocation)
-            return (double) seekLocation(location).getRank() / getNbEvents();
+            return (double) seekEvent(location).getRank() / getNbEvents();
         return 0;
     }
 
@@ -494,7 +494,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
      * @return the next event
      */
     @Override
-    public synchronized ITmfEvent getNextEvent(final ITmfContext context) {
+    public synchronized ITmfEvent readEvent(final ITmfContext context) {
 
         // Validate the context
         if (!(context instanceof TmfExperimentContext))
@@ -502,7 +502,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
 
         if (!context.equals(fExperimentContext))
             // Tracer.trace("Ctx: Restoring context");
-            fExperimentContext = seekLocation(context.getLocation());
+            fExperimentContext = seekEvent(context.getLocation());
 
         final TmfExperimentContext expContext = (TmfExperimentContext) context;
 
@@ -512,7 +512,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         final int lastTrace = expContext.getLastTrace();
         if (lastTrace != TmfExperimentContext.NO_TRACE) {
             final ITmfContext traceContext = expContext.getContexts()[lastTrace];
-            expContext.getEvents()[lastTrace] = expContext.getTraces()[lastTrace].getNextEvent(traceContext);
+            expContext.getEvents()[lastTrace] = expContext.getTraces()[lastTrace].readEvent(traceContext);
             expContext.setLastTrace(TmfExperimentContext.NO_TRACE);
         }
 
@@ -585,7 +585,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     /* (non-Javadoc)
      * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#parseEvent(org.eclipse.linuxtools .tmf.trace.TmfContext)
      */
-    @Override
+//    @Override
     public ITmfEvent parseEvent(final ITmfContext context) {
 
         // Validate the context
@@ -594,7 +594,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
 
         if (!context.equals(fExperimentContext))
             // Tracer.trace("Ctx: Restoring context");
-            seekLocation(context.getLocation());
+            seekEvent(context.getLocation());
 
         final TmfExperimentContext expContext = (TmfExperimentContext) context;
 
@@ -602,7 +602,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         final int lastTrace = expContext.getLastTrace();
         if (lastTrace != TmfExperimentContext.NO_TRACE) {
             final ITmfContext traceContext = expContext.getContexts()[lastTrace];
-            expContext.getEvents()[lastTrace] = expContext.getTraces()[lastTrace].getNextEvent(traceContext);
+            expContext.getEvents()[lastTrace] = expContext.getTraces()[lastTrace].readEvent(traceContext);
             expContext.setLastTrace(TmfExperimentContext.NO_TRACE);
             fExperimentContext = (TmfExperimentContext) context;
         }
@@ -647,7 +647,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
         fInitialized = true;
 
         if (getStreamingInterval() == 0) {
-            final TmfContext context = seekLocation(null);
+            final TmfContext context = seekEvent(0);
             final ITmfEvent event = getNext(context);
             if (event == null)
                 return;

@@ -8,15 +8,12 @@
  * 
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Francois Chouinard - Updated as per TMF Trace Model 1.0
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.parser;
-
-import java.io.IOException;
+package org.eclipse.linuxtools.tmf.core.trace;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
  * <b><u>ITmfEventParser</u></b>
@@ -24,17 +21,12 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  */
 public interface ITmfEventParser<T extends ITmfEvent> {
 
-    /**
-     * @return a parsed event
-     * @throws IOException 
-     */
 	/**
 	 * Parses the trace event referenced by the context.
 	 * 
-	 * @param trace the event stream
-	 * @param context the trace context
-	 * @return the parsed event
-	 * @throws IOException
+	 * @param context
+	 * @return
 	 */
-	public ITmfEvent parseNextEvent(ITmfTrace<T> trace, ITmfContext context) throws IOException;
+	public ITmfEvent parseEvent(ITmfContext context);
+
 }
