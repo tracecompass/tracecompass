@@ -53,7 +53,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     /**
      * The default number of events in an index page. Can be used as block size.
      */
-    public static final int DEFAULT_INDEX_PAGE_SIZE = 1000;
+    public static final int DEFAULT_INDEX_PAGE_SIZE = 50000;
 
     // ------------------------------------------------------------------------
     // Attributes
