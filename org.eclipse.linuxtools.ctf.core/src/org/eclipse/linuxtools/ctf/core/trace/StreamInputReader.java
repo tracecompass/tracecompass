@@ -198,6 +198,10 @@ public class StreamInputReader {
 
     public long seekIndex(long index) throws CTFReaderException {
         /*
+         * we need to check if a trace is empty too.
+         */
+        StreamInputPacketIndexEntry sipie = null;
+        /*
          * Search in the index for the packet to search in.
          */
         this.packetIndexIt = this.streamInput.getIndex().searchIndex(index);
@@ -205,6 +209,8 @@ public class StreamInputReader {
          * Switch to this packet.
          */
         goToNextPacket();
+
+        sipie = this.packetReader.getCurrentPacket();
         /*
          * Read the first packet
          */
@@ -212,9 +218,12 @@ public class StreamInputReader {
         /*
          * get the current index
          */
-        if (this.packetReader.getCurrentPacket() == null) {
-            throw new CTFReaderException(
-                    "Current packet null in index seek, did you index your trace yet?"); //$NON-NLS-1$
+        if (this.packetReader.getCurrentPacket() == null)  {
+            if( !((sipie.getIndexBegin() == 0) && (sipie.getIndexEnd() == Long.MAX_VALUE))) {
+                throw new CTFReaderException(
+                        "Current packet null in index seek, did you index your trace yet?"); //$NON-NLS-1$
+            }
+            return -1;
         }
         return this.packetReader.getCurrentPacket().getIndexBegin();
 

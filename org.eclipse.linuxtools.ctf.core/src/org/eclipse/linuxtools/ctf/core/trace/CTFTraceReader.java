@@ -352,24 +352,28 @@ public class CTFTraceReader {
                  * Seek the trace reader.
                  */
                 final long streamIndex = streamInputReader.seekIndex(index);
-                tempIndex = Math.max(tempIndex, streamIndex);
-                EventDefinition currentEvent = streamInputReader.getCurrentEvent();
-                /*
-                 * Maybe we're at the beginning of a trace.
-                 */
-                if( currentEvent == null ){
-                    streamInputReader.readNextEvent();
-                    currentEvent = streamInputReader.getCurrentEvent();
-                }
-                if( currentEvent != null ) {
-                    tempTimestamp = Math.max(tempTimestamp,
-                            currentEvent.timestamp);
-                } else {
+                if( streamIndex != -1 )
+                {
+                    tempIndex = Math.max(tempIndex, streamIndex);
+                    EventDefinition currentEvent = streamInputReader.getCurrentEvent();
                     /*
-                     * probably beyond the last event
+                     * Maybe we're at the beginning of a trace.
                      */
-                    tempIndex = goToZero();
+                    if( currentEvent == null ){
+                        streamInputReader.readNextEvent();
+                        currentEvent = streamInputReader.getCurrentEvent();
+                    }
+                    if( currentEvent != null ) {
+                        tempTimestamp = Math.max(tempTimestamp,
+                                currentEvent.timestamp);
+                    } else {
+                        /*
+                         * probably beyond the last event
+                         */
+                        tempIndex = goToZero();
+                    }
                 }
+
 
             }
         } catch (CTFReaderException e) {

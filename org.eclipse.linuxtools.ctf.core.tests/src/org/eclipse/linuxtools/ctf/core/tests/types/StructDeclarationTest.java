@@ -18,7 +18,7 @@ import org.junit.Test;
 /**
  * The class <code>StructDeclarationTest</code> contains tests for the class
  * <code>{@link StructDeclaration}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -28,7 +28,7 @@ public class StructDeclarationTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -58,7 +58,7 @@ public class StructDeclarationTest {
     @Test
     public void testStructDeclaration() {
         assertNotNull(fixture);
-        assertEquals(1L, fixture.getMinAlign());
+        assertEquals(1L, fixture.getMaxAlign());
 
         String regex = "^\\[declaration\\] struct\\[[0-9a-f]{1,8}\\]$"; //$NON-NLS-1$
         assertTrue(fixture.toString().matches(regex));
@@ -112,7 +112,7 @@ public class StructDeclarationTest {
      */
     @Test
     public void testGetMinAlign() {
-        long result = fixture.getMinAlign();
+        long result = fixture.getMaxAlign();
         assertEquals(1L, result);
     }
 
@@ -125,15 +125,6 @@ public class StructDeclarationTest {
         boolean result = fixture.hasField(name);
 
         assertEquals(false, result);
-    }
-
-    /**
-     * Run the void setMinAlign(long) method test.
-     */
-    @Test
-    public void testSetMinAlign() {
-        long minAlign = 1L;
-        fixture.setMinAlign(minAlign);
     }
 
     /**
