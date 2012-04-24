@@ -32,7 +32,21 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
  * <p>
  * Abstract implementation of ITmfTrace.
  * <p>
- * Document me...
+ * Since the concept of 'location' is trace specific, the concrete classes have
+ * to provide the related methods, namely:
+ * <ul>
+ * <li> public ITmfLocation<?> getCurrentLocation()
+ * <li> public double getLocationRatio(ITmfLocation<?> location)
+ * <li> public ITmfContext seekEvent(ITmfLocation<?> location)
+ * <li> public ITmfContext seekEvent(double ratio)
+ * </ul>
+ * A concrete trace must provide its corresponding parser. A common way to
+ * accomplish this is by making the concrete class extend TmfTrace and
+ * implement ITmfEventParser.
+ * <p>
+ * The concrete class can either specify its own indexer or use the provided
+ * TmfCheckpointIndexer (default). In this case, the trace cache size will be
+ * used as checkpoint interval.
  */
 public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> implements ITmfTrace<T> {
 
@@ -98,7 +112,8 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     }
 
     /**
-     * The standard constructor (non-live trace)
+     * The standard constructor (non-live trace). Applicable when the trace
+     * implements its own parser and if at checkpoint-based index is OK. 
      * 
      * @param resource the resource associated to the trace
      * @param type the trace event type
@@ -111,7 +126,8 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     }
 
     /**
-     * The standard constructor (live trace)
+     * The standard constructor (live trace). Applicable when the trace
+     * implements its own parser and if at checkpoint-based index is OK.
      * 
      * @param resource the resource associated to the trace
      * @param type the trace event type
@@ -125,7 +141,8 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     }
 
     /**
-     * The full constructor
+     * The 'non-default indexer' constructor. Allows to provide a trace
+     * specific indexer.
      * 
      * @param resource the resource associated to the trace
      * @param type the trace event type
@@ -134,13 +151,30 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @param indexer the trace indexer
      * @throws FileNotFoundException
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected TmfTrace(final IResource resource, final Class<T> type, final String path, final int cacheSize,
             final long interval, final ITmfTraceIndexer<?> indexer) throws FileNotFoundException {
+        this(resource, type, path, cacheSize, interval, null, null);
+    }
+
+    /**
+     * The full constructor where trace specific indexer/parser are provided. 
+     * 
+     * @param resource the resource associated to the trace
+     * @param type the trace event type
+     * @param path the trace path
+     * @param cacheSize the trace cache size
+     * @param indexer the trace indexer
+     * @param parser the trace event parser
+     * @throws FileNotFoundException
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    protected TmfTrace(final IResource resource, final Class<T> type, final String path, final int cacheSize,
+            final long interval, final ITmfTraceIndexer<?> indexer, final ITmfEventParser<ITmfEvent> parser) throws FileNotFoundException {
         super();
         fCacheSize = (cacheSize > 0) ? cacheSize : DEFAULT_TRACE_CACHE_SIZE;
         fStreamingInterval = interval;
         fIndexer = (indexer != null) ? indexer : new TmfCheckpointIndexer(this, fCacheSize);
+        fParser = parser;
         initialize(resource, path, type);
     }
 
@@ -157,7 +191,8 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
         fCacheSize = trace.getCacheSize();
         fStreamingInterval = trace.getStreamingInterval();
         fIndexer = new TmfCheckpointIndexer(this);
-        initialize(trace.getResource(), trace.getPath(), trace.getType());
+        fParser = trace.fParser;
+        initialize(trace.getResource(), trace.getPath(), trace.getEventType());
     }
 
     // ------------------------------------------------------------------------
@@ -212,11 +247,11 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     // ------------------------------------------------------------------------
 
     /* (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.core.component.TmfDataProvider#getType()
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getEventType()
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Class<T> getType() {
+    public Class<T> getEventType() {
         return (Class<T>) super.getType();
     }
 

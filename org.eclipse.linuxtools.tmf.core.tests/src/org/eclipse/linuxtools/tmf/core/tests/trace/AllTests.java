@@ -31,7 +31,7 @@ public class AllTests {
 		suite.addTestSuite(TmfLocationTest.class);
         suite.addTestSuite(TmfContextTest.class);
 		suite.addTestSuite(TmfCheckpointTest.class);
-//        suite.addTestSuite(TmfCheckpointIndexTest.class);
+        suite.addTestSuite(TmfCheckpointIndexTest.class);
 		suite.addTestSuite(TmfTraceTest.class);
 		//$JUnit-END$
 		return suite;

@@ -121,7 +121,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
      * @return the trace path
      */
     @Override
-    public Class<CtfTmfEvent> getType() {
+    public Class<CtfTmfEvent> getEventType() {
         return fType;
     }
 

@@ -183,7 +183,7 @@ public class TmfExperiment<T extends ITmfEvent> extends TmfEventProvider<T> impl
     // ------------------------------------------------------------------------
 
     @Override
-    public Class<T> getType() {
+    public Class<T> getEventType() {
         return fType;
     }
 

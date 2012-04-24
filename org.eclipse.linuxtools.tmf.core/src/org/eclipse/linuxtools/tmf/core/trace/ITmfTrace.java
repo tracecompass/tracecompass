@@ -144,7 +144,7 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
     /**
      * @return the trace event type
      */
-    public Class<T> getType();
+    public Class<T> getEventType();
 
     /**
      * @return the associated trace resource
@@ -184,6 +184,11 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * @return the timestamp of the last trace event
      */
     public ITmfTimestamp getEndTime();
+
+    /**
+     * @return the streaming interval in ms (0 if not a streaming trace)
+     */
+    public long getStreamingInterval();
 
     // ------------------------------------------------------------------------
     // Trace positioning getters
@@ -275,14 +280,5 @@ public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
      * @return the event pointed to by the context
      */
     public ITmfEvent readEvent(ITmfContext context);
-
-    // ------------------------------------------------------------------------
-    //
-    // ------------------------------------------------------------------------
-
-    /**
-     * @return the streaming interval in ms (0 if not a streaming trace)
-     */
-    public long getStreamingInterval();
 
 }
