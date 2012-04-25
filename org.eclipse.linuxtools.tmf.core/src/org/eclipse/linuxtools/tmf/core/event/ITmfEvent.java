@@ -15,8 +15,6 @@ package org.eclipse.linuxtools.tmf.core.event;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
- * <b><u>ITmfEvent</u></b>
- * <p>
  * The basic event structure in TMF. In its canonical form, a data item has:
  * <ul>
  * <li> a parent trace
@@ -30,6 +28,10 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * used as e.g. a location marker (filename:lineno) to indicate where the event
  * was generated.
  * 
+ * @since 1.0
+ * @version 1.0
+ * @author Francois Chouinard
+ *
  * @see ITmfTimestamp
  * @see ITmfEventType
  * @see ITmfEvetnField

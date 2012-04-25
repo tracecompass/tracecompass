@@ -13,14 +13,17 @@
 package org.eclipse.linuxtools.tmf.core.event;
 
 import java.util.HashMap;
+import java.util.Map;
 
 
 /**
- * <b><u>TmfEventTypeManager</u></b>
- * <p>
  * The TmfEventTypeManager acts as a central repository for the available
  * event types. Types are managed in their context space.
- * <p>
+ * 
+ * @since 1.0
+ * @version 1.0
+ * @author Francois Chouinard
+ * @see ITmfEventType
  */
 public final class TmfEventTypeManager {
 
@@ -32,7 +35,7 @@ public final class TmfEventTypeManager {
     private static TmfEventTypeManager fEventTypeManager = null;
 
     // The available types, per context
-    private final HashMap<String, HashMap<String, ITmfEventType>> fEventTypes;
+    private final Map<String, HashMap<String, ITmfEventType>> fEventTypes;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -49,8 +52,9 @@ public final class TmfEventTypeManager {
      * @return the TmfEventTypeManager singleton
      */
     public static synchronized TmfEventTypeManager getInstance() {
-        if (fEventTypeManager == null)
+        if (fEventTypeManager == null) {
             fEventTypeManager = new TmfEventTypeManager();
+        }
         return fEventTypeManager;
     }
 
@@ -66,8 +70,9 @@ public final class TmfEventTypeManager {
      */
     public synchronized void add(final String context, final ITmfEventType type) {
         HashMap<String, ITmfEventType> types = fEventTypes.get(context);
-        if (types == null)
+        if (types == null) {
             types = new HashMap<String, ITmfEventType>();
+        }
         types.put(type.getName(), type);
         fEventTypes.put(context, types);
     }
@@ -89,8 +94,9 @@ public final class TmfEventTypeManager {
      */
     public synchronized ITmfEventType[] getTypes(final String context) {
         final HashMap<String, ITmfEventType> types = fEventTypes.get(context);
-        if (types != null)
+        if (types != null) {
             return types.values().toArray(new ITmfEventType[types.size()]);
+        }
         return null;
     }
 
@@ -103,8 +109,9 @@ public final class TmfEventTypeManager {
      */
     public synchronized ITmfEventType getType(final String context, final String typeId) {
         final HashMap<String, ITmfEventType> types = fEventTypes.get(context);
-        if (types != null)
+        if (types != null) {
             return types.get(typeId);
+        }
         return null;
     }
 

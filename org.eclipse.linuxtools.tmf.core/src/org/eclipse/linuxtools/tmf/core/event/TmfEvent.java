@@ -16,14 +16,20 @@ package org.eclipse.linuxtools.tmf.core.event;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
- * <b><u>TmfEvent</u></b>
- * <p>
  * A basic implementation of ITmfEvent.
- * 
+ * <p>
  * Note that for performance reasons TmfEvent is NOT immutable. If a shallow
  * copy of the event is needed, use the copy constructor. Otherwise (deep copy)
  * use clone().
- */
+ * 
+ * @since 1.0
+ * @version 1.0
+ * @author Francois Chouinard
+ * @see ITmfTimestamp
+ * @see ITmfEventType
+ * @see ITmfEventField
+ * @see ITmfTrace
+*/
 public class TmfEvent implements ITmfEvent {
 
     // ------------------------------------------------------------------------
@@ -104,8 +110,9 @@ public class TmfEvent implements ITmfEvent {
      * @param event the original event
      */
     public TmfEvent(final ITmfEvent event) {
-        if (event == null)
+        if (event == null) {
             throw new IllegalArgumentException();
+        }
         fTrace = event.getTrace();
         fRank = event.getRank();
         fTimestamp = event.getTimestamp();
@@ -278,45 +285,61 @@ public class TmfEvent implements ITmfEvent {
      */
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (!(obj instanceof TmfEvent))
+        }
+        if (!(obj instanceof TmfEvent)) {
             return false;
+        }
         final TmfEvent other = (TmfEvent) obj;
         if (fTrace == null) {
-            if (other.fTrace != null)
+            if (other.fTrace != null) {
                 return false;
-        } else if (!fTrace.equals(other.fTrace))
+            }
+        } else if (!fTrace.equals(other.fTrace)) {
             return false;
-        if (fRank != other.fRank)
+        }
+        if (fRank != other.fRank) {
             return false;
+        }
         if (fTimestamp == null) {
-            if (other.fTimestamp != null)
+            if (other.fTimestamp != null) {
                 return false;
-        } else if (!fTimestamp.equals(other.fTimestamp))
+            }
+        } else if (!fTimestamp.equals(other.fTimestamp)) {
             return false;
+        }
         if (fSource == null) {
-            if (other.fSource != null)
+            if (other.fSource != null) {
                 return false;
-        } else if (!fSource.equals(other.fSource))
+            }
+        } else if (!fSource.equals(other.fSource)) {
             return false;
+        }
         if (fType == null) {
-            if (other.fType != null)
+            if (other.fType != null) {
                 return false;
-        } else if (!fType.equals(other.fType))
+            }
+        } else if (!fType.equals(other.fType)) {
             return false;
+        }
         if (fContent == null) {
-            if (other.fContent != null)
+            if (other.fContent != null) {
                 return false;
-        } else if (!fContent.equals(other.fContent))
+            }
+        } else if (!fContent.equals(other.fContent)) {
             return false;
+        }
         if (fReference == null) {
-            if (other.fReference != null)
+            if (other.fReference != null) {
                 return false;
-        } else if (!fReference.equals(other.fReference))
+            }
+        } else if (!fReference.equals(other.fReference)) {
             return false;
+        }
         return true;
     }
 

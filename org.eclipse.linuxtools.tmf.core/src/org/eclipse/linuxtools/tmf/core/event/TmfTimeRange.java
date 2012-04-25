@@ -14,9 +14,13 @@
 package org.eclipse.linuxtools.tmf.core.event;
 
 /**
- * <b><u>TmfTimeRange</u></b>
- * <p>
  * A utility class to define and manage time ranges.
+ * 
+ * @since 1.0
+ * @version 1.0
+ * @author Francois Chouinard
+ * @see ITmfTimestamp
+ * @see TmfTimestamp
  */
 public final class TmfTimeRange implements Cloneable {
 
@@ -61,8 +65,9 @@ public final class TmfTimeRange implements Cloneable {
      * @param endTime end of the time range
      */
     public TmfTimeRange(final ITmfTimestamp startTime, final ITmfTimestamp endTime) {
-        if (startTime == null || endTime == null)
+        if (startTime == null || endTime == null) {
             throw new IllegalArgumentException();
+        }
         fStartTime = startTime;
         fEndTime = endTime;
     }
@@ -73,8 +78,9 @@ public final class TmfTimeRange implements Cloneable {
      * @param range the other time range
      */
     public TmfTimeRange(final TmfTimeRange range) {
-        if (range == null)
+        if (range == null) {
             throw new IllegalArgumentException();
+        }
         fStartTime = range.getStartTime();
         fEndTime = range.getEndTime();
     }
@@ -109,8 +115,9 @@ public final class TmfTimeRange implements Cloneable {
      */
     public boolean contains(final ITmfTimestamp ts) {
         // Zero acts as a "universal donor" timestamp
-        if (ts.equals(TmfTimestamp.ZERO))
+        if (ts.equals(TmfTimestamp.ZERO)) {
             return true;
+        }
         return (fStartTime.compareTo(ts, true) <= 0) && (fEndTime.compareTo(ts, true) >= 0);
     }
 
@@ -137,11 +144,14 @@ public final class TmfTimeRange implements Cloneable {
      * @return the intersection time range, or null if no intersection exists
      */
     public TmfTimeRange getIntersection(final TmfTimeRange range) {
-        if (fStartTime.compareTo(range.fEndTime, true) > 0 || fEndTime.compareTo(range.fStartTime, true) < 0)
+        if (fStartTime.compareTo(range.fEndTime, true) > 0 || fEndTime.compareTo(range.fStartTime, true) < 0) {
             return null; // no intersection
+        }
 
-        return new TmfTimeRange(fStartTime.compareTo(range.fStartTime, true) < 0 ? range.fStartTime
-                : fStartTime, fEndTime.compareTo(range.fEndTime, true) > 0 ? range.fEndTime
+        return new TmfTimeRange(fStartTime.compareTo(range.fStartTime, true) < 0 
+                ? range.fStartTime 
+                : fStartTime, fEndTime.compareTo(range.fEndTime, true) > 0 
+                        ? range.fEndTime 
                         : fEndTime);
     }
 
@@ -186,17 +196,22 @@ public final class TmfTimeRange implements Cloneable {
      */
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (!(obj instanceof TmfTimeRange))
+        }
+        if (!(obj instanceof TmfTimeRange)) {
             return false;
+        }
         final TmfTimeRange other = (TmfTimeRange) obj;
-        if (!fEndTime.equals(other.fEndTime))
+        if (!fEndTime.equals(other.fEndTime)) {
             return false;
-        if (!fStartTime.equals(other.fStartTime))
+        }
+        if (!fStartTime.equals(other.fStartTime)) {
             return false;
+        }
         return true;
     }
 

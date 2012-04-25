@@ -12,11 +12,17 @@
 
 package org.eclipse.linuxtools.tmf.core.event;
 
+
 /**
- * <b><u>ITmfEventField</u></b>
- * <p>
  * The TMF event payload structure. Each field can be either a terminal or
  * further decomposed into subfields.
+ * 
+ * @since 1.0
+ * @version 1.0
+ * @author Francois Chouinard
+ *
+ * @see TmfEventField
+ * @see ITmfEvent
  */
 public interface ITmfEventField extends Cloneable {
 

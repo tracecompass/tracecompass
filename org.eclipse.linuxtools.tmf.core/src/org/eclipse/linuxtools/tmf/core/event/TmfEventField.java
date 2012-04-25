@@ -18,11 +18,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <b><u>TmfEventField</u></b>
+ * A basic implementation of ITmfEventField.
  * <p>
- * A basic implementation of ITmfEventField. Non-value fields are structural
- * (i.e. used to represent the event structure including optional fields) while
- * the valued fields are actual event fields.
+ * Non-value fields are structural (i.e. used to represent the event structure
+ * including optional fields) while the valued fields are actual event fields.
+ * 
+ * @since 1.0
+ * @version 1.0
+ * @author Francois Chouinard
+ * @see ITmfEventField
+ * @see ITmfEventType
+ * @see ITmfEvent
  */
 public class TmfEventField implements ITmfEventField {
 
@@ -76,8 +82,9 @@ public class TmfEventField implements ITmfEventField {
      * @param fields the list of subfields
      */
     public TmfEventField(final String name, final Object value, final ITmfEventField[] fields) {
-        if (name == null)
+        if (name == null) {
             throw new IllegalArgumentException();
+        }
         fName = name;
         fValue = value;
         fFields = (fields != null) ? Arrays.copyOf(fields, fields.length) : null;
@@ -90,8 +97,9 @@ public class TmfEventField implements ITmfEventField {
      * @param field the other event field
      */
     public TmfEventField(final TmfEventField field) {
-        if (field == null)
+        if (field == null) {
             throw new IllegalArgumentException();
+        }
         fName = field.fName;
         fValue = field.fValue;
         fFields = field.fFields;
@@ -133,8 +141,9 @@ public class TmfEventField implements ITmfEventField {
     @Override
     public String getFieldName(final int index) {
         final ITmfEventField field = getField(index);
-        if (field != null)
+        if (field != null) {
             return field.getName();
+        }
         return null;
     }
 
@@ -143,8 +152,7 @@ public class TmfEventField implements ITmfEventField {
      */
     @Override
     public ITmfEventField[] getFields() {
-        ITmfEventField[] result = (fFields != null) ? Arrays.copyOf(fFields, fFields.length) : null;
-        return result;
+        return (fFields != null) ? Arrays.copyOf(fFields, fFields.length) : null;
     }
 
     /* (non-Javadoc)
@@ -160,8 +168,9 @@ public class TmfEventField implements ITmfEventField {
      */
     @Override
     public ITmfEventField getField(final int index) {
-        if (fFields != null && index >= 0 && index < fFields.length)
+        if (fFields != null && index >= 0 && index < fFields.length) {
             return fFields[index];
+        }
         return null;
     }
 
@@ -191,10 +200,11 @@ public class TmfEventField implements ITmfEventField {
      */
     public final static ITmfEventField makeRoot(final String[] labels) {
         final ITmfEventField[] fields = new ITmfEventField[labels.length];
-        for (int i = 0; i < labels.length; i++)
+        for (int i = 0; i < labels.length; i++) {
             fields[i] = new TmfEventField(labels[i], null);
-        final ITmfEventField rootField = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, fields);
-        return rootField;
+        }
+        // Return a new root field;
+        return new TmfEventField(ITmfEventField.ROOT_FIELD_ID, fields);
     }
 
     /*
@@ -253,20 +263,26 @@ public class TmfEventField implements ITmfEventField {
      */
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (!(obj instanceof TmfEventField))
+        }
+        if (!(obj instanceof TmfEventField)) {
             return false;
+        }
         final TmfEventField other = (TmfEventField) obj;
-        if (!fName.equals(other.fName))
+        if (!fName.equals(other.fName)) {
             return false;
+        }
         if (fValue == null) {
-            if (other.fValue != null)
+            if (other.fValue != null) {
                 return false;
-        } else if (!fValue.equals(other.fValue))
+            }
+        } else if (!fValue.equals(other.fValue)) {
             return false;
+        }
         return true;
     }
 

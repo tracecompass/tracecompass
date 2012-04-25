@@ -15,11 +15,16 @@
 package org.eclipse.linuxtools.tmf.core.event;
 
 /**
- * <b><u>TmfTimestamp</u></b>
- * <p>
- * A generic implementation of ITmfTimestamp.
+ * A generic timestamp implementation. The timestamp is represented by the
+ * tuple { value, scale, precision }.
+ * 
+ * @since 1.0
+ * @version 1.0
+ * @author Francois Chouinard
+ * @see ITmfTimestamp
+ * @see TmfSimpleTimestamp
  */
-public class TmfTimestamp implements ITmfTimestamp {
+public class TmfTimestamp implements ITmfTimestamp, Cloneable {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -50,17 +55,17 @@ public class TmfTimestamp implements ITmfTimestamp {
     /**
      * The timestamp raw value (mantissa)
      */
-    protected long fValue;
+    private long fValue;
 
     /**
      * The timestamp scale (magnitude)
      */
-    protected int fScale;
+    private int fScale;
 
     /**
      * The value precision (tolerance)
      */
-    protected int fPrecision;
+    private int fPrecision;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -111,11 +116,22 @@ public class TmfTimestamp implements ITmfTimestamp {
      * @param timestamp the timestamp to copy
      */
     public TmfTimestamp(final ITmfTimestamp timestamp) {
-        if (timestamp == null)
+        if (timestamp == null) {
             throw new IllegalArgumentException();
+        }
         fValue = timestamp.getValue();
         fScale = timestamp.getScale();
         fPrecision = timestamp.getPrecision();
+    }
+
+    // ------------------------------------------------------------------------
+    // Setters
+    // ------------------------------------------------------------------------
+
+    protected void setValue(long value, int scale, int precision) {
+        fValue = value;
+        fScale = scale;
+        fPrecision = precision;
     }
 
     // ------------------------------------------------------------------------
@@ -178,14 +194,16 @@ public class TmfTimestamp implements ITmfTimestamp {
         int precision = fPrecision;
 
         // Handle the trivial case
-        if (fScale == scale && offset == 0)
+        if (fScale == scale && offset == 0) {
             return new TmfTimestamp(this);
+        }
 
         // First, scale the timestamp
         if (fScale != scale) {
             final int scaleDiff = Math.abs(fScale - scale);
-            if (scaleDiff >= scalingFactors.length)
+            if (scaleDiff >= scalingFactors.length) {
                 throw new ArithmeticException("Scaling exception"); //$NON-NLS-1$
+            }
 
             final long scalingFactor = scalingFactors[scaleDiff];
             if (scale < fScale) {
@@ -198,10 +216,11 @@ public class TmfTimestamp implements ITmfTimestamp {
         }
 
         // Then, apply the offset
-        if (offset < 0)
+        if (offset < 0) {
             value = (value < Long.MIN_VALUE - offset) ? Long.MIN_VALUE : value + offset;
-        else
+        } else {
             value = (value > Long.MAX_VALUE - offset) ? Long.MAX_VALUE : value + offset;
+        }
 
         return new TmfTimestamp(value, scale, precision);
     }
@@ -212,22 +231,26 @@ public class TmfTimestamp implements ITmfTimestamp {
     @Override
     public int compareTo(final ITmfTimestamp ts, final boolean withinPrecision) {
 
-        if (ts == null)
-            return 1;
-
         // Check the corner cases (we can't use equals() because it uses compareTo()...)
-        if (this == ts || (fValue == ts.getValue() && fScale == ts.getScale()))
-            return 0;
-        if ((fValue == BIG_BANG.getValue() && fScale == BIG_BANG.getScale()) || (ts.getValue() == BIG_CRUNCH.getValue() && ts.getScale() == BIG_CRUNCH.getScale()))
-            return -1;
-        if ((fValue == BIG_CRUNCH.getValue() && fScale == BIG_CRUNCH.getScale()) || (ts.getValue() == BIG_BANG.getValue() && ts.getScale() == BIG_BANG.getScale()))
+        if (ts == null) {
             return 1;
+        }
+        if (this == ts || (fValue == ts.getValue() && fScale == ts.getScale())) {
+            return 0;
+        }
+        if ((fValue == BIG_BANG.getValue() && fScale == BIG_BANG.getScale()) || (ts.getValue() == BIG_CRUNCH.getValue() && ts.getScale() == BIG_CRUNCH.getScale())) {
+            return -1;
+        }
+        if ((fValue == BIG_CRUNCH.getValue() && fScale == BIG_CRUNCH.getScale()) || (ts.getValue() == BIG_BANG.getValue() && ts.getScale() == BIG_BANG.getScale())) {
+            return 1;
+        }
 
         try {
             final ITmfTimestamp nts = ts.normalize(0, fScale);
             final long delta = fValue - nts.getValue();
-            if ((delta == 0) || (withinPrecision && (Math.abs(delta) <= (fPrecision + nts.getPrecision()))))
+            if ((delta == 0) || (withinPrecision && (Math.abs(delta) <= (fPrecision + nts.getPrecision())))) {
                 return 0;
+            }
             return (delta > 0) ? 1 : -1;
         }
         catch (final ArithmeticException e) {
@@ -235,12 +258,15 @@ public class TmfTimestamp implements ITmfTimestamp {
 
             // First, look at the sign of the mantissa
             final long value = ts.getValue();
-            if (fValue == 0 && value == 0)
+            if (fValue == 0 && value == 0) {
                 return 0;
-            if (fValue  < 0 && value >= 0)
+            }
+            if (fValue < 0 && value >= 0) {
                 return -1;
-            if (fValue >= 0 && value < 0)
+            }
+            if (fValue >= 0 && value < 0) {
                 return 1;
+            }
 
             // Otherwise, just compare the scales
             final int scale = ts.getScale();
@@ -312,12 +338,15 @@ public class TmfTimestamp implements ITmfTimestamp {
      */
     @Override
     public boolean equals(final Object other) {
-        if (this == other)
+        if (this == other) {
             return true;
-        if (other == null)
+        }
+        if (other == null) {
             return false;
-        if (!(other instanceof TmfTimestamp))
+        }
+        if (!(other instanceof TmfTimestamp)) {
             return false;
+        }
         final TmfTimestamp ts = (TmfTimestamp) other;
         return compareTo(ts, false) == 0;
     }

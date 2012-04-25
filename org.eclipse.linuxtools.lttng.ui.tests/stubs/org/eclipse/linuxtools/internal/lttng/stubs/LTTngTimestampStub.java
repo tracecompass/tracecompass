@@ -33,20 +33,23 @@ public class LTTngTimestampStub extends TmfTimestamp {
 	@Override
     public String toString() {
 
+	    long value = getValue();
+	    int scale = getScale();
+	    
 		// If we are dealing with units of seconds (or higher),
 		// use the plain formatter
-		if (fScale >= 0) {
-	    	Double value = fValue * Math.pow(10, fScale);
-	        return value.toString();
+		if (scale >= 0) {
+	    	Double dvalue = value * Math.pow(10, scale);
+	        return dvalue.toString();
 		}
 
 		// Define a format string
-        String format = String.format("%%1d.%%0%dd", -fScale);
+        String format = String.format("%%1d.%%0%dd", -scale);
 
         // And format the timestamp value
-        double scale = Math.pow(10, fScale);
-        long seconds = (long) (fValue * scale);
-        long fracts  = fValue - (long) ((double) seconds / scale); 
+        double dscale = Math.pow(10, scale);
+        long seconds = (long) (value * dscale);
+        long fracts  = value - (long) ((double) seconds / dscale); 
         String result = String.format(format, seconds, fracts);
 
         return result;

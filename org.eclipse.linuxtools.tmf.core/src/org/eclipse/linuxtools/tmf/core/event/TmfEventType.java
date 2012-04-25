@@ -15,9 +15,14 @@ package org.eclipse.linuxtools.tmf.core.event;
 
 
 /**
- * <b><u>TmfEventType</u></b>
- * <p>
  * A basic implementation of ITmfEventType.
+ * 
+ * @since 1.0
+ * @version 1.0
+ * @author Francois Chouinard
+ * @see ITmfEventType
+ * @see ITmfEventField
+ * @see ITmfEvent
  */
 public class TmfEventType implements ITmfEventType {
 
@@ -48,8 +53,9 @@ public class TmfEventType implements ITmfEventType {
      * @param root the root field
      */
     public TmfEventType(final String context, final String typeId, final ITmfEventField root) {
-        if (context == null || typeId == null)
+        if (context == null || typeId == null) {
             throw new IllegalArgumentException();
+        }
         fContext = context;
         fTypeId = typeId;
         fRootField = root;
@@ -64,8 +70,9 @@ public class TmfEventType implements ITmfEventType {
      * @param type the other type
      */
     public TmfEventType(final ITmfEventType type) {
-        if (type == null)
+        if (type == null) {
             throw new IllegalArgumentException();
+        }
         fContext = type.getContext();
         fTypeId  = type.getName();
         fRootField = type.getRootField();
@@ -104,8 +111,7 @@ public class TmfEventType implements ITmfEventType {
      */
     @Override
     public String[] getFieldNames() {
-        String[] result = (fRootField != null) ? fRootField.getFieldNames() : null;
-        return result;
+        return (fRootField != null) ? fRootField.getFieldNames() : null;
     }
 
     /* (non-Javadoc)
@@ -113,8 +119,7 @@ public class TmfEventType implements ITmfEventType {
      */
     @Override
     public String getFieldName(final int index) {
-        String result = (fRootField != null) ? fRootField.getFieldName(index) : null;
-        return result;
+        return (fRootField != null) ? fRootField.getFieldName(index) : null;
     }
 
     // ------------------------------------------------------------------------
@@ -159,17 +164,22 @@ public class TmfEventType implements ITmfEventType {
      */
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (!(obj instanceof TmfEventType))
+        }
+        if (!(obj instanceof TmfEventType)) {
             return false;
+        }
         final TmfEventType other = (TmfEventType) obj;
-        if (!fContext.equals(other.fContext))
+        if (!fContext.equals(other.fContext)) {
             return false;
-        if (!fTypeId.equals(other.fTypeId))
+        }
+        if (!fTypeId.equals(other.fTypeId)) {
             return false;
+        }
         return true;
     }
 

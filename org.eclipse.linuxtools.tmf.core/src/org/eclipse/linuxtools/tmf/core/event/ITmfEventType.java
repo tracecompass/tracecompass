@@ -12,13 +12,18 @@
 
 package org.eclipse.linuxtools.tmf.core.event;
 
+
 /**
- * <b><u>ITmfEventType</u></b>
- * <p>
  * The TMF event event type. It contains a reference to the full field structure
  * for that event type.
  * <p>
  * Types are unique within their context space.
+ * 
+ * @since 1.0
+ * @version 1.0
+ * @author Francois Chouinard
+ * @see TmfEventType
+ * @see ITmfEvent
  */
 public interface ITmfEventType extends Cloneable {
 

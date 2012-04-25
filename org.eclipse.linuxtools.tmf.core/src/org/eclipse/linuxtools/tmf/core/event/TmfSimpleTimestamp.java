@@ -13,9 +13,14 @@
 package org.eclipse.linuxtools.tmf.core.event;
 
 /**
- * <b><u>TmfSimpleTimestamp</u></b>
- * <p>
- * A simplified timestamp where scale and precision are set to 0.
+ * A simplified timestamp where scale and precision are set to 0 i.e. timestamps
+ * are represented by the tuple { value, 0, 0 }.
+ * 
+ * @since 1.0
+ * @version 1.0
+ * @author Francois Chouinard
+ * @see ITmfTimestamp
+ * @see TmfTimestamp
  */
 public class TmfSimpleTimestamp extends TmfTimestamp {
 
@@ -45,11 +50,10 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
      * @param timestamp the timestamp to copy
      */
     public TmfSimpleTimestamp(final ITmfTimestamp timestamp) {
-        if (timestamp == null || timestamp.getScale() != 0 || timestamp.getPrecision() != 0)
+        if (timestamp == null || timestamp.getScale() != 0 || timestamp.getPrecision() != 0) {
             throw new IllegalArgumentException();
-        fValue = timestamp.getValue();
-        fScale = 0;
-        fPrecision = 0;
+        }
+        setValue(timestamp.getValue(), 0, 0);
     }
 
     // ------------------------------------------------------------------------
@@ -61,8 +65,9 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
      */
     @Override
     public ITmfTimestamp normalize(final long offset, final int scale) throws ArithmeticException {
-        if (scale == 0)
-            return new TmfSimpleTimestamp(fValue + offset);
+        if (scale == 0) {
+            return new TmfSimpleTimestamp(getValue() + offset);
+        }
         return super.normalize(offset, scale);
     }
 
@@ -72,7 +77,7 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
     @Override
     public int compareTo(final ITmfTimestamp ts, final boolean withinPrecision) {
         if (ts instanceof TmfSimpleTimestamp) {
-            final long delta = fValue - ts.getValue();
+            final long delta = getValue() - ts.getValue();
             return (delta == 0) ? 0 : (delta > 0) ? 1 : -1;
         }
         return super.compareTo(ts, withinPrecision);
@@ -83,8 +88,9 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
      */
     @Override
     public ITmfTimestamp getDelta(final ITmfTimestamp ts) {
-        if (ts instanceof TmfSimpleTimestamp)
-            return new TmfSimpleTimestamp(fValue - ts.getValue());
+        if (ts instanceof TmfSimpleTimestamp) {
+            return new TmfSimpleTimestamp(getValue() - ts.getValue());
+        }
         return super.getDelta(ts);
     }
 
@@ -93,7 +99,7 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
     // ------------------------------------------------------------------------
 
     /* (non-Javadoc)
-     * @see java.lang.Object#clone()
+     * @see org.eclipse.linuxtools.tmf.core.event.TmfTimestamp#clone()
      */
     @Override
     public TmfSimpleTimestamp clone() {
@@ -117,12 +123,15 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
      */
     @Override
     public boolean equals(final Object other) {
-        if (this == other)
+        if (this == other) {
             return true;
-        if (other == null)
+        }
+        if (other == null) {
             return false;
-        if (!(other instanceof TmfSimpleTimestamp))
+        }
+        if (!(other instanceof TmfSimpleTimestamp)) {
             return super.equals(other);
+        }
         final TmfSimpleTimestamp ts = (TmfSimpleTimestamp) other;
 
         return compareTo(ts, false) == 0;
@@ -134,7 +143,7 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        return "TmfSimpleTimestamp [fValue=" + fValue + "]";
+        return "TmfSimpleTimestamp [fValue=" + getValue() + "]";
     }
 
 }

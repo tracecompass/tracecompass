@@ -51,7 +51,7 @@ public class LttngTimestamp extends TmfTimestamp {
     }
 
     public void setValue(final long newValue) {
-        fValue = newValue;
+        setValue(newValue, -9, 0);
     }
 
     /**
@@ -62,7 +62,7 @@ public class LttngTimestamp extends TmfTimestamp {
      * @return Seconds in the object, in string.
      */
     public String getSeconds() {
-        return formatSecs(fValue);
+        return formatSecs(getValue());
     }
 
     /**
@@ -73,7 +73,7 @@ public class LttngTimestamp extends TmfTimestamp {
      * @return Seconds in the object, in string.
      */
     public String getNanoSeconds() {
-        return formatNs(fValue);
+        return formatNs(getValue());
     }
 
     /*
@@ -132,20 +132,21 @@ public class LttngTimestamp extends TmfTimestamp {
     @SuppressWarnings("nls")
     public String toString() {
 
-        long value = fValue;
-        if (fValue < 0)
-            value = -fValue;
+        int scale = getScale();
+        long value = getValue();
+        if (value < 0)
+            value = -value;
 
         final StringBuilder sb = new StringBuilder(String.valueOf(value));
 
         // Prepend the correct number of "0" so we can insert a "." at the right location
-        final int nbZeroes = (-fScale) - sb.length() + 1;
+        final int nbZeroes = (-scale) - sb.length() + 1;
         for (int i = 0; i < nbZeroes; i++)
             sb.insert(i, "0");
-        sb.insert(sb.length() + fScale, ".");
+        sb.insert(sb.length() + scale, ".");
 
         // Prepend "-" if negative
-        if (fValue < 0)
+        if (getValue() < 0)
             sb.insert(0, "-");
 
         return sb.toString();

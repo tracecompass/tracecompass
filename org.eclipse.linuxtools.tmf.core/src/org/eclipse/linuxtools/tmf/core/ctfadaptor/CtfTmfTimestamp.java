@@ -13,8 +13,7 @@ public class CtfTmfTimestamp extends TmfTimestamp implements ITmfTimestamp {
 
     public CtfTmfTimestamp(long timestamp, CtfTmfTrace trace) {
         fTrace = trace;
-        fValue = timestamp;
-        fScale = (byte) -9;
+        setValue(timestamp, -9, 0);
     }
 
     /* (non-Javadoc)
@@ -60,7 +59,7 @@ public class CtfTmfTimestamp extends TmfTimestamp implements ITmfTimestamp {
      */
     @Override
     public String toString() {
-        final long timestamp = fValue;
+        final long timestamp = getValue();
         final Date d = new Date(timestamp / 1000000);
         final DateFormat df = new SimpleDateFormat("HH:mm:ss."); //$NON-NLS-1$
         final long nanos = (timestamp % 1000000000);
@@ -71,7 +70,7 @@ public class CtfTmfTimestamp extends TmfTimestamp implements ITmfTimestamp {
     }
 
     public String toFullDateString(){
-        final long timestamp = fValue;
+        final long timestamp = getValue();
         final Date d = new Date(timestamp / 1000000);
         final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss."); //$NON-NLS-1$
         final long nanos = (timestamp % 1000000000);

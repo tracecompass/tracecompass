@@ -13,8 +13,6 @@
 package org.eclipse.linuxtools.tmf.core.event;
 
 /**
- * <b><u>ITmfTimestamp</u></b>
- * <p>
  * The fundamental time reference in the TMF.
  * <p>
  * It defines a generic timestamp interface in its most basic form:
@@ -69,7 +67,7 @@ public interface ITmfTimestamp extends Cloneable, Comparable<ITmfTimestamp> {
      * @param scale the new timestamp scale
      * @return a new 'adjusted' ITmfTimestamp
      */
-    public ITmfTimestamp normalize(long offset, int scale) throws ArithmeticException;
+    public ITmfTimestamp normalize(long offset, int scale);
 
     /**
      * Compares [this] and [ts] within timestamp precision
@@ -105,6 +103,6 @@ public interface ITmfTimestamp extends Cloneable, Comparable<ITmfTimestamp> {
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     @Override
-    public int compareTo(ITmfTimestamp ts);
+    int compareTo(ITmfTimestamp ts);
 
 }
