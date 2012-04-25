@@ -17,7 +17,6 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IProbeEvent
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceEnablement;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.TraceEventType;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.BaseEventInfo;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.EventInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.ProbeEventInfo;
 
 /**

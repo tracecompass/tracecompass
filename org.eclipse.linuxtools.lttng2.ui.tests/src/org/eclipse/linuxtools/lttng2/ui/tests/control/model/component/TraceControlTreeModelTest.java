@@ -40,9 +40,10 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceS
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.UstProviderComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.LTTngControlService;
-import org.eclipse.rse.core.model.Host;
+import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.IHost;
-import org.eclipse.rse.internal.core.model.SystemProfile;
+import org.eclipse.rse.core.model.ISystemProfile;
+import org.eclipse.rse.core.model.ISystemRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.junit.After;
 import org.junit.Before;
@@ -125,9 +126,9 @@ public class TraceControlTreeModelTest extends TestCase {
         
         ITraceControlComponent root = TraceControlTestFacility.getInstance().getControlView().getTraceControlRoot();
 
-        @SuppressWarnings("restriction")
-        IHost host = new Host(new SystemProfile("myProfile", true));
-        host.setHostName("127.0.0.1");
+        ISystemRegistry registry = RSECorePlugin.getTheSystemRegistry();
+        ISystemProfile profile =  registry.createSystemProfile("myProfile", true);
+        IHost host = registry.createLocalHost(profile, "myProfile", "user");
 
         TargetNodeComponent node = new TargetNodeComponent(TARGET_NODE_NAME, root, host, fProxy);
 
@@ -139,8 +140,8 @@ public class TraceControlTreeModelTest extends TestCase {
         // ------------------------------------------------------------------------
         // Verify Parameters of TargetNodeComponent
         // ------------------------------------------------------------------------
-        assertEquals("127.0.0.1", node.getHostName());
-        assertEquals("127.0.0.1", node.getToolTip());
+        assertEquals("LOCALHOST", node.getHostName()); // assigned in createLocalHost() above
+        assertEquals("LOCALHOST", node.getToolTip()); // assigned in createLocalHost() above
         Image connectedImage = node.getImage();
         assertNotNull(connectedImage);
         assertEquals(TargetNodeState.CONNECTED, node.getTargetNodeState());

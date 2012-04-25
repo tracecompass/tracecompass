@@ -37,9 +37,10 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.Target
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceChannelComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceEventComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent;
-import org.eclipse.rse.core.model.Host;
+import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.IHost;
-import org.eclipse.rse.internal.core.model.SystemProfile;
+import org.eclipse.rse.core.model.ISystemProfile;
+import org.eclipse.rse.core.model.ISystemRegistry;
 import org.junit.After;
 import org.junit.Before;
 import org.osgi.framework.FrameworkUtil;
@@ -121,9 +122,9 @@ public class TraceControlKernelProviderTests extends TestCase {
         
         ITraceControlComponent root = TraceControlTestFacility.getInstance().getControlView().getTraceControlRoot();
 
-        @SuppressWarnings("restriction")
-        IHost host = new Host(new SystemProfile("myProfile", true));
-        host.setHostName("127.0.0.1");
+        ISystemRegistry registry = RSECorePlugin.getTheSystemRegistry();
+        ISystemProfile profile =  registry.createSystemProfile("myProfile", true);
+        IHost host = registry.createLocalHost(profile, "myProfile", "user");
         
         TargetNodeComponent node = new TargetNodeComponent("myNode", root, host, fProxy);
 

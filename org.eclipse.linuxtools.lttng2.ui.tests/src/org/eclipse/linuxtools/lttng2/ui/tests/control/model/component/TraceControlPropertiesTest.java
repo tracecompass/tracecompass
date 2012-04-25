@@ -46,9 +46,10 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.TraceEve
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.TraceProbeEventPropertySource;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.TraceSessionPropertySource;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.UstProviderPropertySource;
-import org.eclipse.rse.core.model.Host;
+import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.IHost;
-import org.eclipse.rse.internal.core.model.SystemProfile;
+import org.eclipse.rse.core.model.ISystemProfile;
+import org.eclipse.rse.core.model.ISystemRegistry;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.junit.After;
 import org.junit.Before;
@@ -129,9 +130,9 @@ public class TraceControlPropertiesTest extends TestCase {
             
         ITraceControlComponent root = TraceControlTestFacility.getInstance().getControlView().getTraceControlRoot();
 
-        @SuppressWarnings("restriction")
-        IHost host = new Host(new SystemProfile("myProfile", true));
-        host.setHostName("127.0.0.1");
+        ISystemRegistry registry = RSECorePlugin.getTheSystemRegistry();
+        ISystemProfile profile =  registry.createSystemProfile("myProfile", true);
+        IHost host = registry.createLocalHost(profile, "myProfile", "user");
 
         TargetNodeComponent node = new TargetNodeComponent("myNode", root, host, proxy);
 
@@ -154,7 +155,7 @@ public class TraceControlPropertiesTest extends TestCase {
         assertNotNull(source.getPropertyDescriptors());
 
         assertEquals("myNode", source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_NAME_PROPERTY_ID));
-        assertEquals("127.0.0.1",  source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_ADDRESS_PROPERTY_ID));
+        assertEquals("LOCALHOST",  source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_ADDRESS_PROPERTY_ID));
         assertEquals(TargetNodeState.CONNECTED.name(), source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_STATE_PROPERTY_ID));
         assertNull(source.getPropertyValue("test"));
 

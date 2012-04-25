@@ -28,8 +28,10 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.remote.RemoteSyst
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ICommandShell;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.ILttngControlService;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.service.LTTngControlServiceFactory;
+import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.model.IRSECallback;
+import org.eclipse.rse.core.model.ISystemRegistry;
 import org.eclipse.rse.core.subsystems.CommunicationsEvent;
 import org.eclipse.rse.core.subsystems.ICommunicationsListener;
 import org.eclipse.swt.graphics.Image;
@@ -314,9 +316,20 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
         job.schedule();
     }
 
+    /**
+     * Refresh the node configuration
+     */
     public void refresh() {
         removeAllChildren();
         getConfigurationFromNode();
+    }
+    
+    /**
+     * Deregisters host from registry.
+     */
+    public void deregister() {
+        ISystemRegistry registry = RSECorePlugin.getTheSystemRegistry();
+        registry.deleteHost(fHost);
     }
 
     // ------------------------------------------------------------------------
