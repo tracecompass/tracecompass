@@ -104,7 +104,8 @@ public class TmfEventType implements ITmfEventType {
      */
     @Override
     public String[] getFieldNames() {
-        return (fRootField != null) ? fRootField.getFieldNames() : null;
+        String[] result = (fRootField != null) ? fRootField.getFieldNames() : null;
+        return result;
     }
 
     /* (non-Javadoc)
@@ -112,7 +113,8 @@ public class TmfEventType implements ITmfEventType {
      */
     @Override
     public String getFieldName(final int index) {
-        return (fRootField != null) ? fRootField.getFieldName(index) : null;
+        String result = (fRootField != null) ? fRootField.getFieldName(index) : null;
+        return result;
     }
 
     // ------------------------------------------------------------------------

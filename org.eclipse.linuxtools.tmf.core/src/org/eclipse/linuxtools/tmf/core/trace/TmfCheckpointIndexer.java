@@ -274,7 +274,7 @@ public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITm
             }
         }
         final ITmfContext context = fTrace.seekEvent(location);
-        context.setRank(index * fCheckpointInterval);
+        context.setRank((long) index * fCheckpointInterval);
         return context;
     }
 

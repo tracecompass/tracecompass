@@ -143,7 +143,8 @@ public class TmfEventField implements ITmfEventField {
      */
     @Override
     public ITmfEventField[] getFields() {
-        return (fFields != null) ? Arrays.copyOf(fFields, fFields.length) : null;
+        ITmfEventField[] result = (fFields != null) ? Arrays.copyOf(fFields, fFields.length) : null;
+        return result;
     }
 
     /* (non-Javadoc)

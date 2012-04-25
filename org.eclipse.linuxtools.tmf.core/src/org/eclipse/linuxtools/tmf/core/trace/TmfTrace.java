@@ -298,7 +298,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getNbEvents()
      */
     @Override
-    public long getNbEvents() {
+    public synchronized long getNbEvents() {
         return fNbEvents;
     }
 
@@ -513,7 +513,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      */
     @Override
     @SuppressWarnings("nls")
-    public String toString() {
+    public synchronized String toString() {
         return "TmfTrace [fPath=" + fPath + ", fCacheSize=" + fCacheSize
                 + ", fNbEvents=" + fNbEvents + ", fStartTime=" + fStartTime
                 + ", fEndTime=" + fEndTime + ", fStreamingInterval=" + fStreamingInterval + "]";
