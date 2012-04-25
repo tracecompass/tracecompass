@@ -16,7 +16,13 @@ package org.eclipse.linuxtools.tmf.ui.views.events;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
@@ -36,6 +42,7 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ide.IGotoMarker;
 import org.osgi.framework.Bundle;
 
@@ -47,7 +54,7 @@ import org.osgi.framework.Bundle;
  * TODO: Handle column selection, sort, ... generically (nothing less...)
  * TODO: Implement hide/display columns
  */
-public class TmfEventsView extends TmfView {
+public class TmfEventsView extends TmfView implements IResourceChangeListener {
 
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.events"; //$NON-NLS-1$
 
@@ -218,6 +225,9 @@ public class TmfEventsView extends TmfView {
             fEventsTable = createEventsTable(fParent);
             fEventsTable.setTrace(fExperiment, false);
             fEventsTable.refreshBookmarks(fExperiment.getBookmarksFile());
+            if (fExperiment.getBookmarksFile() != null) {
+                ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
+            }
             fParent.layout();
         }
     }
@@ -236,7 +246,36 @@ public class TmfEventsView extends TmfView {
                     setPartName(fTitlePrefix);
                 }
             });
+
+            if ((fExperiment != null) && (fExperiment.getBookmarksFile() != null)) {
+                ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
+            }
+
 		}
 	}
 
+	@Override
+    public void resourceChanged(final IResourceChangeEvent event) {
+	    if (fExperiment == null || fExperiment.getBookmarksFile() == null) {
+	        return;
+	    }
+
+        for (final IMarkerDelta delta : event.findMarkerDeltas(IMarker.BOOKMARK, false))
+            if (delta.getResource().equals(fExperiment.getBookmarksFile()))
+                if (delta.getKind() == IResourceDelta.REMOVED) {
+                    final IMarker bookmark = delta.getMarker();
+                    Display.getDefault().asyncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            fEventsTable.removeBookmark(bookmark);
+                        }
+                    });
+                } else if (delta.getKind() == IResourceDelta.CHANGED)
+                    Display.getDefault().asyncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            fEventsTable.getTable().refresh();
+                        }
+                    });
+    }
 }
