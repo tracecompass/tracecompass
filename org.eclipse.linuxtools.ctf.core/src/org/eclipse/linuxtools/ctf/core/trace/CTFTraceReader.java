@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.ctf.core.trace;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.Vector;
@@ -69,7 +70,7 @@ public class CTFTraceReader {
      */
     private long fIndex;
 
-    private final long startIndex[];
+    private final HashMap<Integer, Long> startIndex;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -100,11 +101,8 @@ public class CTFTraceReader {
          */
         this.startTime = prio.peek().getCurrentEvent().timestamp;
         this.endTime = this.startTime;
-        this.fIndex = 0;
-        startIndex = new long[prio.size()];
-        for (int i = 0; i < prio.size(); i++) {
-            startIndex[i] = 0;
-        }
+        this.index = 0;
+        startIndex = new HashMap<Integer, Long>();
     }
 
     /**
@@ -252,9 +250,13 @@ public class CTFTraceReader {
                     .getCurrentPacket();
             if (!packetHasMoreEvents) {
                 int n = this.streamInputReaders.indexOf(top);
-                currentPacket.setIndexBegin(startIndex[n]);
-                currentPacket.setIndexEnd(fIndex);
-                startIndex[n] = fIndex + 1;
+
+                if(!startIndex.containsKey(n)){
+                    startIndex.put(n, 0L);
+                }
+                currentPacket.setIndexBegin(startIndex.get(n));
+                currentPacket.setIndexEnd(index);
+                startIndex.put(n, index + 1);
             }
         }
         /*
@@ -352,7 +354,7 @@ public class CTFTraceReader {
                  * Seek the trace reader.
                  */
                 final long streamIndex = streamInputReader.seekIndex(index);
-                if( streamIndex != -1 )
+                if( streamInputReader.getCurrentEvent() != null )
                 {
                     tempIndex = Math.max(tempIndex, streamIndex);
                     EventDefinition currentEvent = streamInputReader.getCurrentEvent();
