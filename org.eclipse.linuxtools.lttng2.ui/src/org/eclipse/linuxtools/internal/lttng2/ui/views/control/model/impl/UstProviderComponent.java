@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl;
 
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IBaseEventInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IUstProviderInfo;
@@ -53,6 +54,7 @@ public class UstProviderComponent extends TraceControlComponent {
     public UstProviderComponent(String name, ITraceControlComponent parent) {
         super(name, parent);
         setImage(USTL_PROVIDER_ICON_FILE);
+        setToolTip(Messages.TraceControl_ProviderDisplayName);
         fProviderInfo = new UstProviderInfo(name);
     }
 
@@ -71,7 +73,7 @@ public class UstProviderComponent extends TraceControlComponent {
             component.setEventInfo(events[i]);
             addChild(component);
         }
-        setToolTip("PID=" + fProviderInfo.getPid()); //$NON-NLS-1$
+        setName(getName() + " [PID=" + fProviderInfo.getPid() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
     }
     
     /**

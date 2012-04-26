@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.Messages;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.IBaseEventInfo;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.ITraceControlComponent;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.property.KernelProviderPropertySource;
@@ -50,6 +51,7 @@ public class KernelProviderComponent extends TraceControlComponent {
      */
     public KernelProviderComponent(String name, ITraceControlComponent parent) {
         super(name, parent);
+        setToolTip(Messages.TraceControl_ProviderDisplayName);
         setImage(KERNEL_PROVIDER_ICON_FILE);
     }
     
