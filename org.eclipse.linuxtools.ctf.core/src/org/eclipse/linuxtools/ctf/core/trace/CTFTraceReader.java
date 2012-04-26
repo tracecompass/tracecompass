@@ -98,10 +98,14 @@ public class CTFTraceReader {
 
         /**
          * Get the start Time of this trace
+         * bear in mind that the trace could be empty.
          */
-        this.startTime = prio.peek().getCurrentEvent().timestamp;
-        this.endTime = this.startTime;
-        this.index = 0;
+        this.startTime = 0;// prio.peek().getPacketReader().getCurrentPacket().getTimestampBegin();
+        if (hasMoreEvents()) {
+            this.startTime = prio.peek().getCurrentEvent().timestamp;
+            this.endTime = this.startTime;
+            this.index = 0;
+        }
         startIndex = new HashMap<Integer, Long>();
     }
 
@@ -250,8 +254,7 @@ public class CTFTraceReader {
                     .getCurrentPacket();
             if (!packetHasMoreEvents) {
                 int n = this.streamInputReaders.indexOf(top);
-
-                if(!startIndex.containsKey(n)){
+                if (!startIndex.containsKey(n)) {
                     startIndex.put(n, 0L);
                 }
                 currentPacket.setIndexBegin(startIndex.get(n));
@@ -298,7 +301,7 @@ public class CTFTraceReader {
             streamInputReader.goToLastEvent();
         }
         int count = prio.size();
-        for (int i = 0; i < (count-1); i++) {
+        for (int i = 0; i < (count - 1); i++) {
             advance();
         }
     }
@@ -354,18 +357,18 @@ public class CTFTraceReader {
                  * Seek the trace reader.
                  */
                 final long streamIndex = streamInputReader.seekIndex(index);
-                if( streamInputReader.getCurrentEvent() != null )
-                {
+                if (streamInputReader.getCurrentEvent() != null) {
                     tempIndex = Math.max(tempIndex, streamIndex);
-                    EventDefinition currentEvent = streamInputReader.getCurrentEvent();
+                    EventDefinition currentEvent = streamInputReader
+                            .getCurrentEvent();
                     /*
                      * Maybe we're at the beginning of a trace.
                      */
-                    if( currentEvent == null ){
+                    if (currentEvent == null) {
                         streamInputReader.readNextEvent();
                         currentEvent = streamInputReader.getCurrentEvent();
                     }
-                    if( currentEvent != null ) {
+                    if (currentEvent != null) {
                         tempTimestamp = Math.max(tempTimestamp,
                                 currentEvent.timestamp);
                     } else {
@@ -375,7 +378,6 @@ public class CTFTraceReader {
                         tempIndex = goToZero();
                     }
                 }
-
 
             }
         } catch (CTFReaderException e) {
@@ -417,6 +419,7 @@ public class CTFTraceReader {
 
     /**
      * Go to the first entry of a trace
+     *
      * @return 0, the first index.
      */
     private long goToZero() {

@@ -18,10 +18,7 @@ public class CtfTmfContent extends TmfEventField {
     public String toString() {
         StringBuilder retVal = new StringBuilder();
         for( ITmfEventField field : getFields())        {
-            retVal.append(field.getName());
-            retVal.append(':');
-            retVal.append(field.getValue());
-            retVal.append(' ');
+            retVal.append(field.toString());
             retVal.append('\t');
         }
         return retVal.toString();

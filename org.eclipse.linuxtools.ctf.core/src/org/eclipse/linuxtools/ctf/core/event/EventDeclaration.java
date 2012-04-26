@@ -57,6 +57,10 @@ public class EventDeclaration {
      */
     private long logLevel;
 
+    /**
+     *
+     */
+    static private EventDeclaration lostEvent = null;
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -80,6 +84,21 @@ public class EventDeclaration {
         }
 
         return event;
+    }
+
+    /**
+     * Creates a "lost" event. This is a synthetic event that is there to show
+     * that there should be something there.
+     * @return
+     */
+    public static EventDeclaration getLostEventDeclaration(){
+        if(lostEvent == null) {
+            lostEvent = new EventDeclaration();
+            lostEvent.fields = new StructDeclaration(1);
+            lostEvent.id = (long) -1;
+            lostEvent.name = "Lost event"; //$NON-NLS-1$
+        }
+        return lostEvent;
     }
 
     // ------------------------------------------------------------------------

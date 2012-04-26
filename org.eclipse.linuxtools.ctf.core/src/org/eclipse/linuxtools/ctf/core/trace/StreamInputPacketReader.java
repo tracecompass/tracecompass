@@ -94,6 +94,13 @@ class StreamInputPacketReader implements IDefinitionScope {
      */
     private int currentCpu = 0;
 
+    /**
+     * number of lost events in this packet
+     */
+    private int lostEvents;
+
+    private int lostSoFar;
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -116,6 +123,9 @@ class StreamInputPacketReader implements IDefinitionScope {
          * Create definitions needed to read the events.
          */
         createDefinitions();
+
+        lostEvents = 0 ;
+        lostSoFar = 0 ;
     }
 
     // ------------------------------------------------------------------------
@@ -250,10 +260,22 @@ class StreamInputPacketReader implements IDefinitionScope {
              */
             if (getStreamPacketContextDef() != null) {
                 getStreamPacketContextDef().read(getBitBuffer());
+                /*
+                 * Read CPU ID
+                 */
+
                 Definition cpuiddef = getStreamPacketContextDef().lookupDefinition("cpu_id"); //$NON-NLS-1$
                 if (cpuiddef instanceof IntegerDefinition) {
                     currentCpu = (int) ((IntegerDefinition) cpuiddef).getValue();
                 }
+                /*
+                 * Read number of lost events
+                 */
+                Definition lostEventsdef = getStreamPacketContextDef().lookupDefinition("events_discarded"); //$NON-NLS-1$
+                if (cpuiddef instanceof IntegerDefinition) {
+                    lostEvents = (int) ((IntegerDefinition) lostEventsdef).getValue();
+                }
+
             }
 
             /*
@@ -292,6 +314,14 @@ class StreamInputPacketReader implements IDefinitionScope {
         Long eventID = null;
         long timestamp = 0;
 
+
+        if( lostEvents > lostSoFar)
+        {
+            EventDefinition eventDef = EventDeclaration.getLostEventDeclaration().createDefinition(streamInputReader);
+            eventDef.timestamp = this.lastTimestamp;
+            ++lostSoFar;
+            return eventDef;
+        }
         StructDefinition sehd = getStreamEventHeaderDef(); // acronym for a long variable name
         BitBuffer currentBitBuffer = getBitBuffer();
         /*
