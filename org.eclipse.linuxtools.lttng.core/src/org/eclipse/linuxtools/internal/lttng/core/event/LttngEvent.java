@@ -46,8 +46,7 @@ public class LttngEvent extends TmfEvent {
     public LttngEvent(TmfTrace<LttngEvent> parent, LttngTimestamp timestamp, String source, LttngEventType type, LttngEventContent content,
             String reference, JniEvent lttEvent)
     {
-        super(timestamp, source, type, reference);
-        super.setContent(content);
+        super(parent, timestamp, source, type, content, reference);
         jniEventReference = lttEvent;
         super.setTrace(parent);
     }

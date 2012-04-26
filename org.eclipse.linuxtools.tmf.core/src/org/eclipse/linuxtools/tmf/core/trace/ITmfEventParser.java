@@ -16,8 +16,14 @@ package org.eclipse.linuxtools.tmf.core.trace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 
 /**
- * <b><u>ITmfEventParser</u></b>
- * <p>
+ * The TMF trace parser API.
+ * 
+ * @since 1.0
+ * @version 1.0
+ * @author Francois Chouinard
+ *
+ * @see ITmfEvent
+ * @see ITmfContext
  */
 public interface ITmfEventParser<T extends ITmfEvent> {
 

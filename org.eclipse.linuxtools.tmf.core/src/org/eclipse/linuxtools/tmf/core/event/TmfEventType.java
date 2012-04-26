@@ -13,16 +13,15 @@
 
 package org.eclipse.linuxtools.tmf.core.event;
 
-
 /**
  * A basic implementation of ITmfEventType.
  * 
  * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
- * @see ITmfEventType
- * @see ITmfEventField
+ * 
  * @see ITmfEvent
+ * @see ITmfEventField
  */
 public class TmfEventType implements ITmfEventType {
 

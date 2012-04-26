@@ -15,14 +15,14 @@ package org.eclipse.linuxtools.tmf.core.event;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
- * The TmfEventTypeManager acts as a central repository for the available
- * event types. Types are managed in their context space.
+ * A central repository for the available event types. Types are managed by
+ * context space.
  * 
  * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
+ * 
  * @see ITmfEventType
  */
 public final class TmfEventTypeManager {

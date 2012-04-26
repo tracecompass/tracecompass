@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.tmf.core.event;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
- * The basic event structure in TMF. In its canonical form, a data item has:
+ * The generic event structure in TMF. In its canonical form, an event has:
  * <ul>
  * <li> a parent trace
  * <li> a rank (order within the trace)
@@ -34,7 +34,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  *
  * @see ITmfTimestamp
  * @see ITmfEventType
- * @see ITmfEvetnField
+ * @see ITmfEventField
  * @see TmfEvent
  */
 public interface ITmfEvent extends Cloneable {
@@ -44,12 +44,28 @@ public interface ITmfEvent extends Cloneable {
     // ------------------------------------------------------------------------
 
     /**
-     * Pre-defined event attributes
+     * Pre-defined event timestamp attribute (for searching &filtering purposes)
      */
     public static final String EVENT_FIELD_TIMESTAMP = ":timestamp:"; //$NON-NLS-1$
-    public static final String EVENT_FIELD_SOURCE    = ":source:";    //$NON-NLS-1$
-    public static final String EVENT_FIELD_TYPE      = ":type:";      //$NON-NLS-1$
-    public static final String EVENT_FIELD_CONTENT   = ":content:";   //$NON-NLS-1$
+
+    /**
+     * Pre-defined event source attribute (for searching &filtering purposes)
+     */
+    public static final String EVENT_FIELD_SOURCE = ":source:"; //$NON-NLS-1$
+
+    /**
+     * Pre-defined event type attribute (for searching &filtering purposes)
+     */
+    public static final String EVENT_FIELD_TYPE = ":type:"; //$NON-NLS-1$
+
+    /**
+     * Pre-defined event content attribute (for searching &filtering purposes)
+     */
+    public static final String EVENT_FIELD_CONTENT = ":content:"; //$NON-NLS-1$
+
+    /**
+     * Pre-defined event reference attribute (for searching &filtering purposes)
+     */
     public static final String EVENT_FIELD_REFERENCE = ":reference:"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------

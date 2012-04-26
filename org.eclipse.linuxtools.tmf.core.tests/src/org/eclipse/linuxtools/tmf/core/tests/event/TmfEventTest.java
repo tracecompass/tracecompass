@@ -33,6 +33,7 @@ import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 
 /**
@@ -132,7 +133,7 @@ public class TmfEventTest extends TestCase {
     public void testDefaultConstructor() {
         final ITmfEvent event = new TmfEvent();
         assertNull("getTrace", event.getTrace());
-        assertEquals("getRank", -1, event.getRank());
+        assertEquals("getRank", TmfContext.UNKNOWN_RANK, event.getRank());
         assertNull("getTimestamp", event.getTimestamp());
         assertNull("getSource", event.getSource());
         assertNull("getType", event.getType());
@@ -161,33 +162,11 @@ public class TmfEventTest extends TestCase {
     public void testNoRankConstructor() {
         final TmfEvent event = new TmfEvent(null, fTimestamp1, fSource, fType, fContent1, fReference1);
         assertNull("getTrace", event.getTrace());
-        assertEquals("getRank", -1, event.getRank());
+        assertEquals("getRank", TmfContext.UNKNOWN_RANK, event.getRank());
         assertEquals("getTimestamp", fTimestamp1, event.getTimestamp());
         assertEquals("getSource", fSource, event.getSource());
         assertEquals("getType", fType, event.getType());
         assertEquals("getContent", fContent1, event.getContent());
-        assertEquals("getReference", fReference1, event.getReference());
-    }
-
-    public void testNoRankContentConstructor() {
-        final TmfEvent event = new TmfEvent(null, fTimestamp1, fSource, fType, fReference1);
-        assertNull("getTrace", event.getTrace());
-        assertEquals("getRank", -1, event.getRank());
-        assertEquals("getTimestamp", fTimestamp1, event.getTimestamp());
-        assertEquals("getSource", fSource, event.getSource());
-        assertEquals("getType", fType, event.getType());
-        assertNull("getContent", event.getContent());
-        assertEquals("getReference", fReference1, event.getReference());
-    }
-
-    public void testNoTraceRankContentConstructor() {
-        final TmfEvent event = new TmfEvent(fTimestamp1, fSource, fType, fReference1);
-        assertNull("getTrace", event.getTrace());
-        assertEquals("getRank", -1, event.getRank());
-        assertEquals("getTimestamp", fTimestamp1, event.getTimestamp());
-        assertEquals("getSource", fSource, event.getSource());
-        assertEquals("getType", fType, event.getType());
-        assertNull("getContent", event.getContent());
         assertEquals("getReference", fReference1, event.getReference());
     }
 

@@ -12,17 +12,16 @@
 
 package org.eclipse.linuxtools.tmf.core.event;
 
-
 /**
- * The TMF event payload structure. Each field can be either a terminal or
+ * The generic event payload in TMF. Each field can be either a terminal or
  * further decomposed into subfields.
  * 
  * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  *
- * @see TmfEventField
  * @see ITmfEvent
+ * @see ITmfEventField
  */
 public interface ITmfEventField extends Cloneable {
 
@@ -50,7 +49,7 @@ public interface ITmfEventField extends Cloneable {
     public Object getValue();
 
     /**
-     * @return the list of subfield names (empty if none)
+     * @return the list of subfield names (empty array if none)
      */
     public String[] getFieldNames();
 
@@ -60,7 +59,7 @@ public interface ITmfEventField extends Cloneable {
     public String getFieldName(int index);
 
     /**
-     * @return the list of subfields (null if none)
+     * @return the list of subfields (empty array if none)
      */
     public ITmfEventField[] getFields();
 
@@ -79,7 +78,7 @@ public interface ITmfEventField extends Cloneable {
     // ------------------------------------------------------------------------
 
     /**
-     * @return a clone of the event type
+     * @return a clone of the event field
      */
     public ITmfEventField clone();
 

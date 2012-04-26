@@ -29,8 +29,6 @@ import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
 
 /**
- * <b><u>TmfTraceIndexer</u></b>
- * <p>
  * A simple trace indexer that builds an array of trace checkpoints. Checkpoints
  * are stored at fixed intervals (event rank) in ascending timestamp order.
  * <p>
@@ -41,6 +39,14 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
  * <p>
  * Locating a specific checkpoint is trivial for both rank (rank % interval) and
  * timestamp (bsearch in the array).
+ * 
+ * @since 1.0
+ * @version 1.0
+ * @author Francois Chouinard
+ *
+ * @see ITmfTraceIndexer
+ * @see ITmfTrace
+ * @see ITmfEvent
  */
 public class TmfCheckpointIndexer<T extends ITmfTrace<ITmfEvent>> implements ITmfTraceIndexer<T> {
 

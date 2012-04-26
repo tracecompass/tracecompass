@@ -16,10 +16,14 @@ package org.eclipse.linuxtools.tmf.core.trace;
 import java.lang.reflect.Method;
 
 /**
- * <b><u>TmfLocation</u></b>
- * <p>
  * A convenience implementation on of ITmfLocation. The generic class (L) must
  * be comparable.
+ * 
+ * @since 1.0
+ * @version 1.0
+ * @author Francois Chouinard
+ *
+ * @see ITmfLocation
  */
 public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L> {
 

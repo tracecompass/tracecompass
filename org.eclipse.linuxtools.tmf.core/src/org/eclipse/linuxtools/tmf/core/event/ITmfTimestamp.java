@@ -31,8 +31,8 @@ package org.eclipse.linuxtools.tmf.core.event;
  * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
- * @see TmfTimestamp
- * @see TmfSimpleTimestamp
+ * 
+ * @see ITmfEvent
  * @see TmfTimeRange
  */
 public interface ITmfTimestamp extends Cloneable, Comparable<ITmfTimestamp> {

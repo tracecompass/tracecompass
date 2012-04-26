@@ -19,8 +19,8 @@ package org.eclipse.linuxtools.tmf.core.event;
  * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
+ * 
  * @see ITmfTimestamp
- * @see TmfTimestamp
  */
 public final class TmfTimeRange implements Cloneable {
 

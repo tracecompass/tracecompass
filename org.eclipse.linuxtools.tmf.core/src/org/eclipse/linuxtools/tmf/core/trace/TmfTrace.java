@@ -28,8 +28,6 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 
 /**
- * <b><u>TmfTrace</u></b>
- * <p>
  * Abstract implementation of ITmfTrace.
  * <p>
  * Since the concept of 'location' is trace specific, the concrete classes have
@@ -47,6 +45,16 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
  * The concrete class can either specify its own indexer or use the provided
  * TmfCheckpointIndexer (default). In this case, the trace cache size will be
  * used as checkpoint interval.
+ * 
+ * @since 1.0
+ * @version 1.0
+ * @author Francois Chouinard
+ *
+ * @see ITmfTrace
+ * @see TmfEventProvider
+ * @see ITmfEvent
+ * @see ITmfTraceIndexer
+ * @see ITmfEventParser
  */
 public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> implements ITmfTrace<T> {
 

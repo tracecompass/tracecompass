@@ -14,6 +14,7 @@
 package org.eclipse.linuxtools.tmf.core.event;
 
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 
 /**
  * A basic implementation of ITmfEvent.
@@ -25,6 +26,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
+ * 
  * @see ITmfTimestamp
  * @see ITmfEventType
  * @see ITmfEventField
@@ -49,36 +51,28 @@ public class TmfEvent implements ITmfEvent {
     // ------------------------------------------------------------------------
 
     /**
-     * Default constructor
+     * Default constructor. All fields have their default value (null) and the
+     * event rank is set to TmfContext.UNKNOWN_RANK.
      */
     public TmfEvent() {
-        this(null, -1, null, null, null, null, null);
+        this(null, TmfContext.UNKNOWN_RANK, null, null, null, null, null);
     }
 
     /**
-     * Constructor - no rank
+     * Standard constructor. The event rank will be set to TmfContext.UNKNOWN_RANK.
+     *
+     * @param trace the parent trace
+     * @param timestamp the event timestamp
+     * @param source the event source
+     * @param type the event type
+     * @param content the event content (payload)
+     * @param reference the event reference
+
      */
     public TmfEvent(final ITmfTrace<? extends ITmfEvent> trace, final ITmfTimestamp timestamp, final String source,
             final ITmfEventType type, final ITmfEventField content, final String reference)
     {
-        this(trace, -1, timestamp, source, type, content, reference);
-    }
-
-    /**
-     * Constructor - no rank, no content
-     */
-    public TmfEvent(final ITmfTrace<? extends ITmfEvent> trace, final ITmfTimestamp timestamp, final String source,
-            final ITmfEventType type, final String reference)
-    {
-        this(trace, -1, timestamp, source, type, null, reference);
-    }
-
-    /**
-     * Constructor - no rank, no content, no trace
-     */
-    public TmfEvent(final ITmfTimestamp timestamp, final String source, final ITmfEventType type, final String reference)
-    {
-        this(null, -1, timestamp, source, type, null, reference);
+        this(trace, TmfContext.UNKNOWN_RANK, timestamp, source, type, content, reference);
     }
 
     /**

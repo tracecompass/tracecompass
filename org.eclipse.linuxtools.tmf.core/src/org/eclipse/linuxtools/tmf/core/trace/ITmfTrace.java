@@ -23,8 +23,6 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 
 /**
- * <b><u>ITmfTrace</u></b>
- * <p>
  * The event stream structure in TMF. In its basic form, a trace has:
  * <ul>
  * <li> an associated Eclipse resource
@@ -101,9 +99,15 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
  *     request.waitForCompletion();
  * } 
  * </pre>
+ * 
+ * @since 1.0
+ * @version 1.0
+ * @author Francois Chouinard
+ *
  * @see ITmfEvent
  * @see ITmfEventProvider
  * @see ITmfEventRequest
+ * @see TmfTrace
  */
 public interface ITmfTrace<T extends ITmfEvent> extends ITmfDataProvider<T> {
 

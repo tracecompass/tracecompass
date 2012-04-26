@@ -15,10 +15,16 @@ package org.eclipse.linuxtools.tmf.core.trace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 
 /**
- * <b><u>ITmfCheckpoint</u></b>
- * <p>
  * The basic trace checkpoint structure in TMF. The purpose of the checkpoint is
  * to associate a trace location to an event timestamp.
+ * 
+ * @since 1.0
+ * @version 1.0
+ * @author Francois Chouinard
+ *
+ * @see TmfCheckpoint
+ * @see ITmfTimestamp
+ * @see ITmfLocation
  */
 public interface ITmfCheckpoint extends Cloneable, Comparable<ITmfCheckpoint> {
 

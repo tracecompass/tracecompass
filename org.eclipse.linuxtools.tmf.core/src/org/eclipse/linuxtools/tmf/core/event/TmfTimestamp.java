@@ -21,8 +21,6 @@ package org.eclipse.linuxtools.tmf.core.event;
  * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
- * @see ITmfTimestamp
- * @see TmfSimpleTimestamp
  */
 public class TmfTimestamp implements ITmfTimestamp, Cloneable {
 

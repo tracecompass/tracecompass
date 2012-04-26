@@ -16,8 +16,14 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 
 /**
- * <b><u>ITmfTraceIndexer</u></b>
- * <p>
+ * The trace indexer API.
+ * 
+ * @since 1.0
+ * @version 1.0
+ * @author Francois Chouinard
+ *
+ * @see ITmfTrace
+ * @see ITmfEvent
  */
 public interface ITmfTraceIndexer<T extends ITmfTrace<ITmfEvent>> {
 

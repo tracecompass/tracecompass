@@ -26,9 +26,9 @@ import java.util.Map;
  * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
- * @see ITmfEventField
- * @see ITmfEventType
+ * 
  * @see ITmfEvent
+ * @see ITmfEventType
  */
 public class TmfEventField implements ITmfEventField {
 
@@ -65,7 +65,7 @@ public class TmfEventField implements ITmfEventField {
     }
 
     /**
-     * Constructor for a terminal field (i.e. no subfields)
+     * Constructor for a terminal field (no subfields)
      * 
      * @param name the event field id
      * @param value the event field value
