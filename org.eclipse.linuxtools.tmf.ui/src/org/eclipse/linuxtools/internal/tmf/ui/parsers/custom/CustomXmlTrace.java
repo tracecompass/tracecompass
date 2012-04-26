@@ -22,6 +22,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefinition.InputAttribute;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomXmlTraceDefinition.InputElement;
@@ -74,7 +75,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
 
     @Override
     public TmfContext seekEvent(final ITmfLocation<?> location) {
-        final CustomXmlTraceContext context = new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
+        final CustomXmlTraceContext context = new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         if (NULL_LOCATION.equals(location) || !new File(getPath()).isFile())
             return context;
         try {
@@ -125,10 +126,10 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
             return context;
         } catch (final FileNotFoundException e) {
             e.printStackTrace();
-            return new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
+            return new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         } catch (final IOException e) {
             e.printStackTrace();
-            return new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
+            return new CustomXmlTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         } finally {
             if (raFile != null) {
                 try {
@@ -180,7 +181,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
     }
 
     @Override
-    public TmfEvent parseEvent(final ITmfContext tmfContext) {
+    public CustomXmlEvent parseEvent(final ITmfContext tmfContext) {
         if (!(tmfContext instanceof CustomXmlTraceContext))
             return null;
 
@@ -278,7 +279,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
                     readElement(buffer, raFile);
                 } else if (c == '/' && numRead == 1) {
                     break; // found "</"
-                } else if (c == '-' && numRead == 3 && buffer.substring(buffer.length() - 3, buffer.length() - 1).equals("!-")) {
+                } else if (c == '-' && numRead == 3 && buffer.substring(buffer.length() - 3, buffer.length() - 1).equals("!-")) { //$NON-NLS-1$
                     readComment(buffer, raFile); // found "<!--"
                 } else if (i == '>')
                     if (buffer.charAt(buffer.length() - 2) == '/') {
@@ -321,7 +322,7 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
                 numRead++;
                 final char c = (char)i;
                 buffer.append(c);
-                if (c == '>' && numRead >= 2 && buffer.substring(buffer.length() - 3, buffer.length() - 1).equals("--"))
+                if (c == '>' && numRead >= 2 && buffer.substring(buffer.length() - 3, buffer.length() - 1).equals("--")) //$NON-NLS-1$
                 {
                     break; // found "-->"
                 }
@@ -409,5 +410,13 @@ public class CustomXmlTrace extends TmfTrace<CustomXmlEvent> implements ITmfEven
 
     public CustomTraceDefinition getDefinition() {
         return fDefinition;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#validate(org.eclipse.core.resources.IProject, java.lang.String)
+     */
+    @Override
+    public boolean validate(IProject project, String path) {
+        return fileExists(path);
     }
 }

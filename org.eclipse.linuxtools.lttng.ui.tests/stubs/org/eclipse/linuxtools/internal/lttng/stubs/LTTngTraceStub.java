@@ -16,9 +16,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
@@ -143,7 +143,7 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> implements ITmfEventPar
      * @see org.eclipse.linuxtools.tmf.trace.ITmfTrace#parseEvent()
      */
     @Override
-    public ITmfEvent parseEvent(final ITmfContext context) {
+    public LttngEvent parseEvent(final ITmfContext context) {
 //        try {
             // paserNextEvent updates the context
             final LttngEvent event = (LttngEvent) fParser.parseEvent(context);
@@ -164,6 +164,14 @@ public class LTTngTraceStub extends TmfTrace<LttngEvent> implements ITmfEventPar
     @Override
     public String toString() {
         return "[LTTngTraceStub]";
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#validate(org.eclipse.core.resources.IProject, java.lang.String)
+     */
+    @Override
+    public boolean validate(IProject project, String path) {
+        return fileExists(path);
     }
 
     //    // ========================================================================

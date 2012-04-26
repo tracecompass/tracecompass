@@ -17,6 +17,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEvent;
 import org.eclipse.linuxtools.internal.lttng.core.event.LttngEventContent;
@@ -82,7 +83,7 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventPar
 //            fCheckpoints.add(new TmfCheckpoint(new LttngTimestamp(0L), new TmfLocation<Long>(0L)));
             ITmfContext context = new TmfContext(new TmfLocation<Long>(0L), 0);
             fIndexer.updateIndex(context, new LttngTimestamp(0L));
-            fParser = (ITmfEventParser) this;
+            fParser = (ITmfEventParser<LttngEvent>) this;
             //        	}
             //        	else {
             //        		indexTrace(true);
@@ -416,6 +417,14 @@ public class LTTngTextTrace extends TmfTrace<LttngEvent> implements ITmfEventPar
 
     public int getCpuNumber() {
         return cpuNumber;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#validate(org.eclipse.core.resources.IProject, java.lang.String)
+     */
+    @Override
+    public boolean validate(IProject project, String path) {
+        return fileExists(path);
     }
 
 }

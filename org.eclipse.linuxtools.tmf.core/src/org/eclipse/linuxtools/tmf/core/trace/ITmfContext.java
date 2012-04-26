@@ -29,14 +29,9 @@ public interface ITmfContext extends Cloneable {
     // ------------------------------------------------------------------------
 
     /**
-     * The initial context event rank, before anything is read from the trace
-     */
-    public long INITIAL_RANK = -1L;
-
-    /**
      * The unknown event rank
      */
-    public long UNKNOWN_RANK = -2L;
+    public long UNKNOWN_RANK = -1L;
 
     // ------------------------------------------------------------------------
     // Getters

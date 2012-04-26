@@ -17,8 +17,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimeRange;
@@ -154,7 +154,6 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
      * @param parser
      * @throws FileNotFoundException
      */
-    @SuppressWarnings("unchecked")
     public TmfTraceStub(final String path, final int cacheSize, final boolean waitForCompletion,
             final ITmfEventParser<TmfEvent> parser, final ITmfTraceIndexer<?> indexer) throws TmfTraceException {
         super(null, TmfEvent.class, path, cacheSize, 0, indexer);
@@ -163,7 +162,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
         } catch (FileNotFoundException e) {
             throw new TmfTraceException(e.getMessage());
         }
-        fParser = (ITmfEventParser<ITmfEvent>) ((parser != null) ? parser : new TmfEventParserStub(this));
+        fParser = (parser != null) ? parser : new TmfEventParserStub(this);
     }
 
     /**
@@ -267,8 +266,7 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
-    public double getLocationRatio(final ITmfLocation location) {
+    public double getLocationRatio(ITmfLocation<?> location) {
         fLock.lock();
         try {
             if (fTrace != null)
@@ -297,12 +295,12 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
     }
 
     @Override
-    public ITmfEvent parseEvent(final ITmfContext context) {
+    public TmfEvent parseEvent(final ITmfContext context) {
         fLock.lock();
         try {
             // parseNextEvent will update the context
             if (fTrace != null) {
-                final ITmfEvent event = fParser.parseEvent(context.clone());
+                final TmfEvent event = fParser.parseEvent(context.clone());
                 return event;
             }
 //        }
@@ -348,6 +346,14 @@ public class TmfTraceStub extends TmfTrace<TmfEvent> implements ITmfEventParser<
             fLock.unlock();
         }
         super.dispose();
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#validate(org.eclipse.core.resources.IProject, java.lang.String)
+     */
+    @Override
+    public boolean validate(IProject project, String path) {
+        return fileExists(path);
     }
 
 }

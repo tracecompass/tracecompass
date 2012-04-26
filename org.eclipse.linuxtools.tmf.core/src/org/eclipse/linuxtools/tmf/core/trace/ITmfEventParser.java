@@ -27,6 +27,6 @@ public interface ITmfEventParser<T extends ITmfEvent> {
 	 * @param context
 	 * @return
 	 */
-	public ITmfEvent parseEvent(ITmfContext context);
+	public T parseEvent(ITmfContext context);
 
 }

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomTxtTraceDefinition.InputLine;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
@@ -60,7 +61,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
 
     @Override
     public TmfContext seekEvent(final ITmfLocation<?> location) {
-        final CustomTxtTraceContext context = new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
+        final CustomTxtTraceContext context = new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         if (NULL_LOCATION.equals(location) || !new File(getPath()).isFile())
             return context;
         BufferedRandomAccessFile raFile = null;
@@ -123,10 +124,10 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
             return context;
         } catch (final FileNotFoundException e) {
             e.printStackTrace();
-            return new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
+            return new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         } catch (final IOException e) {
             e.printStackTrace();
-            return new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.INITIAL_RANK);
+            return new CustomTxtTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         } finally {
             if (raFile != null) {
                 try {
@@ -178,7 +179,7 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
     }
 
     @Override
-    public TmfEvent parseEvent(final ITmfContext tmfContext) {
+    public CustomTxtEvent parseEvent(final ITmfContext tmfContext) {
         if (!(tmfContext instanceof CustomTxtTraceContext))
             return null;
 
@@ -328,5 +329,13 @@ public class CustomTxtTrace extends TmfTrace<CustomTxtEvent> implements ITmfEven
 
     public CustomTraceDefinition getDefinition() {
         return fDefinition;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#validate(org.eclipse.core.resources.IProject, java.lang.String)
+     */
+    @Override
+    public boolean validate(IProject project, String path) {
+        return fileExists(path);
     }
 }

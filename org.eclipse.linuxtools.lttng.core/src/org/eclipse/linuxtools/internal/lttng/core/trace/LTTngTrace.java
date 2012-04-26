@@ -103,7 +103,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
 
     @Override
     public boolean validate(final IProject project, final String path) {
-        if (super.validate(project, path)) {
+        if (fileExists(path)) {
             final String traceLibPath = TraceHelper.getTraceLibDirFromProject(project);
             try {
                 final LTTngTraceVersion version = new LTTngTraceVersion(path, traceLibPath);
@@ -153,7 +153,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         // Set the currentEvent to the eventContent
         eventContent.setEvent(currentLttngEvent);
 
-        fParser = (ITmfEventParser) this;
+        fParser = (ITmfEventParser<LttngEvent>) this;
         fCacheSize = CHECKPOINT_PAGE_SIZE;
  
         // // Bypass indexing if asked
@@ -458,7 +458,7 @@ public class LTTngTrace extends TmfTrace<LttngEvent> implements ITmfEventParser<
         if (location == null) {
             curLocation = new LttngLocation();
             final TmfContext context = seekEvent(curLocation.getOperationTime());
-            context.setRank(ITmfContext.INITIAL_RANK);
+            context.setRank(0);
             return context;
         } else
             curLocation = (LttngLocation) location;
