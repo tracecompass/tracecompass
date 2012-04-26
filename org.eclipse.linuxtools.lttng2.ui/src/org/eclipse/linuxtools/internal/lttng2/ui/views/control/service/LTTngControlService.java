@@ -57,6 +57,9 @@ public class LTTngControlService implements ILttngControlService {
      */
     protected ICommandShell fCommandShell = null;
     
+    /**
+     * The version string.
+     */
     protected String fVersion = "Unknown"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
@@ -85,6 +88,10 @@ public class LTTngControlService implements ILttngControlService {
         return fVersion;
     }
     
+    /**
+     * Sets the version of the LTTng 2.0 control service. 
+     * @param version - a version to set
+     */
     public void setVersion(String version) {
         fVersion = version;
     }

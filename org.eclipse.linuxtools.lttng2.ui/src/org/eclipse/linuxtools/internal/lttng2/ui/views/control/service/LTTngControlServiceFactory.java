@@ -29,17 +29,26 @@ public class LTTngControlServiceFactory {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+    /**
+     * The singleton instance.
+     */
     private static LTTngControlServiceFactory fInstance = null;
     
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
+    /**
+     * Constructor
+     */
     private LTTngControlServiceFactory() {
     }
 
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
+    /**
+     * @return the LTTngControlServiceFactory singleton instance.
+     */
     public static synchronized LTTngControlServiceFactory getInstance() {
         if (fInstance == null) {
             fInstance = new LTTngControlServiceFactory();
@@ -50,6 +59,13 @@ public class LTTngControlServiceFactory {
     // ------------------------------------------------------------------------
     // Factory method
     // ------------------------------------------------------------------------
+    /**
+     * Gets the LTTng Control Service implementation based on the version of the 
+     * remote LTTng Tools.
+     * @param shell - the shell implementation to pass to the service
+     * @return - LTTng Control Service implementation
+     * @throws ExecutionException
+     */
     public ILttngControlService getLttngControlService(ICommandShell shell) throws ExecutionException {
         // get the version
         ICommandResult result = shell.executeCommand(LTTngControlServiceConstants.CONTROL_COMMAND + LTTngControlServiceConstants.COMMAND_VERSION, new NullProgressMonitor());

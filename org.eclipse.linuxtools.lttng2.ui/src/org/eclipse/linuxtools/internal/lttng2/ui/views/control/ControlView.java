@@ -196,14 +196,12 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
         myJob.schedule();
     }
     
-//    public ITraceControlComponent getSelection() {
-//        ISelection selection = fTreeViewer.getSelection();
-//        
-//    }
-
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
+    /**
+     * Creates the context sensitive menu.
+     */
     private void createContextMenu() {
         // First we create a menu Manager
         final MenuManager menuManager = new MenuManager();
