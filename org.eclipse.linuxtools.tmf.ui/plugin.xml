@@ -1117,5 +1117,19 @@
             type="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
       </propertyTester>
    </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.ui.tracetype">
+      <type
+            category="org.eclipse.linuxtools.tmf.ui.category.generic"
+            event_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent"
+            id="org.eclipse.linuxtools.tmf.ui.type.ctf"
+            name="CTF Trace"
+            trace_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace">
+      </type>
+      <category
+            id="org.eclipse.linuxtools.tmf.ui.category.generic"
+            name="Generic">
+      </category>
+   </extension>
 
 </plugin>

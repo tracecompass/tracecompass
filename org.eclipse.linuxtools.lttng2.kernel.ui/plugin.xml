@@ -11,4 +11,18 @@
             name="%perspective.category.name">
       </perspective>
    </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.ui.tracetype">
+      <category
+            id="org.eclipse.linuxtools.lttng2.kernel.ui.category"
+            name="%tracetype.category.lttng">
+      </category>
+      <type
+            category="org.eclipse.linuxtools.lttng2.kernel.ui.category"
+            event_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent"
+            id="org.eclipse.linuxtools.lttng2.kernel.tracetype"
+            name="%tracetype.type.kernel"
+            trace_type="org.eclipse.linuxtools.lttng2.kernel.core.trace.CtfKernelTrace">
+      </type>
+   </extension>
 </plugin>
