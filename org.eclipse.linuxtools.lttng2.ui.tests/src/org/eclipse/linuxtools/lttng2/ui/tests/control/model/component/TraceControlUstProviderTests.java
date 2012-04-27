@@ -225,7 +225,7 @@ public class TraceControlUstProviderTests extends TestCase {
         // ------------------------------------------------------------------------
         // Get first UST provider
         UstProviderComponent ustProvider = (UstProviderComponent) providers[1];
-        assertEquals("/home/user/git/lttng-ust/tests/hello.cxx/.libs/lt-hello", ustProvider.getName());
+        assertEquals("/home/user/git/lttng-ust/tests/hello.cxx/.libs/lt-hello [PID=9379]", ustProvider.getName());
         assertEquals(9379, ustProvider.getPid());
 
         // Get events

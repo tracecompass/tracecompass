@@ -206,7 +206,7 @@ public class TraceControlTreeModelTest extends TestCase {
         // Verify UstProviderComponent
         // ------------------------------------------------------------------------
         UstProviderComponent ustProvider = (UstProviderComponent) providers[1];
-        assertEquals("/home/user/git/lttng-ust/tests/hello.cxx/.libs/lt-hello", ustProvider.getName());
+        assertEquals("/home/user/git/lttng-ust/tests/hello.cxx/.libs/lt-hello [PID=9379]", ustProvider.getName());
         assertEquals(9379, ustProvider.getPid());
 
         // ------------------------------------------------------------------------
@@ -231,7 +231,7 @@ public class TraceControlTreeModelTest extends TestCase {
         // Verify UstProviderComponent
         // ------------------------------------------------------------------------
         ustProvider = (UstProviderComponent) providers[2];
-        assertEquals("/home/user/git/lttng-ust/tests/hello.cxx/.libs/lt-hello", ustProvider.getName());
+        assertEquals("/home/user/git/lttng-ust/tests/hello.cxx/.libs/lt-hello [PID=4852]", ustProvider.getName());
         assertEquals(4852, ustProvider.getPid());
         
         // verify getters and setter

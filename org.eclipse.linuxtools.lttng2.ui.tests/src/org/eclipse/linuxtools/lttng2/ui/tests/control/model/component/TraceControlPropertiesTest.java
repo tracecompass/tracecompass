@@ -197,7 +197,7 @@ public class TraceControlPropertiesTest extends TestCase {
         UstProviderPropertySource ustSource = (UstProviderPropertySource)adapter;
         assertNotNull(ustSource.getPropertyDescriptors());
 
-        assertEquals("/home/user/git/lttng-ust/tests/hello.cxx/.libs/lt-hello", ustSource.getPropertyValue(UstProviderPropertySource.UST_PROVIDER_NAME_PROPERTY_ID));
+        assertEquals("/home/user/git/lttng-ust/tests/hello.cxx/.libs/lt-hello [PID=9379]", ustSource.getPropertyValue(UstProviderPropertySource.UST_PROVIDER_NAME_PROPERTY_ID));
         assertEquals(String.valueOf(9379), ustSource.getPropertyValue(UstProviderPropertySource.UST_PROVIDER_PID_PROPERTY_ID));
 
         // ------------------------------------------------------------------------
