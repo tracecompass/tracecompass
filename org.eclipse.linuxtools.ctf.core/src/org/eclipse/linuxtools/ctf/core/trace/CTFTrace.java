@@ -47,7 +47,7 @@ import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInput;
  * metadata, creating declarations data structures, indexing the event packets
  * (in other words, all the work that can be shared between readers), but the
  * actual reading of events is left to TraceReader.
- *
+ * 
  * @author Matthew Khouzam
  * @version $Revision: 1.0 $
  */
@@ -59,7 +59,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#toString()
      */
     @SuppressWarnings("nls")
@@ -107,7 +107,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Packet header structure definition
-     *
+     * 
      * This is only used when opening the trace files, to read the first packet
      * header and see if they are valid trace files.
      */
@@ -116,18 +116,21 @@ public class CTFTrace implements IDefinitionScope {
     /**
      * Collection of streams contained in the trace.
      */
-    private final HashMap<Long, Stream> streams = new HashMap<Long, Stream>();
+    private final HashMap<Long, Stream> streams;
 
     /**
      * Collection of environment variables set by the tracer
      */
-    private final HashMap<String, String> environment = new HashMap<String, String>();
+    private final HashMap<String, String> environment;
 
     /**
      * Collection of all the clocks in a system.
      */
-    private final HashMap<String, CTFClock> clocks = new HashMap<String, CTFClock>();
+    private final HashMap<String, CTFClock> clocks;
 
+    /** Handlers for the metadata files */
+    private final static FileFilter metadataFileFilter = new MetadataFileFilter();
+    private final static Comparator<File> metadataComparator = new MetadataComparator();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -135,7 +138,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Trace constructor.
-     *
+     * 
      * @param path
      *            Filesystem path of the trace directory.
      * @throws IOException
@@ -146,22 +149,54 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Trace constructor.
-     *
+     * 
      * @param path
      *            Filesystem path of the trace directory.
      * @throws CTFReaderException
      */
-    @SuppressWarnings("unqualified-field-access")
     public CTFTrace(File path) throws CTFReaderException {
         this.path = path;
-
-        metadata = new Metadata(this);
+        this.metadata = new Metadata(this);
 
         if (!this.path.isDirectory()) {
             throw new CTFReaderException("Path must be a valid directory"); //$NON-NLS-1$
         }
+        
+        /* Set up the internal containers for this trace */
+        streams = new HashMap<Long, Stream>();
+        environment = new HashMap<String, String>();
+        clocks = new HashMap<String, CTFClock>();
 
-        this.open();
+        /* Open and parse the metadata file */
+        metadata.parse();
+
+        if (Activator.getDefault() != null) {
+            Activator.getDefault().log(metadata.toString());
+        }
+
+        /* Open all the trace files */
+        /* Create the definitions needed to read things from the files */
+        if (packetHeaderDecl != null) {
+            packetHeaderDef = packetHeaderDecl.createDefinition(this,
+                    "packet.header"); //$NON-NLS-1$
+        }
+
+        /* List files not called metadata and not hidden. */
+        File[] files = path.listFiles(metadataFileFilter);
+        Arrays.sort(files, metadataComparator);
+
+        /* Try to open each file */
+        for (File s : files) {
+            openStreamInput(s);
+        }
+
+        /* Create their index */
+        for (Map.Entry<Long, Stream> stream : streams.entrySet()) {
+            Set<StreamInput> inputs = stream.getValue().getStreamInputs();
+            for (StreamInput s : inputs) {
+                s.createIndex();
+            }
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -170,7 +205,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method getStream gets the stream for a given id
-     *
+     * 
      * @param id
      *            Long the id of the stream
      * @return Stream the stream that we need
@@ -181,7 +216,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method nbStreams gets the number of available streams
-     *
+     * 
      * @return int the number of streams
      */
     public int nbStreams() {
@@ -190,7 +225,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method setMajor sets the major version of the trace (DO NOT USE)
-     *
+     * 
      * @param major
      *            long the major version
      */
@@ -200,7 +235,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method setMinor sets the minor version of the trace (DO NOT USE)
-     *
+     * 
      * @param minor
      *            long the minor version
      */
@@ -210,7 +245,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method setUUID sets the UUID of a trace
-     *
+     * 
      * @param uuid
      *            UUID
      */
@@ -220,7 +255,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method setByteOrder sets the byte order
-     *
+     * 
      * @param byteOrder
      *            ByteOrder of the trace, can be little-endian or big-endian
      */
@@ -230,7 +265,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method setPacketHeader sets the packet header of a trace (DO NOT USE)
-     *
+     * 
      * @param packetHeader
      *            StructDeclaration the header in structdeclaration form
      */
@@ -240,7 +275,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method majortIsSet is the major version number set?
-     *
+     * 
      * @return boolean is the major set?
      */
     public boolean majortIsSet() {
@@ -249,7 +284,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method minorIsSet. is the minor version number set?
-     *
+     * 
      * @return boolean is the minor set?
      */
     public boolean minorIsSet() {
@@ -258,7 +293,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method UUIDIsSet is the UUID set?
-     *
+     * 
      * @return boolean is the UUID set?
      */
     public boolean UUIDIsSet() {
@@ -267,7 +302,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method byteOrderIsSet is the byteorder set?
-     *
+     * 
      * @return boolean is the byteorder set?
      */
     public boolean byteOrderIsSet() {
@@ -276,7 +311,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method packetHeaderIsSet is the packet header set?
-     *
+     * 
      * @return boolean is the packet header set?
      */
     public boolean packetHeaderIsSet() {
@@ -285,7 +320,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method getUUID gets the trace UUID
-     *
+     * 
      * @return UUID gets the trace UUID
      */
     public UUID getUUID() {
@@ -294,7 +329,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method getMajor gets the trace major version
-     *
+     * 
      * @return long gets the trace major version
      */
     public long getMajor() {
@@ -303,7 +338,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method getMinor gets the trace minor version
-     *
+     * 
      * @return long gets the trace minor version
      */
     public long getMinor() {
@@ -312,7 +347,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method getByteOrder gets the trace byte order
-     *
+     * 
      * @return ByteOrder gets the trace byte order
      */
     public ByteOrder getByteOrder() {
@@ -321,7 +356,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method getPacketHeader gets the trace packet header
-     *
+     * 
      * @return StructDeclaration gets the trace packet header
      */
     public StructDeclaration getPacketHeader() {
@@ -330,7 +365,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method getTraceDirectory gets the trace directory
-     *
+     * 
      * @return File the path in "File" format.
      */
     public File getTraceDirectory() {
@@ -339,7 +374,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method getStreams get all the streams in a map format.
-     *
+     * 
      * @return Map<Long,Stream> a map of all the streams.
      */
     public Map<Long, Stream> getStreams() {
@@ -348,7 +383,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method getPath gets the path of the trace directory
-     *
+     * 
      * @return String the path of the trace directory, in string format.
      * @see java.io.File#getPath()
      */
@@ -362,108 +397,9 @@ public class CTFTrace implements IDefinitionScope {
     // ------------------------------------------------------------------------
 
     /**
-     * Opens the trace and creates the index.
-     *
-     * @throws CTFReaderException
-     */
-    private void open() throws CTFReaderException {
-        /* Open and parse the metadata file */
-        openTraceMetadata();
-
-        if (Activator.getDefault() != null) {
-            Activator.getDefault().log(metadata.toString());
-        }
-        /* Open all the trace files */
-        openStreamInputs();
-
-        /* Create their index */
-        createStreamInputIndexes();
-    }
-
-    /**
-     * Parses the metadata
-     *
-     * @throws CTFReaderException
-     */
-    private void openTraceMetadata() throws CTFReaderException {
-        metadata.parse();
-    }
-
-    /**
-     * Creates the definitions needed by the Trace class to open the trace
-     * files.
-     */
-    private void createDefinitions() {
-        if (packetHeaderDecl != null) {
-            packetHeaderDef = packetHeaderDecl.createDefinition(this,
-                    "packet.header"); //$NON-NLS-1$
-        }
-    }
-
-    /**
-     * Creates the indexes of all the trace files.
-     *
-     * @throws CTFReaderException
-     */
-    private void createStreamInputIndexes() throws CTFReaderException {
-        for (Map.Entry<Long, Stream> stream : streams.entrySet()) {
-            Set<StreamInput> inputs = stream.getValue().getStreamInputs();
-            for (StreamInput s : inputs) {
-                s.createIndex();
-            }
-        }
-    }
-
-    /**
-     * Tries to open every file in the trace directory (except metadata).
-     *
-     * @throws CTFReaderException
-     */
-    private void openStreamInputs() throws CTFReaderException {
-        /* Create the definitions needed to read things from the files */
-        createDefinitions();
-
-        /* List files not called metadata and not hidden. */
-        File[] files = path.listFiles(new FileFilter() {
-
-            @Override
-            public boolean accept(File pathname) {
-
-                if (pathname.isDirectory()) {
-                    return false;
-                }
-
-                if (pathname.isHidden()) {
-                    return false;
-                }
-
-                if (pathname.getName().equals("metadata")) { //$NON-NLS-1$
-                    return false;
-                }
-
-                return true;
-            }
-        });
-        Arrays.sort(files, new Comparator<File>() {
-
-            @Override
-            public int compare(File o1, File o2) {
-
-                return o1.getName().compareTo(o2.getName());
-
-            }
-        });
-
-        /* Try to open each file */
-        for (File s : files) {
-            openStreamInput(s);
-        }
-    }
-
-    /**
      * Tries to open the given file, reads the first packet header of the file
      * and check its validity.
-     *
+     * 
      * @param streamFile
      *            A trace file in the trace directory.
      * @throws CTFReaderException
@@ -554,7 +490,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Looks up a definition from packet
-     *
+     * 
      * @param lookupPath
      *            String
      * @return Definition
@@ -570,10 +506,10 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Adds a new stream to the trace.
-     *
+     * 
      * @param stream
      *            A stream object.
-     *
+     * 
      * @throws ParseException
      */
     public void addStream(Stream stream) throws ParseException {
@@ -607,27 +543,24 @@ public class CTFTrace implements IDefinitionScope {
         return environment;
     }
 
-    public String lookupEnvironment( String key )
-    {
+    public String lookupEnvironment(String key) {
         return environment.get(key);
     }
 
-    public void addEnvironmentVar( String varName, String varValue)
-    {
+    public void addEnvironmentVar(String varName, String varValue) {
         environment.put(varName, varValue);
     }
 
     public void addClock(String nameValue, CTFClock ctfClock) {
-       clocks.put(nameValue, ctfClock);
+        clocks.put(nameValue, ctfClock);
     }
 
-    public CTFClock getClock(String name){
+    public CTFClock getClock(String name) {
         return clocks.get(name);
     }
 
-    public CTFClock getClock(){
-        if( clocks.size() == 1 )
-        {
+    public CTFClock getClock() {
+        if (clocks.size() == 1) {
             String key = (String) clocks.keySet().toArray()[0];
             return clocks.get(key);
         }
@@ -635,11 +568,36 @@ public class CTFTrace implements IDefinitionScope {
     }
 
     public long getOffset() {
-        if(getClock() == null )
-        {
+        if (getClock() == null) {
             return 0;
         }
         return (Long) getClock().getProperty("offset"); //$NON-NLS-1$
     }
 
+}
+
+class MetadataFileFilter implements FileFilter {
+
+    @Override
+    public boolean accept(File pathname) {
+        if (pathname.isDirectory()) {
+            return false;
+        }
+        if (pathname.isHidden()) {
+            return false;
+        }
+        if (pathname.getName().equals("metadata")) { //$NON-NLS-1$
+            return false;
+        }
+        return true;
+    }
+
+}
+
+class MetadataComparator implements Comparator<File> {
+
+    @Override
+    public int compare(File o1, File o2) {
+        return o1.getName().compareTo(o2.getName());
+    }
 }
