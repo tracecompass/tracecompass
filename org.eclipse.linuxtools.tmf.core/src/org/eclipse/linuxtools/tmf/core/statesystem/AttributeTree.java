@@ -179,16 +179,16 @@ final class AttributeTree {
             raf.seek(pos + 4);
             raf.writeInt(total);
 
-            raf.close();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-        	if (raf != null) {
-        		try {
-					raf.close();
-				} catch (IOException e) {
-				}
-        	}
+            if (raf != null) {
+                try {
+                    raf.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return total;
     }
