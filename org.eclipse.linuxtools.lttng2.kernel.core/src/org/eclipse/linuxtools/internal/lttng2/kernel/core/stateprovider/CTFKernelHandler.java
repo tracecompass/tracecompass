@@ -277,7 +277,8 @@ class CTFKernelHandler implements Runnable {
 
                 // String parentProcessName = (String)
                 // event.getFieldValue("parent_comm");
-                String childProcessName = (String) content.getField("child_comm").getValue();
+                String childProcessName;
+                childProcessName = (String) content.getField("child_comm").getValue();
                 // assert ( parentProcessName.equals(childProcessName) );
 
                 Integer parentTid = ((Long) content.getField("parent_tid").getValue()).intValue();
@@ -360,29 +361,20 @@ class CTFKernelHandler implements Runnable {
              * Statistics
              */
 
-            /* Nb of events total */
-            try {
-                quark = ss.getQuarkAbsoluteAndAdd("Stats", "Event_types",
-                        eventName);
-                ss.incrementAttribute(ts, quark);
+            /* Number of events of each type, globally */
+            // quark = ss.getQuarkAbsoluteAndAdd("Stats", "Event_types",
+            // eventName);
+            // ss.incrementAttribute(ts, quark);
 
-                // /* Nb of events per CPU */
-                // ss.incrementAttribute(ts,
-                // ss.getAttributeQuarkAndAdd(currentCPUNode, "Stats",
-                // "Event_types", eventType.toString()));
-                //
-                // /* Nb of events per process */
-                // ss.incrementAttribute(ts,
-                // ss.getAttributeQuarkAndAdd(currentThreadNode, "Stats",
-                // "Event_types", eventType.toString()));
+            /* Nb of events per CPU */
+            // quark = ss.getQuarkRelativeAndAdd(currentCPUNode, "Stats",
+            // "Event_types", eventName);
+            // ss.incrementAttribute(ts, quark);
 
-            } catch (StateValueTypeException sve) {
-                /*
-                 * Here's hoping we don't have string values in statistics
-                 * attributes...
-                 */
-                sve.printStackTrace();
-            }
+            /* Nb of events per process */
+            // quark = ss.getQuarkRelativeAndAdd(currentThreadNode, "Stats",
+            // "Event_types", eventName);
+            // ss.incrementAttribute(ts, quark);
 
             // end of big non-indented try
         } catch (AttributeNotFoundException ae) {
