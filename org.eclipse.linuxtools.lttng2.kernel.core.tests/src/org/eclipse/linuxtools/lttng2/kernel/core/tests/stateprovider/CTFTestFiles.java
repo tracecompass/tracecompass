@@ -37,9 +37,9 @@ public abstract class CTFTestFiles {
     public final static String traceFile = "traces/trace2"; //$NON-NLS-1$
     public final static long startTime = 18669367225825L;
 
-    public static CtfTmfTrace trace = null;
+    private static CtfTmfTrace trace = null;
 
-    public static CtfTmfTrace getTestTrace() throws TmfTraceException {
+    public synchronized static CtfTmfTrace getTestTrace() throws TmfTraceException {
         if (trace == null) {
             trace = new CtfTmfTrace();
             trace.initTrace(null, traceFile, CtfTmfEvent.class);

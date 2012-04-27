@@ -30,7 +30,7 @@ import org.junit.Test;
  */
 public class CTFKernelStateInputTest {
 
-    protected static IStateChangeInput input;
+    static IStateChangeInput input;
 
     @BeforeClass
     public static void initialize() throws TmfTraceException {

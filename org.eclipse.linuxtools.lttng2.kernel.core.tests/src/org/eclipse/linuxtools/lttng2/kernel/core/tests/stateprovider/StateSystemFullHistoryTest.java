@@ -42,13 +42,13 @@ import org.junit.*;
 @SuppressWarnings("nls")
 public class StateSystemFullHistoryTest {
 
-    protected static File stateFile;
-    protected static File stateFileBenchmark;
+    static File stateFile;
+    static File stateFileBenchmark;
 
-    protected static HistoryBuilder builder;
-    protected static IStateChangeInput input;
-    protected static IStateHistoryBackend hp;
-    protected static StateHistorySystem shs;
+    static HistoryBuilder builder;
+    static IStateChangeInput input;
+    static IStateHistoryBackend hp;
+    static StateHistorySystem shs;
 
     private final static long interestingTimestamp1 = 18670067372290L;
 
@@ -73,8 +73,13 @@ public class StateSystemFullHistoryTest {
 
     @AfterClass
     public static void cleanup() {
-        stateFile.delete();
-        stateFileBenchmark.delete();
+        boolean ret1, ret2;
+        ret1 = stateFile.delete();
+        ret2 = stateFileBenchmark.delete();
+        if ( !(ret1 && ret2) ) {
+            System.err.println("Error cleaning up during unit testing, " +
+            		"you might have leftovers state history files in /tmp");
+        }
     }
 
     /**
