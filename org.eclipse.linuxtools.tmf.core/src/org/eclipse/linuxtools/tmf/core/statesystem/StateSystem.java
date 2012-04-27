@@ -476,9 +476,9 @@ public class StateSystem {
             transState.processStateChange(t, TmfStateValue.nullValue(),
                     attributeQuark);
         } catch (StateValueTypeException e) {
-            /* 
-             * Will not happen since we're inserting null values only, but
-             * poor compiler has no way of knowing this...
+            /*
+             * Will not happen since we're inserting null values only, but poor
+             * compiler has no way of knowing this...
              */
             e.printStackTrace();
         }
@@ -529,6 +529,18 @@ public class StateSystem {
     public void updateOngoingState(ITmfStateValue newValue, int attributeQuark)
             throws AttributeNotFoundException {
         transState.changeOngoingStateValue(attributeQuark, newValue);
+    }
+
+    /**
+     * Return the name assigned to this quark. This returns only the "basename",
+     * not the complete path to this attribute.
+     * 
+     * @param attributeQuark
+     *            The quark for which we want the name
+     * @return The name of the quark
+     */
+    public String getAttributeName(int attributeQuark) {
+        return attributeTree.getAttributeName(attributeQuark);
     }
 
     /**

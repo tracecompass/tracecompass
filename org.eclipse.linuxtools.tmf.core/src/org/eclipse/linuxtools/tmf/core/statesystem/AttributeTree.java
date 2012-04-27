@@ -336,6 +336,10 @@ final class AttributeTree {
         }
     }
 
+    String getAttributeName(int quark) {
+        return attributeList.get(quark).getName();
+    }
+
     String getFullAttributeName(int quark) {
         if (quark >= attributeList.size() || quark < 0) {
             return null;
