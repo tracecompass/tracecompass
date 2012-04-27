@@ -140,10 +140,10 @@ public class StateSystemFullHistoryTest {
 
         /* Query a stack attribute, has to be done in two passes */
         quark = shs.getQuarkAbsolute("Threads", "1432", "Exec_mode_stack");
-        interval = shs.queryState(quark);
+        interval = list.get(quark);
         valueInt = interval.getStateValue().unboxInt(); /* The stack depth */
         quark2 = shs.getQuarkRelative(quark, Integer.toString(valueInt));
-        interval = shs.queryState(quark2);
+        interval = list.get(quark2);
         valueStr = interval.getStateValue().unboxStr();
         assertTrue(valueStr.equals("sys_poll"));
     }
@@ -183,6 +183,9 @@ public class StateSystemFullHistoryTest {
         //
     }
 
+    /**
+     * Test a range query (with no resolution parameter, so all intervals)
+     */
     @Test
     public void testRangeQuery1() throws AttributeNotFoundException,
             TimeRangeException, StateValueTypeException {
@@ -197,6 +200,26 @@ public class StateSystemFullHistoryTest {
         assertEquals(487, intervals.size()); /* Number of context switches! */
         assertEquals(1685, intervals.get(100).getStateValue().unboxInt());
         assertEquals(18670480869135L, intervals.get(205).getEndTime());
+    }
+
+    /**
+     * Test a range query with a resolution
+     */
+    @Test
+    public void testRangeQuery2() throws AttributeNotFoundException,
+            TimeRangeException, StateValueTypeException {
+
+        long time1 = interestingTimestamp1;
+        long time2 = time1 + 1L * CTFTestFiles.NANOSECS_PER_SEC;
+        long resolution = 1000000; /* One query every millisecond */
+        int quark;
+        List<ITmfStateInterval> intervals;
+
+        quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
+        intervals = shs.queryHistoryRange(quark, time1, time2, resolution);
+        assertEquals(129, intervals.size()); /* Number of context switches! */
+        assertEquals(1452, intervals.get(50).getStateValue().unboxInt());
+        assertEquals(18670837977001L, intervals.get(100).getEndTime());
     }
 
     /**
