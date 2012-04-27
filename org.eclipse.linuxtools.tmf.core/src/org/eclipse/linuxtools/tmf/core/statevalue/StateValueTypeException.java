@@ -21,13 +21,17 @@ package org.eclipse.linuxtools.tmf.core.statevalue;
  * incorrect type (for example, tries to read a String value as an Int).
  * 
  * @author alexmont
- *
+ * 
  */
 public class StateValueTypeException extends Exception {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -4548793451746144513L;
 
+    public StateValueTypeException() {
+        super();
+    }
+
+    public StateValueTypeException(String message) {
+        super(message);
+    }
 }

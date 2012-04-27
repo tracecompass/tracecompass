@@ -17,13 +17,18 @@ package org.eclipse.linuxtools.tmf.core.statesystem;
  * doesn't exist in the system, of if the quark is simply invalid (ie, < 0).
  * 
  * @author alexmont
- *
+ * 
  */
 public class AttributeNotFoundException extends Exception {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 7964275803369706145L;
+
+    public AttributeNotFoundException() {
+        super();
+    }
+
+    public AttributeNotFoundException(String message) {
+        super(message);
+    }
 
 }
