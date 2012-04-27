@@ -45,13 +45,11 @@ public class StateHistorySystem extends StateSystem {
      * TransientState transState; protected CurrentState curState;
      */
 
-    private final IStateHistoryBackend backend;
-
-    /*
-     * This the container that will hold the result of full queries obtained
-     * with loadStateAtTime()
+    /**
+     * In addition, a state "history" system has a storage back-end from which
+     * it can restore past states.
      */
-    private ArrayList<ITmfStateInterval> currentStateInfo;
+    private final IStateHistoryBackend backend;
 
     /**
      * General constructor
@@ -67,7 +65,6 @@ public class StateHistorySystem extends StateSystem {
             throws IOException {
         this.backend = backend;
         transState = new TransientState(backend);
-        currentStateInfo = new ArrayList<ITmfStateInterval>();
 
         if (newFile) {
             attributeTree = new AttributeTree(this);
@@ -130,64 +127,62 @@ public class StateHistorySystem extends StateSystem {
      */
 
     /**
-     * Load the state information at time 't' as the Current State. You can then
-     * use the queryState() method to query the value of different attributes,
-     * as they were at time 't'.
+     * Load the complete state information at time 't' into the returned List.
+     * You can then get the intervals for single attributes by using
+     * List.get(n), where 'n' is the quark of the attribute.
      * 
      * On average if you need around 10 or more queries for the same timestamps,
-     * use this. If you need less than 10 (for example, running many queries for
-     * the same attributes but at different timestamps), you might be better
-     * using the querySingleState() methods instead.
+     * use this method. If you need less than 10 (for example, running many
+     * queries for the same attributes but at different timestamps), you might
+     * be better using the querySingleState() methods instead.
      * 
      * @param t
      *            We will recreate the state information to what it was at time
      *            t.
      * @throws TimeRangeException
+     *             If the 't' parameter is outside of the range of the state
+     *             history.
      */
-    public synchronized void loadStateAtTime(long t) throws TimeRangeException {
-        /* Empty the currentStateInfo */
-        currentStateInfo = new ArrayList<ITmfStateInterval>(
+    public synchronized List<ITmfStateInterval> loadStateAtTime(long t)
+            throws TimeRangeException {
+        List<ITmfStateInterval> stateInfo = new ArrayList<ITmfStateInterval>(
                 attributeTree.getNbAttributes());
+
+        /* Bring the size of the array to the current number of attributes */
         for (int i = 0; i < attributeTree.getNbAttributes(); i++) {
-            currentStateInfo.add(null);
+            stateInfo.add(null);
         }
 
-        backend.doQuery(currentStateInfo, t);
+        /* Query the storage backend */
+        backend.doQuery(stateInfo, t);
 
+        /*
+         * If we are currently building the history, also query the "ongoing"
+         * states for stuff that might not yet be written to the history.
+         */
         if (transState.isActive()) {
-            transState.doQuery(currentStateInfo, t);
+            transState.doQuery(stateInfo, t);
         }
         // We should have previously inserted an interval for every attribute
         // for all possible timestamps (and those could contain 'nullValues').
         // There should be no 'null' objects at this point.
-        for (ITmfStateInterval interval : currentStateInfo) {
-            assert (interval != null);
+        for (int i = 0; i < stateInfo.size(); i++) {
+            if (stateInfo.get(i) == null) {
+                assert (false);
+            }
         }
+        return stateInfo;
     }
 
     /**
-     * Once we have set up the "current state" using loadStateAtTime(), we can
-     * now run queries to get the state of individual attributes at the
-     * previously loaded timestamp.
-     * 
-     * @param attributeQuark
-     *            The quark of attribute for which we want the state.
-     * @return The StateInterval object matching this timestamp/attribute pair.
-     * @throws AttributeNotFoundException
-     */
-    public ITmfStateInterval queryState(int attributeQuark) {
-        return currentStateInfo.get(attributeQuark);
-    }
-
-    /**
-     * Alternative, singular version of the "queryState" method. This one does
-     * not update the whole stateInfo vector, like loadStateAtTimes does. It
-     * only searches for one specific entry in the state history.
+     * Singular query method. This one does not update the whole stateInfo
+     * vector, like loadStateAtTimes() does. It only searches for one specific
+     * entry in the state history.
      * 
      * It should be used when you only want very few entries, instead of the
      * whole state (or many entries, but all at different timestamps). If you do
      * request many entries all at the same time, you should use the
-     * conventional loadStateAtTime() + queryState() method.
+     * conventional loadStateAtTime() + List.get() method.
      * 
      * @param t
      *            The timestamp at which we want the state
@@ -195,7 +190,9 @@ public class StateHistorySystem extends StateSystem {
      *            Which attribute we want to get the state of
      * @return The StateInterval representing the state
      * @throws TimeRangeException
+     *             If 't' is invalid
      * @throws AttributeNotFoundException
+     *             If the requested quark does not exist in the model
      */
     public ITmfStateInterval querySingleState(long t, int attributeQuark)
             throws AttributeNotFoundException, TimeRangeException {
@@ -215,6 +212,10 @@ public class StateHistorySystem extends StateSystem {
      * attribute between timestamps t1 and t2. The list will be ordered by
      * ascending time.
      * 
+     * Note that contrary to loadStateAtTime(), the returned list here is in the
+     * "direction" of time (and not in the direction of attributes, as is the
+     * case with loadStateAtTime()).
+     * 
      * @param attributeQuark
      *            Which attribute this query is interested in
      * @param t1
@@ -223,19 +224,22 @@ public class StateHistorySystem extends StateSystem {
      *            End time of the query
      * @return The List of state intervals that happened between t1 and t2
      * @throws TimeRangeException
+     *             If either t1 or t2 is invalid.
      * @throws AttributeNotFoundException
+     *             If the requested quark does not exist in the model.
      */
-    public List<ITmfStateInterval> queryHistoryRange(int attributeQuark, long t1,
-            long t2) throws TimeRangeException, AttributeNotFoundException {
+    public List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
+            long t1, long t2) throws TimeRangeException,
+            AttributeNotFoundException {
 
         List<ITmfStateInterval> intervals;
         ITmfStateInterval currentInterval;
         long ts;
-        
-        if ( !(backend.checkValidTime(t1) && backend.checkValidTime(t2)) ) {
-            /* 
-             * One of the two timestamps is out of range, don't bother
-             * with the requests
+
+        if (!(backend.checkValidTime(t1) && backend.checkValidTime(t2))) {
+            /*
+             * One of the two timestamps is out of range, don't bother with the
+             * requests
              */
             throw new TimeRangeException();
         }
@@ -268,16 +272,6 @@ public class StateHistorySystem extends StateSystem {
     public synchronized void debugPrint(PrintWriter writer) {
         /* Only used for debugging, shouldn't be externalized */
         writer.println("------------------------------"); //$NON-NLS-1$
-        writer.println("Current State Info vector:\n"); //$NON-NLS-1$
-        for (int i = 0; i < currentStateInfo.size(); i++) {
-            writer.print(i + "\t\t"); //$NON-NLS-1$
-            if (currentStateInfo.get(i) == null) {
-                writer.println("null"); //$NON-NLS-1$
-            } else {
-                writer.println(currentStateInfo.get(i).toString());
-            }
-        }
-        writer.println('\n');
 
         /* Print the other inner containers */
         super.debugPrint(writer);

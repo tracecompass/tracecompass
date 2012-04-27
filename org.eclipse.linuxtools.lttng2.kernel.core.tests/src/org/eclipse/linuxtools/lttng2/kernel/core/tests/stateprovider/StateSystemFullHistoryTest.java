@@ -121,19 +121,20 @@ public class StateSystemFullHistoryTest {
     public void testFullQuery1() throws StateValueTypeException,
             AttributeNotFoundException, TimeRangeException {
 
+        List<ITmfStateInterval> list;
         ITmfStateInterval interval;
         int quark, quark2, valueInt;
         String valueStr;
 
-        shs.loadStateAtTime(interestingTimestamp1);
+        list = shs.loadStateAtTime(interestingTimestamp1);
 
         quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
-        interval = shs.queryState(quark);
+        interval = list.get(quark);
         valueInt = interval.getStateValue().unboxInt();
         assertEquals(1397, valueInt);
 
         quark = shs.getQuarkAbsolute("Threads", "1432", "Exec_name");
-        interval = shs.queryState(quark);
+        interval = list.get(quark);
         valueStr = interval.getStateValue().unboxStr();
         assertEquals("gdbus", valueStr);
 
@@ -289,12 +290,13 @@ public class StateSystemFullHistoryTest {
     @Test(expected = StateValueTypeException.class)
     public void testQueryInvalidValuetype1() throws StateValueTypeException,
             AttributeNotFoundException, TimeRangeException {
+        List<ITmfStateInterval> list;
         ITmfStateInterval interval;
         int quark;
 
-        shs.loadStateAtTime(interestingTimestamp1);
+        list = shs.loadStateAtTime(interestingTimestamp1);
         quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
-        interval = shs.queryState(quark);
+        interval = list.get(quark);
 
         /* This is supposed to be an int value */
         interval.getStateValue().unboxStr();
@@ -303,12 +305,13 @@ public class StateSystemFullHistoryTest {
     @Test(expected = StateValueTypeException.class)
     public void testQueryInvalidValuetype2() throws StateValueTypeException,
             AttributeNotFoundException, TimeRangeException {
+        List<ITmfStateInterval> list;
         ITmfStateInterval interval;
         int quark;
 
-        shs.loadStateAtTime(interestingTimestamp1);
+        list = shs.loadStateAtTime(interestingTimestamp1);
         quark = shs.getQuarkAbsolute("Threads", "1432", "Exec_name");
-        interval = shs.queryState(quark);
+        interval = list.get(quark);
 
         /* This is supposed to be a String value */
         interval.getStateValue().unboxInt();
