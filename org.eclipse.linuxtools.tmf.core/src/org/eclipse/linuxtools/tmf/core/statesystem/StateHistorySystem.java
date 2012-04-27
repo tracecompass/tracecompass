@@ -231,18 +231,11 @@ public class StateHistorySystem extends StateSystem {
     public List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
             long t1, long t2) throws TimeRangeException,
             AttributeNotFoundException {
-
         List<ITmfStateInterval> intervals;
         ITmfStateInterval currentInterval;
         long ts;
 
-        if (!(backend.checkValidTime(t1) && backend.checkValidTime(t2))) {
-            /*
-             * One of the two timestamps is out of range, don't bother with the
-             * requests
-             */
-            throw new TimeRangeException();
-        }
+        checkValidTimeRange(t1, t2);
 
         /* Get the initial state at time T1 */
         intervals = new ArrayList<ITmfStateInterval>();
@@ -258,6 +251,64 @@ public class StateHistorySystem extends StateSystem {
             ts = currentInterval.getEndTime();
         }
         return intervals;
+    }
+
+    /**
+     * Return the state history of a given attribute, but with at most one
+     * update per "resolution". This can be useful for populating views (where
+     * it's useless to have more than one query per pixel, for example).
+     * 
+     * @param attributeQuark
+     *            Which attribute this query is interested in
+     * @param t1
+     *            Start time of the range query
+     * @param t2
+     *            End time of the query
+     * @param resolution
+     *            The "step" of this query
+     * @return The List of states that happened between t1 and t2
+     * @throws TimeRangeException
+     *             If one of the timestamps is invalid
+     * @throws AttributeNotFoundException
+     *             If the attribute doesn't exist
+     */
+    public List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
+            long t1, long t2, long resolution) throws TimeRangeException,
+            AttributeNotFoundException {
+        List<ITmfStateInterval> intervals;
+        ITmfStateInterval currentInterval;
+        long ts;
+
+        checkValidTimeRange(t1, t2);
+
+        /* Get the initial state at time T1 */
+        intervals = new ArrayList<ITmfStateInterval>();
+        currentInterval = querySingleState(t1, attributeQuark);
+        intervals.add(currentInterval);
+
+        /*
+         * Iterate over the "resolution points". We skip unneeded queries in the
+         * case the current interval is longer than the resolution.
+         */
+        for (ts = currentInterval.getStartTime(); (currentInterval.getEndTime() != -1)
+                && (ts <= t2); ts += resolution) {
+            if (ts <= currentInterval.getEndTime()) {
+                continue;
+            }
+            currentInterval = querySingleState(ts, attributeQuark);
+            intervals.add(currentInterval);
+        }
+        return intervals;
+    }
+
+    /**
+     * Makes sure the range [t1, t2] is valid for the current state history.
+     */
+    private void checkValidTimeRange(long t1, long t2)
+            throws TimeRangeException {
+        if (!(backend.checkValidTime(t1) && backend.checkValidTime(t2))) {
+            throw new TimeRangeException();
+        }
     }
 
     /**
