@@ -136,12 +136,16 @@ class HistoryTree {
          */
         res = buffer.getInt();
         if (res != HISTORY_FILE_MAGIC_NUMBER) {
+            fc.close();
+            fis.close();
             throw new IOException(
                     "Selected file does not look like a History Tree file"); //$NON-NLS-1$
         }
 
         res = buffer.getInt(); /* Major version number */
         if (res != MAJOR_VERSION) {
+            fc.close();
+            fis.close();
             throw new IOException("Select History Tree file is of an older " //$NON-NLS-1$
                     + "format. Please use a previous version of " //$NON-NLS-1$
                     + "the parser to open it."); //$NON-NLS-1$
@@ -169,6 +173,7 @@ class HistoryTree {
         ts = buffer.getLong();
 
         this.config = new HTConfig(existingStateFile, bs, maxc, ts);
+        fc.close();
         fis.close();
         /*
          * FIXME We close fis here and the TreeIO will then reopen the same
@@ -231,8 +236,14 @@ class HistoryTree {
             /* done writing the file header */
 
         } catch (IOException e) {
-            /* We should have any problems at this point... */
+            /* We should not have any problems at this point... */
             e.printStackTrace();
+        } finally {
+            try {
+                fc.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return;
     }

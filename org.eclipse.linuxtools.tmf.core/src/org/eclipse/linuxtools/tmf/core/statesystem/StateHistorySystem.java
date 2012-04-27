@@ -73,6 +73,7 @@ public class StateHistorySystem extends StateSystem {
             FileInputStream attributeTreeInput = backend.supplyAttributeTreeReader();
             this.attributeTree = new AttributeTree(this, attributeTreeInput);
             transState.setInactive();
+            attributeTreeInput.close();
         }
     }
 

@@ -375,6 +375,8 @@ public class StateSystemFullHistoryTest {
 
     @Test
     public void testDebugPrinting() throws FileNotFoundException {
-        shs.debugPrint(new PrintWriter(new File("/dev/null")));
+        PrintWriter pw = new PrintWriter(new File("/dev/null"));
+        shs.debugPrint(pw);
+        pw.close();
     }
 }
