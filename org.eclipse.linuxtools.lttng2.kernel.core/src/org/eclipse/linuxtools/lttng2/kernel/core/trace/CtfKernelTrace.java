@@ -47,14 +47,19 @@ public class CtfKernelTrace extends CtfTmfTrace {
         if (!super.validate(project, path)) {
             return false;
         }
-        /* Add extra checks specific to kernel traces here */;
+        /* Add extra checks specific to kernel traces here */
         return true;
+    }
+
+    @Override
+    public StateHistorySystem getStateSystem() {
+        return (StateHistorySystem) this.ss;
     }
 
     @Override
     protected void buildStateSystem() throws TmfTraceException {
         /* Set up the path to the history tree file we'll use */
-        final String htPath = this.getPath() + ".ht";
+        final String htPath = this.getPath() + ".ht"; //$NON-NLS-1$
         final File htFile = new File(htPath);
 
         IStateHistoryBackend htBackend;
@@ -96,6 +101,6 @@ public class CtfKernelTrace extends CtfTmfTrace {
 
         // TODO this part is blocking for now...
         builder.run();
-
+        this.ss = builder.getSS();
     }
 }
