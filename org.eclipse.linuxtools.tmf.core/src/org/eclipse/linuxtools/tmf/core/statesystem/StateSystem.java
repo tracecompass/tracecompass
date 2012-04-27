@@ -338,7 +338,6 @@ public class StateSystem {
     public void pushAttribute(long t, ITmfStateValue value, int attributeQuark)
             throws TimeRangeException, AttributeNotFoundException,
             StateValueTypeException {
-        assert (attributeQuark >= 0);
         Integer stackDepth = 0;
         int subAttributeQuark;
         ITmfStateValue previousSV = transState.getOngoingStateValue(attributeQuark);
@@ -351,16 +350,18 @@ public class StateSystem {
         } else if (previousSV.getType() == 0) {
             /* Previous value was an integer, all is good, use it */
             stackDepth = previousSV.unboxInt();
-            if (stackDepth >= 10) {
-                /*
-                 * Limit stackDepth to 10, to avoid having Attribute Trees grow
-                 * out of control due to buggy insertions
-                 */
-                assert (false);
-            }
         } else {
             /* Previous state of this attribute was another type? Not good! */
-            assert (false);
+            throw new StateValueTypeException();
+        }
+
+        if (stackDepth >= 10) {
+            /*
+             * Limit stackDepth to 10, to avoid having Attribute Trees grow out
+             * of control due to buggy insertions
+             */
+            String message = "Stack limit reached, not pushing"; //$NON-NLS-1$
+            throw new AttributeNotFoundException(message);
         }
 
         stackDepth++;
@@ -369,7 +370,7 @@ public class StateSystem {
 
         modifyAttribute(t, TmfStateValue.newValueInt(stackDepth),
                 attributeQuark);
-        transState.processStateChange(t, value, subAttributeQuark);
+        modifyAttribute(t, value, subAttributeQuark);
     }
 
     /**
@@ -393,21 +394,23 @@ public class StateSystem {
     public void popAttribute(long t, int attributeQuark)
             throws AttributeNotFoundException, TimeRangeException,
             StateValueTypeException {
-        assert (attributeQuark >= 0);
         Integer stackDepth;
         int subAttributeQuark;
         ITmfStateValue previousSV = transState.getOngoingStateValue(attributeQuark);
 
         if (previousSV.isNull()) {
-            /*
-             * If the StateValue was null, this means this is the first time we
-             * use this attribute.
-             */
-            stackDepth = 0;
-        } else {
-            assert (previousSV.getType() == 0);
-            stackDepth = previousSV.unboxInt();
+            /* Same as if stackDepth == 0, see below */
+            return;
         }
+        if (previousSV.getType() != 0) {
+            /*
+             * The existing value was a string, this doesn't look like a valid
+             * stack attribute.
+             */
+            throw new StateValueTypeException();
+        }
+
+        stackDepth = previousSV.unboxInt();
 
         if (stackDepth == 0) {
             /*
@@ -417,9 +420,13 @@ public class StateSystem {
              * silently.
              */
             return;
-        } else if (stackDepth < 0) {
+        }
+
+        if (stackDepth < 0) {
             /* This on the other hand should not happen... */
-            assert (false);
+            String message = "A top-level stack attribute " + //$NON-NLS-1$
+                    "cannot have a negative integer value."; //$NON-NLS-1$
+            throw new StateValueTypeException(message);
         }
 
         /* The attribute should already exist... */
