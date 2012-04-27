@@ -4,10 +4,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 
-public class CtfTmfTimestamp extends TmfTimestamp implements ITmfTimestamp {
+public class CtfTmfTimestamp extends TmfTimestamp {
 
     final private CtfTmfTrace fTrace;
 

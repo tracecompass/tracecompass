@@ -163,7 +163,6 @@ public abstract class CtfTmfEventField implements ITmfEventField {
         return null;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public String getFieldName(int index) {
         return null;
@@ -174,13 +173,11 @@ public abstract class CtfTmfEventField implements ITmfEventField {
         return null;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public ITmfEventField getField(String fieldName) {
         return null;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public ITmfEventField getField(int index) {
         return null;
