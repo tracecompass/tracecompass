@@ -117,7 +117,7 @@ public class StateSystemFullHistoryTest {
             AttributeNotFoundException, TimeRangeException {
 
         ITmfStateInterval interval;
-        int quark, valueInt;
+        int quark, quark2, valueInt;
         String valueStr;
 
         shs.loadStateAtTime(interestingTimestamp1);
@@ -132,12 +132,14 @@ public class StateSystemFullHistoryTest {
         valueStr = interval.getStateValue().unboxStr();
         assertEquals("gdbus", valueStr);
 
-        // FIXME fails at the moment (attribute type is int, and = 3129??), I'll
-        // figure it out later
-        // quark = shs.getQuarkAbsolute("Threads", "3109", "Exec_mode_stack");
-        // interval = shs.getState(quark);
-        // valueStr = interval.getStateValue().unboxStr();
-        // assertTrue( valueStr.equals("bloup") );
+        /* Query a stack attribute, has to be done in two passes */
+        quark = shs.getQuarkAbsolute("Threads", "1432", "Exec_mode_stack");
+        interval = shs.queryState(quark);
+        valueInt = interval.getStateValue().unboxInt(); /* The stack depth */
+        quark2 = shs.getQuarkRelative(quark, Integer.toString(valueInt));
+        interval = shs.queryState(quark2);
+        valueStr = interval.getStateValue().unboxStr();
+        assertTrue(valueStr.equals("sys_poll"));
     }
 
     @Test
