@@ -81,7 +81,7 @@ public class Metadata {
 
     /**
      * Constructs a Metadata object.
-     *
+     * 
      * @param trace
      *            The trace to which belongs this metadata file.
      */
@@ -102,7 +102,7 @@ public class Metadata {
 
     /**
      * Returns the ByteOrder that was detected while parsing the metadata.
-     *
+     * 
      * @return The byte order.
      */
     public ByteOrder getDetectedByteOrder() {
@@ -115,17 +115,14 @@ public class Metadata {
 
     /**
      * Parse the metadata file.
-     *
+     * 
      * @throws CTFReaderException
      */
     public void parse() throws CTFReaderException {
-        /* Open the file and get the FileChannel */
-        FileChannel metadataFileChannel;
-        try {
-            metadataFileChannel = new FileInputStream(metadataFile).getChannel();
-        } catch (FileNotFoundException e) {
-            throw new CTFReaderException("Cannot find metadata file!"); //$NON-NLS-1$
-        }
+        CTFReaderException tempException = null;
+
+        FileInputStream fis = null;
+        FileChannel metadataFileChannel = null;
 
         /*
          * Reader. It will contain a StringReader if we are using packet-based
@@ -134,68 +131,88 @@ public class Metadata {
          */
         Reader metadataTextInput = null;
 
-        /* Check if metadata is packet-based */
-        if (isPacketBased(metadataFileChannel)) {
-            /* Create StringBuffer to receive metadata text */
-            StringBuffer metadataText = new StringBuffer();
-
-            /*
-             * Read metadata packet one by one, appending the text to the
-             * StringBuffer
-             */
-            MetadataPacketHeader packetHeader = readMetadataPacket(
-                    metadataFileChannel, metadataText);
-            while (packetHeader != null) {
-                packetHeader = readMetadataPacket(metadataFileChannel,
-                        metadataText);
-            }
-
-            /* Wrap the metadata string with a StringReader */
-            metadataTextInput = new StringReader(metadataText.toString());
-        } else {
-            /* Wrap the metadata file with a FileReader */
-            try {
-                metadataTextInput = new FileReader(metadataFile);
-            } catch (FileNotFoundException e) {
-                /*
-                 * We've already checked for this earlier. Why does StringReader
-                 * not throw this too??
-                 */
-                throw new CTFReaderException(e);
-            }
-        }
-
-        /* Create an ANTLR reader */
-        ANTLRReaderStream antlrStream;
         try {
+            fis = new FileInputStream(metadataFile);
+            metadataFileChannel = fis.getChannel();
+
+            /* Check if metadata is packet-based */
+            if (isPacketBased(metadataFileChannel)) {
+                /* Create StringBuffer to receive metadata text */
+                StringBuffer metadataText = new StringBuffer();
+
+                /*
+                 * Read metadata packet one by one, appending the text to the
+                 * StringBuffer
+                 */
+                MetadataPacketHeader packetHeader = readMetadataPacket(
+                        metadataFileChannel, metadataText);
+                while (packetHeader != null) {
+                    packetHeader = readMetadataPacket(metadataFileChannel,
+                            metadataText);
+                }
+
+                /* Wrap the metadata string with a StringReader */
+                metadataTextInput = new StringReader(metadataText.toString());
+            } else {
+                /* Wrap the metadata file with a FileReader */
+                metadataTextInput = new FileReader(metadataFile);
+            }
+
+            /* Create an ANTLR reader */
+            ANTLRReaderStream antlrStream;
             antlrStream = new ANTLRReaderStream(metadataTextInput);
+
+            /* Parse the metadata text and get the AST */
+            CTFLexer ctfLexer = new CTFLexer(antlrStream);
+            CommonTokenStream tokens = new CommonTokenStream(ctfLexer);
+            CTFParser ctfParser = new CTFParser(tokens, false);
+            parse_return ret;
+
+            ret = ctfParser.parse();
+
+            CommonTree tree = (CommonTree) ret.getTree();
+
+            /* Generate IO structures (declarations) */
+            IOStructGen gen = new IOStructGen(tree, trace);
+            gen.generate();
+
+        } catch (FileNotFoundException e) {
+            tempException = new CTFReaderException("Cannot find metadata file!"); //$NON-NLS-1$
         } catch (IOException e) {
             /* This would indicate a problem with the ANTLR library... */
-            throw new CTFReaderException(e);
-        }
-
-        /* Parse the metadata text and get the AST */
-        CTFLexer ctfLexer = new CTFLexer(antlrStream);
-        CommonTokenStream tokens = new CommonTokenStream(ctfLexer);
-        CTFParser ctfParser = new CTFParser(tokens, false);
-        parse_return ret;
-        try {
-            ret = ctfParser.parse();
+            tempException = new CTFReaderException(e);
+        } catch (ParseException e) {
+            tempException = new CTFReaderException(e);
         } catch (RecognitionException e) {
             /*
              * We don't want to expose this ANTLR-specific exception type to the
              * outside..
              */
-            throw new CTFReaderException(e);
+            tempException = new CTFReaderException(e);
         }
-        CommonTree tree = (CommonTree) ret.getTree();
 
-        /* Generate IO structures (declarations) */
-        IOStructGen gen = new IOStructGen(tree, trace);
-        try {
-            gen.generate();
-        } catch (ParseException e) {
-            throw new CTFReaderException(e);
+        /* Ghetto resource management. Java 7 will deliver us from this... */
+        if (metadataTextInput != null) {
+            try {
+                metadataTextInput.close();
+            } catch (IOException e) {
+            }
+        }
+        if (metadataFileChannel != null) {
+            try {
+                metadataFileChannel.close();
+            } catch (IOException e) {
+            }
+        }
+        if (fis != null) {
+            try {
+                fis.close();
+            } catch (IOException e) {
+            }
+        }
+
+        if (tempException != null) {
+            throw tempException;
         }
     }
 
@@ -203,7 +220,7 @@ public class Metadata {
      * Determines whether the metadata file is packet-based by looking at the
      * TSDL magic number. If it is packet-based, it also gives information about
      * the endianness of the trace using the detectedByteOrder attribute.
-     *
+     * 
      * @param metadataFileChannel
      *            FileChannel of the metadata file.
      * @return True if the metadata is packet-based.
@@ -249,7 +266,7 @@ public class Metadata {
     /**
      * Reads a metadata packet from the given metadata FileChannel, do some
      * basic validation and append the text to the StringBuffer.
-     *
+     * 
      * @param metadataFileChannel
      *            Metadata FileChannel
      * @param metadataText
