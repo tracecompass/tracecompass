@@ -67,7 +67,7 @@ public class CTFTraceReader {
     /**
      * Current event index
      */
-    private long index;
+    private long fIndex;
 
     private final long startIndex[];
 
@@ -100,7 +100,7 @@ public class CTFTraceReader {
          */
         this.startTime = prio.peek().getCurrentEvent().timestamp;
         this.endTime = this.startTime;
-        this.index = 0;
+        this.fIndex = 0;
         startIndex = new long[prio.size()];
         for (int i = 0; i < prio.size(); i++) {
             startIndex[i] = 0;
@@ -136,7 +136,7 @@ public class CTFTraceReader {
      * @return the index
      */
     public long getIndex() {
-        return index;
+        return fIndex;
     }
 
     // ------------------------------------------------------------------------
@@ -253,8 +253,8 @@ public class CTFTraceReader {
             if (!packetHasMoreEvents) {
                 int n = this.streamInputReaders.indexOf(top);
                 currentPacket.setIndexBegin(startIndex[n]);
-                currentPacket.setIndexEnd(index);
-                startIndex[n] = index + 1;
+                currentPacket.setIndexEnd(fIndex);
+                startIndex[n] = fIndex + 1;
             }
         }
         /*
@@ -271,7 +271,7 @@ public class CTFTraceReader {
             /*
              * increment the index
              */
-            index++;
+            fIndex++;
         }
         boolean hasMoreEvents = hasMoreEvents();
 
@@ -317,7 +317,7 @@ public class CTFTraceReader {
          * Remove all the trace readers from the priority queue
          */
         this.prio.clear();
-        index = 0;
+        fIndex = 0;
         long offset = 0;
         for (StreamInputReader streamInputReader : this.streamInputReaders) {
             /*
@@ -333,7 +333,7 @@ public class CTFTraceReader {
         for (StreamInputReader streamInputReader : this.streamInputReaders) {
             if (streamInputReader.getCurrentEvent() != null) {
                 this.prio.add(streamInputReader);
-                index = Math.max(index, streamInputReader.getPacketReader()
+                fIndex = Math.max(fIndex, streamInputReader.getPacketReader()
                         .getCurrentPacket().getIndexBegin()
                         + offset);
             }
@@ -396,7 +396,7 @@ public class CTFTraceReader {
                 this.advance();
             }
         }
-        this.index = pos;
+        this.fIndex = pos;
         return hasMoreEvents();
     }
 

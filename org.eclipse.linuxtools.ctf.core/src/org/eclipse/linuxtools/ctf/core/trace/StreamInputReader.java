@@ -214,7 +214,7 @@ public class StreamInputReader {
          */
         if (this.packetReader.getCurrentPacket() == null) {
             throw new CTFReaderException(
-                    "Current packet null in index seek, did you index your trace yet?");
+                    "Current packet null in index seek, did you index your trace yet?"); //$NON-NLS-1$
         }
         return this.packetReader.getCurrentPacket().getIndexBegin();
 

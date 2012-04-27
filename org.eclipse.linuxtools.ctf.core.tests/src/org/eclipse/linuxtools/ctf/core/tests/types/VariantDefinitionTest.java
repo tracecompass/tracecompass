@@ -211,7 +211,7 @@ public class VariantDefinitionTest {
      * Run the SequenceDefinition lookupSequence(String) method test.
      */
     @Test
-    public void testLookupSequence_1() throws Exception {
+    public void testLookupSequence_1() {
         String name = ""; //$NON-NLS-1$
         SequenceDefinition result = fixture.lookupSequence(name);
         assertNull(result);

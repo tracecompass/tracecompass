@@ -107,7 +107,7 @@ public class ArrayDefinitionTest {
      * @param bits
      * @return
      */
-    private IntegerDefinition[] createIntDefs(int size, int bits) {
+    private static IntegerDefinition[] createIntDefs(int size, int bits) {
         IntegerDefinition[] defs = new IntegerDefinition[size];
         for (int i = 0; i < size; i++) {
 

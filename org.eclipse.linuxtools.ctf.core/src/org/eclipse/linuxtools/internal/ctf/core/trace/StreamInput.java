@@ -118,7 +118,6 @@ public class StreamInput implements IDefinitionScope {
     // Operations
     // ------------------------------------------------------------------------
 
-    @SuppressWarnings("unused")
     @Override
     public Definition lookupDefinition(String lookupPath) {
         /* TODO: lookup in different dynamic scopes is not supported yet. */

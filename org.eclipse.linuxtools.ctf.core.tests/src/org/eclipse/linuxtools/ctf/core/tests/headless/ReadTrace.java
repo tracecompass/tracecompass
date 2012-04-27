@@ -93,20 +93,8 @@ public class ReadTrace {
             System.out.print(val);
             System.out.print(", ");
         }
-        try {
-            testSeekIndex(trace);
-        } catch (CTFReaderException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        try {
-            testSeekIndex(trace);
-        } catch (CTFReaderException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
+        testSeekIndex(trace);
+        testSeekIndex(trace);
     }
 
     /**
@@ -119,7 +107,7 @@ public class ReadTrace {
         return Long.MIN_VALUE;
     }
 
-    public static void testSeekIndex(CTFTrace trace) throws CTFReaderException {
+    public static void testSeekIndex(CTFTrace trace) {
         CTFTraceReader fixture = new CTFTraceReader(trace);
         long rank = 300000L;
         long timeRank = 4281275394331L;

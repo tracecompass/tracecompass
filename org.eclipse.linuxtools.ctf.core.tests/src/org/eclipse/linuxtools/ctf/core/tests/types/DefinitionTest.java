@@ -62,7 +62,7 @@ public class DefinitionTest {
     }
 
     @Test
-    public void testToString() throws Exception {
+    public void testToString() {
         Definition fixture = new DefTest(null, "Hello"); //$NON-NLS-1$
         String result = fixture.toString();
 

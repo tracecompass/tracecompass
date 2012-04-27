@@ -54,7 +54,7 @@ public class StreamInputReaderTimestampComparatorTest {
      * Run the StreamInputReaderTimestampComparator() constructor test.
      */
     @Test
-    public void testStreamInputReaderTimestampComparator_1() throws Exception {
+    public void testStreamInputReaderTimestampComparator_1() {
         assertNotNull(fixture);
     }
 
