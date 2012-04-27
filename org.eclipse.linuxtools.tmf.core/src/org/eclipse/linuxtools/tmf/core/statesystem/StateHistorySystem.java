@@ -265,7 +265,7 @@ public class StateHistorySystem extends StateSystem {
      * PrintWriter.
      */
     @Override
-    public void debugPrint(PrintWriter writer) {
+    public synchronized void debugPrint(PrintWriter writer) {
         /* Only used for debugging, shouldn't be externalized */
         writer.println("------------------------------"); //$NON-NLS-1$
         writer.println("Current State Info vector:\n"); //$NON-NLS-1$

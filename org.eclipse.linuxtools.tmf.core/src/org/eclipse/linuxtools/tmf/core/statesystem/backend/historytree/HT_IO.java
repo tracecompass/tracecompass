@@ -42,19 +42,26 @@ class HT_IO {
      * Standard constructor
      * 
      * @param tree
-     * @param newFile Are we creating a new file from scratch?
+     * @param newFile
+     *            Are we creating a new file from scratch?
      * @throws IOException
      */
     HT_IO(HistoryTree tree, boolean newFile) throws IOException {
         this.tree = tree;
         File historyTreeFile = tree.config.stateFile;
+        boolean success1 = true, success2;
 
         if (newFile) {
             /* Create a new empty History Tree file */
             if (historyTreeFile.exists()) {
-                historyTreeFile.delete();
+                success1 = historyTreeFile.delete();
             }
-            historyTreeFile.createNewFile();
+            success2 = historyTreeFile.createNewFile();
+            if (!(success1 && success2)) {
+                /* It seems we do not have permission to create the new file */
+                throw new IOException("Cannot create new file at " + //$NON-NLS-1$
+                        historyTreeFile.getName());
+            }
             fis = new FileInputStream(historyTreeFile);
             fos = new FileOutputStream(historyTreeFile, false);
         } else {

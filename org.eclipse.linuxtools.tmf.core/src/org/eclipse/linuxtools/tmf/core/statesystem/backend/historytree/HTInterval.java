@@ -276,4 +276,19 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
             return 0;
         }
     }
+    
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof HTInterval) {
+            if (this.compareTo((HTInterval) other) == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

@@ -136,7 +136,8 @@ class HistoryTree {
          */
         res = buffer.getInt();
         if (res != HISTORY_FILE_MAGIC_NUMBER) {
-            throw new IOException("Selected file does not look like a History Tree file"); //$NON-NLS-1$
+            throw new IOException(
+                    "Selected file does not look like a History Tree file"); //$NON-NLS-1$
         }
 
         res = buffer.getInt(); /* Major version number */
@@ -177,7 +178,6 @@ class HistoryTree {
         this.treeIO = new HT_IO(this, false);
 
         rebuildLatestBranch(rootNodeSeqNb);
-        ts = latestBranch.firstElement().getNodeStart();
         this.treeEnd = latestBranch.firstElement().getNodeEnd();
     }
 
@@ -240,7 +240,7 @@ class HistoryTree {
     /**
      * @name Accessors
      */
-    
+
     long getTreeStart() {
         return config.treeStart;
     }
@@ -492,10 +492,10 @@ class HistoryTree {
     /* Only used for debugging, shouldn't be externalized */
     @SuppressWarnings("nls")
     boolean checkNodeIntegrity(HTNode zenode) {
-        
+
         HTNode otherNode;
         CoreNode node;
-        String message = ""; //$NON-NLS-1$
+        StringBuffer buf = new StringBuffer();
         boolean ret = true;
 
         // FIXME /* Only testing Core Nodes for now */
@@ -512,19 +512,19 @@ class HistoryTree {
         if (node.getNbChildren() > 0) {
             otherNode = treeIO.readNode(node.getChild(0));
             if (node.getNodeStart() != otherNode.getNodeStart()) {
-                message += "Start time of node (" + node.getNodeStart() + ") "
+                buf.append("Start time of node (" + node.getNodeStart() + ") "
                         + "does not match start time of first child " + "("
                         + otherNode.getNodeStart() + "), " + "node #"
-                        + otherNode.getSequenceNumber() + ")\n";
+                        + otherNode.getSequenceNumber() + ")\n");
                 ret = false;
             }
             if (node.isDone()) {
                 otherNode = treeIO.readNode(node.getLatestChild());
                 if (node.getNodeEnd() != otherNode.getNodeEnd()) {
-                    message += "End time of node (" + node.getNodeEnd()
+                    buf.append("End time of node (" + node.getNodeEnd()
                             + ") does not match end time of last child ("
                             + otherNode.getNodeEnd() + ", node #"
-                            + otherNode.getSequenceNumber() + ")\n";
+                            + otherNode.getSequenceNumber() + ")\n");
                     ret = false;
                 }
             }
@@ -537,11 +537,11 @@ class HistoryTree {
         for (int i = 0; i < node.getNbChildren(); i++) {
             otherNode = treeIO.readNode(node.getChild(i));
             if (otherNode.getNodeStart() != node.getChildStart(i)) {
-                message += "  Expected start time of child node #"
+                buf.append("  Expected start time of child node #"
                         + node.getChild(i) + ": " + node.getChildStart(i)
                         + "\n" + "  Actual start time of node #"
                         + otherNode.getSequenceNumber() + ": "
-                        + otherNode.getNodeStart() + "\n";
+                        + otherNode.getNodeStart() + "\n");
                 ret = false;
             }
         }
@@ -550,7 +550,7 @@ class HistoryTree {
             System.out.println("");
             System.out.println("SHT: Integrity check failed for node #"
                     + node.getSequenceNumber() + ":");
-            System.out.println(message);
+            System.out.println(buf.toString());
         }
         return ret;
     }

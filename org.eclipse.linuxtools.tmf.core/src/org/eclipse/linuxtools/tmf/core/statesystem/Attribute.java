@@ -138,15 +138,15 @@ abstract class Attribute {
      * @return
      */
     String getFullAttributeName() {
-        String[] array;
-        String ret = ""; //$NON-NLS-1$
+        String[] array = this.getFullAttribute();
+        StringBuffer buf = new StringBuffer();
 
-        array = this.getFullAttribute();
         for (int i = 0; i < array.length - 1; i++) {
-            ret += array[i] + '/';
+            buf.append(array[i]);
+            buf.append('/');
         }
-        ret += array[array.length - 1];
-        return ret;
+        buf.append(array[array.length - 1]);
+        return buf.toString();
     }
 
     @Override

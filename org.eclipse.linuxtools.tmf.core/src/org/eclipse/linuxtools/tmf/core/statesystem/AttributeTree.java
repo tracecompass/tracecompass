@@ -94,7 +94,10 @@ final class AttributeTree {
             /* Read the first byte = the size of the entry */
             size = in.readByte();
             curByteArray = new byte[size];
-            in.read(curByteArray);
+            res = in.read(curByteArray);
+            if (res != size) {
+                throw new IOException(errorMessage);
+            }
 
             /*
              * Go buffer -> byteArray -> String -> String[] -> insert in list.

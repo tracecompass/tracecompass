@@ -28,8 +28,8 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
  * @author alexmont
  * 
  */
-public class ThreadedHistoryTreeBackend extends HistoryTreeBackend implements
-        Runnable {
+public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
+        implements Runnable {
 
     /*
      * From superclass:
