@@ -27,14 +27,10 @@ public abstract class CTFTestFiles {
     public final static long NANOSECS_PER_SEC = 1000000000L;
 
     /*
-     * To run these tests, you will need to download the following trace, at:
-     * http://www.dorsal.polymtl.ca/~alexmont/data/trace2.tar.bz2
-     * 
-     * and extract it in the
-     * .../org.eclipse.linuxtools.lttng2.kernel.core.tests/traces/ directory.
-     * You can also set up a custom path below.
+     * To run these tests, you will first need to run the get-traces.sh script
+     * located under lttng/org.eclipse.linuxtools.ctf.core.tests/traces/ .
      */
-    public final static String traceFile = "traces/trace2"; //$NON-NLS-1$
+    public final static String traceFile = "../org.eclipse.linuxtools.ctf.core.tests/traces/trace2"; //$NON-NLS-1$
     public final static long startTime = 1331668247314038062L;
 
     private static CtfTmfTrace trace = null;
