@@ -50,7 +50,8 @@ public class StateSystemFullHistoryTest {
     static IStateHistoryBackend hp;
     static StateHistorySystem shs;
 
-    private final static long interestingTimestamp1 = 18670067372290L;
+    /* Offset in the trace + start time of the trace */
+    private final static long interestingTimestamp1 = 18670067372290L + 1331649577946812237L;
 
     protected static String getTestFileName() {
         return "/tmp/statefile.ht"; //$NON-NLS-1$
@@ -199,7 +200,7 @@ public class StateSystemFullHistoryTest {
         intervals = shs.queryHistoryRange(quark, time1, time2);
         assertEquals(487, intervals.size()); /* Number of context switches! */
         assertEquals(1685, intervals.get(100).getStateValue().unboxInt());
-        assertEquals(18670480869135L, intervals.get(205).getEndTime());
+        assertEquals(1331668248427681372L, intervals.get(205).getEndTime());
     }
 
     /**
@@ -219,7 +220,7 @@ public class StateSystemFullHistoryTest {
         intervals = shs.queryHistoryRange(quark, time1, time2, resolution);
         assertEquals(129, intervals.size()); /* Number of context switches! */
         assertEquals(1452, intervals.get(50).getStateValue().unboxInt());
-        assertEquals(18670837977001L, intervals.get(100).getEndTime());
+        assertEquals(1331668248784789238L, intervals.get(100).getEndTime());
     }
 
     /**

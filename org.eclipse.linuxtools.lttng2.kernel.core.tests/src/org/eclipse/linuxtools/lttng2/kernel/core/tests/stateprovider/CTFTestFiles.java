@@ -35,7 +35,7 @@ public abstract class CTFTestFiles {
      * You can also set up a custom path below.
      */
     public final static String traceFile = "traces/trace2"; //$NON-NLS-1$
-    public final static long startTime = 18669367225825L;
+    public final static long startTime = 1331668247314038062L;
 
     private static CtfTmfTrace trace = null;
 
