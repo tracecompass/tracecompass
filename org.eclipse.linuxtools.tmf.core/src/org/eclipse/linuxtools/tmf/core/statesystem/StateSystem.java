@@ -281,9 +281,13 @@ public class StateSystem {
      *             If the requested time is outside of the trace's range
      * @throws AttributeNotFoundException
      *             If the requested attribute quark is invalid
+     * @throws StateValueTypeException
+     *             If the inserted state value's type does not match what is
+     *             already assigned to this attribute.
      */
     public void modifyAttribute(long t, ITmfStateValue value, int attributeQuark)
-            throws TimeRangeException, AttributeNotFoundException {
+            throws TimeRangeException, AttributeNotFoundException,
+            StateValueTypeException {
         transState.processStateChange(t, value, attributeQuark);
     }
 
@@ -468,8 +472,16 @@ public class StateSystem {
             removeAttribute(t, childNodeQuark);
         }
         /* Nullify ourselves */
-        transState.processStateChange(t, TmfStateValue.nullValue(),
-                attributeQuark);
+        try {
+            transState.processStateChange(t, TmfStateValue.nullValue(),
+                    attributeQuark);
+        } catch (StateValueTypeException e) {
+            /* 
+             * Will not happen since we're inserting null values only, but
+             * poor compiler has no way of knowing this...
+             */
+            e.printStackTrace();
+        }
     }
 
     /**

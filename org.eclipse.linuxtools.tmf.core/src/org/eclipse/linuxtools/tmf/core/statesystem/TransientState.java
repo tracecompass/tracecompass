@@ -20,10 +20,11 @@ import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.interval.TmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateHistoryBackend;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
+import org.eclipse.linuxtools.tmf.core.statevalue.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 
 /**
- * The Transient State is used to build intervals from puntual state changse. It
+ * The Transient State is used to build intervals from punctual state changes. It
  * contains a "state info" vector similar to the "current state", except here we
  * also record the start time of every state stored in it.
  * 
@@ -44,13 +45,15 @@ class TransientState {
     private long latestTime;
 
     private ArrayList<ITmfStateValue> ongoingStateInfo;
-    private ArrayList<Long> ongoingStateStartTimes;
+    private final ArrayList<Long> ongoingStateStartTimes;
+    private final ArrayList<Byte> stateValueTypes;
 
     TransientState(IStateHistoryBackend backend) {
         this.backend = backend;
         isActive = true;
         ongoingStateInfo = new ArrayList<ITmfStateValue>();
         ongoingStateStartTimes = new ArrayList<Long>();
+        stateValueTypes = new ArrayList<Byte>();
 
         if (backend != null) {
             latestTime = backend.getStartTime();
@@ -129,6 +132,7 @@ class TransientState {
          * change.
          */
         ongoingStateInfo.add(TmfStateValue.nullValue());
+        stateValueTypes.add((byte) -1);
 
         if (backend == null) {
             ongoingStateStartTimes.add(0L);
@@ -168,13 +172,35 @@ class TransientState {
      *            The timestamp associated with this state change
      * @throws TimeRangeException
      * @throws AttributeNotFoundException
+     * @throws StateValueTypeException 
      */
     synchronized void processStateChange(long eventTime,
             ITmfStateValue value, int index) throws TimeRangeException,
-            AttributeNotFoundException {
+            AttributeNotFoundException, StateValueTypeException {
         assert (this.isActive);
+        
+        byte expectedSvType = stateValueTypes.get(index);
         checkValidAttribute(index);
+        
+        /* 
+         * Make sure the state value type we're inserting is the same as the
+         * one registered for this attribute.
+         */
+        if (expectedSvType == -1) {
+            /* 
+             * The value hasn't been used yet, set it to the value
+             * we're currently inserting (which might be null/-1 again).
+             */
+            stateValueTypes.set(index, value.getType());
+        } else if ((value.getType() != -1) && (value.getType() != expectedSvType)) {
+            /* 
+             * We authorize inserting null values in any type of attribute,
+             * but for every other types, it needs to match our expectations!
+             */
+            throw new StateValueTypeException();
+        }
 
+        /* Update the Transient State's lastestTime, if needed */
         if (latestTime < eventTime) {
             latestTime = eventTime;
         }
@@ -193,10 +219,7 @@ class TransientState {
              * These two conditions are necessary to create an interval and
              * update ongoingStateInfo.
              */
-            backend.insertPastState(ongoingStateStartTimes.get(index), /*
-                                                                        * Start
-                                                                        * Time
-                                                                        */
+            backend.insertPastState(ongoingStateStartTimes.get(index),
                     eventTime - 1, /* End Time */
                     index, /* attribute quark */
                     ongoingStateInfo.get(index)); /* StateValue */
@@ -254,10 +277,7 @@ class TransientState {
                 continue;
             }
             try {
-                backend.insertPastState(ongoingStateStartTimes.get(i), /*
-                                                                        * Start
-                                                                        * Time
-                                                                        */
+                backend.insertPastState(ongoingStateStartTimes.get(i),
                         endTime, /* End Time */
                         i, /* attribute quark */
                         ongoingStateInfo.get(i)); /* StateValue */
