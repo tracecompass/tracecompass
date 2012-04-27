@@ -128,6 +128,9 @@ public class CTFTrace implements IDefinitionScope {
      */
     private final HashMap<String, CTFClock> clocks;
 
+    /** FileChannels to the streams */
+    private final FileChannel[] streamFileChannels;
+
     /** Handlers for the metadata files */
     private final static FileFilter metadataFileFilter = new MetadataFileFilter();
     private final static Comparator<File> metadataComparator = new MetadataComparator();
@@ -161,7 +164,7 @@ public class CTFTrace implements IDefinitionScope {
         if (!this.path.isDirectory()) {
             throw new CTFReaderException("Path must be a valid directory"); //$NON-NLS-1$
         }
-        
+
         /* Set up the internal containers for this trace */
         streams = new HashMap<Long, Stream>();
         environment = new HashMap<String, String>();
@@ -186,8 +189,9 @@ public class CTFTrace implements IDefinitionScope {
         Arrays.sort(files, metadataComparator);
 
         /* Try to open each file */
-        for (File s : files) {
-            openStreamInput(s);
+        streamFileChannels = new FileChannel[files.length];
+        for (int i = 0; i < files.length; i++) {
+            openStreamInput(files[i], i);
         }
 
         /* Create their index */
@@ -195,6 +199,19 @@ public class CTFTrace implements IDefinitionScope {
             Set<StreamInput> inputs = stream.getValue().getStreamInputs();
             for (StreamInput s : inputs) {
                 s.createIndex();
+            }
+        }
+    }
+
+    @Override
+    protected void finalize() {
+        /* If this trace gets closed, release the descriptors to the streams */
+        for (FileChannel fc : streamFileChannels) {
+            if (fc != null) {
+                try {
+                    fc.close();
+                } catch (IOException e) {
+                }
             }
         }
     }
@@ -402,10 +419,13 @@ public class CTFTrace implements IDefinitionScope {
      * 
      * @param streamFile
      *            A trace file in the trace directory.
+     * @param index
+     *            Which index in the class' streamFileChannel array this file
+     *            must use
      * @throws CTFReaderException
      */
-    private void openStreamInput(File streamFile) throws CTFReaderException {
-        FileChannel streamFileChannel;
+    private void openStreamInput(File streamFile, int index)
+            throws CTFReaderException {
         MappedByteBuffer byteBuffer;
         BitBuffer streamBitBuffer;
 
@@ -416,10 +436,11 @@ public class CTFTrace implements IDefinitionScope {
 
         try {
             /* Open the file and get the FileChannel */
-            streamFileChannel = new FileInputStream(streamFile).getChannel();
+            streamFileChannels[index] = new FileInputStream(streamFile).getChannel();
 
             /* Map one memory page of 4 kiB */
-            byteBuffer = streamFileChannel.map(MapMode.READ_ONLY, 0, 4096);
+            byteBuffer = streamFileChannels[index].map(MapMode.READ_ONLY, 0,
+                    4096);
         } catch (IOException e) {
             /* Shouldn't happen at this stage if every other check passed */
             throw new CTFReaderException();
@@ -471,7 +492,7 @@ public class CTFTrace implements IDefinitionScope {
 
             /* Create the stream input */
             StreamInput streamInput = new StreamInput(stream,
-                    streamFileChannel, streamFile);
+                    streamFileChannels[index], streamFile);
 
             /* Add a reference to the streamInput in the stream */
             stream.addInput(streamInput);
@@ -481,7 +502,7 @@ public class CTFTrace implements IDefinitionScope {
 
             /* Create the stream input */
             StreamInput streamInput = new StreamInput(stream,
-                    streamFileChannel, streamFile);
+                    streamFileChannels[index], streamFile);
 
             /* Add a reference to the streamInput in the stream */
             stream.addInput(streamInput);
