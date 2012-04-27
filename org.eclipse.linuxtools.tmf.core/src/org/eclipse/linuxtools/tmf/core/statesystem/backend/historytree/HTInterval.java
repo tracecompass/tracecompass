@@ -200,8 +200,7 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
         buffer.position(endPosOfStringEntry - sizeOfStringEntry);
 
         /*
-         * write the Strings entry (1st byte = size, then the bytes, then
-         * the 0)
+         * write the Strings entry (1st byte = size, then the bytes, then the 0)
          */
         buffer.put((byte) sizeOfStringEntry);
         buffer.put(byteArrayToWrite);
@@ -257,7 +256,7 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
     private int computeStringsEntrySize() {
         if (sv.toByteArray() == null) {
             return 0;
-        } 
+        }
         return sv.toByteArray().length + 2;
         /* (+1 for the first byte indicating the size, +1 for the 0'ed byte) */
     }
@@ -276,7 +275,7 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
             return 0;
         }
     }
-    
+
     @Override
     public boolean equals(Object other) {
         if (other instanceof HTInterval) {
@@ -290,5 +289,13 @@ final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
     @Override
     public int hashCode() {
         return super.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        /* Only for debug, should not be externalized */
+        return '[' + start + ", " + end + ']' + //$NON-NLS-1$
+                ", attribute = " + attribute + //$NON-NLS-1$
+                ", value = " + sv.toString(); //$NON-NLS-1$
     }
 }
