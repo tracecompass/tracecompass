@@ -13,8 +13,11 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
  */
 public abstract class TestParams {
 
-    /* Path to test traces */
-    private static final String testTracePath1 = "Tests/traces/trace20m1"; //$NON-NLS-1$
+    /*
+     * Path to test traces. Make sure you run the traces/get-traces.sh script
+     * first!
+     */
+    private static final String testTracePath1 = "traces/kernel"; //$NON-NLS-1$
     private static CTFTrace testTrace1 = null;
     private static CTFTrace testTraceFromFile1 = null;
 
