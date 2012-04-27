@@ -13,6 +13,7 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfDataRequest;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
+import org.eclipse.linuxtools.tmf.core.statesystem.StateSystem;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -47,6 +48,9 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
      */
     protected CtfIterator iterator;
 
+    /* Reference to the state system assigned to this trace */
+    protected StateSystem ss = null;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -79,6 +83,8 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         // .getLocation().getEndTime());
         // setTimeRange(new TmfTimeRange(this.fStartTime.clone(),
         // this.fEndTime.clone()));
+
+        buildStateSystem();
     }
 
     @Override
@@ -151,8 +157,9 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
     public String getName() {
         final String temp[] = this.fTrace.getPath().split(
                 System.getProperty("file.separator")); //$NON-NLS-1$
-        if (temp.length > 2)
+        if (temp.length > 2) {
             return temp[temp.length - 1];
+        }
         return temp[0];
     }
 
@@ -246,8 +253,9 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
     @Override
     public ITmfContext seekEvent(final ITmfLocation<?> location) {
         CtfLocation currentLocation = (CtfLocation) location;
-        if (currentLocation == null)
+        if (currentLocation == null) {
             currentLocation = new CtfLocation(0L);
+        }
         iterator.setLocation(currentLocation);
         return iterator;
     }
@@ -306,10 +314,20 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         return this.fResource;
     }
 
+    public StateSystem getStateSystem() {
+        return this.ss;
+    }
+
     CTFTrace getCTFTrace() {
         return fTrace;
     }
 
-
+    protected void buildStateSystem() throws TmfTraceException {
+        /*
+         * Nothing is done in the basic implementation, please specify
+         * how/if to build a state system in derived classes.
+         */
+        return;
+    }
 
 }
