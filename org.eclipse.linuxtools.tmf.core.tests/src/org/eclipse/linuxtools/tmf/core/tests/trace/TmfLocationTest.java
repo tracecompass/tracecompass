@@ -34,7 +34,6 @@ public class TmfLocationTest extends TestCase {
     Long aLong = 12345L;
     TmfTimestamp aTimestamp = new TmfTimestamp();
 
-    TmfLocation<Boolean> fLocation0;
     TmfLocation<String> fLocation1;
     TmfLocation<String> fLocation2;
     TmfLocation<Long> fLocation3;
@@ -55,7 +54,6 @@ public class TmfLocationTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        fLocation0 = TmfLocation.NULL_LOCATION;
         fLocation1 = new TmfLocation<String>((String) null);
         fLocation2 = new TmfLocation<String>(aString);
         fLocation3 = new TmfLocation<Long>(aLong);
@@ -72,7 +70,6 @@ public class TmfLocationTest extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testTmfLocation() {
-        assertNull("TmfLocation", fLocation0.getLocation());
         assertNull("TmfLocation", fLocation1.getLocation());
         assertEquals("TmfLocation", aString, fLocation2.getLocation());
         assertEquals("TmfLocation", aLong, fLocation3.getLocation());
@@ -80,13 +77,11 @@ public class TmfLocationTest extends TestCase {
     }
 
     public void testTmfLocationCopy() {
-        TmfLocation<Boolean> location0 = new TmfLocation<Boolean>(fLocation0);
         TmfLocation<String> location1 = new TmfLocation<String>(fLocation1);
         TmfLocation<String> location2 = new TmfLocation<String>(fLocation2);
         TmfLocation<Long> location3 = new TmfLocation<Long>(fLocation3);
         TmfLocation<ITmfTimestamp> location4 = new TmfLocation<ITmfTimestamp>(fLocation4);
 
-        assertNull("TmfLocation", location0.getLocation());
         assertNull("TmfLocation", location1.getLocation());
         assertEquals("TmfLocation", aString, location2.getLocation());
         assertEquals("TmfLocation", aLong, location3.getLocation());

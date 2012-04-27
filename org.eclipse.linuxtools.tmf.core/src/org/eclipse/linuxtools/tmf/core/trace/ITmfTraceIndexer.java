@@ -16,7 +16,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 
 /**
- * The trace indexer API.
+ * The generic trace indexer in TMF.
  * 
  * @since 1.0
  * @version 1.0

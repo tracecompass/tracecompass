@@ -22,19 +22,8 @@ import java.lang.reflect.Method;
  * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
- *
- * @see ITmfLocation
  */
 public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L> {
-
-    // ------------------------------------------------------------------------
-    // Constants
-    // ------------------------------------------------------------------------
-
-    /**
-     * The 'null' location
-     */
-    static public final TmfLocation<Boolean> NULL_LOCATION = new TmfLocation<Boolean>();
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -49,6 +38,7 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L> {
     /**
      * Default constructor (for the 'null' location)
      */
+    @SuppressWarnings("unused")
     private TmfLocation() {
         fLocation = null;
     }
@@ -65,7 +55,7 @@ public class TmfLocation<L extends Comparable<L>> implements ITmfLocation<L> {
     /**
      * Copy constructor
      * 
-     * @param other the original location
+     * @param location the original location
      */
     public TmfLocation(final TmfLocation<L> location) {
         fLocation = location.fLocation;

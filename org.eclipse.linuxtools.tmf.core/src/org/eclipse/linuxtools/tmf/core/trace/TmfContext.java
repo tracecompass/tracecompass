@@ -14,15 +14,15 @@
 package org.eclipse.linuxtools.tmf.core.trace;
 
 /**
- * Trace context structure. It ties a trace location to an event rank. The
- * context should be enough to restore the trace state so the corresponding
- * event can be read.
+ * A basic implementation of ITmfContext.
+ * <p>
+ * It ties a trace location to an event rank. The context should be enough to
+ * restore the trace state so the corresponding event can be read.
  * 
  * @since 1.0
  * @version 1.0
  * @author Francois Chouinard
  *
- * @see ITmfContext
  * @see ITmfLocation
  */
 public class TmfContext implements ITmfContext, Cloneable {

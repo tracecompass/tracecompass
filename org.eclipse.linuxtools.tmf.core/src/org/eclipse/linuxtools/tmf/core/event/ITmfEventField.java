@@ -21,7 +21,7 @@ package org.eclipse.linuxtools.tmf.core.event;
  * @author Francois Chouinard
  *
  * @see ITmfEvent
- * @see ITmfEventField
+ * @see ITmfEventType
  */
 public interface ITmfEventField extends Cloneable {
 

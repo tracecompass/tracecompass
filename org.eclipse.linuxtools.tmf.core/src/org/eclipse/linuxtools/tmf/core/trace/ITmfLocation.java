@@ -15,11 +15,13 @@ package org.eclipse.linuxtools.tmf.core.trace;
 
 
 /**
+ * The generic trace location in TMF.
+ * <p>
  * An ITmfLocation is the equivalent of a random-access file position, holding
  * enough information to allow the positioning of the trace 'pointer' to read an
  * arbitrary event.
  * <p>
- * This location is trace-specific but must be comparable.
+ * This location is trace-specific and must be comparable.
  * 
  * @since 1.0
  * @version 1.0

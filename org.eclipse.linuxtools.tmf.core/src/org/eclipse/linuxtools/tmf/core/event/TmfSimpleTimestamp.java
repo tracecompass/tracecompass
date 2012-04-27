@@ -13,8 +13,7 @@
 package org.eclipse.linuxtools.tmf.core.event;
 
 /**
- * A simplified timestamp where scale and precision are set to 0 i.e. timestamps
- * are represented by the tuple { value, 0, 0 }.
+ * A simplified timestamp where scale and precision are set to 0.
  * 
  * @since 1.0
  * @version 1.0

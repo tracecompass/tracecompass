@@ -50,18 +50,18 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
  * ITmfEvent event = trace.readEvent(context);
  * while (event != null) {
  *     processEvent(event);
- *     event = trace.readEvent(context);
+ *     event = trace.readNextEvent(context);
  * }
  * </pre>
  * <b>Example 2</b>: Process 50 events starting from the 1000th event
  * <pre>
  * int nbEventsRead = 0;
  * ITmfContext context = trace.seekEvent(1000);
- * ITmfEvent event = trace.readEvent(context);
+ * ITmfEvent event = trace.readNextEvent(context);
  * while (event != null && nbEventsRead < 50) {
  *     nbEventsRead++;
  *     processEvent(event);
- *     event = trace.readEvent(context);
+ *     event = trace.readNextEvent(context);
  * }
  * </pre>
  * <b>Example 3</b>: Process the events between 2 timestamps (inclusive)
@@ -69,10 +69,10 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
  * ITmfTimestamp startTime = ...;
  * ITmfTimestamp endTime = ...;
  * ITmfContext context = trace.seekEvent(startTime);
- * ITmfEvent event = trace.readEvent(context);
+ * ITmfEvent event = trace.readNextEvent(context);
  * while (event != null && event.getTimestamp().compareTo(endTime) <= 0) {
  *     processEvent(event);
- *     event = trace.readEvent(context);
+ *     event = trace.readNextEvent(context);
  * }
  * </pre>
  * A trace is also an event provider so it can process event requests
@@ -105,7 +105,7 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
  * @author Francois Chouinard
  *
  * @see ITmfEvent
- * @see ITmfEventProvider
+ * @see ITmfDataProvider
  * @see ITmfEventRequest
  * @see TmfTrace
  */

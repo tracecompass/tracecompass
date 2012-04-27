@@ -16,7 +16,8 @@ package org.eclipse.linuxtools.tmf.core.trace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 
 /**
- * This class maps an event timestamp to a generic location.
+ * A basic implementation of ITmfCheckpoint. It simply maps an event timestamp
+ * to a generic location.
  * 
  * @since 1.0
  * @version 1.0

@@ -37,6 +37,7 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
  * <li> public double getLocationRatio(ITmfLocation<?> location)
  * <li> public ITmfContext seekEvent(ITmfLocation<?> location)
  * <li> public ITmfContext seekEvent(double ratio)
+ * <li> public boolean validate(IProject project, String path)
  * </ul>
  * A concrete trace must provide its corresponding parser. A common way to
  * accomplish this is by making the concrete class extend TmfTrace and
@@ -50,8 +51,6 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
  * @version 1.0
  * @author Francois Chouinard
  *
- * @see ITmfTrace
- * @see TmfEventProvider
  * @see ITmfEvent
  * @see ITmfTraceIndexer
  * @see ITmfEventParser
@@ -78,12 +77,12 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
     private String fPath;
 
     /**
-     * The cache page size
+     * The trace cache page size
      */
     protected int fCacheSize = DEFAULT_TRACE_CACHE_SIZE;
 
     /**
-     * The number of events collected so far
+     * The number of events collected (so far)
      */
     protected long fNbEvents = 0;
 
@@ -472,8 +471,7 @@ public abstract class TmfTrace<T extends ITmfEvent> extends TmfEventProvider<T> 
      * Update the trace attributes
      * 
      * @param context the current trace context
-     * @param rank
-     * @param timestamp
+     * @param timestamp the corresponding timestamp
      */
     protected synchronized void updateAttributes(final ITmfContext context, final ITmfTimestamp timestamp) {
         if (fStartTime.compareTo(timestamp, false) > 0) {
