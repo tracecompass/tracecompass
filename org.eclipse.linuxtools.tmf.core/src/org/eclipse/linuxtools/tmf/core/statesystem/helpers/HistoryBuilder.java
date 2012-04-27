@@ -34,7 +34,7 @@ public class HistoryBuilder implements Runnable {
     private final StateSystem ss;
     private final IStateHistoryBackend hb;
 
-    private final Thread siThread;
+    private final Thread sciThread;
 
     /**
      * Instantiate a new HistoryBuilder helper.
@@ -63,18 +63,24 @@ public class HistoryBuilder implements Runnable {
         }
 
         sci.assignTargetStateSystem(ss);
-        siThread = new Thread(sci, "Input Plugin"); //$NON-NLS-1$
+        sciThread = new Thread(sci, "Input Plugin"); //$NON-NLS-1$
     }
 
     @Override
     public void run() {
-        siThread.start();
+        sciThread.start();
+    }
 
+    /**
+     * Since HistoryBuilder.run() simply starts the processing asynchronously,
+     * you should call .close() when you know the state history is completely
+     * built (or when the user closes the trace, whichever comes first).
+     */
+    public void close() {
         try {
-            siThread.join();
+            sciThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
-            assert (false);
         }
     }
 
