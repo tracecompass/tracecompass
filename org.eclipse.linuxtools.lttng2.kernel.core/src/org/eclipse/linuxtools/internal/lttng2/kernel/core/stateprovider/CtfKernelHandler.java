@@ -32,7 +32,7 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
  * @author alexmont
  * 
  */
-class CTFKernelHandler implements Runnable {
+class CtfKernelHandler implements Runnable {
 
     private final BlockingQueue<CtfTmfEvent> inQueue;
     private StateSystem ss;
@@ -49,7 +49,7 @@ class CTFKernelHandler implements Runnable {
     /* Event names HashMap. TODO: This can be discarded once we move to Java 7 */
     private final HashMap<String, Integer> knownEventNames;
 
-    CTFKernelHandler(BlockingQueue<CtfTmfEvent> eventsQueue) {
+    CtfKernelHandler(BlockingQueue<CtfTmfEvent> eventsQueue) {
         assert (eventsQueue != null);
         this.inQueue = eventsQueue;
         currentCPUNodes = new Vector<Integer>();

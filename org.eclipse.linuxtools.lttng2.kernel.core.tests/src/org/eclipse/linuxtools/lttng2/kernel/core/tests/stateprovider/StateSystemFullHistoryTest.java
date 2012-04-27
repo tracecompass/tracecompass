@@ -29,7 +29,7 @@ import org.eclipse.linuxtools.tmf.core.statesystem.helpers.HistoryBuilder;
 import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateChangeInput;
 import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateHistoryBackend;
 import org.eclipse.linuxtools.tmf.core.statevalue.StateValueTypeException;
-import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CTFKernelStateInput;
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
 import org.junit.*;
 
 /**
@@ -62,7 +62,7 @@ public class StateSystemFullHistoryTest {
         stateFile = new File(getTestFileName());
         stateFileBenchmark = new File(getTestFileName() + ".benchmark"); //$NON-NLS-1$
         try {
-            input = new CTFKernelStateInput(CTFTestFiles.getTestTrace());
+            input = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
             hp = new HistoryTreeBackend(stateFile, input.getStartTime());
             builder = new HistoryBuilder(input, hp);
         } catch (Exception e) {
@@ -94,7 +94,7 @@ public class StateSystemFullHistoryTest {
         IStateHistoryBackend zehp;
 
         try {
-            zeinput = new CTFKernelStateInput(CTFTestFiles.getTestTrace());
+            zeinput = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
             zehp = new HistoryTreeBackend(stateFileBenchmark,
                     zeinput.getStartTime());
             zebuilder = new HistoryBuilder(zeinput, zehp);
@@ -192,7 +192,7 @@ public class StateSystemFullHistoryTest {
             TimeRangeException, StateValueTypeException {
 
         long time1 = interestingTimestamp1;
-        long time2 = time1 + 1L * CTFTestFiles.NANOSECS_PER_SEC;
+        long time2 = time1 + 1L * CtfTestFiles.NANOSECS_PER_SEC;
         int quark;
         List<ITmfStateInterval> intervals;
 
@@ -211,7 +211,7 @@ public class StateSystemFullHistoryTest {
             TimeRangeException, StateValueTypeException {
 
         long time1 = interestingTimestamp1;
-        long time2 = time1 + 1L * CTFTestFiles.NANOSECS_PER_SEC;
+        long time2 = time1 + 1L * CtfTestFiles.NANOSECS_PER_SEC;
         long resolution = 1000000; /* One query every millisecond */
         int quark;
         List<ITmfStateInterval> intervals;
@@ -230,14 +230,14 @@ public class StateSystemFullHistoryTest {
      */
     @Test(expected = TimeRangeException.class)
     public void testFullQueryInvalidTime1() throws TimeRangeException {
-        long ts = CTFTestFiles.startTime + 20L * CTFTestFiles.NANOSECS_PER_SEC;
+        long ts = CtfTestFiles.startTime + 20L * CtfTestFiles.NANOSECS_PER_SEC;
         shs.loadStateAtTime(ts);
 
     }
 
     @Test(expected = TimeRangeException.class)
     public void testFullQueryInvalidTime2() throws TimeRangeException {
-        long ts = CTFTestFiles.startTime - 20L * CTFTestFiles.NANOSECS_PER_SEC;
+        long ts = CtfTestFiles.startTime - 20L * CtfTestFiles.NANOSECS_PER_SEC;
         shs.loadStateAtTime(ts);
 
     }
@@ -247,7 +247,7 @@ public class StateSystemFullHistoryTest {
             throws AttributeNotFoundException, TimeRangeException {
 
         int quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
-        long ts = CTFTestFiles.startTime + 20L * CTFTestFiles.NANOSECS_PER_SEC;
+        long ts = CtfTestFiles.startTime + 20L * CtfTestFiles.NANOSECS_PER_SEC;
         shs.querySingleState(ts, quark);
     }
 
@@ -256,7 +256,7 @@ public class StateSystemFullHistoryTest {
             throws AttributeNotFoundException, TimeRangeException {
 
         int quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
-        long ts = CTFTestFiles.startTime - 20L * CTFTestFiles.NANOSECS_PER_SEC;
+        long ts = CtfTestFiles.startTime - 20L * CtfTestFiles.NANOSECS_PER_SEC;
         shs.querySingleState(ts, quark);
     }
 
@@ -265,8 +265,8 @@ public class StateSystemFullHistoryTest {
             TimeRangeException {
 
         int quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
-        long ts1 = CTFTestFiles.startTime - 20L * CTFTestFiles.NANOSECS_PER_SEC; /* invalid */
-        long ts2 = CTFTestFiles.startTime + 1L * CTFTestFiles.NANOSECS_PER_SEC; /* valid */
+        long ts1 = CtfTestFiles.startTime - 20L * CtfTestFiles.NANOSECS_PER_SEC; /* invalid */
+        long ts2 = CtfTestFiles.startTime + 1L * CtfTestFiles.NANOSECS_PER_SEC; /* valid */
 
         shs.queryHistoryRange(quark, ts1, ts2);
     }
@@ -276,8 +276,8 @@ public class StateSystemFullHistoryTest {
             AttributeNotFoundException {
 
         int quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
-        long ts1 = CTFTestFiles.startTime + 1L * CTFTestFiles.NANOSECS_PER_SEC; /* valid */
-        long ts2 = CTFTestFiles.startTime + 20L * CTFTestFiles.NANOSECS_PER_SEC; /* invalid */
+        long ts1 = CtfTestFiles.startTime + 1L * CtfTestFiles.NANOSECS_PER_SEC; /* valid */
+        long ts2 = CtfTestFiles.startTime + 20L * CtfTestFiles.NANOSECS_PER_SEC; /* invalid */
 
         shs.queryHistoryRange(quark, ts1, ts2);
     }
@@ -287,8 +287,8 @@ public class StateSystemFullHistoryTest {
             AttributeNotFoundException {
 
         int quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
-        long ts1 = CTFTestFiles.startTime - 1L * CTFTestFiles.NANOSECS_PER_SEC; /* invalid */
-        long ts2 = CTFTestFiles.startTime + 20L * CTFTestFiles.NANOSECS_PER_SEC; /* invalid */
+        long ts1 = CtfTestFiles.startTime - 1L * CtfTestFiles.NANOSECS_PER_SEC; /* invalid */
+        long ts2 = CtfTestFiles.startTime + 20L * CtfTestFiles.NANOSECS_PER_SEC; /* invalid */
 
         shs.queryHistoryRange(quark, ts1, ts2);
     }

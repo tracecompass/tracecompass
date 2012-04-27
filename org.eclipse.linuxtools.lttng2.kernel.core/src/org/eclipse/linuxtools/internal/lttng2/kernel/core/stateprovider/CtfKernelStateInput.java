@@ -31,14 +31,14 @@ import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateChangeInput;
  * @author alexmont
  * 
  */
-public class CTFKernelStateInput implements IStateChangeInput {
+public class CtfKernelStateInput implements IStateChangeInput {
 
     final static int EVENTS_QUEUE_SIZE = 10000;
 
     private final BlockingQueue<CtfTmfEvent> eventsQueue;
 
     private final CtfIterator traceReader;
-    private final CTFKernelHandler eventHandler;
+    private final CtfKernelHandler eventHandler;
 
     private final Thread eventHandlerThread;
 
@@ -53,10 +53,10 @@ public class CTFKernelStateInput implements IStateChangeInput {
      *             If the directory was not found, or not recognized as a CTF
      *             trace.
      */
-    public CTFKernelStateInput(CtfTmfTrace trace) {
+    public CtfKernelStateInput(CtfTmfTrace trace) {
         eventsQueue = new ArrayBlockingQueue<CtfTmfEvent>(EVENTS_QUEUE_SIZE);
         traceReader = new CtfIterator(trace);
-        eventHandler = new CTFKernelHandler(eventsQueue);
+        eventHandler = new CtfKernelHandler(eventsQueue);
         ssAssigned = false;
 
         eventHandlerThread = new Thread(eventHandler,

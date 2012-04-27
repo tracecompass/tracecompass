@@ -22,7 +22,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
  * @author alexmont
  * 
  */
-public abstract class CTFTestFiles {
+public abstract class CtfTestFiles {
 
     public final static long NANOSECS_PER_SEC = 1000000000L;
 

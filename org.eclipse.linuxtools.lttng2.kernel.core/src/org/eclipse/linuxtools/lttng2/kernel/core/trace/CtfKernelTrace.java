@@ -16,7 +16,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CTFKernelStateInput;
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.statesystem.StateHistorySystem;
@@ -67,7 +67,7 @@ public class CtfKernelTrace extends CtfTmfTrace {
                 this.ss = new StateHistorySystem(htBackend, false);
             } else {
                 /* Create a new state history from scratch */
-                htInput = new CTFKernelStateInput(this);
+                htInput = new CtfKernelStateInput(this);
                 htBackend = new HistoryTreeBackend(htFile,
                         htInput.getStartTime());
                 builder = new HistoryBuilder(htInput, htBackend);

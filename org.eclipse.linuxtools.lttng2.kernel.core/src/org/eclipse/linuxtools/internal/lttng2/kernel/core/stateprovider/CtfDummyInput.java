@@ -28,7 +28,7 @@ import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateChangeInput;
  * @author alexmont
  * 
  */
-public class CTFDummyInput implements IStateChangeInput {
+public class CtfDummyInput implements IStateChangeInput {
 
     private final CtfIterator iterator;
 
@@ -38,7 +38,7 @@ public class CTFDummyInput implements IStateChangeInput {
      * @param traceFile
      *            The CTF trace to read from (can be any type of CTF trace)
      */
-    public CTFDummyInput(CtfTmfTrace trace) {
+    public CtfDummyInput(CtfTmfTrace trace) {
         this.iterator = new CtfIterator(trace);
 
     }

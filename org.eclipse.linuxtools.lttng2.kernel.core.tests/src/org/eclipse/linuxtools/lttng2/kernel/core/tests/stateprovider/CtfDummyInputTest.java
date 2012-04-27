@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
 
-import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CTFDummyInput;
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfDummyInput;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.junit.BeforeClass;
 
@@ -22,12 +22,12 @@ import org.junit.BeforeClass;
  * @author alexmont
  *
  */
-public class CTFDummyInputTest extends CTFKernelStateInputTest {
+public class CtfDummyInputTest extends CtfKernelStateInputTest {
 
     /* Hiding superclass method */
     @BeforeClass
     public static void initialize() throws TmfTraceException {
-        input = new CTFDummyInput(CTFTestFiles.getTestTrace());
+        input = new CtfDummyInput(CtfTestFiles.getTestTrace());
     }
 
 }
