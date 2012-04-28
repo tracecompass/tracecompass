@@ -25,8 +25,9 @@ import org.junit.runners.Suite;
  * @version $Revision: 1.0 $
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ CtfDummyInputTest.class, CtfKernelStateInputTest.class,
-    StateSystemFullHistoryTest.class, StateSystemFullThreadedHistoryTest.class})
+@Suite.SuiteClasses({ CtfKernelStateInputTest.class,
+    StateSystemFullHistoryTest.class,
+    StateSystemFullThreadedHistoryTest.class})
 public class TestAll {
 
     /**

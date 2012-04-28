@@ -10,7 +10,7 @@
  * 
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider;
+package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
 
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
