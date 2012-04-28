@@ -222,10 +222,12 @@ public class StateHistorySystem extends StateSystem {
      * @param t1
      *            Start time of the range query
      * @param t2
-     *            End time of the query
+     *            Target end time of the query. If t2 is greater than the end of
+     *            the trace, we will return what we have up to the end of the
+     *            history.
      * @return The List of state intervals that happened between t1 and t2
      * @throws TimeRangeException
-     *             If either t1 or t2 is invalid.
+     *             If t1 is invalid, or if t2 <= t1
      * @throws AttributeNotFoundException
      *             If the requested quark does not exist in the model.
      */
@@ -236,7 +238,10 @@ public class StateHistorySystem extends StateSystem {
         ITmfStateInterval currentInterval;
         long ts;
 
-        checkValidTimeRange(t1, t2);
+        /* Make sure the time range makes sense */
+        if (t2 <= t1) {
+            throw new TimeRangeException();
+        }
 
         /* Get the initial state at time T1 */
         intervals = new ArrayList<ITmfStateInterval>();
@@ -245,9 +250,18 @@ public class StateHistorySystem extends StateSystem {
 
         /* Get the following state changes */
         ts = currentInterval.getEndTime();
-        while (ts != -1 && ts <= t2) {
+        while (ts != -1 && ts < t2) {
             ts++; /* To "jump over" to the next state in the history */
-            currentInterval = querySingleState(ts, attributeQuark);
+            try {
+                currentInterval = querySingleState(ts, attributeQuark);
+            } catch (TimeRangeException e) {
+                /*
+                 * If the next timestamp is invalid (this probably means t2 was
+                 * greater than the end of the trace), simply stop the queries
+                 * here and return what we have so far.
+                 */
+                break;
+            }
             intervals.add(currentInterval);
             ts = currentInterval.getEndTime();
         }
@@ -264,12 +278,14 @@ public class StateHistorySystem extends StateSystem {
      * @param t1
      *            Start time of the range query
      * @param t2
-     *            End time of the query
+     *            Target end time of the query. If t2 is greater than the end of
+     *            the trace, we will return what we have up to the end of the
+     *            history.
      * @param resolution
      *            The "step" of this query
      * @return The List of states that happened between t1 and t2
      * @throws TimeRangeException
-     *             If one of the timestamps is invalid
+     *             If t1 is invalid, or if t2 <= t1
      * @throws AttributeNotFoundException
      *             If the attribute doesn't exist
      */
@@ -280,7 +296,10 @@ public class StateHistorySystem extends StateSystem {
         ITmfStateInterval currentInterval;
         long ts;
 
-        checkValidTimeRange(t1, t2);
+        /* Make sure the time range makes sense */
+        if (t2 <= t1) {
+            throw new TimeRangeException();
+        }
 
         /* Get the initial state at time T1 */
         intervals = new ArrayList<ITmfStateInterval>();
@@ -292,24 +311,21 @@ public class StateHistorySystem extends StateSystem {
          * case the current interval is longer than the resolution.
          */
         for (ts = currentInterval.getStartTime(); (currentInterval.getEndTime() != -1)
-                && (ts <= t2); ts += resolution) {
+                && (ts < t2); ts += resolution) {
             if (ts <= currentInterval.getEndTime()) {
                 continue;
             }
-            currentInterval = querySingleState(ts, attributeQuark);
+
+            try {
+                currentInterval = querySingleState(ts, attributeQuark);
+            } catch (TimeRangeException e) {
+                /* Stop the queries, return the intervals we have so far. */
+                break;
+            }
+
             intervals.add(currentInterval);
         }
         return intervals;
-    }
-
-    /**
-     * Makes sure the range [t1, t2] is valid for the current state history.
-     */
-    private void checkValidTimeRange(long t1, long t2)
-            throws TimeRangeException {
-        if (!(backend.checkValidTime(t1) && backend.checkValidTime(t2))) {
-            throw new TimeRangeException();
-        }
     }
 
     /**
