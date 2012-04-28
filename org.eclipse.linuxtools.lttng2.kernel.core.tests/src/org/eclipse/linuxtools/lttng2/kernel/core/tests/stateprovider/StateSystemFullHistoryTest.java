@@ -205,10 +205,30 @@ public class StateSystemFullHistoryTest {
     }
 
     /**
+     * Range query, but with a t2 far off the end of the trace.
+     * The result should still be valid.
+     */
+    @Test
+    public void testRangeQuery2() throws TimeRangeException,
+            AttributeNotFoundException {
+
+        List<ITmfStateInterval> intervals;
+        
+        int quark = shs.getQuarkAbsolute("CPUs", "0", "IRQ_stack");
+        long ts1 = shs.getHistoryBackend().getStartTime(); /* start of the trace */
+        long ts2 = CtfTestFiles.startTime + 20L * CtfTestFiles.NANOSECS_PER_SEC; /* invalid, but ignored */
+
+        intervals = shs.queryHistoryRange(quark, ts1, ts2);
+
+        /* Nb of IRQs on CPU 0 during the whole trace */
+        assertEquals(1653, intervals.size());
+    }
+
+    /**
      * Test a range query with a resolution
      */
     @Test
-    public void testRangeQuery2() throws AttributeNotFoundException,
+    public void testRangeQuery3() throws AttributeNotFoundException,
             TimeRangeException, StateValueTypeException {
 
         long time1 = interestingTimestamp1;
@@ -274,17 +294,6 @@ public class StateSystemFullHistoryTest {
 
     @Test(expected = TimeRangeException.class)
     public void testRangeQueryInvalidTime2() throws TimeRangeException,
-            AttributeNotFoundException {
-
-        int quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");
-        long ts1 = CtfTestFiles.startTime + 1L * CtfTestFiles.NANOSECS_PER_SEC; /* valid */
-        long ts2 = CtfTestFiles.startTime + 20L * CtfTestFiles.NANOSECS_PER_SEC; /* invalid */
-
-        shs.queryHistoryRange(quark, ts1, ts2);
-    }
-
-    @Test(expected = TimeRangeException.class)
-    public void testRangeQueryInvalidTime3() throws TimeRangeException,
             AttributeNotFoundException {
 
         int quark = shs.getQuarkAbsolute("CPUs", "0", "Current_thread");

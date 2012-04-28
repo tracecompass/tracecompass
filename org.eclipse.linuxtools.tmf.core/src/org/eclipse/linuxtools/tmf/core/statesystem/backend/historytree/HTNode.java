@@ -329,6 +329,7 @@ abstract class HTNode {
     HTInterval getRelevantInterval(int key, long t) throws TimeRangeException {
         assert (this.isDone);
         int startIndex;
+        HTInterval curInterval;
 
         if (intervals.size() == 0) {
             return null;
@@ -337,10 +338,11 @@ abstract class HTNode {
         startIndex = getStartIndexFor(t);
 
         for (int i = startIndex; i < intervals.size(); i++) {
-            if (intervals.get(i).getAttribute() == key) {
-                if (intervals.get(i).getStartTime() <= t) {
-                    return intervals.get(i);
-                }
+            curInterval = intervals.get(i);
+            if (curInterval.getAttribute() == key
+                    && curInterval.getStartTime() <= t
+                    && curInterval.getEndTime() >= t) {
+                return curInterval;
             }
         }
         /* We didn't find the relevant information in this node */
