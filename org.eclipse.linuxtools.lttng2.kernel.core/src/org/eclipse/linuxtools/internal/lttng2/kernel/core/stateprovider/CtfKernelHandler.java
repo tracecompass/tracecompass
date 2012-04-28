@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.concurrent.BlockingQueue;
 
+import org.eclipse.linuxtools.lttng2.kernel.core.trace.Attributes;
+import org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngStrings;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.statesystem.AttributeNotFoundException;
@@ -105,7 +107,6 @@ class CtfKernelHandler implements Runnable {
         }
     }
 
-    @SuppressWarnings("nls")
     private void processEvent(CtfTmfEvent event) {
         currentEvent = event;
         ITmfEventField content = event.getContent();
@@ -121,10 +122,10 @@ class CtfKernelHandler implements Runnable {
         if (eventCpu >= currentCPUNodes.size()) {
             /* We need to add this node to the vector */
             for (Integer i = currentCPUNodes.size(); i < eventCpu + 1; i++) {
-                quark = ss.getQuarkAbsoluteAndAdd("CPUs", i.toString());
+                quark = ss.getQuarkAbsoluteAndAdd(Attributes.CPUS, i.toString());
                 currentCPUNodes.add(quark);
 
-                quark = ss.getQuarkAbsoluteAndAdd("Threads", "unknown");
+                quark = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS, Attributes.UNKNOWN);
                 currentThreadNodes.add(quark);
             }
         }
@@ -145,8 +146,7 @@ class CtfKernelHandler implements Runnable {
             case 1: // "exit_syscall":
                 /* Fields: int64 ret */
                 /* Pop "syscall" from the Exec_mode_stack */
-                quark = ss.getQuarkRelativeAndAdd(currentThreadNode,
-                        "Exec_mode_stack");
+                quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.EXEC_MODE_STACK);
                 try {
                     ss.popAttribute(ts, quark);
                 } catch (AttributeNotFoundException e1) {
@@ -161,16 +161,16 @@ class CtfKernelHandler implements Runnable {
 
             case 2: // "irq_handler_entry":
                 /* Fields: int32 irq, string name */
-                Integer irqId = ((Long) content.getField("irq").getValue()).intValue();
+                Integer irqId = ((Long) content.getField(LttngStrings.IRQ).getValue()).intValue();
 
                 /* Push the IRQ to the CPU's IRQ_stack */
-                quark = ss.getQuarkRelativeAndAdd(currentCPUNode, "IRQ_stack");
+                quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.IRQ_STACK);
                 value = TmfStateValue.newValueInt(irqId);
                 ss.pushAttribute(ts, value, quark);
 
                 /* Change the status of the running process to interrupted */
-                quark = ss.getQuarkRelativeAndAdd(currentThreadNode, "Status");
-                value = TmfStateValue.newValueInt(STATE_PROCESS_STATUS_WAIT_CPU);
+                quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
+                value = TmfStateValue.newValueInt(Attributes.STATUS_WAIT_CPU);
                 ss.modifyAttribute(ts, value, quark);
                 break;
 
@@ -179,12 +179,12 @@ class CtfKernelHandler implements Runnable {
                 int stackDepth = 0;
 
                 /* Pop the IRQ from the CPU's IRQ_stack */
-                quark = ss.getQuarkRelativeAndAdd(currentCPUNode, "IRQ_stack");
+                quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.IRQ_STACK);
                 try {
                     ss.popAttribute(ts, quark);
                 } catch (AttributeNotFoundException e1) {
                     System.err.print(event.getTimestamp()
-                            + " Popping empty attribute: " + e1.getMessage());
+                            + " Popping empty attribute: " + e1.getMessage()); //$NON-NLS-1$
                 }
 
                 /*
@@ -199,9 +199,8 @@ class CtfKernelHandler implements Runnable {
                     e.printStackTrace();
                 }
                 if (stackDepth == 0) {
-                    quark = ss.getQuarkRelativeAndAdd(currentThreadNode,
-                            "Status");
-                    value = TmfStateValue.newValueInt(STATE_PROCESS_STATUS_RUN);
+                    quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
+                    value = TmfStateValue.newValueInt(Attributes.STATUS_RUN);
                     ss.modifyAttribute(ts, value, quark);
                 }
                 break;
@@ -226,45 +225,39 @@ class CtfKernelHandler implements Runnable {
                  */
 
                 // prev_comm doesn't seem to get populated...
-                String prevProcessName = (String) content.getField("prev_comm").getValue();
-                Integer prevTid = ((Long) content.getField("prev_tid").getValue()).intValue();
-                Long prevState = (Long) content.getField("prev_state").getValue();
+                String prevProcessName = (String) content.getField(LttngStrings.PREV_COMM).getValue();
+                Integer prevTid = ((Long) content.getField(LttngStrings.PREV_TID).getValue()).intValue();
+                Long prevState = (Long) content.getField(LttngStrings.PREV_STATE).getValue();
 
-                String nextProcessName = (String) content.getField("next_comm").getValue();
-                Integer nextTid = ((Long) content.getField("next_tid").getValue()).intValue();
+                String nextProcessName = (String) content.getField(LttngStrings.NEXT_COMM).getValue();
+                Integer nextTid = ((Long) content.getField(LttngStrings.NEXT_TID).getValue()).intValue();
 
                 /* Update the name of the process going out (if needed) */
-                quark = ss.getQuarkRelativeAndAdd(currentThreadNode,
-                        "Exec_name");
+                quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.EXEC_NAME);
                 value = TmfStateValue.newValueString(prevProcessName);
                 ss.updateOngoingState(value, quark);
 
                 /* Update the currentThreadNodes pointer */
-                Integer newCurrentThreadNode = ss.getQuarkAbsoluteAndAdd(
-                        "Threads", nextTid.toString());
+                Integer newCurrentThreadNode = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS, nextTid.toString());
                 currentThreadNodes.set(eventCpu, newCurrentThreadNode);
 
                 /* Set the status of the new scheduled process */
-                quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode,
-                        "Status");
-                value = TmfStateValue.newValueInt(STATE_PROCESS_STATUS_RUN);
+                quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.STATUS);
+                value = TmfStateValue.newValueInt(Attributes.STATUS_RUN);
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Set the exec name of the new process */
-                quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode,
-                        "Exec_name");
+                quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.EXEC_NAME);
                 value = TmfStateValue.newValueString(nextProcessName);
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Set the status of the process that got scheduled out */
-                quark = ss.getQuarkAbsoluteAndAdd("Threads",
-                        prevTid.toString(), "Status");
+                quark = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS, prevTid.toString(), Attributes.STATUS);
                 value = TmfStateValue.newValueInt(prevState.intValue());
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Set the current scheduled process on the relevant CPU */
-                quark = ss.getQuarkRelativeAndAdd(currentCPUNode,
-                        "Current_thread");
+                quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.CURRENT_THREAD);
                 value = TmfStateValue.newValueInt(nextTid);
                 ss.modifyAttribute(ts, value, quark);
                 break;
@@ -278,37 +271,35 @@ class CtfKernelHandler implements Runnable {
                 // String parentProcessName = (String)
                 // event.getFieldValue("parent_comm");
                 String childProcessName;
-                childProcessName = (String) content.getField("child_comm").getValue();
+                childProcessName = (String) content.getField(LttngStrings.CHILD_COMM).getValue();
                 // assert ( parentProcessName.equals(childProcessName) );
 
-                Integer parentTid = ((Long) content.getField("parent_tid").getValue()).intValue();
-                Integer childTid = ((Long) content.getField("child_tid").getValue()).intValue();
+                Integer parentTid = ((Long) content.getField(LttngStrings.PARENT_TID).getValue()).intValue();
+                Integer childTid = ((Long) content.getField(LttngStrings.CHILD_TID).getValue()).intValue();
 
-                tidNode = ss.getQuarkAbsoluteAndAdd("Threads",
-                        childTid.toString());
+                tidNode = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS, childTid.toString());
 
                 /*
                  * Add the new process with its known TID, PPID, and initial
                  * Exec_name
                  */
-                quark = ss.getQuarkRelativeAndAdd(tidNode, "PPID");
+                quark = ss.getQuarkRelativeAndAdd(tidNode, Attributes.PPID);
                 value = TmfStateValue.newValueInt(parentTid);
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Set the new process' exec_name */
-                quark = ss.getQuarkRelativeAndAdd(tidNode, "Exec_name");
+                quark = ss.getQuarkRelativeAndAdd(tidNode, Attributes.EXEC_NAME);
                 value = TmfStateValue.newValueString(childProcessName);
                 ss.modifyAttribute(ts, value, quark);
                 break;
 
             case 9: // "sched_process_exit":
                 /* Fields: string comm, int32 tid, int32 prio */
-                String processName = (String) content.getField("comm").getValue();
-                Integer tid = ((Long) content.getField("tid").getValue()).intValue();
+                String processName = (String) content.getField(LttngStrings.COMM).getValue();
+                Integer tid = ((Long) content.getField(LttngStrings.TID).getValue()).intValue();
 
                 /* Update the process' name, if we don't have it */
-                quark = ss.getQuarkAbsoluteAndAdd("Threads", tid.toString(),
-                        "Exec_name");
+                quark = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS, tid.toString(), Attributes.EXEC_NAME);
                 value = TmfStateValue.newValueString(processName);
                 ss.updateOngoingState(value, quark);
 
@@ -316,7 +307,7 @@ class CtfKernelHandler implements Runnable {
                  * Remove the process and all its sub-attributes from the
                  * current state
                  */
-                quark = ss.getQuarkAbsoluteAndAdd("Threads", tid.toString());
+                quark = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS, tid.toString());
                 ss.removeAttribute(ts, quark);
                 break;
 
@@ -324,7 +315,7 @@ class CtfKernelHandler implements Runnable {
                 /* Fields: string comm, int32 tid, int32 prio */
                 break;
 
-            // FIXME Not available with CTF. Use event context?
+            // FIXME In CTF it's as "syscall_exec". Will have to be adapted.
             // case LTT_EVENT_EXEC:
             // filename = new String((byte[]) event.getField(0));
             //
@@ -337,8 +328,8 @@ class CtfKernelHandler implements Runnable {
             default:
                 /* Other event types not covered by the main switch */
 
-                if (eventName.startsWith("sys_")
-                        || eventName.startsWith("compat_sys_")) {
+                if (eventName.startsWith(LttngStrings.SYSCALL_PREFIX)
+                        || eventName.startsWith(LttngStrings.COMPAT_SYSCALL_PREFIX)) {
                     /*
                      * This is a replacement for the old sys_enter event. Now
                      * syscall names are listed into the event type
@@ -348,8 +339,7 @@ class CtfKernelHandler implements Runnable {
                      * Push the syscall name on the Exec_mode_stack of the
                      * relevant PID
                      */
-                    quark = ss.getQuarkRelativeAndAdd(currentThreadNode,
-                            "Exec_mode_stack");
+                    quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.EXEC_MODE_STACK);
                     value = TmfStateValue.newValueString(eventName);
                     ss.pushAttribute(ts, value, quark);
                 }
@@ -362,21 +352,20 @@ class CtfKernelHandler implements Runnable {
              */
 
             /* Number of events of each type, globally */
-            // quark = ss.getQuarkAbsoluteAndAdd("Stats", "Event_types",
-            // eventName);
-            // ss.incrementAttribute(ts, quark);
+//             quark = ss.getQuarkAbsoluteAndAdd(Attributes.STATISTICS,
+//                     Attributes.EVENT_TYPES, eventName);
+//             ss.incrementAttribute(ts, quark);
 
-            /* Nb of events per CPU */
-            // quark = ss.getQuarkRelativeAndAdd(currentCPUNode, "Stats",
-            // "Event_types", eventName);
-            // ss.incrementAttribute(ts, quark);
+            /* Number of events per CPU */
+//             quark = ss.getQuarkRelativeAndAdd(currentCPUNode,
+//                     Attributes.STATISTICS, Attributes.EVENT_TYPES, eventName);
+//             ss.incrementAttribute(ts, quark);
 
-            /* Nb of events per process */
-            // quark = ss.getQuarkRelativeAndAdd(currentThreadNode, "Stats",
-            // "Event_types", eventName);
-            // ss.incrementAttribute(ts, quark);
+            /* Number of events per process */
+//             quark = ss.getQuarkRelativeAndAdd(currentThreadNode,
+//                     Attributes.STATISTICS, Attributes.EVENT_TYPES, eventName);
+//             ss.incrementAttribute(ts, quark);
 
-            // end of big non-indented try
         } catch (AttributeNotFoundException ae) {
             /*
              * This would indicate a problem with the logic of the manager here,
@@ -389,8 +378,8 @@ class CtfKernelHandler implements Runnable {
              * This would happen if the events in the trace aren't ordered
              * chronologically, which should never be the case ...
              */
-            System.err.println("TimeRangeExcpetion caught in the state system's event manager.");
-            System.err.println("Are the events in the trace correctly ordered?");
+            System.err.println("TimeRangeExcpetion caught in the state system's event manager."); //$NON-NLS-1$
+            System.err.println("Are the events in the trace correctly ordered?"); //$NON-NLS-1$
             tre.printStackTrace();
 
         } catch (StateValueTypeException sve) {
@@ -403,28 +392,23 @@ class CtfKernelHandler implements Runnable {
 
     }
 
-    @SuppressWarnings("nls")
     private static HashMap<String, Integer> fillEventNames() {
         /*
          * TODO Replace with straight strings in the switch/case once we move to
          * Java 7
          */
-        /*
-         * This is still, imo, cleaner than the wtf-were-they-thinking Java
-         * Enums
-         */
         HashMap<String, Integer> map = new HashMap<String, Integer>();
 
-        map.put("exit_syscall", 1);
-        map.put("irq_handler_entry", 2);
-        map.put("irq_handler_exit", 3);
-        map.put("softirq_entry", 4);
-        map.put("softirq_exit", 5);
-        map.put("softirq_raise", 6);
-        map.put("sched_switch", 7);
-        map.put("sched_process_fork", 8);
-        map.put("sched_process_exit", 9);
-        map.put("sched_process_free", 10);
+        map.put(LttngStrings.EXIT_SYSCALL, 1);
+        map.put(LttngStrings.IRQ_HANDLER_ENTRY, 2);
+        map.put(LttngStrings.IRQ_HANDLER_EXIT, 3);
+        map.put(LttngStrings.SOFTIRQ_ENTRY, 4);
+        map.put(LttngStrings.SOFTIRQ_EXIT, 5);
+        map.put(LttngStrings.SOFTIRQ_RAISE, 6);
+        map.put(LttngStrings.SCHED_SWITCH, 7);
+        map.put(LttngStrings.SCHED_PROCESS_FORK, 8);
+        map.put(LttngStrings.SCHED_PROCESS_EXIT, 9);
+        map.put(LttngStrings.SCHED_PROCESS_FREE, 10);
 
         return map;
     }
@@ -433,8 +417,4 @@ class CtfKernelHandler implements Runnable {
         Integer ret = knownEventNames.get(eventName);
         return (ret != null) ? ret : -1;
     }
-
-    /* Process status */
-    private final static int STATE_PROCESS_STATUS_WAIT_CPU = 1;
-    private final static int STATE_PROCESS_STATUS_RUN = 2;
 }
