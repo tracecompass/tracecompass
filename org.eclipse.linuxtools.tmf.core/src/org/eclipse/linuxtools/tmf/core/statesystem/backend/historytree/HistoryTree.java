@@ -118,8 +118,11 @@ class HistoryTree {
         long ts;
 
         /* Java I/O mumbo jumbo... */
-        if ((!existingStateFile.exists()) || existingStateFile.length() <= 0) {
-            throw new IOException("Invalid state file selected"); //$NON-NLS-1$
+        if (!existingStateFile.exists()) {
+            throw new IOException("Selected state file does not exist"); //$NON-NLS-1$
+        }
+        if  (existingStateFile.length() <= 0) {
+            throw new IOException("Invalid state file selected, target file is empty"); //$NON-NLS-1$
         }
 
         FileInputStream fis = new FileInputStream(existingStateFile);

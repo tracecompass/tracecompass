@@ -53,6 +53,7 @@ public class StateSystemFullThreadedHistoryTest extends
         }
         builder.run();
         shs = (StateHistorySystem) builder.getSS();
+        builder.close(); /* Waits for the construction to finish */
     }
 
     @Override
