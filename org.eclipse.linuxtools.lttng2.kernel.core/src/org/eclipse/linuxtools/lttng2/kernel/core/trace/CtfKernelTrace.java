@@ -19,7 +19,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.statesystem.StateHistorySystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.backend.historytree.HistoryTreeBackend;
 import org.eclipse.linuxtools.tmf.core.statesystem.backend.historytree.ThreadedHistoryTreeBackend;
 import org.eclipse.linuxtools.tmf.core.statesystem.helpers.HistoryBuilder;
@@ -52,11 +51,6 @@ public class CtfKernelTrace extends CtfTmfTrace {
     }
 
     @Override
-    public StateHistorySystem getStateSystem() {
-        return (StateHistorySystem) this.ss;
-    }
-
-    @Override
     protected void buildStateSystem() throws TmfTraceException {
         /* Set up the path to the history tree file we'll use */
         final String htPath = this.getPath() + ".ht"; //$NON-NLS-1$
@@ -73,7 +67,7 @@ public class CtfKernelTrace extends CtfTmfTrace {
             /* Load an existing history */
             try {
                 htBackend = new HistoryTreeBackend(htFile);
-                this.ss = new StateHistorySystem(htBackend, false);
+                this.ss = HistoryBuilder.openExistingHistory(htBackend);
                 return;
             } catch (IOException e) {
                 /*
@@ -99,7 +93,7 @@ public class CtfKernelTrace extends CtfTmfTrace {
             throw new TmfTraceException(e.getMessage());
         }
 
-        this.ss = builder.getSS();
+        this.ss = builder.getStateSystemQuerier();
         builder.run(); /* Start the construction of the history */
 
         //FIXME We will have to call close() once we are notified that the

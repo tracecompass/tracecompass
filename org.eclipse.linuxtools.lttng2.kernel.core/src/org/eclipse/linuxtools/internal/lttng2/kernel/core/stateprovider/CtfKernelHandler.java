@@ -21,9 +21,8 @@ import org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngStrings;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.statesystem.AttributeNotFoundException;
-import org.eclipse.linuxtools.tmf.core.statesystem.StateHistorySystem;
-import org.eclipse.linuxtools.tmf.core.statesystem.StateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.TimeRangeException;
+import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateSystemBuilder;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.statevalue.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
@@ -37,7 +36,7 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 class CtfKernelHandler implements Runnable {
 
     private final BlockingQueue<CtfTmfEvent> inQueue;
-    private StateSystem ss;
+    private IStateSystemBuilder ss;
 
     private CtfTmfEvent currentEvent;
 
@@ -60,12 +59,8 @@ class CtfKernelHandler implements Runnable {
         knownEventNames = fillEventNames();
     }
 
-    void assignStateSystem(StateSystem targetSS) {
+    void assignStateSystem(IStateSystemBuilder targetSS) {
         this.ss = targetSS;
-    }
-
-    StateSystem getStateSystem() {
-        return ss;
     }
 
     @Override
@@ -94,16 +89,14 @@ class CtfKernelHandler implements Runnable {
 
     private void closeStateSystem() {
         /* Close the History system, if there is one */
-        if (ss.getClass() == StateHistorySystem.class) {
-            try {
-                ((StateHistorySystem) ss).closeHistory(currentEvent.getTimestamp().getValue());
-            } catch (TimeRangeException e) {
-                /*
-                 * Since we're using currentEvent.getTimestamp, this shouldn't
-                 * cause any problem
-                 */
-                e.printStackTrace();
-            }
+        try {
+            ss.closeHistory(currentEvent.getTimestamp().getValue());
+        } catch (TimeRangeException e) {
+            /*
+             * Since we're using currentEvent.getTimestamp, this shouldn't
+             * cause any problem
+             */
+            e.printStackTrace();
         }
     }
 

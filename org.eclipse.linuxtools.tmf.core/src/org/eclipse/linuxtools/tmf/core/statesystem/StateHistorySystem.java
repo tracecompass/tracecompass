@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateHistoryBackend;
+import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateSystemBuilder;
 
 /**
  * This is the extension of the StateSystem, which will save the state intervals
@@ -36,14 +37,8 @@ import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateHistoryBackend;
  * @author alexmont
  * 
  */
-public class StateHistorySystem extends StateSystem {
-
-    /*
-     * Inherited from StateSystem
-     * 
-     * protected ArrayList<AttributeTreeNode> attributeList; protected
-     * TransientState transState; protected CurrentState curState;
-     */
+public class StateHistorySystem extends StateSystem implements
+        IStateSystemBuilder {
 
     /**
      * In addition, a state "history" system has a storage back-end from which
@@ -77,26 +72,17 @@ public class StateHistorySystem extends StateSystem {
         }
     }
 
-    public IStateHistoryBackend getHistoryBackend() {
-        return backend;
+    @Override
+    public long getStartTime() {
+        return backend.getStartTime();
     }
 
-    /**
-     * Method to close off the History Provider. This happens for example when
-     * we are done reading an off-line trace. First we close the TransientState,
-     * commit it to the Provider, mark it as inactive, then we write the
-     * Attribute Tree somewhere so we can reopen it later.
-     * 
-     * @param endTime
-     *            The requested End Time of the history, since it could be
-     *            bigger than the timestamp of the last event or state change we
-     *            have seen. All "ongoing" states will be extended until this
-     *            'endTime'.
-     * @throws TimeRangeException
-     *             If the passed endTime doesn't make sense (for example, if
-     *             it's earlier than the latest time) and the backend doesn't
-     *             know how to handle it.
-     */
+    @Override
+    public long getCurrentEndTime() {
+        return backend.getEndTime();
+    }
+
+    @Override
     public void closeHistory(long endTime) throws TimeRangeException {
         File attributeTreeFile;
         long attributeTreeFilePos;
@@ -127,23 +113,7 @@ public class StateHistorySystem extends StateSystem {
      * @name External query methods
      */
 
-    /**
-     * Load the complete state information at time 't' into the returned List.
-     * You can then get the intervals for single attributes by using
-     * List.get(n), where 'n' is the quark of the attribute.
-     * 
-     * On average if you need around 10 or more queries for the same timestamps,
-     * use this method. If you need less than 10 (for example, running many
-     * queries for the same attributes but at different timestamps), you might
-     * be better using the querySingleState() methods instead.
-     * 
-     * @param t
-     *            We will recreate the state information to what it was at time
-     *            t.
-     * @throws TimeRangeException
-     *             If the 't' parameter is outside of the range of the state
-     *             history.
-     */
+    @Override
     public synchronized List<ITmfStateInterval> loadStateAtTime(long t)
             throws TimeRangeException {
         List<ITmfStateInterval> stateInfo = new ArrayList<ITmfStateInterval>(
@@ -175,26 +145,7 @@ public class StateHistorySystem extends StateSystem {
         return stateInfo;
     }
 
-    /**
-     * Singular query method. This one does not update the whole stateInfo
-     * vector, like loadStateAtTimes() does. It only searches for one specific
-     * entry in the state history.
-     * 
-     * It should be used when you only want very few entries, instead of the
-     * whole state (or many entries, but all at different timestamps). If you do
-     * request many entries all at the same time, you should use the
-     * conventional loadStateAtTime() + List.get() method.
-     * 
-     * @param t
-     *            The timestamp at which we want the state
-     * @param attributeQuark
-     *            Which attribute we want to get the state of
-     * @return The StateInterval representing the state
-     * @throws TimeRangeException
-     *             If 't' is invalid
-     * @throws AttributeNotFoundException
-     *             If the requested quark does not exist in the model
-     */
+    @Override
     public ITmfStateInterval querySingleState(long t, int attributeQuark)
             throws AttributeNotFoundException, TimeRangeException {
         ITmfStateInterval ret;
@@ -208,29 +159,7 @@ public class StateHistorySystem extends StateSystem {
         return ret;
     }
 
-    /**
-     * Return a list of state intervals, containing the "history" of a given
-     * attribute between timestamps t1 and t2. The list will be ordered by
-     * ascending time.
-     * 
-     * Note that contrary to loadStateAtTime(), the returned list here is in the
-     * "direction" of time (and not in the direction of attributes, as is the
-     * case with loadStateAtTime()).
-     * 
-     * @param attributeQuark
-     *            Which attribute this query is interested in
-     * @param t1
-     *            Start time of the range query
-     * @param t2
-     *            Target end time of the query. If t2 is greater than the end of
-     *            the trace, we will return what we have up to the end of the
-     *            history.
-     * @return The List of state intervals that happened between t1 and t2
-     * @throws TimeRangeException
-     *             If t1 is invalid, or if t2 <= t1
-     * @throws AttributeNotFoundException
-     *             If the requested quark does not exist in the model.
-     */
+    @Override
     public List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
             long t1, long t2) throws TimeRangeException,
             AttributeNotFoundException {
@@ -268,27 +197,7 @@ public class StateHistorySystem extends StateSystem {
         return intervals;
     }
 
-    /**
-     * Return the state history of a given attribute, but with at most one
-     * update per "resolution". This can be useful for populating views (where
-     * it's useless to have more than one query per pixel, for example).
-     * 
-     * @param attributeQuark
-     *            Which attribute this query is interested in
-     * @param t1
-     *            Start time of the range query
-     * @param t2
-     *            Target end time of the query. If t2 is greater than the end of
-     *            the trace, we will return what we have up to the end of the
-     *            history.
-     * @param resolution
-     *            The "step" of this query
-     * @return The List of states that happened between t1 and t2
-     * @throws TimeRangeException
-     *             If t1 is invalid, or if t2 <= t1
-     * @throws AttributeNotFoundException
-     *             If the attribute doesn't exist
-     */
+    @Override
     public List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
             long t1, long t2, long resolution) throws TimeRangeException,
             AttributeNotFoundException {

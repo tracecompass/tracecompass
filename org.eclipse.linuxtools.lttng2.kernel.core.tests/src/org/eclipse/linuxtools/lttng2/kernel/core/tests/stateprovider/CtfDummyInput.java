@@ -15,8 +15,8 @@ package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
-import org.eclipse.linuxtools.tmf.core.statesystem.StateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateChangeInput;
+import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateSystemBuilder;
 
 /**
  * "Dummy" version of the CTF event input plugin. This one only reads events
@@ -64,17 +64,7 @@ public class CtfDummyInput implements IStateChangeInput {
      * method does nothing.
      */
     @Override
-    public void assignTargetStateSystem(StateSystem ss) {
+    public void assignTargetStateSystem(IStateSystemBuilder ssb) {
         //
     }
-
-    /**
-     * Since there is no target state system in the dummy input, this always
-     * returns null.
-     */
-    @Override
-    public StateSystem getStateSystem() {
-        return null;
-    }
-
 }

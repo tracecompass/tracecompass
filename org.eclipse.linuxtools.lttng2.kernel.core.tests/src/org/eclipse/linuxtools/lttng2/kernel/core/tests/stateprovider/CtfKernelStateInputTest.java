@@ -16,7 +16,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.statesystem.StateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateChangeInput;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -50,12 +49,12 @@ public class CtfKernelStateInputTest {
         assertEquals(testStartTime, CtfTestFiles.startTime);
     }
 
-    @Test
-    public void testRunning() {
-        StateSystem ss = new StateSystem();
-        input.assignTargetStateSystem(ss);
-        input.getStateSystem(); /* Let's pad that coverage... */
-        input.run();
-    }
+    //FIXME re-enable once we offer history-less state systems again
+//    @Test
+//    public void testRunning() {
+//        StateSystem ss = new StateSystem();
+//        input.assignTargetStateSystem(ss);
+//        input.run();
+//    }
 
 }

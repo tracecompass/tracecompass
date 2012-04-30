@@ -15,7 +15,6 @@ package org.eclipse.linuxtools.tmf.core.statesystem.helpers;
 import java.io.IOException;
 
 import org.eclipse.linuxtools.tmf.core.statesystem.StateHistorySystem;
-import org.eclipse.linuxtools.tmf.core.statesystem.StateSystem;
 
 /**
  * This is the high-level wrapper around the State History and its input and
@@ -31,7 +30,7 @@ import org.eclipse.linuxtools.tmf.core.statesystem.StateSystem;
 public class HistoryBuilder implements Runnable {
 
     private final IStateChangeInput sci;
-    private final StateSystem ss;
+    private final StateHistorySystem shs;
     private final IStateHistoryBackend hb;
 
     private final Thread sciThread;
@@ -51,19 +50,31 @@ public class HistoryBuilder implements Runnable {
     public HistoryBuilder(IStateChangeInput stateChangeInput,
             IStateHistoryBackend backend) throws IOException {
         assert (stateChangeInput != null);
-        /* "backend" can be null, this implies no history */
+        assert (backend != null);
+
         sci = stateChangeInput;
+        hb = backend;
+        shs = new StateHistorySystem(hb, true);
 
-        if (backend == null) {
-            hb = null;
-            ss = new StateSystem();
-        } else {
-            hb = backend;
-            ss = new StateHistorySystem(hb, true);
-        }
-
-        sci.assignTargetStateSystem(ss);
+        sci.assignTargetStateSystem(shs);
         sciThread = new Thread(sci, "Input Plugin"); //$NON-NLS-1$
+    }
+
+    /**
+     * Factory-style method to open an existing history, you only have to
+     * provide the already-instantiated IStateHistoryBackend object.
+     * 
+     * @param hb
+     *            The history-backend object
+     * @return A IStateSystemBuilder reference to the new state system. If you
+     *         will only run queries on this history, you should *definitely*
+     *         cast it to IStateSystemQuerier.
+     * @throws IOException
+     *             If there was something wrong.
+     */
+    public static IStateSystemBuilder openExistingHistory(
+            IStateHistoryBackend hb) throws IOException {
+        return new StateHistorySystem(hb, false);
     }
 
     @Override
@@ -85,13 +96,23 @@ public class HistoryBuilder implements Runnable {
     }
 
     /**
-     * Return the StateSystem (or StateHistorySystem) object that was created by
-     * this builder. You will need this reference to run queries.
+     * Return a read/write reference to the state system object that was
+     * created.
      * 
-     * @return The StateSystem that was generated
+     * @return Reference to the state system, with access to everything.
      */
-    public StateSystem getSS() {
-        return ss;
+    public IStateSystemBuilder getStateSystemBuilder() {
+        return shs;
+    }
+
+    /**
+     * Return a read-only reference to the state system object that was created.
+     * 
+     * @return Reference to the state system, but only with the query methods
+     *         available.
+     */
+    public IStateSystemQuerier getStateSystemQuerier() {
+        return shs;
     }
 
 }

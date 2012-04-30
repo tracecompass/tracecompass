@@ -12,8 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.core.statesystem.helpers;
 
-import org.eclipse.linuxtools.tmf.core.statesystem.StateSystem;
-
 /**
  * This is the interface used to define the "state change input", which is the
  * main type of input that goes in the state system.
@@ -42,15 +40,7 @@ public interface IStateChangeInput extends Runnable {
      * 
      * This needs to be called before .run()!
      * 
-     * @param ss
+     * @param ssb
      */
-    public void assignTargetStateSystem(StateSystem ss);
-
-    /**
-     * Return the State System that was assigned to this SCI.
-     * 
-     * @return The target state system
-     */
-    public StateSystem getStateSystem();
-
+    public void assignTargetStateSystem(IStateSystemBuilder ssb);
 }

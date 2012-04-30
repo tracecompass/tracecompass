@@ -19,8 +19,8 @@ import java.util.concurrent.BlockingQueue;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
-import org.eclipse.linuxtools.tmf.core.statesystem.StateSystem;
 import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateChangeInput;
+import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateSystemBuilder;
 
 /**
  * This is the state change input plugin for TMF's state system which handles
@@ -94,14 +94,9 @@ public class CtfKernelStateInput implements IStateChangeInput {
     }
 
     @Override
-    public void assignTargetStateSystem(StateSystem ss) {
-        eventHandler.assignStateSystem(ss);
+    public void assignTargetStateSystem(IStateSystemBuilder ssb) {
+        eventHandler.assignStateSystem(ssb);
         ssAssigned = true;
-    }
-
-    @Override
-    public StateSystem getStateSystem() {
-        return eventHandler.getStateSystem();
     }
 
     @Override
