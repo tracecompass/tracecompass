@@ -32,6 +32,7 @@ public abstract class CtfTestFiles {
      */
     public final static String traceFile = "../org.eclipse.linuxtools.ctf.core.tests/traces/trace2"; //$NON-NLS-1$
     public final static long startTime = 1331668247314038062L;
+    public final static long endTime = 1331668259054285979L; /* Expected end time of history */
 
     private static CtfTmfTrace trace = null;
 

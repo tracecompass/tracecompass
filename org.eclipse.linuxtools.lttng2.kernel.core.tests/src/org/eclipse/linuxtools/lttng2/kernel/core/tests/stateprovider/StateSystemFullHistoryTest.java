@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statesystem.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.statesystem.StateHistorySystem;
@@ -88,36 +89,38 @@ public class StateSystemFullHistoryTest {
     /**
      * Rebuild independently so we can benchmark it. Too bad JUnit doesn't allow
      * us to @Test the @BeforeClass...
+     * 
+     * @throws IOException 
+     * @throws TmfTraceException 
      */
     @Test
-    public void testBuild() {
+    public void testBuild() throws IOException, TmfTraceException {
         HistoryBuilder zebuilder;
         IStateChangeInput zeinput;
-        IStateHistoryBackend zehp;
+        IStateHistoryBackend zehp = null;
 
-        try {
-            zeinput = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
-            zehp = new HistoryTreeBackend(stateFileBenchmark,
-                    zeinput.getStartTime());
-            zebuilder = new HistoryBuilder(zeinput, zehp);
-            zebuilder.run();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        zeinput = new CtfKernelStateInput(CtfTestFiles.getTestTrace());
+        zehp = new HistoryTreeBackend(stateFileBenchmark, zeinput.getStartTime());
+        zebuilder = new HistoryBuilder(zeinput, zehp);
+        zebuilder.run();
+        zebuilder.close();
+
+        assertEquals(CtfTestFiles.startTime, zehp.getStartTime());
+        assertEquals(CtfTestFiles.endTime, zehp.getEndTime());
     }
 
     @Test
-    public void testOpenExistingStateFile() {
+    public void testOpenExistingStateFile() throws IOException {
         IStateHistoryBackend hp2 = null;
         StateHistorySystem shs2 = null;
-        try {
-            /* 'newStateFile' should have already been created */
-            hp2 = new HistoryTreeBackend(stateFile);
-            shs2 = new StateHistorySystem(hp2, false);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        assertTrue(shs2 != null);
+
+        /* 'newStateFile' should have already been created */
+        hp2 = new HistoryTreeBackend(stateFile);
+        shs2 = new StateHistorySystem(hp2, false);
+
+        assertNotNull(shs2);
+        assertEquals(CtfTestFiles.startTime, hp2.getStartTime());
+        assertEquals(CtfTestFiles.endTime, hp2.getEndTime());
     }
 
     @Test
