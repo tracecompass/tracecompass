@@ -2,6 +2,7 @@ package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
@@ -85,6 +86,15 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         // this.fEndTime.clone()));
 
         buildStateSystem();
+
+        /* Refresh the project, so it can pick up new files that got created. */
+        if ( resource != null) {
+            try {
+                resource.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+            } catch (CoreException e) {
+                throw new TmfTraceException(e.getMessage());
+            }
+        }
     }
 
     @Override
