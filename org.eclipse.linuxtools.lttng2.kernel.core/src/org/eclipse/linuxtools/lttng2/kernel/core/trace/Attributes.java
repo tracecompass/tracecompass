@@ -30,9 +30,9 @@ public abstract class Attributes {
     /* First-level attributes */
     public static final String CPUS = "CPUs";
     public static final String THREADS = "Threads";
+    public static final String RESOURCES = "Resources";
 
     /* Sub-attributes of the CPU nodes */
-    public static final String IRQ_STACK = "IRQ_stack";
     public static final String CURRENT_THREAD = "Current_thread";
 
     /* Sub-attributes of the Thread nodes */
@@ -40,6 +40,10 @@ public abstract class Attributes {
     public static final String STATUS = "Status";
     public static final String EXEC_NAME = "Exec_name";
     public static final String EXEC_MODE_STACK = "Exec_mode_stack";
+
+    /* Attributes under "Resources" */
+    public static final String IRQS = "IRQs";
+    public static final String SOFT_IRQS = "Soft_IRQs";
 
     /* 
      * Statistics sub-nodes
@@ -51,6 +55,10 @@ public abstract class Attributes {
     /* Process status (note these are *values*, not attribute names */
     public static final int STATUS_WAIT_CPU = 1;
     public static final int STATUS_RUN = 2;
+    public static final int STATUS_INTERRUPTED = 3;
+
+    /* SoftIRQ-specific stuff. -1: null/disabled, >= 0: running on that CPU */
+    public static final int SOFT_IRQ_RAISED = -2;
 
     /* Misc stuff */
     public static final String UNKNOWN = "Unknown";

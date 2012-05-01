@@ -53,6 +53,8 @@ class CtfKernelHandler implements Runnable {
     /* Common locations in the attribute tree */
     private int cpusNode = -1;
     private int threadsNode = -1;
+    private int irqsNode = -1;
+    private int softIrqsNode = -1;
 
     CtfKernelHandler(BlockingQueue<CtfTmfEvent> eventsQueue) {
         assert (eventsQueue != null);
@@ -136,8 +138,7 @@ class CtfKernelHandler implements Runnable {
         try {
             /*
              * Feed event to the history system if it's known to cause a state
-             * transition See:
-             * https://projectwiki.dorsal.polymtl.ca/index.php/State_transitions
+             * transition.
              */
             switch (getEventIndex(eventName)) {
 
@@ -164,14 +165,15 @@ class CtfKernelHandler implements Runnable {
             {
                 Integer irqId = ((Long) content.getField(LttngStrings.IRQ).getValue()).intValue();
 
-                /* Push the IRQ to the CPU's IRQ_stack */
-                quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.IRQ_STACK);
-                value = TmfStateValue.newValueInt(irqId);
-                ss.pushAttribute(ts, value, quark);
+                /* Mark this IRQ as active in the resource tree.
+                 * The state value = the CPU on which this IRQ is sitting */
+                quark = ss.getQuarkRelativeAndAdd(irqsNode, irqId.toString());
+                value = TmfStateValue.newValueInt(event.getCPU());
+                ss.modifyAttribute(ts, value, quark);
 
                 /* Change the status of the running process to interrupted */
                 quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
-                value = TmfStateValue.newValueInt(Attributes.STATUS_WAIT_CPU);
+                value = TmfStateValue.newValueInt(Attributes.STATUS_INTERRUPTED);
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
@@ -179,46 +181,66 @@ class CtfKernelHandler implements Runnable {
             case 3: // "irq_handler_exit":
             /* Fields: int32 irq, int32 ret */
             {
-                int stackDepth = 0;
+                Integer irqId = ((Long) content.getField(LttngStrings.IRQ).getValue()).intValue();
 
-                /* Pop the IRQ from the CPU's IRQ_stack */
-                quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.IRQ_STACK);
-                try {
-                    ss.popAttribute(ts, quark);
-                } catch (AttributeNotFoundException e1) {
-                    System.err.print(event.getTimestamp()
-                            + " Popping empty attribute: " + e1.getMessage()); //$NON-NLS-1$
-                }
+                /* Put this IRQ back to inactive in the resource tree */
+                quark = ss.getQuarkRelativeAndAdd(irqsNode, irqId.toString());
+                value = TmfStateValue.nullValue();
+                ss.modifyAttribute(ts, value, quark);
 
-                /*
-                 * If this was the last IRQ on the stack, set the process back
-                 * to running
-                 */
-                /* 'quark' should still be valid */
-                try {
-                    stackDepth = ss.queryOngoingState(quark).unboxInt();
-                } catch (StateValueTypeException e) {
-                    /* IRQ_stack SHOULD be of int type, this shouldn't happen */
-                    e.printStackTrace();
-                }
-                if (stackDepth == 0) {
-                    quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
-                    value = TmfStateValue.newValueInt(Attributes.STATUS_RUN);
-                    ss.modifyAttribute(ts, value, quark);
-                }
+                /* Set the previous process back to running */
+                quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
+                value = TmfStateValue.newValueInt(Attributes.STATUS_RUN);
+                ss.modifyAttribute(ts, value, quark);
             }
                 break;
 
             case 4: // "softirq_entry":
             /* Fields: int32 vec */
+            {
+                Integer softIrqId = ((Long) content.getField(LttngStrings.VEC).getValue()).intValue();
+
+                /* Mark this SoftIRQ as active in the resource tree.
+                 * The state value = the CPU on which this SoftIRQ is processed */
+                quark = ss.getQuarkRelativeAndAdd(softIrqsNode, softIrqId.toString());
+                value = TmfStateValue.newValueInt(event.getCPU());
+                ss.modifyAttribute(ts, value, quark);
+
+                /* Change the status of the running process to interrupted */
+                quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
+                value = TmfStateValue.newValueInt(Attributes.STATUS_INTERRUPTED);
+                ss.modifyAttribute(ts, value, quark);
+            }
                 break;
 
             case 5: // "softirq_exit":
             /* Fields: int32 vec */
+            {
+                Integer softIrqId = ((Long) content.getField(LttngStrings.VEC).getValue()).intValue();
+
+                /* Put this SoftIRQ back to inactive (= -1) in the resource tree */
+                quark = ss.getQuarkRelativeAndAdd(softIrqsNode, softIrqId.toString());
+                value = TmfStateValue.nullValue();
+                ss.modifyAttribute(ts, value, quark);
+
+                /* Set the previous process back to running */
+                quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
+                value = TmfStateValue.newValueInt(Attributes.STATUS_RUN);
+                ss.modifyAttribute(ts, value, quark);
+            }
                 break;
 
             case 6: // "softirq_raise":
-                /* Fields: int32 vec */
+            /* Fields: int32 vec */
+            {
+                Integer softIrqId = ((Long) content.getField(LttngStrings.VEC).getValue()).intValue();
+
+                /* Mark this SoftIRQ as *raised* in the resource tree.
+                 * State value = -2 */
+                quark = ss.getQuarkRelativeAndAdd(softIrqsNode, softIrqId.toString());
+                value = TmfStateValue.newValueInt(-2);
+                ss.modifyAttribute(ts, value, quark);
+            }
                 break;
 
             case 7: // "sched_switch":
@@ -405,6 +427,8 @@ class CtfKernelHandler implements Runnable {
     private void setupCommonLocations() {
         cpusNode = ss.getQuarkAbsoluteAndAdd(Attributes.CPUS);
         threadsNode = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS);
+        irqsNode = ss.getQuarkAbsoluteAndAdd(Attributes.RESOURCES, Attributes.IRQS);
+        softIrqsNode = ss.getQuarkAbsoluteAndAdd(Attributes.RESOURCES, Attributes.SOFT_IRQS);
     }
 
     private static HashMap<String, Integer> fillEventNames() {

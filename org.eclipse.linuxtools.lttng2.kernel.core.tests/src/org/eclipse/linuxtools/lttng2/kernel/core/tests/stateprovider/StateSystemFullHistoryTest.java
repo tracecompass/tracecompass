@@ -216,14 +216,14 @@ public class StateSystemFullHistoryTest {
 
         List<ITmfStateInterval> intervals;
         
-        int quark = ssb.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.IRQ_STACK);
+        int quark = ssb.getQuarkAbsolute(Attributes.RESOURCES, Attributes.IRQS, "1");
         long ts1 = ssb.getStartTime(); /* start of the trace */
         long ts2 = CtfTestFiles.startTime + 20L * CtfTestFiles.NANOSECS_PER_SEC; /* invalid, but ignored */
 
         intervals = ssb.queryHistoryRange(quark, ts1, ts2);
 
-        /* Nb of IRQs on CPU 0 during the whole trace */
-        assertEquals(1653, intervals.size());
+        /* Activity of IRQ 1 over the whole trace */
+        assertEquals(65, intervals.size());
     }
 
     /**

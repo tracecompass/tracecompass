@@ -41,11 +41,11 @@ public abstract class LttngStrings {
     public static final String SYSCALL_PREFIX = "sys_";
     public static final String COMPAT_SYSCALL_PREFIX = "compat_sys_";
 
-
     /* Field names */
     public static final String IRQ = "irq";
     public static final String COMM = "comm";
     public static final String TID = "tid";
+    public static final String VEC = "vec";
     public static final String PREV_COMM = "prev_comm";
     public static final String PREV_TID = "prev_tid";
     public static final String PREV_STATE = "prev_state";
