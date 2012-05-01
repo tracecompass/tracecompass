@@ -217,18 +217,11 @@ class CtfKernelHandler implements Runnable {
                  * next_prio
                  */
 
-                // prev_comm doesn't seem to get populated...
-                String prevProcessName = (String) content.getField(LttngStrings.PREV_COMM).getValue();
                 Integer prevTid = ((Long) content.getField(LttngStrings.PREV_TID).getValue()).intValue();
                 Long prevState = (Long) content.getField(LttngStrings.PREV_STATE).getValue();
 
                 String nextProcessName = (String) content.getField(LttngStrings.NEXT_COMM).getValue();
                 Integer nextTid = ((Long) content.getField(LttngStrings.NEXT_TID).getValue()).intValue();
-
-                /* Update the name of the process going out (if needed) */
-                quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.EXEC_NAME);
-                value = TmfStateValue.newValueString(prevProcessName);
-                ss.updateOngoingState(value, quark);
 
                 /* Update the currentThreadNodes pointer */
                 Integer newCurrentThreadNode = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS, nextTid.toString());
