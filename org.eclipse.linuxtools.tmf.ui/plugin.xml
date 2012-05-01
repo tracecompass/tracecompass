@@ -1122,6 +1122,7 @@
       <type
             category="org.eclipse.linuxtools.tmf.ui.category.generic"
             event_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent"
+            icon="icons/eview16/events_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.type.ctf"
             name="CTF Trace"
             trace_type="org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace">
