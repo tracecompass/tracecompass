@@ -5,6 +5,8 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 
 public class CtfLocation implements ITmfLocation<Long> {
 
+    public static final Long INVALID_LOCATION = -1L;
+
     public CtfLocation(Long location) {
         setLocation(location);
     }

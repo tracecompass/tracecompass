@@ -75,7 +75,10 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
             throw new TmfTraceException(e.getMessage());
         }
         this.iterator = new CtfIterator(this, 0, 0);
-        setStartTime(iterator.getCurrentEvent().getTimestamp());
+        setStartTime(TmfTimestamp.BIG_BANG);
+        if( !this.iterator.getLocation().equals(CtfIterator.nullLocation)) {
+            setStartTime(iterator.getCurrentEvent().getTimestamp());
+        }
         TmfSignalManager.register(this);
         // this.currLocation.setTimestamp(this.fEvent.getTimestamp().getValue());
         // this.fStartTime = new TmfSimpleTimestamp(this.currLocation
@@ -266,7 +269,9 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         if (currentLocation == null) {
             currentLocation = new CtfLocation(0L);
         }
-        iterator.setLocation(currentLocation);
+        if( !iterator.getLocation().equals(CtfIterator.nullLocation)) {
+            iterator.setLocation(currentLocation);
+        }
         return iterator;
     }
 

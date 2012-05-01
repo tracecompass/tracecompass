@@ -6,10 +6,12 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 
 public class CtfIterator extends CTFTraceReader implements ITmfContext,
-Comparable<CtfIterator> {
+        Comparable<CtfIterator> {
 
     private final CtfTmfTrace ctfTmfTrace;
 
+    final public static CtfLocation nullLocation = new CtfLocation(
+            CtfLocation.INVALID_LOCATION);
     private CtfLocation curLocation;
     private long curRank;
 
@@ -22,21 +24,39 @@ Comparable<CtfIterator> {
     public CtfIterator(final CtfTmfTrace trace) {
         super(trace.getCTFTrace());
         this.ctfTmfTrace = trace;
+        if (this.hasMoreEvents()) {
 
-        // FIXME put the real stuff here...
-        this.curLocation = new CtfLocation(trace.getStartTime());
-        this.curRank = 0;
+            this.curLocation = new CtfLocation(trace.getStartTime());
+            this.curRank = 0;
+        } else {
+            setUnknownLocation();
+        }
     }
 
-    public CtfIterator(final CtfTmfTrace trace, final long timestampValue, final long rank) {
-        super(trace.getCTFTrace());
-        this.ctfTmfTrace = trace;
-        this.curLocation = (new CtfLocation(this.getCurrentEvent()
-                .getTimestampValue()));
-        if (this.getCurrentEvent().getTimestampValue() != timestampValue)
-            this.seek(timestampValue);
+    /**
+     *
+     */
+    private void setUnknownLocation() {
+        this.curLocation = nullLocation;
+        this.curRank = UNKNOWN_RANK;
+    }
 
-        this.curRank = rank;
+    public CtfIterator(final CtfTmfTrace trace, final long timestampValue,
+            final long rank) {
+        super(trace.getCTFTrace());
+
+        this.ctfTmfTrace = trace;
+        if (this.hasMoreEvents()) {
+            this.curLocation = (new CtfLocation(this.getCurrentEvent()
+                    .getTimestampValue()));
+            if (this.getCurrentEvent().getTimestampValue() != timestampValue) {
+                this.seek(timestampValue);
+                this.curRank = rank;
+            }
+        } else {
+            setUnknownLocation();
+        }
+
     }
 
     public CtfTmfTrace getCtfTmfTrace() {
@@ -45,22 +65,27 @@ Comparable<CtfIterator> {
 
     public CtfTmfEvent getCurrentEvent() {
         final StreamInputReader top = super.prio.peek();
-        if (top != null)
-            return new CtfTmfEvent(top.getCurrentEvent(), top.getFilename(), ctfTmfTrace);
+        if (top != null) {
+            return new CtfTmfEvent(top.getCurrentEvent(), top.getFilename(),
+                    ctfTmfTrace);
+        }
         return null;
     }
 
     @Override
     public boolean seek(final long timestamp) {
         boolean ret = false;
-        final long offsetTimestamp = timestamp - this.getCtfTmfTrace().getCTFTrace().getOffset();
-        if( offsetTimestamp < 0 )
+        final long offsetTimestamp = timestamp
+                - this.getCtfTmfTrace().getCTFTrace().getOffset();
+        if (offsetTimestamp < 0) {
             ret = super.seek(timestamp);
-        else
+        } else {
             ret = super.seek(offsetTimestamp);
+        }
 
-        if (ret)
+        if (ret) {
             curLocation.setLocation(getCurrentEvent().getTimestampValue());
+        }
         return ret;
     }
 
@@ -68,8 +93,9 @@ Comparable<CtfIterator> {
         boolean ret = false;
         ret = super.seekIndex(rank);
 
-        if (ret)
+        if (ret) {
             curLocation.setLocation(getCurrentEvent().getTimestampValue());
+        }
         return ret;
     }
 
@@ -80,7 +106,9 @@ Comparable<CtfIterator> {
 
     @Override
     public void setRank(final long rank) {
-        seekRank(rank);
+        if(!this.curLocation.equals(nullLocation)) {
+            seekRank(rank);
+        }
     }
 
     /*
@@ -106,7 +134,7 @@ Comparable<CtfIterator> {
     public void setLocation(final ITmfLocation<?> location) {
         // FIXME alex: isn't there a cleaner way than a cast here?
         this.curLocation = (CtfLocation) location;
-        seek(((CtfLocation)location).getLocation());
+        seek(((CtfLocation) location).getLocation());
     }
 
     @Override
@@ -131,10 +159,11 @@ Comparable<CtfIterator> {
 
     @Override
     public int compareTo(final CtfIterator o) {
-        if (this.getRank() < o.getRank())
+        if (this.getRank() < o.getRank()) {
             return -1;
-        else if (this.getRank() > o.getRank())
+        } else if (this.getRank() > o.getRank()) {
             return 1;
+        }
         return 0;
     }
 
