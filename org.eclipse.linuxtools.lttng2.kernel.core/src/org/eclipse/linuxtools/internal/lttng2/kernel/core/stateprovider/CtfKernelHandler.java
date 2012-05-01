@@ -50,6 +50,10 @@ class CtfKernelHandler implements Runnable {
     /* Event names HashMap. TODO: This can be discarded once we move to Java 7 */
     private final HashMap<String, Integer> knownEventNames;
 
+    /* Common locations in the attribute tree */
+    private int cpusNode = -1;
+    private int threadsNode = -1;
+
     CtfKernelHandler(BlockingQueue<CtfTmfEvent> eventsQueue) {
         assert (eventsQueue != null);
         this.inQueue = eventsQueue;
@@ -70,6 +74,7 @@ class CtfKernelHandler implements Runnable {
             return;
         }
         CtfTmfEvent event;
+        setupCommonLocations();
 
         try {
             event = inQueue.take();
@@ -115,10 +120,10 @@ class CtfKernelHandler implements Runnable {
         if (eventCpu >= currentCPUNodes.size()) {
             /* We need to add this node to the vector */
             for (Integer i = currentCPUNodes.size(); i < eventCpu + 1; i++) {
-                quark = ss.getQuarkAbsoluteAndAdd(Attributes.CPUS, i.toString());
+                quark = ss.getQuarkRelativeAndAdd(cpusNode, i.toString());
                 currentCPUNodes.add(quark);
 
-                quark = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS, Attributes.UNKNOWN);
+                quark = ss.getQuarkRelativeAndAdd(threadsNode, Attributes.UNKNOWN);
                 currentThreadNodes.add(quark);
             }
         }
@@ -224,7 +229,7 @@ class CtfKernelHandler implements Runnable {
                 Integer nextTid = ((Long) content.getField(LttngStrings.NEXT_TID).getValue()).intValue();
 
                 /* Update the currentThreadNodes pointer */
-                Integer newCurrentThreadNode = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS, nextTid.toString());
+                Integer newCurrentThreadNode = ss.getQuarkRelativeAndAdd(threadsNode, nextTid.toString());
                 initThreadNode(newCurrentThreadNode);
                 currentThreadNodes.set(eventCpu, newCurrentThreadNode);
 
@@ -239,7 +244,7 @@ class CtfKernelHandler implements Runnable {
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Set the status of the process that got scheduled out */
-                quark = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS, prevTid.toString(), Attributes.STATUS);
+                quark = ss.getQuarkRelativeAndAdd(threadsNode, prevTid.toString(), Attributes.STATUS);
                 value = TmfStateValue.newValueInt(prevState.intValue());
                 ss.modifyAttribute(ts, value, quark);
 
@@ -264,7 +269,7 @@ class CtfKernelHandler implements Runnable {
                 Integer parentTid = ((Long) content.getField(LttngStrings.PARENT_TID).getValue()).intValue();
                 Integer childTid = ((Long) content.getField(LttngStrings.CHILD_TID).getValue()).intValue();
 
-                tidNode = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS, childTid.toString());
+                tidNode = ss.getQuarkRelativeAndAdd(threadsNode, childTid.toString());
                 initThreadNode(tidNode);
 
                 /*
@@ -287,7 +292,7 @@ class CtfKernelHandler implements Runnable {
                 Integer tid = ((Long) content.getField(LttngStrings.TID).getValue()).intValue();
 
                 /* Update the process' name, if we don't have it */
-                quark = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS, tid.toString(), Attributes.EXEC_NAME);
+                quark = ss.getQuarkRelativeAndAdd(threadsNode, tid.toString(), Attributes.EXEC_NAME);
                 value = TmfStateValue.newValueString(processName);
                 ss.updateOngoingState(value, quark);
 
@@ -295,7 +300,7 @@ class CtfKernelHandler implements Runnable {
                  * Remove the process and all its sub-attributes from the
                  * current state
                  */
-                quark = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS, tid.toString());
+                quark = ss.getQuarkRelativeAndAdd(threadsNode, tid.toString());
                 ss.removeAttribute(ts, quark);
                 break;
 
@@ -387,6 +392,11 @@ class CtfKernelHandler implements Runnable {
         ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.EXEC_NAME);
         ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.EXEC_MODE_STACK);
         ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
+    }
+
+    private void setupCommonLocations() {
+        cpusNode = ss.getQuarkAbsoluteAndAdd(Attributes.CPUS);
+        threadsNode = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS);
     }
 
     private static HashMap<String, Integer> fillEventNames() {
