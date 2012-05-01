@@ -122,7 +122,8 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
     }
 
     @Override
-    public void finishedBuilding(long endTime) throws TimeRangeException {
+    public void finishedBuilding(long endTime) {
+        HTInterval pill;
         /*
          * We need to commit everything in the History Tree and stop the
          * standalone thread before returning to the StateHistorySystem. (SHS
@@ -134,10 +135,13 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
          * Send the "poison pill" in the queue, then wait for the HT to finish
          * its closeTree()
          */
+        
         try {
-            intervalQueue.put(new HTInterval(-1, endTime, -1,
-                    TmfStateValue.nullValue()));
+            pill = new HTInterval(-1, endTime, -1, TmfStateValue.nullValue());
+            intervalQueue.put(pill);
             shtThread.join();
+        } catch (TimeRangeException e) {
+            e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

@@ -112,7 +112,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     }
 
     @Override
-    public void finishedBuilding(long endTime) throws TimeRangeException {
+    public void finishedBuilding(long endTime) {
         sht.closeTree();
     }
 
