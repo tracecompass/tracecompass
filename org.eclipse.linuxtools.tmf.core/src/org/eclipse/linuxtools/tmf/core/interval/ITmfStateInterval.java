@@ -41,6 +41,17 @@ public interface ITmfStateInterval {
     public long getEndTime();
 
     /**
+     * In case the "real" end time of the interval is not exactly the same as
+     * the end time you want to show in views, you can implement this method to
+     * assign a different value that the viewer can use.
+     * 
+     * If not, you can simply have it return the same as getEndTime().
+     * 
+     * @return The end time that views should use
+     */
+    public long getViewerEndTime();
+
+    /**
      * Retrieve the quark of the attribute this state interval refers to
      * 
      * @return the quark of the attribute this state interval refers to
