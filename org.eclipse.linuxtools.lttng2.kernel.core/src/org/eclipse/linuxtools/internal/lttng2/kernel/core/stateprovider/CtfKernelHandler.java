@@ -20,11 +20,11 @@ import org.eclipse.linuxtools.lttng2.kernel.core.trace.Attributes;
 import org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngStrings;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
-import org.eclipse.linuxtools.tmf.core.statesystem.AttributeNotFoundException;
-import org.eclipse.linuxtools.tmf.core.statesystem.TimeRangeException;
+import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
+import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateSystemBuilder;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
-import org.eclipse.linuxtools.tmf.core.statevalue.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 
 /**

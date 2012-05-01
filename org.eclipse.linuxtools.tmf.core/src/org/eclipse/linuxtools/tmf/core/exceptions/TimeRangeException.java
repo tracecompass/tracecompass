@@ -10,7 +10,7 @@
  * 
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.statesystem;
+package org.eclipse.linuxtools.tmf.core.exceptions;
 
 /**
  * Generic exception for when the user specifies an invalid time stamp. Usually

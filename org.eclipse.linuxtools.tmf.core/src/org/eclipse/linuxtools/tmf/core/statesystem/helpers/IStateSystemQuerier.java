@@ -14,9 +14,9 @@ package org.eclipse.linuxtools.tmf.core.statesystem.helpers;
 
 import java.util.List;
 
+import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.statesystem.AttributeNotFoundException;
-import org.eclipse.linuxtools.tmf.core.statesystem.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 
 /**

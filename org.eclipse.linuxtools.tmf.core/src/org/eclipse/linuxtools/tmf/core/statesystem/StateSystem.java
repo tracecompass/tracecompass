@@ -16,8 +16,10 @@ import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
+import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
-import org.eclipse.linuxtools.tmf.core.statevalue.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 
 /**

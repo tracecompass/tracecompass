@@ -10,7 +10,7 @@
  * 
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.statevalue;
+package org.eclipse.linuxtools.tmf.core.exceptions;
 
 /**
  * The StateValue is a wrapper around the different type of values that can be

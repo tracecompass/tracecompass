@@ -15,10 +15,10 @@ package org.eclipse.linuxtools.tmf.core.statesystem.backend.historytree;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
+import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.statesystem.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
-import org.eclipse.linuxtools.tmf.core.statevalue.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 
 /**

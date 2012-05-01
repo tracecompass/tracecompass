@@ -18,8 +18,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.statesystem.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateHistoryBackend;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;

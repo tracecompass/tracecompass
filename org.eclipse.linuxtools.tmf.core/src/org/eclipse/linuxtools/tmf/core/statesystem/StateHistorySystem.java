@@ -19,6 +19,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateHistoryBackend;
 import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateSystemBuilder;

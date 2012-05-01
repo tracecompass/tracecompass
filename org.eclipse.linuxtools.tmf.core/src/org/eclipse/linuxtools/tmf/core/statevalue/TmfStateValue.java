@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.core.statevalue;
 
+import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
+
 
 /**
  * This is the wrapper class that exposes the different types of 'state values'

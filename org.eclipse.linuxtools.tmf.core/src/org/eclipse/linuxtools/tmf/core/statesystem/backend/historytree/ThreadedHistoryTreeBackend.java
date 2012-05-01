@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-import org.eclipse.linuxtools.tmf.core.statesystem.TimeRangeException;
+import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 

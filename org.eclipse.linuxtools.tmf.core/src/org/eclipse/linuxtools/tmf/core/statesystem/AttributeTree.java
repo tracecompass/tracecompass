@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
+
 /**
  * The Attribute Tree is the /proc-like filesystem used to organize attributes.
  * Each node of this tree is both like a file and a directory in the

@@ -10,7 +10,7 @@
  * 
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.statesystem;
+package org.eclipse.linuxtools.tmf.core.exceptions;
 
 /**
  * This exception gets thrown when the user tries to access an attribute which

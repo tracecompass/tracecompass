@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.core.statevalue;
 
+import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
+
 
 /**
  * This is the interface for using state values and reading their contents.

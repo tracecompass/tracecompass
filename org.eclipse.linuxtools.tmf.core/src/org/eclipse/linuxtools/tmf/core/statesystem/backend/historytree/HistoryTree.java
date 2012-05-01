@@ -21,7 +21,7 @@ import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.util.Vector;
 
-import org.eclipse.linuxtools.tmf.core.statesystem.TimeRangeException;
+import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 
 /**
  * Meta-container for the History Tree. This structure contains all the
