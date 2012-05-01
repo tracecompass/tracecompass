@@ -225,15 +225,16 @@ class CtfKernelHandler implements Runnable {
 
                 /* Update the currentThreadNodes pointer */
                 Integer newCurrentThreadNode = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS, nextTid.toString());
+                initThreadNode(newCurrentThreadNode);
                 currentThreadNodes.set(eventCpu, newCurrentThreadNode);
 
                 /* Set the status of the new scheduled process */
-                quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.STATUS);
+                quark = ss.getQuarkRelative(newCurrentThreadNode, Attributes.STATUS);
                 value = TmfStateValue.newValueInt(Attributes.STATUS_RUN);
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Set the exec name of the new process */
-                quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.EXEC_NAME);
+                quark = ss.getQuarkRelative(newCurrentThreadNode, Attributes.EXEC_NAME);
                 value = TmfStateValue.newValueString(nextProcessName);
                 ss.modifyAttribute(ts, value, quark);
 
@@ -264,17 +265,18 @@ class CtfKernelHandler implements Runnable {
                 Integer childTid = ((Long) content.getField(LttngStrings.CHILD_TID).getValue()).intValue();
 
                 tidNode = ss.getQuarkAbsoluteAndAdd(Attributes.THREADS, childTid.toString());
+                initThreadNode(tidNode);
 
                 /*
                  * Add the new process with its known TID, PPID, and initial
                  * Exec_name
                  */
-                quark = ss.getQuarkRelativeAndAdd(tidNode, Attributes.PPID);
+                quark = ss.getQuarkRelative(tidNode, Attributes.PPID);
                 value = TmfStateValue.newValueInt(parentTid);
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Set the new process' exec_name */
-                quark = ss.getQuarkRelativeAndAdd(tidNode, Attributes.EXEC_NAME);
+                quark = ss.getQuarkRelative(tidNode, Attributes.EXEC_NAME);
                 value = TmfStateValue.newValueString(childProcessName);
                 ss.modifyAttribute(ts, value, quark);
                 break;
@@ -375,7 +377,16 @@ class CtfKernelHandler implements Runnable {
              */
             sve.printStackTrace();
         }
+    }
 
+    /**
+     * Ensure we always have some sub-attributes available for every "TID" node.
+     */
+    private void initThreadNode(int currentThreadNode) {
+        ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.PPID);
+        ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.EXEC_NAME);
+        ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.EXEC_MODE_STACK);
+        ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
     }
 
     private static HashMap<String, Integer> fillEventNames() {

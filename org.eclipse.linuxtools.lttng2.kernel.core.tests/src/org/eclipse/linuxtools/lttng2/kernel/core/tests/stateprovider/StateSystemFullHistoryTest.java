@@ -365,23 +365,21 @@ public class StateSystemFullHistoryTest {
         List<Integer> list = ssb.getQuarks("*", "1577", Attributes.EXEC_NAME);
 
         assertEquals(1, list.size());
-        assertEquals(Integer.valueOf(398), list.get(0));
     }
 
     @Test
     public void testGetQuarks_middle() {
         List<Integer> list = ssb.getQuarks(Attributes.THREADS, "*", Attributes.EXEC_NAME);
 
-        assertEquals(Integer.valueOf(18), list.get(4));
-        assertEquals(Integer.valueOf(54), list.get(10));
-        assertEquals(Integer.valueOf(64), list.get(12));
+        /* Number of different kernel threads in the trace */
+        assertEquals(168, list.size());
     }
 
     @Test
     public void testGetQuarks_end() {
         List<Integer> list = ssb.getQuarks(Attributes.THREADS, "1577", "*");
 
-        assertEquals(3, list.size());
-        assertEquals(Integer.valueOf(398), list.get(1));
+        /* There should be 4 sub-attributes for each Thread node */
+        assertEquals(4, list.size());
     }
 }
