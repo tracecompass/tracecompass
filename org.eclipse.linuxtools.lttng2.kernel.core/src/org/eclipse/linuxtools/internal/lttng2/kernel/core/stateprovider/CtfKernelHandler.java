@@ -142,7 +142,8 @@ class CtfKernelHandler implements Runnable {
             switch (getEventIndex(eventName)) {
 
             case 1: // "exit_syscall":
-                /* Fields: int64 ret */
+            /* Fields: int64 ret */
+            {
                 /* Pop "syscall" from the Exec_mode_stack */
                 quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.EXEC_MODE_STACK);
                 try {
@@ -155,10 +156,12 @@ class CtfKernelHandler implements Runnable {
                     System.err.println(event.getTimestamp()
                             + " Popping empty attribute: " + e1.getMessage()); //$NON-NLS-1$
                 }
+            }
                 break;
 
             case 2: // "irq_handler_entry":
-                /* Fields: int32 irq, string name */
+            /* Fields: int32 irq, string name */
+            {
                 Integer irqId = ((Long) content.getField(LttngStrings.IRQ).getValue()).intValue();
 
                 /* Push the IRQ to the CPU's IRQ_stack */
@@ -170,10 +173,12 @@ class CtfKernelHandler implements Runnable {
                 quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
                 value = TmfStateValue.newValueInt(Attributes.STATUS_WAIT_CPU);
                 ss.modifyAttribute(ts, value, quark);
+            }
                 break;
 
             case 3: // "irq_handler_exit":
-                /* Fields: int32 irq, int32 ret */
+            /* Fields: int32 irq, int32 ret */
+            {
                 int stackDepth = 0;
 
                 /* Pop the IRQ from the CPU's IRQ_stack */
@@ -201,14 +206,15 @@ class CtfKernelHandler implements Runnable {
                     value = TmfStateValue.newValueInt(Attributes.STATUS_RUN);
                     ss.modifyAttribute(ts, value, quark);
                 }
+            }
                 break;
 
             case 4: // "softirq_entry":
-                /* Fields: int32 vec */
+            /* Fields: int32 vec */
                 break;
 
             case 5: // "softirq_exit":
-                /* Fields: int32 vec */
+            /* Fields: int32 vec */
                 break;
 
             case 6: // "softirq_raise":
@@ -216,11 +222,11 @@ class CtfKernelHandler implements Runnable {
                 break;
 
             case 7: // "sched_switch":
-                /*
-                 * Fields: string prev_comm, int32 prev_tid, int32 prev_prio,
-                 * int64 prev_state, string next_comm, int32 next_tid, int32
-                 * next_prio
-                 */
+            /*
+             * Fields: string prev_comm, int32 prev_tid, int32 prev_prio, int64 prev_state,
+             *         string next_comm, int32 next_tid, int32 next_prio
+             */
+            {
 
                 Integer prevTid = ((Long) content.getField(LttngStrings.PREV_TID).getValue()).intValue();
                 Long prevState = (Long) content.getField(LttngStrings.PREV_STATE).getValue();
@@ -252,14 +258,13 @@ class CtfKernelHandler implements Runnable {
                 quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.CURRENT_THREAD);
                 value = TmfStateValue.newValueInt(nextTid);
                 ss.modifyAttribute(ts, value, quark);
+            }
                 break;
 
             case 8: // "sched_process_fork":
-                /*
-                 * Fields: string parent_comm, int32 parent_tid, string
-                 * child_comm, int32 child_tid
-                 */
-
+            /* Fields: string parent_comm, int32 parent_tid,
+             *         string child_comm, int32 child_tid */
+            {
                 // String parentProcessName = (String)
                 // event.getFieldValue("parent_comm");
                 String childProcessName;
@@ -284,10 +289,12 @@ class CtfKernelHandler implements Runnable {
                 quark = ss.getQuarkRelative(tidNode, Attributes.EXEC_NAME);
                 value = TmfStateValue.newValueString(childProcessName);
                 ss.modifyAttribute(ts, value, quark);
+            }
                 break;
 
             case 9: // "sched_process_exit":
-                /* Fields: string comm, int32 tid, int32 prio */
+            /* Fields: string comm, int32 tid, int32 prio */
+            {
                 String processName = (String) content.getField(LttngStrings.COMM).getValue();
                 Integer tid = ((Long) content.getField(LttngStrings.TID).getValue()).intValue();
 
@@ -302,10 +309,11 @@ class CtfKernelHandler implements Runnable {
                  */
                 quark = ss.getQuarkRelativeAndAdd(threadsNode, tid.toString());
                 ss.removeAttribute(ts, quark);
+            }
                 break;
 
             case 10: // "sched_process_free":
-                /* Fields: string comm, int32 tid, int32 prio */
+            /* Fields: string comm, int32 tid, int32 prio */
                 break;
 
             // FIXME In CTF it's as "syscall_exec". Will have to be adapted.
@@ -319,8 +327,8 @@ class CtfKernelHandler implements Runnable {
             // break;
 
             default:
-                /* Other event types not covered by the main switch */
-
+            /* Other event types not covered by the main switch */
+            {
                 if (eventName.startsWith(LttngStrings.SYSCALL_PREFIX)
                         || eventName.startsWith(LttngStrings.COMPAT_SYSCALL_PREFIX)) {
                     /*
@@ -336,9 +344,9 @@ class CtfKernelHandler implements Runnable {
                     value = TmfStateValue.newValueString(eventName);
                     ss.pushAttribute(ts, value, quark);
                 }
-
+            }
                 break;
-            } // End of switch
+            } // End of big switch
 
             /*
              * Statistics
