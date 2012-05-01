@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -47,7 +48,7 @@ import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInput;
  * metadata, creating declarations data structures, indexing the event packets
  * (in other words, all the work that can be shared between readers), but the
  * actual reading of events is left to TraceReader.
- * 
+ *
  * @author Matthew Khouzam
  * @version $Revision: 1.0 $
  */
@@ -59,7 +60,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @SuppressWarnings("nls")
@@ -103,11 +104,11 @@ public class CTFTrace implements IDefinitionScope {
     /**
      * Packet header structure declaration
      */
-    private StructDeclaration packetHeaderDecl;
+    private StructDeclaration packetHeaderDecl = null;
 
     /**
      * Packet header structure definition
-     * 
+     *
      * This is only used when opening the trace files, to read the first packet
      * header and see if they are valid trace files.
      */
@@ -141,7 +142,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Trace constructor.
-     * 
+     *
      * @param path
      *            Filesystem path of the trace directory.
      * @throws IOException
@@ -152,7 +153,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Trace constructor.
-     * 
+     *
      * @param path
      *            Filesystem path of the trace directory.
      * @throws CTFReaderException
@@ -222,7 +223,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method getStream gets the stream for a given id
-     * 
+     *
      * @param id
      *            Long the id of the stream
      * @return Stream the stream that we need
@@ -233,7 +234,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method nbStreams gets the number of available streams
-     * 
+     *
      * @return int the number of streams
      */
     public int nbStreams() {
@@ -242,7 +243,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method setMajor sets the major version of the trace (DO NOT USE)
-     * 
+     *
      * @param major
      *            long the major version
      */
@@ -252,7 +253,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method setMinor sets the minor version of the trace (DO NOT USE)
-     * 
+     *
      * @param minor
      *            long the minor version
      */
@@ -262,7 +263,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method setUUID sets the UUID of a trace
-     * 
+     *
      * @param uuid
      *            UUID
      */
@@ -272,7 +273,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method setByteOrder sets the byte order
-     * 
+     *
      * @param byteOrder
      *            ByteOrder of the trace, can be little-endian or big-endian
      */
@@ -282,7 +283,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method setPacketHeader sets the packet header of a trace (DO NOT USE)
-     * 
+     *
      * @param packetHeader
      *            StructDeclaration the header in structdeclaration form
      */
@@ -292,7 +293,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method majortIsSet is the major version number set?
-     * 
+     *
      * @return boolean is the major set?
      */
     public boolean majortIsSet() {
@@ -301,7 +302,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method minorIsSet. is the minor version number set?
-     * 
+     *
      * @return boolean is the minor set?
      */
     public boolean minorIsSet() {
@@ -310,7 +311,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method UUIDIsSet is the UUID set?
-     * 
+     *
      * @return boolean is the UUID set?
      */
     public boolean UUIDIsSet() {
@@ -319,7 +320,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method byteOrderIsSet is the byteorder set?
-     * 
+     *
      * @return boolean is the byteorder set?
      */
     public boolean byteOrderIsSet() {
@@ -328,7 +329,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method packetHeaderIsSet is the packet header set?
-     * 
+     *
      * @return boolean is the packet header set?
      */
     public boolean packetHeaderIsSet() {
@@ -337,7 +338,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method getUUID gets the trace UUID
-     * 
+     *
      * @return UUID gets the trace UUID
      */
     public UUID getUUID() {
@@ -346,7 +347,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method getMajor gets the trace major version
-     * 
+     *
      * @return long gets the trace major version
      */
     public long getMajor() {
@@ -355,7 +356,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method getMinor gets the trace minor version
-     * 
+     *
      * @return long gets the trace minor version
      */
     public long getMinor() {
@@ -364,7 +365,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method getByteOrder gets the trace byte order
-     * 
+     *
      * @return ByteOrder gets the trace byte order
      */
     public ByteOrder getByteOrder() {
@@ -373,7 +374,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method getPacketHeader gets the trace packet header
-     * 
+     *
      * @return StructDeclaration gets the trace packet header
      */
     public StructDeclaration getPacketHeader() {
@@ -382,7 +383,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method getTraceDirectory gets the trace directory
-     * 
+     *
      * @return File the path in "File" format.
      */
     public File getTraceDirectory() {
@@ -391,7 +392,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method getStreams get all the streams in a map format.
-     * 
+     *
      * @return Map<Long,Stream> a map of all the streams.
      */
     public Map<Long, Stream> getStreams() {
@@ -400,7 +401,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Method getPath gets the path of the trace directory
-     * 
+     *
      * @return String the path of the trace directory, in string format.
      * @see java.io.File#getPath()
      */
@@ -416,7 +417,7 @@ public class CTFTrace implements IDefinitionScope {
     /**
      * Tries to open the given file, reads the first packet header of the file
      * and check its validity.
-     * 
+     *
      * @param streamFile
      *            A trace file in the trace directory.
      * @param index
@@ -511,7 +512,7 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Looks up a definition from packet
-     * 
+     *
      * @param lookupPath
      *            String
      * @return Definition
@@ -527,10 +528,10 @@ public class CTFTrace implements IDefinitionScope {
 
     /**
      * Adds a new stream to the trace.
-     * 
+     *
      * @param stream
      *            A stream object.
-     * 
+     *
      * @throws ParseException
      */
     public void addStream(Stream stream) throws ParseException {
@@ -615,7 +616,7 @@ class MetadataFileFilter implements FileFilter {
 
 }
 
-class MetadataComparator implements Comparator<File> {
+class MetadataComparator implements Comparator<File>, Serializable {
 
     @Override
     public int compare(File o1, File o2) {
