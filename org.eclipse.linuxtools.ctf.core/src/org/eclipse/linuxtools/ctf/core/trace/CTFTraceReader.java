@@ -104,7 +104,7 @@ public class CTFTraceReader {
         if (hasMoreEvents()) {
             this.startTime = prio.peek().getCurrentEvent().timestamp;
             this.endTime = this.startTime;
-            this.index = 0;
+            this.fIndex = 0;
         }
         startIndex = new HashMap<Integer, Long>();
     }
@@ -258,8 +258,8 @@ public class CTFTraceReader {
                     startIndex.put(n, 0L);
                 }
                 currentPacket.setIndexBegin(startIndex.get(n));
-                currentPacket.setIndexEnd(index);
-                startIndex.put(n, index + 1);
+                currentPacket.setIndexEnd(fIndex);
+                startIndex.put(n, fIndex + 1);
             }
         }
         /*
