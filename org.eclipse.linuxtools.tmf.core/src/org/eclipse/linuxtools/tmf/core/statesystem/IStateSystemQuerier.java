@@ -10,7 +10,7 @@
  *   Alexandre Montplaisir - Initial API
  ******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.statesystem.helpers;
+package org.eclipse.linuxtools.tmf.core.statesystem;
 
 import java.util.List;
 

@@ -19,8 +19,8 @@ import java.util.concurrent.BlockingQueue;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
-import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateChangeInput;
-import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateSystemBuilder;
+import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
+import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemBuilder;
 
 /**
  * This is the state change input plugin for TMF's state system which handles

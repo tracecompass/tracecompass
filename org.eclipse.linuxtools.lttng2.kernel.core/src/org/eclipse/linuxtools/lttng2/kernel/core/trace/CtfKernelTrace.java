@@ -19,11 +19,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.statesystem.HistoryBuilder;
+import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
+import org.eclipse.linuxtools.tmf.core.statesystem.IStateHistoryBackend;
 import org.eclipse.linuxtools.tmf.core.statesystem.backend.historytree.HistoryTreeBackend;
 import org.eclipse.linuxtools.tmf.core.statesystem.backend.historytree.ThreadedHistoryTreeBackend;
-import org.eclipse.linuxtools.tmf.core.statesystem.helpers.HistoryBuilder;
-import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateChangeInput;
-import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateHistoryBackend;
 
 /**
  * This is the specification of CtfTmfTrace for use with LTTng 2.x kernel

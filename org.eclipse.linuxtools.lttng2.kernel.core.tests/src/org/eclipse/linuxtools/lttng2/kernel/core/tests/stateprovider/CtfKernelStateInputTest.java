@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateChangeInput;
+import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

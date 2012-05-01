@@ -10,7 +10,7 @@
  * 
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.statesystem.helpers;
+package org.eclipse.linuxtools.tmf.core.statesystem;
 
 /**
  * This is the interface used to define the "state change input", which is the

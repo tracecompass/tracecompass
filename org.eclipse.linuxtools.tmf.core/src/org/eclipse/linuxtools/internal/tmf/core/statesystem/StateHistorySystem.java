@@ -10,7 +10,7 @@
  * 
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.statesystem;
+package org.eclipse.linuxtools.internal.tmf.core.statesystem;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,8 +22,8 @@ import java.util.List;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateHistoryBackend;
-import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateSystemBuilder;
+import org.eclipse.linuxtools.tmf.core.statesystem.IStateHistoryBackend;
+import org.eclipse.linuxtools.tmf.core.statesystem.IStateSystemBuilder;
 
 /**
  * This is the extension of the StateSystem, which will save the state intervals

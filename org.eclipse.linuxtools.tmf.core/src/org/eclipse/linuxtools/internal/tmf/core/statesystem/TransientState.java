@@ -10,7 +10,7 @@
  * 
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.statesystem;
+package org.eclipse.linuxtools.internal.tmf.core.statesystem;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.interval.TmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateHistoryBackend;
+import org.eclipse.linuxtools.tmf.core.statesystem.IStateHistoryBackend;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 

@@ -10,11 +10,11 @@
  * 
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.statesystem.helpers;
+package org.eclipse.linuxtools.tmf.core.statesystem;
 
 import java.io.IOException;
 
-import org.eclipse.linuxtools.tmf.core.statesystem.StateHistorySystem;
+import org.eclipse.linuxtools.internal.tmf.core.statesystem.StateHistorySystem;
 
 /**
  * This is the high-level wrapper around the State History and its input and

@@ -15,10 +15,10 @@ package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
 import java.io.File;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.CtfKernelStateInput;
+import org.eclipse.linuxtools.tmf.core.statesystem.HistoryBuilder;
+import org.eclipse.linuxtools.tmf.core.statesystem.IStateChangeInput;
+import org.eclipse.linuxtools.tmf.core.statesystem.IStateHistoryBackend;
 import org.eclipse.linuxtools.tmf.core.statesystem.backend.historytree.ThreadedHistoryTreeBackend;
-import org.eclipse.linuxtools.tmf.core.statesystem.helpers.HistoryBuilder;
-import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateChangeInput;
-import org.eclipse.linuxtools.tmf.core.statesystem.helpers.IStateHistoryBackend;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
