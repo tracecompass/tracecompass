@@ -115,14 +115,15 @@ class HistoryTree {
          */
         int rootNodeSeqNb, res;
         int bs, maxc;
-        long ts;
+        long startTime;
 
         /* Java I/O mumbo jumbo... */
         if (!existingStateFile.exists()) {
             throw new IOException("Selected state file does not exist"); //$NON-NLS-1$
         }
-        if  (existingStateFile.length() <= 0) {
-            throw new IOException("Invalid state file selected, target file is empty"); //$NON-NLS-1$
+        if (existingStateFile.length() <= 0) {
+            throw new IOException("Invalid state file selected, " + //$NON-NLS-1$
+                    "target file is empty"); //$NON-NLS-1$
         }
 
         FileInputStream fis = new FileInputStream(existingStateFile);
@@ -141,8 +142,8 @@ class HistoryTree {
         if (res != HISTORY_FILE_MAGIC_NUMBER) {
             fc.close();
             fis.close();
-            throw new IOException(
-                    "Selected file does not look like a History Tree file"); //$NON-NLS-1$
+            throw new IOException("Selected file does not" + //$NON-NLS-1$
+                    "look like a History Tree file"); //$NON-NLS-1$
         }
 
         res = buffer.getInt(); /* Major version number */
@@ -161,21 +162,9 @@ class HistoryTree {
 
         this.nodeCount = buffer.getInt();
         rootNodeSeqNb = buffer.getInt();
+        startTime = buffer.getLong();
 
-        /* Go read the start time, which is also the root node's start time */
-        // TODO maybe make this part less ugly, as we need treeStart to build
-        // the SHTConfig object, but we need that object for new SHT_IO()
-        // and rebuildLatestBranch() ...
-        fc.position(getTreeHeaderSize() + (long) rootNodeSeqNb * bs);
-        buffer = ByteBuffer.allocate(8);
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
-        buffer.clear();
-        res = fc.read(buffer);
-        assert (res == 8);
-        buffer.flip();
-        ts = buffer.getLong();
-
-        this.config = new HTConfig(existingStateFile, bs, maxc, ts);
+        this.config = new HTConfig(existingStateFile, bs, maxc, startTime);
         fc.close();
         fis.close();
         /*
@@ -187,6 +176,17 @@ class HistoryTree {
 
         rebuildLatestBranch(rootNodeSeqNb);
         this.treeEnd = latestBranch.firstElement().getNodeEnd();
+
+        /*
+         * Make sure the history start time we read previously is consistent
+         * with was is actually in the root node.
+         */
+        if (startTime != latestBranch.firstElement().getNodeStart()) {
+            fc.close();
+            fis.close();
+            throw new IOException("Inconsistent start times in the" + //$NON-NLS-1$
+                    "history file, it might be corrupted."); //$NON-NLS-1$
+        }
     }
 
     /**
@@ -232,6 +232,9 @@ class HistoryTree {
 
             /* root node seq. nb */
             buffer.putInt(latestBranch.firstElement().getSequenceNumber());
+
+            /* start time of this history */
+            buffer.putLong(latestBranch.firstElement().getNodeStart());
 
             buffer.flip();
             res = fc.write(buffer);
