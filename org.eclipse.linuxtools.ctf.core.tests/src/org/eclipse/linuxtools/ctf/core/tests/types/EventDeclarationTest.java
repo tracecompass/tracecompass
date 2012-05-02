@@ -25,7 +25,7 @@ import org.junit.Test;
 /**
  * The class <code>EventDeclarationTest</code> contains tests for the class
  * <code>{@link EventDeclaration}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -35,7 +35,7 @@ public class EventDeclarationTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -45,8 +45,8 @@ public class EventDeclarationTest {
 
     /**
      * Perform pre-test initialization.
-     * 
-     * @throws CTFReaderException 
+     *
+     * @throws CTFReaderException
      */
     @Before
     public void setUp() throws CTFReaderException {
@@ -97,14 +97,14 @@ public class EventDeclarationTest {
 
     /**
      * Run the EventDefinition createDefinition(StreamInputReader) method test.
-     * 
-     * @throws CTFReaderException 
+     *
+     * @throws CTFReaderException
      */
     @Test
     public void testCreateDefinition() throws CTFReaderException {
         StreamInputReader streamInputReader = new StreamInputReader(
                 new StreamInput(new Stream(TestParams.createTrace()),
-                        (FileChannel) null, TestParams.getEmptyFile()));
+                        (FileChannel) null, TestParams.getTraceFile()));
 
         EventDefinition result = fixture.createDefinition(streamInputReader);
         assertNotNull(result);
@@ -112,8 +112,8 @@ public class EventDeclarationTest {
 
     /**
      * Run the boolean equals(Object) method test.
-     * 
-     * @throws CTFReaderException 
+     *
+     * @throws CTFReaderException
      */
     @Test
     public void testEquals() throws CTFReaderException {
@@ -333,8 +333,8 @@ public class EventDeclarationTest {
 
     /**
      * Test for the EventDefinition class
-     * 
-     * @throws CTFReaderException 
+     *
+     * @throws CTFReaderException
      */
     @Test
     public void testEventDefinition() throws CTFReaderException {

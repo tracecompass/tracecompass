@@ -2,18 +2,11 @@ package org.eclipse.linuxtools.ctf.core.tests.types;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
-import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
-import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
-import org.eclipse.linuxtools.ctf.core.tests.TestParams;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
-import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
-import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +14,7 @@ import org.junit.Test;
 /**
  * The class <code>StringDefinitionTest</code> contains tests for the class
  * <code>{@link StringDefinition}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -31,7 +24,7 @@ public class StringDefinitionTest {
 
     /**
      * Launch the test.
-     * 
+     *
      * @param args
      *            the command line arguments
      */
@@ -41,31 +34,14 @@ public class StringDefinitionTest {
 
     /**
      * Perform pre-test initialization.
-     * 
-     * @throws CTFReaderException 
+     *
+     * @throws CTFReaderException
      */
     @Before
     public void setUp() throws CTFReaderException {
-        CTFTrace trace = TestParams.createTrace();
-        CTFTraceReader tr = new CTFTraceReader(trace);
-        String name = ""; //$NON-NLS-1$
-        StructDefinition structDef = null;
-        boolean found = false;
-
-        while (tr.hasMoreEvents() && !found) {
-            tr.advance();
-            EventDefinition ed = tr.getCurrentEventDef();
-            for (String key : ed.fields.getDefinitions().keySet()) {
-                structDef = ed.fields;
-                Definition d = structDef.lookupDefinition(key);
-                if (d instanceof StringDefinition) {
-                    found = true;
-                    name = key;
-                    break;
-                }
-            }
-        }
-        fixture = structDef.lookupString(name);
+        String name = "testString"; //$NON-NLS-1$
+        StringDeclaration stringDec = new StringDeclaration();
+        fixture = stringDec.createDefinition(null, name);
     }
 
     /**

@@ -17,7 +17,6 @@ import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
-import org.eclipse.linuxtools.ctf.core.tests.TestParams;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
@@ -59,8 +58,6 @@ public class ArrayDefinitionTest {
      */
     @Before
     public void setUp() throws CTFReaderException {
-        this.trace = TestParams.createTrace();
-
         charArrayFixture = createCharArray();
         stringArrayFixture = createStringArray();
         longArrayFixture = createLongArray();

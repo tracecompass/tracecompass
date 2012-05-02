@@ -4,22 +4,25 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.HashMap;
 
-import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
+import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
+import org.eclipse.linuxtools.ctf.core.event.types.EnumDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.SequenceDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.SequenceDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDefinition;
-import org.eclipse.linuxtools.ctf.core.tests.TestParams;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
-import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
-import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 import org.junit.After;
 import org.junit.Before;
@@ -33,6 +36,24 @@ import org.junit.Test;
  * @version $Revision: 1.0 $
  */
 public class StructDefinitionTest {
+
+    private static final String TEST_STRUCT_ID = "testStruct"; //$NON-NLS-1$
+
+    private static final String ENUM_2 = "y"; //$NON-NLS-1$
+
+    private static final String ENUM_1 = "x"; //$NON-NLS-1$
+
+    private static final String TAG_ID = "Tag"; //$NON-NLS-1$
+
+    private static final String INT_ID = "_id"; //$NON-NLS-1$
+
+    private static final String STRING_ID = "_args"; //$NON-NLS-1$
+
+    private static final String ENUM_ID = "_enumArgs"; //$NON-NLS-1$
+
+    private static final String SEQUENCE_ID = "_seq"; //$NON-NLS-1$
+
+    private static final String LENGTH_SEQ = "_len"; //$NON-NLS-1$
 
     private StructDefinition fixture;
 
@@ -55,10 +76,31 @@ public class StructDefinitionTest {
      */
     @Before
     public void setUp() throws CTFReaderException {
-        CTFTrace c = TestParams.createTrace();
-        CTFTraceReader tr = new CTFTraceReader(c);
-        EventDefinition ed = tr.getCurrentEventDef();
-        fixture = ed.fields;
+        StructDeclaration sDec = new StructDeclaration(12);
+        IntegerDeclaration id = new IntegerDeclaration(32, false, 32, ByteOrder.BIG_ENDIAN, Encoding.NONE, null, 8);
+        IntegerDeclaration lenDec = new IntegerDeclaration(8, false, 8, ByteOrder.BIG_ENDIAN, Encoding.NONE, null, 8);
+        StringDeclaration sd = new StringDeclaration();
+        EnumDeclaration ed = new EnumDeclaration(id);
+        SequenceDeclaration seqDec = new SequenceDeclaration(LENGTH_SEQ, id);
+        VariantDeclaration varDec = new VariantDeclaration();
+        EnumDeclaration tagDec = new EnumDeclaration(id);
+        tagDec.add(0, 1, ENUM_1);
+        tagDec.add(2, 3, ENUM_2);
+        varDec.addField(ENUM_2, id);
+        varDec.addField(ENUM_1, sd);
+        varDec.setTag(TAG_ID);
+        sDec.addField(INT_ID, id);
+        sDec.addField(STRING_ID, sd);
+        sDec.addField(ENUM_ID, ed);
+        sDec.addField(TAG_ID, tagDec);
+        sDec.addField(LENGTH_SEQ, lenDec);
+        sDec.addField(SEQUENCE_ID, seqDec);
+        sDec.addField(VAR_FIELD_NAME, varDec);
+        fixture = sDec.createDefinition(null, TEST_STRUCT_ID);
+        EnumDefinition eDef = tagDec.createDefinition(fixture, TAG_ID);
+        VariantDefinition vd = varDec.createDefinition(fixture,VAR_FIELD_NAME );
+        vd.setTagDefinition(eDef);
+
     }
 
     /**
@@ -92,7 +134,7 @@ public class StructDefinitionTest {
      */
     @Test
     public void testLookupArray() {
-        String name = "id"; //$NON-NLS-1$
+        String name = INT_ID;
         ArrayDefinition result = fixture.lookupArray(name);
 
         assertNull(result);
@@ -114,11 +156,9 @@ public class StructDefinitionTest {
      */
     @Test
     public void testLookupEnum() {
-        String name = ""; //$NON-NLS-1$
+        String name = ENUM_ID;
         EnumDefinition result = fixture.lookupEnum(name);
-
-        /* There are no enums in the test trace */
-        assertNull(result);
+        assertNotNull(result);
     }
 
     /**
@@ -126,9 +166,8 @@ public class StructDefinitionTest {
      */
     @Test
     public void testLookupInteger_1() {
-        String name = "_args"; //$NON-NLS-1$
+        String name = "_id"; //$NON-NLS-1$
         IntegerDefinition result = fixture.lookupInteger(name);
-
         assertNotNull(result);
     }
 
@@ -139,7 +178,6 @@ public class StructDefinitionTest {
     public void testLookupInteger_2() {
         String name = VAR_FIELD_NAME;
         IntegerDefinition result = fixture.lookupInteger(name);
-
         assertNull(result);
     }
 
@@ -148,10 +186,9 @@ public class StructDefinitionTest {
      */
     @Test
     public void testLookupSequence() {
-        String name = VAR_FIELD_NAME;
+        String name = SEQUENCE_ID;
         SequenceDefinition result = fixture.lookupSequence(name);
-
-        assertNull(result);
+        assertNotNull(result);
     }
 
     /**
@@ -184,7 +221,7 @@ public class StructDefinitionTest {
         String name = VAR_FIELD_NAME;
         VariantDefinition result = fixture.lookupVariant(name);
 
-        assertNull(result);
+        assertNotNull(result);
     }
 
     /**

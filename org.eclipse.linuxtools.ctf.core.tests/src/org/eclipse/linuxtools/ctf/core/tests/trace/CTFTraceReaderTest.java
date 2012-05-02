@@ -303,13 +303,25 @@ public class CTFTraceReaderTest {
             fixture.advance();
         }
         boolean result= fixture.seekIndex(0);
+
         third = getTimestamp();
         boolean result2 = fixture.seekIndex(rank);
         fourth = getTimestamp();
-        assertTrue(result);
-        assertTrue(result2);
-        assertEquals( first , third);
-        assertEquals( second , fourth);
+        /*
+         * in blocks to see where code coverage fails
+         */
+        {
+            assertTrue(result);
+        }
+        {
+            assertTrue(result2);
+        }
+        {
+            assertEquals( first , third);
+        }
+        {
+            assertEquals( second , fourth);
+        }
     }
 
     /**

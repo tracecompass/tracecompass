@@ -5,17 +5,12 @@ import static org.junit.Assert.assertNotNull;
 
 import java.nio.ByteOrder;
 
-import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
-import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
-import org.eclipse.linuxtools.ctf.core.tests.TestParams;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
-import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
-import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
 import org.eclipse.linuxtools.internal.ctf.core.event.io.BitBuffer;
 import org.junit.After;
 import org.junit.Before;
@@ -31,7 +26,8 @@ import org.junit.Test;
 public class IntegerDefinitionTest {
 
     private IntegerDefinition fixture;
-
+    String name = "testInt"; //$NON-NLS-1$
+    String clockName = "clock"; //$NON-NLS-1$
     /**
      * Launch the test.
      *
@@ -50,27 +46,11 @@ public class IntegerDefinitionTest {
      */
     @Before
     public void setUp() throws CTFReaderException {
-        CTFTrace trace = TestParams.createTrace();
-        CTFTraceReader tr = new CTFTraceReader(trace);
-        String name = ""; //$NON-NLS-1$
+
         StructDefinition structDef = null;
         boolean found = false;
-
-        while (tr.hasMoreEvents() && !found) {
-            tr.advance();
-            EventDefinition ed = tr.getCurrentEventDef();
-            for (String key : ed.fields.getDefinitions().keySet()) {
-                structDef = ed.fields;
-                Definition d = structDef.lookupDefinition(key);
-                if (d instanceof IntegerDefinition) {
-                    found = true;
-                    name = key;
-                    break;
-                }
-            }
-        }
-        assert (structDef != null);
-        fixture = structDef.lookupInteger(name);
+        IntegerDeclaration id = new IntegerDeclaration( 1, true, 1, ByteOrder.BIG_ENDIAN, Encoding.NONE, clockName, 8);
+        fixture = id.createDefinition(null, name);
     }
 
     /**

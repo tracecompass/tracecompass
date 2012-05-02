@@ -172,8 +172,8 @@ public class SequenceDefinitionTest {
      */
     @Test
     public void testToString_nonString() throws Exception {
-        SequenceDefinition nonStringFixture = initNonString();
-        String result = nonStringFixture.toString();
+        fixture = initNonString();
+        String result = fixture.toString();
         assertNotNull(result);
     }
 }
