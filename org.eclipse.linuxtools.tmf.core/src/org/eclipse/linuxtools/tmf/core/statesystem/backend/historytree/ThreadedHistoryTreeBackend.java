@@ -164,9 +164,10 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
             }
             assert (currentInterval.getAttribute() == -1);
             /*
-             * We've been told we're done, let's write down everything and quit
+             * We've been told we're done, let's write down everything and quit.
+             * The end time of this "signal interval" is actually correct.
              */
-            sht.closeTree();
+            sht.closeTree(currentInterval.getEndTime());
             return;
         } catch (InterruptedException e) {
             /* We've been interrupted abnormally */

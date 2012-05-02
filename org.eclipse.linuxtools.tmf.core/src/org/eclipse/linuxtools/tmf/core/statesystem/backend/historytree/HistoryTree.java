@@ -197,10 +197,19 @@ class HistoryTree {
      * 
      * @param requestedEndTime
      */
-    void closeTree() {
+    void closeTree(long requestedEndTime) {
         FileChannel fc;
         ByteBuffer buffer;
         int i, res;
+
+        /* 
+         * Work-around the "empty branches" that get created when the root node
+         * becomes full. Overwrite the tree's end time with the original wanted
+         * end-time, to ensure no queries are sent into those empty nodes.
+         * 
+         * This won't be needed once extended nodes are implemented.
+         */
+        this.treeEnd = requestedEndTime;
 
         /* Close off the latest branch of the tree */
         for (i = 0; i < latestBranch.size(); i++) {

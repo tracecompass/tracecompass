@@ -113,7 +113,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
 
     @Override
     public void finishedBuilding(long endTime) {
-        sht.closeTree();
+        sht.closeTree(endTime);
     }
 
     @Override
