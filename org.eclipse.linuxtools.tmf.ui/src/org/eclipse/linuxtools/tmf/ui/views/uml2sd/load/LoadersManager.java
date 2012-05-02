@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: LoadersManager.java,v 1.5 2008/01/24 02:29:16 apnan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -21,31 +22,52 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiTracer;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 
 /**
  * Manager class for the UML2SD extension point.
+ * 
+ * @version 1.0
+ * @author sveyrier
+ * @author Bernd Hufmann
  */
 public class LoadersManager {
+
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    /**
+     * The loader tag for the extension point.
+     */
+    public static final String LOADER_TAG = "uml2SDLoader"; //$NON-NLS-1$
+    /**
+     * The loader prefix.
+     */
+    public static final String LOADER_PREFIX = LOADER_TAG + "."; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    public static final String LOADER_TAG = "uml2SDLoader"; //$NON-NLS-1$
-    public static final String LOADER_PREFIX = LOADER_TAG + "."; //$NON-NLS-1$
-
-    // The instance
+    /**
+     * The LoadersManager singleton instance.
+     */
     private static LoadersManager loadersManager;
 
-    // Maps for caching information
+    /**
+     * Map for caching information (view ID to loader class)
+     */
     protected HashMap<String, IUml2SDLoader> fViewLoaderMap = new HashMap<String, IUml2SDLoader>();
+    /**
+     * Map for caching information (view ID to list of configuration elements)
+     */
     protected HashMap<String, ArrayList<IConfigurationElement>> fViewLoadersList = new HashMap<String, ArrayList<IConfigurationElement>>();
     
     // ------------------------------------------------------------------------
@@ -65,7 +87,7 @@ public class LoadersManager {
      * 
      * @return the manager instance
      */
-    public static LoadersManager getInstance() {
+    public synchronized static LoadersManager getInstance() {
         if (loadersManager == null) {
             loadersManager = new LoadersManager();
         }
@@ -167,9 +189,7 @@ public class LoadersManager {
 
             return loader;
         } catch (Exception e) {
-            if (TmfUiTracer.isErrorTraced()) {
-                TmfUiTracer.traceError("Exception during getCurrentLoder(): " + e); //$NON-NLS-1$
-            }
+            TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Error getting loader class", e)); //$NON-NLS-1$
         }
         return null;
     }
@@ -224,7 +244,7 @@ public class LoadersManager {
                     }
 
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Error setting current loader class", e)); //$NON-NLS-1$
                 }
             }
             // The old loader is going to be kicked
@@ -273,6 +293,7 @@ public class LoadersManager {
         if (list != null) {
             return list;
         }
+
         ArrayList<IConfigurationElement> ret = new ArrayList<IConfigurationElement>();
         IExtensionPoint iep = Platform.getExtensionRegistry().getExtensionPoint(TmfUiPlugin.PLUGIN_ID, LOADER_TAG);
         if (iep == null) {
@@ -338,6 +359,7 @@ public class LoadersManager {
     /**
      * Creates an instance of the loader class for a given extension point configuration element and
      * also sets it as current loader for the given view.
+     * 
      * @param viewId The view ID.
      * @param ce The extension point configuration element
      */
@@ -349,10 +371,9 @@ public class LoadersManager {
                 setCurrentLoader(l, viewId);
             }
         } catch (CoreException e4) {
-            System.err.println("Error 'uml2SDLoader' Extension point :" + e4); //$NON-NLS-1$
+            TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Error 'uml2SDLoader' Extension point", e4)); //$NON-NLS-1$
         } catch (Exception e5) {
-            e5.printStackTrace();
-            System.err.println("Error 'uml2SDLoader' Extension point :" + e5); //$NON-NLS-1$
+            TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Error 'uml2SDLoader' Extension point", e5)); //$NON-NLS-1$
         }
     }
 }

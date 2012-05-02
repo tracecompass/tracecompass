@@ -13,9 +13,19 @@ package org.eclipse.linuxtools.tmf.core.uml2sd;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 
+/**
+ * <p>
+ * Interface for asynchronous sequence diagram events. 
+ * </p>
+ * 
+ * @version 1.0
+ * @author Bernd Hufmann
+ */
 public interface ITmfAsyncSequenceDiagramEvent extends ITmfSyncSequenceDiagramEvent {
     /**
-     * @return End timestamp of message (i.e. receive time)
+     * Returns end timestamp of message (i.e. receive time)
+     * 
+     * @return end timestamp of message (i.e. receive time)
      */
     public ITmfTimestamp getEndTime();
 }

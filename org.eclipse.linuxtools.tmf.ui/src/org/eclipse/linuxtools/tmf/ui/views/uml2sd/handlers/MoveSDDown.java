@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2006, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: MoveSDDown.java,v 1.2 2006/09/20 20:56:26 ewchan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -17,25 +18,45 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget;
 
 /**
+ * Action class implementation to move down in the sequence diagram view within a page.
+ * 
+ * @version 1.0
  * @author sveyrier
  * 
  */
 public class MoveSDDown extends Action {
 
     // ------------------------------------------------------------------------
-    // Attributes
+    // Constants
     // ------------------------------------------------------------------------
+    /**
+     * The action ID.
+     */
     public final static String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.MoveSDDown"; //$NON-NLS-1$
     
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+    /**
+     * The sequence diagram view reference.
+     */
     protected SDView fView = null;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+    /**
+     * Default constructor
+     */
     public MoveSDDown() {
         this(null);
     }
     
+    /**
+     * Constructor
+     * 
+     * @param view a sequence diagram view reference
+     */
     public MoveSDDown(SDView view) {
         super();
         setId(ID);
@@ -44,7 +65,7 @@ public class MoveSDDown extends Action {
     }
 
     // ------------------------------------------------------------------------
-    // Operations
+    // Methods
     // ------------------------------------------------------------------------
     /*
      * (non-Javadoc)
@@ -55,6 +76,7 @@ public class MoveSDDown extends Action {
         if (fView == null) {
             return;
         }
+
         SDWidget viewer = fView.getSDWidget();
         if (viewer != null) {
             viewer.scrollBy(0, +viewer.getVisibleHeight());
@@ -63,6 +85,7 @@ public class MoveSDDown extends Action {
     
     /**
      * Sets the active SD view.
+     * 
      * @param view The SD view.
      */
     public void setView(SDView view) {

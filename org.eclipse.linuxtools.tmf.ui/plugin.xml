@@ -1090,7 +1090,7 @@
    <extension
          point="org.eclipse.linuxtools.tmf.ui.uml2SDLoader">
       <uml2SDLoader
-            class="org.eclipse.linuxtools.tmf.ui.views.uml2sd.impl.TmfUml2SDSyncLoader"
+            class="org.eclipse.linuxtools.tmf.ui.views.uml2sd.loader.TmfUml2SDSyncLoader"
             default="true"
             id="org.eclipse.linuxtools.tmf.ui.views.uml2sd.impl.TmfUml2SDSyncLoader"
             name="TMF UML2SD Loader"

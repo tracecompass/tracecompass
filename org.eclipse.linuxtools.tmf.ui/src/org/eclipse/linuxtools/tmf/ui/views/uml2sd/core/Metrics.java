@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: Metrics.java,v 1.3 2008/01/24 02:28:49 apnan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -16,10 +17,14 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
  * This class contains the metrics used to layout a sequence diagram on a view The class method are mostly used in
  * combination with the preferences
  * 
+ * @version
  * @author sveyrier
  * 
  */
 public class Metrics {
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
 
     /**
      * Space between the Frame and the top of the View This also represent the space between the frame and the bottom of
@@ -35,7 +40,6 @@ public class Metrics {
      * Space between the Lifelines and the right of the Frame
      */
     public static final int LIFELINE_H_MAGIN = 23;
-
     /**
      * Space between the Lifelines and the bottom of the Frame
      */
@@ -52,7 +56,7 @@ public class Metrics {
     /**
      * Vertical spacing between messages
      */
-    protected static final int MESSAGES_SPACING = 30;
+    public static final int MESSAGES_SPACING = 30;
     /**
      * Vertical spacing between the message and its name
      */
@@ -89,10 +93,14 @@ public class Metrics {
      * The square width which contains the Stop representation (a cross)
      */
     public static final int STOP_WIDTH = 20;
-
+    /**
+     * The internal message width. 
+     */
     public static final int INTERNAL_MESSAGE_WIDTH = 20;
+    /**
+     * The internal sychrounous message height.
+     */
     public static final int SYNC_INTERNAL_MESSAGE_HEIGHT = 10;
-
     /**
      * Line width used when drawing selected GraphNode
      */
@@ -101,6 +109,9 @@ public class Metrics {
      * Line width used when drawing non selected GraphNode
      */
     public static final int NORMAL_LINE_WIDTH = 1;
+    /**
+     * The internal vertical message margin
+     */
     public static final int INTERNAL_MESSAGE_V_MARGIN = 10;
 
     /**
@@ -113,20 +124,50 @@ public class Metrics {
      * message are displayed to avoid message overlapping and mainly saving some execution time
      */
     public static final int MESSAGE_SIGNIFICANT_VSPACING = 1;
-
-    // Used for internal syncMessages only
+    /**
+     *  Message selection tolerance. Used for internal syncMessages only
+     */
     public static final int MESSAGE_SELECTION_TOLERANCE = 30;
-
+    /**
+     * The focus drawing margin.
+     */
     public static final int FOCUS_DRAWING_MARGIN = 10;
+    
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+    /**
+     * The lifeline font height
+     */
+    private static int lifelineFontHeight = 0;
+    /**
+     * The message font height
+     */
+    private static int messageFontHeight = 0;
+    /**
+     * The frame font height
+     */
+    private static int frameFontHeight = 0;
+    /**
+     * The lifeline header font height
+     */
+    private static int lifelineHeaderFontHeight = 0;
+    /**
+     * The lifeline font widht
+     */
+    private static int lifelineFontWidth = 0;
+    /**
+     * The lifeline width
+     */
+    private static int lifeLineWidth = 119;
+    /**
+     * The (forced) event spacing
+     */
+    private static int forcedEventSpacing = -1;
 
-    static private int lifelineFontHeight = 0;
-    static private int messageFontHeight = 0;
-    static private int frameFontHeight = 0;
-    static private int lifelineHeaderFontHeight = 0;
-    static private int lifelineFontWidth = 0;
-    static private int lifeLineWidth = 119;
-
-    static private int forcedEventSpacing = -1;
+    // ------------------------------------------------------------------------
+    // Methods
+    // ------------------------------------------------------------------------
 
     /**
      * Set the character height used to draw the lifeline name
@@ -206,10 +247,10 @@ public class Metrics {
      * @return the character height
      */
     static public int getMessageFontHeigth() {
-        if (forcedEventSpacing >= 0)
+        if (forcedEventSpacing >= 0) {
             return 0;
-        else
-            return messageFontHeight;
+        }
+        return messageFontHeight;
     }
 
     /**
@@ -248,11 +289,16 @@ public class Metrics {
         return lifelineFontWidth;
     }
 
+    /**
+     * Returns the message spacing.
+     * 
+     * @return the message spacing
+     */
     static public int getMessagesSpacing() {
-        if (forcedEventSpacing >= 0)
+        if (forcedEventSpacing >= 0) {
             return forcedEventSpacing;
-        else
-            return MESSAGES_SPACING;
+        } 
+        return MESSAGES_SPACING;
     }
 
     /**

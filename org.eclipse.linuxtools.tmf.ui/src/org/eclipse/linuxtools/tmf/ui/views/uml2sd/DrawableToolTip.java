@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: DrawableToolTip.java,v 1.3 2008/01/24 02:29:01 apnan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -27,14 +28,21 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 /**
+ * <p>
  * This class is used to reproduce the same tooltip behavior on Windows and Linux when the mouse move hover the time
  * compression bar used to display elapsed time using a tooltip. The tooltip is composed of 2 parts, the text value and
- * below, a scale to visually locate the value in a time range (usually the min an max elapsed time in the whole
+ * below, a scale to visually locate the value in a time range (usually the minimum an maximum elapsed time in the whole
  * diagram)
+ * </p>
  * 
+ * @version 1.0
  * @author sveyrier
  */
 public class DrawableToolTip implements PaintListener {
+
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
 
     /**
      * The parent control where the tooltip must be drawn
@@ -45,24 +53,47 @@ public class DrawableToolTip implements PaintListener {
      */
     protected Shell toolTipShell = null;
     /**
-     * Time range data
+     * The Time range data.
      */
     protected TmfTimeRange minMaxRange;
+    /**
+     * The current time.
+     */
     protected ITmfTimestamp currentValue;
-
+    /**
+     * The horizontal margin used for drawing.
+     */
     private static int H_MARGIN = 10;
+    /**
+     * The vertical margin used for drawing.
+     */
     private static int V_MARGIN = 10;
-
+    /**
+     * The minimum text scale margin.
+     */
     private static int TEXT_SCALE_MARGIN = 20;
+    /**
+     * The length of the text scale.
+     */
     private static int SCALE_LENGTH = 100;
-
+    /**
+     * The text to display 
+     */
     protected String msg;
-
     /**
      * The color array used to represent the 10 time range slices
      */
     protected Color[] col;
 
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
+
+    /**
+     * Creates a drawable tool tip instance.
+     * 
+     * @param _parent The parent composite.
+     */
     public DrawableToolTip(Composite _parent) {
         parent = _parent;
         toolTipShell = new Shell(parent.getShell(), SWT.ON_TOP);
@@ -84,6 +115,98 @@ public class DrawableToolTip implements PaintListener {
         col[9] = new Color(Display.getDefault(), 255, 0, 0);
     }
 
+    // ------------------------------------------------------------------------
+    // Methods
+    // ------------------------------------------------------------------------
+    /**
+     * Returns the message to display.
+     * 
+     * @return the message to display.
+     */
+    public String getText() {
+        return msg;
+    }
+
+    /**
+     * Returns teh current time to display.
+     * 
+     * @return the current time to display
+     */
+    public String getAccessibleText() {
+        return currentValue.toString();
+    }
+
+    /**
+     * Returns the horizontal margin.
+     * 
+     * @return the horizontal margin.
+     */
+    protected static int getHorizontalMargin() {
+        return H_MARGIN;
+    }
+
+    /**
+     * Sets the horizontal margin.
+     * 
+     * @param margin The margin to set.
+     */
+    protected static void setHorizontalMargin(int margin) {
+        H_MARGIN = margin;
+    }
+
+    /**
+     * Returns the vertical margin.
+     * 
+     * @return the vertical margin.
+     */
+    protected static int getVerticalMargin() {
+        return V_MARGIN;
+    }
+
+    /**
+     * Sets the vertical margin.
+     * 
+     * @param margin The margin to set.
+     */
+    protected static void setVerticalMargin(int margin) {
+        V_MARGIN = margin;
+    }
+
+    /**
+     * Returns the text scale margin.
+     * 
+     * @return the text scale margin.
+     */
+    protected static int getTextScaleMargin() {
+        return TEXT_SCALE_MARGIN;
+    }
+
+    /**
+     * Sets the text scale margin.
+     * @param textScaleMargin The margin to set.
+     */
+    protected static void setTestScaleMargin(int textScaleMargin) {
+        TEXT_SCALE_MARGIN = textScaleMargin;
+    }
+
+    /**
+     * Returns the scale length.
+     * 
+     * @return the scale length.
+     */
+    protected static int getScaleLength() {
+        return SCALE_LENGTH;
+    }
+
+    /**
+     * Sets the scale length.
+     * 
+     * @param scaleLength The scale length to set.
+     */
+    protected static void setScaleLength(int scaleLength) {
+        SCALE_LENGTH = scaleLength;
+    }
+    
     /**
      * Display the tooltip using the given time range(min,max) the current value and the time unit The tooltip will stay
      * on screen until it is told otherwise
@@ -104,21 +227,31 @@ public class DrawableToolTip implements PaintListener {
     }
 
     /**
-     * Hide the tooltip
+     * Hide the tooltip.
      */
     public void hideToolTip() {
         toolTipShell.setVisible(false);
     }
 
     /**
-     * Draw the tooltip text on the control widget when a paint event is received
+     * Disposes the system resource used by this kind of toolTips (a colors array essentially)
+     */
+    public void dispose() {
+        for (int i = 0; i < col.length; i++)
+            col[i].dispose();
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.swt.events.PaintListener#paintControl(org.eclipse.swt.events.PaintEvent)
      */
     @Override
     public void paintControl(PaintEvent event) {
         msg = SDMessages._138 + " " +  currentValue.toString(); //$NON-NLS-1$
         Point size = event.gc.textExtent(msg);
-        if (size.x < SCALE_LENGTH)
+        if (size.x < SCALE_LENGTH) {
             size.x = SCALE_LENGTH;
+        }
         event.gc.drawText(msg, H_MARGIN, V_MARGIN, true);
         event.gc.drawLine(H_MARGIN, V_MARGIN + TEXT_SCALE_MARGIN + size.y, H_MARGIN + SCALE_LENGTH, V_MARGIN + TEXT_SCALE_MARGIN + size.y);
 
@@ -136,79 +269,35 @@ public class DrawableToolTip implements PaintListener {
         if (gr != 0) {
             // colIndex = Math.round((float)(Math.log(1+delta)/gr));
             colIndex = Math.round((float) (absDelta / gr));
-            if (colIndex > col.length)
+            if (colIndex > col.length) {
                 colIndex = col.length;
-            else if (colIndex <= 1)
+            } else if (colIndex <= 1) {
                 colIndex = 1;
-        } else
+            }
+        } else {
             colIndex = 1;
+        }
 
         for (int i = 0; i <= 10; i++) {
-            if (i < 10)
+            if (i < 10) {
                 event.gc.setBackground(col[i]);
-            if ((i < colIndex) && (i < 10))
+            }
+            if ((i < colIndex) && (i < 10)) {
                 event.gc.fillRectangle(H_MARGIN + i * step, V_MARGIN + TEXT_SCALE_MARGIN + size.y - 5, step, 11);
-            if (i == 0)
+            }
+            if (i == 0) {
                 event.gc.drawText(SDMessages._56, H_MARGIN, size.y + 2 * V_MARGIN + TEXT_SCALE_MARGIN, true);
+            }
             if (i == 0) {
                 int len = event.gc.textExtent(SDMessages._55).x;
                 event.gc.drawText(SDMessages._55, H_MARGIN + SCALE_LENGTH - len + 1, size.y + 2 * V_MARGIN + TEXT_SCALE_MARGIN, true);
             }
             int lineWidth = 10;
-            if ((i == 0) || (i == 10))
+            if ((i == 0) || (i == 10)) {
                 lineWidth = 14;
+            }
             event.gc.drawLine(H_MARGIN + i * step, V_MARGIN + TEXT_SCALE_MARGIN + size.y - lineWidth / 2, H_MARGIN + i * step, V_MARGIN + TEXT_SCALE_MARGIN + size.y + lineWidth / 2);
         }
         toolTipShell.setSize(size.x + 2 * H_MARGIN + 2, 2 * size.y + 3 * V_MARGIN + TEXT_SCALE_MARGIN);
     }
-
-    public String getText() {
-        return msg;
-    }
-
-    public String getAccessibleText() {
-        return currentValue.toString();
-    }
-
-    /**
-     * Dispose the system resource used by this kind of toolTips (a colors array essentially)
-     * 
-     */
-    public void dispose() {
-        for (int i = 0; i < col.length; i++)
-            col[i].dispose();
-    }
-    
-    protected static int getHorizontalMargin() {
-        return H_MARGIN;
-    }
-
-    protected static void setHorizontalMargin(int margin) {
-        H_MARGIN = margin;
-    }
-
-    protected static int getVerticalMargin() {
-        return V_MARGIN;
-    }
-
-    protected static void setVerticalMargin(int margin) {
-        V_MARGIN = margin;
-    }
-
-    protected static int getTestScaleMargin() {
-        return TEXT_SCALE_MARGIN;
-    }
-
-    protected static void setTestScaleMargin(int testScaleMargin) {
-        TEXT_SCALE_MARGIN = testScaleMargin;
-    }
-
-    protected static int getScaleLength() {
-        return SCALE_LENGTH;
-    }
-
-    protected static void setScaleLength(int scaleLength) {
-        SCALE_LENGTH = scaleLength;
-    }
-
 }

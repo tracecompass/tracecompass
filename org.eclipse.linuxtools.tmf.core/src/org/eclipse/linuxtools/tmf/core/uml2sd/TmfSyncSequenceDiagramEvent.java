@@ -15,24 +15,46 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 
 /**
- * <b><u>TmfSyncSequenceDiagramEvent</u></b>
  * <p>
- * Sample implementation of the ITmfSyncSequenceDiagramEvent
+ * A basic implementation of ITmfSyncSequenceDiagramEvent.
  * </p>
+ * 
+ * @version 1.0
+ * @author Bernd Hufmann
  */
 public class TmfSyncSequenceDiagramEvent implements ITmfSyncSequenceDiagramEvent {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+    /**
+     * The start time of the sequence diagram event (i.e. time when signal was sent).
+     */
     final protected ITmfTimestamp fStartTime;
+    /**
+     * The name of the sender of the signal.
+     */
     final protected String fSender;
+    /**
+     * The name of the receiver of the signal.
+     */
     final protected String fReceiver;
+    /**
+     * The name of the signal
+     */
     final protected String fName;
 
     // ------------------------------------------------------------------------
     // Constructors
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
+    /**
+     * Constructor
+     * 
+     * @param startEvent The start event (on sender side).
+     * @param sender The name of sender of signal.
+     * @param receiver The Name of receiver of signal.
+     * @param name - The signal name
+     */    
     public TmfSyncSequenceDiagramEvent(ITmfEvent startEvent, String sender, String receiver, String name) {
 
         if ((startEvent == null) || (sender == null) || (receiver == null) || (name == null)) {
@@ -56,7 +78,7 @@ public class TmfSyncSequenceDiagramEvent implements ITmfSyncSequenceDiagramEvent
     // ------------------------------------------------------------------------
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.uml2sd.ITmfSyncSequenceDiagramEvent#getSender()
+     * @see org.eclipse.linuxtools.tmf.core.uml2sd.ITmfSyncSequenceDiagramEvent#getSender()
      */
     @Override
     public String getSender() {
@@ -65,7 +87,7 @@ public class TmfSyncSequenceDiagramEvent implements ITmfSyncSequenceDiagramEvent
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.uml2sd.ITmfSyncSequenceDiagramEvent#getReceiver()
+     * @see org.eclipse.linuxtools.tmf.core.uml2sd.ITmfSyncSequenceDiagramEvent#getReceiver()
      */
     @Override
     public String getReceiver() {
@@ -74,7 +96,7 @@ public class TmfSyncSequenceDiagramEvent implements ITmfSyncSequenceDiagramEvent
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.uml2sd.ITmfSyncSequenceDiagramEvent#getName()
+     * @see org.eclipse.linuxtools.tmf.core.uml2sd.ITmfSyncSequenceDiagramEvent#getName()
      */
     @Override
     public String getName() {
@@ -83,7 +105,7 @@ public class TmfSyncSequenceDiagramEvent implements ITmfSyncSequenceDiagramEvent
 
     /*
      * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.uml2sd.ITmfSyncSequenceDiagramEvent#getStartTime()
+     * @see org.eclipse.linuxtools.tmf.core.uml2sd.ITmfSyncSequenceDiagramEvent#getStartTime()
      */
     @Override
     public ITmfTimestamp getStartTime() {

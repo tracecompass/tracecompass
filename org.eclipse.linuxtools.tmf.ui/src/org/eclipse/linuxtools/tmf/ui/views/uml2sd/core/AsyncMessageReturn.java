@@ -1,10 +1,9 @@
 /**********************************************************************
- * Copyright (c) 2005, 2006, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: AsyncMessageReturn.java,v 1.2 2006/09/20 20:56:25 ewchan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -13,11 +12,11 @@
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
 
 /**
  * The message return graph node implementation.<br>
- * This class differs on the AsynMessage class only on the drawing line style (dashed instead od plain line).<br>
+ * This class differs on the AsynMessage class only on the drawing line style (dashed instead of plain line).<br>
  * Message return are generally associated to a message. This means, they are connected to the same lifelines than the
  * associated message but in the opposite direction and for a different event occurrence.<br>
  * <br>
@@ -26,18 +25,41 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.ISDPreferences;
  * 
  * 
  * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessage AsyncMessage for usage example
+ * @version 1.0 
  * @author sveyrier
  * 
  */
 public class AsyncMessageReturn extends AsyncMessage {
 
-    protected AsyncMessage message;
-
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    /**
+    * The grahNode ID constant
+    */
     public static final String ASYNC_MESS_RET_TAG = "AsyncMessageRet"; //$NON-NLS-1$
 
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+    /**
+     * The corresponding asynchronous message.
+     */
+    protected AsyncMessage message;
+
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
+    /**
+     * Default constructor.
+     */
     public AsyncMessageReturn() {
         prefId = ISDPreferences.PREF_ASYNC_MESS_RET;
     }
+
+    // ------------------------------------------------------------------------
+    // Methods
+    // ------------------------------------------------------------------------
 
     /**
      * Set the associated message (the message it is the return).<br>
@@ -50,10 +72,15 @@ public class AsyncMessageReturn extends AsyncMessage {
         message = parentMessage;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessage#draw(org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC)
+     */
     @Override
     public void draw(IGC context) {
-        if (!isVisible())
+        if (!isVisible()) {
             return;
+        }
         prefId = ISDPreferences.PREF_ASYNC_MESS_RET;
         int oldStyle = context.getLineStyle();
         // Message return are dashed
@@ -67,6 +94,10 @@ public class AsyncMessageReturn extends AsyncMessage {
         context.setLineStyle(oldStyle);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessage#getArrayId()
+     */
     @Override
     public String getArrayId() {
         return ASYNC_MESS_RET_TAG;

@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: SDView.java,v 1.2 2008/01/24 02:29:01 apnan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -76,29 +77,86 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
 
 /**
+ * <p>
+ * This class is a generic sequence diagram view implementation.
+ * </p>
+
+ * @version 1.0 
  * @author sveyrier
- * 
  */
 public class SDView extends ViewPart {
 
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+    /**
+     * The sequence diagram widget.
+     */
     protected SDWidget sdWidget = null;
+    /**
+     * The time compression bar.
+     */
     protected TimeCompressionBar timeCompressionBar = null;
+    /**
+     * The sequence diagram find provider implementation.
+     */
     protected ISDFindProvider sdFindProvider = null;
+    /**
+     * The sequence diagram paging provider implementation.
+     */
     protected ISDPagingProvider sdPagingProvider = null;
+    /**
+     * The sequence diagram filter provider implementation.
+     */
     protected ISDFilterProvider sdFilterProvider = null;
+    /**
+     * The extended sequence diagram filter provider implementation.
+     */
     protected IExtendedFilterProvider sdExFilterProvider = null;
+    /**
+     * The extended sequence diagram find provider implementation.
+     */
     protected IExtendedFindProvider sdExFindProvider = null;
+    /**
+     * The extended sequence diagram action bar provider implementation.
+     */
     protected ISDExtendedActionBarProvider sdExtendedActionBarProvider = null;
+    /**
+     * The sequence diagram property provider implementation.
+     */
     protected ISDPropertiesProvider sdPropertiesProvider = null;
-
+    /**
+     * Button for executing the next page action.  
+     */
     protected NextPage nextPageButton = null;
+    /**
+     * Button for executing the previous page action.  
+     */
     protected PrevPage prevPageButton = null;
+    /**
+     * Button for executing the first page page action.  
+     */
     protected FirstPage firstPageButton = null;
+    /**
+     * Button for executing the last page action.  
+     */
     protected LastPage lastPageButton = null;
-
+    /**
+     * The menu manager reference.
+     */
     protected MenuManager menuMgr = null;
-    
+    /**
+     * Flag to indicate whether view needs initialization or not. 
+     */
     protected boolean needInit = true;
+    /**
+     * WaitCursor is the cursor to be displayed when long tasks are running
+     */
+    protected Cursor waitCursor;
+
+    // ------------------------------------------------------------------------
+    // Methods
+    // ------------------------------------------------------------------------
 
     /*
      * (non-Javadoc)
@@ -140,15 +198,13 @@ public class SDView extends ViewPart {
     }
 
     /**
-     * Load a blank page that is supposed to explain that a kind of interaction must be chosen
+     * Load a blank page that is supposed to explain that a kind of interaction must be chosen.
      */
     protected void loadBlank() {
-        IUml2SDLoader l = new IUml2SDLoader() {
+        IUml2SDLoader loader = new IUml2SDLoader() {
             /*
              * (non-Javadoc)
-             * @see
-             * org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader#setViewer(org.eclipse.linuxtools.tmf.ui
-             * .views.uml2sd.SDView)
+             * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader#setViewer(org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView)
              */
             @Override
             public void setViewer(SDView viewer) {
@@ -169,14 +225,14 @@ public class SDView extends ViewPart {
 
             /*
              * (non-Javadoc)
-             * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader#aboutToBeReplaced()
+             * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader#dispose()
              */
             @Override
             public void dispose() {
             }
         };
-        l.setViewer(this);
-        setContentDescription(l.getTitleString());
+        loader.setViewer(this);
+        setContentDescription(loader.getTitleString());
     }
 
     /*
@@ -206,12 +262,14 @@ public class SDView extends ViewPart {
     }
 
     /**
+     * Returns the SD widget.
+     * 
      * @return The SD widget.
      */
     public SDWidget getSDWidget() {
         return sdWidget;
     }
-    
+
     /**
      * Set the find provider for the opened sequence diagram viewer<br>
      * If the provider is not set, the find menu item will not be available in the viewer<br>
@@ -232,7 +290,7 @@ public class SDView extends ViewPart {
             KeyBindingsManager.getInstance().setFindEnabled(false);
         }
     }
-
+    
     /**
      * Set the find provider for the opened sequence diagram viewer<br>
      * If the provider is not set, the find menu item will not be available in the viewer<br>
@@ -385,7 +443,7 @@ public class SDView extends ViewPart {
     }
 
     /**
-     * Set the properties view provider for the opened sequence diagram viewer<br>
+     * Set the properties view provider for the opened sequence diagram viewer
      * 
      * @param provider the properties provider
      */
@@ -394,7 +452,7 @@ public class SDView extends ViewPart {
     }
 
     /**
-     * Returns the current extended action bar provider for the view
+     * Returns the current extended action bar provider for the view.
      * 
      * @return the extended action bar provider
      */
@@ -547,10 +605,11 @@ public class SDView extends ViewPart {
         minMax.setId("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ConfigureMinMax");//$NON-NLS-1$
         bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", minMax); //$NON-NLS-1$
 
-        if ((sdWidget.getFrame() != null) && (sdWidget.getFrame().hasTimeInfo()))
+        if ((sdWidget.getFrame() != null) && (sdWidget.getFrame().hasTimeInfo())) {
             minMax.setEnabled(true);
-        else
+        } else {
             minMax.setEnabled(false);
+        }
 
         // Do we need to display a paging item
         if (sdPagingProvider != null) {
@@ -607,12 +666,15 @@ public class SDView extends ViewPart {
         if (sdExFindProvider != null) {
             Action action = sdExFindProvider.getFindAction();
             if (action != null) {
-                if (action.getId() == null)
+                if (action.getId() == null) {
                     action.setId("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.extendedFind"); //$NON-NLS-1$
-                if (action.getImageDescriptor() == null)
+                }
+                if (action.getImageDescriptor() == null) {
                     action.setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_SEARCH_SEQ));
-                if (action.getText() == null)
+                }
+                if (action.getText() == null) {
                     action.setText(SDMessages._41);
+                }
                 bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", action); //$NON-NLS-1$
                 bar.getToolBarManager().appendToGroup("UML2SD_OTHER_COMMANDS", action); //$NON-NLS-1$
             }
@@ -637,11 +699,13 @@ public class SDView extends ViewPart {
     public void updateCoolBar() {
         if (sdPagingProvider != null) {
             IActionBars bar = getViewSite().getActionBars();
-            if (bar == null)
+            if (bar == null) {
                 return;
+            }
             IToolBarManager barManager = bar.getToolBarManager();
-            if (barManager == null)
+            if (barManager == null) {
                 return;
+            }
             IContributionItem nextPage = barManager.find(NextPage.ID);
             if (nextPage != null && nextPage instanceof ActionContributionItem) {
                 IAction nextPageAction = ((ActionContributionItem) nextPage).getAction();
@@ -711,6 +775,7 @@ public class SDView extends ViewPart {
      * The frame to render (the sequence diagram)
      * 
      * @param frame the frame to display
+     * @param resetPosition boolean Flag whether to reset the position or not.
      */
     protected void setFrame(Frame frame, boolean resetPosition) {
         if (sdWidget == null)
@@ -721,17 +786,19 @@ public class SDView extends ViewPart {
             return;
         }
 
-        IUml2SDLoader l = LoadersManager.getInstance().getCurrentLoader(getViewSite().getId(), this);
+        IUml2SDLoader loader = LoadersManager.getInstance().getCurrentLoader(getViewSite().getId(), this);
 
-        if ((l != null) && (l.getTitleString() != null)) {
-            setContentDescription(l.getTitleString());
+        if ((loader != null) && (loader.getTitleString() != null)) {
+            setContentDescription(loader.getTitleString());
         }
 
-        if (getSDWidget() != null)
+        if (getSDWidget() != null) {
             getSDWidget().setFrame(frame, resetPosition);
+        }
 
-        if (timeCompressionBar != null)
+        if (timeCompressionBar != null) {
             timeCompressionBar.setFrame(frame);
+        }
         updateCoolBar();
         if (!frame.hasTimeInfo()) {
             Composite parent = timeCompressionBar.getParent();
@@ -749,8 +816,9 @@ public class SDView extends ViewPart {
             for (int i = 0; i < items.length; i++) {
                 if (items[i] instanceof ActionContributionItem) {
                     IAction action = ((ActionContributionItem) items[i]).getAction();
-                    if (action != null)
+                    if (action != null) {
                         action.setEnabled(true);
+                    }
                 }
             }
         }
@@ -766,20 +834,22 @@ public class SDView extends ViewPart {
     public void setEnableCommand(String id, boolean value) {
         IContributionItem shortKeysMenu = getViewSite().getActionBars().getMenuManager().find("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers");//$NON-NLS-1$
         MenuManager shortKeys = (MenuManager) shortKeysMenu;
-        if (shortKeys == null)
+        if (shortKeys == null) {
             return;
+        }
         IContributionItem item = shortKeys.find(id);
         if ((item != null) && (item instanceof ActionContributionItem)) {
             IAction action = ((ActionContributionItem) item).getAction();
-            if (action != null)
+            if (action != null) {
                 action.setEnabled(value);
+            }
         }
     }
 
     /**
      * Set the frame from an other thread than the one executing the main loop
      * 
-     * @param frame
+     * @param frame The frame to set (and display)
      */
     public void setFrameSync(final Frame frame) {
         if (getSDWidget() == null || getSDWidget().isDisposed()) {
@@ -800,7 +870,7 @@ public class SDView extends ViewPart {
     /**
      * Ensure an object is visible from an other thread than the one executing the main loop
      * 
-     * @param sm
+     * @param sm The node to make visible in view
      */
     public void ensureVisibleSync(final GraphNode sm) {
         getSDWidget().getDisplay().syncExec(new Runnable() {
@@ -817,7 +887,8 @@ public class SDView extends ViewPart {
     /**
      * Set the frame and ensure an object is visible from an other thread than the one executing the main loop
      * 
-     * @param sm
+     * @param sm The node to make visible in view
+     * @param frame Frame The frame to set
      */
     public void setFrameAndEnsureVisibleSync(final Frame frame, final GraphNode sm) {
         if (getSDWidget() == null || getSDWidget().isDisposed()) {
@@ -837,7 +908,8 @@ public class SDView extends ViewPart {
     /**
      * Set the frame and ensure an object is visible
      * 
-     * @param sm
+     * @param sm The node to make visible in view
+     * @param frame Frame The frame to set
      */
     public void setFrameAndEnsureVisible(Frame frame, GraphNode sm) {
         getSDWidget().clearSelection();
@@ -848,9 +920,9 @@ public class SDView extends ViewPart {
     /**
      * Set the frame and ensure an object is visible from an other thread than the one executing the main loop
      * 
-     * @param frame
-     * @param x
-     * @param y
+     * @param frame The frame to set.
+     * @param x The x coordinate to make visible.
+     * @param y The y coordinate to make visible.
      */
     public void setFrameAndEnsureVisibleSync(final Frame frame, final int x, final int y) {
         if (getSDWidget() == null || getSDWidget().isDisposed()) {
@@ -868,9 +940,9 @@ public class SDView extends ViewPart {
     /**
      * Set the frame and ensure an object is visible
      * 
-     * @param frame
-     * @param x
-     * @param y
+     * @param frame The frame to set.
+     * @param x The x coordinate to make visible.
+     * @param y The y coordinate to make visible.
      */
     public void setFrameAndEnsureVisible(Frame frame, int x, int y) {
         getSDWidget().clearSelection();
@@ -880,14 +952,9 @@ public class SDView extends ViewPart {
     }
 
     /**
-     * waitCursor is the cursor to be displayed when long tasks are running
-     */
-    protected Cursor waitCursor;
-
-    /**
      * Toggle between default and wait cursors from an other thread than the one executing the main loop
      * 
-     * @param wait_
+     * @param wait_ <code>true</code> for wait cursor else <code>false</code> for default cursor. 
      */
     public void toggleWaitCursorAsync(final boolean wait_) {
         if (getSDWidget() == null || getSDWidget().isDisposed()) {
@@ -922,7 +989,7 @@ public class SDView extends ViewPart {
     /**
      * Return the time compression bar widget
      * 
-     * @return the time compression bar
+     * @return the time compression bar 
      */
     public TimeCompressionBar getTimeCompressionBar() {
         return timeCompressionBar;
@@ -931,7 +998,7 @@ public class SDView extends ViewPart {
     /**
      * Returns the current Frame (the sequence diagram container)
      * 
-     * @return the frame
+     * @return the current frame 
      */
     public Frame getFrame() {
         if (getSDWidget() != null) {
@@ -942,16 +1009,21 @@ public class SDView extends ViewPart {
         }
     }
 
+    /**
+     * Restores the loader for the view based on the view ID.
+     * 
+     * @return boolean <code>true</code> if initialization is needed else <code>false</code>.
+     */
     protected boolean restoreLoader() {
         String id = getViewSite().getId();
         // System.err.println("restoreLoader() id="+id);
         if (id == null) {
             return true;
         }
-        IUml2SDLoader l = LoadersManager.getInstance().getCurrentLoader(id, this);
+        IUml2SDLoader loader = LoadersManager.getInstance().getCurrentLoader(id, this);
         // System.err.println("restoreLoader() l="+l);
-        if ((l != null)) {// &&( LoadersManager.getLoadersManager().getViewer(l)==this)){
-            l.setViewer(this);
+        if ((loader != null)) {// &&( LoadersManager.getLoadersManager().getViewer(l)==this)){
+            loader.setViewer(this);
             return false;
         } else {
             loadBlank();
@@ -959,12 +1031,18 @@ public class SDView extends ViewPart {
         }
     }
 
+    /**
+     * Checks if current view is ready to be used.
+     * 
+     * @return boolean <code>true</code> if view is ready else <code>false</code>.
+     */
     protected boolean isViewReady() {
-        IWorkbenchPage persp = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-        if (persp == null)
+        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        if (page == null) {
             return false;
+        }
 
-        IViewReference[] ref = persp.getViewReferences();
+        IViewReference[] ref = page.getViewReferences();
         for (int i = 0; i < ref.length; i++) {
             if (ref[i].getView(false) == this) {
                 return true;
@@ -973,6 +1051,9 @@ public class SDView extends ViewPart {
         return false;
     }
 
+    /**
+     * Creates the menu group.
+     */
     protected void createMenuGroup() {
         IActionBars bar = getViewSite().getActionBars();
         if (bar == null) {
@@ -996,6 +1077,11 @@ public class SDView extends ViewPart {
         bar.getMenuManager().add(new Separator("UML2SD_OTHER_PLUGINS_COMMANDS")); //$NON-NLS-1$
     }
 
+    /*
+     * Gets adapter for this view for properties.
+     * (non-Javadoc)
+     * @see org.eclipse.ui.part.WorkbenchPart#getAdapter(java.lang.Class)
+     */
     @SuppressWarnings("rawtypes")
     @Override
     public Object getAdapter(Class _adapter) {

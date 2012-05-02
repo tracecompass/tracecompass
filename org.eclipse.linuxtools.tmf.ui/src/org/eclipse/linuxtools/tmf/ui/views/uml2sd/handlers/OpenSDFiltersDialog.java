@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: OpenSDFiltersDialog.java,v 1.3 2008/01/24 02:28:52 apnan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -16,28 +17,46 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.dialogs.FilterListDialog;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDFilterProvider;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.widgets.FilterListDialog;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
 
 /**
- * Action delegate for 'Filter' on a message
+ * Action class implementation for 'Filtering' of messages/lifelines.
+ * 
+ * @version 1.0
+ * @author sveyrier
  */
 public class OpenSDFiltersDialog extends Action {
 
     // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    /**
+     * The action ID.
+     */
+    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.sdFilters"; //$NON-NLS-1$
+
+    // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.sdFilters"; //$NON-NLS-1$
-    
+    /**
+     * The sequence diagram view reference
+     */
     protected SDView fView;
+    
+    /**
+     * The filter provider reference
+     */
     protected ISDFilterProvider fProvider;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
     /**
-     * @param view_
+     * Constructor 
+     * 
+     * @param theView The view reference
      */
     public OpenSDFiltersDialog(SDView view_, ISDFilterProvider provider_) {
         super(SDMessages._43);
@@ -49,7 +68,7 @@ public class OpenSDFiltersDialog extends Action {
     }
 
     // ------------------------------------------------------------------------
-    // Operations
+    // Methods
     // ------------------------------------------------------------------------
     /*
      * (non-Javadoc)

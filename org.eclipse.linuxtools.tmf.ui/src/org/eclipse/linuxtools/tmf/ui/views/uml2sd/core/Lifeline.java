@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: Lifeline.java,v 1.3 2008/01/24 02:28:49 apnan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -18,7 +19,7 @@ import java.util.List;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IImage;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
 
 /**
  * Lifeline is the UML2 lifeline graphical representation.<br>
@@ -28,56 +29,92 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.ISDPreferences;
  * occurrences are just integer index. The event occurrences with the same value on different lifelines will correspond
  * the same y coordinate value.
  * 
+ * @version 1.0
  * @author sveyrier
  * 
  */
 public class Lifeline extends GraphNode {
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    /**
+     * The life line tag.
+     */
+    public static final String LIFELINE_TAG = "Lifeline"; //$NON-NLS-1$
 
+    // ------------------------------------------------------------------------
+    // Attribute
+    // ------------------------------------------------------------------------
     /**
      * The lifeline position in the containing frame
      */
     protected int indexInFrame = 0;
-
     /**
      * The frame where the lifeline is drawn
      */
     protected Frame frame = null;
-
     /**
      * The current event occurrence created in the lifeline
      */
     protected int eventOccurrence = 0;
-
-    public static final String LIFELINE_TAG = "Lifeline"; //$NON-NLS-1$
-
+    /**
+     * The lifeline category.
+     */
     protected int category = -1;
-
+    /**
+     * Flag whether lifeline has time information available or not
+     */
     protected boolean hasTime = false;
 
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
+    /**
+     * Default constructor
+     */
+    public Lifeline() {
+        prefId = ISDPreferences.PREF_LIFELINE;
+    }
+
+    // ------------------------------------------------------------------------
+    // Methods
+    // ------------------------------------------------------------------------
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getX()
+     */
     @Override
     public int getX() {
         return Metrics.FRAME_H_MARGIN + Metrics.LIFELINE_H_MAGIN + (indexInFrame - 1) * Metrics.swimmingLaneWidth();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getY()
+     */
     @Override
     public int getY() {
         return 2 * Metrics.FRAME_NAME_H_MARGIN + Metrics.LIFELINE_VT_MAGIN / 2 + Metrics.getFrameFontHeigth() + Metrics.getLifelineHeaderFontHeigth() + Metrics.FRAME_V_MARGIN + 2 * Metrics.LIFELINE_HEARDER_TEXT_V_MARGIN;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getWidth()
+     */
     @Override
     public int getWidth() {
         return Metrics.getLifelineWidth();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getHeight()
+     */
     @Override
     public int getHeight() {
         // Set room for two text lines
         return Metrics.getLifelineFontHeigth()/** 2 */
         + 2 * Metrics.LIFELINE_NAME_H_MARGIN;
-    }
-
-    public Lifeline() {
-        prefId = ISDPreferences.PREF_LIFELINE;
     }
 
     /**
@@ -101,10 +138,12 @@ public class Lifeline extends GraphNode {
             LifelineCategories[] categories = frame.getLifelineCategories();
             if (category < categories.length) {
                 return categories[category].getName() + " " + getName(); //$NON-NLS-1$
-            } else
+            } else {
                 return ""; //$NON-NLS-1$
-        } else
+            }
+        } else {
             return ""; //$NON-NLS-1$
+        }
     }
 
     /**
@@ -114,12 +153,13 @@ public class Lifeline extends GraphNode {
      * @return the first visible Execution Occurrence
      */
     public int getExecOccurrenceDrawIndex() {
-        if (!hasChilden)
+        if (!hasChilden) {
             return 0;
-        if (indexes.get(BasicExecutionOccurrence.EXEC_OCC_TAG) != null)
+        }
+        if (indexes.get(BasicExecutionOccurrence.EXEC_OCC_TAG) != null) {
             return ((Integer) indexes.get(BasicExecutionOccurrence.EXEC_OCC_TAG)).intValue();
-        else
-            return 0;
+        }
+        return 0;
     }
 
     /**
@@ -132,8 +172,9 @@ public class Lifeline extends GraphNode {
         if (hasTime) {
             frame.setHasTimeInfo(true);
         }
-        if (frame.getMaxEventOccurrence() < getEventOccurrence() + 1)
+        if (frame.getMaxEventOccurrence() < getEventOccurrence() + 1) {
             frame.setMaxEventOccurrence(getEventOccurrence() + 1);
+        }
     }
 
     /**
@@ -150,7 +191,6 @@ public class Lifeline extends GraphNode {
      * 
      * @param index the lifeline X position
      */
-
     protected void setIndex(int index) {
         indexInFrame = index;
     }
@@ -173,8 +213,9 @@ public class Lifeline extends GraphNode {
      * @param eventOcc the new current event occurrence
      */
     public void setCurrentEventOccurrence(int eventOcc) {
-        if ((frame != null) && (frame.getMaxEventOccurrence() < eventOcc))
+        if ((frame != null) && (frame.getMaxEventOccurrence() < eventOcc)) {
             frame.setMaxEventOccurrence(eventOcc);
+        }
         eventOccurrence = eventOcc;
     }
 
@@ -206,17 +247,25 @@ public class Lifeline extends GraphNode {
     public void addExecution(BasicExecutionOccurrence exec) {
         exec.setLifeline(this);
         addNode(exec);
-        if ((frame != null) && (frame.getMaxEventOccurrence() < exec.endEventOccurrence))
+        if ((frame != null) && (frame.getMaxEventOccurrence() < exec.endEventOccurrence)) {
             frame.setMaxEventOccurrence(exec.endEventOccurrence);
-    }
-
-    protected void setTimeInfo(boolean value) {
-        hasTime = value;
-        if ((frame != null) && (value == true))
-            frame.setHasTimeInfo(value);
+        }
     }
 
     /**
+     * Set whether lifeline has time information available or not.
+     * @param value The value to set
+     */
+    protected void setTimeInfo(boolean value) {
+        hasTime = value;
+        if ((frame != null) && (value == true)) {
+            frame.setHasTimeInfo(value);
+        }
+    }
+
+    /**
+     * Returns true if at least one execution occurrence has time info.
+     * 
      * @return true if at least one execution occurrence has time info
      */
     public boolean hasTimeInfo() {
@@ -224,17 +273,21 @@ public class Lifeline extends GraphNode {
     }
 
     /**
-     * Returns the list of execution occurrence on this lifeline
+     * Returns the list of execution occurrence on this lifeline.
      * 
      * @return the execution occurrence list
      */
     public List<GraphNode> getExecutions() {
-        if (hasChilden)
+        if (hasChilden) {
             return (List<GraphNode>) nodes.get(BasicExecutionOccurrence.EXEC_OCC_TAG);
-        else
-            return new ArrayList<GraphNode>();
+        }
+        return new ArrayList<GraphNode>();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#contains(int, int)
+     */
     @Override
     public boolean contains(int _x, int _y) {
         int x = getX();
@@ -242,8 +295,9 @@ public class Lifeline extends GraphNode {
         int width = getWidth();
         int height = getHeight();
 
-        if (frame == null)
+        if (frame == null) {
             return false;
+        }
         if (Frame.contains(x, y, width, height, _x, _y)) {
             return true;
         }
@@ -257,36 +311,45 @@ public class Lifeline extends GraphNode {
 
         if (hMargin >= 2) {
             if (frame.getVisibleAreaY() < y - height - hMargin) {
-                if (Frame.contains(x - Metrics.LIFELINE_SPACING / 2 + 1, y - height - hMargin, Metrics.swimmingLaneWidth() - 2, height + 1, _x, _y))
+                if (Frame.contains(x - Metrics.LIFELINE_SPACING / 2 + 1, y - height - hMargin, Metrics.swimmingLaneWidth() - 2, height + 1, _x, _y)) {
                     return true;
+                }
             } else {
-                if (Frame.contains(x - Metrics.LIFELINE_SPACING / 2 + 1, frame.getVisibleAreaY(), Metrics.swimmingLaneWidth() - 2, height, _x, _y))
+                if (Frame.contains(x - Metrics.LIFELINE_SPACING / 2 + 1, frame.getVisibleAreaY(), Metrics.swimmingLaneWidth() - 2, height, _x, _y)) {
                     return true;
+                }
             }
         }
-        if (getNodeAt(_x, _y) != null)
+        if (getNodeAt(_x, _y) != null) {
             return true;
+        }
         return false;
     }
 
     /**
      * Returns the lifeline visibility for the given visible area
      * 
-     * @param vx
-     * @param vy
-     * @param vwidth
-     * @param vheight
+     * @param vx The x coordinate of the visible area
+     * @param vy The y coordinate of the visible area
+     * @param vwidth The width of the visible area
+     * @param vheight The height of the visible area
      * @return true if visible false otherwise
      */
     @Override
     public boolean isVisible(int vx, int vy, int vwidth, int vheight) {
         int x = getX();
         int width = getWidth();
-        if (((x >= vx) && (x <= vx + vwidth)) || ((x + width >= vx) && (x <= vx)))
+        if (((x >= vx) && (x <= vx + vwidth)) || ((x + width >= vx) && (x <= vx))) {
             return true;
+        }
         return false;
     }
 
+    /**
+     * Draws the name within the graphical context. 
+     * 
+     * @param context The graphical context.
+     */
     protected void drawName(IGC context) {
         int x = getX();
         int y = getY();
@@ -332,8 +395,9 @@ public class Lifeline extends GraphNode {
             if (Frame.getUserPref().useGradienColor()) {
                 context.setGradientColor(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_LIFELINE));
                 context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_FRAME));
-            } else
+            } else {
                 context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_LIFELINE));
+            }
             context.setForeground(Frame.getUserPref().getForeGroundColor(ISDPreferences.PREF_LIFELINE));
         }
         // Store the lifeline coordinates to save some calls
@@ -345,16 +409,18 @@ public class Lifeline extends GraphNode {
             context.fillGradientRectangle(x, y, width, height / 2 - 7, true);
             context.fillRectangle(x, y + height / 2 - 8, width, +height / 2 - 5);
             context.fillGradientRectangle(x, y + height, width, -height / 2 + 6, true);
-        } else
+        } else {
             context.fillRectangle(x, y, width, height);
+        }
         context.drawRectangle(x, y, width, height);
 
         if (category >= 0) {
             LifelineCategories[] categories = frame.getLifelineCategories();
             if (category < categories.length) {
                 IImage image = categories[category].getImage();
-                if (image != null)
+                if (image != null) {
                     context.drawImage(image, x, y, width, height);
+                }
             }
         }
 
@@ -393,8 +459,9 @@ public class Lifeline extends GraphNode {
 
         context.setLineStyle(context.getLineSolidStyle());
 
-        if (hasFocus())
+        if (hasFocus()) {
             drawFocus(context);
+        }
 
         super.drawChildenNodes(context);
     }
@@ -418,16 +485,28 @@ public class Lifeline extends GraphNode {
         context.setBackground(backupColor);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#draw(org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC)
+     */
     @Override
     public void draw(IGC context) {
         draw(context, getX(), getY());
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getArrayId()
+     */
     @Override
     public String getArrayId() {
         return LIFELINE_TAG;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#positiveDistanceToPoint(int, int)
+     */
     @Override
     public boolean positiveDistanceToPoint(int x, int y) {
         if (getX() > x - Metrics.swimmingLaneWidth())
@@ -435,6 +514,10 @@ public class Lifeline extends GraphNode {
         return false;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getNodeAt(int, int)
+     */
     @Override
     public GraphNode getNodeAt(int x, int y) {
         int vy = 0;
@@ -442,25 +525,29 @@ public class Lifeline extends GraphNode {
         if (getFrame() != null) {
             vy = getFrame().getVisibleAreaY();
             vh = getFrame().getVisibleAreaHeight();
-        } else
+        } else {
             return null;
-        if (getExecutions() == null)
+        }
+        if (getExecutions() == null) {
             return null;
+        }
         for (int i = getExecOccurrenceDrawIndex(); i < getExecutions().size(); i++) {
             GraphNode node = (GraphNode) getExecutions().get(i);
             if (node.getHeight() < 0) {
-                if (node.getY() + node.getHeight() > vy + vh)
+                if (node.getY() + node.getHeight() > vy + vh) {
                     break;
+                }
             } else {
-                if (node.getY() > vy + vh)
+                if (node.getY() > vy + vh) {
                     break;
+                }
             }
             if (node.contains(x, y)) {
                 GraphNode internal = node.getNodeAt(x, y);
-                if (internal != null)
+                if (internal != null) {
                     return internal;
-                else
-                    return node;
+                }
+                return node;
             }
         }
         return null;

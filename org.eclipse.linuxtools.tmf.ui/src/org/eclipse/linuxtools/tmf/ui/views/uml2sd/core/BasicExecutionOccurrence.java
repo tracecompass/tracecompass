@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2006, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: BasicExecutionOccurrence.java,v 1.2 2006/09/20 20:56:25 ewchan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -14,54 +15,102 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
 
 /**
  * BasicExecutionOccurrence is the UML2 execution occurrence graphical representation. It is attached to one Lifeline,
  * the event occurrence "duration" along the lifeline is defined by two event occurrences
  * 
  * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Lifeline Lifeline for more event occurence details
+ * @version 1.0 
  * @author sveyrier
  * 
  */
 public class BasicExecutionOccurrence extends GraphNode {
 
-    protected Lifeline lifeline = null;
-
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    /**
+     * The grahNode ID constant
+     */
     public static final String EXEC_OCC_TAG = "Execution_Occ"; //$NON-NLS-1$
 
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+
+    /**
+     * The corresponding lifeline. 
+     */
+    protected Lifeline lifeline = null;
+
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
+    /**
+     * Default constructore
+     */
     public BasicExecutionOccurrence() {
         prefId = ISDPreferences.PREF_EXEC;
     }
 
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getX()
+     */
     @Override
     public int getX() {
-        if (lifeline == null)
+        if (lifeline == null) {
             return 0;
+        }
         return lifeline.getX() + Metrics.getLifelineWidth() / 2 - Metrics.EXECUTION_OCCURRENCE_WIDTH / 2;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getY()
+     */
     @Override
     public int getY() {
-        if (lifeline == null)
+        if (lifeline == null) {
             return 0;
+        }
         return lifeline.getY() + lifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * startEventOccurrence;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getWidth()
+     */
     @Override
     public int getWidth() {
-        if (lifeline == null)
+        if (lifeline == null) {
             return 0;
+        }
         return Metrics.EXECUTION_OCCURRENCE_WIDTH;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getHeight()
+     */
     @Override
     public int getHeight() {
-        if (lifeline == null)
+        if (lifeline == null) {
             return 0;
+        }
         return ((Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing())) * (endEventOccurrence - startEventOccurrence);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#contains(int, int)
+     */
     @Override
     public boolean contains(int _x, int _y) {
         int x = getX();
@@ -73,17 +122,23 @@ public class BasicExecutionOccurrence extends GraphNode {
             return true;
         }
 
-        if (getNodeAt(_x, _y) != null)
+        if (getNodeAt(_x, _y) != null) {
             return true;
+        }
         return false;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getName()
+     */
     @Override
     public String getName() {
-        if (super.getName() == null || super.getName().equals("")) //$NON-NLS-1$
+        if (super.getName() == null || super.getName().equals("")) { //$NON-NLS-1$
             return lifeline.getToolTipText();
-        else
+        } else {
             return super.getName();
+        }
     }
 
     /**
@@ -142,6 +197,10 @@ public class BasicExecutionOccurrence extends GraphNode {
         endEventOccurrence = occurrence;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#draw(org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC)
+     */
     @Override
     public void draw(IGC context) {
         int x = getX();
@@ -158,10 +217,11 @@ public class BasicExecutionOccurrence extends GraphNode {
         } else {
             tempFillColor = setUnselectedFillColor(context);
         }
-        if (Frame.getUserPref().useGradienColor())
+        if (Frame.getUserPref().useGradienColor()) {
             context.fillGradientRectangle(x, y, width, height, false);
-        else
+        } else {
             context.fillRectangle(x, y, width, height);
+        }
         tempStrokeColor = setUnselectedStrokeColor(context);
         context.drawRectangle(x, y, width, height);
         if (tempFillColor != null) {
@@ -172,8 +232,9 @@ public class BasicExecutionOccurrence extends GraphNode {
             tempStrokeColor.dispose();
             tempStrokeColor = null;
         }
-        if (hasFocus())
+        if (hasFocus()) {
             drawFocus(context);
+        }
         super.drawChildenNodes(context);
     }
 
@@ -187,8 +248,9 @@ public class BasicExecutionOccurrence extends GraphNode {
         if (Frame.getUserPref().useGradienColor()) {
             context.setGradientColor(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_EXEC));
             context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_FRAME));
-        } else
+        } else {
             context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_EXEC));
+        }
         return null;
     }
 
@@ -203,29 +265,45 @@ public class BasicExecutionOccurrence extends GraphNode {
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getArrayId()
+     */
     @Override
     public String getArrayId() {
         return EXEC_OCC_TAG;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#positiveDistanceToPoint(int, int)
+     */
     @Override
     public boolean positiveDistanceToPoint(int x, int y) {
-        if (getY() + getHeight() > y)
+        if (getY() + getHeight() > y) {
             return true;
+        }
         return false;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#isVisible(int, int, int, int)
+     */
     @Override
     public boolean isVisible(int x, int y, int width, int height) {
         if ((getLifeline() != null) && (getLifeline().isVisible(x, y, width, height))) {
             int ly = getY();
             int lh = getHeight();
-            if (ly >= y && ly < y + height)
+            if (ly >= y && ly < y + height) {
                 return true;
-            if (ly + lh > y && ly + lh <= y + height)
+            }
+            if (ly + lh > y && ly + lh <= y + height) {
                 return true;
-            if ((ly < y) && (ly + lh > y + height))
+            }
+            if ((ly < y) && (ly + lh > y + height)) {
                 return true;
+            }
         }
         return false;
     }

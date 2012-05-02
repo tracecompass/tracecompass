@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2006, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: SortAsyncMessageComparator.java,v 1.2 2006/09/20 20:56:27 ewchan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -24,20 +25,26 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode;
  * 
  * Used to order the AsyncMessage list insuring that next node has one of his ends greater than the current node
  * 
+ * @version 1.0
  * @author sveyrier
  * 
  */
 public class SortAsyncMessageComparator implements Comparator<GraphNode>, Serializable {
 
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
     /**
      * Serial version UID
      */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Compares two synchronous syncMessages Returns 0 (equal) if one of the message is not synchronous
-     * 
-     * @return 1 if arg0 is greater, 0 if equal, -1 otherwise
+    // ------------------------------------------------------------------------
+    // Methods
+    // ------------------------------------------------------------------------
+    /*
+     * (non-Javadoc)
+     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
     @Override
     public int compare(GraphNode arg0, GraphNode arg1) {
@@ -47,39 +54,46 @@ public class SortAsyncMessageComparator implements Comparator<GraphNode>, Serial
             int m1Min, m2Min;
             // AsyncMessage has two ends which may have different event occurrences
             // Search for the smaller event occurrence for each messages
-            if (m1.getStartOccurrence() > m1.getEndOccurrence())
+            if (m1.getStartOccurrence() > m1.getEndOccurrence()) {
                 m1Min = m1.getEndOccurrence();
-            else
+            } else {
                 m1Min = m1.getStartOccurrence();
-            if (m2.getStartOccurrence() > m2.getEndOccurrence())
+            }
+            if (m2.getStartOccurrence() > m2.getEndOccurrence()) {
                 m2Min = m2.getEndOccurrence();
-            else
+            } else {
                 m2Min = m2.getStartOccurrence();
+            }
 
             int m1Max, m2Max;
             // Search for the greater event occurrence for each messages
-            if (m1.getStartOccurrence() > m1.getEndOccurrence())
+            if (m1.getStartOccurrence() > m1.getEndOccurrence()) {
                 m1Max = m1.getStartOccurrence();
-            else
+            } else {
                 m1Max = m1.getEndOccurrence();
-            if (m2.getStartOccurrence() > m2.getEndOccurrence())
+            }
+            if (m2.getStartOccurrence() > m2.getEndOccurrence()) {
                 m2Max = m2.getStartOccurrence();
-            else
+            } else {
                 m2Max = m2.getEndOccurrence();
+            }
 
-            if (m1Min > m2Min)
+            if (m1Min > m2Min) {
                 return 1;
-            else if ((m1Min == m2Min))
-                if (m1Max == m2Max)
+            } else if ((m1Min == m2Min)) {
+                if (m1Max == m2Max) {
                     return 0;
-                else if (m1Max > m2Max)
+                } else if (m1Max > m2Max) {
                     return -1;
-                else
+                } else {
                     return 1;
-            else
+                }
+            } else {
                 return -1;
-        } else
+            }
+        } else {
             return 0;
+        }
     }
 
 }

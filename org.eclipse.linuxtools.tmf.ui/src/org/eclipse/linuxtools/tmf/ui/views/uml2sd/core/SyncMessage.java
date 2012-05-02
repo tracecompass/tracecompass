@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2006, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: SyncMessage.java,v 1.2 2006/09/20 20:56:25 ewchan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -17,7 +18,7 @@ import java.util.Comparator;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SortSyncMessageComparator;
 
 /**
@@ -46,28 +47,51 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SortSyncMessageComparator
  * </pre>
  * 
  * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Lifeline Lifeline for more event occurence details
+ * @version 1.0
  * @author sveyrier
  * 
  */
 public class SyncMessage extends BaseMessage implements ITimeRange {
 
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    /**
+     * The graphNode ID
+     */
+    public static final String SYNC_MESS_TAG = "SyncMessage"; //$NON-NLS-1$
+
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+
     /**
      * The associated message return
      */
     protected SyncMessageReturn messageReturn;
-
     /**
      * The time when the message occurs
      */
     protected ITmfTimestamp eventTime = new TmfTimestamp();
-
-    public static final String SYNC_MESS_TAG = "SyncMessage"; //$NON-NLS-1$
-
+    /**
+     * Flag whether the message has time information available or not
+     */
     protected boolean hasTime = false;
 
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
+
+    /**
+     * Default constructor
+     */
     public SyncMessage() {
         prefId = ISDPreferences.PREF_SYNC_MESS;
     }
+
+    // ------------------------------------------------------------------------
+    // Methods
+    // ------------------------------------------------------------------------
 
     /**
      * Ensure both lifelines have the same event occurrence (the greater found on each lifeline)
@@ -75,10 +99,11 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
     protected void syncLifelinesEventOccurrence() {
         if ((getStartLifeline() != null) && (getEndLifeline() != null)) {
             int newIndex = 0;
-            if (getStartLifeline().getEventOccurrence() > getEndLifeline().getEventOccurrence())
+            if (getStartLifeline().getEventOccurrence() > getEndLifeline().getEventOccurrence()) {
                 newIndex = getStartLifeline().getEventOccurrence();
-            else
+            } else {
                 newIndex = getEndLifeline().getEventOccurrence();
+            }
             getStartLifeline().setCurrentEventOccurrence(newIndex);
             getEndLifeline().setCurrentEventOccurrence(newIndex);
             setEventOccurrence(getStartLifeline().getEventOccurrence());
@@ -126,8 +151,9 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
         super.setStartLifeline(lifeline);
         if ((getEndLifeline() == null)) {
             setEventOccurrence(getStartLifeline().getEventOccurrence());
-        } else
+        } else {
             syncLifelinesEventOccurrence();
+        }
     }
 
     /**
@@ -143,8 +169,9 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
         super.setEndLifeline(lifeline);
         if ((getStartLifeline() == null)) {
             setEventOccurrence(getEndLifeline().getEventOccurrence());
-        } else
+        } else {
             syncLifelinesEventOccurrence();
+        }
     }
 
     /**
@@ -185,42 +212,49 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
     public void setTime(ITmfTimestamp time) {
         eventTime = time.clone();
         hasTime = true;
-        if (getStartLifeline() != null && getStartLifeline().getFrame() != null)
+        if (getStartLifeline() != null && getStartLifeline().getFrame() != null) {
             getStartLifeline().getFrame().setHasTimeInfo(true);
-        else if (getEndLifeline() != null && getEndLifeline().getFrame() != null)
+        } else if (getEndLifeline() != null && getEndLifeline().getFrame() != null) {
             getEndLifeline().getFrame().setHasTimeInfo(true);
+        }
     }
 
-    /**
-     * Returns the time when the message begin
-     * 
-     * @return the time
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.ITimeRange#getEndTime()
      */
     @Override
     public ITmfTimestamp getEndTime() {
         return eventTime;
     }
 
-    /**
-     * Returns the time when the message end
-     * 
-     * @return the time
-     */
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.ITimeRange#getStartTime()
+     */ 
     @Override
     public ITmfTimestamp getStartTime() {
         return eventTime;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.ITimeRange#hasTimeInfo()
+     */ 
     @Override
     public boolean hasTimeInfo() {
         return hasTime;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BaseMessage#draw(org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC)
+     */
     @Override
     public void draw(IGC context) {
         if (!isVisible())
             return;
-        // Draw it selected?*/
+        // Draw it selected?
         if (!isSelected()) {
             context.setBackground(Frame.getUserPref().getBackGroundColor(prefId));
             context.setForeground(Frame.getUserPref().getForeGroundColor(prefId));
@@ -228,37 +262,56 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
         super.draw(context);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BaseMessage#isVisible(int, int, int, int)
+     */
     @Override
     public boolean isVisible(int x, int y, int width, int height) {
         if (getY() > y + height +
-        // take into account the message name drawn above the arrow
-                Metrics.MESSAGES_NAME_SPACING + Metrics.getMessageFontHeigth())
+                // take into account the message name drawn above the arrow
+                Metrics.MESSAGES_NAME_SPACING + Metrics.getMessageFontHeigth()) {
             return false;
+        }
 
         // UML2 lost/found message visibility special case
         // Others visibility cases are perform in the ***common*** case
         if ((endLifeline == null && startLifeline != null) || (endLifeline != null && startLifeline == null)) {
-            if (x + width > getX() + getWidth() && x < getX() + getWidth())
+            if (x + width > getX() + getWidth() && x < getX() + getWidth()) {
                 return true;
+            }
         }
         // ***Common*** syncMessages visibility
         return super.isVisible(x, y, width, height);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getComparator()
+     */
     @Override
     public Comparator<GraphNode> getComparator() {
         return new SortSyncMessageComparator();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getArrayId()
+     */
     @Override
     public String getArrayId() {
         return SYNC_MESS_TAG;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#positiveDistanceToPoint(int, int)
+     */
     @Override
     public boolean positiveDistanceToPoint(int x, int y) {
-        if (getY() > y)
+        if (getY() > y) {
             return true;
+        }
         return false;
     }
 }

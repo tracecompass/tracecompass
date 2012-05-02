@@ -13,24 +13,40 @@ package org.eclipse.linuxtools.tmf.core.uml2sd;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 
+/**
+ * <p>
+ * Interface for synchronous sequence diagram events. 
+ * </p>
+ * 
+ * @version 1.0
+ * @author Bernd Hufmann
+ */
 public interface ITmfSyncSequenceDiagramEvent {
     
     /**
+     * Returns Name of message.
+     * 
      * @return Name of message
      */
     public String getName();
     
     /**
+     * Returns name of sender of message.
+     * 
      * @return name of sender of message
      */
     public String getSender();
     
     /**
+     * Returns Name of receiver of message.
+     * 
      * @return Name of receiver of message
      */
     public String getReceiver();
 
     /**
+     * Returns Start time of message (i.e. send time).
+     * 
      * @return Start timestamp of message (i.e. send time)
      */
     public ITmfTimestamp getStartTime();

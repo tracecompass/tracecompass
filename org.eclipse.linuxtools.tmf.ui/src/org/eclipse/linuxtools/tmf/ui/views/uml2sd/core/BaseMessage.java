@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: BaseMessage.java,v 1.3 2008/01/24 02:28:49 apnan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -14,7 +15,7 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
 
 /**
  * The base UML2 syncMessages implementation.<br>
@@ -26,28 +27,44 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.ISDPreferences;
  * <br>
  * 
  * @see Lifeline Lifeline for more event occurence details
+ * @version 1.0
  * @author sveyrier
  */
 public abstract class BaseMessage extends GraphNode {
-
+    
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
     /**
      * The lifeline which send the message
      */
     protected Lifeline startLifeline = null;
-
     /**
      * The lifeline which receive the message
      */
     protected Lifeline endLifeline = null;
-
+    /**
+     * The visiblitiy flag. 
+     */
     protected boolean visible = true;
 
+    // ------------------------------------------------------------------------
+    // Methods
+    // ------------------------------------------------------------------------
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getX()
+     */
     @Override
     public int getX() {
         // returns the exact x coordinate
         return getX(false);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getY()
+     */
     @Override
     public int getY() {
         /*
@@ -80,12 +97,20 @@ public abstract class BaseMessage extends GraphNode {
         return 0;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getWidth()
+     */
     @Override
     public int getWidth() {
         // Returns the exact width
         return getWidth(false);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getHeight()
+     */
     @Override
     public int getHeight() {
         return 0;
@@ -121,8 +146,9 @@ public abstract class BaseMessage extends GraphNode {
             }
         }
 
-        if (quick)
+        if (quick) {
             return x;
+        }
 
         if ((startLifeline != null) && (endLifeline != null) && (startLifeline.getX() > endLifeline.getX())) {
             activationWidth = -activationWidth;
@@ -154,10 +180,11 @@ public abstract class BaseMessage extends GraphNode {
         int width = 0;
         int activationWidth = Metrics.EXECUTION_OCCURRENCE_WIDTH / 2;
         if ((startLifeline != null) && (endLifeline != null)) {
-            if (startLifeline == endLifeline)
+            if (startLifeline == endLifeline) {
                 width = Metrics.INTERNAL_MESSAGE_WIDTH + Metrics.EXECUTION_OCCURRENCE_WIDTH;
-            else
+            } else {
                 width = endLifeline.getX() + Metrics.getLifelineWidth() / 2 - getX(true);
+            }
         } else {
             if (startLifeline != null) {
                 width = Metrics.swimmingLaneWidth() / 2;
@@ -167,42 +194,59 @@ public abstract class BaseMessage extends GraphNode {
             }
         }
 
-        if (quick)
+        if (quick) {
             return width;
+        }
 
         if ((startLifeline != null) && (endLifeline != null) && (startLifeline.getX() > endLifeline.getX())) {
             activationWidth = -activationWidth;
         }
 
-        if (isMessageStartInActivation(endEventOccurrence))
+        if (isMessageStartInActivation(endEventOccurrence)) {
             width = width - activationWidth;
+        }
 
-        if (isMessageEndInActivation(endEventOccurrence))
+        if (isMessageEndInActivation(endEventOccurrence)) {
             width = width - activationWidth;
+        }
 
         return width;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#isVisible(int, int, int, int)
+     */
     @Override
     public boolean isVisible(int x, int y, int width, int height) {
         // ***Common*** syncMessages visibility
         // draw the message only if at least one end is visible
-        if (endLifeline != null && (endLifeline.isVisible(x, y, width, height)) || (startLifeline != null && startLifeline.isVisible(x, y, width, height)))
+        if (endLifeline != null && (endLifeline.isVisible(x, y, width, height)) || (startLifeline != null && startLifeline.isVisible(x, y, width, height))) {
             return true;
+        }
         // In this case it can be a message which cross the whole visible area
         else if (endLifeline != null && (!endLifeline.isVisible(x, y, width, height)) && (startLifeline != null && !startLifeline.isVisible(x, y, width, height))) {
-            if (endLifeline.getX() > x + width && startLifeline.getX() < x)
+            if (endLifeline.getX() > x + width && startLifeline.getX() < x) {
                 return true;
-            else if (startLifeline.getX() > x + width && endLifeline.getX() < x)
+            } else if (startLifeline.getX() > x + width && endLifeline.getX() < x) {
                 return true;
+            }
         }
         return false;
     }
 
+    /**
+     * Sets the visibility value.
+     * 
+     * @param value The visibility to set.
+     */
     public void setVisible(boolean value) {
         visible = value;
     }
 
+    /**
+     * @return the visibility value. 
+     */
     public boolean isVisible() {
         return visible;
     }
@@ -282,12 +326,14 @@ public abstract class BaseMessage extends GraphNode {
             int thisY = getY();
             for (int i = 0; i < startLifeline.getExecutions().size(); i++) {
                 BasicExecutionOccurrence toDraw = (BasicExecutionOccurrence) startLifeline.getExecutions().get(i);
-                if ((event >= toDraw.startEventOccurrence) && (event <= toDraw.endEventOccurrence))
+                if ((event >= toDraw.startEventOccurrence) && (event <= toDraw.endEventOccurrence)) {
                     inActivation = true;
+                }
                 // if we are outside the visible area we stop right now
                 // This works because execution occurrences are ordered along the Y axis
-                if (toDraw.getY() > thisY)
+                if (toDraw.getY() > thisY) {
                     break;
+                }
             }
         }
         return inActivation;
@@ -310,19 +356,22 @@ public abstract class BaseMessage extends GraphNode {
             // for drawing speed reason with only search on the visivle subset
             for (int i = 0; i < endLifeline.getExecutions().size(); i++) {
                 BasicExecutionOccurrence toDraw = (BasicExecutionOccurrence) endLifeline.getExecutions().get(i);
-                if ((event >= toDraw.startEventOccurrence) && (event <= toDraw.endEventOccurrence))
+                if ((event >= toDraw.startEventOccurrence) && (event <= toDraw.endEventOccurrence)) {
                     inActivation = true;
+                }
                 // if we are outside the visible area we stop right now
                 // This works because execution occurrences are ordered along the Y axis
-                if (toDraw.getY() > getY())
+                if (toDraw.getY() > getY()) {
                     break;
+                }
             }
         }
         return inActivation;
     }
 
-    /**
-     * Returns true if the message or the message label contains the point given in parameter
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#contains(int, int)
      */
     @Override
     public boolean contains(int _x, int _y) {
@@ -341,35 +390,46 @@ public abstract class BaseMessage extends GraphNode {
              * rectangle width is negative.
              */
             if (getName().length() * Metrics.getAverageCharWidth() > Metrics.swimmingLaneWidth() - Metrics.EXECUTION_OCCURRENCE_WIDTH / 2 + -Metrics.INTERNAL_MESSAGE_WIDTH) {
-                if (Frame.contains(x + Metrics.INTERNAL_MESSAGE_WIDTH + 10, y, Metrics.swimmingLaneWidth() - Metrics.EXECUTION_OCCURRENCE_WIDTH / 2 + -Metrics.INTERNAL_MESSAGE_WIDTH, Metrics.getMessageFontHeigth(), _x, _y))
+                if (Frame.contains(x + Metrics.INTERNAL_MESSAGE_WIDTH + 10, y, Metrics.swimmingLaneWidth() - Metrics.EXECUTION_OCCURRENCE_WIDTH / 2 + -Metrics.INTERNAL_MESSAGE_WIDTH, Metrics.getMessageFontHeigth(), _x, _y)) {
                     return true;
+                }
             } else {
-                if (Frame.contains(x + Metrics.INTERNAL_MESSAGE_WIDTH + 10, y, getName().length() * Metrics.getAverageCharWidth(), Metrics.getMessageFontHeigth(), _x, _y))
+                if (Frame.contains(x + Metrics.INTERNAL_MESSAGE_WIDTH + 10, y, getName().length() * Metrics.getAverageCharWidth(), Metrics.getMessageFontHeigth(), _x, _y)) {
                     return true;
+                }
             }
 
             // Test if the point is in part 1 of the self message
             // see: "private void drawMessage (NGC context)" method for self message drawing schema
-            if (Frame.contains(x, y - Metrics.MESSAGE_SELECTION_TOLERANCE / 2, Metrics.INTERNAL_MESSAGE_WIDTH / 2, Metrics.MESSAGE_SELECTION_TOLERANCE, _x, _y))
+            if (Frame.contains(x, y - Metrics.MESSAGE_SELECTION_TOLERANCE / 2, Metrics.INTERNAL_MESSAGE_WIDTH / 2, Metrics.MESSAGE_SELECTION_TOLERANCE, _x, _y)) {
                 return true;
+            }
 
             // Test if the point is in part 3 of the self message
-            if (Frame.contains(x + Metrics.INTERNAL_MESSAGE_WIDTH - Metrics.MESSAGE_SELECTION_TOLERANCE / 2, y, Metrics.MESSAGE_SELECTION_TOLERANCE, height + Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT, _x, _y))
+            if (Frame.contains(x + Metrics.INTERNAL_MESSAGE_WIDTH - Metrics.MESSAGE_SELECTION_TOLERANCE / 2, y, Metrics.MESSAGE_SELECTION_TOLERANCE, height + Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT, _x, _y)) {
                 return true;
+            }
 
             // Test if the point is in part 5 of the self message
-            if (Frame.contains(x, y + height - Metrics.MESSAGE_SELECTION_TOLERANCE / 2 + Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT, Metrics.INTERNAL_MESSAGE_WIDTH / 2, Metrics.MESSAGE_SELECTION_TOLERANCE, _x, _y))
+            if (Frame.contains(x, y + height - Metrics.MESSAGE_SELECTION_TOLERANCE / 2 + Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT, Metrics.INTERNAL_MESSAGE_WIDTH / 2, Metrics.MESSAGE_SELECTION_TOLERANCE, _x, _y)) {
                 return true;
+            }
 
             // false otherwise
             return false;
         }
-        if (Frame.contains(x, y - tempHeight, width, tempHeight, _x, _y))
+        if (Frame.contains(x, y - tempHeight, width, tempHeight, _x, _y)) {
             return true;
+        }
         // false otherwise
         return false;
     }
 
+    /**
+     * Method to draw the message using the graphical context.
+     * 
+     * @param context A graphical context to draw in.
+     */
     protected void drawMessage(IGC context) {
         int fX, fY, fW, fH;
         fX = fY = fW = fH = 0;
@@ -391,8 +451,9 @@ public abstract class BaseMessage extends GraphNode {
             context.drawTextTruncatedCentred(getName(), x, y - Metrics.getMessageFontHeigth() - 2 * Metrics.MESSAGES_NAME_SPACING, width, 2 * Metrics.MESSAGES_NAME_SPACING + Metrics.getMessageFontHeigth(), !isSelected());
             context.setForeground(temp);
             int margin = 0;
-            if (endLifeline == null)
+            if (endLifeline == null) {
                 margin = Metrics.MESSAGE_CIRCLE_RAY;
+            }
 
             // Draw the message main line
             context.drawLine(x, y, x + width, y + height);
@@ -421,12 +482,14 @@ public abstract class BaseMessage extends GraphNode {
 
             // Draw a circle at the message end (endLifeline side)
             int ray = Metrics.MESSAGE_CIRCLE_RAY;
-            if (context.getLineWidth() != Metrics.NORMAL_LINE_WIDTH)
+            if (context.getLineWidth() != Metrics.NORMAL_LINE_WIDTH) {
                 ray = ray + Metrics.SELECTION_LINE_WIDTH - Metrics.NORMAL_LINE_WIDTH;
-            if (startLifeline == null)
+            }
+            if (startLifeline == null) {
                 context.fillOval(x - ray, y - ray, ray * 2, ray * 2);
-            else
+            } else {
                 context.fillOval(x + width - ray, y + height - ray, ray * 2, ray * 2);
+            }
             context.setBackground(storedColor);
             context.setForeground(Frame.getUserPref().getFontColor(prefId));
             fX = x;
@@ -440,8 +503,9 @@ public abstract class BaseMessage extends GraphNode {
              * Self syncMessages are drawn in 5 parts 1 -----------+ + 2 + | | | 3 | + 5 + 4 -----------+
              */
             int tempy = Metrics.INTERNAL_MESSAGE_WIDTH / 2;
-            if (Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT <= Metrics.INTERNAL_MESSAGE_WIDTH)
+            if (Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT <= Metrics.INTERNAL_MESSAGE_WIDTH) {
                 tempy = Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT / 2;
+            }
 
             // Part 1
             context.drawLine(x, y, x + Metrics.INTERNAL_MESSAGE_WIDTH / 2, y);
@@ -489,12 +553,13 @@ public abstract class BaseMessage extends GraphNode {
 
             // the space available for the text is sorter if are drawing internal message on the last lifeline
             context.setForeground(Frame.getUserPref().getFontColor(prefId));
-            if (startLifeline.getIndex() == startLifeline.getFrame().getHorizontalIndex())
+            if (startLifeline.getIndex() == startLifeline.getFrame().getHorizontalIndex()) {
                 context.drawTextTruncated(getName(), x + width + Metrics.INTERNAL_MESSAGE_V_MARGIN / 2, y, Metrics.swimmingLaneWidth() / 2 - Metrics.EXECUTION_OCCURRENCE_WIDTH + -Metrics.INTERNAL_MESSAGE_WIDTH, +Metrics.MESSAGES_NAME_SPACING
                         - Metrics.getMessageFontHeigth(), !isSelected());
-            else
+            } else {
                 context.drawTextTruncated(getName(), x + width + Metrics.INTERNAL_MESSAGE_V_MARGIN / 2, y, Metrics.swimmingLaneWidth() - Metrics.EXECUTION_OCCURRENCE_WIDTH + -Metrics.INTERNAL_MESSAGE_WIDTH,
                         +Metrics.MESSAGES_NAME_SPACING - Metrics.getMessageFontHeigth(), !isSelected());
+            }
         }
         // it is regular message
         else if (startLifeline != null && endLifeline != null) {
@@ -508,8 +573,9 @@ public abstract class BaseMessage extends GraphNode {
             double angle = Math.atan(a / b);
             // Compute the coordinates of the two little lines which make the arrow part of the message
             int sign = 1;
-            if (spaceBTWStartEnd < 0)
+            if (spaceBTWStartEnd < 0) {
                 sign = -1;
+            }
             Double x1 = new Double(sign * Math.cos(angle - 0.75) * 7);
             Double y1 = new Double(sign * Math.sin(angle - 0.75) * 7);
             Double x2 = new Double(sign * Math.cos(angle + 0.75) * 7);
@@ -552,17 +618,23 @@ public abstract class BaseMessage extends GraphNode {
             // The label is truncated if it cannot fit between the two message end
             // 2*Metrics.MESSAGES_NAME_SPACING = space above the label + space below the label
             context.setForeground(Frame.getUserPref().getFontColor(prefId));
-            if (spaceBTWStartEnd > 0)
+            if (spaceBTWStartEnd > 0) {
                 context.drawTextTruncatedCentred(getName(), x, y + height / 2 - (2 * Metrics.MESSAGES_NAME_SPACING + Metrics.getMessageFontHeigth()), width, 2 * Metrics.MESSAGES_NAME_SPACING + Metrics.getMessageFontHeigth(), !isSelected());
-            else
+            } else {
                 context.drawTextTruncatedCentred(getName(), x + width, y + height / 2 - (2 * Metrics.MESSAGES_NAME_SPACING + Metrics.getMessageFontHeigth()), -width, 2 * Metrics.MESSAGES_NAME_SPACING + +Metrics.getMessageFontHeigth(), !isSelected());
+            }
         }
     }
-
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNodee#draw(org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC)
+     */
     @Override
     public void draw(IGC context) {
-        if (!isVisible())
+        if (!isVisible()) {
             return;
+        }
         // Draw it selected?*/
         if (isSelected()) {
 
@@ -597,19 +669,33 @@ public abstract class BaseMessage extends GraphNode {
      * 
      * @param message - the message to compare with
      * @return true if identical false otherwise
+     * 
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#isSameAs(org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode)
      */
     @Override
     public boolean isSameAs(GraphNode message) {
-        if (message == null)
+        if (message == null) {
             return false;
-        if (!(message instanceof BaseMessage))
+        }
+        if (!(message instanceof BaseMessage)) {
             return super.isSameAs(message);
-        if (getX() == message.getX() && getY() == message.getY() && getWidth() == message.getWidth() && getHeight() == message.getHeight())
+        }
+        if (getX() == message.getX() && getY() == message.getY() && getWidth() == message.getWidth() && getHeight() == message.getHeight()) {
             return true;
-        else
+        } else {
             return false;
+        }
     }
 
+    /**
+     * Method drawRot.
+     * 
+     * @param x A x coordinate
+     * @param y A y coordinate
+     * @param w A width
+     * @param h A height
+     * @param context A graphical context
+     */
     public void drawRot(int x, int y, int w, int h, IGC context) {
         double angleA = Math.atan2(getHeight(), getWidth());
         double cosA = Math.cos(angleA);
@@ -638,6 +724,10 @@ public abstract class BaseMessage extends GraphNode {
         context.drawPolygon(points);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#drawFocus(org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC)
+     */
     @Override
     public void drawFocus(IGC context) {
         if ((startLifeline != endLifeline) && (startEventOccurrence == endEventOccurrence)) {
@@ -654,7 +744,8 @@ public abstract class BaseMessage extends GraphNode {
             context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_LIFELINE_HEADER));
             context.setForeground(Frame.getUserPref().getForeGroundColor(ISDPreferences.PREF_LIFELINE_HEADER));
             drawRot(getX(), getY() - 5, getWidth(), 10, context);
-        } else
+        } else {
             super.drawFocus(context);
+        }
     }
 }

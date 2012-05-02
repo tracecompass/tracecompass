@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: GraphNode.java,v 1.3 2008/01/24 02:28:49 apnan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -21,7 +22,7 @@ import java.util.List;
 
 import org.eclipse.linuxtools.internal.tmf.ui.TmfUiTracer;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
 
 /**
  * The base class used for all UML2 graph nodes displayed in the Sequence Diagram SDWidget.
@@ -29,50 +30,76 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.ISDPreferences;
  * @author sveyrier
  * @version 1.0
  */
-
 public abstract class GraphNode {
 
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+    /**
+     * The start event occurrence.
+     */
     protected int startEventOccurrence = 0;
-
+    /**
+     * The event event occurrence.
+     */
     protected int endEventOccurrence = 0;
-
     /**
      * Preference ColorId to use to draw font
      */
     public String prefId = ISDPreferences.PREF_SYNC_MESS;
-
     /**
      * The selection state of the graph node.
      */
     protected boolean selected = false;
-
     /**
      * The focus state of the graph node.
      */
     protected boolean focused = false;
-
+    /**
+     * Flag to indicate whether node has children or not. 
+     */
     protected boolean hasChilden = false;
-
     /**
      * The graph node name used to label the graph node in the View.
      */
     protected String name = ""; //$NON-NLS-1$
-
+    /**
+     * A map from node name to graph node.
+     */
     protected HashMap<String, List<GraphNode>> nodes;
+    /**
+     * A map from node name to graph node for forward sorting
+     */
     protected HashMap<String, List<GraphNode>> fnodes;
+    /**
+     * A map from node name to graph node for backwards sorting.
+     */
     protected HashMap<String, List<GraphNode>> bnodes;
-
+    /**
+     * A map from node name to index.
+     */
     protected HashMap<String, Integer> indexes;
+    /**
+     * A map from node name to index for forwards sorting.
+     */
     protected HashMap<String, Boolean> fSort;
+    /**
+     * A map from node name to indexfor forwards sorting.
+     */
     protected HashMap<String, Boolean> bSort;
 
+    // ------------------------------------------------------------------------
+    // Methods
+    // ------------------------------------------------------------------------
+    
     /**
      * Reset the internal index of the first visible GraphNode for each ordered GraphNode lists
-     * 
      */
     public void resetIndex() {
-        if (!hasChilden)
+        if (!hasChilden) {
             return;
+        }
+
         Iterator<String> it = indexes.keySet().iterator();
         while (it.hasNext()) {
             String nodeType = it.next();
@@ -97,8 +124,9 @@ public abstract class GraphNode {
         }
 
         // Nothing to add
-        if (nodeToAdd == null)
+        if (nodeToAdd == null) {
             return;
+        }
 
         if (nodes.get(nodeToAdd.getArrayId()) == null) {
             nodes.put(nodeToAdd.getArrayId(), new ArrayList<GraphNode>(1));
@@ -113,8 +141,9 @@ public abstract class GraphNode {
 
         List<GraphNode> fNodeList = (List<GraphNode>) fnodes.get(nodeToAdd.getArrayId());
         List<GraphNode> bNodeList = null;
-        if (bnodes != null)
+        if (bnodes != null) {
             bNodeList = (List<GraphNode>) bnodes.get(nodeToAdd.getArrayId());
+        }
         if (fNodeList != null && fNodeList.size() > 0) {
             // check if the nodes are added y ordered
             // if not, tag the list to sort it later (during draw)
@@ -195,7 +224,6 @@ public abstract class GraphNode {
      * The returned value is used to highlight the graph node in the View.
      * 
      * @return true if selected, false otherwise
-     * 
      */
     public boolean isSelected() {
         return selected;
@@ -206,7 +234,6 @@ public abstract class GraphNode {
      * The returned value is used to highlight the graph node in the View.
      * 
      * @return true if focued, false otherwise
-     * 
      */
     public boolean hasFocus() {
         return focused;
@@ -329,8 +356,9 @@ public abstract class GraphNode {
     public GraphNode getNodeAt(int x, int y) {
         GraphNode toReturn = null;
 
-        if (!hasChilden)
+        if (!hasChilden) {
             return null;
+        }
 
         Iterator<String> it = nodes.keySet().iterator();
         GraphNode node = null;
@@ -339,20 +367,28 @@ public abstract class GraphNode {
             List<GraphNode> list = (List<GraphNode>) nodes.get(nodeType);
             int index = ((Integer) indexes.get(nodeType)).intValue();
             node = getNodeFromListAt(x, y, list, index);
-            if (toReturn == null)
+            if (toReturn == null) {
                 toReturn = node;
+            }
             if (node != null) {
                 GraphNode internalNode = node.getNodeAt(x, y);
-                if (internalNode != null)
+                if (internalNode != null) {
                     return internalNode;
-                // else return node;
-                else if (Math.abs(node.getWidth()) < Math.abs(toReturn.getWidth()) || Math.abs(node.getHeight()) < Math.abs(toReturn.getHeight()))
+                } else if (Math.abs(node.getWidth()) < Math.abs(toReturn.getWidth()) || Math.abs(node.getHeight()) < Math.abs(toReturn.getHeight())) {
                     toReturn = node;
+                }
             }
         }
         return toReturn;
     }
 
+    /**
+     * Gets node list from node A to node B
+
+     * @param from A from node
+     * @param to A to node
+     * @return the list of nodes
+     */
     public ArrayList<GraphNode> getNodeList(GraphNode from, GraphNode to) {
         ArrayList<GraphNode> result = new ArrayList<GraphNode>();
 
@@ -362,39 +398,45 @@ public abstract class GraphNode {
             result.add(to);
         }
 
-        if (from == null || to == null)
+        if (from == null || to == null) {
             return result;
+        }
 
-        if (from == to)
+        if (from == to) {
             return result;
+        }
 
         int startX = Math.min(from.getX(), Math.min(to.getX(), Math.min(from.getX() + from.getWidth(), to.getX() + to.getWidth())));
         int endX = Math.max(from.getX(), Math.max(to.getX(), Math.max(from.getX() + from.getWidth(), to.getX() + to.getWidth())));
         int startY = Math.min(from.getY(), Math.min(to.getY(), Math.min(from.getY() + from.getHeight(), to.getY() + to.getHeight())));
         int endY = Math.max(from.getY(), Math.max(to.getY(), Math.max(from.getY() + from.getHeight(), to.getY() + to.getHeight())));
 
-        if (!hasChilden)
+        if (!hasChilden) {
             return result;
+        }
 
         Iterator<String> it = nodes.keySet().iterator();
         while (it.hasNext()) {
             Object nodeType = it.next();
             List<GraphNode> nodesList = (List<GraphNode>) nodes.get(nodeType);
-            if (nodesList == null || nodesList.isEmpty())
+            if (nodesList == null || nodesList.isEmpty()) {
                 return null;
+            }
             for (int i = 0; i < nodesList.size(); i++) {
                 GraphNode node = (GraphNode) nodesList.get(i);
                 int nw = node.getWidth();
                 int nh = node.getHeight();
                 int nx = node.getX();
                 int ny = node.getY();
-                if (contains(startX, startY, endX - startX, endY - startY, nx + 1, ny + 1) && contains(startX, startY, endX - startX, endY - startY, nx + nw - 2, ny + nh - 2))
+                if (contains(startX, startY, endX - startX, endY - startY, nx + 1, ny + 1) && contains(startX, startY, endX - startX, endY - startY, nx + nw - 2, ny + nh - 2)) {
                     result.add(node);
+                }
                 result.addAll(node.getNodeList(from, to));
             }
         }
-        if ((to != null) && (!result.contains(to)))
+        if ((to != null) && (!result.contains(to))) {
             result.add(to);
+        }
         return result;
     }
 
@@ -410,12 +452,14 @@ public abstract class GraphNode {
      * @return the graph node containing the point given in parameter, null otherwise
      */
     protected GraphNode getNodeFromListAt(int x, int y, List<GraphNode> list, int fromIndex) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         for (int i = fromIndex; i < list.size(); i++) {
             GraphNode node = (GraphNode) list.get(i);
-            if (node.contains(x, y))
+            if (node.contains(x, y)) {
                 return node;
+            }
         }
         return null;
     }
@@ -448,8 +492,9 @@ public abstract class GraphNode {
      * @param height visible area height
      */
     public void updateIndex(int x, int y, int width, int height) {
-        if (!hasChilden)
+        if (!hasChilden) {
             return;
+        }
         if(TmfUiTracer.isIndexTraced()) {
             TmfUiTracer.traceIndex("*****************************\n"); //$NON-NLS-1$
             TmfUiTracer.traceIndex("Visible area position in virtual screen (x,y)= " + x + " " + y + "\n\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -464,11 +509,13 @@ public abstract class GraphNode {
              * if (x==0) { drawIndex = 0; indexes.put(nodeType,new Integer(drawIndex)); }
              */
             if ((nodes.get(nodeType) != null) && (((List<GraphNode>) nodes.get(nodeType)).size() > 1)) {
-                if (((GraphNode) ((List<GraphNode>) nodes.get(nodeType)).get(drawIndex)).positiveDistanceToPoint(x, y))
+                if (((GraphNode) ((List<GraphNode>) nodes.get(nodeType)).get(drawIndex)).positiveDistanceToPoint(x, y)) {
                     direction = -1;
+                }
 
-                if (drawIndex == 0)
+                if (drawIndex == 0) {
                     direction = 1;
+                }
 
                 if ((direction == -1) && (bnodes.get(nodeType) != null)) {
                     GraphNode currentNode = (GraphNode) ((List<GraphNode>) nodes.get(nodeType)).get(drawIndex);
@@ -477,8 +524,9 @@ public abstract class GraphNode {
                     if (drawIndex < 0) {
                         drawIndex = 0;
                         direction = 1;
-                    } else
+                    } else {
                         nodes.put(nodeType, (List<GraphNode>) bnodes.get(nodeType));
+                    }
                 }
                 GraphNode prev = null;
 
@@ -488,8 +536,9 @@ public abstract class GraphNode {
 
                     GraphNode currentNode = (GraphNode) ((List<GraphNode>) nodes.get(nodeType)).get(i);
 
-                    if (prev == null)
+                    if (prev == null) {
                         prev = currentNode;
+                    }
 
                     Comparator<GraphNode> comp = currentNode.getComparator();
                     HashMap<String, Boolean> sort = fSort;
@@ -504,23 +553,28 @@ public abstract class GraphNode {
                     if (i < ((List<GraphNode>) nodes.get(nodeType)).size() - 1) {
                         GraphNode next = (GraphNode) ((List<GraphNode>) nodes.get(nodeType)).get(i + 1);
 
-                        if ((comp != null) && (comp.compare(currentNode, next) > 0))
+                        if ((comp != null) && (comp.compare(currentNode, next) > 0)) {
                             sort.put(nodeType, Boolean.valueOf(true));
+                        }
                     }
                     if (direction == 1) {
-                        if (((GraphNode) ((List<GraphNode>) nodes.get(nodeType)).get(i)).positiveDistanceToPoint(x, y))
+                        if (((GraphNode) ((List<GraphNode>) nodes.get(nodeType)).get(i)).positiveDistanceToPoint(x, y)) {
                             break;
+                        }
                     } else {
                         if (currentNode.getBackComparator() == null) {
                             if // (currentNode.isVisible(x,y,width,height)
-                            (!currentNode.positiveDistanceToPoint(x, y))
+                            (!currentNode.positiveDistanceToPoint(x, y)) {
                                 break;
+                            }
                         } else {
                             if (currentNode.isVisible(x, y, width, height) && !currentNode.positiveDistanceToPoint(x, y)) {
-                                if ((comp != null) && (comp.compare(currentNode, prev) <= 0))
+                                if ((comp != null) && (comp.compare(currentNode, prev) <= 0)) {
                                     break;
-                            } else if ((comp != null) && (comp.compare(currentNode, prev) <= 0))
+                                }
+                            } else if ((comp != null) && (comp.compare(currentNode, prev) <= 0)) {
                                 prev = currentNode;
+                            }
                         }
                     }
                 }
@@ -534,8 +588,9 @@ public abstract class GraphNode {
                     GraphNode currentNode = (GraphNode) (backList.get(index));
                     if (index > 0) {
                         index = Arrays.binarySearch(list.toArray(new GraphNode[0]), backList.get(index), currentNode.getComparator());
-                        if (index < 0)
+                        if (index < 0) {
                             index = 0;
+                        }
                         indexes.put(nodeType, Integer.valueOf(index));
                     }
                 }
@@ -543,8 +598,9 @@ public abstract class GraphNode {
                 for (int i = drawIndex; i < ((List<GraphNode>) nodes.get(nodeType)).size() && i >= 0; i++) {
                     GraphNode toDraw = (GraphNode) ((List<GraphNode>) nodes.get(nodeType)).get(i);
                     toDraw.updateIndex(x, y, width, height);
-                    if (!toDraw.isVisible(x, y, width, height))
+                    if (!toDraw.isVisible(x, y, width, height)) {
                         break;
+                    }
                 }
             }
             if (TmfUiTracer.isIndexTraced()) {
@@ -568,8 +624,9 @@ public abstract class GraphNode {
      */
     protected void drawChildenNodes(IGC context) {
 
-        if (!hasChilden)
+        if (!hasChilden) {
             return;
+        }
         // If the nodes have not been added ordered, the array is ordered
         Iterator<String> it = fSort.keySet().iterator();
         while (it.hasNext()) {
@@ -582,8 +639,9 @@ public abstract class GraphNode {
                 fSort.put(nodeType, Boolean.valueOf(false));
                 nodes.put(nodeType, Arrays.asList(temp));
                 fnodes.put(nodeType, Arrays.asList(temp));
-                if (TmfUiTracer.isSortingTraced())
+                if (TmfUiTracer.isSortingTraced()) {
                     TmfUiTracer.traceSorting(nodeType + " array sorted\n"); //$NON-NLS-1$
+                }
             }
         }
 
@@ -597,8 +655,9 @@ public abstract class GraphNode {
                 Arrays.sort(temp, node.getBackComparator());
                 bSort.put(nodeType, Boolean.valueOf(false));
                 bnodes.put(nodeType, Arrays.asList(temp));
-                if (TmfUiTracer.isSortingTraced())
+                if (TmfUiTracer.isSortingTraced()) {
                     TmfUiTracer.traceSorting(nodeType + " back array sorted\n"); //$NON-NLS-1$
+                }
             }
         }
 
@@ -607,8 +666,9 @@ public abstract class GraphNode {
         }
 
         int arrayStep = 1;
-        if ((Metrics.getMessageFontHeigth() + Metrics.MESSAGES_NAME_SPACING * 2) * context.getZoom() < Metrics.MESSAGE_SIGNIFICANT_VSPACING)
+        if ((Metrics.getMessageFontHeigth() + Metrics.MESSAGES_NAME_SPACING * 2) * context.getZoom() < Metrics.MESSAGE_SIGNIFICANT_VSPACING) {
             arrayStep = Math.round(Metrics.MESSAGE_SIGNIFICANT_VSPACING / ((Metrics.getMessageFontHeigth() + Metrics.MESSAGES_NAME_SPACING * 2) * context.getZoom()));
+        }
 
         int count = 0;
         Iterator<String> it3 = fSort.keySet().iterator();
@@ -619,8 +679,9 @@ public abstract class GraphNode {
             context.setFont(Frame.getUserPref().getFont(node.prefId));
             int index = ((Integer) indexes.get(nodeType)).intValue();
             count = drawNodes(context, (List<GraphNode>) nodes.get(nodeType), index, arrayStep);
-            if (TmfUiTracer.isDisplayTraced())
+            if (TmfUiTracer.isDisplayTraced()) {
                 TmfUiTracer.traceDisplay(count + " " + nodeType + " drawn, starting from index " + index + "\r\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            }
         }
         if (TmfUiTracer.isDisplayTraced()) {
             TmfUiTracer.traceDisplay("*****************************\n"); //$NON-NLS-1$
@@ -638,13 +699,15 @@ public abstract class GraphNode {
      * @return the number of GraphNodes drawn
      */
     protected int drawNodes(IGC context, List<GraphNode> list, int startIndex, int step) {
-        if (!hasChilden)
+        if (!hasChilden) {
             return 0;
+        }
 
         GraphNode last = null;
         int nodesCount = 0;
-        if (list.size() < 0)
+        if (list.size() < 0) {
             return 0;
+        }
 
         GraphNode node = (GraphNode) list.get(0);
         context.setFont(Frame.getUserPref().getFont(node.prefId));
@@ -662,21 +725,27 @@ public abstract class GraphNode {
             int cw = context.getVisibleWidth();
             int ch = context.getVisibleHeight();
             // The arrays should be ordered, no needs to continue for this one
-            if (!toDraw.isVisible(cx, cy, cw, ch) && toDraw.positiveDistanceToPoint(cx + cw, cy + ch))
+            if (!toDraw.isVisible(cx, cy, cw, ch) && toDraw.positiveDistanceToPoint(cx + cw, cy + ch)) {
                 break;
+            }
             // ***Common*** nodes visibility
             if ((!toDraw.isSameAs(last) || toDraw.isSelected()) && (toDraw.isVisible(context.getContentsX(), context.getContentsY(), context.getVisibleWidth(), context.getVisibleHeight()))) {
                 nodesCount++;
                 
                 toDraw.draw(context);
-                if (hasFocus())
+                if (hasFocus()) {
                     toDraw.drawFocus(context);
+                }
             }
             last = toDraw;
         }
         return nodesCount;
     }
 
+    /**
+     * Draws the focus within the graphical context.
+     * @param context
+     */
     public void drawFocus(IGC context) {
         context.drawFocus(getX(), getY(), getWidth(), getHeight());
     }

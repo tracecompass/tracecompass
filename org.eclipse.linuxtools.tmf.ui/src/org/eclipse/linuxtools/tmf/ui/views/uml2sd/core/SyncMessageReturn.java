@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2006, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: SyncMessageReturn.java,v 1.2 2006/09/20 20:56:25 ewchan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -13,7 +14,7 @@
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
 
 /**
  * The message return graph node implementation.<br>
@@ -26,22 +27,42 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.ISDPreferences;
  * 
  * 
  * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.SyncMessage SyncMessage for usage example
+ * @version 1.0
  * @author sveyrier
  * 
  */
 public class SyncMessageReturn extends SyncMessage {
 
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    /**
+     * The graphNode ID
+     */
+    public static final String SYNC_MESS_RET_TAG = "SyncMessageRet"; //$NON-NLS-1$
+    
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
     /**
      * The associated message(the message it is the return).
      */
     protected SyncMessage message = null;
 
-    public static final String SYNC_MESS_RET_TAG = "SyncMessageRet"; //$NON-NLS-1$
-
+    // ------------------------------------------------------------------------
+    // Constractors
+    // ------------------------------------------------------------------------
+    
+    /**
+     * Default constructor
+     */
     public SyncMessageReturn() {
         prefId = ISDPreferences.PREF_SYNC_MESS_RET;
     }
 
+    // ------------------------------------------------------------------------
+    // Methods
+    // ------------------------------------------------------------------------
     /**
      * Set the associated message (the message it is the return).<br>
      * Setting the association will activate the navigation in the default sequence diagram implementation to the
@@ -63,14 +84,19 @@ public class SyncMessageReturn extends SyncMessage {
         return message;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.SyncMessage#draw(org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC)
+     */
     @Override
     public void draw(IGC context) {
-        if (!isVisible())
+        if (!isVisible()) {
             return;
+        }
         int oldStyle = context.getLineStyle();
         // Message return are dashed
         context.setLineStyle(context.getLineDotStyle());
-        // Draw it selected?*/
+        // Draw it selected?
         if (!isSelected()) {
             context.setBackground(Frame.getUserPref().getBackGroundColor(prefId));
             context.setForeground(Frame.getUserPref().getForeGroundColor(prefId));
@@ -80,6 +106,10 @@ public class SyncMessageReturn extends SyncMessage {
         context.setLineStyle(oldStyle);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.SyncMessage#getArrayId()
+     */
     @Override
     public String getArrayId() {
         return SYNC_MESS_RET_TAG;

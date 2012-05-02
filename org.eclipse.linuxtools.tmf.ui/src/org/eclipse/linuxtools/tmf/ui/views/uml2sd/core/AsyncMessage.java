@@ -1,10 +1,9 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: AsyncMessage.java,v 1.3 2008/01/24 02:28:49 apnan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -17,7 +16,7 @@ import java.util.Comparator;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SortAsyncForBackward;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SortAsyncMessageComparator;
 
@@ -46,33 +45,57 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SortAsyncMessageComparato
  * </pre>
  * 
  * @see Lifeline Lifeline for more event occurence details
+ * @version 1.0 
  * @author sveyrier
  * 
  */
 public class AsyncMessage extends BaseMessage implements ITimeRange {
 
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    /**
+    * The grahNode ID constant
+    */
+    public static final String ASYNC_MESS_TAG = "AsyncMessage"; //$NON-NLS-1$
+
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+    /**
+     * Flag whether message has time information or not.
+     */
     protected boolean hasTime = false;
     /**
      * The time when the message begin
      */
     protected ITmfTimestamp endTime = new TmfTimestamp();
-
     /**
      * The time when the message end
      */
     protected ITmfTimestamp startTime = new TmfTimestamp();
-
     /**
      * The associated message.
      */
     protected AsyncMessageReturn messageReturn = null;
 
-    public static final String ASYNC_MESS_TAG = "AsyncMessage"; //$NON-NLS-1$
-
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
+    /**
+     * Default constructor
+     */
     public AsyncMessage() {
         prefId = ISDPreferences.PREF_ASYNC_MESS;
     }
 
+    // ------------------------------------------------------------------------
+    // Methods
+    // ------------------------------------------------------------------------
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BaseMessage#getX()
+     */
     @Override
     public int getX() {
         int x = super.getX(true);
@@ -86,7 +109,11 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
         }
         return x;
     }
-
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BaseMessage#getY()
+     */
     @Override
     public int getY() {
         if ((startLifeline != null) && (endLifeline != null)) {
@@ -95,6 +122,10 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
         return super.getY();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BaseMessage#getWidth()
+     */
     @Override
     public int getWidth() {
         int width = super.getWidth(true);
@@ -103,15 +134,21 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
             activationWidth = -activationWidth;
         }
 
-        if (isMessageStartInActivation(startEventOccurrence))
+        if (isMessageStartInActivation(startEventOccurrence)) {
             width = width - activationWidth;
+        }
 
-        if (isMessageEndInActivation(endEventOccurrence))
+        if (isMessageEndInActivation(endEventOccurrence)) {
             width = width - activationWidth;
+        }
 
         return width;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BaseMessage#getHeight()
+     */
     @Override
     public int getHeight() {
         if ((startLifeline != null) && (endLifeline != null)) {
@@ -136,15 +173,22 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      */
     public void setEndOccurrence(int occurrence) {
         endEventOccurrence = occurrence;
-        if (getStartLifeline() == null)
+        if (getStartLifeline() == null) {
             startEventOccurrence = occurrence;
+        }
         informFrame(getEndLifeline(), occurrence);
     }
 
+    /**
+     * Informs the given lifeline about the maximum occurrence if applicable.
+     * 
+     * @param lifeLine
+     * @param occurrence
+     */
     protected void informFrame(Lifeline lifeLine, int occurrence) {
-        if ((lifeLine != null) && (lifeLine.getFrame() != null))
-            if (lifeLine.getFrame().getMaxEventOccurrence() < occurrence)
-                lifeLine.getFrame().setMaxEventOccurrence(occurrence);
+        if ((lifeLine != null) && (lifeLine.getFrame() != null) && (lifeLine.getFrame().getMaxEventOccurrence() < occurrence)) {
+            lifeLine.getFrame().setMaxEventOccurrence(occurrence);
+        }
     }
 
     /**
@@ -154,8 +198,9 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      */
     public void setStartOccurrence(int occurrence) {
         startEventOccurrence = occurrence;
-        if (getEndLifeline() == null)
+        if (getEndLifeline() == null) {
             endEventOccurrence = startEventOccurrence;
+        }
         informFrame(getStartLifeline(), occurrence);
     }
 
@@ -181,23 +226,22 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
         setEndLifeline(lifeline);
     }
 
-    /**
-     * Set the lifeLine which has sent the message.<br>
-     * 
-     * @param lifeline the message sender
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BaseMessage#setStartLifeline(org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Lifeline)
      */
     @Override
     public void setStartLifeline(Lifeline lifeline) {
         super.setStartLifeline(lifeline);
         setStartOccurrence(getStartLifeline().getEventOccurrence());
-        if (getEndLifeline() == null)
+        if (getEndLifeline() == null) {
             endEventOccurrence = startEventOccurrence;
+        }
     }
 
-    /**
-     * Set the lifeLine which has received the message.<br>
-     * 
-     * @param lifeline the message receiver
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BaseMessage#setEndLifeline(org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Lifeline)
      */
     @Override
     public void setEndLifeline(Lifeline lifeline) {
@@ -217,23 +261,32 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      * @return Return true if the point C is on the segment defined with the point A and B, else otherwise
      */
     protected boolean isNearSegment(int xA, int yA, int xB, int yB, int xC, int yC) {
-        if ((xA > xB) && (xC > xA))
+        if ((xA > xB) && (xC > xA)) {
             return false;
-        if ((xA < xB) && (xC > xB))
+        }
+        if ((xA < xB) && (xC > xB)) {
             return false;
-        if ((xA < xB) && (xC < xA))
+        }
+        if ((xA < xB) && (xC < xA)) {
             return false;
-        if ((xA > xB) && (xC < xB))
+        }
+        if ((xA > xB) && (xC < xB)) {
             return false;
+        }
         double distAB = Math.sqrt((xB - xA) * (xB - xA) + (yB - yA) * (yB - yA));
         double scalar = ((xB - xA) * (xC - xA) + (yB - yA) * (yC - yA)) / distAB;
         double distAC = Math.sqrt((xC - xA) * (xC - xA) + (yC - yA) * (yC - yA));
         double distToSegment = Math.sqrt(Math.abs(distAC * distAC - scalar * scalar));
-        if (distToSegment <= Metrics.MESSAGE_SELECTION_TOLERANCE)
+        if (distToSegment <= Metrics.MESSAGE_SELECTION_TOLERANCE) {
             return true;
+        }
         return false;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BaseMessage#contains(int, int)
+     */
     @Override
     public boolean contains(int x, int y) {
         // Is it a self message?
@@ -245,15 +298,22 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
         int messageMaxWidth = Metrics.swimmingLaneWidth() - Metrics.EXECUTION_OCCURRENCE_WIDTH;
         int nameWidth = getName().length() * Metrics.getAverageCharWidth();
         if (getName().length() * Metrics.getAverageCharWidth() > messageMaxWidth) {
-            if (Frame.contains(getX(), getY() - Metrics.MESSAGES_NAME_SPACING - Metrics.getMessageFontHeigth(), messageMaxWidth, Metrics.getMessageFontHeigth(), x, y))
+            if (Frame.contains(getX(), getY() - Metrics.MESSAGES_NAME_SPACING - Metrics.getMessageFontHeigth(), messageMaxWidth, Metrics.getMessageFontHeigth(), x, y)) {
                 return true;
+            }
         } else {
-            if (Frame.contains(getX() + (messageMaxWidth - nameWidth) / 2, getY() + getHeight() / 2 - Metrics.MESSAGES_NAME_SPACING - Metrics.getMessageFontHeigth(), nameWidth, Metrics.getMessageFontHeigth(), x, y))
+            if (Frame.contains(getX() + (messageMaxWidth - nameWidth) / 2, getY() + getHeight() / 2 - Metrics.MESSAGES_NAME_SPACING - Metrics.getMessageFontHeigth(), nameWidth, Metrics.getMessageFontHeigth(), x, y)) {
                 return true;
+            }
         }
         return false;
     }
 
+    /**
+     * Draws the asynchronous message using giving graphical context.
+     * 
+     * @param context A graphical context to draw in.
+     */
     protected void drawAsyncMessage(IGC context) {
         if (startLifeline != null && endLifeline != null && startLifeline == endLifeline && (startEventOccurrence != endEventOccurrence)) {
             int x = getX();
@@ -263,14 +323,17 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
             boolean startInActivation = isMessageStartInActivation(startEventOccurrence);
             boolean endInActivation = isMessageEndInActivation(endEventOccurrence);
 
-            if (endInActivation && !startInActivation)
+            if (endInActivation && !startInActivation) {
                 tempx = Metrics.EXECUTION_OCCURRENCE_WIDTH / 2;
-            if (startInActivation && !endInActivation)
+            }
+            if (startInActivation && !endInActivation) {
                 tempx = -Metrics.EXECUTION_OCCURRENCE_WIDTH / 2;
+            }
 
             int tempy = Metrics.INTERNAL_MESSAGE_WIDTH / 2;
-            if (getHeight() <= Metrics.INTERNAL_MESSAGE_WIDTH)
+            if (getHeight() <= Metrics.INTERNAL_MESSAGE_WIDTH) {
                 tempy = getHeight() / 2;
+            }
 
             context.drawLine(x, y, x + Metrics.INTERNAL_MESSAGE_WIDTH / 2, y);
             context.drawLine(x + Metrics.INTERNAL_MESSAGE_WIDTH, y + tempy, x + Metrics.INTERNAL_MESSAGE_WIDTH, y + height - tempy);
@@ -286,17 +349,20 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
 
             context.drawTextTruncated(getName(), x + Metrics.INTERNAL_MESSAGE_WIDTH + Metrics.INTERNAL_MESSAGE_V_MARGIN, y, Metrics.swimmingLaneWidth() - Metrics.EXECUTION_OCCURRENCE_WIDTH + -Metrics.INTERNAL_MESSAGE_WIDTH,
                     +Metrics.MESSAGES_NAME_SPACING - Metrics.getMessageFontHeigth(), !isSelected());
-        } else
+        } else {
             super.draw(context);
+        }
     }
 
-    /**
-     * Draws the asynchronous message in the given GC
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BaseMessage#draw(org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC)
      */
     @Override
     public void draw(IGC context) {
-        if (!isVisible())
+        if (!isVisible()) {
             return;
+        }
         // Draw it selected?
         if (isSelected() && (startLifeline != null && endLifeline != null && startLifeline == endLifeline && (startEventOccurrence != endEventOccurrence))) {
             /*
@@ -331,10 +397,11 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
     public void setEndTime(ITmfTimestamp time) {
         endTime = time.clone();
         hasTime = true;
-        if (getStartLifeline() != null && getStartLifeline().getFrame() != null)
+        if (getStartLifeline() != null && getStartLifeline().getFrame() != null) {
             getStartLifeline().getFrame().setHasTimeInfo(true);
-        else if (getEndLifeline() != null && getEndLifeline().getFrame() != null)
+        } else if (getEndLifeline() != null && getEndLifeline().getFrame() != null) {
             getEndLifeline().getFrame().setHasTimeInfo(true);
+        }
     }
 
     /**
@@ -345,69 +412,95 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
     public void setStartTime(ITmfTimestamp time) {
         startTime = time.clone();
         hasTime = true;
-        if (getStartLifeline() != null && getStartLifeline().getFrame() != null)
+        if (getStartLifeline() != null && getStartLifeline().getFrame() != null) {
             getStartLifeline().getFrame().setHasTimeInfo(true);
-        else if (getEndLifeline() != null && getEndLifeline().getFrame() != null)
+        } else if (getEndLifeline() != null && getEndLifeline().getFrame() != null) {
             getEndLifeline().getFrame().setHasTimeInfo(true);
+        }
     }
 
-    /**
-     * Returns the time when the message begin
-     * 
-     * @return the time
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.ITimeRange#getEndTime()
      */
     @Override
     public ITmfTimestamp getEndTime() {
         return endTime;
     }
 
-    /**
-     * Returns the time when the message end
-     * 
-     * @return the time
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.ITimeRange#getStartTime()
      */
     @Override
     public ITmfTimestamp getStartTime() {
         return startTime;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.ITimeRange#hasTimeInfo()
+     */
     @Override
     public boolean hasTimeInfo() {
         return hasTime;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BaseMessage#isVisible(int, int, int, int)
+     */
     @Override
     public boolean isVisible(int x, int y, int width, int height) {
         int toDrawY = getY();
         int toDrawHeight = getHeight();
-        if ((toDrawY > y + height + Metrics.MESSAGES_NAME_SPACING + Metrics.getMessageFontHeigth()) && (toDrawY + toDrawHeight > y + height + Metrics.MESSAGES_NAME_SPACING + Metrics.getMessageFontHeigth()))
+        if ((toDrawY > y + height + Metrics.MESSAGES_NAME_SPACING + Metrics.getMessageFontHeigth()) && (toDrawY + toDrawHeight > y + height + Metrics.MESSAGES_NAME_SPACING + Metrics.getMessageFontHeigth())) {
             return false;
-        if (toDrawY < y && (toDrawY + toDrawHeight < y))
+        }
+        if (toDrawY < y && (toDrawY + toDrawHeight < y)) {
             return false;
+        }
         return super.isVisible(x, y, width, height);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getComparator()
+     */
     @Override
     public Comparator<GraphNode> getComparator() {
         return new SortAsyncMessageComparator();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getArrayId()
+     */
     @Override
     public String getArrayId() {
         return ASYNC_MESS_TAG;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#getBackComparator()
+     */
     @Override
     public Comparator<GraphNode> getBackComparator() {
         return new SortAsyncForBackward();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#positiveDistanceToPoint(int, int)
+     */
     @Override
     public boolean positiveDistanceToPoint(int x, int y) {
         int mY = getY();
         int mH = getHeight();
-        if ((mY > y) || (mY + mH > y))
+        if ((mY > y) || (mY + mH > y)) {
             return true;
+        }
         return false;
     }
 }

@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: SDViewerPage.java,v 1.5 2008/01/24 02:28:51 apnan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -35,12 +36,24 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 /**
- * The Sequence Diagram preferences page implementation
+ * The Sequence Diagram preferences page implementation.
  * 
+ * @version 1.0
  * @author sveyrier
  */
 public class SDViewerPage extends PreferencePage implements IWorkbenchPreferencePage, SelectionListener {
 
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    /**
+     * Temporary preferences tag
+     */
+    protected static final String TEMP_TAG = SDViewPref.TEMP_TAG;
+    
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
     /**
      * The preference handler used to access the PreferenceStore
      */
@@ -53,59 +66,60 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
      * Foreground color selector
      */
     protected ColorFieldEditor backGroundColor = null;
-
     /**
      * Font color selector
      */
     protected ColorFieldEditor textColor = null;
-
     /**
      * List which display all modifiable sequence Diagram font
      */
     protected List classItemList = null;
-
     /**
      * Font selector (The same is used for each modifiable font)
      */
     protected FontFieldEditor font = null;
-
     /**
      * Link font when zooming selector
      */
     protected BooleanFieldEditor link = null;
-
     /**
      * Enable tooltip selector
      */
     protected BooleanFieldEditor tooltip = null;
-
     /**
      * Do not take external time into account in the min max computation
      */
     protected BooleanFieldEditor noExternalTime = null;
-
     /**
      * Use gradient color selector
      */
     protected BooleanFieldEditor useGrad = null;
-
+    /**
+     * A button area.
+     */
     protected Composite buttonArea;
-
     /**
      * SwimLane width selector
      */
     protected IntegerFieldEditor lifelineWidth = null;
 
-    protected static final String TEMP_TAG = SDViewPref.TEMP_TAG;
-
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
+    /**
+     * Default constructor
+     */
     public SDViewerPage() {
         super();
     }
 
-    /**
-     * Creates the Sequence Diagram preference page content
-     * 
-     * @param parent the parent composite
+    // ------------------------------------------------------------------------
+    // Methods
+    // ------------------------------------------------------------------------
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
      */
     @Override
     protected Control createContents(Composite parent) {
@@ -198,13 +212,18 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         return page;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+     */
     @Override
     public void init(IWorkbench workbench) {
         pref = SDViewPref.getInstance();
     }
 
-    /**
-     * Apply the modification performed in the Sequence diagram preference page
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.preference.PreferencePage#performApply()
      */
     @Override
     protected void performApply() {
@@ -228,19 +247,19 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         swapPref(true);
     }
 
-    /**
-     * Apply the modification performed in the Sequence diagram preference page
-     * 
-     * @return true
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.preference.PreferencePage#performOk()
      */
     @Override
     public boolean performOk() {
         performApply();
         return true;
     }
-
-    /**
-     * Loads the Sequence diagram default preference settings
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
      */
     @Override
     protected void performDefaults() {
@@ -312,10 +331,9 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         textColor.load();
     }
 
-    /**
-     * Sent when a new selection occurs in the graphNode font list
-     * 
-     * @param e the selection event
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
      */
     @Override
     public void widgetSelected(SelectionEvent e) {
@@ -343,21 +361,24 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
 
         // No Background for message graphNodes
         if ((fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_SYNC_MESS)) || (fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_SYNC_MESS_RET))
-                || (fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_ASYNC_MESS)) || (fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_ASYNC_MESS_RET)))
+                || (fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_ASYNC_MESS)) || (fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_ASYNC_MESS_RET))) {
             backGroundColor.setEnabled(false, buttonArea);
-        else
+        } else {
             backGroundColor.setEnabled(true, buttonArea);
+        }
 
         // No font used for execution occurrence and global frame
-        if ((fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_EXEC)) || (fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_FRAME)))
+        if ((fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_EXEC)) || (fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_FRAME))) {
             textColor.setEnabled(false, buttonArea);
-        else
+        } else {
             textColor.setEnabled(true, buttonArea);
+        }
 
-        if (fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_FRAME))
+        if (fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_FRAME)) {
             font.setEnabled(false, buttonArea);
-        else
+        } else {
             font.setEnabled(true, buttonArea);
+        }
     }
 
     protected void swapPref(boolean toTemp) {
@@ -389,7 +410,6 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
                 backGroundColor.setPreferenceName((String) prefName + TAG2);
                 backGroundColor.store();
             }
-
         }
 
         keySet = SDViewPref.getInstance().foreColorPref.keySet();
@@ -432,6 +452,10 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
+     */
     @Override
     public void widgetDefaultSelected(SelectionEvent e) {
     }

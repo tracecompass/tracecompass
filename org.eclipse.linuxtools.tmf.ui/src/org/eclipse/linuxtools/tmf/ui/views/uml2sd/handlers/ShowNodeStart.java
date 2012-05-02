@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2006, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: ShowNodeStart.java,v 1.3 2006/09/20 20:56:26 ewchan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -26,6 +27,9 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode;
 import org.eclipse.ui.IViewPart;
 
 /**
+ * Action class implementation to show end of a graph node.
+ * 
+ * @version 1.0
  * @author sveyrier
  */
 public class ShowNodeStart extends Action {
@@ -33,15 +37,26 @@ public class ShowNodeStart extends Action {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+    /**
+     * The sequence diagram view reference
+     */
     protected SDView fView = null;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+    /**
+     * Default constructor
+     */
     public ShowNodeStart() {
         this(null);
     }
-    
+
+    /**
+     * Constructor
+     * 
+     * @param _view The sequence diagram view reference
+     */
     public ShowNodeStart(IViewPart _view) {
         super();
         if (_view instanceof SDView) {
@@ -51,7 +66,7 @@ public class ShowNodeStart extends Action {
     }
 
     // ------------------------------------------------------------------------
-    // Operations
+    // Methods
     // ------------------------------------------------------------------------
     /*
      * (non-Javadoc)
@@ -60,30 +75,39 @@ public class ShowNodeStart extends Action {
    @Override
     @SuppressWarnings("rawtypes")
     public void run() {
-        if (fView == null)
+        if (fView == null) {
             return;
+        }
+
         SDWidget sdWidget = fView.getSDWidget();
 
         if (sdWidget == null) {
             return;
         }
-        
+
         ISelectionProvider selProvider = sdWidget.getSelectionProvider();
         ISelection sel = selProvider.getSelection();
         Object selectedNode = null;
         Iterator it = ((StructuredSelection) sel).iterator();
-        while (it.hasNext())
+        while (it.hasNext()) {
             selectedNode = it.next();
+        }
         if (selectedNode != null) {
             GraphNode node = (GraphNode) selectedNode;
-            if (node.getX() * sdWidget.getZoomFactor() < sdWidget.getContentsX() + sdWidget.getVisibleWidth() / 2)
+            if (node.getX() * sdWidget.getZoomFactor() < sdWidget.getContentsX() + sdWidget.getVisibleWidth() / 2) {
                 sdWidget.ensureVisible(Math.round(node.getX() * sdWidget.getZoomFactor() - sdWidget.getVisibleWidth() / (float) 2), Math.round(node.getY() * sdWidget.getZoomFactor()));
-            else
+            } else {
                 sdWidget.ensureVisible(Math.round(node.getX() * sdWidget.getZoomFactor() + sdWidget.getVisibleWidth() / (float) 2), Math.round(node.getY() * sdWidget.getZoomFactor()));
+            }
         }
     }
 
-   public void setView(SDView view) {
+   /**
+    * Sets the active SD view.
+    * 
+    * @param view The SD view.
+    */
+  public void setView(SDView view) {
        fView = view;
    }
 }

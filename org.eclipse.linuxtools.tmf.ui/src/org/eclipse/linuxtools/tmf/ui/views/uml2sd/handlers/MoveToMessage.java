@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: MoveToMessage.java,v 1.3 2008/01/24 02:28:52 apnan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -28,25 +29,45 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.SyncMessage;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.SyncMessageReturn;
 
 /**
+ * Action Class implementation to move to selected message
+ * 
+ * @version 1.0
  * @author sveyrier
  * 
  */
 public class MoveToMessage extends Action {
 
     // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    /**
+     * The action ID.
+     */
+    public final static String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.GoToMessage"; //$NON-NLS-1$
+
+    // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    public final static String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.GoToMessage"; //$NON-NLS-1$
-    
+    /**
+     * The sequence diagram view reference.
+     */
     protected SDView fView = null;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+    /**
+     * Default Constructor
+     */
     public MoveToMessage() {
         this(null);
     }
     
+    /**
+     * Constructor
+     * 
+     * @param view a sequence diagram view reference
+     */
     public MoveToMessage(SDView view) {
         super();
         setId(ID);
@@ -56,7 +77,7 @@ public class MoveToMessage extends Action {
     }
 
     // ------------------------------------------------------------------------
-    // Operations
+    // Methods
     // ------------------------------------------------------------------------
 
     /*
@@ -86,8 +107,10 @@ public class MoveToMessage extends Action {
                 selectedNode = node;
             }
         }
-        if (selectedNode == null)
+
+        if (selectedNode == null) {
             return;
+        }
 
         if (selectedNode instanceof SyncMessageReturn) {
             GraphNode node = ((SyncMessageReturn) selectedNode).getMessage();
@@ -108,6 +131,7 @@ public class MoveToMessage extends Action {
 
     /**
      * Sets the active SD view.
+     * 
      * @param view The SD view.
      */
     public void setView(SDView view) {

@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: Zoom.java,v 1.3 2008/01/24 02:28:52 apnan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -28,25 +29,60 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IActionBars;
 
 /**
+ * Action class implementation for zooming in, out or reset of zoom.
+ * 
+ * @version 1.0
  * @author sveyrier
  * 
  */
 public class Zoom extends Action {
 
     // ------------------------------------------------------------------------
-    // Attributes
+    // Constants
     // ------------------------------------------------------------------------
+    /**
+     * The Action ID for zooming in.
+     */
     public final static String ZOOM_IN_ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ZoomInCoolBar"; //$NON-NLS-1$
+    /**
+     * The Action ID for zooming out.
+     */
     public final static String ZOOM_OUT_ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ZoomOutCoolBar"; //$NON-NLS-1$
+    /**
+     * The Action ID for reset zooming.
+     */
     public final static String RESET_ZOOM_ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ResetZoom"; //$NON-NLS-1$
+    /**
+     * The Action ID for no zoominf.
+     */
     public final static String NO_ZOOM_ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.NoZoom"; //$NON-NLS-1$
     
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+    /**
+     * The sequence diagram view reference
+     */
     protected SDView fView = null;
+    /**
+     * Flag to indicate last zoom in.
+     */
     protected boolean fLastZoomIn = false;
+    /**
+     * Flag to indicate last zoom out.
+     */
     protected boolean fLastZoomOut = false;
+    /**
+     * Flag to indicate last zoom.
+     */
     protected boolean fLastZoom = true;
-
+    /**
+     * The cursor used when zooming in.
+     */
     private static Cursor fZoomInCursor;
+    /**
+     * The cursor used when zooming out.
+     */
     private static Cursor fZoomOutCursor;
 
     public static enum ZoomType {
@@ -56,6 +92,12 @@ public class Zoom extends Action {
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+    
+    /**
+     * Constructor
+     * @param _view The view reference
+     * @param type The type of zoom.
+     */
     public Zoom(SDView _view, ZoomType type) {
         super("", AS_RADIO_BUTTON);//$NON-NLS-1$
 
@@ -64,6 +106,7 @@ public class Zoom extends Action {
         if ((fZoomInCursor != null) && (!fZoomInCursor.isDisposed())) {
             fZoomInCursor.dispose();
         }
+
         if ((fZoomOutCursor != null) && (!fZoomOutCursor.isDisposed())) {
             fZoomOutCursor.dispose();
         }
@@ -72,7 +115,7 @@ public class Zoom extends Action {
         fZoomInCursor = new Cursor(Display.getCurrent(), 
                 TmfUiPlugin.getDefault().getImageFromImageRegistry(ITmfImageConstants.IMG_UI_ZOOM_IN).getImageData(), 
                 TmfUiPlugin.getDefault().getImageFromImageRegistry(ITmfImageConstants.IMG_UI_ZOOM).getImageData(), 0, 0);
-        
+
         fZoomOutCursor = new Cursor(Display.getCurrent(), 
                 TmfUiPlugin.getDefault().getImageFromImageRegistry(ITmfImageConstants.IMG_UI_ZOOM_OUT).getImageData(),
                 TmfUiPlugin.getDefault().getImageFromImageRegistry(ITmfImageConstants.IMG_UI_ZOOM).getImageData(), 0, 0);
@@ -110,7 +153,7 @@ public class Zoom extends Action {
     }
 
     // ------------------------------------------------------------------------
-    // Operations
+    // Methods
     // ------------------------------------------------------------------------
     /*
      * (non-Javadoc)
@@ -176,6 +219,7 @@ public class Zoom extends Action {
 
     /**
      * Set action check state of a view action for a given action ID.
+     * 
      * @param id The action ID
      * @param checked true to check the action, false to uncheck the action
      */

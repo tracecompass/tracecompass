@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2006, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: MoveSDLeft.java,v 1.2 2006/09/20 20:56:26 ewchan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -17,25 +18,45 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDWidget;
 
 /**
+ * Action class implementation to move left in the sequence diagram view within a page.
+ * 
+ * @version 1.0
  * @author sveyrier
  * 
  */
 public class MoveSDLeft extends Action {
 
     // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    /**
+     * The action ID.
+     */
+    public final static String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.MoveSDLeft"; //$NON-NLS-1$
+    
+    // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    public final static String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.MoveSDLeft"; //$NON-NLS-1$
-
+    /**
+     * The sequence diagram view reference.
+     */
     protected SDView fView = null;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+    /**
+     * Default constructor
+     */
     public MoveSDLeft(){
         this(null);
     }
 
+    /**
+     * Constructor
+     * 
+     * @param view a sequence diagram view reference
+     */
     public MoveSDLeft(SDView view) {
         super();
         setId(ID);
@@ -49,7 +70,8 @@ public class MoveSDLeft extends Action {
    /*
     * (non-Javadoc)
     * @see org.eclipse.jface.action.Action#run()
-    */    @Override
+    */    
+    @Override
     public void run() {
         
         if (fView == null) {
@@ -64,6 +86,7 @@ public class MoveSDLeft extends Action {
     
     /**
      * Sets the active SD view.
+     * 
      * @param view The SD view.
      */
    public void setView(SDView view) {

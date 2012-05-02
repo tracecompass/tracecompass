@@ -1,10 +1,11 @@
 /**********************************************************************
  * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: SortSyncMessageComparator.java,v 1.2 2006/09/20 20:56:27 ewchan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -29,29 +30,35 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.SyncMessage;
  */
 public class SortSyncMessageComparator implements Comparator<GraphNode>, Serializable {
 
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
     /**
      * Serial version UID
      */
     private static final long serialVersionUID = 4781250984753283718L;
 
-    /**
-     * Compares two synchronous syncMessages. Returns 0 (equal) if one of the message is not synchronous
-     * 
-     * @return 1 if arg0 is greater, 0 if equal, -1 otherwise
+    // ------------------------------------------------------------------------
+    // Methods
+    // ------------------------------------------------------------------------
+    /*
+     * (non-Javadoc)
+     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
     @Override
     public int compare(GraphNode arg0, GraphNode arg1) {
         if (arg0 instanceof SyncMessage && arg1 instanceof SyncMessage) {
             SyncMessage m1 = (SyncMessage) arg0;
             SyncMessage m2 = (SyncMessage) arg1;
-            if (m1.getEventOccurrence() > m2.getEventOccurrence())
+            if (m1.getEventOccurrence() > m2.getEventOccurrence()) {
                 return 1;
-            else if (m1.getEventOccurrence() == m2.getEventOccurrence())
+            } else if (m1.getEventOccurrence() == m2.getEventOccurrence()) {
                 return 0;
-            else
+            } else {
                 return -1;
-        } else
+            }
+        } else {
             return 0;
+        }
     }
-
 }

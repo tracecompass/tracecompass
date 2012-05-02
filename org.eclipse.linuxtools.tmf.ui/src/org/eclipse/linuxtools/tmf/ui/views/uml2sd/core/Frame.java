@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: Frame.java,v 1.3 2008/01/24 02:28:49 apnan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -38,14 +39,37 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.TimeEventComparator;
  */
 public class Frame extends BasicFrame {
 
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+    /**
+     * The lifeline that is current highlighted.
+     */
     protected Lifeline highlightLifeline = null;
+    /**
+     * The value of the start event.
+     */
     protected int startEvent = 0;
+    /**
+     * The nubmer of events in the frame.
+     */
     protected int nbEvent = 0;
+    /**
+     * The color for highlighting.
+     */
     protected IColor highlightColor = null;
-
+    /**
+     * The list of time events of the corresponding execution occurrences.
+     */
     protected List<SDTimeEvent> executionOccurrencesWithTime;
-
+    /**
+     * The Array of lifeline categories.
+     */
     protected LifelineCategories[] lifelineCategories = null;
+
+    // ------------------------------------------------------------------------
+    // Methods
+    // ------------------------------------------------------------------------
 
     /**
      * Returns a list of all lifelines known by this frame. Known lifelines are the only one which can be displayed on
@@ -54,10 +78,10 @@ public class Frame extends BasicFrame {
      * @return the lifelines list
      */
     protected List<GraphNode> getLifelines() {
-        if (!hasChilden)
+        if (!hasChilden) {
             return null;
-        else
-            return (List<GraphNode>) nodes.get(Lifeline.LIFELINE_TAG);
+        } 
+        return (List<GraphNode>) nodes.get(Lifeline.LIFELINE_TAG);
     }
 
     /**
@@ -67,21 +91,22 @@ public class Frame extends BasicFrame {
      */
     public int lifeLinesCount() {
         List<GraphNode> lifelines = getLifelines();
-        if (lifelines != null)
+        if (lifelines != null) {
             return lifelines.size();
-        else
-            return 0;
+        }
+        return 0;
     }
 
     /**
      * Returns the lifeline at the given index in the lifelines array
      * 
      * @param index the position in the lifeline array
-     * @return the lifeline
+     * @return the lifeline or <code>null</code>
      */
     public Lifeline getLifeline(int index) {
-        if ((getLifelines() != null) && (index >= 0) && (index < lifeLinesCount()))
+        if ((getLifelines() != null) && (index >= 0) && (index < lifeLinesCount())) {
             return (Lifeline) getLifelines().get(index);
+        }
         return null;
     }
 
@@ -92,10 +117,10 @@ public class Frame extends BasicFrame {
      * @return the syncMessages list
      */
     protected List<GraphNode> getSyncMessages() {
-        if (!hasChilden)
+        if (!hasChilden) {
             return null;
-        else
-            return (List<GraphNode>) nodes.get(SyncMessage.SYNC_MESS_TAG);
+        } 
+        return (List<GraphNode>) nodes.get(SyncMessage.SYNC_MESS_TAG);
     }
 
     /**
@@ -104,21 +129,22 @@ public class Frame extends BasicFrame {
      * @return the number of syncMessage
      */
     public int syncMessageCount() {
-        if (getSyncMessages() != null)
+        if (getSyncMessages() != null) {
             return getSyncMessages().size();
-        else
-            return 0;
+        } 
+        return 0;
     }
 
     /**
      * Returns the syncMessage at the given index in the syncMessages array
      * 
      * @param index the position in the syncMessages array
-     * @return the syncMessage
+     * @return the syncMessage or <code>null</code>
      */
     public SyncMessage getSyncMessage(int index) {
-        if ((getSyncMessages() != null) && (index >= 0) && (index < getSyncMessages().size()))
+        if ((getSyncMessages() != null) && (index >= 0) && (index < getSyncMessages().size())) {
             return (SyncMessage) getSyncMessages().get(index);
+        }
         return null;
     }
 
@@ -126,13 +152,13 @@ public class Frame extends BasicFrame {
      * Returns a list of asyncMessages known by this frame. Known asyncMessages are the only on which can be displayed
      * on screen
      * 
-     * @return the asyncMessages list
+     * @return the asyncMessages list or <code>null</code>
      */
     protected List<GraphNode> getAsyncMessages() {
-        if (!hasChilden)
+        if (!hasChilden) {
             return null;
-        else
-            return (List<GraphNode>) nodes.get(AsyncMessage.ASYNC_MESS_TAG);
+        }
+        return (List<GraphNode>) nodes.get(AsyncMessage.ASYNC_MESS_TAG);
     }
 
     /**
@@ -141,21 +167,22 @@ public class Frame extends BasicFrame {
      * @return the number of asyncMessage
      */
     public int asyncMessageCount() {
-        if (getAsyncMessages() != null)
+        if (getAsyncMessages() != null) {
             return getAsyncMessages().size();
-        else
-            return 0;
+        }
+        return 0;
     }
 
     /**
      * Returns the asyncMessage at the given index in the asyncMessage array
      * 
      * @param index the position in the asyncMessage array
-     * @return the asyncMessage
+     * @return the asyncMessage or <code>null</code>
      */
     public AsyncMessage getAsyncMessage(int index) {
-        if ((getAsyncMessages() != null) && (index >= 0) && (index < getAsyncMessages().size()))
+        if ((getAsyncMessages() != null) && (index >= 0) && (index < getAsyncMessages().size())) {
             return (AsyncMessage) getAsyncMessages().get(index);
+        }
         return null;
     }
 
@@ -163,13 +190,13 @@ public class Frame extends BasicFrame {
      * Returns a list of syncMessages return known by this frame. Known syncMessages return are the only on which can be
      * displayed on screen
      * 
-     * @return the syncMessages return list
+     * @return the syncMessages return list or <code>null</code>
      */
     protected List<GraphNode> getSyncMessagesReturn() {
-        if (!hasChilden)
+        if (!hasChilden) {
             return null;
-        else
-            return (List<GraphNode>) nodes.get(SyncMessageReturn.SYNC_MESS_RET_TAG);
+        }
+        return (List<GraphNode>) nodes.get(SyncMessageReturn.SYNC_MESS_RET_TAG);
     }
 
     /**
@@ -178,21 +205,22 @@ public class Frame extends BasicFrame {
      * @return the number of syncMessageReturn
      */
     public int syncMessageReturnCount() {
-        if (getSyncMessagesReturn() != null)
+        if (getSyncMessagesReturn() != null) {
             return getSyncMessagesReturn().size();
-        else
-            return 0;
+        }
+        return 0;
     }
 
     /**
      * Returns the syncMessageReturn at the given index in the syncMessageReturn array
      * 
      * @param index the position in the syncMessageReturn array
-     * @return the syncMessageReturn
+     * @return the syncMessageReturn or <code>null</code>
      */
     public SyncMessageReturn getSyncMessageReturn(int index) {
-        if ((getSyncMessagesReturn() != null) && (index >= 0) && (index < getSyncMessagesReturn().size()))
+        if ((getSyncMessagesReturn() != null) && (index >= 0) && (index < getSyncMessagesReturn().size())) {
             return (SyncMessageReturn) getSyncMessagesReturn().get(index);
+        }
         return null;
     }
 
@@ -200,13 +228,13 @@ public class Frame extends BasicFrame {
      * Returns a list of asyncMessageRetun known by this frame. Known asyncMessageRetun are the only on which can be
      * displayed on screen
      * 
-     * @return the asyncMessageRetun list
+     * @return the asyncMessageRetun list or <code>null</code>
      */
     protected List<GraphNode> getAsyncMessagesReturn() {
-        if (!hasChilden)
+        if (!hasChilden) {
             return null;
-        else
-            return (List<GraphNode>) nodes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG);
+        }
+        return (List<GraphNode>) nodes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG);
     }
 
     /**
@@ -215,21 +243,22 @@ public class Frame extends BasicFrame {
      * @return the number of asyncMessageReturn
      */
     public int asyncMessageReturnCount() {
-        if (getAsyncMessagesReturn() != null)
+        if (getAsyncMessagesReturn() != null) {
             return getAsyncMessagesReturn().size();
-        else
-            return 0;
+        }
+        return 0;
     }
 
     /**
      * Returns the asyncMessageReturn at the given index in the asyncMessageReturn array
      * 
      * @param index the position in the asyncMessageReturn array
-     * @return the asyncMessageReturn
+     * @return the asyncMessageReturn or <code>null</code>
      */
     public AsyncMessageReturn getAsyncMessageReturn(int index) {
-        if ((getAsyncMessagesReturn() != null) && (index >= 0) && (index < getAsyncMessagesReturn().size()))
+        if ((getAsyncMessagesReturn() != null) && (index >= 0) && (index < getAsyncMessagesReturn().size())) {
             return (AsyncMessageReturn) getAsyncMessagesReturn().get(index);
+        }
         return null;
     }
 
@@ -241,8 +270,9 @@ public class Frame extends BasicFrame {
      */
     public void addLifeLine(Lifeline lifeline) {
         computeMinMax = true;
-        if (lifeline == null)
+        if (lifeline == null) {
             return;
+        }
         // set the lifeline parent frame
         lifeline.setFrame(this);
         // Increate the frame lifeline counter
@@ -261,12 +291,12 @@ public class Frame extends BasicFrame {
      * @return the first visible lifeline index
      */
     public int getFirstVisibleLifeline() {
-        if (!hasChilden)
+        if (!hasChilden) {
             return 0;
-        else if (indexes.get(Lifeline.LIFELINE_TAG) != null)
+        } else if (indexes.get(Lifeline.LIFELINE_TAG) != null) {
             return ((Integer) indexes.get(Lifeline.LIFELINE_TAG)).intValue();
-        else
-            return 0;
+        }
+        return 0;
     }
 
     /**
@@ -275,12 +305,12 @@ public class Frame extends BasicFrame {
      * @return the first visible synchronous message index
      */
     public int getFirstVisibleSyncMessage() {
-        if (!hasChilden)
+        if (!hasChilden) {
             return 0;
-        else if (indexes.get(SyncMessage.SYNC_MESS_TAG) != null)
+        } else if (indexes.get(SyncMessage.SYNC_MESS_TAG) != null) {
             return ((Integer) indexes.get(SyncMessage.SYNC_MESS_TAG)).intValue();
-        else
-            return 0;
+        }
+        return 0;
     }
 
     /**
@@ -289,12 +319,12 @@ public class Frame extends BasicFrame {
      * @return the first visible synchronous message return index
      */
     public int getFirstVisibleSyncMessageReturn() {
-        if (!hasChilden)
+        if (!hasChilden) {
             return 0;
-        else if (indexes.get(SyncMessageReturn.SYNC_MESS_RET_TAG) != null)
+        } else if (indexes.get(SyncMessageReturn.SYNC_MESS_RET_TAG) != null) {
             return ((Integer) indexes.get(SyncMessageReturn.SYNC_MESS_RET_TAG)).intValue();
-        else
-            return 0;
+        }
+        return 0;
     }
 
     /**
@@ -303,12 +333,12 @@ public class Frame extends BasicFrame {
      * @return the first visible synchronous message index
      */
     public int getFirstVisibleAsyncMessage() {
-        if (!hasChilden)
+        if (!hasChilden) {
             return 0;
-        else if (indexes.get(AsyncMessage.ASYNC_MESS_TAG) != null)
+        } else if (indexes.get(AsyncMessage.ASYNC_MESS_TAG) != null) {
             return ((Integer) indexes.get(AsyncMessage.ASYNC_MESS_TAG)).intValue();
-        else
-            return 0;
+        }
+        return 0;
     }
 
     /**
@@ -317,37 +347,54 @@ public class Frame extends BasicFrame {
      * @return the first visible synchronous message return index
      */
     public int getFirstVisibleAsyncMessageReturn() {
-        if (!hasChilden)
+        if (!hasChilden) {
             return 0;
-        else if (indexes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG) != null)
+        } else if (indexes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG) != null) {
             return ((Integer) indexes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG)).intValue();
-        else
-            return 0;
+        }
+        return 0;
     }
 
+    /**
+     * Returns the list of execution occurrences.
+     * 
+     * @return the list of execution occurrences
+     */
     public List<SDTimeEvent> getExecutionOccurrencesWithTime() {
         return executionOccurrencesWithTime;
     }
 
+    /**
+     * Inserts a lifeline after a given lifeline.
+     * 
+     * @param toInsert A lifeline to insert
+     * @param after A lifelife the toInsert-lifeline will be inserted after.  
+     */
     public void insertLifelineAfter(Lifeline toInsert, Lifeline after) {
-        if ((toInsert == null))
+        if ((toInsert == null)) {
             return;
-        if (toInsert == after)
+        }
+        if (toInsert == after) {
             return;
+        }
         int insertPoint = 0;
-        if (after != null)
+        if (after != null) {
             insertPoint = after.getIndex();
+        }
         int removePoint = toInsert.getIndex() - 1;
-        if (removePoint >= insertPoint)
+        if (removePoint >= insertPoint) {
             getLifelines().remove(removePoint);
+        }
         getLifelines().add(insertPoint, toInsert);
-        if (removePoint < insertPoint)
+        if (removePoint < insertPoint) {
             getLifelines().remove(removePoint);
+        }
 
-        if (removePoint >= insertPoint)
+        if (removePoint >= insertPoint) {
             toInsert.setIndex(insertPoint + 1);
-        else
+        } else {
             toInsert.setIndex(insertPoint - 1);
+        }
 
         insertPoint++;
         if (removePoint >= insertPoint) {
@@ -361,25 +408,37 @@ public class Frame extends BasicFrame {
         }
     }
 
+    /**
+     * Inserts a lifeline before a given lifeline.
+     * 
+     * @param toInsert A lifeline to insert
+     * @param after A lifelife the toInsert-lifeline will be inserted before.  
+     */
     public void insertLifelineBefore(Lifeline toInsert, Lifeline before) {
-        if ((toInsert == null))
+        if ((toInsert == null)) {
             return;
-        if (toInsert == before)
+        }
+        if (toInsert == before) {
             return;
+        }
         int insertPoint = 0;
-        if (before != null)
+        if (before != null) {
             insertPoint = before.getIndex() - 1;
+        }
         int removePoint = toInsert.getIndex() - 1;
-        if (removePoint >= insertPoint)
+        if (removePoint >= insertPoint) {
             getLifelines().remove(removePoint);
+        }
         getLifelines().add(insertPoint, toInsert);
-        if (removePoint < insertPoint)
+        if (removePoint < insertPoint) {
             getLifelines().remove(removePoint);
+        }
 
-        if (removePoint >= insertPoint)
+        if (removePoint >= insertPoint) {
             toInsert.setIndex(insertPoint + 1);
-        else
+        } else {
             toInsert.setIndex(insertPoint - 1);
+        }
 
         insertPoint++;
         if (removePoint >= insertPoint) {
@@ -393,12 +452,20 @@ public class Frame extends BasicFrame {
         }
     }
 
+    /**
+     * Gets the closer life line to the given x-coordinate.
+     * 
+     * @param x A x coordinate
+     * @return the closer lifeline 
+     */
     public Lifeline getCloserLifeline(int x) {
         int index = (x - Metrics.FRAME_H_MARGIN + Metrics.LIFELINE_H_MAGIN) / Metrics.swimmingLaneWidth() - 1;
-        if (index < 0)
+        if (index < 0) {
             index = 0;
-        if (index >= getLifelines().size())
+        }
+        if (index >= getLifelines().size()) {
             index = getLifelines().size() - 1;
+        }
         Lifeline node1, node2, node3;
         int dist1, dist2, dist3;
         node1 = node2 = node3 = getLifeline(index);
@@ -411,14 +478,19 @@ public class Frame extends BasicFrame {
             node3 = getLifeline(index + 1);
             dist3 = Math.abs(node3.getX() + node3.getWidth() / 2 - x);
         }
-        if (dist1 <= dist2 && dist1 <= dist3)
+        if (dist1 <= dist2 && dist1 <= dist3) {
             return node1;
-        else if (dist2 <= dist1 && dist2 <= dist3)
+        } else if (dist2 <= dist1 && dist2 <= dist3) {
             return node2;
-        else
-            return node3;
+        }
+        return node3;
     }
 
+    /**
+     * Re-orders the given list of lifelines.
+     * 
+     * @param list A list of lifelines to reorder.
+     */
     public void reorder(ArrayList<?> list) {
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i) instanceof Lifeline[]) {
@@ -426,13 +498,17 @@ public class Frame extends BasicFrame {
                 if (temp.length == 2) {
                     if (temp[1] == null) {
                         insertLifelineAfter(temp[0], getLifeline(lifeLinesCount() - 1));
-                    } else
+                    } else {
                         insertLifelineBefore(temp[0], temp[1]);
+                    }
                 }
             }
         }
     }
 
+    /**
+     * Resets the time compression information.
+     */
     public void resetTimeCompression() {
         highlightLifeline = null;
         this.startEvent = 0;
@@ -440,11 +516,16 @@ public class Frame extends BasicFrame {
         highlightColor = null;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BasicFrame#computeMinMax()
+     */
     @Override
     protected void computeMinMax() {
         List<SDTimeEvent> timeArray = buildTimeArray();
-        if (timeArray == null)
+        if (timeArray == null) {
             return;
+        }
         for (int i = 0; i < timeArray.size() - 1; i++) {
             SDTimeEvent m1 = (SDTimeEvent) timeArray.get(i);
             SDTimeEvent m2 = (SDTimeEvent) timeArray.get(i + 1);
@@ -452,8 +533,9 @@ public class Frame extends BasicFrame {
                 if ((m1.getGraphNode() instanceof BaseMessage) && (m2.getGraphNode() instanceof BaseMessage)) {
                     BaseMessage mes1 = (BaseMessage) m1.getGraphNode();
                     BaseMessage mes2 = (BaseMessage) m2.getGraphNode();
-                    if ((mes2.startLifeline == null) || (mes1.endLifeline == null))
+                    if ((mes2.startLifeline == null) || (mes1.endLifeline == null)) {
                         continue;
+                    }
                 }
 
             updateMinMax(m1, m2);
@@ -490,22 +572,31 @@ public class Frame extends BasicFrame {
         return false;
     }
 
+    /**
+     * Set whether time information is available or not
+     * 
+     * @param value <code>true</code> for has time information else <code>false</code>
+     */
     protected void setHasTimeInfo(boolean value) {
         timeInfo = value;
     }
 
     /**
-     * @return true if frame has time info else false
+     * Returns whether frame has time info or not.
+     * 
+     * @return <code>true</code> whether frame has time info else <code>false</code>
      */
     public boolean hasTimeInfo() {
         return timeInfo;
     }
 
     /**
-     * @param lifeline
-     * @param startEvent
-     * @param nbEvent
-     * @param color
+     * Highlights the time compression.
+     * 
+     * @param lifeline A lifeline to highlight
+     * @param startEvent A start event number
+     * @param nbEvent A number of events
+     * @param color A color for highlighting
      */
     public void highlightTimeCompression(Lifeline lifeline, int startEvent, int nbEvent, IColor color) {
         highlightLifeline = lifeline;
@@ -548,11 +639,16 @@ public class Frame extends BasicFrame {
         addNode(message);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BasicFrame#draw(org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC)
+     */
     @Override
     public void draw(IGC context) {
         drawFrame(context);
-        if (!hasChilden)
+        if (!hasChilden) {
             return;
+        }
         
         if (highlightLifeline != null) {
             IColor backupColor = context.getBackground();
@@ -563,26 +659,29 @@ public class Frame extends BasicFrame {
         }
         super.draw(context, false);
         int lifelineArryStep = 1;
-        if (Metrics.swimmingLaneWidth() * context.getZoom() < Metrics.LIFELINE_SIGNIFICANT_HSPACING)
+        if (Metrics.swimmingLaneWidth() * context.getZoom() < Metrics.LIFELINE_SIGNIFICANT_HSPACING) {
             lifelineArryStep = Math.round(Metrics.LIFELINE_SIGNIFICANT_HSPACING / (Metrics.swimmingLaneWidth() * context.getZoom()));
-        if (indexes.size() == 0)
+        }
+        if (indexes.size() == 0) {
             return;
+        }
         int lifeLineDrawIndex = ((Integer) indexes.get(Lifeline.LIFELINE_TAG)).intValue();
         for (int i = lifeLineDrawIndex; i < ((List<GraphNode>) nodes.get(Lifeline.LIFELINE_TAG)).size(); i = i + lifelineArryStep) {
             Lifeline toDraw = (Lifeline) ((List<GraphNode>) nodes.get(Lifeline.LIFELINE_TAG)).get(i);
-            if (toDraw.getX() - Metrics.LIFELINE_SPACING / 2 > context.getContentsX() + context.getVisibleWidth())
+            if (toDraw.getX() - Metrics.LIFELINE_SPACING / 2 > context.getContentsX() + context.getVisibleWidth()) {
                 break;
+            }
             toDraw.drawName(context);
 
             if (highlightLifeline != null) {
-                if (toDraw == highlightLifeline)
+                if (toDraw == highlightLifeline) {
                     toDraw.highlightExecOccurrenceRegion(context, startEvent, nbEvent, highlightColor);
-                else if ((toDraw.getIndex() < highlightLifeline.getIndex()) || ((toDraw.getIndex() < highlightLifeline.getIndex()))) {
+                } else if ((toDraw.getIndex() < highlightLifeline.getIndex()) || ((toDraw.getIndex() < highlightLifeline.getIndex()))) {
 
                     int acIndex = toDraw.getExecOccurrenceDrawIndex();
                     // acIndex = first visible execution occurrence
                     // for drawing speed reason with only search on the visible subset
-                    if (toDraw.getExecutions() != null)
+                    if (toDraw.getExecutions() != null) {
                         for (int index = acIndex; index < toDraw.getExecutions().size(); index++) {
                             BasicExecutionOccurrence exec = (BasicExecutionOccurrence) toDraw.getExecutions().get(index);
                             int tempEvent = startEvent;
@@ -594,22 +693,29 @@ public class Frame extends BasicFrame {
                             }
                             // if we are outside the visible area we stop right now
                             // This works because execution occurrences are ordered along the Y axis
-                            if (exec.getY() > getY())
+                            if (exec.getY() > getY()) {
                                 break;
+                            }
                         }
+                    }
                 }
             }
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.BasicFrame#buildTimeArray()
+     */
     @Override
     protected List<SDTimeEvent> buildTimeArray() {
-        if (!hasChilden)
+        if (!hasChilden) {
             return null;
+        }
         try {
             List<SDTimeEvent> timeArray = super.buildTimeArray();
             executionOccurrencesWithTime = null;
-            if (getLifelines() != null)
+            if (getLifelines() != null) {
                 for (int i = 0; i < ((List<GraphNode>) nodes.get(Lifeline.LIFELINE_TAG)).size(); i++) {
                     Lifeline l = (Lifeline) ((List<GraphNode>) nodes.get(Lifeline.LIFELINE_TAG)).get(i);
                     if (l.hasTimeInfo() && l.getExecutions() != null) {
@@ -636,6 +742,7 @@ public class Frame extends BasicFrame {
                         }
                     }
                 }
+            }
 
             if (executionOccurrencesWithTime != null) {
                 SDTimeEvent[] temp = executionOccurrencesWithTime.toArray(new SDTimeEvent[0]);
@@ -653,65 +760,97 @@ public class Frame extends BasicFrame {
 
     }
 
+    /**
+     * Get the closer leaving message.
+     * 
+     * @param lifeline A lifeline reference
+     * @param message A message reference
+     * @param list A list of graph nodes
+     * @param smallerEvent A smaller event flag
+     * @return the closer leaving message.
+     */
     protected GraphNode getCloserLeavingMessage(Lifeline lifeline, BaseMessage message, List<GraphNode> list, boolean smallerEvent) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
+
         if (smallerEvent == false) {
             int event = 0;
-            if (message != null)
+            if (message != null) {
                 event = message.getEventOccurrence();
+            }
             for (int i = 0; i < list.size(); i++) {
                 GraphNode node = (GraphNode) list.get(i);
                 if (node instanceof SyncMessage) {
                     SyncMessage syncNode = (SyncMessage) node;
-                    if ((syncNode.getEventOccurrence() > event) && (syncNode.getStartLifeline() == lifeline) && !syncNode.isSameAs(message))
+                    if ((syncNode.getEventOccurrence() > event) && (syncNode.getStartLifeline() == lifeline) && !syncNode.isSameAs(message)) {
                         return node;
+                    }
                 } else if (node instanceof AsyncMessage) {
                     AsyncMessage asyncNode = (AsyncMessage) node;
-                    if ((asyncNode.getStartOccurrence() > event) && (asyncNode.getStartLifeline() == lifeline) && !asyncNode.isSameAs(message))
+                    if ((asyncNode.getStartOccurrence() > event) && (asyncNode.getStartLifeline() == lifeline) && !asyncNode.isSameAs(message)) {
                         return node;
+                    }
                 }
             }
         } else {
             int event = getMaxEventOccurrence();
-            if (message != null)
+            if (message != null) {
                 if (message instanceof AsyncMessage) {
                     event = ((AsyncMessage) message).getStartOccurrence();
-                } else
+                } else {
                     event = message.getEventOccurrence();
+                }
+            }
             for (int i = list.size() - 1; i >= 0; i--) {
                 GraphNode node = (GraphNode) list.get(i);
                 if (node instanceof SyncMessage) {
                     SyncMessage syncNode = (SyncMessage) node;
-                    if ((syncNode.getEventOccurrence() < event) && (syncNode.getStartLifeline() == lifeline) && !syncNode.isSameAs(message))
+                    if ((syncNode.getEventOccurrence() < event) && (syncNode.getStartLifeline() == lifeline) && !syncNode.isSameAs(message)) {
                         return node;
+                    }
                 } else if (node instanceof AsyncMessage) {
                     AsyncMessage asyncNode = (AsyncMessage) node;
-                    if ((asyncNode.getStartOccurrence() < event) && (asyncNode.getStartLifeline() == lifeline) && !asyncNode.isSameAs(message))
+                    if ((asyncNode.getStartOccurrence() < event) && (asyncNode.getStartLifeline() == lifeline) && !asyncNode.isSameAs(message)) {
                         return node;
+                    }
                 }
             }
         }
         return null;
     }
 
+    
+    /**
+     * Get the closer entering message.
+     * 
+     * @param lifeline A lifeline reference
+     * @param message A message reference
+     * @param list A list of graph nodes
+     * @param smallerEvent A smaller event flag
+     * @return the closer entering message.
+     */
     protected GraphNode getCloserEnteringMessage(Lifeline lifeline, BaseMessage message, List<GraphNode> list, boolean smallerEvent) {
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         if (smallerEvent == false) {
             int event = 0;
-            if (message != null)
+            if (message != null) {
                 event = message.getEventOccurrence();
+            }
             for (int i = 0; i < list.size(); i++) {
                 GraphNode node = (GraphNode) list.get(i);
                 if (node instanceof SyncMessage) {
                     SyncMessage syncNode = (SyncMessage) node;
-                    if ((syncNode.getEventOccurrence() > event) && (syncNode.getEndLifeline() == lifeline) && !syncNode.isSameAs(message))
+                    if ((syncNode.getEventOccurrence() > event) && (syncNode.getEndLifeline() == lifeline) && !syncNode.isSameAs(message)) {
                         return node;
+                    }
                 } else if (node instanceof AsyncMessage) {
                     AsyncMessage asyncNode = (AsyncMessage) node;
-                    if ((asyncNode.getStartOccurrence() > event) && (asyncNode.getEndLifeline() == lifeline) && !asyncNode.isSameAs(message))
+                    if ((asyncNode.getStartOccurrence() > event) && (asyncNode.getEndLifeline() == lifeline) && !asyncNode.isSameAs(message)) {
                         return node;
+                    }
                 }
             }
         } else {
@@ -719,203 +858,299 @@ public class Frame extends BasicFrame {
             if (message != null)
                 if (message instanceof AsyncMessage) {
                     event = ((AsyncMessage) message).getStartOccurrence();
-                } else
+                } else {
                     event = message.getEventOccurrence();
+                }
             for (int i = list.size() - 1; i >= 0; i--) {
                 GraphNode node = (GraphNode) list.get(i);
                 if (node instanceof SyncMessage) {
                     SyncMessage syncNode = (SyncMessage) node;
-                    if ((syncNode.getEventOccurrence() < event) && (syncNode.getEndLifeline() == lifeline) && !syncNode.isSameAs(message))
+                    if ((syncNode.getEventOccurrence() < event) && (syncNode.getEndLifeline() == lifeline) && !syncNode.isSameAs(message)) {
                         return node;
+                    }
                 } else if (node instanceof AsyncMessage) {
                     AsyncMessage asyncNode = (AsyncMessage) node;
-                    if ((asyncNode.getStartOccurrence() < event) && (asyncNode.getEndLifeline() == lifeline) && !asyncNode.isSameAs(message))
+                    if ((asyncNode.getStartOccurrence() < event) && (asyncNode.getEndLifeline() == lifeline) && !asyncNode.isSameAs(message)) {
                         return node;
+                    }
                 }
             }
         }
         return null;
     }
 
+    /**
+     * Get distance of given event from given graph node.
+     * 
+     * @param node A graph node reference.
+     * @param event A event number to check.
+     * @return distance of event from graph node.
+     */
     protected int distanceFromEvent(GraphNode node, int event) {
         int distance = 0;
-        if (node instanceof SyncMessage)
+        if (node instanceof SyncMessage) {
             distance = ((SyncMessage) node).getEventOccurrence() - event;
-        else if (node instanceof AsyncMessage) {
+        } else if (node instanceof AsyncMessage) {
             int start = ((AsyncMessage) node).getStartOccurrence();
             int end = ((AsyncMessage) node).getEndOccurrence();
-            if ((start - event) < (end - event))
+            if ((start - event) < (end - event)) {
                 distance = start - event;
-            else
+            } else {
                 distance = end - event;
+            }
         }
         return Math.abs(distance);
     }
 
+    /**
+     * Get node from 2 given nodes that is close to event.
+     * 
+     * @param node1 A first graph node
+     * @param node2 A second graph node
+     * @param event A event to check.
+     * @return graph node that is closer or <code>null</code>
+     */
     protected GraphNode getCloserToEvent(GraphNode node1, GraphNode node2, int event) {
         if ((node1 != null) && (node2 != null)) {
-            if (distanceFromEvent(node1, event) < distanceFromEvent(node2, event))
+            if (distanceFromEvent(node1, event) < distanceFromEvent(node2, event)) {
                 return node1;
-            else
+            } else {
                 return node2;
-        } else if (node1 != null)
+            }
+        } else if (node1 != null) {
             return node1;
-        else if (node2 != null)
+        } else if (node2 != null) {
             return node2;
-        else
-            return null;
+        } 
+        return null;
     }
 
-    public GraphNode getCalledMessage(BaseMessage StartMessage) {
+    /**
+     * Get called message based on given start message.
+     * 
+     * @param startMessage A start message to check.
+     * @return called message (graph node) or <code>null</code>
+     */
+    public GraphNode getCalledMessage(BaseMessage startMessage) {
         int event = 0;
         GraphNode result = null;
         Lifeline lifeline = null;
-        if (StartMessage != null) {
-            event = ((BaseMessage) StartMessage).getEventOccurrence();
-            lifeline = ((BaseMessage) StartMessage).getEndLifeline();
-            if (lifeline == null)
-                lifeline = ((BaseMessage) StartMessage).getStartLifeline();
+        if (startMessage != null) {
+            event = ((BaseMessage) startMessage).getEventOccurrence();
+            lifeline = ((BaseMessage) startMessage).getEndLifeline();
+            if (lifeline == null) {
+                lifeline = ((BaseMessage) startMessage).getStartLifeline();
+            }
         }
-        if (lifeline == null)
+        if (lifeline == null) {
             return null;
-        GraphNode message = getCloserLeavingMessage(lifeline, StartMessage, getSyncMessages(), false);
-        GraphNode messageReturn = getCloserLeavingMessage(lifeline, StartMessage, getSyncMessagesReturn(), false);
+        }
+        GraphNode message = getCloserLeavingMessage(lifeline, startMessage, getSyncMessages(), false);
+        GraphNode messageReturn = getCloserLeavingMessage(lifeline, startMessage, getSyncMessagesReturn(), false);
         result = getCloserToEvent(message, messageReturn, event);
-        message = getCloserLeavingMessage(lifeline, StartMessage, getAsyncMessages(), false);
+        message = getCloserLeavingMessage(lifeline, startMessage, getAsyncMessages(), false);
         result = getCloserToEvent(result, message, event);
-        messageReturn = getCloserLeavingMessage(lifeline, StartMessage, getAsyncMessagesReturn(), false);
+        messageReturn = getCloserLeavingMessage(lifeline, startMessage, getAsyncMessagesReturn(), false);
         result = getCloserToEvent(result, messageReturn, event);
         return result;
     }
 
-    public GraphNode getCallerMessage(BaseMessage StartMessage) {
+    /**
+     * Get caller message based on given start message.
+     * 
+     * @param startMessage A start message to check.
+     * @return called message (graph node) or <code>null</code>
+     */
+    public GraphNode getCallerMessage(BaseMessage startMessage) {
         int event = getMaxEventOccurrence();
         GraphNode result = null;
         Lifeline lifeline = null;
-        if (StartMessage != null) {
-            event = ((BaseMessage) StartMessage).getEventOccurrence();
-            lifeline = ((BaseMessage) StartMessage).getStartLifeline();
-            if (lifeline == null)
-                lifeline = ((BaseMessage) StartMessage).getEndLifeline();
+        if (startMessage != null) {
+            event = ((BaseMessage) startMessage).getEventOccurrence();
+            lifeline = ((BaseMessage) startMessage).getStartLifeline();
+            if (lifeline == null) {
+                lifeline = ((BaseMessage) startMessage).getEndLifeline();
+            }
         }
-        if (lifeline == null)
+        if (lifeline == null) {
             return null;
-        GraphNode message = getCloserEnteringMessage(lifeline, StartMessage, getSyncMessages(), true);
-        GraphNode messageReturn = getCloserEnteringMessage(lifeline, StartMessage, getSyncMessagesReturn(), true);
+        }
+        GraphNode message = getCloserEnteringMessage(lifeline, startMessage, getSyncMessages(), true);
+        GraphNode messageReturn = getCloserEnteringMessage(lifeline, startMessage, getSyncMessagesReturn(), true);
         result = getCloserToEvent(message, messageReturn, event);
-        message = getCloserEnteringMessage(lifeline, StartMessage, getAsyncMessages(), true);
+        message = getCloserEnteringMessage(lifeline, startMessage, getAsyncMessages(), true);
         result = getCloserToEvent(result, message, event);
-        messageReturn = getCloserEnteringMessage(lifeline, StartMessage, getAsyncMessagesReturn(), true);
+        messageReturn = getCloserEnteringMessage(lifeline, startMessage, getAsyncMessagesReturn(), true);
         result = getCloserToEvent(result, messageReturn, event);
         return result;
     }
 
-    public GraphNode getNextLifelineMessage(Lifeline lifeline, BaseMessage StartMessage) {
+    /**
+     * Get next lifeline based on given message.
+     * 
+     * @param lifeline A lifeline reference
+     * @param startMessage A start message to check
+     * @return next lifeline or <code>null</code>
+     */
+    public GraphNode getNextLifelineMessage(Lifeline lifeline, BaseMessage startMessage) {
         int event = 0;
-        if (StartMessage != null)
-            event = ((BaseMessage) StartMessage).getEventOccurrence();
-        if (lifeline == null)
+        if (startMessage != null) {
+            event = ((BaseMessage) startMessage).getEventOccurrence();
+        }
+        if (lifeline == null) {
             return null;
-        GraphNode message = getCloserLeavingMessage(lifeline, StartMessage, getSyncMessages(), false);
-        GraphNode messageReturn = getCloserLeavingMessage(lifeline, StartMessage, getSyncMessagesReturn(), false);
+        }
+        GraphNode message = getCloserLeavingMessage(lifeline, startMessage, getSyncMessages(), false);
+        GraphNode messageReturn = getCloserLeavingMessage(lifeline, startMessage, getSyncMessagesReturn(), false);
         GraphNode result = getCloserToEvent(message, messageReturn, event);
-        message = getCloserLeavingMessage(lifeline, StartMessage, getAsyncMessages(), false);
+        message = getCloserLeavingMessage(lifeline, startMessage, getAsyncMessages(), false);
         result = getCloserToEvent(result, message, event);
-        messageReturn = getCloserLeavingMessage(lifeline, StartMessage, getAsyncMessagesReturn(), false);
+        messageReturn = getCloserLeavingMessage(lifeline, startMessage, getAsyncMessagesReturn(), false);
         result = getCloserToEvent(result, messageReturn, event);
         return result;
     }
 
+    /**
+     * Get previous lifeline based on given message.
+     * 
+     * @param lifeline A lifeline reference
+     * @param startMessage A start message to check.
+     * @return previous lifeline or <code>null</code>
+     */
+    public GraphNode getPrevLifelineMessage(Lifeline lifeline, BaseMessage startMessage) {
+        int event = getMaxEventOccurrence();
+        if (startMessage != null)
+            if (startMessage instanceof AsyncMessage) {
+                event = ((AsyncMessage) startMessage).getStartOccurrence();
+            } else {
+                event = startMessage.getEventOccurrence();
+            }
+        if (lifeline == null) {
+            return null;
+        }
+        GraphNode message = getCloserLeavingMessage(lifeline, startMessage, getSyncMessages(), true);
+        GraphNode messageReturn = getCloserLeavingMessage(lifeline, startMessage, getSyncMessagesReturn(), true);
+        GraphNode result = getCloserToEvent(message, messageReturn, event);
+        message = getCloserLeavingMessage(lifeline, startMessage, getAsyncMessages(), true);
+        result = getCloserToEvent(result, message, event);
+        messageReturn = getCloserLeavingMessage(lifeline, startMessage, getAsyncMessagesReturn(), true);
+        result = getCloserToEvent(result, messageReturn, event);
+        return result;
+    }
+    
+    /**
+     * Get the first execution occurrence.
+     * 
+     * @param lifeline A lifeline reference
+     * @return the first execution occurrence of lifeline or <code>null</code>.
+     */
     public BasicExecutionOccurrence getFirstExecution(Lifeline lifeline) {
-        if (lifeline == null)
+        if (lifeline == null) {
             return null;
+        }
         List<GraphNode> list = lifeline.getExecutions();
-        if (list == null)
+        if (list == null) {
             return null;
-        if (list.size() == 0)
+        }
+        if (list.size() == 0) {
             return null;
+        }
         BasicExecutionOccurrence result = (BasicExecutionOccurrence) list.get(0);
         for (int i = 0; i < list.size(); i++) {
             BasicExecutionOccurrence e = (BasicExecutionOccurrence) list.get(i);
-            if ((e.getStartOccurrence() < result.getEndOccurrence()))
+            if ((e.getStartOccurrence() < result.getEndOccurrence())) {
                 result = e;
+            }
         }
         return result;
     }
-
+    
+    /**
+     * Get the previous execution occurrence relative to a given execution occurrence.
+     * 
+     * @param exec A execution occurrence reference.
+     * @return the previous execution occurrence of lifeline or <code>null</code>.
+     */
     public BasicExecutionOccurrence getPrevExecOccurrence(BasicExecutionOccurrence exec) {
-        if (exec == null)
+        if (exec == null) {
             return null;
+        }
         Lifeline lifeline = exec.getLifeline();
-        if (lifeline == null)
+        if (lifeline == null) {
             return null;
+        }
         List<GraphNode> list = lifeline.getExecutions();
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         BasicExecutionOccurrence result = null;
         for (int i = 0; i < list.size(); i++) {
             BasicExecutionOccurrence e = (BasicExecutionOccurrence) list.get(i);
-            if ((e.getStartOccurrence() < exec.startEventOccurrence) && (result == null))
+            if ((e.getStartOccurrence() < exec.startEventOccurrence) && (result == null)) {
                 result = e;
-            if ((e.getStartOccurrence() < exec.startEventOccurrence) && (e.getStartOccurrence() >= result.getEndOccurrence()))
+            }
+            if ((e.getStartOccurrence() < exec.startEventOccurrence) && (e.getStartOccurrence() >= result.getEndOccurrence())) {
                 result = e;
+            }
         }
         return result;
     }
 
+    /**
+     * Get the next execution occurrence relative to a given execution occurrence.
+     * 
+     * @param exec A execution occurrence reference.
+     * @return the next execution occurrence of lifeline or <code>null</code>.
+     */
     public BasicExecutionOccurrence getNextExecOccurrence(BasicExecutionOccurrence exec) {
-        if (exec == null)
+        if (exec == null) {
             return null;
+        }
         Lifeline lifeline = exec.getLifeline();
-        if (lifeline == null)
+        if (lifeline == null) {
             return null;
+        }
         List<GraphNode> list = lifeline.getExecutions();
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         BasicExecutionOccurrence result = null;
         for (int i = 0; i < list.size(); i++) {
             BasicExecutionOccurrence e = (BasicExecutionOccurrence) list.get(i);
-            if ((e.getStartOccurrence() > exec.startEventOccurrence) && (result == null))
+            if ((e.getStartOccurrence() > exec.startEventOccurrence) && (result == null)) {
                 result = e;
-            if ((e.getStartOccurrence() > exec.startEventOccurrence) && (e.getStartOccurrence() <= result.getEndOccurrence()))
+            }
+            if ((e.getStartOccurrence() > exec.startEventOccurrence) && (e.getStartOccurrence() <= result.getEndOccurrence())) {
                 result = e;
+            }
         }
         return result;
     }
 
+    /**
+     * Get the last execution occurrence.
+     * 
+     * @param lifeline A lifeline reference.
+     * @return the last execution occurrence of lifeline or <code>null</code>.
+     */
     public BasicExecutionOccurrence getLastExecOccurrence(Lifeline lifeline) {
-        if (lifeline == null)
+        if (lifeline == null) {
             return null;
+        }
         List<GraphNode> list = lifeline.getExecutions();
-        if (list == null)
+        if (list == null) {
             return null;
+        }
         BasicExecutionOccurrence result = null;
         for (int i = 0; i < list.size(); i++) {
             BasicExecutionOccurrence e = (BasicExecutionOccurrence) list.get(i);
-            if (result == null)
+            if (result == null) {
                 result = e;
-            if (e.getStartOccurrence() > result.getEndOccurrence())
+            }
+            if (e.getStartOccurrence() > result.getEndOccurrence()) {
                 result = e;
+            }
         }
-        return result;
-    }
-
-    public GraphNode getPrevLifelineMessage(Lifeline lifeline, BaseMessage StartMessage) {
-        int event = getMaxEventOccurrence();
-        if (StartMessage != null)
-            if (StartMessage instanceof AsyncMessage) {
-                event = ((AsyncMessage) StartMessage).getStartOccurrence();
-            } else
-                event = StartMessage.getEventOccurrence();
-        if (lifeline == null)
-            return null;
-        GraphNode message = getCloserLeavingMessage(lifeline, StartMessage, getSyncMessages(), true);
-        GraphNode messageReturn = getCloserLeavingMessage(lifeline, StartMessage, getSyncMessagesReturn(), true);
-        GraphNode result = getCloserToEvent(message, messageReturn, event);
-        message = getCloserLeavingMessage(lifeline, StartMessage, getAsyncMessages(), true);
-        result = getCloserToEvent(result, message, event);
-        messageReturn = getCloserLeavingMessage(lifeline, StartMessage, getAsyncMessagesReturn(), true);
-        result = getCloserToEvent(result, messageReturn, event);
         return result;
     }
 }

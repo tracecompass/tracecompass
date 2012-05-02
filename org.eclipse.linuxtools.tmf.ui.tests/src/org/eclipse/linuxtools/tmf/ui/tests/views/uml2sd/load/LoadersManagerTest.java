@@ -25,7 +25,7 @@ public class LoadersManagerTest extends TestCase {
     private final static String SDVIEW_WITH_ONE_LOADER = "org.eclipse.linuxtools.tmf.ui.tests.testSDView1Loader"; //$NON-NLS-1$
     private final static String SDVIEW_WITH_MULTIPLE_LOADER = "org.eclipse.linuxtools.tmf.ui.tests.testSDView2Loaders"; //$NON-NLS-1$
     private final static String TEST_LOADER_CLASS_NAME = "org.eclipse.linuxtools.tmf.ui.tests.uml2sd.load.TestLoaders"; //$NON-NLS-1$
-    private final static String TMF_UML2SD_LOADER_CLASS_NAME = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.impl.TmfUml2SDSyncLoader"; //$NON-NLS-1$
+    private final static String TMF_UML2SD_LOADER_CLASS_NAME = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.loader.TmfUml2SDSyncLoader"; //$NON-NLS-1$
     
     private static final String LOADER_TAG = "uml2SDLoader"; //$NON-NLS-1$
     private static final String LOADER_PREFIX = LOADER_TAG + "."; //$NON-NLS-1$

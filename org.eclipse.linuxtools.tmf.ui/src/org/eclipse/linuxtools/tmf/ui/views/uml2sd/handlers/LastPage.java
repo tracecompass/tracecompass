@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -18,20 +18,37 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
 
 /**
- * Moves the focus on the last page in the sequence diagram view. 
+ * Action class implementation to move the focus to the last page of the whole sequence diagram.
+ * 
+ * @version 1.0
+ * @author Bernd Hufmann
  */
 public class LastPage extends Action {
 
     // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    /**
+     * The action ID.
+     */
+    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.lastpage"; //$NON-NLS-1$
+
+    // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.lastpage"; //$NON-NLS-1$
-    
+    /**
+     * The sequence diagram view reference
+     */
     protected SDView fView = null;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+    /**
+     * Standard constructor
+     *  
+     * @param theView the view reference
+     */
     public LastPage(SDView theView) {
         super();
         fView = theView;
@@ -42,7 +59,7 @@ public class LastPage extends Action {
     }
 
     // ------------------------------------------------------------------------
-    // Operations
+    // Methods
     // ------------------------------------------------------------------------
     /*
      * (non-Javadoc)

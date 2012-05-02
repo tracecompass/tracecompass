@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -28,8 +28,8 @@ public class AllTmfUITests {
 		TestSuite suite = new TestSuite(AllTmfUITests.class.getName());
 		//$JUnit-BEGIN$
 		suite.addTest(org.eclipse.linuxtools.tmf.ui.tests.statistics.AllTests.suite());
-        suite.addTest(org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.handlers.widgets.AllTests.suite());
-        suite.addTest(org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.impl.AllTests.suite());
+        suite.addTest(org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.dialogs.AllTests.suite());
+        suite.addTest(org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.loader.AllTests.suite());
         suite.addTest(org.eclipse.linuxtools.tmf.ui.tests.views.uml2sd.load.AllTests.suite());
         suite.addTest(org.eclipse.linuxtools.tmf.ui.tests.histogram.AllTests.suite());
 		//$JUnit-END$

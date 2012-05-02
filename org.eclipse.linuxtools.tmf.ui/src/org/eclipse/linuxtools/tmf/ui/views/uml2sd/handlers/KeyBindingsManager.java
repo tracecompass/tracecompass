@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2011 Ericsson
+ * Copyright (c) 2011, 2012 Ericsson
  * 
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -26,50 +26,91 @@ import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 
 /**
- * <b><u>KeyBindingsManager</u></b>
  * <p>
  * Singleton class that manages key-bindings for certain commands across multiple sequence 
  * diagram view instances.
  * </p>
+ * 
+ * @version 1.0
+ * @author Bernd Hufmann
+ * 
  */
 public class KeyBindingsManager {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    // The instance
+    
+    /**
+     * The singleton instance. 
+     */
     private final static KeyBindingsManager fInstance = new KeyBindingsManager();
-    
-    // Storage of views
+    /**
+     * The list of view names. 
+     */
     private Set<String> fViews = new HashSet<String>(); 
-    
-    // Activations to store
+    /**
+     * The list of activations Activations to store
+     */
     private List<IHandlerActivation> fHandlerActivations = new Vector<IHandlerActivation>();
-
-    // Actions for the keys bindings 
+    /**
+     * The action reference for moving to a message in view. 
+     */
     private MoveToMessage fGoToMessageForKeyBinding;
+    /**
+     * The action reference for opening the find dialog. 
+     */
     private OpenSDFindDialog fFindForKeyBinding;
+    /**
+     * The action reference for moving up in view. 
+     */
     private MoveSDUp fMoveUpForKeyBinding;
+    /**
+     * The action reference for moving down in view. 
+     */
     private MoveSDDown fMoveDownForKeyBinding;
+    /**
+     * The action reference for moving left in view. 
+     */
     private MoveSDLeft fMoveLeftForKeyBinding;
+    /**
+     * The action reference for moving right in view. 
+     */
     private MoveSDRight fMoveRightForKeyBinding;
+    /**
+     * The action reference for showing node start. 
+     */
     private ShowNodeStart fShowNodeStartForKeyBinding;
+    /**
+     * The action reference for showing node end.
+     */
     private ShowNodeEnd fShowNodeEndForKeyBinding;
 
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
+    
+    /**
+     * Private constructor 
+     */
     private KeyBindingsManager() {
     }
 
     // ------------------------------------------------------------------------
-    // Operations
+    // Methods
     // ------------------------------------------------------------------------
-    public static KeyBindingsManager getInstance() {
+    /**
+     * Returns the KeyBindingsManager singleton instance.
+     * 
+     * @return the KeyBindingsManager singleton instance
+     */
+    public synchronized static KeyBindingsManager getInstance() {
         return fInstance;
     }
     
     /**
+     * Adds a view list of managed view list. 
+     * 
      * @param viewId Id of SD view to add and to manage
      */
     public void add(String viewId) {
@@ -84,6 +125,8 @@ public class KeyBindingsManager {
     }
     
     /**
+     * Removes a view from managed view list
+     * 
      * @param viewId Id of SD view to remove
      */
     public void remove(String viewId) {
@@ -95,6 +138,9 @@ public class KeyBindingsManager {
         }
     }
     
+    /*
+     * Initialized the KeyBindingsManager.
+     */
     private void initialize() {
         fGoToMessageForKeyBinding = new MoveToMessage();
         IHandlerService service = (IHandlerService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IHandlerService.class);
@@ -197,6 +243,9 @@ public class KeyBindingsManager {
 
     }
     
+    /*
+     * Disposes the KeyBindingsManager
+     */
     private void dispose() {
         IHandlerService service = (IHandlerService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IHandlerService.class);
         for(IHandlerActivation activation : fHandlerActivations) {
@@ -214,6 +263,8 @@ public class KeyBindingsManager {
     }
 
     /**
+     * Set the view in all supported actions 
+     * 
      * @param view to set in global actions
      */
     public void setSdView(SDView view) {
@@ -231,7 +282,8 @@ public class KeyBindingsManager {
 
     /**
      * Enable / disable find action
-     * @param enabled
+     * 
+     * @param enabled <code>true</code> for enabling else <code>false</code>  
      */
     public void setFindEnabled(boolean enabled) {
         if (fFindForKeyBinding != null) {

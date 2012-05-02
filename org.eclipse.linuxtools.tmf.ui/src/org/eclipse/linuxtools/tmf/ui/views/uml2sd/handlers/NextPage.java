@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: NextPage.java,v 1.3 2008/01/24 02:28:52 apnan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -19,21 +20,38 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
 
 /**
+ * Action class implementation to move the focus to the next page of the whole sequence diagram.
+ * 
+ * @version 1.0
  * @author sveyrier
  * 
  */
 public class NextPage extends Action {
 
     // ------------------------------------------------------------------------
-    // Attributes
+    // Constants
     // ------------------------------------------------------------------------
+    /**
+     * The action ID.
+     */
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.nextpage"; //$NON-NLS-1$
     
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+    /**
+     * The sequence diagram view reference.
+     */
     protected SDView fView = null;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+    /**
+     * Default constructor 
+     * 
+     * @param theView the view reference
+     */
     public NextPage(SDView theView) {
         super();
         fView = theView;

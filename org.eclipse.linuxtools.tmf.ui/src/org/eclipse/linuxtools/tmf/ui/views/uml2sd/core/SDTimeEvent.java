@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2006, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: TimeEvent.java,v 1.2 2006/09/20 20:56:25 ewchan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -15,29 +16,73 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 
 /**
+ * Class implementation of a sequence diagram time event. 
+ * 
+ * @version 1.0
  * @author sveyrier
  * 
  */
 public class SDTimeEvent {
 
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+
+    /**
+     * The time stamp of the event
+     */
     protected ITmfTimestamp time;
+    /**
+     * The event index.
+     */
     protected int event;
+    /**
+     * The time range implementing node.
+     */
     protected ITimeRange node;
 
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
+    /**
+     * The default constructor.
+     * 
+     * @param _time The time stamp of the event.
+     * @param _event The event index.
+     * @param _node The time range implementing node.
+     */
     public SDTimeEvent(ITmfTimestamp _time, int _event, ITimeRange _node) {
         time = _time;
         event = _event;
         node = _node;
     }
 
+    // ------------------------------------------------------------------------
+    // Operations
+    // ------------------------------------------------------------------------
+    /**
+     * Returns the timestamp of the event.
+     * 
+     * @return the timestamp of the event.
+     */
     public ITmfTimestamp getTime() {
         return time;
     }
 
+    /**
+     * Returns the event index.
+     * 
+     * @return the event index.
+     */
     public int getEvent() {
         return event;
     }
 
+    /**
+     * Returns the time range implementing node.
+     * 
+     * @return the time range implementing node.
+     */
     public ITimeRange getGraphNode() {
         return node;
     }

@@ -1,10 +1,11 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 Ericsson.
+ * 
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * $Id: OpenSDFindDialog.java,v 1.3 2008/01/24 02:28:52 apnan Exp $
  * 
  * Contributors: 
  * IBM - Initial API and implementation
@@ -16,31 +17,54 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.linuxtools.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.widgets.SearchFilterDialog;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.dialogs.SearchFilterDialog;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SDMessages;
 import org.eclipse.swt.SWT;
 
 /**
+ * Action class implementation for 'Finding' of messages/lifelines.
+ * 
+ * @version 1.0
  * @author sveyrier
  * 
  */
 public class OpenSDFindDialog extends Action {
+    
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    /**
+     * The action ID.
+     */
+    public final static String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.sdFind"; //$NON-NLS-1$
+    /**
+     * The action definition ID.
+     */
+    public final static String ACTION_DEFINITION_ID = "org.eclipse.ui.edit.findReplace"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    public final static String ID = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.sdFind"; //$NON-NLS-1$
-    public final static String ACTION_DEFINITION_ID = "org.eclipse.ui.edit.findReplace"; //$NON-NLS-1$
-    
-    protected SDView fView = null;
+    /**
+     * The sequence diagram view reference
+     */
+    protected SDView fView;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+    /**
+     * Default constructor
+     */
     public OpenSDFindDialog() {
         this(null);
     }
-    
+
+    /**
+     * Constructor 
+     * 
+     * @param theView The view reference
+     */
     public OpenSDFindDialog(SDView theView) {
         super(SDMessages._41);
         setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_SEARCH_SEQ));
@@ -51,7 +75,7 @@ public class OpenSDFindDialog extends Action {
     }
 
     // ------------------------------------------------------------------------
-    // Operations
+    // Methods
     // ------------------------------------------------------------------------
     /*
      * (non-Javadoc)
@@ -73,8 +97,7 @@ public class OpenSDFindDialog extends Action {
                 SearchFilterDialog dialog = new SearchFilterDialog(fView, fView.getSDFindProvider(), false, SWT.NORMAL);
                 dialog.open();
             }
-        }
-        finally {
+        } finally {
             // Enable action after finishing the search
             this.setEnabled(true);
         }
@@ -82,6 +105,7 @@ public class OpenSDFindDialog extends Action {
     
     /**
      * Sets the active SD view.
+     * 
      * @param view The SD view.
      */
    public void setView(SDView view) {
