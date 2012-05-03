@@ -62,7 +62,9 @@ public final class CtfTmfEvent implements ITmfEvent {
      * the StreamInputReader).
      *
      * @param eventDef
-     * @param top
+
+     * @param fileName String
+     * @param originTrace CtfTmfTrace
      */
     public CtfTmfEvent(EventDefinition eventDef, String fileName,
             CtfTmfTrace originTrace) {
@@ -96,7 +98,8 @@ public final class CtfTmfEvent implements ITmfEvent {
      * mess, and put them into something ITmfEventField can cope with.
      *
      * @param eventDef
-     * @return
+
+     * @return CtfTmfEventField[]
      */
     private static CtfTmfEventField[] parseFields(EventDefinition eventDef) {
         List<CtfTmfEventField> fields = new ArrayList<CtfTmfEventField>();
@@ -165,8 +168,7 @@ public final class CtfTmfEvent implements ITmfEvent {
     /**
      * Get a null event
      *
-     * @return an empty event.
-     */
+     * @return an empty event. */
     public static CtfTmfEvent getNullEvent() {
         if (nullEvent == null) {
             nullEvent = new CtfTmfEvent();
@@ -177,8 +179,7 @@ public final class CtfTmfEvent implements ITmfEvent {
     /**
      * Gets the current timestamp of the event
      *
-     * @return the current timestamp (long)
-     */
+     * @return the current timestamp (long) */
     public long getTimestampValue() {
         return this.timestamp;
     }
@@ -186,8 +187,7 @@ public final class CtfTmfEvent implements ITmfEvent {
     /**
      * Gets the cpu core the event was recorded on.
      *
-     * @return the cpu id for a given source. In lttng it's from CPUINFO
-     */
+     * @return the cpu id for a given source. In lttng it's from CPUINFO */
     public int getCPU() {
         return this.sourceCPU;
     }
@@ -197,8 +197,8 @@ public final class CtfTmfEvent implements ITmfEvent {
      * this ID is not constant from one trace to another for the same event
      * types! Use "getEventName()" for a constant reference.
      *
-     * @return the event ID
-     */
+
+     * @return the event ID */
     public long getID() {
         return this.typeId;
     }
@@ -206,8 +206,7 @@ public final class CtfTmfEvent implements ITmfEvent {
     /**
      * Gets the name of a current event.
      *
-     * @return the event name
-     */
+     * @return the event name */
     public String getEventName() {
         return eventName;
     }
@@ -215,17 +214,26 @@ public final class CtfTmfEvent implements ITmfEvent {
     /**
      * Gets the channel name of a field.
      *
-     * @return the channel name.
-     */
+     * @return the channel name. */
     public String getChannelName() {
         return this.fileName;
     }
 
+    /**
+     * Method getTrace.
+     * @return CtfTmfTrace
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEvent#getTrace()
+     */
     @Override
     public CtfTmfTrace getTrace() {
         return fTrace;
     }
 
+    /**
+     * Method getRank.
+     * @return long
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEvent#getRank()
+     */
     @Override
     public long getRank() {
         // TODO Auto-generated method stub
@@ -236,6 +244,11 @@ public final class CtfTmfEvent implements ITmfEvent {
 
     // TODO Benchmark if the singleton approach is faster than just
     // instantiating a final fTimestramp right away at creation time
+    /**
+     * Method getTimestamp.
+     * @return ITmfTimestamp
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEvent#getTimestamp()
+     */
     @Override
     public ITmfTimestamp getTimestamp() {
         if (fTimestamp == null) {
@@ -245,6 +258,11 @@ public final class CtfTmfEvent implements ITmfEvent {
     }
 
     String fSource = null;
+    /**
+     * Method getSource.
+     * @return String
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEvent#getSource()
+     */
     @Override
     public String getSource() {
         // TODO Returns CPU for now
@@ -255,6 +273,11 @@ public final class CtfTmfEvent implements ITmfEvent {
     }
 
     private CtfTmfEventType type = null;
+    /**
+     * Method getType.
+     * @return ITmfEventType
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEvent#getType()
+     */
     @Override
     public ITmfEventType getType() {
         if(type == null){
@@ -263,12 +286,22 @@ public final class CtfTmfEvent implements ITmfEvent {
         return type;
     }
 
+    /**
+     * Method getContent.
+     * @return ITmfEventField
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEvent#getContent()
+     */
     @Override
     public ITmfEventField getContent() {
         return fContent;
     }
 
     String fReference = null;
+    /**
+     * Method getReference.
+     * @return String
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEvent#getReference()
+     */
     @Override
     public String getReference() {
         if( fReference == null){
@@ -277,6 +310,11 @@ public final class CtfTmfEvent implements ITmfEvent {
         return fReference;
     }
 
+    /**
+     * Method clone.
+     * @return CtfTmfEvent
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfEvent#clone()
+     */
     @Override
     public CtfTmfEvent clone() {
         return new CtfTmfEvent(this);

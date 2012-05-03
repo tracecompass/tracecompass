@@ -18,23 +18,39 @@ import java.util.Date;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 
+/**
+ */
 public class CtfTmfTimestamp extends TmfTimestamp {
 
+    /**
+     */
     public enum TimestampType {
         FULL_DATE, DAY, NANOS, SECONDS
     }
 
     private TimestampType type;
 
+    /**
+     * Constructor for CtfTmfTimestamp.
+     * @param timestamp long
+     */
     public CtfTmfTimestamp(long timestamp) {
         setValue(timestamp, -9, 0);
         type = TimestampType.DAY;
     }
 
+    /**
+     * Method setType.
+     * @param value TimestampType
+     */
     public void setType(TimestampType value) {
         type = value;
     }
 
+    /**
+     * Method getType.
+     * @return TimestampType
+     */
     public TimestampType getType() {
         return type;
     }
@@ -45,6 +61,12 @@ public class CtfTmfTimestamp extends TmfTimestamp {
      * @see
      * org.eclipse.linuxtools.tmf.core.event.TmfTimestamp#getDelta(org.eclipse
      * .linuxtools.tmf.core.event.ITmfTimestamp)
+     */
+    /**
+     * Method getDelta.
+     * @param ts ITmfTimestamp
+     * @return ITmfTimestamp
+     * @see org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp#getDelta(ITmfTimestamp)
      */
     @Override
     public ITmfTimestamp getDelta(ITmfTimestamp ts) {
@@ -88,6 +110,10 @@ public class CtfTmfTimestamp extends TmfTimestamp {
         return super.toString();
     }
 
+    /**
+     * Method secondsToString.
+     * @return String
+     */
     private String secondsToString() {
         double timestamp = getValue();
         timestamp /= 1000000000;
@@ -97,6 +123,10 @@ public class CtfTmfTimestamp extends TmfTimestamp {
         return retVal.toString();
     }
 
+    /**
+     * Method nanoToString.
+     * @return String
+     */
     private String nanoToString() {
         final long timestamp = getValue();
         StringBuilder retVal = new StringBuilder();
@@ -105,6 +135,10 @@ public class CtfTmfTimestamp extends TmfTimestamp {
         return retVal.toString();
     }
 
+    /**
+     * Method dateToString.
+     * @return String
+     */
     private String dateToString() {
         final long timestamp = getValue();
         final Date d = new Date(timestamp / 1000000);
@@ -116,6 +150,10 @@ public class CtfTmfTimestamp extends TmfTimestamp {
         return output.toString();
     }
 
+    /**
+     * Method toFullDateString.
+     * @return String
+     */
     private String toFullDateString() {
         final long timestamp = getValue();
         final Date d = new Date(timestamp / 1000000);
@@ -125,6 +163,38 @@ public class CtfTmfTimestamp extends TmfTimestamp {
         output.append(df.format(d));
         output.append(String.format("%09d", nanos)); //$NON-NLS-1$
         return output.toString();
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = (prime * result) + ((type == null) ? 0 : type.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof CtfTmfTimestamp)) {
+            return false;
+        }
+        CtfTmfTimestamp other = (CtfTmfTimestamp) obj;
+        if (type != other.type) {
+            return false;
+        }
+        return true;
     }
 
 }

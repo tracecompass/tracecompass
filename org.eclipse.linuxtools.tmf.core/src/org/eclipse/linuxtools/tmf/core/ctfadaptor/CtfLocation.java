@@ -1,32 +1,67 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors: Matthew Khouzam - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 
+/**
+ * The ctflocation is the nugget of information that is unique to a location in a trace.
+ * it can be copied and used to restore a position in a given trace.
+ */
 public class CtfLocation implements ITmfLocation<Long> {
 
     public static final Long INVALID_LOCATION = -1L;
 
+    /**
+     * Constructor for CtfLocation.
+     * @param location Long
+     */
     public CtfLocation(Long location) {
         setLocation(location);
     }
 
+    /**
+     * Constructor for CtfLocation.
+     * @param timestamp ITmfTimestamp
+     */
     public CtfLocation(ITmfTimestamp timestamp) {
         setLocation(timestamp.getValue());
     }
 
     private Long fTimestamp;
 
-//    @Override
+    /**
+     * Method setLocation.
+     * @param location Long
+     */
     public void setLocation(Long location) {
         this.fTimestamp = location;
     }
 
+    /**
+     * Method getLocation.
+     * @return Long
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfLocation#getLocation()
+     */
     @Override
     public Long getLocation() {
         return this.fTimestamp;
     }
 
+    /**
+     * Method clone.
+     * @return CtfLocation
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfLocation#clone()
+     */
     @Override
     public CtfLocation clone() {
         return new CtfLocation(getLocation());

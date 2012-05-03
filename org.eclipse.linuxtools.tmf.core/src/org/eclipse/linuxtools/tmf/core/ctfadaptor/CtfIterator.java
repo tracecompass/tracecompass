@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors: Matthew Khouzam - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 
 import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
@@ -5,6 +15,11 @@ import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 
+/**
+ * The ctfIterator is the class that will act like a reader for the trace
+ * it does not have a file handle, so many iterators can be used without worries
+ * of io errors.
+ */
 public class CtfIterator extends CTFTraceReader implements ITmfContext,
         Comparable<CtfIterator> {
 
@@ -19,7 +34,7 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
      * Create a new CTF trace iterator, which initially points at the first
      * event in the trace.
      *
-     * @param trace
+     * @param trace the trace to iterate over
      */
     public CtfIterator(final CtfTmfTrace trace) {
         super(trace.getCTFTrace());
@@ -41,6 +56,12 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
         this.curRank = UNKNOWN_RANK;
     }
 
+    /**
+     * Constructor for CtfIterator.
+     * @param trace CtfTmfTrace the trace
+     * @param timestampValue long the timestamp in ns of the trace for positioning
+     * @param rank long the index of the trace for positioning
+     */
     public CtfIterator(final CtfTmfTrace trace, final long timestampValue,
             final long rank) {
         super(trace.getCTFTrace());
@@ -59,10 +80,18 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
 
     }
 
+    /**
+     * Method getCtfTmfTrace. gets a CtfTmfTrace
+     * @return CtfTmfTrace
+     */
     public CtfTmfTrace getCtfTmfTrace() {
         return ctfTmfTrace;
     }
 
+    /**
+     * Method getCurrentEvent. gets the current event
+     * @return CtfTmfEvent
+     */
     public CtfTmfEvent getCurrentEvent() {
         final StreamInputReader top = super.prio.peek();
         if (top != null) {
@@ -72,6 +101,11 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
         return null;
     }
 
+    /**
+     * Method seek. Seeks to a given timestamp
+     * @param timestamp long the timestamp in ns (utc)
+     * @return boolean
+     */
     @Override
     public boolean seek(final long timestamp) {
         boolean ret = false;
@@ -89,6 +123,11 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
         return ret;
     }
 
+    /**
+     * Method seekRank. seeks to a given rank
+     * @param rank long the rank to seek to
+     * @return boolean
+     */
     public boolean seekRank(final long rank) {
         boolean ret = false;
         ret = super.seekIndex(rank);
@@ -99,11 +138,21 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
         return ret;
     }
 
+    /**
+     * Method getRank.
+     * @return long
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfContext#getRank()
+     */
     @Override
     public long getRank() {
         return super.getIndex();
     }
 
+    /**
+     * Method setRank.
+     * @param rank long
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfContext#setRank(long)
+     */
     @Override
     public void setRank(final long rank) {
         if(!this.curLocation.equals(nullLocation)) {
@@ -124,12 +173,21 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
         return clone;
     }
 
+    /**
+     * Method dispose.
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfContext#dispose()
+     */
     @Override
     public void dispose() {
         // FIXME add dispose() stuff to CTFTrace and call it here...
 
     }
 
+    /**
+     * Method setLocation.
+     * @param location ITmfLocation<?>
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfContext#setLocation(ITmfLocation<?>)
+     */
     @Override
     public void setLocation(final ITmfLocation<?> location) {
         // FIXME alex: isn't there a cleaner way than a cast here?
@@ -137,26 +195,49 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
         seek(((CtfLocation) location).getLocation());
     }
 
+    /**
+     * Method getLocation.
+     * @return CtfLocation
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfContext#getLocation()
+     */
     @Override
     public CtfLocation getLocation() {
         return curLocation;
     }
 
+    /**
+     * Method increaseRank.
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfContext#increaseRank()
+     */
     @Override
     public void increaseRank() {
         curRank++;
     }
 
+    /**
+     * Method hasValidRank, if the iterator is valid
+     * @return boolean
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfContext#hasValidRank()
+     */
     @Override
     public boolean hasValidRank() {
         return (getRank() >= 0);
     }
 
+    /**
+     * Method advance go to the next event
+     * @return boolean successful or not
+     */
     @Override
     public boolean advance() {
         return super.advance();
     }
 
+    /**
+     * Method compareTo.
+     * @param o CtfIterator
+     * @return int -1, 0, 1
+     */
     @Override
     public int compareTo(final CtfIterator o) {
         if (this.getRank() < o.getRank()) {
@@ -166,5 +247,53 @@ public class CtfIterator extends CTFTraceReader implements ITmfContext,
         }
         return 0;
     }
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = (prime * result)
+                + ((ctfTmfTrace == null) ? 0 : ctfTmfTrace.hashCode());
+        result = (prime * result)
+                + ((curLocation == null) ? 0 : curLocation.hashCode());
+        result = (prime * result) + (int) (curRank ^ (curRank >>> 32));
+        return result;
+    }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof CtfIterator)) {
+            return false;
+        }
+        CtfIterator other = (CtfIterator) obj;
+        if (ctfTmfTrace == null) {
+            if (other.ctfTmfTrace != null) {
+                return false;
+            }
+        } else if (!ctfTmfTrace.equals(other.ctfTmfTrace)) {
+            return false;
+        }
+        if (curLocation == null) {
+            if (other.curLocation != null) {
+                return false;
+            }
+        } else if (!curLocation.equals(other.curLocation)) {
+            return false;
+        }
+        if (curRank != other.curRank) {
+            return false;
+        }
+        return true;
+    }
 }

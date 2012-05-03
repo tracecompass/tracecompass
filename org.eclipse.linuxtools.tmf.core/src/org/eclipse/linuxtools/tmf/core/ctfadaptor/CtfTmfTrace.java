@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors: Matthew Khouzam - Initial API and implementation
+ *******************************************************************************/
+
 package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 
 import org.eclipse.core.resources.IProject;
@@ -20,6 +31,8 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
+/**
+ */
 public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTrace<CtfTmfEvent> {
 
     // ------------------------------------------------------------------------
@@ -61,6 +74,14 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         super();
     }
 
+    /**
+     * Method initTrace.
+     * @param resource IResource
+     * @param path String
+     * @param eventType Class<CtfTmfEvent>
+     * @throws TmfTraceException
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#initTrace(IResource, String, Class<CtfTmfEvent>)
+     */
     @SuppressWarnings("unused")
     @Override
     public void initTrace(final IResource resource, final String path, final Class<CtfTmfEvent> eventType)
@@ -82,14 +103,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
             setStartTime(iterator.getCurrentEvent().getTimestamp());
         }
         TmfSignalManager.register(this);
-        // this.currLocation.setTimestamp(this.fEvent.getTimestamp().getValue());
-        // this.fStartTime = new TmfSimpleTimestamp(this.currLocation
-        // .getLocation().getStartTime());
-        // this.fEndTime = new TmfSimpleTimestamp(this.currLocation
-        // .getLocation().getEndTime());
-        // setTimeRange(new TmfTimeRange(this.fStartTime.clone(),
-        // this.fEndTime.clone()));
-
+        // FIXME this should become a request
         buildStateSystem();
 
         /* Refresh the project, so it can pick up new files that got created. */
@@ -102,16 +116,32 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         }
     }
 
+    /**
+     * Method dispose.
+     * @see org.eclipse.linuxtools.tmf.core.component.ITmfComponent#dispose()
+     */
     @Override
     public void dispose() {
         TmfSignalManager.deregister(this);
     }
 
+    /**
+     * Method broadcast.
+     * @param signal TmfSignal
+     * @see org.eclipse.linuxtools.tmf.core.component.ITmfComponent#broadcast(TmfSignal)
+     */
     @Override
     public void broadcast(final TmfSignal signal) {
         TmfSignalManager.dispatchSignal(signal);
     }
 
+    /**
+     * Method validate.
+     * @param project IProject
+     * @param path String
+     * @return boolean
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#validate(IProject, String)
+     */
     @SuppressWarnings("unused")
     @Override
     public boolean validate(final IProject project, final String path) {
@@ -124,51 +154,62 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         }
     }
 
-    @Override
-    public CtfTmfTrace clone() throws CloneNotSupportedException {
-        CtfTmfTrace clone = null;
-        clone = (CtfTmfTrace) super.clone();
-        clone.fStartTime = this.fStartTime.clone();
-        clone.fEndTime = this.fEndTime.clone();
-        clone.fTrace = this.fTrace;
-        return clone;
-    }
-
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
 
     /**
+     * Method getEventType.
      * @return the trace path
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getEventType()
      */
     @Override
     public Class<CtfTmfEvent> getEventType() {
         return fType;
     }
 
+    /**
+     * Method getNbEnvVars.
+     * @return int
+     */
     public int getNbEnvVars() {
         return this.fTrace.getEnvironment().size();
     }
 
 
+    /**
+     * Method getEnvNames.
+     * @return String[]
+     */
     public String[] getEnvNames() {
         final String[] s = new String[getNbEnvVars()];
         return this.fTrace.getEnvironment().keySet().toArray(s);
     }
 
+    /**
+     * Method getEnvValue.
+     * @param key String
+     * @return String
+     */
     public String getEnvValue(final String key)    {
         return this.fTrace.getEnvironment().get(key);
     }
 
 
     /**
-     * @return the trace path
+
+     * @return the trace path * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getPath()
      */
     @Override
     public String getPath() {
         return this.fTrace.getPath();
     }
 
+    /**
+     * Method getName.
+     * @return String
+     * @see org.eclipse.linuxtools.tmf.core.component.ITmfComponent#getName()
+     */
     @Override
     public String getName() {
         String traceName = (fResource != null) ? fResource.getName() : null;
@@ -181,31 +222,61 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         return traceName;
     }
 
+    /**
+     * Method getCacheSize.
+     * @return int
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getCacheSize()
+     */
     @Override
     public int getCacheSize() {
         return 50000; // not true, but it works
     }
 
+    /**
+     * Method getNbEvents.
+     * @return long
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getNbEvents()
+     */
     @Override
     public long getNbEvents() {
         return this.fNbEvents;
     }
 
+    /**
+     * Method getTimeRange.
+     * @return TmfTimeRange
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getTimeRange()
+     */
     @Override
     public TmfTimeRange getTimeRange() {
         return new TmfTimeRange(this.fStartTime, this.fEndTime);
     }
 
+    /**
+     * Method getStartTime.
+     * @return ITmfTimestamp
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getStartTime()
+     */
     @Override
     public ITmfTimestamp getStartTime() {
         return this.fStartTime;
     }
 
+    /**
+     * Method getEndTime.
+     * @return ITmfTimestamp
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getEndTime()
+     */
     @Override
     public ITmfTimestamp getEndTime() {
         return this.fEndTime;
     }
 
+    /**
+     * Method getCurrentLocation.
+     * @return ITmfLocation<?>
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getCurrentLocation()
+     */
     @Override
     public ITmfLocation<?> getCurrentLocation() {
         return iterator.getLocation();
@@ -215,15 +286,27 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
     // Operators
     // ------------------------------------------------------------------------
 
+    /**
+     * Method setTimeRange.
+     * @param range TmfTimeRange
+     */
     protected void setTimeRange(final TmfTimeRange range) {
         this.fStartTime = range.getStartTime();
         this.fEndTime = range.getEndTime();
     }
 
+    /**
+     * Method setStartTime.
+     * @param startTime ITmfTimestamp
+     */
     protected void setStartTime(final ITmfTimestamp startTime) {
         this.fStartTime = startTime;
     }
 
+    /**
+     * Method setEndTime.
+     * @param endTime ITmfTimestamp
+     */
     protected void setEndTime(final ITmfTimestamp endTime) {
         this.fEndTime = endTime;
     }
@@ -232,6 +315,11 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
     // TmfProvider
     // ------------------------------------------------------------------------
 
+    /**
+     * Method armRequest.
+     * @param request ITmfDataRequest<CtfTmfEvent>
+     * @return ITmfContext
+     */
     @Override
     public ITmfContext armRequest(final ITmfDataRequest<CtfTmfEvent> request) {
         if ((request instanceof ITmfEventRequest<?>)
@@ -257,6 +345,8 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
      *
      * FIXME merge with getNextEvent below once they both use the same parameter
      * type.
+     * @param context ITmfContext
+     * @return CtfTmfEvent
      */
     @SuppressWarnings("unused")
     @Override
@@ -269,6 +359,12 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
     // ITmfTrace
     // ------------------------------------------------------------------------
 
+    /**
+     * Method seekEvent.
+     * @param location ITmfLocation<?>
+     * @return ITmfContext
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#seekEvent(ITmfLocation<?>)
+     */
     @Override
     public ITmfContext seekEvent(final ITmfLocation<?> location) {
         CtfLocation currentLocation = (CtfLocation) location;
@@ -281,6 +377,12 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         return iterator;
     }
 
+    /**
+     * Method getLocationRatio.
+     * @param location ITmfLocation<?>
+     * @return double
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getLocationRatio(ITmfLocation<?>)
+     */
     @Override
     public double getLocationRatio(final ITmfLocation<?> location) {
         final CtfLocation curLocation = (CtfLocation) location;
@@ -290,11 +392,22 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
                 / (iterator.getEndTime() - iterator.getStartTime());
     }
 
+    /**
+     * Method getStreamingInterval.
+     * @return long
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getStreamingInterval()
+     */
     @Override
     public long getStreamingInterval() {
         return 0;
     }
 
+    /**
+     * Method seekEvent.
+     * @param timestamp ITmfTimestamp
+     * @return ITmfContext
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#seekEvent(ITmfTimestamp)
+     */
     @Override
     public ITmfContext seekEvent(final ITmfTimestamp timestamp) {
         iterator.seek(timestamp.getValue());
@@ -303,6 +416,9 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
 
     /**
      * Seek by rank
+     * @param rank long
+     * @return ITmfContext
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#seekEvent(long)
      */
     @Override
     public ITmfContext seekEvent(final long rank) {
@@ -312,6 +428,9 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
 
     /**
      * Seek rank ratio
+     * @param ratio double
+     * @return ITmfContext
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#seekEvent(double)
      */
     @Override
     public ITmfContext seekEvent(final double ratio) {
@@ -319,6 +438,12 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         return iterator;
     }
 
+    /**
+     * Method readNextEvent.
+     * @param context ITmfContext
+     * @return CtfTmfEvent
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#readNextEvent(ITmfContext)
+     */
     @SuppressWarnings("unused")
     @Override
     public CtfTmfEvent readNextEvent(final ITmfContext context) {
@@ -326,15 +451,28 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         return iterator.getCurrentEvent();
     }
 
+    /**
+     * Method getResource.
+     * @return IResource
+     * @see org.eclipse.linuxtools.tmf.core.trace.ITmfTrace#getResource()
+     */
     @Override
     public IResource getResource() {
         return this.fResource;
     }
 
+    /**
+     * Method getStateSystem.
+     * @return IStateSystemQuerier
+     */
     public IStateSystemQuerier getStateSystem() {
         return this.ss;
     }
 
+    /**
+     * Method getCTFTrace.
+     * @return CTFTrace
+     */
     CTFTrace getCTFTrace() {
         return fTrace;
     }
@@ -343,6 +481,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
     /**
      * Suppressing the warning, because the 'throws' will usually happen in
      * sub-classes.
+     * @throws TmfTraceException
      */
     @SuppressWarnings({ "unused", "static-method" })
     protected void buildStateSystem() throws TmfTraceException {
