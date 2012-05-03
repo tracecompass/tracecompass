@@ -3,6 +3,7 @@ package org.eclipse.linuxtools.tmf.core.ctfadaptor;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.tmf.core.component.TmfEventProvider;
@@ -60,6 +61,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         super();
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void initTrace(final IResource resource, final String path, final Class<CtfTmfEvent> eventType)
             throws TmfTraceException {
@@ -110,6 +112,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         TmfSignalManager.dispatchSignal(signal);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public boolean validate(final IProject project, final String path) {
         try {
@@ -168,12 +171,14 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
 
     @Override
     public String getName() {
-        final String temp[] = this.fTrace.getPath().split(
-                System.getProperty("file.separator")); //$NON-NLS-1$
-        if (temp.length > 2) {
-            return temp[temp.length - 1];
+        String traceName = (fResource != null) ? fResource.getName() : null;
+        // If no resource was provided, extract the display name the trace path
+        if (traceName == null) {
+            final String path = this.fTrace.getPath();
+            final int sep = path.lastIndexOf(IPath.SEPARATOR);
+            traceName = (sep >= 0) ? path.substring(sep + 1) : path;
         }
-        return temp[0];
+        return traceName;
     }
 
     @Override
@@ -253,6 +258,7 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
      * FIXME merge with getNextEvent below once they both use the same parameter
      * type.
      */
+    @SuppressWarnings("unused")
     @Override
     public CtfTmfEvent getNext(final ITmfContext context) {
         iterator.advance();
@@ -313,16 +319,12 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
         return iterator;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public CtfTmfEvent readNextEvent(final ITmfContext context) {
         iterator.advance();
         return iterator.getCurrentEvent();
     }
-
-//    @Override
-//    public CtfTmfEvent parseEvent(final ITmfContext context) {
-//        return iterator.getCurrentEvent();
-//    }
 
     @Override
     public IResource getResource() {
@@ -336,13 +338,13 @@ public class CtfTmfTrace extends TmfEventProvider<CtfTmfEvent> implements ITmfTr
     CTFTrace getCTFTrace() {
         return fTrace;
     }
-    
+
 
     /**
      * Suppressing the warning, because the 'throws' will usually happen in
      * sub-classes.
      */
-    @SuppressWarnings("unused")
+    @SuppressWarnings({ "unused", "static-method" })
     protected void buildStateSystem() throws TmfTraceException {
         /*
          * Nothing is done in the basic implementation, please specify
