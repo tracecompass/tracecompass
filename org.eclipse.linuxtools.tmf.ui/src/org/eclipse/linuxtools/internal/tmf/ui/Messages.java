@@ -80,7 +80,6 @@ public class Messages extends NLS {
     public static String TmfTimeLegend_TRACE_STATES_TITLE;
     public static String TmfTimeLegend_WINDOW_TITLE;
 
-    public static String TimeScaleCtrl_Timescale;
     public static String TmfTimeStatesCtrl_TRACE_GROUP_LABEL;
     public static String TmfTimeStatesCtrl_UNDEFINED_GROUP;
     public static String TmfTimeTipHandler_DURATION;

@@ -18,7 +18,7 @@ import java.util.Iterator;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSettingsManager;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITmfTimeAnalysisEntry;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
 public class TimeChartEvent implements ITimeEvent {
 
@@ -52,7 +52,7 @@ public class TimeChartEvent implements ITimeEvent {
     }
 
 	@Override
-    public ITmfTimeAnalysisEntry getEntry() {
+    public ITimeGraphEntry getEntry() {
         return fParentEntry;
     }
 

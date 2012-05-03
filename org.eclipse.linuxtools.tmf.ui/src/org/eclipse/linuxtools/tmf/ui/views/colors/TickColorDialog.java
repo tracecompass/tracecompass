@@ -16,10 +16,11 @@ import java.util.Map;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TmfTimeAnalysisProvider;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphProvider;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITmfTimeAnalysisEntry;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TraceColorScheme;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -42,14 +43,14 @@ public class TickColorDialog extends Dialog {
 	int selectedIndex = 0;
 	Composite colorComposite;
 	
-	TraceColorScheme traceColorScheme = new TraceColorScheme();
-	private TmfTimeAnalysisProvider timeAnalysisProvider = new TmfTimeAnalysisProvider() {
+	TimeGraphColorScheme traceColorScheme = new TimeGraphColorScheme();
+	private ITimeGraphProvider timeAnalysisProvider = new TimeGraphProvider() {
 		@Override
         public StateColor getEventColor(ITimeEvent event) {
 	        return null;
         }
 		@Override
-        public String getTraceClassName(ITmfTimeAnalysisEntry trace) {
+        public String getTraceClassName(ITimeGraphEntry trace) {
 	        return null;
         }
 		@Override
@@ -112,7 +113,7 @@ public class TickColorDialog extends Dialog {
     		addPaintListener(new PaintListener() {
     			@Override
     			public void paintControl(PaintEvent e) {
-    				e.gc.setForeground(traceColorScheme.getColor(TraceColorScheme.MID_LINE));
+    				e.gc.setForeground(traceColorScheme.getColor(TimeGraphColorScheme.MID_LINE));
     				int midy = e.y + e.height / 2;
     				e.gc.drawLine(e.x, midy, e.x + e.width, midy);
     				int midx = e.x + e.width / 2;

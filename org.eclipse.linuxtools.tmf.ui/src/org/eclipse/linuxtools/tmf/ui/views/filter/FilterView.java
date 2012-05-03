@@ -124,10 +124,13 @@ public class FilterView extends TmfView {
 		fViewer.setSelection(node, true);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.linuxtools.tmf.ui.views.TmfView#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
+	// ------------------------------------------------------------------------
+	// ViewPart
+	// ------------------------------------------------------------------------
+
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(Composite)
+     */
 	@Override
 	public void createPartControl(Composite parent) {
 
@@ -150,11 +153,14 @@ public class FilterView extends TmfView {
 		});
 	}
 
-	
-	// ------------------------------------------------------------------------
-    // ViewPart
-    // ------------------------------------------------------------------------
-	
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+     */
+    @Override
+    public void setFocus() {
+        fViewer.setFocus();
+    }
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()

@@ -15,17 +15,17 @@ package org.eclipse.linuxtools.tmf.ui.views.timechart;
 import java.util.Map;
 
 import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSettingsManager;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TmfTimeAnalysisProvider;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITmfTimeAnalysisEntry;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TraceColorScheme;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
-public class TimeChartAnalysisProvider extends TmfTimeAnalysisProvider {
+public class TimeChartAnalysisProvider extends TimeGraphProvider {
 
 	private static final Color BOOKMARK_INNER_COLOR = new Color(Display.getDefault(), 115, 165, 224);
 	private static final Color BOOKMARK_OUTER_COLOR = new Color(Display.getDefault(), 2, 70, 140);
@@ -52,7 +52,7 @@ public class TimeChartAnalysisProvider extends TmfTimeAnalysisProvider {
     }
 
 	@Override
-    public String getTraceClassName(ITmfTimeAnalysisEntry entry) {
+    public String getTraceClassName(ITimeGraphEntry entry) {
         return null;
     }
 
@@ -72,7 +72,7 @@ public class TimeChartAnalysisProvider extends TmfTimeAnalysisProvider {
     }
 
     @Override
-    public void drawState(TraceColorScheme colors, ITimeEvent event, Rectangle rect, GC gc, boolean selected, boolean rectBound, boolean timeSelected) {
+    public void drawState(TimeGraphColorScheme colors, ITimeEvent event, Rectangle rect, GC gc, boolean selected, boolean rectBound, boolean timeSelected) {
 	    if (! ((TimeChartEvent) event).isVisible()) {
 	    	return;
 	    }

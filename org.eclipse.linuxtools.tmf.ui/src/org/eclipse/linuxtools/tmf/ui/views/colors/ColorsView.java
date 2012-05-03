@@ -27,10 +27,11 @@ import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.linuxtools.tmf.ui.views.filter.FilterDialog;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TmfTimeAnalysisProvider;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphProvider;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITmfTimeAnalysisEntry;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TraceColorScheme;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseAdapter;
@@ -80,14 +81,14 @@ public class ColorsView extends TmfView {
 	
 	private ColorSettingRow fSelectedRow = null;
 
-	private TraceColorScheme traceColorScheme = new TraceColorScheme();
-	private TmfTimeAnalysisProvider timeAnalysisProvider = new TmfTimeAnalysisProvider() {
+	private TimeGraphColorScheme traceColorScheme = new TimeGraphColorScheme();
+	private ITimeGraphProvider timeAnalysisProvider = new TimeGraphProvider() {
 		@Override
         public StateColor getEventColor(ITimeEvent event) {
 	        return null;
         }
 		@Override
-        public String getTraceClassName(ITmfTimeAnalysisEntry trace) {
+        public String getTraceClassName(ITimeGraphEntry trace) {
 	        return null;
         }
 		@Override
@@ -123,9 +124,9 @@ public class ColorsView extends TmfView {
 		super("Colors"); //$NON-NLS-1$
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.linuxtools.tmf.ui.views.TmfView#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(Composite)
+     */
 	@Override
 	public void createPartControl(Composite parent) {
 		fShell = parent.getShell();
@@ -185,7 +186,15 @@ public class ColorsView extends TmfView {
         
         fillToolBar();
 	}
-	
+
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+     */
+    @Override
+    public void setFocus() {
+        fScrolledComposite.setFocus();
+    }
+
 	public void refresh() {
     	fListComposite.layout();
         fScrolledComposite.setMinSize(fListComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -247,7 +256,7 @@ public class ColorsView extends TmfView {
 			ColorSetting colorSetting = new ColorSetting(
 					Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB(),
 					Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB(),
-					TraceColorScheme.BLACK_STATE,
+					TimeGraphColorScheme.BLACK_STATE,
 					null);
         	ColorSettingRow row = new ColorSettingRow(fListComposite, colorSetting);
         	if (fSelectedRow == null) {
@@ -452,7 +461,7 @@ public class ColorsView extends TmfView {
 				@Override
                 public void paintControl(PaintEvent e) {
 					Rectangle bounds = tickCanvas.getBounds();
-					e.gc.setForeground(traceColorScheme.getColor(TraceColorScheme.MID_LINE));
+					e.gc.setForeground(traceColorScheme.getColor(TimeGraphColorScheme.MID_LINE));
 					int midy = bounds.y + bounds.height / 2 - 1;
 					//int midy = e.y + e.height / 2;
 					e.gc.drawLine(e.x, midy, e.x + e.width, midy);

@@ -43,22 +43,22 @@ import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSetting;
 import org.eclipse.linuxtools.tmf.ui.views.colors.ColorSettingsManager;
 import org.eclipse.linuxtools.tmf.ui.views.colors.IColorSettingsListener;
 import org.eclipse.linuxtools.tmf.ui.views.timechart.TimeChartEvent.RankRange;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeAnalysisViewer;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITmfTimeScaleSelectionListener;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITmfTimeSelectionListener;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TmfTimeScaleSelectionEvent;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TmfTimeSelectionEvent;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TmfViewerFactory;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphRangeListener;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphSelectionListener;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphRangeUpdateEvent;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphSelectionEvent;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphTimeEvent;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphViewer;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITmfTimeAnalysisEntry;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 
-public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionListener, ITmfTimeSelectionListener, IColorSettingsListener,
+public class TimeChartView extends TmfView implements ITimeGraphRangeListener, ITimeGraphSelectionListener, ITimeGraphTimeListener, IColorSettingsListener,
         IResourceChangeListener, ITmfEventsFilterListener {
 
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.timechart"; //$NON-NLS-1$
@@ -66,8 +66,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
     private static final int TIMESTAMP_SCALE = -9;
 
     private final int fDisplayWidth;
-    private Composite fComposite;
-    private ITimeAnalysisViewer fViewer;
+    private TimeGraphViewer fViewer;
     private final ArrayList<TimeChartAnalysisEntry> fTimeAnalysisEntries = new ArrayList<TimeChartAnalysisEntry>();
     private final Map<ITmfTrace<?>, TimeChartDecorationProvider> fDecorationProviders = new HashMap<ITmfTrace<?>, TimeChartDecorationProvider>();
     private ArrayList<DecorateThread> fDecorateThreads;
@@ -84,18 +83,11 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
 
     @Override
     public void createPartControl(Composite parent) {
-        fComposite = new Composite(parent, SWT.NONE);
-        GridLayout gl = new GridLayout();
-        gl.marginWidth = 0;
-        gl.marginHeight = 0;
-        fComposite.setLayout(gl);
-
-        fViewer = TmfViewerFactory.createViewer(fComposite, new TimeChartAnalysisProvider());
-        fViewer.groupTraces(false);
+        fViewer = new TimeGraphViewer(parent, SWT.NONE);
+        fViewer.setTimeGraphProvider(new TimeChartAnalysisProvider());
         fViewer.setTimeCalendarFormat(true);
-        fViewer.setAcceptSelectionAPIcalls(true);
-        fViewer.addWidgetTimeScaleSelectionListner(this);
-        fViewer.addWidgetSelectionListner(this);
+        fViewer.addRangeListener(this);
+        fViewer.addSelectionListener(this);
         fViewer.setMinimumItemWidth(1);
 
         IEditorReference[] editorReferences = getSite().getPage().getEditorReferences();
@@ -113,7 +105,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
                 }
             }
         }
-        fViewer.display(fTimeAnalysisEntries.toArray(new TimeChartAnalysisEntry[0]));
+        fViewer.setInput(fTimeAnalysisEntries.toArray(new TimeChartAnalysisEntry[0]));
 
         fDecorateThreads = new ArrayList<DecorateThread>();
         ColorSettingsManager.addColorSettingsListener(this);
@@ -132,7 +124,6 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
 
     @Override
     public void setFocus() {
-        super.setFocus();
         fViewer.setFocus();
     }
 
@@ -213,9 +204,6 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
     }
 
     private void refreshViewer(boolean resetTimeIntervals) {
-        if (fComposite == null) {
-            return;
-        }
         synchronized (fSyncObj) {
             if (fRefreshBusy) {
                 fRefreshPending = true;
@@ -229,9 +217,9 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                if (fComposite.isDisposed())
+                if (fViewer.getControl().isDisposed())
                     return;
-                fViewer.display(fTimeAnalysisEntries.toArray(new TimeChartAnalysisEntry[0]));
+                fViewer.setInput(fTimeAnalysisEntries.toArray(new TimeChartAnalysisEntry[0]));
                 if (reset) {
                     fViewer.resetStartFinishTime();
                 }
@@ -274,7 +262,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
         }
 
         public void itemizeTraceEntry(TimeChartAnalysisEntry timeAnalysisEntry) {
-            Iterator<ITimeEvent> iterator = timeAnalysisEntry.getTraceEventsIterator();
+            Iterator<ITimeEvent> iterator = timeAnalysisEntry.getTimeEventsIterator();
             TimeChartEvent event = null;
             boolean hasNext = true;
             while (hasNext) {
@@ -363,7 +351,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
         }
 
         public void resetTraceEntry(TimeChartAnalysisEntry timeAnalysisEntry) {
-            Iterator<ITimeEvent> iterator = timeAnalysisEntry.getTraceEventsIterator();
+            Iterator<ITimeEvent> iterator = timeAnalysisEntry.getTimeEventsIterator();
             TimeChartEvent event = null;
             boolean hasNext = true;
             while (!interrupted && hasNext) {
@@ -386,7 +374,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
         public void decorateTraceEntry(TimeChartAnalysisEntry timeAnalysisEntry, TimeChartEvent parentEvent) {
             // Set max duration high to ensure iterator does not consider
             // itemized events
-            Iterator<ITimeEvent> iterator = timeAnalysisEntry.getTraceEventsIterator(0, Long.MAX_VALUE, Long.MAX_VALUE);
+            Iterator<ITimeEvent> iterator = timeAnalysisEntry.getTimeEventsIterator(0, Long.MAX_VALUE, Long.MAX_VALUE);
             TimeChartEvent event = null;
             int entryPriority = ColorSettingsManager.PRIORITY_NONE;
             boolean entryIsBookmarked = false;
@@ -480,15 +468,15 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
     // ------------------------------------------------------------------------
 
     @Override
-    public void tsfTmProcessTimeScaleEvent(TmfTimeScaleSelectionEvent event) {
-        fStartTime = event.getTime0();
-        fStopTime = event.getTime1();
+    public void timeRangeUpdated(TimeGraphRangeUpdateEvent event) {
+        fStartTime = event.getStartTime();
+        fStopTime = event.getEndTime();
         itemize(fStartTime, fStopTime);
     }
 
     @Override
-    public void tsfTmProcessSelEvent(TmfTimeSelectionEvent event) {
-        ITmfTimeAnalysisEntry timeAnalysisEntry = null;
+    public void selectionChanged(TimeGraphSelectionEvent event) {
+        ITimeGraphEntry timeAnalysisEntry = null;
         if (event.getSelection() instanceof TimeChartAnalysisEntry) {
             timeAnalysisEntry = (TimeChartAnalysisEntry) event.getSelection();
         } else if (event.getSelection() instanceof TimeChartEvent) {
@@ -497,7 +485,11 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
         if (timeAnalysisEntry instanceof TimeChartAnalysisEntry) {
             broadcast(new TmfTraceSelectedSignal(this, ((TimeChartAnalysisEntry) timeAnalysisEntry).getTrace()));
         }
-        broadcast(new TmfTimeSynchSignal(this, new TmfTimestamp(event.getSelectedTime(), TIMESTAMP_SCALE)));
+    }
+
+    @Override
+    public void timeSelected(TimeGraphTimeEvent event) {
+        broadcast(new TmfTimeSynchSignal(this, new TmfTimestamp(event.getTime(), TIMESTAMP_SCALE)));
     }
 
     @Override
@@ -587,7 +579,7 @@ public class TimeChartView extends TmfView implements ITmfTimeScaleSelectionList
             ITmfTrace<?> trace = signal.getTrace();
             for (int i = 0; i < fTimeAnalysisEntries.size(); i++) {
                 if (fTimeAnalysisEntries.get(i).getTrace().equals(trace)) {
-                    fViewer.setSelectedTrace(fTimeAnalysisEntries.get(i));
+                    fViewer.setSelection(fTimeAnalysisEntries.get(i));
                     break;
                 }
             }

@@ -104,7 +104,7 @@ public class ColorSetting {
 	
 	/**
 	 * @return the tick color index (0-15)
-	 * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TraceColorScheme
+	 * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme
 	 */
 	public int getTickColorIndex() {
 		return fTickColorIndex;
@@ -112,7 +112,7 @@ public class ColorSetting {
 	
 	/**
 	 * @param tickColorIndex the tick color index to set (0-15)
-	 * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TraceColorScheme
+	 * @see org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme
 	 */
 	public void setTickColorIndex(int tickColorIndex) {
 		fTickColorIndex = tickColorIndex;

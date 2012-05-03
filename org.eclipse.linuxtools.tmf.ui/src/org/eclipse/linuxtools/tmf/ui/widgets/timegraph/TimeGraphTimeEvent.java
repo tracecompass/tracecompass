@@ -10,31 +10,33 @@
  *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model;
+package org.eclipse.linuxtools.tmf.ui.widgets.timegraph;
 
-public class TimeEvent implements ITimeEvent {
-    protected ITimeGraphEntry fEntry;
-    protected long fTime;
-    protected long fDuration;
+import java.util.EventObject;
 
-    public TimeEvent(ITimeGraphEntry entry, long time, long duration) {
-        fEntry = entry;
+public class TimeGraphTimeEvent extends EventObject {
+
+    /**
+     * Default serial version UID for this class.
+     * @since 1.0
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * The selected time.
+     */
+    private long fTime;
+
+    public TimeGraphTimeEvent(Object source, long time) {
+        super(source);
         fTime = time;
-        fDuration = duration;
     }
 
-    @Override
-    public ITimeGraphEntry getEntry() {
-        return fEntry;
-    }
-
-    @Override
+    /**
+     * @return the selected time
+     */
     public long getTime() {
         return fTime;
     }
 
-    @Override
-    public long getDuration() {
-        return fDuration;
-    }
 }

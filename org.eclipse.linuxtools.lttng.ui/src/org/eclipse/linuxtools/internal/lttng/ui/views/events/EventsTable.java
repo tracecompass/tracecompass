@@ -17,7 +17,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
-import org.eclipse.linuxtools.tmf.ui.widgets.ColumnData;
+import org.eclipse.linuxtools.tmf.ui.widgets.virtualtable.ColumnData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 

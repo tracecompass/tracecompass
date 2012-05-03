@@ -6,9 +6,9 @@
 		<category id="org.eclipse.linuxtools.tmf.ui.stubs" name="TMF UI Stubs">
 		</category>
 		<view category="org.eclipse.linuxtools.tmf.ui.stubs"
-			class="org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.test.stub.views.TsfTraceAnalysisView"
+			class="org.eclipse.linuxtools.tmf.ui.widgets.timegraph.test.stub.views.TsfTraceAnalysisView"
 			id="org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.test.stub.views.TmfTaTimeAnalysis"
-			name="TMF Time Analysis View" restorable="true">
+			name="Time Graph View" restorable="true">
 		</view>
   <view
         category="org.eclipse.linuxtools.tmf.ui.stubs"

@@ -219,6 +219,14 @@ public class LatencyView extends TmfView implements IGraphModelListener {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+     */
+    @Override
+    public void setFocus() {
+        fGraphViewer.setFocus();
+    }
+
     @SuppressWarnings("nls")
     @Override
     public String toString() {

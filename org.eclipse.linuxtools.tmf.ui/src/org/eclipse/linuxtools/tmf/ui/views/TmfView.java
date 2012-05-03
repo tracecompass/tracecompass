@@ -15,7 +15,6 @@ package org.eclipse.linuxtools.tmf.ui.views;
 import org.eclipse.linuxtools.tmf.core.component.ITmfComponent;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -55,20 +54,6 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
 	@Override
 	public void broadcast(TmfSignal signal) {
 		TmfSignalManager.dispatchSignal(signal);
-	}
-
-	// ------------------------------------------------------------------------
-	// ViewPart
-	// ------------------------------------------------------------------------
-	
-	@Override
-	public void createPartControl(Composite parent) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void setFocus() {
-		// TODO Auto-generated method stub
 	}
 
 }

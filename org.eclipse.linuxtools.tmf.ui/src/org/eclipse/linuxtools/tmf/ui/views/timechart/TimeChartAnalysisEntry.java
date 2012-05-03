@@ -18,12 +18,11 @@ import java.util.Vector;
 
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITmfTimeAnalysisEntry;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
-public class TimeChartAnalysisEntry implements ITmfTimeAnalysisEntry {
+public class TimeChartAnalysisEntry implements ITimeGraphEntry {
 
     private ITmfTrace<?> fTrace;
-    private String fGroup;
     private Vector<TimeChartEvent> fTraceEvents;
     private int fPower = 0; // 2^fPower nanoseconds per vector position
     private long fReferenceTime = -1; // time corresponding to beginning of index 0
@@ -36,21 +35,19 @@ public class TimeChartAnalysisEntry implements ITmfTimeAnalysisEntry {
         fTraceEvents = new Vector<TimeChartEvent>(modelSize);
     }
     
-    TimeChartAnalysisEntry(ITmfTrace<?> trace, String group, int modelSize) {
-        fTrace = trace;
-        fTraceEvents = new Vector<TimeChartEvent>(modelSize);
-        fGroup = group;
-    }
-    
     @Override
-    public String getGroupName() {
-        return fGroup;
+    public ITimeGraphEntry[] getChildren() {
+        return null;
     }
 
     @Override
-    public int getId() {
-        // TODO Auto-generated method stub
-        return 0;
+    public ITimeGraphEntry getParent() {
+        return null;
+    }
+
+    @Override
+    public boolean hasChildren() {
+        return false;
     }
 
     @Override
@@ -69,17 +66,12 @@ public class TimeChartAnalysisEntry implements ITmfTimeAnalysisEntry {
     }
 
     @Override
-    @Deprecated public <T extends ITimeEvent> Vector<T> getTraceEvents() {
-        return null;
-    }
-
-    @Override
-    public Iterator<ITimeEvent> getTraceEventsIterator() {
+    public Iterator<ITimeEvent> getTimeEventsIterator() {
         return new EntryIterator(0, Long.MAX_VALUE, 0);
     }
     
     @Override
-    public Iterator<ITimeEvent> getTraceEventsIterator(long startTime, long stopTime, long maxDuration) {
+    public Iterator<ITimeEvent> getTimeEventsIterator(long startTime, long stopTime, long maxDuration) {
         return new EntryIterator(startTime, stopTime, maxDuration);
     }
     
@@ -119,7 +111,7 @@ public class TimeChartAnalysisEntry implements ITmfTimeAnalysisEntry {
                                 next = event;
                                 return true;
                             } else {
-                                nestedIterator = event.getItemizedEntry().getTraceEventsIterator(fIteratorStartTime, fIteratorStopTime, fIteratorMaxDuration);
+                                nestedIterator = event.getItemizedEntry().getTimeEventsIterator(fIteratorStartTime, fIteratorStopTime, fIteratorMaxDuration);
                                 return nestedIterator.hasNext();
                             }
                         }
@@ -153,7 +145,6 @@ public class TimeChartAnalysisEntry implements ITmfTimeAnalysisEntry {
             
     }
 
-    @Override
     public void addTraceEvent(ITimeEvent timeEvent) {
         long time = timeEvent.getTime();
         synchronized (fTraceEvents) {
