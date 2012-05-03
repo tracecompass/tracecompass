@@ -10,6 +10,7 @@ import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfIterator;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.junit.After;
 import org.junit.Before;
@@ -38,8 +39,8 @@ public class CtfTmfEventTest {
 
     /**
      * Perform pre-test initialization.
-     * 
-     * @throws FileNotFoundException 
+     *
+     * @throws FileNotFoundException
      */
     @Before
     public void setUp() throws TmfTraceException {
@@ -112,7 +113,7 @@ public class CtfTmfEventTest {
      */
     @Test
     public void testGetFieldValue() {
-        String fieldName = "id"; //$NON-NLS-1$
+        String fieldName = "ret"; //$NON-NLS-1$
         Object result = fixture.getContent().getField(fieldName).getValue();
 
         assertNotNull(result);
@@ -125,8 +126,8 @@ public class CtfTmfEventTest {
     public void testGetFields() {
         CtfTmfEvent nullEvent = CtfTmfEvent.getNullEvent();
         ITmfEventField[] fields = nullEvent.getContent().getFields();
-
-        assertArrayEquals(null, fields);
+        ITmfEventField[] fields2 = new ITmfEventField[0];
+        assertArrayEquals(fields2, fields);
     }
 
     /**
@@ -140,6 +141,11 @@ public class CtfTmfEventTest {
         assertEquals(-1L, result);
     }
 
+    @Test
+    public void testClone() {
+        CtfTmfEvent other = CtfTmfEvent.getNullEvent().clone();
+        assertNotNull(other);
+    }
 
     /**
      * Run the CTFEvent getNullEvent() method test.
@@ -152,7 +158,7 @@ public class CtfTmfEventTest {
         assertEquals(-1, nullEvent.getCPU());
         assertEquals("Empty CTF event", nullEvent.getEventName()); //$NON-NLS-1$
         assertEquals("No stream", nullEvent.getChannelName()); //$NON-NLS-1$
-        assertArrayEquals(null, nullEvent.getContent().getFields());
+        assertArrayEquals(new ITmfEventField[0], nullEvent.getContent().getFields());
         assertEquals(-1L, nullEvent.getID());
         assertEquals(-1L, nullEvent.getTimestampValue());
     }
@@ -167,5 +173,27 @@ public class CtfTmfEventTest {
         long result = nullEvent.getTimestampValue();
 
         assertEquals(-1L, result);
+    }
+
+    @Test
+    public void testRankTraceRefSourceType() {
+        long rank = fixture.getRank();
+        CtfTmfTrace trace = fixture.getTrace();
+        String channelName = fixture.getChannelName();
+        String reference = fixture.getReference();
+        String source = fixture.getSource();
+        ITmfEventType type = fixture.getType();
+        assertEquals(rank, 0);
+        assertEquals(trace.getName(), "kernel"); //$NON-NLS-1$
+        assertEquals(channelName, "channel0_1"); //$NON-NLS-1$
+        assertEquals(reference,"channel0_1"); //$NON-NLS-1$
+        assertEquals(source, "1"); //$NON-NLS-1$
+        assertEquals(type.toString(), "exit_syscall"); //$NON-NLS-1$
+    }
+
+    @Test
+    public void TestToString() {
+        String s = fixture.getContent().toString();
+        assertEquals("ret=4132\t", s); //$NON-NLS-1$
     }
 }

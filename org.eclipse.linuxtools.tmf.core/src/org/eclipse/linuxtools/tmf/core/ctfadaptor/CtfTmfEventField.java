@@ -43,7 +43,7 @@ public abstract class CtfTmfEventField implements ITmfEventField {
      * @param name String
      */
     protected CtfTmfEventField(String name) {
-        /* Strip the damn underscores, screw you CTF */
+        /* Strip the underscore*/
         if ( name.startsWith("_") ) { //$NON-NLS-1$
             this.name = name.substring(1);
         } else {
@@ -150,6 +150,9 @@ public abstract class CtfTmfEventField implements ITmfEventField {
         case 2:
             return new CTFIntegerArrayField(
                     ((CTFIntegerArrayField) other).getValue(), other.name);
+        case 3:
+            return new CTFFloatField(
+                    ((CTFFloatField) other).getValue(), other.name);
         default:
             return null;
         }
@@ -168,7 +171,7 @@ public abstract class CtfTmfEventField implements ITmfEventField {
     /**
      * Return the int representing this field's value type
      *
-    
+
      * @return the field type */
     public abstract int getFieldType();
 
@@ -176,7 +179,7 @@ public abstract class CtfTmfEventField implements ITmfEventField {
      * Return this field's value. You can cast it to the correct type depending
      * on what getFieldType says.
      *
-    
+
      * @return the field value * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getValue()
      */
     @Override
@@ -186,7 +189,7 @@ public abstract class CtfTmfEventField implements ITmfEventField {
      * Other methods defined by ITmfEventField, but not used here: the CTF
      *       fields do not have sub-fields (yet!)
      *
-    
+
      * @return the field names * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getFieldNames()
      */
     @Override
@@ -426,7 +429,7 @@ final class CTFFloatField extends CtfTmfEventField {
      * @see org.eclipse.linuxtools.tmf.core.event.ITmfEventField#getValue()
      */
     @Override
-    public Object getValue() {
+    public Double getValue() {
         return this.value;
     }
 

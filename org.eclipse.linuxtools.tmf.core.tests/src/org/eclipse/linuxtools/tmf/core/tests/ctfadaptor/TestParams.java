@@ -10,7 +10,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 public abstract class TestParams {
 
     /* Path to test traces */
-    private static final String testTracePath1 = "testfiles/trace20m"; //$NON-NLS-1$
+    private static final String testTracePath1 = "testfiles/kernel"; //$NON-NLS-1$
     private static CtfTmfTrace testTrace1 = null;
 
     private static final File emptyFile = new File(""); //$NON-NLS-1$
@@ -22,6 +22,10 @@ public abstract class TestParams {
 
     public static CtfTmfTrace getEmptyTrace() {
         return emptyTrace;
+    }
+
+    public static String getPath(){
+        return testTracePath1;
     }
 
     public static CtfTmfTrace createTrace() throws TmfTraceException {

@@ -156,7 +156,8 @@ public final class CtfTmfEvent implements ITmfEvent {
         this.typeId = -1;
         this.fileName = NO_STREAM;
         this.eventName = EMPTY_CTF_EVENT_NAME;
-        this.fContent = null;
+        this.fContent = new CtfTmfContent("", new CtfTmfEventField[0]);
+
     }
 
     // ------------------------------------------------------------------------

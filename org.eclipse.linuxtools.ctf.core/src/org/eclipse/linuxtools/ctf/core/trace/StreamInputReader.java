@@ -277,4 +277,45 @@ public class StreamInputReader {
         return packetReader;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + name;
+        result = (prime * result)
+                + ((streamInput == null) ? 0 : streamInput.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof StreamInputReader)) {
+            return false;
+        }
+        StreamInputReader other = (StreamInputReader) obj;
+        if (name != other.name) {
+            return false;
+        }
+        if (streamInput == null) {
+            if (other.streamInput != null) {
+                return false;
+            }
+        } else if (!streamInput.equals(other.streamInput)) {
+            return false;
+        }
+        return true;
+    }
+
 }

@@ -67,4 +67,41 @@ public class CtfLocation implements ITmfLocation<Long> {
         return new CtfLocation(getLocation());
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result)
+                + ((fTimestamp == null) ? 0 : fTimestamp.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof CtfLocation)) {
+            return false;
+        }
+        CtfLocation other = (CtfLocation) obj;
+        if (fTimestamp == null) {
+            if (other.fTimestamp != null) {
+                return false;
+            }
+        } else if (!fTimestamp.equals(other.fTimestamp)) {
+            return false;
+        }
+        return true;
+    }
+
 }

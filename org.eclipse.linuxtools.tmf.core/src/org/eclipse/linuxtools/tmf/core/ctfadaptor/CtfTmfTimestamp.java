@@ -171,8 +171,8 @@ public class CtfTmfTimestamp extends TmfTimestamp {
     @Override
     public int hashCode() {
         final int prime = 31;
-        int result = super.hashCode();
-        result = (prime * result) + ((type == null) ? 0 : type.hashCode());
+        int result = super.hashCode() * prime;
+        result += ((type == null) ? 0 : type.toString().hashCode());
         return result;
     }
 

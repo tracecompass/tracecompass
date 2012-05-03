@@ -72,6 +72,7 @@ public class FloatDeclaration implements IDeclaration {
         return encoding;
     }
 
+    @Override
     public long getAlignment() {
         return alignment;
     }
@@ -81,7 +82,7 @@ public class FloatDeclaration implements IDeclaration {
     // ------------------------------------------------------------------------
 
     @Override
-    public Definition createDefinition(IDefinitionScope definitionScope,
+    public FloatDefinition createDefinition(IDefinitionScope definitionScope,
             String fieldName) {
         return new FloatDefinition(this, definitionScope, fieldName);
     }
