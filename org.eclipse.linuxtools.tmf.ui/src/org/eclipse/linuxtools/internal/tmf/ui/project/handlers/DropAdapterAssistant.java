@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
@@ -212,6 +213,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 try {
                     IPath destination = targetExperiment.getProject().getTracesFolder().getResource().getFullPath().addTrailingSeparator().append(sourceResource.getName());
                     sourceResource.copy(destination, false, null);
+                    cleanupBookmarks(destination);
                     // use the copied resource for the experiment
                     if (sourceResource.getType() == IResource.FILE) {
                         sourceResource = targetExperiment.getProject().getTracesFolder().getResource().getFile(sourceResource.getName());
@@ -252,6 +254,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             try {
                 IPath destination = traceFolder.getResource().getFullPath().addTrailingSeparator().append(sourceResource.getName());
                 sourceResource.copy(destination, false, null);
+                cleanupBookmarks(destination);
                 return true;
             } catch (CoreException e) {
                 displayException(e);
@@ -359,6 +362,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             displayException(e);
         }
     } 
+
     /**
      * Create a link to the actual trace and set the trace type
      * 
@@ -394,6 +398,24 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             }
         } catch (CoreException e) {
             displayException(e);
+        }
+    }
+
+    /**
+     * Cleanup bookmarks file in copied trace
+     */
+    private void cleanupBookmarks(IPath path) {
+        IFolder folder = ResourcesPlugin.getWorkspace().getRoot().getFolder(path);
+        if (folder.exists()) {
+            try {
+                for (IResource member : folder.members()) {
+                    if (TmfTrace.class.getCanonicalName().equals(member.getPersistentProperty(TmfTraceElement.TRACETYPE))) {
+                        member.delete(true, null);
+                    }
+                }
+            } catch (CoreException e) {
+                displayException(e);
+            }
         }
     }
 
