@@ -67,167 +67,167 @@ public class SDPrintDialogUI {
     /**
      * The set horizontal pages number. 
      */
-    protected Button setHPagesNumber;
+    protected Button fSetHPagesNumber;
     /**
      * The set vertical pages number. 
      */
-    protected Button setVPagesNumber;
+    protected Button fSetVPagesNumber;
     /**
      * Flag whether to use current zoom or not. 
      */
-    protected Button useCurrentZoom;
+    protected Button fUseCurrentZoom;
     /**
      * Flag whether to print all pages or not
      */
-    protected Button allPages;
+    protected Button fAllPages;
     /**
      * Flag whether to print current page only
      */
-    protected Button currentPage;
+    protected Button fCurrentPage;
     /**
      * Button to select a page list.
      */
-    protected Button pageList;
+    protected Button fPageList;
     /**
      * Button to select a page range.
      */
-    protected Button pageRange;
+    protected Button fPageRange;
     /**
      * Text field to enter from page.
      */
-    protected Text fromPage;
+    protected Text fFromPage;
     /**
      * Text field to enter to page.
      */
-    protected Text toPage;
+    protected Text fToPage;
     /**
      *  The sequence diagram widget reference. 
      */
-    protected SDWidget view;
+    protected SDWidget fSdView;
     /**
      * Text field for number of horizontal pages
      */
-    protected Text hPagesNum;
+    protected Text fHorPagesNum;
     /**
      * Text field for number of vertical pages
      */
-    protected Text vPagesNum;
+    protected Text fVertPagesNum;
     /**
      * Text field for toal number of pages
      */
-    protected Text totalPages;
+    protected Text fTotalPages;
     /**
      * A modify listener implementation to handle modifications. 
      */
-    protected ModifyListener modifyListener;
+    protected ModifyListener fModifyListener;
     /**
      * A selection listener implementation to handle selections.
      */
-    protected SelectionListener selectionListener;
+    protected SelectionListener fSelectionListener;
     /**
      * Local canvas displaying sequence diagram overview.
      */
-    protected LocalSD overviewCanvas;
+    protected LocalSD fOverviewCanvas;
     /**
      * Number of pages
      */
-    protected int nbPages = 0;
+    protected int fNbPages = 0;
     /**
      * Number of selected pages.
      */
-    protected int pageNum = -1;
+    protected int fPageNum = -1;
     /**
      * Number of first page. 
      */
-    protected int firstPage = -1;
+    protected int fFirstPage = -1;
     /**
      * List of pages to print.
      */
-    protected int pagesList[];
+    protected int fPagesList[];
     /**
      * Values for dividing sequence diagram into pages.   
      */
-    protected float stepX, stepY, sTX, sTY;
+    protected float fStepX, fStepY, sTX, sTY;
     /**
      * Page which to print from. 
      */
-    protected int from;
+    protected int fFrom;
     /**
      * Page which to print to. 
      */
-    protected int to;
+    protected int fTo;
     /**
      * Flag for enabling multi-selection.
      */
-    protected boolean multiSelection = false;
+    protected boolean fMultiSelection = false;
     /**
      * Flag for enabling area selection.
      */
-    protected boolean areaSelection = false;
+    protected boolean fAreaSelection = false;
     /**
      * Flag for printing all.
      */
-    protected boolean printAll;
+    protected boolean fPrintAll;
     /**
      * Flag for printing current page only.
      */
-    protected boolean printCurrent;
+    protected boolean fPrintCurrent;
     /**
      * Flag for printing a selection of pages.
      */
-    protected boolean printSelection;
+    protected boolean fPrintSelection;
     /**
      * Flag for printing a range of pages.
      */
-    protected boolean printRange;
+    protected boolean fPrintRange;
     /**
      * Number of selected rows
      */
-    protected int nbRows;
+    protected int fNbRows;
     /**
      * Number of selected lines
      */
-    protected int nbLines;
+    protected int fNbLines;
     /**
      * The zoom factor.
      */
-    protected float zoomFactor;
+    protected float fZoomFactor;
     /**
      * The printer data reference. 
      */
-    protected PrinterData printerData;
+    protected PrinterData fPrinterData;
     /**
      * The diagram tooltip to show if necessary.
      */
-    protected DiagramToolTip toolTip = null;
+    protected DiagramToolTip fToolTip = null;
     /**
      * Label for current selection.
      */
-    protected Label currentSelection;
+    protected Label fCurrentSelection;
     /**
      * The shell reference.
      */
-    protected Shell shell;
+    protected Shell fShell;
     /**
      * Button to open printer dialog from OS.
      */
-    protected Button printerDialog;
+    protected Button fPrinterDialog;
     /**
-     * Flag for showoing print button.
+     * Flag for showing print button.
      */
-    protected boolean showPrintButton;
+    protected boolean fShowPrintButton;
     /**
      * Test value  
      */
-    protected int test = 3;
+    protected int fTest = 3;
     /**
      * Parent wizard page if used as wizard
      */
-    protected WizardPage parentWizardPage = null;
+    protected WizardPage fParentWizardPage = null;
     /**
      * Reference to parent print dialog. 
      */
-    protected SDPrintDialog parentDialog = null;
+    protected SDPrintDialog fParentDialog = null;
 
     // ------------------------------------------------------------------------
     // Helper Class
@@ -253,8 +253,8 @@ public class SDPrintDialogUI {
          */
         @Override
         public int getContentsHeight() {
-            if (view.getContentsHeight() > view.getContentsHeight()) {
-                return (int) (view.getVisibleHeight() / (float) test / view.zoomValue);
+            if (fSdView.getContentsHeight() > fSdView.getContentsHeight()) {
+                return (int) (fSdView.getVisibleHeight() / (float) fTest / fSdView.fZoomValue);
             }
             return (int) (super.getContentsHeight());
         }
@@ -265,8 +265,8 @@ public class SDPrintDialogUI {
          */
         @Override
         public int getContentsWidth() {
-            if (view.getVisibleWidth() > view.getContentsWidth()) {
-                return (int) (view.getVisibleWidth() / (float) test / view.zoomValue);
+            if (fSdView.getVisibleWidth() > fSdView.getContentsWidth()) {
+                return (int) (fSdView.getVisibleWidth() / (float) fTest / fSdView.fZoomValue);
             }
             return (int) (super.getContentsWidth());
         }
@@ -293,9 +293,9 @@ public class SDPrintDialogUI {
 
             Image over = new Image(super.getShell().getDisplay(), img.getImageData());
 
-            for (int pageIndex = 0; pageIndex < pagesList.length; pageIndex++) {
+            for (int pageIndex = 0; pageIndex < fPagesList.length; pageIndex++) {
 
-                int pageNum = pagesList[pageIndex];
+                int pageNum = fPagesList[pageIndex];
 
                 if (getPagesForSelection() > 0 && pageNum > 0) {
                     int line = pageNum / getNbRow();
@@ -310,41 +310,40 @@ public class SDPrintDialogUI {
                     row--;
 
                     Image toDel = over;
-                    if (overviewCanvas.isFocusControl()) {
-                        over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel, new Rectangle(contentsToViewX((int) (row * stepX * overviewCanvas.zoomValue)), contentsToViewY((int) (line * stepY * overviewCanvas.zoomValue)),
-                                ((int) (stepX * overviewCanvas.zoomValue)), ((int) (stepY * overviewCanvas.zoomValue))), new RGB(0, 0, 128)));
+                    if (fOverviewCanvas.isFocusControl()) {
+                        over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel, new Rectangle(contentsToViewX((int) (row * stepX * fOverviewCanvas.fZoomValue)), contentsToViewY((int) (line * stepY * fOverviewCanvas.fZoomValue)),
+                                ((int) (stepX * fOverviewCanvas.fZoomValue)), ((int) (stepY * fOverviewCanvas.fZoomValue))), new RGB(0, 0, 128)));
                     } else {
-                        over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel, new Rectangle(contentsToViewX((int) (row * stepX * overviewCanvas.zoomValue)), contentsToViewY((int) (line * stepY * overviewCanvas.zoomValue)),
-                                ((int) (stepX * overviewCanvas.zoomValue)), ((int) (stepY * overviewCanvas.zoomValue))), new RGB(221, 208, 200)));
+                        over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel, new Rectangle(contentsToViewX((int) (row * stepX * fOverviewCanvas.fZoomValue)), contentsToViewY((int) (line * stepY * fOverviewCanvas.fZoomValue)),
+                                ((int) (stepX * fOverviewCanvas.fZoomValue)), ((int) (stepY * fOverviewCanvas.fZoomValue))), new RGB(221, 208, 200)));
                     }
                     toDel.dispose();
                 }
             }
 
-            Arrays.sort(pagesList);
-            int pos = Arrays.binarySearch(pagesList, pageNum);
-            if (pos < 0)
-                if (getPagesForSelection() > 0 && pageNum > 0) {
-                    int line = pageNum / getNbRow();
-                    int row = pageNum % getNbRow();
-                    if (row != 0) {
-                        line++;
-                    } else {
-                        row = getNbRow();
-                    }
-
-                    line--;
-                    row--;
-
-                    Image toDel = over;
-                    over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel, new Rectangle(contentsToViewX((int) (row * stepX * overviewCanvas.zoomValue)), contentsToViewY((int) (line * stepY * overviewCanvas.zoomValue)),
-                            ((int) (stepX * overviewCanvas.zoomValue)), ((int) (stepY * overviewCanvas.zoomValue))), new RGB(221, 208, 200)));
-                    toDel.dispose();
+            Arrays.sort(fPagesList);
+            int pos = Arrays.binarySearch(fPagesList, fPageNum);
+            if ((pos < 0) && (getPagesForSelection() > 0 && fPageNum > 0)) {
+                int line = fPageNum / getNbRow();
+                int row = fPageNum % getNbRow();
+                if (row != 0) {
+                    line++;
+                } else {
+                    row = getNbRow();
                 }
+
+                line--;
+                row--;
+
+                Image toDel = over;
+                over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel, new Rectangle(contentsToViewX((int) (row * stepX * fOverviewCanvas.fZoomValue)), contentsToViewY((int) (line * stepY * fOverviewCanvas.fZoomValue)),
+                        ((int) (stepX * fOverviewCanvas.fZoomValue)), ((int) (stepY * fOverviewCanvas.fZoomValue))), new RGB(221, 208, 200)));
+                toDel.dispose();
+            }
 
             GC imGC2 = new GC(over);
             imGC2.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
-            NGC imGC = new NGC(overviewCanvas, imGC2);
+            NGC imGC = new NGC(fOverviewCanvas, imGC2);
             for (int i = 0, x = 0; x <= width && stepX > 0; i++, x = (int) (i * stepX)) {
                 imGC.drawLine(x, 0, x, height);
             }
@@ -369,16 +368,16 @@ public class SDPrintDialogUI {
             computeStepXY();
             Image d;
 
-            int lw = (int) (getContentsWidth() / zoomValue);
+            int lw = (int) (getContentsWidth() / fZoomValue);
             if (getContentsWidth() < getVisibleWidth()) {
-                lw = (int) (getVisibleWidth() / zoomValue);
+                lw = (int) (getVisibleWidth() / fZoomValue);
             }
 
-            int lh = (int) (getContentsHeight() / zoomValue);
+            int lh = (int) (getContentsHeight() / fZoomValue);
             if (getContentsHeight() < getVisibleHeight()) {
-                lh = (int) (getVisibleHeight() / zoomValue);
+                lh = (int) (getVisibleHeight() / fZoomValue);
             }
-            d = createPagesSelectionImages(dbuffer, lw, stepX, lh, stepY);
+            d = createPagesSelectionImages(dbuffer, lw, fStepX, lh, fStepY);
 
             if (!isEnabled()) {
                 Image toDel = d;
@@ -393,7 +392,7 @@ public class SDPrintDialogUI {
             int h = d.getBounds().height;
             gc.drawImage(d, 0, 0, w, h, 0, 0, area.width, area.height);
 
-            totalPages.setText(Integer.valueOf(maxNumOfPages()).toString());
+            fTotalPages.setText(Integer.valueOf(maxNumOfPages()).toString());
             displayPageNum();
             dbuffer.dispose();
             d.dispose();
@@ -408,85 +407,85 @@ public class SDPrintDialogUI {
         @Override
         protected void keyPressedEvent(KeyEvent e) {
             if (e.keyCode == SWT.CTRL) {
-                multiSelection = true;
+                fMultiSelection = true;
             }
             if (e.keyCode == SWT.SHIFT) {
-                areaSelection = true;
+                fAreaSelection = true;
             }
             if (e.keyCode == SWT.ARROW_DOWN) {
-                if (pageNum + getNbRow() <= maxNumOfPages()) {
-                    pageNum += getNbRow();
+                if (fPageNum + getNbRow() <= maxNumOfPages()) {
+                    fPageNum += getNbRow();
                 }
-                int line = pageNum / getNbRow();
-                int row = pageNum % getNbRow();
+                int line = fPageNum / getNbRow();
+                int row = fPageNum % getNbRow();
                 if (row == 0) {
                     line--;
                 }
-                if ((line + 1) * stepY > (overviewCanvas.getContentsY() + overviewCanvas.getVisibleHeight()) / overviewCanvas.zoomValue) {
-                    overviewCanvas.scrollBy(0, (int) (stepY * overviewCanvas.zoomValue));
+                if ((line + 1) * fStepY > (fOverviewCanvas.getContentsY() + fOverviewCanvas.getVisibleHeight()) / fOverviewCanvas.fZoomValue) {
+                    fOverviewCanvas.scrollBy(0, (int) (fStepY * fOverviewCanvas.fZoomValue));
                 }
             }
             if (e.keyCode == SWT.ARROW_UP) {
-                if (pageNum - getNbRow() > 0) {
-                    pageNum -= getNbRow();
+                if (fPageNum - getNbRow() > 0) {
+                    fPageNum -= getNbRow();
                 }
-                int line = pageNum / getNbRow();
-                int row = pageNum % getNbRow();
+                int line = fPageNum / getNbRow();
+                int row = fPageNum % getNbRow();
                 if (row == 0) {
                     line--;
                 }
-                if ((line) * stepY <= overviewCanvas.getContentsY() / overviewCanvas.zoomValue) {
-                    overviewCanvas.scrollBy(0, -(int) (stepY * overviewCanvas.zoomValue));
+                if ((line) * fStepY <= fOverviewCanvas.getContentsY() / fOverviewCanvas.fZoomValue) {
+                    fOverviewCanvas.scrollBy(0, -(int) (fStepY * fOverviewCanvas.fZoomValue));
                 }
             }
             if (e.keyCode == SWT.ARROW_LEFT) {
-                if ((pageNum - 2) / getNbRow() == (pageNum - 1) / getNbRow() && pageNum > 1) {
-                    pageNum--;
+                if ((fPageNum - 2) / getNbRow() == (fPageNum - 1) / getNbRow() && fPageNum > 1) {
+                    fPageNum--;
                 }
-                int row = pageNum % getNbRow();
-                if ((row - 1) * stepX < (overviewCanvas.getContentsX()) / overviewCanvas.zoomValue) {
-                    overviewCanvas.scrollBy(-(int) (stepX * overviewCanvas.zoomValue), 0);
+                int row = fPageNum % getNbRow();
+                if ((row - 1) * fStepX < (fOverviewCanvas.getContentsX()) / fOverviewCanvas.fZoomValue) {
+                    fOverviewCanvas.scrollBy(-(int) (fStepX * fOverviewCanvas.fZoomValue), 0);
                 }
             }
             if (e.keyCode == SWT.ARROW_RIGHT) {
-                if ((pageNum - 1) / getNbRow() == pageNum / getNbRow()) {
-                    pageNum++;
+                if ((fPageNum - 1) / getNbRow() == fPageNum / getNbRow()) {
+                    fPageNum++;
                 }
-                int row = pageNum % getNbRow();
+                int row = fPageNum % getNbRow();
                 if (row == 0) {
                     row = getNbRow();
                 }
-                if ((row) * stepX > (overviewCanvas.getContentsX() + overviewCanvas.getVisibleWidth()) / overviewCanvas.zoomValue) {
-                    overviewCanvas.scrollBy((int) (stepX * overviewCanvas.zoomValue), 0);
+                if ((row) * fStepX > (fOverviewCanvas.getContentsX() + fOverviewCanvas.getVisibleWidth()) / fOverviewCanvas.fZoomValue) {
+                    fOverviewCanvas.scrollBy((int) (fStepX * fOverviewCanvas.fZoomValue), 0);
                 }
             }
 
-            if (e.keyCode == 32 && pageNum > -1) {
-                Arrays.sort(pagesList);
-                int pos = Arrays.binarySearch(pagesList, pageNum);
+            if (e.keyCode == 32 && fPageNum > -1) {
+                Arrays.sort(fPagesList);
+                int pos = Arrays.binarySearch(fPagesList, fPageNum);
                 if (pos < 0) {
-                    addToPagesList(pageNum);
+                    addToPagesList(fPageNum);
                 } else {
-                    removeFromPagesList(pageNum);
+                    removeFromPagesList(fPageNum);
                 }
             }
 
-            if (!areaSelection && !multiSelection) {
-                firstPage = pageNum;
-                pagesList = new int[1];
-                pagesList[0] = pageNum;
-            } else if ((pageNum != -1) && (areaSelection) && (firstPage != -1)) {
-                pagesList = new int[0];
-                int line1 = firstPage / getNbRow();
-                int row1 = firstPage % getNbRow();
+            if (!fAreaSelection && !fMultiSelection) {
+                fFirstPage = fPageNum;
+                fPagesList = new int[1];
+                fPagesList[0] = fPageNum;
+            } else if ((fPageNum != -1) && (fAreaSelection) && (fFirstPage != -1)) {
+                fPagesList = new int[0];
+                int line1 = fFirstPage / getNbRow();
+                int row1 = fFirstPage % getNbRow();
                 if (row1 != 0) {
                     line1++;
                 } else {
                     row1 = getNbRow();
                 }
 
-                int line2 = pageNum / getNbRow();
-                int row2 = pageNum % getNbRow();
+                int line2 = fPageNum / getNbRow();
+                int row2 = fPageNum % getNbRow();
                 if (row2 != 0) {
                     line2++;
                 } else {
@@ -513,7 +512,7 @@ public class SDPrintDialogUI {
                 }
             }
             displayPageNum();
-            overviewCanvas.redraw();
+            fOverviewCanvas.redraw();
         }
 
         /*
@@ -523,10 +522,10 @@ public class SDPrintDialogUI {
         @Override
         protected void keyReleasedEvent(KeyEvent e) {
             if (e.keyCode == SWT.CTRL) {
-                multiSelection = false;
+                fMultiSelection = false;
             }
             if (e.keyCode == SWT.SHIFT) {
-                areaSelection = false;
+                fAreaSelection = false;
             }
         }
 
@@ -538,44 +537,44 @@ public class SDPrintDialogUI {
         protected void contentsMouseDownEvent(MouseEvent event) {
 
             computeStepXY();
-            int x1 = (int) ((event.x / overviewCanvas.zoomValue) / stepX);
-            int x2 = (int) ((event.y / overviewCanvas.zoomValue) / stepY);
+            int x1 = (int) ((event.x / fOverviewCanvas.fZoomValue) / fStepX);
+            int x2 = (int) ((event.y / fOverviewCanvas.fZoomValue) / fStepY);
 
-            int oldPage = pageNum;
+            int oldPage = fPageNum;
 
-            pageNum = x1 + x2 * getNbRow() + 1;
+            fPageNum = x1 + x2 * getNbRow() + 1;
 
-            if (pageNum > maxNumOfPages()) {
-                pageNum = oldPage;
+            if (fPageNum > maxNumOfPages()) {
+                fPageNum = oldPage;
                 return;
             }
 
-            if (!areaSelection) {
-                firstPage = pageNum;
+            if (!fAreaSelection) {
+                fFirstPage = fPageNum;
             }
 
-            if ((pageNum != -1) && (multiSelection)) {
-                Arrays.sort(pagesList);
-                int pos = Arrays.binarySearch(pagesList, pageNum);
+            if ((fPageNum != -1) && (fMultiSelection)) {
+                Arrays.sort(fPagesList);
+                int pos = Arrays.binarySearch(fPagesList, fPageNum);
                 if (pos < 0) {
-                    addToPagesList(pageNum);
+                    addToPagesList(fPageNum);
                 } else {
-                    removeFromPagesList(pageNum);
+                    removeFromPagesList(fPageNum);
                 }
-            } else if ((pageNum != -1) && (areaSelection) && (firstPage != -1)) {
+            } else if ((fPageNum != -1) && (fAreaSelection) && (fFirstPage != -1)) {
 
-                pagesList = new int[0];
+                fPagesList = new int[0];
 
-                int line1 = firstPage / getNbRow();
-                int row1 = firstPage % getNbRow();
+                int line1 = fFirstPage / getNbRow();
+                int row1 = fFirstPage % getNbRow();
                 if (row1 != 0) {
                     line1++;
                 } else {
                     row1 = getNbRow();
                 }
 
-                int line2 = pageNum / getNbRow();
-                int row2 = pageNum % getNbRow();
+                int line2 = fPageNum / getNbRow();
+                int row2 = fPageNum % getNbRow();
                 if (row2 != 0) {
                     line2++;
                 } else {
@@ -601,11 +600,11 @@ public class SDPrintDialogUI {
                     }
                 }
             } else {
-                pagesList = new int[1];
-                pagesList[0] = pageNum;
+                fPagesList = new int[1];
+                fPagesList[0] = fPageNum;
             }
             if ((event.stateMask & SWT.CTRL) != 0) {
-                multiSelection = true;
+                fMultiSelection = true;
             }
             displayPageNum();
             redraw();
@@ -617,7 +616,7 @@ public class SDPrintDialogUI {
          */
         @Override
         protected void contentsMouseMoveEvent(MouseEvent e) {
-            toolTip.hideToolTip();
+            fToolTip.hideToolTip();
         }
 
         /*
@@ -625,8 +624,8 @@ public class SDPrintDialogUI {
          * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.ScrollView#resizeContents(int, int)
          */
         @Override
-        public void resizeContents(int _w, int _h) {
-            super.resizeContents(_w, _h);
+        public void resizeContents(int w, int h) {
+            super.resizeContents(w, h);
         }
 
     }
@@ -637,89 +636,89 @@ public class SDPrintDialogUI {
     /**
      * Constructor
      * 
-     * @param s The shell reference
-     * @param v The sequence diagram widget reference
+     * @param shell The shell reference
+     * @param sdWidget The sequence diagram widget reference
      */
-    public SDPrintDialogUI(Shell s, SDWidget v) {
-        this(s, v, false);
+    public SDPrintDialogUI(Shell shell, SDWidget sdWidget) {
+        this(shell, sdWidget, false);
     }
     
     /**
      * Constructor
      * 
-     * @param s The shell reference
-     * @param v The sequence diagram widget reference
+     * @param shello The shell reference
+     * @param sdWidget The sequence diagram widget reference
      * @param showPrintBtn Flag for showing print buttons
      */
-    public SDPrintDialogUI(Shell s, SDWidget v, boolean showPrintBtn) {
-        setShell(s);
-        view = v;
-        showPrintButton = showPrintBtn;
+    public SDPrintDialogUI(Shell shell, SDWidget sdWidget, boolean showPrintBtn) {
+        fShell = shell;
+        fSdView = sdWidget;
+        fShowPrintButton = showPrintBtn;
 
-        printerData = Printer.getDefaultPrinterData();
-        if (printerData != null) {
-            printerData.scope = PrinterData.SELECTION;
+        fPrinterData = Printer.getDefaultPrinterData();
+        if (fPrinterData != null) {
+            fPrinterData.scope = PrinterData.SELECTION;
         }
 
-        pagesList = new int[0];
+        fPagesList = new int[0];
 
-        selectionListener = new SelectionListener() {
+        fSelectionListener = new SelectionListener() {
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                if (useCurrentZoom.getSelection()) {
-                    hPagesNum.setEnabled(false);
-                    vPagesNum.setEnabled(false);
+                if (fUseCurrentZoom.getSelection()) {
+                    fHorPagesNum.setEnabled(false);
+                    fVertPagesNum.setEnabled(false);
                 }
-                if (setHPagesNumber.getSelection()) {
-                    hPagesNum.setEnabled(true);
-                    vPagesNum.setEnabled(false);
-                    if (currentPage.getSelection()) {
-                        currentPage.setSelection(false);
-                        allPages.setSelection(true);
+                if (fSetHPagesNumber.getSelection()) {
+                    fHorPagesNum.setEnabled(true);
+                    fVertPagesNum.setEnabled(false);
+                    if (fCurrentPage.getSelection()) {
+                        fCurrentPage.setSelection(false);
+                        fAllPages.setSelection(true);
                     }
-                    if (hPagesNum.getText() == "") { //$NON-NLS-1$ 
-                        hPagesNum.setText("1"); //$NON-NLS-1$
-                    }
-                }
-                if (setVPagesNumber.getSelection()) {
-                    hPagesNum.setEnabled(false);
-                    vPagesNum.setEnabled(true);
-                    if (currentPage.getSelection()) {
-                        currentPage.setSelection(false);
-                        allPages.setSelection(true);
-                    }
-                    if (vPagesNum.getText() == "") { //$NON-NLS-1$
-                        vPagesNum.setText("1"); //$NON-NLS-1$
+                    if ("".equals(fHorPagesNum.getText())) { //$NON-NLS-1$ 
+                        fHorPagesNum.setText("1"); //$NON-NLS-1$
                     }
                 }
-                if (currentPage.getSelection() || allPages.getSelection() || pageList.getSelection()) {
-                    fromPage.setEnabled(false);
-                    toPage.setEnabled(false);
+                if (fSetVPagesNumber.getSelection()) {
+                    fHorPagesNum.setEnabled(false);
+                    fVertPagesNum.setEnabled(true);
+                    if (fCurrentPage.getSelection()) {
+                        fCurrentPage.setSelection(false);
+                        fAllPages.setSelection(true);
+                    }
+                    if (fVertPagesNum.getText() == "") { //$NON-NLS-1$
+                        fVertPagesNum.setText("1"); //$NON-NLS-1$
+                    }
+                }
+                if (fCurrentPage.getSelection() || fAllPages.getSelection() || fPageList.getSelection()) {
+                    fFromPage.setEnabled(false);
+                    fToPage.setEnabled(false);
                 } else {
-                    fromPage.setEnabled(true);
-                    toPage.setEnabled(true);
+                    fFromPage.setEnabled(true);
+                    fToPage.setEnabled(true);
                 }
 
-                currentPage.setEnabled(useCurrentZoom.getSelection());
-                overviewCanvas.setEnabled(pageList.getSelection());
-                if (overviewCanvas.isEnabled() && (e.widget == useCurrentZoom || e.widget == setHPagesNumber || e.widget == setVPagesNumber)) {
-                    pagesList = new int[1];
-                    pagesList[0] = 1;
-                    pageNum = 1;
-                    firstPage = 1;
-                } else if (overviewCanvas.isEnabled() && (e.widget == pageList)) {
-                    if (pagesList == null || pagesList.length <= 0) {
-                        pagesList = new int[1];
-                        pagesList[0] = 1;
-                        pageNum = 1;
-                        firstPage = 1;
-                    }
+                fCurrentPage.setEnabled(fUseCurrentZoom.getSelection());
+                fOverviewCanvas.setEnabled(fPageList.getSelection());
+                if (fOverviewCanvas.isEnabled() && (e.widget == fUseCurrentZoom || e.widget == fSetHPagesNumber || e.widget == fSetVPagesNumber)) {
+                    fPagesList = new int[1];
+                    fPagesList[0] = 1;
+                    fPageNum = 1;
+                    fFirstPage = 1;
+                } else if ((fOverviewCanvas.isEnabled() && (e.widget == fPageList)) && 
+                           (fPagesList == null || fPagesList.length <= 0)) {
+
+                    fPagesList = new int[1];
+                    fPagesList[0] = 1;
+                    fPageNum = 1;
+                    fFirstPage = 1;
                 }
                 computeStepXY();
-                totalPages.setText(Integer.valueOf(maxNumOfPages()).toString());
-                overviewCanvas.redraw();
-                overviewCanvas.update();
+                fTotalPages.setText(Integer.valueOf(maxNumOfPages()).toString());
+                fOverviewCanvas.redraw();
+                fOverviewCanvas.update();
             }
 
             /*
@@ -728,24 +727,24 @@ public class SDPrintDialogUI {
              */
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
-                pagesList = new int[0];
+                fPagesList = new int[0];
                 computeStepXY();
-                overviewCanvas.redraw();
+                fOverviewCanvas.redraw();
             }
 
         };
 
-        modifyListener = new ModifyListener() {
+        fModifyListener = new ModifyListener() {
             /*
              * (non-Javadoc)
              * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
              */
             @Override
             public void modifyText(ModifyEvent e) {
-                pagesList = new int[0];
+                fPagesList = new int[0];
                 computeStepXY();
-                totalPages.setText(Integer.valueOf(maxNumOfPages()).toString());
-                overviewCanvas.redraw();
+                fTotalPages.setText(Integer.valueOf(maxNumOfPages()).toString());
+                fOverviewCanvas.redraw();
             }
 
         };
@@ -786,32 +785,32 @@ public class SDPrintDialogUI {
         g1layout.numColumns = 2;
         g1.setLayout(g1layout);
 
-        useCurrentZoom = new Button(g1, SWT.RADIO);
-        useCurrentZoom.setText(SDMessages._112);
-        useCurrentZoom.setLayoutData(newGridData(2));
-        useCurrentZoom.addSelectionListener(selectionListener);
+        fUseCurrentZoom = new Button(g1, SWT.RADIO);
+        fUseCurrentZoom.setText(SDMessages._112);
+        fUseCurrentZoom.setLayoutData(newGridData(2));
+        fUseCurrentZoom.addSelectionListener(fSelectionListener);
 
-        setHPagesNumber = new Button(g1, SWT.RADIO);
-        setHPagesNumber.setText(SDMessages._110);
-        setHPagesNumber.setLayoutData(newGridData(1));
-        setHPagesNumber.addSelectionListener(selectionListener);
+        fSetHPagesNumber = new Button(g1, SWT.RADIO);
+        fSetHPagesNumber.setText(SDMessages._110);
+        fSetHPagesNumber.setLayoutData(newGridData(1));
+        fSetHPagesNumber.addSelectionListener(fSelectionListener);
 
-        hPagesNum = new Text(g1, SWT.SINGLE | SWT.BORDER);
-        hPagesNum.addModifyListener(modifyListener);
+        fHorPagesNum = new Text(g1, SWT.SINGLE | SWT.BORDER);
+        fHorPagesNum.addModifyListener(fModifyListener);
 
-        setVPagesNumber = new Button(g1, SWT.RADIO);
-        setVPagesNumber.setText(SDMessages._111);
-        setVPagesNumber.setLayoutData(newGridData(1));
-        setVPagesNumber.addSelectionListener(selectionListener);
+        fSetVPagesNumber = new Button(g1, SWT.RADIO);
+        fSetVPagesNumber.setText(SDMessages._111);
+        fSetVPagesNumber.setLayoutData(newGridData(1));
+        fSetVPagesNumber.addSelectionListener(fSelectionListener);
 
-        vPagesNum = new Text(g1, SWT.SINGLE | SWT.BORDER);
-        vPagesNum.addModifyListener(modifyListener);
+        fVertPagesNum = new Text(g1, SWT.SINGLE | SWT.BORDER);
+        fVertPagesNum.addModifyListener(fModifyListener);
 
         Label nbTotal = new Label(g1, SWT.SHADOW_NONE | SWT.RIGHT);
         nbTotal.setText(SDMessages._109);
         // nbTotal.setLayoutData(newGridData(1));
 
-        totalPages = new Text(g1, SWT.SINGLE | SWT.BORDER | SWT.READ_ONLY);
+        fTotalPages = new Text(g1, SWT.SINGLE | SWT.BORDER | SWT.READ_ONLY);
         // nbHV.addModifyListener(modifListener);
 
         Group g2 = new Group(parent, SWT.SHADOW_NONE);
@@ -830,46 +829,46 @@ public class SDPrintDialogUI {
         data2.horizontalSpan = 1;
         data2.verticalSpan = 1;
 
-        overviewCanvas = new LocalSD(g2, SWT.NO_BACKGROUND);
+        fOverviewCanvas = new LocalSD(g2, SWT.NO_BACKGROUND);
         GridData seqDiagLayoutData = new GridData(GridData.HORIZONTAL_ALIGN_FILL// |GridData.GRAB_HORIZONTAL|
                 /* GridData.GRAB_VERTICAL| */| GridData.VERTICAL_ALIGN_FILL);
         // seqDiagLayoutData.widthHint=400;
         // seqDiagLayoutData.horizontalAlignment=GridData.HORIZONTAL_ALIGN_FILL;
-        overviewCanvas.setLayoutData(seqDiagLayoutData);
+        fOverviewCanvas.setLayoutData(seqDiagLayoutData);
         // overviewCanvas.resizeContents(100,100);
-        if (view.getContentsWidth() < view.getVisibleWidth() && view.getContentsHeight() < view.getVisibleHeight()) {
-            test = 3;
+        if (fSdView.getContentsWidth() < fSdView.getVisibleWidth() && fSdView.getContentsHeight() < fSdView.getVisibleHeight()) {
+            fTest = 3;
         } else {
-            test = 10;
+            fTest = 10;
         }
-        overviewCanvas.setFrame(view.getFrame(), true);
-        overviewCanvas.zoomValue = (float) 1 / test;
-        overviewCanvas.setCornerControl(null);
-        seqDiagLayoutData.widthHint = overviewCanvas.getContentsWidth() / test;
-        seqDiagLayoutData.widthHint = overviewCanvas.getFrame().getWidth() / test + 15;
+        fOverviewCanvas.setFrame(fSdView.getFrame(), true);
+        fOverviewCanvas.fZoomValue = (float) 1 / fTest;
+        fOverviewCanvas.setCornerControl(null);
+        seqDiagLayoutData.widthHint = fOverviewCanvas.getContentsWidth() / fTest;
+        seqDiagLayoutData.widthHint = fOverviewCanvas.getFrame().getWidth() / fTest + 15;
 
-        if (view.getVisibleWidth() < view.getContentsWidth()) {
-            seqDiagLayoutData.widthHint = overviewCanvas.getContentsWidth() / test;
+        if (fSdView.getVisibleWidth() < fSdView.getContentsWidth()) {
+            seqDiagLayoutData.widthHint = fOverviewCanvas.getContentsWidth() / fTest;
             if (seqDiagLayoutData.widthHint > Display.getDefault().getClientArea().width / 4) {
                 seqDiagLayoutData.widthHint = Display.getDefault().getClientArea().width / 4;
             }
         } else {
-            seqDiagLayoutData.widthHint = overviewCanvas.getFrame().getWidth() / test + 15;
+            seqDiagLayoutData.widthHint = fOverviewCanvas.getFrame().getWidth() / fTest + 15;
         }
 
-        if (view.getVisibleHeight() < view.getContentsHeight()) {
-            seqDiagLayoutData.heightHint = overviewCanvas.getContentsHeight() / test;
+        if (fSdView.getVisibleHeight() < fSdView.getContentsHeight()) {
+            seqDiagLayoutData.heightHint = fOverviewCanvas.getContentsHeight() / fTest;
             if (seqDiagLayoutData.heightHint > Display.getDefault().getClientArea().width / 4) {
                 seqDiagLayoutData.heightHint = Display.getDefault().getClientArea().width / 4;
             }
         } else {
-            seqDiagLayoutData.heightHint = overviewCanvas.getFrame().getHeight() / test;
+            seqDiagLayoutData.heightHint = fOverviewCanvas.getFrame().getHeight() / fTest;
         }
 
-        overviewCanvas.setEnabled(false);
+        fOverviewCanvas.setEnabled(false);
 
-        currentSelection = new Label(g2, SWT.SHADOW_NONE | SWT.LEFT);
-        currentSelection.setLayoutData(newGridData(1));
+        fCurrentSelection = new Label(g2, SWT.SHADOW_NONE | SWT.LEFT);
+        fCurrentSelection.setLayoutData(newGridData(1));
 
         Group g3 = new Group(parent, SWT.SHADOW_NONE);
         g3.setText(SDMessages._118);
@@ -878,45 +877,45 @@ public class SDPrintDialogUI {
         g3layout.numColumns = 4;
         g3.setLayout(g3layout);
 
-        allPages = new Button(g3, SWT.RADIO);
-        allPages.setText(SDMessages._108);
-        allPages.setLayoutData(newGridData(4));
-        allPages.addSelectionListener(selectionListener);
+        fAllPages = new Button(g3, SWT.RADIO);
+        fAllPages.setText(SDMessages._108);
+        fAllPages.setLayoutData(newGridData(4));
+        fAllPages.addSelectionListener(fSelectionListener);
 
-        currentPage = new Button(g3, SWT.RADIO);
-        currentPage.setText(SDMessages._107);
-        currentPage.setLayoutData(newGridData(4));
-        currentPage.setEnabled(true);
-        currentPage.setSelection(true);
-        currentPage.addSelectionListener(selectionListener);
+        fCurrentPage = new Button(g3, SWT.RADIO);
+        fCurrentPage.setText(SDMessages._107);
+        fCurrentPage.setLayoutData(newGridData(4));
+        fCurrentPage.setEnabled(true);
+        fCurrentPage.setSelection(true);
+        fCurrentPage.addSelectionListener(fSelectionListener);
 
-        pageList = new Button(g3, SWT.RADIO);
-        pageList.setText(SDMessages._106);
-        pageList.setLayoutData(newGridData(4));
-        pageList.addSelectionListener(selectionListener);
+        fPageList = new Button(g3, SWT.RADIO);
+        fPageList.setText(SDMessages._106);
+        fPageList.setLayoutData(newGridData(4));
+        fPageList.addSelectionListener(fSelectionListener);
 
-        pageRange = new Button(g3, SWT.RADIO);
-        pageRange.setText(SDMessages._103);
-        pageRange.setLayoutData(newGridData(1));
-        pageRange.addSelectionListener(selectionListener);
+        fPageRange = new Button(g3, SWT.RADIO);
+        fPageRange.setText(SDMessages._103);
+        fPageRange.setLayoutData(newGridData(1));
+        fPageRange.addSelectionListener(fSelectionListener);
 
-        fromPage = new Text(g3, SWT.SINGLE | SWT.BORDER);
+        fFromPage = new Text(g3, SWT.SINGLE | SWT.BORDER);
 
         Label labelTo = new Label(g3, SWT.CENTER);
         labelTo.setText(SDMessages._105);
 
-        toPage = new Text(g3, SWT.SINGLE | SWT.BORDER);
+        fToPage = new Text(g3, SWT.SINGLE | SWT.BORDER);
 
-        toolTip = new DiagramToolTip(overviewCanvas);
+        fToolTip = new DiagramToolTip(fOverviewCanvas);
 
-        overviewCanvas.getViewControl().addMouseTrackListener(new MouseTrackListener() {
+        fOverviewCanvas.getViewControl().addMouseTrackListener(new MouseTrackListener() {
             /*
              * (non-Javadoc)
              * @see org.eclipse.swt.events.MouseTrackListener#mouseEnter(org.eclipse.swt.events.MouseEvent)
              */
             @Override
             public void mouseEnter(MouseEvent e) {
-                toolTip.hideToolTip();
+                fToolTip.hideToolTip();
             }
 
             /*
@@ -925,7 +924,7 @@ public class SDPrintDialogUI {
              */
             @Override
             public void mouseExit(MouseEvent e) {
-                toolTip.hideToolTip();
+                fToolTip.hideToolTip();
             }
 
             /*
@@ -934,24 +933,24 @@ public class SDPrintDialogUI {
              */
             @Override
             public void mouseHover(MouseEvent e) {
-                int x1 = (int) (overviewCanvas.viewToContentsX(e.x) / overviewCanvas.zoomValue / stepX);
-                int x2 = (int) (overviewCanvas.viewToContentsY(e.y) / overviewCanvas.zoomValue / stepY);
+                int x1 = (int) (fOverviewCanvas.viewToContentsX(e.x) / fOverviewCanvas.fZoomValue / fStepX);
+                int x2 = (int) (fOverviewCanvas.viewToContentsY(e.y) / fOverviewCanvas.fZoomValue / fStepY);
                 int num = x1 + x2 * getNbRow() + 1;
                 if (num > maxNumOfPages()) {
                     return;
                 }
                 if (num > 0) {
-                    toolTip.showToolTip(String.valueOf(num));
+                    fToolTip.showToolTip(String.valueOf(num));
                     displayPageNum();
                 } else {
-                    currentSelection.setText("");//$NON-NLS-1$
-                    toolTip.hideToolTip();
+                    fCurrentSelection.setText("");//$NON-NLS-1$
+                    fToolTip.hideToolTip();
                 }
             }
 
         });
 
-        overviewCanvas.addTraverseListener(new TraverseListener() {
+        fOverviewCanvas.addTraverseListener(new TraverseListener() {
             /*
              * (non-Javadoc)
              * @see org.eclipse.swt.events.TraverseListener#keyTraversed(org.eclipse.swt.events.TraverseEvent)
@@ -964,14 +963,14 @@ public class SDPrintDialogUI {
             }
         });
 
-        overviewCanvas.addFocusListener(new FocusListener() {
+        fOverviewCanvas.addFocusListener(new FocusListener() {
             /*
              * (non-Javadoc)
              * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
              */
             @Override
             public void focusGained(FocusEvent e) {
-                overviewCanvas.redraw();
+                fOverviewCanvas.redraw();
             }
 
             /*
@@ -980,11 +979,11 @@ public class SDPrintDialogUI {
              */
             @Override
             public void focusLost(FocusEvent e) {
-                overviewCanvas.redraw();
+                fOverviewCanvas.redraw();
             }
         });
 
-        if (showPrintButton) {
+        if (fShowPrintButton) {
             Composite printerDlg = new Composite(parent, SWT.NONE);
             data = GridUtil.createHorizontalFill();
             data.horizontalSpan = 6;
@@ -995,10 +994,10 @@ public class SDPrintDialogUI {
 
             Label label = new Label(printerDlg, SWT.NONE);
             label.setLayoutData(GridUtil.createHorizontalFill());
-            printerDialog = new Button(printerDlg, SWT.PUSH);
-            printerDialog.setText(SDMessages._115);
+            fPrinterDialog = new Button(printerDlg, SWT.PUSH);
+            fPrinterDialog.setText(SDMessages._115);
 
-            printerDialog.addSelectionListener(new SelectionListener() {
+            fPrinterDialog.addSelectionListener(new SelectionListener() {
 
                 /*
                  * (non-Javadoc)
@@ -1031,37 +1030,37 @@ public class SDPrintDialogUI {
      * @return number of pages for selection.
      */
     public int getPagesForSelection() {
-        return nbPages;
+        return fNbPages;
     }
 
     public boolean okPressed() {
-        printAll = allPages.getSelection();
-        printCurrent = currentPage.getSelection();
-        printSelection = pageList.getSelection();
-        printRange = pageRange.getSelection();
+        fPrintAll = fAllPages.getSelection();
+        fPrintCurrent = fCurrentPage.getSelection();
+        fPrintSelection = fPageList.getSelection();
+        fPrintRange = fPageRange.getSelection();
         try {
-            if (printRange) {
-                from = Integer.valueOf(fromPage.getText()).intValue();
-                to = Integer.valueOf(toPage.getText()).intValue();
-                if (from > maxNumOfPages() || to > maxNumOfPages() || from <= 0 || to <= 0) {
+            if (fPrintRange) {
+                fFrom = Integer.valueOf(fFromPage.getText()).intValue();
+                fTo = Integer.valueOf(fToPage.getText()).intValue();
+                if (fFrom > maxNumOfPages() || fTo > maxNumOfPages() || fFrom <= 0 || fTo <= 0) {
                     MessageDialog.openError(getShell(), SDMessages._98, SDMessages._99);
                     return false;
                 }
-            } else if (setHPagesNumber.getSelection() && nbPages <= 0) {
+            } else if (fSetHPagesNumber.getSelection() && fNbPages <= 0) {
                 MessageDialog.openError(getShell(), SDMessages._98, SDMessages._101);
                 return false;
-            } else if (setVPagesNumber.getSelection() && nbPages <= 0) {
+            } else if (fSetVPagesNumber.getSelection() && fNbPages <= 0) {
                 MessageDialog.openError(getShell(), SDMessages._98, SDMessages._100);
                 return false;
-            } else if (printSelection && getPageList().length <= 0) {
+            } else if (fPrintSelection && getPageList().length <= 0) {
                 MessageDialog.openError(getShell(), SDMessages._98, SDMessages._102);
                 return false;
             }
 
         } catch (Exception e) {
             MessageDialog.openError(getShell(), SDMessages._98, SDMessages._99);
-            from = 0;
-            to = 0;
+            fFrom = 0;
+            fTo = 0;
             return false;
         }
 
@@ -1073,7 +1072,7 @@ public class SDPrintDialogUI {
      * @param img The corresponding image
      * @param r The selected rectangle.
      * @param color The color to use for selection
-     * @return
+     * @return image data reference
      */
     public ImageData drawRegionSelected(Image img, Rectangle r, RGB color) {
         ImageData id = img.getImageData();
@@ -1096,16 +1095,7 @@ public class SDPrintDialogUI {
      */
     public static RGB combine(RGB front, RGB back) {
         int _af = 128;
-        if (_af == 1) {
-            return front;
-        }
-        if (_af == 0) {
-            return back;
-        }
         int _ab = 200;
-        if (_ab == 0) {
-            return front;
-        }
 
         double af = (_af) / 255.0;
         double rf = front.red;
@@ -1129,60 +1119,62 @@ public class SDPrintDialogUI {
      * Computes value for X coordinates step and Y coordinates step.
      */
     protected void computeStepXY() {
-        float cw = overviewCanvas.getContentsWidth() / overviewCanvas.zoomValue;
-        float ch = overviewCanvas.getContentsHeight() / overviewCanvas.zoomValue;
+        float cw = fOverviewCanvas.getContentsWidth() / fOverviewCanvas.fZoomValue;
+        float ch = fOverviewCanvas.getContentsHeight() / fOverviewCanvas.fZoomValue;
         try {
-            if (printerData == null) {
-                stepX = 0;
-                stepY = 0;
-                nbPages = 0;
-                zoomFactor = 0;
+            if (fPrinterData == null) {
+                fStepX = 0;
+                fStepY = 0;
+                fNbPages = 0;
+                fZoomFactor = 0;
             } else {
-                Printer printer = new Printer(printerData);
-                if (setHPagesNumber.getSelection()) {
-                    nbPages = Integer.valueOf(hPagesNum.getText()).intValue();
-                    float z1 = (float) view.getContentsWidth() / (cw);
-                    float z2 = printer.getClientArea().width / ((float) view.getContentsWidth() / nbPages);
+                Printer printer = new Printer(fPrinterData);
+                if (fSetHPagesNumber.getSelection()) {
+                    fNbPages = Integer.valueOf(fHorPagesNum.getText()).intValue();
+                    float z1 = (float) fSdView.getContentsWidth() / (cw);
+                    float z2 = printer.getClientArea().width / ((float) fSdView.getContentsWidth() / fNbPages);
 
-                    stepY = printer.getClientArea().height / z1 / z2;
-                    stepX = cw / nbPages;
-                } else if (setVPagesNumber.getSelection()) {
-                    nbPages = Integer.valueOf(vPagesNum.getText()).intValue();
-                    float z1 = (float) view.getContentsHeight() / (ch);
-                    float z2 = printer.getClientArea().height / ((float) view.getContentsHeight() / nbPages);
-                    stepX = printer.getClientArea().width / z1 / z2;
-                    stepY = ch / nbPages;
+                    fStepY = printer.getClientArea().height / z1 / z2;
+                    fStepX = cw / fNbPages;
+                } else if (fSetVPagesNumber.getSelection()) {
+                    fNbPages = Integer.valueOf(fVertPagesNum.getText()).intValue();
+                    float z1 = (float) fSdView.getContentsHeight() / (ch);
+                    float z2 = printer.getClientArea().height / ((float) fSdView.getContentsHeight() / fNbPages);
+                    fStepX = printer.getClientArea().width / z1 / z2;
+                    fStepY = ch / fNbPages;
                 } else {
-                    float z1 = view.getContentsWidth() / (cw);
-                    stepX = ((float) view.getVisibleWidth() / z1);
-                    nbPages = Math.round(cw / stepX);
-                    if (nbPages == 0) {
-                        nbPages = 1;
+                    float z1 = fSdView.getContentsWidth() / (cw);
+                    fStepX = ((float) fSdView.getVisibleWidth() / z1);
+                    fNbPages = Math.round(cw / fStepX);
+                    if (fNbPages == 0) {
+                        fNbPages = 1;
                     }
                     int pw = printer.getClientArea().width;
                     int ph = printer.getClientArea().height;
-                    float z2 = pw / ((float) view.getContentsWidth() / nbPages);
-                    stepY = ((float) ph / z1 / z2);
+                    float z2 = pw / ((float) fSdView.getContentsWidth() / fNbPages);
+                    fStepY = ((float) ph / z1 / z2);
                 }
             }
         } catch (NumberFormatException e) {
-            stepX = stepY = nbPages = 0;
-            zoomFactor = 0;
+            fStepX = fStepY = fNbPages = 0;
+            fZoomFactor = 0;
         }
-        sTX = stepX * (view.getContentsWidth() / cw);
-        sTY = stepY * (view.getContentsHeight() / ch);
+        sTX = fStepX * (fSdView.getContentsWidth() / cw);
+        sTY = fStepY * (fSdView.getContentsHeight() / ch);
         float rat = 1;
-        if ((view.getVisibleWidth() > view.getContentsWidth()) && (setVPagesNumber.getSelection() || setHPagesNumber.getSelection())) {
-            rat = (float) view.getVisibleWidth() / (float) view.getContentsWidth();
+        if ((fSdView.getVisibleWidth() > fSdView.getContentsWidth()) && (fSetVPagesNumber.getSelection() || fSetHPagesNumber.getSelection())) {
+            rat = (float) fSdView.getVisibleWidth() / (float) fSdView.getContentsWidth();
         }
-        zoomFactor = (overviewCanvas.getContentsWidth() / cw) / overviewCanvas.getZoomFactor() * rat;// /view.getZoomFactor();
+        fZoomFactor = (fOverviewCanvas.getContentsWidth() / cw) / fOverviewCanvas.getZoomFactor() * rat;// /view.getZoomFactor();
     }
 
     /**
+     * Returns the pages list.
+     * 
      * @return the pages list.
      */
     public int[] getPageList() {
-        return Arrays.copyOf(pagesList, pagesList.length);
+        return Arrays.copyOf(fPagesList, fPagesList.length);
     }
 
     /**
@@ -1190,11 +1182,11 @@ public class SDPrintDialogUI {
      * @param num
      */
     public void addToPagesList(int num) {
-        int temp[] = new int[pagesList.length + 1];
-        System.arraycopy(pagesList, 0, temp, 0, pagesList.length);
+        int temp[] = new int[fPagesList.length + 1];
+        System.arraycopy(fPagesList, 0, temp, 0, fPagesList.length);
         temp[temp.length - 1] = num;
-        pagesList = new int[temp.length];
-        System.arraycopy(temp, 0, pagesList, 0, temp.length);
+        fPagesList = new int[temp.length];
+        System.arraycopy(temp, 0, fPagesList, 0, temp.length);
     }
 
     /**
@@ -1202,91 +1194,106 @@ public class SDPrintDialogUI {
      * @param num
      */
     public void removeFromPagesList(int num) {
-        int pos = Arrays.binarySearch(pagesList, num);
-        int temp[] = new int[pagesList.length - 1];
-        System.arraycopy(pagesList, 0, temp, 0, pos);
-        System.arraycopy(pagesList, pos + 1, temp, pos, pagesList.length - pos - 1);
-        pagesList = new int[temp.length];
-        System.arraycopy(temp, 0, pagesList, 0, temp.length);
+        int pos = Arrays.binarySearch(fPagesList, num);
+        int temp[] = new int[fPagesList.length - 1];
+        System.arraycopy(fPagesList, 0, temp, 0, pos);
+        System.arraycopy(fPagesList, pos + 1, temp, pos, fPagesList.length - pos - 1);
+        fPagesList = new int[temp.length];
+        System.arraycopy(temp, 0, fPagesList, 0, temp.length);
     }
 
     /**
+     * Returns the maximum number of pages.
+     * 
      * @return maximum number of pages.
      */
     public int maxNumOfPages() {
-        int max = getNbRow() * getNbLines();
-        return max;
+        return (getNbRow() * getNbLines());
     }
 
     /**
+     * Returns the number of rows.
+     * 
      * @return number of rows.
      */
     public int getNbRow() {
-        if (!setHPagesNumber.isDisposed()) {
-            int cw = (int) (overviewCanvas.getContentsWidth() / overviewCanvas.zoomValue);
+        if (!fSetHPagesNumber.isDisposed()) {
+            int cw = (int) (fOverviewCanvas.getContentsWidth() / fOverviewCanvas.fZoomValue);
             int row = 1;
-            if (stepX != 0) {
-                row = (int) (cw / stepX);
-                if (setHPagesNumber.getSelection()) {
-                    row = Math.round((float) cw / stepX);
-                } else if ((cw % stepX != 0)) {
+            if (fStepX != 0) {
+                row = (int) (cw / fStepX);
+                if (fSetHPagesNumber.getSelection()) {
+                    row = Math.round((float) cw / fStepX);
+                } else if ((cw % fStepX != 0)) {
                     row++;
                 }
             }
-            nbRows = row;
+            fNbRows = row;
         }
-        return nbRows;
+        return fNbRows;
     }
 
     /**
+     * Returns the number of lines.
+     * 
      * @return number of lines
      */
     public int getNbLines() {
-        if (!setVPagesNumber.isDisposed()) {
-            int ch = (int) (overviewCanvas.getContentsHeight() / overviewCanvas.zoomValue);
+        if (!fSetVPagesNumber.isDisposed()) {
+            int ch = (int) (fOverviewCanvas.getContentsHeight() / fOverviewCanvas.fZoomValue);
             int line = 1;
-            if (stepY != 0) {
-                line = (int) (ch / stepY);
-                if (setVPagesNumber.getSelection()) {
-                    line = Math.round((float) ch / stepY);
-                } else if (ch % stepY != 0) {
+            if (fStepY != 0) {
+                line = (int) (ch / fStepY);
+                if (fSetVPagesNumber.getSelection()) {
+                    line = Math.round((float) ch / fStepY);
+                } else if (ch % fStepY != 0) {
                     line++;
                 }
             }
-            nbLines = line;
+            fNbLines = line;
         }
-        return nbLines;
+        return fNbLines;
     }
 
     /**
-     * @return whether to print all pages or not.
+     * Returns whether to print all pages or not.
+     * 
+     * @return <code>true</code> for all pages else <code>false</code>.
      */
     public boolean printAll() {
-        return printAll;
+        return fPrintAll;
     }
 
     /**
-     * @return whether to print only current page.
+     * Returns whether to print only current page 
+     * 
+     * @return <code>true</code> for current page only else <code>false</code>..
      */
     public boolean printCurrent() {
-        return printCurrent;
+        return fPrintCurrent;
     }
 
     /**
-     * @return whether to print selected pages.
+     * Returns whether to print selected pages.
+     * 
+     * @return <code>true</code> for selected pages only else <code>false</code>. 
      */
     public boolean printSelection() {
-        return printSelection;
+        return fPrintSelection;
     }
     
     /**
-     * @return whether to print range of pages.
+     * Returns whether to print range of pages.
+     * 
+     * @return <code>true</code> for range of pages only else <code>false</code>.
      */
     public boolean printRange() {
-        return printRange;
+        return fPrintRange;
     }
 
     /**
+     * Returns the step in X direction.
+     * 
      * @return step in X direction
      */
     public float getStepX() {
@@ -1294,6 +1301,8 @@ public class SDPrintDialogUI {
     }
 
     /**
+     * Returns the step in Y direction.
+     * 
      * @return step in Y direction
      */
     public float getStepY() {
@@ -1301,56 +1310,68 @@ public class SDPrintDialogUI {
     }
 
     /**
+     * Returns the zoom factor
+     * 
      * @return zoom factor
      */
     public float getZoomFactor() {
-        return zoomFactor;
+        return fZoomFactor;
     }
 
     /**
+     * Returns the printer data reference.
+     * 
      * @return printer data reference
      */
     public PrinterData getPrinterData() {
-        return printerData;
+        return fPrinterData;
     }
 
     /**
+     * Returns the page number to start printing from.
+     * 
      * @return page number to start printing from
      */
     public int getFrom() {
-        return from;
+        return fFrom;
     }
 
     /**
+     * Returns the page number to print to.
+     * 
      * @return page number to print to
      */
     public int getTo() {
-        return to;
+        return fTo;
     }
 
     /**
      * Displays current number of pages
      */
     protected void displayPageNum() {
-        if (pageNum > 0) {
-            String message = MessageFormat.format(SDMessages._117, new Object[] { Integer.valueOf(pageNum) });
-            currentSelection.setText(message);
-            currentSelection.getParent().layout();
+        if (fPageNum > 0) {
+            String message = MessageFormat.format(SDMessages._117, new Object[] { Integer.valueOf(fPageNum) });
+            fCurrentSelection.setText(message);
+            fCurrentSelection.getParent().layout();
         }
     }
 
     /**
+     * Returns the shell reference.
+     * 
      * @return the shell reference.
      */
     public Shell getShell() {
-        return shell;
+        return fShell;
     }
 
     /**
+     * Sets the shell.
+     * 
      * @param shell The shell reference.
      */
     public void setShell(Shell shell) {
-        this.shell = shell;
+        fShell = shell;
     }
 
     /**
@@ -1358,49 +1379,49 @@ public class SDPrintDialogUI {
      */
     public void printButtonSelected() {
         PrintDialog printer = new PrintDialog(getShell());
-        if (allPages.getSelection()) {
+        if (fAllPages.getSelection()) {
             printer.setScope(PrinterData.ALL_PAGES);
         }
-        if (currentPage.getSelection()) {
+        if (fCurrentPage.getSelection()) {
             printer.setScope(PrinterData.SELECTION);
         }
-        if (pageList.getSelection()) {
+        if (fPageList.getSelection()) {
             printer.setScope(PrinterData.SELECTION);
         }
-        if (pageRange.getSelection()) {
+        if (fPageRange.getSelection()) {
             printer.setScope(PrinterData.PAGE_RANGE);
-            from = Integer.valueOf(fromPage.getText()).intValue();
-            to = Integer.valueOf(toPage.getText()).intValue();
-            printer.setStartPage(from);
-            printer.setEndPage(to);
+            fFrom = Integer.valueOf(fFromPage.getText()).intValue();
+            fTo = Integer.valueOf(fToPage.getText()).intValue();
+            printer.setStartPage(fFrom);
+            printer.setEndPage(fTo);
         }
 
         PrinterData newPrinterData = printer.open();
         if (newPrinterData != null) {
-            printerData = newPrinterData;
+            fPrinterData = newPrinterData;
         }
         updatePrinterStatus();
 
         if (printer.getScope() == PrinterData.ALL_PAGES) {
-            allPages.setSelection(true);
-            currentPage.setSelection(false);
-            pageList.setSelection(false);
-            pageRange.setSelection(false);
-            hPagesNum.setEnabled(false);
-            vPagesNum.setEnabled(false);
+            fAllPages.setSelection(true);
+            fCurrentPage.setSelection(false);
+            fPageList.setSelection(false);
+            fPageRange.setSelection(false);
+            fHorPagesNum.setEnabled(false);
+            fVertPagesNum.setEnabled(false);
         }
         if (printer.getScope() == PrinterData.PAGE_RANGE) {
-            allPages.setSelection(false);
-            currentPage.setSelection(false);
-            pageList.setSelection(false);
-            pageRange.setSelection(true);
-            fromPage.setEnabled(true);
-            toPage.setEnabled(true);
-            fromPage.setText((Integer.valueOf(printer.getStartPage())).toString());
-            toPage.setText((Integer.valueOf(printer.getEndPage())).toString());
+            fAllPages.setSelection(false);
+            fCurrentPage.setSelection(false);
+            fPageList.setSelection(false);
+            fPageRange.setSelection(true);
+            fFromPage.setEnabled(true);
+            fToPage.setEnabled(true);
+            fFromPage.setText((Integer.valueOf(printer.getStartPage())).toString());
+            fToPage.setText((Integer.valueOf(printer.getEndPage())).toString());
         }
         computeStepXY();
-        overviewCanvas.redraw();
+        fOverviewCanvas.redraw();
     }
 
     /**
@@ -1409,7 +1430,7 @@ public class SDPrintDialogUI {
      * @param parent The parent wizard page
      */
     public void setParentWizardPage(WizardPage parent) {
-        parentWizardPage = parent;
+        fParentWizardPage = parent;
     }
 
     /**
@@ -1418,34 +1439,34 @@ public class SDPrintDialogUI {
      * @param parent The parent dialog box. 
      */
     public void setParentDialog(SDPrintDialog parent) {
-        parentDialog = parent;
+        fParentDialog = parent;
     }
 
     /**
      * Updates the printer status
      */
     protected void updatePrinterStatus() {
-        if (parentWizardPage != null) {
+        if (fParentWizardPage != null) {
             // used in the wizard dialog
-            if (printerData == null) {
+            if (fPrinterData == null) {
                 // show error message and disable Finish button
-                parentWizardPage.setErrorMessage(SDMessages._135);
-                parentWizardPage.setPageComplete(false);
+                fParentWizardPage.setErrorMessage(SDMessages._135);
+                fParentWizardPage.setPageComplete(false);
             } else {
                 // clear error message and enable Finish button
-                parentWizardPage.setErrorMessage(null);
-                parentWizardPage.setPageComplete(true);
+                fParentWizardPage.setErrorMessage(null);
+                fParentWizardPage.setPageComplete(true);
             }
-        } else if (parentDialog != null) {
+        } else if (fParentDialog != null) {
             // used in the print dialog
-            if (printerData == null) {
+            if (fPrinterData == null) {
                 // show error message and disable OK button
-                parentDialog.setErrorMessage(SDMessages._135);
-                parentDialog.setPageComplete(false);
+                fParentDialog.setErrorMessage(SDMessages._135);
+                fParentDialog.setPageComplete(false);
             } else {
                 // clear error message and enable OK button
-                parentDialog.setErrorMessage(null);
-                parentDialog.setPageComplete(true);
+                fParentDialog.setErrorMessage(null);
+                fParentDialog.setPageComplete(true);
             }
         }
     }

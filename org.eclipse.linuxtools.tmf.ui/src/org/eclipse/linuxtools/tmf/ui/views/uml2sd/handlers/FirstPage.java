@@ -47,11 +47,11 @@ public class FirstPage extends Action {
     /**
      * Default constructor 
      * 
-     * @param theView the view reference
+     * @param view the view reference
      */
-    public FirstPage(SDView theView) {
+    public FirstPage(SDView view) {
         super();
-        fView = theView;
+        fView = view;
         setText(SDMessages._139);
         setToolTipText(SDMessages._140);
         setId(ID);

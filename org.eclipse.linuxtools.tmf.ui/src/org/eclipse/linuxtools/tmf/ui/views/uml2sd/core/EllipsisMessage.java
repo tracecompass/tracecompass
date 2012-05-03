@@ -24,7 +24,7 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
  * @author sveyrier
  * 
  */
-public class EllipsisMessage extends AsyncMessage implements ITimeRange {
+public class EllipsisMessage extends AsyncMessage {
 
     /*
      * (non-Javadoc)
@@ -32,7 +32,7 @@ public class EllipsisMessage extends AsyncMessage implements ITimeRange {
      */
     @Override
     public int getX() {
-        if (startLifeline == null) {
+        if (fStartLifeline == null) {
             return super.getX() + super.getWidth() - 16;
         } 
         return super.getX();
@@ -69,7 +69,7 @@ public class EllipsisMessage extends AsyncMessage implements ITimeRange {
         int height = getHeight();
 
         // UML2 found message (always drawn from left to right)
-        if (startLifeline == null && endLifeline != null) {
+        if (fStartLifeline == null && fEndLifeline != null) {
             // Draw the message label above the message and centered
             // The label is truncated if it cannot fit between the two message end
             // 2*Metrics.MESSAGES_NAME_SPACING = space above the label + space below the label
@@ -91,7 +91,7 @@ public class EllipsisMessage extends AsyncMessage implements ITimeRange {
             context.setBackground(storedColor);
         }
         // UML2 lost message (always drawn from left to right)
-        else if (endLifeline == null && startLifeline != null) {
+        else if (fEndLifeline == null && fStartLifeline != null) {
             // Draw the message label above the message and centered
             // The label is truncated if it cannot fit between the two message end
             // 2*Metrics.MESSAGES_NAME_SPACING = space above the label + space below the label

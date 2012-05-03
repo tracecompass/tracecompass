@@ -35,11 +35,11 @@ public class LifelineCategories {
     /**
 	 * The category name
 	 */
-	protected String name = null;
+	protected String fName = null;
 	/**
 	 * The category image
 	 */
-	protected IImage categoryImage = null;
+	protected IImage fCategoryImage = null;
 
     // ------------------------------------------------------------------------
     // Methods
@@ -51,7 +51,7 @@ public class LifelineCategories {
 	 * @return the category name
 	 */
 	public String getName() {
-		return name;
+		return fName;
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class LifelineCategories {
 	 * @param string the name
 	 */
 	public void setName(String string) {
-		name = string;
+		fName = string;
 	}
 	   
 	/**
@@ -69,7 +69,7 @@ public class LifelineCategories {
 	 * @return the category icon
 	 */
 	public IImage getImage() {
-		return categoryImage;
+		return fCategoryImage;
 	}
 	
 	/**
@@ -78,6 +78,6 @@ public class LifelineCategories {
 	 * @param image the icon
 	 */
 	public void setImage(IImage image) {
-		categoryImage = image;
+		fCategoryImage = image;
 	}
 }

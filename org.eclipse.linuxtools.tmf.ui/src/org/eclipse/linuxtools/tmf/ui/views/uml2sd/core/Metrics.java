@@ -139,31 +139,31 @@ public class Metrics {
     /**
      * The lifeline font height
      */
-    private static int lifelineFontHeight = 0;
+    private static int fLifelineFontHeight = 0;
     /**
      * The message font height
      */
-    private static int messageFontHeight = 0;
+    private static int fMessageFontHeight = 0;
     /**
      * The frame font height
      */
-    private static int frameFontHeight = 0;
+    private static int fFrameFontHeight = 0;
     /**
      * The lifeline header font height
      */
-    private static int lifelineHeaderFontHeight = 0;
+    private static int fLifelineHeaderFontHeight = 0;
     /**
      * The lifeline font widht
      */
-    private static int lifelineFontWidth = 0;
+    private static int fLifelineFontWidth = 0;
     /**
      * The lifeline width
      */
-    private static int lifeLineWidth = 119;
+    private static int fLifeLineWidth = 119;
     /**
      * The (forced) event spacing
      */
-    private static int forcedEventSpacing = -1;
+    private static int fForcedEventSpacing = -1;
 
     // ------------------------------------------------------------------------
     // Methods
@@ -175,7 +175,7 @@ public class Metrics {
      * @param height the character height
      */
     static public void setLifelineFontHeight(int height) {
-        lifelineFontHeight = height;
+        fLifelineFontHeight = height;
     }
 
     /**
@@ -184,7 +184,7 @@ public class Metrics {
      * @param width the character width
      */
     static public void setLifelineFontWidth(int width) {
-        lifelineFontWidth = width;
+        fLifelineFontWidth = width;
     }
 
     /**
@@ -193,7 +193,7 @@ public class Metrics {
      * @param fontHeight the character height
      */
     static public void setMessageFontHeight(int fontHeight) {
-        messageFontHeight = fontHeight;
+        fMessageFontHeight = fontHeight;
     }
 
     /**
@@ -202,7 +202,7 @@ public class Metrics {
      * @return the character height
      */
     static public int getFrameFontHeigth() {
-        return frameFontHeight;
+        return fFrameFontHeight;
     }
 
     /**
@@ -211,7 +211,7 @@ public class Metrics {
      * @param fontHeight the character height
      */
     static public void setFrameFontHeight(int fontHeight) {
-        frameFontHeight = fontHeight;
+        fFrameFontHeight = fontHeight;
     }
 
     /**
@@ -220,7 +220,7 @@ public class Metrics {
      * @return the character height
      */
     static public int getLifelineHeaderFontHeigth() {
-        return lifelineHeaderFontHeight;
+        return fLifelineHeaderFontHeight;
     }
 
     /**
@@ -229,7 +229,7 @@ public class Metrics {
      * @param fontHeight the character height
      */
     static public void setLifelineHeaderFontHeight(int fontHeight) {
-        lifelineHeaderFontHeight = fontHeight;
+        fLifelineHeaderFontHeight = fontHeight;
     }
 
     /**
@@ -238,7 +238,7 @@ public class Metrics {
      * @return the character height
      */
     static public int getLifelineFontHeigth() {
-        return lifelineFontHeight;
+        return fLifelineFontHeight;
     }
 
     /**
@@ -247,10 +247,10 @@ public class Metrics {
      * @return the character height
      */
     static public int getMessageFontHeigth() {
-        if (forcedEventSpacing >= 0) {
+        if (fForcedEventSpacing >= 0) {
             return 0;
         }
-        return messageFontHeight;
+        return fMessageFontHeight;
     }
 
     /**
@@ -259,7 +259,7 @@ public class Metrics {
      * @return the vertical space used by a Lifeline
      */
     static public int getLifelineWidth() {
-        return lifeLineWidth;
+        return fLifeLineWidth;
     }
 
     /**
@@ -268,7 +268,7 @@ public class Metrics {
      * @param value the vertical space
      */
     static public void setLifelineWidth(int value) {
-        lifeLineWidth = value;
+        fLifeLineWidth = value;
     }
 
     /**
@@ -286,7 +286,7 @@ public class Metrics {
      * @return the average character width
      */
     static public int getAverageCharWidth() {
-        return lifelineFontWidth;
+        return fLifelineFontWidth;
     }
 
     /**
@@ -295,8 +295,8 @@ public class Metrics {
      * @return the message spacing
      */
     static public int getMessagesSpacing() {
-        if (forcedEventSpacing >= 0) {
-            return forcedEventSpacing;
+        if (fForcedEventSpacing >= 0) {
+            return fForcedEventSpacing;
         } 
         return MESSAGES_SPACING;
     }
@@ -307,7 +307,7 @@ public class Metrics {
      * @param eventSpacing
      */
     static public void setForcedEventSpacing(int eventSpacing) {
-        forcedEventSpacing = eventSpacing;
+        fForcedEventSpacing = eventSpacing;
     }
 
     /**
@@ -316,6 +316,6 @@ public class Metrics {
      * @return forcedEventSpacing
      */
     static public int getForcedEventSpacing() {
-        return forcedEventSpacing;
+        return fForcedEventSpacing;
     }
 }

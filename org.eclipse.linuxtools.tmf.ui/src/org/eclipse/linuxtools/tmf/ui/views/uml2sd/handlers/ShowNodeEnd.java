@@ -55,12 +55,12 @@ public class ShowNodeEnd extends Action {
     /**
      * Constructor
      * 
-     * @param _view The sequence diagram view reference
+     * @param view The sequence diagram view reference
      */
-    public ShowNodeEnd(IViewPart _view) {
+    public ShowNodeEnd(IViewPart view) {
         super();
-        if (_view instanceof SDView) {
-            fView = (SDView)_view;
+        if (view instanceof SDView) {
+            fView = (SDView)view;
         }
         setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_NODE_END));
     }

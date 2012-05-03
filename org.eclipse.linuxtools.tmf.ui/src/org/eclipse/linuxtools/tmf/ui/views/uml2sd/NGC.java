@@ -47,35 +47,35 @@ public class NGC implements IGC {
     /**
      * The graphical context.
      */
-    protected GC context;
+    protected GC fContext;
     /**
      * The reference to the sequence diagram view.
      */
-    protected SDWidget view;
+    protected SDWidget fView;
     /**
      * A reference to the last used font.
      */
-    protected Font tempFont = null;
+    protected Font fTempFont = null;
     /**
      * The color of the gradient.
      */
-    protected IColor gradientColor = null;
+    protected IColor fGradientColor = null;
     /**
      * The color of the background.
      */
-    protected IColor backGround = null;
+    protected IColor fBackground = null;
     /**
      * The color of the foreground.
      */
-    protected IColor foreGround = null;
+    protected IColor fForeground = null;
     /**
-     * The current vertical screen bounds.
+     * The current visible y screen bounds
      */
-    protected int y_;
+    protected int fVisibleY;
     /**
-     * The current horizontal screen bounds.
+     * The current visible x screen bound.
      */
-    protected int x_;
+    protected int fVisibleX;
     /**
      * The current yx value (view visible height - visible screen bounds) 
      */
@@ -87,12 +87,12 @@ public class NGC implements IGC {
     /**
      * <code>true</code> to draw with focus else <code>false</code>. 
      */
-    protected boolean drawWithFocus = false;
+    protected boolean fDrawWithFocus = false;
 
     /**
      * The static visible screen bounds.
      */
-    private static int vscreen_bounds = 0;
+    private static int fVisibleScreenBounds = 0;
     
     
     // ------------------------------------------------------------------------
@@ -106,8 +106,8 @@ public class NGC implements IGC {
      * @param gc A graphical context.
      */
     public NGC(SDWidget scrollView, GC gc) {
-        context = gc;
-        view = scrollView;
+        fContext = gc;
+        fView = scrollView;
     }
 
     // ------------------------------------------------------------------------
@@ -120,7 +120,7 @@ public class NGC implements IGC {
      */
     @Override
     public void setLineStyle(int style) {
-        context.setLineStyle(style);
+        fContext.setLineStyle(style);
     }
 
     /*
@@ -129,7 +129,7 @@ public class NGC implements IGC {
      */
     @Override
     public int getLineStyle() {
-        return context.getLineStyle();
+        return fContext.getLineStyle();
     }
 
     /*
@@ -138,7 +138,7 @@ public class NGC implements IGC {
      */
     @Override
     public int getContentsX() {
-        return Math.round(view.getContentsX() / view.zoomValue);
+        return Math.round(fView.getContentsX() / fView.fZoomValue);
     }
 
     /*
@@ -147,7 +147,7 @@ public class NGC implements IGC {
      */
     @Override
     public int getContentsY() {
-        return Math.round(view.getContentsY() / view.zoomValue);
+        return Math.round(fView.getContentsY() / fView.fZoomValue);
     }
 
     /*
@@ -156,7 +156,7 @@ public class NGC implements IGC {
      */
     @Override
     public int getVisibleWidth() {
-        return Math.round(view.getVisibleWidth() / view.zoomValue);
+        return Math.round(fView.getVisibleWidth() / fView.fZoomValue);
     }
 
     /*
@@ -165,7 +165,7 @@ public class NGC implements IGC {
      */
     @Override
     public int getVisibleHeight() {
-        return Math.round(view.getVisibleHeight() / view.zoomValue);
+        return Math.round(fView.getVisibleHeight() / fView.fZoomValue);
     }
 
     /*
@@ -174,7 +174,7 @@ public class NGC implements IGC {
      */
     @Override
     public int contentsToViewX(int x) {
-        return view.contentsToViewX(x);
+        return fView.contentsToViewX(x);
     }
 
     /*
@@ -183,7 +183,7 @@ public class NGC implements IGC {
      */
     @Override
     public int contentsToViewY(int y) {
-        return view.contentsToViewY(y);
+        return fView.contentsToViewY(y);
     }
 
     /**
@@ -195,19 +195,19 @@ public class NGC implements IGC {
      */
     protected byte code(int x, int y) {
         byte c = 0;
-        y_ = vscreen_bounds;
-        x_ = vscreen_bounds;
-        yx = view.getVisibleHeight() + vscreen_bounds;
-        xx = view.getVisibleWidth() + vscreen_bounds;
+        fVisibleY = fVisibleScreenBounds;
+        fVisibleX = fVisibleScreenBounds;
+        yx = fView.getVisibleHeight() + fVisibleScreenBounds;
+        xx = fView.getVisibleWidth() + fVisibleScreenBounds;
         if (y > yx) {
             c |= 0x01; // top
-        } else if (y < y_) {
+        } else if (y < fVisibleY) {
             c |= 0x02; // bottom
         }
         
         if (x > xx) {
             c |= 0x04; // right
-        } else if (x < x_) {
+        } else if (x < fVisibleX) {
             c |= 0x08; // left
         }
         return c;
@@ -219,17 +219,22 @@ public class NGC implements IGC {
      */
     @Override
     public void drawLine(int x1, int y1, int x2, int y2) {
-        x1 = Math.round(x1 * view.zoomValue);
-        y1 = Math.round(y1 * view.zoomValue);
-        x2 = Math.round(x2 * view.zoomValue);
-        y2 = Math.round(y2 * view.zoomValue);
-        x1 = view.contentsToViewX(x1);
-        y1 = view.contentsToViewY(y1);
-        x2 = view.contentsToViewX(x2);
-        y2 = view.contentsToViewY(y2);
+        int localX1 = x1; 
+        int localY1 = y1; 
+        int localX2 = x2;
+        int localY2 = y2;
+        
+        localX1 = Math.round(localX1 * fView.fZoomValue);
+        localY1 = Math.round(localY1 * fView.fZoomValue);
+        localX2 = Math.round(localX2 * fView.fZoomValue);
+        localY2 = Math.round(localY2 * fView.fZoomValue);
+        localX1 = fView.contentsToViewX(localX1);
+        localY1 = fView.contentsToViewY(localY1);
+        localX2 = fView.contentsToViewX(localX2);
+        localY2 = fView.contentsToViewY(localY2);
 
-        byte code1 = code(x1, y1);
-        byte code2 = code(x2, y2);
+        byte code1 = code(localX1, localY1);
+        byte code2 = code(localX2, localY2);
         byte codex;
         boolean draw = false;
         boolean end = false;
@@ -244,33 +249,33 @@ public class NGC implements IGC {
             } else {
                 codex = (code1 != 0) ? code1 : code2;
                 if ((codex & 0x01) != 0) { // top
-                    x = x1 + ((x2 - x1) * (yx - y1)) / (y2 - y1);
+                    x = localX1 + ((localX2 - localX1) * (yx - localY1)) / (localY2 - localY1);
                     y = yx;
                 } else if ((codex & 0x02) != 0) { // bottom
-                    x = x1 + ((x2 - x1) * (y_ - y1)) / (y2 - y1);
-                    y = y_;
+                    x = localX1 + ((localX2 - localX1) * (fVisibleY - localY1)) / (localY2 - localY1);
+                    y = fVisibleY;
                 } else if ((codex & 0x04) != 0) { // right
-                    y = y1 + ((y2 - y1) * (xx - x1)) / (x2 - x1);
+                    y = localY1 + ((localY2 - localY1) * (xx - localX1)) / (localX2 - localX1);
                     x = xx;
                 } else if ((codex & 0x08) != 0) { // left
-                    y = y1 + ((y2 - y1) * (x_ - x1)) / (x2 - x1);
-                    x = x_;
+                    y = localY1 + ((localY2 - localY1) * (fVisibleX - localX1)) / (localX2 - localX1);
+                    x = fVisibleX;
                 }
 
                 if (codex == code1) {
-                    x1 = x;
-                    y1 = y;
-                    code1 = code(x1, y1);
+                    localX1 = x;
+                    localY1 = y;
+                    code1 = code(localX1, localY1);
                 } else {
-                    x2 = x;
-                    y2 = y;
-                    code2 = code(x2, y2);
+                    localX2 = x;
+                    localY2 = y;
+                    code2 = code(localX2, localY2);
                 }
             }
         } while (!end);
 
         if (draw) {
-            context.drawLine(x1, y1, x2, y2);
+            fContext.drawLine(localX1, localY1, localX2, localY2);
         }
     }
 
@@ -280,36 +285,42 @@ public class NGC implements IGC {
      */
     @Override
     public void drawRectangle(int x, int y, int width, int height) {
-        x = Math.round(x * view.zoomValue);
+        int localX = x;
+        int localY = y;
+        int localWidth = width;
+        int localHeight = height;
+                
+        localX = Math.round(localX * fView.fZoomValue);
         // Workaround to avoid problems for some special cases (not very nice)
-        if (y != getContentsY()) {
-            y = Math.round(y * view.zoomValue);
-            y = view.contentsToViewY(y);
-        } else
-            y = 0;
-        width = Math.round(width * view.zoomValue);
-        height = Math.round(height * view.zoomValue);
-        x = view.contentsToViewX(x);
+        if (localY != getContentsY()) {
+            localY = Math.round(localY * fView.fZoomValue);
+            localY = fView.contentsToViewY(localY);
+        } else {
+            localY = 0;
+        }
+        localWidth = Math.round(localWidth * fView.fZoomValue);
+        localHeight = Math.round(localHeight * fView.fZoomValue);
+        localX = fView.contentsToViewX(localX);
 
-        if (x < -vscreen_bounds) {
-            width = width + x + vscreen_bounds;
-            x = -vscreen_bounds;
+        if (localX < -fVisibleScreenBounds) {
+            localWidth = localWidth + localX + fVisibleScreenBounds;
+            localX = -fVisibleScreenBounds;
         }
-        if (y < -vscreen_bounds) {
-            height = height + y + vscreen_bounds;
-            y = -vscreen_bounds;
+        if (localY < -fVisibleScreenBounds) {
+            localHeight = localHeight + localY + fVisibleScreenBounds;
+            localY = -fVisibleScreenBounds;
         }
-        if ((width < -vscreen_bounds) && (x + width < -vscreen_bounds)) {
-            width = -vscreen_bounds;
-        } else if (width + x > view.getVisibleWidth() + vscreen_bounds) {
-            width = view.getVisibleWidth() + vscreen_bounds - x;
+        if ((localWidth < -fVisibleScreenBounds) && (localX + localWidth < -fVisibleScreenBounds)) {
+            localWidth = -fVisibleScreenBounds;
+        } else if (localWidth + localX > fView.getVisibleWidth() + fVisibleScreenBounds) {
+            localWidth = fView.getVisibleWidth() + fVisibleScreenBounds - localX;
         }
-        if ((height < -vscreen_bounds) && (y + height < -vscreen_bounds)) {
-            height = -vscreen_bounds;
-        } else if (height + y > view.getVisibleHeight() + vscreen_bounds) {
-            height = view.getVisibleHeight() + vscreen_bounds - y;
+        if ((localHeight < -fVisibleScreenBounds) && (localY + localHeight < -fVisibleScreenBounds)) {
+            localHeight = -fVisibleScreenBounds;
+        } else if (localHeight + localY > fView.getVisibleHeight() + fVisibleScreenBounds) {
+            localHeight = fView.getVisibleHeight() + fVisibleScreenBounds - localY;
         }
-        context.drawRectangle(x, y, width, height);
+        fContext.drawRectangle(localX, localY, localWidth, localHeight);
     }
     
     /*
@@ -318,28 +329,33 @@ public class NGC implements IGC {
      */
     @Override
     public void drawFocus(int x, int y, int width, int height) {
+        int localX = x;
+        int localY = y;
+        int localWidth = width;
+        int localHeight = height;
+
         IColor bC = getBackground();
         IColor fC = getForeground();
 
-        if (width < 0) {
-            x = x + width;
-            width = -width;
+        if (localWidth < 0) {
+            localX = localX + localWidth;
+            localWidth = -localWidth;
         }
 
-        if (height < 0) {
-            y = y + height;
-            height = -height;
+        if (localHeight < 0) {
+            localY = localY + localHeight;
+            localHeight = -localHeight;
         }
 
-        x = Math.round(x * view.zoomValue);
-        y = Math.round(y * view.zoomValue);
-        width = Math.round(width * view.zoomValue);
-        height = Math.round(height * view.zoomValue);
+        localX = Math.round(localX * fView.fZoomValue);
+        localY = Math.round(localY * fView.fZoomValue);
+        localWidth = Math.round(localWidth * fView.fZoomValue);
+        localHeight = Math.round(localHeight * fView.fZoomValue);
 
         setForeground(Frame.getUserPref().getForeGroundColorSelection());
         setBackground(Frame.getUserPref().getBackGroundColorSelection());
 
-        context.drawFocus(view.contentsToViewX(x - 1), view.contentsToViewY(y - 1), width + 3, height + 3);
+        fContext.drawFocus(fView.contentsToViewX(localX - 1), fView.contentsToViewY(localY - 1), localWidth + 3, localHeight + 3);
 
         setBackground(bC);
         setForeground(fC);
@@ -354,15 +370,15 @@ public class NGC implements IGC {
         int len = (points.length / 2) * 2;
         int[] localPoint = new int[len];
         for (int i = 0; i < len; i++) {
-            localPoint[i] = view.contentsToViewX(Math.round(points[i] * view.zoomValue));
+            localPoint[i] = fView.contentsToViewX(Math.round(points[i] * fView.fZoomValue));
             i++;
-            localPoint[i] = view.contentsToViewY(Math.round(points[i] * view.zoomValue));
+            localPoint[i] = fView.contentsToViewY(Math.round(points[i] * fView.fZoomValue));
         }
         
         if (validatePolygonHeight(localPoint) <= 0)
             return;
         
-        context.fillPolygon(localPoint);
+        fContext.fillPolygon(localPoint);
     }
 
     /*
@@ -374,16 +390,16 @@ public class NGC implements IGC {
         int len = (points.length / 2) * 2;
         int[] localPoint = new int[len];
         for (int i = 0; i < len; i++) {
-            localPoint[i] = view.contentsToViewX(Math.round(points[i] * view.zoomValue));
+            localPoint[i] = fView.contentsToViewX(Math.round(points[i] * fView.fZoomValue));
             i++;
-            localPoint[i] = view.contentsToViewY(Math.round(points[i] * view.zoomValue));
+            localPoint[i] = fView.contentsToViewY(Math.round(points[i] * fView.fZoomValue));
         }
         
         if (validatePolygonHeight(localPoint) <= 0) {
             return;
         }
 
-        context.drawPolygon(localPoint);
+        fContext.drawPolygon(localPoint);
     }
 
     /*
@@ -392,36 +408,41 @@ public class NGC implements IGC {
      */
     @Override
     public void fillRectangle(int x, int y, int width, int height) {
-        x = Math.round(x * view.zoomValue);
+        int localX = x;
+        int localY = y;
+        int localWidth = width;
+        int localHeight = height;
+
+        localX = Math.round(localX * fView.fZoomValue);
         // Workaround to avoid problems for some special cases (not very nice)
-        if (y != getContentsY()) {
-            y = Math.round(y * view.zoomValue);
-            y = view.contentsToViewY(y) + 1;
+        if (localY != getContentsY()) {
+            localY = Math.round(localY * fView.fZoomValue);
+            localY = fView.contentsToViewY(localY) + 1;
         } else {
-            y = 1;
+            localY = 1;
         }
-        width = Math.round(width * view.zoomValue) - 1;
-        height = Math.round(height * view.zoomValue) - 1;
-        x = view.contentsToViewX(x) + 1;
-        if (x < -vscreen_bounds) {
-            width = width + x + vscreen_bounds;
-            x = -vscreen_bounds;
+        localWidth = Math.round(localWidth * fView.fZoomValue) - 1;
+        localHeight = Math.round(localHeight * fView.fZoomValue) - 1;
+        localX = fView.contentsToViewX(localX) + 1;
+        if (localX < -fVisibleScreenBounds) {
+            localWidth = localWidth + localX + fVisibleScreenBounds;
+            localX = -fVisibleScreenBounds;
         }
-        if (y < -vscreen_bounds) {
-            height = height + y + vscreen_bounds;
-            y = -vscreen_bounds;
+        if (localY < -fVisibleScreenBounds) {
+            localHeight = localHeight + localY + fVisibleScreenBounds;
+            localY = -fVisibleScreenBounds;
         }
-        if ((width < -vscreen_bounds) && (x + width < -vscreen_bounds)) {
-            width = -vscreen_bounds;
-        } else if (width + x > view.getVisibleWidth() + vscreen_bounds) {
-            width = view.getVisibleWidth() + vscreen_bounds - x;
+        if ((localWidth < -fVisibleScreenBounds) && (localX + localWidth < -fVisibleScreenBounds)) {
+            localWidth = -fVisibleScreenBounds;
+        } else if (localWidth + localX > fView.getVisibleWidth() + fVisibleScreenBounds) {
+            localWidth = fView.getVisibleWidth() + fVisibleScreenBounds - localX;
         }
-        if ((height < -vscreen_bounds) && (y + height < -vscreen_bounds)) {
-            height = -vscreen_bounds;
-        } else if (height + y > view.getVisibleHeight() + vscreen_bounds) {
-            height = view.getVisibleHeight() + vscreen_bounds - y;
+        if ((localHeight < -fVisibleScreenBounds) && (localY + localHeight < -fVisibleScreenBounds)) {
+            localHeight = -fVisibleScreenBounds;
+        } else if (localHeight + localY > fView.getVisibleHeight() + fVisibleScreenBounds) {
+            localHeight = fView.getVisibleHeight() + fVisibleScreenBounds - localY;
         }
-        context.fillRectangle(x, y, width, height);
+        fContext.fillRectangle(localX, localY, localWidth, localHeight);
 
     }
 
@@ -430,40 +451,45 @@ public class NGC implements IGC {
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC#fillGradientRectangle(int, int, int, int, boolean)
      */
     @Override
-    public void fillGradientRectangle(int x, int y, int width, int height, boolean vertical) {
-        x = Math.round(x * view.zoomValue);
-        y = Math.round(y * view.zoomValue);
-        width = Math.round(width * view.zoomValue);
-        height = Math.round(height * view.zoomValue);
-        IColor tempColor = foreGround;
-        setForeground(gradientColor);
-        x = view.contentsToViewX(x);
-        y = view.contentsToViewY(y);
+    public void fillGradientRectangle(int x, int y, int width, int height, boolean isVertical) {
+        int localX = x;
+        int localY = y;
+        int localWidth = width;
+        int localHeight = height;
+        
+        localX = Math.round(localX * fView.fZoomValue);
+        localY = Math.round(localY * fView.fZoomValue);
+        localWidth = Math.round(localWidth * fView.fZoomValue);
+        localHeight = Math.round(localHeight * fView.fZoomValue);
+        IColor tempColor = fForeground;
+        setForeground(fGradientColor);
+        localX = fView.contentsToViewX(localX);
+        localY = fView.contentsToViewY(localY);
 
-        if (x < -vscreen_bounds) {
-            width = width + x + vscreen_bounds;
-            x = -vscreen_bounds;
+        if (localX < -fVisibleScreenBounds) {
+            localWidth = localWidth + localX + fVisibleScreenBounds;
+            localX = -fVisibleScreenBounds;
         }
-        if (y < -vscreen_bounds) {
-            height = height + y + vscreen_bounds;
-            y = -vscreen_bounds;
+        if (localY < -fVisibleScreenBounds) {
+            localHeight = localHeight + localY + fVisibleScreenBounds;
+            localY = -fVisibleScreenBounds;
         }
 
-        if ((width < -vscreen_bounds) && (x + width < -vscreen_bounds)) {
-            width = -vscreen_bounds;
-        } else if (width + x > view.getVisibleWidth() + vscreen_bounds) {
-            width = view.getVisibleWidth() + vscreen_bounds - x;
+        if ((localWidth < -fVisibleScreenBounds) && (localX + localWidth < -fVisibleScreenBounds)) {
+            localWidth = -fVisibleScreenBounds;
+        } else if (localWidth + localX > fView.getVisibleWidth() + fVisibleScreenBounds) {
+            localWidth = fView.getVisibleWidth() + fVisibleScreenBounds - localX;
         }
-        if ((height < -vscreen_bounds) && (y + height < -vscreen_bounds)) {
-            height = -vscreen_bounds;
-        } else if (height + y > view.getVisibleHeight() + vscreen_bounds) {
-            height = view.getVisibleHeight() + vscreen_bounds - y;
+        if ((localHeight < -fVisibleScreenBounds) && (localY + localHeight < -fVisibleScreenBounds)) {
+            localHeight = -fVisibleScreenBounds;
+        } else if (localHeight + localY > fView.getVisibleHeight() + fVisibleScreenBounds) {
+            localHeight = fView.getVisibleHeight() + fVisibleScreenBounds - localY;
         }
-        if (vertical) {
-            context.fillGradientRectangle(x, y, width, height, vertical);
+        if (isVertical) {
+            fContext.fillGradientRectangle(localX, localY, localWidth, localHeight, isVertical);
         }
         else {
-            context.fillGradientRectangle(x + width, y, -width, height + 1, vertical);
+            fContext.fillGradientRectangle(localX + localWidth, localY, -localWidth, localHeight + 1, isVertical);
         }
         setForeground(tempColor);
     }
@@ -475,7 +501,7 @@ public class NGC implements IGC {
      */
     @Override
     public int textExtent(String name) {
-        return ((Point) (context.textExtent(name))).x;
+        return ((Point) (fContext.textExtent(name))).x;
     }
 
     /*
@@ -483,13 +509,16 @@ public class NGC implements IGC {
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC#drawText(java.lang.String, int, int, boolean)
      */
     @Override
-    public void drawText(String string, int x, int y, boolean trans) {
-        x = Math.round(x * view.zoomValue);
-        y = Math.round(y * view.zoomValue);
-        context.drawText(string, view.contentsToViewX(x), view.contentsToViewY(y), trans);
-        if (drawWithFocus) {
-            Point r = context.textExtent(string);
-            context.drawFocus(x - 1, y - 1, r.x + 2, r.y + 2);
+    public void drawText(String string, int x, int y, boolean isTrans) {
+        int localX = x;
+        int localY = y;
+        
+        localX = Math.round(localX * fView.fZoomValue);
+        localY = Math.round(localY * fView.fZoomValue);
+        fContext.drawText(string, fView.contentsToViewX(localX), fView.contentsToViewY(localY), isTrans);
+        if (fDrawWithFocus) {
+            Point r = fContext.textExtent(string);
+            fContext.drawFocus(localX - 1, localY - 1, r.x + 2, r.y + 2);
         }
     }
 
@@ -499,12 +528,15 @@ public class NGC implements IGC {
      */
     @Override
     public void drawText(String string, int x, int y) {
-        x = Math.round(x * view.zoomValue);
-        y = Math.round(y * view.zoomValue);
-        context.drawText(string, view.contentsToViewX(x), view.contentsToViewY(y), true);
-        if (drawWithFocus) {
-            Point r = context.textExtent(string);
-            context.drawFocus(x - 1, y - 1, r.x + 2, r.y + 2);
+        int localX = x;
+        int localY = y;
+
+        localX = Math.round(localX * fView.fZoomValue);
+        localY = Math.round(localY * fView.fZoomValue);
+        fContext.drawText(string, fView.contentsToViewX(localX), fView.contentsToViewY(localY), true);
+        if (fDrawWithFocus) {
+            Point r = fContext.textExtent(string);
+            fContext.drawFocus(localX - 1, localY - 1, r.x + 2, r.y + 2);
         }
     }
 
@@ -514,11 +546,16 @@ public class NGC implements IGC {
      */
     @Override
     public void fillOval(int x, int y, int width, int height) {
-        x = Math.round(x * view.zoomValue);
-        y = Math.round(y * view.zoomValue);
-        width = Math.round(width * view.zoomValue);
-        height = Math.round(height * view.zoomValue);
-        context.fillOval(view.contentsToViewX(x), view.contentsToViewY(y), width, height);
+        int localX = x;
+        int localY = y;
+        int localWidth = width;
+        int localHeight = height;
+        
+        localX = Math.round(localX * fView.fZoomValue);
+        localY = Math.round(localY * fView.fZoomValue);
+        localWidth = Math.round(localWidth * fView.fZoomValue);
+        localHeight = Math.round(localHeight * fView.fZoomValue);
+        fContext.fillOval(fView.contentsToViewX(localX), fView.contentsToViewY(localY), localWidth, localHeight);
     }
 
     /*
@@ -527,8 +564,8 @@ public class NGC implements IGC {
      */
     @Override
     public IColor getBackground() {
-        if ((backGround != null) && (backGround.getColor() instanceof Color) && (!((Color) (backGround.getColor())).isDisposed())) {
-            return backGround;
+        if ((fBackground != null) && (fBackground.getColor() instanceof Color) && (!((Color) (fBackground.getColor())).isDisposed())) {
+            return fBackground;
         }
         return ColorImpl.getSystemColor(SWT.COLOR_WHITE);
     }
@@ -539,8 +576,8 @@ public class NGC implements IGC {
      */
     @Override
     public IColor getForeground() {
-        if ((foreGround != null) && (foreGround.getColor() instanceof Color) && (!((Color) (foreGround.getColor())).isDisposed())) {
-            return foreGround;
+        if ((fForeground != null) && (fForeground.getColor() instanceof Color) && (!((Color) (fForeground.getColor())).isDisposed())) {
+            return fForeground;
         }
         return ColorImpl.getSystemColor(SWT.COLOR_WHITE);
     }
@@ -555,8 +592,8 @@ public class NGC implements IGC {
             return;
         }
         if (color.getColor() instanceof Color) {
-            context.setBackground((Color) color.getColor());
-            backGround = color;
+            fContext.setBackground((Color) color.getColor());
+            fBackground = color;
         }
     }
 
@@ -572,8 +609,8 @@ public class NGC implements IGC {
         if (color.getColor() instanceof Color) {
             Color c = (Color) color.getColor();
             if (!c.isDisposed()) {
-                context.setForeground(c);
-                foreGround = color;
+                fContext.setForeground(c);
+                fForeground = color;
             }
         }
     }
@@ -588,7 +625,7 @@ public class NGC implements IGC {
             return;
         }
         if (color.getColor() instanceof Color) {
-            gradientColor = color;
+            fGradientColor = color;
         }
     }
 
@@ -598,11 +635,11 @@ public class NGC implements IGC {
      */
     @Override
     public void setLineWidth(int width) {
-        if (view.isPrinting()) {
-            context.setLineWidth(width * 2);
+        if (fView.isPrinting()) {
+            fContext.setLineWidth(width * 2);
         }
         else {
-            context.setLineWidth(width);
+            fContext.setLineWidth(width);
         }
     }
 
@@ -612,7 +649,7 @@ public class NGC implements IGC {
      */
     @Override
     public int getLineWidth() {
-        return context.getLineWidth();
+        return fContext.getLineWidth();
     }
 
     /**
@@ -624,13 +661,13 @@ public class NGC implements IGC {
      * @param isTransparent true for transparent else false
      */
     protected void localDrawText(String string, int x, int y, boolean isTransparent) {
-        Point r = context.textExtent(string);
+        Point r = fContext.textExtent(string);
         if (!isTransparent) {
-            context.fillRectangle(x, y, r.x, r.y);
+            fContext.fillRectangle(x, y, r.x, r.y);
         }
-        context.drawText(string, x, y, isTransparent);
-        if ((drawWithFocus) && (string.length() > 1)) {
-            context.drawFocus(x - 1, y - 1, r.x + 2, r.y + 2);
+        fContext.drawText(string, x, y, isTransparent);
+        if ((fDrawWithFocus) && (string.length() > 1)) {
+            fContext.drawFocus(x - 1, y - 1, r.x + 2, r.y + 2);
         }
     }
 
@@ -639,38 +676,38 @@ public class NGC implements IGC {
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC#drawTextTruncatedCentred(java.lang.String, int, int, int, int, boolean)
      */
     @Override
-    public void drawTextTruncatedCentred(String name, int _x, int _y, int width, int height, boolean trans) {
-        Point tx = context.textExtent(name);
-        _x = Math.round(_x * view.zoomValue);
+    public void drawTextTruncatedCentred(String name, int xValue, int yValue, int width, int height, boolean trans) {
+        Point tx = fContext.textExtent(name);
+        xValue = Math.round(xValue * fView.fZoomValue);
         int y = 0;
         // Workaround to avoid round problems for some special cases (not very nice)
-        if (_y != getContentsY()) {
-            _y = Math.round(_y * view.zoomValue);
-            y = view.contentsToViewY(_y);
+        if (yValue != getContentsY()) {
+            yValue = Math.round(yValue * fView.fZoomValue);
+            y = fView.contentsToViewY(yValue);
         }
-        width = Math.round(width * view.zoomValue);
-        height = Math.round(height * view.zoomValue);
-        int x = view.contentsToViewX(_x);
+        width = Math.round(width * fView.fZoomValue);
+        height = Math.round(height * fView.fZoomValue);
+        int x = fView.contentsToViewX(xValue);
         if (tx.y > height) {
             return;
         }
         
         // Adjust height and y
-        if (y < -vscreen_bounds) {
-            height = height + y + vscreen_bounds;
-            y = -vscreen_bounds;
+        if (y < -fVisibleScreenBounds) {
+            height = height + y + fVisibleScreenBounds;
+            y = -fVisibleScreenBounds;
         }
-        if ((height < -vscreen_bounds) && (y + height < -vscreen_bounds)) {
-            height = -vscreen_bounds;
-        } else if (height + y > view.getVisibleHeight() + vscreen_bounds) {
-            height = view.getVisibleHeight() + vscreen_bounds - y;
+        if ((height < -fVisibleScreenBounds) && (y + height < -fVisibleScreenBounds)) {
+            height = -fVisibleScreenBounds;
+        } else if (height + y > fView.getVisibleHeight() + fVisibleScreenBounds) {
+            height = fView.getVisibleHeight() + fVisibleScreenBounds - y;
         }
         
         if (tx.x <= width) {
             localDrawText(name, x + 1 + (width - tx.x) / 2, y + 1 + (height - tx.y) / 2, trans);
         } else {
             String nameToDisplay = name;
-            for (int i = name.length() - 1; i >= 0 && context.textExtent(nameToDisplay).x >= width; i--) {
+            for (int i = name.length() - 1; i >= 0 && fContext.textExtent(nameToDisplay).x >= width; i--) {
                 nameToDisplay = name.substring(0, i);
             }
             int dotCount = 0;
@@ -683,7 +720,7 @@ public class NGC implements IGC {
                 buf.append("."); //$NON-NLS-1$
             }
             nameToDisplay = buf.toString();
-            localDrawText(nameToDisplay, x + 1 + (width - context.textExtent(nameToDisplay).x) / 2, y + 1 + (height - context.textExtent(nameToDisplay).y) / 2, trans);
+            localDrawText(nameToDisplay, x + 1 + (width - fContext.textExtent(nameToDisplay).x) / 2, y + 1 + (height - fContext.textExtent(nameToDisplay).y) / 2, trans);
         }
     }
 
@@ -692,23 +729,29 @@ public class NGC implements IGC {
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC#drawTextTruncated(java.lang.String, int, int, int, int, boolean)
      */
     @Override
-    public void drawTextTruncated(String name, int _x, int _y, int width, int height, boolean trans) {
-        _x = Math.round(_x * view.zoomValue);
-        _y = Math.round(_y * view.zoomValue);
-        width = Math.round(width * view.zoomValue);
-        height = Math.round(height * view.zoomValue);
-        int x = view.contentsToViewX(_x);
-        int y = view.contentsToViewY(_y);
-        if (context.textExtent(name).x <= width) {
-            localDrawText(name, x + 1, y + 1 + height, trans);
+    public void drawTextTruncated(String name, int xValue, int yValue, int width, int height, boolean trans) {
+        int localX = xValue;
+        int localY = yValue;
+        int localWidth = width;
+        int localHeight = height;
+        
+        localX = Math.round(localX * fView.fZoomValue);
+        localY = Math.round(localY * fView.fZoomValue);
+        localWidth = Math.round(localWidth * fView.fZoomValue);
+        localHeight = Math.round(localHeight * fView.fZoomValue);
+        int x = fView.contentsToViewX(localX);
+        int y = fView.contentsToViewY(localY);
+        if (fContext.textExtent(name).x <= localWidth) {
+            localDrawText(name, x + 1, y + 1 + localHeight, trans);
         } else {
             String nameToDisplay = name;
-            for (int i = name.length() - 1; i >= 0 && context.textExtent(nameToDisplay).x >= width; i--) {
+            for (int i = name.length() - 1; i >= 0 && fContext.textExtent(nameToDisplay).x >= localWidth; i--) {
                 nameToDisplay = name.substring(0, i);
             }
             int dotCount = 0;
-            for (int i = 1; i <= 3 && nameToDisplay.length() - i > 0; i++)
+            for (int i = 1; i <= 3 && nameToDisplay.length() - i > 0; i++) {
                 dotCount++;
+            }
             nameToDisplay = nameToDisplay.substring(0, nameToDisplay.length() - dotCount);
 
             StringBuffer buf = new StringBuffer(nameToDisplay);
@@ -717,7 +760,7 @@ public class NGC implements IGC {
                 buf.append("."); //$NON-NLS-1$
             }
             nameToDisplay = buf.toString();
-            localDrawText(nameToDisplay, x + 1, y + 1 + height, trans);
+            localDrawText(nameToDisplay, x + 1, y + 1 + localHeight, trans);
         }
     }
 
@@ -726,26 +769,29 @@ public class NGC implements IGC {
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC#drawImage(org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IImage, int, int, int, int)
      */
     @Override
-    public void drawImage(IImage image, int _x, int _y, int maxWith, int maxHeight) {
+    public void drawImage(IImage image, int xValue, int yValue, int maxWith, int maxHeight) {
+        int localX = xValue;
+        int localY = yValue;
+        
         Image img = null;
-        if (image != null && image.getImage() instanceof Image)
+        if (image != null && image.getImage() instanceof Image) {
             img = (Image) image.getImage();
-        else {
-            _x = Math.round(_x * view.zoomValue);
-            _y = Math.round(_y * view.zoomValue);
-            int x = view.contentsToViewX(_x);
-            int y = view.contentsToViewY(_y);
-            float tempZoom = view.zoomValue;
+        } else {
+            localX = Math.round(localX * fView.fZoomValue);
+            localY = Math.round(localY * fView.fZoomValue);
+            int x = fView.contentsToViewX(localX);
+            int y = fView.contentsToViewY(localY);
+            float tempZoom = fView.fZoomValue;
             int width = Math.round(maxWith * tempZoom);
             int height = Math.round(maxHeight * tempZoom);
-            context.setBackground(view.getDisplay().getSystemColor(SWT.COLOR_RED));
-            context.fillRectangle(x, y, width, height);
+            fContext.setBackground(fView.getDisplay().getSystemColor(SWT.COLOR_RED));
+            fContext.fillRectangle(x, y, width, height);
             return;
         }
-        _x = Math.round(_x * view.zoomValue);
-        _y = Math.round(_y * view.zoomValue);
-        int x = view.contentsToViewX(_x);
-        int y = view.contentsToViewY(_y);
+        localX = Math.round(localX * fView.fZoomValue);
+        localY = Math.round(localY * fView.fZoomValue);
+        int x = fView.contentsToViewX(localX);
+        int y = fView.contentsToViewY(localY);
         Rectangle b = ((Image) image.getImage()).getBounds();
         int width = b.width;
         int height = b.height;
@@ -755,21 +801,21 @@ public class NGC implements IGC {
         if (height > maxHeight) {
             height = maxHeight;
         }
-        float tempZoom = view.zoomValue;
+        float tempZoom = fView.fZoomValue;
         width = Math.round(width * tempZoom);
         height = Math.round(height * tempZoom);
 
-        if (view.printing && width > 0 && height > 0) {
-            Image dbuffer = new Image(view.getDisplay(), width, height);
+        if (fView.fIsPrinting && width > 0 && height > 0) {
+            Image dbuffer = new Image(fView.getDisplay(), width, height);
             GC tempgc = new GC(dbuffer);
             tempgc.drawImage(img, 0, 0, b.width, b.height, 0, 0, width, height);
-            Image dbuffer2 = new Image(view.getDisplay(), dbuffer.getImageData());
-            context.drawImage(dbuffer2, x, y);
+            Image dbuffer2 = new Image(fView.getDisplay(), dbuffer.getImageData());
+            fContext.drawImage(dbuffer2, x, y);
             tempgc.dispose();
             dbuffer.dispose();
             dbuffer2.dispose();
         } else {
-            context.drawImage(img, 0, 0, b.width, b.height, x, y, width, height);
+            fContext.drawImage(img, 0, 0, b.width, b.height, x, y, width, height);
         }
     }
 
@@ -779,14 +825,14 @@ public class NGC implements IGC {
      */
     @Override
     public void drawArc(int x, int y, int width, int height, int startAngle, int endAngle) {
-        x = Math.round(x * view.zoomValue);
-        y = Math.round(y * view.zoomValue);
-        width = Math.round(width * view.zoomValue);
-        height = Math.round(height * view.zoomValue);
+        x = Math.round(x * fView.fZoomValue);
+        y = Math.round(y * fView.fZoomValue);
+        width = Math.round(width * fView.fZoomValue);
+        height = Math.round(height * fView.fZoomValue);
         if (width == 0 || height == 0 || endAngle == 0) {
             return;
         }
-        context.drawArc(view.contentsToViewX(x), view.contentsToViewY(y), width, height, startAngle, endAngle);
+        fContext.drawArc(fView.contentsToViewX(x), fView.contentsToViewY(y), width, height, startAngle, endAngle);
     }
 
     /*
@@ -797,17 +843,17 @@ public class NGC implements IGC {
     public void setFont(IFont font) {
         if (font.getFont() != null && ((Font) font.getFont()).getFontData().length > 0) {
             FontData fontData = ((Font) font.getFont()).getFontData()[0];
-            if (SDViewPref.getInstance().fontLinked() || view.printing) {
-                int h = Math.round(fontData.getHeight() * view.zoomValue);
+            if (SDViewPref.getInstance().fontLinked() || fView.fIsPrinting) {
+                int h = Math.round(fontData.getHeight() * fView.fZoomValue);
                 if (h > 0) {
                     fontData.setHeight(h);
                 }
             }
-            if (tempFont != null) {
-                tempFont.dispose();
+            if (fTempFont != null) {
+                fTempFont.dispose();
             }
-            tempFont = new Font(Display.getCurrent(), fontData);
-            context.setFont(tempFont);
+            fTempFont = new Font(Display.getCurrent(), fontData);
+            fContext.setFont(fTempFont);
         }
     }
 
@@ -818,10 +864,10 @@ public class NGC implements IGC {
     @Override
     public int getFontHeight(IFont font) {
         if (font.getFont() != null && (font.getFont() instanceof Font) && ((Font) font.getFont()).getFontData().length > 0) {
-            Font toRestore = context.getFont();
-            context.setFont((Font) font.getFont());
-            int height = context.textExtent("lp").y;//$NON-NLS-1$
-            context.setFont(toRestore);
+            Font toRestore = fContext.getFont();
+            fContext.setFont((Font) font.getFont());
+            int height = fContext.textExtent("lp").y;//$NON-NLS-1$
+            fContext.setFont(toRestore);
             return height;
         }
         return 0;
@@ -833,7 +879,7 @@ public class NGC implements IGC {
      * @return the current font height.
      */
     protected int getCurrentFontHeight() {
-        return context.textExtent("lp").y; //$NON-NLS-1$
+        return fContext.textExtent("lp").y; //$NON-NLS-1$
     }
 
     /*
@@ -843,10 +889,10 @@ public class NGC implements IGC {
     @Override
     public int getFontWidth(IFont font) {
         if ((font.getFont() != null) && (font.getFont() instanceof Font)) {
-            Font toRestore = context.getFont();
-            context.setFont((Font) font.getFont());
-            int width = context.getFontMetrics().getAverageCharWidth();
-            context.setFont(toRestore);
+            Font toRestore = fContext.getFont();
+            fContext.setFont((Font) font.getFont());
+            int width = fContext.getFontMetrics().getAverageCharWidth();
+            fContext.setFont(toRestore);
             return width;
         }
         return 0;
@@ -856,14 +902,14 @@ public class NGC implements IGC {
      * Disposes all created resources.
      */
     public void dispose() {
-        if (tempFont != null) {
-            tempFont.dispose();
+        if (fTempFont != null) {
+            fTempFont.dispose();
         }
-        tempFont = null;
-        if (context != null) {
-            context.dispose();
+        fTempFont = null;
+        if (fContext != null) {
+            fContext.dispose();
         }
-        context = null;
+        fContext = null;
     }
 
     /*
@@ -872,11 +918,10 @@ public class NGC implements IGC {
      */
     @Override
     public float getZoom() {
-        if (view != null) {
-            return view.zoomValue;
-        } else {
-            return 1;
-        }
+        if (fView != null) {
+            return fView.fZoomValue;
+        } 
+        return 1;
     }
 
     /*
@@ -921,7 +966,7 @@ public class NGC implements IGC {
      */
     @Override
     public void setDrawTextWithFocusStyle(boolean focus) {
-        drawWithFocus = focus;
+        fDrawWithFocus = focus;
     }
     
     /**
@@ -930,7 +975,7 @@ public class NGC implements IGC {
      * @return the screen bounds.
      */
     protected static int getVscreenBounds() {
-        return vscreen_bounds;
+        return fVisibleScreenBounds;
     }
 
     /**
@@ -939,7 +984,7 @@ public class NGC implements IGC {
      * @param vBounds the screen bounds.
      */
     protected static void setVscreenBounds(int vBounds) {
-        vscreen_bounds = vBounds;
+        fVisibleScreenBounds = vBounds;
     }
     
     // ------------------------------------------------------------------------
@@ -962,14 +1007,14 @@ public class NGC implements IGC {
             i+=2;
         }
         int height = max - min;
-        if (min < -vscreen_bounds) {
-            height = height + min + vscreen_bounds;
-            min = -vscreen_bounds;
+        if (min < -fVisibleScreenBounds) {
+            height = height + min + fVisibleScreenBounds;
+            min = -fVisibleScreenBounds;
         }
-        if ((height < -vscreen_bounds) && (min + height < -vscreen_bounds)) {
-            height = -vscreen_bounds;
-        } else if (height + min > view.getVisibleHeight() + vscreen_bounds) {
-            height = view.getVisibleHeight() + vscreen_bounds - min;
+        if ((height < -fVisibleScreenBounds) && (min + height < -fVisibleScreenBounds)) {
+            height = -fVisibleScreenBounds;
+        } else if (height + min > fView.getVisibleHeight() + fVisibleScreenBounds) {
+            height = fView.getVisibleHeight() + fVisibleScreenBounds - min;
         }
         return height;
     }

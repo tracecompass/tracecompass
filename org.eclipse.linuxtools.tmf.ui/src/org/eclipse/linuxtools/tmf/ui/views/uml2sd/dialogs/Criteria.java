@@ -38,35 +38,35 @@ public class Criteria {
     /**
      * Flag whether lifeline is selected or not.
      */
-    protected boolean lifeLineSelected = false;
+    protected boolean fLifeLineSelected = false;
     /**
      * Flag whether synchronous message is selected or not.
      */
-    protected boolean syncMessageSelected = false;
+    protected boolean fSyncMessageSelected = false;
     /**
      * Flag whether synchronous message return is selected or not.
      */
-    protected boolean syncMessageReturnSelected = false;
+    protected boolean fSyncMessageReturnSelected = false;
     /**
      * Flag whether asynchronous message is selected or not.
      */
-    protected boolean asyncMessageSelected = false;
+    protected boolean fAsyncMessageSelected = false;
     /**
      * Flag whether asynchronous message return is selected or not.
      */
-    protected boolean asyncMessageReturnSelected = false;
+    protected boolean fAsyncMessageReturnSelected = false;
     /**
      * Flag whether case sensitive find is required or not.
      */
-    protected boolean caseSenstiveSelected = false;
+    protected boolean fCaseSenstiveSelected = false;
     /**
      * Flag whether stop graph node is selected or not.
      */
-    protected boolean stopSelected = false;
+    protected boolean fStopSelected = false;
     /**
      * The find expression. 
      */
-    protected String  expression = null;
+    protected String  fExpression = null;
     /**
      * The find pattern as regular expression. 
      */
@@ -88,16 +88,17 @@ public class Criteria {
      * @param other Criteria to create new criteria
      */
     public Criteria (Criteria other) {
-         this.lifeLineSelected = other.lifeLineSelected;
-         this.syncMessageSelected = other.syncMessageSelected;
-         this.syncMessageReturnSelected = other.syncMessageReturnSelected;
-         this.asyncMessageSelected = other.asyncMessageSelected;
-         this.asyncMessageReturnSelected = other.asyncMessageReturnSelected;
-         this.caseSenstiveSelected = other.caseSenstiveSelected;
-         this.stopSelected = other.stopSelected;
-         setExpression(other.expression);
+         this.fLifeLineSelected = other.fLifeLineSelected;
+         this.fSyncMessageSelected = other.fSyncMessageSelected;
+         this.fSyncMessageReturnSelected = other.fSyncMessageReturnSelected;
+         this.fAsyncMessageSelected = other.fAsyncMessageSelected;
+         this.fAsyncMessageReturnSelected = other.fAsyncMessageReturnSelected;
+         this.fCaseSenstiveSelected = other.fCaseSenstiveSelected;
+         this.fStopSelected = other.fStopSelected;
+         fExpression = other.fExpression;
+         updatePattern();
     }
-    
+
     // ------------------------------------------------------------------------
     // Methods
     // ------------------------------------------------------------------------
@@ -108,7 +109,7 @@ public class Criteria {
      * @return true if the AsyncMessageReturn is selected, false otherwise
      */
     public boolean isAsyncMessageReturnSelected() {
-        return asyncMessageReturnSelected;
+        return fAsyncMessageReturnSelected;
     }
 
     /**
@@ -117,7 +118,7 @@ public class Criteria {
      * @return true if the AsyncMessage is selected, false otherwise
      */
     public boolean isAsyncMessageSelected() {
-        return asyncMessageSelected;
+        return fAsyncMessageSelected;
     }
 
     /**
@@ -126,7 +127,7 @@ public class Criteria {
      * @return the expression text
      */
     public String getExpression() {
-        return expression;
+        return fExpression;
     }
 
     /**
@@ -153,7 +154,7 @@ public class Criteria {
      * @return true if the LifeLine is selected, false otherwise
      */
     public boolean isLifeLineSelected() {
-        return lifeLineSelected;
+        return fLifeLineSelected;
     }
 
     /**
@@ -162,7 +163,7 @@ public class Criteria {
      * @return true if the Stop is selected, false otherwise
      */
     public boolean isStopSelected() {
-        return stopSelected;
+        return fStopSelected;
     }
 
     /**
@@ -171,7 +172,7 @@ public class Criteria {
      * @return true if the SyncMessageReturn is selected, false otherwise
      */
     public boolean isSyncMessageReturnSelected() {
-        return syncMessageReturnSelected;
+        return fSyncMessageReturnSelected;
     }
 
     /**
@@ -180,7 +181,7 @@ public class Criteria {
      * @return true if the SyncMessage is selected, false otherwise
      */
     public boolean isSyncMessageSelected() {
-        return syncMessageSelected;
+        return fSyncMessageSelected;
     }
 
     /**
@@ -189,7 +190,7 @@ public class Criteria {
      * @param b true if selected, false otherwise
      */
     public void setAsyncMessageReturnSelected(boolean b) {
-        asyncMessageReturnSelected = b;
+        fAsyncMessageReturnSelected = b;
     }
 
     /**
@@ -198,7 +199,7 @@ public class Criteria {
      * @param b true if selected, false otherwise
      */
     public void setAsyncMessageSelected(boolean b) {
-        asyncMessageSelected = b;
+        fAsyncMessageSelected = b;
     }
 
     /**
@@ -207,22 +208,8 @@ public class Criteria {
      * @param string the text
      */
     public void setExpression(String string) {
-        expression = string;
-        if (expression != null) {
-            try {
-                if (caseSenstiveSelected) {
-                    pattern = Pattern.compile(string);
-                }
-                else {
-                    pattern = Pattern.compile(string, Pattern.CASE_INSENSITIVE);   
-                }
-            } catch (PatternSyntaxException e) {
-                pattern = null;
-            }
-        }
-        else {
-            pattern = null;
-        }
+        fExpression = string;
+        updatePattern();
     }
 
     /**
@@ -231,7 +218,7 @@ public class Criteria {
      * @param b true if selected, false otherwise
      */
     public void setLifeLineSelected(boolean b) {
-        lifeLineSelected = b;
+        fLifeLineSelected = b;
     }
 
     /**
@@ -240,7 +227,7 @@ public class Criteria {
      * @param b true if selected, false otherwise
      */
     public void setStopSelected(boolean b) {
-        stopSelected = b;
+        fStopSelected = b;
     }
 
     /**
@@ -249,7 +236,7 @@ public class Criteria {
      * @param b true if selected, false otherwise
      */
     public void setSyncMessageReturnSelected(boolean b) {
-        syncMessageReturnSelected = b;
+        fSyncMessageReturnSelected = b;
     }
 
     /**
@@ -258,7 +245,7 @@ public class Criteria {
      * @param b true if selected, false otherwise
      */
     public void setSyncMessageSelected(boolean b) {
-        syncMessageSelected = b;
+        fSyncMessageSelected = b;
     }
 
     /**
@@ -267,7 +254,7 @@ public class Criteria {
      * @return true if the case sensitive is selected, false otherwise
      */
     public boolean isCaseSenstiveSelected() {
-        return caseSenstiveSelected;
+        return fCaseSenstiveSelected;
     }
 
     /**
@@ -276,9 +263,9 @@ public class Criteria {
      * @param b true if selected, false otherwise
      */
     public void setCaseSenstiveSelected(boolean b) {
-        caseSenstiveSelected = b;
+        fCaseSenstiveSelected = b;
         // Make sure that pattern is set
-        setExpression(expression);
+        setExpression(fExpression);
     }
 
     /**
@@ -379,15 +366,16 @@ public class Criteria {
                 list.add(SDMessages._29);
             }
         }
-
-        String ret = "", prefix = "["; //$NON-NLS-1$ //$NON-NLS-2$
+        StringBuffer ret = new StringBuffer();
+        String prefix = "["; //$NON-NLS-1$
         for (Iterator<String> i = list.iterator(); i.hasNext();) {
             String s = (String) i.next();
-            ret += prefix + s;
+            ret.append(prefix);
+            ret.append(s);
             prefix = " " + SDMessages._34 + " "; //$NON-NLS-1$ //$NON-NLS-2$
         }
-        ret += "]"; //$NON-NLS-1$
-        return ret;
+        ret.append("]"); //$NON-NLS-1$
+        return ret.toString();
     }
 
     /**
@@ -402,4 +390,26 @@ public class Criteria {
         }
         return pattern.matcher(stringToMatch).matches();
     }
+
+    /**
+     * Updates the regular expression pattern based on the expression.
+     */
+    private void updatePattern() {
+        if (fExpression != null) {
+            try {
+                if (fCaseSenstiveSelected) {
+                    pattern = Pattern.compile(fExpression);
+                }
+                else {
+                    pattern = Pattern.compile(fExpression, Pattern.CASE_INSENSITIVE);   
+                }
+            } catch (PatternSyntaxException e) {
+                pattern = null;
+            }
+        }
+        else {
+            pattern = null;
+        }
+    }
+
 }

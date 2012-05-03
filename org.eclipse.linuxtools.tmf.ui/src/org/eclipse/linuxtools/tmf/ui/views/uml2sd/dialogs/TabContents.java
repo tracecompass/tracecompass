@@ -42,55 +42,55 @@ public class TabContents extends Composite {
     /**
      * A graph node type listener implementation.
      */
-    GraphNodeTypeListener graphNodeTypeListener = null;
+    protected GraphNodeTypeListener fGraphNodeTypeListener = null;
     /**
      * A expression listener implementation.
      */
-    ExpressionListener expressionListener = null;
+    protected ExpressionListener fExpressionListener = null;
     /**
      * The button for lifelines.
      */
-    Button lifelineButton = null;
+    protected Button fLifelineButton = null;
     /**
      * The button for stops.
      */
-    Button stopButton = null;
+    protected Button fStopButton = null;
     /**
      * The button for synchronous messages
      */
-    Button synMessageButton = null;
+    protected Button fSynMessageButton = null;
     /**
      * The button for synchronous return messages
      */
-    Button synMessageReturnButton = null;
+    protected Button fSynMessageReturnButton = null;
     /**
      * The button for asynchronous messages
      */
-    Button asynMessageButton = null;
+    protected Button fAsynMessageButton = null;
     /**
      * The button for asynchronous return messages
      */
-    Button asynMessageReturnButton = null;
+    protected Button fAsynMessageReturnButton = null;
     /**
      * The search text combo box.
      */
-    Combo searchText = null;
+    protected Combo fSearchText = null;
     /**
      * The group for selection kind.
      */
-    Group kindSelection = null;
+    protected Group fKindSelection = null;
     /**
      * The button for case sensitive expressions.
      */
-    Button caseSensitive = null;
+    protected Button fCaseSensitive = null;
     /**
      * The label for the result string.
      */
-    Label result = null;
+    protected Label fResult = null;
     /**
      * The button for notifying parent about valid data.
      */
-    Button parentOkButton = null;
+    protected Button fParentOkButton = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -109,8 +109,8 @@ public class TabContents extends Composite {
         setOkButton(okButton);
         setLayout(new GridLayout());
 
-        graphNodeTypeListener = new GraphNodeTypeListener();
-        expressionListener = new ExpressionListener();
+        fGraphNodeTypeListener = new GraphNodeTypeListener();
+        fExpressionListener = new ExpressionListener();
 
         // Inform the user how to fill the string to search
         Label searchTitle = new Label(this, SWT.LEFT);
@@ -123,115 +123,115 @@ public class TabContents extends Composite {
         searchPart.setLayoutData(searchPartData);
 
         // Create the user string input area
-        searchText = new Combo(searchPart, SWT.DROP_DOWN);
+        fSearchText = new Combo(searchPart, SWT.DROP_DOWN);
         GridData comboData = new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_VERTICAL | GridData.VERTICAL_ALIGN_FILL);
         /*
          * GridData tabLayoutData2 = new GridData(GridData.HORIZONTAL_ALIGN_FILL| GridData.VERTICAL_ALIGN_FILL);
          */
-        searchText.setLayoutData(comboData);
+        fSearchText.setLayoutData(comboData);
         if (expressionList != null) {
             for (int i = 0; i < expressionList.length; i++) {
-                searchText.add(expressionList[i]);
+                fSearchText.add(expressionList[i]);
             }
         }
-        searchText.addModifyListener(expressionListener);
+        fSearchText.addModifyListener(fExpressionListener);
 
         // Create the case sensitive check button
-        caseSensitive = new Button(searchPart, SWT.CHECK);
-        caseSensitive.setText(SDMessages._27);
+        fCaseSensitive = new Button(searchPart, SWT.CHECK);
+        fCaseSensitive.setText(SDMessages._27);
 
         // Create the group for searched graph node kind selection
-        kindSelection = new Group(this, SWT.SHADOW_NONE);
-        kindSelection.setText(SDMessages._25);
+        fKindSelection = new Group(this, SWT.SHADOW_NONE);
+        fKindSelection.setText(SDMessages._25);
         // kindSelection.setLayoutData(tabLayoutData2);
         GridLayout kindSelectionLayout = new GridLayout();
         kindSelectionLayout.numColumns = 1;
-        kindSelection.setLayout(kindSelectionLayout);
+        fKindSelection.setLayout(kindSelectionLayout);
         GridData kindSelectionData = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL | GridData.VERTICAL_ALIGN_FILL);
-        kindSelection.setLayoutData(kindSelectionData);
+        fKindSelection.setLayoutData(kindSelectionData);
 
         // Create the lifeline check button
         if (provider != null && provider.isNodeSupported(ISDGraphNodeSupporter.LIFELINE)) {
-            lifelineButton = new Button(kindSelection, SWT.CHECK);
+            fLifelineButton = new Button(fKindSelection, SWT.CHECK);
             String nodeName = provider.getNodeName(ISDGraphNodeSupporter.LIFELINE, null);
             if (nodeName != null) {
-                lifelineButton.setText(nodeName);
+                fLifelineButton.setText(nodeName);
             } else {
-                lifelineButton.setText(SDMessages._28);
+                fLifelineButton.setText(SDMessages._28);
             }
-            lifelineButton.setEnabled(true);
-            lifelineButton.addSelectionListener(graphNodeTypeListener);
+            fLifelineButton.setEnabled(true);
+            fLifelineButton.addSelectionListener(fGraphNodeTypeListener);
         }
 
         if (provider != null && provider.isNodeSupported(ISDGraphNodeSupporter.STOP)) {
             // Create the stop check button
-            stopButton = new Button(kindSelection, SWT.CHECK);
+            fStopButton = new Button(fKindSelection, SWT.CHECK);
             String nodeName = provider.getNodeName(ISDGraphNodeSupporter.STOP, null);
             if (nodeName != null) {
-                stopButton.setText(nodeName);
+                fStopButton.setText(nodeName);
             } else {
-                stopButton.setText(SDMessages._29);
+                fStopButton.setText(SDMessages._29);
             }
             
-            stopButton.setEnabled(true);
-            stopButton.addSelectionListener(graphNodeTypeListener);
+            fStopButton.setEnabled(true);
+            fStopButton.addSelectionListener(fGraphNodeTypeListener);
         }
 
         if (provider != null && provider.isNodeSupported(ISDGraphNodeSupporter.SYNCMESSAGE)) {
             // Create the synchronous message check button
-            synMessageButton = new Button(kindSelection, SWT.CHECK);
+            fSynMessageButton = new Button(fKindSelection, SWT.CHECK);
             String nodeName = provider.getNodeName(ISDGraphNodeSupporter.SYNCMESSAGE, null);
             if (nodeName != null) {
-                synMessageButton.setText(nodeName);
+                fSynMessageButton.setText(nodeName);
             } else {
-                synMessageButton.setText(SDMessages._30);
+                fSynMessageButton.setText(SDMessages._30);
             }
-            synMessageButton.setEnabled(true);
-            synMessageButton.addSelectionListener(graphNodeTypeListener);
+            fSynMessageButton.setEnabled(true);
+            fSynMessageButton.addSelectionListener(fGraphNodeTypeListener);
         }
 
         if (provider != null && provider.isNodeSupported(ISDGraphNodeSupporter.SYNCMESSAGERETURN)) {
             // Create the synchronous message return check button
-            synMessageReturnButton = new Button(kindSelection, SWT.CHECK);
+            fSynMessageReturnButton = new Button(fKindSelection, SWT.CHECK);
             String nodeName = provider.getNodeName(ISDGraphNodeSupporter.SYNCMESSAGERETURN, null);
             if (nodeName != null) {
-                synMessageReturnButton.setText(nodeName);
+                fSynMessageReturnButton.setText(nodeName);
             } else {
-                synMessageReturnButton.setText(SDMessages._31);
+                fSynMessageReturnButton.setText(SDMessages._31);
             }
-            synMessageReturnButton.setEnabled(true);
-            synMessageReturnButton.addSelectionListener(graphNodeTypeListener);
+            fSynMessageReturnButton.setEnabled(true);
+            fSynMessageReturnButton.addSelectionListener(fGraphNodeTypeListener);
         }
 
         if (provider != null && provider.isNodeSupported(ISDGraphNodeSupporter.ASYNCMESSAGE)) {
             // Create the asynchronous message check button
-            asynMessageButton = new Button(kindSelection, SWT.CHECK);
+            fAsynMessageButton = new Button(fKindSelection, SWT.CHECK);
             String nodeName = provider.getNodeName(ISDGraphNodeSupporter.ASYNCMESSAGE, null);
             if (nodeName != null) {
-                asynMessageButton.setText(nodeName);
+                fAsynMessageButton.setText(nodeName);
             } else {
-                asynMessageButton.setText(SDMessages._32);
+                fAsynMessageButton.setText(SDMessages._32);
             }
-            asynMessageButton.setEnabled(true);
-            asynMessageButton.addSelectionListener(graphNodeTypeListener);
+            fAsynMessageButton.setEnabled(true);
+            fAsynMessageButton.addSelectionListener(fGraphNodeTypeListener);
         }
 
         if (provider != null && provider.isNodeSupported(ISDGraphNodeSupporter.ASYNCMESSAGERETURN)) {
             // Create the asynchronous message return check button
-            asynMessageReturnButton = new Button(kindSelection, SWT.CHECK);
+            fAsynMessageReturnButton = new Button(fKindSelection, SWT.CHECK);
             String nodeName = provider.getNodeName(ISDGraphNodeSupporter.ASYNCMESSAGERETURN, null);
             if (nodeName != null) {
-                asynMessageReturnButton.setText(nodeName);
+                fAsynMessageReturnButton.setText(nodeName);
             } else {
-                asynMessageReturnButton.setText(SDMessages._33);
+                fAsynMessageReturnButton.setText(SDMessages._33);
             }
-            asynMessageReturnButton.setEnabled(true);
-            asynMessageReturnButton.addSelectionListener(graphNodeTypeListener);
+            fAsynMessageReturnButton.setEnabled(true);
+            fAsynMessageReturnButton.addSelectionListener(fGraphNodeTypeListener);
         }
 
-        result = new Label(this, SWT.LEFT);
-        result.setText(SDMessages._23);
-        result.setVisible(false);
+        fResult = new Label(this, SWT.LEFT);
+        fResult.setText(SDMessages._23);
+        fResult.setVisible(false);
     }
 
     // ------------------------------------------------------------------------
@@ -243,19 +243,19 @@ public class TabContents extends Composite {
      * @param found <code>true</code> for found (enable visibility) else false
      */
     public void setResult(boolean found) {
-        result.setVisible(!found);
+        fResult.setVisible(!found);
     }
 
     /**
 	 * Updates parent OK button based on input data.
 	 */
     public void updateOkButton() {
-        if (parentOkButton == null) {
+        if (fParentOkButton == null) {
             return;
         }
-        boolean enabled = (searchText.getText() != null && !searchText.getText().equals("")) && //$NON-NLS-1$
-                (getLifelineButtonSelection() || getStopButtonSelection() || getSynMessageButtonSelection() || getSynMessageReturnButtonSelection() || getAsynMessageButtonSelection() || getAsynMessageReturnButtonSelection());
-        parentOkButton.setEnabled(enabled);
+        boolean enabled = (fSearchText.getText() != null && !fSearchText.getText().equals("")) && //$NON-NLS-1$
+                (isLifelineButtonSelected() || isStopButtonSelected() || isSynMessageButtonSelected() || isSynMessageReturnButtonSelected() || isAsynMessageButtonSelected() || isAsynMessageReturnButtonSelected());
+        fParentOkButton.setEnabled(enabled);
     }
 
     /**
@@ -264,7 +264,7 @@ public class TabContents extends Composite {
      * @param okButton The parent OK button
      */
     public void setOkButton(Button okButton) {
-        parentOkButton = okButton;
+        fParentOkButton = okButton;
     }
 
     /**
@@ -272,9 +272,9 @@ public class TabContents extends Composite {
      * 
      * @return true if check, false otherwise
      */
-    public boolean getAsynMessageButtonSelection() {
-        if (asynMessageButton != null) {
-            return asynMessageButton.getSelection();
+    public boolean isAsynMessageButtonSelected() {
+        if (fAsynMessageButton != null) {
+            return fAsynMessageButton.getSelection();
         }
         return false;
     }
@@ -284,9 +284,9 @@ public class TabContents extends Composite {
      * 
      * @return true if check, false otherwise
      */
-    public boolean getAsynMessageReturnButtonSelection() {
-        if (asynMessageReturnButton != null) {
-            return asynMessageReturnButton.getSelection();
+    public boolean isAsynMessageReturnButtonSelected() {
+        if (fAsynMessageReturnButton != null) {
+            return fAsynMessageReturnButton.getSelection();
         }
         return false;
     }
@@ -296,9 +296,9 @@ public class TabContents extends Composite {
      * 
      * @return true if check, false otherwise
      */
-    public boolean getCaseSensitiveSelection() {
-        if (caseSensitive != null) {
-            return caseSensitive.getSelection();
+    public boolean isCaseSensitiveSelected() {
+        if (fCaseSensitive != null) {
+            return fCaseSensitive.getSelection();
         }
         return false;
     }
@@ -308,9 +308,9 @@ public class TabContents extends Composite {
      * 
      * @return true if check, false otherwise
      */
-    public boolean getLifelineButtonSelection() {
-        if (lifelineButton != null) {
-            return lifelineButton.getSelection();
+    public boolean isLifelineButtonSelected() {
+        if (fLifelineButton != null) {
+            return fLifelineButton.getSelection();
         }
         return false;
     }
@@ -321,7 +321,7 @@ public class TabContents extends Composite {
      * @return the string to search for
      */
     public String getSearchText() {
-        return searchText.getText();
+        return fSearchText.getText();
     }
 
     /**
@@ -329,9 +329,9 @@ public class TabContents extends Composite {
      * 
      * @return true if check, false otherwise
      */
-    public boolean getStopButtonSelection() {
-        if (stopButton != null) {
-            return stopButton.getSelection();
+    public boolean isStopButtonSelected() {
+        if (fStopButton != null) {
+            return fStopButton.getSelection();
         }
         return false;
     }
@@ -341,9 +341,9 @@ public class TabContents extends Composite {
      * 
      * @return true if check, false otherwise
      */
-    public boolean getSynMessageButtonSelection() {
-        if (synMessageButton != null) {
-            return synMessageButton.getSelection();
+    public boolean isSynMessageButtonSelected() {
+        if (fSynMessageButton != null) {
+            return fSynMessageButton.getSelection();
         }
         return false;
     }
@@ -353,9 +353,9 @@ public class TabContents extends Composite {
      * 
      * @return true if check, false otherwise
      */
-    public boolean getSynMessageReturnButtonSelection() {
-        if (synMessageReturnButton != null) {
-            return synMessageReturnButton.getSelection();
+    public boolean isSynMessageReturnButtonSelected() {
+        if (fSynMessageReturnButton != null) {
+            return fSynMessageReturnButton.getSelection();
         }
         return false;
     }
@@ -364,8 +364,8 @@ public class TabContents extends Composite {
      * Set the asynchronous message check button state
      */
     public void setAsynMessageButtonSelection(boolean state) {
-        if (asynMessageButton != null) {
-            asynMessageButton.setSelection(state);
+        if (fAsynMessageButton != null) {
+            fAsynMessageButton.setSelection(state);
         }
     }
 
@@ -373,8 +373,8 @@ public class TabContents extends Composite {
      * Set the asynchronous message return check button state
      */
     public void setAsynMessageReturnButtonSelection(boolean state) {
-        if (asynMessageReturnButton != null) {
-            asynMessageReturnButton.setSelection(state);
+        if (fAsynMessageReturnButton != null) {
+            fAsynMessageReturnButton.setSelection(state);
         }
     }
 
@@ -382,8 +382,8 @@ public class TabContents extends Composite {
      * Set the case sensitive check button state
      */
     public void setCaseSensitiveSelection(boolean state) {
-        if (caseSensitive != null) {
-            caseSensitive.setSelection(state);
+        if (fCaseSensitive != null) {
+            fCaseSensitive.setSelection(state);
         }
     }
 
@@ -391,8 +391,8 @@ public class TabContents extends Composite {
      * Set the lifeline check button state
      */
     public void setLifelineButtonSelection(boolean state) {
-        if (lifelineButton != null) {
-            lifelineButton.setSelection(state);
+        if (fLifelineButton != null) {
+            fLifelineButton.setSelection(state);
         }
     }
 
@@ -400,15 +400,15 @@ public class TabContents extends Composite {
      * Set the user input string
      */
     public void setSearchText(String text) {
-        searchText.setText(text);
+        fSearchText.setText(text);
     }
 
     /**
      * Set the stop check button state
      */
     public void setStopButtonSelection(boolean state) {
-        if (stopButton != null) {
-            stopButton.setSelection(state);
+        if (fStopButton != null) {
+            fStopButton.setSelection(state);
         }
     }
 
@@ -416,8 +416,8 @@ public class TabContents extends Composite {
      * Set the synchronous message check button state
      */
     public void setSynMessageButtonSelection(boolean state) {
-        if (synMessageButton != null) {
-            synMessageButton.setSelection(state);
+        if (fSynMessageButton != null) {
+            fSynMessageButton.setSelection(state);
         }
     }
 
@@ -425,8 +425,8 @@ public class TabContents extends Composite {
      * Set the synchronous message return check button state
      */
     public void setSynMessageReturnButtonSelection(boolean state) {
-        if (synMessageReturnButton != null) {
-            synMessageReturnButton.setSelection(state);
+        if (fSynMessageReturnButton != null) {
+            fSynMessageReturnButton.setSelection(state);
         }
     }
 

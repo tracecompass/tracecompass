@@ -275,26 +275,26 @@ public interface IGC {
      * will not be modified, otherwise it will be filled with the receiver's background color.
      * 
      * @param name the string to draw
-     * @param _x the _x coordinate of the rectangle to draw the string
-     * @param _y the _y coordinate of the rectangle to draw the string
+     * @param x the x coordinate of the rectangle to draw the string
+     * @param y the y coordinate of the rectangle to draw the string
      * @param width the width of the rectangle to draw the string
      * @param height the height of the rectangle to draw the string
      * @param trans if true the background will be transparent, otherwise it will be opaque
      */
-    public abstract void drawTextTruncatedCentred(String name, int _x, int _y, int width, int height, boolean trans);
+    public abstract void drawTextTruncatedCentred(String name, int x, int y, int width, int height, boolean trans);
 
     /**
      * Draws the given string into the given rectangle (left justify) If the string cannot fit in the rectangle area,
      * the string is truncated. If trans is true, then the background of the rectangular area where the text is being
      * drawn will not be modified, otherwise it will be filled with the receiver's background color.
      * 
-     * @param _x the _x coordinate of the rectangle to draw the string
-     * @param _y the _y coordinate of the rectangle to draw the string
+     * @param x the x coordinate of the rectangle to draw the string
+     * @param y the y coordinate of the rectangle to draw the string
      * @param width the width of the rectangle to draw the string
      * @param height the height of the rectangle to draw the string
      * @param trans if true the background will be transparent, otherwise it will be opaque
      */
-    public abstract void drawTextTruncated(String name, int _x, int _y, int width, int height, boolean trans);
+    public abstract void drawTextTruncated(String name, int x, int y, int width, int height, boolean trans);
 
     /**
      * Copies a the source image into a (potentially different sized) rectangular area in the graphical context. If the
@@ -302,12 +302,12 @@ public interface IGC {
      * copied.
      * 
      * @param image the image to draw
-     * @param _x the x coordinate in the destination to copy to
-     * @param _y the y coordinate in the destination to copy to
+     * @param x the x coordinate in the destination to copy to
+     * @param y the y coordinate in the destination to copy to
      * @param maxWith the width in pixels of the destination rectangle
      * @param maxHeight the height in pixels of the destination rectangle
      */
-    public abstract void drawImage(IImage image, int _x, int _y, int maxWith, int maxHeight);
+    public abstract void drawImage(IImage image, int x, int y, int maxWith, int maxHeight);
 
     /**
      * Draws the outline of a circular or elliptical arc within the specified rectangular area. The resulting arc begins

@@ -34,11 +34,11 @@ public class FontImpl implements IFont {
     /**
      * The font object
      */
-    protected Font font = null;
+    protected Font fFont = null;
     /**
      * Flag to indicate that this object is managing the resource.
      */
-    protected boolean manageFont = true;
+    protected boolean fManageFont = true;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -50,7 +50,7 @@ public class FontImpl implements IFont {
      * @param data A font data
      */
     public FontImpl(Display display, FontData data) {
-        font = new Font(display, data);
+        fFont = new Font(display, data);
     }
 
     /**
@@ -59,8 +59,8 @@ public class FontImpl implements IFont {
      * @param value A font to copy.
      */
     protected FontImpl(Font value) {
-        font = value;
-        manageFont = false;
+        fFont = value;
+        fManageFont = false;
     }
 
     // ------------------------------------------------------------------------
@@ -81,7 +81,7 @@ public class FontImpl implements IFont {
      */
     @Override
     public Object getFont() {
-        return font;
+        return fFont;
     }
     
     /*
@@ -90,8 +90,8 @@ public class FontImpl implements IFont {
      */
     @Override
     public void dispose() {
-        if (font != null) {
-            font.dispose();
+        if (fFont != null) {
+            fFont.dispose();
         }
     }
 }

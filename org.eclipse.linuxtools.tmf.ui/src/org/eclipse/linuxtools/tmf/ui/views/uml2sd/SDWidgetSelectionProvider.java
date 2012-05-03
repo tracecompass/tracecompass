@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -37,11 +38,11 @@ public class SDWidgetSelectionProvider implements ISelectionProvider {
     /**
      * The listener list
      */
-    protected ArrayList<ISelectionChangedListener> listenerList = null;
+    protected List<ISelectionChangedListener> fListenerList = null;
     /**
      * The current selection
      */
-    protected ISelection currentSelection = null;
+    protected ISelection fCurrentSelection = null;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -50,7 +51,7 @@ public class SDWidgetSelectionProvider implements ISelectionProvider {
      * Standard constructor
      */
     protected SDWidgetSelectionProvider() {
-        listenerList = new ArrayList<ISelectionChangedListener>();
+        fListenerList = new ArrayList<ISelectionChangedListener>();
     }
 
     // ------------------------------------------------------------------------
@@ -63,8 +64,8 @@ public class SDWidgetSelectionProvider implements ISelectionProvider {
      */
     @Override
     public void addSelectionChangedListener(ISelectionChangedListener listener) {
-        if (!listenerList.contains(listener))
-            listenerList.add(listener);
+        if (!fListenerList.contains(listener))
+            fListenerList.add(listener);
     }
 
     /*
@@ -73,7 +74,7 @@ public class SDWidgetSelectionProvider implements ISelectionProvider {
      */
     @Override
     public void removeSelectionChangedListener(ISelectionChangedListener listener) {
-        listenerList.remove(listener);
+        fListenerList.remove(listener);
     }
 
     /*
@@ -82,10 +83,10 @@ public class SDWidgetSelectionProvider implements ISelectionProvider {
      */
     @Override
     public void setSelection(ISelection selection) {
-        currentSelection = selection;
-        for (int i = 0; i < listenerList.size(); i++) {
-            ISelectionChangedListener list = (ISelectionChangedListener) listenerList.get(i);
-            list.selectionChanged(new SelectionChangedEvent(this, currentSelection));
+        fCurrentSelection = selection;
+        for (int i = 0; i < fListenerList.size(); i++) {
+            ISelectionChangedListener list = (ISelectionChangedListener) fListenerList.get(i);
+            list.selectionChanged(new SelectionChangedEvent(this, fCurrentSelection));
         }
     }
 
@@ -95,7 +96,7 @@ public class SDWidgetSelectionProvider implements ISelectionProvider {
      */
     @Override
     public ISelection getSelection() {
-        return currentSelection;
+        return fCurrentSelection;
     }
 
 }

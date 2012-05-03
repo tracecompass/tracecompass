@@ -56,7 +56,6 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDCollapseP
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDExtendedActionBarProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDFilterProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDFindProvider;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDGraphNodeSupporter;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDPagingProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDPropertiesProvider;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader;
@@ -92,67 +91,67 @@ public class SDView extends ViewPart {
     /**
      * The sequence diagram widget.
      */
-    protected SDWidget sdWidget = null;
+    protected SDWidget fSdWidget = null;
     /**
      * The time compression bar.
      */
-    protected TimeCompressionBar timeCompressionBar = null;
+    protected TimeCompressionBar fTimeCompressionBar = null;
     /**
      * The sequence diagram find provider implementation.
      */
-    protected ISDFindProvider sdFindProvider = null;
+    protected ISDFindProvider fSdFindProvider = null;
     /**
      * The sequence diagram paging provider implementation.
      */
-    protected ISDPagingProvider sdPagingProvider = null;
+    protected ISDPagingProvider fSdPagingProvider = null;
     /**
      * The sequence diagram filter provider implementation.
      */
-    protected ISDFilterProvider sdFilterProvider = null;
+    protected ISDFilterProvider fSdFilterProvider = null;
     /**
      * The extended sequence diagram filter provider implementation.
      */
-    protected IExtendedFilterProvider sdExFilterProvider = null;
+    protected IExtendedFilterProvider fSdExFilterProvider = null;
     /**
      * The extended sequence diagram find provider implementation.
      */
-    protected IExtendedFindProvider sdExFindProvider = null;
+    protected IExtendedFindProvider fSdExFindProvider = null;
     /**
      * The extended sequence diagram action bar provider implementation.
      */
-    protected ISDExtendedActionBarProvider sdExtendedActionBarProvider = null;
+    protected ISDExtendedActionBarProvider fSdExtendedActionBarProvider = null;
     /**
      * The sequence diagram property provider implementation.
      */
-    protected ISDPropertiesProvider sdPropertiesProvider = null;
+    protected ISDPropertiesProvider fSdPropertiesProvider = null;
     /**
      * Button for executing the next page action.  
      */
-    protected NextPage nextPageButton = null;
+    protected NextPage fNextPageButton = null;
     /**
      * Button for executing the previous page action.  
      */
-    protected PrevPage prevPageButton = null;
+    protected PrevPage fPrevPageButton = null;
     /**
      * Button for executing the first page page action.  
      */
-    protected FirstPage firstPageButton = null;
+    protected FirstPage fFirstPageButton = null;
     /**
      * Button for executing the last page action.  
      */
-    protected LastPage lastPageButton = null;
+    protected LastPage fLastPageButton = null;
     /**
      * The menu manager reference.
      */
-    protected MenuManager menuMgr = null;
+    protected MenuManager fMenuMgr = null;
     /**
      * Flag to indicate whether view needs initialization or not. 
      */
-    protected boolean needInit = true;
+    protected boolean fNeedInit = true;
     /**
      * WaitCursor is the cursor to be displayed when long tasks are running
      */
-    protected Cursor waitCursor;
+    protected Cursor fWaitCursor;
 
     // ------------------------------------------------------------------------
     // Methods
@@ -174,12 +173,12 @@ public class SDView extends ViewPart {
         GridData timeLayoutdata = new GridData(GridData.GRAB_VERTICAL | GridData.VERTICAL_ALIGN_FILL);
         timeLayoutdata.widthHint = 10;
         GridData seqDiagLayoutData = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.VERTICAL_ALIGN_FILL);
-        timeCompressionBar = new TimeCompressionBar(parent, SWT.NONE);
-        timeCompressionBar.setLayoutData(timeLayoutdata);
-        sdWidget = new SDWidget(parent, SWT.NONE);// SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-        sdWidget.setLayoutData(seqDiagLayoutData);
-        sdWidget.setSite(this);
-        sdWidget.setTimeBar(timeCompressionBar);
+        fTimeCompressionBar = new TimeCompressionBar(parent, SWT.NONE);
+        fTimeCompressionBar.setLayoutData(timeLayoutdata);
+        fSdWidget = new SDWidget(parent, SWT.NONE);// SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+        fSdWidget.setLayoutData(seqDiagLayoutData);
+        fSdWidget.setSite(this);
+        fSdWidget.setTimeBar(fTimeCompressionBar);
 
         // Add this view to the key bindings manager
         KeyBindingsManager.getInstance().add(this.getSite().getId());
@@ -188,13 +187,13 @@ public class SDView extends ViewPart {
 
         hookContextMenu();
 
-        timeCompressionBar.setVisible(false);
+        fTimeCompressionBar.setVisible(false);
         parent.layout(true);
 
         Print print = new Print(this);
         getViewSite().getActionBars().setGlobalActionHandler(ActionFactory.PRINT.getId(), print);
 
-        needInit = restoreLoader();
+        fNeedInit = restoreLoader();
     }
 
     /**
@@ -241,13 +240,13 @@ public class SDView extends ViewPart {
      */
     @Override
     public void setFocus() {
-        if (sdWidget != null) {
+        if (fSdWidget != null) {
             // update actions for key bindings
             KeyBindingsManager.getInstance().setSdView(this);
-            sdWidget.setFocus();
+            fSdWidget.setFocus();
         }
-        if (isViewReady() && needInit) {
-            needInit = restoreLoader();
+        if (isViewReady() && fNeedInit) {
+            fNeedInit = restoreLoader();
         }
     }
 
@@ -267,7 +266,7 @@ public class SDView extends ViewPart {
      * @return The SD widget.
      */
     public SDWidget getSDWidget() {
-        return sdWidget;
+        return fSdWidget;
     }
 
     /**
@@ -280,8 +279,8 @@ public class SDView extends ViewPart {
      * @param provider the search provider
      */
     public void setSDFindProvider(ISDFindProvider provider) {
-        sdFindProvider = provider;
-        sdExFindProvider = null;
+        fSdFindProvider = provider;
+        fSdExFindProvider = null;
         createCoolbarContent();
         if (provider != null) {
             KeyBindingsManager.getInstance().setFindEnabled(true);
@@ -299,8 +298,8 @@ public class SDView extends ViewPart {
      * @param provider
      */
     public void setExtendedFindProvider(IExtendedFindProvider provider) {
-        sdExFindProvider = provider;
-        sdFindProvider = null;
+        fSdExFindProvider = provider;
+        fSdFindProvider = null;
         createCoolbarContent();
         if (provider != null) {
             KeyBindingsManager.getInstance().setFindEnabled(true);
@@ -316,7 +315,7 @@ public class SDView extends ViewPart {
      * @return extended find provider.
      */
     public IExtendedFindProvider getExtendedFindProvider() {
-        return sdExFindProvider;
+        return fSdExFindProvider;
     }
 
     /**
@@ -324,15 +323,15 @@ public class SDView extends ViewPart {
      */
     public void resetProviders() {
         KeyBindingsManager.getInstance().setFindEnabled(false);
-        sdFindProvider = null;
-        sdExFindProvider = null;
-        sdFilterProvider = null;
-        sdExFilterProvider = null;
-        sdPagingProvider = null;
-        sdExtendedActionBarProvider = null;
-        sdPropertiesProvider = null;
-        if ((sdWidget != null) && (!sdWidget.isDisposed())) {
-            sdWidget.setCollapseProvider(null);
+        fSdFindProvider = null;
+        fSdExFindProvider = null;
+        fSdFilterProvider = null;
+        fSdExFilterProvider = null;
+        fSdPagingProvider = null;
+        fSdExtendedActionBarProvider = null;
+        fSdPropertiesProvider = null;
+        if ((fSdWidget != null) && (!fSdWidget.isDisposed())) {
+            fSdWidget.setCollapseProvider(null);
         }
     }
 
@@ -344,7 +343,7 @@ public class SDView extends ViewPart {
      * @param provider the filter provider
      */
     public void setSDFilterProvider(ISDFilterProvider provider) {
-        sdFilterProvider = provider;
+        fSdFilterProvider = provider;
         // Both systems can be used now, commenting out next statement
         // sdExFilterProvider = null;
         createCoolbarContent();
@@ -355,7 +354,7 @@ public class SDView extends ViewPart {
      * @param provider
      */
     public void setExtendedFilterProvider(IExtendedFilterProvider provider) {
-        sdExFilterProvider = provider;
+        fSdExFilterProvider = provider;
         // Both systems can be used now, commenting out next statement
         // sdFilterProvider = null;
         createCoolbarContent();
@@ -367,7 +366,7 @@ public class SDView extends ViewPart {
      * @return The extended find provider.
      */
     public IExtendedFilterProvider getExtendedFilterProvider() {
-        return sdExFilterProvider;
+        return fSdExFilterProvider;
     }
 
     /**
@@ -377,8 +376,8 @@ public class SDView extends ViewPart {
      * @param provider - the provider to register
      */
     public void setCollapsingProvider(ISDCollapseProvider provider) {
-        if ((sdWidget != null) && (!sdWidget.isDisposed())) {
-            sdWidget.setCollapseProvider(provider);
+        if ((fSdWidget != null) && (!fSdWidget.isDisposed())) {
+            fSdWidget.setCollapseProvider(provider);
         }
     }
 
@@ -391,7 +390,7 @@ public class SDView extends ViewPart {
      * @param provider the paging provider
      */
     public void setSDPagingProvider(ISDPagingProvider provider) {
-        sdPagingProvider = provider;
+        fSdPagingProvider = provider;
         createCoolbarContent();
     }
 
@@ -401,7 +400,7 @@ public class SDView extends ViewPart {
      * @return the paging provider
      */
     public ISDPagingProvider getSDPagingProvider() {
-        return sdPagingProvider;
+        return fSdPagingProvider;
     }
 
     /**
@@ -410,7 +409,7 @@ public class SDView extends ViewPart {
      * @return the find provider
      */
     public ISDFindProvider getSDFindProvider() {
-        return sdFindProvider;
+        return fSdFindProvider;
     }
 
     /**
@@ -419,7 +418,7 @@ public class SDView extends ViewPart {
      * @return the filter provider
      */
     public ISDFilterProvider getSDFilterProvider() {
-        return sdFilterProvider;
+        return fSdFilterProvider;
     }
 
     /**
@@ -429,7 +428,7 @@ public class SDView extends ViewPart {
      * @param provider the search provider
      */
     public void setSDExtendedActionBarProvider(ISDExtendedActionBarProvider provider) {
-        sdExtendedActionBarProvider = provider;
+        fSdExtendedActionBarProvider = provider;
         createCoolbarContent();
     }
 
@@ -439,7 +438,7 @@ public class SDView extends ViewPart {
      * @return the extended action bar provider
      */
     public ISDExtendedActionBarProvider getSDExtendedActionBarProvider() {
-        return sdExtendedActionBarProvider;
+        return fSdExtendedActionBarProvider;
     }
 
     /**
@@ -448,7 +447,7 @@ public class SDView extends ViewPart {
      * @param provider the properties provider
      */
     public void setSDPropertiesProvider(ISDPropertiesProvider provider) {
-        sdPropertiesProvider = provider;
+        fSdPropertiesProvider = provider;
     }
 
     /**
@@ -457,24 +456,24 @@ public class SDView extends ViewPart {
      * @return the extended action bar provider
      */
     public ISDPropertiesProvider getSDPropertiesProvider() {
-        return sdPropertiesProvider;
+        return fSdPropertiesProvider;
     }
 
     /**
      * Creates the basic sequence diagram menu
      */
     protected void hookContextMenu() {
-        menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-        menuMgr.setRemoveAllWhenShown(true);
-        menuMgr.addMenuListener(new IMenuListener() {
+        fMenuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+        fMenuMgr.setRemoveAllWhenShown(true);
+        fMenuMgr.addMenuListener(new IMenuListener() {
             @Override
             public void menuAboutToShow(IMenuManager manager) {
                 fillContextMenu(manager);
             }
         });
-        Menu menu = menuMgr.createContextMenu(sdWidget.getViewControl());
-        sdWidget.getViewControl().setMenu(menu);
-        getSite().registerContextMenu(menuMgr, sdWidget.getSelectionProvider());
+        Menu menu = fMenuMgr.createContextMenu(fSdWidget.getViewControl());
+        fSdWidget.getViewControl().setMenu(menu);
+        getSite().registerContextMenu(fMenuMgr, fSdWidget.getSelectionProvider());
     }
 
     /**
@@ -483,7 +482,7 @@ public class SDView extends ViewPart {
      * @return the menu manager
      */
     public MenuManager getMenuManager() {
-        return menuMgr;
+        return fMenuMgr;
     }
 
     /**
@@ -493,8 +492,8 @@ public class SDView extends ViewPart {
      */
     protected void fillContextMenu(IMenuManager manager) {
         manager.add(new Separator("Additions")); //$NON-NLS-1$
-        if (getSDWidget() != null && getSDWidget().currentGraphNode != null) {
-            ISelectionProvider selProvider = sdWidget.getSelectionProvider();
+        if (getSDWidget() != null && getSDWidget().fCurrentGraphNode != null) {
+            ISelectionProvider selProvider = fSdWidget.getSelectionProvider();
             ISelection sel = selProvider.getSelection();
             int nbMessage = 0;
             Iterator<?> it = ((StructuredSelection) sel).iterator();
@@ -507,20 +506,16 @@ public class SDView extends ViewPart {
             if (nbMessage != 1) {
                 return;
             }
-            GraphNode node = getSDWidget().currentGraphNode;
-            if (node instanceof SyncMessageReturn) {
-                if (((SyncMessageReturn) node).getMessage() != null) {
-                    Action goToMessage = new MoveToMessage(this);
-                    goToMessage.setText(SDMessages._39);
-                    manager.add(goToMessage);
-                }
+            GraphNode node = getSDWidget().fCurrentGraphNode;
+            if ((node instanceof SyncMessageReturn) && (((SyncMessageReturn) node).getMessage() != null)) {
+                Action goToMessage = new MoveToMessage(this);
+                goToMessage.setText(SDMessages._39);
+                manager.add(goToMessage);
             }
-            if (node instanceof SyncMessage) {
-                if (((SyncMessage) node).getMessageReturn() != null) {
-                    Action goToMessage = new MoveToMessage(this);
-                    goToMessage.setText(SDMessages._40);
-                    manager.add(goToMessage);
-                }
+            if ((node instanceof SyncMessage) && (((SyncMessage) node).getMessageReturn() != null)) {
+                Action goToMessage = new MoveToMessage(this);
+                goToMessage.setText(SDMessages._40);
+                manager.add(goToMessage);
             }
         }
         manager.add(new Separator("MultiSelectAdditions")); //$NON-NLS-1$
@@ -605,37 +600,37 @@ public class SDView extends ViewPart {
         minMax.setId("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ConfigureMinMax");//$NON-NLS-1$
         bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", minMax); //$NON-NLS-1$
 
-        if ((sdWidget.getFrame() != null) && (sdWidget.getFrame().hasTimeInfo())) {
+        if ((fSdWidget.getFrame() != null) && (fSdWidget.getFrame().hasTimeInfo())) {
             minMax.setEnabled(true);
         } else {
             minMax.setEnabled(false);
         }
 
         // Do we need to display a paging item
-        if (sdPagingProvider != null) {
-            nextPageButton = new NextPage(this);
-            bar.getToolBarManager().appendToGroup("UML2SD_OTHER_COMMANDS", nextPageButton); //$NON-NLS-1$
-            nextPageButton.setEnabled(sdPagingProvider.hasNextPage());
-            bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", nextPageButton); //$NON-NLS-1$
+        if (fSdPagingProvider != null) {
+            fNextPageButton = new NextPage(this);
+            bar.getToolBarManager().appendToGroup("UML2SD_OTHER_COMMANDS", fNextPageButton); //$NON-NLS-1$
+            fNextPageButton.setEnabled(fSdPagingProvider.hasNextPage());
+            bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", fNextPageButton); //$NON-NLS-1$
 
-            prevPageButton = new PrevPage(this);
-            bar.getToolBarManager().appendToGroup("UML2SD_OTHER_COMMANDS", prevPageButton); //$NON-NLS-1$
-            prevPageButton.setEnabled(sdPagingProvider.hasPrevPage());
-            bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", prevPageButton); //$NON-NLS-1$
+            fPrevPageButton = new PrevPage(this);
+            bar.getToolBarManager().appendToGroup("UML2SD_OTHER_COMMANDS", fPrevPageButton); //$NON-NLS-1$
+            fPrevPageButton.setEnabled(fSdPagingProvider.hasPrevPage());
+            bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", fPrevPageButton); //$NON-NLS-1$
             
-            firstPageButton = new FirstPage(this);
-            bar.getToolBarManager().appendToGroup("UML2SD_OTHER_COMMANDS", firstPageButton); //$NON-NLS-1$
-            firstPageButton.setEnabled(sdPagingProvider.hasPrevPage());
-            bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", firstPageButton); //$NON-NLS-1$
+            fFirstPageButton = new FirstPage(this);
+            bar.getToolBarManager().appendToGroup("UML2SD_OTHER_COMMANDS", fFirstPageButton); //$NON-NLS-1$
+            fFirstPageButton.setEnabled(fSdPagingProvider.hasPrevPage());
+            bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", fFirstPageButton); //$NON-NLS-1$
 
-            lastPageButton = new LastPage(this);
-            bar.getToolBarManager().appendToGroup("UML2SD_OTHER_COMMANDS", lastPageButton); //$NON-NLS-1$
-            lastPageButton.setEnabled(sdPagingProvider.hasNextPage());
-            bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", lastPageButton); //$NON-NLS-1$
+            fLastPageButton = new LastPage(this);
+            bar.getToolBarManager().appendToGroup("UML2SD_OTHER_COMMANDS", fLastPageButton); //$NON-NLS-1$
+            fLastPageButton.setEnabled(fSdPagingProvider.hasNextPage());
+            bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", fLastPageButton); //$NON-NLS-1$
         }
 
-        if (sdExFilterProvider != null) {
-            Action action = sdExFilterProvider.getFilterAction();
+        if (fSdExFilterProvider != null) {
+            Action action = fSdExFilterProvider.getFilterAction();
             if (action != null) {
                 if (action.getId() == null)
                     action.setId("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.extendedFilter"); //$NON-NLS-1$
@@ -648,23 +643,23 @@ public class SDView extends ViewPart {
             }
         }
         // Both systems can be used now: commenting out else keyword
-        /* else */if (sdFilterProvider != null) {
-            bar.getMenuManager().appendToGroup("UML2SD_FILTERING", new OpenSDFiltersDialog(this, sdFilterProvider)); //$NON-NLS-1$	
+        /* else */if (fSdFilterProvider != null) {
+            bar.getMenuManager().appendToGroup("UML2SD_FILTERING", new OpenSDFiltersDialog(this, fSdFilterProvider)); //$NON-NLS-1$	
             // No longer in the coolbar: commenting out next statement
             //bar.getToolBarManager().appendToGroup("UML2SD_FILTERING",new OpenSDFiltersDialog(this, sdFilterProvider));	//$NON-NLS-1$	
         }
-        if (sdPagingProvider != null && sdPagingProvider instanceof ISDAdvancedPagingProvider) {
+        if (fSdPagingProvider instanceof ISDAdvancedPagingProvider) {
             IContributionItem sdPaging = bar.getMenuManager().find(OpenSDPagesDialog.ID);
             if (sdPaging != null) {
                 bar.getMenuManager().remove(sdPaging);
                 sdPaging = null;
             }
-            bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", new OpenSDPagesDialog(this, (ISDAdvancedPagingProvider) sdPagingProvider)); //$NON-NLS-1$
+            bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", new OpenSDPagesDialog(this, (ISDAdvancedPagingProvider) fSdPagingProvider)); //$NON-NLS-1$
             updatePagesMenuItem(bar);
         }
 
-        if (sdExFindProvider != null) {
-            Action action = sdExFindProvider.getFindAction();
+        if (fSdExFindProvider != null) {
+            Action action = fSdExFindProvider.getFindAction();
             if (action != null) {
                 if (action.getId() == null) {
                     action.setId("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.extendedFind"); //$NON-NLS-1$
@@ -678,13 +673,13 @@ public class SDView extends ViewPart {
                 bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", action); //$NON-NLS-1$
                 bar.getToolBarManager().appendToGroup("UML2SD_OTHER_COMMANDS", action); //$NON-NLS-1$
             }
-        } else if (sdFindProvider != null) {
+        } else if (fSdFindProvider != null) {
             bar.getMenuManager().appendToGroup("UML2SD_OTHER_COMMANDS", new OpenSDFindDialog(this)); //$NON-NLS-1$
             bar.getToolBarManager().appendToGroup("UML2SD_OTHER_COMMANDS", new OpenSDFindDialog(this)); //$NON-NLS-1$
         }
 
-        if (sdExtendedActionBarProvider != null) {
-            sdExtendedActionBarProvider.supplementCoolbarContent(bar);
+        if (fSdExtendedActionBarProvider != null) {
+            fSdExtendedActionBarProvider.supplementCoolbarContent(bar);
         }
 
         bar.updateActionBars();
@@ -697,7 +692,7 @@ public class SDView extends ViewPart {
      * 
      */
     public void updateCoolBar() {
-        if (sdPagingProvider != null) {
+        if (fSdPagingProvider != null) {
             IActionBars bar = getViewSite().getActionBars();
             if (bar == null) {
                 return;
@@ -707,34 +702,34 @@ public class SDView extends ViewPart {
                 return;
             }
             IContributionItem nextPage = barManager.find(NextPage.ID);
-            if (nextPage != null && nextPage instanceof ActionContributionItem) {
+            if (nextPage instanceof ActionContributionItem) {
                 IAction nextPageAction = ((ActionContributionItem) nextPage).getAction();
-                if (nextPageAction != null && nextPageAction instanceof NextPage) {
-                    ((NextPage) nextPageAction).setEnabled(sdPagingProvider.hasNextPage());
+                if (nextPageAction instanceof NextPage) {
+                    ((NextPage) nextPageAction).setEnabled(fSdPagingProvider.hasNextPage());
                 }
             }
 
             IContributionItem prevPage = barManager.find(PrevPage.ID);
-            if (prevPage != null && prevPage instanceof ActionContributionItem) {
+            if (prevPage instanceof ActionContributionItem) {
                 IAction prevPageAction = ((ActionContributionItem) prevPage).getAction();
-                if (prevPageAction != null && prevPageAction instanceof PrevPage) {
-                    ((PrevPage) prevPageAction).setEnabled(sdPagingProvider.hasPrevPage());
+                if (prevPageAction instanceof PrevPage) {
+                    ((PrevPage) prevPageAction).setEnabled(fSdPagingProvider.hasPrevPage());
                 }
             }
 
             IContributionItem firstPage = barManager.find(FirstPage.ID);
-            if (firstPage != null && firstPage instanceof ActionContributionItem) {
+            if (firstPage instanceof ActionContributionItem) {
                 IAction firstPageAction = ((ActionContributionItem) firstPage).getAction();
-                if (firstPageAction != null && firstPageAction instanceof FirstPage) {
-                    ((FirstPage) firstPageAction).setEnabled(sdPagingProvider.hasPrevPage());
+                if (firstPageAction instanceof FirstPage) {
+                    ((FirstPage) firstPageAction).setEnabled(fSdPagingProvider.hasPrevPage());
                 }
             }
 
             IContributionItem lastPage = barManager.find(LastPage.ID);
-            if (lastPage != null && lastPage instanceof ActionContributionItem) {
+            if (lastPage instanceof ActionContributionItem) {
                 IAction lastPageAction = ((ActionContributionItem) lastPage).getAction();
-                if (lastPageAction != null && lastPageAction instanceof LastPage) {
-                    ((LastPage) lastPageAction).setEnabled(sdPagingProvider.hasNextPage());
+                if (lastPageAction instanceof LastPage) {
+                    ((LastPage) lastPageAction).setEnabled(fSdPagingProvider.hasNextPage());
                 }
             }
             
@@ -748,7 +743,7 @@ public class SDView extends ViewPart {
      * @param bar the bar containing the action
      */
     protected void updatePagesMenuItem(IActionBars bar) {
-        if (sdPagingProvider instanceof ISDAdvancedPagingProvider) {
+        if (fSdPagingProvider instanceof ISDAdvancedPagingProvider) {
             IMenuManager menuManager = bar.getMenuManager();
             ActionContributionItem contributionItem = (ActionContributionItem) menuManager.find(OpenSDPagesDialog.ID);
             IAction openSDPagesDialog = null;
@@ -756,8 +751,8 @@ public class SDView extends ViewPart {
                 openSDPagesDialog = contributionItem.getAction();
             }
 
-            if (openSDPagesDialog != null && openSDPagesDialog instanceof OpenSDPagesDialog) {
-                openSDPagesDialog.setEnabled(((ISDAdvancedPagingProvider) sdPagingProvider).pagesCount() > 1);
+            if (openSDPagesDialog instanceof OpenSDPagesDialog) {
+                openSDPagesDialog.setEnabled(((ISDAdvancedPagingProvider) fSdPagingProvider).pagesCount() > 1);
             }
         }
     }
@@ -778,7 +773,7 @@ public class SDView extends ViewPart {
      * @param resetPosition boolean Flag whether to reset the position or not.
      */
     protected void setFrame(Frame frame, boolean resetPosition) {
-        if (sdWidget == null)
+        if (fSdWidget == null)
             return;
 
         if (frame == null) {
@@ -796,17 +791,17 @@ public class SDView extends ViewPart {
             getSDWidget().setFrame(frame, resetPosition);
         }
 
-        if (timeCompressionBar != null) {
-            timeCompressionBar.setFrame(frame);
+        if (fTimeCompressionBar != null) {
+            fTimeCompressionBar.setFrame(frame);
         }
         updateCoolBar();
         if (!frame.hasTimeInfo()) {
-            Composite parent = timeCompressionBar.getParent();
-            timeCompressionBar.setVisible(false);
+            Composite parent = fTimeCompressionBar.getParent();
+            fTimeCompressionBar.setVisible(false);
             parent.layout(true);
         } else {
-            Composite parent = timeCompressionBar.getParent();
-            timeCompressionBar.setVisible(true);
+            Composite parent = fTimeCompressionBar.getParent();
+            fTimeCompressionBar.setVisible(true);
             parent.layout(true);
         }
         IContributionItem shortKeysMenu = getViewSite().getActionBars().getMenuManager().find("org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers");//$NON-NLS-1$
@@ -954,9 +949,9 @@ public class SDView extends ViewPart {
     /**
      * Toggle between default and wait cursors from an other thread than the one executing the main loop
      * 
-     * @param wait_ <code>true</code> for wait cursor else <code>false</code> for default cursor. 
+     * @param wait <code>true</code> for wait cursor else <code>false</code> for default cursor. 
      */
-    public void toggleWaitCursorAsync(final boolean wait_) {
+    public void toggleWaitCursorAsync(final boolean wait) {
         if (getSDWidget() == null || getSDWidget().isDisposed()) {
             return;
         }
@@ -967,18 +962,18 @@ public class SDView extends ViewPart {
                 if (getSDWidget() == null || getSDWidget().isDisposed()) {
                     return;
                 }
-                if (wait_) {
-                    if (waitCursor != null && !waitCursor.isDisposed()) {
-                        waitCursor.dispose();
+                if (wait) {
+                    if (fWaitCursor != null && !fWaitCursor.isDisposed()) {
+                        fWaitCursor.dispose();
                     }
-                    waitCursor = new Cursor(getSDWidget().getDisplay(), SWT.CURSOR_WAIT);
-                    getSDWidget().setCursor(waitCursor);
+                    fWaitCursor = new Cursor(getSDWidget().getDisplay(), SWT.CURSOR_WAIT);
+                    getSDWidget().setCursor(fWaitCursor);
                     getSDWidget().getDisplay().update();
                 } else {
-                    if (waitCursor != null && !waitCursor.isDisposed()) {
-                        waitCursor.dispose();
+                    if (fWaitCursor != null && !fWaitCursor.isDisposed()) {
+                        fWaitCursor.dispose();
                     }
-                    waitCursor = null;
+                    fWaitCursor = null;
                     getSDWidget().setCursor(null);
                     getSDWidget().getDisplay().update();
                 }
@@ -992,7 +987,7 @@ public class SDView extends ViewPart {
      * @return the time compression bar 
      */
     public TimeCompressionBar getTimeCompressionBar() {
-        return timeCompressionBar;
+        return fTimeCompressionBar;
     }
 
     /**
@@ -1084,10 +1079,10 @@ public class SDView extends ViewPart {
      */
     @SuppressWarnings("rawtypes")
     @Override
-    public Object getAdapter(Class _adapter) {
-        Object obj = super.getAdapter(_adapter);
-        if (sdPropertiesProvider != null && _adapter.equals(IPropertySheetPage.class)) {
-            return sdPropertiesProvider.getPropertySheetEntry();
+    public Object getAdapter(Class adapter) {
+        Object obj = super.getAdapter(adapter);
+        if (fSdPropertiesProvider != null && adapter.equals(IPropertySheetPage.class)) {
+            return fSdPropertiesProvider.getPropertySheetEntry();
         }
 
         return obj;

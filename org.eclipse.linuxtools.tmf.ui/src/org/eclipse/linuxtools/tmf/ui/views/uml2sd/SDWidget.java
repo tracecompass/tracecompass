@@ -97,160 +97,159 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
     /**
      * The frame to display in the sequence diagram widget.
      */
-    protected Frame frame;
+    protected Frame fFrame;
     /**
      * The overview image to display.
      */
-    protected Image overView = null;
+    protected Image fOverView = null;
     /**
      * The zoom in menu item. 
      */
-    protected MenuItem zoomIn = null;
+    protected MenuItem fZoomIn = null;
     /**
      * The zoom out menu item. 
      */
-    protected MenuItem zoomOut = null;
+    protected MenuItem fZoomOut = null;
     /**
      * The sequence diagram selection provider. 
      */
-    protected SDWidgetSelectionProvider selProvider = null;
+    protected SDWidgetSelectionProvider fSelProvider = null;
     /**
      * The current zoom value. 
      */
-    public float zoomValue = 1;
+    public float fZoomValue = 1;
     /**
      * The current zoomInMode (true for zoom in). 
      */
-    protected boolean zoomInMode = false;
+    protected boolean fZoomInMode = false;
     /**
      * The current zoomOutMode (true for zoom out). 
      */
-    protected boolean zoomOutMode = false;
+    protected boolean fZoomOutMode = false;
     /**
      * The current list of selected graph nodes. 
      */
-    protected List<GraphNode> selectedNodeList = null;
+    protected List<GraphNode> fSelectedNodeList = null;
     /**
      * Flag whether ctrl button is selected or not. 
      */
-    protected boolean ctrlSelection = false;
+    protected boolean fCtrlSelection = false;
     /**
      * A reference to the view site. 
      */
-    protected ViewPart site = null;
+    protected ViewPart fSite = null;
     /**
      * The current graph node (the last selected one). 
      */
-    public GraphNode currentGraphNode = null;
+    public GraphNode fCurrentGraphNode = null;
     /**
      * The first graph node in list (multiple selection). 
      */
-    public GraphNode listStart = null;
+    public GraphNode fListStart = null;
     /**
      * The previous graph node (multiple selection). 
      */
-    public ArrayList<GraphNode> prevList = null;
+    public List<GraphNode> fPrevList = null;
     /**
      * The time compression bar.  
      */
-    protected TimeCompressionBar timeBar = null;
+    protected TimeCompressionBar fTimeBar = null;
     /**
      * The current diagram tool tip. 
      */
-    protected DiagramToolTip toolTip = null;
+    protected DiagramToolTip fToolTip = null;
     /**
      * The accessible object reference of view control.
      */
-    protected Accessible accessible = null;
+    protected Accessible fAccessible = null;
     /**
      * The current node for the tooltip to display.
      */
-    protected GraphNode toolTipNode;
+    protected GraphNode fToolTipNode;
     /**
      * The life line to drag and drop.
      */
-    protected Lifeline dragAndDrop = null;
+    protected Lifeline fDragAndDrop = null;
     /**
      * The number of focused widgets. 
      */
-    protected int focusedWidget = -1;
+    protected int fFocusedWidget = -1;
     /**
      * The printer zoom.
      */
-    protected float printerZoom = 0;
+    protected float fPrinterZoom = 0;
     /**
      * Y coordinate for printer.
      */
-    protected int printerY = 0;
+    protected int fPrinterY = 0;
     /**
      * X coordinate for printer.
      */
-    protected int printerX = 0;
+    protected int fPrinterX = 0;
     /**
      * Flag whether drag and drop is enabled or not. 
      */
-    protected boolean getDragAndDrop = false;
+    protected boolean fIsDragAndDrop = false;
     /**
      * The x coordinate for drag.
      */
-    protected int dragX = 0;
+    protected int fDragX = 0;
     /**
      * The y coordinate for drag.
      */
-    protected int dragY = 0;
+    protected int fDragY = 0;
     /**
      * The reorder mode.
      */
-    protected boolean reorderMode = false;
+    protected boolean fReorderMode = false;
     /**
      * The collapse caret image.
      */
-    protected Image collapaseCaretImg = null;
+    protected Image fCollapaseCaretImg = null;
     /**
      * The arrow up caret image.
      */
-    protected Image arrowUpCaretImg = null;
+    protected Image fArrowUpCaretImg = null;
     /**
      * The current caret image.
      */
-    protected Image currentCaretImage = null;
+    protected Image fCurrentCaretImage = null;
     /**
      * A sequence diagramm collapse provider (for collapsing graph nodes)
      */
-    protected ISDCollapseProvider collapseProvider = null;
+    protected ISDCollapseProvider fCollapseProvider = null;
     /**
      * The insertion caret.
      */
-    protected Caret insertionCartet = null;
-
+    protected Caret fInsertionCartet = null;
     /**
      * The reorder list when in reorder mode.
      */
-    protected ArrayList<Lifeline[]> reorderList = null;
+    protected ArrayList<Lifeline[]> fReorderList = null;
     /**
      * Flag to specify whether in printing mode or not.
      */
-    protected boolean printing = false;
+    protected boolean fIsPrinting = false;
     /**
      * A printer reference.
      */
-    protected Printer printer = null;
+    protected Printer fPrinter = null;
     /**
      * Flag whether shift was selected or not. 
      */
-    protected boolean shiftSelection = false;
+    protected boolean fShiftSelection = false;
     /**
      * The scroll tooltip. 
      */
-    protected DiagramToolTip scrollToolTip = null;
+    protected DiagramToolTip fScrollToolTip = null;
     /** 
      * Timer for auto_scroll feature 
      */
-    protected AutoScroll local_auto_scroll_ = null;
+    protected AutoScroll fLocalAutoScroll = null;
     /**
      * TimerTask for auto_scroll feature !=null when auto scroll is running 
      */
-    protected Timer local_auto_scroll_timer_ = null;
+    protected Timer fLocalAutoScrollTimer = null;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -263,24 +262,24 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
     public SDWidget(Composite c, int s) {
         super(c, s | SWT.NO_BACKGROUND, true);
         setOverviewEnabled(true);
-        selectedNodeList = new ArrayList<GraphNode>();
-        selProvider = new SDWidgetSelectionProvider();
+        fSelectedNodeList = new ArrayList<GraphNode>();
+        fSelProvider = new SDWidgetSelectionProvider();
         SDViewPref.getInstance().addPropertyChangeListener(this);
-        toolTip = new DiagramToolTip(getViewControl());
+        fToolTip = new DiagramToolTip(getViewControl());
         super.addDisposeListener(this);
 
-        scrollToolTip = new DiagramToolTip(c);
+        fScrollToolTip = new DiagramToolTip(c);
         getVerticalBar().addListener(SWT.MouseUp, new Listener() {
 
             @Override
             public void handleEvent(Event event) {
-                scrollToolTip.hideToolTip();
+                fScrollToolTip.hideToolTip();
             }
 
         });
-        accessible = getViewControl().getAccessible();
+        fAccessible = getViewControl().getAccessible();
 
-        accessible.addAccessibleListener(new AccessibleAdapter() {
+        fAccessible.addAccessibleListener(new AccessibleAdapter() {
             /*
              * (non-Javadoc)
              * @see org.eclipse.swt.accessibility.AccessibleAdapter#getName(org.eclipse.swt.accessibility.AccessibleEvent)
@@ -289,12 +288,12 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
             public void getName(AccessibleEvent e) {
                 // Case toolTip
                 if (e.childID == 0) {
-                    if (toolTipNode != null) {
-                        if (toolTipNode instanceof Lifeline) {
-                            Lifeline lifeline = (Lifeline) toolTipNode;
+                    if (fToolTipNode != null) {
+                        if (fToolTipNode instanceof Lifeline) {
+                            Lifeline lifeline = (Lifeline) fToolTipNode;
                             e.result = lifeline.getToolTipText();
                         } else {
-                            e.result = toolTipNode.getName() + getPostfixForTooltip(true);
+                            e.result = fToolTipNode.getName() + getPostfixForTooltip(true);
                         }
                     }
                 } else {
@@ -325,17 +324,17 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
             }
         });
 
-        accessible.addAccessibleControlListener(new AccessibleControlAdapter() {
+        fAccessible.addAccessibleControlListener(new AccessibleControlAdapter() {
             /*
              * (non-Javadoc)
              * @see org.eclipse.swt.accessibility.AccessibleControlAdapter#getFocus(org.eclipse.swt.accessibility.AccessibleControlEvent)
              */
             @Override
             public void getFocus(AccessibleControlEvent e) {
-                if (focusedWidget == -1) {
+                if (fFocusedWidget == -1) {
                     e.childID = ACC.CHILDID_SELF;
                 } else {
-                    e.childID = focusedWidget;
+                    e.childID = fFocusedWidget;
                 }
             }
 
@@ -355,6 +354,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
                 case 1:
                     e.detail = ACC.ROLE_LABEL;
                     break;
+                default:
+                    break;
                 }
             }
 
@@ -369,19 +370,19 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
                     e.detail |= ACC.STATE_FOCUSED;
                 } else {
                     e.detail |= ACC.STATE_SELECTABLE;
-                    if (e.childID == focusedWidget)
+                    if (e.childID == fFocusedWidget)
                         e.detail |= ACC.STATE_FOCUSED | ACC.STATE_SELECTED | ACC.STATE_CHECKED;
                 }
             }
         });
 
-        insertionCartet = new Caret((Canvas) getViewControl(), SWT.NONE);
-        insertionCartet.setVisible(false);
+        fInsertionCartet = new Caret((Canvas) getViewControl(), SWT.NONE);
+        fInsertionCartet.setVisible(false);
 
-        collapaseCaretImg = TmfUiPlugin.getDefault().getImageFromPath(ITmfImageConstants.IMG_UI_ARROW_COLLAPSE_OBJ);
-        arrowUpCaretImg = TmfUiPlugin.getDefault().getImageFromPath(ITmfImageConstants.IMG_UI_ARROW_UP_OBJ);
+        fCollapaseCaretImg = TmfUiPlugin.getDefault().getImageFromPath(ITmfImageConstants.IMG_UI_ARROW_COLLAPSE_OBJ);
+        fArrowUpCaretImg = TmfUiPlugin.getDefault().getImageFromPath(ITmfImageConstants.IMG_UI_ARROW_UP_OBJ);
 
-        reorderList = new ArrayList<Lifeline[]>();
+        fReorderList = new ArrayList<Lifeline[]>();
         getViewControl().addTraverseListener(new TraverseListener() {
 
             /*
@@ -422,8 +423,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
             public void focusGained(FocusEvent e) {
                 // TODO Auto-generated method stub
                 SDViewPref.getInstance().setNoFocusSelection(false);
-                ctrlSelection = false;
-                shiftSelection = false;
+                fCtrlSelection = false;
+                fShiftSelection = false;
                 redraw();
             }
 
@@ -449,8 +450,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      */
     public void setTimeBar(TimeCompressionBar bar) {
         if (bar != null) {
-            timeBar = bar;
-            timeBar.addTimeCompressionListener(this);
+            fTimeBar = bar;
+            fTimeBar.addTimeCompressionListener(this);
         }
     }
     
@@ -460,8 +461,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @param frame the frame which will be drawn in the view
      */
     public void resizeContents(Frame frame) {
-        int width = Math.round((frame.getWidth() + 2 * Metrics.FRAME_H_MARGIN) * zoomValue);
-        int height = Math.round((frame.getHeight() + 2 * Metrics.FRAME_V_MARGIN) * zoomValue);
+        int width = Math.round((frame.getWidth() + 2 * Metrics.FRAME_H_MARGIN) * fZoomValue);
+        int height = Math.round((frame.getHeight() + 2 * Metrics.FRAME_V_MARGIN) * fZoomValue);
         resizeContents(width, height);
     }
 
@@ -472,21 +473,21 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @param resetPosition boolean
      */
     public void setFrame(Frame theFrame, boolean resetPosition) {
-        reorderList.clear();
-        selectedNodeList.clear();
-        selProvider.setSelection(new StructuredSelection());
-        frame = theFrame;
+        fReorderList.clear();
+        fSelectedNodeList.clear();
+        fSelProvider.setSelection(new StructuredSelection());
+        fFrame = theFrame;
         if (resetPosition) {
             setContentsPos(0, 0);
-            resizeContents(frame);
+            resizeContents(fFrame);
             redraw();
         }
         // prepare the old overview to be reused
-        if (overView != null) {
-            overView.dispose();
+        if (fOverView != null) {
+            fOverView.dispose();
         }
-        overView = null;
-        resizeContents(frame);
+        fOverView = null;
+        resizeContents(fFrame);
     }
 
     /**
@@ -495,7 +496,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @return the frame 
      */
     public Frame getFrame() {
-        return frame;
+        return fFrame;
     }
 
     /**
@@ -504,7 +505,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @return the selection provider 
      */
     public ISelectionProvider getSelectionProvider() {
-        return selProvider;
+        return fSelProvider;
     }
     
     /**
@@ -513,7 +514,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @return a list of selected graph nodes.
      */
     public List<GraphNode> getSelection() {
-        return selectedNodeList;
+        return fSelectedNodeList;
     }
 
     /**
@@ -525,11 +526,11 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         if (node == null) {
             return;
         }
-        selectedNodeList.add(node);
+        fSelectedNodeList.add(node);
         node.setSelected(true);
-        currentGraphNode = node;
-        StructuredSelection selection = new StructuredSelection(selectedNodeList);
-        selProvider.setSelection(selection);
+        fCurrentGraphNode = node;
+        StructuredSelection selection = new StructuredSelection(fSelectedNodeList);
+        fSelProvider.setSelection(selection);
     }
 
     /**
@@ -540,13 +541,13 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
     public void addSelection(List<GraphNode> list) {
         // selectedNodeList.addAll(list);
         for (int i = 0; i < list.size(); i++) {
-            if (!selectedNodeList.contains(list.get(i))) {
-                selectedNodeList.add(list.get(i));
+            if (!fSelectedNodeList.contains(list.get(i))) {
+                fSelectedNodeList.add(list.get(i));
                 ((GraphNode) list.get(i)).setSelected(true);
             }
         }
-        StructuredSelection selection = new StructuredSelection(selectedNodeList);
-        selProvider.setSelection(selection);
+        StructuredSelection selection = new StructuredSelection(fSelectedNodeList);
+        fSelProvider.setSelection(selection);
     }
 
     /**
@@ -555,11 +556,11 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @param node to remove
      */
     public void removeSelection(GraphNode node) {
-        selectedNodeList.remove(node);
+        fSelectedNodeList.remove(node);
         node.setSelected(false);
         node.setFocused(false);
-        StructuredSelection selection = new StructuredSelection(selectedNodeList);
-        selProvider.setSelection(selection);
+        StructuredSelection selection = new StructuredSelection(fSelectedNodeList);
+        fSelProvider.setSelection(selection);
     }
 
     /**
@@ -568,26 +569,26 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @param list of nodes to remove.
      */
     public void removeSelection(List<GraphNode> list) {
-        selectedNodeList.removeAll(list);
+        fSelectedNodeList.removeAll(list);
         for (int i = 0; i < list.size(); i++) {
             ((GraphNode) list.get(i)).setSelected(false);
             ((GraphNode) list.get(i)).setFocused(false);
         }
-        StructuredSelection selection = new StructuredSelection(selectedNodeList);
-        selProvider.setSelection(selection);
+        StructuredSelection selection = new StructuredSelection(fSelectedNodeList);
+        fSelProvider.setSelection(selection);
     }
 
     /**
      * Clear the list of GraphNodes which must be drawn selected.
      */
     public void clearSelection() {
-        for (int i = 0; i < selectedNodeList.size(); i++) {
-            ((GraphNode) selectedNodeList.get(i)).setSelected(false);
-            ((GraphNode) selectedNodeList.get(i)).setFocused(false);
+        for (int i = 0; i < fSelectedNodeList.size(); i++) {
+            ((GraphNode) fSelectedNodeList.get(i)).setSelected(false);
+            ((GraphNode) fSelectedNodeList.get(i)).setFocused(false);
         }
-        currentGraphNode = null;
-        selectedNodeList.clear();
-        selProvider.setSelection(new StructuredSelection());
+        fCurrentGraphNode = null;
+        fSelectedNodeList.clear();
+        fSelProvider.setSelection(new StructuredSelection());
     }
 
     /**
@@ -596,9 +597,9 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @param viewSite The view part to set
      */
     public void setSite(ViewPart viewSite) {
-        site = viewSite;
-        site.getSite().setSelectionProvider(selProvider);
-        IContextService service = (IContextService) site.getSite().getWorkbenchWindow().getService(IContextService.class);
+        fSite = viewSite;
+        fSite.getSite().setSelectionProvider(fSelProvider);
+        IContextService service = (IContextService) fSite.getSite().getWorkbenchWindow().getService(IContextService.class);
         service.activateContext("org.eclipse.linuxtools.tmf.ui.view.uml2sd.context"); //$NON-NLS-1$
         service.activateContext(IContextIds.CONTEXT_ID_WINDOW);
     }
@@ -609,7 +610,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @return the current graph node 
      * */
     public GraphNode getMouseOverNode() {
-        return currentGraphNode;
+        return fCurrentGraphNode;
     }
     
     /**
@@ -621,7 +622,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         if (value) {
             setZoomOutMode(false);
         }
-        zoomInMode = value;
+        fZoomInMode = value;
     }
 
     /**
@@ -633,7 +634,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         if (value) {
             setZoomInMode(false);
         }
-        zoomOutMode = value;
+        fZoomOutMode = value;
     }
 
     /**
@@ -659,16 +660,14 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         if (node == null) {
             return;
         }
-        int x = Math.round(node.getX() * zoomValue);
-        int y = Math.round(node.getY() * zoomValue);
-        int width = Math.round(node.getWidth() * zoomValue);
-        int height = Math.round(node.getHeight() * zoomValue);
-        if (node instanceof BaseMessage) {
-            if (height == 0) {
-                int header = Metrics.LIFELINE_HEARDER_TEXT_V_MARGIN * 2 + Metrics.getLifelineHeaderFontHeigth();
-                height = -Math.round((Metrics.getMessagesSpacing() + header) * zoomValue);
-                y = y + Math.round(Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT * zoomValue);
-            }
+        int x = Math.round(node.getX() * fZoomValue);
+        int y = Math.round(node.getY() * fZoomValue);
+        int width = Math.round(node.getWidth() * fZoomValue);
+        int height = Math.round(node.getHeight() * fZoomValue);
+        if ((node instanceof BaseMessage) && (height == 0)) {
+            int header = Metrics.LIFELINE_HEARDER_TEXT_V_MARGIN * 2 + Metrics.getLifelineHeaderFontHeigth();
+            height = -Math.round((Metrics.getMessagesSpacing() + header) * fZoomValue);
+            y = y + Math.round(Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT * fZoomValue);
         }
         if (node instanceof BasicExecutionOccurrence) {
             width = 1;
@@ -687,7 +686,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @return the current zoom factor.
      */
     public float getZoomFactor() {
-        return zoomValue;
+        return fZoomValue;
     }
 
     /**
@@ -696,7 +695,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @return the printer reference
      */
     public Printer getPrinter() {
-        return printer;
+        return fPrinter;
     }
 
     /**
@@ -705,7 +704,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @return whether the widget is used for printing or not
      */
     public boolean isPrinting() {
-        return printing;
+        return fIsPrinting;
     }
 
     /**
@@ -715,37 +714,37 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @return the overview image
      */
     public Image getOverview(Rectangle rect) {
-        float oldzoom = zoomValue;
-        if ((overView != null) && ((rect.width != overView.getBounds().width) || (rect.height != overView.getBounds().height))) {
-            overView.dispose();
-            overView = null;
+        float oldzoom = fZoomValue;
+        if ((fOverView != null) && ((rect.width != fOverView.getBounds().width) || (rect.height != fOverView.getBounds().height))) {
+            fOverView.dispose();
+            fOverView = null;
         }
-        if (overView == null) {
+        if (fOverView == null) {
             int backX = getContentsX();
             int backY = getContentsY();
             setContentsPos(0, 0);
-            overView = new Image(getDisplay(), rect.width, rect.height);
-            GC gcim = new GC(overView);
+            fOverView = new Image(getDisplay(), rect.width, rect.height);
+            GC gcim = new GC(fOverView);
             NGC context = new NGC(this, gcim);
             context.setBackground(SDViewPref.getInstance().getBackGroundColor(SDViewPref.PREF_FRAME));
-            frame.draw(context);
+            fFrame.draw(context);
             setContentsPos(backX, backY);
             gcim.dispose();
             context.dispose();
         }
-        zoomValue = oldzoom;
-        return overView;
+        fZoomValue = oldzoom;
+        return fOverView;
     }
     
     /**
      * Resets the zoom factor.
      */
     public void resetZoomFactor() {
-        int currentX = Math.round(getContentsX() / zoomValue);
-        int currentY = Math.round(getContentsY() / zoomValue);
-        zoomValue = 1;
-        if (timeBar != null && !timeBar.isDisposed()) {
-            timeBar.setZoom(zoomValue);
+        int currentX = Math.round(getContentsX() / fZoomValue);
+        int currentY = Math.round(getContentsY() / fZoomValue);
+        fZoomValue = 1;
+        if (fTimeBar != null && !fTimeBar.isDisposed()) {
+            fTimeBar.setZoom(fZoomValue);
         }
         redraw();
         update();
@@ -758,7 +757,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @param mode - true to enable false otherwise
      */
     public void setReorderMode(boolean mode) {
-        reorderMode = mode;
+        fReorderMode = mode;
     }
 
     /**
@@ -768,7 +767,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @return - the re-odered sequence 
      */
     public ArrayList<Lifeline[]> getLifelineReoderList() {
-        return reorderList;
+        return fReorderList;
     }
 
     /**
@@ -780,10 +779,10 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         if (node == null) {
             return;
         }
-        if (currentGraphNode != null) {
-            currentGraphNode.setFocused(false);
+        if (fCurrentGraphNode != null) {
+            fCurrentGraphNode.setFocused(false);
         }
-        currentGraphNode = node;
+        fCurrentGraphNode = node;
         node.setFocused(true);
         ensureVisible(node);
         setFocus(0);
@@ -795,7 +794,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @return the current graph node
      */
     public GraphNode getFocusNode() {
-        return currentGraphNode;
+        return fCurrentGraphNode;
     }
 
     /**
@@ -807,18 +806,16 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
             traverseLeft();
         }
         GraphNode node = null;
-        if (selectedNode instanceof BaseMessage) {
-            if (((BaseMessage) selectedNode).getEndLifeline() != null) {
-                node = frame.getCalledMessage((BaseMessage) selectedNode);
-            }
+        if ((selectedNode instanceof BaseMessage) && (((BaseMessage) selectedNode).getEndLifeline() != null)) {
+            node = fFrame.getCalledMessage((BaseMessage) selectedNode);
         }
         if (selectedNode instanceof BasicExecutionOccurrence) {
             selectedNode = ((BasicExecutionOccurrence) selectedNode).getLifeline();
         }
         if ((node == null) && (selectedNode instanceof Lifeline)) {
-            for (int i = 0; i < frame.lifeLinesCount(); i++) {
-                if ((selectedNode == frame.getLifeline(i)) && (i < frame.lifeLinesCount() - 1)) {
-                    node = frame.getLifeline(i + 1);
+            for (int i = 0; i < fFrame.lifeLinesCount(); i++) {
+                if ((selectedNode == fFrame.getLifeline(i)) && (i < fFrame.lifeLinesCount() - 1)) {
+                    node = fFrame.getLifeline(i + 1);
                     break;
                 }
             }
@@ -835,28 +832,24 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
     public void traverseLeft() {
         Object selectedNode = getFocusNode();
         GraphNode node = null;
-        if (selectedNode instanceof BaseMessage) {
-            if (((BaseMessage) selectedNode).getStartLifeline() != null) {
-                node = frame.getCallerMessage((BaseMessage) selectedNode);
-            }
+        if ((selectedNode instanceof BaseMessage) && (((BaseMessage) selectedNode).getStartLifeline() != null)) {
+            node = fFrame.getCallerMessage((BaseMessage) selectedNode);
         }
         if (selectedNode instanceof BasicExecutionOccurrence) {
             selectedNode = ((BasicExecutionOccurrence) selectedNode).getLifeline();
         }
         if (node == null) {
-            if (selectedNode instanceof BaseMessage) {
-                if (((BaseMessage) selectedNode).getEndLifeline() != null) {
-                    selectedNode = ((BaseMessage) selectedNode).getEndLifeline();
-                }
+            if ((selectedNode instanceof BaseMessage) && (((BaseMessage) selectedNode).getEndLifeline() != null)) {
+                selectedNode = ((BaseMessage) selectedNode).getEndLifeline();
             }
-            for (int i = 0; i < frame.lifeLinesCount(); i++) {
-                if ((selectedNode == frame.getLifeline(i)) && (i > 0)) {
-                    node = frame.getLifeline(i - 1);
+            for (int i = 0; i < fFrame.lifeLinesCount(); i++) {
+                if ((selectedNode == fFrame.getLifeline(i)) && (i > 0)) {
+                    node = fFrame.getLifeline(i - 1);
                     break;
                 }
             }
-            if ((frame.lifeLinesCount() > 0) && (node == null)) {
-                node = frame.getLifeline(0);
+            if ((fFrame.lifeLinesCount() > 0) && (node == null)) {
+                node = fFrame.getLifeline(0);
             }
         }
         if (node != null) {
@@ -875,24 +868,20 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         }
         GraphNode node = null;
         if (selectedNode instanceof BaseMessage) {
-            node = frame.getPrevLifelineMessage(((BaseMessage) selectedNode).getStartLifeline(), (BaseMessage) selectedNode);
+            node = fFrame.getPrevLifelineMessage(((BaseMessage) selectedNode).getStartLifeline(), (BaseMessage) selectedNode);
         } else if (selectedNode instanceof Lifeline) {
-            node = frame.getPrevLifelineMessage((Lifeline) selectedNode, null);
+            node = fFrame.getPrevLifelineMessage((Lifeline) selectedNode, null);
             if (!(node instanceof Lifeline)) {
                 node = null;
             }
         } else if (selectedNode instanceof BasicExecutionOccurrence) {
-            node = frame.getPrevExecOccurrence((BasicExecutionOccurrence) selectedNode);
+            node = fFrame.getPrevExecOccurrence((BasicExecutionOccurrence) selectedNode);
             if (node == null) {
                 node = ((BasicExecutionOccurrence) selectedNode).getLifeline();
             }
         }
-        if (node == null) {
-            if (selectedNode instanceof BaseMessage) {
-                if (((BaseMessage) selectedNode).getStartLifeline() != null) {
-                    node = ((BaseMessage) selectedNode).getStartLifeline();
-                }
-            }
+        if ((node == null) && (selectedNode instanceof BaseMessage) && (((BaseMessage) selectedNode).getStartLifeline() != null)) {
+            node = ((BaseMessage) selectedNode).getStartLifeline();
         }
 
         if (node != null) {
@@ -911,12 +900,12 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         }
         GraphNode node;
         if (selectedNode instanceof BaseMessage) {
-            node = frame.getNextLifelineMessage(((BaseMessage) selectedNode).getStartLifeline(), (BaseMessage) selectedNode);
+            node = fFrame.getNextLifelineMessage(((BaseMessage) selectedNode).getStartLifeline(), (BaseMessage) selectedNode);
         } else if (selectedNode instanceof Lifeline) {
             // node = frame.getNextLifelineMessage((Lifeline)selectedNode,null);
-            node = frame.getFirstExecution((Lifeline) selectedNode);
+            node = fFrame.getFirstExecution((Lifeline) selectedNode);
         } else if (selectedNode instanceof BasicExecutionOccurrence) {
-            node = frame.getNextExecOccurrence((BasicExecutionOccurrence) selectedNode);
+            node = fFrame.getNextExecOccurrence((BasicExecutionOccurrence) selectedNode);
         } else {
             return;
         }
@@ -939,18 +928,18 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         
         if (selectedNode instanceof BaseMessage) {
             if (((BaseMessage) selectedNode).getStartLifeline() != null) {
-                node = frame.getNextLifelineMessage(((BaseMessage) selectedNode).getStartLifeline(), null);
+                node = fFrame.getNextLifelineMessage(((BaseMessage) selectedNode).getStartLifeline(), null);
             } else {
-                node = frame.getNextLifelineMessage(((BaseMessage) selectedNode).getEndLifeline(), null);
+                node = fFrame.getNextLifelineMessage(((BaseMessage) selectedNode).getEndLifeline(), null);
             }
         } else if (selectedNode instanceof Lifeline) {
-            node = frame.getNextLifelineMessage((Lifeline) selectedNode, null);
+            node = fFrame.getNextLifelineMessage((Lifeline) selectedNode, null);
         } else if (selectedNode instanceof BasicExecutionOccurrence) {
-            node = frame.getFirstExecution(((BasicExecutionOccurrence) selectedNode).getLifeline());
+            node = fFrame.getFirstExecution(((BasicExecutionOccurrence) selectedNode).getLifeline());
         } else {
-            if (frame.lifeLinesCount() > 0) {
-                Lifeline lifeline = frame.getLifeline(0);
-                node = frame.getNextLifelineMessage(lifeline, null);
+            if (fFrame.lifeLinesCount() > 0) {
+                Lifeline lifeline = fFrame.getLifeline(0);
+                node = fFrame.getNextLifelineMessage(lifeline, null);
             }
         }
 
@@ -970,15 +959,15 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         }
         GraphNode node;
         if (selectedNode instanceof BaseMessage) {
-            node = frame.getPrevLifelineMessage(((BaseMessage) selectedNode).getStartLifeline(), null);
+            node = fFrame.getPrevLifelineMessage(((BaseMessage) selectedNode).getStartLifeline(), null);
         } else if (selectedNode instanceof Lifeline) {
-            node = frame.getPrevLifelineMessage((Lifeline) selectedNode, null);
+            node = fFrame.getPrevLifelineMessage((Lifeline) selectedNode, null);
         } else if (selectedNode instanceof BasicExecutionOccurrence) {
-            node = frame.getLastExecOccurrence(((BasicExecutionOccurrence) selectedNode).getLifeline());
+            node = fFrame.getLastExecOccurrence(((BasicExecutionOccurrence) selectedNode).getLifeline());
         } else {
-            if (frame.lifeLinesCount() > 0) {
-                Lifeline lifeline = frame.getLifeline(0);
-                node = frame.getPrevLifelineMessage(lifeline, null);
+            if (fFrame.lifeLinesCount() > 0) {
+                Lifeline lifeline = fFrame.getLifeline(0);
+                node = fFrame.getPrevLifelineMessage(lifeline, null);
             } else {
                 return;
             }
@@ -998,19 +987,19 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
     public void printUI(SDPrintDialogUI sdPrintDialog) {
         PrinterData data = sdPrintDialog.getPrinterData();
 
-        if ((data == null) || (frame == null)) {
+        if ((data == null) || (fFrame == null)) {
             return;
         }
         
-        printer = new Printer(data);
+        fPrinter = new Printer(data);
         
-        String jobName = MessageFormat.format(SDMessages._116, new Object[] { String.valueOf(site.getContentDescription()), String.valueOf(frame.getName()) });
-        printer.startJob(jobName);
+        String jobName = MessageFormat.format(SDMessages._116, new Object[] { String.valueOf(fSite.getContentDescription()), String.valueOf(fFrame.getName()) });
+        fPrinter.startJob(jobName);
         
-        GC gc = new GC(printer);
+        GC gc = new GC(fPrinter);
         Frame.setUserPref(SDViewPref.getInstance());
 
-        float lastZoom = zoomValue;
+        float lastZoom = fZoomValue;
 
         Rectangle area = getClientArea();
         GC gcim = null;
@@ -1046,8 +1035,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         Metrics.setMessageFontHeight(messageFontHeight);
         context.setFont(SDViewPref.getInstance().getFont(SDViewPref.PREF_LIFELINE));
 
-        int width = Math.round((frame.getWidth() + 2 * Metrics.FRAME_H_MARGIN) * zoomValue);
-        int height = Math.round((frame.getHeight() + 2 * Metrics.FRAME_V_MARGIN) * zoomValue);
+        int width = Math.round((fFrame.getWidth() + 2 * Metrics.FRAME_H_MARGIN) * fZoomValue);
+        int height = Math.round((fFrame.getHeight() + 2 * Metrics.FRAME_V_MARGIN) * fZoomValue);
         if (width < area.width) {
             width = area.width;
         }
@@ -1058,29 +1047,26 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
         context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_FRAME));
         context.fillRectangle(0, 0, getContentsWidth(), Metrics.FRAME_V_MARGIN);
-        context.fillRectangle(0, 0, frame.getX(), getContentsHeight());
-        context.fillRectangle(frame.getX() + frame.getWidth() + 1, 0, getContentsWidth() - (frame.getX() + frame.getWidth() + 1), getContentsHeight());
-        context.fillRectangle(0, frame.getY() + frame.getHeight() + 1, getContentsWidth(), getContentsHeight() - (frame.getY() + frame.getHeight() + 1));
+        context.fillRectangle(0, 0, fFrame.getX(), getContentsHeight());
+        context.fillRectangle(fFrame.getX() + fFrame.getWidth() + 1, 0, getContentsWidth() - (fFrame.getX() + fFrame.getWidth() + 1), getContentsHeight());
+        context.fillRectangle(0, fFrame.getY() + fFrame.getHeight() + 1, getContentsWidth(), getContentsHeight() - (fFrame.getY() + fFrame.getHeight() + 1));
         gcim.setLineWidth(1);
 
-        printer.startPage();
-        zoomValue = lastZoom;
+        fPrinter.startPage();
+        fZoomValue = lastZoom;
 
         int restoreX = getContentsX();
         int restoreY = getContentsY();
 
-        float zh = getContentsHeight();
-        float zw = getContentsWidth();
+        float zh = sdPrintDialog.getStepY() * sdPrintDialog.getZoomFactor();
+        float zw = sdPrintDialog.getStepX() * sdPrintDialog.getZoomFactor();
 
-        zh = sdPrintDialog.getStepY() * sdPrintDialog.getZoomFactor();
-        zw = sdPrintDialog.getStepX() * sdPrintDialog.getZoomFactor();
-
-        float zoomValueH = printer.getClientArea().height / zh;
-        float zoomValueW = printer.getClientArea().width / zw;
+        float zoomValueH = fPrinter.getClientArea().height / zh;
+        float zoomValueW = fPrinter.getClientArea().width / zw;
         if (zoomValueH > zoomValueW) {
-            printerZoom = zoomValueH;
+            fPrinterZoom = zoomValueH;
         } else {
-            printerZoom = zoomValueW;
+            fPrinterZoom = zoomValueW;
         }
 
         if (sdPrintDialog.printSelection()) {
@@ -1101,14 +1087,14 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
             }
         }
 
-        printer.endJob();
-        printing = false;
+        fPrinter.endJob();
+        fIsPrinting = false;
 
         gc.dispose();
         context.dispose();
 
-        zoomValue = lastZoom;
-        printer.dispose();
+        fZoomValue = lastZoom;
+        fPrinter.dispose();
         setContentsPos(restoreX, restoreY);
     }
 
@@ -1152,7 +1138,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
         printPage(i, j, pd, context, pageNum);
 
-        printer.endPage();
+        fPrinter.endPage();
     }
 
     /**
@@ -1165,29 +1151,29 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @param pageNum int the current page
      */
     public void printPage(int i, int j, SDPrintDialogUI pd, NGC context, int pageNum) {
-        printing = false;
-        int pageNumFontZoom = printer.getClientArea().height / getVisibleHeight();
-        printerX = i;
-        printerY = j;
+        fIsPrinting = false;
+        int pageNumFontZoom = fPrinter.getClientArea().height / getVisibleHeight();
+        fPrinterX = i;
+        fPrinterY = j;
         setContentsPos(i, j);
         update();
-        printing = true;
-        float lastZoom = zoomValue;
-        zoomValue = printerZoom * lastZoom;
+        fIsPrinting = true;
+        float lastZoom = fZoomValue;
+        fZoomValue = fPrinterZoom * lastZoom;
 
-        frame.draw(context);
+        fFrame.draw(context);
 
-        zoomValue = pageNumFontZoom;
+        fZoomValue = pageNumFontZoom;
         context.setFont(SDViewPref.getInstance().getFont(SDViewPref.PREF_LIFELINE));
         String currentPageNum = String.valueOf(pageNum);
         int ii = context.textExtent(currentPageNum);
         int jj = context.getCurrentFontHeight();
         // context.setBackground(ColorImpl.getSystemColor(SWT.COLOR_BLACK));
         // context.setForeground(ColorImpl.getSystemColor(SWT.COLOR_WHITE));
-        zoomValue = printerZoom * lastZoom;
-        context.drawText(currentPageNum, Math.round(printerX + getVisibleWidth() / printerZoom - ii / printerZoom), Math.round(printerY + getVisibleHeight() / printerZoom - jj / printerZoom), false);
-        printing = false;
-        zoomValue = lastZoom;
+        fZoomValue = fPrinterZoom * lastZoom;
+        context.drawText(currentPageNum, Math.round(fPrinterX + getVisibleWidth() / fPrinterZoom - ii / fPrinterZoom), Math.round(fPrinterY + getVisibleHeight() / fPrinterZoom - jj / fPrinterZoom), false);
+        fIsPrinting = false;
+        fZoomValue = lastZoom;
     }
     
     /**
@@ -1196,7 +1182,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @param provider The collapse provider to set
      */
     protected void setCollapseProvider(ISDCollapseProvider provider) {
-        collapseProvider = provider;
+        fCollapseProvider = provider;
     }
 
     
@@ -1230,24 +1216,24 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         String postfix = "";//$NON-NLS-1$
         // Determine if the tooltip must show the time difference between the current mouse position and
         // the last selected graphNode
-        if ((currentGraphNode != null) && 
-                (currentGraphNode instanceof ITimeRange) && 
-                (toolTipNode instanceof ITimeRange) && 
-                (currentGraphNode != toolTipNode) && 
-                ((ITimeRange) toolTipNode).hasTimeInfo() && 
-                ((ITimeRange) currentGraphNode).hasTimeInfo()) {
-            postfix = " -> " + currentGraphNode.getName() + "\n" + SDMessages._138 + " "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
+        if ((fCurrentGraphNode != null) && 
+                (fCurrentGraphNode instanceof ITimeRange) && 
+                (fToolTipNode instanceof ITimeRange) && 
+                (fCurrentGraphNode != fToolTipNode) && 
+                ((ITimeRange) fToolTipNode).hasTimeInfo() && 
+                ((ITimeRange) fCurrentGraphNode).hasTimeInfo()) {
+            postfix = " -> " + fCurrentGraphNode.getName() + "\n" + SDMessages._138 + " "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
             
             //double delta = ((ITimeRange)toolTipNode).getLastTime()-((ITimeRange)currentGraphNode).getLastTime();
-            ITmfTimestamp firstTime = ((ITimeRange) currentGraphNode).getEndTime();
-            ITmfTimestamp lastTime = ((ITimeRange) toolTipNode).getEndTime();
+            ITmfTimestamp firstTime = ((ITimeRange) fCurrentGraphNode).getEndTime();
+            ITmfTimestamp lastTime = ((ITimeRange) fToolTipNode).getEndTime();
             TmfTimestamp delta = (TmfTimestamp) lastTime.getDelta(firstTime);
             postfix += delta.toString();
         } else {
-            if ((toolTipNode instanceof ITimeRange) && ((ITimeRange) toolTipNode).hasTimeInfo()) {
+            if ((fToolTipNode instanceof ITimeRange) && ((ITimeRange) fToolTipNode).hasTimeInfo()) {
                 postfix = "\n";//$NON-NLS-1$
-                ITmfTimestamp firstTime = ((ITimeRange) toolTipNode).getStartTime();
-                ITmfTimestamp lastTime = ((ITimeRange) toolTipNode).getEndTime();  
+                ITmfTimestamp firstTime = ((ITimeRange) fToolTipNode).getStartTime();
+                ITmfTimestamp lastTime = ((ITimeRange) fToolTipNode).getEndTime();  
                 
                 if (firstTime != null) {
                     if (lastTime != null && firstTime.compareTo(lastTime, true) != 0) {
@@ -1271,11 +1257,11 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @param newFocusShape A new focus shape.
      */
     protected void setFocus(int newFocusShape) {
-        focusedWidget = newFocusShape;
-        if (focusedWidget == -1) {
+        fFocusedWidget = newFocusShape;
+        if (fFocusedWidget == -1) {
             getViewControl().getAccessible().setFocus(ACC.CHILDID_SELF);
         } else {
-            getViewControl().getAccessible().setFocus(focusedWidget);
+            getViewControl().getAccessible().setFocus(fFocusedWidget);
         }
     }
 
@@ -1286,9 +1272,9 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @param node the GraphNode to highlight
      */
     protected void performSelection(GraphNode node) {
-        if ((ctrlSelection) || (shiftSelection)) {
+        if ((fCtrlSelection) || (fShiftSelection)) {
             if (node != null) {
-                if (selectedNodeList.contains(node)) {
+                if (fSelectedNodeList.contains(node)) {
                     removeSelection(node);
                 } else {
                     addSelection(node);
@@ -1354,26 +1340,26 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         Metrics.setMessageFontHeight(messageFontHeight);
         context.setFont(SDViewPref.getInstance().getFont(SDViewPref.PREF_LIFELINE));
 
-        int width = (int) ((frame.getWidth() + 2 * Metrics.FRAME_H_MARGIN) * zoomValue);
-        int height = (int) ((frame.getHeight() + 2 * Metrics.FRAME_V_MARGIN) * zoomValue);
+        int width = (int) ((fFrame.getWidth() + 2 * Metrics.FRAME_H_MARGIN) * fZoomValue);
+        int height = (int) ((fFrame.getHeight() + 2 * Metrics.FRAME_V_MARGIN) * fZoomValue);
 
         resizeContents(width, height);
 
         context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_FRAME));
         context.fillRectangle(0, 0, getContentsWidth(), Metrics.FRAME_V_MARGIN);
-        context.fillRectangle(0, 0, frame.getX(), getContentsHeight());
-        context.fillRectangle(frame.getX() + frame.getWidth() + 1, 0, getContentsWidth() - (frame.getX() + frame.getWidth() + 1), getContentsHeight());
-        context.fillRectangle(0, frame.getY() + frame.getHeight() + 1, getContentsWidth(), getContentsHeight() - (frame.getY() + frame.getHeight() + 1));
+        context.fillRectangle(0, 0, fFrame.getX(), getContentsHeight());
+        context.fillRectangle(fFrame.getX() + fFrame.getWidth() + 1, 0, getContentsWidth() - (fFrame.getX() + fFrame.getWidth() + 1), getContentsHeight());
+        context.fillRectangle(0, fFrame.getY() + fFrame.getHeight() + 1, getContentsWidth(), getContentsHeight() - (fFrame.getY() + fFrame.getHeight() + 1));
         gcim.setLineWidth(1);
 
-        frame.draw(context);
-        if (dragAndDrop != null) {
-            Lifeline node = (Lifeline) dragAndDrop;
-            boolean isSelected = dragAndDrop.isSelected();
-            boolean hasFocus = dragAndDrop.hasFocus();
+        fFrame.draw(context);
+        if (fDragAndDrop != null) {
+            Lifeline node = (Lifeline) fDragAndDrop;
+            boolean isSelected = fDragAndDrop.isSelected();
+            boolean hasFocus = fDragAndDrop.hasFocus();
             node.setSelected(false);
             node.setFocused(false);
-            node.draw(context, dragX, dragY);
+            node.draw(context, fDragX, fDragY);
             node.setSelected(isSelected);
             node.setFocused(hasFocus);
         }
@@ -1391,23 +1377,21 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         if (!(isFocusControl() || getViewControl().isFocusControl())) {
             Control[] child = getParent().getChildren();
             for (int i = 0; i < child.length; i++) {
-                if (child[i].isFocusControl()) {
-                    if (!(child[i] instanceof ScrollView)) {
-                        getViewControl().setFocus();
-                        break;
-                    }
+                if ((child[i].isFocusControl())&& (!(child[i] instanceof ScrollView))) {
+                    getViewControl().setFocus();
+                    break;
                 }
             }
         }
         setFocus(-1);
 
         if (event.keyCode == SWT.CTRL) {
-            ctrlSelection = true;
+            fCtrlSelection = true;
         }
         if (event.keyCode == SWT.SHIFT) {
-            shiftSelection = true;
-            prevList = new ArrayList<GraphNode>();
-            prevList.addAll(getSelection());
+            fShiftSelection = true;
+            fPrevList = new ArrayList<GraphNode>();
+            fPrevList.addAll(getSelection());
         }
 
         GraphNode prevNode = getFocusNode();
@@ -1436,26 +1420,26 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
             traverseEnd();
         }
 
-        if ((!shiftSelection) && (!ctrlSelection)) {
-            listStart = currentGraphNode;
+        if ((!fShiftSelection) && (!fCtrlSelection)) {
+            fListStart = fCurrentGraphNode;
         }
 
         if (event.character == ' ') {
-            performSelection(currentGraphNode);
-            if (!shiftSelection)
-                listStart = currentGraphNode;
+            performSelection(fCurrentGraphNode);
+            if (!fShiftSelection)
+                fListStart = fCurrentGraphNode;
         }
 
-        if ((shiftSelection) && (prevNode != getFocusNode())) {
+        if ((fShiftSelection) && (prevNode != getFocusNode())) {
             clearSelection();
-            addSelection(prevList);
-            addSelection(frame.getNodeList(listStart, getFocusNode()));
+            addSelection(fPrevList);
+            addSelection(fFrame.getNodeList(fListStart, getFocusNode()));
             if (getFocusNode() instanceof Lifeline) {
                 ensureVisible(getFocusNode().getX(), getFocusNode().getY(), getFocusNode().getWidth(), getFocusNode().getHeight(), SWT.CENTER | SWT.VERTICAL, true);
             } else { 
                 ensureVisible(getFocusNode());
             }
-        } else if ((!ctrlSelection) && (!shiftSelection)) {
+        } else if ((!fCtrlSelection) && (!fShiftSelection)) {
 
             clearSelection();
             if (getFocusNode() != null) {
@@ -1469,26 +1453,26 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
             }
         }
 
-        if (currentGraphNode != null) {
-            currentGraphNode.setFocused(true);
+        if (fCurrentGraphNode != null) {
+            fCurrentGraphNode.setFocused(true);
         }
         redraw();
 
-        if ((event.character == ' ') && ((zoomInMode) || (zoomOutMode))) {
-            int cx = Math.round((getContentsX() + getVisibleWidth() / 2) / zoomValue);
-            int cy = Math.round((getContentsY() + getVisibleHeight() / 2) / zoomValue);
-            if (zoomInMode) {
-                if (zoomValue < 64) {
-                    zoomValue = zoomValue * (float) 1.25;
+        if ((event.character == ' ') && ((fZoomInMode) || (fZoomOutMode))) {
+            int cx = Math.round((getContentsX() + getVisibleWidth() / 2) / fZoomValue);
+            int cy = Math.round((getContentsY() + getVisibleHeight() / 2) / fZoomValue);
+            if (fZoomInMode) {
+                if (fZoomValue < 64) {
+                    fZoomValue = fZoomValue * (float) 1.25;
                 }
             } else {
-                zoomValue = zoomValue / (float) 1.25;
+                fZoomValue = fZoomValue / (float) 1.25;
             }
-            int x = Math.round(cx * zoomValue - getVisibleWidth() / (float) 2);
-            int y = Math.round(cy * zoomValue - getVisibleHeight() / (float) 2);
+            int x = Math.round(cx * fZoomValue - getVisibleWidth() / (float) 2);
+            int y = Math.round(cy * fZoomValue - getVisibleHeight() / (float) 2);
             setContentsPos(x, y);
-            if (timeBar != null) {
-                timeBar.setZoom(zoomValue);
+            if (fTimeBar != null) {
+                fTimeBar.setZoom(fZoomValue);
             }
             // redraw also resize the scrollView content
             redraw();
@@ -1503,9 +1487,9 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
     protected void keyReleasedEvent(KeyEvent event) {
         setFocus(-1);
         if (event.keyCode == SWT.CTRL)
-            ctrlSelection = false;
+            fCtrlSelection = false;
         if (event.keyCode == SWT.SHIFT)
-            shiftSelection = false;
+            fShiftSelection = false;
         super.keyReleasedEvent(event);
         setFocus(1);
     }
@@ -1533,32 +1517,35 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      */
     @Override
     public boolean setContentsPos(int x, int y) {
-        if (x < 0) {
-            x = 0;
+        int localX = x;
+        int localY = y;
+        
+        if (localX < 0) {
+            localX = 0;
         }
-        if (y < 0) {
-            y = 0;
+        if (localY < 0) {
+            localY = 0;
         }
-        if (frame == null) {
+        if (fFrame == null) {
             return false;
         }
-        if (x + getVisibleWidth() > getContentsWidth()) {
-            x = getContentsWidth() - getVisibleWidth();
+        if (localX + getVisibleWidth() > getContentsWidth()) {
+            localX = getContentsWidth() - getVisibleWidth();
         }
-        if (y + getVisibleHeight() > getContentsHeight()) {
-            y = getContentsHeight() - getVisibleHeight();
+        if (localY + getVisibleHeight() > getContentsHeight()) {
+            localY = getContentsHeight() - getVisibleHeight();
         }
-        int x1 = Math.round(x / zoomValue);
-        int y2 = Math.round(y / zoomValue);
-        int width = Math.round(getVisibleWidth() / zoomValue);
-        int height = Math.round(getVisibleHeight() / zoomValue);
-        frame.updateIndex(x1, y2, width, height);
+        int x1 = Math.round(localX / fZoomValue);
+        int y2 = Math.round(localY / fZoomValue);
+        int width = Math.round(getVisibleWidth() / fZoomValue);
+        int height = Math.round(getVisibleHeight() / fZoomValue);
+        fFrame.updateIndex(x1, y2, width, height);
 
-        if (insertionCartet != null && insertionCartet.isVisible()) {
-            insertionCartet.setVisible(false);
+        if (fInsertionCartet != null && fInsertionCartet.isVisible()) {
+            fInsertionCartet.setVisible(false);
         }
 
-        return super.setContentsPos(x, y);
+        return super.setContentsPos(localX, localY);
     }
 
     /*
@@ -1568,23 +1555,23 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
     @Override
     protected void contentsMouseHover(MouseEvent event) {
         GraphNode graphNode = null;
-        if (frame != null) {
-            int x = Math.round(event.x / zoomValue);
-            int y = Math.round(event.y / zoomValue);
-            graphNode = frame.getNodeAt(x, y);
+        if (fFrame != null) {
+            int x = Math.round(event.x / fZoomValue);
+            int y = Math.round(event.y / fZoomValue);
+            graphNode = fFrame.getNodeAt(x, y);
             if ((graphNode != null) && (SDViewPref.getInstance().tooltipEnabled())) {
-                toolTipNode = graphNode;
+                fToolTipNode = graphNode;
                 String postfix = getPostfixForTooltip(true);
                 if (graphNode instanceof Lifeline) {
                     Lifeline lifeline = (Lifeline) graphNode;
-                    toolTip.showToolTip(lifeline.getToolTipText() + postfix);
+                    fToolTip.showToolTip(lifeline.getToolTipText() + postfix);
                     setFocus(0);
                 } else {
-                    toolTip.showToolTip(graphNode.getName() + postfix);
+                    fToolTip.showToolTip(graphNode.getName() + postfix);
                     setFocus(0);
                 }
             } else {
-                toolTip.hideToolTip();
+                fToolTip.hideToolTip();
             }
         }
     }
@@ -1595,28 +1582,26 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      */
     @Override
     protected void contentsMouseMoveEvent(MouseEvent e) {
-        scrollToolTip.hideToolTip();
-        toolTip.hideToolTip();
+        fScrollToolTip.hideToolTip();
+        fToolTip.hideToolTip();
         // super.contentsMouseMoveEvent(e);
         if (!(isFocusControl() || getViewControl().isFocusControl())) {
             Control[] child = getParent().getChildren();
             for (int i = 0; i < child.length; i++) {
-                if (child[i].isFocusControl()) {
-                    if (!(child[i] instanceof ScrollView)) {
-                        getViewControl().setFocus();
-                        break;
-                    }
+                if ((child[i].isFocusControl()) && (!(child[i] instanceof ScrollView))) {
+                    getViewControl().setFocus();
+                    break;
                 }
             }
         }
         setFocus(-1);
 
-        if (((e.stateMask & SWT.BUTTON_MASK) != 0) && ((dragAndDrop != null) || getDragAndDrop) && (reorderMode || collapseProvider != null)) {
-            getDragAndDrop = false;
-            if (currentGraphNode instanceof Lifeline) {
-                dragAndDrop = (Lifeline) currentGraphNode;
+        if (((e.stateMask & SWT.BUTTON_MASK) != 0) && ((fDragAndDrop != null) || fIsDragAndDrop) && (fReorderMode || fCollapseProvider != null)) {
+            fIsDragAndDrop = false;
+            if (fCurrentGraphNode instanceof Lifeline) {
+                fDragAndDrop = (Lifeline) fCurrentGraphNode;
             }
-            if (dragAndDrop != null) {
+            if (fDragAndDrop != null) {
                 int dx = 0;
                 int dy = 0;
                 if (e.x > getContentsX() + getVisibleWidth()) {
@@ -1629,83 +1614,83 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
                 } else if (e.y < getContentsY()) {
                     dy = -getContentsY() + e.y;
                 }
-                dragX = e.x;
-                dragY = e.y;
+                fDragX = e.x;
+                fDragY = e.y;
                 if (dx != 0 || dy != 0) {
-                    if (local_auto_scroll_ == null) {
-                        if (local_auto_scroll_timer_ == null) {
-                            local_auto_scroll_timer_ = new Timer(true);
+                    if (fLocalAutoScroll == null) {
+                        if (fLocalAutoScrollTimer == null) {
+                            fLocalAutoScrollTimer = new Timer(true);
                         }
-                        local_auto_scroll_ = new AutoScroll(this, dx, dy);
-                        local_auto_scroll_timer_.schedule(local_auto_scroll_, 0, 75);
+                        fLocalAutoScroll = new AutoScroll(this, dx, dy);
+                        fLocalAutoScrollTimer.schedule(fLocalAutoScroll, 0, 75);
                     } else {
-                        local_auto_scroll_.dx_ = dx;
-                        local_auto_scroll_.dy_ = dy;
+                        fLocalAutoScroll.fDeltaX = dx;
+                        fLocalAutoScroll.fDeltaY = dy;
                     }
-                } else if (local_auto_scroll_ != null) {
-                    local_auto_scroll_.cancel();
-                    local_auto_scroll_ = null;
+                } else if (fLocalAutoScroll != null) {
+                    fLocalAutoScroll.cancel();
+                    fLocalAutoScroll = null;
                 }
-                dragX = Math.round(e.x / zoomValue);
-                dragY = Math.round(e.y / zoomValue);
+                fDragX = Math.round(e.x / fZoomValue);
+                fDragY = Math.round(e.y / fZoomValue);
                 redraw();
-                Lifeline node = frame.getCloserLifeline(dragX);
-                if ((node != null) && (node != dragAndDrop)) {
+                Lifeline node = fFrame.getCloserLifeline(fDragX);
+                if ((node != null) && (node != fDragAndDrop)) {
                     int y = 0;
                     int y1 = 0;
                     int height = Metrics.getLifelineHeaderFontHeigth() + 2 * Metrics.LIFELINE_HEARDER_TEXT_V_MARGIN;
                     int hMargin = Metrics.LIFELINE_VT_MAGIN / 4;
                     int x = node.getX();
                     int width = node.getWidth();
-                    if (frame.getVisibleAreaY() < node.getY() + node.getHeight() - height - hMargin) {
-                        y = contentsToViewY(Math.round((node.getY() + node.getHeight()) * zoomValue));
+                    if (fFrame.getVisibleAreaY() < node.getY() + node.getHeight() - height - hMargin) {
+                        y = contentsToViewY(Math.round((node.getY() + node.getHeight()) * fZoomValue));
                     } else {
-                        y = Math.round(height * zoomValue);
+                        y = Math.round(height * fZoomValue);
                     }
 
-                    if (frame.getVisibleAreaY() < contentsToViewY(node.getY() - hMargin)) {
-                        y1 = contentsToViewY(Math.round((node.getY() - hMargin) * zoomValue));
+                    if (fFrame.getVisibleAreaY() < contentsToViewY(node.getY() - hMargin)) {
+                        y1 = contentsToViewY(Math.round((node.getY() - hMargin) * fZoomValue));
                     } else {
-                        y1 = Math.round(height * zoomValue);
+                        y1 = Math.round(height * fZoomValue);
                     }
 
-                    int rx = Math.round(x * zoomValue);
+                    int rx = Math.round(x * fZoomValue);
 
-                    insertionCartet.setVisible(true);
-                    if ((insertionCartet.getImage() != null) && (!insertionCartet.getImage().isDisposed())) {
-                        insertionCartet.getImage().dispose();
+                    fInsertionCartet.setVisible(true);
+                    if ((fInsertionCartet.getImage() != null) && (!fInsertionCartet.getImage().isDisposed())) {
+                        fInsertionCartet.getImage().dispose();
                     }
-                    if (rx <= e.x && Math.round(rx + (width * zoomValue)) >= e.x) {
-                        if (collapseProvider != null) {
-                            ImageData data = collapaseCaretImg.getImageData();
-                            data = data.scaledTo(Math.round(collapaseCaretImg.getBounds().width * zoomValue), Math.round(collapaseCaretImg.getBounds().height * zoomValue));
-                            currentCaretImage = new Image(Display.getCurrent(), data);
-                            insertionCartet.setImage(currentCaretImage);
-                            insertionCartet.setLocation(contentsToViewX(rx + Math.round((width / (float) 2) * zoomValue)) - currentCaretImage.getBounds().width / 2, y);
+                    if (rx <= e.x && Math.round(rx + (width * fZoomValue)) >= e.x) {
+                        if (fCollapseProvider != null) {
+                            ImageData data = fCollapaseCaretImg.getImageData();
+                            data = data.scaledTo(Math.round(fCollapaseCaretImg.getBounds().width * fZoomValue), Math.round(fCollapaseCaretImg.getBounds().height * fZoomValue));
+                            fCurrentCaretImage = new Image(Display.getCurrent(), data);
+                            fInsertionCartet.setImage(fCurrentCaretImage);
+                            fInsertionCartet.setLocation(contentsToViewX(rx + Math.round((width / (float) 2) * fZoomValue)) - fCurrentCaretImage.getBounds().width / 2, y);
                         }
-                    } else if (reorderMode) {
+                    } else if (fReorderMode) {
                         if (rx > e.x) {
-                            if (node.getIndex() > 1 && frame.getLifeline(node.getIndex() - 2) == dragAndDrop) {
+                            if (node.getIndex() > 1 && fFrame.getLifeline(node.getIndex() - 2) == fDragAndDrop) {
                                 return;
                             }
-                            ImageData data = arrowUpCaretImg.getImageData();
-                            data = data.scaledTo(Math.round(arrowUpCaretImg.getBounds().width * zoomValue), Math.round(arrowUpCaretImg.getBounds().height * zoomValue));
-                            currentCaretImage = new Image(Display.getCurrent(), data);
-                            insertionCartet.setImage(currentCaretImage);
-                            insertionCartet.setLocation(contentsToViewX(Math.round((x - Metrics.LIFELINE_SPACING / 2) * zoomValue)) - currentCaretImage.getBounds().width / 2, y1);
+                            ImageData data = fArrowUpCaretImg.getImageData();
+                            data = data.scaledTo(Math.round(fArrowUpCaretImg.getBounds().width * fZoomValue), Math.round(fArrowUpCaretImg.getBounds().height * fZoomValue));
+                            fCurrentCaretImage = new Image(Display.getCurrent(), data);
+                            fInsertionCartet.setImage(fCurrentCaretImage);
+                            fInsertionCartet.setLocation(contentsToViewX(Math.round((x - Metrics.LIFELINE_SPACING / 2) * fZoomValue)) - fCurrentCaretImage.getBounds().width / 2, y1);
                         } else {
-                            if (node.getIndex() < frame.lifeLinesCount() && frame.getLifeline(node.getIndex()) == dragAndDrop) {
+                            if (node.getIndex() < fFrame.lifeLinesCount() && fFrame.getLifeline(node.getIndex()) == fDragAndDrop) {
                                 return;
                             }
-                            ImageData data = arrowUpCaretImg.getImageData();
-                            data = data.scaledTo(Math.round(arrowUpCaretImg.getBounds().width * zoomValue), Math.round(arrowUpCaretImg.getBounds().height * zoomValue));
-                            currentCaretImage = new Image(Display.getCurrent(), data);
-                            insertionCartet.setImage(currentCaretImage);
-                            insertionCartet.setLocation(contentsToViewX(Math.round((x + width + Metrics.LIFELINE_SPACING / 2) * zoomValue)) - currentCaretImage.getBounds().width / 2 + 1, y1);
+                            ImageData data = fArrowUpCaretImg.getImageData();
+                            data = data.scaledTo(Math.round(fArrowUpCaretImg.getBounds().width * fZoomValue), Math.round(fArrowUpCaretImg.getBounds().height * fZoomValue));
+                            fCurrentCaretImage = new Image(Display.getCurrent(), data);
+                            fInsertionCartet.setImage(fCurrentCaretImage);
+                            fInsertionCartet.setLocation(contentsToViewX(Math.round((x + width + Metrics.LIFELINE_SPACING / 2) * fZoomValue)) - fCurrentCaretImage.getBounds().width / 2 + 1, y1);
                         }
                     }
                 } else {
-                    insertionCartet.setVisible(false);
+                    fInsertionCartet.setVisible(false);
                 }
             }
         } else {
@@ -1721,46 +1706,46 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
     protected void contentsMouseUpEvent(MouseEvent event) {
         // Just in case the diagram highlight a time compression region
         // this region need to be released when clicking everywhere
-        insertionCartet.setVisible(false);
-        if (dragAndDrop != null) {
-            if ((overView != null) && (!overView.isDisposed())) {
-                overView.dispose();
+        fInsertionCartet.setVisible(false);
+        if (fDragAndDrop != null) {
+            if ((fOverView != null) && (!fOverView.isDisposed())) {
+                fOverView.dispose();
             }
-            overView = null;
-            Lifeline node = frame.getCloserLifeline(dragX);
+            fOverView = null;
+            Lifeline node = fFrame.getCloserLifeline(fDragX);
             if (node != null) {
-                int rx = Math.round(node.getX() * zoomValue);
-                if (rx <= event.x && Math.round(rx + (node.getWidth() * zoomValue)) >= event.x) {
-                    if ((collapseProvider != null) && (dragAndDrop != node)) {
-                        collapseProvider.collapseTwoLifelines((Lifeline) dragAndDrop, node);
+                int rx = Math.round(node.getX() * fZoomValue);
+                if (rx <= event.x && Math.round(rx + (node.getWidth() * fZoomValue)) >= event.x) {
+                    if ((fCollapseProvider != null) && (fDragAndDrop != node)) {
+                        fCollapseProvider.collapseTwoLifelines((Lifeline) fDragAndDrop, node);
                     }
                 } else if (rx < event.x) {
-                    frame.insertLifelineAfter((Lifeline) dragAndDrop, node);
-                    if (node.getIndex() < frame.lifeLinesCount()) {
-                        Lifeline temp[] = { (Lifeline) dragAndDrop, frame.getLifeline(node.getIndex()) };
-                        reorderList.add(temp);
+                    fFrame.insertLifelineAfter((Lifeline) fDragAndDrop, node);
+                    if (node.getIndex() < fFrame.lifeLinesCount()) {
+                        Lifeline temp[] = { (Lifeline) fDragAndDrop, fFrame.getLifeline(node.getIndex()) };
+                        fReorderList.add(temp);
                     } else {
-                        Lifeline temp[] = { (Lifeline) dragAndDrop, null };
-                        reorderList.add(temp);
+                        Lifeline temp[] = { (Lifeline) fDragAndDrop, null };
+                        fReorderList.add(temp);
                     }
                 } else {
-                    frame.insertLifelineBefore((Lifeline) dragAndDrop, node);
-                    Lifeline temp[] = { (Lifeline) dragAndDrop, node };
-                    reorderList.add(temp);
+                    fFrame.insertLifelineBefore((Lifeline) fDragAndDrop, node);
+                    Lifeline temp[] = { (Lifeline) fDragAndDrop, node };
+                    fReorderList.add(temp);
                 }
             }
         }
-        dragAndDrop = null;
+        fDragAndDrop = null;
         redraw();
-        if (frame == null) {
+        if (fFrame == null) {
             return;
         }
-        frame.resetTimeCompression();
+        fFrame.resetTimeCompression();
 
         // reset auto scroll if it's engaged
-        if (local_auto_scroll_ != null) {
-            local_auto_scroll_.cancel();
-            local_auto_scroll_ = null;
+        if (fLocalAutoScroll != null) {
+            fLocalAutoScroll.cancel();
+            fLocalAutoScroll = null;
         }
         super.contentsMouseUpEvent(event);
     }
@@ -1771,70 +1756,69 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      */
     @Override
     protected void contentsMouseDownEvent(MouseEvent event) {
-        if (currentGraphNode != null) {
-            currentGraphNode.setFocused(false);
+        if (fCurrentGraphNode != null) {
+            fCurrentGraphNode.setFocused(false);
         }
 
         // Just in case the diagram highlight a time compression region
         // this region need to be released when clicking everywhere
-        if (frame == null) {
+        if (fFrame == null) {
             return;
         }
-        frame.resetTimeCompression();
+
+        fFrame.resetTimeCompression();
 
         if ((event.stateMask & SWT.CTRL) != 0) {
-            ctrlSelection = true;
+            fCtrlSelection = true;
         } else {
-            ctrlSelection = false;
+            fCtrlSelection = false;
         }
 
-        if (((zoomInMode) || (zoomOutMode)) && (event.button == 1)) {
-            int cx = Math.round(event.x / zoomValue);
-            int cy = Math.round(event.y / zoomValue);
-            if (zoomInMode) {
-                if (zoomValue < 64) {
-                    zoomValue = zoomValue * (float) 1.25;
+        if (((fZoomInMode) || (fZoomOutMode)) && (event.button == 1)) {
+            int cx = Math.round(event.x / fZoomValue);
+            int cy = Math.round(event.y / fZoomValue);
+            if (fZoomInMode) {
+                if (fZoomValue < 64) {
+                    fZoomValue = fZoomValue * (float) 1.25;
                 }
             } else {
-                zoomValue = zoomValue / (float) 1.25;
+                fZoomValue = fZoomValue / (float) 1.25;
             }
-            int x = Math.round(cx * zoomValue - getVisibleWidth() / (float) 2);
-            int y = Math.round(cy * zoomValue - getVisibleHeight() / (float) 2);
+            int x = Math.round(cx * fZoomValue - getVisibleWidth() / (float) 2);
+            int y = Math.round(cy * fZoomValue - getVisibleHeight() / (float) 2);
             setContentsPos(x, y);
-            if (timeBar != null) {
-                timeBar.setZoom(zoomValue);
+            if (fTimeBar != null) {
+                fTimeBar.setZoom(fZoomValue);
             }
             // redraw also resize the scrollView content
             redraw();
         } else {// if (event.button ==1)
             GraphNode node = null;
-            if (frame != null) {
-                int x = Math.round(event.x / zoomValue);
-                int y = Math.round(event.y / zoomValue);
-                node = frame.getNodeAt(x, y);
+            int x = Math.round(event.x / fZoomValue);
+            int y = Math.round(event.y / fZoomValue);
+            node = fFrame.getNodeAt(x, y);
 
-                if ((event.button == 1) || ((node != null) && !node.isSelected())) {
-                    if (!shiftSelection) {
-                        listStart = node;
-                    }
-                    if (shiftSelection) {
-                        clearSelection();
-                        addSelection(frame.getNodeList(listStart, node));
-                    } else {
-                        performSelection(node);
-                    }
-                    currentGraphNode = node;
-                    if (node != null) {
-                        node.setFocused(true);
-                    }
+            if ((event.button == 1) || ((node != null) && !node.isSelected())) {
+                if (!fShiftSelection) {
+                    fListStart = node;
                 }
-                redraw();
+                if (fShiftSelection) {
+                    clearSelection();
+                    addSelection(fFrame.getNodeList(fListStart, node));
+                } else {
+                    performSelection(node);
+                }
+                fCurrentGraphNode = node;
+                if (node != null) {
+                    node.setFocused(true);
+                }
             }
+            redraw();
         }
-        if (dragAndDrop == null) {
+        if (fDragAndDrop == null) {
             super.contentsMouseDownEvent(event);
         }
-        getDragAndDrop = (event.button == 1);
+        fIsDragAndDrop = (event.button == 1);
 
     }
     
@@ -1845,26 +1829,26 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         /**
          * Field delta x.
          */
-        public int dx_;
+        public int fDeltaX;
         /**
          * Field delta y.
          */
-        public int dy_;
+        public int fDeltaY;
         /**
          * Field sequence diagram reference.
          */
-        public SDWidget sv_;
+        public SDWidget fSdWidget;
 
         /**
          * Constructor for AutoScroll.
-         * @param _sv sequence diagram widget reference 
-         * @param _dx delta x
-         * @param _dy delta y
+         * @param sv sequence diagram widget reference 
+         * @param dx delta x
+         * @param dy delta y
          */
-        public AutoScroll(SDWidget _sv, int _dx, int _dy) {
-            sv_ = _sv;
-            dx_ = _dx;
-            dy_ = _dy;
+        public AutoScroll(SDWidget sv, int dx, int dy) {
+            fSdWidget = sv;
+            fDeltaX = dx;
+            fDeltaY = dy;
         }
 
         /*
@@ -1876,11 +1860,11 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    if (sv_.isDisposed())
+                    if (fSdWidget.isDisposed())
                         return;
-                    sv_.dragX += dx_;
-                    sv_.dragY += dy_;
-                    sv_.scrollBy(dx_, dy_);
+                    fSdWidget.fDragX += fDeltaX;
+                    fSdWidget.fDragY += fDeltaY;
+                    fSdWidget.scrollBy(fDeltaX, fDeltaY);
                 }
             });
         }
@@ -1892,7 +1876,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      */
     @Override
     protected void drawContents(GC gc, int clipx, int clipy, int clipw, int cliph) {
-        if (frame == null) {
+        if (fFrame == null) {
             gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
             gc.fillRectangle(0, 0, getVisibleWidth(), getVisibleHeight());
             gc.dispose();
@@ -1903,21 +1887,21 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
         Rectangle area = getClientArea();
         Image dbuffer = getDrawBuffer();
-        int height = Math.round((frame.getHeight() + 2 * Metrics.FRAME_V_MARGIN) * zoomValue);
+        int height = Math.round((fFrame.getHeight() + 2 * Metrics.FRAME_V_MARGIN) * fZoomValue);
 
         try {
             gc.drawImage(dbuffer, 0, 0, area.width, area.height, 0, 0, area.width, area.height);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR,TmfUiPlugin.PLUGIN_ID, "Error drawin content", e)); //$NON-NLS-1$
         }
         dbuffer.dispose();
-        setHScrollBarIncrement(Math.round(SDViewPref.getInstance().getLifelineWidth() / (float) 2 * zoomValue));
-        setVScrollBarIncrement(Math.round(Metrics.getMessagesSpacing() * zoomValue));
-        if ((timeBar != null) && (frame.hasTimeInfo())) {
-            timeBar.resizeContents(9, height + getHorizontalBarHeight());
-            timeBar.setContentsPos(getContentsX(), getContentsY());
-            timeBar.redraw();
-            timeBar.update();
+        setHScrollBarIncrement(Math.round(SDViewPref.getInstance().getLifelineWidth() / (float) 2 * fZoomValue));
+        setVScrollBarIncrement(Math.round(Metrics.getMessagesSpacing() * fZoomValue));
+        if ((fTimeBar != null) && (fFrame.hasTimeInfo())) {
+            fTimeBar.resizeContents(9, height + getHorizontalBarHeight());
+            fTimeBar.setContentsPos(getContentsX(), getContentsY());
+            fTimeBar.redraw();
+            fTimeBar.update();
         }
         float xRatio = getContentsWidth() / (float) getVisibleWidth();
         float yRatio = getContentsHeight() / (float) getVisibleHeight();
@@ -1942,10 +1926,10 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      */
     @Override
     public void widgetSelected(SelectionEvent event) {
-        if (event.widget == zoomIn) {
-            zoomValue = zoomValue * 2;
-        } else if (event.widget == zoomOut) {
-            zoomValue = zoomValue / 2;
+        if (event.widget == fZoomIn) {
+            fZoomValue = fZoomValue * 2;
+        } else if (event.widget == fZoomOut) {
+            fZoomValue = fZoomValue / 2;
         }
         redraw();
     }
@@ -1958,16 +1942,16 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      */
     @Override
     public void propertyChange(PropertyChangeEvent e) {
-        if (frame != null && !isDisposed()) {
-            frame.resetTimeCompression();
+        if (fFrame != null && !isDisposed()) {
+            fFrame.resetTimeCompression();
         }
         if (e.getProperty().equals("PREFOK")) //$NON-NLS-1$
         {
             // Prepare the overview to be reused for the new
             // settings (especially the colors)
-            if (overView != null)
-                overView.dispose();
-            overView = null;
+            if (fOverView != null)
+                fOverView.dispose();
+            fOverView = null;
             redraw();
         }
     }
@@ -1978,25 +1962,25 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      */
     @Override
     public void widgetDisposed(DisposeEvent e) {
-        if (overView != null) {
-            overView.dispose();
+        if (fOverView != null) {
+            fOverView.dispose();
         }
         super.removeDisposeListener(this);
-        if ((currentCaretImage != null) && (!currentCaretImage.isDisposed())) {
-            currentCaretImage.dispose();
+        if ((fCurrentCaretImage != null) && (!fCurrentCaretImage.isDisposed())) {
+            fCurrentCaretImage.dispose();
         }
-        if ((arrowUpCaretImg != null) && (!arrowUpCaretImg.isDisposed())) {
-            arrowUpCaretImg.dispose();
+        if ((fArrowUpCaretImg != null) && (!fArrowUpCaretImg.isDisposed())) {
+            fArrowUpCaretImg.dispose();
         }
-        if ((collapaseCaretImg != null) && (!collapaseCaretImg.isDisposed())) {
-            collapaseCaretImg.dispose();
+        if ((fCollapaseCaretImg != null) && (!fCollapaseCaretImg.isDisposed())) {
+            fCollapaseCaretImg.dispose();
         }
         SDViewPref.getInstance().removePropertyChangeListener(this);
         LoadersManager lm = LoadersManager.getInstance();
-        if (site != null && site instanceof SDView) {
-            ((SDView) site).resetProviders();
+        if (fSite instanceof SDView) {
+            ((SDView) fSite).resetProviders();
             if (lm != null) {
-                lm.resetLoader(((SDView) site).getViewSite().getId());
+                lm.resetLoader(((SDView) fSite).getViewSite().getId());
             }
         }
     }
@@ -2007,34 +1991,34 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      */
     @Override
     protected void drawOverview(GC gc, Rectangle r) {
-        float oldzoom = zoomValue;
+        float oldzoom = fZoomValue;
         if (getContentsWidth() > getContentsHeight()) {
-            zoomValue = (float) r.width / (float) getContentsWidth() * oldzoom;
+            fZoomValue = (float) r.width / (float) getContentsWidth() * oldzoom;
         } else {
-            zoomValue = (float) r.height / (float) getContentsHeight() * oldzoom;
+            fZoomValue = (float) r.height / (float) getContentsHeight() * oldzoom;
         }
-        if ((overView != null) && ((r.width != overView.getBounds().width) || (r.height != overView.getBounds().height))) {
-            overView.dispose();
-            overView = null;
+        if ((fOverView != null) && ((r.width != fOverView.getBounds().width) || (r.height != fOverView.getBounds().height))) {
+            fOverView.dispose();
+            fOverView = null;
         }
-        if (overView == null) {
+        if (fOverView == null) {
             int backX = getContentsX();
             int backY = getContentsY();
             setContentsPos(0, 0);
-            overView = new Image(getDisplay(), r.width, r.height);
-            GC gcim = new GC(overView);
+            fOverView = new Image(getDisplay(), r.width, r.height);
+            GC gcim = new GC(fOverView);
             NGC context = new NGC(this, gcim);
             context.setBackground(SDViewPref.getInstance().getBackGroundColor(SDViewPref.PREF_FRAME));
-            frame.draw(context);
+            fFrame.draw(context);
             setContentsPos(backX, backY);
             gcim.dispose();
             context.dispose();
         }
-        if ((overView != null) && (r.width == overView.getBounds().width) && (r.height == overView.getBounds().height)) {
-            gc.drawImage(overView, 0, 0, r.width, r.height, 0, 0, r.width, r.height);
+        if ((fOverView != null) && (r.width == fOverView.getBounds().width) && (r.height == fOverView.getBounds().height)) {
+            gc.drawImage(fOverView, 0, 0, r.width, r.height, 0, 0, r.width, r.height);
         }
 
-        zoomValue = oldzoom;
+        fZoomValue = oldzoom;
 
         super.drawOverview(gc, r);
     }
@@ -2045,7 +2029,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      */
     @Override
     public void deltaSelected(Lifeline lifeline, int startEvent, int nbEvent, IColor color) {
-        frame.highlightTimeCompression(lifeline, startEvent, nbEvent, color);
+        fFrame.highlightTimeCompression(lifeline, startEvent, nbEvent, color);
         ensureVisible(lifeline);
         int y1 = lifeline.getY() + lifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * startEvent;
         int y2 = lifeline.getY() + lifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * (startEvent + nbEvent);
@@ -2060,8 +2044,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      */
     @Override
     public int getVisibleWidth() {
-        if (printing) {
-            return printer.getClientArea().width;
+        if (fIsPrinting) {
+            return fPrinter.getClientArea().width;
         }
         return super.getVisibleWidth();
     }
@@ -2072,8 +2056,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      */
     @Override
     public int getVisibleHeight() {
-        if (printing) {
-            return printer.getClientArea().height;
+        if (fIsPrinting) {
+            return fPrinter.getClientArea().height;
         }
         return super.getVisibleHeight();
     }
@@ -2083,12 +2067,12 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.ScrollView#contentsToViewX(int)
      */
     @Override
-    public int contentsToViewX(int _x) {
-        if (printing) {
-            int v = Math.round(printerX * printerZoom);
-            return _x - v;
+    public int contentsToViewX(int x) {
+        if (fIsPrinting) {
+            int v = Math.round(fPrinterX * fPrinterZoom);
+            return x - v;
         }
-        return _x - getContentsX();
+        return x - getContentsX();
     }
 
     /*
@@ -2096,12 +2080,12 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.ScrollView#contentsToViewY(int)
      */
     @Override
-    public int contentsToViewY(int _y) {
-        if (printing) {
-            int v = Math.round(printerY * printerZoom);
-            return _y - v;
+    public int contentsToViewY(int y) {
+        if (fIsPrinting) {
+            int v = Math.round(fPrinterY * fPrinterZoom);
+            return y - v;
         }
-        return _y - getContentsY();
+        return y - getContentsY();
     }
 
     /*
@@ -2110,8 +2094,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      */
     @Override
     public int getContentsX() {
-        if (printing) {
-            return Math.round(printerX * printerZoom);
+        if (fIsPrinting) {
+            return Math.round(fPrinterX * fPrinterZoom);
         }
         return super.getContentsX();
 
@@ -2123,8 +2107,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      */
     @Override
     public int getContentsY() {
-        if (printing) {
-            return Math.round(printerY * printerZoom);
+        if (fIsPrinting) {
+            return Math.round(fPrinterY * fPrinterZoom);
         }
         return super.getContentsY();
     }

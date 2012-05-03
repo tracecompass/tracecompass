@@ -52,14 +52,14 @@ public class OpenSDPagesDialog extends Action {
     /**
      * Constructor 
      * 
-     * @param view_ The view reference
+     * @param view The view reference
      */
-    public OpenSDPagesDialog(SDView view_, ISDAdvancedPagingProvider provider_) {
+    public OpenSDPagesDialog(SDView view, ISDAdvancedPagingProvider provider) {
         super(SDMessages._44);
         setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_GOTO_PAGE));
         setId(ID);
-        fView = view_;
-        fProvider = provider_;
+        fView = view;
+        fProvider = provider;
     }
 
     // ------------------------------------------------------------------------

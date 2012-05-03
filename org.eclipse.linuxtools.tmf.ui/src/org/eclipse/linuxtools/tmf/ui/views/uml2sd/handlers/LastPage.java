@@ -47,11 +47,11 @@ public class LastPage extends Action {
     /**
      * Standard constructor
      *  
-     * @param theView the view reference
+     * @param view the view reference
      */
-    public LastPage(SDView theView) {
+    public LastPage(SDView view) {
         super();
-        fView = theView;
+        fView = view;
         setText(SDMessages._141);
         setToolTipText(SDMessages._142);
         setId(ID);

@@ -73,46 +73,46 @@ public class SearchFilterDialog extends Dialog {
     /**
      * The sequence diagram view reference.
      */
-    protected SDView viewer = null;
+    protected SDView fSdView = null;
 
     /**
      * The tab with the controls for a Criteria
      */
-    protected TabFolder tab = null;
+    protected TabFolder fTabFolder = null;
 
     /**
      * The Criteria updated by this dialog
      */
-    protected Criteria criteria = null;
+    protected Criteria fCriteria = null;
 
     /**
      * The find/filter provider telling which graph nodes are supported
      */
-    protected ISDGraphNodeSupporter provider = null;
+    protected ISDGraphNodeSupporter fProvider = null;
 
     /**
      * The okText is the text for the Ok button and title is the title of the dialog.<br>
      * Both depend (okText and title (below)) on the usage that is done of this dialog 
      * (find or filter).
      */
-    protected String okText;
+    protected String fOkText;
     
     /**
      * The title is the title of the dialog.<br>
      * Both depend (okText and title) on the usage that is done of this dialog 
      * (find or filter).
      */
-    protected String title;
+    protected String fTitle;
 
     /**
      * List of string expressions that have been searched already
      */
-    protected String[] expressionList;
+    protected String[] fExpressionList;
 
     /**
      * find is true if the dialog is for the find feature and false for filter feature
      */
-    protected boolean find;
+    protected boolean fIsFind;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -120,17 +120,17 @@ public class SearchFilterDialog extends Dialog {
     /**
      * Standard constructor
      * 
-     * @param view_ A sequence diagram view reference
-     * @param provider_ A graph node supporter provider
-     * @param filter_ A flag to indicate filtering (true) or finding (false)  
+     * @param view A sequence diagram view reference
+     * @param provider A graph node supporter provider
+     * @param filter A flag to indicate filtering (true) or finding (false)  
      * @param style Style bits
      */
-    public SearchFilterDialog(SDView view_, ISDGraphNodeSupporter provider_, boolean filter_, int style) {
-        super(view_.getSDWidget().getShell());
+    public SearchFilterDialog(SDView view, ISDGraphNodeSupporter provider, boolean filter, int style) {
+        super(view.getSDWidget().getShell());
         setShellStyle(SWT.DIALOG_TRIM | style);
-        provider = provider_;
-        viewer = view_;
-        find = !filter_;
+        fProvider = provider;
+        fSdView = view;
+        fIsFind = !filter;
     }
     
     // ------------------------------------------------------------------------
@@ -143,15 +143,15 @@ public class SearchFilterDialog extends Dialog {
      */
     @Override
     public Control createDialogArea(Composite arg0) {
-        if (find) {
-            expressionList = TmfUiPlugin.getDefault().getDialogSettings().getArray(FIND_EXPRESSION_LIST);
+        if (fIsFind) {
+            fExpressionList = TmfUiPlugin.getDefault().getDialogSettings().getArray(FIND_EXPRESSION_LIST);
         } else {
-            expressionList = TmfUiPlugin.getDefault().getDialogSettings().getArray(FILTER_EXPRESSION_LIST);
+            fExpressionList = TmfUiPlugin.getDefault().getDialogSettings().getArray(FILTER_EXPRESSION_LIST);
         }
-        if (expressionList == null) {
-            expressionList = new String[0];
+        if (fExpressionList == null) {
+            fExpressionList = new String[0];
         }
-        return new TabContents(arg0, provider, getButton(IDialogConstants.OK_ID), expressionList);
+        return new TabContents(arg0, fProvider, getButton(IDialogConstants.OK_ID), fExpressionList);
     }
 
     /**
@@ -161,40 +161,40 @@ public class SearchFilterDialog extends Dialog {
     public int open() {
         create();
 
-        if (criteria == null) {
+        if (fCriteria == null) {
             loadCriteria();
         }
 
-        if (criteria == null) {
-            criteria = new Criteria();
-            criteria.setLifeLineSelected(provider.isNodeSupported(ISDGraphNodeSupporter.LIFELINE));
-            criteria.setSyncMessageSelected(provider.isNodeSupported(ISDGraphNodeSupporter.SYNCMESSAGE));
-            criteria.setSyncMessageReturnSelected(provider.isNodeSupported(ISDGraphNodeSupporter.SYNCMESSAGERETURN));
-            criteria.setAsyncMessageSelected(provider.isNodeSupported(ISDGraphNodeSupporter.ASYNCMESSAGE));
-            criteria.setAsyncMessageReturnSelected(provider.isNodeSupported(ISDGraphNodeSupporter.ASYNCMESSAGERETURN));
-            criteria.setStopSelected(provider.isNodeSupported(ISDGraphNodeSupporter.STOP));
+        if (fCriteria == null) {
+            fCriteria = new Criteria();
+            fCriteria.setLifeLineSelected(fProvider.isNodeSupported(ISDGraphNodeSupporter.LIFELINE));
+            fCriteria.setSyncMessageSelected(fProvider.isNodeSupported(ISDGraphNodeSupporter.SYNCMESSAGE));
+            fCriteria.setSyncMessageReturnSelected(fProvider.isNodeSupported(ISDGraphNodeSupporter.SYNCMESSAGERETURN));
+            fCriteria.setAsyncMessageSelected(fProvider.isNodeSupported(ISDGraphNodeSupporter.ASYNCMESSAGE));
+            fCriteria.setAsyncMessageReturnSelected(fProvider.isNodeSupported(ISDGraphNodeSupporter.ASYNCMESSAGERETURN));
+            fCriteria.setStopSelected(fProvider.isNodeSupported(ISDGraphNodeSupporter.STOP));
         }
-        copyFromCriteria(criteria);
+        copyFromCriteria(fCriteria);
 
-        if (okText != null) {
-            getButton(IDialogConstants.OK_ID).setText(okText);
+        if (fOkText != null) {
+            getButton(IDialogConstants.OK_ID).setText(fOkText);
         } else {
             getButton(IDialogConstants.OK_ID).setText(SDMessages._21);
         }
 
-        if (find) {
+        if (fIsFind) {
             getButton(IDialogConstants.CANCEL_ID).setText(SDMessages._22);
         }
 
         Button okButton = getButton(IDialogConstants.OK_ID);
         ((TabContents) getDialogArea()).setOkButton(okButton);
-        if (criteria == null || !((criteria.getExpression() != null && !criteria.getExpression().equals("")) && //$NON-NLS-1$
-                (criteria.isAsyncMessageReturnSelected() || criteria.isAsyncMessageSelected() || criteria.isLifeLineSelected() || criteria.isStopSelected() || criteria.isSyncMessageReturnSelected() || criteria.isSyncMessageSelected()))) {
+        if (fCriteria == null || !((fCriteria.getExpression() != null && !fCriteria.getExpression().equals("")) && //$NON-NLS-1$
+                (fCriteria.isAsyncMessageReturnSelected() || fCriteria.isAsyncMessageSelected() || fCriteria.isLifeLineSelected() || fCriteria.isStopSelected() || fCriteria.isSyncMessageReturnSelected() || fCriteria.isSyncMessageSelected()))) {
             okButton.setEnabled(false);
         }
 
-        if (title != null) {
-            getShell().setText(title);
+        if (fTitle != null) {
+            getShell().setText(fTitle);
         } else {
             getShell().setText(SDMessages._24);
         }
@@ -202,7 +202,7 @@ public class SearchFilterDialog extends Dialog {
         getShell().pack();
         getShell().setLocation(getShell().getDisplay().getCursorLocation());
 
-        criteria = null;
+        fCriteria = null;
         return super.open();
     }
 
@@ -213,34 +213,34 @@ public class SearchFilterDialog extends Dialog {
     protected void loadCriteria() {
 
         String CRITERIA = FIND_CRITERIA;
-        if (!find) {
+        if (!fIsFind) {
             CRITERIA = FILTER_CRITERIA;
         }
 
         DialogSettings section = (DialogSettings) TmfUiPlugin.getDefault().getDialogSettings().getSection(CRITERIA);
-        List selection = viewer.getSDWidget().getSelection();
-        if ((selection == null || selection.size() != 1) || (!find)) {
+        List selection = fSdView.getSDWidget().getSelection();
+        if ((selection == null || selection.size() != 1) || (!fIsFind)) {
             if (section != null) {
-                criteria = new Criteria();
-                criteria.load(section);
+                fCriteria = new Criteria();
+                fCriteria.load(section);
             }
         } else {
             GraphNode gn = (GraphNode) selection.get(0);
-            criteria = new Criteria();
-            criteria.setExpression(gn.getName());
-            criteria.setCaseSenstiveSelected(true);
-            if (gn instanceof Lifeline && provider.isNodeSupported(ISDGraphNodeSupporter.LIFELINE)) {
-                criteria.setLifeLineSelected(true);
-            } else if (gn instanceof SyncMessageReturn && provider.isNodeSupported(ISDGraphNodeSupporter.SYNCMESSAGERETURN)) {
-                criteria.setSyncMessageReturnSelected(true);
-            } else if ((gn instanceof SyncMessageReturn || gn instanceof SyncMessage) && provider.isNodeSupported(ISDGraphNodeSupporter.SYNCMESSAGE)) {
-                criteria.setSyncMessageSelected(true);
-            } else if (gn instanceof AsyncMessageReturn && provider.isNodeSupported(ISDGraphNodeSupporter.ASYNCMESSAGERETURN)) {
-                criteria.setAsyncMessageReturnSelected(true);
-            } else if ((gn instanceof AsyncMessageReturn || gn instanceof AsyncMessage) && provider.isNodeSupported(ISDGraphNodeSupporter.ASYNCMESSAGE)) {
-                criteria.setAsyncMessageSelected(true);
-            } else if (gn instanceof Stop && provider.isNodeSupported(ISDGraphNodeSupporter.STOP)) {
-                criteria.setStopSelected(true);
+            fCriteria = new Criteria();
+            fCriteria.setExpression(gn.getName());
+            fCriteria.setCaseSenstiveSelected(true);
+            if (gn instanceof Lifeline && fProvider.isNodeSupported(ISDGraphNodeSupporter.LIFELINE)) {
+                fCriteria.setLifeLineSelected(true);
+            } else if (gn instanceof SyncMessageReturn && fProvider.isNodeSupported(ISDGraphNodeSupporter.SYNCMESSAGERETURN)) {
+                fCriteria.setSyncMessageReturnSelected(true);
+            } else if ((gn instanceof SyncMessageReturn || gn instanceof SyncMessage) && fProvider.isNodeSupported(ISDGraphNodeSupporter.SYNCMESSAGE)) {
+                fCriteria.setSyncMessageSelected(true);
+            } else if (gn instanceof AsyncMessageReturn && fProvider.isNodeSupported(ISDGraphNodeSupporter.ASYNCMESSAGERETURN)) {
+                fCriteria.setAsyncMessageReturnSelected(true);
+            } else if ((gn instanceof AsyncMessageReturn || gn instanceof AsyncMessage) && fProvider.isNodeSupported(ISDGraphNodeSupporter.ASYNCMESSAGE)) {
+                fCriteria.setAsyncMessageSelected(true);
+            } else if (gn instanceof Stop && fProvider.isNodeSupported(ISDGraphNodeSupporter.STOP)) {
+                fCriteria.setStopSelected(true);
             }
         }
     }
@@ -254,12 +254,12 @@ public class SearchFilterDialog extends Dialog {
     @Override
     public void okPressed() {
         copyToCriteria();
-        if (!find) {
+        if (!fIsFind) {
             saveCriteria();
             super.close(); // Filter is modal
         }
-        if ((provider != null) && (provider instanceof ISDFindProvider) && find) {
-            boolean result = ((ISDFindProvider) provider).find(criteria);
+        if ((fProvider != null) && (fProvider instanceof ISDFindProvider) && fIsFind) {
+            boolean result = ((ISDFindProvider) fProvider).find(fCriteria);
             TabContents content = getTabContents();
             content.setResult(result);
         }
@@ -271,10 +271,10 @@ public class SearchFilterDialog extends Dialog {
      */
     @Override
     public void cancelPressed() {
-        if (find) {
+        if (fIsFind) {
             copyToCriteria();
-            if (provider instanceof ISDFindProvider) {
-                ((ISDFindProvider) provider).cancel();
+            if (fProvider instanceof ISDFindProvider) {
+                ((ISDFindProvider) fProvider).cancel();
             }
             saveCriteria();
         }
@@ -287,7 +287,7 @@ public class SearchFilterDialog extends Dialog {
     public void saveCriteria() {
         String CRITERIA = FIND_CRITERIA;
         String EXPRESSION_LIST = FIND_EXPRESSION_LIST;
-        if (!find) {
+        if (!fIsFind) {
             CRITERIA = FILTER_CRITERIA;
             EXPRESSION_LIST = FILTER_EXPRESSION_LIST;
         }
@@ -296,25 +296,25 @@ public class SearchFilterDialog extends Dialog {
         if (section == null) {
             section = (DialogSettings) settings.addNewSection(CRITERIA);
         }
-        criteria.save(section);
+        fCriteria.save(section);
 
-        if (criteria.getExpression().length() > 0) {
+        if (fCriteria.getExpression().length() > 0) {
             ArrayList<String> list = new ArrayList<String>();
-            for (int i = 0; i < expressionList.length; i++) {
-                list.add(expressionList[i]);
+            for (int i = 0; i < fExpressionList.length; i++) {
+                list.add(fExpressionList[i]);
             }
             // Remove the used expression if one from the dropdown list
-            list.remove(criteria.getExpression());
+            list.remove(fCriteria.getExpression());
             // Put the new expression at the beginning
-            list.add(0, criteria.getExpression());
+            list.add(0, fCriteria.getExpression());
             // Fill in the expressionList, truncating to MAX_EXPRESSION_LIST
             int size = Math.min(list.size(), MAX_EXPRESSION_LIST);
             String[] temp = new String[size];
             for (int i = 0; i < size; i++) {
                 temp[i] = (String) list.get(i);
             }
-            expressionList = temp;
-            settings.put(EXPRESSION_LIST, expressionList);
+            fExpressionList = temp;
+            settings.put(EXPRESSION_LIST, fExpressionList);
         }
     }
 
@@ -324,32 +324,32 @@ public class SearchFilterDialog extends Dialog {
 	 * @return the criteria
 	 */
     public Criteria getCriteria() {
-        return criteria;
+        return fCriteria;
     }
 
     /**
      * Sets the criteria.
      * 
-     * @param criteria_ the criteria to set.
+     * @param criteria the criteria to set.
      */
-    public void setCriteria(Criteria criteria_) {
-        criteria = criteria_;
+    public void setCriteria(Criteria criteria) {
+        fCriteria = criteria;
     }
 
     /**
      * Get the current end-user settings from the dialog to a Criteria
      */
     public void copyToCriteria() {
-        criteria = new Criteria();
+        fCriteria = new Criteria();
         TabContents content = getTabContents();
-        criteria.setLifeLineSelected(content.getLifelineButtonSelection());
-        criteria.setSyncMessageSelected(content.getSynMessageButtonSelection());
-        criteria.setSyncMessageReturnSelected(content.getSynMessageReturnButtonSelection());
-        criteria.setAsyncMessageSelected(content.getAsynMessageButtonSelection());
-        criteria.setAsyncMessageReturnSelected(content.getAsynMessageReturnButtonSelection());
-        criteria.setStopSelected(content.getStopButtonSelection());
-        criteria.setCaseSenstiveSelected(content.getCaseSensitiveSelection());
-        criteria.setExpression(content.getSearchText());
+        fCriteria.setLifeLineSelected(content.isLifelineButtonSelected());
+        fCriteria.setSyncMessageSelected(content.isSynMessageButtonSelected());
+        fCriteria.setSyncMessageReturnSelected(content.isSynMessageReturnButtonSelected());
+        fCriteria.setAsyncMessageSelected(content.isAsynMessageButtonSelected());
+        fCriteria.setAsyncMessageReturnSelected(content.isAsynMessageReturnButtonSelected());
+        fCriteria.setStopSelected(content.isStopButtonSelected());
+        fCriteria.setCaseSenstiveSelected(content.isCaseSensitiveSelected());
+        fCriteria.setExpression(content.getSearchText());
     }
 
     /**
@@ -359,10 +359,10 @@ public class SearchFilterDialog extends Dialog {
      */
     protected TabContents getTabContents() {
         TabContents content = null;
-        if (tab == null) {
+        if (fTabFolder == null) {
             content = (TabContents) getDialogArea();
         } else {
-            content = (TabContents) tab.getSelection()[0].getControl();
+            content = (TabContents) fTabFolder.getSelection()[0].getControl();
         }
         return content;
     }
@@ -390,18 +390,18 @@ public class SearchFilterDialog extends Dialog {
     /**
      * Sets the text to be used for the ok button
      * 
-     * @param okText_ text to set
+     * @param okText text to set
      */
-    public void setOkText(String okText_) {
-        okText = okText_;
+    public void setOkText(String okText) {
+        fOkText = okText;
     }
 
     /**
      * Sets the title to be used for the dialog box.
      * 
-     * @param title_ The title to set
+     * @param title The title to set
      */
-    public void setTitle(String title_) {
-        title = title_;
+    public void setTitle(String title) {
+        fTitle = title;
     }
 }

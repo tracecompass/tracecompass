@@ -44,7 +44,7 @@ public class BasicFrame extends GraphNode {
     /**
      * The sequence diagram reference. 
      */
-    protected static ISDPreferences userPref = null;
+    protected static ISDPreferences fUserPref = null;
     
     // ------------------------------------------------------------------------
     // Attributes
@@ -53,68 +53,68 @@ public class BasicFrame extends GraphNode {
     /**
      * Contains the max elapsed time between two consecutive messages in the whole frame
      */
-    protected ITmfTimestamp maxTime = new TmfTimestamp(0);
+    protected ITmfTimestamp fMaxTime = new TmfTimestamp(0);
     /**
      * Contains the min elapsed time between two consecutive messages in the whole frame
      */
-    protected ITmfTimestamp minTime = new TmfTimestamp(0);
+    protected ITmfTimestamp fMinTime = new TmfTimestamp(0);
     /**
      * Indicate if the min and max elapsed time between two consecutive messages in the whole frame need to be computed
      */
-    protected boolean computeMinMax = true;
+    protected boolean fComputeMinMax = true;
     /**
      * Store the preference set by the user regarding the external time. This flag is used determine if the min and max
      * need to be recomputed in case this preference is changed.
      */
-    protected boolean lastExternalTimePref = SDViewPref.getInstance().excludeExternalTime();
+    protected boolean fLastExternalTimePref = SDViewPref.getInstance().excludeExternalTime();
     /**
      * The greater event occurrence created on graph nodes drawn in this Frame This directly impact the Frame height
      */
-    protected int verticalIndex = 0;
+    protected int fVerticalIndex = 0;
     /**
      * The index along the x axis where the next lifeline will is drawn This directly impact the Frame width
      */
-    protected int horizontalIndex = 0;
+    protected int fHorizontalIndex = 0;
     /**
-     * The information flag.
+     * The time information flag.
      */
-    protected boolean timeInfo = false;
+    protected boolean fHasTimeInfo = false;
     /**
      * The current Frame visible area - x coordinates
      */
-    protected int visibleAreaX;
+    protected int fVisibleAreaX;
     /**
      * The current Frame visible area - y coordinates
      */
-    protected int visibleAreaY;
+    protected int fVisibleAreaY;
     /**
      * The current Frame visible area - width
      */
-    protected int visibleAreaWidth;
+    protected int fVisibleAreaWidth;
     /**
      * The current Frame visible area - height
      */
-    protected int visibleAreaHeight;
+    protected int fVisibleAreaHeight;
     /**
      * The event occurrence spacing (-1 for none)
      */
-    protected int forceEventOccurrenceSpacing = -1;
+    protected int fForceEventOccurrenceSpacing = -1;
     /**
      * Flag to indicate customized minumum and maximum.
      */
-    protected boolean customMinMax = false;
+    protected boolean fCustomMinMax = false;
     /**
      * The minimum time between messages of the sequence diagram frame.
      */
-    protected ITmfTimestamp minSDTime = new TmfTimestamp();
+    protected ITmfTimestamp fMinSDTime = new TmfTimestamp();
     /**
      * The maximum time between messages of the sequence diagram frame.
      */
-    protected ITmfTimestamp maxSDTime = new TmfTimestamp();
+    protected ITmfTimestamp fMaxSDTime = new TmfTimestamp();
     /**
      * Flag to indicate that initial minimum has to be computed.
      */
-    protected boolean initSDMin = true;
+    protected boolean fInitSDMin = true;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -124,7 +124,7 @@ public class BasicFrame extends GraphNode {
      * Creates an empty frame.
      */
     public BasicFrame() {
-        Metrics.setForcedEventSpacing(forceEventOccurrenceSpacing);
+        Metrics.setForcedEventSpacing(fForceEventOccurrenceSpacing);
     }
 
     // ------------------------------------------------------------------------
@@ -138,7 +138,7 @@ public class BasicFrame extends GraphNode {
      * @return the greater event occurrence
      */
     protected int getMaxEventOccurrence() {
-        return verticalIndex;
+        return fVerticalIndex;
     }
 
     /**
@@ -147,7 +147,7 @@ public class BasicFrame extends GraphNode {
      * @param eventOccurrence the new greater event occurrence
      */
     protected void setMaxEventOccurrence(int eventOccurrence) {
-        verticalIndex = eventOccurrence;
+        fVerticalIndex = eventOccurrence;
     }
 
     /**
@@ -159,7 +159,7 @@ public class BasicFrame extends GraphNode {
      * @return a new lifeline index
      */
     protected int getNewHorizontalIndex() {
-        return ++horizontalIndex;
+        return ++fHorizontalIndex;
     }
 
     /**
@@ -169,7 +169,7 @@ public class BasicFrame extends GraphNode {
      * @see Frame#getNewHorizontalIndex() for horizontal index description
      */
     protected int getHorizontalIndex() {
-        return horizontalIndex;
+        return fHorizontalIndex;
     }
 
     /*
@@ -178,7 +178,7 @@ public class BasicFrame extends GraphNode {
      */
     @Override
     public void addNode(GraphNode nodeToAdd) {
-        computeMinMax = true;
+        fComputeMinMax = true;
         super.addNode(nodeToAdd);
     }
 
@@ -207,10 +207,10 @@ public class BasicFrame extends GraphNode {
      */
     @Override
     public int getWidth() {
-        if (horizontalIndex == 0) {
+        if (fHorizontalIndex == 0) {
             return 3 * Metrics.swimmingLaneWidth() + Metrics.LIFELINE_H_MAGIN * 2 - Metrics.FRAME_H_MARGIN - Metrics.LIFELINE_SPACING / 2;
         } else {
-            return horizontalIndex * Metrics.swimmingLaneWidth() + Metrics.LIFELINE_H_MAGIN * 2 + 1 - Metrics.LIFELINE_SPACING;
+            return fHorizontalIndex * Metrics.swimmingLaneWidth() + Metrics.LIFELINE_H_MAGIN * 2 + 1 - Metrics.LIFELINE_SPACING;
         }
     }
 
@@ -221,14 +221,14 @@ public class BasicFrame extends GraphNode {
     @Override
     public int getHeight() {
         // The Frame height depends on the maximum number of messages added to a lifeline
-        if (verticalIndex == 0) {
+        if (fVerticalIndex == 0) {
             return 5 * (Metrics.getMessagesSpacing() + Metrics.getMessageFontHeigth()) + Metrics.LIFELINE_NAME_H_MARGIN + Metrics.FRAME_NAME_H_MARGIN + Metrics.getFrameFontHeigth() + Metrics.LIFELINE_VT_MAGIN + Metrics.LIFELINE_VB_MAGIN
                     + Metrics.LIFELINE_NAME_H_MARGIN + Metrics.FRAME_NAME_H_MARGIN + Metrics.getLifelineFontHeigth() * 2;
         }
-        if (forceEventOccurrenceSpacing >= 0) {
-            Metrics.setForcedEventSpacing(forceEventOccurrenceSpacing);
+        if (fForceEventOccurrenceSpacing >= 0) {
+            Metrics.setForcedEventSpacing(fForceEventOccurrenceSpacing);
         }
-        return verticalIndex * (Metrics.getMessagesSpacing() + Metrics.getMessageFontHeigth()) + Metrics.LIFELINE_NAME_H_MARGIN + Metrics.FRAME_NAME_H_MARGIN + Metrics.getFrameFontHeigth() + Metrics.LIFELINE_VT_MAGIN + Metrics.LIFELINE_VB_MAGIN
+        return fVerticalIndex * (Metrics.getMessagesSpacing() + Metrics.getMessageFontHeigth()) + Metrics.LIFELINE_NAME_H_MARGIN + Metrics.FRAME_NAME_H_MARGIN + Metrics.getFrameFontHeigth() + Metrics.LIFELINE_VT_MAGIN + Metrics.LIFELINE_VB_MAGIN
                 + Metrics.LIFELINE_NAME_H_MARGIN + Metrics.FRAME_NAME_H_MARGIN + Metrics.getLifelineFontHeigth() * 2;
     }
 
@@ -255,15 +255,15 @@ public class BasicFrame extends GraphNode {
             // only lifeline list is x ordered
             // Stop browsing the list if the node is outside the visible area
             // all others nodes will be not visible
-            if ((node instanceof Lifeline) && (node.getX() > visibleAreaX + visibleAreaWidth)) {
+            if ((node instanceof Lifeline) && (node.getX() > fVisibleAreaX + fVisibleAreaWidth)) {
                 break;
             }
             if (node.getHeight() < 0) {
-                if (node.getY() + node.getHeight() > visibleAreaY + visibleAreaHeight) {
+                if (node.getY() + node.getHeight() > fVisibleAreaY + fVisibleAreaHeight) {
                     break;
                 }
             } else {
-                if (node.getY() > visibleAreaY + visibleAreaHeight) {
+                if (node.getY() > fVisibleAreaY + fVisibleAreaHeight) {
                     break;
                 }
             }
@@ -335,17 +335,17 @@ public class BasicFrame extends GraphNode {
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#draw(IGC)
      */
     protected void draw(IGC context, boolean drawFrame) {
-        visibleAreaHeight = context.getVisibleHeight();
-        visibleAreaWidth = context.getVisibleWidth();
-        visibleAreaX = context.getContentsX();
-        visibleAreaY = context.getContentsY();
+        fVisibleAreaHeight = context.getVisibleHeight();
+        fVisibleAreaWidth = context.getVisibleWidth();
+        fVisibleAreaX = context.getContentsX();
+        fVisibleAreaY = context.getContentsY();
 
-        if (forceEventOccurrenceSpacing >= 0) {
-            Metrics.setForcedEventSpacing(forceEventOccurrenceSpacing);
+        if (fForceEventOccurrenceSpacing >= 0) {
+            Metrics.setForcedEventSpacing(fForceEventOccurrenceSpacing);
         } else {
             Metrics.setForcedEventSpacing(-1);
         }
-        if (userPref == null) {
+        if (fUserPref == null) {
             return;
         }
         super.drawChildenNodes(context);
@@ -357,7 +357,7 @@ public class BasicFrame extends GraphNode {
      * @param pref the preferences to set.
      */
     public static void setUserPref(ISDPreferences pref) {
-        userPref = pref;
+        fUserPref = pref;
     }
 
     /**
@@ -365,7 +365,7 @@ public class BasicFrame extends GraphNode {
      * @return the sequence diagram preferences.
      */
     public static ISDPreferences getUserPref() {
-        return userPref;
+        return fUserPref;
     }
 
     /**
@@ -374,7 +374,7 @@ public class BasicFrame extends GraphNode {
      * @param space A spacing to set.
      */
     public void forceEventOccurrenceSpacing(int space) {
-        forceEventOccurrenceSpacing = space;
+        fForceEventOccurrenceSpacing = space;
     }
 
     /**
@@ -383,7 +383,7 @@ public class BasicFrame extends GraphNode {
      * @return the X coordinates of the frame visible area
      */
     public int getVisibleAreaX() {
-        return visibleAreaX;
+        return fVisibleAreaX;
     }
 
     /**
@@ -392,7 +392,7 @@ public class BasicFrame extends GraphNode {
      * @return the frame visible area width
      */
     public int getVisibleAreaWidth() {
-        return visibleAreaWidth;
+        return fVisibleAreaWidth;
     }
 
     /**
@@ -401,7 +401,7 @@ public class BasicFrame extends GraphNode {
      * @return the frame visible area height
      */
     public int getVisibleAreaHeight() {
-        return visibleAreaHeight;
+        return fVisibleAreaHeight;
     }
 
     /**
@@ -410,7 +410,7 @@ public class BasicFrame extends GraphNode {
      * @return the X coordinates of the frame visible area
      */
     public int getVisibleAreaY() {
-        return visibleAreaY;
+        return fVisibleAreaY;
     }
 
     /**
@@ -419,30 +419,30 @@ public class BasicFrame extends GraphNode {
      * @return the minimum GraphNode time
      */
     public ITmfTimestamp getMinTime() {
-        if (lastExternalTimePref != SDViewPref.getInstance().excludeExternalTime()) {
-            lastExternalTimePref = SDViewPref.getInstance().excludeExternalTime();
-            computeMinMax = true;
+        if (fLastExternalTimePref != SDViewPref.getInstance().excludeExternalTime()) {
+            fLastExternalTimePref = SDViewPref.getInstance().excludeExternalTime();
+            fComputeMinMax = true;
         }
-        if ((computeMinMax) && (!customMinMax)) {
+        if ((fComputeMinMax) && (!fCustomMinMax)) {
             computeMinMax();
-            computeMinMax = false;
+            fComputeMinMax = false;
         }
-        return minTime;
+        return fMinTime;
     }
 
     public void setMin(ITmfTimestamp min) {
-        minTime = min;
-        customMinMax = true;
+        fMinTime = min;
+        fCustomMinMax = true;
     }
 
     public void setMax(ITmfTimestamp max) {
-        maxTime = max;
-        customMinMax = true;
+        fMaxTime = max;
+        fCustomMinMax = true;
     }
 
     public void resetCustomMinMax() {
-        customMinMax = false;
-        computeMinMax = true;
+        fCustomMinMax = false;
+        fComputeMinMax = true;
     }
 
     /**
@@ -451,22 +451,22 @@ public class BasicFrame extends GraphNode {
      * @return the maximum GraphNode time
      */
     public ITmfTimestamp getMaxTime() {
-        if (lastExternalTimePref != SDViewPref.getInstance().excludeExternalTime()) {
-            lastExternalTimePref = SDViewPref.getInstance().excludeExternalTime();
-            computeMinMax = true;
+        if (fLastExternalTimePref != SDViewPref.getInstance().excludeExternalTime()) {
+            fLastExternalTimePref = SDViewPref.getInstance().excludeExternalTime();
+            fComputeMinMax = true;
         }
-        if (computeMinMax) {
+        if (fComputeMinMax) {
             computeMinMax();
-            computeMinMax = false;
+            fComputeMinMax = false;
         }
-        return maxTime;
+        return fMaxTime;
     }
 
     /**
      * Computes the minimum and maximum time between consecutive messages within the frame. 
      */
     protected void computeMaxMinTime() {
-        if (!initSDMin) {
+        if (!fInitSDMin) {
             return;
         }
 
@@ -477,13 +477,13 @@ public class BasicFrame extends GraphNode {
         for (int i = 0; i < timeArray.size(); i++) {
             SDTimeEvent m = (SDTimeEvent) timeArray.get(i);
 
-            if (m.getTime().compareTo(maxSDTime, true) > 0) {
-                maxSDTime = m.getTime();
+            if (m.getTime().compareTo(fMaxSDTime, true) > 0) {
+                fMaxSDTime = m.getTime();
             }
 
-            if ((m.getTime().compareTo(minSDTime, true) < 0) || (initSDMin == true)) {
-                minSDTime = m.getTime();
-                initSDMin = false;
+            if ((m.getTime().compareTo(fMinSDTime, true) < 0) || fInitSDMin) {
+                fMinSDTime = m.getTime();
+                fInitSDMin = false;
             }
         }
     }
@@ -495,7 +495,7 @@ public class BasicFrame extends GraphNode {
      */
     public ITmfTimestamp getSDMinTime() {
         computeMaxMinTime();
-        return minSDTime;
+        return fMinSDTime;
     }
 
     /**
@@ -505,7 +505,7 @@ public class BasicFrame extends GraphNode {
      */
     public ITmfTimestamp getSDMaxTime() {
         computeMaxMinTime();
-        return maxSDTime;
+        return fMaxSDTime;
     }
 
     /**
@@ -532,21 +532,21 @@ public class BasicFrame extends GraphNode {
      */
     protected void updateMinMax(SDTimeEvent m1, SDTimeEvent m2) {
         ITmfTimestamp delta = m2.getTime().getDelta(m1.getTime());
-        if (computeMinMax) {
-            minTime = delta.clone();
-            if (minTime.compareTo(TmfTimestamp.ZERO, false) < 0) {
-                minTime = new TmfTimestamp(0, m1.getTime().getScale(), m1.getTime().getPrecision());
+        if (fComputeMinMax) {
+            fMinTime = delta.clone();
+            if (fMinTime.compareTo(TmfTimestamp.ZERO, false) < 0) {
+                fMinTime = new TmfTimestamp(0, m1.getTime().getScale(), m1.getTime().getPrecision());
             }
-            maxTime = minTime.clone();
-            computeMinMax = false;
+            fMaxTime = fMinTime.clone();
+            fComputeMinMax = false;
         }
 
-        if ((delta.compareTo(minTime, true) < 0) && (delta.compareTo(TmfTimestamp.ZERO, false) > 0)) {
-            minTime = delta.clone();
+        if ((delta.compareTo(fMinTime, true) < 0) && (delta.compareTo(TmfTimestamp.ZERO, false) > 0)) {
+            fMinTime = delta.clone();
         }
 
-        if ((delta.compareTo(maxTime, true) > 0) && (delta.compareTo(TmfTimestamp.ZERO, false) > 0)) {
-            maxTime = delta.clone();
+        if ((delta.compareTo(fMaxTime, true) > 0) && (delta.compareTo(TmfTimestamp.ZERO, false) > 0)) {
+            fMaxTime = delta.clone();
         }
     }
 
@@ -556,15 +556,15 @@ public class BasicFrame extends GraphNode {
      * @return the time array else <code>null</code>.
      */
     protected List<SDTimeEvent> buildTimeArray() {
-        if (!hasChilden) {
+        if (!fHasChilden) {
             return null;
         }
 
-        Iterator<String> it = fSort.keySet().iterator();
+        Iterator<String> it = fForwardSort.keySet().iterator();
         List<SDTimeEvent> timeArray = new ArrayList<SDTimeEvent>();
         while (it.hasNext()) {
             String nodeType = it.next();
-            List<GraphNode> list = (List<GraphNode>) nodes.get(nodeType);
+            List<GraphNode> list = (List<GraphNode>) fNodes.get(nodeType);
             for (int i = 0; i < list.size(); i++) {
                 Object timedNode = list.get(i);
                 if ((timedNode instanceof ITimeRange) && ((ITimeRange) timedNode).hasTimeInfo()) {

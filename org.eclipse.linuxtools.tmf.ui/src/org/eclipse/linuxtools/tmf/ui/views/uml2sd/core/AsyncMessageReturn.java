@@ -45,7 +45,7 @@ public class AsyncMessageReturn extends AsyncMessage {
     /**
      * The corresponding asynchronous message.
      */
-    protected AsyncMessage message;
+    protected AsyncMessage fMessage;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -54,7 +54,7 @@ public class AsyncMessageReturn extends AsyncMessage {
      * Default constructor.
      */
     public AsyncMessageReturn() {
-        prefId = ISDPreferences.PREF_ASYNC_MESS_RET;
+        fPrefId = ISDPreferences.PREF_ASYNC_MESS_RET;
     }
 
     // ------------------------------------------------------------------------
@@ -69,7 +69,7 @@ public class AsyncMessageReturn extends AsyncMessage {
      * @param parentMessage the message to associate
      */
     public void setMessage(AsyncMessage parentMessage) {
-        message = parentMessage;
+        fMessage = parentMessage;
     }
 
     /*
@@ -81,13 +81,13 @@ public class AsyncMessageReturn extends AsyncMessage {
         if (!isVisible()) {
             return;
         }
-        prefId = ISDPreferences.PREF_ASYNC_MESS_RET;
+        fPrefId = ISDPreferences.PREF_ASYNC_MESS_RET;
         int oldStyle = context.getLineStyle();
         // Message return are dashed
         context.setLineStyle(context.getLineDotStyle());
         if (!isSelected()) {
-            context.setBackground(Frame.getUserPref().getBackGroundColor(prefId));
-            context.setForeground(Frame.getUserPref().getForeGroundColor(prefId));
+            context.setBackground(Frame.getUserPref().getBackGroundColor(fPrefId));
+            context.setForeground(Frame.getUserPref().getForeGroundColor(fPrefId));
         }
         super.draw(context);
         // restore the context

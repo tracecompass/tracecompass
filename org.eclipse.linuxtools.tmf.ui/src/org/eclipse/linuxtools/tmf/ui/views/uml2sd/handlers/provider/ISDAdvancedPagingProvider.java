@@ -45,8 +45,8 @@ public interface ISDAdvancedPagingProvider extends ISDPagingProvider {
      * Instructs a load of the &lt;pageNumber_&gt;<i>th</i> page.<br>
      * <b>Note</b> that first page has the index 0 (indexes are from 0 to pagesCount()-1).
      * 
-     * @param pageNumber_ index of the page to load
+     * @param pageNumber index of the page to load
      */
-    public void pageNumberChanged(int pageNumber_);
+    public void pageNumberChanged(int pageNumber);
 
 }

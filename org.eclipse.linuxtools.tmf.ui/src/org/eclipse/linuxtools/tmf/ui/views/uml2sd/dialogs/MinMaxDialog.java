@@ -47,39 +47,39 @@ public class MinMaxDialog extends Dialog {
     /**
      * Label for minimum. 
      */
-    protected Label minLabel;
+    protected Label fMinLabel;
     /**
      * Label for maximum.
      */
-    protected Label maxLabel;
+    protected Label fMaxLabel;
     /**
      * Label for scale
      */
-    protected Label scaleLabel;
+    protected Label fScaleLabel;
     /**
      * Label for precision.
      */
-    protected Label precisionLabel;
+    protected Label fPrecisionLabel;
     /**
      * Text field for minimum. 
      */
-    protected Text minText;
+    protected Text fMinText;
     /**
      * Text field for maximum. 
      */
-    protected Text maxText;
+    protected Text fMaxText;
     /**
      * Text field for scale. 
      */
-    protected Text scaleText;
+    protected Text fScaleText;
     /**
      * Text field for precision. 
      */
-    protected Text precisionText;
+    protected Text fPrecisionText;
     /**
      * The sequence diagram widget reference.
      */
-    protected SDWidget sdWidget;
+    protected SDWidget fSdWidget;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -91,7 +91,7 @@ public class MinMaxDialog extends Dialog {
      */
     public MinMaxDialog(Shell shell, SDWidget viewer) {
         super(shell);
-        sdWidget = viewer;
+        fSdWidget = viewer;
     }
 
     // ------------------------------------------------------------------------
@@ -127,38 +127,38 @@ public class MinMaxDialog extends Dialog {
         g1layout.numColumns = 3;
         g1.setLayout(g1layout);
 
-        minLabel = new Label(g1, SWT.RADIO);
-        minLabel.setText(SDMessages._124);
-        minLabel.setLayoutData(newGridData(1));
+        fMinLabel = new Label(g1, SWT.RADIO);
+        fMinLabel.setText(SDMessages._124);
+        fMinLabel.setLayoutData(newGridData(1));
 
-        minText = new Text(g1, SWT.SINGLE | SWT.BORDER);
-        minText.setLayoutData(newGridData(2));
-        minText.setText(String.valueOf(sdWidget.getFrame().getMinTime().getValue()));
+        fMinText = new Text(g1, SWT.SINGLE | SWT.BORDER);
+        fMinText.setLayoutData(newGridData(2));
+        fMinText.setText(String.valueOf(fSdWidget.getFrame().getMinTime().getValue()));
 
-        maxLabel = new Label(g1, SWT.RADIO);
-        maxLabel.setText(SDMessages._125);
-        maxLabel.setLayoutData(newGridData(1));
+        fMaxLabel = new Label(g1, SWT.RADIO);
+        fMaxLabel.setText(SDMessages._125);
+        fMaxLabel.setLayoutData(newGridData(1));
 
-        maxText = new Text(g1, SWT.SINGLE | SWT.BORDER);
-        maxText.setLayoutData(newGridData(2));
-        maxText.setText(String.valueOf(sdWidget.getFrame().getMaxTime().getValue()));
+        fMaxText = new Text(g1, SWT.SINGLE | SWT.BORDER);
+        fMaxText.setLayoutData(newGridData(2));
+        fMaxText.setText(String.valueOf(fSdWidget.getFrame().getMaxTime().getValue()));
 
-        scaleLabel = new Label(g1, SWT.RADIO);
-        scaleLabel.setText(SDMessages._136);
-        scaleLabel.setLayoutData(newGridData(1));
+        fScaleLabel = new Label(g1, SWT.RADIO);
+        fScaleLabel.setText(SDMessages._136);
+        fScaleLabel.setLayoutData(newGridData(1));
 
-        scaleText = new Text(g1, SWT.SINGLE | SWT.BORDER);
-        scaleText.setLayoutData(newGridData(2));
-        scaleText.setText(String.valueOf(sdWidget.getFrame().getMinTime().getScale()));
+        fScaleText = new Text(g1, SWT.SINGLE | SWT.BORDER);
+        fScaleText.setLayoutData(newGridData(2));
+        fScaleText.setText(String.valueOf(fSdWidget.getFrame().getMinTime().getScale()));
 
         
-        precisionLabel = new Label(g1, SWT.RADIO);
-        precisionLabel.setText(SDMessages._137);
-        precisionLabel.setLayoutData(newGridData(1));
+        fPrecisionLabel = new Label(g1, SWT.RADIO);
+        fPrecisionLabel.setText(SDMessages._137);
+        fPrecisionLabel.setLayoutData(newGridData(1));
 
-        precisionText = new Text(g1, SWT.SINGLE | SWT.BORDER);
-        precisionText.setLayoutData(newGridData(2));
-        precisionText.setText(String.valueOf(sdWidget.getFrame().getMinTime().getPrecision()));
+        fPrecisionText = new Text(g1, SWT.SINGLE | SWT.BORDER);
+        fPrecisionText.setLayoutData(newGridData(2));
+        fPrecisionText.setText(String.valueOf(fSdWidget.getFrame().getMinTime().getPrecision()));
 
         return parent;
     }
@@ -174,15 +174,15 @@ public class MinMaxDialog extends Dialog {
         int scale = 0;
         int precision = 0;
         try {
-            min = Long.parseLong(minText.getText());
-            max = Long.parseLong(maxText.getText());
-            scale = Integer.parseInt(scaleText.getText());
-            precision = Integer.parseInt(precisionText.getText());
+            min = Long.parseLong(fMinText.getText());
+            max = Long.parseLong(fMaxText.getText());
+            scale = Integer.parseInt(fScaleText.getText());
+            precision = Integer.parseInt(fPrecisionText.getText());
 
-            sdWidget.getFrame().setMax(new TmfTimestamp(max, scale, precision));
-            sdWidget.getFrame().setMin(new TmfTimestamp(min, scale, precision));
+            fSdWidget.getFrame().setMax(new TmfTimestamp(max, scale, precision));
+            fSdWidget.getFrame().setMin(new TmfTimestamp(min, scale, precision));
 
-            sdWidget.redraw();
+            fSdWidget.redraw();
 
             super.okPressed();
         } catch (Exception e) {
@@ -205,12 +205,12 @@ public class MinMaxDialog extends Dialog {
              */
             @Override
             public void widgetSelected(SelectionEvent e) {
-                sdWidget.getFrame().resetCustomMinMax();
-                minText.setText(String.valueOf(sdWidget.getFrame().getMinTime().getValue()));
-                maxText.setText(String.valueOf(sdWidget.getFrame().getMaxTime().getValue()));
-                scaleText.setText(String.valueOf(sdWidget.getFrame().getMinTime().getScale()));
-                precisionText.setText(String.valueOf(sdWidget.getFrame().getMinTime().getPrecision()));
-                maxText.getParent().layout(true);
+                fSdWidget.getFrame().resetCustomMinMax();
+                fMinText.setText(String.valueOf(fSdWidget.getFrame().getMinTime().getValue()));
+                fMaxText.setText(String.valueOf(fSdWidget.getFrame().getMaxTime().getValue()));
+                fScaleText.setText(String.valueOf(fSdWidget.getFrame().getMinTime().getScale()));
+                fPrecisionText.setText(String.valueOf(fSdWidget.getFrame().getMinTime().getPrecision()));
+                fMaxText.getParent().layout(true);
             }
 
             /*

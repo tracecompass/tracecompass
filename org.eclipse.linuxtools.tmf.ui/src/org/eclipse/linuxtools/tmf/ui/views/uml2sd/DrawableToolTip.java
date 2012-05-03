@@ -47,43 +47,43 @@ public class DrawableToolTip implements PaintListener {
     /**
      * The parent control where the tooltip must be drawn
      */
-    protected Composite parent = null;
+    protected Composite fParent = null;
     /**
      * The tooltip shell
      */
-    protected Shell toolTipShell = null;
+    protected Shell fToolTipShell = null;
     /**
      * The Time range data.
      */
-    protected TmfTimeRange minMaxRange;
+    protected TmfTimeRange fMinMaxRange;
     /**
      * The current time.
      */
-    protected ITmfTimestamp currentValue;
+    protected ITmfTimestamp fCurrentValue;
     /**
      * The horizontal margin used for drawing.
      */
-    private static int H_MARGIN = 10;
+    private static int fHorMargin = 10;
     /**
      * The vertical margin used for drawing.
      */
-    private static int V_MARGIN = 10;
+    private static int fVertMargin = 10;
     /**
      * The minimum text scale margin.
      */
-    private static int TEXT_SCALE_MARGIN = 20;
+    private static int fTextScaleMargin = 20;
     /**
      * The length of the text scale.
      */
-    private static int SCALE_LENGTH = 100;
+    private static int fScaleLength = 100;
     /**
      * The text to display 
      */
-    protected String msg;
+    protected String fMessage;
     /**
      * The color array used to represent the 10 time range slices
      */
-    protected Color[] col;
+    protected Color[] fColors;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -92,27 +92,27 @@ public class DrawableToolTip implements PaintListener {
     /**
      * Creates a drawable tool tip instance.
      * 
-     * @param _parent The parent composite.
+     * @param parent The parent composite.
      */
-    public DrawableToolTip(Composite _parent) {
-        parent = _parent;
-        toolTipShell = new Shell(parent.getShell(), SWT.ON_TOP);
-        toolTipShell.setLayout(new RowLayout());
-        toolTipShell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-        toolTipShell.addPaintListener(this);
-        toolTipShell.setSize(200, 50);
+    public DrawableToolTip(Composite parent) {
+        fParent = parent;
+        fToolTipShell = new Shell(fParent.getShell(), SWT.ON_TOP);
+        fToolTipShell.setLayout(new RowLayout());
+        fToolTipShell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+        fToolTipShell.addPaintListener(this);
+        fToolTipShell.setSize(200, 50);
 
-        col = new Color[10];
-        col[0] = new Color(Display.getDefault(), 255, 229, 229);
-        col[1] = new Color(Display.getDefault(), 255, 204, 204);
-        col[2] = new Color(Display.getDefault(), 255, 178, 178);
-        col[3] = new Color(Display.getDefault(), 255, 153, 153);
-        col[4] = new Color(Display.getDefault(), 255, 127, 127);
-        col[5] = new Color(Display.getDefault(), 255, 102, 102);
-        col[6] = new Color(Display.getDefault(), 255, 76, 76);
-        col[7] = new Color(Display.getDefault(), 255, 51, 51);
-        col[8] = new Color(Display.getDefault(), 255, 25, 25);
-        col[9] = new Color(Display.getDefault(), 255, 0, 0);
+        fColors = new Color[10];
+        fColors[0] = new Color(Display.getDefault(), 255, 229, 229);
+        fColors[1] = new Color(Display.getDefault(), 255, 204, 204);
+        fColors[2] = new Color(Display.getDefault(), 255, 178, 178);
+        fColors[3] = new Color(Display.getDefault(), 255, 153, 153);
+        fColors[4] = new Color(Display.getDefault(), 255, 127, 127);
+        fColors[5] = new Color(Display.getDefault(), 255, 102, 102);
+        fColors[6] = new Color(Display.getDefault(), 255, 76, 76);
+        fColors[7] = new Color(Display.getDefault(), 255, 51, 51);
+        fColors[8] = new Color(Display.getDefault(), 255, 25, 25);
+        fColors[9] = new Color(Display.getDefault(), 255, 0, 0);
     }
 
     // ------------------------------------------------------------------------
@@ -124,7 +124,7 @@ public class DrawableToolTip implements PaintListener {
      * @return the message to display.
      */
     public String getText() {
-        return msg;
+        return fMessage;
     }
 
     /**
@@ -133,7 +133,7 @@ public class DrawableToolTip implements PaintListener {
      * @return the current time to display
      */
     public String getAccessibleText() {
-        return currentValue.toString();
+        return fCurrentValue.toString();
     }
 
     /**
@@ -142,7 +142,7 @@ public class DrawableToolTip implements PaintListener {
      * @return the horizontal margin.
      */
     protected static int getHorizontalMargin() {
-        return H_MARGIN;
+        return fHorMargin;
     }
 
     /**
@@ -151,7 +151,7 @@ public class DrawableToolTip implements PaintListener {
      * @param margin The margin to set.
      */
     protected static void setHorizontalMargin(int margin) {
-        H_MARGIN = margin;
+        fHorMargin = margin;
     }
 
     /**
@@ -160,7 +160,7 @@ public class DrawableToolTip implements PaintListener {
      * @return the vertical margin.
      */
     protected static int getVerticalMargin() {
-        return V_MARGIN;
+        return fVertMargin;
     }
 
     /**
@@ -169,7 +169,7 @@ public class DrawableToolTip implements PaintListener {
      * @param margin The margin to set.
      */
     protected static void setVerticalMargin(int margin) {
-        V_MARGIN = margin;
+        fVertMargin = margin;
     }
 
     /**
@@ -178,7 +178,7 @@ public class DrawableToolTip implements PaintListener {
      * @return the text scale margin.
      */
     protected static int getTextScaleMargin() {
-        return TEXT_SCALE_MARGIN;
+        return fTextScaleMargin;
     }
 
     /**
@@ -186,7 +186,7 @@ public class DrawableToolTip implements PaintListener {
      * @param textScaleMargin The margin to set.
      */
     protected static void setTestScaleMargin(int textScaleMargin) {
-        TEXT_SCALE_MARGIN = textScaleMargin;
+        fTextScaleMargin = textScaleMargin;
     }
 
     /**
@@ -195,7 +195,7 @@ public class DrawableToolTip implements PaintListener {
      * @return the scale length.
      */
     protected static int getScaleLength() {
-        return SCALE_LENGTH;
+        return fScaleLength;
     }
 
     /**
@@ -204,7 +204,7 @@ public class DrawableToolTip implements PaintListener {
      * @param scaleLength The scale length to set.
      */
     protected static void setScaleLength(int scaleLength) {
-        SCALE_LENGTH = scaleLength;
+        fScaleLength = scaleLength;
     }
     
     /**
@@ -216,29 +216,29 @@ public class DrawableToolTip implements PaintListener {
      * @param max the scale max
      */
     public void showToolTip(ITmfTimestamp value, ITmfTimestamp min, ITmfTimestamp max) {
-        minMaxRange = new TmfTimeRange(min.clone(), max.clone());
-        currentValue = value.clone();
+        fMinMaxRange = new TmfTimeRange(min.clone(), max.clone());
+        fCurrentValue = value.clone();
 
-        int w = toolTipShell.getBounds().width;
-        int h = toolTipShell.getBounds().height;
+        int w = fToolTipShell.getBounds().width;
+        int h = fToolTipShell.getBounds().height;
         Point hr = Display.getDefault().getCursorLocation();
-        toolTipShell.setBounds(hr.x, hr.y + 26, w, h);
-        toolTipShell.setVisible(true);
+        fToolTipShell.setBounds(hr.x, hr.y + 26, w, h);
+        fToolTipShell.setVisible(true);
     }
 
     /**
      * Hide the tooltip.
      */
     public void hideToolTip() {
-        toolTipShell.setVisible(false);
+        fToolTipShell.setVisible(false);
     }
 
     /**
      * Disposes the system resource used by this kind of toolTips (a colors array essentially)
      */
     public void dispose() {
-        for (int i = 0; i < col.length; i++)
-            col[i].dispose();
+        for (int i = 0; i < fColors.length; i++)
+            fColors[i].dispose();
     }
     
     /*
@@ -247,30 +247,30 @@ public class DrawableToolTip implements PaintListener {
      */
     @Override
     public void paintControl(PaintEvent event) {
-        msg = SDMessages._138 + " " +  currentValue.toString(); //$NON-NLS-1$
-        Point size = event.gc.textExtent(msg);
-        if (size.x < SCALE_LENGTH) {
-            size.x = SCALE_LENGTH;
+        fMessage = SDMessages._138 + " " +  fCurrentValue.toString(); //$NON-NLS-1$
+        Point size = event.gc.textExtent(fMessage);
+        if (size.x < fScaleLength) {
+            size.x = fScaleLength;
         }
-        event.gc.drawText(msg, H_MARGIN, V_MARGIN, true);
-        event.gc.drawLine(H_MARGIN, V_MARGIN + TEXT_SCALE_MARGIN + size.y, H_MARGIN + SCALE_LENGTH, V_MARGIN + TEXT_SCALE_MARGIN + size.y);
+        event.gc.drawText(fMessage, fHorMargin, fVertMargin, true);
+        event.gc.drawLine(fHorMargin, fVertMargin + fTextScaleMargin + size.y, fHorMargin + fScaleLength, fVertMargin + fTextScaleMargin + size.y);
 
-        int step = SCALE_LENGTH / 10;
+        int step = fScaleLength / 10;
 
         // double gr = (max - min) / 10;
-        ITmfTimestamp minMaxdelta = (TmfTimestamp) minMaxRange.getEndTime().getDelta(minMaxRange.getStartTime());
+        ITmfTimestamp minMaxdelta = (TmfTimestamp) fMinMaxRange.getEndTime().getDelta(fMinMaxRange.getStartTime());
         double gr = (minMaxdelta.getValue()) / (double) 10;
 
         // double delta = currentValue-min;
-        ITmfTimestamp delta = (TmfTimestamp) currentValue.getDelta(minMaxRange.getStartTime());
+        ITmfTimestamp delta = (TmfTimestamp) fCurrentValue.getDelta(fMinMaxRange.getStartTime());
         long absDelta = Math.abs(delta.getValue());
         
         int colIndex = 0;
         if (gr != 0) {
             // colIndex = Math.round((float)(Math.log(1+delta)/gr));
             colIndex = Math.round((float) (absDelta / gr));
-            if (colIndex > col.length) {
-                colIndex = col.length;
+            if (colIndex > fColors.length) {
+                colIndex = fColors.length;
             } else if (colIndex <= 1) {
                 colIndex = 1;
             }
@@ -280,24 +280,24 @@ public class DrawableToolTip implements PaintListener {
 
         for (int i = 0; i <= 10; i++) {
             if (i < 10) {
-                event.gc.setBackground(col[i]);
+                event.gc.setBackground(fColors[i]);
             }
             if ((i < colIndex) && (i < 10)) {
-                event.gc.fillRectangle(H_MARGIN + i * step, V_MARGIN + TEXT_SCALE_MARGIN + size.y - 5, step, 11);
+                event.gc.fillRectangle(fHorMargin + i * step, fVertMargin + fTextScaleMargin + size.y - 5, step, 11);
             }
             if (i == 0) {
-                event.gc.drawText(SDMessages._56, H_MARGIN, size.y + 2 * V_MARGIN + TEXT_SCALE_MARGIN, true);
+                event.gc.drawText(SDMessages._56, fHorMargin, size.y + 2 * fVertMargin + fTextScaleMargin, true);
             }
             if (i == 0) {
                 int len = event.gc.textExtent(SDMessages._55).x;
-                event.gc.drawText(SDMessages._55, H_MARGIN + SCALE_LENGTH - len + 1, size.y + 2 * V_MARGIN + TEXT_SCALE_MARGIN, true);
+                event.gc.drawText(SDMessages._55, fHorMargin + fScaleLength - len + 1, size.y + 2 * fVertMargin + fTextScaleMargin, true);
             }
             int lineWidth = 10;
             if ((i == 0) || (i == 10)) {
                 lineWidth = 14;
             }
-            event.gc.drawLine(H_MARGIN + i * step, V_MARGIN + TEXT_SCALE_MARGIN + size.y - lineWidth / 2, H_MARGIN + i * step, V_MARGIN + TEXT_SCALE_MARGIN + size.y + lineWidth / 2);
+            event.gc.drawLine(fHorMargin + i * step, fVertMargin + fTextScaleMargin + size.y - lineWidth / 2, fHorMargin + i * step, fVertMargin + fTextScaleMargin + size.y + lineWidth / 2);
         }
-        toolTipShell.setSize(size.x + 2 * H_MARGIN + 2, 2 * size.y + 3 * V_MARGIN + TEXT_SCALE_MARGIN);
+        fToolTipShell.setSize(size.x + 2 * fHorMargin + 2, 2 * size.y + 3 * fVertMargin + fTextScaleMargin);
     }
 }

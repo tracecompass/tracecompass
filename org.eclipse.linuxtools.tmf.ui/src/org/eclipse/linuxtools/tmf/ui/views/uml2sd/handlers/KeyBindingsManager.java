@@ -11,10 +11,10 @@
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -44,7 +44,7 @@ public class KeyBindingsManager {
     /**
      * The singleton instance. 
      */
-    private final static KeyBindingsManager fInstance = new KeyBindingsManager();
+    private static KeyBindingsManager fInstance = null;
     /**
      * The list of view names. 
      */
@@ -52,7 +52,7 @@ public class KeyBindingsManager {
     /**
      * The list of activations Activations to store
      */
-    private List<IHandlerActivation> fHandlerActivations = new Vector<IHandlerActivation>();
+    private List<IHandlerActivation> fHandlerActivations = new ArrayList<IHandlerActivation>();
     /**
      * The action reference for moving to a message in view. 
      */
@@ -91,9 +91,9 @@ public class KeyBindingsManager {
     // ------------------------------------------------------------------------
     
     /**
-     * Private constructor 
+     * Constructor 
      */
-    private KeyBindingsManager() {
+    protected KeyBindingsManager() {
     }
 
     // ------------------------------------------------------------------------
@@ -105,6 +105,9 @@ public class KeyBindingsManager {
      * @return the KeyBindingsManager singleton instance
      */
     public synchronized static KeyBindingsManager getInstance() {
+        if (fInstance == null) {
+            fInstance = new KeyBindingsManager();
+        }
         return fInstance;
     }
     
@@ -115,7 +118,7 @@ public class KeyBindingsManager {
      */
     public void add(String viewId) {
         
-        if (fViews.size() == 0) {
+        if (fViews.isEmpty()) {
             initialize();
         }
         
@@ -133,7 +136,7 @@ public class KeyBindingsManager {
         if (fViews.contains(viewId)) {
             fViews.remove(viewId);
         }
-        if (fViews.size() == 0) {
+        if (fViews.isEmpty()) {
             dispose();
         }
     }
@@ -268,7 +271,7 @@ public class KeyBindingsManager {
      * @param view to set in global actions
      */
     public void setSdView(SDView view) {
-        if (fViews.size() > 0) {
+        if (!fViews.isEmpty()) {
             fGoToMessageForKeyBinding.setView(view);
             fFindForKeyBinding.setView(view);
             fMoveUpForKeyBinding.setView(view);

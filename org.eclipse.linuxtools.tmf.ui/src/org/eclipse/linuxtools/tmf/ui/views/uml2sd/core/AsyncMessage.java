@@ -65,19 +65,19 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
     /**
      * Flag whether message has time information or not.
      */
-    protected boolean hasTime = false;
+    protected boolean fHasTime = false;
     /**
      * The time when the message begin
      */
-    protected ITmfTimestamp endTime = new TmfTimestamp();
+    protected ITmfTimestamp fEndTime = new TmfTimestamp();
     /**
      * The time when the message end
      */
-    protected ITmfTimestamp startTime = new TmfTimestamp();
+    protected ITmfTimestamp fStartTime = new TmfTimestamp();
     /**
      * The associated message.
      */
-    protected AsyncMessageReturn messageReturn = null;
+    protected AsyncMessageReturn fMessageReturn = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -86,7 +86,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      * Default constructor
      */
     public AsyncMessage() {
-        prefId = ISDPreferences.PREF_ASYNC_MESS;
+        fPrefId = ISDPreferences.PREF_ASYNC_MESS;
     }
 
     // ------------------------------------------------------------------------
@@ -100,11 +100,11 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
     public int getX() {
         int x = super.getX(true);
         int activationWidth = Metrics.EXECUTION_OCCURRENCE_WIDTH / 2;
-        if ((startLifeline != null) && (endLifeline != null) && (startLifeline.getX() > endLifeline.getX())) {
+        if ((fStartLifeline != null) && (fEndLifeline != null) && (fStartLifeline.getX() > fEndLifeline.getX())) {
             activationWidth = -activationWidth;
         }
 
-        if (isMessageStartInActivation(startEventOccurrence)) {
+        if (isMessageStartInActivation(fStartEventOccurrence)) {
             x = x + activationWidth;
         }
         return x;
@@ -116,8 +116,8 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      */
     @Override
     public int getY() {
-        if ((startLifeline != null) && (endLifeline != null)) {
-            return endLifeline.getY() + endLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * startEventOccurrence;
+        if ((fStartLifeline != null) && (fEndLifeline != null)) {
+            return fEndLifeline.getY() + fEndLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fStartEventOccurrence;
         }
         return super.getY();
     }
@@ -130,15 +130,15 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
     public int getWidth() {
         int width = super.getWidth(true);
         int activationWidth = Metrics.EXECUTION_OCCURRENCE_WIDTH / 2;
-        if ((startLifeline != null) && (endLifeline != null) && (startLifeline.getX() > endLifeline.getX())) {
+        if ((fStartLifeline != null) && (fEndLifeline != null) && (fStartLifeline.getX() > fEndLifeline.getX())) {
             activationWidth = -activationWidth;
         }
 
-        if (isMessageStartInActivation(startEventOccurrence)) {
+        if (isMessageStartInActivation(fStartEventOccurrence)) {
             width = width - activationWidth;
         }
 
-        if (isMessageEndInActivation(endEventOccurrence)) {
+        if (isMessageEndInActivation(fEndEventOccurrence)) {
             width = width - activationWidth;
         }
 
@@ -151,8 +151,8 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      */
     @Override
     public int getHeight() {
-        if ((startLifeline != null) && (endLifeline != null)) {
-            return (endLifeline.getY() + endLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * endEventOccurrence) - getY();
+        if ((fStartLifeline != null) && (fEndLifeline != null)) {
+            return (fEndLifeline.getY() + fEndLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fEndEventOccurrence) - getY();
         }
         return super.getHeight();
     }
@@ -163,7 +163,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      * @param message the message return to associate
      */
     protected void setMessageReturn(AsyncMessageReturn message) {
-        messageReturn = message;
+        fMessageReturn = message;
     }
 
     /**
@@ -172,9 +172,9 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      * @param occurrence the event occurrence to set
      */
     public void setEndOccurrence(int occurrence) {
-        endEventOccurrence = occurrence;
+        fEndEventOccurrence = occurrence;
         if (getStartLifeline() == null) {
-            startEventOccurrence = occurrence;
+            fStartEventOccurrence = occurrence;
         }
         informFrame(getEndLifeline(), occurrence);
     }
@@ -197,9 +197,9 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      * @param occurrence the event occurrence to set
      */
     public void setStartOccurrence(int occurrence) {
-        startEventOccurrence = occurrence;
+        fStartEventOccurrence = occurrence;
         if (getEndLifeline() == null) {
-            endEventOccurrence = startEventOccurrence;
+            fEndEventOccurrence = fStartEventOccurrence;
         }
         informFrame(getStartLifeline(), occurrence);
     }
@@ -235,7 +235,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
         super.setStartLifeline(lifeline);
         setStartOccurrence(getStartLifeline().getEventOccurrence());
         if (getEndLifeline() == null) {
-            endEventOccurrence = startEventOccurrence;
+            fEndEventOccurrence = fStartEventOccurrence;
         }
     }
 
@@ -290,7 +290,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
     @Override
     public boolean contains(int x, int y) {
         // Is it a self message?
-        if (startLifeline == endLifeline) {
+        if (fStartLifeline == fEndLifeline) {
             return super.contains(x, y);
         }
         if (isNearSegment(getX(), getY(), getX() + getWidth(), getY() + getHeight(), x, y))
@@ -315,13 +315,13 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      * @param context A graphical context to draw in.
      */
     protected void drawAsyncMessage(IGC context) {
-        if (startLifeline != null && endLifeline != null && startLifeline == endLifeline && (startEventOccurrence != endEventOccurrence)) {
+        if (fStartLifeline != null && fEndLifeline != null && fStartLifeline == fEndLifeline && (fStartEventOccurrence != fEndEventOccurrence)) {
             int x = getX();
             int y = getY();
             int height = getHeight();
             int tempx = 0;
-            boolean startInActivation = isMessageStartInActivation(startEventOccurrence);
-            boolean endInActivation = isMessageEndInActivation(endEventOccurrence);
+            boolean startInActivation = isMessageStartInActivation(fStartEventOccurrence);
+            boolean endInActivation = isMessageEndInActivation(fEndEventOccurrence);
 
             if (endInActivation && !startInActivation) {
                 tempx = Metrics.EXECUTION_OCCURRENCE_WIDTH / 2;
@@ -339,8 +339,8 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
             context.drawLine(x + Metrics.INTERNAL_MESSAGE_WIDTH, y + tempy, x + Metrics.INTERNAL_MESSAGE_WIDTH, y + height - tempy);
             context.drawLine(x + tempx, y + height, x + Metrics.INTERNAL_MESSAGE_WIDTH / 2, y + height);
 
-            Double xt = new Double(Math.cos(0.75) * 7);
-            Double yt = new Double(Math.sin(0.75) * 7);
+            Double xt = Double.valueOf(Math.cos(0.75) * 7);
+            Double yt = Double.valueOf(Math.sin(0.75) * 7);
 
             context.drawLine(x + xt.intValue() + tempx, y + height + yt.intValue(), x + tempx, y + height);
             context.drawArc(x, y, Metrics.INTERNAL_MESSAGE_WIDTH, 2 * tempy, 0, 90);
@@ -364,7 +364,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
             return;
         }
         // Draw it selected?
-        if (isSelected() && (startLifeline != null && endLifeline != null && startLifeline == endLifeline && (startEventOccurrence != endEventOccurrence))) {
+        if (isSelected() && (fStartLifeline != null && fEndLifeline != null && fStartLifeline == fEndLifeline && (fStartEventOccurrence != fEndEventOccurrence))) {
             /*
              * Draw it twice First time, bigger inverting selection colors Second time, regular drawing using selection
              * colors This create the highlight effect
@@ -376,8 +376,8 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
             context.setForeground(Frame.getUserPref().getForeGroundColorSelection());
             // Second drawing is done after the else
         } else {
-            context.setBackground(Frame.getUserPref().getBackGroundColor(prefId));
-            context.setForeground(Frame.getUserPref().getForeGroundColor(prefId));
+            context.setBackground(Frame.getUserPref().getBackGroundColor(fPrefId));
+            context.setForeground(Frame.getUserPref().getForeGroundColor(fPrefId));
         }
         if (hasFocus()) {
             context.setDrawTextWithFocusStyle(true);
@@ -395,8 +395,8 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      * @param time the time when the message end
      */
     public void setEndTime(ITmfTimestamp time) {
-        endTime = time.clone();
-        hasTime = true;
+        fEndTime = time.clone();
+        fHasTime = true;
         if (getStartLifeline() != null && getStartLifeline().getFrame() != null) {
             getStartLifeline().getFrame().setHasTimeInfo(true);
         } else if (getEndLifeline() != null && getEndLifeline().getFrame() != null) {
@@ -410,8 +410,8 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      * @param time the time when the message start
      */
     public void setStartTime(ITmfTimestamp time) {
-        startTime = time.clone();
-        hasTime = true;
+        fStartTime = time.clone();
+        fHasTime = true;
         if (getStartLifeline() != null && getStartLifeline().getFrame() != null) {
             getStartLifeline().getFrame().setHasTimeInfo(true);
         } else if (getEndLifeline() != null && getEndLifeline().getFrame() != null) {
@@ -425,7 +425,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      */
     @Override
     public ITmfTimestamp getEndTime() {
-        return endTime;
+        return fEndTime;
     }
 
     /*
@@ -434,7 +434,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      */
     @Override
     public ITmfTimestamp getStartTime() {
-        return startTime;
+        return fStartTime;
     }
 
     /*
@@ -443,7 +443,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
      */
     @Override
     public boolean hasTimeInfo() {
-        return hasTime;
+        return fHasTime;
     }
 
     /*

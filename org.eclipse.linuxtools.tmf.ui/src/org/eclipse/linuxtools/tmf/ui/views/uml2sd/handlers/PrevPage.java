@@ -44,7 +44,7 @@ public class PrevPage extends Action {
     /**
      * The sequence diagram view reference.
      */
-    protected SDView view = null;
+    protected SDView fView = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -53,11 +53,11 @@ public class PrevPage extends Action {
     /**
      * Default constructor 
      * 
-     * @param theView the view reference
+     * @param view the view reference
      */
-    public PrevPage(SDView theView) {
+    public PrevPage(SDView view) {
         super();
-        view = theView;
+        fView = view;
         setText(SDMessages._35);
         setToolTipText(SDMessages._37);
         setId(ID); 
@@ -73,13 +73,13 @@ public class PrevPage extends Action {
      */
     @Override
     public void run() {
-        if ((view == null) || (view.getSDWidget()) == null) {
+        if ((fView == null) || (fView.getSDWidget()) == null) {
             return;
         }
-        if (view.getSDPagingProvider() != null) {
-            view.getSDPagingProvider().prevPage();
+        if (fView.getSDPagingProvider() != null) {
+            fView.getSDPagingProvider().prevPage();
         }
-        view.updateCoolBar();
-        view.getSDWidget().redraw();
+        fView.updateCoolBar();
+        fView.getSDWidget().redraw();
     }
 }

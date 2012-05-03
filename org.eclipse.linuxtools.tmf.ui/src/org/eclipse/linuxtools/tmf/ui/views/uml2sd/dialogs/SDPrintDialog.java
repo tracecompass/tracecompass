@@ -42,23 +42,23 @@ public class SDPrintDialog extends Dialog {
     /**
      * The sequence dialog widget reference.
      */
-    protected SDWidget view;
+    protected SDWidget fSdView;
     /**
      * Sequence dialog print dialog UI
      */
-    protected SDPrintDialogUI dialogUI;
+    protected SDPrintDialogUI fDialogUI;
     /**
      * Error message to display.
      */
-    protected String errorMessage = null;
+    protected String fErrorMessage = null;
     /**
      * A message label.
      */
-    protected Label messageLabel = null;
+    protected Label fMessageLabel = null;
     /**
      * Flag whether the page is complete or not
      */
-    protected boolean isPageComplete = true;
+    protected boolean fIsPageComplete = true;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -71,10 +71,10 @@ public class SDPrintDialog extends Dialog {
      */
     public SDPrintDialog(Shell shell, SDWidget viewer) {
         super(shell);
-        view = viewer;
+        fSdView = viewer;
 
-        dialogUI = new SDPrintDialogUI(shell, view);
-        dialogUI.setParentDialog(this);
+        fDialogUI = new SDPrintDialogUI(shell, fSdView);
+        fDialogUI.setParentDialog(this);
     }
 
     // ------------------------------------------------------------------------
@@ -89,13 +89,13 @@ public class SDPrintDialog extends Dialog {
         p.getShell().setText(SDMessages._114);
         Composite parent = (Composite) super.createDialogArea(p);
 
-        dialogUI.createDialogArea(parent);
+        fDialogUI.createDialogArea(parent);
 
-        messageLabel = new Label(parent, SWT.NONE);
+        fMessageLabel = new Label(parent, SWT.NONE);
         GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
         gridData.horizontalSpan = 6;
-        messageLabel.setLayoutData(gridData);
-        setErrorMessage(errorMessage);
+        fMessageLabel.setLayoutData(gridData);
+        setErrorMessage(fErrorMessage);
 
         return parent;
     }
@@ -107,7 +107,7 @@ public class SDPrintDialog extends Dialog {
     @Override
     protected void okPressed() {
 
-        if (dialogUI.okPressed())
+        if (fDialogUI.okPressed())
             super.okPressed();
     }
 
@@ -129,7 +129,7 @@ public class SDPrintDialog extends Dialog {
             @Override
             public void widgetSelected(SelectionEvent e) {
 
-                dialogUI.printButtonSelected();
+                fDialogUI.printButtonSelected();
             }
             /*
              * (non-Javadoc)
@@ -147,7 +147,7 @@ public class SDPrintDialog extends Dialog {
      * @return the dialog UI
      */
     public SDPrintDialogUI getDialogUI() {
-        return dialogUI;
+        return fDialogUI;
     }
 
     /**
@@ -156,12 +156,12 @@ public class SDPrintDialog extends Dialog {
      * @param message error message to set
      */
     public void setErrorMessage(String message) {
-        errorMessage = message;
-        if (messageLabel != null) {
-            if (errorMessage == null) {
-                messageLabel.setText(""); //$NON-NLS-1$
+        fErrorMessage = message;
+        if (fMessageLabel != null) {
+            if (fErrorMessage == null) {
+                fMessageLabel.setText(""); //$NON-NLS-1$
             } else {
-                messageLabel.setText(errorMessage);
+                fMessageLabel.setText(fErrorMessage);
             }
         }
     }
@@ -171,7 +171,7 @@ public class SDPrintDialog extends Dialog {
      * @param complete whether page is complete or not
      */
     public void setPageComplete(boolean complete) {
-        isPageComplete = complete;
+        fIsPageComplete = complete;
         updateButtons();
     }
 
@@ -180,7 +180,7 @@ public class SDPrintDialog extends Dialog {
      */
     public void updateButtons() {
         Button okButton = getButton(IDialogConstants.OK_ID);
-        if (isPageComplete) {
+        if (fIsPageComplete) {
             if (okButton != null) {
                 okButton.setEnabled(true);
             }

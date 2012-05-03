@@ -58,13 +58,13 @@ public class OpenSDFiltersDialog extends Action {
      * 
      * @param theView The view reference
      */
-    public OpenSDFiltersDialog(SDView view_, ISDFilterProvider provider_) {
+    public OpenSDFiltersDialog(SDView view, ISDFilterProvider provider) {
         super(SDMessages._43);
         setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_FILTERS));
         setId(ID);
         setToolTipText(SDMessages._43);
-        fView = view_;
-        fProvider = provider_;
+        fView = view;
+        fProvider = provider;
     }
 
     // ------------------------------------------------------------------------

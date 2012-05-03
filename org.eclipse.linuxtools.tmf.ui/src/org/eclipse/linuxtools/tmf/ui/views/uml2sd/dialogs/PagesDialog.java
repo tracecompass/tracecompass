@@ -45,9 +45,9 @@ public class PagesDialog extends Dialog {
     /**
      * viewer and provided are kept here as attributes
      */
-    protected ISDAdvancedPagingProvider provider = null;
-    protected TextArea currentPage;
-    protected Label totalPageComment;
+    protected ISDAdvancedPagingProvider fProvider = null;
+    protected TextArea fCurrentPage;
+    protected Label fTotalPageComment;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -56,12 +56,12 @@ public class PagesDialog extends Dialog {
     /**
      * Standard constructor
      * 
-     * @param view_ The sequence diagram view reference
-     * @param provider_ The paging provider reference
+     * @param view The sequence diagram view reference
+     * @param provider The paging provider reference
      */
-    public PagesDialog(IViewPart view_, ISDAdvancedPagingProvider provider_) {
-        super(view_.getSite().getShell());
-        provider = provider_;
+    public PagesDialog(IViewPart view, ISDAdvancedPagingProvider provider) {
+        super(view.getSite().getShell());
+        fProvider = provider;
         setShellStyle(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
     }
 
@@ -89,12 +89,12 @@ public class PagesDialog extends Dialog {
         Label label = new Label(ret, SWT.NONE);
         label.setText(SDMessages._75);
 
-        currentPage = new TextArea(ret);
-        currentPage.setBounds(1, provider.pagesCount());
-        currentPage.setValue(provider.currentPage() + 1);
+        fCurrentPage = new TextArea(ret);
+        fCurrentPage.setBounds(1, fProvider.pagesCount());
+        fCurrentPage.setValue(fProvider.currentPage() + 1);
 
-        totalPageComment = new Label(ret, SWT.NONE);
-        totalPageComment.setAlignment(SWT.RIGHT);
+        fTotalPageComment = new Label(ret, SWT.NONE);
+        fTotalPageComment.setAlignment(SWT.RIGHT);
 
         updateComments();
 
@@ -108,25 +108,28 @@ public class PagesDialog extends Dialog {
      */
     @Override
     public void okPressed() {
-        int currentPageValue = currentPage.getValue() - 1;
+        int currentPageValue = fCurrentPage.getValue() - 1;
         super.close();
-        provider.pageNumberChanged(currentPageValue);
+        fProvider.pageNumberChanged(currentPageValue);
     }
 
     /**
      * Updates the comments texts. 
      */
     protected void updateComments() {
-        int pages = Math.max(0, provider.pagesCount());
-        String totalPageCommentText = SDMessages._70 + pages + " "; //$NON-NLS-1$
+        int pages = Math.max(0, fProvider.pagesCount());
+        StringBuffer totalPageCommentText = new StringBuffer();
+        totalPageCommentText.append(SDMessages._70);
+        totalPageCommentText.append(pages);
+        totalPageCommentText.append(" "); //$NON-NLS-1$
         if (pages == 0) {
-            totalPageCommentText += SDMessages._71;
+            totalPageCommentText.append(SDMessages._71);
         } else if (pages == 1) {
-            totalPageCommentText += SDMessages._72;
+            totalPageCommentText.append(SDMessages._72);
         } else {
-            totalPageCommentText += SDMessages._73;
+            totalPageCommentText.append(SDMessages._73);
         }
-        totalPageComment.setText(totalPageCommentText);
+        fTotalPageComment.setText(totalPageCommentText.toString());
     }
 
     
@@ -140,15 +143,15 @@ public class PagesDialog extends Dialog {
         /**
          * The text field.
          */
-        protected Text text;
+        protected Text fText;
         /**
          * The minimum page value
          */
-        int min;
+        int fMin;
         /**
          * The maximum page value
          */
-        int max;
+        int fMax;
 
         /**
          * Constructor
@@ -156,8 +159,8 @@ public class PagesDialog extends Dialog {
          * @param parent The paren composite
          */
         public TextArea(Composite parent) {
-            text = new Text(parent, SWT.SINGLE | SWT.BORDER | SWT.RIGHT);
-            text.setTextLimit(10);
+            fText = new Text(parent, SWT.SINGLE | SWT.BORDER | SWT.RIGHT);
+            fText.setTextLimit(10);
         }
 
         /**
@@ -166,8 +169,8 @@ public class PagesDialog extends Dialog {
          * @param page The page value
          */
         public void setValue(int page) {
-            int value = Math.max(min, Math.min(max, page));
-            text.setText(Integer.toString(value));
+            int value = Math.max(fMin, Math.min(fMax, page));
+            fText.setText(Integer.toString(value));
         }
 
         /**
@@ -178,27 +181,27 @@ public class PagesDialog extends Dialog {
         public int getValue() {
             int res;
             try {
-                res = Integer.parseInt(text.getText());
+                res = Integer.parseInt(fText.getText());
             } catch (Exception e) {
                 // ignored
                 res = 0;
             }
-            return Math.max(min, Math.min(max, res));
+            return Math.max(fMin, Math.min(fMax, res));
         }
 
         /**
          * Sets the minimum and maximum page values.
          * 
-         * @param min_ A minimum page value
-         * @param max_ A maximum page value
+         * @param min A minimum page value
+         * @param max A maximum page value
          */
-        public void setBounds(int min_, int max_) {
-            min = Math.max(0, min_);
-            max = Math.max(min, max_);
+        public void setBounds(int min, int max) {
+            fMin = Math.max(0, min);
+            fMax = Math.max(fMin, max);
             Integer tab[] = new Integer[2];
-            tab[0] = Integer.valueOf(min);
-            tab[1] = Integer.valueOf(max);
-            text.setToolTipText(MessageFormat.format(SDMessages._69, (Object[]) tab));
+            tab[0] = Integer.valueOf(fMin);
+            tab[1] = Integer.valueOf(fMax);
+            fText.setToolTipText(MessageFormat.format(SDMessages._69, (Object[]) tab));
         }
     }
 

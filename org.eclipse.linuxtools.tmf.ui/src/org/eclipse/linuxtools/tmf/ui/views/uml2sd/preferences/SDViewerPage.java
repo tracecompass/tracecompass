@@ -57,51 +57,51 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
     /**
      * The preference handler used to access the PreferenceStore
      */
-    protected SDViewPref pref = null;
+    protected SDViewPref fPreferences = null;
     /**
      * BackGround color selector
      */
-    protected ColorFieldEditor lineColor = null;
+    protected ColorFieldEditor fLineColor = null;
     /**
      * Foreground color selector
      */
-    protected ColorFieldEditor backGroundColor = null;
+    protected ColorFieldEditor fBackGroundColor = null;
     /**
      * Font color selector
      */
-    protected ColorFieldEditor textColor = null;
+    protected ColorFieldEditor fTextColor = null;
     /**
      * List which display all modifiable sequence Diagram font
      */
-    protected List classItemList = null;
+    protected List fClassItemList = null;
     /**
      * Font selector (The same is used for each modifiable font)
      */
-    protected FontFieldEditor font = null;
+    protected FontFieldEditor fFont = null;
     /**
      * Link font when zooming selector
      */
-    protected BooleanFieldEditor link = null;
+    protected BooleanFieldEditor fLink = null;
     /**
      * Enable tooltip selector
      */
-    protected BooleanFieldEditor tooltip = null;
+    protected BooleanFieldEditor fTooltip = null;
     /**
      * Do not take external time into account in the min max computation
      */
-    protected BooleanFieldEditor noExternalTime = null;
+    protected BooleanFieldEditor fNoExternalTime = null;
     /**
      * Use gradient color selector
      */
-    protected BooleanFieldEditor useGrad = null;
+    protected BooleanFieldEditor fUseGrad = null;
     /**
      * A button area.
      */
-    protected Composite buttonArea;
+    protected Composite fButtonArea;
     /**
      * SwimLane width selector
      */
-    protected IntegerFieldEditor lifelineWidth = null;
+    protected IntegerFieldEditor fLifelineWidth = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -131,23 +131,23 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         page.setLayoutData(pageLayoutdata);
         page.setLayout(pageLayout);
 
-        tooltip = new BooleanFieldEditor(SDViewPref.PREF_TOOLTIP, SDMessages._97, page);
-        tooltip.setPreferenceStore(pref.getPreferenceStore());
-        tooltip.load();
+        fTooltip = new BooleanFieldEditor(SDViewPref.PREF_TOOLTIP, SDMessages._97, page);
+        fTooltip.setPreferenceStore(fPreferences.getPreferenceStore());
+        fTooltip.load();
 
         // link font with zoom pref
-        link = new BooleanFieldEditor(SDViewPref.PREF_LINK_FONT, SDMessages._82, page);
-        link.setPreferenceStore(pref.getPreferenceStore());
-        link.load();
+        fLink = new BooleanFieldEditor(SDViewPref.PREF_LINK_FONT, SDMessages._82, page);
+        fLink.setPreferenceStore(fPreferences.getPreferenceStore());
+        fLink.load();
 
-        noExternalTime = new BooleanFieldEditor(SDViewPref.PREF_EXCLUDE_EXTERNAL_TIME, SDMessages._83, page);
-        noExternalTime.setPreferenceStore(pref.getPreferenceStore());
-        noExternalTime.load();
+        fNoExternalTime = new BooleanFieldEditor(SDViewPref.PREF_EXCLUDE_EXTERNAL_TIME, SDMessages._83, page);
+        fNoExternalTime.setPreferenceStore(fPreferences.getPreferenceStore());
+        fNoExternalTime.load();
 
         // use gradient color pref
-        useGrad = new BooleanFieldEditor(SDViewPref.PREF_USE_GRADIENT, SDMessages._84, page);
-        useGrad.setPreferenceStore(pref.getPreferenceStore());
-        useGrad.load();
+        fUseGrad = new BooleanFieldEditor(SDViewPref.PREF_USE_GRADIENT, SDMessages._84, page);
+        fUseGrad.setPreferenceStore(fPreferences.getPreferenceStore());
+        fUseGrad.load();
 
         Label separator = new Label(page, SWT.SEPARATOR | SWT.HORIZONTAL | SWT.SHADOW_NONE);
         GridData sepData = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL | GridData.VERTICAL_ALIGN_FILL);
@@ -160,52 +160,52 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
         prefPage.setLayout(prefPageLayout);
 
         // swimLane width pref
-        lifelineWidth = new IntegerFieldEditor(SDViewPref.PREF_LIFELINE_WIDTH, SDMessages._80, prefPage);
-        lifelineWidth.setPreferenceStore(pref.getPreferenceStore());
-        lifelineWidth.setValidRange(119, 500);
-        lifelineWidth.load();
+        fLifelineWidth = new IntegerFieldEditor(SDViewPref.PREF_LIFELINE_WIDTH, SDMessages._80, prefPage);
+        fLifelineWidth.setPreferenceStore(fPreferences.getPreferenceStore());
+        fLifelineWidth.setValidRange(119, 500);
+        fLifelineWidth.load();
 
         // not very nice
         new Label(prefPage, SWT.SEPARATOR | SWT.HORIZONTAL | SWT.SHADOW_NONE);
         new Label(prefPage, SWT.SEPARATOR | SWT.HORIZONTAL | SWT.SHADOW_NONE);
 
         // Font list pref
-        classItemList = new List(prefPage, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+        fClassItemList = new List(prefPage, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
         GridData tabItemLayoutdata = new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_VERTICAL | GridData.VERTICAL_ALIGN_FILL);
-        classItemList.setLayoutData(tabItemLayoutdata);
+        fClassItemList.setLayoutData(tabItemLayoutdata);
 
         String[] fontList2 = SDViewPref.getFontList2();
         for (int i = 0; i < fontList2.length; i++) {
-            classItemList.add(fontList2[i]);
+            fClassItemList.add(fontList2[i]);
         }
-        classItemList.setSelection(0);
-        classItemList.addSelectionListener(this);
-        buttonArea = new Composite(prefPage, SWT.NONE);
+        fClassItemList.setSelection(0);
+        fClassItemList.addSelectionListener(this);
+        fButtonArea = new Composite(prefPage, SWT.NONE);
         GridData tabItemLayoutdata2 = new GridData(GridData.HORIZONTAL_ALIGN_FILL/* |GridData.GRAB_HORIZONTAL */| GridData.GRAB_VERTICAL | GridData.VERTICAL_ALIGN_FILL);
-        buttonArea.setLayoutData(tabItemLayoutdata2);
+        fButtonArea.setLayoutData(tabItemLayoutdata2);
         GridLayout buttonAreaLayout = new GridLayout();
         buttonAreaLayout.numColumns = 1;
-        buttonArea.setLayout(buttonAreaLayout);
+        fButtonArea.setLayout(buttonAreaLayout);
 
         // font selector initialise for the lifeline font pref
         String[] fontList = SDViewPref.getFontList();
-        font = new FontFieldEditor(fontList[0], "",//$NON-NLS-1$
-                SDMessages._81, buttonArea);
-        font.getPreviewControl().setSize(500, 500);
-        font.setPreferenceStore(pref.getPreferenceStore());
-        font.load();
+        fFont = new FontFieldEditor(fontList[0], "",//$NON-NLS-1$
+                SDMessages._81, fButtonArea);
+        fFont.getPreviewControl().setSize(500, 500);
+        fFont.setPreferenceStore(fPreferences.getPreferenceStore());
+        fFont.load();
 
-        backGroundColor = new ColorFieldEditor(fontList[0] + SDViewPref.BACK_COLOR_POSTFIX, SDMessages._85, buttonArea);
-        backGroundColor.setPreferenceStore(pref.getPreferenceStore());
-        backGroundColor.load();
+        fBackGroundColor = new ColorFieldEditor(fontList[0] + SDViewPref.BACK_COLOR_POSTFIX, SDMessages._85, fButtonArea);
+        fBackGroundColor.setPreferenceStore(fPreferences.getPreferenceStore());
+        fBackGroundColor.load();
 
-        lineColor = new ColorFieldEditor(fontList[0] + SDViewPref.FORE_COLOR_POSTFIX, SDMessages._86, buttonArea);
-        lineColor.setPreferenceStore(pref.getPreferenceStore());
-        lineColor.load();
+        fLineColor = new ColorFieldEditor(fontList[0] + SDViewPref.FORE_COLOR_POSTFIX, SDMessages._86, fButtonArea);
+        fLineColor.setPreferenceStore(fPreferences.getPreferenceStore());
+        fLineColor.load();
 
-        textColor = new ColorFieldEditor(fontList[0] + SDViewPref.TEXT_COLOR_POSTFIX, SDMessages._87, buttonArea);
-        textColor.setPreferenceStore(pref.getPreferenceStore());
-        textColor.load();
+        fTextColor = new ColorFieldEditor(fontList[0] + SDViewPref.TEXT_COLOR_POSTFIX, SDMessages._87, fButtonArea);
+        fTextColor.setPreferenceStore(fPreferences.getPreferenceStore());
+        fTextColor.load();
         swapPref(true);
         Dialog.applyDialogFont(page);
 
@@ -218,7 +218,7 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
      */
     @Override
     public void init(IWorkbench workbench) {
-        pref = SDViewPref.getInstance();
+        fPreferences = SDViewPref.getInstance();
     }
 
     /*
@@ -228,22 +228,22 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
     @Override
     protected void performApply() {
         // Store the prefrences in the PreferenceStore
-        if (!lifelineWidth.isValid()) {
-            lifelineWidth.showErrorMessage();
+        if (!fLifelineWidth.isValid()) {
+            fLifelineWidth.showErrorMessage();
             return;
         }
-        font.store();
-        backGroundColor.store();
-        lineColor.store();
-        link.store();
-        tooltip.store();
-        noExternalTime.store();
-        textColor.store();
-        useGrad.store();
-        lifelineWidth.store();
+        fFont.store();
+        fBackGroundColor.store();
+        fLineColor.store();
+        fLink.store();
+        fTooltip.store();
+        fNoExternalTime.store();
+        fTextColor.store();
+        fUseGrad.store();
+        fLifelineWidth.store();
         swapPref(false);
         // then save them in the preference file
-        pref.apply();
+        fPreferences.apply();
         swapPref(true);
     }
 
@@ -263,72 +263,72 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
      */
     @Override
     protected void performDefaults() {
-        link.loadDefault();
-        tooltip.loadDefault();
-        noExternalTime.loadDefault();
-        useGrad.loadDefault();
-        lifelineWidth.loadDefault();
+        fLink.loadDefault();
+        fTooltip.loadDefault();
+        fNoExternalTime.loadDefault();
+        fUseGrad.loadDefault();
+        fLifelineWidth.loadDefault();
 
         // and all the fonts and colors
         // fonts and colors are stored for each time because
         // we are using only one FontFieldEditor
-        Set<String> keySet = SDViewPref.getInstance().fontPref.keySet();
+        Set<String> keySet = SDViewPref.getInstance().fFontPref.keySet();
         Iterator<String> it = keySet.iterator();
         while (it.hasNext()) {
             Object prefName = it.next();
             if (prefName instanceof String) {
-                font.setPreferenceName((String) prefName);
-                font.loadDefault();
-                font.setPreferenceName((String) prefName + TEMP_TAG);
-                font.store();
+                fFont.setPreferenceName((String) prefName);
+                fFont.loadDefault();
+                fFont.setPreferenceName((String) prefName + TEMP_TAG);
+                fFont.store();
             }
         }
 
-        keySet = SDViewPref.getInstance().backColorPref.keySet();
+        keySet = SDViewPref.getInstance().fBackColorPref.keySet();
         it = keySet.iterator();
         while (it.hasNext()) {
             Object prefName = it.next();
             if (prefName instanceof String) {
-                backGroundColor.setPreferenceName((String) prefName);
-                backGroundColor.loadDefault();
-                backGroundColor.setPreferenceName((String) prefName + TEMP_TAG);
-                backGroundColor.store();
+                fBackGroundColor.setPreferenceName((String) prefName);
+                fBackGroundColor.loadDefault();
+                fBackGroundColor.setPreferenceName((String) prefName + TEMP_TAG);
+                fBackGroundColor.store();
             }
 
         }
 
         String[] fontList = SDViewPref.getFontList();
-        backGroundColor.setPreferenceName(fontList[classItemList.getSelectionIndex()] + SDViewPref.BACK_COLOR_POSTFIX + TEMP_TAG);
-        backGroundColor.load();
+        fBackGroundColor.setPreferenceName(fontList[fClassItemList.getSelectionIndex()] + SDViewPref.BACK_COLOR_POSTFIX + TEMP_TAG);
+        fBackGroundColor.load();
 
-        keySet = SDViewPref.getInstance().foreColorPref.keySet();
+        keySet = SDViewPref.getInstance().fForeColorPref.keySet();
         it = keySet.iterator();
         while (it.hasNext()) {
             Object prefName = it.next();
             if (prefName instanceof String) {
-                lineColor.setPreferenceName((String) prefName);
-                lineColor.loadDefault();
-                lineColor.setPreferenceName((String) prefName + TEMP_TAG);
-                lineColor.store();
+                fLineColor.setPreferenceName((String) prefName);
+                fLineColor.loadDefault();
+                fLineColor.setPreferenceName((String) prefName + TEMP_TAG);
+                fLineColor.store();
             }
         }
 
-        lineColor.setPreferenceName(fontList[classItemList.getSelectionIndex()] + SDViewPref.FORE_COLOR_POSTFIX + TEMP_TAG);
-        lineColor.load();
+        fLineColor.setPreferenceName(fontList[fClassItemList.getSelectionIndex()] + SDViewPref.FORE_COLOR_POSTFIX + TEMP_TAG);
+        fLineColor.load();
 
-        keySet = SDViewPref.getInstance().textColorPref.keySet();
+        keySet = SDViewPref.getInstance().fTextColorPref.keySet();
         it = keySet.iterator();
         while (it.hasNext()) {
             Object prefName = it.next();
             if (prefName instanceof String) {
-                textColor.setPreferenceName((String) prefName);
-                textColor.loadDefault();
-                textColor.setPreferenceName((String) prefName + TEMP_TAG);
-                textColor.store();
+                fTextColor.setPreferenceName((String) prefName);
+                fTextColor.loadDefault();
+                fTextColor.setPreferenceName((String) prefName + TEMP_TAG);
+                fTextColor.store();
             }
         }
-        textColor.setPreferenceName(fontList[classItemList.getSelectionIndex()] + SDViewPref.TEXT_COLOR_POSTFIX + TEMP_TAG);
-        textColor.load();
+        fTextColor.setPreferenceName(fontList[fClassItemList.getSelectionIndex()] + SDViewPref.TEXT_COLOR_POSTFIX + TEMP_TAG);
+        fTextColor.load();
     }
 
     /*
@@ -339,45 +339,45 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
     public void widgetSelected(SelectionEvent e) {
         // Store the past set font preference or else the
         // FontFieldEditor reassignment will make us loose the current modification
-        font.store();
-        lineColor.store();
-        backGroundColor.store();
-        textColor.store();
+        fFont.store();
+        fLineColor.store();
+        fBackGroundColor.store();
+        fTextColor.store();
 
         String[] fontList = SDViewPref.getFontList();
         
         // set the FontFieldEditor for the new selected graphNode font
-        font.setPreferenceName(fontList[classItemList.getSelectionIndex()] + TEMP_TAG);
-        font.load();
+        fFont.setPreferenceName(fontList[fClassItemList.getSelectionIndex()] + TEMP_TAG);
+        fFont.load();
 
-        backGroundColor.setPreferenceName(fontList[classItemList.getSelectionIndex()] + SDViewPref.BACK_COLOR_POSTFIX + TEMP_TAG);
-        backGroundColor.load();
+        fBackGroundColor.setPreferenceName(fontList[fClassItemList.getSelectionIndex()] + SDViewPref.BACK_COLOR_POSTFIX + TEMP_TAG);
+        fBackGroundColor.load();
 
-        lineColor.setPreferenceName(fontList[classItemList.getSelectionIndex()] + SDViewPref.FORE_COLOR_POSTFIX + TEMP_TAG);
-        lineColor.load();
+        fLineColor.setPreferenceName(fontList[fClassItemList.getSelectionIndex()] + SDViewPref.FORE_COLOR_POSTFIX + TEMP_TAG);
+        fLineColor.load();
 
-        textColor.setPreferenceName(fontList[classItemList.getSelectionIndex()] + SDViewPref.TEXT_COLOR_POSTFIX + TEMP_TAG);
-        textColor.load();
+        fTextColor.setPreferenceName(fontList[fClassItemList.getSelectionIndex()] + SDViewPref.TEXT_COLOR_POSTFIX + TEMP_TAG);
+        fTextColor.load();
 
         // No Background for message graphNodes
-        if ((fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_SYNC_MESS)) || (fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_SYNC_MESS_RET))
-                || (fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_ASYNC_MESS)) || (fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_ASYNC_MESS_RET))) {
-            backGroundColor.setEnabled(false, buttonArea);
+        if ((fontList[fClassItemList.getSelectionIndex()].equals(SDViewPref.PREF_SYNC_MESS)) || (fontList[fClassItemList.getSelectionIndex()].equals(SDViewPref.PREF_SYNC_MESS_RET))
+                || (fontList[fClassItemList.getSelectionIndex()].equals(SDViewPref.PREF_ASYNC_MESS)) || (fontList[fClassItemList.getSelectionIndex()].equals(SDViewPref.PREF_ASYNC_MESS_RET))) {
+            fBackGroundColor.setEnabled(false, fButtonArea);
         } else {
-            backGroundColor.setEnabled(true, buttonArea);
+            fBackGroundColor.setEnabled(true, fButtonArea);
         }
 
         // No font used for execution occurrence and global frame
-        if ((fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_EXEC)) || (fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_FRAME))) {
-            textColor.setEnabled(false, buttonArea);
+        if ((fontList[fClassItemList.getSelectionIndex()].equals(SDViewPref.PREF_EXEC)) || (fontList[fClassItemList.getSelectionIndex()].equals(SDViewPref.PREF_FRAME))) {
+            fTextColor.setEnabled(false, fButtonArea);
         } else {
-            textColor.setEnabled(true, buttonArea);
+            fTextColor.setEnabled(true, fButtonArea);
         }
 
-        if (fontList[classItemList.getSelectionIndex()].equals(SDViewPref.PREF_FRAME)) {
-            font.setEnabled(false, buttonArea);
+        if (fontList[fClassItemList.getSelectionIndex()].equals(SDViewPref.PREF_FRAME)) {
+            fFont.setEnabled(false, fButtonArea);
         } else {
-            font.setEnabled(true, buttonArea);
+            fFont.setEnabled(true, fButtonArea);
         }
     }
 
@@ -388,67 +388,67 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
             TAG1 = TEMP_TAG;
             TAG2 = "";//$NON-NLS-1$
         }
-        Set<String> keySet = SDViewPref.getInstance().fontPref.keySet();
+        Set<String> keySet = SDViewPref.getInstance().fFontPref.keySet();
         Iterator<String> it = keySet.iterator();
         while (it.hasNext()) {
             Object prefName = it.next();
             if (prefName instanceof String) {
-                font.setPreferenceName((String) prefName + TAG1);
-                font.load();
-                font.setPreferenceName((String) prefName + TAG2);
-                font.store();
+                fFont.setPreferenceName((String) prefName + TAG1);
+                fFont.load();
+                fFont.setPreferenceName((String) prefName + TAG2);
+                fFont.store();
             }
         }
 
-        keySet = SDViewPref.getInstance().backColorPref.keySet();
+        keySet = SDViewPref.getInstance().fBackColorPref.keySet();
         it = keySet.iterator();
         while (it.hasNext()) {
             Object prefName = it.next();
             if (prefName instanceof String) {
-                backGroundColor.setPreferenceName((String) prefName + TAG1);
-                backGroundColor.load();
-                backGroundColor.setPreferenceName((String) prefName + TAG2);
-                backGroundColor.store();
+                fBackGroundColor.setPreferenceName((String) prefName + TAG1);
+                fBackGroundColor.load();
+                fBackGroundColor.setPreferenceName((String) prefName + TAG2);
+                fBackGroundColor.store();
             }
         }
 
-        keySet = SDViewPref.getInstance().foreColorPref.keySet();
+        keySet = SDViewPref.getInstance().fForeColorPref.keySet();
         it = keySet.iterator();
         while (it.hasNext()) {
             Object prefName = it.next();
             if (prefName instanceof String) {
-                lineColor.setPreferenceName((String) prefName + TAG1);
-                lineColor.load();
-                lineColor.setPreferenceName((String) prefName + TAG2);
-                lineColor.store();
+                fLineColor.setPreferenceName((String) prefName + TAG1);
+                fLineColor.load();
+                fLineColor.setPreferenceName((String) prefName + TAG2);
+                fLineColor.store();
             }
         }
 
-        keySet = SDViewPref.getInstance().textColorPref.keySet();
+        keySet = SDViewPref.getInstance().fTextColorPref.keySet();
         it = keySet.iterator();
         while (it.hasNext()) {
             Object prefName = it.next();
             if (prefName instanceof String) {
-                textColor.setPreferenceName((String) prefName + TAG1);
-                textColor.load();
-                textColor.setPreferenceName((String) prefName + TAG2);
-                textColor.store();
+                fTextColor.setPreferenceName((String) prefName + TAG1);
+                fTextColor.load();
+                fTextColor.setPreferenceName((String) prefName + TAG2);
+                fTextColor.store();
             }
         }
         String[] fontList = SDViewPref.getFontList();
         if (toTemp) {
             // set the FontFieldEditor for the new selected graphNode font
-            font.setPreferenceName(fontList[classItemList.getSelectionIndex()] + TEMP_TAG);
-            font.load();
+            fFont.setPreferenceName(fontList[fClassItemList.getSelectionIndex()] + TEMP_TAG);
+            fFont.load();
 
-            backGroundColor.setPreferenceName(fontList[classItemList.getSelectionIndex()] + SDViewPref.BACK_COLOR_POSTFIX + TEMP_TAG);
-            backGroundColor.load();
+            fBackGroundColor.setPreferenceName(fontList[fClassItemList.getSelectionIndex()] + SDViewPref.BACK_COLOR_POSTFIX + TEMP_TAG);
+            fBackGroundColor.load();
 
-            lineColor.setPreferenceName(fontList[classItemList.getSelectionIndex()] + SDViewPref.FORE_COLOR_POSTFIX + TEMP_TAG);
-            lineColor.load();
+            fLineColor.setPreferenceName(fontList[fClassItemList.getSelectionIndex()] + SDViewPref.FORE_COLOR_POSTFIX + TEMP_TAG);
+            fLineColor.load();
 
-            textColor.setPreferenceName(fontList[classItemList.getSelectionIndex()] + SDViewPref.TEXT_COLOR_POSTFIX + TEMP_TAG);
-            textColor.load();
+            fTextColor.setPreferenceName(fontList[fClassItemList.getSelectionIndex()] + SDViewPref.TEXT_COLOR_POSTFIX + TEMP_TAG);
+            fTextColor.load();
         }
     }
 

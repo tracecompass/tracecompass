@@ -43,7 +43,7 @@ public class BasicExecutionOccurrence extends GraphNode {
     /**
      * The corresponding lifeline. 
      */
-    protected Lifeline lifeline = null;
+    protected Lifeline fLifeline = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -52,7 +52,7 @@ public class BasicExecutionOccurrence extends GraphNode {
      * Default constructore
      */
     public BasicExecutionOccurrence() {
-        prefId = ISDPreferences.PREF_EXEC;
+        fPrefId = ISDPreferences.PREF_EXEC;
     }
 
     // ------------------------------------------------------------------------
@@ -65,10 +65,10 @@ public class BasicExecutionOccurrence extends GraphNode {
      */
     @Override
     public int getX() {
-        if (lifeline == null) {
+        if (fLifeline == null) {
             return 0;
         }
-        return lifeline.getX() + Metrics.getLifelineWidth() / 2 - Metrics.EXECUTION_OCCURRENCE_WIDTH / 2;
+        return fLifeline.getX() + Metrics.getLifelineWidth() / 2 - Metrics.EXECUTION_OCCURRENCE_WIDTH / 2;
     }
 
     /*
@@ -77,10 +77,10 @@ public class BasicExecutionOccurrence extends GraphNode {
      */
     @Override
     public int getY() {
-        if (lifeline == null) {
+        if (fLifeline == null) {
             return 0;
         }
-        return lifeline.getY() + lifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * startEventOccurrence;
+        return fLifeline.getY() + fLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fStartEventOccurrence;
     }
 
     /*
@@ -89,7 +89,7 @@ public class BasicExecutionOccurrence extends GraphNode {
      */
     @Override
     public int getWidth() {
-        if (lifeline == null) {
+        if (fLifeline == null) {
             return 0;
         }
         return Metrics.EXECUTION_OCCURRENCE_WIDTH;
@@ -101,10 +101,10 @@ public class BasicExecutionOccurrence extends GraphNode {
      */
     @Override
     public int getHeight() {
-        if (lifeline == null) {
+        if (fLifeline == null) {
             return 0;
         }
-        return ((Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing())) * (endEventOccurrence - startEventOccurrence);
+        return ((Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing())) * (fEndEventOccurrence - fStartEventOccurrence);
     }
 
     /*
@@ -112,17 +112,17 @@ public class BasicExecutionOccurrence extends GraphNode {
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#contains(int, int)
      */
     @Override
-    public boolean contains(int _x, int _y) {
+    public boolean contains(int xValue, int yValue) {
         int x = getX();
         int y = getY();
         int width = getWidth();
         int height = getHeight();
 
-        if (Frame.contains(x, y, width, height, _x, _y)) {
+        if (Frame.contains(x, y, width, height, xValue, yValue)) {
             return true;
         }
 
-        if (getNodeAt(_x, _y) != null) {
+        if (getNodeAt(xValue, yValue) != null) {
             return true;
         }
         return false;
@@ -135,7 +135,7 @@ public class BasicExecutionOccurrence extends GraphNode {
     @Override
     public String getName() {
         if (super.getName() == null || super.getName().equals("")) { //$NON-NLS-1$
-            return lifeline.getToolTipText();
+            return fLifeline.getToolTipText();
         } else {
             return super.getName();
         }
@@ -147,7 +147,7 @@ public class BasicExecutionOccurrence extends GraphNode {
      * @param theLifeline - the parent lifeline
      */
     public void setLifeline(Lifeline theLifeline) {
-        lifeline = theLifeline;
+        fLifeline = theLifeline;
     }
 
     /**
@@ -156,7 +156,7 @@ public class BasicExecutionOccurrence extends GraphNode {
      * @return - the parent lifeline
      */
     public Lifeline getLifeline() {
-        return lifeline;
+        return fLifeline;
     }
 
     /**
@@ -166,7 +166,7 @@ public class BasicExecutionOccurrence extends GraphNode {
      */
     @Override
     public int getStartOccurrence() {
-        return startEventOccurrence;
+        return fStartEventOccurrence;
     }
 
     /**
@@ -176,7 +176,7 @@ public class BasicExecutionOccurrence extends GraphNode {
      */
     @Override
     public int getEndOccurrence() {
-        return endEventOccurrence;
+        return fEndEventOccurrence;
     }
 
     /**
@@ -185,7 +185,7 @@ public class BasicExecutionOccurrence extends GraphNode {
      * @param occurrence the start event occurrence to set
      */
     public void setStartOccurrence(int occurrence) {
-        startEventOccurrence = occurrence;
+        fStartEventOccurrence = occurrence;
     }
 
     /**
@@ -194,7 +194,7 @@ public class BasicExecutionOccurrence extends GraphNode {
      * @param occurrence the end event occurrence to set
      */
     public void setEndOccurrence(int occurrence) {
-        endEventOccurrence = occurrence;
+        fEndEventOccurrence = occurrence;
     }
 
     /*
@@ -207,11 +207,12 @@ public class BasicExecutionOccurrence extends GraphNode {
         int y = getY();
         int width = getWidth();
         int height = getHeight();
-        IColor tempFillColor = null, tempStrokeColor = null;
+        IColor tempFillColor = null;
+        IColor tempStrokeColor = null;
 
         // The execution occurrence is selected
         // if the owning lifeline is selected
-        if (lifeline.isSelected() || isSelected()) {
+        if (fLifeline.isSelected() || isSelected()) {
             context.setBackground(Frame.getUserPref().getBackGroundColorSelection());
             context.setForeground(Frame.getUserPref().getForeGroundColorSelection());
         } else {
@@ -226,11 +227,9 @@ public class BasicExecutionOccurrence extends GraphNode {
         context.drawRectangle(x, y, width, height);
         if (tempFillColor != null) {
             tempFillColor.dispose();
-            tempFillColor = null;
         }
         if (tempStrokeColor != null) {
             tempStrokeColor.dispose();
-            tempStrokeColor = null;
         }
         if (hasFocus()) {
             drawFocus(context);

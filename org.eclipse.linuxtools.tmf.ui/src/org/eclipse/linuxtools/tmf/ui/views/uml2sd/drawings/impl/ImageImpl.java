@@ -36,7 +36,10 @@ public class ImageImpl implements IImage {
     // Attributes
     // ------------------------------------------------------------------------
    
-    protected Image img = null;
+    /**
+     * The image reference
+     */
+    protected Image fImage = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -47,16 +50,16 @@ public class ImageImpl implements IImage {
      * @param file A file name of image file.
      */
     public ImageImpl(String file) {
-        img = getResourceImage(file);
+        fImage = createResourceImage(file);
     }
 
     /**
      * Copy constructor
      * 
-     * @param img_ THe image to copy
+     * @param image THe image to copy
      */
-    public ImageImpl(Image img_) {
-        img = img_;
+    public ImageImpl(Image image) {
+        fImage = image;
     }
 
     // ------------------------------------------------------------------------
@@ -65,19 +68,11 @@ public class ImageImpl implements IImage {
     /**
      * Returns Image object from file name.
      * 
-     * @param _name File name of image file
+     * @param name File name of image file
      * @return image object or <code>null</code>
      */
-    public Image getResourceImage(String _name) {
-        try {
-            URL BASIC_URL = new URL("platform", "localhost", "plugin");//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            URL url = new URL(BASIC_URL, "plugin/org.eclipse.linuxtools.tmf.ui/icons/" + _name);//$NON-NLS-1$
-            ImageDescriptor img = ImageDescriptor.createFromURL(url);
-            return img.createImage();
-        } catch (MalformedURLException e) {
-            TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Error opening image file", e));  //$NON-NLS-1$
-        }
-        return null;
+    public Image getResourceImage(String name) {
+        return createResourceImage(name);
     }
 
     /*
@@ -86,7 +81,7 @@ public class ImageImpl implements IImage {
      */
     @Override
     public Object getImage() {
-        return img;
+        return fImage;
     }
 
     /*
@@ -95,8 +90,27 @@ public class ImageImpl implements IImage {
      */
     @Override
     public void dispose() {
-        if (img != null) {
-            img.dispose();
+        if (fImage != null) {
+            fImage.dispose();
         }
     }
+
+    /**
+     * Returns Image object from file name.
+     * 
+     * @param name File name of image file
+     * @return image object or <code>null</code>
+     */
+    private Image createResourceImage(String name) {
+        try {
+            URL BASIC_URL = new URL("platform", "localhost", "plugin");//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            URL url = new URL(BASIC_URL, "plugin/org.eclipse.linuxtools.tmf.ui/icons/" + name);//$NON-NLS-1$
+            ImageDescriptor img = ImageDescriptor.createFromURL(url);
+            return img.createImage();
+        } catch (MalformedURLException e) {
+            TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Error opening image file", e));  //$NON-NLS-1$
+        }
+        return null;
+    }
+
 }

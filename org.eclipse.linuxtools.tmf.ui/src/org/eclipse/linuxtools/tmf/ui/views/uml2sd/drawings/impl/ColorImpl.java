@@ -32,11 +32,11 @@ public class ColorImpl implements IColor {
     /**
      * The color object.
      */
-    protected Color col = null;
+    protected Color fColor = null;
     /**
      * Flag to indicate that this object is managing the resource.
      */
-    protected boolean manageColor = true;
+    protected boolean fManageColor = true;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -50,7 +50,7 @@ public class ColorImpl implements IColor {
      * @param b A value for blue
      */
     public ColorImpl(Display display, int r, int g, int b) {
-        col = new Color(display, r, g, b);
+        fColor = new Color(display, r, g, b);
     }
 
     /** 
@@ -59,8 +59,8 @@ public class ColorImpl implements IColor {
      * @param A color to copy
      */
     protected ColorImpl(Color color) {
-        col = color;
-        manageColor = false;
+        fColor = color;
+        fManageColor = false;
     }
 
     // ------------------------------------------------------------------------
@@ -83,7 +83,7 @@ public class ColorImpl implements IColor {
      */
     @Override
     public Object getColor() {
-        return col;
+        return fColor;
     }
 
     /*
@@ -92,8 +92,8 @@ public class ColorImpl implements IColor {
      */
     @Override
     public void dispose() {
-        if ((col != null) && (manageColor)) {
-            col.dispose();
+        if ((fColor != null) && (fManageColor)) {
+            fColor.dispose();
         }
     }
 

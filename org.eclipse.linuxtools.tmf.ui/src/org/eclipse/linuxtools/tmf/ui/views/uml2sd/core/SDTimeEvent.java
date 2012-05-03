@@ -31,15 +31,15 @@ public class SDTimeEvent {
     /**
      * The time stamp of the event
      */
-    protected ITmfTimestamp time;
+    protected ITmfTimestamp fTimestamp;
     /**
      * The event index.
      */
-    protected int event;
+    protected int fEvent;
     /**
      * The time range implementing node.
      */
-    protected ITimeRange node;
+    protected ITimeRange fNode;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -47,14 +47,14 @@ public class SDTimeEvent {
     /**
      * The default constructor.
      * 
-     * @param _time The time stamp of the event.
-     * @param _event The event index.
-     * @param _node The time range implementing node.
+     * @param time The time stamp of the event.
+     * @param event The event index.
+     * @param node The time range implementing node.
      */
-    public SDTimeEvent(ITmfTimestamp _time, int _event, ITimeRange _node) {
-        time = _time;
-        event = _event;
-        node = _node;
+    public SDTimeEvent(ITmfTimestamp time, int event, ITimeRange node) {
+        fTimestamp = time;
+        fEvent = event;
+        fNode = node;
     }
 
     // ------------------------------------------------------------------------
@@ -66,7 +66,7 @@ public class SDTimeEvent {
      * @return the timestamp of the event.
      */
     public ITmfTimestamp getTime() {
-        return time;
+        return fTimestamp;
     }
 
     /**
@@ -75,7 +75,7 @@ public class SDTimeEvent {
      * @return the event index.
      */
     public int getEvent() {
-        return event;
+        return fEvent;
     }
 
     /**
@@ -84,7 +84,7 @@ public class SDTimeEvent {
      * @return the time range implementing node.
      */
     public ITimeRange getGraphNode() {
-        return node;
+        return fNode;
     }
 
 }

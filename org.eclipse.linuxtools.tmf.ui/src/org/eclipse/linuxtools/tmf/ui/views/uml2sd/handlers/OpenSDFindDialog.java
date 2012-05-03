@@ -63,15 +63,15 @@ public class OpenSDFindDialog extends Action {
     /**
      * Constructor 
      * 
-     * @param theView The view reference
+     * @param view The view reference
      */
-    public OpenSDFindDialog(SDView theView) {
+    public OpenSDFindDialog(SDView view) {
         super(SDMessages._41);
         setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_SEARCH_SEQ));
         setId(ID);
         setActionDefinitionId(ACTION_DEFINITION_ID);
         setToolTipText(SDMessages._41);
-        fView = theView;
+        fView = view;
     }
 
     // ------------------------------------------------------------------------

@@ -55,12 +55,12 @@ public class ShowNodeStart extends Action {
     /**
      * Constructor
      * 
-     * @param _view The sequence diagram view reference
+     * @param view The sequence diagram view reference
      */
-    public ShowNodeStart(IViewPart _view) {
+    public ShowNodeStart(IViewPart view) {
         super();
-        if (_view instanceof SDView) {
-            fView = (SDView)_view;
+        if (view instanceof SDView) {
+            fView = (SDView)view;
         }
         setImageDescriptor(TmfUiPlugin.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_NODE_START));
     }

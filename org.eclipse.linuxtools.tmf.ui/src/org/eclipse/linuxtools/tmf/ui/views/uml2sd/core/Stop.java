@@ -42,13 +42,13 @@ public class Stop extends GraphNode {
     /**
      * The owning lifeline on which the stop appears
      */
-    protected Lifeline lifeline = null;
+    protected Lifeline fLifeline = null;
     /**
      * This basically represents the time when the stop occurs on the owning Lifeline
      * 
      * @see Lifeline Lifeline for more event occurence details
      */
-    protected int eventOccurrence = 0;
+    protected int fEventOccurrence = 0;
 
     // ------------------------------------------------------------------------
     // Methods
@@ -60,10 +60,10 @@ public class Stop extends GraphNode {
      */
     @Override
     public int getX() {
-        if (lifeline == null) {
+        if (fLifeline == null) {
             return 0;
         }
-        return lifeline.getX() + Metrics.getLifelineWidth() / 2 - Metrics.STOP_WIDTH / 2;
+        return fLifeline.getX() + Metrics.getLifelineWidth() / 2 - Metrics.STOP_WIDTH / 2;
     }
 
     /*
@@ -72,10 +72,10 @@ public class Stop extends GraphNode {
      */
     @Override
     public int getY() {
-        if (lifeline == null) {
+        if (fLifeline == null) {
             return 0;
         }
-        return lifeline.getY() + lifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * eventOccurrence - Metrics.STOP_WIDTH / 2;
+        return fLifeline.getY() + fLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fEventOccurrence - Metrics.STOP_WIDTH / 2;
     }
 
     /*
@@ -84,7 +84,7 @@ public class Stop extends GraphNode {
      */
     @Override
     public int getWidth() {
-        if (lifeline == null) {
+        if (fLifeline == null) {
             return 0;
         }
         return Metrics.STOP_WIDTH;
@@ -96,7 +96,7 @@ public class Stop extends GraphNode {
      */
     @Override
     public int getHeight() {
-        if (lifeline == null) {
+        if (fLifeline == null) {
             return 0;
         }
         return Metrics.STOP_WIDTH;
@@ -108,7 +108,7 @@ public class Stop extends GraphNode {
      * @param theLifeline The the stop owing lifeline
      */
     public void setLifeline(Lifeline theLifeline) {
-        lifeline = theLifeline;
+        fLifeline = theLifeline;
     }
 
     /**
@@ -117,7 +117,7 @@ public class Stop extends GraphNode {
      * @param occurrence the eventOccurence to assign to the stop
      */
     public void setEventOccurrence(int occurrence) {
-        eventOccurrence = occurrence;
+        fEventOccurrence = occurrence;
     }
 
     /*
@@ -127,7 +127,7 @@ public class Stop extends GraphNode {
     @Override
     public void draw(IGC context) {
         // Set the appropriate color depending if the graph node if selected or not
-        if (lifeline.isSelected()) {
+        if (fLifeline.isSelected()) {
             context.setForeground(Frame.getUserPref().getBackGroundColorSelection());
             context.setLineWidth(Metrics.SELECTION_LINE_WIDTH);
             int lastWidth = context.getLineWidth();

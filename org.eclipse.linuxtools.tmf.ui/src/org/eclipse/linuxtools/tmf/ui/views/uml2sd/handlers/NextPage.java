@@ -50,11 +50,11 @@ public class NextPage extends Action {
     /**
      * Default constructor 
      * 
-     * @param theView the view reference
+     * @param view the view reference
      */
-    public NextPage(SDView theView) {
+    public NextPage(SDView view) {
         super();
-        fView = theView;
+        fView = view;
         setText(SDMessages._36);
         setToolTipText(SDMessages._38);
         setId(ID); 

@@ -47,7 +47,7 @@ public class SyncMessageReturn extends SyncMessage {
     /**
      * The associated message(the message it is the return).
      */
-    protected SyncMessage message = null;
+    protected SyncMessage fMessage = null;
 
     // ------------------------------------------------------------------------
     // Constractors
@@ -57,7 +57,7 @@ public class SyncMessageReturn extends SyncMessage {
      * Default constructor
      */
     public SyncMessageReturn() {
-        prefId = ISDPreferences.PREF_SYNC_MESS_RET;
+        fPrefId = ISDPreferences.PREF_SYNC_MESS_RET;
     }
 
     // ------------------------------------------------------------------------
@@ -71,8 +71,8 @@ public class SyncMessageReturn extends SyncMessage {
      * @param parentMessage the message to associate
      */
     public void setMessage(SyncMessage parentMessage) {
-        message = parentMessage;
-        message.setMessageReturn(this);
+        fMessage = parentMessage;
+        fMessage.setMessageReturn(this);
     }
 
     /**
@@ -81,7 +81,7 @@ public class SyncMessageReturn extends SyncMessage {
      * @return the associated message
      */
     public SyncMessage getMessage() {
-        return message;
+        return fMessage;
     }
 
     /*
@@ -98,8 +98,8 @@ public class SyncMessageReturn extends SyncMessage {
         context.setLineStyle(context.getLineDotStyle());
         // Draw it selected?
         if (!isSelected()) {
-            context.setBackground(Frame.getUserPref().getBackGroundColor(prefId));
-            context.setForeground(Frame.getUserPref().getForeGroundColor(prefId));
+            context.setBackground(Frame.getUserPref().getBackGroundColor(fPrefId));
+            context.setForeground(Frame.getUserPref().getForeGroundColor(fPrefId));
         }
         super.draw(context);
         // restore the context

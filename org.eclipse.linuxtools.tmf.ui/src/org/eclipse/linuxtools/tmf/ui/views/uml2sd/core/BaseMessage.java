@@ -38,15 +38,15 @@ public abstract class BaseMessage extends GraphNode {
     /**
      * The lifeline which send the message
      */
-    protected Lifeline startLifeline = null;
+    protected Lifeline fStartLifeline = null;
     /**
      * The lifeline which receive the message
      */
-    protected Lifeline endLifeline = null;
+    protected Lifeline fEndLifeline = null;
     /**
      * The visiblitiy flag. 
      */
-    protected boolean visible = true;
+    protected boolean fVisible = true;
 
     // ------------------------------------------------------------------------
     // Methods
@@ -72,25 +72,25 @@ public abstract class BaseMessage extends GraphNode {
          * lifeline name getHeight return the height of this rectangle The message y coordinate is then relative to this
          * position depending of its eventOccurrence Space between syncMessages is constant
          */
-        if ((startLifeline != null) && (endLifeline != null)) {
+        if ((fStartLifeline != null) && (fEndLifeline != null)) {
             /*
              * Regular message, both ends are attached to a lifeline
              */
-            return endLifeline.getY() + endLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * endEventOccurrence;
+            return fEndLifeline.getY() + fEndLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fEndEventOccurrence;
 
         } else {
             /*
              * UML2 lost message kind
              */
-            if (startLifeline != null) {
-                return startLifeline.getY() + startLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * endEventOccurrence;
+            if (fStartLifeline != null) {
+                return fStartLifeline.getY() + fStartLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fEndEventOccurrence;
             }
 
             /*
              * UML2 found message kind
              */
-            if (endLifeline != null) {
-                return endLifeline.getY() + endLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * endEventOccurrence;
+            if (fEndLifeline != null) {
+                return fEndLifeline.getY() + fEndLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fEndEventOccurrence;
             }
         }
         // return 0 by default
@@ -134,15 +134,15 @@ public abstract class BaseMessage extends GraphNode {
     protected int getX(boolean quick) {
         int x = 0;
         int activationWidth = Metrics.EXECUTION_OCCURRENCE_WIDTH / 2;
-        if ((startLifeline != null) && (endLifeline != null)) {
-            x = startLifeline.getX() + Metrics.getLifelineWidth() / 2;
+        if ((fStartLifeline != null) && (fEndLifeline != null)) {
+            x = fStartLifeline.getX() + Metrics.getLifelineWidth() / 2;
         } else {
-            if (startLifeline != null) {
-                x = startLifeline.getX() + Metrics.getLifelineWidth() / 2;
+            if (fStartLifeline != null) {
+                x = fStartLifeline.getX() + Metrics.getLifelineWidth() / 2;
             }
 
-            if (endLifeline != null) {
-                x = endLifeline.getX() - Metrics.LIFELINE_SPACING / 2;
+            if (fEndLifeline != null) {
+                x = fEndLifeline.getX() - Metrics.LIFELINE_SPACING / 2;
             }
         }
 
@@ -150,11 +150,11 @@ public abstract class BaseMessage extends GraphNode {
             return x;
         }
 
-        if ((startLifeline != null) && (endLifeline != null) && (startLifeline.getX() > endLifeline.getX())) {
+        if ((fStartLifeline != null) && (fEndLifeline != null) && (fStartLifeline.getX() > fEndLifeline.getX())) {
             activationWidth = -activationWidth;
         }
 
-        if (isMessageStartInActivation(endEventOccurrence)) {
+        if (isMessageStartInActivation(fEndEventOccurrence)) {
             x = x + activationWidth;
         }
 
@@ -179,17 +179,17 @@ public abstract class BaseMessage extends GraphNode {
     protected int getWidth(boolean quick) {
         int width = 0;
         int activationWidth = Metrics.EXECUTION_OCCURRENCE_WIDTH / 2;
-        if ((startLifeline != null) && (endLifeline != null)) {
-            if (startLifeline == endLifeline) {
+        if ((fStartLifeline != null) && (fEndLifeline != null)) {
+            if (fStartLifeline == fEndLifeline) {
                 width = Metrics.INTERNAL_MESSAGE_WIDTH + Metrics.EXECUTION_OCCURRENCE_WIDTH;
             } else {
-                width = endLifeline.getX() + Metrics.getLifelineWidth() / 2 - getX(true);
+                width = fEndLifeline.getX() + Metrics.getLifelineWidth() / 2 - getX(true);
             }
         } else {
-            if (startLifeline != null) {
+            if (fStartLifeline != null) {
                 width = Metrics.swimmingLaneWidth() / 2;
             }
-            if (endLifeline != null) {
+            if (fEndLifeline != null) {
                 width = Metrics.swimmingLaneWidth() / 2;
             }
         }
@@ -198,15 +198,15 @@ public abstract class BaseMessage extends GraphNode {
             return width;
         }
 
-        if ((startLifeline != null) && (endLifeline != null) && (startLifeline.getX() > endLifeline.getX())) {
+        if ((fStartLifeline != null) && (fEndLifeline != null) && (fStartLifeline.getX() > fEndLifeline.getX())) {
             activationWidth = -activationWidth;
         }
 
-        if (isMessageStartInActivation(endEventOccurrence)) {
+        if (isMessageStartInActivation(fEndEventOccurrence)) {
             width = width - activationWidth;
         }
 
-        if (isMessageEndInActivation(endEventOccurrence)) {
+        if (isMessageEndInActivation(fEndEventOccurrence)) {
             width = width - activationWidth;
         }
 
@@ -221,14 +221,14 @@ public abstract class BaseMessage extends GraphNode {
     public boolean isVisible(int x, int y, int width, int height) {
         // ***Common*** syncMessages visibility
         // draw the message only if at least one end is visible
-        if (endLifeline != null && (endLifeline.isVisible(x, y, width, height)) || (startLifeline != null && startLifeline.isVisible(x, y, width, height))) {
+        if (fEndLifeline != null && (fEndLifeline.isVisible(x, y, width, height)) || (fStartLifeline != null && fStartLifeline.isVisible(x, y, width, height))) {
             return true;
         }
         // In this case it can be a message which cross the whole visible area
-        else if (endLifeline != null && (!endLifeline.isVisible(x, y, width, height)) && (startLifeline != null && !startLifeline.isVisible(x, y, width, height))) {
-            if (endLifeline.getX() > x + width && startLifeline.getX() < x) {
+        else if (fEndLifeline != null && (!fEndLifeline.isVisible(x, y, width, height)) && (fStartLifeline != null && !fStartLifeline.isVisible(x, y, width, height))) {
+            if (fEndLifeline.getX() > x + width && fStartLifeline.getX() < x) {
                 return true;
-            } else if (startLifeline.getX() > x + width && endLifeline.getX() < x) {
+            } else if (fStartLifeline.getX() > x + width && fEndLifeline.getX() < x) {
                 return true;
             }
         }
@@ -241,14 +241,14 @@ public abstract class BaseMessage extends GraphNode {
      * @param value The visibility to set.
      */
     public void setVisible(boolean value) {
-        visible = value;
+        fVisible = value;
     }
 
     /**
      * @return the visibility value. 
      */
     public boolean isVisible() {
-        return visible;
+        return fVisible;
     }
 
     /**
@@ -257,7 +257,7 @@ public abstract class BaseMessage extends GraphNode {
      * @param lifeline - the message sender
      */
     public void setStartLifeline(Lifeline lifeline) {
-        startLifeline = lifeline;
+        fStartLifeline = lifeline;
     }
 
     /**
@@ -266,7 +266,7 @@ public abstract class BaseMessage extends GraphNode {
      * @return the message sender
      */
     public Lifeline getStartLifeline() {
-        return startLifeline;
+        return fStartLifeline;
     }
 
     /**
@@ -275,7 +275,7 @@ public abstract class BaseMessage extends GraphNode {
      * @return the message receiver
      */
     public Lifeline getEndLifeline() {
-        return endLifeline;
+        return fEndLifeline;
     }
 
     /**
@@ -284,7 +284,7 @@ public abstract class BaseMessage extends GraphNode {
      * @param lifeline the message receiver
      */
     public void setEndLifeline(Lifeline lifeline) {
-        endLifeline = lifeline;
+        fEndLifeline = lifeline;
     }
 
     /**
@@ -294,7 +294,7 @@ public abstract class BaseMessage extends GraphNode {
      * @see Lifeline Lifeline for more event occurence details
      */
     protected void setEventOccurrence(int occurrence) {
-        endEventOccurrence = occurrence;
+        fEndEventOccurrence = occurrence;
     }
 
     /**
@@ -304,7 +304,7 @@ public abstract class BaseMessage extends GraphNode {
      * @see Lifeline Lifeline for more event occurence details
      */
     public int getEventOccurrence() {
-        return endEventOccurrence;
+        return fEndEventOccurrence;
     }
 
     /**
@@ -319,14 +319,14 @@ public abstract class BaseMessage extends GraphNode {
      */
     protected boolean isMessageStartInActivation(int event) {
         boolean inActivation = false;
-        if ((startLifeline != null) && (startLifeline.getExecutions() != null)) {
+        if ((fStartLifeline != null) && (fStartLifeline.getExecutions() != null)) {
             // int acIndex=startLifeline.getExecOccurrenceDrawIndex();
             // acIndex = first visible execution occurrence
             // for drawing speed reason with only search on the visivle subset
             int thisY = getY();
-            for (int i = 0; i < startLifeline.getExecutions().size(); i++) {
-                BasicExecutionOccurrence toDraw = (BasicExecutionOccurrence) startLifeline.getExecutions().get(i);
-                if ((event >= toDraw.startEventOccurrence) && (event <= toDraw.endEventOccurrence)) {
+            for (int i = 0; i < fStartLifeline.getExecutions().size(); i++) {
+                BasicExecutionOccurrence toDraw = (BasicExecutionOccurrence) fStartLifeline.getExecutions().get(i);
+                if ((event >= toDraw.fStartEventOccurrence) && (event <= toDraw.fEndEventOccurrence)) {
                     inActivation = true;
                 }
                 // if we are outside the visible area we stop right now
@@ -351,12 +351,12 @@ public abstract class BaseMessage extends GraphNode {
      */
     protected boolean isMessageEndInActivation(int event) {
         boolean inActivation = false;
-        if ((endLifeline != null) && (endLifeline.getExecutions() != null)) {
+        if ((fEndLifeline != null) && (fEndLifeline.getExecutions() != null)) {
             // acIndex = first visible execution occurrence
             // for drawing speed reason with only search on the visivle subset
-            for (int i = 0; i < endLifeline.getExecutions().size(); i++) {
-                BasicExecutionOccurrence toDraw = (BasicExecutionOccurrence) endLifeline.getExecutions().get(i);
-                if ((event >= toDraw.startEventOccurrence) && (event <= toDraw.endEventOccurrence)) {
+            for (int i = 0; i < fEndLifeline.getExecutions().size(); i++) {
+                BasicExecutionOccurrence toDraw = (BasicExecutionOccurrence) fEndLifeline.getExecutions().get(i);
+                if ((event >= toDraw.fStartEventOccurrence) && (event <= toDraw.fEndEventOccurrence)) {
                     inActivation = true;
                 }
                 // if we are outside the visible area we stop right now
@@ -374,7 +374,7 @@ public abstract class BaseMessage extends GraphNode {
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#contains(int, int)
      */
     @Override
-    public boolean contains(int _x, int _y) {
+    public boolean contains(int xValue, int yValue) {
         int x = getX();
         int y = getY();
         int width = getWidth();
@@ -384,41 +384,41 @@ public abstract class BaseMessage extends GraphNode {
         int tempHeight = Metrics.MESSAGES_NAME_SPACING + Metrics.getMessageFontHeigth();
 
         // Is it a self message?
-        if (startLifeline == endLifeline) {
+        if (fStartLifeline == fEndLifeline) {
             /*
              * Rectangle.contains(x,y, width, height) does not works with negative height or width We check here if the
              * rectangle width is negative.
              */
             if (getName().length() * Metrics.getAverageCharWidth() > Metrics.swimmingLaneWidth() - Metrics.EXECUTION_OCCURRENCE_WIDTH / 2 + -Metrics.INTERNAL_MESSAGE_WIDTH) {
-                if (Frame.contains(x + Metrics.INTERNAL_MESSAGE_WIDTH + 10, y, Metrics.swimmingLaneWidth() - Metrics.EXECUTION_OCCURRENCE_WIDTH / 2 + -Metrics.INTERNAL_MESSAGE_WIDTH, Metrics.getMessageFontHeigth(), _x, _y)) {
+                if (Frame.contains(x + Metrics.INTERNAL_MESSAGE_WIDTH + 10, y, Metrics.swimmingLaneWidth() - Metrics.EXECUTION_OCCURRENCE_WIDTH / 2 + -Metrics.INTERNAL_MESSAGE_WIDTH, Metrics.getMessageFontHeigth(), xValue, yValue)) {
                     return true;
                 }
             } else {
-                if (Frame.contains(x + Metrics.INTERNAL_MESSAGE_WIDTH + 10, y, getName().length() * Metrics.getAverageCharWidth(), Metrics.getMessageFontHeigth(), _x, _y)) {
+                if (Frame.contains(x + Metrics.INTERNAL_MESSAGE_WIDTH + 10, y, getName().length() * Metrics.getAverageCharWidth(), Metrics.getMessageFontHeigth(), xValue, yValue)) {
                     return true;
                 }
             }
 
             // Test if the point is in part 1 of the self message
             // see: "private void drawMessage (NGC context)" method for self message drawing schema
-            if (Frame.contains(x, y - Metrics.MESSAGE_SELECTION_TOLERANCE / 2, Metrics.INTERNAL_MESSAGE_WIDTH / 2, Metrics.MESSAGE_SELECTION_TOLERANCE, _x, _y)) {
+            if (Frame.contains(x, y - Metrics.MESSAGE_SELECTION_TOLERANCE / 2, Metrics.INTERNAL_MESSAGE_WIDTH / 2, Metrics.MESSAGE_SELECTION_TOLERANCE, xValue, yValue)) {
                 return true;
             }
 
             // Test if the point is in part 3 of the self message
-            if (Frame.contains(x + Metrics.INTERNAL_MESSAGE_WIDTH - Metrics.MESSAGE_SELECTION_TOLERANCE / 2, y, Metrics.MESSAGE_SELECTION_TOLERANCE, height + Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT, _x, _y)) {
+            if (Frame.contains(x + Metrics.INTERNAL_MESSAGE_WIDTH - Metrics.MESSAGE_SELECTION_TOLERANCE / 2, y, Metrics.MESSAGE_SELECTION_TOLERANCE, height + Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT, xValue, yValue)) {
                 return true;
             }
 
             // Test if the point is in part 5 of the self message
-            if (Frame.contains(x, y + height - Metrics.MESSAGE_SELECTION_TOLERANCE / 2 + Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT, Metrics.INTERNAL_MESSAGE_WIDTH / 2, Metrics.MESSAGE_SELECTION_TOLERANCE, _x, _y)) {
+            if (Frame.contains(x, y + height - Metrics.MESSAGE_SELECTION_TOLERANCE / 2 + Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT, Metrics.INTERNAL_MESSAGE_WIDTH / 2, Metrics.MESSAGE_SELECTION_TOLERANCE, xValue, yValue)) {
                 return true;
             }
 
             // false otherwise
             return false;
         }
-        if (Frame.contains(x, y - tempHeight, width, tempHeight, _x, _y)) {
+        if (Frame.contains(x, y - tempHeight, width, tempHeight, xValue, yValue)) {
             return true;
         }
         // false otherwise
@@ -442,24 +442,24 @@ public abstract class BaseMessage extends GraphNode {
 
         // UML2 found message (always drawn from left to right)
         // or UML2 lost message (always drawn from left to right)
-        if ((startLifeline == null || endLifeline == null) && startLifeline != endLifeline) {
+        if ((fStartLifeline == null || fEndLifeline == null) && fStartLifeline != fEndLifeline) {
             // Draw the message label above the message and centered
             // The label is truncated if it cannot fit between the two message end
             // 2*Metrics.MESSAGES_NAME_SPACING = space above the label + space below the label
             IColor temp = context.getForeground();
-            context.setForeground(Frame.getUserPref().getFontColor(prefId));
+            context.setForeground(Frame.getUserPref().getFontColor(fPrefId));
             context.drawTextTruncatedCentred(getName(), x, y - Metrics.getMessageFontHeigth() - 2 * Metrics.MESSAGES_NAME_SPACING, width, 2 * Metrics.MESSAGES_NAME_SPACING + Metrics.getMessageFontHeigth(), !isSelected());
             context.setForeground(temp);
             int margin = 0;
-            if (endLifeline == null) {
+            if (fEndLifeline == null) {
                 margin = Metrics.MESSAGE_CIRCLE_RAY;
             }
 
             // Draw the message main line
             context.drawLine(x, y, x + width, y + height);
             // Draw the two little lines which make a arrow part of the message
-            Double xt = new Double(Math.cos(0.75) * 7);
-            Double yt = new Double(Math.sin(0.75) * 7);
+            Double xt = Double.valueOf(Math.cos(0.75) * 7);
+            Double yt = Double.valueOf(Math.sin(0.75) * 7);
             if (context.getLineStyle() == context.getLineSolidStyle()) {
                 IColor backcolor = context.getBackground();
                 context.setBackground(context.getForeground());
@@ -485,20 +485,20 @@ public abstract class BaseMessage extends GraphNode {
             if (context.getLineWidth() != Metrics.NORMAL_LINE_WIDTH) {
                 ray = ray + Metrics.SELECTION_LINE_WIDTH - Metrics.NORMAL_LINE_WIDTH;
             }
-            if (startLifeline == null) {
+            if (fStartLifeline == null) {
                 context.fillOval(x - ray, y - ray, ray * 2, ray * 2);
             } else {
                 context.fillOval(x + width - ray, y + height - ray, ray * 2, ray * 2);
             }
             context.setBackground(storedColor);
-            context.setForeground(Frame.getUserPref().getFontColor(prefId));
+            context.setForeground(Frame.getUserPref().getFontColor(fPrefId));
             fX = x;
             fY = y - yt.intValue();
             fW = width;
             fH = height + 2 * yt.intValue();
         }
         // it is self message (always drawn at the left side of the owning lifeLifeline)
-        else if (startLifeline != null && endLifeline != null && startLifeline == endLifeline) {
+        else if (fStartLifeline != null && fEndLifeline != null && fStartLifeline == fEndLifeline) {
             /*
              * Self syncMessages are drawn in 5 parts 1 -----------+ + 2 + | | | 3 | + 5 + 4 -----------+
              */
@@ -514,8 +514,8 @@ public abstract class BaseMessage extends GraphNode {
             // Part 5
             context.drawLine(x, y + height + Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT, x + Metrics.INTERNAL_MESSAGE_WIDTH / 2, y + height + Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT);
 
-            Double xt = new Double(Math.cos(0.75) * 7);
-            Double yt = new Double(Math.sin(0.75) * 7);
+            Double xt = Double.valueOf(Math.cos(0.75) * 7);
+            Double yt = Double.valueOf(Math.sin(0.75) * 7);
 
             fX = x;
             fY = y;
@@ -552,8 +552,8 @@ public abstract class BaseMessage extends GraphNode {
             // 2*Metrics.MESSAGES_NAME_SPACING = space above the label + space below the label
 
             // the space available for the text is sorter if are drawing internal message on the last lifeline
-            context.setForeground(Frame.getUserPref().getFontColor(prefId));
-            if (startLifeline.getIndex() == startLifeline.getFrame().getHorizontalIndex()) {
+            context.setForeground(Frame.getUserPref().getFontColor(fPrefId));
+            if (fStartLifeline.getIndex() == fStartLifeline.getFrame().getHorizontalIndex()) {
                 context.drawTextTruncated(getName(), x + width + Metrics.INTERNAL_MESSAGE_V_MARGIN / 2, y, Metrics.swimmingLaneWidth() / 2 - Metrics.EXECUTION_OCCURRENCE_WIDTH + -Metrics.INTERNAL_MESSAGE_WIDTH, +Metrics.MESSAGES_NAME_SPACING
                         - Metrics.getMessageFontHeigth(), !isSelected());
             } else {
@@ -562,11 +562,11 @@ public abstract class BaseMessage extends GraphNode {
             }
         }
         // it is regular message
-        else if (startLifeline != null && endLifeline != null) {
+        else if (fStartLifeline != null && fEndLifeline != null) {
             // Draw the message main line
             context.drawLine(x, y, x + width, y + height);
 
-            int spaceBTWStartEnd = endLifeline.getX() - startLifeline.getX();
+            int spaceBTWStartEnd = fEndLifeline.getX() - fStartLifeline.getX();
 
             double a = height;
             double b = width;
@@ -576,10 +576,10 @@ public abstract class BaseMessage extends GraphNode {
             if (spaceBTWStartEnd < 0) {
                 sign = -1;
             }
-            Double x1 = new Double(sign * Math.cos(angle - 0.75) * 7);
-            Double y1 = new Double(sign * Math.sin(angle - 0.75) * 7);
-            Double x2 = new Double(sign * Math.cos(angle + 0.75) * 7);
-            Double y2 = new Double(sign * Math.sin(angle + 0.75) * 7);
+            Double x1 = Double.valueOf(sign * Math.cos(angle - 0.75) * 7);
+            Double y1 = Double.valueOf(sign * Math.sin(angle - 0.75) * 7);
+            Double x2 = Double.valueOf(sign * Math.cos(angle + 0.75) * 7);
+            Double y2 = Double.valueOf(sign * Math.sin(angle + 0.75) * 7);
 
             fX = getX();
             fY = y + height - y2.intValue();
@@ -617,7 +617,7 @@ public abstract class BaseMessage extends GraphNode {
             // Draw the message label above the message and centered
             // The label is truncated if it cannot fit between the two message end
             // 2*Metrics.MESSAGES_NAME_SPACING = space above the label + space below the label
-            context.setForeground(Frame.getUserPref().getFontColor(prefId));
+            context.setForeground(Frame.getUserPref().getFontColor(fPrefId));
             if (spaceBTWStartEnd > 0) {
                 context.drawTextTruncatedCentred(getName(), x, y + height / 2 - (2 * Metrics.MESSAGES_NAME_SPACING + Metrics.getMessageFontHeigth()), width, 2 * Metrics.MESSAGES_NAME_SPACING + Metrics.getMessageFontHeigth(), !isSelected());
             } else {
@@ -680,11 +680,7 @@ public abstract class BaseMessage extends GraphNode {
         if (!(message instanceof BaseMessage)) {
             return super.isSameAs(message);
         }
-        if (getX() == message.getX() && getY() == message.getY() && getWidth() == message.getWidth() && getHeight() == message.getHeight()) {
-            return true;
-        } else {
-            return false;
-        }
+        return ((getX() == message.getX()) && (getY() == message.getY()) && (getWidth() == message.getWidth()) && (getHeight() == message.getHeight()));
     }
 
     /**
@@ -704,7 +700,8 @@ public abstract class BaseMessage extends GraphNode {
         int gx = getX();
         int gy = getY();
 
-        h = h / 2;
+        int localHeight = h;
+        localHeight = localHeight / 2;
 
         double cw = Math.sqrt(w * w + getHeight() * getHeight());
 
@@ -714,11 +711,11 @@ public abstract class BaseMessage extends GraphNode {
         int x2 = Math.round((float) (cw * cosA - (y - gy) * sinA));
         int y2 = Math.round((float) (cw * sinA + (y - gy) * cosA));
 
-        int x3 = Math.round((float) (cw * cosA - (h) * sinA));
-        int y3 = Math.round((float) (cw * sinA + (h) * cosA));
+        int x3 = Math.round((float) (cw * cosA - (localHeight) * sinA));
+        int y3 = Math.round((float) (cw * sinA + (localHeight) * cosA));
 
-        int x4 = Math.round((float) ((x - gx) * cosA - (h) * sinA));
-        int y4 = Math.round((float) ((x - gx) * sinA + (h) * cosA));
+        int x4 = Math.round((float) ((x - gx) * cosA - (localHeight) * sinA));
+        int y4 = Math.round((float) ((x - gx) * sinA + (localHeight) * cosA));
 
         int[] points = { x1 + getX(), y1 + getY(), x2 + getX(), y2 + getY(), x3 + getX(), y3 + getY(), x4 + getX(), y4 + getY() };
         context.drawPolygon(points);
@@ -730,15 +727,15 @@ public abstract class BaseMessage extends GraphNode {
      */
     @Override
     public void drawFocus(IGC context) {
-        if ((startLifeline != endLifeline) && (startEventOccurrence == endEventOccurrence)) {
+        if ((fStartLifeline != fEndLifeline) && (fStartEventOccurrence == fEndEventOccurrence)) {
             context.setLineStyle(context.getLineDotStyle());
             context.setLineWidth(Metrics.NORMAL_LINE_WIDTH);
             context.setBackground(Frame.getUserPref().getBackGroundColorSelection());
             context.setForeground(Frame.getUserPref().getForeGroundColorSelection());
             context.drawFocus(getX(), getY() - 3, getWidth(), getHeight() + 6);
-        } else if ((startLifeline == endLifeline) && (startEventOccurrence == endEventOccurrence)) {
+        } else if ((fStartLifeline == fEndLifeline) && (fStartEventOccurrence == fEndEventOccurrence)) {
             context.drawFocus(getX(), getY() - 3, getWidth(), Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT + 6);
-        } else if ((startLifeline != endLifeline) && (startEventOccurrence != endEventOccurrence)) {
+        } else if ((fStartLifeline != fEndLifeline) && (fStartEventOccurrence != fEndEventOccurrence)) {
             context.setLineStyle(context.getLineDotStyle());
             context.setLineWidth(Metrics.NORMAL_LINE_WIDTH);
             context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_LIFELINE_HEADER));

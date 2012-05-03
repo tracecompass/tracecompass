@@ -38,15 +38,15 @@ public class HotSpot extends GraphNode {
     /**
      * The execution occurrence the hot spot marker is for.
      */
-    protected BasicExecutionOccurrence execOcc = null;
+    protected BasicExecutionOccurrence fExecOcc = null;
     /**
      * The occurrence number.
      */
-    protected int occurrence = 0;
+    protected int fOccurrence = 0;
     /**
      * The marker image to display.
      */
-    protected IImage image = null;
+    protected IImage fImage = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -56,7 +56,7 @@ public class HotSpot extends GraphNode {
      * Default constructor
      */
     public HotSpot() {
-        prefId = ISDPreferences.PREF_EXEC;
+        fPrefId = ISDPreferences.PREF_EXEC;
     }
 
     // ------------------------------------------------------------------------
@@ -69,7 +69,7 @@ public class HotSpot extends GraphNode {
      * @param img A image to set
      */
     public void setImage(IImage img) {
-        image = img;
+        fImage = img;
     }
 
     /*
@@ -78,8 +78,8 @@ public class HotSpot extends GraphNode {
      */
     @Override
     public int getX() {
-        if (execOcc != null) {
-            return execOcc.getX() - 3;
+        if (fExecOcc != null) {
+            return fExecOcc.getX() - 3;
         }
         return 0;
     }
@@ -90,8 +90,8 @@ public class HotSpot extends GraphNode {
      */
     @Override
     public int getY() {
-        if (execOcc != null){
-            return execOcc.getY();
+        if (fExecOcc != null){
+            return fExecOcc.getY();
         }
         return 0;
     }
@@ -102,8 +102,8 @@ public class HotSpot extends GraphNode {
      */
     @Override
     public int getWidth() {
-        if (execOcc != null) {
-            return execOcc.getWidth() + 7;
+        if (fExecOcc != null) {
+            return fExecOcc.getWidth() + 7;
         }
         return 0;
     }
@@ -114,8 +114,8 @@ public class HotSpot extends GraphNode {
      */
     @Override
     public int getHeight() {
-        if (execOcc != null) {
-            return execOcc.getWidth() + 10;
+        if (fExecOcc != null) {
+            return fExecOcc.getWidth() + 10;
         }
         return 0;
     }
@@ -126,8 +126,8 @@ public class HotSpot extends GraphNode {
      * @param occ the parent lifeline
      */
     public void setExecution(BasicExecutionOccurrence occ) {
-        execOcc = occ;
-        execOcc.addNode(this);
+        fExecOcc = occ;
+        fExecOcc.addNode(this);
     }
 
     /**
@@ -136,7 +136,7 @@ public class HotSpot extends GraphNode {
      * @return - the parent lifeline
      */
     public BasicExecutionOccurrence getExecOcc() {
-        return execOcc;
+        return fExecOcc;
     }
 
     /**
@@ -145,7 +145,7 @@ public class HotSpot extends GraphNode {
      * @return the occurrence number.
      */
     public int getOccurrence() {
-        return occurrence;
+        return fOccurrence;
     }
 
     /**
@@ -154,7 +154,7 @@ public class HotSpot extends GraphNode {
      * @param occ A number to set.
      */
     public void setOccurrence(int occ) {
-        occurrence = occ;
+        fOccurrence = occ;
     }
 
     /*
@@ -166,14 +166,14 @@ public class HotSpot extends GraphNode {
 
         // The execution occurrence is selected
         // if the owning lifeline is selected
-        if (isSelected() || (execOcc != null && execOcc.isSelected()) || (execOcc != null && execOcc.getLifeline() != null && execOcc.getLifeline().isSelected())) {
+        if (isSelected() || (fExecOcc != null && fExecOcc.isSelected()) || (fExecOcc != null && fExecOcc.getLifeline() != null && fExecOcc.getLifeline().isSelected())) {
             context.setBackground(Frame.getUserPref().getBackGroundColorSelection());
             context.setForeground(Frame.getUserPref().getForeGroundColorSelection());
         } else {
             context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_EXEC));
             context.setForeground(Frame.getUserPref().getForeGroundColor(ISDPreferences.PREF_EXEC));
         }
-        context.drawImage(image, getX(), getY(), getWidth(), getHeight());
+        context.drawImage(fImage, getX(), getY(), getWidth(), getHeight());
     }
 
     /*
@@ -199,13 +199,13 @@ public class HotSpot extends GraphNode {
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.GraphNode#contains(int, int)
      */
     @Override
-    public boolean contains(int _x, int _y) {
+    public boolean contains(int xValue, int yValue) {
         int x = getX();
         int y = getY();
         int width = getWidth();
         int height = getHeight();
 
-        if (Frame.contains(x, y, width, height, _x, _y)) {
+        if (Frame.contains(x, y, width, height, xValue, yValue)) {
             return true;
         }
         return false;

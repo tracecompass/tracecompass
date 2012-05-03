@@ -79,37 +79,29 @@ public class Zoom extends Action {
     /**
      * The cursor used when zooming in.
      */
-    private static Cursor fZoomInCursor;
+    private Cursor fZoomInCursor;
     /**
      * The cursor used when zooming out.
      */
-    private static Cursor fZoomOutCursor;
+    private Cursor fZoomOutCursor;
 
     public static enum ZoomType {
         ZOOM_NONE, ZOOM_IN, ZOOM_OUT, ZOOM_RESET
     };
-
+    
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
     
     /**
      * Constructor
-     * @param _view The view reference
+     * @param view The view reference
      * @param type The type of zoom.
      */
-    public Zoom(SDView _view, ZoomType type) {
+    public Zoom(SDView view, ZoomType type) {
         super("", AS_RADIO_BUTTON);//$NON-NLS-1$
 
-        fView = _view;
-
-        if ((fZoomInCursor != null) && (!fZoomInCursor.isDisposed())) {
-            fZoomInCursor.dispose();
-        }
-
-        if ((fZoomOutCursor != null) && (!fZoomOutCursor.isDisposed())) {
-            fZoomOutCursor.dispose();
-        }
+        fView = view;
 
         // Pre-create zooming cursors
         fZoomInCursor = new Cursor(Display.getCurrent(), 
@@ -234,7 +226,7 @@ public class Zoom extends Action {
                 return;
             }
             IContributionItem nextPage = barManager.find(id);
-            if (nextPage != null && nextPage instanceof ActionContributionItem) {
+            if (nextPage instanceof ActionContributionItem) {
                 IAction action = ((ActionContributionItem) nextPage).getAction();
                 if (action != null) {
                     action.setChecked(checked);

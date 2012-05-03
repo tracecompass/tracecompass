@@ -18,6 +18,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
@@ -45,27 +48,27 @@ public class Frame extends BasicFrame {
     /**
      * The lifeline that is current highlighted.
      */
-    protected Lifeline highlightLifeline = null;
+    protected Lifeline fHighlightLifeline = null;
     /**
      * The value of the start event.
      */
-    protected int startEvent = 0;
+    protected int fStartEvent = 0;
     /**
      * The nubmer of events in the frame.
      */
-    protected int nbEvent = 0;
+    protected int fNbEvent = 0;
     /**
      * The color for highlighting.
      */
-    protected IColor highlightColor = null;
+    protected IColor fHighlightColor = null;
     /**
      * The list of time events of the corresponding execution occurrences.
      */
-    protected List<SDTimeEvent> executionOccurrencesWithTime;
+    protected List<SDTimeEvent> fExecutionOccurrencesWithTime;
     /**
      * The Array of lifeline categories.
      */
-    protected LifelineCategories[] lifelineCategories = null;
+    protected LifelineCategories[] fLifelineCategories = null;
 
     // ------------------------------------------------------------------------
     // Methods
@@ -78,10 +81,10 @@ public class Frame extends BasicFrame {
      * @return the lifelines list
      */
     protected List<GraphNode> getLifelines() {
-        if (!hasChilden) {
+        if (!fHasChilden) {
             return null;
         } 
-        return (List<GraphNode>) nodes.get(Lifeline.LIFELINE_TAG);
+        return (List<GraphNode>) fNodes.get(Lifeline.LIFELINE_TAG);
     }
 
     /**
@@ -117,10 +120,10 @@ public class Frame extends BasicFrame {
      * @return the syncMessages list
      */
     protected List<GraphNode> getSyncMessages() {
-        if (!hasChilden) {
+        if (!fHasChilden) {
             return null;
         } 
-        return (List<GraphNode>) nodes.get(SyncMessage.SYNC_MESS_TAG);
+        return (List<GraphNode>) fNodes.get(SyncMessage.SYNC_MESS_TAG);
     }
 
     /**
@@ -155,10 +158,10 @@ public class Frame extends BasicFrame {
      * @return the asyncMessages list or <code>null</code>
      */
     protected List<GraphNode> getAsyncMessages() {
-        if (!hasChilden) {
+        if (!fHasChilden) {
             return null;
         }
-        return (List<GraphNode>) nodes.get(AsyncMessage.ASYNC_MESS_TAG);
+        return (List<GraphNode>) fNodes.get(AsyncMessage.ASYNC_MESS_TAG);
     }
 
     /**
@@ -193,10 +196,10 @@ public class Frame extends BasicFrame {
      * @return the syncMessages return list or <code>null</code>
      */
     protected List<GraphNode> getSyncMessagesReturn() {
-        if (!hasChilden) {
+        if (!fHasChilden) {
             return null;
         }
-        return (List<GraphNode>) nodes.get(SyncMessageReturn.SYNC_MESS_RET_TAG);
+        return (List<GraphNode>) fNodes.get(SyncMessageReturn.SYNC_MESS_RET_TAG);
     }
 
     /**
@@ -231,10 +234,10 @@ public class Frame extends BasicFrame {
      * @return the asyncMessageRetun list or <code>null</code>
      */
     protected List<GraphNode> getAsyncMessagesReturn() {
-        if (!hasChilden) {
+        if (!fHasChilden) {
             return null;
         }
-        return (List<GraphNode>) nodes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG);
+        return (List<GraphNode>) fNodes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG);
     }
 
     /**
@@ -269,7 +272,7 @@ public class Frame extends BasicFrame {
      * @param lifeline the lifeline to add
      */
     public void addLifeLine(Lifeline lifeline) {
-        computeMinMax = true;
+        fComputeMinMax = true;
         if (lifeline == null) {
             return;
         }
@@ -279,7 +282,7 @@ public class Frame extends BasicFrame {
         // and set the lifeline drawing order
         lifeline.setIndex(getNewHorizontalIndex());
         if (lifeline.hasTimeInfo()) {
-            timeInfo = true;
+            fHasTimeInfo = true;
         }
         // add the lifeline to the lifelines list
         addNode(lifeline);
@@ -291,10 +294,10 @@ public class Frame extends BasicFrame {
      * @return the first visible lifeline index
      */
     public int getFirstVisibleLifeline() {
-        if (!hasChilden) {
+        if (!fHasChilden) {
             return 0;
-        } else if (indexes.get(Lifeline.LIFELINE_TAG) != null) {
-            return ((Integer) indexes.get(Lifeline.LIFELINE_TAG)).intValue();
+        } else if (fIndexes.get(Lifeline.LIFELINE_TAG) != null) {
+            return ((Integer) fIndexes.get(Lifeline.LIFELINE_TAG)).intValue();
         }
         return 0;
     }
@@ -305,10 +308,10 @@ public class Frame extends BasicFrame {
      * @return the first visible synchronous message index
      */
     public int getFirstVisibleSyncMessage() {
-        if (!hasChilden) {
+        if (!fHasChilden) {
             return 0;
-        } else if (indexes.get(SyncMessage.SYNC_MESS_TAG) != null) {
-            return ((Integer) indexes.get(SyncMessage.SYNC_MESS_TAG)).intValue();
+        } else if (fIndexes.get(SyncMessage.SYNC_MESS_TAG) != null) {
+            return ((Integer) fIndexes.get(SyncMessage.SYNC_MESS_TAG)).intValue();
         }
         return 0;
     }
@@ -319,10 +322,10 @@ public class Frame extends BasicFrame {
      * @return the first visible synchronous message return index
      */
     public int getFirstVisibleSyncMessageReturn() {
-        if (!hasChilden) {
+        if (!fHasChilden) {
             return 0;
-        } else if (indexes.get(SyncMessageReturn.SYNC_MESS_RET_TAG) != null) {
-            return ((Integer) indexes.get(SyncMessageReturn.SYNC_MESS_RET_TAG)).intValue();
+        } else if (fIndexes.get(SyncMessageReturn.SYNC_MESS_RET_TAG) != null) {
+            return ((Integer) fIndexes.get(SyncMessageReturn.SYNC_MESS_RET_TAG)).intValue();
         }
         return 0;
     }
@@ -333,10 +336,10 @@ public class Frame extends BasicFrame {
      * @return the first visible synchronous message index
      */
     public int getFirstVisibleAsyncMessage() {
-        if (!hasChilden) {
+        if (!fHasChilden) {
             return 0;
-        } else if (indexes.get(AsyncMessage.ASYNC_MESS_TAG) != null) {
-            return ((Integer) indexes.get(AsyncMessage.ASYNC_MESS_TAG)).intValue();
+        } else if (fIndexes.get(AsyncMessage.ASYNC_MESS_TAG) != null) {
+            return ((Integer) fIndexes.get(AsyncMessage.ASYNC_MESS_TAG)).intValue();
         }
         return 0;
     }
@@ -347,10 +350,10 @@ public class Frame extends BasicFrame {
      * @return the first visible synchronous message return index
      */
     public int getFirstVisibleAsyncMessageReturn() {
-        if (!hasChilden) {
+        if (!fHasChilden) {
             return 0;
-        } else if (indexes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG) != null) {
-            return ((Integer) indexes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG)).intValue();
+        } else if (fIndexes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG) != null) {
+            return ((Integer) fIndexes.get(AsyncMessageReturn.ASYNC_MESS_RET_TAG)).intValue();
         }
         return 0;
     }
@@ -361,7 +364,7 @@ public class Frame extends BasicFrame {
      * @return the list of execution occurrences
      */
     public List<SDTimeEvent> getExecutionOccurrencesWithTime() {
-        return executionOccurrencesWithTime;
+        return fExecutionOccurrencesWithTime;
     }
 
     /**
@@ -491,7 +494,7 @@ public class Frame extends BasicFrame {
      * 
      * @param list A list of lifelines to reorder.
      */
-    public void reorder(ArrayList<?> list) {
+    public void reorder(List<?> list) {
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i) instanceof Lifeline[]) {
                 Lifeline temp[] = (Lifeline[]) list.get(i);
@@ -510,10 +513,10 @@ public class Frame extends BasicFrame {
      * Resets the time compression information.
      */
     public void resetTimeCompression() {
-        highlightLifeline = null;
-        this.startEvent = 0;
-        this.nbEvent = 0;
-        highlightColor = null;
+        fHighlightLifeline = null;
+        this.fStartEvent = 0;
+        this.fNbEvent = 0;
+        fHighlightColor = null;
     }
 
     /*
@@ -529,14 +532,13 @@ public class Frame extends BasicFrame {
         for (int i = 0; i < timeArray.size() - 1; i++) {
             SDTimeEvent m1 = (SDTimeEvent) timeArray.get(i);
             SDTimeEvent m2 = (SDTimeEvent) timeArray.get(i + 1);
-            if (SDViewPref.getInstance().excludeExternalTime())
-                if ((m1.getGraphNode() instanceof BaseMessage) && (m2.getGraphNode() instanceof BaseMessage)) {
-                    BaseMessage mes1 = (BaseMessage) m1.getGraphNode();
-                    BaseMessage mes2 = (BaseMessage) m2.getGraphNode();
-                    if ((mes2.startLifeline == null) || (mes1.endLifeline == null)) {
-                        continue;
-                    }
+            if (SDViewPref.getInstance().excludeExternalTime() && ((m1.getGraphNode() instanceof BaseMessage) && (m2.getGraphNode() instanceof BaseMessage))) {
+                BaseMessage mes1 = (BaseMessage) m1.getGraphNode();
+                BaseMessage mes2 = (BaseMessage) m2.getGraphNode();
+                if ((mes2.fStartLifeline == null) || (mes1.fEndLifeline == null)) {
+                    continue;
                 }
+            }
 
             updateMinMax(m1, m2);
         }
@@ -578,7 +580,7 @@ public class Frame extends BasicFrame {
      * @param value <code>true</code> for has time information else <code>false</code>
      */
     protected void setHasTimeInfo(boolean value) {
-        timeInfo = value;
+        fHasTimeInfo = value;
     }
 
     /**
@@ -587,7 +589,7 @@ public class Frame extends BasicFrame {
      * @return <code>true</code> whether frame has time info else <code>false</code>
      */
     public boolean hasTimeInfo() {
-        return timeInfo;
+        return fHasTimeInfo;
     }
 
     /**
@@ -599,10 +601,10 @@ public class Frame extends BasicFrame {
      * @param color A color for highlighting
      */
     public void highlightTimeCompression(Lifeline lifeline, int startEvent, int nbEvent, IColor color) {
-        highlightLifeline = lifeline;
-        this.startEvent = startEvent;
-        this.nbEvent = nbEvent;
-        highlightColor = color;
+        fHighlightLifeline = lifeline;
+        this.fStartEvent = startEvent;
+        this.fNbEvent = nbEvent;
+        fHighlightColor = color;
     }
 
     /**
@@ -612,7 +614,7 @@ public class Frame extends BasicFrame {
      * @param categories the lifeline categories array
      */
     public void setLifelineCategories(LifelineCategories[] categories) {
-        lifelineCategories = Arrays.copyOf(categories, categories.length);
+        fLifelineCategories = Arrays.copyOf(categories, categories.length);
     }
 
     /**
@@ -621,7 +623,7 @@ public class Frame extends BasicFrame {
      * @return the lifeline categories array or null if not set
      */
     public LifelineCategories[] getLifelineCategories() {
-        return  Arrays.copyOf(lifelineCategories, lifelineCategories.length); 
+        return  Arrays.copyOf(fLifelineCategories, fLifelineCategories.length); 
     }
 
     /**
@@ -646,15 +648,15 @@ public class Frame extends BasicFrame {
     @Override
     public void draw(IGC context) {
         drawFrame(context);
-        if (!hasChilden) {
+        if (!fHasChilden) {
             return;
         }
         
-        if (highlightLifeline != null) {
+        if (fHighlightLifeline != null) {
             IColor backupColor = context.getBackground();
             context.setBackground(Frame.getUserPref().getTimeCompressionSelectionColor());
-            int gy = highlightLifeline.getY() + highlightLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * startEvent;
-            context.fillRectangle(Metrics.FRAME_H_MARGIN + 1, gy, highlightLifeline.getX() + Metrics.getLifelineWidth() / 2 - Metrics.FRAME_H_MARGIN, (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * nbEvent);
+            int gy = fHighlightLifeline.getY() + fHighlightLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fStartEvent;
+            context.fillRectangle(Metrics.FRAME_H_MARGIN + 1, gy, fHighlightLifeline.getX() + Metrics.getLifelineWidth() / 2 - Metrics.FRAME_H_MARGIN, (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fNbEvent);
             context.setBackground(backupColor);
         }
         super.draw(context, false);
@@ -662,21 +664,21 @@ public class Frame extends BasicFrame {
         if (Metrics.swimmingLaneWidth() * context.getZoom() < Metrics.LIFELINE_SIGNIFICANT_HSPACING) {
             lifelineArryStep = Math.round(Metrics.LIFELINE_SIGNIFICANT_HSPACING / (Metrics.swimmingLaneWidth() * context.getZoom()));
         }
-        if (indexes.size() == 0) {
+        if (fIndexes.size() == 0) {
             return;
         }
-        int lifeLineDrawIndex = ((Integer) indexes.get(Lifeline.LIFELINE_TAG)).intValue();
-        for (int i = lifeLineDrawIndex; i < ((List<GraphNode>) nodes.get(Lifeline.LIFELINE_TAG)).size(); i = i + lifelineArryStep) {
-            Lifeline toDraw = (Lifeline) ((List<GraphNode>) nodes.get(Lifeline.LIFELINE_TAG)).get(i);
+        int lifeLineDrawIndex = ((Integer) fIndexes.get(Lifeline.LIFELINE_TAG)).intValue();
+        for (int i = lifeLineDrawIndex; i < ((List<GraphNode>) fNodes.get(Lifeline.LIFELINE_TAG)).size(); i = i + lifelineArryStep) {
+            Lifeline toDraw = (Lifeline) ((List<GraphNode>) fNodes.get(Lifeline.LIFELINE_TAG)).get(i);
             if (toDraw.getX() - Metrics.LIFELINE_SPACING / 2 > context.getContentsX() + context.getVisibleWidth()) {
                 break;
             }
             toDraw.drawName(context);
 
-            if (highlightLifeline != null) {
-                if (toDraw == highlightLifeline) {
-                    toDraw.highlightExecOccurrenceRegion(context, startEvent, nbEvent, highlightColor);
-                } else if ((toDraw.getIndex() < highlightLifeline.getIndex()) || ((toDraw.getIndex() < highlightLifeline.getIndex()))) {
+            if (fHighlightLifeline != null) {
+                if (toDraw == fHighlightLifeline) {
+                    toDraw.highlightExecOccurrenceRegion(context, fStartEvent, fNbEvent, fHighlightColor);
+                } else if ((toDraw.getIndex() < fHighlightLifeline.getIndex()) || ((toDraw.getIndex() < fHighlightLifeline.getIndex()))) {
 
                     int acIndex = toDraw.getExecOccurrenceDrawIndex();
                     // acIndex = first visible execution occurrence
@@ -684,9 +686,9 @@ public class Frame extends BasicFrame {
                     if (toDraw.getExecutions() != null) {
                         for (int index = acIndex; index < toDraw.getExecutions().size(); index++) {
                             BasicExecutionOccurrence exec = (BasicExecutionOccurrence) toDraw.getExecutions().get(index);
-                            int tempEvent = startEvent;
-                            for (int j = 0; j < nbEvent; j++) {
-                                if (((tempEvent >= exec.startEventOccurrence) && (tempEvent <= exec.endEventOccurrence) && (tempEvent + 1 >= exec.startEventOccurrence) && (tempEvent + 1 <= exec.endEventOccurrence))) {
+                            int tempEvent = fStartEvent;
+                            for (int j = 0; j < fNbEvent; j++) {
+                                if (((tempEvent >= exec.fStartEventOccurrence) && (tempEvent <= exec.fEndEventOccurrence) && (tempEvent + 1 >= exec.fStartEventOccurrence) && (tempEvent + 1 <= exec.fEndEventOccurrence))) {
                                     toDraw.highlightExecOccurrenceRegion(context, tempEvent, 1, Frame.getUserPref().getTimeCompressionSelectionColor());
                                 }
                                 tempEvent = tempEvent + 1;
@@ -709,15 +711,15 @@ public class Frame extends BasicFrame {
      */
     @Override
     protected List<SDTimeEvent> buildTimeArray() {
-        if (!hasChilden) {
+        if (!fHasChilden) {
             return null;
         }
         try {
             List<SDTimeEvent> timeArray = super.buildTimeArray();
-            executionOccurrencesWithTime = null;
+            fExecutionOccurrencesWithTime = null;
             if (getLifelines() != null) {
-                for (int i = 0; i < ((List<GraphNode>) nodes.get(Lifeline.LIFELINE_TAG)).size(); i++) {
-                    Lifeline l = (Lifeline) ((List<GraphNode>) nodes.get(Lifeline.LIFELINE_TAG)).get(i);
+                for (int i = 0; i < ((List<GraphNode>) fNodes.get(Lifeline.LIFELINE_TAG)).size(); i++) {
+                    Lifeline l = (Lifeline) ((List<GraphNode>) fNodes.get(Lifeline.LIFELINE_TAG)).get(i);
                     if (l.hasTimeInfo() && l.getExecutions() != null) {
                         for (Iterator<GraphNode> j = l.getExecutions().iterator(); j.hasNext();) {
                             GraphNode o = j.next();
@@ -728,15 +730,15 @@ public class Frame extends BasicFrame {
                                     ITmfTimestamp time = eo.getStartTime();
                                     SDTimeEvent f = new SDTimeEvent(time, event, eo);
                                     timeArray.add(f);
-                                    if (executionOccurrencesWithTime == null) {
-                                        executionOccurrencesWithTime = new ArrayList<SDTimeEvent>();
+                                    if (fExecutionOccurrencesWithTime == null) {
+                                        fExecutionOccurrencesWithTime = new ArrayList<SDTimeEvent>();
                                     }
-                                    executionOccurrencesWithTime.add(f);
+                                    fExecutionOccurrencesWithTime.add(f);
                                     event = eo.getEndOccurrence();
                                     time = eo.getEndTime();
                                     f = new SDTimeEvent(time, event, eo);
                                     timeArray.add(f);
-                                    executionOccurrencesWithTime.add(f);
+                                    fExecutionOccurrencesWithTime.add(f);
                                 }
                             }
                         }
@@ -744,17 +746,17 @@ public class Frame extends BasicFrame {
                 }
             }
 
-            if (executionOccurrencesWithTime != null) {
-                SDTimeEvent[] temp = executionOccurrencesWithTime.toArray(new SDTimeEvent[0]);
+            if (fExecutionOccurrencesWithTime != null) {
+                SDTimeEvent[] temp = fExecutionOccurrencesWithTime.toArray(new SDTimeEvent[fExecutionOccurrencesWithTime.size()]);
                 Arrays.sort(temp, new TimeEventComparator());
-                executionOccurrencesWithTime = Arrays.asList(temp);
+                fExecutionOccurrencesWithTime = Arrays.asList(temp);
             }
-            SDTimeEvent[] temp = timeArray.toArray(new SDTimeEvent[0]);
+            SDTimeEvent[] temp = timeArray.toArray(new SDTimeEvent[timeArray.size()]);
             Arrays.sort(temp, new TimeEventComparator());
             timeArray = Arrays.asList(temp);
             return timeArray;
         } catch (Exception e) {
-            e.printStackTrace();
+            TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Error building time array", e )); //$NON-NLS-1$
             return null;
         }
 
@@ -834,7 +836,7 @@ public class Frame extends BasicFrame {
         if (list == null) {
             return null;
         }
-        if (smallerEvent == false) {
+        if (!smallerEvent) {
             int event = 0;
             if (message != null) {
                 event = message.getEventOccurrence();
@@ -1049,12 +1051,11 @@ public class Frame extends BasicFrame {
             return null;
         }
         List<GraphNode> list = lifeline.getExecutions();
-        if (list == null) {
+
+        if ((list == null) || (list.isEmpty())) {
             return null;
         }
-        if (list.size() == 0) {
-            return null;
-        }
+
         BasicExecutionOccurrence result = (BasicExecutionOccurrence) list.get(0);
         for (int i = 0; i < list.size(); i++) {
             BasicExecutionOccurrence e = (BasicExecutionOccurrence) list.get(i);
@@ -1086,10 +1087,10 @@ public class Frame extends BasicFrame {
         BasicExecutionOccurrence result = null;
         for (int i = 0; i < list.size(); i++) {
             BasicExecutionOccurrence e = (BasicExecutionOccurrence) list.get(i);
-            if ((e.getStartOccurrence() < exec.startEventOccurrence) && (result == null)) {
+            if ((e.getStartOccurrence() < exec.fStartEventOccurrence) && (result == null)) {
                 result = e;
             }
-            if ((e.getStartOccurrence() < exec.startEventOccurrence) && (e.getStartOccurrence() >= result.getEndOccurrence())) {
+            if ((e.getStartOccurrence() < exec.fStartEventOccurrence) && (e.getStartOccurrence() >= result.getEndOccurrence())) {
                 result = e;
             }
         }
@@ -1117,10 +1118,10 @@ public class Frame extends BasicFrame {
         BasicExecutionOccurrence result = null;
         for (int i = 0; i < list.size(); i++) {
             BasicExecutionOccurrence e = (BasicExecutionOccurrence) list.get(i);
-            if ((e.getStartOccurrence() > exec.startEventOccurrence) && (result == null)) {
+            if ((e.getStartOccurrence() > exec.fStartEventOccurrence) && (result == null)) {
                 result = e;
             }
-            if ((e.getStartOccurrence() > exec.startEventOccurrence) && (e.getStartOccurrence() <= result.getEndOccurrence())) {
+            if ((e.getStartOccurrence() > exec.fStartEventOccurrence) && (e.getStartOccurrence() <= result.getEndOccurrence())) {
                 result = e;
             }
         }

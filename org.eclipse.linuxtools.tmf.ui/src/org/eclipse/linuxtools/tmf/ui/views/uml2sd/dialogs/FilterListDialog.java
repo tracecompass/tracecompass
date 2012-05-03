@@ -48,8 +48,13 @@ public class FilterListDialog extends Dialog {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-
+    /**
+     * Filter list criteria property name
+     */
     protected static final String FILTERS_LIST_CRITERIA = "filtersListsCriteria"; //$NON-NLS-1$
+    /**
+     * Filter list size property name
+     */
     protected static final String FILTERS_LIST_SIZE = "filtersListSize"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
@@ -59,31 +64,31 @@ public class FilterListDialog extends Dialog {
     /**
      * The viewer and provided are kept here as attributes
      */
-    protected IViewPart viewer = null;
+    protected IViewPart fViewer = null;
     /**
      * The filter provider implementation
      */
-    protected ISDFilterProvider provider = null;
+    protected ISDFilterProvider fProvider = null;
     /**
      * The filters are the result of editing this list
      */
-    protected List<FilterCriteria> filters;
+    protected List<FilterCriteria> fFilters;
     /**
      * The add button.
      */
-    protected Button add;
+    protected Button fAdd;
     /**
      * The remove button.
      */
-    protected Button remove;
+    protected Button fRemove;
     /**
      * The edit button.
      */
-    protected Button edit;
+    protected Button fEdit;
     /**
      * The table with list of filters.
      */
-    protected Table table;
+    protected Table fTable;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -92,14 +97,14 @@ public class FilterListDialog extends Dialog {
     /**
      * Standard constructor
      * 
-     * @param view_ The view reference
-     * @param loader_ The filter provider implementation
+     * @param view The view reference
+     * @param loader The filter provider implementation
      */
-    public FilterListDialog(IViewPart view_, ISDFilterProvider loader_) {
-        super(view_.getSite().getShell());
-        viewer = view_;
-        provider = loader_;
-        filters = null;
+    public FilterListDialog(IViewPart view, ISDFilterProvider loader) {
+        super(view.getSite().getShell());
+        fViewer = view;
+        fProvider = loader;
+        fFilters = null;
         // filters = provider.getCurrentFilters();
         setShellStyle(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
     }
@@ -116,27 +121,27 @@ public class FilterListDialog extends Dialog {
      * @param loaderClassName A loader class name for the filters
      */
     protected void addCriteria(Criteria criteria, boolean checked, boolean positive, String loaderClassName) {
-        CriteriaTableItem cti = new CriteriaTableItem(table, checked, positive, loaderClassName);
+        CriteriaTableItem cti = new CriteriaTableItem(fTable, checked, positive, loaderClassName);
         cti.setCriteria(criteria);
     }
 
     /**
      * Replaces a selected criteria with a new criteria.
      * 
-     * @param new_ A new criteria.
+     * @param newCriteria A new criteria.
      */
-    protected void replaceSelectedCriteria(Criteria new_) {
-        CriteriaTableItem cti = (CriteriaTableItem) table.getSelection()[0].getData();
-        cti.setCriteria(new_);
+    protected void replaceSelectedCriteria(Criteria newCriteria) {
+        CriteriaTableItem cti = (CriteriaTableItem) fTable.getSelection()[0].getData();
+        cti.setCriteria(newCriteria);
     }
 
     /**
 	 * Handles table selection count.
 	 */
     protected void handleTableSelectionCount() {
-        int count = table.getSelectionCount();
-        edit.setEnabled(count == 1);
-        remove.setEnabled(count > 0);
+        int count = fTable.getSelectionCount();
+        fEdit.setEnabled(count == 1);
+        fRemove.setEnabled(count > 0);
     }
 
     /*
@@ -160,19 +165,19 @@ public class FilterListDialog extends Dialog {
         rowLayout.spacing = 8;
         ret.setLayout(rowLayout);
 
-        table = new Table(ret, SWT.MULTI | SWT.CHECK);
-        table.setLayoutData(new RowData(220, 84));
-        table.setHeaderVisible(false);
-        table.addSelectionListener(new SelectionListener() {
+        fTable = new Table(ret, SWT.MULTI | SWT.CHECK);
+        fTable.setLayoutData(new RowData(220, 84));
+        fTable.setHeaderVisible(false);
+        fTable.addSelectionListener(new SelectionListener() {
             /*
              * (non-Javadoc)
              * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
              */
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
-                int count = table.getSelectionCount();
+                int count = fTable.getSelectionCount();
                 if (count == 1) {
-                    Criteria criteria = openFilterDialog(((CriteriaTableItem) table.getSelection()[0].getData()).getCriteria(), SDMessages._63);
+                    Criteria criteria = openFilterDialog(((CriteriaTableItem) fTable.getSelection()[0].getData()).getCriteria(), SDMessages._63);
                     if (criteria != null) {
                         replaceSelectedCriteria(criteria);
                     }
@@ -188,8 +193,8 @@ public class FilterListDialog extends Dialog {
                 handleTableSelectionCount();
             }
         });
-        if (filters != null) {
-            for (Iterator<FilterCriteria> i = filters.iterator(); i.hasNext();) {
+        if (fFilters != null) {
+            for (Iterator<FilterCriteria> i = fFilters.iterator(); i.hasNext();) {
                 FilterCriteria filterCriteria = (FilterCriteria) i.next();
                 addCriteria(filterCriteria.getCriteria(), filterCriteria.isActive(), filterCriteria.isPositive(), filterCriteria.getLoaderClassName());
             }
@@ -207,9 +212,9 @@ public class FilterListDialog extends Dialog {
         rowLayoutCommands.marginBottom = 4;
         rowLayoutCommands.spacing = 8;
         commands.setLayout(rowLayoutCommands);
-        add = new Button(commands, SWT.NONE);
-        add.setText(SDMessages._61);
-        add.addSelectionListener(new SelectionListener() {
+        fAdd = new Button(commands, SWT.NONE);
+        fAdd.setText(SDMessages._61);
+        fAdd.addSelectionListener(new SelectionListener() {
             /*
              * (non-Javadoc)
              * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
@@ -233,9 +238,9 @@ public class FilterListDialog extends Dialog {
             }
         });
 
-        edit = new Button(commands, SWT.NONE);
-        edit.setText(SDMessages._60);
-        edit.addSelectionListener(new SelectionListener() {
+        fEdit = new Button(commands, SWT.NONE);
+        fEdit.setText(SDMessages._60);
+        fEdit.addSelectionListener(new SelectionListener() {
             /*
              * (non-Javadoc)
              * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
@@ -251,17 +256,17 @@ public class FilterListDialog extends Dialog {
              */
             @Override
             public void widgetSelected(SelectionEvent e) {
-                Criteria c = openFilterDialog(((CriteriaTableItem) table.getSelection()[0].getData()).getCriteria(), SDMessages._63);
+                Criteria c = openFilterDialog(((CriteriaTableItem) fTable.getSelection()[0].getData()).getCriteria(), SDMessages._63);
                 if (c != null) {
                     replaceSelectedCriteria(c);
                 }
             }
         });
-        edit.setEnabled(false);
+        fEdit.setEnabled(false);
 
-        remove = new Button(commands, SWT.NONE);
-        remove.setText(SDMessages._64);
-        remove.addSelectionListener(new SelectionListener() {
+        fRemove = new Button(commands, SWT.NONE);
+        fRemove.setText(SDMessages._64);
+        fRemove.addSelectionListener(new SelectionListener() {
             /*
              * (non-Javadoc)
              * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
@@ -277,11 +282,11 @@ public class FilterListDialog extends Dialog {
              */
             @Override
             public void widgetSelected(SelectionEvent e) {
-                table.remove(table.getSelectionIndices());
+                fTable.remove(fTable.getSelectionIndices());
                 handleTableSelectionCount();
             }
         });
-        remove.setEnabled(false);
+        fRemove.setEnabled(false);
 
         getShell().setText(SDMessages._65);
         /*
@@ -299,7 +304,7 @@ public class FilterListDialog extends Dialog {
      * @return the criteria that has been updated or created
      */
     protected Criteria openFilterDialog(Criteria criteria, String action) {
-        SearchFilterDialog filter = new SearchFilterDialog((SDView) viewer, provider, true, SWT.APPLICATION_MODAL);
+        SearchFilterDialog filter = new SearchFilterDialog((SDView) fViewer, fProvider, true, SWT.APPLICATION_MODAL);
         filter.setCriteria(criteria);
         filter.setOkText(action);
         filter.setTitle(SDMessages._66);
@@ -326,34 +331,34 @@ public class FilterListDialog extends Dialog {
      */
     @Override
     public void okPressed() {
-        if (table.getItemCount() > 0) {
-            filters = new ArrayList<FilterCriteria>();
+        if (fTable.getItemCount() > 0) {
+            fFilters = new ArrayList<FilterCriteria>();
         } else {
-            filters = null;
+            fFilters = null;
         }
-        for (int i = 0; i < table.getItemCount(); i++) {
-            TableItem item = table.getItem(i);
+        for (int i = 0; i < fTable.getItemCount(); i++) {
+            TableItem item = fTable.getItem(i);
             CriteriaTableItem cti = (CriteriaTableItem) item.getData();
-            FilterCriteria fc = new FilterCriteria(cti.getCriteria(), item.getChecked(), cti.getPositive(), cti.getLoaderClassName());
-            FilterCriteria efc = FilterCriteria.find(fc, filters);
+            FilterCriteria fc = new FilterCriteria(cti.getCriteria(), item.getChecked(), cti.isPositive(), cti.getLoaderClassName());
+            FilterCriteria efc = FilterCriteria.find(fc, fFilters);
             if (efc == null) {
-                filters.add(fc);
+                fFilters.add(fc);
             } else {
                 efc.setActive(efc.isActive() || fc.isActive());
             }
         }
         super.close();
-        provider.filter(filters);
-        saveFiltersCriteria(filters);
+        fProvider.filter(fFilters);
+        saveFiltersCriteria(fFilters);
     }
 
     /**
      * Sets the list of filters.
      * 
-     * @param filters_ The list of filters to set.
+     * @param filters The list of filters to set.
      */
-    public void setFilters(ArrayList<FilterCriteria> filters_) {
-        filters = filters_;
+    public void setFilters(List<FilterCriteria> filters) {
+        fFilters = filters;
     }
 
     /**
@@ -362,7 +367,7 @@ public class FilterListDialog extends Dialog {
      * @return the filters list after editing
      */
     public List<FilterCriteria> getFilters() {
-        return filters;
+        return fFilters;
     }
 
     /**
@@ -469,60 +474,60 @@ public class FilterListDialog extends Dialog {
         /**
          * The criteria reference
          */
-        protected Criteria criteria;
+        protected Criteria fCriteria;
         /**
          * The "positive" value.
          */
-        protected boolean positive;
+        protected boolean fIsPositive;
         /**
          * The loader class name
          */
-        protected String loaderClassName;
+        protected String fLoaderClassName;
         /**
          * The actual table item.
          */
-        protected TableItem tableItem;
+        protected TableItem fTableItem;
 
         /**
          * Constructor
          * 
          * @param parent The parent table
-         * @param active_ <code>true</code> if filter criteria is active else <code>false</code> 
-         * @param positive_  <code>true</code> for positive filter else <code>false</code>
-         * @param loaderClassName_ The loader class name
+         * @param isActive <code>true</code> if filter criteria is active else <code>false</code> 
+         * @param isPositive <code>true</code> for positive filter else <code>false</code>
+         * @param loaderClassName The loader class name
          */
-        public CriteriaTableItem(Table parent, boolean active_, boolean positive_, String loaderClassName_) {
-            tableItem = new TableItem(parent, SWT.NONE);
-            tableItem.setData(this);
-            tableItem.setChecked(active_);
-            positive = positive_;
-            loaderClassName = loaderClassName_;
+        public CriteriaTableItem(Table parent, boolean isActive, boolean isPositive, String loaderClassName) {
+            fTableItem = new TableItem(parent, SWT.NONE);
+            fTableItem.setData(this);
+            fTableItem.setChecked(isActive);
+            fIsPositive = isPositive;
+            fLoaderClassName = loaderClassName;
         }
 
         /**
          * Constructor
          * 
          * @param parent The parent table
-         * @param active_ <code>true</code> if filter criteria is active else <code>false</code> 
-         * @param positive_  <code>true</code> for positive filter else <code>false</code>
-         * @param loaderClassName_ The loader class name
+         * @param isActive <code>true</code> if filter criteria is active else <code>false</code> 
+         * @param isPositive <code>true</code> for positive filter else <code>false</code>
+         * @param loaderClassName The loader class name
          * @param index The table item index
          */
-        public CriteriaTableItem(Table parent, boolean checked_, boolean positive_, String loaderClassName_, int index) {
-            tableItem = new TableItem(parent, SWT.NONE, index);
-            tableItem.setChecked(checked_);
-            positive = positive_;
-            loaderClassName = loaderClassName_;
+        public CriteriaTableItem(Table parent, boolean isActive, boolean isPositive, String loaderClassName, int index) {
+            fTableItem = new TableItem(parent, SWT.NONE, index);
+            fTableItem.setChecked(isActive);
+            fIsPositive = isPositive;
+            fLoaderClassName = loaderClassName;
         }
 
         /**
          * Sets the criteria.
          * 
-         * @param criteria_ The criteria to set
+         * @param criteria The criteria to set
          */
-        public void setCriteria(Criteria criteria_) {
-            criteria = criteria_;
-            tableItem.setText((positive ? SDMessages._59 : SDMessages._58) + " " + criteria.getExpression() + " " + criteria.getGraphNodeSummary(provider, loaderClassName)); //$NON-NLS-1$ //$NON-NLS-2$
+        public void setCriteria(Criteria criteria) {
+            fCriteria = criteria;
+            fTableItem.setText((fIsPositive ? SDMessages._59 : SDMessages._58) + " " + fCriteria.getExpression() + " " + fCriteria.getGraphNodeSummary(fProvider, fLoaderClassName)); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         /**
@@ -530,7 +535,7 @@ public class FilterListDialog extends Dialog {
          * @return the criteria
          */
         public Criteria getCriteria() {
-            return criteria;
+            return fCriteria;
         }
 
         /**
@@ -538,8 +543,8 @@ public class FilterListDialog extends Dialog {
          * 
          * @return <code>true</code> for positive filter else <code>false</code>
          */
-        public boolean getPositive() {
-            return positive;
+        public boolean isPositive() {
+            return fIsPositive;
         }
 
         /**
@@ -548,7 +553,7 @@ public class FilterListDialog extends Dialog {
          * @return the loader class name
          */
         public String getLoaderClassName() {
-            return loaderClassName;
+            return fLoaderClassName;
         }
     }
 

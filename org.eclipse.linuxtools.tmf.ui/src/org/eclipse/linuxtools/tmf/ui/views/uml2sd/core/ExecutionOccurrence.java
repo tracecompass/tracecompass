@@ -36,31 +36,31 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
     /**
      * Set the red, green and blue value of the optional color to be used for filling the execution occurrence. 
      */
-    protected int[] fillRGB;
+    protected int[] fFillRGB;
     /**
      * Set the red, green and blue value of the optional color to be used for drawing the execution occurrence
      */
-    protected int[] strokeRGB;
+    protected int[] fStrokeRGB;
     /**
      * The occurrence image.
      */
-    protected IImage image;
+    protected IImage fImage;
     /**
      * The top ellipses image.
      */
-    protected IImage ellipsesImage;
+    protected IImage fEllipsesImage;
     /**
      *  The start time stamp. 
      */
-    protected ITmfTimestamp startTime;
+    protected ITmfTimestamp fStartTime;
     /**
      * The end time stamp;
      */
-    protected ITmfTimestamp endTime;
+    protected ITmfTimestamp fEndTime;
     /**
      * Flag to indicate whether time information is available or not. 
      */
-    protected boolean hasTime;
+    protected boolean fHasTimeInfo;
 
     // ------------------------------------------------------------------------
     // Methods
@@ -72,10 +72,10 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
     @Override
     public void setLifeline(Lifeline theLifeline) {
         super.setLifeline(theLifeline);
-        if (lifeline != null && hasTime) {
-            lifeline.hasTime = true;
-            if (lifeline.getFrame() != null) {
-                lifeline.getFrame().setHasTimeInfo(true);
+        if (fLifeline != null && fHasTimeInfo) {
+            fLifeline.fHasTimeInfo = true;
+            if (fLifeline.getFrame() != null) {
+                fLifeline.getFrame().setHasTimeInfo(true);
             }
         }
     }
@@ -83,47 +83,47 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
     /**
      * Set the red, green and blue value of the optional color to be used for filling the execution occurrence.
      * 
-     * @param _r A value for red.
-     * @param _g A green value for green.
-     * @param _b A value blue.
+     * @param red A value for red.
+     * @param green A green value for green.
+     * @param blue A value blue.
      */
-    public void setFillColor(int _r, int _g, int _b) {
-        fillRGB = new int[3];
-        fillRGB[0] = _r;
-        fillRGB[1] = _g;
-        fillRGB[2] = _b;
+    public void setFillColor(int red, int green, int blue) {
+        fFillRGB = new int[3];
+        fFillRGB[0] = red;
+        fFillRGB[1] = green;
+        fFillRGB[2] = blue;
     }
 
     /**
      * Set the red, green and blue value of the optional color to be used for drawing the execution occurrence
      * 
-     * @param _r A value for red.
-     * @param _g A green value for green.
-     * @param _b A value blue.
+     * @param red A value for red.
+     * @param green A green value for green.
+     * @param blue A value blue.
      */
-    public void setStrokeColor(int _r, int _g, int _b) {
-        strokeRGB = new int[3];
-        strokeRGB[0] = _r;
-        strokeRGB[1] = _g;
-        strokeRGB[2] = _b;
+    public void setStrokeColor(int red, int green, int blue) {
+        fStrokeRGB = new int[3];
+        fStrokeRGB[0] = red;
+        fStrokeRGB[1] = green;
+        fStrokeRGB[2] = blue;
     }
 
     /**
      * Set the corresponding image.
      * 
-     * @param image_ A image to set.
+     * @param image A image to set.
      */
-    public void setImage(IImage image_) {
-        image = image_;
+    public void setImage(IImage image) {
+        fImage = image;
     }
 
     /**
      * Set the top ellipses image.
      * 
-     * @param image_ A image to set.
+     * @param image A image to set.
      */
-    public void setTopEllipsesImage(IImage image_) {
-        ellipsesImage = image_;
+    public void setTopEllipsesImage(IImage image) {
+        fEllipsesImage = image;
     }
 
     /**
@@ -132,10 +132,10 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
      * @param time the time when the execution occurrence starts
      */
     public void setStartTime(ITmfTimestamp time) {
-        startTime = time.clone();
-        hasTime = true;
-        if (lifeline != null) {
-            lifeline.setTimeInfo(true);
+        fStartTime = time.clone();
+        fHasTimeInfo = true;
+        if (fLifeline != null) {
+            fLifeline.setTimeInfo(true);
         }
     }
 
@@ -145,10 +145,10 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
      * @param time the time when the execution occurrence ends
      */
     public void setEndTime(ITmfTimestamp time) {
-        endTime = time.clone();
-        hasTime = true;
-        if (lifeline != null) {
-            lifeline.setTimeInfo(true);
+        fEndTime = time.clone();
+        fHasTimeInfo = true;
+        if (fLifeline != null) {
+            fLifeline.setTimeInfo(true);
         }
     }
 
@@ -158,7 +158,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
      */
     @Override
     public ITmfTimestamp getStartTime() {
-        return startTime;
+        return fStartTime;
     }
 
     /*
@@ -167,7 +167,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
      */
     @Override
     public ITmfTimestamp getEndTime() {
-        return endTime;
+        return fEndTime;
     }
 
     /*
@@ -176,7 +176,7 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
      */
     @Override
     public boolean hasTimeInfo() {
-        return hasTime;
+        return fHasTimeInfo;
     }
 
     /*
@@ -190,11 +190,11 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
         int y = getY();
         int width = getWidth();
         int height = getHeight();
-        if (image != null) {
-            context.drawImage(image, x + width - 4, y + height - 11, 8, 11);
+        if (fImage != null) {
+            context.drawImage(fImage, x + width - 4, y + height - 11, 8, 11);
         }
-        if (ellipsesImage != null) {
-            context.drawImage(ellipsesImage, x + width, y, 40, 10);
+        if (fEllipsesImage != null) {
+            context.drawImage(fEllipsesImage, x + width, y, 40, 10);
         }
     }
 
@@ -204,8 +204,8 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
      */
     @Override
     protected IColor setUnselectedFillColor(IGC context) {
-        if (fillRGB != null) {
-            IColor tempFillColor = context.createColor(fillRGB[0], fillRGB[1], fillRGB[2]);
+        if (fFillRGB != null) {
+            IColor tempFillColor = context.createColor(fFillRGB[0], fFillRGB[1], fFillRGB[2]);
             if (Frame.getUserPref().useGradienColor()) {
                 context.setGradientColor(tempFillColor);
                 context.setForeground(Frame.getUserPref().getForeGroundColor(ISDPreferences.PREF_EXEC));
@@ -225,8 +225,8 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
      */
     @Override
     protected IColor setUnselectedStrokeColor(IGC context) {
-        if (strokeRGB != null) {
-            IColor tempStrokeColor = context.createColor(strokeRGB[0], strokeRGB[1], strokeRGB[2]);
+        if (fStrokeRGB != null) {
+            IColor tempStrokeColor = context.createColor(fStrokeRGB[0], fStrokeRGB[1], fStrokeRGB[2]);
             context.setForeground(tempStrokeColor);
             return tempStrokeColor;
         } else {

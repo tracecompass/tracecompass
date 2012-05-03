@@ -33,7 +33,7 @@ public class ConfigureMinMax extends Action {
     /**
      * The corresponding sequence diagram view reference.
      */
-    protected SDView view = null;
+    protected SDView fView = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -42,12 +42,12 @@ public class ConfigureMinMax extends Action {
     /**
      * Standard constructor.
      * 
-     * @param _view The sequence diagram view for the action 
+     * @param view The sequence diagram view for the action 
      */
-    public ConfigureMinMax(IViewPart _view) {
+    public ConfigureMinMax(IViewPart view) {
         super();
-        if (_view instanceof SDView) {
-            view = (SDView) _view;
+        if (view instanceof SDView) {
+            fView = (SDView) view;
         }
     }
 
@@ -61,8 +61,8 @@ public class ConfigureMinMax extends Action {
      */
     @Override
     public void run() {
-        if ((view != null) && (view.getSDWidget() != null)) {
-            MinMaxDialog minMax = new MinMaxDialog(view.getSite().getShell(), view.getSDWidget());
+        if ((fView != null) && (fView.getSDWidget() != null)) {
+            MinMaxDialog minMax = new MinMaxDialog(fView.getSite().getShell(), fView.getSDWidget());
             minMax.open();
         }
     }

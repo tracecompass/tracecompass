@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -59,16 +60,16 @@ public class LoadersManager {
     /**
      * The LoadersManager singleton instance.
      */
-    private static LoadersManager loadersManager;
+    private static LoadersManager fLoadersManager;
 
     /**
      * Map for caching information (view ID to loader class)
      */
-    protected HashMap<String, IUml2SDLoader> fViewLoaderMap = new HashMap<String, IUml2SDLoader>();
+    protected Map<String, IUml2SDLoader> fViewLoaderMap = new HashMap<String, IUml2SDLoader>();
     /**
      * Map for caching information (view ID to list of configuration elements)
      */
-    protected HashMap<String, ArrayList<IConfigurationElement>> fViewLoadersList = new HashMap<String, ArrayList<IConfigurationElement>>();
+    protected Map<String, ArrayList<IConfigurationElement>> fViewLoadersList = new HashMap<String, ArrayList<IConfigurationElement>>();
     
     // ------------------------------------------------------------------------
     // Constructor
@@ -88,10 +89,10 @@ public class LoadersManager {
      * @return the manager instance
      */
     public synchronized static LoadersManager getInstance() {
-        if (loadersManager == null) {
-            loadersManager = new LoadersManager();
+        if (fLoadersManager == null) {
+            fLoadersManager = new LoadersManager();
         }
-        return loadersManager;
+        return fLoadersManager;
     }
     
     /**

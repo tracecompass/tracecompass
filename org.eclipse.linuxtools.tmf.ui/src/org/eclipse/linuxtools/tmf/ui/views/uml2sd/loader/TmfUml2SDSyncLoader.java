@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.loader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -373,7 +374,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                  */
                 @Override
                 public void handleCompleted() {
-                    if (fEvents.size() == 0) {
+                    if (fEvents.isEmpty()) {
                         fFrame = new Frame();
                         fView.setFrameSync(fFrame);
                     }
@@ -604,7 +605,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                     }
                 }
 
-                if (msgs.size() > 0) {
+                if (!msgs.isEmpty()) {
                     fFindResults.addAll(msgs);
                 }
 
@@ -808,19 +809,21 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
      * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.provider.ISDAdvancedPagingProvider#pageNumberChanged(int)
      */
     @Override
-    public void pageNumberChanged(int pageNumber) {
+    public void pageNumberChanged(int pagenNumber) {
+        int localPageNumber = pagenNumber;
+        
         fLock.lock();
         try {
             cancelOngoingRequests();
 
-            if (pageNumber < 0) {
-                pageNumber = 0;
+            if (localPageNumber < 0) {
+                localPageNumber = 0;
             }
             int size = fCheckPoints.size();
-            if (pageNumber >  (size - 1)) {
-                pageNumber = size - 1;
+            if (localPageNumber > (size - 1)) {
+                localPageNumber = size - 1;
             }
-            fCurrentPage = pageNumber;
+            fCurrentPage = localPageNumber;
             moveToPage();
         } finally {
             fLock.unlock();
@@ -904,8 +907,8 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
         final Frame frame = new Frame();
 
-        if (events.size() > 0) {
-            HashMap<String, Lifeline> nodeToLifelineMap = new HashMap<String, Lifeline>();
+        if (!events.isEmpty()) {
+            Map<String, Lifeline> nodeToLifelineMap = new HashMap<String, Lifeline>();
 
             frame.setName(Messages.TmfUml2SDSyncLoader_FrameName);
 
@@ -1043,12 +1046,9 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         					if (syncMessage.getStartTime().compareTo(fCurrentTime, false) == 0) {
         						isExactTime = true;
         						break;
-        					}
-        					else if (syncMessage.getStartTime().compareTo(fCurrentTime, false) > 0) {
-        						if (prevMessage != null) {
-        							syncMessage = prevMessage;
-        							break;
-        						}
+        					} else if ((syncMessage.getStartTime().compareTo(fCurrentTime, false) > 0) && (prevMessage != null)) {
+        					    syncMessage = prevMessage;
+        					    break;
         					}
         					prevMessage = syncMessage;
         				}
@@ -1092,7 +1092,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
      */
     protected void moveToPage(boolean notifyAll) {
 
-        TmfTimeRange window = TmfTimeRange.ETERNITY;
+        TmfTimeRange window = null;
 
         fLock.lock();
         try {
@@ -1103,6 +1103,10 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
             window = fCheckPoints.get(fCurrentPage);
         } finally {
             fLock.unlock();
+        }
+
+        if (window == null) {
+            window = TmfTimeRange.ETERNITY;
         }
 
         fPageRequest = new TmfEventRequest<ITmfEvent>(ITmfEvent.class, window, TmfDataRequest.ALL_DATA, 1, ITmfDataRequest.ExecutionType.FOREGROUND) {
@@ -1220,11 +1224,8 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         try {
             if (fFilterCriteria != null) {
                 for(FilterCriteria criteria : fFilterCriteria) {
-                    if (criteria.isActive() && criteria.getCriteria().isSyncMessageSelected() ) {
-
-                        if(criteria.getCriteria().matches(sdEvent.getName())) {
-                            return true;
-                        }
+                    if (criteria.isActive() && criteria.getCriteria().isSyncMessageSelected() && criteria.getCriteria().matches(sdEvent.getName())) {
+                        return true;
                     }
                 }
             }
@@ -1245,11 +1246,8 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         try {
             if (fFilterCriteria != null) {
                 for(FilterCriteria criteria : fFilterCriteria) {
-                    if (criteria.isActive() && criteria.getCriteria().isLifeLineSelected()) {
-
-                        if(criteria.getCriteria().matches(lifeline)) {
-                            return true;
-                        }
+                    if (criteria.isActive() && criteria.getCriteria().isLifeLineSelected() && criteria.getCriteria().matches(lifeline)) {
+                        return true;
                     }
                 }
             }
@@ -1293,7 +1291,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
             try {
                 fSearchRequest.waitForCompletion();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Search request interrupted!", e)); //$NON-NLS-1$
             }
 
             IStatus status = Status.OK_STATUS;
@@ -1432,23 +1430,12 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                     }
                 }
 
-                if (fCriteria.isSyncMessageSelected()) {
-                    if (fCriteria.matches(sdEvent.getName())) {
-                        fFoundTime = event.getTimestamp().clone();
-                        fIsFound = true;
-                        super.cancel();
-                    }
+                if (fCriteria.isSyncMessageSelected() && fCriteria.matches(sdEvent.getName())) {
+                    fFoundTime = event.getTimestamp().clone();
+                    fIsFound = true;
+                    super.cancel();
                 }
             }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see org.eclipse.linuxtools.tmf.request.TmfDataRequest#handleCompleted()
-         */
-        @Override
-        public void handleCompleted() {
-            super.handleCompleted();
         }
 
         /**

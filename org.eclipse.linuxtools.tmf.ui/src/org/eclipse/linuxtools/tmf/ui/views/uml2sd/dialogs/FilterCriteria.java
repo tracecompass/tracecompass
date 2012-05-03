@@ -49,19 +49,19 @@ public class FilterCriteria {
     /**
      * The criteria reference.  
      */
-    protected Criteria criteria;
+    protected Criteria fCriteria;
     /**
      * Flag whether this criteria is active or not
      */
-    protected boolean active;
+    protected boolean fIsActive;
     /**
      * Flag whether this criteria is for positive filter or not
      */
-    protected boolean positive;
+    protected boolean fIsPositive;
     /**
      * The loader class name.
      */
-    protected String loaderClassName;
+    protected String fLoaderClassName;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -69,29 +69,27 @@ public class FilterCriteria {
     /**
      * Standard constructor
      * 
-     * @param criteria_ A criteria reference
-     * @param active_ <code>true</code> if filter criteria is active else <code>false</code> 
-     * @param positive_  <code>true</code> for positive filter else <code>false</code>
+     * @param criteria A criteria reference
+     * @param isActive <code>true</code> if filter criteria is active else <code>false</code> 
+     * @param isPositive  <code>true</code> for positive filter else <code>false</code>
      */
-    public FilterCriteria(Criteria criteria_, boolean active_, boolean positive_) {
-        setCriteria(criteria_);
-        setActive(active_);
-        setPositive(positive_);
+    public FilterCriteria(Criteria criteria, boolean isActive, boolean isPositive) {
+        this(criteria, isActive, isPositive, null);
     }
 
     /**
      * Constructor
      * 
-     * @param criteria_ A criteria reference
-     * @param active_ <code>true</code> if filter criteria is active else <code>false</code> 
-     * @param positive_  <code>true</code> for positive filter else <code>false</code>
-     * @param loaderClassName_ A loader class name
+     * @param criteria A criteria reference
+     * @param isActive <code>true</code> if filter criteria is active else <code>false</code> 
+     * @param isPositive  <code>true</code> for positive filter else <code>false</code>
+     * @param loaderClassName A loader class name
      */
-    public FilterCriteria(Criteria criteria_, boolean active_, boolean positive_, String loaderClassName_) {
-        setCriteria(criteria_);
-        setActive(active_);
-        setPositive(positive_);
-        setLoaderClassName(loaderClassName_);
+    public FilterCriteria(Criteria criteria, boolean isActive, boolean isPositive, String loaderClassName) {
+        fCriteria = criteria;
+        fIsActive = isActive;
+        fIsPositive = isPositive;
+        fLoaderClassName = loaderClassName;
     }
 
     /**
@@ -99,10 +97,10 @@ public class FilterCriteria {
      * @param other FilterCriteria
      */
     public FilterCriteria (FilterCriteria other) {
-        criteria = new Criteria(other.criteria);
-        this.active = other.active;
-        this.positive = other.positive;
-        this.loaderClassName = other.loaderClassName;
+        fCriteria = new Criteria(other.fCriteria);
+        fIsActive = other.fIsActive;
+        fIsPositive = other.fIsPositive;
+        fLoaderClassName = other.fLoaderClassName;
     }
 
     /**
@@ -121,11 +119,11 @@ public class FilterCriteria {
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer(super.toString());
-        sb.append(":"); //$NON-NLS-1$
-        if (criteria != null) {
-            sb.append(" expression=");sb.append(criteria.getExpression()); //$NON-NLS-1$
-            sb.append(" active=");sb.append(active); //$NON-NLS-1$
-            sb.append(" positive=");sb.append(positive); //$NON-NLS-1$
+        sb.append(':');
+        if (fCriteria != null) {
+            sb.append(" expression=");sb.append(fCriteria.getExpression()); //$NON-NLS-1$
+            sb.append(" active=");sb.append(fIsActive); //$NON-NLS-1$
+            sb.append(" positive=");sb.append(fIsPositive); //$NON-NLS-1$
         } else {
             sb.append("empty criteria"); //$NON-NLS-1$
         }
@@ -134,10 +132,10 @@ public class FilterCriteria {
 
     /**
      * Sets a criteria reference.
-     * @param criteria_ A criteria reference
+     * @param criteria A criteria reference
      */
-    public void setCriteria(Criteria criteria_) {
-        criteria = criteria_;
+    public void setCriteria(Criteria criteria) {
+        fCriteria = criteria;
     }
 
     /**
@@ -146,16 +144,16 @@ public class FilterCriteria {
      * @return the criteria reference
      */
     public Criteria getCriteria() {
-        return criteria;
+        return fCriteria;
     }
 
     /**
      * Sets the active flag.
      * 
-     * @param active_ A active value.
+     * @param isActive A active value.
      */
-    public void setActive(boolean active_) {
-        active = active_;
+    public void setActive(boolean isActive) {
+        fIsActive = isActive;
     }
 
     /**
@@ -164,16 +162,16 @@ public class FilterCriteria {
      * @return whether filter criteria is active or not.
      */
     public boolean isActive() {
-        return active;
+        return fIsActive;
     }
 
     /**
      * Sets filter is for positive filtering or not.
      * 
-     * @param positive_ The value to set.
+     * @param isPositive The value to set.
      */
-    public void setPositive(boolean positive_) {
-        positive = positive_;
+    public void setPositive(boolean isPositive) {
+        fIsPositive = isPositive;
     }
 
     /**
@@ -182,16 +180,16 @@ public class FilterCriteria {
      * @return Returns the positive.
      */
     public boolean isPositive() {
-        return positive;
+        return fIsPositive;
     }
 
     /**
      * Sets the loader class name for this filter.
      * 
-     * @param loaderClassName_ The loader class name to set
+     * @param loaderClassName The loader class name to set
      */
-    public void setLoaderClassName(String loaderClassName_) {
-        loaderClassName = loaderClassName_;
+    public void setLoaderClassName(String loaderClassName) {
+        fLoaderClassName = loaderClassName;
     }
 
     /**
@@ -200,7 +198,7 @@ public class FilterCriteria {
      * @return the class loader name.
      */
     public String getLoaderClassName() {
-        return loaderClassName;
+        return fLoaderClassName;
     }
 
     /**
@@ -257,8 +255,8 @@ public class FilterCriteria {
         } else {
             settings.put(LOADERCLASSNAME, ""); //$NON-NLS-1$
         }
-        if (criteria != null) {
-            criteria.save(settings);
+        if (fCriteria != null) {
+            fCriteria.save(settings);
         }
     }
 
@@ -270,10 +268,10 @@ public class FilterCriteria {
     public void load(DialogSettings settings) {
         setActive(settings.getBoolean(ACTIVE));
         setPositive(settings.getBoolean(POSITIVE));
-        String loaderClassName_ = settings.get(LOADERCLASSNAME);
-        setLoaderClassName(loaderClassName_ != null && loaderClassName_.length() > 0 ? loaderClassName_ : null);
-        if (criteria != null) {
-            criteria.load(settings);
+        String loaderClassName = settings.get(LOADERCLASSNAME);
+        setLoaderClassName(loaderClassName != null && loaderClassName.length() > 0 ? loaderClassName : null);
+        if (fCriteria != null) {
+            fCriteria.load(settings);
         }
     }
 }

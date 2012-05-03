@@ -68,15 +68,15 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
     /**
      * The associated message return
      */
-    protected SyncMessageReturn messageReturn;
+    protected SyncMessageReturn fMessageReturn;
     /**
      * The time when the message occurs
      */
-    protected ITmfTimestamp eventTime = new TmfTimestamp();
+    protected ITmfTimestamp fEventTime = new TmfTimestamp();
     /**
      * Flag whether the message has time information available or not
      */
-    protected boolean hasTime = false;
+    protected boolean fHasTimeInfo = false;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -86,7 +86,7 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
      * Default constructor
      */
     public SyncMessage() {
-        prefId = ISDPreferences.PREF_SYNC_MESS;
+        fPrefId = ISDPreferences.PREF_SYNC_MESS;
     }
 
     // ------------------------------------------------------------------------
@@ -182,8 +182,8 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
      */
     @Override
     protected void setEventOccurrence(int occurrence) {
-        startEventOccurrence = occurrence;
-        endEventOccurrence = occurrence;
+        fStartEventOccurrence = occurrence;
+        fEndEventOccurrence = occurrence;
     }
 
     /**
@@ -192,7 +192,7 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
      * @param message the message return to associate
      */
     protected void setMessageReturn(SyncMessageReturn message) {
-        messageReturn = message;
+        fMessageReturn = message;
     }
 
     /**
@@ -201,7 +201,7 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
      * @return the message return
      */
     public SyncMessageReturn getMessageReturn() {
-        return messageReturn;
+        return fMessageReturn;
     }
 
     /**
@@ -210,8 +210,8 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
      * @param time the time when the message occurs
      */
     public void setTime(ITmfTimestamp time) {
-        eventTime = time.clone();
-        hasTime = true;
+        fEventTime = time.clone();
+        fHasTimeInfo = true;
         if (getStartLifeline() != null && getStartLifeline().getFrame() != null) {
             getStartLifeline().getFrame().setHasTimeInfo(true);
         } else if (getEndLifeline() != null && getEndLifeline().getFrame() != null) {
@@ -225,7 +225,7 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
      */
     @Override
     public ITmfTimestamp getEndTime() {
-        return eventTime;
+        return fEventTime;
     }
 
     /*
@@ -234,7 +234,7 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
      */ 
     @Override
     public ITmfTimestamp getStartTime() {
-        return eventTime;
+        return fEventTime;
     }
 
     /*
@@ -243,7 +243,7 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
      */ 
     @Override
     public boolean hasTimeInfo() {
-        return hasTime;
+        return fHasTimeInfo;
     }
 
     /*
@@ -256,8 +256,8 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
             return;
         // Draw it selected?
         if (!isSelected()) {
-            context.setBackground(Frame.getUserPref().getBackGroundColor(prefId));
-            context.setForeground(Frame.getUserPref().getForeGroundColor(prefId));
+            context.setBackground(Frame.getUserPref().getBackGroundColor(fPrefId));
+            context.setForeground(Frame.getUserPref().getForeGroundColor(fPrefId));
         }
         super.draw(context);
     }
@@ -276,7 +276,7 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
 
         // UML2 lost/found message visibility special case
         // Others visibility cases are perform in the ***common*** case
-        if ((endLifeline == null && startLifeline != null) || (endLifeline != null && startLifeline == null)) {
+        if ((fEndLifeline == null && fStartLifeline != null) || (fEndLifeline != null && fStartLifeline == null)) {
             if (x + width > getX() + getWidth() && x < getX() + getWidth()) {
                 return true;
             }

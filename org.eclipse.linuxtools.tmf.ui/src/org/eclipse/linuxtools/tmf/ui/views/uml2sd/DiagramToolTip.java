@@ -39,19 +39,19 @@ public class DiagramToolTip {
     /**
      * The parent control where the tooltip must be drawn.
      */
-    protected Control parent = null;
+    protected Control fParent = null;
     /**
      * The tooltip shell.
      */
-    protected Shell toolTipShell = null;
+    protected Shell fToolTipShell = null;
     /**
      * The tooltip text.
      */
-    protected String text = null;
+    protected String fText = null;
     /**
      * The text box.
      */
-    protected Text textBox = null;
+    protected Text fTextBox = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -60,14 +60,14 @@ public class DiagramToolTip {
     /**
      * Create a new tooltip for the given parent control
      * 
-     * @param _parent the parent control.
+     * @param parent the parent control.
      */
-    public DiagramToolTip(Control _parent) {
-        parent = _parent;
-        toolTipShell = new Shell(parent.getShell(), SWT.MULTI);
-        toolTipShell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-        textBox = new Text(toolTipShell, SWT.WRAP | SWT.MULTI);
-        textBox.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+    public DiagramToolTip(Control parent) {
+        fParent = parent;
+        fToolTipShell = new Shell(fParent.getShell(), SWT.MULTI);
+        fToolTipShell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+        fTextBox = new Text(fToolTipShell, SWT.WRAP | SWT.MULTI);
+        fTextBox.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
     }
 
     // ------------------------------------------------------------------------
@@ -81,12 +81,12 @@ public class DiagramToolTip {
      */
     public void showToolTip(String value) {
         if ((value == null) || (value.equalsIgnoreCase(""))) { //$NON-NLS-1$
-            toolTipShell.setVisible(false);
+            fToolTipShell.setVisible(false);
             return;
         }
 
-        text = value;
-        int w = toolTipShell.getBounds().width;
+        fText = value;
+        int w = fToolTipShell.getBounds().width;
         Point hr = Display.getDefault().getCursorLocation();
         int cursorH = 32;
         for (int i = 0; i < Display.getDefault().getCursorSizes().length; i++) {
@@ -101,17 +101,17 @@ public class DiagramToolTip {
             }
             hr.x = hr.x - tempX;
         }
-        textBox.setText(value);
+        fTextBox.setText(value);
         int charactersPerColumn = 100;
-        GC gc = new GC(textBox);
+        GC gc = new GC(fTextBox);
         FontMetrics fm = gc.getFontMetrics();
         gc.dispose();
         int width = charactersPerColumn * fm.getAverageCharWidth();
-        textBox.setSize(textBox.computeSize(width, textBox.getLineCount() * textBox.getLineHeight()));
-        toolTipShell.setLocation(hr.x, hr.y + cursorH);
-        toolTipShell.setSize(textBox.getSize());
-        textBox.setVisible(true);
-        toolTipShell.setVisible(true);
+        fTextBox.setSize(fTextBox.computeSize(width, fTextBox.getLineCount() * fTextBox.getLineHeight()));
+        fToolTipShell.setLocation(hr.x, hr.y + cursorH);
+        fToolTipShell.setSize(fTextBox.getSize());
+        fTextBox.setVisible(true);
+        fToolTipShell.setVisible(true);
 
     }
 
@@ -119,7 +119,7 @@ public class DiagramToolTip {
      * Hide the tooltip
      */
     public void hideToolTip() {
-        toolTipShell.setVisible(false);
+        fToolTipShell.setVisible(false);
     }
 
 }
