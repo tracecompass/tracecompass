@@ -10,8 +10,11 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.lttng2.kernel.kernel.ui.views;
+package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views;
 
+import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow.ControlFlowView;
+import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources.ResourcesView;
+import org.eclipse.linuxtools.internal.lttng2.ui.views.control.ControlView;
 import org.eclipse.linuxtools.tmf.ui.views.events.TmfEventsView;
 import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramView;
 import org.eclipse.ui.IFolderLayout;
@@ -31,6 +34,9 @@ public class PerspectiveFactory implements IPerspectiveFactory {
     // LTTng views
     private static final String EVENTS_VIEW_ID = TmfEventsView.ID;
     private static final String HISTOGRAM_VIEW_ID = HistogramView.ID;
+    private static final String CONTROL_VIEW_ID = ControlView.ID;
+    private static final String CONTROLFLOW_VIEW_ID = ControlFlowView.ID;
+    private static final String RESOURCES_VIEW_ID = ResourcesView.ID;
 
     // Standard Eclipse views
     private static final String PROJECT_VIEW_ID = IPageLayout.ID_PROJECT_EXPLORER;
@@ -55,10 +61,13 @@ public class PerspectiveFactory implements IPerspectiveFactory {
         IFolderLayout topLeftFolder = layout.createFolder(
                 "topLeftFolder", IPageLayout.LEFT, 0.15f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
         topLeftFolder.addView(PROJECT_VIEW_ID);
+        topLeftFolder.addView(CONTROL_VIEW_ID);
 
-//        // Create the top right folder
-//        IFolderLayout topRightFolder = layout.createFolder(
-//                "topRightFolder", IPageLayout.TOP, 0.40f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
+        // Create the top right folder
+        IFolderLayout topRightFolder = layout.createFolder(
+                "topRightFolder", IPageLayout.TOP, 0.40f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
+        topRightFolder.addView(CONTROLFLOW_VIEW_ID);
+        topRightFolder.addView(RESOURCES_VIEW_ID);
 
         // Create the middle right folder
         IFolderLayout middleRightFolder = layout.createFolder(

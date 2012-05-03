@@ -2,13 +2,12 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         id="org.eclipse.linuxtools.lttng2.kernel.ui.perspective"
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="org.eclipse.linuxtools.internal.lttng2.kernel.kernel.ui.views.PerspectiveFactory"
+            class="org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.PerspectiveFactory"
             icon="icons/obj16/garland16.png"
             id="org.eclipse.linuxtools.lttng2.kernel.ui.perspective"
-            name="%perspective.category.name">
+            name="%kernel.perspective.name">
       </perspective>
    </extension>
    <extension
@@ -25,5 +24,26 @@
             name="%tracetype.type.kernel"
             trace_type="org.eclipse.linuxtools.lttng2.kernel.core.trace.CtfKernelTrace">
       </type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.lttng2.ui.views.category"
+            class="org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow.ControlFlowView"
+            icon="icons/eview16/control_flow_view.gif"
+            id="org.eclipse.linuxtools.lttng2.kernel.ui.views.controlflow"
+            name="%controlflow.view.name"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.lttng2.ui.views.category"
+            class="org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources.ResourcesView"
+            icon="icons/eview16/resources_view.gif"
+            id="org.eclipse.linuxtools.lttng2.kernel.ui.views.resources"
+            name="%resources.view.name"
+            restorable="true">
+      </view>
    </extension>
 </plugin>
