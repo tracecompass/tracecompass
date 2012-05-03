@@ -239,7 +239,7 @@ public final class CtfTmfEvent implements ITmfEvent {
     @Override
     public ITmfTimestamp getTimestamp() {
         if (fTimestamp == null) {
-            fTimestamp = new CtfTmfTimestamp(timestamp, fTrace);
+            fTimestamp = new CtfTmfTimestamp(timestamp);
         }
         return fTimestamp;
     }

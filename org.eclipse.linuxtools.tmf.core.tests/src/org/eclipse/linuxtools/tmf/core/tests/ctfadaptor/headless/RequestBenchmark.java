@@ -32,7 +32,7 @@ public class RequestBenchmark extends TmfEventRequest<CtfTmfEvent> {
     }
 
     // Path of the trace
-    public static final String TRACE_PATH = "../org.eclipse.linuxtools.ctf.core.tests/Tests/traces/trace20m1";
+    public static final String TRACE_PATH = "../org.eclipse.linuxtools.ctf.core.tests/traces/kernel";
 
     // *** Change this to run several time over the same trace
     public static final int NB_OF_PASS = 100;
@@ -61,10 +61,8 @@ public class RequestBenchmark extends TmfEventRequest<CtfTmfEvent> {
 
             // Create a new time range from -infinity to +infinity
             // That way, we will get "everything" in the trace
-            final CtfTmfTimestamp ts1 = new CtfTmfTimestamp(Long.MIN_VALUE,
-                    (CtfTmfTrace) traces[0]);
-            final CtfTmfTimestamp ts2 = new CtfTmfTimestamp(Long.MAX_VALUE,
-                    (CtfTmfTrace) traces[0]);
+            final CtfTmfTimestamp ts1 = new CtfTmfTimestamp(Long.MIN_VALUE);
+            final CtfTmfTimestamp ts2 = new CtfTmfTimestamp(Long.MAX_VALUE);
             final TmfTimeRange tmpRange = new TmfTimeRange(ts1, ts2);
 
             // We will issue a request for each "pass".
@@ -106,16 +104,18 @@ public class RequestBenchmark extends TmfEventRequest<CtfTmfEvent> {
         nbEvent = 0;
         prev = next;
         benchs.add(val);
-        if (benchs.size() == NB_OF_PASS)
+        if (benchs.size() == NB_OF_PASS) {
             try {
                 System.out.println("Nb events : " + nbEvent2);
 
-                for (final double value : benchs)
+                for (final double value : benchs) {
                     System.out.print(value + ", ");
+                }
                 fExperiment.sendRequest(null);
 
             } catch (final Exception e) {
             }
+        }
     }
 
     @Override
