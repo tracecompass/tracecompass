@@ -17,6 +17,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SortAsyncForBackward;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SortAsyncMessageComparator;
 
@@ -363,21 +364,24 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
         if (!isVisible()) {
             return;
         }
+
+        ISDPreferences pref = SDViewPref.getInstance();
+
         // Draw it selected?
         if (isSelected() && (fStartLifeline != null && fEndLifeline != null && fStartLifeline == fEndLifeline && (fStartEventOccurrence != fEndEventOccurrence))) {
             /*
              * Draw it twice First time, bigger inverting selection colors Second time, regular drawing using selection
              * colors This create the highlight effect
              */
-            context.setForeground(Frame.getUserPref().getBackGroundColorSelection());
+            context.setForeground(pref.getBackGroundColorSelection());
             context.setLineWidth(Metrics.SELECTION_LINE_WIDTH);
             drawAsyncMessage(context);
-            context.setBackground(Frame.getUserPref().getBackGroundColorSelection());
-            context.setForeground(Frame.getUserPref().getForeGroundColorSelection());
+            context.setBackground(pref.getBackGroundColorSelection());
+            context.setForeground(pref.getForeGroundColorSelection());
             // Second drawing is done after the else
         } else {
-            context.setBackground(Frame.getUserPref().getBackGroundColor(fPrefId));
-            context.setForeground(Frame.getUserPref().getForeGroundColor(fPrefId));
+            context.setBackground(pref.getBackGroundColor(fPrefId));
+            context.setForeground(pref.getForeGroundColor(fPrefId));
         }
         if (hasFocus()) {
             context.setDrawTextWithFocusStyle(true);

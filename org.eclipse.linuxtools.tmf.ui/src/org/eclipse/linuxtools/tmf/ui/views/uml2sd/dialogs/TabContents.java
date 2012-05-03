@@ -106,7 +106,7 @@ public class TabContents extends Composite {
      */
     public TabContents(Composite parent, ISDGraphNodeSupporter provider, Button okButton, String[] expressionList) {
         super(parent, SWT.NONE);
-        setOkButton(okButton);
+        fParentOkButton = okButton;
         setLayout(new GridLayout());
 
         fGraphNodeTypeListener = new GraphNodeTypeListener();

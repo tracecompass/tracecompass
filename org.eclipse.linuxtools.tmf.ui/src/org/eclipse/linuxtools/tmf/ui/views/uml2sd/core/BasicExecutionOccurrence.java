@@ -16,6 +16,7 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
 
 /**
  * BasicExecutionOccurrence is the UML2 execution occurrence graphical representation. It is attached to one Lifeline,
@@ -210,15 +211,17 @@ public class BasicExecutionOccurrence extends GraphNode {
         IColor tempFillColor = null;
         IColor tempStrokeColor = null;
 
+        ISDPreferences pref = SDViewPref.getInstance();
+        
         // The execution occurrence is selected
         // if the owning lifeline is selected
         if (fLifeline.isSelected() || isSelected()) {
-            context.setBackground(Frame.getUserPref().getBackGroundColorSelection());
-            context.setForeground(Frame.getUserPref().getForeGroundColorSelection());
+            context.setBackground(pref.getBackGroundColorSelection());
+            context.setForeground(pref.getForeGroundColorSelection());
         } else {
             tempFillColor = setUnselectedFillColor(context);
         }
-        if (Frame.getUserPref().useGradienColor()) {
+        if (pref.useGradienColor()) {
             context.fillGradientRectangle(x, y, width, height, false);
         } else {
             context.fillRectangle(x, y, width, height);
@@ -244,11 +247,14 @@ public class BasicExecutionOccurrence extends GraphNode {
      * @return IColor
      */
     protected IColor setUnselectedFillColor(IGC context) {
-        if (Frame.getUserPref().useGradienColor()) {
-            context.setGradientColor(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_EXEC));
-            context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_FRAME));
+
+        ISDPreferences pref = SDViewPref.getInstance();
+
+        if (pref.useGradienColor()) {
+            context.setGradientColor(pref.getBackGroundColor(ISDPreferences.PREF_EXEC));
+            context.setBackground(pref.getBackGroundColor(ISDPreferences.PREF_FRAME));
         } else {
-            context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_EXEC));
+            context.setBackground(pref.getBackGroundColor(ISDPreferences.PREF_EXEC));
         }
         return null;
     }
@@ -260,7 +266,7 @@ public class BasicExecutionOccurrence extends GraphNode {
      * @return IColor
      */
     protected IColor setUnselectedStrokeColor(IGC context) {
-        context.setForeground(Frame.getUserPref().getForeGroundColor(ISDPreferences.PREF_EXEC));
+        context.setForeground(SDViewPref.getInstance().getForeGroundColor(ISDPreferences.PREF_EXEC));
         return null;
     }
 

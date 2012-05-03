@@ -24,6 +24,7 @@ import java.util.Map;
 import org.eclipse.linuxtools.internal.tmf.ui.TmfUiTracer;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
 
 /**
  * The base class used for all UML2 graph nodes displayed in the Sequence Diagram SDWidget.
@@ -133,10 +134,10 @@ public abstract class GraphNode {
             fNodes.put(nodeToAdd.getArrayId(), new ArrayList<GraphNode>(1));
             fIndexes.put(nodeToAdd.getArrayId(), Integer.valueOf(0));
             fForwardNodes.put(nodeToAdd.getArrayId(), new ArrayList<GraphNode>(1));
-            fForwardSort.put(nodeToAdd.getArrayId(), Boolean.valueOf(false));
+            fForwardSort.put(nodeToAdd.getArrayId(), Boolean.FALSE);
             if (nodeToAdd.getBackComparator() != null) {
                 fBackwardNodes.put(nodeToAdd.getArrayId(), new ArrayList<GraphNode>(1));
-                fBackwardSort.put(nodeToAdd.getArrayId(), Boolean.valueOf(false));
+                fBackwardSort.put(nodeToAdd.getArrayId(), Boolean.FALSE);
             }
         }
 
@@ -152,10 +153,10 @@ public abstract class GraphNode {
             Comparator<GraphNode> fcomp = nodeToAdd.getComparator();
             Comparator<GraphNode> bcomp = nodeToAdd.getBackComparator();
             if ((fcomp != null) && (fcomp.compare(node, nodeToAdd) > 0)) {
-                fForwardSort.put(nodeToAdd.getArrayId(), Boolean.valueOf(true));
+                fForwardSort.put(nodeToAdd.getArrayId(), Boolean.TRUE);
             }
             if ((bcomp != null) && (bcomp.compare(node, nodeToAdd) > 0)) {
-                fBackwardSort.put(nodeToAdd.getArrayId(), Boolean.valueOf(true));
+                fBackwardSort.put(nodeToAdd.getArrayId(), Boolean.TRUE);
             }
         }
 
@@ -521,7 +522,8 @@ public abstract class GraphNode {
 
                 if ((direction == -1) && (fBackwardNodes.get(nodeType) != null)) {
                     GraphNode currentNode = (GraphNode) ((List<GraphNode>) fNodes.get(nodeType)).get(drawIndex);
-                    drawIndex = Arrays.binarySearch(((List<GraphNode>) fBackwardNodes.get(nodeType)).toArray(new GraphNode[0]), ((List<GraphNode>) fNodes.get(nodeType)).get(drawIndex), currentNode.getBackComparator());
+                    drawIndex = Arrays.binarySearch(((List<GraphNode>) fBackwardNodes.get(nodeType)).toArray(new GraphNode[((List<GraphNode>) fBackwardNodes.get(nodeType)).size()]), 
+                            ((List<GraphNode>) fNodes.get(nodeType)).get(drawIndex), currentNode.getBackComparator());
                     fNodes.put(nodeType, (List<GraphNode>) fBackwardNodes.get(nodeType));
                     if (drawIndex < 0) {
                         drawIndex = 0;
@@ -554,7 +556,7 @@ public abstract class GraphNode {
                         GraphNode next = (GraphNode) ((List<GraphNode>) fNodes.get(nodeType)).get(i + 1);
 
                         if ((comp != null) && (comp.compare(currentNode, next) > 0)) {
-                            sort.put(nodeType, Boolean.valueOf(true));
+                            sort.put(nodeType, Boolean.TRUE);
                         }
                     }
                     if (direction == 1) {
@@ -636,7 +638,7 @@ public abstract class GraphNode {
                 GraphNode[] temp = ((List<GraphNode>) fForwardNodes.get(nodeType)).toArray(new GraphNode[((List<GraphNode>)fForwardNodes.get(nodeType)).size()]);
                 GraphNode node = (GraphNode) ((List<GraphNode>) fNodes.get(nodeType)).get(0);
                 Arrays.sort(temp, node.getComparator());
-                fForwardSort.put(nodeType, Boolean.valueOf(false));
+                fForwardSort.put(nodeType, Boolean.FALSE);
                 fNodes.put(nodeType, Arrays.asList(temp));
                 fForwardNodes.put(nodeType, Arrays.asList(temp));
                 if (TmfUiTracer.isSortingTraced()) {
@@ -653,7 +655,7 @@ public abstract class GraphNode {
                 GraphNode[] temp = ((List<GraphNode>) fBackwardNodes.get(nodeType)).toArray(new GraphNode[((List<GraphNode>) fBackwardNodes.get(nodeType)).size()]);
                 GraphNode node = (GraphNode) ((List<GraphNode>) fNodes.get(nodeType)).get(0);
                 Arrays.sort(temp, node.getBackComparator());
-                fBackwardSort.put(nodeType, Boolean.valueOf(false));
+                fBackwardSort.put(nodeType, Boolean.FALSE);
                 fBackwardNodes.put(nodeType, Arrays.asList(temp));
                 if (TmfUiTracer.isSortingTraced()) {
                     TmfUiTracer.traceSorting(nodeType + " back array sorted\n"); //$NON-NLS-1$
@@ -676,7 +678,7 @@ public abstract class GraphNode {
             count = 0;
             Object nodeType = it3.next();
             GraphNode node = (GraphNode) ((List<GraphNode>) fNodes.get(nodeType)).get(0);
-            context.setFont(Frame.getUserPref().getFont(node.fPrefId));
+            context.setFont(SDViewPref.getInstance().getFont(node.fPrefId));
             int index = ((Integer) fIndexes.get(nodeType)).intValue();
             count = drawNodes(context, (List<GraphNode>) fNodes.get(nodeType), index, arrayStep);
             if (TmfUiTracer.isDisplayTraced()) {
@@ -710,14 +712,14 @@ public abstract class GraphNode {
         }
 
         GraphNode node = (GraphNode) list.get(0);
-        context.setFont(Frame.getUserPref().getFont(node.fPrefId));
+        context.setFont(SDViewPref.getInstance().getFont(node.fPrefId));
         Comparator<GraphNode> comparator = node.getComparator();
         for (int i = startIndex; i < list.size(); i = i + step) {
             GraphNode toDraw = (GraphNode) list.get(i);
             if (i < list.size() - 1) {
                 GraphNode next = (GraphNode) list.get(i + 1);
                 if ((comparator != null) && (comparator.compare(toDraw, next) > 0)) {
-                    fForwardSort.put(next.getArrayId(), Boolean.valueOf(true));
+                    fForwardSort.put(next.getArrayId(), Boolean.TRUE);
                 }
             }
             int cx = context.getContentsX();

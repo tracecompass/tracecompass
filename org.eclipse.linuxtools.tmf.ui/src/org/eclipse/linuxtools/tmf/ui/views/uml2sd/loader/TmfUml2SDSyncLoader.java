@@ -262,20 +262,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     @TmfSignalHandler
     public void experimentSelected(TmfExperimentSelectedSignal<ITmfEvent> signal) {
 
-        final Job job = new Job("Indexing " + getName() + "...") { //$NON-NLS-1$ //$NON-NLS-2$
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-                while (!monitor.isCanceled()) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        return Status.OK_STATUS;
-                    }
-                }
-                monitor.done();
-                return Status.OK_STATUS;
-            }
-        };
+        final Job job = new IndexingJob("Indexing " + getName() + "..."); //$NON-NLS-1$ //$NON-NLS-2$
         job.setUser(false);
         job.schedule();
 
@@ -1466,6 +1453,34 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         }
     }
 
+    /**
+     * Job class to provide progress monitor feedback. 
+     * 
+     * @version 1.0
+     * @author Bernd Hufmann
+     *
+     */
+    protected static class IndexingJob extends Job {
+
+        public IndexingJob(String name) {
+            super(name);
+        }
+
+        @Override
+        protected IStatus run(IProgressMonitor monitor) {
+            while (!monitor.isCanceled()) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    return Status.OK_STATUS;
+                }
+            }
+            monitor.done();
+            return Status.OK_STATUS;
+        }
+    }
+
+    
     /**
      * Returns sequence diagram event if details in given event are available else null.
      * 

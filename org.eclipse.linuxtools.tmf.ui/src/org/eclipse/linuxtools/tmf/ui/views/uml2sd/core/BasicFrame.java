@@ -39,17 +39,9 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
 public class BasicFrame extends GraphNode {
 
     // ------------------------------------------------------------------------
-    // Static Attributes/Constants
-    // ------------------------------------------------------------------------
-    /**
-     * The sequence diagram reference. 
-     */
-    protected static ISDPreferences fUserPref = null;
-    
-    // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    
+
     /**
      * Contains the max elapsed time between two consecutive messages in the whole frame
      */
@@ -280,8 +272,11 @@ public class BasicFrame extends GraphNode {
      * @param context the context to draw to
      */
     protected void drawFrame(IGC context) {
-        context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_FRAME));
-        context.setForeground(Frame.getUserPref().getForeGroundColor(ISDPreferences.PREF_FRAME));
+        
+        ISDPreferences pref = SDViewPref.getInstance();
+        
+        context.setBackground(pref.getBackGroundColor(ISDPreferences.PREF_FRAME));
+        context.setForeground(pref.getForeGroundColor(ISDPreferences.PREF_FRAME));
 
         int x = getX();
         int y = getY();
@@ -292,9 +287,9 @@ public class BasicFrame extends GraphNode {
         context.fillRectangle(x, y, w, h);
         context.drawRectangle(x, y, w, h);
 
-        context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_FRAME_NAME));
-        context.setForeground(Frame.getUserPref().getForeGroundColor(ISDPreferences.PREF_FRAME_NAME));
-        context.setFont(Frame.getUserPref().getFont(ISDPreferences.PREF_FRAME_NAME));
+        context.setBackground(pref.getBackGroundColor(ISDPreferences.PREF_FRAME_NAME));
+        context.setForeground(pref.getForeGroundColor(ISDPreferences.PREF_FRAME_NAME));
+        context.setFont(pref.getFont(ISDPreferences.PREF_FRAME_NAME));
 
         int nameWidth = context.textExtent(getName()) + 2 * Metrics.FRAME_NAME_V_MARGIN;
         int nameHeight = Metrics.getFrameFontHeigth() + +Metrics.FRAME_NAME_H_MARGIN * 2;
@@ -309,11 +304,11 @@ public class BasicFrame extends GraphNode {
         context.drawPolygon(points);
         context.drawLine(x, y, x, y + nameHeight);
 
-        context.setForeground(Frame.getUserPref().getFontColor(ISDPreferences.PREF_FRAME_NAME));
+        context.setForeground(pref.getFontColor(ISDPreferences.PREF_FRAME_NAME));
         context.drawTextTruncatedCentred(getName(), x, y, nameWidth - 11, nameHeight, false);
 
-        context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_FRAME));
-        context.setForeground(Frame.getUserPref().getForeGroundColor(ISDPreferences.PREF_FRAME));
+        context.setBackground(pref.getBackGroundColor(ISDPreferences.PREF_FRAME));
+        context.setForeground(pref.getForeGroundColor(ISDPreferences.PREF_FRAME));
     }
 
     /*
@@ -345,27 +340,8 @@ public class BasicFrame extends GraphNode {
         } else {
             Metrics.setForcedEventSpacing(-1);
         }
-        if (fUserPref == null) {
-            return;
-        }
+
         super.drawChildenNodes(context);
-    }
-
-    /**
-     * Sets the sequence diagram preferences.
-     * 
-     * @param pref the preferences to set.
-     */
-    public static void setUserPref(ISDPreferences pref) {
-        fUserPref = pref;
-    }
-
-    /**
-     * Returns the sequence diagram preferences.
-     * @return the sequence diagram preferences.
-     */
-    public static ISDPreferences getUserPref() {
-        return fUserPref;
     }
 
     /**
@@ -471,7 +447,8 @@ public class BasicFrame extends GraphNode {
         }
 
         List<SDTimeEvent> timeArray = buildTimeArray();
-        if (timeArray == null) {
+
+        if ((timeArray == null) || timeArray.isEmpty()) {
             return;
         }
         for (int i = 0; i < timeArray.size(); i++) {
@@ -513,7 +490,8 @@ public class BasicFrame extends GraphNode {
      */
     protected void computeMinMax() {
         List<SDTimeEvent> timeArray = buildTimeArray();
-        if (timeArray == null) {
+
+        if ((timeArray == null) || timeArray.isEmpty()) {
             return;
         }
         for (int i = 0; i < timeArray.size() - 1; i++) {
@@ -553,11 +531,11 @@ public class BasicFrame extends GraphNode {
     /**
      * Builds the time array based on the list of graph nodes.
      * 
-     * @return the time array else <code>null</code>.
+     * @return the time array else empty list.
      */
     protected List<SDTimeEvent> buildTimeArray() {
         if (!fHasChilden) {
-            return null;
+            return new ArrayList<SDTimeEvent>();
         }
 
         Iterator<String> it = fForwardSort.keySet().iterator();

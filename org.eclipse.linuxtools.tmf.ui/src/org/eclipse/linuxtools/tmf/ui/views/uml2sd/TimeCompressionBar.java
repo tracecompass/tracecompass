@@ -242,35 +242,9 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
             }
         });
 
-        getViewControl().addTraverseListener(new TraverseListener() {
+        getViewControl().addTraverseListener(new LocalTraverseListener());
 
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.TraverseListener#keyTraversed(org.eclipse.swt.events.TraverseEvent)
-             */
-            @Override
-            public void keyTraversed(TraverseEvent e) {
-                if ((e.detail == SWT.TRAVERSE_TAB_NEXT) || (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)) {
-                    e.doit = true;
-                }
-            }
-
-        });
-
-        addTraverseListener(new TraverseListener() {
-
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.TraverseListener#keyTraversed(org.eclipse.swt.events.TraverseEvent)
-             */
-            @Override
-            public void keyTraversed(TraverseEvent e) {
-                if ((e.detail == SWT.TRAVERSE_TAB_NEXT) || (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)) {
-                    e.doit = true;
-                }
-            }
-
-        });
+        addTraverseListener(new LocalTraverseListener());
 
         getViewControl().addFocusListener(new FocusListener() {
 
@@ -917,15 +891,6 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         super.keyPressedEvent(event);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.ScrollView#keyReleasedEvent(org.eclipse.swt.events.KeyEvent)
-     */
-    @Override
-    protected void keyReleasedEvent(KeyEvent event) {
-        super.keyReleasedEvent(event);
-    }
-
     /**
      * Selects the time delta for given delta y coordinate and direction.
      * 
@@ -1113,6 +1078,23 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
                     fTooltip.showToolTip(delta, fMinTime, fMaxTime);
                     fTooltip.hideToolTip();
                 }
+            }
+        }
+    }
+    
+    /**
+     * Traverse Listener implementation.
+     */
+    protected static class LocalTraverseListener implements TraverseListener {
+
+        /*
+         * (non-Javadoc)
+         * @see org.eclipse.swt.events.TraverseListener#keyTraversed(org.eclipse.swt.events.TraverseEvent)
+         */
+        @Override
+        public void keyTraversed(TraverseEvent e) {
+            if ((e.detail == SWT.TRAVERSE_TAB_NEXT) || (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)) {
+                e.doit = true;
             }
         }
     }

@@ -13,6 +13,7 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
 
 /**
  * The message return graph node implementation.<br>
@@ -81,13 +82,16 @@ public class AsyncMessageReturn extends AsyncMessage {
         if (!isVisible()) {
             return;
         }
+
+        ISDPreferences pref = SDViewPref.getInstance();
+
         fPrefId = ISDPreferences.PREF_ASYNC_MESS_RET;
         int oldStyle = context.getLineStyle();
         // Message return are dashed
         context.setLineStyle(context.getLineDotStyle());
         if (!isSelected()) {
-            context.setBackground(Frame.getUserPref().getBackGroundColor(fPrefId));
-            context.setForeground(Frame.getUserPref().getForeGroundColor(fPrefId));
+            context.setBackground(pref.getBackGroundColor(fPrefId));
+            context.setForeground(pref.getForeGroundColor(fPrefId));
         }
         super.draw(context);
         // restore the context

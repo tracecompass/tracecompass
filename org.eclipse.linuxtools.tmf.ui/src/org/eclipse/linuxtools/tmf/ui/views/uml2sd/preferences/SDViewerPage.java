@@ -104,16 +104,6 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
     protected IntegerFieldEditor fLifelineWidth = null;
 
     // ------------------------------------------------------------------------
-    // Constructors
-    // ------------------------------------------------------------------------
-    /**
-     * Default constructor
-     */
-    public SDViewerPage() {
-        super();
-    }
-
-    // ------------------------------------------------------------------------
     // Methods
     // ------------------------------------------------------------------------
 

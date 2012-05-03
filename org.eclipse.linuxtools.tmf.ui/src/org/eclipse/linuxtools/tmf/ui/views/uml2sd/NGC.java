@@ -13,7 +13,6 @@
  **********************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.uml2sd;
 
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Frame;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IFont;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
@@ -352,8 +351,8 @@ public class NGC implements IGC {
         localWidth = Math.round(localWidth * fView.fZoomValue);
         localHeight = Math.round(localHeight * fView.fZoomValue);
 
-        setForeground(Frame.getUserPref().getForeGroundColorSelection());
-        setBackground(Frame.getUserPref().getBackGroundColorSelection());
+        setForeground(SDViewPref.getInstance().getForeGroundColorSelection());
+        setBackground(SDViewPref.getInstance().getBackGroundColorSelection());
 
         fContext.drawFocus(fView.contentsToViewX(localX - 1), fView.contentsToViewY(localY - 1), localWidth + 3, localHeight + 3);
 
@@ -677,37 +676,42 @@ public class NGC implements IGC {
      */
     @Override
     public void drawTextTruncatedCentred(String name, int xValue, int yValue, int width, int height, boolean trans) {
+        int localX = xValue;
+        int localY = yValue;
+        int localWidth = width;
+        int localHeight = height;
+
         Point tx = fContext.textExtent(name);
-        xValue = Math.round(xValue * fView.fZoomValue);
+        localX = Math.round(localX * fView.fZoomValue);
         int y = 0;
         // Workaround to avoid round problems for some special cases (not very nice)
-        if (yValue != getContentsY()) {
-            yValue = Math.round(yValue * fView.fZoomValue);
-            y = fView.contentsToViewY(yValue);
+        if (localY != getContentsY()) {
+            localY = Math.round(localY * fView.fZoomValue);
+            y = fView.contentsToViewY(localY);
         }
-        width = Math.round(width * fView.fZoomValue);
-        height = Math.round(height * fView.fZoomValue);
-        int x = fView.contentsToViewX(xValue);
-        if (tx.y > height) {
+        localWidth = Math.round(localWidth * fView.fZoomValue);
+        localHeight = Math.round(localHeight * fView.fZoomValue);
+        int x = fView.contentsToViewX(localX);
+        if (tx.y > localHeight) {
             return;
         }
         
         // Adjust height and y
         if (y < -fVisibleScreenBounds) {
-            height = height + y + fVisibleScreenBounds;
+            localHeight = localHeight + y + fVisibleScreenBounds;
             y = -fVisibleScreenBounds;
         }
-        if ((height < -fVisibleScreenBounds) && (y + height < -fVisibleScreenBounds)) {
-            height = -fVisibleScreenBounds;
-        } else if (height + y > fView.getVisibleHeight() + fVisibleScreenBounds) {
-            height = fView.getVisibleHeight() + fVisibleScreenBounds - y;
+        if ((localHeight < -fVisibleScreenBounds) && (y + localHeight < -fVisibleScreenBounds)) {
+            localHeight = -fVisibleScreenBounds;
+        } else if (localHeight + y > fView.getVisibleHeight() + fVisibleScreenBounds) {
+            localHeight = fView.getVisibleHeight() + fVisibleScreenBounds - y;
         }
         
-        if (tx.x <= width) {
-            localDrawText(name, x + 1 + (width - tx.x) / 2, y + 1 + (height - tx.y) / 2, trans);
+        if (tx.x <= localWidth) {
+            localDrawText(name, x + 1 + (localWidth - tx.x) / 2, y + 1 + (localHeight - tx.y) / 2, trans);
         } else {
             String nameToDisplay = name;
-            for (int i = name.length() - 1; i >= 0 && fContext.textExtent(nameToDisplay).x >= width; i--) {
+            for (int i = name.length() - 1; i >= 0 && fContext.textExtent(nameToDisplay).x >= localWidth; i--) {
                 nameToDisplay = name.substring(0, i);
             }
             int dotCount = 0;
@@ -720,7 +724,7 @@ public class NGC implements IGC {
                 buf.append("."); //$NON-NLS-1$
             }
             nameToDisplay = buf.toString();
-            localDrawText(nameToDisplay, x + 1 + (width - fContext.textExtent(nameToDisplay).x) / 2, y + 1 + (height - fContext.textExtent(nameToDisplay).y) / 2, trans);
+            localDrawText(nameToDisplay, x + 1 + (localWidth - fContext.textExtent(nameToDisplay).x) / 2, y + 1 + (localHeight - fContext.textExtent(nameToDisplay).y) / 2, trans);
         }
     }
 
@@ -825,14 +829,19 @@ public class NGC implements IGC {
      */
     @Override
     public void drawArc(int x, int y, int width, int height, int startAngle, int endAngle) {
-        x = Math.round(x * fView.fZoomValue);
-        y = Math.round(y * fView.fZoomValue);
-        width = Math.round(width * fView.fZoomValue);
-        height = Math.round(height * fView.fZoomValue);
-        if (width == 0 || height == 0 || endAngle == 0) {
+        int localX = x;
+        int localY = y;
+        int localWidth = width;
+        int localHeight = height;
+
+        localX = Math.round(localX * fView.fZoomValue);
+        localY = Math.round(localY * fView.fZoomValue);
+        localWidth = Math.round(localWidth * fView.fZoomValue);
+        localHeight = Math.round(localHeight * fView.fZoomValue);
+        if (localWidth == 0 || localHeight == 0 || endAngle == 0) {
             return;
         }
-        fContext.drawArc(fView.contentsToViewX(x), fView.contentsToViewY(y), width, height, startAngle, endAngle);
+        fContext.drawArc(fView.contentsToViewX(localX), fView.contentsToViewY(localY), localWidth, localHeight, startAngle, endAngle);
     }
 
     /*

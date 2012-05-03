@@ -225,7 +225,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
     /**
      * The reorder list when in reorder mode.
      */
-    protected ArrayList<Lifeline[]> fReorderList = null;
+    protected List<Lifeline[]> fReorderList = null;
     /**
      * Flag to specify whether in printing mode or not.
      */
@@ -383,35 +383,9 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         fArrowUpCaretImg = TmfUiPlugin.getDefault().getImageFromPath(ITmfImageConstants.IMG_UI_ARROW_UP_OBJ);
 
         fReorderList = new ArrayList<Lifeline[]>();
-        getViewControl().addTraverseListener(new TraverseListener() {
+        getViewControl().addTraverseListener(new LocalTraverseListener());
 
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.TraverseListener#keyTraversed(org.eclipse.swt.events.TraverseEvent)
-             */
-            @Override
-            public void keyTraversed(TraverseEvent e) {
-                if ((e.detail == SWT.TRAVERSE_TAB_NEXT) || (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)) {
-                    e.doit = true;
-                }
-            }
-
-        });
-
-        addTraverseListener(new TraverseListener() {
-
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.TraverseListener#keyTraversed(org.eclipse.swt.events.TraverseEvent)
-             */
-            @Override
-            public void keyTraversed(TraverseEvent e) {
-                if ((e.detail == SWT.TRAVERSE_TAB_NEXT) || (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)) {
-                    e.doit = true;
-                }
-            }
-
-        });
+        addTraverseListener(new LocalTraverseListener());
 
         getViewControl().addFocusListener(new FocusListener() {
 
@@ -421,7 +395,6 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
              */
             @Override
             public void focusGained(FocusEvent e) {
-                // TODO Auto-generated method stub
                 SDViewPref.getInstance().setNoFocusSelection(false);
                 fCtrlSelection = false;
                 fShiftSelection = false;
@@ -766,7 +739,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * 
      * @return - the re-odered sequence 
      */
-    public ArrayList<Lifeline[]> getLifelineReoderList() {
+    public List<Lifeline[]> getLifelineReoderList() {
         return fReorderList;
     }
 
@@ -997,7 +970,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         fPrinter.startJob(jobName);
         
         GC gc = new GC(fPrinter);
-        Frame.setUserPref(SDViewPref.getInstance());
+//        Frame.setUserPref(SDViewPref.getInstance());
 
         float lastZoom = fZoomValue;
 
@@ -1012,8 +985,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         Metrics.setLifelineFontHeight(context.getFontHeight(SDViewPref.getInstance().getFont(SDViewPref.PREF_LIFELINE)));
         Metrics.setLifelineFontWidth(context.getFontWidth(SDViewPref.getInstance().getFont(SDViewPref.PREF_LIFELINE)));
         Metrics.setLifelineWidth(SDViewPref.getInstance().getLifelineWidth());
-        Metrics.setFrameFontHeight(context.getFontHeight(Frame.getUserPref().getFont(ISDPreferences.PREF_FRAME_NAME)));
-        Metrics.setLifelineHeaderFontHeight(context.getFontHeight(Frame.getUserPref().getFont(ISDPreferences.PREF_LIFELINE_HEADER)));
+        Metrics.setFrameFontHeight(context.getFontHeight(SDViewPref.getInstance().getFont(ISDPreferences.PREF_FRAME_NAME)));
+        Metrics.setLifelineHeaderFontHeight(context.getFontHeight(SDViewPref.getInstance().getFont(ISDPreferences.PREF_LIFELINE_HEADER)));
 
         int syncMessFontH = context.getFontHeight(SDViewPref.getInstance().getFont(SDViewPref.PREF_SYNC_MESS));
         int syncMessRetFontH = context.getFontHeight(SDViewPref.getInstance().getFont(SDViewPref.PREF_SYNC_MESS_RET));
@@ -1045,7 +1018,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         }
         resizeContents(width, height);
 
-        context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_FRAME));
+        context.setBackground(SDViewPref.getInstance().getBackGroundColor(ISDPreferences.PREF_FRAME));
         context.fillRectangle(0, 0, getContentsWidth(), Metrics.FRAME_V_MARGIN);
         context.fillRectangle(0, 0, fFrame.getX(), getContentsHeight());
         context.fillRectangle(fFrame.getX() + fFrame.getWidth() + 1, 0, getContentsWidth() - (fFrame.getX() + fFrame.getWidth() + 1), getContentsHeight());
@@ -1213,7 +1186,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
      * @return the tooltip text.
      */
     protected String getPostfixForTooltip(boolean accessible) {
-        String postfix = "";//$NON-NLS-1$
+        StringBuffer postfix = new StringBuffer();
+//        String postfix = "";//$NON-NLS-1$
         // Determine if the tooltip must show the time difference between the current mouse position and
         // the last selected graphNode
         if ((fCurrentGraphNode != null) && 
@@ -1222,33 +1196,50 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
                 (fCurrentGraphNode != fToolTipNode) && 
                 ((ITimeRange) fToolTipNode).hasTimeInfo() && 
                 ((ITimeRange) fCurrentGraphNode).hasTimeInfo()) {
-            postfix = " -> " + fCurrentGraphNode.getName() + "\n" + SDMessages._138 + " "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
+            postfix.append(" -> "); //$NON-NLS-1$
+            postfix.append(fCurrentGraphNode.getName());
+            postfix.append("\n"); //$NON-NLS-1$
+            postfix.append(SDMessages._138);
+            postfix.append(" "); //$NON-NLS-1$
+            
+//            postfix = " -> " + fCurrentGraphNode.getName() + "\n" + SDMessages._138 + " "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
             
             //double delta = ((ITimeRange)toolTipNode).getLastTime()-((ITimeRange)currentGraphNode).getLastTime();
             ITmfTimestamp firstTime = ((ITimeRange) fCurrentGraphNode).getEndTime();
             ITmfTimestamp lastTime = ((ITimeRange) fToolTipNode).getEndTime();
             TmfTimestamp delta = (TmfTimestamp) lastTime.getDelta(firstTime);
-            postfix += delta.toString();
+            postfix.append(delta.toString());
+
+//            postfix += delta.toString();
         } else {
             if ((fToolTipNode instanceof ITimeRange) && ((ITimeRange) fToolTipNode).hasTimeInfo()) {
-                postfix = "\n";//$NON-NLS-1$
+                postfix.append("\n"); //$NON-NLS-1$
+//                postfix = "\n";//$NON-NLS-1$
                 ITmfTimestamp firstTime = ((ITimeRange) fToolTipNode).getStartTime();
                 ITmfTimestamp lastTime = ((ITimeRange) fToolTipNode).getEndTime();  
                 
                 if (firstTime != null) {
                     if (lastTime != null && firstTime.compareTo(lastTime, true) != 0) {
-                            postfix += "start: " + firstTime + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
-                            postfix += "end: " + lastTime + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
+                        postfix.append("start: "); //$NON-NLS-1$
+                        postfix.append(firstTime.toString());
+                        postfix.append("\n"); //$NON-NLS-1$
+                        postfix.append("end: "); //$NON-NLS-1$ 
+                        postfix.append(lastTime.toString());
+                        postfix.append("\n"); //$NON-NLS-1$
+//                            postfix += "start: " + firstTime + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
+//                            postfix += "end: " + lastTime + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
                         } else {
-                            postfix += firstTime.toString();    
+                            postfix.append(firstTime.toString());
+//                            postfix += firstTime.toString();    
                         }
                     }
                 else if (lastTime != null) {
-                    postfix += lastTime.toString();
+                    postfix.append(lastTime.toString());
+//                    postfix += lastTime.toString();
                 }
             }
         }
-        return postfix;
+        return postfix.toString();
     }
 
     /**
@@ -1317,8 +1308,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         Metrics.setLifelineFontHeight(context.getFontHeight(SDViewPref.getInstance().getFont(SDViewPref.PREF_LIFELINE)));
         Metrics.setLifelineFontWidth(context.getFontWidth(SDViewPref.getInstance().getFont(SDViewPref.PREF_LIFELINE)));
         Metrics.setLifelineWidth(SDViewPref.getInstance().getLifelineWidth());
-        Metrics.setFrameFontHeight(context.getFontHeight(Frame.getUserPref().getFont(ISDPreferences.PREF_FRAME_NAME)));
-        Metrics.setLifelineHeaderFontHeight(context.getFontHeight(Frame.getUserPref().getFont(ISDPreferences.PREF_LIFELINE_HEADER)));
+        Metrics.setFrameFontHeight(context.getFontHeight(SDViewPref.getInstance().getFont(ISDPreferences.PREF_FRAME_NAME)));
+        Metrics.setLifelineHeaderFontHeight(context.getFontHeight(SDViewPref.getInstance().getFont(ISDPreferences.PREF_LIFELINE_HEADER)));
 
         int syncMessFontH = context.getFontHeight(SDViewPref.getInstance().getFont(SDViewPref.PREF_SYNC_MESS));
         int syncMessRetFontH = context.getFontHeight(SDViewPref.getInstance().getFont(SDViewPref.PREF_SYNC_MESS_RET));
@@ -1345,7 +1336,7 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
 
         resizeContents(width, height);
 
-        context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_FRAME));
+        context.setBackground(SDViewPref.getInstance().getBackGroundColor(ISDPreferences.PREF_FRAME));
         context.fillRectangle(0, 0, getContentsWidth(), Metrics.FRAME_V_MARGIN);
         context.fillRectangle(0, 0, fFrame.getX(), getContentsHeight());
         context.fillRectangle(fFrame.getX() + fFrame.getWidth() + 1, 0, getContentsWidth() - (fFrame.getX() + fFrame.getWidth() + 1), getContentsHeight());
@@ -1882,7 +1873,8 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
             gc.dispose();
             return;
         } else {
-            Frame.setUserPref(SDViewPref.getInstance());
+//            Frame.setUserPref(SDViewPref.getInstance());
+            SDViewPref.getInstance();
         }
 
         Rectangle area = getClientArea();
@@ -2112,4 +2104,22 @@ public class SDWidget extends ScrollView implements SelectionListener, IProperty
         }
         return super.getContentsY();
     }
+    
+    /**
+     * Traverse Listener implementation.
+     */
+    protected static class LocalTraverseListener implements TraverseListener {
+
+        /*
+         * (non-Javadoc)
+         * @see org.eclipse.swt.events.TraverseListener#keyTraversed(org.eclipse.swt.events.TraverseEvent)
+         */
+        @Override
+        public void keyTraversed(TraverseEvent e) {
+            if ((e.detail == SWT.TRAVERSE_TAB_NEXT) || (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)) {
+                e.doit = true;
+            }
+        }
+    }
+
 }

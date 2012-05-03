@@ -20,6 +20,7 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IImage;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
 
 /**
  * Lifeline is the UML2 lifeline graphical representation.<br>
@@ -351,25 +352,27 @@ public class Lifeline extends GraphNode {
      * @param context The graphical context.
      */
     protected void drawName(IGC context) {
+        ISDPreferences pref = SDViewPref.getInstance();
+
         int x = getX();
         int y = getY();
         int height = Metrics.getLifelineHeaderFontHeigth() + 2 * Metrics.LIFELINE_HEARDER_TEXT_V_MARGIN;
         int hMargin = Metrics.LIFELINE_VT_MAGIN / 4;// (Metrics.LIFELINE_NAME_H_MARGIN)/2;
 
         context.setLineStyle(context.getLineSolidStyle());
-        context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_LIFELINE_HEADER));
-        context.setForeground(Frame.getUserPref().getForeGroundColor(ISDPreferences.PREF_LIFELINE_HEADER));
-        context.setFont(Frame.getUserPref().getFont(ISDPreferences.PREF_LIFELINE_HEADER));
+        context.setBackground(pref.getBackGroundColor(ISDPreferences.PREF_LIFELINE_HEADER));
+        context.setForeground(pref.getForeGroundColor(ISDPreferences.PREF_LIFELINE_HEADER));
+        context.setFont(pref.getFont(ISDPreferences.PREF_LIFELINE_HEADER));
         if (hMargin >= 0) {
             if (fFrame.getVisibleAreaY() < y - height - hMargin) {
                 context.fillRectangle(x - Metrics.LIFELINE_SPACING / 2 + 1, y - height - hMargin, Metrics.swimmingLaneWidth() - 2, height);
                 context.drawRectangle(x - Metrics.LIFELINE_SPACING / 2 + 1, y - height - hMargin, Metrics.swimmingLaneWidth() - 2, height);
-                context.setForeground(Frame.getUserPref().getFontColor(ISDPreferences.PREF_LIFELINE_HEADER));
+                context.setForeground(pref.getFontColor(ISDPreferences.PREF_LIFELINE_HEADER));
                 context.drawTextTruncatedCentred(getName(), x + Metrics.LIFELINE_NAME_V_MARGIN - Metrics.LIFELINE_SPACING / 2 + 1, y - height - hMargin, Metrics.swimmingLaneWidth() - 2 * Metrics.LIFELINE_NAME_V_MARGIN - 2, height, true);
             } else {
                 context.fillRectangle(x - Metrics.LIFELINE_SPACING / 2 + 1, fFrame.getVisibleAreaY(), Metrics.swimmingLaneWidth() - 2, height);
                 context.drawRectangle(x - Metrics.LIFELINE_SPACING / 2 + 1, fFrame.getVisibleAreaY(), Metrics.swimmingLaneWidth() - 2, height);
-                context.setForeground(Frame.getUserPref().getFontColor(ISDPreferences.PREF_LIFELINE_HEADER));
+                context.setForeground(pref.getFontColor(ISDPreferences.PREF_LIFELINE_HEADER));
                 context.drawTextTruncatedCentred(getName(), x - Metrics.LIFELINE_SPACING / 2 + Metrics.LIFELINE_NAME_V_MARGIN + 1, fFrame.getVisibleAreaY(), Metrics.swimmingLaneWidth() - 2 * Metrics.LIFELINE_NAME_V_MARGIN - 2, height, true);
             }
         }
@@ -383,29 +386,32 @@ public class Lifeline extends GraphNode {
      * @param y - the y coordinate
      */
     public void draw(IGC context, int x, int y) {
+        
+        ISDPreferences pref = SDViewPref.getInstance();
+        
         // Set the draw color depending if the lifeline must be selected or not
         context.setLineWidth(Metrics.NORMAL_LINE_WIDTH);
         if (isSelected()) {
-            if (Frame.getUserPref().useGradienColor()) {
-                context.setGradientColor(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_LIFELINE));
+            if (pref.useGradienColor()) {
+                context.setGradientColor(pref.getBackGroundColor(ISDPreferences.PREF_LIFELINE));
             }
-            context.setBackground(Frame.getUserPref().getBackGroundColorSelection());
-            context.setForeground(Frame.getUserPref().getForeGroundColorSelection());
+            context.setBackground(pref.getBackGroundColorSelection());
+            context.setForeground(pref.getForeGroundColorSelection());
         } else {
-            if (Frame.getUserPref().useGradienColor()) {
-                context.setGradientColor(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_LIFELINE));
-                context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_FRAME));
+            if (pref.useGradienColor()) {
+                context.setGradientColor(pref.getBackGroundColor(ISDPreferences.PREF_LIFELINE));
+                context.setBackground(pref.getBackGroundColor(ISDPreferences.PREF_FRAME));
             } else {
-                context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_LIFELINE));
+                context.setBackground(pref.getBackGroundColor(ISDPreferences.PREF_LIFELINE));
             }
-            context.setForeground(Frame.getUserPref().getForeGroundColor(ISDPreferences.PREF_LIFELINE));
+            context.setForeground(pref.getForeGroundColor(ISDPreferences.PREF_LIFELINE));
         }
         // Store the lifeline coordinates to save some calls
         int width = getWidth();
         int height = getHeight();
 
         // Draw the rectangle which contain the lifeline name
-        if (Frame.getUserPref().useGradienColor()) {
+        if (pref.useGradienColor()) {
             context.fillGradientRectangle(x, y, width, height / 2 - 7, true);
             context.fillRectangle(x, y + height / 2 - 8, width, +height / 2 - 5);
             context.fillGradientRectangle(x, y + height, width, -height / 2 + 6, true);
@@ -427,8 +433,8 @@ public class Lifeline extends GraphNode {
         // Draw the lifeline label into the rectangle
         // The label is truncated if it cannot fit
         IColor temp = context.getForeground();
-        context.setFont(Frame.getUserPref().getFont(ISDPreferences.PREF_LIFELINE));
-        context.setForeground(Frame.getUserPref().getFontColor(ISDPreferences.PREF_LIFELINE));
+        context.setFont(pref.getFont(ISDPreferences.PREF_LIFELINE));
+        context.setForeground(pref.getFontColor(ISDPreferences.PREF_LIFELINE));
         context.drawTextTruncatedCentred(getName(), x + Metrics.LIFELINE_NAME_V_MARGIN, y, Metrics.getLifelineWidth() - 2 * Metrics.LIFELINE_NAME_V_MARGIN, height, true);
 
         context.setLineStyle(context.getLineDashStyle());
@@ -446,10 +452,10 @@ public class Lifeline extends GraphNode {
          */
 
         if (isSelected()) {
-            context.setForeground(Frame.getUserPref().getBackGroundColorSelection());
+            context.setForeground(pref.getBackGroundColorSelection());
             context.setLineWidth(5);
             context.drawLine(x + Metrics.getLifelineWidth() / 2, y + height, x + Metrics.getLifelineWidth() / 2, dashedLineEnd - 4);
-            context.setForeground(Frame.getUserPref().getForeGroundColorSelection());
+            context.setForeground(pref.getForeGroundColorSelection());
         }
 
         context.setLineWidth(Metrics.NORMAL_LINE_WIDTH);

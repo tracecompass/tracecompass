@@ -19,6 +19,7 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.event.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.util.SortSyncMessageComparator;
 
 /**
@@ -252,12 +253,16 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
      */
     @Override
     public void draw(IGC context) {
-        if (!isVisible())
+        if (!isVisible()) {
             return;
+        }
+
+        ISDPreferences pref = SDViewPref.getInstance();
+
         // Draw it selected?
         if (!isSelected()) {
-            context.setBackground(Frame.getUserPref().getBackGroundColor(fPrefId));
-            context.setForeground(Frame.getUserPref().getForeGroundColor(fPrefId));
+            context.setBackground(pref.getBackGroundColor(fPrefId));
+            context.setForeground(pref.getForeGroundColor(fPrefId));
         }
         super.draw(context);
     }

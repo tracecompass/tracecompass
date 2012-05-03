@@ -200,36 +200,7 @@ public class SDView extends ViewPart {
      * Load a blank page that is supposed to explain that a kind of interaction must be chosen.
      */
     protected void loadBlank() {
-        IUml2SDLoader loader = new IUml2SDLoader() {
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader#setViewer(org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView)
-             */
-            @Override
-            public void setViewer(SDView viewer) {
-                // Nothing to do
-                Frame f = new Frame();
-                f.setName(""); //$NON-NLS-1$
-                viewer.setFrame(f);
-            }
-
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader#getTitleString()
-             */
-            @Override
-            public String getTitleString() {
-                return ""; //$NON-NLS-1$
-            }
-
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader#dispose()
-             */
-            @Override
-            public void dispose() {
-            }
-        };
+        IUml2SDLoader loader = new BlankUml2SdLoader(); 
         loader.setViewer(this);
         setContentDescription(loader.getTitleString());
     }
@@ -1087,4 +1058,41 @@ public class SDView extends ViewPart {
 
         return obj;
     }
+    
+    /**
+     * @version 1.0
+     * 
+     * Loader for a blank sequence diagram.
+     * 
+     */
+    public static class BlankUml2SdLoader implements IUml2SDLoader {
+        /*
+         * (non-Javadoc)
+         * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader#setViewer(org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView)
+         */
+        @Override
+        public void setViewer(SDView viewer) {
+            // Nothing to do
+            Frame f = new Frame();
+            f.setName(""); //$NON-NLS-1$
+            viewer.setFrame(f);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader#getTitleString()
+         */
+        @Override
+        public String getTitleString() {
+            return ""; //$NON-NLS-1$
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader#dispose()
+         */
+        @Override
+        public void dispose() {
+        }
+    } 
 }

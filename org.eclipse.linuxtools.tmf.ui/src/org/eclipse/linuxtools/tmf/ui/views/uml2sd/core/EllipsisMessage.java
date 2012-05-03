@@ -16,6 +16,7 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
 
 /**
  * Class to draw Ellipsis Message.
@@ -128,21 +129,25 @@ public class EllipsisMessage extends AsyncMessage {
         if (!isVisible()) {
             return;
         }
+
+        ISDPreferences pref = SDViewPref.getInstance();
+
         // Draw it selected?*/
         if (isSelected()) {
+
             /*
              * Draw it twice First time, bigger inverting selection colors Second time, regular drawing using selection
              * colors This create the highlight effect
              */
-            context.setForeground(Frame.getUserPref().getBackGroundColorSelection());
+            context.setForeground(pref.getBackGroundColorSelection());
             context.setLineWidth(Metrics.SELECTION_LINE_WIDTH);
             drawMessage(context);
-            context.setBackground(Frame.getUserPref().getBackGroundColorSelection());
-            context.setForeground(Frame.getUserPref().getForeGroundColorSelection());
+            context.setBackground(pref.getBackGroundColorSelection());
+            context.setForeground(pref.getForeGroundColorSelection());
             // Second drawing is done after the else
         } else {
-            context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_ASYNC_MESS));
-            context.setForeground(Frame.getUserPref().getForeGroundColor(ISDPreferences.PREF_ASYNC_MESS));
+            context.setBackground(pref.getBackGroundColor(ISDPreferences.PREF_ASYNC_MESS));
+            context.setForeground(pref.getForeGroundColor(ISDPreferences.PREF_ASYNC_MESS));
         }
         if (hasFocus()) {
             context.setDrawTextWithFocusStyle(true);

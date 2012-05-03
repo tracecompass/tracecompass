@@ -16,6 +16,7 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
 
 /**
  * The base UML2 syncMessages implementation.<br>
@@ -434,11 +435,13 @@ public abstract class BaseMessage extends GraphNode {
         int fX, fY, fW, fH;
         fX = fY = fW = fH = 0;
 
-        // temporay store the coordinates to avoid more methods calls
+        // temporary store the coordinates to avoid more methods calls
         int x = getX();
         int y = getY();
         int width = getWidth();
         int height = getHeight();
+
+        ISDPreferences pref = SDViewPref.getInstance();
 
         // UML2 found message (always drawn from left to right)
         // or UML2 lost message (always drawn from left to right)
@@ -447,7 +450,7 @@ public abstract class BaseMessage extends GraphNode {
             // The label is truncated if it cannot fit between the two message end
             // 2*Metrics.MESSAGES_NAME_SPACING = space above the label + space below the label
             IColor temp = context.getForeground();
-            context.setForeground(Frame.getUserPref().getFontColor(fPrefId));
+            context.setForeground(pref.getFontColor(fPrefId));
             context.drawTextTruncatedCentred(getName(), x, y - Metrics.getMessageFontHeigth() - 2 * Metrics.MESSAGES_NAME_SPACING, width, 2 * Metrics.MESSAGES_NAME_SPACING + Metrics.getMessageFontHeigth(), !isSelected());
             context.setForeground(temp);
             int margin = 0;
@@ -491,7 +494,7 @@ public abstract class BaseMessage extends GraphNode {
                 context.fillOval(x + width - ray, y + height - ray, ray * 2, ray * 2);
             }
             context.setBackground(storedColor);
-            context.setForeground(Frame.getUserPref().getFontColor(fPrefId));
+            context.setForeground(pref.getFontColor(fPrefId));
             fX = x;
             fY = y - yt.intValue();
             fW = width;
@@ -552,7 +555,7 @@ public abstract class BaseMessage extends GraphNode {
             // 2*Metrics.MESSAGES_NAME_SPACING = space above the label + space below the label
 
             // the space available for the text is sorter if are drawing internal message on the last lifeline
-            context.setForeground(Frame.getUserPref().getFontColor(fPrefId));
+            context.setForeground(pref.getFontColor(fPrefId));
             if (fStartLifeline.getIndex() == fStartLifeline.getFrame().getHorizontalIndex()) {
                 context.drawTextTruncated(getName(), x + width + Metrics.INTERNAL_MESSAGE_V_MARGIN / 2, y, Metrics.swimmingLaneWidth() / 2 - Metrics.EXECUTION_OCCURRENCE_WIDTH + -Metrics.INTERNAL_MESSAGE_WIDTH, +Metrics.MESSAGES_NAME_SPACING
                         - Metrics.getMessageFontHeigth(), !isSelected());
@@ -617,7 +620,7 @@ public abstract class BaseMessage extends GraphNode {
             // Draw the message label above the message and centered
             // The label is truncated if it cannot fit between the two message end
             // 2*Metrics.MESSAGES_NAME_SPACING = space above the label + space below the label
-            context.setForeground(Frame.getUserPref().getFontColor(fPrefId));
+            context.setForeground(pref.getFontColor(fPrefId));
             if (spaceBTWStartEnd > 0) {
                 context.drawTextTruncatedCentred(getName(), x, y + height / 2 - (2 * Metrics.MESSAGES_NAME_SPACING + Metrics.getMessageFontHeigth()), width, 2 * Metrics.MESSAGES_NAME_SPACING + Metrics.getMessageFontHeigth(), !isSelected());
             } else {
@@ -635,18 +638,19 @@ public abstract class BaseMessage extends GraphNode {
         if (!isVisible()) {
             return;
         }
+        
         // Draw it selected?*/
         if (isSelected()) {
-
+            ISDPreferences pref = SDViewPref.getInstance();
             /*
              * Draw it twice First time, bigger inverting selection colors Second time, regular drawing using selection
              * colors This create the highlight effect
              */
-            context.setForeground(Frame.getUserPref().getBackGroundColorSelection());
+            context.setForeground(pref.getBackGroundColorSelection());
             context.setLineWidth(Metrics.SELECTION_LINE_WIDTH);
             drawMessage(context);
-            context.setBackground(Frame.getUserPref().getBackGroundColorSelection());
-            context.setForeground(Frame.getUserPref().getForeGroundColorSelection());
+            context.setBackground(pref.getBackGroundColorSelection());
+            context.setForeground(pref.getForeGroundColorSelection());
             // Second drawing is done after
         }
         context.setLineWidth(Metrics.NORMAL_LINE_WIDTH);
@@ -727,19 +731,22 @@ public abstract class BaseMessage extends GraphNode {
      */
     @Override
     public void drawFocus(IGC context) {
+
+        ISDPreferences pref = SDViewPref.getInstance();
+
         if ((fStartLifeline != fEndLifeline) && (fStartEventOccurrence == fEndEventOccurrence)) {
             context.setLineStyle(context.getLineDotStyle());
             context.setLineWidth(Metrics.NORMAL_LINE_WIDTH);
-            context.setBackground(Frame.getUserPref().getBackGroundColorSelection());
-            context.setForeground(Frame.getUserPref().getForeGroundColorSelection());
+            context.setBackground(pref.getBackGroundColorSelection());
+            context.setForeground(pref.getForeGroundColorSelection());
             context.drawFocus(getX(), getY() - 3, getWidth(), getHeight() + 6);
         } else if ((fStartLifeline == fEndLifeline) && (fStartEventOccurrence == fEndEventOccurrence)) {
             context.drawFocus(getX(), getY() - 3, getWidth(), Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT + 6);
         } else if ((fStartLifeline != fEndLifeline) && (fStartEventOccurrence != fEndEventOccurrence)) {
             context.setLineStyle(context.getLineDotStyle());
             context.setLineWidth(Metrics.NORMAL_LINE_WIDTH);
-            context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_LIFELINE_HEADER));
-            context.setForeground(Frame.getUserPref().getForeGroundColor(ISDPreferences.PREF_LIFELINE_HEADER));
+            context.setBackground(pref.getBackGroundColor(ISDPreferences.PREF_LIFELINE_HEADER));
+            context.setForeground(pref.getForeGroundColor(ISDPreferences.PREF_LIFELINE_HEADER));
             drawRot(getX(), getY() - 5, getWidth(), 10, context);
         } else {
             super.drawFocus(context);

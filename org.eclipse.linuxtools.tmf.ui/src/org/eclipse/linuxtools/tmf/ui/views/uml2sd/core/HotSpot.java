@@ -16,6 +16,7 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IImage;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
 
 /**
  * Class to add a hot spot marker.
@@ -164,14 +165,16 @@ public class HotSpot extends GraphNode {
     @Override
     public void draw(IGC context) {
 
+        ISDPreferences pref = SDViewPref.getInstance();
+
         // The execution occurrence is selected
         // if the owning lifeline is selected
         if (isSelected() || (fExecOcc != null && fExecOcc.isSelected()) || (fExecOcc != null && fExecOcc.getLifeline() != null && fExecOcc.getLifeline().isSelected())) {
-            context.setBackground(Frame.getUserPref().getBackGroundColorSelection());
-            context.setForeground(Frame.getUserPref().getForeGroundColorSelection());
+            context.setBackground(pref.getBackGroundColorSelection());
+            context.setForeground(pref.getForeGroundColorSelection());
         } else {
-            context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_EXEC));
-            context.setForeground(Frame.getUserPref().getForeGroundColor(ISDPreferences.PREF_EXEC));
+            context.setBackground(pref.getBackGroundColor(ISDPreferences.PREF_EXEC));
+            context.setForeground(pref.getForeGroundColor(ISDPreferences.PREF_EXEC));
         }
         context.drawImage(fImage, getX(), getY(), getWidth(), getHeight());
     }

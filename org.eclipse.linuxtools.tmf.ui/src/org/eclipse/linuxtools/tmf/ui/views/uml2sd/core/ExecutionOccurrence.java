@@ -18,6 +18,7 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IImage;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
 
 /**
  * ExecutionOccurrence is the UML2 execution occurrence graphical representation. It is a BasicExecutionOccurrence on
@@ -204,12 +205,13 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
      */
     @Override
     protected IColor setUnselectedFillColor(IGC context) {
+        ISDPreferences pref = SDViewPref.getInstance();
         if (fFillRGB != null) {
             IColor tempFillColor = context.createColor(fFillRGB[0], fFillRGB[1], fFillRGB[2]);
-            if (Frame.getUserPref().useGradienColor()) {
+            if (pref.useGradienColor()) {
                 context.setGradientColor(tempFillColor);
-                context.setForeground(Frame.getUserPref().getForeGroundColor(ISDPreferences.PREF_EXEC));
-                context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_FRAME));
+                context.setForeground(pref.getForeGroundColor(ISDPreferences.PREF_EXEC));
+                context.setBackground(pref.getBackGroundColor(ISDPreferences.PREF_FRAME));
             } else {
                 context.setBackground(tempFillColor);
             }

@@ -18,9 +18,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.linuxtools.internal.tmf.ui.TmfUiPlugin;
 import org.eclipse.linuxtools.tmf.core.event.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IColor;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
@@ -526,7 +523,7 @@ public class Frame extends BasicFrame {
     @Override
     protected void computeMinMax() {
         List<SDTimeEvent> timeArray = buildTimeArray();
-        if (timeArray == null) {
+        if ((timeArray == null) || timeArray.isEmpty()) {
             return;
         }
         for (int i = 0; i < timeArray.size() - 1; i++) {
@@ -556,6 +553,11 @@ public class Frame extends BasicFrame {
     public boolean findDateBounds(ITmfTimestamp dateToFind, ITimeRange bounds[]) {
         if (hasTimeInfo()) {
             List<SDTimeEvent> timeArray = buildTimeArray();
+
+            if ((timeArray == null) || timeArray.isEmpty()) {
+                return false;
+            }
+
             bounds[0] = null;
             bounds[1] = null;
             for (int i = 0; i < timeArray.size(); i++) {
@@ -654,7 +656,7 @@ public class Frame extends BasicFrame {
         
         if (fHighlightLifeline != null) {
             IColor backupColor = context.getBackground();
-            context.setBackground(Frame.getUserPref().getTimeCompressionSelectionColor());
+            context.setBackground(SDViewPref.getInstance().getTimeCompressionSelectionColor());
             int gy = fHighlightLifeline.getY() + fHighlightLifeline.getHeight() + (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fStartEvent;
             context.fillRectangle(Metrics.FRAME_H_MARGIN + 1, gy, fHighlightLifeline.getX() + Metrics.getLifelineWidth() / 2 - Metrics.FRAME_H_MARGIN, (Metrics.getMessageFontHeigth() + Metrics.getMessagesSpacing()) * fNbEvent);
             context.setBackground(backupColor);
@@ -689,7 +691,7 @@ public class Frame extends BasicFrame {
                             int tempEvent = fStartEvent;
                             for (int j = 0; j < fNbEvent; j++) {
                                 if (((tempEvent >= exec.fStartEventOccurrence) && (tempEvent <= exec.fEndEventOccurrence) && (tempEvent + 1 >= exec.fStartEventOccurrence) && (tempEvent + 1 <= exec.fEndEventOccurrence))) {
-                                    toDraw.highlightExecOccurrenceRegion(context, tempEvent, 1, Frame.getUserPref().getTimeCompressionSelectionColor());
+                                    toDraw.highlightExecOccurrenceRegion(context, tempEvent, 1, SDViewPref.getInstance().getTimeCompressionSelectionColor());
                                 }
                                 tempEvent = tempEvent + 1;
                             }
@@ -711,55 +713,51 @@ public class Frame extends BasicFrame {
      */
     @Override
     protected List<SDTimeEvent> buildTimeArray() {
+
         if (!fHasChilden) {
-            return null;
+            return new ArrayList<SDTimeEvent>();
         }
-        try {
-            List<SDTimeEvent> timeArray = super.buildTimeArray();
-            fExecutionOccurrencesWithTime = null;
-            if (getLifelines() != null) {
-                for (int i = 0; i < ((List<GraphNode>) fNodes.get(Lifeline.LIFELINE_TAG)).size(); i++) {
-                    Lifeline l = (Lifeline) ((List<GraphNode>) fNodes.get(Lifeline.LIFELINE_TAG)).get(i);
-                    if (l.hasTimeInfo() && l.getExecutions() != null) {
-                        for (Iterator<GraphNode> j = l.getExecutions().iterator(); j.hasNext();) {
-                            GraphNode o = j.next();
-                            if (o instanceof ExecutionOccurrence) {
-                                ExecutionOccurrence eo = (ExecutionOccurrence) o;
-                                if (eo.hasTimeInfo()) {
-                                    int event = eo.getStartOccurrence();
-                                    ITmfTimestamp time = eo.getStartTime();
-                                    SDTimeEvent f = new SDTimeEvent(time, event, eo);
-                                    timeArray.add(f);
-                                    if (fExecutionOccurrencesWithTime == null) {
-                                        fExecutionOccurrencesWithTime = new ArrayList<SDTimeEvent>();
-                                    }
-                                    fExecutionOccurrencesWithTime.add(f);
-                                    event = eo.getEndOccurrence();
-                                    time = eo.getEndTime();
-                                    f = new SDTimeEvent(time, event, eo);
-                                    timeArray.add(f);
-                                    fExecutionOccurrencesWithTime.add(f);
+
+        List<SDTimeEvent> timeArray = super.buildTimeArray();
+        fExecutionOccurrencesWithTime = null;
+        if (getLifelines() != null) {
+            for (int i = 0; i < ((List<GraphNode>) fNodes.get(Lifeline.LIFELINE_TAG)).size(); i++) {
+                Lifeline lifeline = (Lifeline) ((List<GraphNode>) fNodes.get(Lifeline.LIFELINE_TAG)).get(i);
+                if (lifeline.hasTimeInfo() && lifeline.getExecutions() != null) {
+                    for (Iterator<GraphNode> j = lifeline.getExecutions().iterator(); j.hasNext();) {
+                        GraphNode o = j.next();
+                        if (o instanceof ExecutionOccurrence) {
+                            ExecutionOccurrence eo = (ExecutionOccurrence) o;
+                            if (eo.hasTimeInfo()) {
+                                int event = eo.getStartOccurrence();
+                                ITmfTimestamp time = eo.getStartTime();
+                                SDTimeEvent f = new SDTimeEvent(time, event, eo);
+                                timeArray.add(f);
+                                if (fExecutionOccurrencesWithTime == null) {
+                                    fExecutionOccurrencesWithTime = new ArrayList<SDTimeEvent>();
                                 }
+                                fExecutionOccurrencesWithTime.add(f);
+                                event = eo.getEndOccurrence();
+                                time = eo.getEndTime();
+                                f = new SDTimeEvent(time, event, eo);
+                                timeArray.add(f);
+                                fExecutionOccurrencesWithTime.add(f);
                             }
                         }
                     }
                 }
             }
-
-            if (fExecutionOccurrencesWithTime != null) {
-                SDTimeEvent[] temp = fExecutionOccurrencesWithTime.toArray(new SDTimeEvent[fExecutionOccurrencesWithTime.size()]);
-                Arrays.sort(temp, new TimeEventComparator());
-                fExecutionOccurrencesWithTime = Arrays.asList(temp);
-            }
-            SDTimeEvent[] temp = timeArray.toArray(new SDTimeEvent[timeArray.size()]);
-            Arrays.sort(temp, new TimeEventComparator());
-            timeArray = Arrays.asList(temp);
-            return timeArray;
-        } catch (Exception e) {
-            TmfUiPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, TmfUiPlugin.PLUGIN_ID, "Error building time array", e )); //$NON-NLS-1$
-            return null;
         }
 
+        if (fExecutionOccurrencesWithTime != null) {
+            SDTimeEvent[] temp = fExecutionOccurrencesWithTime.toArray(new SDTimeEvent[fExecutionOccurrencesWithTime.size()]);
+            Arrays.sort(temp, new TimeEventComparator());
+            fExecutionOccurrencesWithTime = Arrays.asList(temp);
+        }
+        SDTimeEvent[] temp = timeArray.toArray(new SDTimeEvent[timeArray.size()]);
+        Arrays.sort(temp, new TimeEventComparator());
+        timeArray = Arrays.asList(temp);
+        return timeArray;
     }
 
     /**
@@ -776,7 +774,7 @@ public class Frame extends BasicFrame {
             return null;
         }
 
-        if (smallerEvent == false) {
+        if (!smallerEvent) {
             int event = 0;
             if (message != null) {
                 event = message.getEventOccurrence();

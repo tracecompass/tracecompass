@@ -77,7 +77,7 @@ public class LoadersManager {
     /**
      * This should not be used by the clients
      */
-    private LoadersManager() {
+    protected LoadersManager() {
     }
 
     // ------------------------------------------------------------------------

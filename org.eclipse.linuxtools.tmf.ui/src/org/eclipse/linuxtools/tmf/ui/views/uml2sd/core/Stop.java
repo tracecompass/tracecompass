@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.tmf.ui.views.uml2sd.core;
 
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.drawings.IGC;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.ISDPreferences;
+import org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewPref;
 
 /**
  * <p>
@@ -126,9 +127,12 @@ public class Stop extends GraphNode {
      */
     @Override
     public void draw(IGC context) {
+
+        ISDPreferences pref = SDViewPref.getInstance();
+
         // Set the appropriate color depending if the graph node if selected or not
         if (fLifeline.isSelected()) {
-            context.setForeground(Frame.getUserPref().getBackGroundColorSelection());
+            context.setForeground(pref.getBackGroundColorSelection());
             context.setLineWidth(Metrics.SELECTION_LINE_WIDTH);
             int lastWidth = context.getLineWidth();
             context.setLineWidth(9);
@@ -137,11 +141,11 @@ public class Stop extends GraphNode {
             context.drawLine(getX() + getWidth(), getY(), getX(), getY() + getHeight());
             // restore the context
             context.setLineWidth(lastWidth);
-            context.setBackground(Frame.getUserPref().getBackGroundColorSelection());
-            context.setForeground(Frame.getUserPref().getForeGroundColorSelection());
+            context.setBackground(pref.getBackGroundColorSelection());
+            context.setForeground(pref.getForeGroundColorSelection());
         } else {
-            context.setBackground(Frame.getUserPref().getBackGroundColor(ISDPreferences.PREF_LIFELINE));
-            context.setForeground(Frame.getUserPref().getForeGroundColor(ISDPreferences.PREF_LIFELINE));
+            context.setBackground(pref.getBackGroundColor(ISDPreferences.PREF_LIFELINE));
+            context.setForeground(pref.getForeGroundColor(ISDPreferences.PREF_LIFELINE));
         }
         int lastWidth = context.getLineWidth();
         context.setLineWidth(3);

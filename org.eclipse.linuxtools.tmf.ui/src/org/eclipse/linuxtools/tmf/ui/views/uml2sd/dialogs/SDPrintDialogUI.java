@@ -381,8 +381,6 @@ public class SDPrintDialogUI {
             if (!isEnabled()) {
                 Image toDel = d;
                 d = new Image(super.getShell().getDisplay(), drawRegionSelected(d, new Rectangle(0, 0, lw, lh), new RGB(221, 208, 200)));
-                // d, new Rectangle(0,0,((int)(stepX*overviewCanvas.zoomValue)),((int)(
-                // stepY*overviewCanvas.zoomValue))),new RGB(221,208,200)));
                 toDel.dispose();
             }
 
@@ -629,6 +627,22 @@ public class SDPrintDialogUI {
 
     }
 
+    /**
+     * A traverse listener implementation.
+     */
+    protected static class LocalTraverseListener implements TraverseListener {
+        /*
+         * (non-Javadoc)
+         * @see org.eclipse.swt.events.TraverseListener#keyTraversed(org.eclipse.swt.events.TraverseEvent)
+         */
+        @Override
+        public void keyTraversed(TraverseEvent e) {
+            if ((e.detail == SWT.TRAVERSE_TAB_NEXT) || (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)) {
+                e.doit = true;
+            }
+        }
+    }
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -687,7 +701,7 @@ public class SDPrintDialogUI {
                         fCurrentPage.setSelection(false);
                         fAllPages.setSelection(true);
                     }
-                    if (fVertPagesNum.getText() == "") { //$NON-NLS-1$
+                    if ("".equals(fVertPagesNum.getText())) { //$NON-NLS-1$
                         fVertPagesNum.setText("1"); //$NON-NLS-1$
                     }
                 }
@@ -829,10 +843,7 @@ public class SDPrintDialogUI {
         data2.verticalSpan = 1;
 
         fOverviewCanvas = new LocalSD(g2, SWT.NO_BACKGROUND);
-        GridData seqDiagLayoutData = new GridData(GridData.HORIZONTAL_ALIGN_FILL// |GridData.GRAB_HORIZONTAL|
-                /* GridData.GRAB_VERTICAL| */| GridData.VERTICAL_ALIGN_FILL);
-        // seqDiagLayoutData.widthHint=400;
-        // seqDiagLayoutData.horizontalAlignment=GridData.HORIZONTAL_ALIGN_FILL;
+        GridData seqDiagLayoutData = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_FILL);
         fOverviewCanvas.setLayoutData(seqDiagLayoutData);
         // overviewCanvas.resizeContents(100,100);
         if (fSdView.getContentsWidth() < fSdView.getVisibleWidth() && fSdView.getContentsHeight() < fSdView.getVisibleHeight()) {
@@ -949,18 +960,7 @@ public class SDPrintDialogUI {
 
         });
 
-        fOverviewCanvas.addTraverseListener(new TraverseListener() {
-            /*
-             * (non-Javadoc)
-             * @see org.eclipse.swt.events.TraverseListener#keyTraversed(org.eclipse.swt.events.TraverseEvent)
-             */
-            @Override
-            public void keyTraversed(TraverseEvent e) {
-                if ((e.detail == SWT.TRAVERSE_TAB_NEXT) || (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)) {
-                    e.doit = true;
-                }
-            }
-        });
+        fOverviewCanvas.addTraverseListener(new LocalTraverseListener());
 
         fOverviewCanvas.addFocusListener(new FocusListener() {
             /*
@@ -1004,7 +1004,6 @@ public class SDPrintDialogUI {
                  */
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-
                     printButtonSelected();
                 }
 
@@ -1164,7 +1163,7 @@ public class SDPrintDialogUI {
         if ((fSdView.getVisibleWidth() > fSdView.getContentsWidth()) && (fSetVPagesNumber.getSelection() || fSetHPagesNumber.getSelection())) {
             rat = (float) fSdView.getVisibleWidth() / (float) fSdView.getContentsWidth();
         }
-        fZoomFactor = (fOverviewCanvas.getContentsWidth() / cw) / fOverviewCanvas.getZoomFactor() * rat;// /view.getZoomFactor();
+        fZoomFactor = (fOverviewCanvas.getContentsWidth() / cw) / fOverviewCanvas.getZoomFactor() * rat;
     }
 
     /**
