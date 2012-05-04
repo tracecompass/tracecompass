@@ -13,7 +13,6 @@
 package org.eclipse.linuxtools.internal.tmf.core.statesystem;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -67,10 +66,8 @@ public class StateHistorySystem extends StateSystem implements
             attributeTree = new AttributeTree(this);
         } else {
             /* We're opening an existing file */
-            FileInputStream attributeTreeInput = backend.supplyAttributeTreeReader();
-            this.attributeTree = new AttributeTree(this, attributeTreeInput);
+            this.attributeTree = new AttributeTree(this, backend.supplyAttributeTreeReader());
             transState.setInactive();
-            attributeTreeInput.close();
         }
     }
 
