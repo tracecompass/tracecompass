@@ -32,6 +32,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -72,6 +74,9 @@ public class TimeGraphCombo extends Composite {
 
     // Number of filler rows used by the tree content provider
     private static int fNumFillerRows;
+
+    // Calculated item height for Linux workaround
+    private int fLinuxItemHeight = 0;
 
     // ------------------------------------------------------------------------
     // Classes
@@ -230,7 +235,7 @@ public class TimeGraphCombo extends Composite {
         tree.setLinesVisible(true);
 
         fTimeGraphViewer = new TimeGraphViewer(sash, SWT.NONE);
-        fTimeGraphViewer.setItemHeight(tree.getItemHeight() + getTreeItemHeightAdjustement());
+        fTimeGraphViewer.setItemHeight(getItemHeight(tree));
         fTimeGraphViewer.setHeaderHeight(tree.getHeaderHeight());
         fTimeGraphViewer.setBorderWidth(tree.getBorderWidth());
         fTimeGraphViewer.setNameWidthPref(0);
@@ -317,7 +322,7 @@ public class TimeGraphCombo extends Composite {
                     event.doit = false;
                 } else if (event.keyCode == SWT.PAGE_DOWN) {
                     int height = tree.getSize().y - tree.getHeaderHeight() - tree.getHorizontalBar().getSize().y;
-                    int countPerPage = height / (tree.getItemHeight() + getTreeItemHeightAdjustement());
+                    int countPerPage = height / getItemHeight(tree);
                     int index = Math.min(fTimeGraphViewer.getSelectionIndex() + countPerPage - 1, treeItems.size() - 1);
                     fTimeGraphViewer.setSelection((ITimeGraphEntry) treeItems.get(index).getData());
                     event.doit = false;
@@ -398,7 +403,7 @@ public class TimeGraphCombo extends Composite {
             }
         });
 
-        fNumFillerRows = Display.getDefault().getBounds().height / (tree.getItemHeight() + getTreeItemHeightAdjustement());
+        fNumFillerRows = Display.getDefault().getBounds().height / getItemHeight(tree);
 
         sash.setWeights(new int[] { 1, 1 });
     }
@@ -454,25 +459,37 @@ public class TimeGraphCombo extends Composite {
     // Internal
     // ------------------------------------------------------------------------
 
-    /*
-     * SWT doesn't seem to report correctly the tree item height, at least in
-     * the case of KDE.
-     * 
-     * This method provides an adjustment term according to the desktop session.
-     * 
-     * @return Height adjustment 
-     */
-    private int getTreeItemHeightAdjustement() {
-        int ajustement = 0;
-        String desktopSession = System.getenv("DESKTOP_SESSION"); //$NON-NLS-1$
-
-        if (desktopSession != null) {
-            if (desktopSession.equals("kde")) { //$NON-NLS-1$
-                ajustement = 2;
+    public int getItemHeight(final Tree tree) {
+        /*
+         * Bug in Linux.  The method getItemHeight doesn't always return the correct value.
+         */
+        if (fLinuxItemHeight >= 0 && System.getProperty("os.name").contains("Linux")) { //$NON-NLS-1$ //$NON-NLS-2$
+            if (fLinuxItemHeight != 0) {
+                return fLinuxItemHeight;
             }
+            ArrayList<TreeItem> treeItems = getVisibleExpandedItems(tree);
+            if (treeItems.size() > 1) {
+                final TreeItem treeItem0 = treeItems.get(0);
+                final TreeItem treeItem1 = treeItems.get(1);
+                PaintListener paintListener = new PaintListener() {
+                    @Override
+                    public void paintControl(PaintEvent e) {
+                        tree.removePaintListener(this);
+                        int y0 = treeItem0.getBounds().y;
+                        int y1 = treeItem1.getBounds().y;
+                        int itemHeight = y1 - y0;
+                        if (itemHeight > 0) {
+                            fLinuxItemHeight = itemHeight;
+                            fTimeGraphViewer.setItemHeight(itemHeight);
+                        }
+                    }
+                };
+                tree.addPaintListener(paintListener);
+            }
+        } else {
+            fLinuxItemHeight = -1; // Not Linux, don't perform os.name check anymore
         }
-
-        return ajustement;
+        return tree.getItemHeight();
     }
 
     // ------------------------------------------------------------------------
@@ -531,6 +548,7 @@ public class TimeGraphCombo extends Composite {
         fTreeViewer.expandAll();
         fTreeViewer.getTree().getVerticalBar().setEnabled(false);
         fTreeViewer.getTree().getVerticalBar().setVisible(false);
+        fTimeGraphViewer.setItemHeight(getItemHeight(fTreeViewer.getTree()));
         fTimeGraphViewer.setInput(input);
     }
 
